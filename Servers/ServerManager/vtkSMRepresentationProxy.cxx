@@ -20,7 +20,7 @@
 #include "vtkInformation.h"
 #include "vtkPVDataInformation.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMRepresentationProxy, "1.10");
 vtkCxxSetObjectMacro(vtkSMRepresentationProxy, ViewInformation, vtkInformation);
 //----------------------------------------------------------------------------
 vtkSMRepresentationProxy::vtkSMRepresentationProxy()
@@ -80,6 +80,12 @@ bool vtkSMRepresentationProxy::GetBounds(double bounds[6])
     return false;
     }
   info->GetBounds(bounds);
+  
+  if(bounds[1] < bounds[0])
+    {
+    return false;
+    }
+
   return true;
 }
 
