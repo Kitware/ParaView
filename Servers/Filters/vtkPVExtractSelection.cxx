@@ -26,8 +26,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSelection.h"
+#include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.8");
+#include <vtkstd/vector>
+
+class vtkPVExtractSelection::vtkSelectionVector : 
+  public vtkstd::vector<vtkSmartPointer<vtkSelection> >
+{
+};
+
+
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.9");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -122,6 +131,7 @@ int vtkPVExtractSelection::RequestData(
     return 1;
     }
 
+  vtkSelectionVector oVector;
   if (cdOutput)
     {
     // For composite datasets, the output of this filter is
@@ -130,7 +140,6 @@ int vtkPVExtractSelection::RequestData(
     // HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on each of the
     // vtkSelection instances correctly to help identify the block they came
     // from.
-    output->SetContentType(vtkSelection::SELECTIONS);
     vtkCompositeDataIterator* iter = cdInput->NewIterator();
     vtkHierarchicalBoxDataIterator* hbIter = 
       vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
@@ -148,16 +157,18 @@ int vtkPVExtractSelection::RequestData(
       geomOutput = vtkDataSet::SafeDownCast(cdOutput->GetDataSet(iter));
       if (curSel && geomOutput)
         {
-        vtkSelection* outputChild = this->RequestDataInternal(
-          geomOutput, curSel);
-        if (outputChild)
+        vtkSelectionVector curOVector;
+        vtkSelectionVector::iterator viter;
+
+        this->RequestDataInternal(curOVector, geomOutput, curSel);
+
+        for (viter = curOVector.begin(); viter != curOVector.end(); ++viter)
           {
           // RequestDataInternal() will not set COMPOSITE_INDEX() for
           // hierarchical datasets.
-          outputChild->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
+          viter->GetPointer()->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
             iter->GetCurrentFlatIndex());
-          output->AddChild(outputChild);
-          outputChild->Delete();
+          oVector.push_back(viter->GetPointer());
           }
         }
       }
@@ -165,10 +176,22 @@ int vtkPVExtractSelection::RequestData(
     }
   else if (geomOutput)
     {
-    vtkSelection* child = this->RequestDataInternal(
-      geomOutput, sel);
-    output->ShallowCopy(child);
-    child->Delete();
+    this->RequestDataInternal(oVector, geomOutput, sel);
+    }
+
+
+  if (oVector.size() == 1)
+    {
+    output->ShallowCopy(oVector[0]);
+    }
+  else if (oVector.size() > 1)
+    {
+    output->SetContentType(vtkSelection::SELECTIONS);
+    vtkSelectionVector::iterator iter;
+    for (iter = oVector.begin(); iter != oVector.end(); ++iter)
+      {
+      output->AddChild(iter->GetPointer());
+      }
     }
 
   return 1;
@@ -242,13 +265,10 @@ vtkSelection* vtkPVExtractSelection::LocateSelection(unsigned int composite_inde
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVExtractSelection::RequestDataInternal(
+void vtkPVExtractSelection::RequestDataInternal(vtkSelectionVector& outputs,
   vtkDataSet* geomOutput, vtkSelection* sel)
 {
-  vtkSelection* output = vtkSelection::New();
-  output->Clear();
-  output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
-  output->SetContentType(vtkSelection::INDICES);
+  // DON'T CLEAR THE outputs.
 
   int ft = vtkSelection::CELL;
   if (sel && sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
@@ -256,26 +276,37 @@ vtkSelection* vtkPVExtractSelection::RequestDataInternal(
     ft = sel->GetProperties()->Get(vtkSelection::FIELD_TYPE());
     }
 
-  vtkIdTypeArray *oids=0;
-  if (geomOutput)
+  if (geomOutput && ft == vtkSelection::CELL)
     {
-    if (ft == vtkSelection::CELL)
+    vtkSelection* output = vtkSelection::New();
+    output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
+    output->SetContentType(vtkSelection::INDICES);
+    vtkIdTypeArray *oids = vtkIdTypeArray::SafeDownCast(
+      geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
+    if (oids)
       {
-      oids = vtkIdTypeArray::SafeDownCast(
-        geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
+      output->SetSelectionList(oids);
+      outputs.push_back(output);
       }
-    else
-      {
-      oids = vtkIdTypeArray::SafeDownCast(
-        geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
-      }
-    }
-  if (oids)
-    {
-    output->SetSelectionList(oids);
+    output->Delete();
     }
 
-  return output;
+  // no else, since original point indices are always passed.
+  if (geomOutput)
+    {
+    vtkSelection* output = vtkSelection::New();
+    output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
+    output->SetFieldType(vtkSelection::POINT);
+    output->SetContentType(vtkSelection::INDICES);
+    vtkIdTypeArray* oids = vtkIdTypeArray::SafeDownCast(
+      geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
+    if (oids)
+      {
+      output->SetSelectionList(oids);
+      outputs.push_back(output);
+      }
+    output->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

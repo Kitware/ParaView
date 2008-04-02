@@ -51,13 +51,13 @@ public:
   // Description:
   // In case of Composite datasets, set the flat index of the dataset to pass.
   // The flat index must point to a non-empty, non-composite dataset or a
-  // non-empty multipiece dataset for anything to be passed through. 
+  // non-empty multipiece dataset for anything to be passed through.
   // If the input is not a composite dataset, then this index is ignored.
   // If FieldType is FIELD then the CompositeDataSetIndex cannot be
   // vtkMultiPieceDataSet, it has to be a vtkDataSet.
   void SetCompositeDataSetIndex(unsigned int);
   unsigned int GetCompositeDataSetIndex();
-  
+
   // Description:
   // Get/Set the MPI controller used for gathering.
   void SetController(vtkMultiProcessController*);
@@ -81,8 +81,8 @@ protected:
   // to do its work. This is the method you should override to do whatever the
   // algorithm is designed to do. This happens during the fourth pass in the
   // pipeline execution process.
-  virtual int RequestData(vtkInformation*, 
-                          vtkInformationVector**, 
+  virtual int RequestData(vtkInformation*,
+                          vtkInformationVector**,
                           vtkInformationVector*);
 
   int RequestDataInternal(
@@ -95,7 +95,8 @@ protected:
     vtkSelection* output, vtkMultiPieceDataSet* pieces);
 
   bool DetermineBlockIndices(vtkMultiPieceDataSet* input);
-  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel, 
+  vtkSelection* LocateSelection(int fieldType,
+    unsigned int composite_index, vtkSelection* sel,
     vtkDataObject* inputDO);
 
   vtkIndexBasedBlockFilter* BlockFilter;
