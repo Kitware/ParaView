@@ -22,7 +22,7 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.4");
+vtkCxxRevisionMacro(vtkPVImageSlicer, "1.5");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {
@@ -142,7 +142,12 @@ int vtkPVImageSlicer::RequestData(
   voi->SetVOI(outWholeExt);
   voi->SetInput(clone);
   voi->Update();
+
   output->ShallowCopy(voi->GetOutput());
+  // vtkExtractVOI is not passing correct origin. Until that's fixed, I
+  // will just use the input origin/spacing to compute the bounds.
+  output->SetOrigin(input->GetOrigin());
+
   voi->Delete();
   clone->Delete();
   return 1;
