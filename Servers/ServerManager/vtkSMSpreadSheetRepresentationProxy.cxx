@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
@@ -62,7 +62,7 @@ bool vtkSMSpreadSheetRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
 
-  this->SelectionRepresentation = 
+  this->SelectionRepresentation =
     vtkSMBlockDeliveryRepresentationProxy::SafeDownCast(
       this->GetSubProxy("SelectionRepresentation"));
   if (!this->SelectionRepresentation)
@@ -72,12 +72,12 @@ bool vtkSMSpreadSheetRepresentationProxy::BeginCreateVTKObjects()
     }
 
   // Relay StartEvent|EndEvent fired by the internal selection representation.
-  vtkCommand* adapter = vtkMakeMemberFunctionCommand(*this, 
+  vtkCommand* adapter = vtkMakeMemberFunctionCommand(*this,
     &vtkSMSpreadSheetRepresentationProxy::InvokeStartEvent);
   this->SelectionRepresentation->AddObserver(vtkCommand::StartEvent, adapter);
   adapter->Delete();
 
-  adapter = vtkMakeMemberFunctionCommand(*this, 
+  adapter = vtkMakeMemberFunctionCommand(*this,
     &vtkSMSpreadSheetRepresentationProxy::InvokeEndEvent);
   this->SelectionRepresentation->AddObserver(vtkCommand::EndEvent, adapter);
   adapter->Delete();
@@ -101,7 +101,7 @@ bool vtkSMSpreadSheetRepresentationProxy::CreatePipeline(
     }
 
   // Connect the selection output from the input to the SelectionRepresentation.
-  
+
   // Ensure that the source proxy has created extract selection filters.
   input->CreateSelectionProxies();
 
@@ -127,7 +127,7 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
 
   // Pass essential properties to the selection representation
   // such as "BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex".
-  const char* pnames[] = 
+  const char* pnames[] =
     {"BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex", 0};
   for (int cc=0; pnames[cc]; cc++)
     {
@@ -135,8 +135,8 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
     vtkSMProperty* dest = this->SelectionRepresentation->GetProperty(pnames[cc]);
     if (src->GetMTime() > dest->GetMTime())
       {
-      // Otherwise Copy() call Modified() every time and the spreadsheet view 
-      // then needs to update everything since is thinks a property on the 
+      // Otherwise Copy() call Modified() every time and the spreadsheet view
+      // then needs to update everything since is thinks a property on the
       // repsentation has changed.
       dest->Copy(src);
       this->SelectionRepresentation->UpdateProperty(pnames[cc]);
@@ -162,7 +162,7 @@ void vtkSMSpreadSheetRepresentationProxy::Update(vtkSMViewProxy* view)
       }
     else
       {
-      this->Connect(this->GetInputProxy(), 
+      this->Connect(this->GetInputProxy(),
         this->UpdateStrategy, "Input", this->OutputPort);
       }
 
@@ -192,7 +192,7 @@ bool vtkSMSpreadSheetRepresentationProxy::IsSelectionAvailable(vtkIdType blockid
 //----------------------------------------------------------------------------
 vtkIdType vtkSMSpreadSheetRepresentationProxy::GetMaximumNumberOfItems()
 {
-  vtkPVDataInformation* info = 
+  vtkPVDataInformation* info =
     this->SelectionOnly?
     this->GetInputProxy()->GetSelectionOutput(this->OutputPort)->GetDataInformation(0, false):
     this->GetInputProxy()->GetDataInformation(this->OutputPort, false);
@@ -211,8 +211,14 @@ vtkIdType vtkSMSpreadSheetRepresentationProxy::GetMaximumNumberOfItems()
 
   if (!info)
     {
-    vtkErrorMacro("Failed to locate composite information for "
+    /*
+     * Don't raise an error here since when the spreadsheet view is in selection
+     * only mode and nothing is selected, we would indeed get empty data
+     * information.
+
+     vtkErrorMacro("Failed to locate composite information for "
       << this->CompositeDataSetIndex);
+    */
     return 0;
     }
 
