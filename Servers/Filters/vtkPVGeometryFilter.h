@@ -182,8 +182,6 @@ private:
   void AddCompositeIndex(vtkPolyData* pd, unsigned int index);
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
 
-
-  int GenerateGroupScalars;
   unsigned int CompositeIndex;
 };
 

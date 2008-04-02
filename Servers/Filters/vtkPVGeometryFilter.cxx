@@ -53,7 +53,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnsignedIntArray.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.78");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.79");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -80,7 +80,6 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
 
   this->OutlineSource = vtkOutlineSource::New();
 
-  this->GenerateGroupScalars = 0;
   this->CompositeIndex = 0;
 
   this->PassThroughCellIds = 1;
@@ -301,13 +300,11 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     }
 
   vtkAppendPolyData* append = vtkAppendPolyData::New();
-  this->GenerateGroupScalars = 1;
   int numInputs = 0;
 
   int retVal = 0;
   if (this->ExecuteCompositeDataSet(mgInput, append, numInputs))
     {
-    this->GenerateGroupScalars = 0;
     if (numInputs > 0)
       {
       append->Update();
@@ -573,20 +570,6 @@ void vtkPVGeometryFilter::DataSetExecute(
     
       output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
       output->SetLines(this->OutlineSource->GetOutput()->GetLines());
-
-      if (this->GenerateGroupScalars)
-        {
-        vtkFloatArray* newArray = vtkFloatArray::New();
-        vtkIdType numCells = output->GetNumberOfCells();
-        newArray->SetNumberOfTuples(numCells);
-        for(vtkIdType cellId=0; cellId<numCells; cellId++)
-          {
-          newArray->SetValue(cellId, this->CompositeIndex);
-          }
-        newArray->SetName("GroupScalars");
-        output->GetCellData()->SetScalars(newArray);
-        newArray->Delete();
-        }
       }
     }
 }
@@ -775,20 +758,6 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
     outline->Delete();
-
-    if (this->GenerateGroupScalars)
-      {
-      vtkFloatArray* newArray = vtkFloatArray::New();
-      vtkIdType numCells = output->GetNumberOfCells();
-      newArray->SetNumberOfTuples(numCells);
-      for(vtkIdType cellId=0; cellId<numCells; cellId++)
-        {
-        newArray->SetValue(cellId, this->CompositeIndex);
-        }
-      newArray->SetName("GroupScalars");
-      output->GetCellData()->SetScalars(newArray);
-      newArray->Delete();
-      }
     }
   else
     {
