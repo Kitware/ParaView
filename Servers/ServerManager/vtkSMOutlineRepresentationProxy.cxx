@@ -31,7 +31,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -157,11 +157,11 @@ void vtkSMOutlineRepresentationProxy::SetColorAttributeType(int type)
   switch (type)
     {
   case POINT_DATA:
-    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_DATA); 
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
     break;
 
   case CELL_DATA:
-    ivp->SetElement(0,  VTK_SCALAR_MODE_USE_CELL_DATA);
+    ivp->SetElement(0,  VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
     break;
 
   case FIELD_DATA:
