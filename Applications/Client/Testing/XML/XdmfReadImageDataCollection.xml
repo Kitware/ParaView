@@ -8,4 +8,6 @@
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
   <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,63,4,/0:0/0:0" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,63,4,/0:0/0:0" />  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="vtkCompositeIndex" />
 </pqevents>
