@@ -114,7 +114,7 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.2");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.3");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -319,6 +319,11 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     }
 
   vtkSelectionSource* source = vtkSelectionSource::New();
+  source->SetFieldType(this->FieldType);
+  source->SetContainingCells(this->ContainingCells);
+  source->SetInverse(this->Inverse);
+  source->UpdateInformation();
+
   vtkStreamingDemandDrivenPipeline* sddp = vtkStreamingDemandDrivenPipeline::SafeDownCast(
     source->GetExecutive());
   if (sddp)
@@ -326,9 +331,6 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
     sddp->SetUpdateExtent(0, piece, npieces, 0);
     }
 
-  source->SetFieldType(this->FieldType);
-  source->SetContainingCells(this->ContainingCells);
-  source->SetInverse(this->Inverse);
 
   switch (this->Mode)
     {
