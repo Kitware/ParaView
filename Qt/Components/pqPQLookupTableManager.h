@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookupTableManager.h"
 #include "pqComponentsExport.h"
 
+class vtkSMProxy;
 
 /// pqPQLookupTableManager is an implementation specific to ParaView.
 /// A lookup table is shared among all arrays with same name and
@@ -46,25 +47,38 @@ public:
   pqPQLookupTableManager(QObject* parent=0);
   virtual ~pqPQLookupTableManager();
 
-  /// Get a LookupTable for the array with name \c arrayname 
-  /// and component. component = -1 represents magnitude. 
+  /// Get a LookupTable for the array with name \c arrayname
+  /// and component. component = -1 represents magnitude.
   /// This subclass associates a LUT with arrayname:component
   /// pair. If  none exists, a new one will be created.
-  pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
+  virtual pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
     int number_of_components, int component);
+
+  /// Saves the state of the lut so that the next time a new LUT is created, it
+  /// will have the same state as this one.
+  virtual void saveAsDefault(pqScalarsToColors*);
+
+  /// Setting key used to save the default lookup table.
+  static const char* DEFAULT_LOOKUPTABLE_SETTING_KEY()
+    {
+    return "/lookupTable/Default";
+    }
 
 public slots:
   /// Called to update scalar ranges of all lookup tables.
   virtual void updateLookupTableScalarRanges();
 
 protected:
-  /// Called when a new LUT pq object is created. 
+  /// Called when a new LUT pq object is created.
   /// This happens as a result of either the GUI or python
   /// registering a LUT proxy.
   virtual void onAddLookupTable(pqScalarsToColors* lut);
 
   /// Called when a LUT is removed.
   virtual void onRemoveLookupTable(pqScalarsToColors* lut);
+
+  /// set default property values for LUT.
+  void setDefaultState(vtkSMProxy* lut);
 
 protected:
   /// creates a new LUT.

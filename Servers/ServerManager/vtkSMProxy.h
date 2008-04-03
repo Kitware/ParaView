@@ -409,10 +409,14 @@ public:
   virtual void InitializeAndCopyFromID(vtkClientServerID id);
 //ETX
 
+  // Description:
+  // Saves the state of the proxy. This state can be reloaded
+  // to create a new proxy that is identical the present state of this proxy.
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
-
 
   // Description:
   // Overloaded for garbage collection.
@@ -690,11 +694,6 @@ protected:
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
-
-  // Description:
-  // Saves the state of the proxy. This state can be reloaded
-  // to create a new proxy that is identical the present state of this proxy.
-  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
   // Description:
   // This method saves state information about the proxy

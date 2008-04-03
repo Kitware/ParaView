@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
 #include "pqLineEditNumberValidator.h"
+#include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
@@ -278,6 +279,10 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Hook the close button up to the accept action.
   this->connect(this->Form->CloseButton, SIGNAL(clicked()),
       this, SLOT(accept()));
+
+  //Hook up the MakeDefaultButton
+  this->connect(this->Form->MakeDefaultButton, SIGNAL(clicked()),
+      this, SLOT(makeDefault()));
 }
 
 pqColorScaleEditor::~pqColorScaleEditor()
@@ -1688,4 +1693,12 @@ void pqColorScaleEditor::enableLegendControls(bool enable)
   this->Form->CountLabel->setEnabled(enable);
 }
 
-
+void pqColorScaleEditor::makeDefault()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
+  if (lut_mgr)
+    {
+    lut_mgr->saveAsDefault(this->ColorMap);
+    }
+}

@@ -119,6 +119,9 @@ private slots:
   void cleanupDisplay();
   void cleanupLegend();
   //@}
+  
+  /// MakeDefaultButton callback.
+  void makeDefault();
 
 private:
   void loadBuiltinColorPresets();

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.1.
 
    See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -31,11 +31,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPQLookupTableManager.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLoaderBase.h"
 
 #include <QList>
 #include <QMap>
@@ -48,7 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
+
+#include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
 class pqPQLookupTableManager::pqInternal
@@ -80,7 +88,7 @@ public:
           }
         return (this->ConnectionID < k.ConnectionID);
         }
-      return (this->NumberOfComponents < k.NumberOfComponents); 
+      return (this->NumberOfComponents < k.NumberOfComponents);
       }
 
   private:
@@ -91,8 +99,9 @@ public:
 
   typedef QMap<Key, QPointer<pqScalarsToColors> > MapOfLUT;
   MapOfLUT LookupTables;
+  vtkSmartPointer<vtkPVXMLElement> DefaultLUTElement;
 
-  QString getRegistrationName(const QString& arrayname, 
+  QString getRegistrationName(const QString& arrayname,
     int number_of_components, int vtkNotUsed(component)) const
     {
     return QString::number(number_of_components) + "." + arrayname;
@@ -111,11 +120,44 @@ public:
     }
 };
 
+class pqSimpleStateLoader : public vtkSMStateLoaderBase
+{
+public:
+  static pqSimpleStateLoader* New();
+  vtkTypeRevisionMacro(pqSimpleStateLoader, vtkSMStateLoaderBase);
+
+  int LoadState(vtkPVXMLElement* xml, vtkSMProxy* proxy)
+    {
+    return this->LoadProxyState(xml, proxy);
+    }
+
+protected:
+  virtual void CreatedNewProxy(int, vtkSMProxy* )
+    {
+    qCritical() << "Invalid XML when loading default lookup table state.";
+    }
+};
+vtkStandardNewMacro(pqSimpleStateLoader);
+vtkCxxRevisionMacro(pqSimpleStateLoader, "1.12");
+
 //-----------------------------------------------------------------------------
 pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
   : pqLookupTableManager(_p)
 {
   this->Internal = new pqInternal;
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings && settings->contains(DEFAULT_LOOKUPTABLE_SETTING_KEY()))
+    {
+    vtkPVXMLParser* parser = vtkPVXMLParser::New();
+    if (parser->Parse(
+        settings->value(DEFAULT_LOOKUPTABLE_SETTING_KEY()).toString().toAscii().data()))
+      {
+      this->Internal->DefaultLUTElement = parser->GetRootElement();
+      }
+    parser->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -128,7 +170,7 @@ pqPQLookupTableManager::~pqPQLookupTableManager()
 void pqPQLookupTableManager::onAddLookupTable(pqScalarsToColors* lut)
 {
   QString registration_name = lut->getSMName();
-  pqInternal::Key key = 
+  pqInternal::Key key =
     this->Internal->getKey(lut->getServer()->GetConnectionID(),
       registration_name);
   if (!this->Internal->LookupTables.contains(key))
@@ -140,7 +182,7 @@ void pqPQLookupTableManager::onAddLookupTable(pqScalarsToColors* lut)
 //-----------------------------------------------------------------------------
 void pqPQLookupTableManager::onRemoveLookupTable(pqScalarsToColors* lut)
 {
-  pqInternal::MapOfLUT::iterator iter = 
+  pqInternal::MapOfLUT::iterator iter =
     this->Internal->LookupTables.begin();
   for (; iter != this->Internal->LookupTables.end(); )
     {
@@ -173,11 +215,59 @@ pqScalarsToColors* pqPQLookupTableManager::getLookupTable(pqServer* server,
 }
 
 //-----------------------------------------------------------------------------
+void pqPQLookupTableManager::saveAsDefault(pqScalarsToColors* lut)
+{
+  if (!lut)
+    {
+    qCritical() << "Cannot save empty lookup table as default.";
+    return;
+    }
+
+  vtkSMProxy* lutProxy = lut->getProxy();
+  this->Internal->DefaultLUTElement.TakeReference(lutProxy->SaveState(0));
+  vtksys_ios::ostringstream stream;
+  this->Internal->DefaultLUTElement->PrintXML(stream, vtkIndent());
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqSettings* settings = core->settings();
+  if (settings)
+    {
+    settings->setValue(pqPQLookupTableManager::DEFAULT_LOOKUPTABLE_SETTING_KEY(),
+      stream.str().c_str());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPQLookupTableManager::setDefaultState(vtkSMProxy* lutProxy)
+{
+  // Setup default LUT to go from Cool to Warm.
+  QList<QVariant> values;
+  values << 0.0 << 0.1381 << 0.2411 << 0.7091
+         << 1.0 << 0.6728 << 0.1408 << 0.1266;
+  pqSMAdaptor::setMultipleElementProperty(
+    lutProxy->GetProperty("RGBPoints"), values);
+  pqSMAdaptor::setEnumerationProperty(
+    lutProxy->GetProperty("ColorSpace"), "Diverging");
+  pqSMAdaptor::setEnumerationProperty(
+    lutProxy->GetProperty("VectorMode"), "Magnitude");
+
+  if (this->Internal->DefaultLUTElement)
+    {
+    pqSimpleStateLoader* loader = pqSimpleStateLoader::New();
+    loader->LoadState(this->Internal->DefaultLUTElement, lutProxy);
+    loader->Delete();
+    }
+
+  lutProxy->UpdateVTKObjects();
+  lutProxy->InvokeCommand("Build");
+}
+
+//-----------------------------------------------------------------------------
 pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   const QString& arrayname, int number_of_components, int component)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* lutProxy = 
+  vtkSMProxy* lutProxy =
     pxm->NewProxy("lookup_tables", "PVLookupTable");
   lutProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   lutProxy->SetConnectionID(server->GetConnectionID());
@@ -188,24 +278,11 @@ pqScalarsToColors* pqPQLookupTableManager::createLookupTable(pqServer* server,
   // and our internal DS will be updated.
   pxm->RegisterProxy("lookup_tables", name.toAscii().data(), lutProxy);
   lutProxy->Delete();
-
-  // Setup default LUT to go from Cool to Warm.
-  QList<QVariant> values;
-  values << 0.0 << 0.1381 << 0.2411 << 0.7091
-         << 1.0 << 0.6728 << 0.1408 << 0.1266;
-
-  pqSMAdaptor::setMultipleElementProperty(
-                                    lutProxy->GetProperty("RGBPoints"), values);
-  pqSMAdaptor::setEnumerationProperty(
-                              lutProxy->GetProperty("ColorSpace"), "Diverging");
-  pqSMAdaptor::setEnumerationProperty(
-    lutProxy->GetProperty("VectorMode"), "Magnitude");
-  lutProxy->UpdateVTKObjects();
-  lutProxy->InvokeCommand("Build");
+  this->setDefaultState(lutProxy);
 
   if (number_of_components >= 1)
     {
-    vtkSMIntRangeDomain* componentsDomain = 
+    vtkSMIntRangeDomain* componentsDomain =
       vtkSMIntRangeDomain::SafeDownCast(
         lutProxy->GetProperty("VectorComponent")->GetDomain("range"));
     componentsDomain->AddMaximum(0, (number_of_components-1));
@@ -226,8 +303,8 @@ void pqPQLookupTableManager::updateLookupTableScalarRanges()
 {
   pqApplicationCore* core = pqApplicationCore::instance();
   pqServerManagerModel* smmodel = core->getServerManagerModel();
-  
-  QList<pqPipelineRepresentation*> reprs = 
+
+  QList<pqPipelineRepresentation*> reprs =
     smmodel->findItems<pqPipelineRepresentation*>();
   foreach(pqPipelineRepresentation* repr, reprs)
     {

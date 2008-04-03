@@ -56,6 +56,9 @@ public:
   virtual pqScalarsToColors* getLookupTable(pqServer* server, 
     const QString& arrayname, int number_of_components, int component) = 0;
 
+  /// Saves the state of the lut so that the next time a new LUT is created, it
+  /// will have the same state as this one.
+  virtual void saveAsDefault(pqScalarsToColors*)=0;
 public slots:
   /// Called to update scalar ranges of all lookup tables.
   virtual void updateLookupTableScalarRanges()=0;
