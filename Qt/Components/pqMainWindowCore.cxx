@@ -634,6 +634,20 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
 }
 
 //-----------------------------------------------------------------------------
+/// Provides access to the menu manager used for the filters menu.
+pqProxyMenuManager* pqMainWindowCore::filtersMenuManager() const
+{
+  return this->Implementation->FiltersMenuManager;
+}
+
+//-----------------------------------------------------------------------------
+/// Provides access to the menu manager used for the sources menu.
+pqProxyMenuManager* pqMainWindowCore::sourcesMenuManager() const
+{
+  return this->Implementation->SourcesMenuManager;
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setToolbarMenu(pqViewMenu *menu)
 {
   this->Implementation->ToolbarMenu = menu;

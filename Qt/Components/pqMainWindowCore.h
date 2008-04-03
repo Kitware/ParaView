@@ -59,6 +59,7 @@ class pqPipelineMenu;
 class pqPipelineSource;
 class pqPlotViewModule;
 class pqProxy;
+class pqProxyMenuManager;
 class pqProxyTabWidget;
 class pqRenderView;
 class pqRubberBandHelper;
@@ -237,6 +238,13 @@ public:
   /// Asks the user for a new connection (even if a server connection
   /// already exists.
   bool makeServerConnection();
+
+  /// Provides access to the menu manager used for the filters menu.
+  pqProxyMenuManager* filtersMenuManager() const;
+
+  /// Provides access to the menu manager used for the sources menu.
+  pqProxyMenuManager* sourcesMenuManager() const;
+
 signals:
   void enableFileLoadServerState(bool);
   void enableFileSaveServerState(bool);
