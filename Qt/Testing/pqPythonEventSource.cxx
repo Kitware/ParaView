@@ -375,7 +375,6 @@ class pqPythonEventSource::pqInternal
 {
 public:
   QString FileName;
-  PyGILState_STATE MainState;
 };
 
 pqPythonEventSource::pqPythonEventSource(QObject* p)
