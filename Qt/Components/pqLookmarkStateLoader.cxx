@@ -3,13 +3,13 @@
    Program: ParaView
    Module:    pqLookmarkStateLoader.cxx
 
-   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
+   under the terms of the ParaView license version 1.2. 
 
-   See License_v1.1.txt for the full ParaView license.
+   See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.20");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.21");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
