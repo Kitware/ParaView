@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDialog>
 #include <QMainWindow>
+#include <QDesktopWidget>
 
 //-----------------------------------------------------------------------------
 pqSettings::pqSettings(
@@ -71,7 +72,23 @@ void pqSettings::restoreState(const QString& key, QMainWindow& window)
     
   if(this->contains("Position"))
     {
-    window.move(this->value("Position").toPoint());
+    QPoint windowTopLeft = this->value("Position").toPoint();
+    QRect mwRect(windowTopLeft, window.size());
+    
+    QDesktopWidget desktop;
+    QRect desktopRect = desktop.availableGeometry( desktop.primaryScreen() );
+    // try moving it to keep size
+    if(!desktopRect.contains(mwRect))
+      {
+      mwRect = QRect(desktopRect.topLeft(), window.size());
+      }
+    // still doesn't fit, resize it
+    if(!desktopRect.contains(mwRect))
+      {
+      mwRect = QRect(desktopRect.topLeft(), window.size());
+      window.resize(desktopRect.size());
+      }
+    window.move(mwRect.topLeft());
     }
 
   if(this->contains("Layout"))
