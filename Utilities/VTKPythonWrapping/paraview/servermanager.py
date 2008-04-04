@@ -1464,8 +1464,14 @@ def _getPyProxy(smproxy):
 def _makeUpdateCameraMethod(rv):
     """ This internal method is used to create observer methods """
     rvref = rv
+    rvref().BlockUpdateCamera = False
     def UpdateCamera(obj, string):
-        rvref().SynchronizeCameraProperties()
+        if not rvref().BlockUpdateCamera:
+          # used to avoid some nasty recursion that occurs when interacting in
+          # the GUI.
+          rvref().BlockUpdateCamera = True
+          rvref().SynchronizeCameraProperties()
+          rvref().BlockUpdateCamera = False
     return UpdateCamera
 
 def _createInitialize(group, name):

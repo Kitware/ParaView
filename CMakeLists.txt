@@ -172,6 +172,13 @@ IF (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
   SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
 ENDIF (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 
+IF (PARAVIEW_ENABLE_PYTHON)
+  # ParaView python uses NewInterpretor API, which cannot be used with the
+  # python's thread support API (PyGIL*). Hence, we disable all thread support.
+  # No mutiple threads in paraview. Sorry.
+  SET(VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Build VTK with MPI support" FORCE)
+ENDIF (PARAVIEW_ENABLE_PYTHON)
+
 #########################################################################
 # Set the ServerManager test data dir,
 SET(PVServerManagerTestData ${PARAVIEW_DATA_ROOT})
