@@ -65,11 +65,11 @@ public:
   }
 
   pqFileDialogModelFileInfo(const QString& l, const QString& filepath, 
-           int t, const QList<pqFileDialogModelFileInfo>& g =
+           vtkPVFileInformation::FileTypes t, const QList<pqFileDialogModelFileInfo>& g =
            QList<pqFileDialogModelFileInfo>()) :
     Label(l),
     FilePath(filepath),
-    Type(static_cast<vtkPVFileInformation::FileTypes>(t)),
+    Type(t),
     Group(g)
   {
   }
@@ -348,11 +348,13 @@ public:
         }
       if (vtkPVFileInformation::IsDirectory(info->GetType()))
         {
-        dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), info->GetType()));
+        dirs.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), 
+            static_cast<vtkPVFileInformation::FileTypes>(info->GetType())));
         }
       else if (info->GetType() != vtkPVFileInformation::FILE_GROUP)
         {
-        files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(), info->GetType()));
+        files.push_back(pqFileDialogModelFileInfo(info->GetName(), info->GetFullPath(),
+            static_cast<vtkPVFileInformation::FileTypes>(info->GetType())));
         }
       else if (info->GetType() == vtkPVFileInformation::FILE_GROUP)
         {
@@ -365,7 +367,7 @@ public:
           vtkPVFileInformation* child = vtkPVFileInformation::SafeDownCast(
             childIter->GetCurrentObject());
           groupFiles.push_back(pqFileDialogModelFileInfo(child->GetName(), child->GetFullPath(),
-                                   child->GetType()));
+            static_cast<vtkPVFileInformation::FileTypes>(child->GetType())));
           }
         files.push_back(pqFileDialogModelFileInfo(info->GetName(), groupFiles[0].filePath(),
           vtkPVFileInformation::SINGLE_FILE, groupFiles));
@@ -548,7 +550,8 @@ bool pqFileDialogModel::makeDirEntry(const QString& dirName)
     return false;
     }
 
-  this->Implementation->FileList.push_back(pqFileDialogModelFileInfo(dirName, dirPath, true));
+  this->Implementation->FileList.push_back(pqFileDialogModelFileInfo(dirName,
+      dirPath, vtkPVFileInformation::DIRECTORY));
   this->reset();
 
   return true;
