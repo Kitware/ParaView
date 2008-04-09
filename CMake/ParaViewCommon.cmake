@@ -213,10 +213,14 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   # A GCC compiler.  Quiet warning about strstream deprecation.
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
   IF(APPLE)
-    # The fink package on OSX sets the environment variable LD_PREBIND
-    # which breaks paraview linking.  Add this option to tell the
-    # linker to ignore the environment variable.
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -noprebind")
+    EXECUTE_PROCESS(COMMAND sw_vers -productVersion
+      OUTPUT_VARIABLE OSX_VERSION)
+    IF(OSX_VERSION MATCHES "10.[01234].")
+      # The fink package on OSX sets the environment variable LD_PREBIND
+      # which breaks paraview linking.  Add this option to tell the
+      # linker to ignore the environment variable.
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -noprebind")
+    ENDIF(OSX_VERSION MATCHES "10.[01234].")
   ENDIF(APPLE)
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
   IF(CMAKE_SYSTEM MATCHES "OSF1-V.*")
