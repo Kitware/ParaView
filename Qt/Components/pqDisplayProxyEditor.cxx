@@ -571,9 +571,13 @@ void pqDisplayProxyEditor::openColorMapEditor()
     }
 
   // Create a color map editor and set the display.
-  pqColorScaleEditor colorScale(this);
-  colorScale.setRepresentation(this->Internal->Representation);
-  colorScale.exec();
+  if(!this->ColorScaleEditor)
+    {
+    this->ColorScaleEditor = new pqColorScaleEditor(this);
+    this->ColorScaleEditor->setRepresentation(this->Internal->Representation);
+    this->ColorScaleEditor->setAttribute(Qt::WA_DeleteOnClose);
+    }
+  this->ColorScaleEditor->show();
 }
 
 //-----------------------------------------------------------------------------
