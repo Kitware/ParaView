@@ -73,20 +73,21 @@ protected:
         int axis1, int maxFlag1,
         int axis2, int maxFlag2);
   void CreateFace(
-        vtkCTHFragmentConnectIterator* iterator,
-        int axis, int maxFlag,
-        vtkCTHFragmentConnectIterator* next);
+        vtkCTHFragmentConnectIterator* in,
+        vtkCTHFragmentConnectIterator* out,
+        int axis, int outMaxFlag);
   void ComputeDisplacementFactors(
-        vtkCTHFragmentConnectIterator* pointNeighborIterators, 
+        vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
         double displacmentFactors[3]);
-  void ComputeCorner(
+  void SubVoxelPositionCorner(
         double* point, 
-        vtkCTHFragmentConnectIterator pointNeighborIterators[8]);
+        vtkCTHFragmentConnectIterator* pointNeighborIterators[8]);
   void FindPointNeighbors(
         vtkCTHFragmentConnectIterator* iteratorMin0, 
         vtkCTHFragmentConnectIterator* iteratorMax0,
         int axis0, int maxFlag1, int maxFlag2, 
-        vtkCTHFragmentConnectIterator pointNeighborIterators[8]);
+        vtkCTHFragmentConnectIterator pointNeighborIterators[8],
+        double pt[3]);
   // Returns the total number of blocks in all levels (local process only).
   int  ComputeOriginAndRootSpacing(
         vtkHierarchicalBoxDataSet* input);
@@ -167,9 +168,18 @@ protected:
   // Integrate the volume for this fragment.
   // We will do the same for all attributes?
   double FragmentVolume;
-
   // Save the volume in this array indexed by the fragmentId.
   vtkDoubleArray* FragmentVolumes;
+
+  // I am going to try to integrate the cell attriubtes here.
+  // The simplest thing to do is keep the arrays in a vtkCellData object.
+  vtkCellData* IntegratedFragmentAttributes;
+  // I am going to do the actual integration in a raw memory buffer.
+  // It is flexible with no complicated arbitrary structure.
+  // I just iterate through the buffer casting the pointer to the correct types.
+  void* IntegrationBuffer;
+  
+  
   // This is getting a bit ugly but ...
   // When we resolve (merge equivalent) fragments we need a mapping
   // from local ids to global ids.
@@ -191,6 +201,27 @@ protected:
   // Use for the moment to find neighbors.
   // It could be changed into the primary storage of blocks.
   vtkstd::vector<vtkCTHFragmentLevel*> Levels;
+
+  // Ivars for computing the point on corners and edges of a face.
+  vtkCTHFragmentConnectIterator* FaceNeighbors;
+  // Permutation of the neighbors. Axis0 normal to face.
+  int faceAxis0;
+  int faceAxis1;
+  int faceAxis2;
+  double FaceCornerPoints[12];
+  double FaceEdgePoints[12];
+  int    FaceEdgeFlags[4];
+  // outMaxFlag implies out is positive direction of axis.
+  void ComputeFacePoints(vtkCTHFragmentConnectIterator* in,
+                        vtkCTHFragmentConnectIterator* out,
+                        int axis, int outMaxFlag);
+  void ComputeFaceNeighbors(vtkCTHFragmentConnectIterator* in,
+                            vtkCTHFragmentConnectIterator* out,
+                            int axis, int  outMaxFlag);
+  void FindNeighbor(
+    int faceIndex[3], int faceLevel, 
+    vtkCTHFragmentConnectIterator* neighbor,
+    vtkCTHFragmentConnectIterator* reference);
 
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.
