@@ -42,7 +42,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.14");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.15");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -306,6 +306,7 @@ public:
   void GetPointExtent(int ext[6]);
   void GetCellExtent(int ext[6]);
   void GetCellIncrements(int incs[3]);
+  const int*  GetCellIncrements() {return this->CellIncrements;}
   void GetBaseCellExtent(int ext[6]);
   // This was a major time consumer so use the pointer directly.
   const int* GetBaseCellExtent() { return this->BaseCellExtent;}
@@ -1189,6 +1190,10 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->LocalToGlobalOffsets = 0;
   this->TotalNumberOfRawFragments = 0;
   this->NumberOfResolvedFragments = 0;
+  this->IntegratedFragmentAttributes = 0;
+  this->IntegrationBuffer = 0;
+  
+  this->FaceNeighbors =  new vtkCTHFragmentConnectIterator[32];
 }
 
 //----------------------------------------------------------------------------
@@ -1206,6 +1211,11 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
 
   delete this->EquivalenceSet;
   this->EquivalenceSet = 0;
+  this->IntegratedFragmentAttributes = 0;
+  this->IntegrationBuffer = 0;
+  
+  delete this->FaceNeighbors;
+  this->FaceNeighbors = 0;
 }
 
 
@@ -1431,6 +1441,9 @@ void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
 
   for (int axis = 0; axis < 3; ++axis)
     {
+    // The purpose for passing a list into the method is no longer.
+    // We could simplify this method.
+    neighbors.clear();
     this->FindFaceNeighbors(block->GetLevel(), blockIndex, 
                             axis, 0, &neighbors);
     for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
@@ -2417,7 +2430,7 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 // This method could probably be more efficient. General computation works
 // for all gradient directions, but components are either 1 or 0.
 void vtkCTHFragmentConnect::ComputeDisplacementFactors(
-  vtkCTHFragmentConnectIterator* pointNeighborIterators, 
+  vtkCTHFragmentConnectIterator* pointNeighborIterators[8], 
   double displacmentFactors[3])
 {
   // DEBUGGING
@@ -2429,14 +2442,14 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
 
   double middleValue = 127.5;
 
-  double v000 = pointNeighborIterators[0].VolumeFractionPointer[0];
-  double v001 = pointNeighborIterators[1].VolumeFractionPointer[0];
-  double v010 = pointNeighborIterators[2].VolumeFractionPointer[0];
-  double v011 = pointNeighborIterators[3].VolumeFractionPointer[0];
-  double v100 = pointNeighborIterators[4].VolumeFractionPointer[0];
-  double v101 = pointNeighborIterators[5].VolumeFractionPointer[0];
-  double v110 = pointNeighborIterators[6].VolumeFractionPointer[0];
-  double v111 = pointNeighborIterators[7].VolumeFractionPointer[0];
+  double v000 = pointNeighborIterators[0]->VolumeFractionPointer[0];
+  double v001 = pointNeighborIterators[1]->VolumeFractionPointer[0];
+  double v010 = pointNeighborIterators[2]->VolumeFractionPointer[0];
+  double v011 = pointNeighborIterators[3]->VolumeFractionPointer[0];
+  double v100 = pointNeighborIterators[4]->VolumeFractionPointer[0];
+  double v101 = pointNeighborIterators[5]->VolumeFractionPointer[0];
+  double v110 = pointNeighborIterators[6]->VolumeFractionPointer[0];
+  double v111 = pointNeighborIterators[7]->VolumeFractionPointer[0];
   
   double centerValue = (v000+v001+v010+v011+v100+v101+v110+v111)*0.125;
   double surfaceValue;
@@ -2533,9 +2546,11 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
 
 
 //----------------------------------------------------------------------------
-void vtkCTHFragmentConnect::ComputeCorner(
+// Pass the non displaced corner location in the point argument.
+// It will be modified with the sub voxel displacement.
+void vtkCTHFragmentConnect::SubVoxelPositionCorner(
   double* point, 
-  vtkCTHFragmentConnectIterator pointNeighborIterators[8])
+  vtkCTHFragmentConnectIterator* pointNeighborIterators[8])
 {
   double displacementFactors[3];
   this->ComputeDisplacementFactors(pointNeighborIterators, displacementFactors);
@@ -2557,27 +2572,22 @@ void vtkCTHFragmentConnect::ComputeCorner(
   int highestLevel = -1;
   for (int ii = 0; ii < 8; ++ii)
     {
-    if (pointNeighborIterators[ii].Block->GetLevel() > highestLevel)
+    if (pointNeighborIterators[ii]->Block->GetLevel() > highestLevel)
       {
-      highestLevel = pointNeighborIterators[ii].Block->GetLevel();
-      hEdge0 = pointNeighborIterators[ii].Block->HalfEdges[1];
-      hEdge1 = pointNeighborIterators[ii].Block->HalfEdges[3];
-      hEdge2 = pointNeighborIterators[ii].Block->HalfEdges[5];
+      highestLevel = pointNeighborIterators[ii]->Block->GetLevel();
+      hEdge0 = pointNeighborIterators[ii]->Block->HalfEdges[1];
+      hEdge1 = pointNeighborIterators[ii]->Block->HalfEdges[3];
+      hEdge2 = pointNeighborIterators[ii]->Block->HalfEdges[5];
       }
     }
-  
-  // Compute the corner point from the iterator.
-  double* origin  = pointNeighborIterators[7].Block->GetOrigin();
-  double* spacing = pointNeighborIterators[7].Block->GetSpacing();
-  int*    index   =  pointNeighborIterators[7].Index;
-    
+
   // Apply interpolation factors.
   for (int ii = 0; ii < 3; ++ii)
     {
-    point[ii] = origin[ii] + spacing[ii]*(double)(index[ii]);
+    // Apply the subvoxel displacements.
     point[ii] += hEdge0[ii]*displacementFactors[0]
         + hEdge1[ii]*displacementFactors[1] 
-        + hEdge2[ii]*displacementFactors[2]; 
+        + hEdge2[ii]*displacementFactors[2];
     }
 }
 
@@ -2589,155 +2599,670 @@ void vtkCTHFragmentConnect::ComputeCorner(
 // face (between cell 4 and 13 is the face to be created. The array is
 // ordered (axis0, axis1, axis2).  
 // Cell 4 (1,1,0) is the voxel inside the surface.
+//
+// Now to fix cracks.  If neighbors are higher level, 
+// I need to have more than 4 points for a face.
+// I am only going to support transitions of 1 level.
 void vtkCTHFragmentConnect::CreateFace(
-  vtkCTHFragmentConnectIterator* iterator,
-  int axis, int maxFlag,
-  vtkCTHFragmentConnectIterator* next)
+  vtkCTHFragmentConnectIterator* in,
+  vtkCTHFragmentConnectIterator* out,
+  int axis, int outMaxFlag)
 {
-  int ii;
-  double pt00[3];
-  double pt01[3];
-  double pt10[3];
-  double pt11[3];
-
-  if (iterator->Block == 0 || iterator->Block->GetGhostFlag())
+  if (in->Block == 0 || in->Block->GetGhostFlag())
     {
     return;
     }
 
-
-  // This should not occur, but we will check as a sanity condition.
-  if (iterator->Block == 0)
-    {
-    vtkErrorMacro("Iterator should never be out of the dataset.");
-    return;
-    }
-  if (next->Block == 0)
-    {
-    *next = *iterator;
-    if (maxFlag)
+  if (out->Block == 0)
+    { // Pad the volume so we can create faces on the outside of the dataset.
+    *out = *in;
+    if (outMaxFlag)
       {
-      ++next->Index[axis];
+      ++out->Index[axis];
       }
     else
       {
-      --next->Index[axis];
+      --out->Index[axis];
       }
     }
 
-
-  // Neighbor is outside of fragment.  Make a face.
-    
-  // We want to create the smallest face between two blocks.
-  double* hEdge0;
-  double* hEdge1;
-  double* hEdge2;  
-  if (next->Block && next->Block->GetLevel() > iterator->Block->GetLevel())
-    {
-    // Switch min-max
-    int nextMaxFlag = ! maxFlag;
-    hEdge0 = next->Block->HalfEdges[2*((axis+2)%3)+1];
-    hEdge1 = next->Block->HalfEdges[2*((axis+1)%3)+1];
-    hEdge2 = next->Block->HalfEdges[2*axis + nextMaxFlag];  
-    }
-  else
-    {
-    hEdge0 = iterator->Block->HalfEdges[2*((axis+2)%3)+1];
-    hEdge1 = iterator->Block->HalfEdges[2*((axis+1)%3)+1];
-    hEdge2 = iterator->Block->HalfEdges[2*axis + maxFlag];  
-    }
-  
-  // Use volume fraction to position corners.
-  vtkCTHFragmentConnectIterator pointNeighborIterators[8];
-  if (maxFlag)
-    {
-    this->FindPointNeighbors(iterator, next, axis, 0,0, pointNeighborIterators);
-    this->ComputeCorner(pt00, pointNeighborIterators);
-    this->FindPointNeighbors(iterator, next, axis, 1,0, pointNeighborIterators);
-    this->ComputeCorner(pt01, pointNeighborIterators);
-    this->FindPointNeighbors(iterator, next, axis, 0,1, pointNeighborIterators);
-    this->ComputeCorner(pt10, pointNeighborIterators);
-    this->FindPointNeighbors(iterator, next, axis, 1,1, pointNeighborIterators);
-    this->ComputeCorner(pt11, pointNeighborIterators);
-    }
-  else
-    {
-    this->FindPointNeighbors(next, iterator, axis, 0,0, pointNeighborIterators);
-    this->ComputeCorner(pt00, pointNeighborIterators);
-    this->FindPointNeighbors(next, iterator, axis, 1,0, pointNeighborIterators);
-    this->ComputeCorner(pt01, pointNeighborIterators);
-    this->FindPointNeighbors(next, iterator, axis, 0,1, pointNeighborIterators);
-    this->ComputeCorner(pt10, pointNeighborIterators);
-    this->FindPointNeighbors(next, iterator, axis, 1,1, pointNeighborIterators);
-    this->ComputeCorner(pt11, pointNeighborIterators);
-    }
-
-  // Add points to the output.  Create separate points fro each triangle.  
+  // Add points to the output.  Create separate points for each triangle.  
   // We can worry about merging points later.
-  // Attributes for debugging.
+  // FragmentIds get merged later.
+  vtkCTHFragmentConnectIterator* cornerNeighbors[8];
   vtkIntArray* idScalars = vtkIntArray::SafeDownCast(this->Mesh->GetPointData()->GetScalars());
   vtkPoints *points = this->Mesh->GetPoints();
   vtkCellArray *polys = this->Mesh->GetPolys();
-  vtkIdType quadPtIds[4];
-  vtkIdType triPtIds[3];  
-  
-  // 00
-  quadPtIds[0] = points->InsertNextPoint(pt00);
-  idScalars->InsertTuple1(quadPtIds[0], this->FragmentId);
-  // 01
-  quadPtIds[1] = points->InsertNextPoint(pt01);
-  idScalars->InsertTuple1(quadPtIds[1], this->FragmentId);
-  // 10
-  quadPtIds[2] = points->InsertNextPoint(pt10);
-  idScalars->InsertTuple1(quadPtIds[2], this->FragmentId);
-  // 11
-  quadPtIds[3] = points->InsertNextPoint(pt11);
-  idScalars->InsertTuple1(quadPtIds[3], this->FragmentId);
-  
-  // Compute length of diagonals (squared)
-  // This will help us decide which way to split up the quad into triangles.
-  double tmp;
-  double d0011 = 0.0;
-  double d0110 = 0.0;
-  for (ii = 0; ii < 3; ++ii)
+  vtkIdType quadCornerIds[4];
+  vtkIdType quadMidIds[4];
+  vtkIdType triPtIds[3];
+  vtkIdType startTriId = polys->GetNumberOfCells();
+
+  // Compute the corner and edge points.
+  // Store the results in ivars.
+  this->ComputeFacePoints(in, out,
+                          axis, outMaxFlag);
+  // Find the neighbor iterators.
+  // Store the results in ivars.
+  this->ComputeFaceNeighbors(in, out,
+                             axis, outMaxFlag);
+
+  // A word about indexing:
+  // face neighbors 2x4x4 indexed face normal axis first, axis1, then axis2.
+  // Some may be duplicated if they cover more than one grid element
+  // Same order with point neighbors, but they are 2x2x2.
+  // Face corners ordered axis1, axis2.
+  // Face edge middles are 0: -axis2, 1: -axis1, 2: +axis1, 3: +axis2
+  // The rational for this is the order the points are traversed
+  // in the neighbor array.
+
+  // Permute the corner neighbors to be xyz ordered.
+  int inc0 = 1 << axis;
+  int inc1 = 1 << ((axis+1)%3);
+  int inc2 = 1 << ((axis+2)%3);
+  int i0 = 0;
+  int i1 = inc0;
+  int i2 =      inc1; 
+  int i3 = inc0+inc1; 
+  int i4 =           inc2; 
+  int i5 = inc0     +inc2; 
+  int i6 =      inc1+inc2; 
+  int i7 = inc0+inc1+inc2; 
+
+  // Do every thing in coordinate system of face.
+  cornerNeighbors[i0] = &(this->FaceNeighbors[0]);
+  cornerNeighbors[i1] = &(this->FaceNeighbors[1]);
+  cornerNeighbors[i2] = &(this->FaceNeighbors[2]);
+  cornerNeighbors[i3] = &(this->FaceNeighbors[3]);
+  cornerNeighbors[i4] = &(this->FaceNeighbors[8]);
+  cornerNeighbors[i5] = &(this->FaceNeighbors[9]);
+  cornerNeighbors[i6] = &(this->FaceNeighbors[10]);
+  cornerNeighbors[i7] = &(this->FaceNeighbors[11]);
+  this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors);
+  quadCornerIds[0] = points->InsertNextPoint(this->FaceCornerPoints);
+  idScalars->InsertTuple1(quadCornerIds[0], this->FragmentId);
+  cornerNeighbors[i0] = &(this->FaceNeighbors[4]);
+  cornerNeighbors[i1] = &(this->FaceNeighbors[5]);
+  cornerNeighbors[i2] = &(this->FaceNeighbors[6]);
+  cornerNeighbors[i3] = &(this->FaceNeighbors[7]);
+  cornerNeighbors[i4] = &(this->FaceNeighbors[12]);
+  cornerNeighbors[i5] = &(this->FaceNeighbors[13]);
+  cornerNeighbors[i6] = &(this->FaceNeighbors[14]);
+  cornerNeighbors[i7] = &(this->FaceNeighbors[15]);
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors);
+  quadCornerIds[1] = points->InsertNextPoint(this->FaceCornerPoints+3);
+  idScalars->InsertTuple1(quadCornerIds[1], this->FragmentId);
+  cornerNeighbors[i0] = &(this->FaceNeighbors[16]);
+  cornerNeighbors[i1] = &(this->FaceNeighbors[17]);
+  cornerNeighbors[i2] = &(this->FaceNeighbors[18]);
+  cornerNeighbors[i3] = &(this->FaceNeighbors[19]);
+  cornerNeighbors[i4] = &(this->FaceNeighbors[24]);
+  cornerNeighbors[i5] = &(this->FaceNeighbors[25]);
+  cornerNeighbors[i6] = &(this->FaceNeighbors[26]);
+  cornerNeighbors[i7] = &(this->FaceNeighbors[27]);
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors);
+  quadCornerIds[2] = points->InsertNextPoint(this->FaceCornerPoints+6);
+  idScalars->InsertTuple1(quadCornerIds[2], this->FragmentId);
+  cornerNeighbors[i0] = &(this->FaceNeighbors[20]);
+  cornerNeighbors[i1] = &(this->FaceNeighbors[21]);
+  cornerNeighbors[i2] = &(this->FaceNeighbors[22]);
+  cornerNeighbors[i3] = &(this->FaceNeighbors[23]);
+  cornerNeighbors[i4] = &(this->FaceNeighbors[28]);
+  cornerNeighbors[i5] = &(this->FaceNeighbors[29]);
+  cornerNeighbors[i6] = &(this->FaceNeighbors[30]);
+  cornerNeighbors[i7] = &(this->FaceNeighbors[31]);
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors);
+  quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
+  idScalars->InsertTuple1(quadCornerIds[3], this->FragmentId);
+
+  // Now for the mid edge point if the neighbors on that side are smaller.
+  if (this->FaceEdgeFlags[0])
     {
-    tmp = pt00[ii]-pt11[ii];
-    d0011 += tmp*tmp;
-    tmp = pt01[ii]-pt10[ii];
-    d0110 += tmp*tmp;
+    cornerNeighbors[i0] = &(this->FaceNeighbors[2]);
+    cornerNeighbors[i1] = &(this->FaceNeighbors[3]);
+    cornerNeighbors[i2] = &(this->FaceNeighbors[4]);
+    cornerNeighbors[i3] = &(this->FaceNeighbors[5]);
+    cornerNeighbors[i4] = &(this->FaceNeighbors[10]);
+    cornerNeighbors[i5] = &(this->FaceNeighbors[11]);
+    cornerNeighbors[i6] = &(this->FaceNeighbors[12]);
+    cornerNeighbors[i7] = &(this->FaceNeighbors[13]);
+    this->SubVoxelPositionCorner(this->FaceEdgePoints, cornerNeighbors);
+    quadMidIds[0] = points->InsertNextPoint(this->FaceEdgePoints);
+    idScalars->InsertTuple1(quadMidIds[0], this->FragmentId);
+    }
+  if (this->FaceEdgeFlags[1])
+    {
+    cornerNeighbors[i0] = &(this->FaceNeighbors[8]);
+    cornerNeighbors[i1] = &(this->FaceNeighbors[9]);
+    cornerNeighbors[i2] = &(this->FaceNeighbors[10]);
+    cornerNeighbors[i3] = &(this->FaceNeighbors[11]);
+    cornerNeighbors[i4] = &(this->FaceNeighbors[16]);
+    cornerNeighbors[i5] = &(this->FaceNeighbors[17]);
+    cornerNeighbors[i6] = &(this->FaceNeighbors[18]);
+    cornerNeighbors[i7] = &(this->FaceNeighbors[19]);
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+3, cornerNeighbors);
+    quadMidIds[1] = points->InsertNextPoint(this->FaceEdgePoints+3);
+    idScalars->InsertTuple1(quadMidIds[1], this->FragmentId);
+    }
+  if (this->FaceEdgeFlags[2])
+    {
+    cornerNeighbors[i0] = &(this->FaceNeighbors[12]);
+    cornerNeighbors[i1] = &(this->FaceNeighbors[13]);
+    cornerNeighbors[i2] = &(this->FaceNeighbors[14]);
+    cornerNeighbors[i3] = &(this->FaceNeighbors[15]);
+    cornerNeighbors[i4] = &(this->FaceNeighbors[20]);
+    cornerNeighbors[i5] = &(this->FaceNeighbors[21]);
+    cornerNeighbors[i6] = &(this->FaceNeighbors[22]);
+    cornerNeighbors[i7] = &(this->FaceNeighbors[23]);
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+6, cornerNeighbors);
+    quadMidIds[2] = points->InsertNextPoint(this->FaceEdgePoints+6);
+    idScalars->InsertTuple1(quadMidIds[2], this->FragmentId);
+    }
+  if (this->FaceEdgeFlags[3])
+    {
+    cornerNeighbors[i0] = &(this->FaceNeighbors[18]);
+    cornerNeighbors[i1] = &(this->FaceNeighbors[19]);
+    cornerNeighbors[i2] = &(this->FaceNeighbors[20]);
+    cornerNeighbors[i3] = &(this->FaceNeighbors[21]);
+    cornerNeighbors[i4] = &(this->FaceNeighbors[26]);
+    cornerNeighbors[i5] = &(this->FaceNeighbors[27]);
+    cornerNeighbors[i6] = &(this->FaceNeighbors[28]);
+    cornerNeighbors[i7] = &(this->FaceNeighbors[29]);
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+9, cornerNeighbors);
+    quadMidIds[3] = points->InsertNextPoint(this->FaceEdgePoints+9);
+    idScalars->InsertTuple1(quadMidIds[3], this->FragmentId);
+    }
+
+  // Now there are 9 possibilities 
+  // (10 if you count the two ways to triangulate the simple quad).
+  // No edges, $ cases with one mid point, 4 cases with two mid points.
+  // That is all because the face is always the smallest of the two in/out voxels.
+  int caseIdx = this->FaceEdgeFlags[0] | (this->FaceEdgeFlags[1] << 1)
+                  | (this->FaceEdgeFlags[2] << 2) | (this->FaceEdgeFlags[3] << 3);
+  
+  //c2 e3 c3
+  //e1    e2
+  //c0 e0 c1
+
+  switch (caseIdx)
+    {
+    // One edge point
+    case 1:
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadCornerIds[2];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadCornerIds[3];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadCornerIds[1];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 2:
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadCornerIds[3];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadCornerIds[1];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadCornerIds[0];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 4:
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadCornerIds[0];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadCornerIds[2];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadCornerIds[3];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 8:
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadCornerIds[1];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadCornerIds[0];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadCornerIds[2];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    // Two adjacent edge points
+    case 3: // e0 and e1
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadMidIds[1];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadMidIds[0];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadCornerIds[3];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadCornerIds[1];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 5: // e0 and e2
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadMidIds[0];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadMidIds[2];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadCornerIds[3];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadCornerIds[2];
+      triPtIds[2] = quadMidIds[0];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 10: // e1 and e3
+      triPtIds[0] = quadCornerIds[2];
+      triPtIds[1] = quadMidIds[3];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadMidIds[1];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadCornerIds[1];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadCornerIds[0];
+      triPtIds[2] = quadMidIds[1];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    case 12: // e2 and e3
+      triPtIds[0] = quadCornerIds[3];
+      triPtIds[1] = quadMidIds[2];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadMidIds[3];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[1];
+      triPtIds[1] = quadCornerIds[0];
+      triPtIds[2] = quadMidIds[2];
+      polys->InsertNextCell(3, triPtIds);
+      triPtIds[0] = quadCornerIds[0];
+      triPtIds[1] = quadCornerIds[2];
+      triPtIds[2] = quadMidIds[3];
+      polys->InsertNextCell(3, triPtIds);
+      break;
+    // No edges.
+    // For a simple quad, choose a triangulation.
+    case 0:
+      {
+      // Compute length of diagonals (squared)
+      // This will help us decide which way to split up the quad into triangles.
+      double tmp;
+      double d0011 = 0.0;
+      double d0110 = 0.0;
+      double *pt00 = this->FaceCornerPoints;
+      double *pt01 = this->FaceCornerPoints+3;
+      double *pt10 = this->FaceCornerPoints+6;
+      double *pt11 = this->FaceCornerPoints+9;
+      for (int ii = 0; ii < 3; ++ii)
+        {
+        tmp = pt00[ii]-pt11[ii];
+        d0011 += tmp*tmp;
+        tmp = pt01[ii]-pt10[ii];
+        d0110 += tmp*tmp;
+        }
+      if (d0011 < d0110)
+        {   
+        triPtIds[0] = quadCornerIds[0];
+        triPtIds[1] = quadCornerIds[1];
+        triPtIds[2] = quadCornerIds[3];
+        polys->InsertNextCell(3, triPtIds);
+        triPtIds[0] = quadCornerIds[0];
+        triPtIds[1] = quadCornerIds[3];
+        triPtIds[2] = quadCornerIds[2];
+        polys->InsertNextCell(3, triPtIds);
+        }
+      else
+        {
+        triPtIds[0] = quadCornerIds[1];
+        triPtIds[1] = quadCornerIds[3];
+        triPtIds[2] = quadCornerIds[2];
+        polys->InsertNextCell(3, triPtIds);
+        triPtIds[0] = quadCornerIds[2];
+        triPtIds[1] = quadCornerIds[0];
+        triPtIds[2] = quadCornerIds[1];
+        polys->InsertNextCell(3, triPtIds);
+        }
+      break;
+      }
+    default:
+      vtkErrorMacro("Unexpected edge case.");
+    }
+
+  // Cell data attributes for debugging.
+  vtkIdType numTris = polys->GetNumberOfCells() - startTriId;
+
+  for (vtkIdType ii = 0; ii < numTris; ++ii)
+    {
+    this->LevelArray->InsertNextValue(in->Block->GetLevel());
+    //this->BlockIdArray->InsertNextValue(iterator->Block->GetBlockId());
+    this->BlockIdArray->InsertNextValue(in->Block->LevelBlockId);
+    }
+}
+
+//----------------------------------------------------------------------------
+// Computes the face and edge middle points of the shared contact face
+// between the two iterators.
+void vtkCTHFragmentConnect::ComputeFacePoints(
+  vtkCTHFragmentConnectIterator* in,
+  vtkCTHFragmentConnectIterator* out,
+  int axis, int outMaxFlag)
+{
+  vtkCTHFragmentConnectIterator* smaller;
+  double* origin;
+  double* spacing;
+  int maxFlag;
+  int axis1 = (axis+1)%3;
+  int axis2 = (axis+2)%3;
+  
+  // We create the smaller face of the two voxels.
+  smaller = in;
+  // A bit confusing.  If out iterator is max, then the face of out is min.
+  maxFlag = outMaxFlag;
+  if (in->Block->GetLevel() < out->Block->GetLevel())
+    {
+    smaller = out;
+    maxFlag = !outMaxFlag;
     }
   
-  if (d0011 < d0110)
-    {   
-    triPtIds[0] = quadPtIds[0];
-    triPtIds[1] = quadPtIds[1];
-    triPtIds[2] = quadPtIds[3];
-    polys->InsertNextCell(3, triPtIds);
-    triPtIds[0] = quadPtIds[0];
-    triPtIds[1] = quadPtIds[3];
-    triPtIds[2] = quadPtIds[2];
-    polys->InsertNextCell(3, triPtIds);
+  origin = smaller->Block->GetOrigin();
+  spacing = smaller->Block->GetSpacing();
+  double halfSpacing[3];
+  double faceOrigin[3];
+  halfSpacing[0] = spacing[0] * 0.5;
+  halfSpacing[1] = spacing[1] * 0.5;
+  halfSpacing[2] = spacing[2] * 0.5;
+  // find the origin of the voxel.
+  faceOrigin[0] = origin[0] + (double)(smaller->Index[0]) * spacing[0];
+  faceOrigin[1] = origin[1] + (double)(smaller->Index[1]) * spacing[1];
+  faceOrigin[2] = origin[2] + (double)(smaller->Index[2]) * spacing[2];
+  // Move the voxel origin to the face origin.
+  if (maxFlag)
+    {
+    faceOrigin[axis] += spacing[axis];
+    }
+
+  // Now compute all of the corner points.
+  // 6 9
+  // 0 3
+  // First set them all to the origin.
+  this->FaceCornerPoints[0] = this->FaceCornerPoints[3] = 
+    this->FaceCornerPoints[6] = this->FaceCornerPoints[9] = faceOrigin[0];
+  this->FaceCornerPoints[1] = this->FaceCornerPoints[4] = 
+    this->FaceCornerPoints[7] = this->FaceCornerPoints[10] = faceOrigin[1];
+  this->FaceCornerPoints[2] = this->FaceCornerPoints[5] = 
+    this->FaceCornerPoints[8] = this->FaceCornerPoints[11] = faceOrigin[2];
+  // Now offset them to the corners.
+  this->FaceCornerPoints[3+axis1] += spacing[axis1];
+  this->FaceCornerPoints[9+axis1] += spacing[axis1];
+  this->FaceCornerPoints[6+axis2] += spacing[axis2];
+  this->FaceCornerPoints[9+axis2] += spacing[axis2];
+
+  // Now do the same for the edge points
+  //   3
+  // 1   2
+  //   0
+  // First set them all to the origin.
+  this->FaceEdgePoints[0] = this->FaceEdgePoints[3] = 
+    this->FaceEdgePoints[6] = this->FaceEdgePoints[9] = faceOrigin[0];
+  this->FaceEdgePoints[1] = this->FaceEdgePoints[4] = 
+    this->FaceEdgePoints[7] = this->FaceEdgePoints[10] = faceOrigin[1];
+  this->FaceEdgePoints[2] = this->FaceEdgePoints[5] = 
+    this->FaceEdgePoints[8] = this->FaceEdgePoints[11] = faceOrigin[2];  
+  // Now offset the points to the middle of the edges.
+  this->FaceEdgePoints[axis1] += halfSpacing[axis1];
+  this->FaceEdgePoints[9+axis1] += halfSpacing[axis1];
+  this->FaceEdgePoints[6+axis1] += spacing[axis1];
+  this->FaceEdgePoints[3+axis2] += halfSpacing[axis2];
+  this->FaceEdgePoints[6+axis2] += halfSpacing[axis2];
+  this->FaceEdgePoints[9+axis2] += spacing[axis2];
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::ComputeFaceNeighbors(
+  vtkCTHFragmentConnectIterator* in,
+  vtkCTHFragmentConnectIterator* out,
+  int axis, int outMaxFlag)
+{
+  int axis1 = (axis+1)%3;
+  int axis2 = (axis+2)%3;
+
+  // Neighbors are one level higher than the smallest voxel.
+  int faceLevel;
+  int faceIndex[3];
+  // We need to find the smallest face (largest level) of the two iterators.
+  if (in->Block->GetLevel() > out->Block->GetLevel())
+    {
+    faceLevel = in->Block->GetLevel() + 1;
+    faceIndex[0] = in->Index[0];
+    faceIndex[1] = in->Index[1];
+    faceIndex[2] = in->Index[2];
+    if (outMaxFlag)
+      {
+      faceIndex[axis] += 1;
+      }
     }
   else
     {
-    triPtIds[0] = quadPtIds[1];
-    triPtIds[1] = quadPtIds[3];
-    triPtIds[2] = quadPtIds[2];
-    polys->InsertNextCell(3, triPtIds);
-    triPtIds[0] = quadPtIds[2];
-    triPtIds[1] = quadPtIds[0];
-    triPtIds[2] = quadPtIds[1];
-    polys->InsertNextCell(3, triPtIds);
+    faceLevel = out->Block->GetLevel() + 1;
+    faceIndex[0] = out->Index[0];
+    faceIndex[1] = out->Index[1];
+    faceIndex[2] = out->Index[2];
+    if ( ! outMaxFlag)
+      {
+      faceIndex[axis] += 1;
+      }
     }
-  
-  // Cell data attributes for debugging.
-  this->LevelArray->InsertNextValue(iterator->Block->GetLevel());
-  this->LevelArray->InsertNextValue(iterator->Block->GetLevel());
-  //this->BlockIdArray->InsertNextValue(iterator->Block->GetBlockId());
-  //this->BlockIdArray->InsertNextValue(iterator->Block->GetBlockId());
-  this->BlockIdArray->InsertNextValue(iterator->Block->LevelBlockId);
-  this->BlockIdArray->InsertNextValue(iterator->Block->LevelBlockId);
+  faceIndex[0] = faceIndex[0] << 1;
+  faceIndex[1] = faceIndex[1] << 1;
+  faceIndex[2] = faceIndex[2] << 1;
+
+  // The center four on each side of the face are always the same.
+  // The face is the smallest of in and out, so there is no possibility
+  // for subdivision.
+  if (outMaxFlag)
+    {
+    this->FaceNeighbors[10] = this->FaceNeighbors[12] =
+       this->FaceNeighbors[18] = this->FaceNeighbors[20] = *in;
+    this->FaceNeighbors[11] = this->FaceNeighbors[13] =
+       this->FaceNeighbors[19] = this->FaceNeighbors[21] = *out;
+    }
+  else
+    {
+    this->FaceNeighbors[10] = this->FaceNeighbors[12] =
+       this->FaceNeighbors[18] = this->FaceNeighbors[20] = *out;
+    this->FaceNeighbors[11] = this->FaceNeighbors[13] =
+       this->FaceNeighbors[19] = this->FaceNeighbors[21] = *in;
+    }
+
+  // Ok, we have 24 neighbors to compute.
+  // How can we do this efficiently?
+  // faceIndex and faceLevel here are actually neighborIndex and neighborLevel.
+  // Face index starts at (1,1,1)
+  // increments: 1, 2, 8
+  // Start at the corner and march around the edges.
+  faceIndex[axis1] -= 1;
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+1, this->FaceNeighbors+11);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+3, this->FaceNeighbors+11);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+5, this->FaceNeighbors+11);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+7, this->FaceNeighbors+11);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+15, this->FaceNeighbors+11);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+23, this->FaceNeighbors+11);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+31, this->FaceNeighbors+11);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+29, this->FaceNeighbors+11);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+27, this->FaceNeighbors+11);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+25, this->FaceNeighbors+11);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+17, this->FaceNeighbors+11);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+9, this->FaceNeighbors+11);
+  //Now for the other side (min axis).
+  faceIndex[axis2] -= 1;
+  faceIndex[axis] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+0, this->FaceNeighbors+10);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+2, this->FaceNeighbors+10);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+4, this->FaceNeighbors+10);
+  faceIndex[axis1] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+6, this->FaceNeighbors+10);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+14, this->FaceNeighbors+10);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+22, this->FaceNeighbors+10);
+  faceIndex[axis2] += 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+30, this->FaceNeighbors+10);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+28, this->FaceNeighbors+10);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+26, this->FaceNeighbors+10);
+  faceIndex[axis1] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+24, this->FaceNeighbors+10);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+16, this->FaceNeighbors+10);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+8, this->FaceNeighbors+10);
 }
+
+
+//----------------------------------------------------------------------------
+// Find an iterator from an index,level and a neighbor reference iterator.
+void vtkCTHFragmentConnect::FindNeighbor(
+  int faceIdx[3], int faceLevel, 
+  vtkCTHFragmentConnectIterator* neighbor,
+  vtkCTHFragmentConnectIterator* reference)
+{
+  // Convert the index to the level of the reference block.
+  int neighborIdx[3];
+  int refLevel = reference->Block->GetLevel();
+  
+  neighborIdx[0] = faceIdx[0] >> (faceLevel-refLevel);
+  neighborIdx[1] = faceIdx[1] >> (faceLevel-refLevel);
+  neighborIdx[2] = faceIdx[2] >> (faceLevel-refLevel);
+
+  // The index might point to the reference iterator.
+  if (neighborIdx[0] == reference->Index[0] && 
+      neighborIdx[1] == reference->Index[1] &&
+      neighborIdx[2] == reference->Index[2])
+    {
+    *neighbor = *reference;
+    return;
+    }
+
+  // Find the block the neighbor is in.
+  vtkCTHFragmentConnectBlock* referenceBlock = reference->Block;
+  const int* ext;
+  ext = referenceBlock->GetBaseCellExtent();
+
+  // Check each axis and direction for the extent leaving the bounds.
+  for (int axis = 0; axis < 3; ++axis)
+    {
+    int minIdx = 2*axis;
+    int maxIdx = minIdx + 1;
+    for (int max = 0; max < 2; ++max)
+      {
+      if ((max == 0 && neighborIdx[axis] < ext[minIdx]) || 
+          (max == 1 && neighborIdx[axis] > ext[maxIdx]))
+        { // Index is in neighboring block.  Find the block.
+        vtkCTHFragmentConnectBlock* block;
+        int num, idx;
+        num = referenceBlock->GetNumberOfFaceNeighbors(2*axis+max);
+        for (idx = 0; idx < num; ++idx)
+          {
+          block = referenceBlock->GetFaceNeighbor(2*axis+max, idx);
+          // Is this the one?
+          int tmpIdx[3];
+          int level = block->GetLevel();
+          tmpIdx[0] = faceIdx[0] >> (faceLevel-level);
+          tmpIdx[1] = faceIdx[1] >> (faceLevel-level);
+          tmpIdx[2] = faceIdx[2] >> (faceLevel-level);
+          const int* tmpExt = block->GetBaseCellExtent();
+          if (tmpIdx[axis] >= tmpExt[minIdx] && tmpIdx[axis] <= tmpExt[maxIdx])
+            { // yes
+            referenceBlock = block;
+            ext = tmpExt;
+            neighborIdx[0] = tmpIdx[0];
+            neighborIdx[1] = tmpIdx[1];
+            neighborIdx[2] = tmpIdx[2];
+            // Terminate the search of this direction (block has changed!)
+            num = 0;
+            }
+          }
+        }
+      }
+    }
+
+  // We have a block
+  // clamp the neighbor index to pad the volume
+  if (neighborIdx[0] < ext[0]) { neighborIdx[0] = ext[0];}
+  if (neighborIdx[0] > ext[1]) { neighborIdx[0] = ext[1];}
+  if (neighborIdx[1] < ext[2]) { neighborIdx[1] = ext[2];}
+  if (neighborIdx[1] > ext[3]) { neighborIdx[1] = ext[3];}
+  if (neighborIdx[2] < ext[4]) { neighborIdx[2] = ext[4];}
+  if (neighborIdx[2] > ext[5]) { neighborIdx[2] = ext[5];}
+
+  neighbor->Block = referenceBlock;
+  neighbor->Index[0] = neighborIdx[0];
+  neighbor->Index[1] = neighborIdx[1];
+  neighbor->Index[2] = neighborIdx[2];
+  const int *incs = referenceBlock->GetCellIncrements();
+  int offset = (neighborIdx[0]- ext[0])*incs[0]
+             + (neighborIdx[1]- ext[2])*incs[1]
+             + (neighborIdx[2]- ext[4])*incs[2];
+  neighbor->FragmentIdPointer = referenceBlock->GetBaseFragmentIdPointer() + offset;
+  neighbor->VolumeFractionPointer = referenceBlock->GetBaseVolumeFractionPointer() + offset;
+}
+
+
+
+
+
+
 
 //----------------------------------------------------------------------------
 // This is for getting the neighbors necessary to place face points.
@@ -2955,7 +3480,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
         {
         // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(&iterator, ii, 0, &next);
+        this->CreateFace(&iterator, &next, ii, 0);
         }    
       else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -2982,7 +3507,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
           {
           // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 0, &next2);
+          this->CreateFace(&iterator, &next2, ii, 0);
           }    
         else if (next2.FragmentIdPointer[0] == -1)
           { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -2999,7 +3524,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
           {
           // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 0, &next2);
+          this->CreateFace(&iterator, &next2, ii, 0);
           }    
         else if (next2.FragmentIdPointer[0] == -1)
           { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3018,7 +3543,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
             {
             // Neighbor is outside of fragment.  Make a face.
-            this->CreateFace(&iterator, ii, 0, &next);
+            this->CreateFace(&iterator, &next, ii, 0);
             }    
           else if (next.FragmentIdPointer[0] == -1)
             { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3037,7 +3562,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
       this->GetNeighborIterator(&next, &iterator, ii,1, (ii+1)%3,0, (ii+2)%3,0);
       if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
         { // Neighbor is outside of fragment.  Make a face.
-        this->CreateFace(&iterator, ii, 1, &next);
+        this->CreateFace(&iterator, &next, ii, 1);
         }
       else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3059,7 +3584,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
           {
           // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 1, &next2);
+          this->CreateFace(&iterator, &next2, ii, 1);
           }    
         else if (next2.FragmentIdPointer[0] == -1)
           { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3076,7 +3601,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
           {
           // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, ii, 1, &next2);
+          this->CreateFace(&iterator, &next2, ii, 1);
           }    
         else if (next2.FragmentIdPointer[0] == -1)
           { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3095,7 +3620,7 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
             {
             // Neighbor is outside of fragment.  Make a face.
-            this->CreateFace(&iterator, ii, 1, &next);
+            this->CreateFace(&iterator, &next, ii, 1);
             }    
           else if (next.FragmentIdPointer[0] == -1)
             { // We have not visited this neighbor yet. Mark the voxel and recurse.
@@ -3113,142 +3638,6 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
     }
 }
 
-
-//----------------------------------------------------------------------------
-// Min and max iterators may be different levels.
-// An issue is that neighboring voxels may be higher level.
-// Fill in the volume fraction values for the 8 voxels touching this point.
-// Point is one of the four on the shared face between the two iterators.
-// maxFlag1 and maxFlag2 determine which point.
-// Neighbors are in xyz order (x is the inner loop).
-// Axis0, axis1 and axis2 define the permutation.
-// Value of 0 is x, value 1 is y and value 2 is z.
-void vtkCTHFragmentConnect::FindPointNeighbors(
-  vtkCTHFragmentConnectIterator* iteratorMin0, 
-  vtkCTHFragmentConnectIterator* iteratorMax0,
-  int axis0, int maxFlag1, int maxFlag2, 
-  vtkCTHFragmentConnectIterator pointNeighborIterators[8])
-{
-  vtkCTHFragmentConnectIterator* neighborIterator1; 
-  vtkCTHFragmentConnectIterator* neighborIterator2; 
-
-   int axis1 = (axis0+1)%3;
-   int axis2 = (axis0+2)%3;
-
-  int faceLevel;
-  const int* faceIndex;
-  // We need to find the smallest face (largest level) of the two iterators.
-  if (iteratorMax0->Block->GetLevel() > iteratorMin0->Block->GetLevel())
-    {
-    faceLevel = iteratorMax0->Block->GetLevel();
-    faceIndex = iteratorMax0->Index;
-    }
-  else
-    {
-    faceLevel = iteratorMin0->Block->GetLevel();
-    faceIndex = iteratorMin0->Index;
-    }
-    
-  // Find the axis1 and axis 2 neighbor indexes.  
-  // These will be the same for both min0 and max0 layers.
-  // First the indexes.
-  int neighborIndex1, neighborIndex2;
-  int neighborMaxFlag1, neighborMaxFlag2;
-  if (maxFlag1)
-    {
-    neighborIndex1 = faceIndex[axis1] + 1;
-    neighborMaxFlag1 = 0;
-    }
-  else
-    {
-    neighborIndex1 = faceIndex[axis1] - 1;
-    neighborMaxFlag1 = 1;
-    }
-  if (maxFlag2)
-    {
-    neighborIndex2 = faceIndex[axis2] + 1;
-    neighborMaxFlag2 = 0;
-    }
-  else
-    {
-    neighborIndex2 = faceIndex[axis2] - 1;
-    neighborMaxFlag2 = 1;
-    }
-
-  // To compute which neighbor gets the iterator we create neighbor increments that we can permute.
-  // We could make the computation more efficient by using shifts instead of multiplication.
-  int inc[3];
-  inc[0] = 1; inc[1] = 2; inc[2] = 4;
-    
-  // Start with the iteratorMin0 layer.   
-  // First set the iterator passed in.
-  // The cell is in the opposite direction of the corner.
-  pointNeighborIterators[neighborMaxFlag1*inc[axis1] + neighborMaxFlag2*inc[axis2]] = *iteratorMin0;
-
-  // Find the neighbor on axis1.
-  neighborIterator1 = &(pointNeighborIterators[maxFlag1*inc[axis1] + neighborMaxFlag2*inc[axis2]]);
-  // Lower level of iteratorMin0 may cause the new index and iterator to stay the same.
-  *neighborIterator1 = *iteratorMin0;
-  if (neighborIndex1 >> (faceLevel-iteratorMin0->Block->GetLevel()) != iteratorMin0->Index[axis1])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator1, iteratorMin0, axis1,maxFlag1,  
-                                 axis2,maxFlag2, axis0,1);
-    }
-    
-  // Find the neighbor on axis2.
-  neighborIterator2 = &(pointNeighborIterators[neighborMaxFlag1*inc[axis1] + maxFlag2*inc[axis2]]);
-  // Lower level of iteratorMin0 may cause the new index and iterator to stay the same.
-  *neighborIterator2 = *iteratorMin0;
-  if (neighborIndex2 >> (faceLevel-iteratorMin0->Block->GetLevel()) != iteratorMin0->Index[axis2])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator2, iteratorMin0, axis2,maxFlag2, 
-                                  axis0,1, axis1,maxFlag1);
-    }
-  
-  // Now use neighbor1 to find the corner neighbor.
-  neighborIterator2 = &(pointNeighborIterators[maxFlag1*inc[axis1] + maxFlag2*inc[axis2]]);
-  // Lower level of neighborIterator1 may cause the new index and iterator to stay the same.
-  *neighborIterator2 = *neighborIterator1;
-  if (neighborIndex2 >> (faceLevel-neighborIterator1->Block->GetLevel()) != neighborIterator1->Index[axis2])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator2, neighborIterator1, axis2,maxFlag2, 
-                                  axis0,1, axis1,neighborMaxFlag1);
-    }
-    
-  // Now do the iteratorMax0 layer.   
-  // First set the iterator passed in.
-  pointNeighborIterators[inc[axis0] + neighborMaxFlag1*inc[axis1] + neighborMaxFlag2*inc[axis2]] = *iteratorMax0;
-
-  // Find the neighbor on axis1.
-  neighborIterator1 = &(pointNeighborIterators[inc[axis0] + maxFlag1*inc[axis1] + neighborMaxFlag2*inc[axis2]]);
-  // Lower level of iteratorMax0 may cause the new index and iterator to stay the same.
-  *neighborIterator1 = *iteratorMax0;
-  if (neighborIndex1 >> (faceLevel-iteratorMax0->Block->GetLevel()) != iteratorMax0->Index[axis1])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator1, iteratorMax0, axis1,maxFlag1, 
-                                  axis2,maxFlag2, axis0,0);
-    }
-    
-  // Find the neighbor on axis2.
-  neighborIterator2 = &(pointNeighborIterators[inc[axis0] + neighborMaxFlag1*inc[axis1] + maxFlag2*inc[axis2]]);
-  // Lower level of iteratorMax0 may cause the new index and iterator to stay the same.
-  *neighborIterator2 = *iteratorMax0;
-  if (neighborIndex2 >> (faceLevel-iteratorMax0->Block->GetLevel()) != iteratorMax0->Index[axis2])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator2, iteratorMax0, axis2,maxFlag2, 
-                                 axis0,0, axis1,maxFlag1);
-    }
-  
-  // Now use neighbor1 to find the corner neighbor.
-  neighborIterator2 = &(pointNeighborIterators[inc[axis0] + maxFlag1*inc[axis1] + maxFlag2*inc[axis2]]);
-  // Lower level of neighborIterator1 may cause the new index and iterator to stay the same.
-  *neighborIterator2 = *neighborIterator1;
-  if (neighborIndex2 >> (faceLevel-neighborIterator1->Block->GetLevel()) != neighborIterator1->Index[axis2])
-    { // Move iterator.
-    this->GetNeighborIteratorPad(neighborIterator2, neighborIterator1, axis2, maxFlag2, 
-                                  axis0,0, axis1,neighborMaxFlag1);
-    }
-}
 
 
 
@@ -4081,5 +4470,99 @@ void vtkCTHFragmentConnect::GenerateVolumeArray(
   output->GetPointData()->AddArray(va);
   va->Delete();
 }
+
+
+/*
+//----------------------------------------------------------------------------
+// We could integrate the attributes in a second pass.  It would not be too
+// expensive because we would not have to worry about neighbors between blocks
+// or processes.  Just a simple traversal of the fragment id, volume fraction 
+// and attibutes (block by block).  The only advantage I can see for this is
+// the knowlege of how many framents there would be would keep the 
+// fragment integration arrays from reallocating.
+// I am just going to integrate the attributes as the voxels are visited for 
+// connectivity
+void vtkCTHFragmentConnect::InitializeAttributeIntegration(vtkCellData* inCellData)
+{
+  int numComps;
+  int bufferLength = 0;
+
+  // This is where we store the attributes for each fragment
+  // after integration.  This is not the final celldata array
+  // because equivalent framgents are merge.
+  this->IntegratedFragmentAttributes = vtkCellData::New();
+  
+  // Allocate arrays.
+  int numArrays = inCellData->GetNumberOfArrays();
+  for (int ii = 0; ii < numArrays; ++ii)
+    {
+    vtkDataArray* inArray = inCellData->GetArray(ii);
+    // Make a new array of the same type.
+    vtkDataArray* fragArray = inArray->NewInstance();
+    numComps = inArray->GetNumberOfComponents();
+    fragArray->SetNumberOfComponents(numComps);
+    fragArray->SetName(inArray->GetName());
+    this->IntegratedFragmentAttributes->AddArray(fragArray);
+    bufLength += numComps * fragArray->GetDataTypeSize();
+    }
+  
+  // I am going to do the actual integration in a raw memory buffer.
+  // It is flexible with no complicated arbitrary structure.
+  // I just iterate through the buffer casting the pointer to the correct types.
+  this->IntegrationBuffer = new unsigned char[bufferLength];
+}
+
+//----------------------------------------------------------------------------
+// This is called every time we visit a voxel that is part of a fragment.
+void vtkCTHFragmentConnect::IntegrateFragmentAttributesForVoxel(
+  vtkIdType voxelId, 
+  double volumeFraction,
+  vtkCellData* inCellData)
+{
+  void* integrationPtr = this->IntegrationBuffer();
+  
+  int numArrays = inCellData->GetNumberOfArrays();
+  for (int ii = 0; ii < numArrays; ++ii)
+    {
+    vtkDataArray* inArray = inCellData->GetArray(ii);
+    numComps = inArray->GetNumberOfComponents();
+    // What should we do if the array is an int or byte ???
+    // We should probably skip the volume fractions.????????
+    switch (inArray->GetDataType())
+      {
+      case VTK_FLOAT :
+        // We could template this ...
+        float* inPtr = ((vtkFloatArray*)(inArray))->GetPointer(0);
+        float* floatIntegrationPtr = ((float*)(integrationPtr));
+        for (int comp = 0; comp < numComps; ++comp)
+          {
+          *floatIntegrationPtr++ += *inPtr++;
+          }
+        integrationPtr = (void*)(floatIntegrationPtr);
+        break;
+      case VTK_DOUBLE :
+        float* inPtr = ((vtkFloatArray*)(inArray))->GetPointer(0);
+        float* floatIntegrationPtr = ((float*)(integrationPtr));
+        for (int comp = 0; comp < numComps; ++comp)
+          {
+          *floatIntegrationPtr++ += *inPtr++;
+          }
+        integrationPtr = (void*)(floatIntegrationPtr);
+        break;
+    }
+}
+
+//----------------------------------------------------------------------------
+// This should be called when the connectivity moves to a new framment.
+void vtkCTHFragmentConnect::FinishFragmentAttributeIntgration()
+{
+}
+
+//----------------------------------------------------------------------------
+// This resolves all equivalent fragment, places the new arrays in the
+// output cell data, and frees all memory used for the integration.
+void vtkCTHFragmentConnect::FinializeAttributeIntegration(..)
+
+*/
 
 
