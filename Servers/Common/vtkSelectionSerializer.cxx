@@ -32,7 +32,7 @@
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.17");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.18");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -66,33 +66,33 @@ void vtkSelectionSerializer::PrintXML(
   vtkInformationIterator* iter = vtkInformationIterator::New();
   vtkInformation* properties = selection->GetProperties();
   iter->SetInformation(properties);
-  for(iter->GoToFirstItem(); 
-      !iter->IsDoneWithTraversal(); 
+  for(iter->GoToFirstItem();
+      !iter->IsDoneWithTraversal();
       iter->GoToNextItem())
     {
     vtkInformationKey* key = iter->GetCurrentKey();
-    os << ni 
-       << "<Property key=\"" << key->GetName() 
+    os << ni
+       << "<Property key=\"" << key->GetName()
        << "\" value=\"";
     if (key->IsA("vtkInformationIntegerKey"))
       {
-      vtkInformationIntegerKey* iKey = 
+      vtkInformationIntegerKey* iKey =
         static_cast<vtkInformationIntegerKey*>(key);
       os << properties->Get(iKey);
       }
     else if (key->IsA("vtkInformationDoubleKey"))
       {
-      vtkInformationDoubleKey* dKey = 
+      vtkInformationDoubleKey* dKey =
         static_cast<vtkInformationDoubleKey*>(key);
       os << properties->Get(dKey);
       }
     else if (key->IsA("vtkInformationStringKey"))
       {
-      vtkInformationStringKey* sKey = 
+      vtkInformationStringKey* sKey =
         static_cast<vtkInformationStringKey*>(key);
       os << properties->Get(sKey);
       }
-      
+
     os << "\"/>" << endl;
     }
   iter->Delete();
@@ -140,8 +140,8 @@ void vtkSelectionSerializer::WriteSelectionData(
       vtkDataArray* list = vtkDataArray::SafeDownCast(data->GetAbstractArray(i));
       vtkIdType numTuples = list->GetNumberOfTuples();
       vtkIdType numComps  = list->GetNumberOfComponents();
-      
-      os << indent 
+
+      os << indent
          << "<SelectionList"
          << " classname=\""
          << list->GetClassName()
@@ -170,7 +170,7 @@ void vtkSelectionSerializer::WriteSelectionData(
         selection->GetSelectionList());
       vtkIdType numTuples = stringList->GetNumberOfTuples();
       vtkIdType numComps  = stringList->GetNumberOfComponents();
-      os << indent 
+      os << indent
          << "<SelectionList"
          << " classname=\""
          << stringList->GetClassName()
@@ -209,7 +209,7 @@ void vtkSelectionSerializer::Parse(const char* xml, vtkSelection* root)
 }
 
 //----------------------------------------------------------------------------
-void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML, 
+void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
                                        vtkSelection* node)
 {
   if (!nodeXML || !node)
@@ -358,10 +358,10 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
       {
       if (elem->GetAttribute("classname"))
         {
-        vtkAbstractArray* arr = 
+        vtkAbstractArray* arr =
           vtkAbstractArray::SafeDownCast(
             vtkInstantiator::CreateInstance(elem->GetAttribute("classname")));
-        vtkDataArray* dataArray = 
+        vtkDataArray* dataArray =
           vtkDataArray::SafeDownCast(arr);
         if (dataArray)
           {
@@ -392,7 +392,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           }
         else if (vtkStringArray::SafeDownCast(arr))
           {
-          vtkStringArray* stringArray = 
+          vtkStringArray* stringArray =
             vtkStringArray::SafeDownCast(arr);
           stringArray->SetName(elem->GetAttribute("name"));
           vtkIdType numTuples;
@@ -407,7 +407,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
               {
               vtkPVXMLElement* strElem = elem->GetNestedElement(ind);
               stringArray->SetValue(ind, strElem->GetCharacterData());
-              }            
+              }
             }
           node->GetSelectionData()->AddArray(stringArray);
           stringArray->Delete();
