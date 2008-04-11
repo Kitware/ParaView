@@ -118,11 +118,11 @@ pqCutPanel::pqCutPanel(pqProxy* object_proxy, QWidget* p) :
     SIGNAL(modified()),
     this, SLOT(setModified()));
     
-  connect(
-    &this->Implementation->SampleScalarWidget,
-    SIGNAL(samplesChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
+  // Link SampleScalarWidget's qProperty to vtkSMProperty
+  this->propertyManager()->registerLink(
+    &this->Implementation->SampleScalarWidget, "samples",
+    SIGNAL(samplesChanged()), this->proxy(),
+    this->proxy()->GetProperty("ContourValues"));
   
   connect(
     this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));

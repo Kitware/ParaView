@@ -91,13 +91,7 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   panel_layout->addWidget(group1);
   panel_layout->addWidget(group2);
   panel_layout->addStretch();
-  
-  connect(
-    &this->Implementation->SampleScalarWidget,
-    SIGNAL(samplesChanged()),
-    this->propertyManager(),
-    SLOT(propertyChanged()));
-    
+
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->propertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 
@@ -106,7 +100,13 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
     this->proxy(),
     vtkSMDoubleVectorProperty::SafeDownCast(this->proxy()->GetProperty("ContourValues")),
     this->proxy()->GetProperty("SelectInputScalars"));
-    
+
+  // Link SampleScalarWidget's qProperty to vtkSMProperty
+  this->propertyManager()->registerLink(
+    &this->Implementation->SampleScalarWidget, "samples",
+    SIGNAL(samplesChanged()), this->proxy(),
+    this->proxy()->GetProperty("ContourValues"));
+
   pqNamedWidgets::link(
     &this->Implementation->ControlsContainer, this->proxy(), this->propertyManager());
 }
