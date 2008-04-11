@@ -85,6 +85,8 @@ protected:
     Qt::KeyboardModifiers modifiers);
 
   QTimer* Timer;
+
+  int itemCount(QTreeWidgetItem* item) const;
 };
 
 #endif // !_pqTreeWidget_h

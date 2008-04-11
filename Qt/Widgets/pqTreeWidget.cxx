@@ -263,6 +263,26 @@ void pqTreeWidget::doToggle(int column)
 }
 
 //-----------------------------------------------------------------------------
+int pqTreeWidget::itemCount(QTreeWidgetItem* item) const
+{
+  int maxItemHint = 10;
+  int numItems = item? item->childCount() : this->topLevelItemCount();
+  int count = numItems;
+  for (int cc=0; cc < numItems; cc++)
+    {
+    QTreeWidgetItem* childItem = item? item->child(cc): this->topLevelItem(cc);
+    count += this->itemCount(childItem);
+    if (count > maxItemHint)
+      {
+      // cut short traversal of the tree if we've reached the max size.
+      return maxItemHint;
+      }
+    }
+
+  return count;
+}
+
+//-----------------------------------------------------------------------------
 QSize pqTreeWidget::sizeHint() const
 {
   // lets show X items before we get a scrollbar
@@ -272,12 +292,12 @@ QSize pqTreeWidget::sizeHint() const
   // for no items, let's give a space of X pixels
   int minItemHeight = 20;
 
-  int num = this->topLevelItemCount() + 1; /* extra room for scroll bar */
+  int num = this->itemCount(NULL) + 1; /* extra room for scroll bar */
   num = qMin(num, maxItemHint);
   
   int pix = minItemHeight;
 
-  if(num)
+  if (num)
     {
     pix = qMax(pix, this->sizeHintForRow(0) * num);
     }
