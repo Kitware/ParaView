@@ -42,7 +42,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.15");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.16");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -2715,6 +2715,11 @@ void vtkCTHFragmentConnect::CreateFace(
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
   idScalars->InsertTuple1(quadCornerIds[3], this->FragmentId);
 
+  if ( quadCornerIds[3] > 74503) // 74507
+    {
+    cerr << "Debug\n";
+    }
+
   // Now for the mid edge point if the neighbors on that side are smaller.
   if (this->FaceEdgeFlags[0])
     {
@@ -3167,6 +3172,40 @@ void vtkCTHFragmentConnect::ComputeFaceNeighbors(
   this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+16, this->FaceNeighbors+10);
   faceIndex[axis2] -= 1;
   this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+8, this->FaceNeighbors+10);
+  
+  --faceLevel;
+  this->FaceEdgeFlags[0] = 0;
+  if (this->FaceNeighbors[2].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[3].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[4].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[5].Block->GetLevel() > faceLevel)
+    {
+    this->FaceEdgeFlags[0] = 1;
+    }
+  this->FaceEdgeFlags[1] = 0;
+  if (this->FaceNeighbors[8].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[9].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[16].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[17].Block->GetLevel() > faceLevel)
+    {
+    this->FaceEdgeFlags[1] = 1;
+    }
+  this->FaceEdgeFlags[2] = 0;
+  if (this->FaceNeighbors[14].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[15].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[22].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[23].Block->GetLevel() > faceLevel)
+    {
+    this->FaceEdgeFlags[2] = 1;
+    }
+  this->FaceEdgeFlags[3] = 0;
+  if (this->FaceNeighbors[26].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[27].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[28].Block->GetLevel() > faceLevel ||
+      this->FaceNeighbors[29].Block->GetLevel() > faceLevel)
+    {
+    this->FaceEdgeFlags[3] = 1;
+    }
 }
 
 
