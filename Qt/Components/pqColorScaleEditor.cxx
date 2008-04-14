@@ -1691,6 +1691,8 @@ void pqColorScaleEditor::enableLegendControls(bool enable)
   this->Form->LabelFrame->setEnabled(enable);
   this->Form->NumberOfLabels->setEnabled(enable);
   this->Form->CountLabel->setEnabled(enable);
+  this->Form->AspectRatio->setEnabled(enable);
+  this->Form->AspectRatioLabel->setEnabled(enable);
 }
 
 void pqColorScaleEditor::makeDefault()
