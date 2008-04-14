@@ -5614,10 +5614,10 @@
         default_values="2"
         update_self="1">
         <EnumerationDomain name="enum">
+          <Entry value="3" text="Outline" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
-          <Entry value="3" text="Outline" />
           <Entry value="5" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
@@ -5652,12 +5652,12 @@
         default_values="2"
         update_self="1">
         <EnumerationDomain name="enum">
+          <Entry value="3" text="Outline" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
-          <Entry value="3" text="Outline" />
-          <Entry value="4" text="Volume" />
           <Entry value="5" text="Surface With Edges" />
+          <Entry value="4" text="Volume" />
         </EnumerationDomain>
       </IntVectorProperty>
 
@@ -5705,12 +5705,12 @@
         default_values="6"
         update_self="1">
         <EnumerationDomain name="enum">
+          <Entry value="3" text="Outline" />
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
           <Entry value="2" text="Surface" />
-          <Entry value="3" text="Outline" />
-          <Entry value="4" text="Volume" />
           <Entry value="5" text="Surface With Edges" />
+          <Entry value="4" text="Volume" />
           <Entry value="6" text="Slice" />
         </EnumerationDomain>
       </IntVectorProperty>
