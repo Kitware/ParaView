@@ -28,55 +28,6 @@
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile" >
-    <property name="title" >
-     <string>&amp;File</string>
-    </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
-    <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="separator" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="actionFileSaveGeometry" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
-    <addaction name="actionDelete_All" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="actionSelectSurfacePoints" />
-    <addaction name="actionSelect_Frustum" />
-    <addaction name="actionSelectFrustumPoints" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-    <addaction name="actionEditViewSettings" />
-   </widget>
    <widget class="QMenu" name="menuHelp" >
     <property name="title" >
      <string>&amp;Help</string>
@@ -108,6 +59,11 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
    <widget class="QMenu" name="menuAnimation" >
     <property name="title" >
      <string>A&amp;nimation</string>
@@ -118,11 +74,6 @@
     <addaction name="actionVCRNextFrame" />
     <addaction name="actionVCRLastFrame" />
     <addaction name="actionVCRLoop" />
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -154,6 +105,56 @@
     <addaction name="separator" />
     <addaction name="menuToolbars" />
     <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="actionSelectSurfacePoints" />
+    <addaction name="actionSelect_Frustum" />
+    <addaction name="actionSelectFrustumPoints" />
+    <addaction name="actionSelect_Block" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+    <addaction name="actionEditViewSettings" />
+   </widget>
+   <widget class="QMenu" name="menuFile" >
+    <property name="title" >
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
+    <addaction name="separator" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
    </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
@@ -235,6 +236,9 @@
    <property name="windowTitle" >
     <string>Selection Controls</string>
    </property>
+   <property name="toolTip" >
+    <string>Select Block</string>
+   </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
@@ -246,6 +250,7 @@
    <addaction name="actionSelectSurfacePoints" />
    <addaction name="actionSelect_Frustum" />
    <addaction name="actionSelectFrustumPoints" />
+   <addaction name="actionSelect_Block" />
   </widget>
   <widget class="QToolBar" name="undoRedoToolbar" >
    <property name="windowTitle" >
@@ -685,6 +690,9 @@
    </property>
    <property name="statusTip" >
     <string>Select Cells On</string>
+   </property>
+   <property name="shortcut" >
+    <string>S</string>
    </property>
   </action>
   <action name="actionSelect_Frustum" >
@@ -1239,6 +1247,23 @@
   <action name="actionEditViewSettings" >
    <property name="text" >
     <string>View Settings...</string>
+   </property>
+  </action>
+  <action name="actionSelect_Block" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqGroupExtract24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Select Block</string>
+   </property>
+   <property name="shortcut" >
+    <string>B</string>
    </property>
   </action>
  </widget>

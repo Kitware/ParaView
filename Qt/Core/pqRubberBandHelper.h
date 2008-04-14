@@ -69,7 +69,8 @@ public:
     SELECT, //aka, Surface selection
     SELECT_POINTS,
     FRUSTUM,
-    FRUSTUM_POINTS
+    FRUSTUM_POINTS,
+    BLOCKS
   };
   //ETX
 
@@ -84,6 +85,7 @@ public slots:
   void beginSurfacePointsSelection();
   void beginFrustumSelection();
   void beginFrustumPointsSelection();
+  void beginBlockSelection();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.

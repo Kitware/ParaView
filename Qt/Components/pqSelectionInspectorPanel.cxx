@@ -129,6 +129,7 @@ public:
     {
     this->SelectionLinks = new pqPropertyLinks;
     this->RepLinks = new pqPropertyLinks;
+    this->BlocksAdaptor = 0;
     this->IndicesAdaptor = 0;
     this->GlobalIDsAdaptor = 0;
     this->LocationsAdaptor = 0;
@@ -164,6 +165,7 @@ public:
     delete this->RepLinks;
     delete this->CompositeTreeAdaptor;
     delete this->LocationsAdaptor;
+    delete this->BlocksAdaptor;
 
     delete this->SelectionColorAdaptor;
     delete this->PointColorAdaptor;
@@ -206,6 +208,7 @@ public:
   pqSignalAdaptorTreeWidget* IndicesAdaptor;
   pqSignalAdaptorTreeWidget* GlobalIDsAdaptor;
   pqSignalAdaptorTreeWidget* LocationsAdaptor;
+  pqSignalAdaptorCompositeTreeWidget* BlocksAdaptor;
 
   QPointer<pqOutputPort> InputPort;
   // The representation whose properties are being edited.
@@ -246,7 +249,8 @@ public:
     GLOBALIDS = 1,
     FRUSTUM = 2,
     LOCATIONS = 3,
-    THRESHOLDS = 4
+    THRESHOLDS = 4,
+    BLOCKS = 5
     };
 };
 
@@ -315,6 +319,7 @@ void pqSelectionInspectorPanel::setupGUI()
   this->setupFrustumSelectionGUI();
   this->setupLocationsSelectionGUI();
   this->setupThresholdSelectionGUI();
+  this->setupBlockSelectionGUI();
   this->setupSelectionLabelGUI();
 
   QObject::connect(this->Implementation->SelectionLinks, SIGNAL(qtWidgetChanged()),
@@ -452,6 +457,9 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
   delete this->Implementation->CompositeTreeAdaptor;
   this->Implementation->CompositeTreeAdaptor = 0;
 
+  delete this->Implementation->BlocksAdaptor;
+  this->Implementation->BlocksAdaptor = 0;
+
   // composite tree is only shown for "CompositeDataIDSelectionSource".
   this->Implementation->compositeTree->setVisible(false);
    
@@ -545,6 +553,19 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
       pqImplementation::LOCATIONS);
     idsAdaptor = this->Implementation->LocationsAdaptor;
     }
+  else if (proxyname == QString("BlockSelectionSource"))
+    {
+    this->Implementation->comboSelectionType->setCurrentIndex(
+      pqImplementation::BLOCKS);
+    this->Implementation->BlocksAdaptor = 
+      new pqSignalAdaptorCompositeTreeWidget(
+        this->Implementation->Blocks, 
+        this->Implementation->InputPort->getOutputPortProxy(),
+        vtkSMCompositeTreeDomain::LEAVES,
+        pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, 
+        /*selectMultiple=*/true,
+        /*autoUpdateVisibility=*/false);
+    }
   else
     {
     qDebug() << proxyname << "is not handled by the pqSelectionInspectorPanel yet.";
@@ -576,6 +597,14 @@ void pqSelectionInspectorPanel::updateSelectionGUI()
     this->Implementation->SelectionLinks->addPropertyLink(
       idsAdaptor, "values", SIGNAL(valuesChanged()),
       selSource, selSource->GetProperty("Locations"));
+    }
+
+  if (selSource->GetProperty("Blocks"))
+    {
+    this->Implementation->SelectionLinks->addPropertyLink(
+      this->Implementation->BlocksAdaptor, "values", 
+      SIGNAL(valuesChanged()),
+      selSource, selSource->GetProperty("Blocks"));
     }
 
   if (selSource->GetProperty("Thresholds"))
@@ -992,6 +1021,12 @@ void pqSelectionInspectorPanel::setupLocationsSelectionGUI()
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::setupBlockSelectionGUI()
+{
+
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupGlobalIDSelectionGUI()
 {
   this->Implementation->GlobalIDsAdaptor =
@@ -1062,9 +1097,11 @@ void pqSelectionInspectorPanel::newValue()
     activeTree = this->Implementation->Locations;
     adaptor = this->Implementation->LocationsAdaptor;
     break;
-
-  case pqImplementation::FRUSTUM: // Frustum
+    
+  case pqImplementation::BLOCKS: 
+  case pqImplementation::FRUSTUM:
   default:
+    // don't support newValue().
     return;
     }
 
@@ -1108,8 +1145,10 @@ void pqSelectionInspectorPanel::deleteValue()
     activeTree = this->Implementation->Locations;
     break;
 
+  case pqImplementation::BLOCKS:
   case pqImplementation::FRUSTUM: // Frustum
   default:
+    // not supported.
     return;
     }
 
@@ -1142,8 +1181,10 @@ void pqSelectionInspectorPanel::deleteAllValues()
     activeTree = this->Implementation->Locations;
     break;
 
+  case pqImplementation::BLOCKS: 
   case pqImplementation::FRUSTUM: // Frustum
   default:
+    // Not supported.
     return;
     }
 
@@ -1297,6 +1338,9 @@ int pqSelectionInspectorPanel::getContentType() const
 
   case pqImplementation::LOCATIONS:
     return vtkSelection::LOCATIONS;
+
+  case pqImplementation::BLOCKS:
+    return vtkSelection::BLOCKS;
 
   default:
     qDebug() << "Case not handled.";

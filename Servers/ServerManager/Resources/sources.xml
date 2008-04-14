@@ -1314,6 +1314,31 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    </Proxy>
    
    <!-- ==================================================================== -->
+   <SourceProxy name="BlockSelectionSource" class="vtkPVSelectionSource"
+      base_proxygroup="sources" base_proxyname="SelectionSourceBase">
+      <Documentation>
+        BlockSelectionSource is a source producing a block-based selection used
+        to select blocks from a composite dataset.
+      </Documentation>
+      <IdTypeVectorProperty name="Blocks"
+        command="AddBlock" 
+        clean_command="RemoveAllBlocks"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        default_values="0"
+        label="Blocks">
+        <Documentation>
+          The list of blocks that will be added to the selection produced by the
+          selection source. The blocks are identified using their composite
+          index (flat index).
+        </Documentation>
+     </IdTypeVectorProperty> 
+
+      <!-- End of BlockSelectionSource -->
+   </SourceProxy>
+   
+   <!-- ==================================================================== -->
    <SourceProxy name="FrustumSelectionSource" class="vtkPVSelectionSource"
       base_proxygroup="sources" base_proxyname="SelectionSourceBase">
       <Documentation>

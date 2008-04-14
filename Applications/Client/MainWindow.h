@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -54,7 +54,7 @@ public:
 
 public slots:
   QVariant findToolBarActionsNotInMenus();
-  
+
 private slots:
   void onUndoLabel(const QString&);
   void onRedoLabel(const QString&);
@@ -69,7 +69,6 @@ private slots:
   void onHelpAbout();
   void onHelpHelp();
 
-  void onSelectionShortcut();
   void onQuickLaunchShortcut();
 
   void assistantError(const QString& err);
@@ -81,7 +80,7 @@ private slots:
   void onPlaying(bool);
 
   void onAddCameraLink();
-  
+
   void onDeleteAll();
 
   void onSelectionModeChanged(int mode);

@@ -27,11 +27,12 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkUnsignedIntArray.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkIndexBasedBlockSelectionFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.5");
+vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.6");
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
 {
@@ -408,7 +409,9 @@ int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(
     }
 
   vtkInformation* inProperties = input->GetProperties();
-  if (inProperties->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::INDICES)
+
+  if ((inProperties->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::INDICES) &&
+    (inProperties->Get(vtkSelection::CONTENT_TYPE()) != vtkSelection::BLOCKS))
     {
     return 1;
     }
@@ -422,6 +425,24 @@ int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(
     // input selection process id is not same as this process's id, which means
     // that the input selection is not applicable to this process. Nothing to do
     // in that case.
+    return 1;
+    }
+
+  if (inProperties->Get(vtkSelection::CONTENT_TYPE()) == vtkSelection::BLOCKS)
+    {
+    // If input selection is of type vtkSelection::BLOCKS, 
+    // the output contains the current composite block if it is selected in the
+    // input.
+    output->GetProperties()->Copy(inProperties);
+    if (input->GetSelectionList()->LookupValue(
+        vtkVariant(this->GetCompositeDataSetIndex())) != -1)
+      {
+      vtkUnsignedIntArray* selList = vtkUnsignedIntArray::New();
+      selList->SetNumberOfTuples(1);
+      selList->SetValue(0, this->GetCompositeDataSetIndex());
+      output->SetSelectionList(selList);
+      selList->Delete();
+      }
     return 1;
     }
 

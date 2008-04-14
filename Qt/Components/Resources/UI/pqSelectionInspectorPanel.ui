@@ -150,6 +150,11 @@
             <string>Thresholds</string>
            </property>
           </item>
+          <item>
+           <property name="text" >
+            <string>Blocks</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item row="2" column="0" >
@@ -219,7 +224,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QTreeWidget" name="compositeTree" >
+         <widget class="pqTreeWidget" name="compositeTree" >
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Expanding" hsizetype="Fixed" >
             <horstretch>0</horstretch>
@@ -803,6 +808,40 @@
                </size>
               </property>
              </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Blocks" >
+           <layout class="QGridLayout" >
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>3</number>
+            </property>
+            <property name="verticalSpacing" >
+             <number>3</number>
+            </property>
+            <item row="0" column="0" >
+             <widget class="pqTreeWidget" name="Blocks" >
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Blocks</string>
+               </property>
+              </column>
+             </widget>
             </item>
            </layout>
           </widget>

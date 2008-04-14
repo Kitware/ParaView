@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.14");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.15");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -89,7 +89,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
 
   vtkInformation* inputProperties =  input->GetProperties();
   vtkInformation* outputProperties = output->GetProperties();
-  
+
   if (global_ids)
     {
     outputProperties->Set(
@@ -140,7 +140,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     {
     return;
     }
-      
+
   if (!inputProperties->Has(vtkSelection::SOURCE_ID()) ||
       !inputProperties->Has(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()))
     {
@@ -177,7 +177,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   id.ID = inputProperties->Get(vtkSelectionSerializer::ORIGINAL_SOURCE_ID());
   vtkAlgorithm* originalAlg = vtkAlgorithm::SafeDownCast(
     pm->GetObjectFromID(id));
-  vtkDataSet* originalDS = originalAlg? 
+  vtkDataSet* originalDS = originalAlg?
     vtkDataSet::SafeDownCast(originalAlg->GetOutputDataObject(0)) : 0;
   vtkIdTypeArray* globalIdsArray = originalDS?
     vtkIdTypeArray::SafeDownCast(originalDS->GetCellData()->GetGlobalIds()): 0;
@@ -207,7 +207,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   if (inputProperties->Has(vtkSelection::INDEXED_VERTICES()) &&
       (inputProperties->Get(vtkSelection::INDEXED_VERTICES()) == 1) &&
       vertptrs && vertlist)
-    {    
+    {
     vtkIdTypeArray* pointMapArray = vtkIdTypeArray::SafeDownCast(
       ds->GetPointData()->GetArray("vtkOriginalPointIds"));
     if (!pointMapArray)
@@ -220,7 +220,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
         ds->GetCellData()->GetArray("vtkCompositeIndex"));
     // compositeIndexArray may not be present at all if the input dataset is not a
     // composite dataset.
-   
+
     // NOTE: these are cell-data arrays.
     amrLevelArray = vtkUnsignedIntArray::SafeDownCast(
       ds->GetCellData()->GetArray("vtkAMRLevel")); // may be null.
@@ -260,7 +260,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
         for (vtkIdType v = 0; v < npts; v++)
           {
           vtkIdType idx = vertlist->GetValue(ptr+1+v);
-          vtkIdType ptId = idlist->GetId(idx); 
+          vtkIdType ptId = idlist->GetId(idx);
           vtkIdType originalPtId = ptId;
           if (pointMapArray)
             {
@@ -274,7 +274,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       }
     idlist->Delete();
     }
-  else 
+  else
     {
     vtkIdTypeArray* cellMapArray = vtkIdTypeArray::SafeDownCast(
       ds->GetCellData()->GetArray("vtkOriginalCellIds"));
@@ -305,7 +305,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
         }
       else if (compositeIndexArray)
         {
-        unsigned int composite_index = 
+        unsigned int composite_index =
           compositeIndexArray->GetValue(geomCellId);
         key = vtkKeyType(composite_index);
         }
@@ -325,7 +325,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   outputProperties->Set(
     vtkSelection::SOURCE_ID(),
     inputProperties->Get(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()));
-  
+
   if (inputProperties->Has(vtkSelection::PROCESS_ID()))
     {
     outputProperties->Set(vtkSelection::PROCESS_ID(),
@@ -359,11 +359,11 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       vtkIdType index=0;
       for (sit = ids.begin(); sit != ids.end(); sit++, index++)
         {
-        outputArray->SetValue(index, *sit); 
+        outputArray->SetValue(index, *sit);
         }
       child->SetSelectionList(outputArray);
       outputArray->Delete();
-  
+
       output->AddChild(child);
       child->Delete();
       }
@@ -377,7 +377,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     vtkIdType index=0;
     for (sit = ids.begin(); sit != ids.end(); sit++, index++)
       {
-      outputArray->SetValue(index, *sit); 
+      outputArray->SetValue(index, *sit);
       }
     if (amrLevelArray && amrIndexArray)
       {

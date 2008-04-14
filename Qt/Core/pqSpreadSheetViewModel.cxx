@@ -644,6 +644,18 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
       }
     return qSel;
     }
+  else if (vtkselection->GetContentType() == vtkSelection::BLOCKS)
+    {
+    QItemSelection qSel;
+    vtkUnsignedIntArray* blocks = vtkUnsignedIntArray::SafeDownCast(
+      vtkselection->GetSelectionList());
+    if (blocks && blocks->GetNumberOfTuples() > 0)
+      {
+      qSel.select(this->createIndex(0, 0),
+        this->createIndex(this->rowCount()-1, 0));
+      }
+    return qSel;
+    }
   qCritical() << "Unknown selection object.";
   return QItemSelection();
 

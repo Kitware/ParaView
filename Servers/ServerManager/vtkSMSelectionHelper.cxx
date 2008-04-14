@@ -36,12 +36,13 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkUnsignedIntArray.h"
 
 #include <vtkstd/vector>
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.12");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.13");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -80,6 +81,7 @@ void vtkSMSelectionHelper::ConvertSurfaceSelectionToVolumeSelection(
 }
 
 //-----------------------------------------------------------------------------
+// Don't think this method is used anymore.
 void vtkSMSelectionHelper::ConvertSurfaceSelectionToGlobalIDVolumeSelection(
   vtkIdType connectionID,
   vtkSelection* input, vtkSelection* output)
@@ -199,6 +201,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     proxyname = "GlobalIDSelectionSource";
     break;
 
+  case vtkSelection::BLOCKS:
+    proxyname = "BlockSelectionSource";
+    break;
+
   default:
     vtkGenericWarningMacro("Unhandled ContentType: " << contentType);
     return selSource;
@@ -272,6 +278,27 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
       for (vtkIdType cc=0; cc < numIDs; cc++)
         {
         ids->SetElement(curValues+cc, idList->GetValue(cc));
+        }
+      }
+    }
+  else if (contentType == vtkSelection::BLOCKS)
+    {
+    vtkSMIdTypeVectorProperty* blocks = vtkSMIdTypeVectorProperty::SafeDownCast(
+      selSource->GetProperty("Blocks"));
+    if (!originalSelSource)
+      {
+      blocks->SetNumberOfElements(0);
+      }
+    unsigned int curValues = blocks->GetNumberOfElements();
+    vtkUnsignedIntArray* idList = vtkUnsignedIntArray::SafeDownCast(
+      selection->GetSelectionList());
+    if (idList)
+      {
+      vtkIdType numIDs = idList->GetNumberOfTuples();
+      blocks->SetNumberOfElements(curValues+numIDs);
+      for (vtkIdType cc=0; cc < numIDs; cc++)
+        {
+        blocks->SetElement(curValues+cc, idList->GetValue(cc));
         }
       }
     }
@@ -394,6 +421,10 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
     outproxyname = "ThresholdSelectionSource";
     break;
 
+  case vtkSelection::BLOCKS:
+    outproxyname = "BlockSelectionSource";
+    break;
+
   case vtkSelection::INDICES:
       {
       vtkPVDataInformation* di = dataSource->GetDataInformation(dataPort, true);
@@ -432,9 +463,9 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
     if (ids->GetNumberOfElements() > 0)
       {
       // convert from global IDs to indices.
-      return vtkSMSelectionHelper::ConvertIndices(
+      return vtkSMSelectionHelper::ConvertInternal(
         vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
-        dataSource, dataPort, false);
+        dataSource, dataPort, vtkSelection::INDICES);
       }
     }
   else if (outputType == vtkSelection::GLOBALIDS && selectionSourceProxy && (
@@ -447,10 +478,19 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
     if (ids->GetNumberOfElements() > 0)
       {
       // convert from ID seelction to global IDs.
-      return vtkSMSelectionHelper::ConvertIndices(
+      return vtkSMSelectionHelper::ConvertInternal(
         vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
-        dataSource, dataPort, true);
+        dataSource, dataPort, vtkSelection::GLOBALIDS);
       }
+    }
+  else if (outputType == vtkSelection::BLOCKS && selectionSourceProxy &&
+    (strcmp(inproxyname, "GlobalIDSelectionSource") == 0 ||
+     strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0||
+     strcmp(inproxyname, "CompositeDataIDSelectionSource")==0))
+    {
+    return vtkSMSelectionHelper::ConvertInternal(
+      vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
+      dataSource, dataPort, vtkSelection::BLOCKS);
     }
 
   // Conversion not possible, so simply create a new proxy of the requested
@@ -488,9 +528,9 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMSelectionHelper::ConvertIndices(
+vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
-  int dataPort, bool toGlobalIDs)
+  int dataPort, int outputType)
 {
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -514,7 +554,7 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertIndices(
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     convertor->GetProperty("OutputType"));
-  ivp->SetElement(0, toGlobalIDs? vtkSelection::GLOBALIDS : vtkSelection::INDICES);
+  ivp->SetElement(0, outputType);
   convertor->UpdateVTKObjects();
 
   // * Request conversion.

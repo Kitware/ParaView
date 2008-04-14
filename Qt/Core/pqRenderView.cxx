@@ -53,6 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkTrackballPan.h"
+#include "vtkSMSelectionHelper.h"
+#include "vtkSelection.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -1333,6 +1335,16 @@ void pqRenderView::resetViewDirection(
 //-----------------------------------------------------------------------------
 void pqRenderView::selectOnSurface(int rect[4])
 {
+  pqOutputPort* opPort = this->selectOnSurfaceInternal(rect);
+
+  // Fire selection event to let the world know that this view selected
+  // something.
+  emit this->selected(opPort);
+}
+
+//-----------------------------------------------------------------------------
+pqOutputPort* pqRenderView::selectOnSurfaceInternal(int rect[4])
+{
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 
   vtkSmartPointer<vtkCollection> selectedRepresentations = 
@@ -1344,14 +1356,12 @@ void pqRenderView::selectOnSurface(int rect[4])
   if (!renderModuleP->SelectOnSurface(rect[0], rect[1], rect[2], rect[3], 
       selectedRepresentations, selectionSources, surfaceSelections, false))
     {
-    emit this->selected(0);
-    return;
+    return 0;
     }
 
   if (selectedRepresentations->GetNumberOfItems()<=0)
     {
-    emit this->selected(0);
-    return;
+    return 0;
     }
 
   vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
@@ -1365,8 +1375,7 @@ void pqRenderView::selectOnSurface(int rect[4])
   if (!repr)
     {
     // No data display was selected (or none that is registered).
-    emit this->selected(0);
-    return;
+    return 0;
     }
 
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
@@ -1374,10 +1383,7 @@ void pqRenderView::selectOnSurface(int rect[4])
     opPort->getSource()->getProxy());
   selectedSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
-
-  // Fire selection event to let the world know that this view selected
-  // something.
-  emit this->selected(opPort);
+  return opPort;
 }
 
 //-----------------------------------------------------------------------------
@@ -1530,4 +1536,32 @@ void pqRenderView::selectFrustumPoints(int rect[4])
   // Fire selection event to let the world know that this view selected
   // something.
   emit this->selected(opPort);
+}
+
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectBlock(int rectangle[4])
+{
+  bool block = this->blockSignals(true);
+  pqOutputPort* port = this->selectOnSurfaceInternal(rectangle);
+  if (port)
+    {
+    vtkSMSourceProxy* selSource = port->getSelectionInput();
+    vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+      port->getSource()->getProxy());
+
+    // convert the index based selection to vtkSelection::BLOCKS selection.
+    vtkSMSourceProxy* newSelSource = vtkSMSourceProxy::SafeDownCast(
+      vtkSMSelectionHelper::ConvertSelection(vtkSelection::BLOCKS,
+        selSource,
+        selectedSource, port->getPortNumber()));
+    selectedSource->SetSelectionInput(port->getPortNumber(), newSelSource, 0);
+    if (newSelSource)
+      {
+      newSelSource->Delete();
+      }
+    }
+
+  this->blockSignals(block);
+  emit this->selected(port);
 }

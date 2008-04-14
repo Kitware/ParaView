@@ -235,6 +235,17 @@ void pqExtractSelectionsPanel::updateLabels()
       columnValues << value[cc].toString() << "\t\t";
       }
     }
+  else if (strcmp(xmlname, "BlockSelectionSource") == 0)
+    {
+    columnValues << "Block Selection" << endl << endl << endl;
+    columnValues << "Blocks" << endl;
+    vtkSMProperty* prop = selectionSource->GetProperty("Blocks");
+    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
+    foreach (const QVariant& value, values)
+      {
+      columnValues << value.toString() << endl;
+      }
+    }
   else
     {
     columnValues << "None" << endl;

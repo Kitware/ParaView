@@ -75,6 +75,9 @@ private:
   class vtkSelectionVector;
   void RequestDataInternal(vtkSelectionVector& outputs,
     vtkDataSet* geomOutput, vtkSelection* sel);
+
+  // Returns the combined content type for the selection.
+  int GetContentType(vtkSelection* sel);
 //ETX
 };
 

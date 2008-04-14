@@ -266,6 +266,12 @@ void pqRubberBandHelper::beginFrustumPointsSelection()
 }
 
 //-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginBlockSelection()
+{
+  this->setRubberBandOn(BLOCKS);
+}
+
+//-----------------------------------------------------------------------------
 void pqRubberBandHelper::endSelection()
 {
   this->setRubberBandOff();
@@ -327,21 +333,27 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
       this->ReorderBoundingBox(rect, rectOut);
       if (this->Internal->RenderView) 
         {
-        if(this->Mode == SELECT)
+        switch (this->Mode)
           {
+        case SELECT:
           this->Internal->RenderView->selectOnSurface(rectOut);
-          }
-        else if(this->Mode == SELECT_POINTS)
-          {
+          break;
+
+        case SELECT_POINTS:
           this->Internal->RenderView->selectPointsOnSurface(rectOut);
-          }
-        else if(this->Mode == FRUSTUM)
-          {
+          break;
+
+        case FRUSTUM:
           this->Internal->RenderView->selectFrustum(rectOut);
-          }
-        else if(this->Mode == FRUSTUM_POINTS)
-          {
+          break;
+
+        case FRUSTUM_POINTS:
           this->Internal->RenderView->selectFrustumPoints(rectOut);
+          break;
+
+        case BLOCKS:
+          this->Internal->RenderView->selectBlock(rectOut);
+          break;
           }
         }
       emit this->selectionFinished(rectOut[0], rectOut[1], rectOut[2], rectOut[3]);

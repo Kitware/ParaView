@@ -91,9 +91,9 @@ private:
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
     vtkIdType connectionId, vtkSelection* selection, vtkSMProxy* selSource=0);
 
-  static vtkSMProxy* ConvertIndices(
+  static vtkSMProxy* ConvertInternal(
     vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,
-    int dataPort, bool toGlobalIDs);
+    int dataPort, int outputType);
 };
 
 #endif

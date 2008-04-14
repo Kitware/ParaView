@@ -231,6 +231,10 @@ public slots:
   void selectFrustum(int rectangle[4]);
   void selectFrustumPoints(int rectangle[4]);
 
+  /// Creates a "block" selection given the rectangle in display coordinates.
+  /// block selection is selection of a block in a composite dataset.
+  void selectBlock(int rectangle[4]);
+
 private slots:
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.
@@ -286,6 +290,8 @@ protected:
 private: 
   class pqInternal;
   pqInternal* Internal;
+
+  pqOutputPort* selectOnSurfaceInternal(int rect[4]);
 };
 
 #endif

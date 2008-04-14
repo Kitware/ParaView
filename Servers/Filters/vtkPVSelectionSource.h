@@ -66,6 +66,11 @@ public:
   // Add a value range to threshold within.
   void AddThreshold(double min, double max);
   void RemoveAllThresholds();
+
+  // Description:
+  // Add the flat-index/composite index for a block.
+  void AddBlock(vtkIdType blockno);
+  void RemoveAllBlocks();
   
   // Description:
   // For threshold and value selection, this controls the name of the
@@ -112,7 +117,8 @@ protected:
     COMPOSITEID,
     HIERARCHICALID,
     THRESHOLDS,
-    LOCATIONS
+    LOCATIONS,
+    BLOCKS
     };
 
   Modes Mode;

@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -92,7 +92,7 @@ public:
     ToolbarsMenu(0)
   {
   }
-  
+
   ~pqImplementation()
   {
     delete this->ViewMenu;
@@ -127,17 +127,17 @@ MainWindow::MainWindow() :
   this->insertToolBarBreak(this->Implementation->UI.commonFilters);
 
   this->setIconSize(QSize(24, 24));
-  
+
   this->Implementation->RecentFilesMenu = new
     pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles, this);
   QObject::connect(this->Implementation->RecentFilesMenu,
     SIGNAL(serverConnectFailed()),
     &this->Implementation->Core,
     SLOT(makeDefaultConnectionIfNoneExists()));
-  
-  this->Implementation->ViewMenu = 
+
+  this->Implementation->ViewMenu =
     new pqViewMenu(*this->Implementation->UI.menuView, this);
-  this->Implementation->ToolbarsMenu = 
+  this->Implementation->ToolbarsMenu =
     new pqViewMenu(*this->Implementation->UI.menuToolbars);
   this->Implementation->Core.setDockWindowMenu(this->Implementation->ViewMenu);
   this->Implementation->Core.setToolbarMenu(this->Implementation->ToolbarsMenu);
@@ -189,32 +189,32 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionFileSaveAnimation,
     SLOT(setEnabled(bool)));
 
-  connect(this->Implementation->UI.actionFileSaveGeometry, SIGNAL(triggered()), 
+  connect(this->Implementation->UI.actionFileSaveGeometry, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(onSaveGeometry()));
   connect(&this->Implementation->Core,
     SIGNAL(enableFileSaveGeometry(bool)),
     this->Implementation->UI.actionFileSaveGeometry,
     SLOT(setEnabled(bool)));
 
-  connect(this->Implementation->UI.actionFileExit, SIGNAL(triggered()), 
-    pqApplicationCore::instance(), SLOT(quit()));  
+  connect(this->Implementation->UI.actionFileExit, SIGNAL(triggered()),
+    pqApplicationCore::instance(), SLOT(quit()));
 
   pqUndoStack* undoStack = this->Implementation->Core.getApplicationUndoStack();
 
   connect(this->Implementation->UI.actionEditUndo,
     SIGNAL(triggered()), undoStack, SLOT(undo()));
   connect(undoStack,
-    SIGNAL(canUndoChanged(bool)), 
+    SIGNAL(canUndoChanged(bool)),
     this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
   connect(undoStack,
     SIGNAL(undoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
 
   connect(this->Implementation->UI.actionEditViewSettings,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditViewSettings()));
-  
+
   connect(this->Implementation->UI.actionEditSettings,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
-    
+
   connect(this->Implementation->UI.actionEditRedo,
     SIGNAL(triggered()), undoStack, SLOT(redo()));
   connect(undoStack,
@@ -232,7 +232,7 @@ MainWindow::MainWindow() :
     SIGNAL(cameraUndoLabel(const QString&)),
     this,
     SLOT(onCameraUndoLabel(const QString&)));
-    
+
   connect(this->Implementation->UI.actionEditCameraRedo,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditCameraRedo()));
   connect(&this->Implementation->Core,
@@ -295,7 +295,7 @@ MainWindow::MainWindow() :
 
   connect(this->Implementation->UI.actionToolsManageCustomFilters,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageCustomFilters()));
-  
+
   connect(this->Implementation->UI.actionToolsManageLinks,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onToolsManageLinks()));
 
@@ -334,22 +334,22 @@ MainWindow::MainWindow() :
   this->Implementation->Core.onHelpEnableTooltips(
     this->Implementation->UI.actionHelpEnableTooltips->isChecked());
 
-  connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+  connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
     &this->Implementation->Core.VCRController(), SLOT(onPlay()));
-  
+
   connect(this->Implementation->UI.actionVCRFirstFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onFirstFrame()));
-    
+
   connect(this->Implementation->UI.actionVCRPreviousFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onPreviousFrame()));
-    
+
   connect(this->Implementation->UI.actionVCRNextFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onNextFrame()));
-    
+
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
- 
-  connect(this->Implementation->UI.actionVCRLoop, SIGNAL(toggled(bool)), 
+
+  connect(this->Implementation->UI.actionVCRLoop, SIGNAL(toggled(bool)),
     &this->Implementation->Core.VCRController(), SLOT(onLoop(bool)));
 
   pqVCRController* vcrcontroller = &this->Implementation->Core.VCRController();
@@ -372,15 +372,10 @@ MainWindow::MainWindow() :
   connect(vcrcontroller, SIGNAL(playing(bool)),
     this, SLOT(onPlaying(bool)));
 
-  pqProgressManager* progress_manager = 
+  pqProgressManager* progress_manager =
     pqApplicationCore::instance()->getProgressManager();
   progress_manager->addNonBlockableObject(
     this->Implementation->UI.VCRToolbar);
-  
-  // Create Selection Shortcut.
-  QShortcut *s=new QShortcut(QKeySequence(tr("S")),&this->Implementation->Core.multiViewManager());
-  QObject::connect(s, SIGNAL(activated()),
-    this, SLOT(onSelectionShortcut()));
 
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
     &this->Implementation->Core.multiViewManager());
@@ -406,14 +401,14 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionPositiveY, SLOT(setEnabled(bool)));
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
-    this->Implementation->UI.actionNegativeY, SLOT(setEnabled(bool)));  
+    this->Implementation->UI.actionNegativeY, SLOT(setEnabled(bool)));
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
     this->Implementation->UI.actionPositiveZ, SLOT(setEnabled(bool)));
   connect(
     &this->Implementation->Core, SIGNAL(enableFileSaveScreenshot(bool)),
     this->Implementation->UI.actionNegativeZ, SLOT(setEnabled(bool)));
-  
+
   connect(
     this->Implementation->UI.actionResetCamera, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(resetCamera()));
@@ -428,7 +423,7 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, SLOT(resetViewDirectionPosY()));
   connect(
     this->Implementation->UI.actionNegativeY, SIGNAL(triggered()),
-    &this->Implementation->Core, SLOT(resetViewDirectionNegY()));  
+    &this->Implementation->Core, SLOT(resetViewDirectionNegY()));
   connect(
     this->Implementation->UI.actionPositiveZ, SIGNAL(triggered()),
     &this->Implementation->Core, SLOT(resetViewDirectionPosZ()));
@@ -445,6 +440,7 @@ MainWindow::MainWindow() :
  // modeGroup->addAction(this->Implementation->UI.actionSelect_Thresholds);
   modeGroup->addAction(this->Implementation->UI.actionSelect_Frustum);
   modeGroup->addAction(this->Implementation->UI.actionSelectFrustumPoints);
+  modeGroup->addAction(this->Implementation->UI.actionSelect_Block);
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
@@ -452,7 +448,7 @@ MainWindow::MainWindow() :
     {
     if (a == this->Implementation->UI.actionScalarBarVisibility)
       {
-      // actionScalarBarVisibility's enabled state is managed by 
+      // actionScalarBarVisibility's enabled state is managed by
       // pqScalarBarVisibilityAdaptor.
       continue;
       }
@@ -504,16 +500,16 @@ MainWindow::MainWindow() :
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core.setupProxyTabWidget(
       this->Implementation->UI.objectInspectorDock);
-      
+
   QObject::connect(
     proxyTab->getObjectInspector(),
-    SIGNAL(preaccept()), 
+    SIGNAL(preaccept()),
     this,
     SLOT(onPreAccept()));
 
   QObject::connect(
     proxyTab->getObjectInspector(),
-    SIGNAL(postaccept()), 
+    SIGNAL(postaccept()),
     this,
     SLOT(onPostAccept()));
 
@@ -525,31 +521,31 @@ MainWindow::MainWindow() :
 
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
-    
+
 
   this->Implementation->Core.setupSelectionInspector(
     this->Implementation->UI.selectionInspectorDock);
-    
+
   this->Implementation->Core.setupLookmarkBrowser(
     this->Implementation->UI.lookmarkBrowserDock);
 
   this->Implementation->Core.setupLookmarkInspector(
     this->Implementation->UI.lookmarkInspectorDock);
 
-  pqAnimationPanel* animation_panel = 
+  pqAnimationPanel* animation_panel =
     this->Implementation->Core.setupAnimationPanel(
     this->Implementation->UI.animationPanelDock);
   animation_panel->setCurrentTimeToolbar(
     this->Implementation->UI.currentTimeToolbar);
 
-  pqComparativeVisPanel* cv_panel = 
+  pqComparativeVisPanel* cv_panel =
     new pqComparativeVisPanel(
     this->Implementation->UI.comparativePanelDock);
   this->Implementation->UI.comparativePanelDock->setWidget(cv_panel);
 
   this->Implementation->Core.setupAnimationView(
     this->Implementation->UI.animationViewDock);
-  
+
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.variableToolbar,
@@ -603,7 +599,7 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationPanelDock,
     this->Implementation->UI.animationPanelDock->windowTitle());
-  
+
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationViewDock,
     this->Implementation->UI.animationViewDock->windowTitle());
@@ -635,7 +631,7 @@ MainWindow::MainWindow() :
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.statisticsViewDock,
     this->Implementation->UI.statisticsViewDock->windowTitle());
-    
+
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
 
@@ -668,7 +664,7 @@ MainWindow::MainWindow() :
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();
-  
+
   this->Implementation->UI.actionEditUndo->setEnabled(
     undoStack->canUndo());
   this->Implementation->UI.actionEditRedo->setEnabled(
@@ -689,11 +685,11 @@ MainWindow::MainWindow() :
     &this->Implementation->Core, SLOT(setCenterAxesVisibility(bool)));
   QObject::connect(
     this->Implementation->UI.actionResetCenter, SIGNAL(triggered()),
-    &this->Implementation->Core, 
+    &this->Implementation->Core,
     SLOT(resetCenterOfRotationToCenterOfCurrentData()));
   QObject::connect(
     this->Implementation->UI.actionPickCenter, SIGNAL(toggled(bool)),
-    &this->Implementation->Core, 
+    &this->Implementation->Core,
     SLOT(pickCenterOfRotation(bool)));
 
   QObject::connect(
@@ -708,7 +704,7 @@ MainWindow::MainWindow() :
   QObject::connect(
     &this->Implementation->Core, SIGNAL(pickingCenter(bool)),
     this->Implementation->UI.actionPickCenter, SLOT(setChecked(bool)));
-  
+
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onManagePlugins()));
 
@@ -717,41 +713,48 @@ MainWindow::MainWindow() :
   QObject::connect(
     this->Implementation->UI.actionMoveMode, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
-  
+
   // 3d Selection Modes
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
     this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
     this->Implementation->UI.actionSelectSurfacePoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
     this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)), 
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
     this->Implementation->UI.actionSelectFrustumPoints, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->UI.actionSelect_Block, SLOT(setEnabled(bool)));
 
 
   QObject::connect(
-    this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()), 
-    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));  
+    this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()),
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));
   QObject::connect(
-    this->Implementation->UI.actionSelectSurfacePoints, SIGNAL(triggered()), 
-    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSurfacePointsSelection()));  
+    this->Implementation->UI.actionSelectSurfacePoints, SIGNAL(triggered()),
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSurfacePointsSelection()));
   QObject::connect(
-    this->Implementation->UI.actionSelect_Frustum, SIGNAL(triggered()), 
+    this->Implementation->UI.actionSelect_Frustum, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumSelection()));
   QObject::connect(
-    this->Implementation->UI.actionSelectFrustumPoints, SIGNAL(triggered()), 
+    this->Implementation->UI.actionSelectFrustumPoints, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumPointsSelection()));
+  QObject::connect(
+    this->Implementation->UI.actionSelect_Block, SIGNAL(triggered()),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SLOT(beginBlockSelection()));
 
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(selectionModeChanged(int)),
     this, SLOT(onSelectionModeChanged(int)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(interactionModeChanged(bool)),
     this->Implementation->UI.actionMoveMode, SLOT(setChecked(bool)));
 
@@ -798,7 +801,7 @@ bool MainWindow::compareView(const QString& ReferenceImage,
   return this->Implementation->Core.compareView(
     ReferenceImage, Threshold, Output, TempDirectory);
 }
-  
+
 //-----------------------------------------------------------------------------
 void MainWindow::onUndoLabel(const QString& label)
 {
@@ -917,7 +920,7 @@ void MainWindow::onHelpHelp()
   const char* binDir = "/";
   const char* binDir1 = "/";
 #endif
-  
+
   QString helper = QCoreApplication::applicationDirPath() +
     binDir + QString("pqClientDocFinder.txt");
   if(!QFile::exists(helper))
@@ -947,13 +950,13 @@ void MainWindow::onHelpHelp()
     */
     }
 
-  this->Implementation->AssistantClient = 
+  this->Implementation->AssistantClient =
     new QAssistantClient(assistantExe, this);
   QObject::connect(this->Implementation->AssistantClient,
                    SIGNAL(error(const QString&)),
                    this,
                    SLOT(assistantError(const QString&)));
-  
+
   QStringList args;
   args.append(QString("-profile"));
 
@@ -981,13 +984,13 @@ void MainWindow::onHelpHelp()
       this, "Help error", "Couldn't find"
       " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
       " points to that file");
-    
+
     delete this->Implementation->AssistantClient;
     return;
     }
-  
+
   args.append(profileFile);
-  
+
   this->Implementation->AssistantClient->setArguments(args);
   this->Implementation->AssistantClient->openAssistant();
 }
@@ -996,12 +999,6 @@ void MainWindow::onHelpHelp()
 void MainWindow::assistantError(const QString& error)
 {
   qCritical(error.toAscii().data());
-}
-
-//-----------------------------------------------------------------------------
-void MainWindow::onSelectionShortcut()
-{
-  this->Implementation->Core.renderViewSelectionHelper()->beginSelection();
 }
 
 //-----------------------------------------------------------------------------
@@ -1024,6 +1021,10 @@ void MainWindow::onSelectionModeChanged(int mode)
     else if(mode == pqRubberBandHelper::FRUSTUM_POINTS)
       {
       this->Implementation->UI.actionSelectFrustumPoints->setChecked(true);
+      }
+    else if (mode == pqRubberBandHelper::BLOCKS)
+      {
+      this->Implementation->UI.actionSelect_Block->setChecked(true);
       }
     else // INTERACT
       {
@@ -1089,9 +1090,9 @@ void MainWindow::onPlaying(bool playing)
 {
   if(playing)
     {
-    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
       &this->Implementation->Core.VCRController(), SLOT(onPlay()));
-    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
       &this->Implementation->Core.VCRController(), SLOT(onPause()));
     this->Implementation->UI.actionVCRPlay->setIcon(
       QIcon(":/pqWidgets/Icons/pqVcrPause24.png"));
@@ -1099,17 +1100,17 @@ void MainWindow::onPlaying(bool playing)
     }
   else
     {
-    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+    connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
       &this->Implementation->Core.VCRController(), SLOT(onPlay()));
-    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()), 
+    disconnect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
       &this->Implementation->Core.VCRController(), SLOT(onPause()));
     this->Implementation->UI.actionVCRPlay->setIcon(
       QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"));
     this->Implementation->UI.actionVCRPlay->setText("&amp;Play");
     }
-  
+
   this->Implementation->Core.setSelectiveEnabledState(!playing);
-  
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1123,7 +1124,7 @@ void MainWindow::onAddCameraLink()
     }
   else
     {
-    QMessageBox::information(this, "Add Camera Link", 
+    QMessageBox::information(this, "Add Camera Link",
                              "No render module is active");
     }
 }

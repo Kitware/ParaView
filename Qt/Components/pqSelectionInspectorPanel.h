@@ -137,6 +137,9 @@ protected:
   /// Sets up the GUI for the Locations selection.
   void setupLocationsSelectionGUI();
 
+  /// Sets up the GUI for the Blocks selection.
+  void setupBlockSelectionGUI();
+
   void setupSelectionLabelGUI();
 
   /// Sets up property links between the selection source proxy and the GUI.
