@@ -106,7 +106,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.79");
+vtkCxxRevisionMacro(vtkProcessModule, "1.80");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -142,6 +142,7 @@ vtkProcessModule::vtkProcessModule()
   this->ExceptionRaised = 0;
   
   this->MemoryInformation = vtkKWProcessStatistics::New();
+
   this->ServerInformation = vtkPVServerInformation::New();
 
   this->UseMPI = 1;
@@ -153,7 +154,6 @@ vtkProcessModule::vtkProcessModule()
 
   this->LastProgress = -1;
   this->LastProgressName = 0;
-
 
   // setting this here since this must be initialized on all processes to produce
   // correct result.
@@ -294,7 +294,6 @@ int vtkProcessModule::Start(int argc, char** argv)
   this->ConnectionManager->AddObserver(vtkCommand::ConnectionClosedEvent,
     this->Observer);
 
-
   int myId;
   // This call blocks on the Satellite nodes (never on root node).
   if (this->ConnectionManager->Initialize(argc, argv, 
@@ -381,6 +380,11 @@ int vtkProcessModule::StartClient(int argc, char** argv)
     // established by now. Disable any new connection requests.
     this->DisableNewConnections=true;
     }
+
+  // fill up ServerInformation with local information. ServerInformation is only used
+  // when there's no remote server.
+  this->ServerInformation->CopyFromObject(this);
+
   // if the PM supports multiple connections, its the responsibility of the GUI
   // to connect to the server.
   return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);

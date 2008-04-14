@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.13");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -108,21 +108,26 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
     return;
     }
   
-  vtkPVServerOptions *options =
-    vtkPVServerOptions::SafeDownCast(pm->GetOptions());
+  vtkPVOptions* options = pm->GetOptions();
+  vtkPVServerOptions *serverOptions = vtkPVServerOptions::SafeDownCast(options);
+
   options->GetTileDimensions(this->TileDimensions);
   options->GetTileMullions(this->TileMullions);
   this->UseOffscreenRendering = options->GetUseOffscreenRendering();
   this->Timeout = options->GetTimeout();
   this->SetRenderModuleName(options->GetRenderModuleName());
-  this->SetNumberOfMachines(options->GetNumberOfMachines());
-  unsigned int idx;
-  for (idx = 0; idx < options->GetNumberOfMachines(); idx++)
+
+  if (serverOptions)
     {
-    this->SetEnvironment(idx, options->GetDisplayName(idx));
-    this->SetLowerLeft(idx, options->GetLowerLeft(idx));
-    this->SetLowerRight(idx, options->GetLowerRight(idx));
-    this->SetUpperLeft(idx, options->GetUpperLeft(idx));
+    this->SetNumberOfMachines(serverOptions->GetNumberOfMachines());
+    unsigned int idx;
+    for (idx = 0; idx < serverOptions->GetNumberOfMachines(); idx++)
+      {
+      this->SetEnvironment(idx, serverOptions->GetDisplayName(idx));
+      this->SetLowerLeft(idx, serverOptions->GetLowerLeft(idx));
+      this->SetLowerRight(idx, serverOptions->GetLowerRight(idx));
+      this->SetUpperLeft(idx, serverOptions->GetUpperLeft(idx));
+      }
     }
 }
 

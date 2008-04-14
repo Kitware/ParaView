@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.42");
+vtkCxxRevisionMacro(vtkPVOptions, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -133,7 +133,7 @@ void vtkPVOptions::Initialize()
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
-                           vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER);
+                           vtkPVOptions::PVRENDER_SERVER | vtkPVOptions::PVSERVER|vtkPVOptions::PVBATCH);
 
   this->AddBooleanArgument("--stereo", 0, &this->UseStereoRendering,
                            "Tell the application to enable stereo rendering"

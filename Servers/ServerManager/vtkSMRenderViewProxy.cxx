@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.65");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.66");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -327,6 +327,7 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   this->Superclass::EndCreateVTKObjects();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkPVOptions* pvoptions = pm->GetOptions();
   
   // Set all the client side pointers.
   this->Renderer = vtkRenderer::SafeDownCast(
@@ -343,7 +344,7 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   // Set the helper for interaction.
   this->Interactor->SetPVRenderView(this->RenderViewHelper);
 
-  if (pm->GetOptions()->GetUseStereoRendering())
+  if (pvoptions->GetUseStereoRendering())
     {
     SetIntVectorProperty(this->RenderWindowProxy, "StereoCapableWindow", 1);
     SetIntVectorProperty(this->RenderWindowProxy, "StereoRender", 1);
@@ -404,14 +405,19 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
     pm->SendStream(this->ConnectionID, 
       vtkProcessModule::RENDER_SERVER, stream);
 
-    // Ensure that the client always does onscreen rendering.
-    stream  << vtkClientServerStream::Invoke
-            << this->RenderWindowProxy->GetID()
-            << "SetOffScreenRendering"
-            << 0
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::CLIENT, stream);
+    // Ensure that the client always does onscreen rendering, unless we are
+    // running in batch mode and offscreen rendering is requested.
+    if (pvoptions->GetUseOffscreenRendering() == 0)
+      {
+      // pvoptions->GetUseOffscreenRendering() can be set only in batch mode.
+      stream  << vtkClientServerStream::Invoke
+              << this->RenderWindowProxy->GetID()
+              << "SetOffScreenRendering"
+              << 0
+              << vtkClientServerStream::End;
+      pm->SendStream(this->ConnectionID, 
+        vtkProcessModule::CLIENT, stream);
+      }
     }
 
   this->Interactor->Enable();
