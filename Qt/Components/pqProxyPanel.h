@@ -118,6 +118,9 @@ protected slots:
   /// or an already active panel is accepted. 
   virtual void updateInformationAndDomains();
 
+protected:
+  bool event(QEvent* e);
+
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

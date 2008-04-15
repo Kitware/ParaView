@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QStyle>
 #include <QStyleOption>
+#include <QHelpEvent>
+#include <QToolTip>
 
 // VTK includes
 #include "vtkCommand.h"
@@ -46,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMDocumentation.h"
 
 // ParaView includes
 #include "pqPropertyManager.h"
@@ -260,5 +263,48 @@ void pqProxyPanel::updateInformationAndDomains()
 void pqProxyPanel::setModified()
 {
   emit this->modified();
+}
+
+bool pqProxyPanel::event(QEvent* e)
+{
+  bool ret = QWidget::event(e);
+
+  //  show tooltips for any server manager property
+  //  doing it this way does not depend on the panel being created
+  //  with tooltips set (auto panel or not)
+  //  if a custom panel doesn't name its widgets to match the SM property,
+  //  no tooltip will be shown
+  if(!e->isAccepted() && e->type() == QEvent::ToolTip)
+    {
+    QHelpEvent* he = static_cast<QHelpEvent*>(e);
+    // find the sm property this mouse is over
+    QWidget* w = QApplication::widgetAt(he->globalPos());
+    if(this->isAncestorOf(w))
+      {
+      vtkSMProperty* smProperty = NULL;
+      for(; !smProperty && w != this; w = w->parentWidget())
+        {
+        QString name = w->objectName();
+        int trimIndex = name.lastIndexOf(QRegExp("_[0-9]*$"));
+        if(trimIndex != -1)
+          {
+          name = name.left(trimIndex);
+          }
+        smProperty = this->Implementation->Proxy->GetProperty(name.toAscii().data());
+        }
+
+      if(smProperty)
+        {
+        vtkSMDocumentation* doc = smProperty->GetDocumentation();
+        if(doc)
+          {
+          QToolTip::showText(he->globalPos(), QString("<p>%1</p>").arg(doc->GetDescription()), this);
+          ret = true;
+          e->setAccepted(true);
+          }
+        }
+      }
+    }
+  return ret;
 }
 
