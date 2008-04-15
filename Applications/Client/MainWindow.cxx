@@ -500,6 +500,12 @@ MainWindow::MainWindow() :
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core.setupProxyTabWidget(
       this->Implementation->UI.objectInspectorDock);
+  
+  QObject::connect(
+    proxyTab->getObjectInspector(),
+    SIGNAL(helpRequested(QString)),
+    this,
+    SLOT(showHelpForProxy(QString)));
 
   QObject::connect(
     proxyTab->getObjectInspector(),
@@ -894,16 +900,13 @@ QString Locate(const QString& appName)
   return app_dir + QDir::separator() + appName;
 }
 
+
 //-----------------------------------------------------------------------------
-void MainWindow::onHelpHelp()
+void MainWindow::makeAssistant()
 {
   if(this->Implementation->AssistantClient)
     {
-    if(!this->Implementation->AssistantClient->isOpen())
-      {
-      this->Implementation->AssistantClient->openAssistant();
-      }
-      return;
+    return;
     }
 
   QString assistantExe;
@@ -992,7 +995,16 @@ void MainWindow::onHelpHelp()
   args.append(profileFile);
 
   this->Implementation->AssistantClient->setArguments(args);
-  this->Implementation->AssistantClient->openAssistant();
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onHelpHelp()
+{
+  this->makeAssistant();
+  if(this->Implementation->AssistantClient)
+    {
+    this->Implementation->AssistantClient->openAssistant();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1153,3 +1165,19 @@ void MainWindow::onQuickLaunchShortcut()
 {
   this->Implementation->Core.quickLaunch();
 }
+
+//-----------------------------------------------------------------------------
+void MainWindow::showHelpForProxy(const QString& proxy)
+{
+  // make sure assistant is ready
+  this->makeAssistant();
+
+  if(this->Implementation->AssistantClient)
+    {
+    this->Implementation->AssistantClient->openAssistant();
+    QString page("Documentation/%1.html");
+    page = page.arg(proxy);
+    this->Implementation->AssistantClient->showPage(page);
+    }
+}
+

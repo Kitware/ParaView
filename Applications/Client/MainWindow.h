@@ -68,6 +68,8 @@ private slots:
 
   void onHelpAbout();
   void onHelpHelp();
+  void showHelpForProxy(const QString& proxy);
+  void makeAssistant();
 
   void onQuickLaunchShortcut();
 
