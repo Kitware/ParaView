@@ -1113,6 +1113,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         else
           {
           QTextEdit *textEdit = new QTextEdit(panelLayout->parentWidget());
+          QFont textFont("Courier");
+          textEdit->setFont(textFont);
           if(informationOnly)
             {
             textEdit->setEnabled(false);
