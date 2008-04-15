@@ -42,7 +42,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.16");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.17");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -661,20 +661,26 @@ void vtkCTHFragmentConnectBlock::InitializeGhostLayer(
 
 
 //----------------------------------------------------------------------------
+// Flipped a coin.  This method only addes the neighbor relation one way.
+// User needs to call it twice to get the backward connection.
 void vtkCTHFragmentConnectBlock::AddNeighbor(
   vtkCTHFragmentConnectBlock *neighbor, 
   int axis, 
   int maxFlag)
 {
+  if (this->Level == 4 && this->BaseCellExtent[0] == 208 && this->BaseCellExtent[2] == 224 && this->BaseCellExtent[4] == 160)
+    {
+    cerr << "Debug\n";
+    }
+
+
   if (maxFlag)
     { // max neighbor
     this->Neighbors[2*axis+1].push_back(neighbor);
-    neighbor->Neighbors[2*axis].push_back(this);
     }
   else
     { // min neighbor
     this->Neighbors[2*axis].push_back(neighbor);
-    neighbor->Neighbors[2*axis+1].push_back(this);
     }
 }
 
@@ -933,6 +939,11 @@ void vtkCTHFragmentLevel::SetStandardBlockDimensions(int dims[3])
 int vtkCTHFragmentLevel::AddBlock(vtkCTHFragmentConnectBlock* block)
 {
   int xIdx, yIdx, zIdx;
+  
+  if (block->GetLevel() == 4 && block->LevelBlockId == 24)
+    {
+    cerr << "Debug.\n";
+    }
   
   // First make sure the level is correct.
   // We assume that the block dimensions are correct.
@@ -1439,11 +1450,15 @@ void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
   blockIndex[1] = ext[2] / this->StandardBlockDimensions[1];
   blockIndex[2] = ext[4] / this->StandardBlockDimensions[2];
 
+  if (blockIndex[0] == 13 && blockIndex[1] == 14 && blockIndex[2] == 10)
+    {
+    cerr << "Debug.\n";
+    }
+
   for (int axis = 0; axis < 3; ++axis)
     {
     // The purpose for passing a list into the method is no longer.
     // We could simplify this method.
-    neighbors.clear();
     this->FindFaceNeighbors(block->GetLevel(), blockIndex, 
                             axis, 0, &neighbors);
     for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
@@ -1486,6 +1501,7 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
   int axis1 = (faceAxis+1)%3;
   int axis2 = (faceAxis+2)%3;
 
+  result->clear();
 
   for (unsigned int level = 0; level < this->Levels.size(); ++level)
     {
@@ -3121,57 +3137,56 @@ void vtkCTHFragmentConnect::ComputeFaceNeighbors(
   // Face index starts at (1,1,1)
   // increments: 1, 2, 8
   // Start at the corner and march around the edges.
-  faceIndex[axis1] -= 1;
   faceIndex[axis2] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+1, this->FaceNeighbors+11);
-  faceIndex[axis1] += 1;
   this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+3, this->FaceNeighbors+11);
   faceIndex[axis1] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+5, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+5, this->FaceNeighbors+3);
   faceIndex[axis1] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+7, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+7, this->FaceNeighbors+5);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+15, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+15, this->FaceNeighbors+7);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+23, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+23, this->FaceNeighbors+15);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+31, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+31, this->FaceNeighbors+23);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+29, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+29, this->FaceNeighbors+31);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+27, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+27, this->FaceNeighbors+29);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+25, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+25, this->FaceNeighbors+27);
   faceIndex[axis2] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+17, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+17, this->FaceNeighbors+25);
   faceIndex[axis2] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+9, this->FaceNeighbors+11);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+9, this->FaceNeighbors+17);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+1, this->FaceNeighbors+9);
   //Now for the other side (min axis).
-  faceIndex[axis2] -= 1;
-  faceIndex[axis] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+0, this->FaceNeighbors+10);
-  faceIndex[axis1] += 1;
+  faceIndex[axis] -= 1; // Move to the other layer
+  faceIndex[axis1] += 1; // Start below reference block.
   this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+2, this->FaceNeighbors+10);
   faceIndex[axis1] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+4, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+4, this->FaceNeighbors+2);
   faceIndex[axis1] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+6, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+6, this->FaceNeighbors+4);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+14, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+14, this->FaceNeighbors+6);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+22, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+22, this->FaceNeighbors+14);
   faceIndex[axis2] += 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+30, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+30, this->FaceNeighbors+22);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+28, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+28, this->FaceNeighbors+30);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+26, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+26, this->FaceNeighbors+28);
   faceIndex[axis1] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+24, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+24, this->FaceNeighbors+26);
   faceIndex[axis2] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+16, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+16, this->FaceNeighbors+24);
   faceIndex[axis2] -= 1;
-  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+8, this->FaceNeighbors+10);
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+8, this->FaceNeighbors+16);
+  faceIndex[axis2] -= 1;
+  this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+0, this->FaceNeighbors+8);
   
   --faceLevel;
   this->FaceEdgeFlags[0] = 0;
@@ -3218,11 +3233,23 @@ void vtkCTHFragmentConnect::FindNeighbor(
 {
   // Convert the index to the level of the reference block.
   int neighborIdx[3];
-  int refLevel = reference->Block->GetLevel();
+  vtkCTHFragmentConnectBlock* refBlock = reference->Block;
+  const int* ext;
+  ext = refBlock->GetBaseCellExtent();
+  int refLevel = refBlock->GetLevel();
   
-  neighborIdx[0] = faceIdx[0] >> (faceLevel-refLevel);
-  neighborIdx[1] = faceIdx[1] >> (faceLevel-refLevel);
-  neighborIdx[2] = faceIdx[2] >> (faceLevel-refLevel);
+  if (refLevel > faceLevel)
+    {
+    neighborIdx[0] = faceIdx[0] << (refLevel-faceLevel);
+    neighborIdx[1] = faceIdx[1] << (refLevel-faceLevel);
+    neighborIdx[2] = faceIdx[2] << (refLevel-faceLevel);
+    }
+  else
+    {
+    neighborIdx[0] = faceIdx[0] >> (faceLevel-refLevel);
+    neighborIdx[1] = faceIdx[1] >> (faceLevel-refLevel);
+    neighborIdx[2] = faceIdx[2] >> (faceLevel-refLevel);
+    }
 
   // The index might point to the reference iterator.
   if (neighborIdx[0] == reference->Index[0] && 
@@ -3234,48 +3261,86 @@ void vtkCTHFragmentConnect::FindNeighbor(
     }
 
   // Find the block the neighbor is in.
-  vtkCTHFragmentConnectBlock* referenceBlock = reference->Block;
-  const int* ext;
-  ext = referenceBlock->GetBaseCellExtent();
 
-  // Check each axis and direction for the extent leaving the bounds.
-  for (int axis = 0; axis < 3; ++axis)
+  int tmpLevel;
+  int recheck = 1;
+  int outOfAxis;
+  while (recheck)
     {
-    int minIdx = 2*axis;
-    int maxIdx = minIdx + 1;
-    for (int max = 0; max < 2; ++max)
+    recheck = 0;
+    // Check each axis and direction for the extent leaving the bounds.
+    for (int axis = 0; axis < 3; ++axis)
       {
-      if ((max == 0 && neighborIdx[axis] < ext[minIdx]) || 
-          (max == 1 && neighborIdx[axis] > ext[maxIdx]))
-        { // Index is in neighboring block.  Find the block.
-        vtkCTHFragmentConnectBlock* block;
-        int num, idx;
-        num = referenceBlock->GetNumberOfFaceNeighbors(2*axis+max);
-        for (idx = 0; idx < num; ++idx)
+      int minIdx = 2*axis;
+      int maxIdx = minIdx + 1;
+      // Min direction
+      if (neighborIdx[axis] < ext[minIdx] && 
+          refBlock->GetNumberOfFaceNeighbors(minIdx) > 0)
+        {
+        // Move in this direction.
+        refBlock = refBlock->GetFaceNeighbor(minIdx, 0);
+        ext = refBlock->GetBaseCellExtent();
+        // Save level for next comparison.
+        tmpLevel = refBlock->GetLevel();
+        if (tmpLevel > faceLevel)
           {
-          block = referenceBlock->GetFaceNeighbor(2*axis+max, idx);
-          // Is this the one?
-          int tmpIdx[3];
-          int level = block->GetLevel();
-          tmpIdx[0] = faceIdx[0] >> (faceLevel-level);
-          tmpIdx[1] = faceIdx[1] >> (faceLevel-level);
-          tmpIdx[2] = faceIdx[2] >> (faceLevel-level);
-          const int* tmpExt = block->GetBaseCellExtent();
-          if (tmpIdx[axis] >= tmpExt[minIdx] && tmpIdx[axis] <= tmpExt[maxIdx])
-            { // yes
-            referenceBlock = block;
-            ext = tmpExt;
-            neighborIdx[0] = tmpIdx[0];
-            neighborIdx[1] = tmpIdx[1];
-            neighborIdx[2] = tmpIdx[2];
-            // Terminate the search of this direction (block has changed!)
-            num = 0;
-            }
+          neighborIdx[0] = faceIdx[0] << (tmpLevel-faceLevel);
+          neighborIdx[1] = faceIdx[1] << (tmpLevel-faceLevel);
+          neighborIdx[2] = faceIdx[2] << (tmpLevel-faceLevel);
           }
+        else
+          {
+          neighborIdx[0] = faceIdx[0] >> (faceLevel-tmpLevel);
+          neighborIdx[1] = faceIdx[1] >> (faceLevel-tmpLevel);
+          neighborIdx[2] = faceIdx[2] >> (faceLevel-tmpLevel);
+          }
+        // If we changed levels, or our extent 
+        // does not included index look some more.
+        // Note: If we move to a higher level, previous axes may go
+        // out of extent.
+        if (tmpLevel > refLevel ||
+            neighborIdx[axis] < ext[minIdx])
+          {
+          recheck = -1;
+          }
+        refLevel = tmpLevel;
+        }
+
+      // Max direction
+      if (neighborIdx[axis] > ext[maxIdx] && 
+          refBlock->GetNumberOfFaceNeighbors(maxIdx) > 0)
+        {
+        // Move in this direction.
+        refBlock = refBlock->GetFaceNeighbor(maxIdx, 0);
+        ext = refBlock->GetBaseCellExtent();
+        // Save level for next comparison.
+        tmpLevel = refBlock->GetLevel();
+        if (tmpLevel > faceLevel)
+          {
+          neighborIdx[0] = faceIdx[0] << (tmpLevel-faceLevel);
+          neighborIdx[1] = faceIdx[1] << (tmpLevel-faceLevel);
+          neighborIdx[2] = faceIdx[2] << (tmpLevel-faceLevel);
+          }
+        else
+          {
+          neighborIdx[0] = faceIdx[0] >> (faceLevel-tmpLevel);
+          neighborIdx[1] = faceIdx[1] >> (faceLevel-tmpLevel);
+          neighborIdx[2] = faceIdx[2] >> (faceLevel-tmpLevel);
+          }
+        // If we changed levels, or our extent 
+        // does not included index look some more.
+        // Note: If we move to a higher level, previous axes may go
+        // out of extent.
+        if (tmpLevel > refLevel ||
+            neighborIdx[axis] < ext[minIdx])
+          {
+          recheck = -1;
+          }
+        refLevel = tmpLevel;
         }
       }
     }
-
+    
   // We have a block
   // clamp the neighbor index to pad the volume
   if (neighborIdx[0] < ext[0]) { neighborIdx[0] = ext[0];}
@@ -3285,16 +3350,16 @@ void vtkCTHFragmentConnect::FindNeighbor(
   if (neighborIdx[2] < ext[4]) { neighborIdx[2] = ext[4];}
   if (neighborIdx[2] > ext[5]) { neighborIdx[2] = ext[5];}
 
-  neighbor->Block = referenceBlock;
+  neighbor->Block = refBlock;
   neighbor->Index[0] = neighborIdx[0];
   neighbor->Index[1] = neighborIdx[1];
   neighbor->Index[2] = neighborIdx[2];
-  const int *incs = referenceBlock->GetCellIncrements();
+  const int *incs = refBlock->GetCellIncrements();
   int offset = (neighborIdx[0]- ext[0])*incs[0]
              + (neighborIdx[1]- ext[2])*incs[1]
              + (neighborIdx[2]- ext[4])*incs[2];
-  neighbor->FragmentIdPointer = referenceBlock->GetBaseFragmentIdPointer() + offset;
-  neighbor->VolumeFractionPointer = referenceBlock->GetBaseVolumeFractionPointer() + offset;
+  neighbor->FragmentIdPointer = refBlock->GetBaseFragmentIdPointer() + offset;
+  neighbor->VolumeFractionPointer = refBlock->GetBaseVolumeFractionPointer() + offset;
 }
 
 
