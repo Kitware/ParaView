@@ -394,6 +394,7 @@ void pqFileDialog::onCreateNewFolder()
     return;
     }
 
+  this->Implementation->Ui.Files->scrollTo(idx);
   this->Implementation->Ui.Files->selectionModel()->select(idx,
     QItemSelectionModel::Select|QItemSelectionModel::Current);
   this->Implementation->Ui.Files->edit(idx);

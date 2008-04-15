@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStyle>
 #include <QDir>
 #include <QApplication>
+#include <QMessageBox>
 
 #include <pqServer.h>
 #include <vtkClientServerStream.h>
@@ -609,7 +610,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
 
   this->reset();
 
-  return true;
+  return ret;
 }
 
 bool pqFileDialogModel::rmdir(const QString& dirName)
@@ -666,7 +667,12 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   QString path;
   QString oldPath = this->absoluteFilePath(oldname);
   QString newPath = this->absoluteFilePath(newname);
-  
+
+  if(oldPath == newPath)
+    {
+    return true;
+    }
+
   vtkPVFileInformation* info;
   info = this->Implementation->GetData(false, oldPath, false);
 
@@ -682,6 +688,9 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   info = this->Implementation->GetData(false, newPath, false);
   if(info->GetType() == oldType)
     {
+    QString message("Cannot rename to %1, which already exists");
+    message = message.arg(newname);
+    QMessageBox::warning(NULL, "Error renaming", message);
     return false;
     }
 
