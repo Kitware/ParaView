@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.8");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -362,6 +362,26 @@ void vtkSMNewWidgetRepresentationProxy::UnRegister(vtkObjectBase* obj)
     }
 
   this->Superclass::UnRegister(obj);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMNewWidgetRepresentationProxy::GetBounds(double bds[6])
+{
+  if (this->RepresentationProxy)
+    {
+    // since the widget representation is also present on the client, we can
+    // directly get its bounds.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkWidgetRepresentation* repr = vtkWidgetRepresentation::SafeDownCast(
+      pm->GetObjectFromID(this->RepresentationProxy->GetID()));
+    if (repr)
+      {
+      double *propBds = repr->GetBounds();
+      memcpy(bds, propBds, 6*sizeof(double));
+      return true;
+      }
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

@@ -47,6 +47,10 @@ public:
   // Calls set enabled on the WidgetProxy.
   virtual void SetEnabled(int enable);
 
+  // Description:
+  // Get the bounds for the representation.  Returns true if successful.
+  virtual bool GetBounds(double bounds[6]);
+
 //BTX
 protected:
   vtkSMNewWidgetRepresentationProxy();
