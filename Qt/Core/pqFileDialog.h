@@ -154,10 +154,6 @@ private slots:
   // Called when the user requests to create a new directory in the cwd
   void onCreateNewFolder();
 
-  // Called when the user presses 'return' or clicks out of the qlineedit 
-  // widget used to change the name of a directory that has just been created
-  void onFinishedEditingNewFolderName();
-  
   /// Emits the filesSelected() signal and closes the dialog,
   void emitFilesSelected(const QStringList&);
 

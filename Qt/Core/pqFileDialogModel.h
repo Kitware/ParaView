@@ -74,14 +74,14 @@ public:
   bool isDir(const QModelIndex&);
 
   // Creates a directory. "dirName" can be relative or absolute path
-  bool makeDir(const QString& dirname);
+  bool mkdir(const QString& dirname);
 
-  // Create an item in the model whose type is a directory without actually 
-  // writing it to the filesystem.
-  // "dirName" can be relative or absolute path
-  bool makeDirEntry(const QString& dirname);
-  bool removeDirEntry(const QString& dirname);
+  // Removes a directory. "dirName" can be relative or absolute path
+  bool rmdir(const QString& dirname);
   
+  // Renames a directory or file.
+  bool rename(const QString& oldname, const QString& newname);
+
   /// Returns whether the file exists
   /// also returns the full path, which could be a resolved shortcut
   bool fileExists(const QString& file, QString& fullpath);
@@ -104,6 +104,9 @@ public:
 
   /// Returns the server that this model is browsing
   pqServer* server() const;
+
+  /// sets data (used by the view when editing names of folders)
+  bool setData(const QModelIndex& idx, const QVariant& value, int role);
   
   // overloads for QAbstractItemModel
 
@@ -121,6 +124,8 @@ public:
   bool hasChildren(const QModelIndex& p) const;
   /// returns header data
   QVariant headerData(int section, Qt::Orientation, int role) const;
+  /// returns flags for item
+  Qt::ItemFlags flags(const QModelIndex& idx) const;
   
 private:
   class pqImplementation;

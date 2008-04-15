@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkStringList.h>
+#include <vtkDirectory.h>
 
 #include "pqSMAdaptor.h"
 
@@ -450,6 +451,27 @@ public:
   /// Caches information about the set of files within the current path.
   QVector<pqFileDialogModelFileInfo> FileList;  // adjacent memory occupation for QModelIndex
 
+  const pqFileDialogModelFileInfo* infoForIndex(const QModelIndex& idx) const
+    {
+    if(idx.isValid() && 
+       NULL == idx.internalPointer() &&
+       idx.row() >= 0 && 
+       idx.row() < this->FileList.size())
+      {
+      return &this->FileList[idx.row()];
+      }
+    else if(idx.isValid() && idx.internalPointer())
+      {
+      pqFileDialogModelFileInfo* ptr = reinterpret_cast<pqFileDialogModelFileInfo*>(idx.internalPointer());
+      const QList<pqFileDialogModelFileInfo>& grp = ptr->group();
+      if(idx.row() >= 0 && idx.row() < grp.size())
+        {
+        return &grp[idx.row()];
+        }
+      }
+    return NULL;
+    }
+
 private:   
   // server vs. local implementation private
   pqServer* Server;
@@ -541,7 +563,7 @@ bool pqFileDialogModel::fileExists(const QString& file, QString& fullpath)
   return false;
 }
 
-bool pqFileDialogModel::makeDirEntry(const QString& dirName)
+bool pqFileDialogModel::mkdir(const QString& dirName)
 {
   QString path;
   QString dirPath = this->absoluteFilePath(dirName);
@@ -550,63 +572,35 @@ bool pqFileDialogModel::makeDirEntry(const QString& dirName)
     return false;
     }
 
-  this->Implementation->FileList.push_back(pqFileDialogModelFileInfo(dirName,
-      dirPath, vtkPVFileInformation::DIRECTORY));
-  this->reset();
+  bool ret = false;
+  
+  vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
+  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+                         vtkProcessModule::DATA_SERVER :
+                         vtkProcessModule::CLIENT;
 
-  return true;
-}
-
-bool pqFileDialogModel::removeDirEntry(const QString& dirName)
-{
-  QString dirPath = this->absoluteFilePath(dirName);
-  int i=0;
-  for(i=0; i<this->Implementation->FileList.size(); i++)
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
+  stream << vtkClientServerStream::Invoke
+        << dirID << "MakeDirectory" 
+        << dirPath.toAscii().data()
+        << vtkClientServerStream::End;
+  pm->SendStream(conn, server, stream);
+  
+  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  if(result.GetNumberOfMessages() == 1 && 
+     result.GetNumberOfArguments(0) == 1)
     {
-    if(this->Implementation->FileList[i].type() == vtkPVFileInformation::DIRECTORY && 
-      this->Implementation->FileList[i].filePath() == dirPath)
+    int tmp;
+    if(result.GetArgument(0, 0, &tmp) && tmp)
       {
-      this->Implementation->FileList.remove(i);
-      this->reset();
-      break;
+      ret = true;
       }
     }
-  return true;
-}
 
-bool pqFileDialogModel::makeDir(const QString& dirName)
-{
-  QString path;
-  QString dirPath = this->absoluteFilePath(dirName);
-  if(this->dirExists(dirPath,path))
-    {
-    return false;
-    }
-
-  if(this->Implementation->getServer())
-    {
-    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-    stream << vtkClientServerStream::Invoke
-          << dirID << "MakeDirectory" << dirPath.toAscii().data()
-          << vtkClientServerStream::End;
-    pm->SendStream(
-      this->Implementation->getServer()->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, stream);
-    pm->DeleteStreamObject(dirID, stream);
-    pm->SendStream(
-      this->Implementation->getServer()->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, stream);
-    }
-  else
-    {
-    QDir dir(this->getCurrentPath());
-    if(!dir.mkdir(dirName))
-      {
-      return false;
-      }
-    }
+  pm->DeleteStreamObject(dirID, stream);
+  pm->SendStream(conn, server, stream);
 
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
@@ -616,6 +610,119 @@ bool pqFileDialogModel::makeDir(const QString& dirName)
   this->reset();
 
   return true;
+}
+
+bool pqFileDialogModel::rmdir(const QString& dirName)
+{
+  QString path;
+  QString dirPath = this->absoluteFilePath(dirName);
+  if(!this->dirExists(dirPath,path))
+    {
+    return false;
+    }
+  
+  bool ret = false;
+  
+  vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
+  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+                         vtkProcessModule::DATA_SERVER :
+                         vtkProcessModule::CLIENT;
+
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
+  stream << vtkClientServerStream::Invoke
+        << dirID << "DeleteDirectory" 
+        << dirPath.toAscii().data()
+        << vtkClientServerStream::End;
+  pm->SendStream(conn, server, stream);
+  
+  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  if(result.GetNumberOfMessages() == 1 && 
+     result.GetNumberOfArguments(0) == 1)
+    {
+    int tmp;
+    if(result.GetArgument(0, 0, &tmp) && tmp)
+      {
+      ret = true;
+      }
+    }
+
+  pm->DeleteStreamObject(dirID, stream);
+  pm->SendStream(conn, server, stream);
+  
+  QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(true, cPath, false);
+  this->Implementation->Update(cPath, info);
+
+  this->reset();
+  
+  return ret;
+}
+
+bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
+{
+  QString path;
+  QString oldPath = this->absoluteFilePath(oldname);
+  QString newPath = this->absoluteFilePath(newname);
+  
+  vtkPVFileInformation* info;
+  info = this->Implementation->GetData(false, oldPath, false);
+
+  int oldType = info->GetType();
+  
+  if(oldType != vtkPVFileInformation::SINGLE_FILE && 
+    !vtkPVFileInformation::IsDirectory(oldType))
+    {
+    return false;
+    }
+  
+  // don't replace file/dir
+  info = this->Implementation->GetData(false, newPath, false);
+  if(info->GetType() == oldType)
+    {
+    return false;
+    }
+
+  bool ret = false;
+  
+  vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
+  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+                         vtkProcessModule::DATA_SERVER :
+                         vtkProcessModule::CLIENT;
+
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
+  stream << vtkClientServerStream::Invoke
+        << dirID << "Rename" 
+        << oldPath.toAscii().data()
+        << newPath.toAscii().data()
+        << vtkClientServerStream::End;
+  pm->SendStream(conn, server, stream);
+  
+  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  if(result.GetNumberOfMessages() == 1 && 
+     result.GetNumberOfArguments(0) == 1)
+    {
+    int tmp;
+    if(result.GetArgument(0, 0, &tmp) && tmp)
+      {
+      ret = true;
+      }
+    }
+
+  pm->DeleteStreamObject(dirID, stream);
+  pm->SendStream(conn, server, stream);
+
+  QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
+  info = this->Implementation->GetData(true, cPath, false);
+  this->Implementation->Update(cPath, info);
+    
+  this->reset();
+
+  return ret;
 }
 
 bool pqFileDialogModel::dirExists(const QString& path, QString& fullpath)
@@ -650,24 +757,8 @@ int pqFileDialogModel::columnCount(const QModelIndex& /*idx*/) const
 
 QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
 {
-  const pqFileDialogModelFileInfo* file = NULL;
-
-  if(idx.isValid() && 
-     NULL == idx.internalPointer() &&
-     idx.row() >= 0 && 
-     idx.row() < this->Implementation->FileList.size())
-    {
-    file = &this->Implementation->FileList[idx.row()];
-    }
-  else if(idx.isValid() && idx.internalPointer())
-    {
-    pqFileDialogModelFileInfo* ptr = reinterpret_cast<pqFileDialogModelFileInfo*>(idx.internalPointer());
-    const QList<pqFileDialogModelFileInfo>& grp = ptr->group();
-    if(idx.row() >= 0 && idx.row() < grp.size())
-      {
-      file = &grp[idx.row()];
-      }
-    }
+  const pqFileDialogModelFileInfo* file =
+    this->Implementation->infoForIndex(idx);
 
   if(!file)
     {
@@ -675,7 +766,7 @@ QVariant pqFileDialogModel::data(const QModelIndex & idx, int role) const
     return QVariant();
     }
 
-  if(role == Qt::DisplayRole && idx.column() == 0)
+  if((role == Qt::DisplayRole || role == Qt::EditRole) && idx.column() == 0)
     {
     return file->label();
     }
@@ -764,4 +855,36 @@ QVariant pqFileDialogModel::headerData(int section,
 
   return QVariant();
 }
+
+bool pqFileDialogModel::setData(const QModelIndex& idx, const QVariant& value, int role)
+{
+  if(role != Qt::DisplayRole && role != Qt::EditRole)
+    {
+    return false;
+    }
+
+  const pqFileDialogModelFileInfo* file =
+    this->Implementation->infoForIndex(idx);
+
+  if(!file)
+    {
+    return false;
+    }
+
+  QString name = value.toString();
+  return this->rename(file->filePath(), name);
+}
+  
+Qt::ItemFlags pqFileDialogModel::flags(const QModelIndex& idx) const
+{
+  Qt::ItemFlags ret = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  const pqFileDialogModelFileInfo* file =
+    this->Implementation->infoForIndex(idx);
+  if(file && !file->isGroup())
+    {
+    ret |= Qt::ItemIsEditable;
+    }
+  return ret;
+}
+
 

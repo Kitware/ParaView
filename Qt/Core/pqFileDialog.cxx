@@ -110,11 +110,9 @@ public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
   pqFileDialogFilter FileFilter;
-  QLineEdit *FolderNameEditorWidget;
   FileMode Mode;
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
-  QString TempFolderName;
   bool SupressOverwriteWarning;
   
   // remember the last locations we browsed
@@ -126,7 +124,6 @@ public:
     Model(new pqFileDialogModel(server, NULL)),
     FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
     FileFilter(this->Model),
-    FolderNameEditorWidget(NULL),
     Mode(ExistingFile),
     SupressOverwriteWarning(false)
   {
@@ -230,6 +227,8 @@ pqFileDialog::pqFileDialog(
   Implementation(new pqImplementation(this, server))
 {
   this->Implementation->Ui.setupUi(this);
+
+  this->Implementation->Ui.Files->setEditTriggers(QAbstractItemView::EditKeyPressed);
 
   this->setWindowTitle(title);
   
@@ -357,11 +356,23 @@ void pqFileDialog::onCreateNewFolder()
   //   once the user provides a new name for it. 
   //   FIXME: I guess we could insert an item into the model without 
   //    actually creating a new directory but this way I could reuse code.
-  QString dirName = QString("NewFolder");
+  QString dirName = QString("New Folder");
   int i=0;
-  while(!this->Implementation->Model->makeDirEntry(dirName))
+  QString fullDir;
+  while(this->Implementation->Model->dirExists(dirName, fullDir))
     {
-    dirName = QString("NewFolder" + QString::number(i++));
+    dirName = QString("New Folder%1").arg(i++);
+    }
+
+  if(!this->Implementation->Model->mkdir(dirName))
+    {
+    QMessageBox message(
+          QMessageBox::Warning,
+          this->windowTitle(),
+          QString(tr("Unable to create directory %1.")).arg(dirName),
+          QMessageBox::Ok);
+    message.exec();
+    return;
     }
 
   // Get the index of the new directory in the model
@@ -383,84 +394,10 @@ void pqFileDialog::onCreateNewFolder()
     return;
     }
 
-  // Insert a line edit widget at the index in the view. 
-  // THis widget will retain keyboard and mouse focus until 'return' is pressed
-  QLineEdit *editor = new QLineEdit(dirName);
-  editor->setText(dirName);
-  editor->selectAll();
-  this->Implementation->Ui.Files->setIndexWidget(idx,editor); 
-  this->Implementation->Ui.Files->scrollTo(idx); 
-  // Listen for when the user is finished editing
-  QObject::connect(editor,SIGNAL(editingFinished()),this,
-                  SLOT(onFinishedEditingNewFolderName()));
-  editor->setFocus();
-  this->Implementation->Ui.OK->setAutoDefault(false);
-  QObject::disconnect(this->Implementation->Ui.Files, 
-                  SIGNAL(activated(const QModelIndex&)), 
-                  this, 
-                  SLOT(onActivateFile(const QModelIndex&)));
-
-  // Store vars that we'll need access to in the slots
-  this->Implementation->TempFolderName = dirName;
-  this->Implementation->FolderNameEditorWidget = editor;
+  this->Implementation->Ui.Files->selectionModel()->select(idx,
+    QItemSelectionModel::Select|QItemSelectionModel::Current);
+  this->Implementation->Ui.Files->edit(idx);
 }
-
-//-----------------------------------------------------------------------------
-void pqFileDialog::onFinishedEditingNewFolderName()
-{
-  // get the name for the new directory provided by the user
-  QString newName = this->Implementation->FolderNameEditorWidget->text();
-  
-  // remove the placeholder directory before creating actual one:
-  this->Implementation->Model->removeDirEntry(this->Implementation->TempFolderName);
-
-  if(!this->Implementation->Model->makeDir(newName))
-    {
-    // FIXME: Pressing return or clicking 'ok' in message box is causing 
-    // onActivateFile() to be called and the file with the current index 
-    // to be opened
-    QMessageBox message(
-          QMessageBox::Warning,
-          this->windowTitle(),
-          QString(tr("A directory named %1 already exists.")).arg(newName),
-          QMessageBox::Ok);
-    message.exec();
-    this->Implementation->Ui.OK->setAutoDefault(true);
-    QObject::connect(this->Implementation->Ui.Files, 
-                    SIGNAL(activated(const QModelIndex&)), 
-                    this, 
-                    SLOT(onActivateFile(const QModelIndex&)));
-    return;
-    }  
-
-  this->Implementation->Ui.OK->setAutoDefault(true);
-
-  QObject::connect(this->Implementation->Ui.Files, 
-                   SIGNAL(activated(const QModelIndex&)), 
-                   this, 
-                   SLOT(onActivateFile(const QModelIndex&)));
-
-  // make sure the new entry is visible, 
-  // also select it (so pressing 'return' will open it which is 
-  //    probably what the user wants to do)
-  QAbstractProxyModel* m = &this->Implementation->FileFilter;
-  int numrows = m->rowCount(QModelIndex());
-  QModelIndex idx;
-  for(int i=0; i<numrows; i++)
-    {
-    idx = m->index(i, 0, QModelIndex());
-    if(newName == m->data(idx, Qt::DisplayRole))
-      {
-      this->Implementation->Ui.Files->scrollTo(idx);
-      // This was cauing the directory to automatically be opened so 
-      // I'm disabling it until I find a fix
-      //this->Implementation->Ui.Files->selectionModel()->setCurrentIndex(
-      //    idx,QItemSelectionModel::ClearAndSelect);
-      break;
-      }
-    }
-}
-
 
 //-----------------------------------------------------------------------------
 void pqFileDialog::onContextMenuRequested(const QPoint &menuPos)
