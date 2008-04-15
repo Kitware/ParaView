@@ -117,9 +117,12 @@ signals:
   /// emitted when render module is changed
   void viewChanged(pqView*);
 
+  void helpRequested(const QString& proxyType);
+
 protected slots:
 
   void removeProxy(pqPipelineSource* proxy);
+  void showHelp();
 
   void deleteProxy();
 
@@ -136,6 +139,7 @@ private:
   QPushButton* AcceptButton;
   QPushButton* ResetButton;
   QPushButton* DeleteButton;
+  QPushButton* HelpButton;
   QPointer<pqView> View;
   QTimer AutoAcceptTimer;
   static bool AutoAccept;

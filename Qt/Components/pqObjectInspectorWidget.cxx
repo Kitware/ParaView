@@ -246,10 +246,17 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->DeleteButton->setObjectName("Delete");
   this->DeleteButton->setText(tr("Delete"));
   this->DeleteButton->setIcon(QIcon(QPixmap(":/QtWidgets/Icons/pqDelete16.png")));
+  
+  this->HelpButton = new QPushButton(this);
+  this->HelpButton->setObjectName("Help");
+  this->HelpButton->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+  this->HelpButton->setEnabled(false);
+  
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
   buttonlayout->addWidget(this->DeleteButton);
+  buttonlayout->addWidget(this->HelpButton);
   buttonlayout->addStretch();
   
   mainLayout->addLayout(buttonlayout);
@@ -258,6 +265,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->connect(this->AcceptButton, SIGNAL(clicked()), SLOT(accept()));
   this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
   this->connect(this->DeleteButton, SIGNAL(clicked()), SLOT(deleteProxy()));
+  this->connect(this->HelpButton, SIGNAL(clicked()), SLOT(showHelp()));
 
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
@@ -396,8 +404,10 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   if(!proxy)
     {
     this->DeleteButton->setEnabled(false);
+    this->HelpButton->setEnabled(false);
     return;
     }
+  this->HelpButton->setEnabled(true);
 
   // search for a custom form for this proxy with pending changes
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
@@ -666,3 +676,13 @@ pqView* pqObjectInspectorWidget::view()
 {
   return this->View;
 }
+
+//-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::showHelp()
+{
+  if(this->CurrentPanel && this->CurrentPanel->referenceProxy())
+    {
+    this->helpRequested(this->CurrentPanel->referenceProxy()->getProxy()->GetXMLName());
+    }
+}
+
