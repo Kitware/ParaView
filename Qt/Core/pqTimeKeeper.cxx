@@ -196,6 +196,17 @@ void pqTimeKeeper::updateTimeKeeperProxy()
     dvp->SetElements(&std_keys[0]);
     }
   this->getProxy()->UpdateVTKObjects();
+
+  // if the current time is not in the range of the timesteps currently
+  // available, we change the time.
+  QPair<double, double> range = this->getTimeRange();
+  double curtime = this->getTime();
+  if (range.first < range.second && 
+    (curtime < range.first || curtime > range.second))
+    {
+    this->setTime(range.first);
+    }
+
   emit this->timeStepsChanged();
 }
 

@@ -212,6 +212,19 @@ void pqAnimationScene::updateTimeRanges()
     pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
     }
   sceneProxy->UpdateVTKObjects();
+
+  // If the animation time is not in the scene time range, set it to the min
+  // value.
+  double min = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("StartTime")).toDouble();
+  double max = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("EndTime")).toDouble();
+  double cur = pqSMAdaptor::getElementProperty(
+    sceneProxy->GetProperty("AnimationTime")).toDouble();
+  if (cur < min || cur > max)
+    {
+    this->setAnimationTime(min);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -436,6 +449,7 @@ void pqAnimationScene::setAnimationTime(double time)
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("AnimationTime"),
     time);
   this->getProxy()->UpdateProperty("AnimationTime");
+  emit this->animationTime(time);
 }
 
 
@@ -453,6 +467,5 @@ void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)
     (cueInfo->EndTime - cueInfo->StartTime));
 
   this->setAnimationTime(cueInfo->AnimationTime);
-  emit this->animationTime(cueInfo->AnimationTime);
   emit this->tick(progress);
 }
