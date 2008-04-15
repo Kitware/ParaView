@@ -630,12 +630,13 @@ void pqChartAxis::layoutAxis(const QRect &area)
     valueChanged = this->Scale->setValueRange(pqChartValue(), pqChartValue());
     }
 
-  //if((valueChanged || this->Internal->ScaleChanged) &&
-  //    this->Scale->getScaleType() == pqChartPixelScale::Logarithmic &&
-  //    !this->Scale->isLogScaleAvailable())
-  //  {
-  //  qWarning() << "Warning: Invalid range for a logarithmic scale.";
-  //  }
+  if((valueChanged || this->Internal->ScaleChanged) &&
+      this->Scale->getScaleType() == pqChartPixelScale::Logarithmic &&
+      !this->Scale->isLogScaleAvailable())
+    {
+    qWarning() << "Warning: Invalid range for a logarithmic scale."
+               << "Please select a range greater than zero.";
+    }
 
   // Signal the chart layers if the pixel-value map changed.
   if(pixelChanged || valueChanged || this->Internal->ScaleChanged)
