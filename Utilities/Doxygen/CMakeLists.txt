@@ -30,6 +30,7 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_SOURCE_LOCATIONS
        "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf2/vtk\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable\" \\
+        \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
@@ -48,6 +49,7 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_PARSED_INPUT_DIRS
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf2/vtk\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/VTKPythonWrapping/Executable\" \\
+        \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
