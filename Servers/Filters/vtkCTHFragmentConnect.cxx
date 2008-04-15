@@ -42,7 +42,7 @@
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.17");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.18");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
@@ -1714,11 +1714,11 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
   // Find the overall bounds of the data set.
   // Find one of the lowest level blocks to compute origin.
 
-  int    lowestLevel;
+  int    lowestLevel = 0;
   double lowestSpacing[3];
   double lowestOrigin[3];
   int    lowestDims[3];
-  int    largestLevel;
+  int    largestLevel = 0;
   double largestOrigin[3];
   double largestSpacing[3];
   int    largestDims[3];
@@ -2654,6 +2654,9 @@ void vtkCTHFragmentConnect::CreateFace(
   vtkIdType triPtIds[3];
   vtkIdType startTriId = polys->GetNumberOfCells();
 
+  // Avoid a warning
+  quadMidIds[0] = quadMidIds[1] = quadMidIds[2] = quadMidIds[3] = 0;
+  
   // Compute the corner and edge points.
   // Store the results in ivars.
   this->ComputeFacePoints(in, out,
@@ -3264,7 +3267,6 @@ void vtkCTHFragmentConnect::FindNeighbor(
 
   int tmpLevel;
   int recheck = 1;
-  int outOfAxis;
   while (recheck)
     {
     recheck = 0;
