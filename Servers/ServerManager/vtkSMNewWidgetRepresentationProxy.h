@@ -69,6 +69,10 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
+  // Description:
+  // Updates the widget's enabled state.
+  void UpdateEnabled();
+
   vtkSMProxy* RepresentationProxy;
   vtkSMProxy* WidgetProxy;
   vtkAbstractWidget* Widget;
@@ -79,6 +83,7 @@ protected:
   friend class vtkSMNewWidgetRepresentationObserver;
 //ETX
 
+  int Enabled;
 private:
   void ExecuteEvent(unsigned long event);
 

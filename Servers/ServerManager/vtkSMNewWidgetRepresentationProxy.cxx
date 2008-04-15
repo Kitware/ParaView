@@ -18,8 +18,9 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkProcessModule.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPropertyIterator.h"
@@ -27,13 +28,13 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkWeakPointer.h"
 #include "vtkWidgetRepresentation.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.7");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -55,6 +56,7 @@ struct vtkSMNewWidgetRepresentationInternals
 {
   typedef vtkstd::list<vtkSmartPointer<vtkSMLink> > LinksType;
   LinksType Links;
+  vtkWeakPointer<vtkSMRenderViewProxy> ViewProxy;
 };
 
 //----------------------------------------------------------------------------
@@ -63,6 +65,7 @@ vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
   this->RepresentationProxy = 0;
   this->WidgetProxy = 0;
   this->Widget = 0;
+  this->Enabled = 0;
   this->Observer = vtkSMNewWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
   this->Internal = new vtkSMNewWidgetRepresentationInternals;
@@ -93,16 +96,10 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkAbstractWidget* widget = NULL;
-  if (this->WidgetProxy)
+  vtkAbstractWidget* widget = this->Widget;
+  if (widget)
     {
-    widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID()));
-    if (widget)
-      {
-      widget->SetInteractor(renderView->GetInteractor());
-      }
+    widget->SetInteractor(renderView->GetInteractor());
     }
 
   if (this->RepresentationProxy)
@@ -135,6 +132,8 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
       }
     }
 
+  this->Internal->ViewProxy = renderView;
+  this->UpdateEnabled();
   return true;
 }
 
@@ -148,17 +147,11 @@ bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     return false;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (this->WidgetProxy)
+  if (this->Widget)
     {
-    vtkAbstractWidget* widget = vtkAbstractWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID()));
-    if (this->Widget)
-      {
-      widget->SetEnabled(0);
-      widget->SetCurrentRenderer(0);
-      widget->SetInteractor(0);
-      }
+    this->Widget->SetEnabled(0);
+    this->Widget->SetCurrentRenderer(0);
+    this->Widget->SetInteractor(0);
     }
 
   if (this->RepresentationProxy)
@@ -182,18 +175,26 @@ bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
       }
     }
 
+  this->Internal->ViewProxy = 0;
   return this->Superclass::RemoveFromView(view);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::SetEnabled(int enable)
 {
-  if (this->WidgetProxy)
+  if (this->Enabled != enable)
     {
-    vtkSMIntVectorProperty* enabled = vtkSMIntVectorProperty::SafeDownCast(
-      this->WidgetProxy->GetProperty("Enabled"));
-    enabled->SetElements1(enable);
-    this->WidgetProxy->UpdateVTKObjects();
+    this->Enabled = enable;
+    this->UpdateEnabled();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMNewWidgetRepresentationProxy::UpdateEnabled()
+{
+  if (this->Internal->ViewProxy && this->Widget)
+    {
+    this->Widget->SetEnabled(this->Enabled);
     }
 }
 
