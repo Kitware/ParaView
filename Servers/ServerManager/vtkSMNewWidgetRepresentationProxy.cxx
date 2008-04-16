@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.9");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -377,8 +377,11 @@ bool vtkSMNewWidgetRepresentationProxy::GetBounds(double bds[6])
     if (repr)
       {
       double *propBds = repr->GetBounds();
-      memcpy(bds, propBds, 6*sizeof(double));
-      return true;
+      if (propBds)
+        {
+        memcpy(bds, propBds, 6*sizeof(double));
+        return true;
+        }
       }
     }
   return false;
