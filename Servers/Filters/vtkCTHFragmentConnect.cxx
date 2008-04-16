@@ -16,34 +16,45 @@
 
 #include "vtkMultiProcessController.h"
 
-#include "vtkCollection.h"
-#include "vtkCellArray.h"
-#include "vtkCommand.h"
-#include "vtkImageData.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-#include "vtkMarchingCubesCases.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
-#include "vtkPolyData.h"
-#include "vtkCellData.h"
-#include "vtkDataSetWriter.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkUniformGrid.h"
-#include "vtkAMRBox.h"
-#include <math.h>
-#include "vtkDoubleArray.h"
 
 #include "vtkDataSet.h"
-#include "vtkDataObject.h"
+#include "vtkPolyData.h"
+#include "vtkImageData.h"
+#include "vtkUniformGrid.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkHierarchicalBoxDataSet.h"
+#include "vtkAMRBox.h"
+
+#include "vtkDataObject.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellArray.h"
+#include "vtkPointData.h"
+#include "vtkCellData.h"
+#include "vtkCollection.h"
+#include "vtkDataArraySelection.h"
+
+#include "vtkDataSetWriter.h"
 #include "vtkXMLPolyDataWriter.h"
+
+#include "vtkCallbackCommand.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+
+#include "vtkMarchingCubesCases.h"
+
+#include <math.h>
+
+#include "vtksys/ios/sstream"
+using vtksys_ios::ostringstream;
 
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.18");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.19");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
+
 
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
@@ -143,14 +154,14 @@ void vtkCTHFragmentEquivalenceSet::Print()
 int vtkCTHFragmentEquivalenceSet::GetEquivalentSetId(int memberId)
 {
   int ref;
-  
+
   ref = this->GetReference(memberId);
   while (!this->Resolved && ref != memberId)
     {
     memberId = ref;
     ref = this->GetReference(memberId);
     }
-    
+
   return ref;
 }
 
@@ -173,10 +184,10 @@ void vtkCTHFragmentEquivalenceSet::AddEquivalence(int id1, int id2)
 {
   if (this->Resolved)
     {
-    cerr << "Set already resolved.  you cannot add more equivalences.\n";
+    vtkGenericWarningMacro("Set already resolved, you cannot add more equivalences.");
     return;
     }
-    
+
   int num = this->EquivalenceArray->GetNumberOfTuples();
 
   // Expand the range to include both ids.
@@ -240,11 +251,10 @@ int vtkCTHFragmentEquivalenceSet::ResolveEquivalences()
 {
   // Go through the equivalence array collapsing chains 
   // and assigning consecutive ids.
-  
   int count = 0;
   int id;
   int newId;
-  
+
   int numIds = this->EquivalenceArray->GetNumberOfTuples();
   for (int ii = 0; ii < numIds; ++ii)
     {
@@ -263,7 +273,7 @@ int vtkCTHFragmentEquivalenceSet::ResolveEquivalences()
       }
     }
   this->Resolved = 1;
-  cerr << "Final number of equivalent sets: " << count << endl;
+  //cerr << "Final number of equivalent sets: " << count << endl;
 
   return count;
 }
@@ -435,7 +445,7 @@ void vtkCTHFragmentConnectBlock::Initialize(
   int level, 
   double globalOrigin[3],
   double rootSpacing[3],
-  const char* volumeFractionArrayName)
+  const char* volumeFractionArrayName )
 {
   if (this->VolumeFractionArray)
     {
@@ -447,7 +457,7 @@ void vtkCTHFragmentConnectBlock::Initialize(
     vtkGenericWarningMacro("No image to initialize with.");
     return;
     }
-  
+
   this->BlockId = blockId;
   this->Image = image;
   this->Image->Register(0);
@@ -668,10 +678,10 @@ void vtkCTHFragmentConnectBlock::AddNeighbor(
   int axis, 
   int maxFlag)
 {
-  if (this->Level == 4 && this->BaseCellExtent[0] == 208 && this->BaseCellExtent[2] == 224 && this->BaseCellExtent[4] == 160)
-    {
-    cerr << "Debug\n";
-    }
+//   if (this->Level == 4 && this->BaseCellExtent[0] == 208 && this->BaseCellExtent[2] == 224 && this->BaseCellExtent[4] == 160)
+//     {
+//     cerr << "Debug\n";
+//     }
 
 
   if (maxFlag)
@@ -939,12 +949,12 @@ void vtkCTHFragmentLevel::SetStandardBlockDimensions(int dims[3])
 int vtkCTHFragmentLevel::AddBlock(vtkCTHFragmentConnectBlock* block)
 {
   int xIdx, yIdx, zIdx;
-  
-  if (block->GetLevel() == 4 && block->LevelBlockId == 24)
-    {
-    cerr << "Debug.\n";
-    }
-  
+
+//   if (block->GetLevel() == 4 && block->LevelBlockId == 24)
+//     {
+//     cerr << "Debug.\n";
+//     }
+
   // First make sure the level is correct.
   // We assume that the block dimensions are correct.
   if (block->GetLevel() != this->Level)
@@ -1186,7 +1196,17 @@ int vtkCTHFragmentConnectRingBuffer::Pop(vtkCTHFragmentConnectIterator* item)
 // of 0.0. ComputeNormal is on, ComputeGradients is off and ComputeScalars is on.
 vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 {
-  this->VolumeFractionArrayName = 0;
+  // Setup the selection callback to modify this object when an array
+  // selection is changed.
+  this->MaterialArraySelection = vtkDataArraySelection::New();
+
+  this->SelectionObserver = vtkCallbackCommand::New();
+  this->SelectionObserver->SetCallback(
+    &vtkCTHFragmentConnect::SelectionModifiedCallback );
+  this->SelectionObserver->SetClientData(this);
+
+  this->MaterialArraySelection->AddObserver( vtkCommand::ModifiedEvent,
+                                     this->SelectionObserver );
 
   this->NumberOfInputBlocks = 0;
   this->InputBlocks = 0;
@@ -1203,8 +1223,15 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->NumberOfResolvedFragments = 0;
   this->IntegratedFragmentAttributes = 0;
   this->IntegrationBuffer = 0;
-  
+
   this->FaceNeighbors =  new vtkCTHFragmentConnectIterator[32];
+
+  this->CurrentFragmentIdArrayName = 0;
+  this->CurrentFragmentMesh = 0;
+  this->CurrentFragmentIdArrayIndex = -1;
+
+  this->MaterialFractionThreshold = 0.5;
+  this->scaledMaterialFractionThreshold = 127.5;
 }
 
 //----------------------------------------------------------------------------
@@ -1214,7 +1241,7 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->Controller = 0;
   this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
   this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
-  
+
   this->FragmentId = 0;
   this->FragmentVolume = 0.0;
   this->FragmentVolumes->Delete();
@@ -1224,9 +1251,13 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->EquivalenceSet = 0;
   this->IntegratedFragmentAttributes = 0;
   this->IntegrationBuffer = 0;
-  
-  delete this->FaceNeighbors;
+
+  delete [] this->FaceNeighbors;
   this->FaceNeighbors = 0;
+
+  this->MaterialArraySelection->RemoveObserver( this->SelectionObserver );
+  this->MaterialArraySelection->Delete();
+  this->SelectionObserver->Delete();
 }
 
 
@@ -1283,7 +1314,8 @@ void vtkCTHFragmentConnect::DeleteAllBlocks()
 
 //----------------------------------------------------------------------------
 // Initialize a single block from an image input.
-int vtkCTHFragmentConnect::InitializeBlocks(vtkImageData* input)
+int vtkCTHFragmentConnect::InitializeBlocks( vtkImageData* input,
+                                             const char *arrayName )
 {
   // Just in case
   this->DeleteAllBlocks();
@@ -1294,15 +1326,19 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkImageData* input)
   this->InputBlocks = new vtkCTHFragmentConnectBlock*[1];
   this->NumberOfInputBlocks = 1;
   block = this->InputBlocks[0] = new vtkCTHFragmentConnectBlock;
-  block->Initialize(0, input, 0, input->GetOrigin(), input->GetSpacing(),
-                    this->VolumeFractionArrayName);
+
+  block->Initialize( 0, input, 0,
+                     input->GetOrigin(),
+                     input->GetSpacing(),
+                     arrayName );
 
   return VTK_OK;
 }
 
 //----------------------------------------------------------------------------
 // Initialize blocks from multi block input.
-int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
+int vtkCTHFragmentConnect::InitializeBlocks( vtkHierarchicalBoxDataSet* input,
+                                             const char *arrayName )
 {
   int level;
   int numLevels = input->GetNumberOfLevels();
@@ -1341,7 +1377,7 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
     int cumulativeExt[6];
     cumulativeExt[0] = cumulativeExt[2] = cumulativeExt[4] = VTK_LARGE_INTEGER;
     cumulativeExt[1] = cumulativeExt[3] = cumulativeExt[5] = -VTK_LARGE_INTEGER;
-    
+
     int numBlocks = input->GetNumberOfDataSets(level);
     for (int levelBlockId = 0; levelBlockId < numBlocks; ++levelBlockId)
       {
@@ -1355,11 +1391,15 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
         // Do we really need the block to know its id? 
         // We use it to find neighbors.  We should save pointers directly in neighbor array.
         // We also use it for debugging.
-        block->Initialize(blockIndex, image, level, this->GlobalOrigin, this->RootSpacing,
-                          this->VolumeFractionArrayName);
+        block->Initialize( blockIndex,
+                           image,
+                           level,
+                           this->GlobalOrigin,
+                           this->RootSpacing,
+                           arrayName );
         // For debugging:
         block->LevelBlockId = levelBlockId;
-        
+
         // Collect information about the blocks in this level.
         const int *ext;
         ext = block->GetBaseCellExtent();
@@ -1429,7 +1469,7 @@ int vtkCTHFragmentConnect::InitializeBlocks(vtkHierarchicalBoxDataSet* input)
     {
     this->ShareGhostBlocks();
     }
-    
+
   return VTK_OK;
 }
 
@@ -1450,10 +1490,10 @@ void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
   blockIndex[1] = ext[2] / this->StandardBlockDimensions[1];
   blockIndex[2] = ext[4] / this->StandardBlockDimensions[2];
 
-  if (blockIndex[0] == 13 && blockIndex[1] == 14 && blockIndex[2] == 10)
-    {
-    cerr << "Debug.\n";
-    }
+//   if (blockIndex[0] == 13 && blockIndex[1] == 14 && blockIndex[2] == 10)
+//     {
+//     cerr << "Debug.\n";
+//     }
 
   for (int axis = 0; axis < 3; ++axis)
     {
@@ -2268,107 +2308,161 @@ int vtkCTHFragmentConnect::RequestData(
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
-  if (this->VolumeFractionArrayName == 0)
+  int nArraysEnabled = this->MaterialArraySelection->GetNumberOfArraysEnabled();
+
+  // Do we have anything to do?
+  if ( nArraysEnabled == 0)
     {
     vtkErrorMacro("No volume fraction specified.");
     return 0;
     }
 
+  // these used to report filter's progress 
+  // back to PV
+  double progress = 0.0;
+  double progressPerArray = 1.0/(double)nArraysEnabled;
+
   // get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  this->FragmentId = 0;
-  this->FragmentVolume = 0.0;
-  this->EquivalenceSet->Initialize();
+  vtkMultiBlockDataSet *outputMbds =
+    vtkMultiBlockDataSet::SafeDownCast( outInfo->Get(vtkDataObject::DATA_OBJECT()) );
 
-  this->BlockIdArray = vtkIntArray::New();
-  this->BlockIdArray->SetName("BlockId");
-  this->LevelArray = vtkIntArray::New();
-  this->LevelArray->SetName("Level");
-  output->GetCellData()->AddArray(this->BlockIdArray);
-  output->GetCellData()->AddArray(this->LevelArray);
+  // the filter generates a poly data DS for each
+  // array that it processes
+  outputMbds->SetNumberOfBlocks( nArraysEnabled );
 
-  this->Mesh = output;
-  vtkPoints* points = vtkPoints::New();
-  this->Mesh->SetPoints(points);
-  points->Delete();
-  vtkCellArray* polys = vtkCellArray::New();
-  this->Mesh->SetPolys(polys);
-  polys->Delete();
-  // Id Scalars holds the computed index of the fragment.
-  // Make point scalars for now.  Probably use cell scalars in the future.
-  vtkIntArray* idScalars = vtkIntArray::New();
-  idScalars->SetName("FragmentId");
-  output->GetPointData()->SetScalars(idScalars);
+  // process enabled arrays, i is the index into 
+  // the array names, j is the index into the 
+  // multiblock data set
+  int nArrays = this->MaterialArraySelection->GetNumberOfArrays();
+  for ( int i=0,j=0; i<nArrays; ++i )
+    {
 
-  // Keep a counter of which connected component we are upto.
-  this->FragmentId = 0;
-  this->FragmentVolume = 0.0;
+    // skip disabled arrays
+    if ( !this->MaterialArraySelection->GetArraySetting( i ) )
+      {
+      continue;
+      }
+    // results of the filter are placed here
+    vtkPolyData *thisOutputPd = vtkPolyData::New();
+    // save pointer for use in helper methods,
+    // but it's only valid during this iteration of this loop
+    this->CurrentFragmentMesh = thisOutputPd;
 
-  vtkImageData *inData = vtkImageData::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (inData != 0)
-    { // Just an image data. Process it directly.
-    this->InitializeBlocks(inData);
-    int ret = this->ProcessBlock(0);
-    this->DeleteAllBlocks();
+    /// Begin Processing...
+    // TODO need to save info that can be re-used during multiple passes
+    this->FragmentId = 0;
+    this->FragmentVolume = 0.0;
+    this->EquivalenceSet->Initialize();
+
+    this->BlockIdArray = vtkIntArray::New();
+    this->BlockIdArray->SetName("BlockId");
+    this->LevelArray = vtkIntArray::New();
+    this->LevelArray->SetName("Level");
+    thisOutputPd->GetCellData()->AddArray(this->BlockIdArray);
+    thisOutputPd->GetCellData()->AddArray(this->LevelArray);
+
+    vtkPoints* points = vtkPoints::New();
+    thisOutputPd->SetPoints(points);
+    points->Delete();
+    vtkCellArray* polys = vtkCellArray::New();
+    thisOutputPd->SetPolys(polys);
+    polys->Delete();
+
+    // Id Scalars holds the computed index of the fragment.
+    // Make point scalars for now.  Probably use cell scalars in the future.
+    vtkIntArray* idScalars = vtkIntArray::New();
+
+    // get name of the array we are to process
+    const char *thisMaterialArrayName = this->MaterialArraySelection->GetArrayName( i );
+    // construct an array name that identifies which
+    // material this fragment set comes from for use
+    // in the output data set, with in an individual block.
+    ostringstream ossFragIdName;
+    ossFragIdName << "Fragment id - " << thisMaterialArrayName;
+
+    idScalars->SetName(ossFragIdName.str().c_str());
+    thisOutputPd->GetPointData()->SetScalars( idScalars );
+
+    // save this for use in helper methods, to access this id array
+    // but it's only valid during this iteration of this loop
+    this->CurrentFragmentIdArrayName = thisOutputPd->GetPointData()->GetScalars()->GetName();
+
+    // Keep a counter of which connected component we are up to.
+    this->FragmentId = 0;
+    this->FragmentVolume = 0.0;
+
+    vtkImageData *inData = vtkImageData::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()) );
+    if (inData != 0)
+      { // Just an image data. Process it directly.
+      this->InitializeBlocks( inData, thisMaterialArrayName );
+      int ret = this->ProcessBlock(0);
+      this->DeleteAllBlocks();
+      this->BlockIdArray->Delete();
+      this->BlockIdArray = 0;
+      this->LevelArray->Delete();
+      this->LevelArray = 0;
+      return ret;
+      }
+
+    // Try AMR
+    vtkHierarchicalBoxDataSet *hds=vtkHierarchicalBoxDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    if (hds)
+      {
+      this->InitializeBlocks( hds, thisMaterialArrayName );
+      int blockId;
+      for (blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
+        {
+        this->ProcessBlock(blockId);
+        }
+      this->UpdateProgress( (double)j*0.25*progressPerArray );
+
+      //char tmp[128];
+      //sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
+      //this->SaveBlockSurfaces(tmp);
+      //sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
+      //this->SaveGhostSurfaces(tmp);
+
+      this->ResolveEquivalences(idScalars);
+      this->UpdateProgress( (double)j*0.5*progressPerArray );
+      this->GenerateVolumeArray(idScalars,dynamic_cast<vtkDataSet*>(thisOutputPd));
+      this->DeleteAllBlocks();
+      }
+
+    // add a leaf to multi block, and inc index
+    thisOutputPd->Update();
+    outputMbds->SetBlock( j, thisOutputPd );
+    ++j;
+    this->UpdateProgress( (double)j*progressPerArray );
+
+    idScalars->Delete();
     this->BlockIdArray->Delete();
     this->BlockIdArray = 0;
     this->LevelArray->Delete();
     this->LevelArray = 0;
-    return ret;
-    }
-    
-  // Try AMR
-  vtkHierarchicalBoxDataSet *hds=vtkHierarchicalBoxDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  if (hds)
-    {
-    this->InitializeBlocks(hds);
-    int blockId;
-    for (blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
-      {
-      this->ProcessBlock(blockId);
-      }
-    
-    //char tmp[128];
-    //sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
-    //this->SaveBlockSurfaces(tmp);
-    //sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
-    //this->SaveGhostSurfaces(tmp);
-    
-    
-    this->ResolveEquivalences(idScalars);
-    this->GenerateVolumeArray(idScalars, output);
-    this->DeleteAllBlocks();
-    }
 
-  idScalars->Delete();
-  this->BlockIdArray->Delete();
-  this->BlockIdArray = 0;
-  this->LevelArray->Delete();
-  this->LevelArray = 0;
+    // Mark data for helpers as invalid
+    this->CurrentFragmentMesh = 0;
+    this->CurrentFragmentIdArrayName = 0;
+    this->CurrentFragmentIdArrayIndex = -1;
+    }
 
   return 1;
 }
 
-
-
 //----------------------------------------------------------------------------
 int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 {
-  float middleValue = 127.5;
-
   vtkCTHFragmentConnectBlock* block = this->InputBlocks[blockId];
   if (block == 0)
     {
     return 0;
-    }  
-    
+    }
+
   vtkCTHFragmentConnectIterator* xIterator = new vtkCTHFragmentConnectIterator;
   vtkCTHFragmentConnectIterator* yIterator = new vtkCTHFragmentConnectIterator;
   vtkCTHFragmentConnectIterator* zIterator = new vtkCTHFragmentConnectIterator;
@@ -2396,7 +2490,7 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
         {
         xIterator->Index[0] = ix;    
         if (*(xIterator->FragmentIdPointer) == -1 && 
-            *(xIterator->VolumeFractionPointer) > middleValue) //0.5)
+            *(xIterator->VolumeFractionPointer) > this->scaledMaterialFractionThreshold)
           { // We have a new fragment.
           this->EquivalenceSet->AddEquivalence(this->FragmentId,this->FragmentId);
           // We have to mark every voxel we push on the queue.
@@ -2419,19 +2513,19 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
     zIterator->VolumeFractionPointer += cellIncs[2];
     zIterator->FragmentIdPointer += cellIncs[2];
     }
-  
+
   delete queue;
-  delete xIterator;  
-  delete yIterator;  
-  delete zIterator;  
-    
+  delete xIterator;
+  delete yIterator;
+  delete zIterator;
+
   return 1;
 }
 
 
 //----------------------------------------------------------------------------
 // This method computes the displacement of the corner to place it near a 
-// location where the interpolated volume fraction is 0.5.  
+// location where the interpolated volume fraction is a given threshold.
 // The results are returned as displacmentFactors that scale the basis vectors
 // associated with the face.  For the purpose of this computation, 
 // These vectors are orthogonal and their 
@@ -2439,7 +2533,7 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 // The actual interpolated volume will be warped later.
 // The previous version had a problem.  
 // Moving along the gradient and being constrained to inside the box
-// did not allow us to always hit the 0.5 target.
+// did not allow us to always hit the threshold target.
 // This version moves in the direction of the average normal of original
 // surface.  It essentially looks at neighbors to determine if original
 // voxel surface is flat, an edge, or a corner.
@@ -2456,8 +2550,6 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   //displacmentFactors[2] = 0.0;
   //return;
 
-  double middleValue = 127.5;
-
   double v000 = pointNeighborIterators[0]->VolumeFractionPointer[0];
   double v001 = pointNeighborIterators[1]->VolumeFractionPointer[0];
   double v010 = pointNeighborIterators[2]->VolumeFractionPointer[0];
@@ -2466,9 +2558,10 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   double v101 = pointNeighborIterators[5]->VolumeFractionPointer[0];
   double v110 = pointNeighborIterators[6]->VolumeFractionPointer[0];
   double v111 = pointNeighborIterators[7]->VolumeFractionPointer[0];
-  
+
+  // cell centered data interpolated to the current node
   double centerValue = (v000+v001+v010+v011+v100+v101+v110+v111)*0.125;
-  double surfaceValue;
+
   // Compute the gradient after a threshold.
   double t000 = 0.0;
   double t001 = 0.0;
@@ -2478,14 +2571,14 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   double t101 = 0.0;
   double t110 = 0.0;
   double t111 = 0.0;
-  if (v000 > middleValue) { t000 = 1.0;}
-  if (v001 > middleValue) { t001 = 1.0;}
-  if (v010 > middleValue) { t010 = 1.0;}
-  if (v011 > middleValue) { t011 = 1.0;}
-  if (v100 > middleValue) { t100 = 1.0;}
-  if (v101 > middleValue) { t101 = 1.0;}
-  if (v110 > middleValue) { t110 = 1.0;}
-  if (v111 > middleValue) { t111 = 1.0;}
+  if (v000 > this->scaledMaterialFractionThreshold) { t000 = 1.0;}
+  if (v001 > this->scaledMaterialFractionThreshold) { t001 = 1.0;}
+  if (v010 > this->scaledMaterialFractionThreshold) { t010 = 1.0;}
+  if (v011 > this->scaledMaterialFractionThreshold) { t011 = 1.0;}
+  if (v100 > this->scaledMaterialFractionThreshold) { t100 = 1.0;}
+  if (v101 > this->scaledMaterialFractionThreshold) { t101 = 1.0;}
+  if (v110 > this->scaledMaterialFractionThreshold) { t110 = 1.0;}
+  if (v111 > this->scaledMaterialFractionThreshold) { t111 = 1.0;}
 
   // We use the gradient ater threshold to choose a direction
   // to move the point.  After considering he discussion about
@@ -2493,27 +2586,30 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   // face connected (after threshold) to the iterator/voxel
   // that is generating this face.  We do not know which iterator 
   // that is because it was not passed in .......
-  
+
   double g[3]; // Gradient at center.
   g[2] = -t000-t001-t010-t011+t100+t101+t110+t111;
   g[1] = -t000-t001+t010+t011-t100-t101+t110+t111;
   g[0] = -t000+t001-t010+t011-t100+t101-t110+t111;
-  // This is unussual but it can happen wioth a checkerboard pattern.
+  // This is unussual but it can happen with a checkerboard pattern.
   // We should break the symetry and choose a direction ...
   if (g[0] == 0.0 && g[1] == 0.0 &&  g[2] == 0.0)
     {
     displacmentFactors[0] = displacmentFactors[1] = displacmentFactors[2] = 0.0;
     return;
     }
-  // If the center value is above 0.5, then we need to go in the negative gradient direction.
-  if (centerValue > middleValue)
+  // If the center value is above the threshold
+  // then we need to go in the negative gradient direction.
+  if (centerValue > this->scaledMaterialFractionThreshold)
     {
-    g[0] = -g[0];  
-    g[1] = -g[1];  
-    g[2] = -g[2];  
-    }    
-    
-  // Scale so that the largest(smallest) component is equal to 0.5(-0.5);
+    g[0] = -g[0];
+    g[1] = -g[1];
+    g[2] = -g[2];
+    }
+
+  // Scale so that the largest(smallest) component is equal to 
+  // 0.5(-0.5); This puts the tip of the gradient vector on the surface
+  // of a unit cube.
   double max = fabs(g[0]);
   double tmp = fabs(g[1]);
   if (tmp > max) {max = tmp;}
@@ -2523,8 +2619,10 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   g[0] *= tmp;
   g[1] *= tmp;
   g[2] *= tmp;
-  
-  // g is on the surface of a unit cube. Compute interpolated surface value.
+
+  // g is on the surface of a unit cube. Compute interpolated surface value
+  // with a tri-linear interpolation.
+  double surfaceValue;
   surfaceValue = v000*(0.5-g[0])*(0.5-g[1])*(0.5-g[2])
                 + v001*(0.5+g[0])*(0.5-g[1])*(0.5-g[2])
                 + v010*(0.5-g[0])*(0.5+g[1])*(0.5-g[2])
@@ -2533,9 +2631,9 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
                 + v101*(0.5+g[0])*(0.5-g[1])*(0.5+g[2])
                 + v110*(0.5-g[0])*(0.5+g[1])*(0.5+g[2])
                 + v111*(0.5+g[0])*(0.5+g[1])*(0.5+g[2]);
-  
+
   // Compute how far to the surface we must travel.
-  double k = (middleValue - centerValue) / (surfaceValue - centerValue);
+  double k = (this->scaledMaterialFractionThreshold - centerValue) / (surfaceValue - centerValue);
     // clamping caused artifacts in my test data sphere.
     // What sort of artifacts????  I forget.
     // the test spy data looks ok so lets go ahead with clamping.
@@ -2553,11 +2651,12 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
     {
     k = 1.0;
     }
-  
+
   // This should give us decent displacement factors.
-  displacmentFactors[0] = k * g[0] * 2.0;
-  displacmentFactors[1] = k * g[1] * 2.0;
-  displacmentFactors[2] = k * g[2] * 2.0;
+  k *= 2.0;
+  displacmentFactors[0] = k * g[0];
+  displacmentFactors[1] = k * g[1];
+  displacmentFactors[2] = k * g[2];
 }
 
 
@@ -2642,13 +2741,14 @@ void vtkCTHFragmentConnect::CreateFace(
       }
     }
 
-  // Add points to the output.  Create separate points for each triangle.  
+  // Add points to the output.  Create separate points for each triangle.
   // We can worry about merging points later.
   // FragmentIds get merged later.
   vtkCTHFragmentConnectIterator* cornerNeighbors[8];
-  vtkIntArray* idScalars = vtkIntArray::SafeDownCast(this->Mesh->GetPointData()->GetScalars());
-  vtkPoints *points = this->Mesh->GetPoints();
-  vtkCellArray *polys = this->Mesh->GetPolys();
+  vtkIntArray* idScalars =
+    vtkIntArray::SafeDownCast(this->CurrentFragmentMesh->GetPointData()->GetScalars());
+  vtkPoints *points = this->CurrentFragmentMesh->GetPoints();
+  vtkCellArray *polys = this->CurrentFragmentMesh->GetPolys();
   vtkIdType quadCornerIds[4];
   vtkIdType quadMidIds[4];
   vtkIdType triPtIds[3];
@@ -2734,10 +2834,10 @@ void vtkCTHFragmentConnect::CreateFace(
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
   idScalars->InsertTuple1(quadCornerIds[3], this->FragmentId);
 
-  if ( quadCornerIds[3] > 74503) // 74507
-    {
-    cerr << "Debug\n";
-    }
+//   if ( quadCornerIds[3] > 74503) // 74507
+//     {
+//     cerr << "Debug\n";
+//     }
 
   // Now for the mid edge point if the neighbors on that side are smaller.
   if (this->FaceEdgeFlags[0])
@@ -2985,7 +3085,7 @@ void vtkCTHFragmentConnect::CreateFace(
       break;
       }
     default:
-      vtkErrorMacro("Unexpected edge case.");
+      vtkErrorMacro("Unexpected edge case:" << caseIdx);
     }
 
   // Cell data attributes for debugging.
@@ -3342,7 +3442,7 @@ void vtkCTHFragmentConnect::FindNeighbor(
         }
       }
     }
-    
+
   // We have a block
   // clamp the neighbor index to pad the volume
   if (neighborIdx[0] < ext[0]) { neighborIdx[0] = ext[0];}
@@ -3382,7 +3482,7 @@ void vtkCTHFragmentConnect::GetNeighborIteratorPad(
 {
   if (iterator->VolumeFractionPointer == 0)
     {
-    cerr << "Error empty input block.  Cannot find neighbor.\n";
+    vtkErrorMacro("Error empty input block.  Cannot find neighbor.");
     *next = *iterator;
     return;
     }
@@ -3545,14 +3645,14 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
 // This extracts faces at the same time.
 // This is called only when the voxel is part of a fragment.
 // I tried to create a generic API to replace the hard coded conditional ifs.
-void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * queue)
+void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *queue)
 {
   while (queue->GetSize())
     {
     // Get the next voxel/iterator to search.
     vtkCTHFragmentConnectIterator iterator;
     queue->Pop(&iterator);
-    
+
     // Lets integrate volume when we remove the iterator from the queue.
     // We could also do it wehn we add the iterator to the queue, but
     // the adds occur in so many places.
@@ -3562,8 +3662,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
       this->FragmentVolume += spacing[0] * spacing[1] * spacing[2]
              * (double)(*(iterator.VolumeFractionPointer)) / 255.0;
       }
-      
-    double middleValue = 127.5;
+
+    ///double middleValue = 127.5;
 
     // Create another iterator on the stack for recursion.
     vtkCTHFragmentConnectIterator next;
@@ -3583,11 +3683,11 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
       // "Left"/min
       this->GetNeighborIterator(&next, &iterator, ii,0, (ii+1)%3,0, (ii+2)%3,0);
 
-      if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+      if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
         {
         // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(&iterator, &next, ii, 0);
-        }    
+        }
       else if (next.FragmentIdPointer[0] == -1)
         { // We have not visited this neighbor yet. Mark the voxel and recurse.
         *(next.FragmentIdPointer) = this->FragmentId;
@@ -3610,7 +3710,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         vtkCTHFragmentConnectIterator next2;
         // Take the first neighbor found and move +Y
         this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+        if (next2.VolumeFractionPointer == 0 || 
+            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
           // Neighbor is outside of fragment.  Make a face.
           this->CreateFace(&iterator, &next2, ii, 0);
@@ -3627,7 +3728,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           }
         // Take the fist iterator found and move +Z
         this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+        if (next2.VolumeFractionPointer == 0 || 
+            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
           // Neighbor is outside of fragment.  Make a face.
           this->CreateFace(&iterator, &next2, ii, 0);
@@ -3646,7 +3748,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.Block)
           {
           this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-          if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+          if (next.VolumeFractionPointer == 0 || 
+              next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
             {
             // Neighbor is outside of fragment.  Make a face.
             this->CreateFace(&iterator, &next, ii, 0);
@@ -3666,7 +3769,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
 
       // "Right"/max
       this->GetNeighborIterator(&next, &iterator, ii,1, (ii+1)%3,0, (ii+2)%3,0);
-      if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+      if (next.VolumeFractionPointer == 0 ||
+          next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
         { // Neighbor is outside of fragment.  Make a face.
         this->CreateFace(&iterator, &next, ii, 1);
         }
@@ -3687,7 +3791,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         vtkCTHFragmentConnectIterator next2;
         // Take the first neighbor found and move +Y
         this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+        if (next2.VolumeFractionPointer == 0 || 
+            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
           // Neighbor is outside of fragment.  Make a face.
           this->CreateFace(&iterator, &next2, ii, 1);
@@ -3704,7 +3809,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
           }
         // Take the fist iterator found and move +Z
         this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-        if (next2.VolumeFractionPointer == 0 || next2.VolumeFractionPointer[0] < middleValue)
+        if (next2.VolumeFractionPointer == 0 || 
+            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
           {
           // Neighbor is outside of fragment.  Make a face.
           this->CreateFace(&iterator, &next2, ii, 1);
@@ -3723,7 +3829,8 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer * qu
         if (next2.Block)
           {
           this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-          if (next.VolumeFractionPointer == 0 || next.VolumeFractionPointer[0] < middleValue)
+          if (next.VolumeFractionPointer == 0 || 
+              next.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
             {
             // Neighbor is outside of fragment.  Make a face.
             this->CreateFace(&iterator, &next, ii, 1);
@@ -3764,7 +3871,6 @@ int vtkCTHFragmentConnect::FillInputPortInformation(int port, vtkInformation *in
 void vtkCTHFragmentConnect::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
 }
 
 
@@ -4027,9 +4133,90 @@ void vtkCTHFragmentConnect::SaveGhostSurfaces(const char* fileName)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SelectMaterialArray( const char *arrayName )
+{
+  this->MaterialArraySelection->AddArray( arrayName );
+}
 
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::UnselectMaterialArray( const char *arrayName )
+{
+  this->MaterialArraySelection->RemoveArrayByName( arrayName );
+}
 
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::UnselectAllMaterialArrays()
+{
+  this->MaterialArraySelection->RemoveAllArrays();
+}
 
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SelectionModifiedCallback( vtkObject*, 
+                                                       unsigned long,
+                                                       void* clientdata,
+                                                       void* )
+{
+  static_cast<vtkCTHFragmentConnect*>(clientdata)->Modified();
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetNumberOfMaterialArrays()
+{
+  return this->MaterialArraySelection->GetNumberOfArrays();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkCTHFragmentConnect::GetMaterialArrayName(int index)
+{
+  return this->MaterialArraySelection->GetArrayName(index);
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetMaterialArrayStatus(const char* name)
+{
+  return this->MaterialArraySelection->ArrayIsEnabled(name);
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetMaterialArrayStatus(int index)
+{
+  return this->MaterialArraySelection->GetArraySetting(index);
+}
+
+//-----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SetMaterialArrayStatus( const char* name, 
+                                                    int status )
+{
+  vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if(status)
+    {
+    this->MaterialArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->MaterialArraySelection->DisableArray(name);
+    }
+}
+
+//------------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SetMaterialFractionThreshold(double fraction)
+{
+  vtkDebugMacro( << this->GetClassName() 
+                 << " (" << this << "): setting MaterialFractionThreshold to "
+                 << fraction );
+
+  if (this->MaterialFractionThreshold != fraction)
+    {
+    // clamp material fraction at 0.08
+    fraction = fraction < 0.08 ? 0.08 : fraction;
+    this->MaterialFractionThreshold = fraction;
+    this->scaledMaterialFractionThreshold = 255.0*fraction;
+    this->Modified();
+    }
+
+    //cerr << "Set ucMaterialFractionThreshold to:" << this->scaledMaterialFractionThreshold << endl;
+}
 
 
 //
@@ -4559,15 +4746,15 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
 // The volume array should really be field data.
 void vtkCTHFragmentConnect::GenerateVolumeArray(
   vtkIntArray* fragmentIds,
-  vtkPolyData *output)
+  vtkDataSet* output )
 {
   int numPoints = fragmentIds->GetNumberOfTuples();
   int* idPtr = fragmentIds->GetPointer(0);
-  
+
   vtkDoubleArray* va = vtkDoubleArray::New();
   va->SetName("FragmentVolume");
   va->SetNumberOfTuples(numPoints);
-  
+
   for (int ii = 0; ii < numPoints; ++ii)
     {
     va->InsertTuple1(ii, this->FragmentVolumes->GetTuple1(*idPtr++));

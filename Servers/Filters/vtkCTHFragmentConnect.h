@@ -22,32 +22,69 @@
 #ifndef __vtkCTHFragmentConnect_h
 #define __vtkCTHFragmentConnect_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkstd/vector" // using vector internally. ok for leaf classes.
 
+class vtkDataSet;
+class vtkImageData;
+class vtkPolyData;
+class vtkHierarchicalBoxDataSet;
+class vtkPoints;
 class vtkDoubleArray;
 class vtkCellArray;
-class vtkImageData;
-class vtkPoints;
-class vtkHierarchicalBoxDataSet;
+class vtkCellData;
+class vtkIntArray;
 class vtkCTHFragmentLevel;
 class vtkCTHFragmentConnectBlock;
 class vtkCTHFragmentConnectIterator;
 class vtkCTHFragmentEquivalenceSet;
 class vtkCTHFragmentConnectRingBuffer;
 class vtkMultiProcessController;
+class vtkDataArraySelection;
+class vtkCallbackCommand;
 
-class VTK_EXPORT vtkCTHFragmentConnect : public vtkPolyDataAlgorithm
+class VTK_EXPORT vtkCTHFragmentConnect : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkCTHFragmentConnect *New();
-  vtkTypeRevisionMacro(vtkCTHFragmentConnect,vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkCTHFragmentConnect,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The filter only processes one array at a time for now.
-  vtkSetStringMacro(VolumeFractionArrayName);
-  vtkGetStringMacro(VolumeFractionArrayName);
+  // Get pointer to the array selection object
+  // that configures which arrays are to be processed
+  //BTX
+  //vtkGetMacro(MaterialArraySelection, vtkDataArraySelection *);
+  //ETX
+
+  // for convinience we provide add/remove
+  // other operations may be performed by Get ing the
+  // vtkDataArraySelection and manipulating directly
+  // Add a single array
+  void SelectMaterialArray(const char *name);
+  // remove a single array
+  void UnselectMaterialArray( const char *name );
+  // remove all arrays
+  void UnselectAllMaterialArrays();
+
+  // sets modified if array selection changes
+  static void SelectionModifiedCallback( vtkObject*,
+                                         unsigned long,
+                                         void* clientdata,
+                                         void* );
+  // Enable/disable processing on an array
+  void SetMaterialArrayStatus( const char* name,
+                               int status );
+  // Get enable./disable status for a given array
+  int GetMaterialArrayStatus(const char* name);
+  int GetMaterialArrayStatus(int index);
+  // Query the number of available arrays
+  int GetNumberOfMaterialArrays();
+  // Get the name of a specific array
+  const char *GetMaterialArrayName(int index);
+
+  // interface to the volume fraction 
+  void SetMaterialFractionThreshold(double fraction);
+  vtkGetMacro(MaterialFractionThreshold, double);
 
 protected:
   vtkCTHFragmentConnect();
@@ -92,8 +129,6 @@ protected:
   int  ComputeOriginAndRootSpacing(
         vtkHierarchicalBoxDataSet* input);
 
-  char *VolumeFractionArrayName;
-
   // Complex ghost layer Handling.
   vtkstd::vector<vtkCTHFragmentConnectBlock*> GhostBlocks;
   void ShareGhostBlocks();
@@ -102,14 +137,13 @@ protected:
     int level,
     int inExt[6],
     int outExt[6]);
-  
+
   void ComputeAndDistributeGhostBlocks(
     int *numBlocksInProc,
     int* blockMetaData,
     int myProc,
     int numProcs);
-  
-  vtkPolyData* Mesh;
+
   vtkMultiProcessController* Controller;
 
   vtkCTHFragmentEquivalenceSet* EquivalenceSet;
@@ -129,15 +163,15 @@ protected:
   void ResolveVolumes();
   void GenerateVolumeArray(
     vtkIntArray* fragemntIds,
-    vtkPolyData *output);
-  
+    vtkDataSet* output );
+
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
   vtkCTHFragmentConnectBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks(vtkImageData* input); 
-  int InitializeBlocks(vtkHierarchicalBoxDataSet* input); 
+  int InitializeBlocks(vtkImageData* input, const char *arrayName );
+  int InitializeBlocks( vtkHierarchicalBoxDataSet* input, const char *arrayName );
   void AddBlock(vtkCTHFragmentConnectBlock* block);
 
   // New methods for connecting neighbors.
@@ -161,9 +195,29 @@ protected:
     int blockIndex[3],
     int neighborDirection[3]);
 
+  // Threshold value used to select a cell
+  // as being iniside some fragment, PV uses
+  // a double between 0 and 1, this is stored here
+  double MaterialFractionThreshold;
+  // The extraction filter uses a scaled threshold
+  // in the range of 0 to 255
+  double scaledMaterialFractionThreshold;
+
   vtkIntArray *BlockIdArray;
   vtkIntArray *LevelArray;
-  
+  // while processing a material array this holds
+  // a pointer to the output poly data
+  // data set, At other time its not valid
+  vtkPolyData *CurrentFragmentMesh;
+  // while processing an individual material 
+  // this points to the name of the fragment array
+  // At other times its not valid
+  const char *CurrentFragmentIdArrayName;
+  // While processing an individual material 
+  // this identifies the current fragment mesh of the
+  // fragment id array. At other times it's not valid.
+  int CurrentFragmentIdArrayIndex;
+
   int FragmentId;
   // Integrate the volume for this fragment.
   // We will do the same for all attributes?
@@ -178,8 +232,7 @@ protected:
   // It is flexible with no complicated arbitrary structure.
   // I just iterate through the buffer casting the pointer to the correct types.
   void* IntegrationBuffer;
-  
-  
+
   // This is getting a bit ugly but ...
   // When we resolve (merge equivalent) fragments we need a mapping
   // from local ids to global ids.
@@ -190,7 +243,7 @@ protected:
   int *LocalToGlobalOffsets;
   int TotalNumberOfRawFragments;
   int NumberOfResolvedFragments;
-  
+
   double GlobalOrigin[3];
   double RootSpacing[3];
   int StandardBlockDimensions[3];
@@ -222,6 +275,10 @@ protected:
     int faceIndex[3], int faceLevel, 
     vtkCTHFragmentConnectIterator* neighbor,
     vtkCTHFragmentConnectIterator* reference);
+
+  // Manage array selection interface
+  vtkDataArraySelection *MaterialArraySelection;
+  vtkCallbackCommand *SelectionObserver;
 
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.
