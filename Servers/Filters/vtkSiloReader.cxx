@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSiloReader, "1.6");
+vtkCxxRevisionMacro(vtkSiloReader, "1.7");
 vtkStandardNewMacro(vtkSiloReader);
 
 //----------------------------------------------------------------------------
@@ -1165,7 +1165,8 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
         // Sanity check
         if (varArray->GetNumberOfTuples() != mesh->GetNumberOfCells())
           {
-          vtkErrorMacro("Array number of tuples does not match mesh number of cells.");
+          vtkErrorMacro("Number of cells in mesh does not match number of tuples in array: "
+            << varName);
           }
         else
           {
@@ -1177,7 +1178,8 @@ int vtkSiloReader::CreateDataSet(vtkMultiBlockDataSet *output)
         // Sanity check
         if (varArray->GetNumberOfTuples() != mesh->GetNumberOfPoints())
           {
-          vtkErrorMacro("Array number of tuples does not match mesh number of points.");
+          vtkErrorMacro("Number of points in mesh does not match number of tuples in array: "
+            << varName);
           }
         else
           {
