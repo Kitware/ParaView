@@ -135,6 +135,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWriterFactory.h"
 #include "pqSaveSnapshotDialog.h"
 #include "pqQuickLaunchDialog.h"
+#include "pqViewOptionsInterface.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -3246,6 +3247,7 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
     qobject_cast<pqActionGroupInterface*>(iface);
   pqDockWindowInterface* dockWindow =
     qobject_cast<pqDockWindowInterface*>(iface);
+
   if(actionGroup)
     {
     this->addPluginActions(actionGroup);
@@ -3258,6 +3260,23 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
   // plugins may contain new entries for menus
   this->Implementation->FiltersMenuManager->update();
   this->Implementation->SourcesMenuManager->update();
+
+  pqViewOptionsInterface* viewOptions =
+    qobject_cast<pqViewOptionsInterface*>(iface);
+  if(viewOptions)
+    {
+    foreach(QString viewtype, viewOptions->viewTypes())
+      {
+      pqActiveViewOptions* o =
+        viewOptions->createActiveViewOptions(viewtype, 
+          this->Implementation->ActiveViewOptions);
+      if(o)
+        {
+        this->Implementation->ActiveViewOptions->registerOptions(
+          viewtype, o);
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

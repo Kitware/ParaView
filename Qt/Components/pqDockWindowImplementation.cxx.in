@@ -32,29 +32,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#include "@CLASS_NAME@.h"
-#include "@CLASS_NAME@Implementation.h"
+#include "@ARG_CLASS_NAME@.h"
+#include "@ARG_CLASS_NAME@Implementation.h"
 
 #include <QDockWidget>
 #include <QWidget>
 
-@CLASS_NAME@Implementation::@CLASS_NAME@Implementation(QObject* p)
+@ARG_CLASS_NAME@Implementation::@CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
   this->MyDock = 0;
 }
 
-QString @CLASS_NAME@Implementation::dockArea() const
+QString @ARG_CLASS_NAME@Implementation::dockArea() const
 {
-  return "@DOCK_AREA@";
+  return "@ARG_DOCK_AREA@";
 }
 
-QDockWidget* @CLASS_NAME@Implementation::dockWindow(QWidget* p)
+QDockWidget* @ARG_CLASS_NAME@Implementation::dockWindow(QWidget* p)
 {
   if(!this->MyDock)
     {
-    this->MyDock = new @CLASS_NAME@(p);
-    this->MyDock->setObjectName("@CLASS_NAME@");
+    this->MyDock = new @ARG_CLASS_NAME@(p);
+    this->MyDock->setObjectName("@ARG_CLASS_NAME@");
     }
   return this->MyDock;
 }

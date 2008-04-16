@@ -32,21 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _@VIEW_TYPE@Implementation_h
-#define _@VIEW_TYPE@Implementation_h
+#ifndef _@ARG_VIEW_TYPE@Implementation_h
+#define _@ARG_VIEW_TYPE@Implementation_h
 
 #include <QObject>
 #include "pqViewModuleInterface.h"
 
 /// interface class for plugins that create view modules
-class @VIEW_TYPE@Implementation : public QObject, 
+class @ARG_VIEW_TYPE@Implementation : public QObject, 
                                   public pqViewModuleInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqViewModuleInterface)
 public:
   
-  @VIEW_TYPE@Implementation(QObject* o);
+  @ARG_VIEW_TYPE@Implementation(QObject* o);
 
   QStringList viewTypes() const;
   QStringList displayTypes() const;

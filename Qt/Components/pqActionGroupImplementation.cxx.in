@@ -32,26 +32,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@CLASS_NAME@Implementation.h"
-#include "@CLASS_NAME@.h"
+#include "@ARG_CLASS_NAME@Implementation.h"
+#include "@ARG_CLASS_NAME@.h"
 
-@CLASS_NAME@Implementation::@CLASS_NAME@Implementation(QObject* p)
+@ARG_CLASS_NAME@Implementation::@ARG_CLASS_NAME@Implementation(QObject* p)
   : QObject(p)
 {
-  this->ActionGroup = new @CLASS_NAME@(this);
+  this->ActionGroup = new @ARG_CLASS_NAME@(this);
 }
 
-@CLASS_NAME@Implementation::~@CLASS_NAME@Implementation()
+@ARG_CLASS_NAME@Implementation::~@ARG_CLASS_NAME@Implementation()
 {
 }
 
-QString @CLASS_NAME@Implementation::groupName()
+QString @ARG_CLASS_NAME@Implementation::groupName()
 {
-  return "@GROUP_NAME@";
+  return "@ARG_GROUP_NAME@";
 }
 
 
-QActionGroup* @CLASS_NAME@Implementation::actionGroup()
+QActionGroup* @ARG_CLASS_NAME@Implementation::actionGroup()
 {
   return this->ActionGroup;
 }

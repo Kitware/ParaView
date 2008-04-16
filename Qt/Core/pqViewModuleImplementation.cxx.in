@@ -32,94 +32,94 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "@VIEW_TYPE@Implementation.h"
-#include "@VIEW_TYPE@.h"
+#include "@ARG_VIEW_TYPE@Implementation.h"
+#include "@ARG_VIEW_TYPE@.h"
 
 #include "vtkSMProxyManager.h"
 #include "pqDataRepresentation.h"
 #include "pqServer.h"
 
 // configured with CMake
-// requires: VIEW_TYPE, VIEW_TYPE_NAME, DISPLAY_TYPE, VIEW_XML_GROUP,
-//      VIEW_XML_NAME
+// requires: ARG_VIEW_TYPE, VIEW_TYPE_NAME, ARG_DISPLAY_TYPE, ARG_VIEW_XML_GROUP,
+//      ARG_VIEW_XML_NAME
 
-@VIEW_TYPE@Implementation::@VIEW_TYPE@Implementation(QObject* o)
+@ARG_VIEW_TYPE@Implementation::@ARG_VIEW_TYPE@Implementation(QObject* o)
   : QObject(o)
 {
 }
 
-QStringList @VIEW_TYPE@Implementation::viewTypes() const
+QStringList @ARG_VIEW_TYPE@Implementation::viewTypes() const
 {
-  return QStringList() << "@VIEW_TYPE@";
+  return QStringList() << "@ARG_VIEW_TYPE@";
 }
 
-QStringList @VIEW_TYPE@Implementation::displayTypes() const
+QStringList @ARG_VIEW_TYPE@Implementation::displayTypes() const
 {
-  return QStringList() << "@DISPLAY_TYPE@";
+  return QStringList() << "@ARG_DISPLAY_TYPE@";
 }
 
-QString @VIEW_TYPE@Implementation::viewTypeName(const QString& /*type*/) const
+QString @ARG_VIEW_TYPE@Implementation::viewTypeName(const QString& /*type*/) const
 {
   return "@VIEW_TYPE_NAME@";
 }
 
-bool @VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
+bool @ARG_VIEW_TYPE@Implementation::canCreateView(const QString& viewtype) const
 {
-  return viewtype == "@VIEW_TYPE@";
+  return viewtype == "@ARG_VIEW_TYPE@";
 }
 
-vtkSMProxy* @VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype,
+vtkSMProxy* @ARG_VIEW_TYPE@Implementation::createViewProxy(const QString& viewtype,
                                                        pqServer *server)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if(viewtype == "@VIEW_TYPE@")
+  if(viewtype == "@ARG_VIEW_TYPE@")
     {
     // First, see if there is a render view specific to the server
     QString xmlname
-      = QString("@VIEW_XML_NAME@%1").arg(server->getRenderViewXMLName());
-    if (pxm->ProxyElementExists("@VIEW_XML_GROUP@", xmlname.toAscii().data()))
+      = QString("@ARG_VIEW_XML_NAME@%1").arg(server->getRenderViewXMLName());
+    if (pxm->ProxyElementExists("@ARG_VIEW_XML_GROUP@", xmlname.toAscii().data()))
       {
-      return pxm->NewProxy("@VIEW_XML_GROUP@", xmlname.toAscii().data());
+      return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", xmlname.toAscii().data());
       }
 
     // Next, see what happens if we augment the type with View, in case this is
     // how it is registered in XML.
-    if (pxm->ProxyElementExists("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@View"))
+    if (pxm->ProxyElementExists("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View"))
       {
-      return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@View");
+      return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@View");
       }
 
     // Last, just return whatever objectis registered under the view name.
-    return pxm->NewProxy("@VIEW_XML_GROUP@", "@VIEW_XML_NAME@");
+    return pxm->NewProxy("@ARG_VIEW_XML_GROUP@", "@ARG_VIEW_XML_NAME@");
     }
 
   return NULL;
 }
 
-pqView* @VIEW_TYPE@Implementation::createView(const QString& viewtype,
+pqView* @ARG_VIEW_TYPE@Implementation::createView(const QString& viewtype,
                                                 const QString& group,
                                                 const QString& viewname,
                                                 vtkSMViewProxy* viewmodule,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  if(viewtype == "@VIEW_TYPE@")
+  if(viewtype == "@ARG_VIEW_TYPE@")
     {
-    return new @VIEW_TYPE@("@VIEW_TYPE@", group, viewname, viewmodule, server, p);
+    return new @ARG_VIEW_TYPE@("@ARG_VIEW_TYPE@", group, viewname, viewmodule, server, p);
     }
   return NULL;
 }
 
-pqDataRepresentation* @VIEW_TYPE@Implementation::createDisplay(const QString& display_type, 
+pqDataRepresentation* @ARG_VIEW_TYPE@Implementation::createDisplay(const QString& display_type, 
   const QString& group,
   const QString& n,
   vtkSMProxy* proxy,
   pqServer* server,
   QObject* p)
 {
-  if(display_type == "@DISPLAY_TYPE@")
+  if(display_type == "@ARG_DISPLAY_TYPE@")
     {
-    return new @DISPLAY_TYPE@(group, n, proxy, server, p);
+    return new @ARG_DISPLAY_TYPE@(group, n, proxy, server, p);
     }
   return NULL;
 }

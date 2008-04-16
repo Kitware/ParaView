@@ -1,9 +1,7 @@
-// Generated file.  Do not edit.
-
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqActionGroupImplementation.h.in
+   Module:    pqViewOptionsInterface.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -32,32 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _@ARG_CLASS_NAME@Implementation_h
-#define _@ARG_CLASS_NAME@Implementation_h
+#ifndef _pqViewOptionsInterface_h
+#define _pqViewOptionsInterface_h
 
-#include "pqActionGroupInterface.h"
-#include <QObject>
+#include <QtPlugin>
+class pqActiveViewOptions;
+class pqOptionsContainer;
 
-/// interface class for plugins that create QActionGroups
-/// for adding actions to menus and toolbars
-class @ARG_CLASS_NAME@Implementation : public QObject, public pqActionGroupInterface
+/// interface class for plugins that create view options pages
+class pqViewOptionsInterface
 {
-  Q_OBJECT
-  Q_INTERFACES(pqActionGroupInterface)
 public:
-  @ARG_CLASS_NAME@Implementation(QObject* p);
-  ~@ARG_CLASS_NAME@Implementation();
+  /// destructor
+  virtual ~pqViewOptionsInterface() {}
 
-  /// the identifier for this action group
-  ///  return "ToolBar/MyTools to put them in a toolbar called MyTools
-  ///  return "MenuBar/MyMenu to put the actions under MyMenu
-  virtual QString groupName();
+  /// returns a list of view types that this interface provides options for  
+  virtual QStringList viewTypes() const = 0;
 
-  /// the instance of the QActionGroup that defines the actions
-  virtual QActionGroup* actionGroup();
-protected:
-  QActionGroup* ActionGroup;
+  /// return an options object for the active view.
+  /// this is used when there are options that are specific to an instance of a
+  /// view
+  virtual pqActiveViewOptions* createActiveViewOptions(const QString& type, QObject* parent) = 0;
+  
+  /// return an options object for global view options
+  /// this is used when there are options that apply to all instance of a view
+  virtual pqOptionsContainer* createGlobalViewOptions(const QString& type, QWidget* parent) = 0;
+
 };
+
+Q_DECLARE_INTERFACE(pqViewOptionsInterface, "com.kitware/paraview/viewoptions")
 
 #endif
 

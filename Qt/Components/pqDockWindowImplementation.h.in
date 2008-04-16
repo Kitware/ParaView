@@ -32,19 +32,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-#ifndef _@CLASS_NAME@Implementation_h
-#define _@CLASS_NAME@Implementation_h
+#ifndef _@ARG_CLASS_NAME@Implementation_h
+#define _@ARG_CLASS_NAME@Implementation_h
 
 #include <QObject>
 #include "pqDockWindowInterface.h"
 
 // make this dock window a part of the application
-class @CLASS_NAME@Implementation : public QObject, public pqDockWindowInterface
+class @ARG_CLASS_NAME@Implementation : public QObject, public pqDockWindowInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqDockWindowInterface)
 public:
-  @CLASS_NAME@Implementation(QObject* p);
+  @ARG_CLASS_NAME@Implementation(QObject* p);
   virtual QString dockArea() const;
   virtual QDockWidget* dockWindow(QWidget* p);
 
