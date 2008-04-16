@@ -21,6 +21,7 @@ MyView::MyView(const QString& viewmoduletype,
 {
   // our view is just a simple QWidget
   this->MyWidget = new QWidget;
+  this->MyWidget->setAutoFillBackground(true);
   new QVBoxLayout(this->MyWidget);
 
   // connect to display creation so we can show them in our view
@@ -60,6 +61,18 @@ void MyView::onRepresentationRemoved(pqRepresentation* d)
     this->MyWidget->layout()->removeWidget(l);
     delete l;
     }
+}
+
+void MyView::setBackground(const QColor& c)
+{
+  QPalette p = this->MyWidget->palette();
+  p.setColor(QPalette::Window, c);
+  this->MyWidget->setPalette(p);
+}
+
+QColor MyView::background() const
+{
+  return this->MyWidget->palette().color(QPalette::Window);
 }
 
 bool MyView::canDisplay(pqOutputPort* opPort) const

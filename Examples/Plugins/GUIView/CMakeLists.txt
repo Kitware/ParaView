@@ -3,7 +3,7 @@
 # manager.  this plugin also contains a custom display panel
 
 # moc the Qt based .h files
-QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h)
+QT4_WRAP_CPP(MOC_SRCS MyView.h MyDisplay.h MyViewActiveOptions.h MyViewOptions.h)
 
 # invoke macro to create sources for our custom view and display panel
 ADD_PARAVIEW_VIEW_MODULE(
@@ -25,9 +25,14 @@ ADD_PARAVIEW_VIEW_MODULE(
                          # With MyDisplay.h implementing pqDisplayPanel
                          DISPLAY_PANEL MyDisplay)
 
+
+ADD_PARAVIEW_VIEW_OPTIONS(OPTIONS_IFACE OPTIONS_IFACE_SRCS
+                          VIEW_TYPE MyView ACTIVE_VIEW_OPTIONS MyViewActiveOptions)
+
 # create a GUI side plugin with the GUI side code
-ADD_PARAVIEW_PLUGIN(GUIMyView "1.0" GUI_INTERFACES ${IFACES} 
-                    SOURCES MyView.cxx MyDisplay.cxx ${MOC_SRCS} ${IFACE_SRCS})
+ADD_PARAVIEW_PLUGIN(GUIMyView "1.0" GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
+                    GUI_SOURCES MyView.cxx MyDisplay.cxx MyViewActiveOptions.cxx MyViewOptions.cxx
+                    ${MOC_SRCS} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS})
 
 # create a server side plugin with the server side code
 ADD_PARAVIEW_PLUGIN(SMMyView "1.0" SERVER_MANAGER_XML MyViewSM.xml)

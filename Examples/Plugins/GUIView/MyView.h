@@ -4,6 +4,7 @@
 
 #include "pqView.h"
 #include <QMap>
+#include <QColor>
 class QLabel;
 
 /// a simple view that shows a QLabel with the display's name in the view
@@ -30,6 +31,10 @@ public:
 
   /// returns whether this view can display the given source
   bool canDisplay(pqOutputPort* opPort) const;
+
+  /// set the background color of this view
+  void setBackground(const QColor& col);
+  QColor background() const;
 
 protected slots:
   /// helper slots to create labels
