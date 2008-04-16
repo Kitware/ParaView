@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.35");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.36");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -498,25 +498,19 @@ void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
     src);
   if (dsrc)
     {
-    int imUpdate = this->ImmediateUpdate;
-    this->ImmediateUpdate = 0;
-    unsigned int i;
-    unsigned int numElems = dsrc->GetNumberOfElements();
-    this->SetNumberOfElements(numElems);
-    for(i=0; i<numElems; i++)
+    bool modified = false;
+    if (this->Internals->Values != dsrc->Internals->Values)
       {
-      this->SetElement(i, dsrc->GetElement(i));
+      this->Internals->Values = dsrc->Internals->Values;
+      modified = true;
       }
-    numElems = dsrc->GetNumberOfElements();
-    this->SetNumberOfUncheckedElements(numElems);
-    for(i=0; i<numElems; i++)
-      {
-      this->SetUncheckedElement(i, dsrc->GetUncheckedElement(i));
-      }
-    this->ImmediateUpdate = imUpdate;
-    }
 
-  this->Modified();
+    this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
+    if (modified)
+      {
+      this->Modified();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
