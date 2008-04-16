@@ -246,6 +246,29 @@ void pqExtractSelectionsPanel::updateLabels()
       columnValues << value.toString() << endl;
       }
     }
+  else if (strcmp(xmlname, "ThresholdSelectionSource") == 0)
+    {
+    columnValues << "Threshold Selection" << endl;
+    columnValues << "Array: " 
+      << pqSMAdaptor::getElementProperty(
+        selectionSource->GetProperty("ArrayName")).toString() 
+      << (fieldType == 0? " (cell)" : " (point)") << endl << endl;
+    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
+      selectionSource->GetProperty("Thresholds"));
+    for (int cc=0; cc <values.size(); cc++)
+      {
+      const QVariant& value = values[cc];
+      columnValues << value.toString();
+      if (cc%2)
+        {
+        columnValues << endl;
+        }
+      else
+        {
+        columnValues << "\t\t" ;
+        }
+      }
+    }
   else
     {
     columnValues << "None" << endl;
