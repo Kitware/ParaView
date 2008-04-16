@@ -576,7 +576,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
   bool ret = false;
   
   vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+  vtkTypeUInt32 servers = this->Implementation->isRemote() ? 
                          vtkProcessModule::DATA_SERVER :
                          vtkProcessModule::CLIENT;
 
@@ -587,9 +587,9 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
         << dirID << "MakeDirectory" 
         << dirPath.toAscii().data()
         << vtkClientServerStream::End;
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
   
-  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  vtkClientServerStream result = pm->GetLastResult(conn, servers);
   if(result.GetNumberOfMessages() == 1 && 
      result.GetNumberOfArguments(0) == 1)
     {
@@ -601,7 +601,7 @@ bool pqFileDialogModel::mkdir(const QString& dirName)
     }
 
   pm->DeleteStreamObject(dirID, stream);
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
 
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
@@ -625,7 +625,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   bool ret = false;
   
   vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+  vtkTypeUInt32 servers = this->Implementation->isRemote() ? 
                          vtkProcessModule::DATA_SERVER :
                          vtkProcessModule::CLIENT;
 
@@ -636,9 +636,9 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
         << dirID << "DeleteDirectory" 
         << dirPath.toAscii().data()
         << vtkClientServerStream::End;
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
   
-  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  vtkClientServerStream result = pm->GetLastResult(conn, servers);
   if(result.GetNumberOfMessages() == 1 && 
      result.GetNumberOfArguments(0) == 1)
     {
@@ -650,7 +650,7 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
     }
 
   pm->DeleteStreamObject(dirID, stream);
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
   
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
@@ -697,7 +697,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
   bool ret = false;
   
   vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-  vtkTypeUInt32 server = this->Implementation->isRemote() ? 
+  vtkTypeUInt32 servers = this->Implementation->isRemote() ? 
                          vtkProcessModule::DATA_SERVER :
                          vtkProcessModule::CLIENT;
 
@@ -709,9 +709,9 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
         << oldPath.toAscii().data()
         << newPath.toAscii().data()
         << vtkClientServerStream::End;
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
   
-  vtkClientServerStream result = pm->GetLastResult(conn, server);
+  vtkClientServerStream result = pm->GetLastResult(conn, servers);
   if(result.GetNumberOfMessages() == 1 && 
      result.GetNumberOfArguments(0) == 1)
     {
@@ -723,7 +723,7 @@ bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
     }
 
   pm->DeleteStreamObject(dirID, stream);
-  pm->SendStream(conn, server, stream);
+  pm->SendStream(conn, servers, stream);
 
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   info = this->Implementation->GetData(true, cPath, false);
