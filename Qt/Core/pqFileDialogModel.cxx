@@ -664,7 +664,6 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
 
 bool pqFileDialogModel::rename(const QString& oldname, const QString& newname)
 {
-  QString path;
   QString oldPath = this->absoluteFilePath(oldname);
   QString newPath = this->absoluteFilePath(newname);
 

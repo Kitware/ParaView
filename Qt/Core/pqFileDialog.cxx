@@ -398,6 +398,7 @@ void pqFileDialog::onCreateNewFolder()
   this->Implementation->Ui.Files->selectionModel()->select(idx,
     QItemSelectionModel::Select|QItemSelectionModel::Current);
   this->Implementation->Ui.Files->edit(idx);
+  this->Implementation->Ui.FileName->clear();
 }
 
 //-----------------------------------------------------------------------------
