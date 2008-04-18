@@ -113,6 +113,7 @@ public:
   QLineEdit* CurrentTimeWidget;
   QSpinBox* CurrentTimeIndexWidget;
   QPointer<pqServer> ActiveServer;
+  QString DocumentationDir;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -992,6 +993,9 @@ void MainWindow::makeAssistant()
     return;
     }
 
+  QFileInfo fi(profileFile);
+  this->Implementation->DocumentationDir = fi.absolutePath();
+
   args.append(profileFile);
 
   this->Implementation->AssistantClient->setArguments(args);
@@ -1175,7 +1179,8 @@ void MainWindow::showHelpForProxy(const QString& proxy)
   if(this->Implementation->AssistantClient)
     {
     this->Implementation->AssistantClient->openAssistant();
-    QString page("Documentation/%1.html");
+    QString page("%1/Documentation/%2.html");
+    page = page.arg(this->Implementation->DocumentationDir);
     page = page.arg(proxy);
     this->Implementation->AssistantClient->showPage(page);
     }
