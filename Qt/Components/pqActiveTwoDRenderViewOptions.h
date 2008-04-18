@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqServerManagerModelItem.cxx
+   Module:    pqActiveTwoDRenderViewOptions.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqServerManagerModelItem.cxx
-/// \date 4/14/2006
+/// \file pqActiveTwoDRenderViewOptions.h
+/// \date 7/31/2007
 
-#include "pqServerManagerModelItem.h"
+#ifndef _pqActiveTwoDRenderViewOptions_h
+#define _pqActiveTwoDRenderViewOptions_h
 
-// ParaView includes.
-#include "vtkEventQtSlotConnect.h"
 
-// Qt includes.
+#include "pqComponentsExport.h"
+#include "pqActiveViewOptions.h"
 
-//-----------------------------------------------------------------------------
-pqServerManagerModelItem::pqServerManagerModelItem(QObject* _parent /*=null*/)
-  : QObject(_parent)
+
+/// \class pqActiveTwoDRenderViewOptions
+/// \brief
+///   The pqActiveTwoDRenderViewOptions class is used to dislpay an
+///   options dialog for the render view.
+class PQCOMPONENTS_EXPORT pqActiveTwoDRenderViewOptions :
+    public pqActiveViewOptions
 {
-  this->Connector = 0;
-}
+  Q_OBJECT
 
-//-----------------------------------------------------------------------------
-pqServerManagerModelItem::~pqServerManagerModelItem()
-{
-  if (this->Connector)
-    {
-    this->Connector->Delete();
-    this->Connector = 0;
-    }
-}
+public:
+  /// \brief
+  ///   Creates a render view options instance.
+  /// \param parent The parent object.
+  pqActiveTwoDRenderViewOptions(QObject *parent=0);
+  virtual ~pqActiveTwoDRenderViewOptions();
 
-//-----------------------------------------------------------------------------
-vtkEventQtSlotConnect* pqServerManagerModelItem::getConnector()
-{
-  if (!this->Connector)
-    {
-    this->Connector = vtkEventQtSlotConnect::New();
-    }
+  /// \name pqActiveViewOptions Methods
+  //@{
+  virtual void showOptions(pqView *view, const QString &page,
+      QWidget *parent=0);
+  virtual void changeView(pqView *view);
+  virtual void closeOptions();
+  //@}
 
-  return this->Connector;
-}
+protected slots:
+  void finishDialog();
 
+private:
+  class pqInternal;
+  pqInternal* Internal;
+};
 
+#endif

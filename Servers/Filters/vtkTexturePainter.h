@@ -114,6 +114,14 @@ public:
   vtkSetMacro(MapScalars, int);
   vtkGetMacro(MapScalars, int);
 
+  // Description:
+  // When set, the image slice is always rendered in the XY plane (Z==0)
+  // irrespective of the image bounds. Default if Off.
+  static vtkInformationIntegerKey* USE_XY_PLANE();
+  vtkSetClampMacro(UseXYPlane, int, 0, 1);
+  vtkBooleanMacro(UseXYPlane, int);
+  vtkGetMacro(UseXYPlane, int);
+
   //BTX
   enum 
     {
@@ -152,6 +160,7 @@ protected:
   int MapScalars;
   int ScalarMode;
   int ScalarArrayIndex;
+  int UseXYPlane;
   char* ScalarArrayName;
   vtkScalarsToColors* LookupTable;
 

@@ -443,7 +443,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox" >
+    <widget class="QGroupBox" name="AnnotationGroup" >
      <property name="title" >
       <string>Annotation</string>
      </property>

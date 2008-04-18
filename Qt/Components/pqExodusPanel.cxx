@@ -79,6 +79,10 @@ public:
   }
   vtkSmartPointer<vtkSMProxy> ExodusHelper;
   QVector<double> TimestepValues;
+
+  QSet<QTreeWidgetItem*> PendingChangedItems;
+  QString PendingChangedItemsPropertyName;
+  QTimer PendingChangedItemsTimer;
 };
 
 pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
@@ -86,7 +90,11 @@ pqExodusPanel::pqExodusPanel(pqProxy* object_proxy, QWidget* p) :
 {
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
-  
+
+  this->UI->PendingChangedItemsTimer.setInterval(10/*milliseconds*/);
+  QObject::connect(&this->UI->PendingChangedItemsTimer, SIGNAL(timeout()),
+    this, SLOT(updatePendingChangedItems()));
+
   QObject::connect(this->UI->DisplayType, SIGNAL(currentChanged(int)), 
                    this, SIGNAL(displayTypeChanged()));
   
@@ -573,19 +581,126 @@ void pqExodusPanel::reset()
 
 void pqExodusPanel::blockItemChanged(QTreeWidgetItem* item)
 {
-  this->selectionItemChanged(item, "BlockArrayStatus");
+  if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
+    this->UI->PendingChangedItemsPropertyName != "BlockArrayStatus")
+    {
+    this->updatePendingChangedItems();
+    }
+
+  this->UI->PendingChangedItemsPropertyName = "BlockArrayStatus";
+  this->UI->PendingChangedItems.insert(item);
+  this->UI->PendingChangedItemsTimer.start();
+
+  //this->selectionItemChanged(item, "BlockArrayStatus");
 }
 
 void pqExodusPanel::hierarchyItemChanged(QTreeWidgetItem* item)
 {
-  this->selectionItemChanged(item, "HierarchyArrayStatus");
+  if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
+    this->UI->PendingChangedItemsPropertyName != "HierarchyArrayStatus")
+    {
+    this->updatePendingChangedItems();
+    }
+
+  this->UI->PendingChangedItemsPropertyName = "HierarchyArrayStatus";
+  this->UI->PendingChangedItems.insert(item);
+  this->UI->PendingChangedItemsTimer.start();
+//  this->selectionItemChanged(item, "HierarchyArrayStatus");
 }
 
 void pqExodusPanel::materialItemChanged(QTreeWidgetItem* item)
 {
-  this->selectionItemChanged(item, "MaterialArrayStatus");
+  if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
+    this->UI->PendingChangedItemsPropertyName != "MaterialArrayStatus")
+    {
+    this->updatePendingChangedItems();
+    }
+
+  this->UI->PendingChangedItemsPropertyName = "MaterialArrayStatus";
+  this->UI->PendingChangedItems.insert(item);
+  this->UI->PendingChangedItemsTimer.start();
+//  this->selectionItemChanged(item, "MaterialArrayStatus");
 }
 
+//-----------------------------------------------------------------------------
+void pqExodusPanel::updatePendingChangedItems()
+{
+  QString propName = this->UI->PendingChangedItemsPropertyName;
+  if (propName.isEmpty() || this->UI->PendingChangedItems.size() == 0)
+    {
+    return;
+    }
+
+  vtkSMProxy* pxy = this->UI->ExodusHelper;
+  vtkSMProperty* blockInfo[3];
+  vtkSMProperty* blockStatus[3];
+  int i;
+
+  blockInfo[0] = pxy->GetProperty("BlockArrayInfo");
+  blockInfo[1] = pxy->GetProperty("HierarchyArrayInfo");
+  blockInfo[2] = pxy->GetProperty("MaterialArrayInfo");
+
+  blockStatus[0] = pxy->GetProperty("BlockArrayStatus");
+  blockStatus[1] = pxy->GetProperty("HierarchyArrayStatus");
+  blockStatus[2] = pxy->GetProperty("MaterialArrayStatus");
+
+
+  vtkSMProperty* prop = NULL;
+  prop = pxy->GetProperty(propName.toAscii().data());
+
+  QList< QList< QVariant > > values;
+  // clear out any old stuff
+  for(i=0; i<3; i++)
+    {
+    pqSMAdaptor::setSelectionProperty(blockStatus[i], values);
+    }
+
+  foreach (QTreeWidgetItem* item, this->UI->PendingChangedItems)
+    {
+    // set only the selections that the user changed
+    pqTreeWidgetItemObject* itemObject = 
+      static_cast<pqTreeWidgetItemObject*>(item);
+    int index = values.size();
+    values.append(QList<QVariant>());
+    values[index].append(itemObject->text(0));
+    values[index].append(itemObject->isChecked());
+    }
+
+  // send change down to the vtkExodusReader
+  pqSMAdaptor::setSelectionProperty(prop, values);
+  pxy->UpdateProperty(propName.toAscii().data());
+
+  // get the new selections back
+  for(i=0; i<3; i++)
+    {
+    pxy->UpdatePropertyInformation(blockInfo[i]);
+    blockStatus[i]->Copy(blockInfo[i]);
+    }
+
+  QTreeWidget* widgets[3] =
+    {
+    this->UI->BlockArrayStatus,
+    this->UI->HierarchyArrayStatus,
+    this->UI->MaterialArrayStatus
+    };
+
+  for(i=0; i<3; i++)
+    {
+    values = pqSMAdaptor::getSelectionProperty(blockStatus[i]);
+    for(int j=0; j<values.size(); j++)
+      {
+      pqTreeWidgetItemObject* treeItemObject;
+      treeItemObject = static_cast<pqTreeWidgetItemObject*>(
+        widgets[i]->topLevelItem(j));
+      treeItemObject->setChecked(values[j][1].toBool());
+      }
+    }
+
+  this->UI->PendingChangedItems.clear();
+  this->UI->PendingChangedItemsPropertyName.clear();
+}
+
+//-----------------------------------------------------------------------------
 void pqExodusPanel::selectionItemChanged(QTreeWidgetItem* item,
                                          const QString& propName)
 {

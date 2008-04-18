@@ -123,17 +123,26 @@ void pqDisplayRepresentationWidget::updateLinks()
   vtkSMProxy* displayProxy = this->Internal->Display->getProxy();
   vtkSMProperty* repProperty =
       this->Internal->Display->getProxy()->GetProperty("Representation");
-  repProperty->UpdateDependentDomains();
-  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
-  foreach(QVariant item, items)
+  if (repProperty)
     {
-    this->Internal->comboBox->addItem(item.toString());
-    }
+    repProperty->UpdateDependentDomains();
+    QList<QVariant> items = 
+      pqSMAdaptor::getEnumerationPropertyDomain(repProperty);
+    foreach(QVariant item, items)
+      {
+      this->Internal->comboBox->addItem(item.toString());
+      }
 
-  this->Internal->Links.addPropertyLink(
-    this->Internal->Adaptor, "currentText",
-    SIGNAL(currentTextChanged(const QString&)),
-    displayProxy, repProperty);
+    this->Internal->Links.addPropertyLink(
+      this->Internal->Adaptor, "currentText",
+      SIGNAL(currentTextChanged(const QString&)),
+      displayProxy, repProperty);
+    this->Internal->comboBox->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->comboBox->setEnabled(false);
+    }
 
   this->Internal->comboBox->blockSignals(false);
 

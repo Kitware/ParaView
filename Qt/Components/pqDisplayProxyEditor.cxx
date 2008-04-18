@@ -175,64 +175,99 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("Visibility"));
 
+  vtkSMProperty* prop = 0;
+
   // setup cube axes visibility.
-  this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
-    "checked", SIGNAL(stateChanged(int)),
-    reprProxy, reprProxy->GetProperty("CubeAxesVisibility"));
+  if ((prop = reprProxy->GetProperty("CubeAxesVisibility")) != 0)
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
+      "checked", SIGNAL(stateChanged(int)),
+      reprProxy, prop);
+    this->Internal->AnnotationGroup->show();
+    }
+  else
+    {
+    this->Internal->AnnotationGroup->hide();
+    }
 
   // setup for choosing color
-  this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("AmbientColor"));
-  this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("DiffuseColor"));
+  if (reprProxy->GetProperty("AmbientColor"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
+      "color", SIGNAL(colorChanged(const QVariant&)),
+      reprProxy, reprProxy->GetProperty("AmbientColor"));
+    this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
+      "color", SIGNAL(colorChanged(const QVariant&)),
+      reprProxy, reprProxy->GetProperty("DiffuseColor"));
 
-  // setup for specular lighting
-  QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
-                   this, SIGNAL(specularColorChanged()));
-  QObject::connect(this->Internal->ColorAdaptor,
-                   SIGNAL(colorChanged(const QVariant&)),
-                   this, SIGNAL(specularColorChanged()));
-  this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
-    "value", SIGNAL(editingFinished()),
-    reprProxy, reprProxy->GetProperty("Specular"));
-  this->Internal->Links->addPropertyLink(this,
-    "specularColor", SIGNAL(specularColorChanged()),
-    reprProxy, reprProxy->GetProperty("SpecularColor"));
-  this->Internal->Links->addPropertyLink(this->Internal->SpecularPower,
-    "value", SIGNAL(editingFinished()),
-    reprProxy, reprProxy->GetProperty("SpecularPower"));
-  QObject::connect(this->Internal->SpecularIntensity, SIGNAL(editingFinished()),
-                   this, SLOT(updateAllViews()));
-  QObject::connect(this, SIGNAL(specularColorChanged()),
-                   this, SLOT(updateAllViews()));
-  QObject::connect(this->Internal->SpecularPower, SIGNAL(editingFinished()),
-                   this, SLOT(updateAllViews()));
+    // setup for specular lighting
+    QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
+      this, SIGNAL(specularColorChanged()));
+    QObject::connect(this->Internal->ColorAdaptor,
+      SIGNAL(colorChanged(const QVariant&)),
+      this, SIGNAL(specularColorChanged()));
+    this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
+      "value", SIGNAL(editingFinished()),
+      reprProxy, reprProxy->GetProperty("Specular"));
+    this->Internal->Links->addPropertyLink(this,
+      "specularColor", SIGNAL(specularColorChanged()),
+      reprProxy, reprProxy->GetProperty("SpecularColor"));
+    this->Internal->Links->addPropertyLink(this->Internal->SpecularPower,
+      "value", SIGNAL(editingFinished()),
+      reprProxy, reprProxy->GetProperty("SpecularPower"));
+    QObject::connect(this->Internal->SpecularIntensity, SIGNAL(editingFinished()),
+      this, SLOT(updateAllViews()));
+    QObject::connect(this, SIGNAL(specularColorChanged()),
+      this, SLOT(updateAllViews()));
+    QObject::connect(this->Internal->SpecularPower, SIGNAL(editingFinished()),
+      this, SLOT(updateAllViews()));
+    }
   
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
-  vtkSMProperty* Property = reprProxy->GetProperty("Interpolation");
-  Property->UpdateDependentDomains();
-  QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
-    Property);
-  foreach(QVariant item, items)
+  if ((prop = reprProxy->GetProperty("Interpolation")) != 0)
     {
-    this->Internal->StyleInterpolation->addItem(item.toString());
+    prop->UpdateDependentDomains();
+    QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(prop);
+    foreach(QVariant item, items)
+      {
+      this->Internal->StyleInterpolation->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(this->Internal->InterpolationAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, prop);
+    this->Internal->StyleInterpolation->setEnabled(true);
     }
-  this->Internal->Links->addPropertyLink(this->Internal->InterpolationAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("Interpolation"));
+  else
+    {
+    this->Internal->StyleInterpolation->setEnabled(false);
+    }
 
   // setup for point size
-  this->Internal->Links->addPropertyLink(this->Internal->StylePointSize,
-    "value", SIGNAL(editingFinished()),
-    reprProxy, reprProxy->GetProperty("PointSize"));
+  if ((prop = reprProxy->GetProperty("PointSize")) !=0)
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->StylePointSize,
+      "value", SIGNAL(editingFinished()),
+      reprProxy, reprProxy->GetProperty("PointSize"));
+    this->Internal->StylePointSize->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->StylePointSize->setEnabled(false);
+    }
 
   // setup for line width
-  this->Internal->Links->addPropertyLink(this->Internal->StyleLineWidth,
-    "value", SIGNAL(editingFinished()),
-    reprProxy, reprProxy->GetProperty("LineWidth"));
+  if ((prop = reprProxy->GetProperty("LineWidth")) != 0)
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->StyleLineWidth,
+      "value", SIGNAL(editingFinished()),
+      reprProxy, reprProxy->GetProperty("LineWidth"));
+    this->Internal->StyleLineWidth->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->StyleLineWidth->setEnabled(false);
+    }
 
   // setup for translate
   this->Internal->Links->addPropertyLink(this->Internal->TranslateX,
@@ -297,9 +332,12 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     reprProxy, reprProxy->GetProperty("MapScalars"));
 
   // setup for InterpolateScalarsBeforeMapping
-  this->Internal->Links->addPropertyLink(
-    this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
-    reprProxy, reprProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+  if (reprProxy->GetProperty("InterpolateScalarsBeforeMapping"))
+    {
+    this->Internal->Links->addPropertyLink(
+      this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
+      reprProxy, reprProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+    }
 
   this->Internal->ColorBy->setRepresentation(repr);
   QObject::connect(this->Internal->ColorBy,
@@ -317,9 +355,12 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   this->Internal->Texture->setRepresentation(repr);
 
-  this->Internal->Links->addPropertyLink(this->Internal->EdgeColorAdaptor,
-    "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("EdgeColor"));
+  if ( (prop = reprProxy->GetProperty("EdgeColor")) != 0)
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->EdgeColorAdaptor,
+      "color", SIGNAL(colorChanged(const QVariant&)),
+      reprProxy, prop);
+    }
 
   if (reprProxy->GetProperty("Slice"))
     {

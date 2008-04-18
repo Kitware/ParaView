@@ -204,7 +204,7 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
   // If this is the only source displayed in the view, reset the camera to make sure its visible
   if(view->getNumberOfVisibleRepresentations()==1)
     {
-    pqRenderView* ren = qobject_cast<pqRenderView*>(view);
+    pqRenderViewBase* ren = qobject_cast<pqRenderViewBase*>(view);
     if (ren)
       {
       ren->resetCamera();
@@ -256,7 +256,7 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   // (hence the conditional on "visible")
   if(view->getNumberOfVisibleRepresentations()==1 && visible)
     {
-    pqRenderView* ren = qobject_cast<pqRenderView*>(view);
+    pqRenderViewBase* ren = qobject_cast<pqRenderViewBase*>(view);
     if (ren)
       {
       ren->resetCamera();

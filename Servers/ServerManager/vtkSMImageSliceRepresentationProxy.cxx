@@ -25,7 +25,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMImageSliceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMImageSliceRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMImageSliceRepresentationProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMImageSliceRepresentationProxy::vtkSMImageSliceRepresentationProxy()
 {
@@ -70,7 +70,6 @@ bool vtkSMImageSliceRepresentationProxy::BeginCreateVTKObjects()
   return true;
 }
 
-
 //-----------------------------------------------------------------------------
 bool vtkSMImageSliceRepresentationProxy::EndCreateVTKObjects()
 {
@@ -80,7 +79,6 @@ bool vtkSMImageSliceRepresentationProxy::EndCreateVTKObjects()
 
   return this->Superclass::EndCreateVTKObjects();
 }
-
 
 //-----------------------------------------------------------------------------
 bool vtkSMImageSliceRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
@@ -159,6 +157,52 @@ void vtkSMImageSliceRepresentationProxy::SetColorArrayName(const char* name)
 
   this->Mapper->UpdateVTKObjects();
   //this->LODMapper->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMImageSliceRepresentationProxy::GetBounds(double bounds[6])
+{
+  if (!this->Superclass::GetBounds(bounds))
+    {
+    return false;
+    }
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("UseXYPlane"));
+  if (ivp && ivp->GetElement(0) == 1)
+    {
+    // transform bounds to XY plane.
+    if (bounds[4] == bounds[5])
+      {
+      // already XY plane
+      bounds[4] = bounds[5] = 0;
+      }
+    else if (bounds[0] == bounds[1])
+      {
+      // in YZ plane 
+      double newbounds[6];
+      newbounds[0] = bounds[2];
+      newbounds[1] = bounds[3];
+      newbounds[2] = bounds[4];
+      newbounds[3] = bounds[5];
+      newbounds[4] = 0;
+      newbounds[5] = 0;
+      memcpy(bounds, newbounds, 6*sizeof(double));
+      }
+    else if (bounds[2] == bounds[3])
+      {
+      // in YZ plane 
+      double newbounds[6];
+      newbounds[0] = bounds[4];
+      newbounds[1] = bounds[5];
+      newbounds[2] = bounds[2];
+      newbounds[3] = bounds[3];
+      newbounds[4] = 0;
+      newbounds[5] = 0;
+      memcpy(bounds, newbounds, 6*sizeof(double));
+      }
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------

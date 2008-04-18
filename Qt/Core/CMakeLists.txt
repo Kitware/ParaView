@@ -78,6 +78,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqQVTKWidgetEventTranslator.h
   pqReaderFactory.h
   pqRenderView.h
+  pqRenderViewBase.h
   pqRepresentation.h
   pqRubberBandHelper.h
   pqScalarBarRepresentation.h
@@ -100,6 +101,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTableView.h
   pqTextRepresentation.h
   pqTimeKeeper.h
+  pqTwoDRenderView.h
   pqUndoStack.h
   pqView.h
   pqVTKHistogramModel.h
@@ -253,6 +255,8 @@ ADD_LIBRARY(pqCore
   pqReaderFactory.h
   pqRenderView.cxx
   pqRenderView.h
+  pqRenderViewBase.cxx
+  pqRenderViewBase.h
   pqRepresentation.cxx
   pqRepresentation.h
   pqRubberBandHelper.cxx
@@ -302,6 +306,8 @@ ADD_LIBRARY(pqCore
   pqTextRepresentation.h
   pqTimeKeeper.cxx
   pqTimeKeeper.h
+  pqTwoDRenderView.cxx
+  pqTwoDRenderView.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqView.cxx

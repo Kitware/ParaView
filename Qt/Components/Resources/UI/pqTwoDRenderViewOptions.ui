@@ -1,0 +1,95 @@
+<ui version="4.0" >
+ <class>pqTwoDRenderViewOptions</class>
+ <widget class="QWidget" name="pqTwoDRenderViewOptions" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>289</width>
+    <height>172</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>3</number>
+   </property>
+   <property name="spacing" >
+    <number>3</number>
+   </property>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="General" >
+      <layout class="QGridLayout" >
+       <property name="margin" >
+        <number>9</number>
+       </property>
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="2" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0" >
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Background Color</string>
+         </property>
+         <layout class="QGridLayout" >
+          <property name="margin" >
+           <number>9</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="1" >
+           <widget class="QPushButton" name="restoreDefault" >
+            <property name="text" >
+             <string>Restore Default</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" >
+           <widget class="pqColorChooserButton" name="backgroundColor" >
+            <property name="toolTip" >
+             <string>Change the background color of the 3D View window</string>
+            </property>
+            <property name="text" >
+             <string>Choose Color ...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

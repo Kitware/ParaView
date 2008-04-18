@@ -33,7 +33,7 @@
 #include "vtkTexture.h"
 
 vtkStandardNewMacro(vtkTexturePainter);
-vtkCxxRevisionMacro(vtkTexturePainter, "1.3");
+vtkCxxRevisionMacro(vtkTexturePainter, "1.4");
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE_MODE, Integer);
@@ -42,6 +42,7 @@ vtkInformationKeyMacro(vtkTexturePainter, MAP_SCALARS, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SCALAR_MODE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SCALAR_ARRAY_NAME, String);
 vtkInformationKeyMacro(vtkTexturePainter, SCALAR_ARRAY_INDEX, Integer);
+vtkInformationKeyMacro(vtkTexturePainter, USE_XY_PLANE, Integer);
 //----------------------------------------------------------------------------
 vtkTexturePainter::vtkTexturePainter()
 {
@@ -57,6 +58,7 @@ vtkTexturePainter::vtkTexturePainter()
   this->MapScalars = 0;
   this->ScalarArrayName = 0;
   this->ScalarArrayIndex = 0;
+  this->UseXYPlane = 0;
   this->ScalarMode = vtkDataObject::FIELD_ASSOCIATION_POINTS;
 }
 
@@ -112,6 +114,15 @@ void vtkTexturePainter::ProcessInformation(vtkInformation* information)
     this->SetScalarArrayIndex(information->Get(SCALAR_ARRAY_INDEX()));
     }
 
+  if (information->Has(USE_XY_PLANE()))
+    {
+    this->SetUseXYPlane(information->Get(USE_XY_PLANE()));
+    }
+  else
+    {
+    this->SetUseXYPlane(0);
+    }
+
   this->Superclass::ProcessInformation(information);
 }
 
@@ -135,6 +146,13 @@ static const int YZ_PLANE_QPOINTS_INDICES[] =
 {0, 2, 4, 0, 3, 4, 0, 3, 5, 0, 2, 5};
 static const int XZ_PLANE_QPOINTS_INDICES[] =
 {0, 2, 4, 1, 2, 4, 1, 2, 5, 0, 2, 5};
+
+static const int *XY_PLANE_QPOINTS_INDICES_ORTHO =
+XY_PLANE_QPOINTS_INDICES;
+static const int YZ_PLANE_QPOINTS_INDICES_ORTHO[] =
+{2, 4, 0, 3, 4, 0, 3, 5, 0, 2, 5, 0};
+static const int XZ_PLANE_QPOINTS_INDICES_ORTHO[] = 
+{ 4, 0, 2, 4, 1, 2, 5, 1, 2, 5, 0, 2 };
 
 //----------------------------------------------------------------------------
 int vtkTexturePainter::SetupScalars(vtkImageData* input)
@@ -327,14 +345,29 @@ void vtkTexturePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
       {
     case VTK_XY_PLANE:
       indices = XY_PLANE_QPOINTS_INDICES;
+      if (this->UseXYPlane)
+        {
+        indices = XY_PLANE_QPOINTS_INDICES_ORTHO;
+        outputbounds[4]=0;
+        }
       break;
 
     case VTK_YZ_PLANE:
       indices = YZ_PLANE_QPOINTS_INDICES;
+      if (this->UseXYPlane)
+        {
+        indices = YZ_PLANE_QPOINTS_INDICES_ORTHO;
+        outputbounds[0]=0;
+        }
       break;
 
     case VTK_XZ_PLANE:
       indices = XZ_PLANE_QPOINTS_INDICES;
+      if (this->UseXYPlane)
+        {
+        indices = XZ_PLANE_QPOINTS_INDICES_ORTHO;
+        outputbounds[2]=0;
+        }
       break;
       }
 

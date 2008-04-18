@@ -44,40 +44,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"  
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
+#include "pqTwoDRenderView.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
 
-struct Manip
-{
-  int Mouse;
-  int Shift;
-  int Control;
-  QByteArray Name;
-
-  Manip &operator=(const Manip &other)
-    {
-    this->Mouse = other.Mouse;
-    this->Shift = other.Shift;
-    this->Control = other.Control;
-    this->Name = other.Name;
-    return *this;
-    }
-};
-
-// set up with default names
-static Manip DefaultManips[9] =
-  {
-    { 1, 0, 0, "Rotate"},
-    { 2, 0, 0, "Pan"},
-    { 3, 0, 0, "Zoom"},
-    { 1, 1, 0, "Roll"},
-    { 2, 1, 0, "Rotate"},
-    { 3, 1, 0, "Pan"},
-    { 1, 0, 1, "Zoom"},
-    { 2, 0, 1, "Rotate"},
-    { 3, 0, 1, "Zoom"},
-  };
+typedef pqRenderView::ManipulatorType Manip;
 
 class pqGlobalRenderViewOptions::pqInternal 
   : public Ui::pqGlobalRenderViewOptions
@@ -85,6 +57,8 @@ class pqGlobalRenderViewOptions::pqInternal
 public:
   QList<QComboBox*> CameraControl3DComboBoxList;
   QList<QString> CameraControl3DComboItemList;
+  QList<QComboBox*> CameraControl2DComboBoxList;
+  QList<QString> CameraControl2DComboItemList;
 
   void updateLODThresholdLabel(int value)
     {
@@ -166,7 +140,7 @@ void pqGlobalRenderViewOptions::init()
       << this->Internal->comboBoxCamera3D_4 << this->Internal->comboBoxCamera3D_5
       << this->Internal->comboBoxCamera3D_6 << this->Internal->comboBoxCamera3D_7
       << this->Internal->comboBoxCamera3D_8 << this->Internal->comboBoxCamera3D_9;
-  
+ 
   this->Internal->CameraControl3DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
      << "Pan" << "Roll" << "Rotate" << "Zoom";
   
@@ -175,6 +149,23 @@ void pqGlobalRenderViewOptions::init()
     foreach(QString name, this->Internal->CameraControl3DComboItemList)
       {
       this->Internal->CameraControl3DComboBoxList.at(cc)->addItem(name);
+      }
+    }
+
+  this->Internal->CameraControl2DComboBoxList << this->Internal->comboBoxCamera2D
+      << this->Internal->comboBoxCamera2D_2 << this->Internal->comboBoxCamera2D_3
+      << this->Internal->comboBoxCamera2D_4 << this->Internal->comboBoxCamera2D_5
+      << this->Internal->comboBoxCamera2D_6 << this->Internal->comboBoxCamera2D_7
+      << this->Internal->comboBoxCamera2D_8 << this->Internal->comboBoxCamera2D_9;
+
+  this->Internal->CameraControl2DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
+     << "Pan" << "Zoom";
+
+  for ( int cc = 0; cc < this->Internal->CameraControl2DComboBoxList.size(); cc++ )
+    {
+    foreach(QString name, this->Internal->CameraControl2DComboItemList)
+      {
+      this->Internal->CameraControl2DComboBoxList.at(cc)->addItem(name);
       }
     }
 
@@ -260,6 +251,13 @@ void pqGlobalRenderViewOptions::init()
   for ( int cc = 0; cc < this->Internal->CameraControl3DComboBoxList.size(); cc++ )
     {
     QObject::connect(this->Internal->CameraControl3DComboBoxList[cc],
+                    SIGNAL(currentIndexChanged(int)),
+                    this, SIGNAL(changesAvailable()));
+    }
+
+  for ( int cc = 0; cc < this->Internal->CameraControl2DComboBoxList.size(); cc++ )
+    {
+    QObject::connect(this->Internal->CameraControl2DComboBoxList[cc],
                     SIGNAL(currentIndexChanged(int)),
                     this, SIGNAL(changesAvailable()));
     }
@@ -393,9 +391,10 @@ void pqGlobalRenderViewOptions::applyChanges()
   
   // save out camera manipulators
   Manip manips[9];
+  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
   for(int i=0; i<9; i++)
     {
-    manips[i] = DefaultManips[i];
+    manips[i] = default3DManips[i];
     manips[i].Name =
       this->Internal->CameraControl3DComboBoxList[i]->currentText().toAscii();
     }
@@ -414,6 +413,28 @@ void pqGlobalRenderViewOptions::applyChanges()
 
   settings->endGroup();
 
+  // Now save out 2D camera manipulators (these are saved in a different group).
+  settings->beginGroup("renderModule2D");
+  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  for(int i=0; i<9; i++)
+    {
+    manips[i] = default2DManips[i];
+    manips[i].Name =
+      this->Internal->CameraControl2DComboBoxList[i]->currentText().toAscii();
+    }
+  
+  strs.clear();
+  for(int i=0; i<9; i++)
+    {
+    strs << QString("Manipulator%1Mouse%2Shift%3Control%4Name%5")
+                    .arg(i+1)
+                    .arg(manips[i].Mouse)
+                    .arg(manips[i].Shift)
+                    .arg(manips[i].Control)
+                    .arg(QString(manips[i].Name));
+    }
+  settings->setValue("InteractorStyle/CameraManipulators", strs);
+  settings->endGroup();
 
   // loop through render views and apply new settings
   QList<pqRenderView*> views =
@@ -548,9 +569,10 @@ void pqGlobalRenderViewOptions::resetChanges()
   val = settings->value("InteractorStyle/CameraManipulators");
 
   Manip manips[9];
+  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
   for(int k = 0; k < 9; k++)
     {
-    manips[k] = DefaultManips[k];
+    manips[k] = default3DManips[k];
     }
 
   if(val.isValid())
@@ -586,6 +608,49 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->CameraControl3DComboBoxList[i]->setCurrentIndex(idx);
     }
 
+  settings->endGroup();
+
+  settings->beginGroup("renderModule2D");
+  val = settings->value("InteractorStyle/CameraManipulators");
+
+  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  for(int k = 0; k < 9; k++)
+    {
+    manips[k] = default2DManips[k];
+    }
+
+  if(val.isValid())
+    {
+    QStringList strs = val.toStringList();
+    int num = strs.count();
+    for(int i=0; i<num; i++)
+      {
+      Manip tmp;
+      tmp.Name.resize(strs[i].size());
+      int manip_index;
+      if(5 == sscanf(strs[i].toAscii().data(),
+        "Manipulator%dMouse%dShift%dControl%dName%s",
+        &manip_index, &tmp.Mouse, &tmp.Shift, &tmp.Control, tmp.Name.data()))
+        {
+        for(int j=0; j<9; j++)
+          {
+          if(manips[j].Mouse == tmp.Mouse &&
+             manips[j].Shift == tmp.Shift &&
+             manips[j].Control == tmp.Control)
+            {
+            manips[j].Name = tmp.Name.data();
+            break;
+            }
+          }
+        }
+      }
+    }
+
+  for(int i=0; i<9; i++)
+    {
+    int idx = this->Internal->CameraControl2DComboItemList.indexOf(manips[i].Name);
+    this->Internal->CameraControl2DComboBoxList[i]->setCurrentIndex(idx);
+    }
   settings->endGroup();
   
 }
@@ -649,9 +714,19 @@ void pqGlobalRenderViewOptions::clientCollectSliderChanged(int value)
 //-----------------------------------------------------------------------------
 void pqGlobalRenderViewOptions::resetDefaultCameraManipulators()
 {
+  const Manip* default3DManips = pqRenderView::getDefaultManipulatorTypes();
   for(int i=0; i<9; i++)
     {
-    int idx = this->Internal->CameraControl3DComboItemList.indexOf(DefaultManips[i].Name);
+    int idx = this->Internal->CameraControl3DComboItemList.indexOf(
+      default3DManips[i].Name);
     this->Internal->CameraControl3DComboBoxList[i]->setCurrentIndex(idx);
+    }
+
+  const Manip* default2DManips = pqTwoDRenderView::getDefaultManipulatorTypes();
+  for(int i=0; i<9; i++)
+    {
+    int idx = this->Internal->CameraControl2DComboItemList.indexOf(
+      default2DManips[i].Name);
+    this->Internal->CameraControl2DComboBoxList[i]->setCurrentIndex(idx);
     }
 }

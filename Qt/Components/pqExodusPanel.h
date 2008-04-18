@@ -72,7 +72,8 @@ protected slots:
   void hierarchyItemChanged(QTreeWidgetItem*);
   void materialItemChanged(QTreeWidgetItem*);
   void selectionItemChanged(QTreeWidgetItem*, const QString&);
-  
+ 
+  void updatePendingChangedItems();
 protected:
   int displayType() const;
   /// populate widgets with properties from the server manager

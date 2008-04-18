@@ -47,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkImageSliceMapper);
-vtkCxxRevisionMacro(vtkImageSliceMapper, "1.1");
+vtkCxxRevisionMacro(vtkImageSliceMapper, "1.2");
 //----------------------------------------------------------------------------
 vtkImageSliceMapper::vtkImageSliceMapper()
 {
@@ -58,6 +58,7 @@ vtkImageSliceMapper::vtkImageSliceMapper()
 
   this->Slice = 0;
   this->SliceMode = XY_PLANE;
+  this->UseXYPlane = 0;
 
   this->Observer = vtkObserver::New();
   this->Observer->Target = this;
@@ -217,6 +218,7 @@ void vtkImageSliceMapper::UpdatePainterInformation()
     }
   info->Set(vtkTexturePainter::SCALAR_MODE(), this->ScalarMode);
   info->Set(vtkTexturePainter::LOOKUP_TABLE(), this->LookupTable);
+  info->Set(vtkTexturePainter::USE_XY_PLANE(), this->UseXYPlane);
 
   // tell is we should map unsiged chars thorough LUT.
   info->Set(vtkTexturePainter::MAP_SCALARS(), 

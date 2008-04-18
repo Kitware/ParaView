@@ -53,6 +53,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.h
   pqActiveServer.h
+  pqActiveTwoDRenderViewOptions.h
   pqActiveView.h
   pqActiveViewOptions.h
   pqActiveViewOptionsManager.h
@@ -189,6 +190,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqThresholdPanel.h
   pqTimerLogDisplay.h
   pqToolTipTrapper.h
+  pqTwoDRenderViewOptions.h
   pqVCRController.h
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
@@ -264,6 +266,7 @@ SET(UI_FORMS
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
+  Resources/UI/pqTwoDRenderViewOptions.ui
   Resources/UI/pqWriterDialog.ui
   Resources/UI/pqXDMFPanel.ui
   Resources/UI/pqXYPlotDisplayEditor.ui
@@ -325,6 +328,8 @@ ADD_LIBRARY(pqComponents
   pqActiveRenderViewOptions.h
   pqActiveServer.cxx
   pqActiveServer.h
+  pqActiveTwoDRenderViewOptions.cxx
+  pqActiveTwoDRenderViewOptions.h
   pqActiveView.cxx
   pqActiveView.h
   pqActiveViewOptions.cxx
@@ -614,6 +619,8 @@ ADD_LIBRARY(pqComponents
   pqTimerLogDisplay.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
+  pqTwoDRenderViewOptions.cxx
+  pqTwoDRenderViewOptions.h
   pqUndoStackBuilder.cxx
   pqUndoStackBuilder.h
   pqVariableType.h

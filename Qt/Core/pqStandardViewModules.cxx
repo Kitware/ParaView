@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetView.h"
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
+#include "pqTwoDRenderView.h"
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
   : QObject(o)
@@ -58,6 +59,7 @@ QStringList pqStandardViewModules::viewTypes() const
 {
   return QStringList() << 
     pqRenderView::renderViewType() << 
+    pqTwoDRenderView::twoDRenderViewType() <<
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
@@ -99,6 +101,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqSpreadSheetView::spreadsheetViewTypeName();
     }
+  else if  (type == pqTwoDRenderView::twoDRenderViewType())
+    {
+    return pqTwoDRenderView::twoDRenderViewTypeName();
+    }
 
   return QString();
 }
@@ -120,6 +126,12 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     QString xmlname = server->getRenderViewXMLName();
     xmlname = "Comparative" + xmlname;
+    return pxm->NewProxy("views", xmlname.toAscii().data());
+    }
+  else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
+    {
+    QString xmlname = server->getRenderViewXMLName();
+    xmlname = "2D" + xmlname;
     return pxm->NewProxy("views", xmlname.toAscii().data());
     }
   else if(viewtype == pqPlotView::barChartType())
@@ -179,6 +191,11 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     // Currently we only handle comparative render views.
     return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
+    }
+  else if (viewmodule->IsA("vtkSMTwoDRenderViewProxy"))
+    {
+    return new pqTwoDRenderView(
+      group, viewname, viewmodule, server, p); 
     }
 
   return NULL;

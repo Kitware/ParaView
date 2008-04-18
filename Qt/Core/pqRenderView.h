@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderViewModule_h
 
 
-#include "pqView.h"
+#include "pqRenderViewBase.h"
 #include <QColor> // needed for return type.
 
 class QAction;
@@ -41,10 +41,10 @@ class QVTKWidget;
 class vtkSMRenderViewProxy;
 
 // This is a PQ abstraction of a render view.
-class PQCORE_EXPORT pqRenderView : public pqView
+class PQCORE_EXPORT pqRenderView : public pqRenderViewBase
 {
   Q_OBJECT
-  typedef pqView Superclass;
+  typedef pqRenderViewBase Superclass;
 public:
   static QString renderViewType() { return "RenderView"; }
   static QString renderViewTypeName() { return "3D View"; }
@@ -67,12 +67,6 @@ public:
   /// Returns the render view proxy associated with this object.
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
-  /// Returns the QVTKWidget for this render Window.
-  virtual QWidget* getWidget();
-
-  /// Request a StillRender. 
-  virtual void render();
-
   /// Resets the camera to include all visible data.
   /// It is essential to call this resetCamera, to ensure that the reset camera
   /// action gets pushed on the interaction undo stack.
@@ -80,10 +74,6 @@ public:
 
   /// Resets the center of rotation to the focal point.
   void resetCenterOfRotation();
-
-  /// Save a screenshot for the render module. If width or height ==0,
-  /// the current window size is used.
-  virtual bool saveImage(int width, int height, const QString& filename);
 
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
@@ -97,16 +87,7 @@ public:
   virtual void setDefaultPropertyValues();
 
   /// restore the default background color
-  int* defaultBackgroundColor();
-  
-  /// restore the default light parameters
-  void restoreDefaultLightSettings();
-
-  /// Save the settings of this render module with QSettings
-  virtual void saveSettings();
-
-  /// Apply the settings from QSettings to this render module
-  virtual void restoreSettings(bool only_global);
+  virtual const int* defaultBackgroundColor() const;
 
   /// Get if the orientation axes is visible.
   bool getOrientationAxesVisibility() const;
@@ -131,19 +112,11 @@ public:
   /// Get the current center of rotation.
   void getCenterOfRotation(double center[3]) const;
 
-  /// add an action for a context menu
-  void addMenuAction(QAction* a);
-  /// remove an action for a context menu
-  void removeMenuAction(QAction* a);
-
   /// Returns if this view module can support 
   /// undo/redo. Returns false by default. Subclassess must override
   /// if that's not the case.
   virtual bool supportsUndo() const { return true; }
  
-  // returns whether a source can be displayed in this view module 
-  virtual bool canDisplay(pqOutputPort* opPort) const;
-
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.
   virtual bool canUndo() const;
@@ -159,22 +132,25 @@ public:
   /// (and all linked views, if any).
   void clearUndoStack();
 
-  /// Get/set the camera manipulators
-  QList<vtkSMProxy*> getCameraManipulators() const;
-  virtual bool updateDefaultInteractors(QList<vtkSMProxy*> manipulators);
-
-  /// Create a CameraManipulatorProxy given the mouse, key and name.
-  /// Whoever calling this is reponsible for deleting the new proxy.
-  virtual vtkSMProxy* createCameraManipulator(
-    int mouse, int shift, int control, QString name);
-
-  /// Restore the default camera manipulators
-  QList<vtkSMProxy*> getDefaultCameraManipulators() const;
-
   /// Reset camera view direction
   void resetViewDirection(
     double look_x, double look_y, double look_z,
     double up_x, double up_y, double up_z);
+
+  /// Save the settings of this render module with QSettings.
+  /// We  only save non-global settings in this method.
+  /// Global settings are saved by the dialog itself.
+  /// Overridden to save axes specific settings.
+  virtual void saveSettings();
+
+  /// Apply the settings from QSettings to this render module
+  /// Overridden to load axes specific settings.
+  virtual void restoreSettings(bool only_global);
+public:
+  /// Returns a array of 9 ManipulatorType objects defining
+  /// default set of camera manipulators used by this type of view.
+  static const ManipulatorType* getDefaultManipulatorTypes()
+    { return pqRenderView::DefaultManipulatorTypes; }
 
 public slots:
   // Toggle the orientation axes visibility.
@@ -240,22 +216,11 @@ private slots:
   // ResetCameraEvent.
   void onResetCameraEvent();
 
-  /// Setups up RenderModule and QVTKWidget binding.
-  /// This method is called for all pqRenderView objects irrespective
-  /// of whether it is created from state/undo-redo/python or by the GUI. Hence
-  /// don't change any render module properties here.
-  void initializeWidgets();
-
   /// Called when undo stack changes. We fires appropriate 
   /// undo signals as required by pqView.
   void onUndoStackChanged();
 
 protected:
-  bool eventFilter(QObject* caller, QEvent* e);
-
-  /// Creates default interactor style/manipulators.
-  virtual void createDefaultInteractors();
-
   /// Center Axes represents the 3D axes in the view. When GUI creates the view,
   /// we explicitly create a center axes, register it and add it to the view 
   /// displays.
@@ -283,15 +248,37 @@ protected:
   /// view. Default implementation creates a QVTKWidget.
   virtual QWidget* createWidget();
 
-  /// Use this method to initialize the pqObject state using the
-  /// underlying vtkSMProxy. This needs to be done only once,
-  /// after the object has been created. 
-  virtual void initialize();
+  /// Return the name of the group used for global settings (except interactor
+  /// style).
+  virtual const char* globalSettingsGroup() const
+    { return "renderModule"; }
+
+  /// Return the name of the group used for view-sepecific settings such as
+  /// background color, lighting.
+  virtual const char* viewSettingsGroup() const
+    { return "renderModule"; }
+
+  /// Returns the name of the group in which to save the interactor style
+  /// settings.
+  virtual const char* interactorStyleSettingsGroup() const
+    { return "renderModule/InteractorStyle"; }
+
+
+  /// Must be overridden to return the default manipulator types.
+  virtual const ManipulatorType* getDefaultManipulatorTypesInternal()
+    { return pqRenderView::getDefaultManipulatorTypes(); }
+
+  /// Setups up RenderModule and QVTKWidget binding.
+  /// This method is called for all pqRenderView objects irrespective
+  /// of whether it is created from state/undo-redo/python or by the GUI. Hence
+  /// don't change any render module properties here.
+  virtual void initializeWidgets();
 private: 
   class pqInternal;
   pqInternal* Internal;
-
   pqOutputPort* selectOnSurfaceInternal(int rect[4]);
+
+  static ManipulatorType DefaultManipulatorTypes[9];
 };
 
 #endif

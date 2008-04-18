@@ -78,6 +78,13 @@ public:
     { this->SetSliceMode(XZ_PLANE); }
   void SetSliceModeToXYPlane()
     { this->SetSliceMode(XY_PLANE); }
+
+  // Description:
+  // When set, the image slice is always rendered in the XY plane (Z==0)
+  // irrespective of the image bounds. Default if Off.
+  vtkSetClampMacro(UseXYPlane, int, 0, 1);
+  vtkBooleanMacro(UseXYPlane, int);
+  vtkGetMacro(UseXYPlane, int);
   
   // Description:
   // Update that sets the update piece first.
@@ -137,6 +144,7 @@ protected:
 
   int SliceMode;
   int Slice;
+  int UseXYPlane;
 private:
   vtkImageSliceMapper(const vtkImageSliceMapper&); // Not implemented
   void operator=(const vtkImageSliceMapper&); // Not implemented

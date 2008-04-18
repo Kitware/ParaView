@@ -67,6 +67,7 @@ protected slots:
   void hierarchyItemChanged(QTreeWidgetItem*);
   void materialItemChanged(QTreeWidgetItem*);
   void selectionItemChanged(QTreeWidgetItem*, const QString&);
+  void updatePendingChangedItems();
 
   // When the "Refresh" button is pressed, call a method on the reader
   // which will cause the reader's TIME_STEPS() and TIME_RANGE() output

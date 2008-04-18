@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkMath.h"
 #include "vtkProcessModule.h"
+#include "vtkProperty.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
@@ -49,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkMath.h"
+#include "vtkSMSurfaceRepresentationProxy.h"
 
 // Qt includes.
 #include <QList>
@@ -77,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineRepresentation::pqInternal
 {
 public:
-  vtkSmartPointer<vtkSMPVRepresentationProxy> RepresentationProxy;
+  vtkSmartPointer<vtkSMPropRepresentationProxy> RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   pqInternal()
@@ -121,7 +123,7 @@ public:
 pqPipelineRepresentation::pqPipelineRepresentation(
   const QString& group,
   const QString& name,
-  vtkSMPVRepresentationProxy* display,
+  vtkSMPropRepresentationProxy* display,
   pqServer* server, QObject* p/*=null*/):
   Superclass(group, name, display, server, p)
 {
@@ -163,7 +165,7 @@ pqPipelineRepresentation::~pqPipelineRepresentation()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMPVRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
+vtkSMPropRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy() const
 {
   return this->Internal->RepresentationProxy;
 }
@@ -215,7 +217,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   this->createHelperProxies();
 
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
     {
     return;
@@ -249,7 +251,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   // get data set type
   // and set the default representation
-  if(dataInfo)
+  if (dataInfo && repr->IsA("vtkSMPVRepresentationProxy"))
     {
     int dataSetType = dataInfo->GetDataSetType();
     if(dataSetType == VTK_POLY_DATA ||
@@ -437,7 +439,7 @@ int pqPipelineRepresentation::getNumberOfComponents(
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype)
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
     {
     return;
@@ -543,7 +545,54 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
 //-----------------------------------------------------------------------------
 int pqPipelineRepresentation::getRepresentationType() const
 {
-  return this->getRepresentationProxy()->GetRepresentation();
+  vtkSMProxy* repr = this->getRepresentationProxy();
+  vtkSMPVRepresentationProxy* pvRepr = 
+    vtkSMPVRepresentationProxy::SafeDownCast(repr);
+  if (pvRepr)
+    {
+    return pvRepr->GetRepresentation();
+    }
+
+  const char* xmlname = repr->GetXMLName();
+  if (strcmp(xmlname, "SurfaceRepresentation") == 0)
+    {
+    int reprType = 
+      pqSMAdaptor::getElementProperty(repr->GetProperty("Representation")).toInt();
+    switch (reprType)
+      {
+    case VTK_POINTS:
+      return vtkSMPVRepresentationProxy::POINTS;
+
+    case VTK_WIREFRAME:
+      return vtkSMPVRepresentationProxy::WIREFRAME;
+
+    case VTK_SURFACE_WITH_EDGES:
+      return vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES;
+
+    case VTK_SURFACE:
+    default:
+      return vtkSMPVRepresentationProxy::SURFACE;
+      }
+    }
+  
+  if (strcmp(xmlname, "OutlineRepresentation") == 0)
+    {
+    return vtkSMPVRepresentationProxy::OUTLINE;
+    }
+
+  if (strcmp(xmlname, "UnstructuredGridVolumeRepresentation") == 0 ||
+    strcmp(xmlname, "UniformGridVolumeRepresentation") == 0)
+    {
+    return vtkSMPVRepresentationProxy::VOLUME;
+    }
+
+  if (strcmp(xmlname, "ImageSliceRepresentation") == 0)
+    {
+    return vtkSMPVRepresentationProxy::SLICE;
+    }
+
+  qCritical() << "pqPipelineRepresentation created for a incorrect proxy : " << xmlname;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -696,7 +745,7 @@ void pqPipelineRepresentation::getColorArray(
 //-----------------------------------------------------------------------------
 QList<QString> pqPipelineRepresentation::getColorFields()
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
 
   QList<QString> ret;
   if(!repr)
@@ -876,7 +925,7 @@ QPair<double, double> pqPipelineRepresentation::getColorFieldRange()
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::setColorField(const QString& value)
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
 
   if(!repr)
     {
@@ -910,7 +959,7 @@ void pqPipelineRepresentation::setColorField(const QString& value)
 //-----------------------------------------------------------------------------
 QString pqPipelineRepresentation::getColorField(bool raw)
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
     {
     return pqPipelineRepresentation::solidColor();
@@ -944,7 +993,7 @@ QString pqPipelineRepresentation::getColorField(bool raw)
 //-----------------------------------------------------------------------------
 bool pqPipelineRepresentation::getDataBounds(double bounds[6])
 {
-  vtkSMPVRepresentationProxy* repr = 
+  vtkSMPropRepresentationProxy* repr = 
     this->getRepresentationProxy();
 
   vtkPVDataInformation* info = repr? 
@@ -960,7 +1009,7 @@ bool pqPipelineRepresentation::getDataBounds(double bounds[6])
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::setRepresentation(int representation)
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   pqSMAdaptor::setElementProperty(
     repr->GetProperty("Representation"), representation);
   repr->UpdateVTKObjects();
@@ -970,7 +1019,7 @@ void pqPipelineRepresentation::setRepresentation(int representation)
 //-----------------------------------------------------------------------------
 void pqPipelineRepresentation::onRepresentationChanged()
 {
-  vtkSMPVRepresentationProxy* repr = this->getRepresentationProxy();
+  vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
     {
     return;

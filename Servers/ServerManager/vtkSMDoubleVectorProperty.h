@@ -176,7 +176,6 @@ protected:
   vtkSetStringMacro(SetNumberCommand);
   vtkGetStringMacro(SetNumberCommand);
 
-
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();

@@ -112,24 +112,6 @@ public:
   // the server render window. (0,0) corresponds to upper left corner.
   vtkSetVector2Macro(ViewPosition, int);
   vtkGetVector2Macro(ViewPosition, int);
-
-  // Description:
-  // Returns the memory size for the visible data.
-  // If some of the visible representations are dirty, this results in updating
-  // those representations partially. i.e. the representation is updated only
-  // until the filter from which the data size information is updated (which is
-  // generally before the expensive data transfer filters).
-  unsigned long GetVisibleDisplayedDataSize();
-
-  // Description:
-  // Returns the full resoultion memory size for the all the visible
-  // representations irresepective of whether low resolution (LOD) data is
-  // currently shown in the view.
-  // If some of the visible representations are dirty, this results in updating
-  // those representations partially. i.e. the representation is updated only
-  // until the filter from which the data size information is updated (which is
-  // generally before the expensive data transfer filters).
-  unsigned long GetVisibileFullResDataSize();
  
   // Description:
   // Create a default representation for the given output port of source proxy.
@@ -143,19 +125,19 @@ public:
   // Every view has a update time i.e. a time to which all the representations
   // in it will be updated to (ofcourse, every representation has flags on it
   // to avoid using the view's update time).
-  void SetViewUpdateTime(double time);
+  virtual void SetViewUpdateTime(double time);
   vtkGetMacro(ViewUpdateTime, double);
 
   // Description:
   // When caching is enabled (typically, when playing animations,
   // this time must be updated when each frame is changed.
-  void SetCacheTime(double time);
+  virtual void SetCacheTime(double time);
   vtkGetMacro(CacheTime, double);
 
   // Description:
   // Set/get whether cached geometry should be used whenever possible.
   // Called by vtkSMAnimationSceneProxy to enable caching.
-  void SetUseCache(int);
+  virtual void SetUseCache(int);
   vtkGetMacro(UseCache, int);
 
 //BTX
@@ -245,6 +227,24 @@ protected:
   // Description:
   // Marks all data size information as invalid.
   void InvalidateDataSizes();
+
+  // Description:
+  // Returns the memory size for the visible data.
+  // If some of the visible representations are dirty, this results in updating
+  // those representations partially. i.e. the representation is updated only
+  // until the filter from which the data size information is updated (which is
+  // generally before the expensive data transfer filters).
+  unsigned long GetVisibleDisplayedDataSize();
+
+  // Description:
+  // Returns the full resoultion memory size for the all the visible
+  // representations irresepective of whether low resolution (LOD) data is
+  // currently shown in the view.
+  // If some of the visible representations are dirty, this results in updating
+  // those representations partially. i.e. the representation is updated only
+  // until the filter from which the data size information is updated (which is
+  // generally before the expensive data transfer filters).
+  unsigned long GetVisibileFullResDataSize();
 
   // Description:
   // In multiview setups, some viewmodules may share certain objects with each

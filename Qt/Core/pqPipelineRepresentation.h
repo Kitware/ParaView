@@ -47,10 +47,10 @@ class pqServer;
 class vtkPVArrayInformation;
 class vtkPVDataSetAttributesInformation;
 class vtkPVDataSetAttributesInformation;
-class vtkSMPVRepresentationProxy;
+class vtkSMPropRepresentationProxy;
 
 /// This is PQ representation for a single display. A pqRepresentation represents
-/// a single vtkSMPVRepresentationProxy. The display can be added to
+/// a single vtkSMPropRepresentationProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
 class PQCORE_EXPORT pqPipelineRepresentation : public pqDataRepresentation
@@ -66,7 +66,7 @@ public:
   // \c parent:- QObject parent.
   pqPipelineRepresentation( const QString& group, 
                             const QString& name,
-                            vtkSMPVRepresentationProxy* repr, 
+                            vtkSMPropRepresentationProxy* repr, 
                             pqServer* server,
                             QObject* parent=NULL);
   virtual ~pqPipelineRepresentation();
@@ -76,7 +76,7 @@ public:
 
 
   // Get the internal display proxy.
-  vtkSMPVRepresentationProxy* getRepresentationProxy() const;
+  vtkSMPropRepresentationProxy* getRepresentationProxy() const;
 
   // Sets the default color mapping for the display.
   // The rules are:

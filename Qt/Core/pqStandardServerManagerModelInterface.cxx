@@ -121,10 +121,10 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
           xml_type, "representations", name, proxy, server, 0);
         }
       }
-    if (proxy->IsA("vtkSMPVRepresentationProxy"))
+    if (proxy->IsA("vtkSMPropRepresentationProxy"))
       {
       return new pqPipelineRepresentation(group, name, 
-        vtkSMPVRepresentationProxy::SafeDownCast(proxy), server, 0);
+        vtkSMPropRepresentationProxy::SafeDownCast(proxy), server, 0);
       }
     if (proxy->IsA("vtkSMDataRepresentationProxy"))
       {

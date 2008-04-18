@@ -40,19 +40,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 
-
+class vtkEventQtSlotConnect;
 class PQCORE_EXPORT pqServerManagerModelItem : public QObject
 {
   Q_OBJECT
 
 public:
   pqServerManagerModelItem(QObject* parent=NULL);
-  virtual ~pqServerManagerModelItem() {}
+  virtual ~pqServerManagerModelItem();
+
+protected:
+  /// All subclasses generally need some vtkEventQtSlotConnect instance to
+  /// connect to VTK events. This provides access to a vtkEventQtSlotConnect
+  /// instance which all subclasses can use for listening to events.
+  vtkEventQtSlotConnect* getConnector();
 
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.
   virtual void onInputChanged() { };
+private:
+  vtkEventQtSlotConnect* Connector;
 };
 
 #endif

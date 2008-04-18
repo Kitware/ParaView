@@ -39,6 +39,12 @@ public:
   // coloring is disabled.
   void SetColorArrayName(const char* name);
 
+  // Description:
+  // Get the bounds for the representation.  Returns true if successful.
+  // Default implementation returns non-transformed bounds.
+  // Overridden to take "UseXYPlane" property value into consideration.
+  virtual bool GetBounds(double bounds[6]);
+
 //BTX
 protected:
   vtkSMImageSliceRepresentationProxy();

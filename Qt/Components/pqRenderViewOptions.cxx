@@ -277,7 +277,7 @@ void pqRenderViewOptions::restoreDefaultBackground()
 {
   if (this->Internal->RenderView)
     {
-    int* col = this->Internal->RenderView->defaultBackgroundColor();
+    const int* col = this->Internal->RenderView->defaultBackgroundColor();
     this->Internal->backgroundColor->setChosenColor(
                QColor(col[0], col[1], col[2]));
     }

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveChartOptions.h"
 #include "pqActiveRenderViewOptions.h"
 #include "pqActiveServer.h"
+#include "pqActiveTwoDRenderViewOptions.h"
 #include "pqActiveView.h"
 #include "pqActiveViewOptionsManager.h"
 #include "pqAnimationManager.h"
@@ -126,6 +127,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
+#include "pqTwoDRenderView.h"
 #include "pqUndoStackBuilder.h"
 #include "pqVCRController.h"
 #include "pqViewContextMenuManager.h"
@@ -976,12 +978,18 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
 
     this->Implementation->ActiveViewOptions->setRenderViewOptions(
       new pqActiveRenderViewOptions(this->Implementation->ActiveViewOptions));
+
     pqActiveChartOptions *chartOptions = new pqActiveChartOptions(
       this->Implementation->ActiveViewOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
       pqPlotView::barChartType(), chartOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
       pqPlotView::XYPlotType(), chartOptions);
+
+    pqActiveTwoDRenderViewOptions* twoDOptions = new pqActiveTwoDRenderViewOptions(
+      this->Implementation->ActiveViewOptions);
+    this->Implementation->ActiveViewOptions->registerOptions(
+      pqTwoDRenderView::twoDRenderViewType(), twoDOptions);
     }
 
   return this->Implementation->ActiveViewOptions;
@@ -3048,7 +3056,8 @@ void pqMainWindowCore::createPendingDisplays()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCamera()
 {
-  pqRenderView* ren = qobject_cast<pqRenderView*>(pqActiveView::instance().current());
+  pqRenderViewBase* ren = 
+    qobject_cast<pqRenderViewBase*>(pqActiveView::instance().current());
   if (ren)
     {
     ren->resetCamera();

@@ -273,10 +273,14 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
     this->VTKConnect->Connect(repr->GetProperty("ColorArrayName"),
       vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()),
       NULL, 0.0);
-    this->VTKConnect->Connect(
-      repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-      this, SLOT(needReloadGUI()),
-      NULL, 0.0);
+
+    if (repr->GetProperty("Representation"))
+      {
+      this->VTKConnect->Connect(
+        repr->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
+        this, SLOT(needReloadGUI()),
+        NULL, 0.0);
+      }
     
     this->VTKConnect->Connect(
       this->Representation->getOutputPortFromInput()->getOutputPortProxy(),

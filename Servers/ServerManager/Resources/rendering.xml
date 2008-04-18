@@ -977,6 +977,17 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="UseXYPlane"
+        command="SetUseXYPlane"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the image slice is always rendered in the XY plane (Z==0)
+          irrespective of the image bounds. Default if Off.
+        </Documentation>
+      </IntVectorProperty>
+
     <!-- End of ImageSliceMapper -->
     </SourceProxy>
   <!-- End of "mappers" -->  
@@ -4456,6 +4467,74 @@
       <!-- End of ComparativeClientServerRenderView -->
     </ComparativeViewProxy>
 
+    <TwoDRenderViewProxy name="2DRenderView"
+      base_proxygroup="views" base_proxyname="ViewBase">
+      <Documentation>
+        Simplest 2D render view without compositing/client-server support.
+        Currently this view can only show image slices.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView"
+          proxygroup="views" proxyname="RenderView" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <!-- Hide CameraParallelProjection, since CameraParallelProjection is
+            always true in this view. 
+          <Property name="CameraParallelProjection" />
+          -->
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of 2DRenderView -->
+    </TwoDRenderViewProxy>
+
     <!-- End if group "views" -->
   </ProxyGroup>
 
@@ -4953,6 +5032,7 @@
           proxygroup="mappers" proxyname="ImageSliceMapper" />
         <ExposedProperties>
           <Property name="LookupTable" />
+          <Property name="UseXYPlane" />
         <!--  <Property name="Slice" />
           <Property name="SliceMode" />-->
           <Property name="MapScalars" />
@@ -4984,6 +5064,22 @@
       <SubProxy>
         <!-- Property for the vtkProp.  -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Opacity" />
+          <Property name="Shading" />
+
+          <!--
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+          <Property name="PointSize" />
+          <Property name="LineWidth" />
+          <Property name="Interpolation" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          -->
+        </ExposedProperties>
       </SubProxy>
 
       <!-- End of ImageSliceRepresentation -->

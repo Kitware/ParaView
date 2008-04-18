@@ -160,6 +160,7 @@ SET(Kit_SRCS
   vtkSMTimeRangeInformationHelper.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
+  vtkSMTwoDRenderViewProxy.cxx
   vtkSMUndoElement.cxx
   vtkSMUndoRedoStateLoader.cxx
   vtkSMUndoStackBuilder.cxx
