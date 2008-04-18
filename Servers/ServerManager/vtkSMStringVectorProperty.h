@@ -104,6 +104,10 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  // Description:
+  // Returns the default value, if any, specified in the XML.
+  const char* GetDefaulValue();
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();

@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.37");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.38");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -32,6 +32,7 @@ struct vtkSMStringVectorPropertyInternals
   vtkstd::vector<vtkStdString> LastPushedValues;
   vtkstd::vector<int> ElementTypes;
   vtkstd::vector<char> Initialized;
+  vtkStdString DefaultValue;
 
   void UpdateLastPushedValues()
     {
@@ -381,10 +382,21 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     if (initVal)
       {
       this->SetElement(0, initVal); // what to do with > 1 element?
+      this->Internals->DefaultValue = initVal;
       }
     this->Internals->UpdateLastPushedValues(); 
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMStringVectorProperty::GetDefaulValue()
+{
+  if (!this->Internals->DefaultValue.empty())
+    {
+    return this->Internals->DefaultValue.c_str();
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------

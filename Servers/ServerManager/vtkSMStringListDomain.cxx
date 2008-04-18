@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.19");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.20");
 
 struct vtkSMStringListDomainInternals
 {
@@ -255,9 +255,19 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop)
   unsigned int num_string = this->GetNumberOfStrings();
   if (svp && num_string > 0)
     {
-    if (svp->GetNumberOfElements() == 1 && !svp->GetRepeatCommand())
+    if (svp->GetNumberOfElements() == 1 && 
+      !svp->GetRepeatCommand() )
       {
-      svp->SetElement(0, this->GetString(0));
+      const char* defaultValue = svp->GetDefaulValue();
+      if (defaultValue)
+        {
+        svp->SetElement(0, defaultValue);
+        }
+      else
+        {
+        svp->SetElement(0, this->GetString(0));
+        }
+
       return 1;
       }
     if (svp->GetRepeatCommand() && svp->GetNumberOfElementsPerCommand()==1)
@@ -270,7 +280,6 @@ int vtkSMStringListDomain::SetDefaultValues(vtkSMProperty* prop)
       return 1;
       }
     }
-
 
   return this->Superclass::SetDefaultValues(prop);
 }
