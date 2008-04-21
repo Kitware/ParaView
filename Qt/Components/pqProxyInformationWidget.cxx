@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QHeaderView>
 #include <QStringList>
+#include <QTimer>
 
 // VTK includes
 #include "vtkCommand.h"
@@ -127,7 +128,7 @@ void pqProxyInformationWidget::setOutputPort(pqOutputPort* source)
       }
     }
 
-  this->updateInformation();
+  QTimer::singleShot(10, this, SLOT(updateInformation()));
 }
 
 //-----------------------------------------------------------------------------
