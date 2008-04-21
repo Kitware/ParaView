@@ -429,6 +429,70 @@ void pqPipelineBrowser::setView(pqView *rm)
 //----------------------------------------------------------------------------
 void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 {
+  QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
+  if (indexes.size() > 1 && index.column() == 1)
+    {
+    //have multiple items selected, and we are clicking on an eye
+    //now we need to detect if the eye we are clicking on is one that is selected
+    
+    pqServerManagerModelItem *smIndex, *smItem;
+    QModelIndex item;
+    
+    smIndex = this->Model->getItemFor(index);
+    bool inSelection = false;    
+    for (int i=0; i < indexes.size() && !inSelection; i++)
+      {            
+      smItem = this->Model->getItemFor(indexes.at(i));      
+      if (smItem == smIndex)
+        {              
+        inSelection = true;        
+        }
+      }
+    //the eye we clicked on is in the selected group, so operate on the entire group
+    if (inSelection)
+      {
+      emit this->beginUndo("Change Visibility of multiple items");
+      for (int i=0; i < indexes.size(); i++)
+        {        
+        item = indexes.at(i);
+        pqPipelineModel::ItemType itemType;
+        itemType = this->Model->getTypeFor(item);
+        //ignore link items as that solves the massive problem
+        //of selecting multiple links and setting visibility multiple times on the same item
+        if (itemType != pqPipelineModel::Link)    
+          {
+          this->handleSingleClickItem(item);
+          }
+        }
+      emit this->endUndo();
+      return;
+      }
+
+    // we will just do visibility on the eye that was clicked, since it is not
+    // part of the main group -- simply fall through.
+    }
+
+  // we make sure we are only clicking on an eye
+  // and we have 1 or less items selected
+  if (index.column() == 1)
+    {
+    // We need to obtain the source to give the undo element some sensible name.
+    pqServerManagerModelItem* smModelItem = this->Model->getItemFor(index);
+    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(smModelItem);
+    pqOutputPort* port = source? source->getOutputPort(0) :
+      qobject_cast<pqOutputPort*>(smModelItem);
+    source = port->getSource();
+
+    // call the old eye code
+    emit this->beginUndo(QString("Change Visibility of %1").arg(
+        source->getSMName()));
+    this->handleSingleClickItem(index); 
+    emit this->endUndo();
+    }
+}
+//----------------------------------------------------------------------------
+void pqPipelineBrowser::handleSingleClickItem(const QModelIndex &index)
+{
   // See if the index is associated with a source.
   pqServerManagerModelItem* smModelItem = this->Model->getItemFor(index);
 
@@ -439,7 +503,7 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     {
     source = port->getSource();
 
-    if(index.column() == 1 && source->modifiedState() != pqProxy::UNINITIALIZED)
+    if (source->modifiedState() != pqProxy::UNINITIALIZED)
       {
       // If the column clicked is 1, the user clicked the visible icon.
       // Get the display object for the current window.
@@ -453,9 +517,6 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
         visible = !repr->isVisible();
         }
 
-      emit this->beginUndo(QString("Change Visibility of %1").arg(
-        source->getSMName()));
-
       pqDisplayPolicy* dpolicy = 
         pqApplicationCore::instance()->getDisplayPolicy();
       // Will create new display if needed. May also create new view 
@@ -463,7 +524,6 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
       repr = dpolicy->setRepresentationVisibility(
         port, this->Internal->View, visible);
 
-      emit this->endUndo();
       if(repr)
         {
         repr->renderView(false);

@@ -137,6 +137,7 @@ signals:
 
 private slots:
   void handleIndexClicked(const QModelIndex &index);
+  void handleSingleClickItem(const QModelIndex &index);
   
   /// Called when the user changes the name of a source.
   void onRename(const QModelIndex& index, const QString& name);
