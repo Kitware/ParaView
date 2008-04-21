@@ -42,7 +42,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.14");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.15");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -153,7 +153,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
 {
   if (!selection)
     {
-    return 0;
+    return selSource;
     }
 
   if (selection->GetNumberOfChildren()>0)
@@ -177,7 +177,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
     {
   case -1:
     // ContentType is not defined. Empty selection.
-    return 0;
+    return selSource;
 
   case vtkSelection::FRUSTUM:
     proxyname = "FrustumSelectionSource";
