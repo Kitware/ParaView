@@ -42,7 +42,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.13");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.14");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -165,7 +165,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
   vtkSMProxy* originalSelSource = selSource;
 
   vtkInformation* selProperties = selection->GetProperties();
-  int contentType = selProperties->Get(vtkSelection::CONTENT_TYPE());
+  int contentType = selection->GetContentType();
 
   // Determine the type of selection source proxy to create that will
   // generate the a vtkSelection same the "selection" instance passed as an
@@ -175,6 +175,10 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
   bool use_hierarchical = false;
   switch (contentType)
     {
+  case -1:
+    // ContentType is not defined. Empty selection.
+    return 0;
+
   case vtkSelection::FRUSTUM:
     proxyname = "FrustumSelectionSource";
     break;

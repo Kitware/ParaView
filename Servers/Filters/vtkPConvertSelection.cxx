@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPConvertSelection.h"
 
+#include "vtkCompositeDataSet.h"
 #include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -23,7 +24,7 @@
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkPConvertSelection);
-vtkCxxRevisionMacro(vtkPConvertSelection, "1.1");
+vtkCxxRevisionMacro(vtkPConvertSelection, "1.2");
 vtkCxxSetObjectMacro(vtkPConvertSelection, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkPConvertSelection::vtkPConvertSelection()
@@ -104,15 +105,11 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
     }
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkSelection* input = vtkSelection::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkSelection* input = vtkSelection::GetData(inInfo);
 
-  vtkInformation* dataInfo = inputVector[1]->GetInformationObject(0);
-  vtkDataObject* data = dataInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkDataObject* data = vtkDataObject::GetData(inputVector[1], 0);
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkSelection* output = vtkSelection::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkSelection* output = vtkSelection::GetData(outputVector, 0);
 
   // Now we need to remote components from the input that don't belong to this
   // process.
@@ -129,11 +126,18 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
     }
 
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
-  if (ds && ds->GetNumberOfPoints() > 0)
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(data);
+  if ( (ds && ds->GetNumberOfPoints() > 0) || 
+    (cds && cds->GetNumberOfPoints() > 0))
     {
     // This is needed since vtkConvertSelection simply shallow copies input to
     // output and raises errors when "data" is empty.
-    if (!this->Convert(newInput, data, output))
+    input->Register(this);
+    inInfo->Set(vtkDataObject::DATA_OBJECT(), newInput);
+    int ret = this->Superclass::RequestData(request, inputVector, outputVector);
+    inInfo->Set(vtkDataObject::DATA_OBJECT(), input);
+    input->UnRegister(this);
+    if (!ret)
       {
       return 0;
       }
