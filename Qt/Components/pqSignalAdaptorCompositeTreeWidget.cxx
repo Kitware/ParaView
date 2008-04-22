@@ -615,6 +615,9 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
   item->setData(0, NODE_TYPE, NON_LEAF);
 
   this->LevelNo = 0;
+  bool is_hierarchical = 
+    (strcmp(info->GetCompositeDataClassName(), "vtkHierarchicalBoxDataSet") == 0);
+
   for (unsigned int cc=0; cc < cinfo->GetNumberOfChildren(); cc++)
     {
     vtkPVDataInformation* childInfo = cinfo->GetDataInformation(cc);
@@ -626,7 +629,8 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
     bool is_leaf = true;
     if (childInfo && childInfo->GetCompositeDataInformation()->GetDataIsComposite())
       {
-      childLabel = QString("Node %1").arg(cc);
+      childLabel = is_hierarchical? 
+        QString("Level %1").arg(cc) : QString("Block %1").arg(cc);
       is_leaf = false;
       }
 
