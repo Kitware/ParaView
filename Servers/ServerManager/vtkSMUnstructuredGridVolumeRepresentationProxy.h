@@ -47,6 +47,16 @@ public:
   vtkGetMacro(SupportsZSweepMapper, int);
 
   // Description:
+  // Set the active volume mapper by enum index.
+  void SetSelectedMapperIndex(int);
+  vtkGetMacro(SelectedMapperIndex, int);
+
+  // Description:
+  // Set the active volume mapper by enum index only if
+  // the mapper is supported.
+  void SetSelectedMapperIndexIfSupported(int);
+
+  // Description:
   // Convenience methods for switching between volume
   // mappers.
   void SetVolumeMapperToBunykCM();
@@ -172,6 +182,7 @@ protected:
   int SupportsZSweepMapper;
   int SupportsBunykMapper;
   int RenderViewExtensionsTested;
+  int SelectedMapperIndex;
 
 private:
   vtkSMUnstructuredGridVolumeRepresentationProxy(const vtkSMUnstructuredGridVolumeRepresentationProxy&); // Not implemented

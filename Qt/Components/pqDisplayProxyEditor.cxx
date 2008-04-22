@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMCompositeTreeDomain.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -73,6 +74,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqSMAdaptor.h"
 #include "pqWidgetRangeDomain.h"
+#include "pqOutputPort.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -85,6 +88,8 @@ public:
     this->EdgeColorAdaptor = 0;
     this->SliceDirectionAdaptor = 0;
     this->SliceDomain = 0;
+    this->SelectedMapperAdaptor = 0;
+    this->CompositeTreeAdaptor = 0;
     }
 
   ~pqDisplayProxyEditorInternal()
@@ -103,7 +108,9 @@ public:
   pqSignalAdaptorColor*    ColorAdaptor;
   pqSignalAdaptorColor*    EdgeColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
+  pqSignalAdaptorComboBox* SelectedMapperAdaptor;
   pqWidgetRangeDomain* SliceDomain;
+  pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
 
   // map of <material labels, material files>
   static QMap<QString, QString> MaterialMap;
@@ -129,6 +136,8 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->EditCubeAxes, SIGNAL(clicked(bool)),
     this, SLOT(editCubeAxes()));
+  QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged ()),
+    this, SLOT(volumeBlockSelected()));
 }
 
 //-----------------------------------------------------------------------------
@@ -149,6 +158,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   delete this->Internal->SliceDomain;
   this->Internal->SliceDomain = 0;
+  delete this->Internal->CompositeTreeAdaptor;
+  this->Internal->CompositeTreeAdaptor = 0;
 
   vtkSMProxy* reprProxy = (repr)? repr->getProxy() : NULL;
   if(this->Internal->Representation)
@@ -169,7 +180,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   // The slots are already connected but we do not want them to execute
   // while we are initializing the GUI
   this->DisableSlots = 1;
-  
+
   // setup for visibility
   this->Internal->Links->addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
@@ -384,6 +395,31 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       reprProxy, reprProxy->GetProperty("SliceMode"));
     }
+
+  if (reprProxy->GetProperty("ExtractedBlockIndex"))
+    {
+    this->Internal->CompositeTreeAdaptor = 
+      new pqSignalAdaptorCompositeTreeWidget(
+        this->Internal->compositeTree,
+        this->Internal->Representation->getOutputPortFromInput()->getOutputPortProxy(),
+        vtkSMCompositeTreeDomain::NONE,
+        pqSignalAdaptorCompositeTreeWidget::INDEX_MODE_FLAT, false, true);
+    }
+
+  if (reprProxy->GetProperty("SelectedMapperIndex"))
+    {
+    QList<QVariant> mapperNames = 
+      pqSMAdaptor::getEnumerationPropertyDomain(
+        reprProxy->GetProperty("SelectedMapperIndex"));
+    foreach(QVariant item, mapperNames)
+      {
+      this->Internal->SelectedMapperIndex->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+      this->Internal->SelectedMapperAdaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      reprProxy, reprProxy->GetProperty("SelectedMapperIndex"));
+    }
     
 
 #if 0                                       //FIXME 
@@ -531,6 +567,14 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(this->Internal->SliceDirectionAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
+
+  this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->SelectedMapperIndex);
+  QObject::connect(this->Internal->SelectedMapperAdaptor, 
+    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
+  QObject::connect(this->Internal->SelectedMapperAdaptor,
+    SIGNAL(currentTextChanged(const QString&)),
+    this, SLOT(selectedMapperChanged()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -565,6 +609,14 @@ void pqDisplayProxyEditor::updateEnableState()
     // may have changed.
     QTimer::singleShot(0, this, SLOT(sliceDirectionChanged()));
     }
+
+  this->Internal->compositeTree->setVisible(
+   this->Internal->CompositeTreeAdaptor &&
+   (reprType == vtkSMPVRepresentationProxy::VOLUME));
+
+  this->Internal->SelectedMapperIndex->setEnabled(
+    reprType == vtkSMPVRepresentationProxy::VOLUME
+    && this->Internal->Representation->getProxy()->GetProperty("SelectedMapperIndex"));
 
   vtkSMDataRepresentationProxy* display = 
     this->Internal->Representation->getRepresentationProxy();
@@ -769,4 +821,33 @@ void pqDisplayProxyEditor::sliceDirectionChanged()
       prop->UpdateDependentDomains();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+/// Handle user selection of block for volume rendering
+void pqDisplayProxyEditor::volumeBlockSelected()
+{
+  if (this->Internal->CompositeTreeAdaptor
+      && this->Internal->Representation)
+    {
+    bool valid = false;
+    unsigned int selectedIndex = 
+      this->Internal->CompositeTreeAdaptor->getCurrentFlatIndex(&valid);
+    if (valid && selectedIndex > 0) 
+      {
+      vtkSMDataRepresentationProxy* repr =
+        this->Internal->Representation->getRepresentationProxy();
+      pqSMAdaptor::setElementProperty(
+        repr->GetProperty("ExtractedBlockIndex"), selectedIndex-1);
+      repr->UpdateVTKObjects();
+      this->Internal->Representation->renderViewEventually();
+      this->Internal->ColorBy->reloadGUI();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::selectedMapperChanged()
+{
+
 }

@@ -37,7 +37,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -632,6 +632,63 @@ vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
       this->ConnectionID, mySelection);
   
   return selectionSource;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetSelectedMapperIndex(int index)
+{
+  this->SelectedMapperIndex = index;
+  switch (index)
+    {
+    case vtkSMUnstructuredGridVolumeRepresentationProxy::PROJECTED_TETRA_VOLUME_MAPPER:
+      this->SetVolumeMapperToPTCM();
+      break;
+    case vtkSMUnstructuredGridVolumeRepresentationProxy::HAVS_VOLUME_MAPPER:
+      this->SetVolumeMapperToHAVSCM();
+      break;
+    case vtkSMUnstructuredGridVolumeRepresentationProxy::ZSWEEP_VOLUME_MAPPER:
+      this->SetVolumeMapperToZSweepCM();
+      break;
+    case vtkSMUnstructuredGridVolumeRepresentationProxy::BUNYK_RAY_CAST_VOLUME_MAPPER:
+      this->SetVolumeMapperToBunykCM();
+      break;
+    default:
+      vtkDebugMacro("Unknown volume mapper index " << index);
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredGridVolumeRepresentationProxy::SetSelectedMapperIndexIfSupported(int index)
+{
+
+  if (index == vtkSMUnstructuredGridVolumeRepresentationProxy::PROJECTED_TETRA_VOLUME_MAPPER)
+    {
+    this->SetVolumeMapperToPTCM();
+    }
+  else if (index == vtkSMUnstructuredGridVolumeRepresentationProxy::HAVS_VOLUME_MAPPER
+          && this->GetSupportsHAVSMapper())
+    {
+    this->SetVolumeMapperToHAVSCM();
+    }
+  else if (index == vtkSMUnstructuredGridVolumeRepresentationProxy::ZSWEEP_VOLUME_MAPPER
+           && this->GetSupportsZSweepMapper())
+    {
+    this->SetVolumeMapperToZSweepCM();
+    }
+  else if (index == vtkSMUnstructuredGridVolumeRepresentationProxy::BUNYK_RAY_CAST_VOLUME_MAPPER
+           && this->GetSupportsBunykMapper())
+    {
+    this->SetVolumeMapperToBunykCM();
+    }
+  else
+    {
+    vtkDebugMacro("Requested volume mapper index " << index << " is not supported.");
+    return;
+    }
+
+  // Only set the index if we were successful
+  this->SelectedMapperIndex = index;
 }
 
 //----------------------------------------------------------------------------

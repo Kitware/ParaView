@@ -5344,6 +5344,19 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="SelectedMapperIndex"
+        command="SetSelectedMapperIndex"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Projected tetra" />
+          <Entry value="1" text="HAVS" />
+          <Entry value="2" text="Z sweep" />
+          <Entry value="4" text="Bunyk ray cast" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="ColorAttributeType"
         command="SetColorAttributeType"
         number_of_elements="1"
@@ -5388,10 +5401,7 @@
 
       <!-- Subproxies for Volume Pipeline -->
       <SubProxy>
-        <SourceProxy name="VolumeFilter" class="vtkDataSetTriangleFilter" >
-          <!-- I don't directly use the DataSetTriangleFilter since I need
-          a more restrictive domain for this one -->
-          <!-- note this property is not exposed -->
+        <SourceProxy name="VolumeFilter" class="vtkVolumeRepresentationPreprocessor" >
           <InputProperty
             name="Input"
             command="SetInputConnection">
@@ -5399,10 +5409,27 @@
               <Group name="sources"/>
               <Group name="filters"/>
             </ProxyGroupDomain>
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkUnstructuredGrid" />
+            <DataTypeDomain name="input_type"
+              composite_data_supported="1">
+              <DataType value="vtkDataObject" />
             </DataTypeDomain>
           </InputProperty>
+          <IntVectorProperty
+            name="ExtractedBlockIndex"
+            command="SetExtractedBlockIndex"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              In case of multiblock datasets, choose the flat index of the dataset to 
+              volume render. The flat index must point to an unstructured grid dataset.
+              If the input is not a multiblock dataset then this index is ignored.
+            </Documentation>
+            <CompositeTreeDomain name="tree" mode="leaves">
+              <RequiredProperties>
+                <Property name="Input" function="Input"/>
+              </RequiredProperties>
+           </CompositeTreeDomain>
+          </IntVectorProperty>
           <IntVectorProperty
             name="TetrahedraOnly"
             command="SetTetrahedraOnly"
@@ -5411,6 +5438,9 @@
             <BooleanDomain name="bool"/>
           </IntVectorProperty>
         </SourceProxy>
+        <ExposedProperties>
+          <Property name="ExtractedBlockIndex" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -5733,7 +5763,7 @@
         name="Input"
         command="NotUsed">
        <DataTypeDomain name="input_type"
-          composite_data_supported="0">
+          composite_data_supported="1">
          <DataType value="vtkUnstructuredGrid"/>
        </DataTypeDomain>
         <Documentation>
@@ -5768,6 +5798,8 @@
         <ExposedProperties>
           <Property name="ScalarOpacityFunction" />
           <Property name="ScalarOpacityUnitDistance" />
+          <Property name="ExtractedBlockIndex" />
+          <Property name="SelectedMapperIndex" />
         </ExposedProperties>
       </SubProxy>
 
