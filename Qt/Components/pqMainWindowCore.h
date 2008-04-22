@@ -267,6 +267,7 @@ signals:
   void pickingCenter(bool);
   void refreshFiltersMenu();
   void refreshSourcesMenu();
+  void enableExport(bool);
   
   /** \todo Hide these private implementation details */
   void postAccept();
@@ -289,6 +290,9 @@ public slots:
 
   void onFileSaveData();
   void onFileSaveData(const QStringList& files);
+
+  /// Called to export the current view.
+  void onFileExport();
 
   void onFileSaveScreenshot();
 

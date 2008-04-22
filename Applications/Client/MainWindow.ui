@@ -130,6 +130,11 @@
     <addaction name="actionEditSettings" />
     <addaction name="actionEditViewSettings" />
    </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>&amp;Sources</string>
+    </property>
+   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>&amp;File</string>
@@ -147,6 +152,7 @@
     <addaction name="separator" />
     <addaction name="actionFileSaveData" />
     <addaction name="actionFileSaveScreenshot" />
+    <addaction name="actionExport" />
     <addaction name="separator" />
     <addaction name="actionFileSaveAnimation" />
     <addaction name="actionFileSaveGeometry" />
@@ -155,11 +161,6 @@
     <addaction name="actionServerDisconnect" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>&amp;Sources</string>
-    </property>
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -1264,6 +1265,11 @@
    </property>
    <property name="shortcut" >
     <string>B</string>
+   </property>
+  </action>
+  <action name="actionExport" >
+   <property name="text" >
+    <string>Export</string>
    </property>
   </action>
  </widget>

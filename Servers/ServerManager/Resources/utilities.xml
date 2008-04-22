@@ -2204,4 +2204,80 @@
     <!-- End of group "misc" -->
   </ProxyGroup>
 
+  <ProxyGroup name="exporters">
+    <!-- Proxy group for exporters used to export views.  -->
+
+    <ExporterProxy name="X3DExporter" class="vtkX3DExporter"
+      file_extension="x3d">
+      <Documentation short_help="X3D Files" long_help="Export X3D Files">
+        Exporter to export a single render view to an X3D file.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          Name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty name="View"
+        command="SetView"
+        update_self="1">
+        <Documentation>
+          The view to export.
+        </Documentation>
+        <ProxyGroupDomain name="group">
+          <Group name="views"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property name="Write" command="Write" 
+        update_self="1">
+        <Documentation>
+          Triggers exporting of the view.
+        </Documentation>
+      </Property>
+
+      <!-- End of X3DExporter -->
+    </ExporterProxy>
+
+    <ExporterProxy name="VRMLExporter" class="vtkVRMLExporter"
+      file_extension="vrml">
+      <Documentation>
+        Exporter to export a single render view to an VRML file.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          Name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty name="View"
+        command="SetView"
+        update_self="1">
+        <Documentation>
+          The view to export.
+        </Documentation>
+        <ProxyGroupDomain name="group">
+          <Group name="views"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property name="Write" command="Write" 
+        update_self="1">
+        <Documentation>
+          Triggers exporting of the view.
+        </Documentation>
+      </Property>
+
+      <!-- End of VRMLExporter -->
+    </ExporterProxy>
+
+    <!-- End of "exporters" -->
+  </ProxyGroup>
+
 </ServerManagerConfiguration>

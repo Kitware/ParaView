@@ -104,6 +104,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTwoDRenderView.h
   pqUndoStack.h
   pqView.h
+  pqViewExporterManager.h
   pqVTKHistogramModel.h
   pqWriterFactory.h
   pqXMLEventObserver.h
@@ -312,6 +313,8 @@ ADD_LIBRARY(pqCore
   pqUndoStack.h
   pqView.cxx
   pqView.h
+  pqViewExporterManager.cxx
+  pqViewExporterManager.h
   pqVTKHistogramColor.cxx
   pqVTKHistogramColor.h
   pqVTKHistogramModel.cxx

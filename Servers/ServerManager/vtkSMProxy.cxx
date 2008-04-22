@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.101");
+vtkCxxRevisionMacro(vtkSMProxy, "1.102");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -412,6 +412,12 @@ vtkClientServerID vtkSMProxy::GetID()
 {
   this->CreateVTKObjects();
   return this->VTKObjectID;
+}
+
+//---------------------------------------------------------------------------
+vtkObjectBase* vtkSMProxy::GetClientSideObject()
+{
+  return vtkProcessModule::GetProcessModule()->GetObjectFromID(this->GetID());
 }
 
 //---------------------------------------------------------------------------

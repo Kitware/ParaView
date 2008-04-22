@@ -58,6 +58,7 @@ SET(Kit_SRCS
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
   vtkSMExponentialKeyFrameProxy.cxx
+  vtkSMExporterProxy.cxx
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx

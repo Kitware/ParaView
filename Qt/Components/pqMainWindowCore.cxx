@@ -138,6 +138,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSaveSnapshotDialog.h"
 #include "pqQuickLaunchDialog.h"
 #include "pqViewOptionsInterface.h"
+#include "pqViewExporterManager.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -249,6 +250,7 @@ public:
   pqPendingDisplayManager PendingDisplayManager;
   pqRubberBandHelper RenderViewSelectionHelper;
   pqPickHelper RenderViewPickHelper;
+  pqViewExporterManager ViewExporterManager;
   QPointer<pqUndoStack> UndoStack;
  
   QPointer<pqFiltersMenuManager> FiltersMenuManager;
@@ -560,6 +562,20 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     pqApplicationCore::instance()->getProgressManager();
   progress_manager->addNonBlockableObject(
     &this->Implementation->MultiViewManager);
+
+  /// Set up the view exporter.
+  QObject::connect(&this->Implementation->ViewExporterManager,
+    SIGNAL(exportable(bool)), 
+    this, SIGNAL(enableExport(bool)));
+
+  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &this->Implementation->ViewExporterManager,
+    SLOT(setView(pqView*)));
+
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+    SIGNAL(serverManagerExtensionLoaded()),
+    &this->Implementation->ViewExporterManager,
+    SLOT(refresh()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1741,6 +1757,32 @@ void pqMainWindowCore::onFileSaveScreenshot()
     if (!saved)
       {
       qCritical() << "Save Image failed.";
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onFileExport()
+{
+  QString filters = 
+    this->Implementation->ViewExporterManager.getSupportedFileTypes();
+  if (filters.isEmpty())
+    {
+    qDebug() << "Cannot export current view.";
+    return;
+    }
+
+  pqFileDialog file_dialog(NULL,
+    this->Implementation->Parent, tr("Save File:"), QString(), filters);
+  file_dialog.setObjectName("FileExportDialog");
+  file_dialog.setFileMode(pqFileDialog::AnyFile);
+  if (file_dialog.exec() == QDialog::Accepted &&
+    file_dialog.getSelectedFiles().size() > 0)
+    {
+    if (!this->Implementation->ViewExporterManager.write(
+        file_dialog.getSelectedFiles()[0]))
+      {
+      qCritical() << "Failed to export correctly.";
       }
     }
 }

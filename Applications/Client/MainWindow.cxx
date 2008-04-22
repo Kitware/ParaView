@@ -771,6 +771,13 @@ MainWindow::MainWindow() :
     SIGNAL(selectionFinished(int, int, int, int)),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
 
+  QObject::connect(
+    this->Implementation->UI.actionExport, SIGNAL(triggered()),
+    &this->Implementation->Core, SLOT(onFileExport()));
+  QObject::connect(
+    &this->Implementation->Core, SIGNAL(enableExport(bool)),
+    this->Implementation->UI.actionExport, SLOT(setEnabled(bool)));
+
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
 
