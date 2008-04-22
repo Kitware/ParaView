@@ -111,9 +111,6 @@ protected:
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  // This can be removed when streaming is removed.
-  int PreviousUpdateWasBlockedByStreaming;  
-
   vtkPVUpdateSuppressorCacheMap* Cache;
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
