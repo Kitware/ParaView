@@ -2170,6 +2170,35 @@
          This property specifies the parameter index.
        </Documentation>
      </StringVectorProperty>
+     
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0"
+        information_property="TimestepValues">
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Set the current timestep.
+       </Documentation>
+     </IntVectorProperty>
+     
    <!-- End XdmfReader -->
    </SourceProxy>
    
