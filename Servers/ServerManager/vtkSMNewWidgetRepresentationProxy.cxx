@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.10");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -110,6 +110,7 @@ bool vtkSMNewWidgetRepresentationProxy::AddToView(vtkSMViewProxy* view)
 
     if (rendererProp)
       {
+      rendererProp->RemoveAllProxies();
       rendererProp->AddProxy(renderView->GetRendererProxy());
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
@@ -162,6 +163,7 @@ bool vtkSMNewWidgetRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     if (rendererProp)
       {
       rendererProp->RemoveAllProxies();
+      rendererProp->AddProxy(0);
       this->RepresentationProxy->UpdateProperty("Renderer");
       }
 

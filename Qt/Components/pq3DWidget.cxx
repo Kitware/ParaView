@@ -67,8 +67,7 @@ public:
   pq3DWidgetInternal() :
     IgnorePropertyChange(false),
     WidgetVisible(true),
-    Selected(false),
-    PickShortcut(0)
+    Selected(false)
   {
   }
     
@@ -88,7 +87,7 @@ public:
 
   pqPickHelper PickHelper;
   QKeySequence PickSequence;
-  QShortcut* PickShortcut;
+  QPointer<QShortcut> PickShortcut;
 };
 
 //-----------------------------------------------------------------------------
@@ -178,7 +177,8 @@ void pq3DWidget::pickingSupported(const QKeySequence& key)
 //-----------------------------------------------------------------------------
 void pq3DWidget::setView(pqView* pqview)
 { 
-  if (pqview == this->renderView())
+  pqRenderView* rview = this->renderView();
+  if (pqview == rview)
     {
     this->Superclass::setView(pqview);
     return;
@@ -186,24 +186,24 @@ void pq3DWidget::setView(pqView* pqview)
 
   // get rid of old shortcut.
   delete this->Internal->PickShortcut;
-  this->Internal->PickShortcut = 0;
 
   bool cur_visbility = this->widgetVisible();
   this->hideWidget();
 
   vtkSMRepresentationProxy* widget = this->getWidgetProxy();
-  if (this->renderView() && widget)
+  if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderViewProxy()->RemoveRepresentation(widget);
+    rview->getRenderViewProxy()->RemoveRepresentation(widget);
     }
 
   this->Superclass::setView(pqview);
   this->Internal->PickHelper.setView(pqview);
 
-  if (pqview && !this->Internal->PickSequence.isEmpty())
+  rview = this->renderView();
+  if (rview && !this->Internal->PickSequence.isEmpty())
     {
     this->Internal->PickShortcut = new QShortcut(
       this->Internal->PickSequence, pqview->getWidget());
@@ -211,13 +211,13 @@ void pq3DWidget::setView(pqView* pqview)
       &this->Internal->PickHelper, SLOT(pick()));
     }
 
-  if (this->renderView() && widget)
+  if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
+    rview->getRenderViewProxy()->AddRepresentation(widget);
     }
 
   if (cur_visbility)
@@ -230,9 +230,9 @@ void pq3DWidget::setView(pqView* pqview)
 //-----------------------------------------------------------------------------
 void pq3DWidget::render()
 {
-  if (this->renderView())
+  if (pqRenderView* rview = this->renderView())
     {
-    this->renderView()->render();
+    rview->render();
     }
 }
 
@@ -252,25 +252,25 @@ void pq3DWidget::onControlledPropertyChanged()
 void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 {
  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-
- if (this->renderView() && widget)
+  pqRenderView* rview = this->renderView();
+ if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    this->renderView()->getRenderViewProxy()->RemoveRepresentation(widget);
-    this->renderView()->render();
+    rview->getRenderViewProxy()->RemoveRepresentation(widget);
+    rview->render();
     }
   this->Internal->WidgetProxy = pxy;
 
-  if (this->renderView() && pxy)
+  if (rview && pxy)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    this->renderView()->getRenderViewProxy()->AddRepresentation(widget);
-    this->renderView()->render();
+    rview->getRenderViewProxy()->AddRepresentation(widget);
+    rview->render();
     }
 }
 
