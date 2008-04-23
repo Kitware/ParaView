@@ -36,7 +36,7 @@ class vtkDataSetTriangleFilter;
 class vtkExtractBlock;
 
 
-class VTK_GRAPHICS_EXPORT vtkVolumeRepresentationPreprocessor :
+class VTK_EXPORT vtkVolumeRepresentationPreprocessor :
   public vtkUnstructuredGridAlgorithm
 {
 public:
