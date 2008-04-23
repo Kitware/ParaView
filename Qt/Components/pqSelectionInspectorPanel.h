@@ -120,8 +120,14 @@ protected slots:
   /// current item.
   void onCurrentIndexChanged(QTreeWidgetItem* item);
 
+  /// Update positions of point-handle widgets based on the selection locations.
   void updateLocationWidgets();
+
+  /// Update selection locations based on point-handle widget positions.
   void updateLocationFromWidgets();
+
+  /// Called when ShowFrustum checkbox is toggled.
+  void updateFrustum();
 
 protected:
   /// Sets up the GUI by created default signal/slot bindings etc.
@@ -166,6 +172,7 @@ protected:
   void addWidgetsToView();
   void allocateWidgets(unsigned int numWidgets);
 
+  void updateFrustumInternal(bool);
 private:
   struct pqImplementation;
   pqImplementation* const Implementation;

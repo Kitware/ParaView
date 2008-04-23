@@ -22,7 +22,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMAxesRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAxesRepresentationProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMAxesRepresentationProxy::vtkSMAxesRepresentationProxy()
@@ -45,18 +45,10 @@ void vtkSMAxesRepresentationProxy::CreateVTKObjects()
   this->Superclass::CreateVTKObjects();
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
 
-  vtkClientServerStream str;
-  vtkClientServerID id = this->GetID();
-  str << vtkClientServerStream::Invoke << id 
-      << "SymmetricOn" << vtkClientServerStream::End;
-  str << vtkClientServerStream::Invoke << id
-      << "ComputeNormalsOff" << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->Servers,str,0);
-
   // Setup the pipeline.
   vtkSMProxy* mapper = this->GetSubProxy("Mapper");
   vtkSMProxy* actor = this->GetSubProxy("Prop");
-
+  vtkSMProxy* property = this->GetSubProxy("Property");
   if (!mapper)
     {
     vtkErrorMacro("Subproxy Mapper must be defined.");
@@ -69,6 +61,7 @@ void vtkSMAxesRepresentationProxy::CreateVTKObjects()
     return;
     }
  
+  vtkClientServerStream str;
   str << vtkClientServerStream::Invoke << this->GetID() 
       << "GetOutput" << vtkClientServerStream::End;
   str << vtkClientServerStream::Invoke << mapper->GetID()
@@ -81,9 +74,15 @@ void vtkSMAxesRepresentationProxy::CreateVTKObjects()
     actor->GetProperty("Mapper"));
   pp->RemoveAllProxies();
   pp->AddProxy(mapper);
+  mapper->UpdateVTKObjects();
 
-  this->UpdateVTKObjects();
-
+  if (property)
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(actor->GetProperty("Property"));
+    pp->RemoveAllProxies();
+    pp->AddProxy(property);
+    actor->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------

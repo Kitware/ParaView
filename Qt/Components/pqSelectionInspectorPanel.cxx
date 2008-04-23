@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollArea>
 #include <QtDebug>
 #include <QVBoxLayout>
+#include <QTimer>
 
 #include "pq3DWidgetFactory.h"
 #include "pqActiveView.h"
@@ -133,7 +134,6 @@ public:
     this->IndicesAdaptor = 0;
     this->GlobalIDsAdaptor = 0;
     this->LocationsAdaptor = 0;
-    this->SelectionSource = 0;
     this->CompositeTreeAdaptor = 0;
     // Selection Labels Properties
     this->SelectionColorAdaptor = 0;
@@ -147,7 +147,6 @@ public:
     this->FieldTypeAdaptor = 0;
     this->ThresholdsAdaptor = 0;
     this->ThresholdScalarArrayAdaptor = 0;
-    this->SelectionSource = 0;
     this->InputPort = 0;
     this->VTKConnectSelInput = vtkEventQtSlotConnect::New();
     this->VTKConnectRep = vtkEventQtSlotConnect::New();
@@ -177,7 +176,6 @@ public:
     delete this->FieldTypeAdaptor;
     delete this->ThresholdsAdaptor;
     delete this->ThresholdScalarArrayAdaptor;
-    this->SelectionSource = 0;
     this->InputPort = 0;
     this->VTKConnectSelInput->Delete();
     this->VTKConnectRep->Delete();
@@ -213,7 +211,6 @@ public:
   QPointer<pqOutputPort> InputPort;
   // The representation whose properties are being edited.
   QPointer<pqDataRepresentation> PrevRepresentation;
-  vtkSmartPointer<vtkSMSourceProxy> SelectionSource;
   QPointer<pqRenderView> ActiveView;
 
   // Selection Labels Properties
@@ -243,6 +240,8 @@ public:
   bool UpdatingGUI;
 
   QList<vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> > LocationWigets;
+  vtkSmartPointer<vtkSMRepresentationProxy> FrustumWidget;
+
   enum 
     {
     IDS = 0,
@@ -429,6 +428,9 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 
   // Updates the 3D widgets used.
   this->updateLocationWidgets();
+
+  // update the frustum widget.
+  this->updateFrustum();
 
   // Set up property links between the selection representation and the GUI.
   this->updateDisplayStyleGUI();
@@ -1210,6 +1212,9 @@ void pqSelectionInspectorPanel::onFieldTypeChanged(const QString& type)
 void pqSelectionInspectorPanel::setupFrustumSelectionGUI()
 {
   // TODO: add widgets to interact with the the Frutum box 
+  QObject::connect(this->Implementation->checkboxShowFrustum,
+    SIGNAL(toggled(bool)),
+    this, SLOT(updateFrustum()), Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -1255,8 +1260,14 @@ void pqSelectionInspectorPanel::updateAllSelectionViews()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onActiveViewChanged(pqView* view)
 {
+  // remove frustum widget from the old view.
+  this->updateFrustumInternal(false);
+
   pqRenderView* renView = qobject_cast<pqRenderView*>(view);
   this->Implementation->ActiveView = renView;
+
+  // update the frustum widget.
+  QTimer::singleShot(10, this, SLOT(updateFrustum()));
 
   // Update the "Display Style" GUI since it shows the representation in the
   // active view.
@@ -1538,4 +1549,82 @@ void pqSelectionInspectorPanel::updateLocationFromWidgets()
       }
     adaptor->setValues(values);
     }
+}
+
+//-----------------------------------------------------------------------------
+/// Called when ShowFrustum checkbox is toggled.
+void pqSelectionInspectorPanel::updateFrustum()
+{
+  bool showFrustum = this->Implementation->checkboxShowFrustum->isChecked();
+  this->updateFrustumInternal(showFrustum);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
+{
+  if (!this->Implementation->ActiveView)
+    {
+    showFrustum = false;
+    }
+  vtkSMSourceProxy* selSource = this->Implementation->getSelectionSource();
+
+  if (!selSource || strcmp(selSource->GetXMLName(), "FrustumSelectionSource") != 0)
+    {
+    showFrustum = false;
+    }
+
+  if (!showFrustum)
+    {
+    if (this->Implementation->FrustumWidget)
+      {
+      if (this->Implementation->ActiveView)
+        {
+        this->Implementation->ActiveView->getRenderViewProxy()->RemoveRepresentation(
+          this->Implementation->FrustumWidget);
+        }
+      this->Implementation->FrustumWidget = 0;
+      this->updateRepresentationViews();
+      }
+    return;
+    }
+
+  if (!this->Implementation->FrustumWidget)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+        pxm->NewProxy("representations", "FrustumWidget"));
+    this->Implementation->FrustumWidget.TakeReference(repr);
+    repr->SetConnectionID(
+      this->Implementation->ActiveView->getServer()->GetConnectionID());
+    repr->UpdateVTKObjects();
+    pqSMAdaptor::setEnumerationProperty(
+      repr->GetProperty("Representation"), "Wireframe");
+    pqSMAdaptor::setMultipleElementProperty(
+      repr->GetProperty("Color"), 0, 0.5);
+    pqSMAdaptor::setMultipleElementProperty(
+      repr->GetProperty("Color"), 1, 0.0);
+    pqSMAdaptor::setMultipleElementProperty(
+      repr->GetProperty("Color"), 2, 0.5);
+    pqSMAdaptor::setElementProperty(
+      repr->GetProperty("LineWidth"), 3);
+    repr->UpdateVTKObjects();
+    }
+
+  this->Implementation->ActiveView->getRenderViewProxy()->AddRepresentation(
+    this->Implementation->FrustumWidget);
+  QList<QVariant> values32 = pqSMAdaptor::getMultipleElementProperty(
+    selSource->GetProperty("Frustum"));
+  QList<QVariant> values24;
+  for (int cc=0; cc < 8; cc++)
+    {
+    for (int kk=0; kk < 3; kk++)
+      {
+      values24.push_back(values32[cc*4+kk]);
+      }
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Implementation->FrustumWidget->GetProperty("Corners"),
+    values24);
+  this->Implementation->FrustumWidget->UpdateVTKObjects();
+  this->updateRepresentationViews();
 }

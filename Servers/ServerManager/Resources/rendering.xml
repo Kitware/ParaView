@@ -6625,7 +6625,71 @@
       <!-- End of SpreadSheetRepresentation -->
     </SpreadSheetRepresentationProxy>
 
+    <AxesRepresentationProxy name="FrustumWidget" class="vtkOutlineSource" >
+      <IntVectorProperty name="BoxType"
+        command="SetBoxType"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Corners"
+         command="SetCorners"
+         number_of_elements="24"
+         argument_is_array="1"
+         default_values="0 0 0 1 0 0 0 1 0 1 1 0 0 0 1 1 0 1 0 1 1 1 1 1" >
+         <Documentation>
+          Specify the corners of the outline when in Oriented mode, the values
+          are supplied as 8*3 double values.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop" proxygroup="props" proxyname="Actor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Color" />
+          <Property name="LineWidth" />
+          <Property name="PointSize" />
+          <Property name="Representation" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of FrustumWidget -->
+    </AxesRepresentationProxy>
+
     <AxesRepresentationProxy name="AxesRepresentation" class="vtkAxes" >
+      
+      <IntVectorProperty name="Symmetric"
+        command="SetSymmetric"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ComputeNormals"
+        command="SetComputeNormals"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper">
         </Proxy>
