@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 
 

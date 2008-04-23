@@ -88,7 +88,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetItemObject.h"
 #include "pqTreeWidgetSelectionHelper.h"
@@ -954,7 +953,9 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
           h->setData(0, Qt::DisplayRole, propertyLabel);
           tw->setHeaderItem(h);
           tw->setObjectName(propertyName);
-          new pqTreeWidgetCheckHelper(tw, 0, tw);
+          pqTreeWidgetSelectionHelper* helper = 
+            new pqTreeWidgetSelectionHelper(tw);
+          helper->setObjectName(QString("%1Helper").arg(propertyName));
           panelLayout->addWidget(tw, rowCount, 0, 1, 2);
           rowCount++;
           }
@@ -1012,7 +1013,9 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         h->setData(0, Qt::DisplayRole, header);
         tw->setHeaderItem(h);
         tw->setObjectName(name);
-        new pqTreeWidgetCheckHelper(tw, 0, tw);
+        pqTreeWidgetSelectionHelper* helper = 
+          new pqTreeWidgetSelectionHelper(tw);
+        helper->setObjectName(QString("%1Helper").arg(propertyName));
         panelLayout->addWidget(tw, rowCount, 0, 1, 2);
         rowCount++;
         }

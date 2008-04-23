@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqTimeKeeper.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidgetSelectionHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqExodusIIPanel.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -105,6 +105,12 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   this->UI->PendingChangedItemsTimer.setInterval(10/*milliseconds*/);
   QObject::connect(&this->UI->PendingChangedItemsTimer, SIGNAL(timeout()),
     this, SLOT(updatePendingChangedItems()));
+
+  QList<pqTreeWidget*> treeWidgets = this->findChildren<pqTreeWidget*>();
+  foreach (pqTreeWidget* tree, treeWidgets)
+    {
+    new pqTreeWidgetSelectionHelper(tree);
+    }
 }
 
 pqExodusIIPanel::~pqExodusIIPanel()
@@ -201,7 +207,6 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->DisplItem = 0;
 
   // we hook up the node/element variables
-  new pqTreeWidgetCheckHelper(this->UI->Variables, 0, this);
 
   // do block id, global element id
   this->addSelectionToTreeWidget("Object Ids", "ObjectId", this->UI->Variables,
@@ -285,8 +290,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
                                   this->UI->Variables, PM_GLOBAL);
 
   // we hook up the sideset/nodeset 
-  QTreeWidget* SetsTree = this->UI->Sets;
-  new pqTreeWidgetCheckHelper(SetsTree, 0, this);
+  //QTreeWidget* SetsTree = this->UI->Sets;
 
 
   // blocks

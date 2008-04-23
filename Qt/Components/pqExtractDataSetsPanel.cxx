@@ -59,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "vtkSMDoubleVectorProperty.h"
 

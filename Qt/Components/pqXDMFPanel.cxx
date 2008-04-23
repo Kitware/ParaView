@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqProxy.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetCheckHelper.h"
+#include "pqTreeWidgetSelectionHelper.h"
 #include "pqTreeWidgetItemObject.h"
 #include "ui_pqXDMFPanel.h"
 
@@ -79,7 +79,7 @@ pqXDMFPanel::pqXDMFPanel(pqProxy* object_proxy, QWidget* p) :
 {
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
-  new pqTreeWidgetCheckHelper(this->UI->Variables, 0, this);
+  new pqTreeWidgetSelectionHelper(this->UI->Variables);
   this->linkServerManagerProperties();
 }
 
