@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 #include <QTreeWidget>
 #include <QtDebug>
-
+#include <QMenu>
 // ParaView Includes.
 
 //-----------------------------------------------------------------------------
@@ -45,11 +45,14 @@ pqTreeWidgetSelectionHelper::pqTreeWidgetSelectionHelper(QTreeWidget* tree):
 {
   this->TreeWidget = tree;
   tree->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  tree->setContextMenuPolicy(Qt::CustomContextMenu);
 
   QObject::connect(tree, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
     this, SLOT(onItemClicked(QTreeWidgetItem*, int)));
   QObject::connect(tree, SIGNAL(itemPressed(QTreeWidgetItem*, int)),
     this, SLOT(onItemPressed(QTreeWidgetItem*, int)));
+  QObject::connect(tree, SIGNAL(customContextMenuRequested(const QPoint&)),
+    this, SLOT(showContextMenu(const QPoint&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -57,9 +60,8 @@ pqTreeWidgetSelectionHelper::~pqTreeWidgetSelectionHelper()
 {
 }
 
-
 //-----------------------------------------------------------------------------
-void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int column)
+void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int )
 {
 //  qDebug() << "onItemPressed" 
 //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
@@ -67,35 +69,65 @@ void pqTreeWidgetSelectionHelper::onItemPressed(QTreeWidgetItem* item, int colum
   this->PressState = -1;
   if ((item->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
     {
-    this->PressState = item->checkState(column);
+    this->PressState = item->checkState(0);
     this->Selection = this->TreeWidget->selectionModel()->selection();
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeWidgetSelectionHelper::onItemClicked(QTreeWidgetItem* item, int column)
+void pqTreeWidgetSelectionHelper::onItemClicked(QTreeWidgetItem* item, int)
 {
-//  qDebug() << "onItemClicked" 
-//  << this->TreeWidget->selectionModel()->selectedIndexes().size();
+  //  qDebug() << "onItemClicked" 
+  //  << this->TreeWidget->selectionModel()->selectedIndexes().size();
   if (this->PressState != -1)
     {
-    Qt::CheckState state = item->checkState(column);
+    Qt::CheckState state = item->checkState(0);
     if (state != this->PressState)
       {
       // Change all checkable items in the this->Selection to match the new
       // check state.
-      this->TreeWidget->selectionModel()->select(this->Selection, 
-        QItemSelectionModel::ClearAndSelect);
+      this->setSelectedItemsCheckState(state);
+      }
+    }
+}
 
-      QList<QTreeWidgetItem*> items = this->TreeWidget->selectedItems();
-      foreach (QTreeWidgetItem* curitem, items)
-        {
-        if (curitem != item && 
-          (curitem->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
-          {
-          curitem->setCheckState(column, state);
-          }
-        }
+//-----------------------------------------------------------------------------
+void pqTreeWidgetSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)
+{
+  // Change all checkable items in the this->Selection to match the new
+  // check state.
+  this->TreeWidget->selectionModel()->select(this->Selection, 
+    QItemSelectionModel::ClearAndSelect);
+
+  QList<QTreeWidgetItem*> items = this->TreeWidget->selectedItems();
+  foreach (QTreeWidgetItem* curitem, items)
+    {
+    if ((curitem->flags() & Qt::ItemIsUserCheckable) == Qt::ItemIsUserCheckable)
+      {
+      curitem->setCheckState(/*column*/0, state);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeWidgetSelectionHelper::showContextMenu(const QPoint &pos)
+{
+  if (this->TreeWidget->selectionModel()->selectedIndexes().size() > 0)
+    {
+    QMenu menu;
+    menu.setObjectName("TreeWidgetCheckMenu");
+    QAction* check = new QAction("Check", &menu);
+    QAction* uncheck = new QAction("Uncheck", &menu);
+    menu.addAction(check);
+    menu.addAction(uncheck);
+    QAction* result = menu.exec(this->TreeWidget->mapToGlobal(pos));
+    if (result == check)
+      {
+      this->setSelectedItemsCheckState(Qt::Checked);
+      }
+    else if (result == uncheck)
+      {
+      this->setSelectedItemsCheckState(Qt::Unchecked);
       }
     }
 }

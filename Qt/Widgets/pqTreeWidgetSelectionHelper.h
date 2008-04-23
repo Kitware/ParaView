@@ -44,6 +44,8 @@ class QTreeWidgetItem;
 /// (un)checking all of them etc. This cannot work in parallel with
 /// pqTreeWidgetCheckHelper, hence only once of the two must be used on the same
 /// tree widget.
+/// CAVEATS: This helper currently assumes that the 0-th column is checkable (if
+/// at all). This can be fixed if needed.
 class QTWIDGETS_EXPORT pqTreeWidgetSelectionHelper : public QObject
 {
   Q_OBJECT
@@ -55,10 +57,13 @@ public:
 protected slots:
   void onItemClicked (QTreeWidgetItem *item, int column);
   void onItemPressed (QTreeWidgetItem *item, int column); 
+  void showContextMenu(const QPoint&);
 
 private:
   pqTreeWidgetSelectionHelper(const pqTreeWidgetSelectionHelper&); // Not implemented.
   void operator=(const pqTreeWidgetSelectionHelper&); // Not implemented.
+
+  void setSelectedItemsCheckState(Qt::CheckState state);
 
   QTreeWidget* TreeWidget;
   QItemSelection Selection;

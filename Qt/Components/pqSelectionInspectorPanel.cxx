@@ -76,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorTreeWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetItemObject.h"
-
+#include "pqTreeWidgetSelectionHelper.h"
 
 //////////////////////////////////////////////////////////////////////////////
 class pqSelectionInspectorTreeItem : public pqTreeWidgetItemObject
@@ -1025,7 +1025,8 @@ void pqSelectionInspectorPanel::setupLocationsSelectionGUI()
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::setupBlockSelectionGUI()
 {
-
+  // Enable group selection on the widget.
+  new pqTreeWidgetSelectionHelper(this->Implementation->Blocks);
 }
 
 //-----------------------------------------------------------------------------
