@@ -102,12 +102,11 @@ public slots:
   void select(pqOutputPort*);
 
 private slots:
-  /// Called when a source is removed from the pipeline browser
-  void sourceRemoved(pqPipelineSource*);
-
   /// Called when the view fires signal indicating that is has made a selection.
   void onSelected(pqOutputPort*);
 
+  /// Called when server manager item is being deleted.
+  void onItemRemoved(pqServerManagerModelItem* item);
 private:
   pqSelectionManagerImplementation* Implementation;
 

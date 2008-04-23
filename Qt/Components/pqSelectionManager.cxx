@@ -111,7 +111,7 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   // that was deleted might have been selected.
   QObject::connect(
     model, SIGNAL(itemRemoved(pqServerManagerModelItem*)),
-    this,  SLOT(clearSelection()));
+    this,  SLOT(onItemRemoved(pqServerManagerModelItem*)));
 
   // When server disconnects we must clean up the selection proxies
   // explicitly. This is needed since the internal selection proxies
@@ -150,6 +150,17 @@ void pqSelectionManager::setActiveView(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionManager::onItemRemoved(pqServerManagerModelItem* item)
+{
+  if (this->Implementation->SelectedPort && 
+    item == this->Implementation->SelectedPort->getSource())
+    {
+    // clear selection if the selected source is being deleted.
+    this->clearSelection();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionManager::clearSelection()
 {
   // Actual cleaning is done by internal method,
@@ -170,12 +181,6 @@ void pqSelectionManager::clearSelection()
 pqOutputPort* pqSelectionManager::getSelectedPort() const
 {
   return this->Implementation->SelectedPort;
-}
-
-//-----------------------------------------------------------------------------
-void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
-{
-  this->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
