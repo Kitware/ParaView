@@ -91,6 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetCheckHelper.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetItemObject.h"
+#include "pqTreeWidgetSelectionHelper.h"
 
 //-----------------------------------------------------------------------------
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
@@ -368,6 +369,9 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       pqSignalAdaptorCompositeTreeWidget* treeAdaptor = 
         new pqSignalAdaptorCompositeTreeWidget(tree,
           vtkSMIntVectorProperty::SafeDownCast(SMProperty));
+      pqTreeWidgetSelectionHelper* helper = 
+        new pqTreeWidgetSelectionHelper(tree);
+      helper->setObjectName("CompositeTreeSelectionHelper");
       treeAdaptor->setObjectName("CompositeTreeAdaptor");
       property_manager->registerLink(
         treeAdaptor, "values", SIGNAL(valuesChanged()),
@@ -572,6 +576,11 @@ void pqNamedWidgets::unlinkObject(QObject* object, pqSMProxy proxy,
         treeAdaptor, "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
       delete treeAdaptor;
+
+      pqTreeWidgetSelectionHelper* helper = 
+        tree->findChild<pqTreeWidgetSelectionHelper*>(
+          "CompositeTreeSelectionHelper");
+      delete helper;
       }
     }
   else if(pt == pqSMAdaptor::FIELD_SELECTION)
