@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkMath.h"
@@ -108,6 +110,7 @@ public:
   pqLineChartDisplayItemList *List;
   int ChangeCount;
   bool InMultiChange;
+  unsigned int LastCompositeIndex;
 };
 
 
@@ -212,8 +215,8 @@ pqLineChartRepresentation::pqInternals::pqInternals()
   this->List = &this->PointList;
   this->ChangeCount = 0;
   this->InMultiChange = false;
+  this->LastCompositeIndex = 0;
 }
-
 
 //-----------------------------------------------------------------------------
 pqLineChartRepresentation::pqLineChartRepresentation(const QString& group,
@@ -349,13 +352,41 @@ vtkRectilinearGrid* pqLineChartRepresentation::getClientSideData() const
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(this->getProxy());
   if (proxy)
     {
-    return vtkRectilinearGrid::SafeDownCast(proxy->GetOutput());
+    vtkDataObject* output = proxy->GetOutput();
+    if (output->IsA("vtkCompositeDataSet"))
+      {
+      vtkCompositeDataSet* cd = static_cast<vtkCompositeDataSet*>(output);
+      unsigned int composite_index = pqSMAdaptor::getElementProperty(
+        proxy->GetProperty("CompositeDataSetIndex")).toUInt();
+      
+      vtkCompositeDataIterator* iter = cd->NewIterator();
+      for (iter->InitTraversal();
+        !iter->IsDoneWithTraversal() && iter->GetCurrentFlatIndex() < composite_index;
+        iter->GoToNextItem())
+        {
+        // do nothing.
+        }
+
+      if (!iter->IsDoneWithTraversal() && 
+        iter->GetCurrentFlatIndex() == composite_index)
+        {
+        output = iter->GetCurrentDataObject();
+        }
+      iter->Delete();
+      }
+
+    return vtkRectilinearGrid::SafeDownCast(output);
     }
   return 0;
 }
 
 bool pqLineChartRepresentation::isDataModified() const
 {
+  if (this->getCompositeDataSetIndex() != this->Internals->LastCompositeIndex)
+    {
+    return true;
+    }
+
   vtkRectilinearGrid *data = this->getClientSideData();
   return data && data->GetMTime() > this->Internals->LastUpdateTime;
 }
@@ -445,6 +476,13 @@ int pqLineChartRepresentation::getAttributeType() const
 {
   return pqSMAdaptor::getElementProperty(
       this->getProxy()->GetProperty("AttributeType")).toInt();
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqLineChartRepresentation::getCompositeDataSetIndex() const
+{
+  return pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("CompositeDataSetIndex")).toUInt();
 }
 
 //-----------------------------------------------------------------------------
@@ -948,6 +986,7 @@ void pqLineChartRepresentation::finishSeriesUpdate()
   this->Internals->LastUpdateTime.Modified();
   this->Internals->PointList.XChanged = false;
   this->Internals->CellList.XChanged = false;
+  this->Internals->LastCompositeIndex = this->getCompositeDataSetIndex();
 }
 
 //-----------------------------------------------------------------------------

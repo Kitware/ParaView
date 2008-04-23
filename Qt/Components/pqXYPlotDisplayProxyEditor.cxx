@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComboBoxDomain.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPropertyLinks.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetCheckHelper.h"
@@ -207,6 +208,7 @@ public:
     this->AttributeModeAdaptor = 0;
     this->Model = 0;
     this->InChange = false;
+    this->CompositeIndexAdaptor = 0;
     }
 
   ~pqInternal()
@@ -215,6 +217,7 @@ public:
     delete this->XAxisComponentAdaptor;
     delete this->XAxisArrayDomain;
     delete this->AttributeModeAdaptor;
+    delete this->CompositeIndexAdaptor;
     }
 
   pqPropertyLinks Links;
@@ -222,6 +225,7 @@ public:
   pqSignalAdaptorComboBox* XAxisComponentAdaptor;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
   pqComboBoxDomain* XAxisArrayDomain;
+  pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
 
   QPointer<pqLineChartRepresentation> Display;
   pqLineSeriesEditorModel *Model;
@@ -792,6 +796,9 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
   this->Internal->Model->reloadSeries();
   delete this->Internal->XAxisArrayDomain;
   this->Internal->XAxisArrayDomain = 0;
+  delete this->Internal->CompositeIndexAdaptor;
+  this->Internal->CompositeIndexAdaptor = 0;
+
   if(this->Internal->Display)
     {
     this->disconnect(this->Internal->Display, 0, this, 0);
@@ -838,6 +845,19 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
   this->connect(
       this->Internal->Display, SIGNAL(styleChanged(int, Qt::PenStyle)),
       this, SLOT(updateItemStyle(int, Qt::PenStyle)));
+
+  // Set up the CompositeIndexAdaptor 
+  this->Internal->CompositeIndexAdaptor = new pqSignalAdaptorCompositeTreeWidget(
+    this->Internal->CompositeIndex, 
+    vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty("CompositeDataSetIndex")),
+    /*autoUpdateVisibility=*/true);
+
+  this->Internal->Links.addPropertyLink(this->Internal->CompositeIndexAdaptor,
+    "values", SIGNAL(valuesChanged()),
+    proxy, proxy->GetProperty("CompositeDataSetIndex"));
+  QObject::connect(this->Internal->CompositeIndexAdaptor, SIGNAL(valuesChanged()),
+    this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
   this->reloadSeries();
 }

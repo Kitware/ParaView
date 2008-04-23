@@ -6104,6 +6104,22 @@
         </DataTypeDomain>
       </InputProperty>
 
+      <IntVectorProperty name="CompositeDataSetIndex"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          In case of Composite datasets, set the flat index of the dataset to 
+          pass. The flat index must point to a non-empty, non-composite dataset 
+          for anything to be passed through. If the input is not a composite 
+          dataset, then this index is ignored.
+        </Documentation>
+        <CompositeTreeDomain name="tree" mode="leaves">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+       </CompositeTreeDomain>
+      </IntVectorProperty>
+
       <IntVectorProperty name="AttributeType"
         number_of_elements="1"
         default_values="0">

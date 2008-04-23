@@ -17,6 +17,65 @@
     <number>6</number>
    </property>
    <item row="3" column="0" colspan="2" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>X Axis Data</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>6</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="XAxisComponent" >
+        <property name="whatsThis" >
+         <string>Choose the component of the x-axis data array.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Component</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="XAxisArray" >
+        <property name="whatsThis" >
+         <string>Choose the name of the x-axis data array.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QRadioButton" name="UseDataArray" >
+        <property name="whatsThis" >
+         <string>Select this option to use a data array to define the x-axis points.</string>
+        </property>
+        <property name="text" >
+         <string>Use Data Array</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QRadioButton" name="UseArrayIndex" >
+        <property name="whatsThis" >
+         <string>Select this option to use the indexes of the y-axis array for the x-axis points.</string>
+        </property>
+        <property name="text" >
+         <string>Use Array Index From Y Axis Data</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2" >
     <widget class="QGroupBox" name="SeriesGroup" >
      <property name="sizePolicy" >
       <sizepolicy>
@@ -189,26 +248,6 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2" >
-    <widget class="QCheckBox" name="ViewData" >
-     <property name="toolTip" >
-      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
-     </property>
-     <property name="whatsThis" >
-      <string>Use this option to show/hide all the line series in the chart.</string>
-     </property>
-     <property name="text" >
-      <string>Show Line Series in Chart</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>Attribute Mode</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1" >
     <widget class="QComboBox" name="AttributeMode" >
      <item>
@@ -229,63 +268,33 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string>X Axis Data</string>
+   <item row="0" column="0" colspan="2" >
+    <widget class="QCheckBox" name="ViewData" >
+     <property name="toolTip" >
+      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
      </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>6</number>
+     <property name="whatsThis" >
+      <string>Use this option to show/hide all the line series in the chart.</string>
+     </property>
+     <property name="text" >
+      <string>Show Line Series in Chart</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Attribute Mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="pqTreeWidget" name="CompositeIndex" >
+     <column>
+      <property name="text" >
+       <string>Select Block</string>
       </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="XAxisComponent" >
-        <property name="whatsThis" >
-         <string>Choose the component of the x-axis data array.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Component</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="XAxisArray" >
-        <property name="whatsThis" >
-         <string>Choose the name of the x-axis data array.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QRadioButton" name="UseDataArray" >
-        <property name="whatsThis" >
-         <string>Select this option to use a data array to define the x-axis points.</string>
-        </property>
-        <property name="text" >
-         <string>Use Data Array</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QRadioButton" name="UseArrayIndex" >
-        <property name="whatsThis" >
-         <string>Select this option to use the indexes of the y-axis array for the x-axis points.</string>
-        </property>
-        <property name="text" >
-         <string>Use Array Index From Y Axis Data</string>
-        </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     </column>
     </widget>
    </item>
   </layout>
@@ -295,6 +304,11 @@
    <class>pqTreeView</class>
    <extends>QTreeView</extends>
    <header>pqTreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
   </customwidget>
   <customwidget>
    <class>pqColorChooserButton</class>

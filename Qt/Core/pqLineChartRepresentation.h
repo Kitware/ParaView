@@ -79,6 +79,9 @@ public:
   /// Returns the array used for masking.
   vtkDataArray* getMaskArray();
 
+  /// Returns the value of the "CompositeDataSetIndex" property.
+  unsigned int getCompositeDataSetIndex() const;
+
   bool isUpdateNeeded() const;
   bool isArrayUpdateNeeded(int attributeType) const;
 
