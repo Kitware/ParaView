@@ -69,10 +69,14 @@ public:
   /// all undo related signals defined by this class.
   virtual bool supportsUndo() const { return false; }
 
+  /// Returns if this view module can support lookmarks.
+  /// Returns false by default. Subclassess must override
+  /// if that's not the case.
+  virtual bool supportsLookmarks() const { return false; }
+
   /// Returns the type of this view module.
   QString getViewType() const
     { return this->ViewType; }
-
 
   /// Computes the magnification and view size given the current view size for
   /// the full size for the view.

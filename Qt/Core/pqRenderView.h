@@ -117,6 +117,9 @@ public:
   /// if that's not the case.
   virtual bool supportsUndo() const { return true; }
  
+  /// This view supports lookmarks.
+  virtual bool supportsLookmarks() const { return true; }
+ 
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.
   virtual bool canUndo() const;

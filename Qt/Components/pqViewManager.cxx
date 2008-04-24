@@ -461,6 +461,18 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     qobject_cast<pqRenderView*>(view);
   if(render_module)
     {
+    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), 
+      "Adjust Camera", 
+      this);
+    cameraAction->setObjectName("CameraButton");
+    frame->addTitlebarAction(cameraAction);
+    cameraAction->setEnabled(true);
+    QObject::connect(cameraAction, SIGNAL(triggered()), 
+      this, SLOT(onCameraTriggered()));
+    }
+
+  if(view->supportsLookmarks())
+    {
     QAction* lookmarkAction = new QAction(QIcon(":/pqWidgets/Icons/pqLookmark16.png"), 
       "Lookmark", 
       this);
@@ -471,15 +483,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     this->Internal->LookmarkSignalMapper->setMapping(lookmarkAction, frame);
     QObject::connect(lookmarkAction, SIGNAL(triggered(bool)), 
       this->Internal->LookmarkSignalMapper, SLOT(map()));
-
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), 
-      "Adjust Camera", 
-      this);
-    cameraAction->setObjectName("CameraButton");
-    frame->addTitlebarAction(cameraAction);
-    cameraAction->setEnabled(true);
-    QObject::connect(cameraAction, SIGNAL(triggered()), 
-      this, SLOT(onCameraTriggered()));
     }
 
   QAction* optionsAction = new QAction(
@@ -548,17 +551,21 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
     qobject_cast<pqRenderView*>(view);
   if(render_module)
     {
-    QAction *lookmarkAction= frame->getAction("LookmarkButton");
-    if(lookmarkAction)
-      {
-      frame->removeTitlebarAction(lookmarkAction);
-      delete lookmarkAction;
-      }
     QAction *cameraAction= frame->getAction("CameraButton");
     if(cameraAction)
       {
       frame->removeTitlebarAction(cameraAction);
       delete cameraAction;
+      }
+    }
+
+  if(view->supportsLookmarks())
+    {
+    QAction *lookmarkAction= frame->getAction("LookmarkButton");
+    if(lookmarkAction)
+      {
+      frame->removeTitlebarAction(lookmarkAction);
+      delete lookmarkAction;
       }
     }
 
