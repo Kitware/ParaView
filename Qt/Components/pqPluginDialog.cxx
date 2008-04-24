@@ -140,7 +140,10 @@ void pqPluginDialog::loadLocalPlugin()
 QString pqPluginDialog::loadPlugin(pqServer* server)
 {
   pqFileDialog fd(server, this, "Load Plugin", QString(), 
-                  "Plugins (*.so;*.dylib;*.dll;*.sl)\nAll Files (*)");
+                  "Plugins (*.so;*.dylib;*.dll;*.sl)\n"
+                  "Client Resource Files (*.bqrc)\n"
+                  "Server Manager XML (*.xml)\n"
+                  "All Files (*)");
   QString plugin;
   if(fd.exec() == QDialog::Accepted)
     {
@@ -156,11 +159,11 @@ QString pqPluginDialog::loadPlugin(pqServer* server, const QString& plugin)
   QString ret = plugin;
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   /* a local plugin may contain both server side code and client code */
-  pqPluginManager::LoadStatus result1 = pm->loadPlugin(server, plugin, &error1);
+  pqPluginManager::LoadStatus result1 = pm->loadExtension(server, plugin, &error1);
   pqPluginManager::LoadStatus result2 = pqPluginManager::LOADED;
   if(!server)
     {
-    result2 = pm->loadPlugin(this->Server, plugin, &error2);
+    result2 = pm->loadExtension(this->Server, plugin, &error2);
     }
   
   if(result1 == pqPluginManager::NOTLOADED && 
@@ -210,13 +213,13 @@ void pqPluginDialog::refreshLocal()
   QStringList allplugins;
 
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  foreach(QString p, pm->loadedPlugins(NULL))
+  foreach(QString p, pm->loadedExtensions(NULL))
     {
     allplugins.append(QString("client - %1").arg(p));
     }
   if(!this->Server->isRemote())
     {
-    foreach(QString p, pm->loadedPlugins(this->Server))
+    foreach(QString p, pm->loadedExtensions(this->Server))
       {
       allplugins.append(QString("server - %1").arg(p));
       }
@@ -231,7 +234,7 @@ void pqPluginDialog::refreshRemote()
   if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-    QStringList plugins = pm->loadedPlugins(this->Server);
+    QStringList plugins = pm->loadedExtensions(this->Server);
     this->remotePlugins->clear();
     this->remotePlugins->addItems(plugins);
     }

@@ -446,6 +446,7 @@ private slots:
   void onPostAccept();
 
   void addPluginInterface(QObject* iface);
+  void extensionLoaded();
   void addPluginActions(pqActionGroupInterface* iface);
   void addPluginDockWindow(pqDockWindowInterface* iface);
 

@@ -1189,7 +1189,7 @@
   </action>
   <action name="actionManage_Plugins" >
    <property name="text" >
-    <string>Manage Plugins...</string>
+    <string>Manage Plugins/Extensions...</string>
    </property>
   </action>
   <action name="actionToolsCreateLookmark" >

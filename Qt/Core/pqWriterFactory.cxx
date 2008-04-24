@@ -165,7 +165,7 @@ pqWriterFactory::pqWriterFactory(QObject* _parent/*=NULL*/) : QObject(_parent)
   // the client vs. server load order is not defined
   // and we require both before adding a new reader to the GUI
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
-                   SIGNAL(guiPluginLoaded()),
+                   SIGNAL(guiExtensionLoaded()),
                    this, SLOT(loadFileTypes()));
   QObject::connect(pqApplicationCore::instance()->getPluginManager(),
                    SIGNAL(serverManagerExtensionLoaded()),

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QCoreApplication>
 #include <QDir>
+#include <QResource>
 
 #include "vtkSMXMLParser.h"
 #include "vtkProcessModule.h"
@@ -75,7 +76,7 @@ QObjectList pqPluginManager::interfaces()
   return this->Interfaces + this->ExtraInterfaces;
 }
 
-pqPluginManager::LoadStatus pqPluginManager::loadServerPlugin(pqServer* server, const QString& lib,
+pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* server, const QString& lib,
                                        QString& error)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
@@ -115,44 +116,82 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerPlugin(pqServer* server, 
   
   if(success == LOADED)
     {
-    this->Plugins.insert(server, lib);
+    this->Extensions.insert(server, lib);
     emit this->serverManagerExtensionLoaded();
     }
 
   return success;
 }
 
-pqPluginManager::LoadStatus pqPluginManager::loadClientPlugin(const QString& lib, QString& error)
+pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& lib, QString& error)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
-  QPluginLoader qplugin(lib);
-  if(qplugin.load())
+
+  QFileInfo fi(lib);
+  if(fi.suffix() == "bqrc")
     {
-    QObject* pqpluginObject = qplugin.instance();
-    pqPlugin* pqplugin = qobject_cast<pqPlugin*>(pqpluginObject);
-    if(pqplugin)
+    if(QResource::registerResource(lib))
       {
-      pqpluginObject->setParent(this);  // take ownership to clean up later
       success = LOADED;
-      this->Plugins.insert(NULL, lib);
-      emit this->guiPluginLoaded();
-      QObjectList ifaces = pqplugin->interfaces();
-      foreach(QObject* iface, ifaces)
-        {
-        this->Interfaces.append(iface);
-        emit this->guiInterfaceLoaded(iface);
-        }
+      this->Extensions.insert(NULL, lib);
+      emit this->guiExtensionLoaded();
       }
     else
       {
-      error = "This is not a ParaView Client Plugin.";
-      qplugin.unload();
+      error = "Unable to register resource";
+      }
+    }
+  else if(fi.suffix() == "xml")
+    {
+    QFile f(lib);
+    if(f.open(QIODevice::ReadOnly))
+      {
+      QByteArray dat = f.readAll();
+      vtkSMXMLParser* parser = vtkSMXMLParser::New();
+      parser->Parse(dat.data());
+      parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
+      parser->Delete();
+      this->Extensions.insert(NULL, lib);
+      success = LOADED;
+      emit this->serverManagerExtensionLoaded();
+      }
+    else
+      {
+      error = "Unable to open " + lib;
       }
     }
   else
     {
-    error = qplugin.errorString();
+    QPluginLoader qplugin(lib);
+    if(qplugin.load())
+      {
+      QObject* pqpluginObject = qplugin.instance();
+      pqPlugin* pqplugin = qobject_cast<pqPlugin*>(pqpluginObject);
+      if(pqplugin)
+        {
+        pqpluginObject->setParent(this);  // take ownership to clean up later
+        success = LOADED;
+        this->Extensions.insert(NULL, lib);
+        emit this->guiExtensionLoaded();
+        QObjectList ifaces = pqplugin->interfaces();
+        foreach(QObject* iface, ifaces)
+          {
+          this->Interfaces.append(iface);
+          emit this->guiInterfaceLoaded(iface);
+          }
+        }
+      else
+        {
+        error = "This is not a ParaView Client Plugin.";
+        qplugin.unload();
+        }
+      }
+    else
+      {
+      error = qplugin.errorString();
+      }
     }
+
   return success;
 }
 
@@ -168,26 +207,36 @@ static QStringList getLibraries(const QString& path, pqServer* server)
     QString file = model.getFilePaths(idx)[0];
     QFileInfo fileinfo(file);
     // if file names start with known lib suffixes
-    if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib)$")) == 0)
+    if(server)
       {
-      libs.append(file);
+      if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib)$")) == 0)
+        {
+        libs.append(file);
+        }
+      }
+    else
+      {
+      if(fileinfo.completeSuffix().indexOf(QRegExp("(so|dll|sl|dylib|xml|bqrc)$")) == 0)
+        {
+        libs.append(file);
+        }
       }
     }
   return libs;
 }
 
-void pqPluginManager::loadPlugins(pqServer* server)
+void pqPluginManager::loadExtensions(pqServer* server)
 {
   QStringList plugin_paths = this->pluginPaths(server);
 
   foreach(QString path, plugin_paths)
     {
-    this->loadPlugins(path, server);
+    this->loadExtensions(path, server);
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqPluginManager::loadPlugins(const QString& path, pqServer* server)
+void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
 {
   QStringList libs = ::getLibraries(path, server);
   foreach(QString lib, libs)
@@ -195,23 +244,23 @@ void pqPluginManager::loadPlugins(const QString& path, pqServer* server)
     QString dummy;
     if(server)
       {
-      pqPluginManager::loadServerPlugin(server, lib, dummy);
+      pqPluginManager::loadServerExtension(server, lib, dummy);
       }
     else
       {
-      pqPluginManager::loadClientPlugin(lib, dummy);
+      pqPluginManager::loadClientExtension(lib, dummy);
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-pqPluginManager::LoadStatus pqPluginManager::loadPlugin(
+pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   pqServer* server, const QString& lib, QString* errorReturn)
 {
   LoadStatus success = NOTLOADED;
   QString error;
   
-  if(this->Plugins.values(server).contains(lib))
+  if(this->Extensions.values(server).contains(lib))
     {
     return ALREADYLOADED;
     }
@@ -219,20 +268,20 @@ pqPluginManager::LoadStatus pqPluginManager::loadPlugin(
   if(server)
     {
     // look for SM stuff in the plugin
-    success = pqPluginManager::loadServerPlugin(server, lib, error);
+    success = pqPluginManager::loadServerExtension(server, lib, error);
     }
 
   if(!server)
     {
     // check if this plugin has gui stuff in it
-    success = loadClientPlugin(lib, error);
+    success = loadClientExtension(lib, error);
     }
   
   if(success == NOTLOADED)
     {
     if(!errorReturn)
       {
-      QMessageBox::information(NULL, "Plugin Load Failed", error);
+      QMessageBox::information(NULL, "Extension Load Failed", error);
       }
     else
       {
@@ -243,9 +292,9 @@ pqPluginManager::LoadStatus pqPluginManager::loadPlugin(
   return success;
 }
 
-QStringList pqPluginManager::loadedPlugins(pqServer* server)
+QStringList pqPluginManager::loadedExtensions(pqServer* server)
 {
-  return this->Plugins.values(server);
+  return this->Extensions.values(server);
 }
 
 void pqPluginManager::addInterface(QObject* iface)
@@ -267,13 +316,13 @@ void pqPluginManager::removeInterface(QObject* iface)
 
 void pqPluginManager::onServerConnected(pqServer* server)
 {
-  this->loadPlugins(server);
+  this->loadExtensions(server);
 }
 
 void pqPluginManager::onServerDisconnected(pqServer* server)
 {
   // remove referenced plugins
-  this->Plugins.remove(server);
+  this->Extensions.remove(server);
 }
 
 QStringList pqPluginManager::pluginPaths(pqServer* server)

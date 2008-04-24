@@ -479,8 +479,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   
   this->connect(pqApplicationCore::instance()->getPluginManager(),
                 SIGNAL(guiInterfaceLoaded(QObject*)),
-                this,
-                SLOT(addPluginInterface(QObject*)));
+                this, SLOT(addPluginInterface(QObject*)));
+  this->connect(pqApplicationCore::instance()->getPluginManager(),
+                SIGNAL(guiExtensionLoaded()),
+                this, SLOT(extensionLoaded()));
 
 /*
   this->installEventFilter(this);
@@ -3286,6 +3288,14 @@ void pqMainWindowCore::onManagePlugins()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::extensionLoaded()
+{
+  // plugins may contain new entries for menus
+  this->Implementation->FiltersMenuManager->update();
+  this->Implementation->SourcesMenuManager->update();
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::addPluginInterface(QObject* iface)
 {
   pqActionGroupInterface* actionGroup =
@@ -3301,10 +3311,6 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
     {
     this->addPluginDockWindow(dockWindow);
     }
-
-  // plugins may contain new entries for menus
-  this->Implementation->FiltersMenuManager->update();
-  this->Implementation->SourcesMenuManager->update();
 
   pqViewOptionsInterface* viewOptions =
     qobject_cast<pqViewOptionsInterface*>(iface);

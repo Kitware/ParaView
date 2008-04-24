@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.23");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.24");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -183,7 +183,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     // load client plugins
     pqPluginManager* pluginManager =
       pqApplicationCore::instance()->getPluginManager();
-    pluginManager->loadPlugins(NULL);
+    pluginManager->loadExtensions(NULL);
 
     // // Create the default connection.
     // pqServerResource resource = pqServerResource("builtin:");

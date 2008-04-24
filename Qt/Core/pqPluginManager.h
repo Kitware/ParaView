@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServer;
 
-/// plugin loader takes care of loading plugins
-/// containing GUI extensions and server manager extensions
+/// extension manager takes care of loading plugins, xml files, and binary qrc files
+/// the plugins may also contain xml files and qrc files
 class PQCORE_EXPORT pqPluginManager : public QObject
 {
   Q_OBJECT
@@ -51,26 +51,26 @@ public:
 
   enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
 
-  /// attempt to load a plugin
+  /// attempt to load an extension
   /// return status on success, if NOTLOADED was returned, the error is reported
   /// If errorMsg is non-null, then errors are not reported, but the error
   /// message is put in the errorMsg string
-  LoadStatus loadPlugin(pqServer* server, const QString& lib, QString* errorMsg=0);
+  LoadStatus loadExtension(pqServer* server, const QString& lib, QString* errorMsg=0);
   
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
-  void loadPlugins(pqServer*);
+  void loadExtensions(pqServer*);
 
   /// Attempts to load all available plugins in the directory pointed by
   /// \c path. If server is 0, it loads client plugins, else it loads server
   /// plugins
-  void loadPlugins(const QString& path, pqServer* server);
+  void loadExtensions(const QString& path, pqServer* server);
   
   /// return all GUI interfaces that have been loaded
   QObjectList interfaces();
 
   /// return all the plugins loaded on a server, or locally if NULL is passed in
-  QStringList loadedPlugins(pqServer*);
+  QStringList loadedExtensions(pqServer*);
 
   /// add an extra interface.
   /// these interfaces are appended to the ones loaded from plugins
@@ -86,16 +86,18 @@ signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);
   
-  /// signal for when a gui plugin is loaded
-  void guiPluginLoaded();
+  /// signal for when a gui extension is loaded.  This can come from loading a
+  /// gui plugin or a qrc file
+  void guiExtensionLoaded();
 
-  /// notification that new extensions were added to the server manager
+  /// notification that new xml was added to the server manager, which could
+  /// come from a plugin or an xml file
   void serverManagerExtensionLoaded();
 
 protected:
 
-  LoadStatus loadClientPlugin(const QString& lib, QString& error);
-  LoadStatus loadServerPlugin(pqServer* server, const QString& lib, QString& error);
+  LoadStatus loadClientExtension(const QString& lib, QString& error);
+  LoadStatus loadServerExtension(pqServer* server, const QString& lib, QString& error);
 
 protected slots:
   void onServerConnected(pqServer*);
@@ -104,7 +106,7 @@ protected slots:
 private:
 
   QObjectList Interfaces;
-  QMultiMap<pqServer*, QString> Plugins;
+  QMultiMap<pqServer*, QString> Extensions;
   QObjectList ExtraInterfaces;
 };
 
