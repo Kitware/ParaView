@@ -249,7 +249,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   
   this->HelpButton = new QPushButton(this);
   this->HelpButton->setObjectName("Help");
-  this->HelpButton->setIcon(this->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+  this->HelpButton->setIcon(QIcon(":/pqWidgets/Icons/pqHelp16.png"));
   this->HelpButton->setEnabled(false);
   
   buttonlayout->addStretch();
