@@ -844,7 +844,7 @@ void WriteProxies(vtkStringPairList *stringList, vtkStringPairList *labelList,
     proxy = manager->GetPrototypeProxy((*iter).second.c_str(), (*iter).first.c_str());
     if (!proxy)
       {
-      return;
+      continue;
       }
 
     vtksys_ios::ostringstream filename;
