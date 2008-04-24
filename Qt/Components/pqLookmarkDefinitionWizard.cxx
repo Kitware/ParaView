@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqRenderView.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -75,8 +74,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtksys/ios/sstream"
 
 #include "assert.h"
@@ -231,30 +230,32 @@ void pqLookmarkDefinitionWizard::createLookmark()
     return;
     }
 
-  pqRenderView* renderModule = qobject_cast<pqRenderView*>(this->ViewModule);
-  if(!renderModule)
+  if(!this->ViewModule->supportsLookmarks())
     {
-    qCritical() << "Can only create lookmarks of render views at this time.";
+    qCritical() << "This view does not support lookmarks.";
     return;
     }
 
-  vtkSMRenderViewProxy* smRen = renderModule->getRenderViewProxy();
+  vtkSMProxy* viewProxy = this->ViewModule->getViewProxy();
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
   // Save a screenshot of the view to store with the lookmark
-  QWidget* w = renderModule->getWidget();
+  QWidget* w = this->ViewModule->getWidget();
   QSize old = w->size();
   w->resize(150,150);
-  vtkImageData* imageData = smRen->CaptureWindow(1);
-  w->resize(old);
   QImage image;
-  pqImageUtil::fromImageData(imageData, image);
-  imageData->Delete();
+  vtkImageData* imageData = this->ViewModule->captureImage(1);
+  if(imageData)
+    {
+    w->resize(old);
+    pqImageUtil::fromImageData(imageData, image);
+    imageData->Delete();
+    }
   
   vtkCollection *proxies = vtkCollection::New();
   // Save visible displays and their sources, also any display/source pair 
   // upstream from a visible one in the pipeline:
-  QList<pqRepresentation*> displays = renderModule->getRepresentations();
+  QList<pqRepresentation*> displays = this->ViewModule->getRepresentations();
   QList<pqRepresentation *>::Iterator iter;
   pqDataRepresentation *consDisp;
   for(iter = displays.begin(); iter != displays.end(); ++iter)
@@ -274,11 +275,11 @@ void pqLookmarkDefinitionWizard::createLookmark()
   // their referred proxies
   vtkPVXMLElement *stateElement = proxyManager->SaveState(proxies, true);
 
-  // Collect all referred (proxy property) proxies of the render module EXCEPT 
+  // Collect all referred (proxy property) proxies of the view EXCEPT 
   // its "Displays" These have been handled separately.
   proxies->RemoveAllItems();
   vtkSmartPointer<vtkSMPropertyIterator> pIter;
-  pIter.TakeReference(smRen->NewPropertyIterator());
+  pIter.TakeReference(viewProxy->NewPropertyIterator());
   for (pIter->Begin(); !pIter->IsAtEnd(); pIter->Next())
     {
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
@@ -294,7 +295,7 @@ void pqLookmarkDefinitionWizard::createLookmark()
       }
     }
   
-  // Save all referred proxies of the render module's non-display referred proxies
+  // Save all referred proxies of the view's non-display referred proxies
   vtkPVXMLElement* childElement = proxyManager->SaveState(proxies, true);
   unsigned int cc;
   for (cc=0; cc < childElement->GetNumberOfNestedElements(); cc++)
@@ -303,10 +304,10 @@ void pqLookmarkDefinitionWizard::createLookmark()
     }
   childElement->Delete();
 
-  // Now add the render module, but don't save its referred proxies, because 
+  // Now add the view, but don't save its referred proxies, because 
   // we've dealt with them separately
   proxies->RemoveAllItems();
-  proxies->AddItem(smRen);
+  proxies->AddItem(viewProxy);
   childElement = proxyManager->SaveState(proxies, false);
   for (cc=0; cc < childElement->GetNumberOfNestedElements(); cc++)
     {

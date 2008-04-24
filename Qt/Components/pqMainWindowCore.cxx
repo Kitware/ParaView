@@ -2018,14 +2018,9 @@ void pqMainWindowCore::onToolsCreateLookmark(QWidget* widget)
   pqMultiViewFrame* frame= qobject_cast<pqMultiViewFrame*>(widget);
   if(frame)
     {
-    pqRenderView* rm = qobject_cast<pqRenderView*>(
-      this->Implementation->MultiViewManager.getView(frame));
-    if (rm)
-      {
-      // Create a lookmark of the currently active view
-      this->onToolsCreateLookmark(
+    // Create a lookmark of the currently active view
+    this->onToolsCreateLookmark(
         this->Implementation->MultiViewManager.getView(frame));
-      }
     }
 
 }
@@ -2033,15 +2028,14 @@ void pqMainWindowCore::onToolsCreateLookmark(QWidget* widget)
 void pqMainWindowCore::onToolsCreateLookmark(pqView *view)
 {
   // right now we only support Lookmarks of render modules
-  pqRenderView* const renderView= qobject_cast<pqRenderView*>(view);
-  if(!renderView)
+  if(!view->supportsLookmarks())
     {
-    qCritical() << "Cannnot create Lookmark. No active render module.";
+    qCritical() << "This view type does not support lookmarks.";
     return;
     }
 
   pqLookmarkDefinitionWizard wizard(this->Implementation->LookmarkManagerModel, 
-                                    renderView, 
+                                    view, 
                                     this->Implementation->Parent);
   if(wizard.exec() == QDialog::Accepted)
     {

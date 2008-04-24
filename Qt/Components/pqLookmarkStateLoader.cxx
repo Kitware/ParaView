@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.21");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.22");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -527,7 +527,8 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       }
     }
   else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
-      strcmp(proxyElement->GetAttribute("type"), "RenderView")==0 )
+      (strcmp(proxyElement->GetAttribute("type"), "RenderView")==0 ||
+       strcmp(proxyElement->GetAttribute("type"), "ClientGraphView")==0 ) )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
     QString name;
@@ -546,7 +547,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       else if (element->GetName() == QString("Property") &&
         element->GetAttribute("name") == QString("Representations"))
         {
-        // remove unused displays from the render module's displays proxyproperty
+        // remove unused displays from the view's displays proxyproperty
         QStringList ids = this->Internal->IdsOfProxyElementsToIgnore;
         displaysToRemove.clear();
         for(int k=0;k<ids.size();k++)

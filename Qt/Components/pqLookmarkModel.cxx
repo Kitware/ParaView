@@ -220,7 +220,7 @@ void pqLookmarkModel::load(
 
   if(!view)
     {
-    qDebug() << "Cannot load lookmark without a render view";
+    qDebug() << "Cannot load lookmark without a valid view";
     return;
     }
 
@@ -253,17 +253,9 @@ void pqLookmarkModel::load(
   // added to the beginning of the loader's preferred view list to ensure 
   // it is used before any others
   vtkSMPQStateLoader* smpqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-  pqRenderView* renModule = NULL;
   if (smpqLoader)
     {
-    renModule = qobject_cast<pqRenderView*>(view);
-    if(!renModule)
-      {
-      renModule = qobject_cast<pqRenderView*>(
-        core->getObjectBuilder()->createView(
-          pqRenderView::renderViewType(), server));
-      }
-    smpqLoader->AddPreferredRenderView(renModule->getRenderViewProxy());
+    smpqLoader->AddPreferredView(view->getViewProxy());
     }
 
   // set some parameters specific to the lookmark state loader
@@ -291,8 +283,9 @@ void pqLookmarkModel::load(
 
   pqApplicationCore::instance()->loadState(stateElement,server,loader);
 
-  // reset the camera after loading the lookmark if we did not restore
-  // the lookmark's camera state
+  // If this is a render module with no previous visible representations
+  // and RestoreCamera is turned off, reset the camera.
+  pqRenderView* renModule = qobject_cast<pqRenderView*>(view);
   if(resetCamera && renModule)
     {
     renModule->resetCamera();
