@@ -362,10 +362,10 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
       findItems<pqRenderView*>(server);
     foreach (pqRenderView* renderView, renderViews)
       {
-      pqLoader->AddPreferredRenderView(renderView->getRenderViewProxy());
+      pqLoader->AddPreferredView(renderView->getViewProxy());
       }
     // Tell the state loader what type of render view subclass to create.
-    pqLoader->SetRenderViewXMLName(
+    pqLoader->SetViewXMLName(
       server->getRenderViewXMLName().toAscii().data());
     }
 
@@ -382,7 +382,7 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
   if (pqLoader)
     {
     // delete any unused rendermodules from state loader
-    pqLoader->ClearPreferredRenderViews();
+    pqLoader->ClearPreferredViews();
     }
 
   pqEventDispatcher::processEventsAndWait(1);

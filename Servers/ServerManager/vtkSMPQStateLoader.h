@@ -29,7 +29,7 @@
 
 #include "vtkSMStateLoader.h"
 
-class vtkSMRenderViewProxy;
+class vtkSMViewProxy;
 //BTX
 struct vtkSMPQStateLoaderInternals;
 //ETX
@@ -44,15 +44,15 @@ public:
   // Description:
   // For every request to create a render module, one from this list is used 
   // first, if possible
-  virtual void AddPreferredRenderView(vtkSMRenderViewProxy*);
-  void RemovePreferredRenderView(vtkSMRenderViewProxy*);
-  void ClearPreferredRenderViews();
+  virtual void AddPreferredView(vtkSMViewProxy*);
+  void RemovePreferredView(vtkSMViewProxy*);
+  void ClearPreferredViews();
 
   // Description:
   // Set the name for the proxy to create when creating render views.
   // This is required since the type of render view created usually depends on
   // the type of connection/client etc.
-  vtkSetStringMacro(RenderViewXMLName);
+  vtkSetStringMacro(ViewXMLName);
 
 protected:
   vtkSMPQStateLoader();
@@ -67,7 +67,7 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  char* RenderViewXMLName;
+  char* ViewXMLName;
 
   vtkSMPQStateLoaderInternals *PQInternal;
 private:

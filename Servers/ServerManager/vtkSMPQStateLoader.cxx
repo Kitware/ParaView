@@ -17,17 +17,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
 #include <vtkstd/list>
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.21");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.22");
 
 struct vtkSMPQStateLoaderInternals
 {
-  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> > PreferredRenderViews;
+  vtkstd::list<vtkSmartPointer<vtkSMViewProxy> > PreferredViews;
 };
 
 
@@ -35,14 +35,14 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->RenderViewXMLName = 0;
-  this->SetRenderViewXMLName("RenderView");
+  this->ViewXMLName = 0;
+  this->SetViewXMLName("RenderView");
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
-  this->SetRenderViewXMLName(0);
+  this->SetViewXMLName(0);
   delete this->PQInternal;
 }
 
@@ -55,21 +55,21 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
-    if (prototype && prototype->IsA("vtkSMRenderViewProxy"))
+    if (prototype && prototype->IsA("vtkSMViewProxy"))
       {
-      if (!this->PQInternal->PreferredRenderViews.empty())
+      if (!this->PQInternal->PreferredViews.empty())
         {
         // Return a preferred render view if one exists.
-        vtkSMRenderViewProxy *renMod = this->PQInternal->PreferredRenderViews.front();
+        vtkSMViewProxy *renMod = this->PQInternal->PreferredViews.front();
         renMod->Register(this);
-        this->PQInternal->PreferredRenderViews.pop_front();
+        this->PQInternal->PreferredViews.pop_front();
         return renMod;
         }
 
       // Can't use exiting module (none present, or all present are have
       // already been used, hence we allocate a new one.
       return this->Superclass::NewProxyInternal(xml_group, 
-        this->RenderViewXMLName);
+        this->ViewXMLName);
       }
     }
 
@@ -77,34 +77,34 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::AddPreferredRenderView(vtkSMRenderViewProxy *renderView)
+void vtkSMPQStateLoader::AddPreferredView(vtkSMViewProxy *view)
 {
-  if(!renderView)
+  if(!view)
     { 
     vtkWarningMacro("Could not add preffered render module.");
     return;
     }
   // Make sure it is not part of the list yet
-  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> >::iterator begin = 
-    this->PQInternal->PreferredRenderViews.begin();
-  vtkstd::list<vtkSmartPointer<vtkSMRenderViewProxy> >::iterator end = 
-    this->PQInternal->PreferredRenderViews.end();
-  if(vtkstd::find(begin,end,renderView) == end)
+  vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator begin = 
+    this->PQInternal->PreferredViews.begin();
+  vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator end = 
+    this->PQInternal->PreferredViews.end();
+  if(vtkstd::find(begin,end,view) == end)
     {
-    this->PQInternal->PreferredRenderViews.push_back(renderView);
+    this->PQInternal->PreferredViews.push_back(view);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::RemovePreferredRenderView(vtkSMRenderViewProxy *renderView)
+void vtkSMPQStateLoader::RemovePreferredView(vtkSMViewProxy *view)
 {
-  this->PQInternal->PreferredRenderViews.remove(renderView);
+  this->PQInternal->PreferredViews.remove(view);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMPQStateLoader::ClearPreferredRenderViews()
+void vtkSMPQStateLoader::ClearPreferredViews()
 {
-  this->PQInternal->PreferredRenderViews.clear();
+  this->PQInternal->PreferredViews.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -128,7 +128,7 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "RenderViewXMLName: " 
-    << (this->RenderViewXMLName? this->RenderViewXMLName : "(none)")
+  os << indent << "ViewXMLName: " 
+    << (this->ViewXMLName? this->ViewXMLName : "(none)")
     << endl;
 }
