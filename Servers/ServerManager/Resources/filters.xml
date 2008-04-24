@@ -6149,34 +6149,66 @@ Tessellate a higher-order dataset.
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="CTHFragmentConnect" class="vtkCTHFragmentConnect"
-      label="Extract CTH Boundaries and Fragments">
+   <SourceProxy 
+     name="CTHFragmentConnect" 
+     class="vtkCTHFragmentConnect"
+     label="Extract CTH Boundaries and Fragments">
      <Documentation
-        long_help=""
-        short_help="">
+       long_help="TODO long help"
+       short_help="TODO short help">
+       TODO document CTH Fragment Extract Filter.
      </Documentation>
      <InputProperty
-        name="Input"
-        command="SetInputConnection">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-             <Group name="filters"/>
-           </ProxyGroupDomain>
-           <DataTypeDomain name="input_type">
-             <DataType value="vtkHierarchicalBoxDataSet"/>
-           </DataTypeDomain>
-           <Documentation>
-             This property specifies the input to this filter.
-           </Documentation>
+       name="Input"
+       command="SetInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkHierarchicalBoxDataSet"/>
+       </DataTypeDomain>
+       <InputArrayDomain
+         name="input_array" 
+         attribute_type="cell"
+         number_of_components="1" />
      </InputProperty>
-     <StringVectorProperty name="VolumeFractionArray"
-                           command="SetVolumeFractionArrayName"
-                           number_of_elements="1">
+
+     <StringVectorProperty
+       name="SelectMaterialArray"
+       command="SelectMaterialArray"
+       clean_command="UnselectAllMaterialArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Select Material Fraction Arrays">
        <Documentation>
-         The name of the volume fraction array to process.
+         Specifies the arrays from which to generate fragment sets.
        </Documentation>
+       <ArrayListDomain 
+         name="array_list"
+         attribute_type="Scalars"
+         data_type="VTK_UNSIGNED_CHAR">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- override gui no to set default -->
+         <NoDefault />
+       </Hints>
      </StringVectorProperty>
-   <!-- End CTHFragmentConnect -->
+     <DoubleVectorProperty
+       name="MaterialFractionThreshold"
+       command="SetMaterialFractionThreshold"
+       number_of_elements="1"
+       default_values="0.5"
+       label="Material Fraction Threshold">
+       <DoubleRangeDomain name="range" min="0.08" max="1" />
+       <Documentation>
+         Threshold value used to determine inclusion/excluision from the fragment set.
+       </Documentation>
+     </DoubleVectorProperty>
+     <!-- End CTHFragmentConnect -->
    </SourceProxy>
 
    <!-- ==================================================================== -->
