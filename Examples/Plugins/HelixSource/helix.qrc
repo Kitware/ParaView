@@ -1,0 +1,7 @@
+<!-- paraview looks for "/pqWidgets/UI/<SM XML Name>.ui", so an alias is created to put the panel there -->
+<!-- this resource can be converted to binary form by running "rcc -binary -o helix.bqrc helix.qrc" -->
+<RCC>
+    <qresource prefix="/pqWidgets" >
+        <file alias="UI/HelixSource.ui">HelixSource.ui</file>
+    </qresource>
+</RCC>
