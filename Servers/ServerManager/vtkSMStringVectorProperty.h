@@ -106,7 +106,7 @@ public:
 
   // Description:
   // Returns the default value, if any, specified in the XML.
-  const char* GetDefaulValue();
+  const char* GetDefaultValue(int idx);
 
 protected:
   vtkSMStringVectorProperty();

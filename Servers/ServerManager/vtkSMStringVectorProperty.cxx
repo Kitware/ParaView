@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.38");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.39");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -32,7 +32,7 @@ struct vtkSMStringVectorPropertyInternals
   vtkstd::vector<vtkStdString> LastPushedValues;
   vtkstd::vector<int> ElementTypes;
   vtkstd::vector<char> Initialized;
-  vtkStdString DefaultValue;
+  vtkstd::vector<vtkStdString> DefaultValues;
 
   void UpdateLastPushedValues()
     {
@@ -378,11 +378,28 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   numEls = this->GetNumberOfElements();
   if (numEls > 0)
     {
-    const char *initVal = element->GetAttribute("default_values");
-    if (initVal)
+    const char* tmp = element->GetAttribute("default_values");
+    const char* delimiter = element->GetAttribute("default_values_delimiter");
+    if(tmp && delimiter)
       {
-      this->SetElement(0, initVal); // what to do with > 1 element?
-      this->Internals->DefaultValue = initVal;
+      vtkStdString initVal = tmp;
+      vtkStdString delim = delimiter;
+      vtkStdString::size_type pos1 = -delim.size();
+      vtkStdString::size_type pos2 = 0;
+      for(int i=0; i<numEls && pos2 != vtkStdString::npos; i++)
+        {
+        pos1 += delim.size();
+        pos2 = initVal.find(delimiter, pos1);
+        vtkStdString v = pos1 == pos2 ? "" : initVal.substr(pos1, pos2);
+        this->Internals->DefaultValues.push_back(v);
+        this->SetElement(i, v.c_str());
+        pos1 = pos2;
+        }
+      }
+    else if(tmp)
+      {
+      this->SetElement(0, tmp);
+      this->Internals->DefaultValues.push_back(tmp);
       }
     this->Internals->UpdateLastPushedValues(); 
     }
@@ -390,11 +407,12 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMStringVectorProperty::GetDefaulValue()
+const char* vtkSMStringVectorProperty::GetDefaultValue(int idx)
 {
-  if (!this->Internals->DefaultValue.empty())
+  if(idx >= 0 && idx < (int)this->Internals->DefaultValues.size() && 
+    !this->Internals->DefaultValues[idx].empty())
     {
-    return this->Internals->DefaultValue.c_str();
+    return this->Internals->DefaultValues[idx].c_str();
     }
   return 0;
 }
