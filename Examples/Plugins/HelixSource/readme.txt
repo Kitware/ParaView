@@ -18,3 +18,7 @@ This example contains:
 3.  A helix.qrc file specifying the .ui file to include in the resource.
 4.  A binary resource helix.bqrc, created from helix.qrc by the Qt's rcc command:
     rcc -binary -o helix.bqrc helix.qrc
+
+  Although the Qt files aren't required, it does give a better user interface
+  to the helix source.
+
