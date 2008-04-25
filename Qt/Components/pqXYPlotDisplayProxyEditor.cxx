@@ -257,7 +257,7 @@ pqLineSeriesEditorModel::pqLineSeriesEditorModel(
   : pqCheckableHeaderModel(parentObject), Items(), Display(display)
 {
   // Set up the column headers.
-  this->insertHeaderSections(Qt::Horizontal, 0, 2);
+  this->insertHeaderSections(Qt::Horizontal, 0, 1);
   this->setCheckable(0, Qt::Horizontal, true);
   this->setCheckState(0, Qt::Horizontal, Qt::Unchecked);
 
@@ -283,7 +283,7 @@ int pqLineSeriesEditorModel::rowCount(const QModelIndex &parentIndex) const
 
 int pqLineSeriesEditorModel::columnCount(const QModelIndex &) const
 {
-  return 3;
+  return 2;
 }
 
 bool pqLineSeriesEditorModel::hasChildren(const QModelIndex &parentIndex) const
@@ -294,7 +294,7 @@ bool pqLineSeriesEditorModel::hasChildren(const QModelIndex &parentIndex) const
 QModelIndex pqLineSeriesEditorModel::index(int row, int column,
     const QModelIndex &parentIndex) const
 {
-  if(!parentIndex.isValid() && column >= 0 && column < 3 && row >= 0 &&
+  if(!parentIndex.isValid() && column >= 0 && column < 2 && row >= 0 &&
       row < this->Items.size())
     {
     return this->createIndex(row, column);
@@ -318,47 +318,14 @@ QVariant pqLineSeriesEditorModel::data(const QModelIndex &idx, int role) const
       {
       if(idx.column() == 0)
         {
-        return QVariant(item->Variable);
+        QString arrayName = item->Variable;
+        this->Display->addComponentLabel(arrayName, item->Component,
+            item->ComponentCount);
+        return QVariant(arrayName);
         }
       else if(idx.column() == 1)
         {
         return QVariant(item->LegendName);
-        }
-      else if(idx.column() == 2)
-        {
-        int component = item->Component;
-        if(role == Qt::DisplayRole && item->ComponentCount > 1)
-          {
-          if(component == -2)
-            {
-            return QVariant(QString("Distance"));
-            }
-          else if(component == -1)
-            {
-            return QVariant(QString("Magnitude"));
-            }
-          else if(item->ComponentCount == 3)
-            {
-            if(item->Component == 0)
-              {
-              return QVariant(QString("X"));
-              }
-            else if(item->Component == 1)
-              {
-              return QVariant(QString("Y"));
-              }
-            else if(item->Component == 2)
-              {
-              return QVariant(QString("Z"));
-              }
-            }
-
-          return QVariant(QString::number(component));
-          }
-        else if(role == Qt::EditRole)
-          {
-          return QVariant(component);
-          }
         }
       }
     else if(role == Qt::CheckStateRole)
@@ -373,16 +340,6 @@ QVariant pqLineSeriesEditorModel::data(const QModelIndex &idx, int role) const
       if(idx.column() == 1)
         {
         return QVariant(item->LineColor);
-        }
-      }
-    else if(role == Qt::UserRole)
-      {
-      if(idx.column() == 2 && item->ComponentCount > 1)
-        {
-        QList<QVariant> range;
-        range.append(QVariant(-1));
-        range.append(QVariant(item->ComponentCount));
-        return QVariant(range);
         }
       }
     }
@@ -400,10 +357,6 @@ Qt::ItemFlags pqLineSeriesEditorModel::flags(const QModelIndex &idx) const
       result |= Qt::ItemIsUserCheckable;
       }
     else if(idx.column() == 1)
-      {
-      result |= Qt::ItemIsEditable;
-      }
-    else if(idx.column() == 2 && this->Items[idx.row()]->ComponentCount > 1)
       {
       result |= Qt::ItemIsEditable;
       }
@@ -428,8 +381,7 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
         if(name != item->LegendName)
           {
           item->LegendName = name;
-          int series = this->Display->getSeriesIndex(item->Variable);
-          this->Display->setSeriesLabel(series, item->LegendName);
+          this->Display->setSeriesLabel(idx.row(), item->LegendName);
           this->Display->renderViewEventually();
           emit this->dataChanged(idx, idx);
           }
@@ -454,24 +406,10 @@ bool pqLineSeriesEditorModel::setData(const QModelIndex &idx,
 
       if(result && changed)
         {
-        int series = this->Display->getSeriesIndex(item->Variable);
-        this->Display->setSeriesEnabled(series, item->Enabled);
+        this->Display->setSeriesEnabled(idx.row(), item->Enabled);
         this->Display->renderViewEventually();
         emit this->dataChanged(idx, idx);
         this->updateCheckState(0, Qt::Horizontal);
-        }
-      }
-    else if(idx.column() == 2 && role == Qt::EditRole)
-      {
-      result = true;
-      int component = value.toInt();
-      if(component != item->Component)
-        {
-        item->Component = component;
-        int series = this->Display->getSeriesIndex(item->Variable);
-        this->Display->setSeriesComponent(series, component);
-        this->Display->renderViewEventually();
-        emit this->dataChanged(idx, idx);
         }
       }
     }
@@ -491,10 +429,6 @@ QVariant pqLineSeriesEditorModel::headerData(int section,
     else if(section == 1)
       {
       return QVariant(QString("Legend Name"));
-      }
-    else if(section == 2)
-      {
-      return QVariant(QString("Component"));
       }
     }
   else
@@ -709,7 +643,6 @@ pqXYPlotDisplayProxyEditor::pqXYPlotDisplayProxyEditor(pqRepresentation* display
       new pqLineSeriesEditorDelegate(this));
   this->Internal->Model = new pqLineSeriesEditorModel(0, this);
   this->Internal->SeriesList->setModel(this->Internal->Model);
-  //this->Internal->SeriesList->header()->setResizeMode(QHeaderView::Stretch);
 
   QObject::connect(
     this->Internal->SeriesList, SIGNAL(activated(const QModelIndex &)),

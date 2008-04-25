@@ -89,7 +89,7 @@ public:
 
   int getNumberOfSeries() const;
 
-  int getSeriesIndex(const QString &name) const;
+  int getSeriesIndex(const QString &name, int component) const;
 
   bool isSeriesEnabled(int series) const;
   void setSeriesEnabled(int series, bool enabled);
@@ -118,7 +118,7 @@ public:
   void setSeriesAxesIndex(int series, int index);
 
   int getSeriesComponent(int series) const;
-  void setSeriesComponent(int series, int component);
+  void addComponentLabel(QString &name, int component, int numComponents) const;
 
   void beginSeriesChanges();
   void endSeriesChanges();
@@ -158,8 +158,6 @@ signals:
   void styleChanged(int series, Qt::PenStyle style);
 
 protected:
-  /// method to set default values for the status property.
-  void setStatusDefaults(vtkSMProperty* prop);
   bool getXArrayDefault(vtkSMProperty* prop, QString &arrayName);
 
 private slots:

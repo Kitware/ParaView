@@ -263,7 +263,8 @@ void pqPlotViewLineChart::update(bool force)
       }
 
     // First, remove or update the current model series.
-    QStringList displayNames;
+    QMap<QString, QList<int> > displayList;
+    QMap<QString, QList<int> >::Iterator kter;
     QList<pqPlotViewLineChartSeries>::Iterator series =
         (*jter)->Series.begin();
     while(series != (*jter)->Series.end())
@@ -271,7 +272,7 @@ void pqPlotViewLineChart::update(bool force)
       // Remove the series if the data type has changed, the display
       // is not visible, or the series is not enabled.
       int index = (*jter)->Representation->getSeriesIndex(
-          series->RepresentationName);
+          series->RepresentationName, series->YComponent);
       if(typeChanged || !isVisible ||
           !(*jter)->Representation->isSeriesEnabled(index))
         {
@@ -290,9 +291,7 @@ void pqPlotViewLineChart::update(bool force)
       else
         {
         yArray = 0;
-        int component = (*jter)->Representation->getSeriesComponent(index);
-        bool componentChanged = component != series->YComponent;
-        if(arrayChanged || componentChanged)
+        if(arrayChanged)
           {
           yArray = (*jter)->Representation->getYArray(index);
           if(!yArray)
@@ -331,10 +330,11 @@ void pqPlotViewLineChart::update(bool force)
           series->Model->setChartAxes(this->Internal->IndexAxes[series->Chart]);
           }
 
-        if(arrayChanged || componentChanged)
+        if(arrayChanged)
           {
           // Update the arrays for the series.
-          series->YComponent = component;
+          series->YComponent =
+              (*jter)->Representation->getSeriesComponent(index);
           series->Model->setDataArrays(xArray, yArray, maskArray, 0,
               series->YComponent);
           }
@@ -382,7 +382,19 @@ void pqPlotViewLineChart::update(bool force)
           series->LegendId = 0;
           }
 
-        displayNames.append(series->RepresentationName);
+        // Add the array name to the list.
+        kter = displayList.find(series->RepresentationName);
+        if(kter != displayList.end())
+          {
+          kter->append(series->YComponent);
+          }
+        else
+          {
+          QList<int> components;
+          components.append(series->YComponent);
+          displayList.insert(series->RepresentationName, components);
+          }
+
         ++series;
         }
       }
@@ -399,9 +411,14 @@ void pqPlotViewLineChart::update(bool force)
           {
           QString name;
           (*jter)->Representation->getSeriesName(i, name);
-          if(displayNames.contains(name))
+          int yComponent = (*jter)->Representation->getSeriesComponent(i);
+          kter = displayList.find(name);
+          if(kter != displayList.end())
             {
-            continue;
+            if(kter->contains(yComponent))
+              {
+              continue;
+              }
             }
 
           yArray = (*jter)->Representation->getYArray(i);
@@ -441,7 +458,7 @@ void pqPlotViewLineChart::update(bool force)
             }
 
           // Set the model arrays.
-          plot->YComponent = (*jter)->Representation->getSeriesComponent(i);
+          plot->YComponent = yComponent;
           plot->Model->setDataArrays(xArray, yArray, maskArray, 0,
               plot->YComponent);
 
