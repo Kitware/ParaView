@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _@ARG_VIEW_TYPE@OptionsImplementation_h
 #define _@ARG_VIEW_TYPE@OptionsImplementation_h
 
-#include <QObject>
 #include "pqViewOptionsInterface.h"
+
+#include <QObject>
+#include <QStringList>
 
 /// CMake configured implementation of an options interface that
 /// support one view type
