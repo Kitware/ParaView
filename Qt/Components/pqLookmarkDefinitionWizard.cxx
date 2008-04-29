@@ -239,17 +239,24 @@ void pqLookmarkDefinitionWizard::createLookmark()
   vtkSMProxy* viewProxy = this->ViewModule->getViewProxy();
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
 
-  // Save a screenshot of the view to store with the lookmark
-  QWidget* w = this->ViewModule->getWidget();
-  QSize old = w->size();
-  w->resize(150,150);
   QImage image;
-  vtkImageData* imageData = this->ViewModule->captureImage(1);
-  if(imageData)
+  if (this->Form->SaveImage->checkState() == Qt::Checked)
     {
-    w->resize(old);
-    pqImageUtil::fromImageData(imageData, image);
-    imageData->Delete();
+    // Save a screenshot of the view to store with the lookmark
+    QWidget* w = this->ViewModule->getWidget();
+    QSize old = w->size();
+    w->resize(150,150);
+    vtkImageData* imageData = this->ViewModule->captureImage(1);
+    if(imageData)
+      {
+      w->resize(old);
+      pqImageUtil::fromImageData(imageData, image);
+      imageData->Delete();
+      }
+    }
+  else
+    {
+    image = QImage(":pqWidgets/Icons/pqLookmarkThumbnail.png");
     }
   
   vtkCollection *proxies = vtkCollection::New();

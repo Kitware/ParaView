@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>pqLookmarkDefinitionWizard</class>
- <widget class="QDialog" name="lookmarkDefinitionWizard" >
+ <widget class="QDialog" name="pqLookmarkDefinitionWizard" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -220,6 +220,16 @@
          <widget class="QTextEdit" name="LookmarkComments" />
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="SaveImage" >
+        <property name="text" >
+         <string>Capture screenshot for lookmark thumbnail</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QFrame" name="frame_5" >
