@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkStructuredData.h"
 
 #include <QtDebug>
 #include <QString>
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqTwoDRenderView.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayPolicy::pqDisplayPolicy(QObject* _parent) :QObject(_parent)
@@ -95,6 +97,24 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   vtkPVDataInformation* datainfo = update_pipeline?
     opPort->getDataInformation(true) : opPort->getCachedDataInformation();
   QString className = datainfo?  datainfo->GetDataClassName() : QString();
+
+
+  // * Check if we should create the 2D view.
+  if ((className == "vtkImageData" || className == "vtkUniformGrid") && 
+    datainfo->GetCompositeDataClassName()==0)
+    {
+    int extent[6];
+    datainfo->GetExtent(extent);
+    int temp[6]={0, 0, 0, 0, 0, 0};
+    int dimensionality = vtkStructuredData::GetDataDimension(
+      vtkStructuredData::SetExtent(extent, temp));
+    if (dimensionality == 2)
+      {
+      return pqTwoDRenderView::twoDRenderViewType();
+      }
+    }
+
+  // * Check if we should create any of the Plot Views.
   if (className != "vtkRectilinearGrid")
     {
     return view_type;
@@ -106,22 +126,20 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     {
     int extent[6];
     datainfo->GetExtent(extent);
-    int non_zero_dims = 0;
-    for (int cc=0; cc < 3; cc++)
-      {
-      non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-      }
+    int temp[6]={0, 0, 0, 0, 0, 0};
+    int dimensionality = vtkStructuredData::GetDataDimension(
+      vtkStructuredData::SetExtent(extent, temp));
 
     vtkPVDataSetAttributesInformation* cellDataInfo =
       datainfo->GetCellDataInformation();
     vtkPVDataSetAttributesInformation* pointDataInfo =
       datainfo->GetPointDataInformation();
-    if (non_zero_dims == 1 && cellDataInfo->GetNumberOfArrays() > 0)
+    if (dimensionality == 1 && cellDataInfo->GetNumberOfArrays() > 0)
       {
       // Has cell data, mostlikely this is a histogram.
       view_type = pqPlotView::barChartType();
       }
-    else if (non_zero_dims == 1 && 
+    else if (dimensionality == 1 && 
       (pointDataInfo->GetNumberOfArrays() > 0 ||
        cellDataInfo->GetNumberOfArrays() > 0 ) && 
       datainfo->GetNumberOfPoints() > 1)
