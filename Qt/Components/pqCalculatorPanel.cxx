@@ -414,8 +414,7 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
   for(int i=0; i<fdi->GetNumberOfArrays(); i++)
     {
     vtkPVArrayInformation* arrayInfo = fdi->GetArrayInformation(i);
-    if(arrayInfo->GetIsPartial() 
-        || arrayInfo->GetDataType() == VTK_STRING
+    if (arrayInfo->GetDataType() == VTK_STRING
         || arrayInfo->GetDataType() == VTK_VARIANT )
       {
       continue;
