@@ -56,7 +56,7 @@
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"
-                          label="Plot Field Variable over Time">
+                          label="Plot Global Variables over Time">
      <Documentation>
 This filter extracts the variables that reside in a dataset's field data and are
 defined over time. The output is a 1D rectilinear grid where the x coordinates
