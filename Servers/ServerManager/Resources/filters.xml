@@ -3,7 +3,7 @@
 
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkExtractArraysOverTime"
-      label="Extract Selection (Over Time)">
+      label="Plot Selection Over Time">
       <Documentation>
         This filter extracts the selection over time, i.e.  cell and/or point 
         variables at a cells/point selected are extracted over time
