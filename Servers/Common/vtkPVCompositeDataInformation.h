@@ -65,6 +65,12 @@ public:
   vtkPVDataInformation* GetDataInformation(unsigned int idx);
 
   // Description:
+  // Return the name of the child node at the given index, if any. This is the
+  // value for the key vtkCompositeDataSet::NAME() in the meta-data associated
+  // with the node.
+  const char* GetName(unsigned int idx);
+
+  // Description:
   // Get/Set if the data is multipiece. If so, then GetDataInformation() will
   // always return NULL. For vtkMultiblockDataSet, we don't collect information
   // about individual pieces. One can however, query the number of pieces by
@@ -77,10 +83,6 @@ public:
 
   // TODO:
   // Add API to obtain meta data information for each of the children. 
-
-  // Description:
-  // Get the flat-index range for the composite dataset.
-  vtkGetMacro(FlatIndexMax, unsigned int);
 
 //BTX
 protected:

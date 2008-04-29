@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.49");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -66,16 +66,12 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
   this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
-
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
-
   this->PointArrayInformation = vtkPVArrayInformation::New();
-  
-  this->Name = 0;
+
   this->DataClassName = 0;
   this->CompositeDataClassName = 0;
   this->NumberOfDataSets = 0;
-  this->NameSetToDefault = 0;
   this->TimeSpan[0] = VTK_DOUBLE_MAX;
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
 }
@@ -93,7 +89,6 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->CompositeDataInformation = NULL;
   this->PointArrayInformation->Delete();
   this->PointArrayInformation = NULL;
-  this->SetName(0);
   this->SetDataClassName(0);
   this->SetCompositeDataClassName(0);
 }
@@ -130,24 +125,14 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PointArrayInformation " << endl;
   this->PointArrayInformation->PrintSelf(os, i2);
 
-  if (this->Name)
-    {
-    os << indent << "Name: " << this->Name << endl;
-    }
-  else
-    {
-    os << indent << "Name: NULL\n";
-    }
-
-  os << indent << "DataClassName: " 
+  os << indent << "DataClassName: "
      << (this->DataClassName?this->DataClassName:"(none)") << endl;
-  os << indent << "CompositeDataClassName: " 
+  os << indent << "CompositeDataClassName: "
      << (this->CompositeDataClassName?this->CompositeDataClassName:"(none)") << endl;
 
-  os << indent << "TimeSpan: " 
+  os << indent << "TimeSpan: "
      << this->TimeSpan[0] << ", " << this->TimeSpan[1]
      << endl;
-
 }
 
 //----------------------------------------------------------------------------
@@ -170,7 +155,6 @@ void vtkPVDataInformation::Initialize()
   this->FieldDataInformation->Initialize();
   this->CompositeDataInformation->Initialize();
   this->PointArrayInformation->Initialize();
-  this->SetName(0);
   this->SetDataClassName(0);
   this->SetCompositeDataClassName(0);
   this->TimeSpan[0] = VTK_DOUBLE_MAX;
@@ -221,8 +205,6 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo,
   this->PointArrayInformation->AddInformation(
     dataInfo->GetPointArrayInformation());
 
-  this->SetName(dataInfo->GetName());
-
   double *timespan;
   timespan = dataInfo->GetTimeSpan();
   this->TimeSpan[0] = timespan[0];
@@ -266,7 +248,7 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
     {
     for (unsigned int cc=0; cc < numDataSets; cc++)
       {
-      vtkPVDataInformation* childInfo = 
+      vtkPVDataInformation* childInfo =
         this->CompositeDataInformation->GetDataInformation(cc);
       if (childInfo)
         {
@@ -294,15 +276,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   this->DataSetType = data->GetDataObjectType();
 
   this->NumberOfDataSets = 1;
-
-  // Look for a name stored in Field Data.
-  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
-  if (nameArray)
-    {
-    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
-    this->SetName(str);
-    }
-
 
   switch ( this->DataSetType )
     {
@@ -361,7 +334,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     *tmpFile << "\t" << this->NumberOfPoints << " points" << endl;
     *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
-  
+
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
     {
@@ -391,7 +364,7 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   //Copy time span from the dataset's producing algorithm
   vtkInformation *pinfo = data->GetPipelineInformation();
   if (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
-    {    
+    {
     double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     this->TimeSpan[0] = times[0];
     this->TimeSpan[1] = times[1];
@@ -408,15 +381,6 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
   this->DataSetType = data->GetDataObjectType();
 
   this->NumberOfDataSets = 1;
-
-  // Look for a name stored in Field Data.
-  vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
-  if (nameArray)
-    {
-    char* str = static_cast<char*>(nameArray->GetVoidPointer(0));
-    this->SetName(str);
-    }
-
   this->NumberOfPoints = data->GetNumberOfPoints();
   if (!this->NumberOfPoints)
     {
@@ -456,7 +420,7 @@ void vtkPVDataInformation::CopyFromSelection(vtkSelection* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
     = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
 
   this->MemorySize = data->GetActualMemorySize();
@@ -473,7 +437,7 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
     = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
 
   if(data->GetPoints())
@@ -494,7 +458,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
   this->NumberOfDataSets = 1;
-  this->Bounds[0] = this->Bounds[1] = this->Bounds[2] 
+  this->Bounds[0] = this->Bounds[1] = this->Bounds[2]
     = this->Bounds[3] = this->Bounds[4] = this->Bounds[5] = 0;
 
   this->MemorySize = data->GetActualMemorySize();
@@ -525,7 +489,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 
   if (!dobj)
     {
-    vtkErrorMacro("Could not cast object to a known data set: " 
+    vtkErrorMacro("Could not cast object to a known data set: "
                   << (object?object->GetClassName():"(null"));
     return;
     }
@@ -572,7 +536,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
-  vtkErrorMacro("Could not cast object to a known data set: " 
+  vtkErrorMacro("Could not cast object to a known data set: "
                 << (dobj?dobj->GetClassName():"(null"));
 
 }
@@ -612,10 +576,10 @@ void vtkPVDataInformation::AddInformation(
     return;
     }
 
-  if (this->NumberOfPoints == 0 && 
-      this->NumberOfCells == 0 && 
+  if (this->NumberOfPoints == 0 &&
+      this->NumberOfCells == 0 &&
       this->NumberOfDataSets == 0)
-    { 
+    {
     // Just copy the other array information.
     this->DeepCopy(info, !addingParts);
     return;
@@ -664,7 +628,7 @@ void vtkPVDataInformation::AddInformation(
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
   this->NumberOfRows += info->GetNumberOfRows();
-  
+
   switch ( this->DataSetType )
     {
     case VTK_POLY_DATA:
@@ -676,7 +640,7 @@ void vtkPVDataInformation::AddInformation(
     // Adding data information of parts
     this->NumberOfDataSets += info->GetNumberOfDataSets();
     }
-  else 
+  else
     {
     // Adding data information of 1 part across processors
     if (this->GetCompositeDataClassName())
@@ -730,12 +694,7 @@ void vtkPVDataInformation::AddInformation(
   this->FieldDataInformation->AddInformation(info->GetFieldDataInformation());
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
 
-  if (this->Name == NULL)
-    {
-    this->SetName(info->GetName());
-    }
-
-  double *times = info->GetTimeSpan(); 
+  double *times = info->GetTimeSpan();
   if (times[0] < this->TimeSpan[0])
     {
     this->TimeSpan[0] = times[0];
@@ -745,108 +704,6 @@ void vtkPVDataInformation::AddInformation(
     this->TimeSpan[1] = times[1];
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::SetName(const char* name)
-{
-  if (!this->Name && !name) { return;}
-  if ( this->Name && name && (!strcmp(this->Name, name))) 
-    { 
-    return;
-    }
-  if (this->Name) { delete [] this->Name; }
-  if (name) 
-    { 
-    this->Name = new char[strlen(name)+1];
-    strcpy(this->Name, name);
-    } 
-  else 
-    { 
-    this->Name = 0; 
-    } 
-  this->Modified(); 
-  this->NameSetToDefault = 0;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVDataInformation::GetName()
-{
-  if (!this->Name || this->Name[0] == '\0' || this->NameSetToDefault)
-    {
-    if (this->Name)
-      {
-      delete[] this->Name;
-      }
-    char str[256];
-    if (this->GetDataSetType() == VTK_POLY_DATA)
-      {
-      long nc = this->GetNumberOfCells();
-      sprintf(str, "Polygonal: %ld cells", nc);
-      }
-    else if (this->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
-      {
-      long nc = this->GetNumberOfCells();
-      sprintf(str, "Unstructured Grid: %ld cells", nc);
-      }
-    else if (this->GetDataSetType() == VTK_IMAGE_DATA)
-      {
-      int *ext = this->GetExtent();
-      if (ext)
-        {
-        sprintf(str, "Uniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-        }
-      else
-        {
-        sprintf(str, "Uniform Rectilinear: invalid extent");
-        }
-      }
-    else if (this->GetDataSetType() == VTK_UNIFORM_GRID)
-      {
-      int *ext = this->GetExtent();
-      sprintf(str, 
-              "Uniform Rectilinear (with blanking): "
-              "extent (%d, %d) (%d, %d) (%d, %d)", 
-              ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-      }
-    else if (this->GetDataSetType() == VTK_RECTILINEAR_GRID)
-      {
-      int *ext = this->GetExtent();
-      if (ext)
-        {
-        sprintf(str, 
-                "Nonuniform Rectilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-        }
-      else
-        {
-        sprintf(str, "Nonuniform Rectilinear: invalid extent");
-        }
-      }
-    else if (this->GetDataSetType() == VTK_STRUCTURED_GRID)
-      {
-      int *ext = this->GetExtent();
-      if (ext)
-        {
-        sprintf(str, "Curvilinear: extent (%d, %d) (%d, %d) (%d, %d)", 
-                ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-        }
-      else
-        {
-        sprintf(str, "Curvilinear: invalid extent");
-        }
-      }
-    else
-      {
-      sprintf(str, "Part of unknown type");
-      }
-    this->Name = new char[256];
-    strncpy(this->Name, str, 256);
-    this->NameSetToDefault = 1;
-    }
-  return this->Name;
-}
-
 
 //----------------------------------------------------------------------------
 const char* vtkPVDataInformation::GetPrettyDataTypeString()
@@ -914,7 +771,7 @@ const char* vtkPVDataInformation::GetPrettyDataTypeString()
     case VTK_DIRECTED_ACYCLIC_GRAPH:
       return "Directed Acyclic Graph";
     }
-  
+
   return "UnknownType";
 }
 
@@ -986,14 +843,14 @@ int vtkPVDataInformation::IsDataStructured()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* 
+vtkPVDataInformation*
 vtkPVDataInformation::GetDataInformationForCompositeIndex(int index)
 {
   return this->GetDataInformationForCompositeIndex(&index);
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataInformation* 
+vtkPVDataInformation*
 vtkPVDataInformation::GetDataInformationForCompositeIndex(int* index)
 {
   if (*index == 0)
@@ -1011,8 +868,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;
-  *css << this->Name
-       << this->DataClassName
+  *css << this->DataClassName
        << this->DataSetType
        << this->NumberOfDataSets
        << this->NumberOfPoints
@@ -1063,64 +919,79 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   *css << vtkClientServerStream::End;
 }
 
+// Macros used to make it easy to insert/remove entries when serializing
+// to/from a stream.
+
+#define CSS_ARGUMENT_BEGIN() \
+  {\
+  int __vtk__css_argument_int_counter = 0
+
+#define CSS_GET_NEXT_ARGUMENT(css, msg, var)\
+  css->GetArgument(msg, __vtk__css_argument_int_counter++, var)
+
+#define CSS_GET_NEXT_ARGUMENT2(css, msg, var, len)\
+  css->GetArgument(msg, __vtk__css_argument_int_counter++, var, len)
+
+#define CSS_GET_CUR_INDEX() __vtk__css_argument_int_counter
+
+#define CSS_ARGUMENT_END() \
+  }
+
+
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
 {
-  const char* name = 0;
-  if(!css->GetArgument(0, 0, &name))
-    {
-    vtkErrorMacro("Error parsing name of data.");
-    return;
-    }
-  this->SetName(name);
+  CSS_ARGUMENT_BEGIN();
+
   const char* dataclassname = 0;
-  if(!css->GetArgument(0, 1, &dataclassname))
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &dataclassname))
     {
     vtkErrorMacro("Error parsing class name of data.");
     return;
     }
   this->SetDataClassName(dataclassname);
-  if(!css->GetArgument(0, 2, &this->DataSetType))
+
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->DataSetType))
     {
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
-  if(!css->GetArgument(0, 3, &this->NumberOfDataSets))
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfDataSets))
     {
     vtkErrorMacro("Error parsing number of datasets.");
     return;
     }
-  if(!css->GetArgument(0, 4, &this->NumberOfPoints))
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfPoints))
     {
     vtkErrorMacro("Error parsing number of points.");
     return;
     }
-  if(!css->GetArgument(0, 5, &this->NumberOfCells))
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfCells))
     {
     vtkErrorMacro("Error parsing number of cells.");
     return;
     }
-  if(!css->GetArgument(0, 6, &this->NumberOfRows))
+  if (!CSS_GET_NEXT_ARGUMENT(css, 0, &this->NumberOfRows))
     {
     vtkErrorMacro("Error parsing number of cells.");
     return;
     }
-  if(!css->GetArgument(0, 7, &this->MemorySize))
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->MemorySize))
     {
     vtkErrorMacro("Error parsing memory size.");
     return;
     }
-  if(!css->GetArgument(0, 8, &this->PolygonCount))
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->PolygonCount))
     {
     vtkErrorMacro("Error parsing memory size.");
     return;
     }
-  if(!css->GetArgument(0, 9, this->Bounds, 6))
+  if(!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Bounds, 6))
     {
     vtkErrorMacro("Error parsing bounds.");
     return;
     }
-  if(!css->GetArgument(0, 10, this->Extent, 6))
+  if(!CSS_GET_NEXT_ARGUMENT2(css, 0,  this->Extent, 6))
     {
     vtkErrorMacro("Error parsing extent.");
     return;
@@ -1131,72 +1002,75 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   vtkClientServerStream dcss;
 
   // Point array information.
-  if(!css->GetArgumentLength(0, 11, &length))
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
     {
     vtkErrorMacro("Error parsing length of point data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 11, &*data.begin(), length))
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing point data information.");
     return;
     }
   dcss.SetData(&*data.begin(), length);
   this->PointArrayInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
 
   // Point data array information.
-  if(!css->GetArgumentLength(0, 12, &length))
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
     {
     vtkErrorMacro("Error parsing length of point data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 12, &*data.begin(), length))
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing point data information.");
     return;
     }
   dcss.SetData(&*data.begin(), length);
   this->PointDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
 
   // Cell data array information.
-  if(!css->GetArgumentLength(0, 13, &length))
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
     {
     vtkErrorMacro("Error parsing length of cell data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 13, &*data.begin(), length))
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing cell data information.");
     return;
     }
   dcss.SetData(&*data.begin(), length);
   this->CellDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
 
   const char* compositedataclassname = 0;
-  if(!css->GetArgument(0, 14, &compositedataclassname))
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &compositedataclassname))
     {
     vtkErrorMacro("Error parsing class name of data.");
     return;
     }
   this->SetCompositeDataClassName(compositedataclassname);
 
-  if(!css->GetArgument(0, 15, &this->CompositeDataSetType))
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->CompositeDataSetType))
     {
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
 
   // Composite data information.
-  if(!css->GetArgumentLength(0, 16, &length))
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
     {
     vtkErrorMacro("Error parsing length of cell data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 16, &*data.begin(), length))
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing cell data information.");
     return;
@@ -1210,27 +1084,30 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     {
     this->CompositeDataInformation->Initialize();
     }
+  CSS_GET_CUR_INDEX()++;
 
   // Field data array information.
-  if(!css->GetArgumentLength(0, 17, &length))
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
     {
     vtkErrorMacro("Error parsing length of field data information.");
     return;
     }
 
   data.resize(length);
-  if(!css->GetArgument(0, 17, &*data.begin(), length))
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing field data information.");
     return;
     }
   dcss.SetData(&*data.begin(), length);
   this->FieldDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
 
-  if(!css->GetArgument(0, 18, this->TimeSpan, 2))
+  if(!CSS_GET_NEXT_ARGUMENT2(css, 0, this->TimeSpan, 2))
     {
     vtkErrorMacro("Error parsing timespan.");
     return;
     }
-  
+
+  CSS_ARGUMENT_END();
 }

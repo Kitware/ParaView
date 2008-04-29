@@ -589,6 +589,8 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
       // user should be able to select individual pieces.
       for (unsigned int cc=0; cc < cinfo->GetNumberOfChildren(); cc++)
         {
+        // We don't fetch the names for each piece in a vtkMultiPieceDataSet
+        // hence we just make up a name,
         QString childLabel = QString("DataSet %1").arg(cc);
         if (this->ShowIndex)
           {
@@ -622,16 +624,25 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
     {
     vtkPVDataInformation* childInfo = cinfo->GetDataInformation(cc);
     QString childLabel = QString("DataSet %1").arg(cc);
-    if (this->ShowIndex)
-      {
-      childLabel = QString("DataSet (%1)").arg(this->FlatIndex);
-      }
+
     bool is_leaf = true;
     if (childInfo && childInfo->GetCompositeDataInformation()->GetDataIsComposite())
       {
       childLabel = is_hierarchical? 
         QString("Level %1").arg(cc) : QString("Block %1").arg(cc);
       is_leaf = false;
+      }
+    if (const char* cname = cinfo->GetName(cc))
+      {
+      if (cname[0])
+        {
+        childLabel = cname;
+        }
+      }
+
+    if (this->ShowIndex)
+      {
+      childLabel = QString("%1 (%2)").arg(childLabel).arg(this->FlatIndex);
       }
 
     if (this->Internal->DomainMode != vtkSMCompositeTreeDomain::NON_LEAVES || !is_leaf)

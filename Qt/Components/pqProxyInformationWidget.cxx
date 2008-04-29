@@ -440,7 +440,13 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
       compositeInformation->GetDataInformation(cc);
     QTreeWidgetItem* childItem = 
       this->fillCompositeInformation(childInfo, node);
-    if (isHB)
+    const char* name = compositeInformation->GetName(cc);
+    if (name && name[0])
+      {
+      // use name given to the block.
+      childItem->setText(0, name);
+      }
+    else if (isHB)
       {
       childItem->setText(0, QString("Level %1").arg(cc));
       }
@@ -450,6 +456,7 @@ QTreeWidgetItem* pqProxyInformationWidget::fillCompositeInformation(
       }
     else
       {
+      // Use the data classname in the name for the leaf node.
       childItem->setText(0, QString("%1: %2").arg(cc).arg(childItem->text(0)));
       }
     }

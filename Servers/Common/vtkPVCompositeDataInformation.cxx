@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkInformation.h"
 #include "vtkMultiPieceDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
@@ -23,14 +24,20 @@
 #include "vtkTimerLog.h"
 
 #include <vtkstd/vector>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.13");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.14");
 
 struct vtkPVCompositeDataInformationInternals
 {
-  typedef vtkstd::vector<vtkSmartPointer<vtkPVDataInformation> > 
-    VectorOfDataInformation;
+  struct vtkNode
+    {
+    vtkSmartPointer<vtkPVDataInformation> Info;
+    vtkstd::string Name;
+    };
+  typedef vtkstd::vector<vtkNode> VectorOfDataInformation;
+
 
   VectorOfDataInformation ChildrenInformation;
 };
@@ -42,8 +49,6 @@ vtkPVCompositeDataInformation::vtkPVCompositeDataInformation()
   this->DataIsComposite = 0;
   this->DataIsMultiPiece = 0;
   this->NumberOfPieces = 0;
-  this->FlatIndexMax = 0;
-
   // DON'T FORGET TO UPDATE Initialize().
 }
 
@@ -83,10 +88,10 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformationForCompos
     this->Internal->ChildrenInformation.begin();
   for ( ; iter!= this->Internal->ChildrenInformation.end(); ++iter)
     {
-    if (iter->GetPointer())
+    if (iter->Info)
       {
       vtkPVDataInformation* info = 
-        iter->GetPointer()->GetDataInformationForCompositeIndex(index);
+        iter->Info->GetDataInformationForCompositeIndex(index);
       if ( (*index) == -1)
         {
         return info;
@@ -110,7 +115,6 @@ void vtkPVCompositeDataInformation::Initialize()
   this->DataIsMultiPiece = 0;
   this->NumberOfPieces = 0;
   this->DataIsComposite = 0;
-  this->FlatIndexMax = 0;
   this->Internal->ChildrenInformation.clear();
 }
 
@@ -136,7 +140,23 @@ vtkPVDataInformation* vtkPVCompositeDataInformation::GetDataInformation(
     return NULL;
     }
 
-  return this->Internal->ChildrenInformation[idx];
+  return this->Internal->ChildrenInformation[idx].Info;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVCompositeDataInformation::GetName(unsigned int idx)
+{
+  if (this->DataIsMultiPiece)
+    {
+    return NULL;
+    }
+
+  if (idx >= this->Internal->ChildrenInformation.size())
+    {
+    return NULL;
+    }
+
+  return this->Internal->ChildrenInformation[idx].Name.c_str();
 }
 
 //----------------------------------------------------------------------------
@@ -157,8 +177,6 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
   if (mpDS)
     {
     this->DataIsMultiPiece = 1;
-    this->FlatIndexMax = mpDS->GetNumberOfPieces(); // 0 for self and (1, num-pieces) 
-                                                    // for the pieces.
     this->SetNumberOfPieces(mpDS->GetNumberOfPieces());
     return;
     }
@@ -179,13 +197,18 @@ void vtkPVCompositeDataInformation::CopyFromObject(vtkObject* object)
       {
       childInfo = vtkSmartPointer<vtkPVDataInformation>::New();
       childInfo->CopyFromObject(curDO); 
-
-      vtkPVCompositeDataInformation* cd = 
-        childInfo->GetCompositeDataInformation();
-      this->FlatIndexMax += (cd->GetFlatIndexMax()+1);
       }
     this->Internal->ChildrenInformation.resize(index+1);
-    this->Internal->ChildrenInformation[index] = childInfo;
+    this->Internal->ChildrenInformation[index].Info = childInfo;
+    if (iter->HasCurrentMetaData())
+      {
+      vtkInformation* info = iter->GetCurrentMetaData();
+      if (info->Has(vtkCompositeDataSet::NAME()))
+        {
+        this->Internal->ChildrenInformation[index].Name = 
+          info->Get(vtkCompositeDataSet::NAME());
+        }
+      }
     }
   // vtkTimerLog::MarkEndEvent("Copying information from composite data");
 }
@@ -228,8 +251,8 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
 
   for (unsigned int i=0; i < otherNumChildren; i++)
     {
-    vtkPVDataInformation* otherInfo = info->Internal->ChildrenInformation[i];
-    vtkPVDataInformation* localInfo = this->Internal->ChildrenInformation[i];
+    vtkPVDataInformation* otherInfo = info->Internal->ChildrenInformation[i].Info;
+    vtkPVDataInformation* localInfo = this->Internal->ChildrenInformation[i].Info;
     if (otherInfo)
       {
       if (localInfo)
@@ -240,9 +263,21 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
         {
         vtkPVDataInformation* dinf = vtkPVDataInformation::New();
         dinf->AddInformation(otherInfo);
-        this->Internal->ChildrenInformation[i] = dinf;
+        this->Internal->ChildrenInformation[i].Info = dinf;
         dinf->Delete();
         }
+      }
+
+    vtkstd::string &otherName = info->Internal->ChildrenInformation[i].Name;
+    vtkstd::string &localName = this->Internal->ChildrenInformation[i].Name;
+    if (!otherName.empty())
+      {
+      if (!localName.empty() && localName != otherName)
+        {
+        vtkWarningMacro("Same block is named as \'" << localName.c_str()
+          << "\' as well as \'" << otherName.c_str() << "\'");
+        }
+      localName = otherName;
       }
     }
 }
@@ -265,10 +300,12 @@ void vtkPVCompositeDataInformation::CopyToStream(
   // information for sub-datasets. There may be a lot of them.
   for(unsigned i=0; i<numChildren; i++)
     {
-    vtkPVDataInformation* dataInf = this->Internal->ChildrenInformation[i];
+    vtkPVDataInformation* dataInf = this->Internal->ChildrenInformation[i].Info;
     if (dataInf)
       {
-      *css << i;
+      *css << i 
+           << this->Internal->ChildrenInformation[i].Name.c_str();
+
       vtkClientServerStream dcss;
       dataInf->CopyToStream(&dcss);
       
@@ -329,6 +366,14 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       {
       break;
       }
+    msgIdx++;
+
+    const char* name = 0;
+    if (!css->GetArgument(0, msgIdx, &name))
+      {
+      vtkErrorMacro("Error parsing the name for the block.");
+      return;
+      }
 
     vtkTypeUInt32 length;
     vtkstd::vector<unsigned char> data;
@@ -352,7 +397,8 @@ void vtkPVCompositeDataInformation::CopyFromStream(
       }
     dcss.SetData(&*data.begin(), length);
     dataInf->CopyFromStream(&dcss);
-    this->Internal->ChildrenInformation[childIdx] = dataInf;
+    this->Internal->ChildrenInformation[childIdx].Info = dataInf;
+    this->Internal->ChildrenInformation[childIdx].Name = name;
     dataInf->Delete();
     }
 

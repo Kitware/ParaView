@@ -125,15 +125,6 @@ public:
   vtkPVDataInformation* GetDataInformationForCompositeIndex(int* index);
 
   // Description:
-  // Name stored in field data.
-  const char* GetName();
-
-  // Description:
-  // We allow the name to be set so paraview can set a default value
-  // if the data has no name.
-  void SetName(const char* name);
-
-  // Description:
   // ClassName of the data represented by information object.
   vtkGetStringMacro(DataClassName);
 
@@ -174,8 +165,6 @@ protected:
   int            Extent[6];
   double         TimeSpan[2];
 
-  char*          Name;
-
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
 
@@ -191,8 +180,6 @@ protected:
   vtkPVArrayInformation* PointArrayInformation;
 
 private:
-  int NameSetToDefault;
-
   vtkPVDataInformation(const vtkPVDataInformation&); // Not implemented
   void operator=(const vtkPVDataInformation&); // Not implemented
 };
