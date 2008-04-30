@@ -210,8 +210,6 @@ void pqLookmarkModel::load(
               pqView *view,  
               vtkSMStateLoader *arg_loader)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-
   if(!server)
     {
     qDebug() << "Cannot load lookmark without an active server";
