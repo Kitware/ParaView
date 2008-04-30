@@ -99,8 +99,31 @@ public:
     xml_server->AddNestedElement(startup.getConfiguration());
     return xml_server;
   }
+  
+  static vtkSmartPointer<vtkPVXMLElement> saveDefaults(const QString& name, pqServerStartup& startup)
+  {
+    vtkPVXMLElement* config = startup.getConfiguration();
+    vtkPVXMLElement* xml_options = config->FindNestedElementByName("Options");
+    if(!xml_options)
+      {
+      return NULL;
+      }
 
-  static pqServerStartup* load(vtkPVXMLElement* xml_server, bool save)
+    vtkSmartPointer<vtkPVXMLElement> xml_server =
+      vtkSmartPointer<vtkPVXMLElement>::New();
+    xml_server->SetName("Server");
+    xml_server->AddAttribute("name", name.toAscii().data());
+    xml_server->AddAttribute("resource",
+      startup.getServer().toURI().toAscii().data());
+    vtkSmartPointer<vtkPVXMLElement> config2 = 
+      vtkSmartPointer<vtkPVXMLElement>::New();
+    config2->SetName("SavedOptions");
+    config2->AddNestedElement(xml_options);
+    xml_server->AddNestedElement(config2);
+    return xml_server;
+  }
+
+  pqServerStartup* load(vtkPVXMLElement* xml_server, bool userPrefs)
   {
     const QString name = xml_server->GetAttribute("name");
   
@@ -113,11 +136,29 @@ public:
       vtkPVXMLElement* xml_startup = xml_server->GetNestedElement(i);
       if(QString(xml_startup->GetName()) == "ManualStartup")
         {
-        return new pqManualServerStartup(name, server, save, xml_startup);
+        return new pqManualServerStartup(name, server, userPrefs, xml_startup);
         }
       else if(QString(xml_startup->GetName()) == "CommandStartup")
         {
-        return new pqCommandServerStartup(name, server, save, xml_startup);
+        return new pqCommandServerStartup(name, server, userPrefs, xml_startup);
+        }
+      else if(QString(xml_startup->GetName()) == "SavedOptions")
+        {
+        // find an existing server with this name, and append the option values
+        if(this->Startups.count(name))
+          {
+          pqServerStartup* su = this->Startups[name];
+          vtkPVXMLElement* config = su->getConfiguration();
+          vtkPVXMLElement* xml_options = config->FindNestedElementByName("Options");
+          vtkPVXMLElement* xml_options2 = xml_startup->FindNestedElementByName("Options");
+          if(xml_options && xml_options2)
+            {
+            xml_options->Merge(xml_options2, "name");
+            }
+          }
+
+        // we made changes in place, so we don't make a new one here
+        return NULL;
         }
       }
 
@@ -302,7 +343,7 @@ void pqServerStartups::deleteStartups(const StartupsT& startups)
   emit this->changed();
 }
 
-void pqServerStartups::save(vtkPVXMLElement* xml, bool saveOnly) const
+void pqServerStartups::save(vtkPVXMLElement* xml, bool userPrefs) const
 {
   vtkSmartPointer<vtkPVXMLElement> xml_servers =
     vtkSmartPointer<vtkPVXMLElement>::New();
@@ -316,18 +357,28 @@ void pqServerStartups::save(vtkPVXMLElement* xml, bool saveOnly) const
     {
     const QString startup_name = startup->first;
     pqServerStartup* const startup_command = startup->second;
-    if(saveOnly && !startup_command->shouldSave())
-      continue;
-    
-    xml_servers->AddNestedElement(pqImplementation::save(startup_name, *startup_command));
+    if(userPrefs && !startup_command->shouldSave())
+      {
+      // for read only server settings, we'll save the users value's for the options
+      vtkSmartPointer<vtkPVXMLElement> s =
+        pqImplementation::saveDefaults(startup_name, *startup_command);
+      if(s)
+        {
+        xml_servers->AddNestedElement(s);
+        }
+      }
+    else
+      {
+      xml_servers->AddNestedElement(pqImplementation::save(startup_name, *startup_command));
+      }
     }
 }
 
-void pqServerStartups::save(const QString& path, bool saveOnly) const
+void pqServerStartups::save(const QString& path, bool userPrefs) const
 {
   vtkSmartPointer<vtkPVXMLElement> xml =
     vtkSmartPointer<vtkPVXMLElement>::New();
-  this->save(xml, saveOnly);
+  this->save(xml, userPrefs);
 
   vtksys_ios::ostringstream xml_stream;
   xml->GetNestedElement(0)->PrintXML(xml_stream, vtkIndent());
@@ -343,7 +394,7 @@ void pqServerStartups::save(const QString& path, bool saveOnly) const
     }
 }
 
-void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool s)
+void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool userPrefs)
 {
   if(QString(xml_servers->GetName()) != "Servers")
     {
@@ -358,7 +409,8 @@ void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool s)
     if(QString(xml_server->GetName()) == "Server")
       {
       const QString name = xml_server->GetAttribute("name");
-      if(pqServerStartup* const startup = pqImplementation::load(xml_server, s))
+      if(pqServerStartup* const startup = 
+        this->Implementation->load(xml_server, userPrefs))
         {
         this->Implementation->deleteStartup(name);
         this->Implementation->Startups.insert(vtkstd::make_pair(name, startup));
@@ -369,7 +421,7 @@ void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool s)
   emit this->changed();
 }
 
-void pqServerStartups::load(const QString& path, bool s)
+void pqServerStartups::load(const QString& path, bool userPrefs)
 {
   QFile file(path);
   if(file.exists())
@@ -379,7 +431,13 @@ void pqServerStartups::load(const QString& path, bool s)
     parser->SetFileName(path.toAscii().data());
     if(parser->Parse())
       {
-      this->load(parser->GetRootElement(), s);
+      this->load(parser->GetRootElement(), userPrefs);
+      }
+    else
+      {
+      QString warn("Failed to parse ");
+      warn += path;
+      qWarning(warn.toAscii().data());
       }
     }
 }

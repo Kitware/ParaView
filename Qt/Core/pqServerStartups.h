@@ -89,8 +89,8 @@ signals:
   void changed();
 
 private:
-  void save(vtkPVXMLElement*, bool) const;
-  void load(vtkPVXMLElement*, bool save);
+  void save(vtkPVXMLElement*, bool userPrefs) const;
+  void load(vtkPVXMLElement*, bool userPrefs);
 
   pqServerStartups(const pqServerStartups&);
   pqServerStartups& operator=(const pqServerStartups&);
