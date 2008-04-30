@@ -131,6 +131,7 @@ pqBarChartRepresentation *pqPlotViewHistogram::getCurrentRepresentation() const
 void pqPlotViewHistogram::setCurrentRepresentation(pqBarChartRepresentation *display)
 {
   // Update the lookup table.
+  display->updateLookupTable();
   vtkSMProxy* lut = 0;
   if(display)
     {
