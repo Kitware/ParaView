@@ -47,11 +47,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqUndoStack.h"
+#include "pqScalarsToColors.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   QWidget( p ),
-  BlockEmission(false),
+  BlockEmission(0),
   Updating(false)
 {
   this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
@@ -59,21 +60,23 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor16.png");
 
   this->Layout  = new QHBoxLayout( this );
-  this->Layout->setMargin(0);
-  this->Layout->setSpacing(6);
+  this->Layout->setMargin( 0 );
 
   this->Variables = new QComboBox( this );
   this->Variables->setMaxVisibleItems(60);
   this->Variables->setObjectName("Variables");
   this->Variables->setMinimumSize( QSize( 150, 0 ) );
+  
+  this->Components = new QComboBox( this );
+  this->Components->setObjectName("Components");
 
-  this->Layout->setMargin( 0 );
-  this->Layout->setSpacing( 1 );
   this->Layout->addWidget(this->Variables);
-
+  this->Layout->addWidget(this->Components);
 
   QObject::connect(this->Variables, SIGNAL(currentIndexChanged(int)), 
     SLOT(onVariableActivated(int)));
+  QObject::connect(this->Components, SIGNAL(currentIndexChanged(int)), 
+    SLOT(onComponentActivated(int)));
   QObject::connect(this, 
     SIGNAL(variableChanged(pqVariableType, const QString&)),
     this,
@@ -94,14 +97,9 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::~pqDisplayColorWidget()
 {
-  delete this->Layout;
-  delete this->Variables;
   delete this->CellDataIcon;
   delete this->PointDataIcon;
   delete this->SolidColorIcon;
-  
-  this->Layout = 0;
-  this->Variables = 0;
   this->VTKConnect->Delete();
 }
 
@@ -114,9 +112,9 @@ QString pqDisplayColorWidget::getCurrentText() const
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::clear()
 {
-  this->BlockEmission = true;
+  this->BlockEmission++;
   this->Variables->clear();
-  this->BlockEmission = false;
+  this->BlockEmission--;
 }
 
 //-----------------------------------------------------------------------------
@@ -129,8 +127,7 @@ void pqDisplayColorWidget::addVariable(pqVariableType type,
     return;
     }
 
-  bool old_value = this->BlockEmission;
-  this->BlockEmission = true;
+  this->BlockEmission++;
   switch(type)
     {
     case VARIABLE_TYPE_NONE:
@@ -146,7 +143,7 @@ void pqDisplayColorWidget::addVariable(pqVariableType type,
         name, this->variableData(type, name));
       break;
     }
-  this->BlockEmission = old_value;
+  this->BlockEmission--;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,6 +154,32 @@ void pqDisplayColorWidget::chooseVariable(pqVariableType type,
   if(row != -1)
     {
     this->Variables->setCurrentIndex(row);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::onComponentActivated(int row)
+{
+  if(this->BlockEmission)
+    {
+    return;
+    }
+  
+  pqPipelineRepresentation* display = this->getRepresentation();
+  if(display)
+    {
+    pqScalarsToColors* lut = display->getLookupTable();
+
+    if(row == 0)
+      {
+      lut->setVectorMode(pqScalarsToColors::MAGNITUDE, -1);
+      }
+    else
+      {
+      lut->setVectorMode(pqScalarsToColors::COMPONENT, row-1);
+      }
+    display->updateLookupTableScalarRange();
+    display->renderViewEventually();
     }
 }
 
@@ -235,7 +258,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::updateGUI()
 {
-  this->BlockEmission = true;
+  this->BlockEmission++;
   pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
@@ -245,8 +268,51 @@ void pqDisplayColorWidget::updateGUI()
       index = 0;
       }
     this->Variables->setCurrentIndex(index);
+    this->updateComponents();
     }
-  this->BlockEmission = false;
+  this->BlockEmission--;
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayColorWidget::updateComponents()
+{
+  this->BlockEmission++;
+  this->Components->clear();
+
+  pqPipelineRepresentation* display = this->getRepresentation();
+  if (display)
+    {
+    pqScalarsToColors* lut = display->getLookupTable();
+    int numComponents = display->getColorFieldNumberOfComponents(
+        display->getColorField());
+    if(lut && numComponents > 1)
+      {
+      // delayed connection for when lut finally exists
+      // remove previous connection, if any
+      this->VTKConnect->Disconnect(
+        lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
+        this, SLOT(needReloadGUI()), NULL);
+      this->VTKConnect->Connect(
+        lut->getProxy(), vtkCommand::PropertyModifiedEvent, 
+        this, SLOT(needReloadGUI()), NULL, 0.0);
+
+      this->Components->addItem("Magnitude");
+      for(int i=0; i<numComponents; i++)
+        {
+        this->Components->addItem(QString("%1").arg(i));
+        }
+      
+      if(lut->getVectorMode() == pqScalarsToColors::MAGNITUDE)
+        {
+        this->Components->setCurrentIndex(0);
+        }
+      else
+        {
+        this->Components->setCurrentIndex(lut->getVectorComponent()+1);
+        }
+      }
+    }
+  this->BlockEmission--;
 }
 
 //-----------------------------------------------------------------------------
@@ -287,7 +353,7 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
       vtkCommand::UpdateInformationEvent, 
       this, SLOT(needReloadGUI()),
       NULL, 0.0);
-
+    
     // Every time the display updates, it is possible that the arrays available for 
     // coloring have changed, hence we reload the list.
     QObject::connect(this->Representation, SIGNAL(updated()), 
@@ -317,14 +383,14 @@ void pqDisplayColorWidget::needReloadGUI()
 void pqDisplayColorWidget::reloadGUI()
 {
   this->Updating = false;
-  this->BlockEmission = true;
+  this->BlockEmission++;
   this->clear();
 
   pqPipelineRepresentation* display = this->getRepresentation();
   if (!display)
     {
     this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
-    this->BlockEmission = false;
+    this->BlockEmission--;
     this->setEnabled(false);
     return;
     }
@@ -350,8 +416,8 @@ void pqDisplayColorWidget::reloadGUI()
       this->addVariable(VARIABLE_TYPE_NODE, arrayName);
       }
     }
-
-  this->BlockEmission = false;
+    
+  this->BlockEmission--;
   this->updateGUI();
 
   emit this->modified();

@@ -111,11 +111,13 @@ private slots:
   /// Called to emit the variableChanged() signal in response to user input 
   /// or the chooseVariable() method.
   void onVariableActivated(int row);
+  void onComponentActivated(int row);
 
   /// Called when any important property on the display changes.
   /// This updates the selected value.
   void updateGUI();
   void needReloadGUI();
+  void updateComponents();
 
 private:
   /// Converts a variable type and name into a packed string representation 
@@ -128,7 +130,8 @@ private:
 
   QHBoxLayout* Layout;
   QComboBox* Variables;
-  bool BlockEmission;
+  QComboBox* Components;
+  int BlockEmission;
   bool Updating;
   vtkEventQtSlotConnect* VTKConnect;
   QPointer<pqPipelineRepresentation> Representation;
