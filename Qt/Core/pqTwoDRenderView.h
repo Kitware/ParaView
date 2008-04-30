@@ -66,6 +66,12 @@ public:
 
   /// returns whether a source can be displayed in this view module 
   virtual bool canDisplay(pqOutputPort* opPort) const;
+  
+protected slots:
+  /// Called when representationVisibilityChanged() is fired.
+  /// Since this view can only show 1 image at a time, we need to ensure that no
+  /// other repr is currently visible.
+  void updateVisibility(pqRepresentation* repr, bool visible);
 
 protected:
   /// Return the name of the group used for global settings (except interactor

@@ -35,12 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMTwoDRenderViewProxy.h"
 
 // Qt Includes.
 
 // ParaView Includes.
 #include "pqOutputPort.h"
+#include "pqPipelineSource.h"
+#include "pqRepresentation.h"
 
 pqTwoDRenderView::ManipulatorType pqTwoDRenderView::DefaultManipulatorTypes[9] = 
 {
@@ -65,6 +68,8 @@ pqTwoDRenderView::pqTwoDRenderView(
   Superclass(twoDRenderViewType(), group, name, viewProxy, server, _parent)
 {
   this->InitializedWidgets = false;
+  QObject::connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+    this, SLOT(updateVisibility(pqRepresentation*, bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -128,14 +133,37 @@ vtkImageData* pqTwoDRenderView::captureImage(int magnification)
 //-----------------------------------------------------------------------------
 bool pqTwoDRenderView::canDisplay(pqOutputPort* opPort) const
 {
-  if (!this->Superclass::canDisplay(opPort))
+  if (opPort == NULL || !this->Superclass::canDisplay(opPort))
     {
     return false;
     }
 
-  vtkPVDataInformation* info = opPort->getDataInformation(true);
-  return (info && 
-    (strcmp(info->GetDataClassName(), "vtkImageData") == 0 ||
-    strcmp(info->GetDataClassName(), "vtkUniformGrid") == 0) &&
-    info->GetCompositeDataClassName() == 0);
+  pqPipelineSource* source = opPort->getSource();
+  vtkSMSourceProxy* sourceProxy = 
+    vtkSMSourceProxy::SafeDownCast(source->getProxy());
+  if (!sourceProxy ||
+     sourceProxy->GetOutputPortsCreated()==0)
+    {
+    return false;
+    }
+
+  const char* dataclassname = opPort->getDataClassName();
+  return (strcmp(dataclassname, "vtkImageData") == 0 ||
+    strcmp(dataclassname, "vtkUniformGrid") == 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqTwoDRenderView::updateVisibility(pqRepresentation* curRepr, bool visible)
+{
+  if (visible)
+    {
+    QList<pqRepresentation*> reprs = this->getRepresentations();
+    foreach (pqRepresentation* repr, reprs)
+      {
+      if (repr != curRepr && repr->isVisible())
+        {
+        repr->setVisible(false);
+        }
+      }
+    }
 }

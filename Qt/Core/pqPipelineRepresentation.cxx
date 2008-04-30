@@ -349,7 +349,10 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     }
 
   // Propagate solid color from the upstream representation.
-  if (upstreamDisplay)
+  // In case of slice representation (and similar) there may be no "Color"
+  // property, hence we need to have this check.
+  if (upstreamDisplay && repr->GetProperty("Color") && 
+    upstreamDisplay->getProxy()->GetProperty("Color"))
     {
     repr->GetProperty("Color")->Copy(
       upstreamDisplay->getProxy()->GetProperty("Color"));
