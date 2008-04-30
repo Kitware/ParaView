@@ -132,7 +132,7 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
 
   this->setRepresentation(repr);
 
-  QObject::connect(this->Internal->Links, SIGNAL(qtWidgetChanged()),
+  QObject::connect(this->Internal->Links, SIGNAL(smPropertyChanged()),
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->EditCubeAxes, SIGNAL(clicked(bool)),
     this, SLOT(editCubeAxes()));
@@ -465,63 +465,6 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setupGUIConnections()
 {
-  // We are usinging Queues slot execution where ever possible,
-  // This ensures that the updateAllViews() slot is called 
-  // only after the vtkSMProperty has been changed by the pqPropertyLinks.
-  QObject::connect(
-    this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->ColorInterpolateColors, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->ColorMapScalars, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->StylePointSize,  SIGNAL(editingFinished()), 
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->StyleLineWidth, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->TranslateX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->TranslateY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->TranslateZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->ScaleX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->ScaleY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->ScaleZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OrientationX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OrientationY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OrientationZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OriginX, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OriginY, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->OriginZ, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
-  QObject::connect(
-    this->Internal->Opacity, SIGNAL(editingFinished()),
-    this, SLOT(updateAllViews()));
   QObject::connect(
     this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
     this, SLOT(zoomToData()));
@@ -542,8 +485,6 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->StyleInterpolation);
   this->Internal->InterpolationAdaptor->setObjectName(
     "StyleInterpolationAdapator");
-  QObject::connect(this->Internal->InterpolationAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
     
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
                             this->Internal->ColorActorColor,
@@ -553,25 +494,17 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->EdgeColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
 
-  QObject::connect(
-    this->Internal->ColorActorColor, SIGNAL(chosenColorChanged(const QColor&)),
-    this, SLOT(updateAllViews()));
-  
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
 
   this->Internal->SliceDirectionAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SliceDirection);
-  QObject::connect(this->Internal->SliceDirectionAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->SliceDirectionAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(sliceDirectionChanged()), Qt::QueuedConnection);
 
   this->Internal->SelectedMapperAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->SelectedMapperIndex);
-  QObject::connect(this->Internal->SelectedMapperAdaptor, 
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->SelectedMapperAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(selectedMapperChanged()), Qt::QueuedConnection);
