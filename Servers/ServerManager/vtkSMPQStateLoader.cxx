@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.22");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.23");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -55,7 +55,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
-    if (prototype && prototype->IsA("vtkSMViewProxy"))
+    if (prototype && prototype->IsA("vtkSMRenderViewProxy"))
       {
       if (!this->PQInternal->PreferredViews.empty())
         {
@@ -70,6 +70,30 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
       // already been used, hence we allocate a new one.
       return this->Superclass::NewProxyInternal(xml_group, 
         this->ViewXMLName);
+      }
+    else if(prototype && prototype->IsA("vtkSMViewProxy"))
+      {
+      // If it is some other kind of view, handle separately
+      if (!this->PQInternal->PreferredViews.empty())
+        {
+        // Return a preferred view of the same type if one exists.
+        vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator iter = 
+          this->PQInternal->PreferredViews.begin();
+        while(iter != this->PQInternal->PreferredViews.end())
+          {
+          if(strcmp((*iter)->GetXMLName(),xml_name)==0)
+            {
+            (*iter)->Register(this);
+            this->PQInternal->PreferredViews.remove(*iter);
+            return (*iter);
+            }
+          iter++;
+          }
+        }
+
+      // Can't use existing module (none present of the same type, 
+      // or all present are have already been used, hence we allocate a new one.
+      return this->Superclass::NewProxyInternal(xml_group, xml_name);
       }
     }
 
