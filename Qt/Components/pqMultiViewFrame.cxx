@@ -118,6 +118,7 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   // setup the context menu
   this->Menu->setContextMenuPolicy(Qt::CustomContextMenu);
   this->Menu->setAcceptDrops(true);
+  this->setAcceptDrops(true);
   QObject::connect(this->Menu,  
     SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(onCustomContextMenuRequested(const QPoint&)));
@@ -377,6 +378,25 @@ QUuid pqMultiViewFrame::uniqueID() const
   return this->UniqueID;
 }
 
+bool pqMultiViewFrame::event(QEvent* e)
+{
+  if(e->type() == QEvent::DragEnter)
+    {
+    QDragEnterEvent* de=reinterpret_cast<QDragEnterEvent*>(e);
+    emit(dragEnter(this,de));
+    }
+  else if(e->type() == QEvent::DragMove)
+    {
+    QDragMoveEvent* de=reinterpret_cast<QDragMoveEvent*>(e);
+    emit(dragMove(this,de));
+    }
+  else if(e->type() == QEvent::Drop)
+    {
+    QDropEvent* de=reinterpret_cast<QDropEvent*>(e);
+    emit(drop(this,de));
+    }
+  return QWidget::event(e);
+}
 
 bool pqMultiViewFrame::eventFilter(QObject* caller, QEvent* e)
 {

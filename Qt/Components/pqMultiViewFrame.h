@@ -144,6 +144,7 @@ protected slots:
 protected:
   void paintEvent(QPaintEvent* e);
   bool eventFilter(QObject*, QEvent* e);
+  bool event(QEvent* e);
 
 private:
   QWidget* EmptyMainWidget;
