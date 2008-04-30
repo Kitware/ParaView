@@ -141,6 +141,12 @@ public:
   virtual void GatherInformation(vtkIdType connectionID,
     vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id);
 //ETX
+  virtual void GatherInformation(vtkIdType connectionID,
+    vtkTypeUInt32 serverFlags, vtkPVInformation* info, int id)
+  {
+    this->GatherInformation(connectionID, serverFlags, info, 
+                            vtkClientServerID(id));
+  }
   
   // Description:
   // Start the process modules. It will create the application
@@ -265,6 +271,12 @@ public:
   // Get the vtkClientServerID used for the ProcessModule.
   vtkClientServerID GetProcessModuleID();
 //ETX
+  int GetProcessModuleIDAsInt()
+  {
+  vtkClientServerID id = this->GetProcessModuleID();
+  return id.ID;
+  }
+
   // Description:
   // Get/Set the global process module.
   static vtkProcessModule* GetProcessModule();
