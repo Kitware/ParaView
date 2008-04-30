@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.39");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.40");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -384,11 +384,14 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       {
       vtkStdString initVal = tmp;
       vtkStdString delim = delimiter;
-      vtkStdString::size_type pos1 = -delim.size();
+      vtkStdString::size_type pos1 = 0;
       vtkStdString::size_type pos2 = 0;
       for(int i=0; i<numEls && pos2 != vtkStdString::npos; i++)
         {
-        pos1 += delim.size();
+        if(i != 0)
+          {
+          pos1 += delim.size();
+          }
         pos2 = initVal.find(delimiter, pos1);
         vtkStdString v = pos1 == pos2 ? "" : initVal.substr(pos1, pos2);
         this->Internals->DefaultValues.push_back(v);
