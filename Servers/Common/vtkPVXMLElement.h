@@ -151,6 +151,15 @@ public:
   void PrintXML();
 
   // Description:
+  // Merges another element with this one, both having the same name.
+  // If any attribute, character data or nested element exists in both, 
+  // the passed in one will override this one's.  If they don't exist,
+  // they'll be added.  If nested elements have the same names, the
+  // optional attributeName maybe passed in as another criteria to determine
+  // what to merge in case of same names.
+  void Merge(vtkPVXMLElement* element, const char* attributeName);
+
+  // Description:
   // Similar to DOM sepecific getElementsByTagName(). 
   // Returns a list of vtkPVXMLElements with the given name in the order
   // in which they will be encountered in a preorder traversal

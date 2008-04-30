@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.21");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.22");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -563,4 +563,87 @@ int vtkPVXMLElement::GetCharacterDataAsVector(int length, vtkIdType* data)
   return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
 }
 #endif
+
+void vtkPVXMLElement::Merge(vtkPVXMLElement* element, const char* attributeName)
+{
+  if(!element || 0 != strcmp(this->GetName(), element->GetName()))
+    {
+    return;
+    }
+  if(attributeName)
+    {
+    const char* attr1 = this->GetAttribute(attributeName);
+    const char* attr2 = element->GetAttribute(attributeName);
+    if(attr1 && attr2 && 0 != strcmp(attr1, attr2))
+      {
+      return;
+      }
+    }
+
+  // override character data if there is some
+  if(!element->Internal->CharacterData.empty())
+    {
+    this->Internal->CharacterData = element->Internal->CharacterData;
+    }
+  
+  // add attributes from element to this, or override attribute values on this
+  unsigned int numAttributes = element->Internal->AttributeNames.size();
+  unsigned int numAttributes2 = this->Internal->AttributeNames.size();
+
+  for(unsigned int i=0; i < numAttributes; ++i)
+    {
+    bool found = false;
+    for(unsigned int j=0; !found && j < numAttributes2; ++j)
+      {
+      if(element->Internal->AttributeNames[i] ==
+        this->Internal->AttributeNames[j])
+        {
+        this->Internal->AttributeValues[j] =
+          element->Internal->AttributeValues[i];
+        found = true;
+        }
+      }
+    // if not found, add it
+    if(!found)
+      {
+      this->AddAttribute(element->Internal->AttributeNames[i].c_str(),
+                         element->Internal->AttributeValues[i].c_str());
+      }
+    }
+
+  // now recursively merge the children with the same names
+
+  vtkPVXMLElementInternals::VectorOfElements::iterator iter;
+  vtkPVXMLElementInternals::VectorOfElements::iterator iter2;
+
+  for(iter = element->Internal->NestedElements.begin();
+      iter != element->Internal->NestedElements.end(); ++iter)
+    {
+    bool found = false;
+    for(iter2 = this->Internal->NestedElements.begin();
+        iter2 != this->Internal->NestedElements.end(); ++iter2)
+      {
+      const char* attr1 = attributeName ? this->GetAttribute(attributeName) : NULL;
+      const char* attr2 = attributeName ? element->GetAttribute(attributeName) : NULL;
+      if(0 == strcmp((*iter)->Name, (*iter2)->Name) &&
+        (!attributeName || (!attr1 || !attr2 || 0 == strcmp(attr1, attr2))))
+        {
+        (*iter2)->Merge(*iter, attributeName);
+        found = true;
+        }
+      }
+    // if not found, add it
+    if(!found)
+      {
+      vtkSmartPointer<vtkPVXMLElement> newElement = 
+        vtkSmartPointer<vtkPVXMLElement>::New();
+      newElement->SetName((*iter)->GetName());
+      newElement->SetId((*iter)->GetId());
+      newElement->Internal->AttributeNames = (*iter)->Internal->AttributeNames;
+      newElement->Internal->AttributeValues = (*iter)->Internal->AttributeValues;
+      this->AddNestedElement(newElement);
+      newElement->Merge(*iter, attributeName);
+      }
+    }
+}
 
