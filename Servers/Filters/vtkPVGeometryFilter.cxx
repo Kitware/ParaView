@@ -53,7 +53,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnsignedIntArray.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.79");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.80");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -880,7 +880,6 @@ void vtkPVGeometryFilter::PolyDataExecute(
     else
       {
       out->ShallowCopy(input);
-      out->RemoveGhostCells(1);
       if (this->PassThroughCellIds)
         {
         vtkIdTypeArray *originalCellIds = vtkIdTypeArray::New();
@@ -913,6 +912,7 @@ void vtkPVGeometryFilter::PolyDataExecute(
         originalPointIds->Delete();
         originalPointIds = NULL;
         }
+      out->RemoveGhostCells(1);
       }
     return;
     }
