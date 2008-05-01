@@ -114,7 +114,7 @@ public:
   /// Creates a representation to show the data from the given output port of a
   /// source in the given \c view.
   virtual pqDataRepresentation* createDataRepresentation(
-    pqOutputPort* source, pqView* view);
+    pqOutputPort* source, pqView* view, const QString &representationType="");
 
   /// Destroys the data display. It will remove the display from any 
   /// view modules it is added to and then unregister it.

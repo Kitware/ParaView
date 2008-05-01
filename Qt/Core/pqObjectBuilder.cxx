@@ -366,7 +366,8 @@ void pqObjectBuilder::destroy(pqView* view)
 
 //-----------------------------------------------------------------------------
 pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
-  pqOutputPort* opPort, pqView* view)
+  pqOutputPort* opPort, pqView* view,
+  const QString &representationType)
 {
   if (!opPort || !view)
     {
@@ -386,8 +387,14 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
 
   // HACK to create correct representation for text sources/filters.
   QString srcProxyName = source->getProxy()->GetXMLName();
-  if ( (srcProxyName == "TextSource" || srcProxyName == "TimeToTextConvertor"
-      || srcProxyName == "TimeToTextConvertorSource") && 
+  if (representationType != "")
+    {
+    reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
+      "representations", representationType.toAscii().data());
+    }
+  else if ( (srcProxyName == "TextSource" || 
+             srcProxyName == "TimeToTextConvertor"
+             || srcProxyName == "TimeToTextConvertorSource") && 
     qobject_cast<pqRenderView*>(view))
     {
     reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
