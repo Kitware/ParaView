@@ -99,6 +99,7 @@ protected:
   virtual void InvalidateGeometryInternal(int useCache);
 
   vtkSMSourceProxy* CollectProxy;
+  vtkSMProxy* AppendProxy;
   vtkSMProxy* UpdateSuppressorProxy;
   vtkSMProxy* MapperProxy;
   vtkSMProxy* ActorProxy;

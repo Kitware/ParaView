@@ -7235,6 +7235,40 @@ This property controls how the filter works to generate tensor cell data. You ca
       <!-- End of ConvertSelection -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
+   <SourceProxy name="CompositeDataToUnstructuredGridFilter"
+      class="vtkCompositeDataToUnstructuredGridFilter">
+      <Documentation
+        short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid" >
+      vtkCompositeDataToUnstructuredGridFilter appends all vtkUnstructuredGrid
+      leaves of the input composite dataset to a single unstructure grid. The
+      subtree to be combined can be choosen using the SubTreeCompositeIndex. If 
+      the SubTreeCompositeIndex is a leaf node, then no appending is required.
+      </Documentation>
+      
+      <InputProperty name="Input"
+        command="SetInputConnection">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+        <Documentation>
+          Set the input composite dataset.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="SubTreeCompositeIndex"
+        command="SetSubTreeCompositeIndex"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Select the index of the subtree to be appended.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of CompositeDataToUnstructuredGridFilter -->
+    </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

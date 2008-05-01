@@ -7270,6 +7270,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="Append" proxygroup="filters"
+          proxyname="CompositeDataToUnstructuredGridFilter" />
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
       </SubProxy>

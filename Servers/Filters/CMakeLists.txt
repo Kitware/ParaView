@@ -23,6 +23,7 @@ SET(Filters_SRCS
 #  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeAnimationPlayer.cxx
+  vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
 #  vtkDataAnalysisFilter.cxx

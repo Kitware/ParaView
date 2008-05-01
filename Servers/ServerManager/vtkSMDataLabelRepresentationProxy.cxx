@@ -44,6 +44,7 @@ vtkSMDataLabelRepresentationProxy::vtkSMDataLabelRepresentationProxy()
   this->ActorProxy = 0;
   this->TextPropertyProxy = 0;
   this->GeometryIsValid = 0;
+  this->AppendProxy = 0;
   
   this->CellCenterFilter = 0;
   this->CellActorProxy = 0;
@@ -58,6 +59,7 @@ vtkSMDataLabelRepresentationProxy::~vtkSMDataLabelRepresentationProxy()
   this->UpdateSuppressorProxy = 0;
   this->MapperProxy = 0;
   this->ActorProxy = 0;
+  this->AppendProxy = 0;
   this->TextPropertyProxy = 0;
 
   this->CellCenterFilter = 0;
@@ -116,6 +118,7 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
  
+  this->AppendProxy = this->GetSubProxy("Append");
   this->CollectProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("Collect"));
   this->UpdateSuppressorProxy = this->GetSubProxy("UpdateSuppressor");
@@ -123,8 +126,8 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
   this->ActorProxy = this->GetSubProxy("PointLabelProp2D");
   this->TextPropertyProxy =  this->GetSubProxy("PointLabelProperty");
 
-  if (!this->CollectProxy || !this->UpdateSuppressorProxy || !this->MapperProxy
-    || !this->ActorProxy || !this->TextPropertyProxy)
+  if (!this->AppendProxy || !this->CollectProxy || !this->UpdateSuppressorProxy ||
+    !this->MapperProxy || !this->ActorProxy || !this->TextPropertyProxy)
     {
     vtkErrorMacro("Not all required subproxies were defined.");
     return false;
@@ -143,6 +146,7 @@ bool vtkSMDataLabelRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  this->AppendProxy->SetServers(vtkProcessModule::DATA_SERVER);
   this->CollectProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
 
   this->UpdateSuppressorProxy->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
@@ -190,8 +194,10 @@ bool vtkSMDataLabelRepresentationProxy::EndCreateVTKObjects()
   // There used to be a check to ensure that the data type of input is vtkDataSet.
   // I've taken that out since it would cause excution of the extract selection
   // filter. We can put that back if needed.
-  this->Connect(this->GetInputProxy(), this->CollectProxy, 
+  this->Connect(this->GetInputProxy(), this->AppendProxy, 
     "Input", this->OutputPort);
+
+  this->Connect(this->AppendProxy, this->CollectProxy);
   this->SetupPipeline();
   this->SetupDefaults();
 
@@ -209,7 +215,7 @@ void vtkSMDataLabelRepresentationProxy::SetupPipeline()
     this->CollectProxy->GetProperty("OutputDataType"));
   if (otype != NULL)
     {
-    otype->SetElement(0,4); //vtkUnstructuredGrid
+    otype->SetElement(0, VTK_UNSTRUCTURED_GRID); 
     }
   
   stream << vtkClientServerStream::Invoke
