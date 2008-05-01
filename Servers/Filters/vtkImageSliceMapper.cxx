@@ -47,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkImageSliceMapper);
-vtkCxxRevisionMacro(vtkImageSliceMapper, "1.2");
+vtkCxxRevisionMacro(vtkImageSliceMapper, "1.3");
 //----------------------------------------------------------------------------
 vtkImageSliceMapper::vtkImageSliceMapper()
 {
@@ -165,8 +165,51 @@ double* vtkImageSliceMapper::GetBounds()
     {
     return bounds;
     }
+
   this->Update();
   input->GetBounds(this->Bounds);
+  if (this->UseXYPlane)
+    {
+    // When using XY plane, the image will be in XY plane placed at the origin,
+    // hence we adjust the bounds.
+    if (this->Bounds[0] == this->Bounds[1])
+      {
+      this->Bounds[0] = this->Bounds[2];
+      this->Bounds[1] = this->Bounds[3];
+      this->Bounds[2] = this->Bounds[4];
+      this->Bounds[3] = this->Bounds[5];
+      }
+    else if (this->Bounds[2] == this->Bounds[3])
+      {
+      this->Bounds[0] = this->Bounds[4];
+      this->Bounds[1] = this->Bounds[5];
+      this->Bounds[2] = this->Bounds[0];
+      this->Bounds[3] = this->Bounds[1];
+      }
+    else if (this->Bounds[5] == this->Bounds[5])
+      {
+      // nothing to do.
+      }
+    // We check for SliceMode only if the input is not already 2D, since slice
+    // mode is applicable only for 3D images.
+    else if (this->SliceMode == YZ_PLANE)
+      {
+      this->Bounds[0] = this->Bounds[2];
+      this->Bounds[1] = this->Bounds[3];
+      this->Bounds[2] = this->Bounds[4];
+      this->Bounds[3] = this->Bounds[5];
+      }
+    else if (this->SliceMode == XZ_PLANE)
+      {
+      this->Bounds[0] = this->Bounds[4];
+      this->Bounds[1] = this->Bounds[5];
+      this->Bounds[2] = this->Bounds[0];
+      this->Bounds[3] = this->Bounds[1];
+      }
+
+    this->Bounds[4] = this->Bounds[5] = 0.0;
+    }
+
   return this->Bounds;
 }
 
