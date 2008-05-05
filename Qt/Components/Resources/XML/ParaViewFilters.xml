@@ -106,6 +106,7 @@
   <Filter name="TemporalCache" />
   <Filter name="TemporalInterpolator" />
   <Filter name="TemporalShiftScale" />
+  <Filter name="TemporalStatistics" />
   <Filter name="TessellatorFilter" />
   <Filter name="TextureMapToCylinder" />
   <Filter name="TextureMapToPlane" />
