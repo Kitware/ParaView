@@ -7,6 +7,10 @@
           extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
           file_description="ExodusII">
   </Reader>
+  <Reader name="ExodusRestartReader"
+          extensions="ex-timeseries"
+          file_description="Metafile for restarted exodus outputs">
+  </Reader>
   <Reader name="LSDynaReader"
           extensions="d3plot k lsdyna"
           file_description="LSDyna">
@@ -103,6 +107,11 @@
   <Reader name="spcthreader"
           extensions="spcth 0"
           file_description="SpyPlot CTH dataset">
+  </Reader>
+
+  <Reader name="SPCTHRestartReader"
+          extensions="spcth-timeseries"
+          file_description="Case file for restarted CTH outputs">
   </Reader>
 
   <Reader name="DEMReader"

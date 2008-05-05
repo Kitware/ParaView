@@ -29,6 +29,7 @@ SET(Filters_SRCS
 #  vtkDataAnalysisFilter.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
+  vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
   vtkFileSeriesReader.cxx

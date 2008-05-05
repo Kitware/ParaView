@@ -146,6 +146,10 @@ public:
         {
         return new pqExodusIIPanel(proxy, p);
         }
+      if(QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName())
+        {
+        return new pqExodusIIPanel(proxy, p);
+        }
       if(QString("XdmfReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqXDMFPanel(proxy, p);

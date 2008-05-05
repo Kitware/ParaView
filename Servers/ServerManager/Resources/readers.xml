@@ -1315,6 +1315,60 @@
    <!-- End spcthreader-->
    </SourceProxy>
 
+  <FileSeriesReaderProxy name="SPCTHRestartReader"
+                         class="vtkFileSeriesReader"
+                         label="Restarted Sim Spy Plot Reader"
+                         file_name_method="SetFileName">
+    <Documentation short_help="Read SPCTH files from simulation restarts."
+                   long_help="Read collections of SPCTH files from simulations that were restarted.">
+      When a CTH simulation is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
+    </Documentation>
+    <SubProxy>
+      <Proxy name="Reader" proxygroup="sources" proxyname="spcthreader" />
+      <ExposedProperties>
+        <Property name="DownConvertVolumeFraction" />
+        <Property name="DistributeFiles" />
+        <Property name="GenerateLevelArray" />
+        <Property name="GenerateActiveBlockArray" />
+        <Property name="GenerateBlockIdArray" />
+        <Property name="CellArrayInfo" />
+        <Property name="CellArrayStatus" />
+      </ExposedProperties>
+    </SubProxy>
+
+    <StringVectorProperty name="FileName"
+                          animateable="0"
+                          command="SetMetaFileName"
+                          number_of_elements="1">
+      <FileListDomain name="files" />
+      <Documentation>
+        This points to a special metadata file that lists the output files for each restart.
+      </Documentation>
+    </StringVectorProperty>
+
+    <IntVectorProperty name="UseMetaFile"
+                       command="SetUseMetaFile"
+                       number_of_elements="1"
+                       default_values="1">
+      <BooleanDomain name="bool" />
+      <Documentation>
+        This hidden property must always be set to 1 for this proxy to work.
+      </Documentation>
+    </IntVectorProperty>
+
+    <DoubleVectorProperty name="TimestepValues" 
+                          repeatable="1"
+                          information_only="1">
+      <TimeStepsInformationHelper/>
+    </DoubleVectorProperty>
+
+    <Hints>
+      <!-- This property is here simply to set it. -->
+      <Property name="UseMetaFile" show="0" />
+    </Hints>
+    <!-- SPCTHRestartReader -->
+  </FileSeriesReaderProxy>
+
 
    <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML reader">
      <Documentation
@@ -3410,6 +3464,114 @@
 
    <!-- End ExodusIIReader -->
    </SourceProxy>
+
+   <FileSeriesReaderProxy name="ExodusRestartReader"
+                          class="vtkExodusFileSeriesReader"
+                          label="Restarted Sim Exodus Reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read Exodus files from simulation restarts."
+                    long_help="Read collections of Exodus output files from simulations that were restarted.">
+       When a simulation that outputs exodus files is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
+     </Documentation>
+     <SubProxy>
+       <Proxy name="Reader" proxygroup="sources" proxyname="ExodusIIReader" />
+       <ExposedProperties>
+         <Property name="XMLFileNameInfo" />
+         <Property name="XMLFileName" />
+         <Property name="HasModeShapes" />
+         <Property name="ModeShape" />
+         <Property name="Refresh" />
+         <Property name="EdgeBlockArrayInfo" />
+         <Property name="EdgeBlockArrayStatus" />
+         <Property name="FaceBlockArrayInfo" />
+         <Property name="FaceBlockArrayStatus" />
+         <Property name="ElementBlockArrayInfo" />
+         <Property name="ElementBlockArrayStatus" />
+         <Property name="MaterialArrayInfo" />
+         <Property name="MaterialArrayStatus" />
+         <Property name="HierarchyArrayInfo" />
+         <Property name="HierarchyArrayStatus" />
+         <Property name="GlobalResultArrayInfo" />
+         <Property name="GlobalResultArrayStatus" />
+         <Property name="PointResultArrayInfo" />
+         <Property name="PointResultArrayStatus" />
+         <Property name="EdgeResultArrayInfo" />
+         <Property name="EdgeResultArrayStatus" />
+         <Property name="FaceResultArrayInfo" />
+         <Property name="FaceResultArrayStatus" />
+         <Property name="ElementResultArrayInfo" />
+         <Property name="ElementResultArrayStatus" />
+         <Property name="NodeMapInfo" />
+         <Property name="NodeMapArrayStatus" />
+         <Property name="EdgeMapInfo" />
+         <Property name="EdgeMapArrayStatus" />
+         <Property name="FaceMapInfo" />
+         <Property name="FaceMapArrayStatus" />
+         <Property name="ElementMapInfo" />
+         <Property name="ElementMapArrayStatus" />
+         <Property name="NodeSetInfo" />
+         <Property name="NodeSetArrayStatus" />
+         <Property name="SideSetInfo" />
+         <Property name="SideSetArrayStatus" />
+         <Property name="FaceSetInfo" />
+         <Property name="FaceSetArrayStatus" />
+         <Property name="EdgeSetInfo" />
+         <Property name="EdgeSetArrayStatus" />
+         <Property name="ElementSetInfo" />
+         <Property name="ElementSetArrayStatus" />
+         <Property name="ElementSetResultArrayInfo" />
+         <Property name="ElementSetResultArrayStatus" />
+         <Property name="SideSetResultArrayInfo" />
+         <Property name="SideSetResultArrayStatus" />
+         <Property name="FaceSetResultArrayInfo" />
+         <Property name="FaceSetResultArrayStatus" />
+         <Property name="EdgeSetResultArrayInfo" />
+         <Property name="EdgeSetResultArrayStatus" />
+         <Property name="NodeSetResultArrayInfo" />
+         <Property name="NodeSetResultArrayStatus" />
+         <Property name="ApplyDisplacements" />
+         <Property name="DisplacementMagnitude" />
+         <Property name="GenerateObjectIdCellArray" />
+         <Property name="GenerateGlobalNodeIdArray" />
+         <Property name="GenerateGlobalElementIdArray" />
+         <Property name="ExodusModelMetadata" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           animateable="0"
+                           command="SetMetaFileName"
+                           number_of_elements="1">
+       <FileListDomain name="files" />
+       <Documentation>
+         This points to a special metadata file that lists the output files for each restart.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="UseMetaFile"
+                        command="SetUseMetaFile"
+                        number_of_elements="1"
+                        default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         This hidden property must always be set to 1 for this proxy to work.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues" 
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <!-- This property is here simply to set it. -->
+       <Property name="UseMetaFile" show="0" />
+       <!-- This is for special GUI control. -->
+       <Property name="Refresh" show="0"/>
+     </Hints>
+     <!-- ExodusRestartReader -->
+   </FileSeriesReaderProxy>
 
 
    <SourceProxy name="AVSucdReader" 
