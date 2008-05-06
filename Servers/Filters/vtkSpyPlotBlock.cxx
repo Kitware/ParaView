@@ -66,6 +66,7 @@ const char *vtkSpyPlotBlock::GetClassName() const
 }
 
 //-----------------------------------------------------------------------------
+// world space
 void vtkSpyPlotBlock::GetBounds(double bounds[6])const
 {
   bounds[0] = MinBlockBound(0);
@@ -122,6 +123,19 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6]) const
     rbounds[j++] = 0;
     }
 }
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotBlock::GetSpacing(double spacing[3]) const
+{
+  double maxV, minV;
+  for (int q=0; q<3; ++q)
+    {
+    minV = MinBlockBound(q);
+    maxV = MaxBlockBound(q);
+    spacing[q] = (maxV - minV) / this->Dimensions[q];
+    }
+}
+
      
 //-----------------------------------------------------------------------------
 void vtkSpyPlotBlock::GetVectors(vtkDataArray *coordinates[3]) const

@@ -27,8 +27,8 @@
 //    - normals
 //    - tcoords
 //    - tensors
-// * data_type - one of:
-//    - VTK_BIT, VTK_CHAR, etc or the equivalent integers
+// * data_type - one or more of:
+//    - VTK_BIT, VTK_CHAR, VTK_INT, VTK_FLOAT, VTK_DOUBLE,... etc etc or the equivalent integers
 //      from vtkType.h
 //    - VTK_VOID, and 0 are equivalent to not specifying, meaning any data type
 //      is allowed

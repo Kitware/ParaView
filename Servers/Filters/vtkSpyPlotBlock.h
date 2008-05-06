@@ -41,6 +41,7 @@ public:
   void GetDimensions(int dims[3]) const;
   int GetDimension(int i) const;
   void GetBounds(double bounds[6])const;
+  void GetSpacing(double spacing[3]) const;
   void GetVectors(vtkDataArray *coordinates[3]) const;
   void GetVectors(vtkFloatArray *coordinates[3]) const;
   vtkFloatArray *GetVectors(int i) const;

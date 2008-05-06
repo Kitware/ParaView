@@ -27,21 +27,24 @@
 #include "vtkSMStringVectorProperty.h"
 
 #include <vtkstd/map>
+#include <vtkstd/vector>
+#include <vtkstd/string>
+#include "vtksys/ios/sstream"
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.13");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.14");
 
 struct vtkSMArrayListDomainInternals
 {
   vtkstd::map<vtkStdString, int> PartialMap;
+  vtkstd::vector<int> DataTypes;
 };
 
 //---------------------------------------------------------------------------
 vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
-  this->DataType = VTK_VOID;
   this->DefaultElement = 0;
   this->InputDomainName = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
@@ -79,12 +82,25 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx)) )
       {
       this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
-      if (!this->DataType || (arrayInfo->GetDataType() == this->DataType))
+      int nAcceptedTypes=this->ALDInternals->DataTypes.size();
+      if ( nAcceptedTypes==0 )
         {
         unsigned int newidx = this->AddString(arrayInfo->GetName());
         if (arrayInfo == attrInfo)
           {
           attrIdx = newidx;
+          }
+        }
+      for (int i=0; i<nAcceptedTypes; ++i)
+        {
+        int thisDataType=this->ALDInternals->DataTypes[i];
+        if (!thisDataType || (arrayInfo->GetDataType() == thisDataType))
+          {
+          unsigned int newidx = this->AddString(arrayInfo->GetName());
+          if (arrayInfo == attrInfo)
+            {
+            attrIdx = newidx;
+            }
           }
         }
       }
@@ -241,98 +257,102 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
     this->SetAttributeType(vtkDataSetAttributes::SCALARS);
     }
 
-  const char* data_type = element->GetAttribute("data_type");  
+  const char* data_type = element->GetAttribute("data_type");
+
   if(data_type)
     {
-    //from vtkType.h
-    this->DataType = -1;
-    if (!strcmp(data_type, "VTK_VOID")) 
+    // data_type can be a space delimited list of types
+    // vlaid for the domain
+    vtksys_ios::istringstream dataTypeStream(data_type);
+
+    while (dataTypeStream.good())
       {
-      this->DataType=0;    
-      }
-    if (!strcmp(data_type, "VTK_BIT")) 
-      {
-      this->DataType=1;
-      }
-    if (!strcmp(data_type, "VTK_CHAR")) 
-      {
-      this->DataType=2;
-      }
-    if (!strcmp(data_type, "VTK_SIGNED_CHAR")) 
-      {
-      this->DataType=15;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED_CHAR")) 
-      {
-      this->DataType=3;
-      }
-    if (!strcmp(data_type, "VTK_SHORT")) 
-      {
-      this->DataType=4;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED_SHORT")) 
-      {
-      this->DataType=5;
-      }
-    if (!strcmp(data_type, "VTK_INT")) 
-      {
-      this->DataType=6;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED_INT")) 
-      {
-      this->DataType=7;
-      }
-    if (!strcmp(data_type, "VTK_LONG")) 
-      {
-      this->DataType=8;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED_LONG")) 
-      {
-      this->DataType=9;
-      }
-    if (!strcmp(data_type, "VTK_FLOAT")) 
-      {
-      this->DataType=10;
-      }
-    if (!strcmp(data_type, "VTK_DOUBLE")) 
-      {
-      this->DataType=11;
-      }
-    if (!strcmp(data_type, "VTK_ID_TYPE")) 
-      {
-      this->DataType=12;
-      }
-    if (!strcmp(data_type, "VTK_STRING")) 
-      {
-      this->DataType=13;
-      }
-    if (!strcmp(data_type, "VTK_OPAQUE")) 
-      {
-      this->DataType=14;
-      }
-    if (!strcmp(data_type, "VTK_LONG_LONG")) 
-      {
-      this->DataType=16;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED_LONG_LONG")) 
-      {
-      this->DataType=17;
-      }
-    if (!strcmp(data_type, "VTK___INT64")) 
-      {
-      this->DataType=18;
-      }
-    if (!strcmp(data_type, "VTK_UNSIGNED___INT64")) 
-      {
-      this->DataType=19;
-      }
-    if (this->DataType == -1)
-      {
-      this->DataType = atoi(data_type);
+      vtkstd::string thisType;
+      dataTypeStream >> thisType;
+
+      if ( thisType=="VTK_VOID" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_VOID);
+        }
+      else if ( thisType=="VTK_BIT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_BIT);
+        }
+      else if ( thisType=="VTK_CHAR" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_CHAR);
+        }
+      else if ( thisType=="VTK_SIGNED_CHAR" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_SIGNED_CHAR);
+        }
+      else if ( thisType=="VTK_UNSIGNED_CHAR" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_CHAR);
+        }
+      else if ( thisType=="VTK_SHORT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_SHORT);
+        }
+      else if ( thisType=="VTK_UNSIGNED_SHORT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_SHORT);
+        }
+      else if ( thisType=="VTK_INT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_INT);
+        }
+      else if ( thisType=="VTK_UNSIGNED_INT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_INT);
+        }
+      else if ( thisType=="VTK_LONG" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_LONG);
+        }
+      else if ( thisType=="VTK_FLOAT" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_FLOAT);
+        }
+      else if ( thisType=="VTK_DOUBLE" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_DOUBLE);
+        }
+      else if ( thisType=="VTK_ID_TYPE" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_ID_TYPE);
+        }
+      else if ( thisType=="VTK_STRING" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_STRING);
+        }
+      else if ( thisType=="VTK_OPAQUE" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_OPAQUE);
+        }
+      else if ( thisType=="VTK_LONG_LONG" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_LONG_LONG);
+        }
+      else if ( thisType=="VTK_UNSIGNED_LONG_LONG" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED_LONG_LONG);
+        }
+      else if ( thisType=="VTK___INT64" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK___INT64);
+        }
+      else if ( thisType=="VTK_UNSIGNED___INT64" )
+        {
+        this->ALDInternals->DataTypes.push_back(VTK_UNSIGNED___INT64);
+        }
+      else
+        {
+        int maybeType=atoi(thisType.c_str()); //?
+        this->ALDInternals->DataTypes.push_back(maybeType);
+        }
       }
     }
-
-  
   return 1;
 }
 
@@ -346,20 +366,6 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
     return 0;
     }
 
-  if (this->GetNumberOfStrings() > 0)
-    {
-    const char* array = this->GetString(0);
-    if (svp->GetNumberOfElements() == 5)
-      {
-      svp->SetElement(4, array);
-      return 1;
-      }
-    else if (svp->GetNumberOfElements() == 1)
-      {
-      svp->SetElement(0, array);
-      return 1;
-      }
-    }
   return this->Superclass::SetDefaultValues(prop);
 }
 
@@ -369,5 +375,9 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DefaultElement: " << this->DefaultElement << endl;
   os << indent << "AttributeType: " << this->AttributeType << endl;
-  os << indent << "DataType: " << this->DataType << endl;
+  int nDataTypes=this->ALDInternals->DataTypes.size();
+  for (int i=0; i<nDataTypes; ++i)
+    {
+    os << indent << "DataType: " << this->ALDInternals->DataTypes[i] << endl;
+    }
 }

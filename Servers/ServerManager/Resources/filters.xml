@@ -6236,6 +6236,7 @@ Tessellate a higher-order dataset.
        short_help="TODO short help">
        TODO document CTH Fragment Extract Filter.
      </Documentation>
+
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -6247,11 +6248,12 @@ Tessellate a higher-order dataset.
          <DataType value="vtkHierarchicalBoxDataSet"/>
        </DataTypeDomain>
        <InputArrayDomain
-         name="input_array" 
+         name="input_array"
          attribute_type="cell"
-         number_of_components="1" />
+         number_of_components="1"/>
      </InputProperty>
 
+     <!-- Material Fraction Array-->
      <StringVectorProperty
        name="SelectMaterialArray"
        command="SelectMaterialArray"
@@ -6262,10 +6264,7 @@ Tessellate a higher-order dataset.
        <Documentation>
          Specifies the arrays from which to generate fragment sets.
        </Documentation>
-       <ArrayListDomain 
-         name="array_list"
-         attribute_type="Scalars"
-         data_type="VTK_UNSIGNED_CHAR">
+       <ArrayListDomain name="array_list" data_type="VTK_UNSIGNED_CHAR" attribute_type="Scalars">
          <RequiredProperties>
            <Property name="Input" function="Input"/>
          </RequiredProperties>
@@ -6275,6 +6274,56 @@ Tessellate a higher-order dataset.
          <NoDefault />
        </Hints>
      </StringVectorProperty>
+
+     <!-- Summation Array -->
+     <StringVectorProperty
+       name="SelectSummationArray"
+       command="SelectSummationArray"
+       clean_command="UnselectAllSummationArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Compute summation over:">
+       <Documentation>
+         Specifies the arrays from which to sum over fragments.
+       </Documentation>
+
+       <ArrayListDomain 
+         name="array_list"
+         data_type="VTK_FLOAT VTK_DOUBLE">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- override gui no to set default-->
+         <NoDefault /> 
+       </Hints>
+     </StringVectorProperty>
+
+     <!-- Volume weighted average Array -->
+     <StringVectorProperty
+       name="SelectWeightedAverageArray"
+       command="SelectWeightedAverageArray"
+       clean_command="UnselectAllWeightedAverageArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Compute volume weighted average over:">
+       <Documentation>
+         Specifies the arrays from which to volume weighted average.
+       </Documentation>
+       <ArrayListDomain 
+         name="array_list"
+         data_type="VTK_FLOAT VTK_DOUBLE">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- override gui no to set default -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty>
+
      <DoubleVectorProperty
        name="MaterialFractionThreshold"
        command="SetMaterialFractionThreshold"

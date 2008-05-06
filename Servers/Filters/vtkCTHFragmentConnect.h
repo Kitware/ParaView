@@ -24,6 +24,7 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkstd/vector" // using vector internally. ok for leaf classes.
+#include "vtkstd/string" // ...then same is true of string
 
 class vtkDataSet;
 class vtkImageData;
@@ -39,9 +40,11 @@ class vtkCTHFragmentConnectBlock;
 class vtkCTHFragmentConnectIterator;
 class vtkCTHFragmentEquivalenceSet;
 class vtkCTHFragmentConnectRingBuffer;
+class vtkCTHMaterialFragmentArray;
 class vtkMultiProcessController;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
+
 
 class VTK_EXPORT vtkCTHFragmentConnect : public vtkMultiBlockDataSetAlgorithm
 {
@@ -50,15 +53,9 @@ public:
   vtkTypeRevisionMacro(vtkCTHFragmentConnect,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Get pointer to the array selection object
-  // that configures which arrays are to be processed
-  //BTX
-  //vtkGetMacro(MaterialArraySelection, vtkDataArraySelection *);
-  //ETX
+  // PARAVIEW interface stuff
 
-  // for convinience we provide add/remove
-  // other operations may be performed by Get ing the
-  // vtkDataArraySelection and manipulating directly
+  // Material sellection
   // Add a single array
   void SelectMaterialArray(const char *name);
   // remove a single array
@@ -66,11 +63,6 @@ public:
   // remove all arrays
   void UnselectAllMaterialArrays();
 
-  // sets modified if array selection changes
-  static void SelectionModifiedCallback( vtkObject*,
-                                         unsigned long,
-                                         void* clientdata,
-                                         void* );
   // Enable/disable processing on an array
   void SetMaterialArrayStatus( const char* name,
                                int status );
@@ -82,9 +74,55 @@ public:
   // Get the name of a specific array
   const char *GetMaterialArrayName(int index);
 
-  // interface to the volume fraction 
+  // WeightedAverage attribute sellection
+  // Add a single array
+  void SelectWeightedAverageArray(const char *name);
+  // remove a single array
+  void UnselectWeightedAverageArray( const char *name );
+  // remove all arrays
+  void UnselectAllWeightedAverageArrays();
+
+  // Enable/disable processing on an array
+  void SetWeightedAverageArrayStatus( const char* name,
+                                  int status );
+  // Get enable./disable status for a given array
+  int GetWeightedAverageArrayStatus(const char* name);
+  int GetWeightedAverageArrayStatus(int index);
+  // Query the number of available arrays
+  int GetNumberOfWeightedAverageArrays();
+  // Get the name of a specific array
+  const char *GetWeightedAverageArrayName(int index);
+
+  // Summation attribute sellection
+  // Add a single array
+  void SelectSummationArray(const char *name);
+  // remove a single array
+  void UnselectSummationArray( const char *name );
+  // remove all arrays
+  void UnselectAllSummationArrays();
+
+  // Enable/disable processing on an array
+  void SetSummationArrayStatus( const char* name,
+                                  int status );
+  // Get enable./disable status for a given array
+  int GetSummationArrayStatus(const char* name);
+  int GetSummationArrayStatus(int index);
+  // Query the number of available arrays
+  int GetNumberOfSummationArrays();
+  // Get the name of a specific array
+  const char *GetSummationArrayName(int index);
+
+
+
+  // volume fraction 
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
+
+  // sets modified if array selection changes 
+  static void SelectionModifiedCallback( vtkObject*,
+                                         unsigned long,
+                                         void* clientdata,
+                                         void* );
 
 protected:
   vtkCTHFragmentConnect();
@@ -125,10 +163,14 @@ protected:
         int axis0, int maxFlag1, int maxFlag2, 
         vtkCTHFragmentConnectIterator pointNeighborIterators[8],
         double pt[3]);
-  // Returns the total number of blocks in all levels (local process only).
-  int  ComputeOriginAndRootSpacing(
+  // Finds a global origin for the data set, and level 0 dx
+  int  ComputeOriginAndRootSpacingOld(
         vtkHierarchicalBoxDataSet* input);
-
+  void  ComputeOriginAndRootSpacing(
+        vtkHierarchicalBoxDataSet* input);
+  // Returns the total number of local(wrt this proc) blocks.
+  int GetNumberOfLocalBlocks(
+        vtkHierarchicalBoxDataSet* input);
   // Complex ghost layer Handling.
   vtkstd::vector<vtkCTHFragmentConnectBlock*> GhostBlocks;
   void ShareGhostBlocks();
@@ -160,18 +202,30 @@ protected:
     int* procOffset);
   void MergeGhostEquivalenceSets(
     vtkCTHFragmentEquivalenceSet* globalSet);
-  void ResolveVolumes();
-  void GenerateVolumeArray(
-    vtkIntArray* fragemntIds,
+  void ResolveAndPartitionFragments();
+  // copy any integrated attribute(including volume)
+  // into the fragment polys in the output data set
+  void CopyIntegratedAttributesToFragments(
+    vtkIntArray* fragmentIds,
     vtkDataSet* output );
+  // integration helper, returns 0 if the source array 
+  // type is unsupported.
+  int Accumulate(vtkstd::vector<double> &dest, // scalar/vector result
+                 vtkDataArray *src,    // array to accumulate from
+                 int nComps,           // 
+                 int srcCellIndex,     // which cell
+                 double weight);       // weight of contribution
+
 
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
   vtkCTHFragmentConnectBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks(vtkImageData* input, const char *arrayName );
-  int InitializeBlocks( vtkHierarchicalBoxDataSet* input, const char *arrayName );
+  int InitializeBlocks( vtkHierarchicalBoxDataSet* input, 
+                        vtkstd::string &materialFractionArrayName,
+                        vtkstd::vector<vtkstd::string> &averagedArrayNames,
+                        vtkstd::vector<vtkstd::string> &summedArrayNames );
   void AddBlock(vtkCTHFragmentConnectBlock* block);
 
   // New methods for connecting neighbors.
@@ -213,25 +267,40 @@ protected:
   // this points to the name of the fragment array
   // At other times its not valid
   const char *CurrentFragmentIdArrayName;
-  // While processing an individual material 
-  // this identifies the current fragment mesh of the
-  // fragment id array. At other times it's not valid.
-  int CurrentFragmentIdArrayIndex;
 
+  // Local id of current fragment
   int FragmentId;
-  // Integrate the volume for this fragment.
-  // We will do the same for all attributes?
+
+  // Accumulator for the volume of the current fragment.
   double FragmentVolume;
-  // Save the volume in this array indexed by the fragmentId.
+  // Fragment volumes indexed by the fragment id. It's a local
+  // per-process indexing until fragments have been resolved
   vtkDoubleArray* FragmentVolumes;
 
-  // I am going to try to integrate the cell attriubtes here.
-  // The simplest thing to do is keep the arrays in a vtkCellData object.
-  vtkCellData* IntegratedFragmentAttributes;
-  // I am going to do the actual integration in a raw memory buffer.
-  // It is flexible with no complicated arbitrary structure.
-  // I just iterate through the buffer casting the pointer to the correct types.
-  void* IntegrationBuffer;
+  // Weighted average, where weights correspond to fragment volume.
+  // Accumulators one for each array to average
+  vtkstd::vector<vtkstd::vector<double> > FragmentWeightedAverage;
+  // Final weighted averages are indexed by fragment id.
+  vtkstd::vector<vtkDoubleArray *>FragmentWeightedAverages;
+  // number of arrays for which to compute the weighted average
+  int nToAverage;
+
+  // Sum of data over the fragment.
+  // Accumulators, one for each array to sum
+  vtkstd::vector<vtkstd::vector<double> > FragmentSum;
+  // Final weighted averages are indexed by fragment id.
+  vtkstd::vector<vtkDoubleArray *>FragmentSums;
+  // number of arrays for which to compute the weighted average
+  int nToSum;
+
+
+//   // I am going to try to integrate the cell attriubtes here.
+//   // The simplest thing to do is keep the arrays in a vtkCellData object.
+//   vtkCellData* IntegratedFragmentAttributes;
+//   // I am going to do the actual integration in a raw memory buffer.
+//   // It is flexible with no complicated arbitrary structure.
+//   // I just iterate through the buffer casting the pointer to the correct types.
+//   void* IntegrationBuffer;
 
   // This is getting a bit ugly but ...
   // When we resolve (merge equivalent) fragments we need a mapping
@@ -276,8 +345,17 @@ protected:
     vtkCTHFragmentConnectIterator* neighbor,
     vtkCTHFragmentConnectIterator* reference);
 
-  // Manage array selection interface
+  // Create an array of loading factors a measure of the process work
+  // load that each fragment piece represents. Indexed by fragement id.
+  // These are used for load ballancing purposes as fragment pieces are 
+  // collected.
+  vtkIntArray *LoadArray;
+  void BuildLocalLoadArray(vtkIntArray *loadArray);
+
+  // PARAVIEW interface data
   vtkDataArraySelection *MaterialArraySelection;
+  vtkDataArraySelection *WeightedAverageArraySelection;
+  vtkDataArraySelection *SummationArraySelection;
   vtkCallbackCommand *SelectionObserver;
 
 private:

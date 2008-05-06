@@ -179,6 +179,26 @@ protected:
                       int *rightHasBounds,
                       int *leftHasBounds);
 
+  // Determine the box size on just this reader
+  // returns true if box size is a constant on this reader
+  // false if not.
+  bool GetLocalBoxSize(vtkSpyPlotBlockIterator *biter,
+                       int *localBoxSize) const;
+
+  // Determine box size if it is a constant across the data set
+  // If not then this is set to -1,-1,-1.
+  void SetGlobalBoxSize(vtkSpyPlotBlockIterator *biter);
+
+  // Determine the minimum level that is used on just this level
+  // and get the spacing there
+  void GetLocalMinLevelAndSpacing(vtkSpyPlotBlockIterator *biter,
+                                  int *localMinLevel,
+                                  double spacing[3]) const;
+
+  // Set the minimum level that is used
+  // and get the spacing there
+  void SetGlobalMinLevelAndSpacing(vtkSpyPlotBlockIterator *biter);
+
   // Set things up to process an AMR Block
   int PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                      vtkSpyPlotBlock *block, 
@@ -245,7 +265,7 @@ protected:
   // - number of time steps
   // - number of fields
   // - name of fields
-  int UpdateMetaData(vtkInformation* request, 
+  int UpdateMetaData(vtkInformation* request,
                      vtkInformationVector* outputVector);
 
   // Description:
@@ -303,9 +323,12 @@ protected:
   vtkSpyPlotReaderMap *Map;
   
   int DistributeFiles;
-  
+
   vtkBoundingBox *Bounds; //bounds of the hierarchy without the bad ghostcells.
-  
+  int BoxSize[3];         // size of boxes if they are all the same, else -1,-1,-1
+  int MinLevel;       // first used level
+  double MinLevelSpacing[3]; // grid spacing on first used level
+
   int GenerateLevelArray; // user flag
   int GenerateBlockIdArray; // user flag
   int GenerateActiveBlockArray; // user flag

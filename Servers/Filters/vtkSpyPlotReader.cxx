@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.59");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.60");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -79,6 +79,9 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   
   this->Map = new vtkSpyPlotReaderMap;
   this->Bounds = new vtkBoundingBox;
+  this->BoxSize[0] = -1;
+  this->BoxSize[1] = -1;
+  this->BoxSize[2] = -1;
   this->FileName = 0;
   this->CurrentFileName = 0;
   this->CellDataArraySelection = vtkDataArraySelection::New();
@@ -644,7 +647,7 @@ int vtkSpyPlotReader::RequestData(
     }
 
   hb->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
-                            steps+this->CurrentTimeStep, 1);  
+                            steps+this->CurrentTimeStep, 1);
   
   // Tell all of the unireaders that they need to make to check to see
   // if they are current
@@ -662,7 +665,7 @@ int vtkSpyPlotReader::RequestData(
     vtkDebugMacro("Distribute blocks");
     blockIterator=new vtkSpyPlotBlockDistributionBlockIterator;
     }
-  
+
   blockIterator->Init(numProcessors,processNumber,this,this->Map,
                       this->CurrentTimeStep);
 
@@ -672,6 +675,13 @@ int vtkSpyPlotReader::RequestData(
   int progressInterval = total_num_of_blocks / 10 + 1;
   int rightHasBounds = 0;
   int leftHasBounds = 0;
+
+  // TODO collect the functions that gather meta data 
+  // in one place and collect the data in a single pass
+  // TODO move the MakeCurrent outside of metadata funcs
+  // TODO Remove meta data arrays from field data prior to
+  // adding new ones.
+
   // Note that in the process of getting the bounds 
   // all of the readers will get updated appropriately  
   this->SetGlobalBounds(blockIterator, total_num_of_blocks,
@@ -680,16 +690,76 @@ int vtkSpyPlotReader::RequestData(
   // Set the global bounds of the reader
   double b[6];
   this->Bounds->GetBounds(b);
-  info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
   if (!this->Bounds->IsValid())
     {
     // There were no bounds set - reader must have no blocks
     delete blockIterator;
     return 1;
     }
-  
+  // TODO get rid of this, and fix filter to use
+  // field data
+  info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
+
+  // Determine if the box size is constant
+  // and set the size if so, -1 is used
+  // as a flag indicating its not constant
+  this->SetGlobalBoxSize( blockIterator );
+
+  // Determine the minimum level in use
+  // and its grid spacing
+  this->SetGlobalMinLevelAndSpacing( blockIterator );
+
+  // export global bounds, minimum level, spacing, and box size
+  // in field data memebers for use by downstream filters
+  vtkHierarchicalBoxDataSet *hbds 
+        = vtkHierarchicalBoxDataSet::SafeDownCast(hb);
+  if ( hbds )
+    {
+    // global bounds
+    vtkDoubleArray *da = vtkDoubleArray::New();
+    da->SetNumberOfComponents(1);
+    da->SetNumberOfTuples(6);
+    da->SetName("GlobalBounds");
+    for (int q=0; q<6; ++q)
+      {
+      da->SetValue(q, b[q]);
+      }
+    hbds->GetFieldData()->AddArray( da );
+    da->Delete();
+    // global box size
+    vtkIntArray *ia = vtkIntArray::New();
+    ia->SetNumberOfComponents(1);
+    ia->SetNumberOfTuples(3);
+    ia->SetName("GlobalBoxSize");
+    for (int q=0; q<3; ++q)
+      {
+      ia->SetValue(q, this->BoxSize[q]);
+      }
+    hbds->GetFieldData()->AddArray( ia );
+    ia->Delete();
+    // minimum level in use
+    ia = vtkIntArray::New();
+    ia->SetNumberOfComponents(1);
+    ia->SetNumberOfTuples(1);
+    ia->SetName("MinLevel");
+    ia->SetValue(0, this->MinLevel);
+    hbds->GetFieldData()->AddArray( ia );
+    ia->Delete();
+    // grid spacing on the min level
+    da = vtkDoubleArray::New();
+    da->SetNumberOfComponents(1);
+    da->SetNumberOfTuples(3);
+    da->SetName("MinLevelSpacing");
+    for (int q=0; q<3; ++q)
+      {
+      da->SetValue(q, this->MinLevelSpacing[q]);
+      }
+    hbds->GetFieldData()->AddArray( da );
+    da->Delete();
+    }
+
   // Read all files
-  
+
   //vtkDebugMacro("there is (are) "<<numFiles<<" file(s)");
   // Read only the part of the file for this processNumber.
   int current_block_number;
@@ -844,7 +914,7 @@ int vtkSpyPlotReader::RequestData(
     for (i = 0; i<totalNumberOfDataSets; i++)
       {
       cout<<processNumber<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
-      if(hb->GetDataSet(level,i)==0)
+//       if(hb->GetDataSet(level,i)==0)
         {
         cout<<" Void"<<endl;
         }
@@ -1381,6 +1451,235 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     }
 }
 
+void vtkSpyPlotReader::GetLocalMinLevelAndSpacing(
+                              vtkSpyPlotBlockIterator *biter,
+                              int *localMinLevel,
+                              double spacing[3]) const
+{
+  // get first blocks level
+  biter->Start();
+  biter->GetUniReader()->MakeCurrent();
+  vtkSpyPlotBlock *thisBlock= biter->GetBlock();
+  *localMinLevel = thisBlock->GetLevel();
+
+  vtkSpyPlotBlock *minLevelBlock=thisBlock;
+
+  // compare to all others
+  for ( biter->Next(); biter->IsActive(); biter->Next())
+    {
+    thisBlock = biter->GetBlock();
+    int thisMinLevel=thisBlock->GetLevel();
+    if (thisMinLevel < *localMinLevel)
+      {
+      minLevelBlock=thisBlock;
+      *localMinLevel=thisMinLevel;
+      }
+    }
+  // now that we have a ptr to the block with minimum 
+  // level.  We can get the spacing there.
+  minLevelBlock->GetSpacing(spacing);
+
+  return;
+}
+
+void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
+                            vtkSpyPlotBlockIterator *biter)
+{
+  // get the local min level and its spacing
+  int localMinLevel;
+  double localMinLevelSpacing[3];
+  this->GetLocalMinLevelAndSpacing(biter,&localMinLevel,localMinLevelSpacing);
+
+  // If we are not running in parallel then the local
+  // size is the global size
+  if (!this->Controller)
+    {
+    this->MinLevel=localMinLevel;
+    for (int q=0; q<3; ++q)
+      {
+      this->MinLevelSpacing[q]=localMinLevelSpacing[q];
+      }
+    return;
+    }
+  vtkCommunicator *comm = this->Controller->GetCommunicator();
+  if (!comm)
+    {
+    vtkErrorMacro("Couldn't get the communicator.");
+    return;
+    }
+  // package the level and its spacing because
+  // we want to reduce min level but also need
+  // its associated spacing to go along for the ride.
+  double sendBuf[4]={(double)localMinLevel,
+                     localMinLevelSpacing[0],
+                     localMinLevelSpacing[1],
+                     localMinLevelSpacing[2]};
+  // collect the information on proc 0
+  int numProcs=comm->GetNumberOfProcesses();
+  int myRank=comm->GetLocalProcessId();
+
+  // proc 0 gets a bigger buffer to collect all the data
+  double *recvBuf = myRank==0 ? new double[4*numProcs] : 0;
+  if (!comm->Gather( sendBuf, recvBuf, 4, 0))
+    {
+    vtkErrorMacro("Communication error gathering the local minimum level and spacing.");
+    }
+
+  // reduce min level while preserving its
+  // associated spacing
+  if (myRank==0)
+    {
+    // sendBuf will hold the result of the reduction
+    // it is already initialized with min level and
+    // spacing from proc 0, we start looking in data
+    // gathered from proc 1...n
+    for (int i=0,j=4; i<numProcs-1; ++i, j+=4)
+      {
+      if (sendBuf[0]>recvBuf[j])
+        {
+        // copy
+        for (int i=0; i<4; ++i)
+          {
+          sendBuf[i]=recvBuf[j+i];
+          }
+        }
+      }
+    }
+  // proc 0 knows the min level and spacing 
+  // share this with everyone else
+  if (!comm->Broadcast(sendBuf,4,0))
+    {
+    vtkErrorMacro("Communication error broadcasting the local minimum level and spacing.");
+    }
+  // now everyone has the min level and associated grid spacing
+  this->MinLevel=(int)sendBuf[0];
+  for (int q=0; q<3; ++q)
+    {
+    this->MinLevelSpacing[q]=sendBuf[1+q];
+    }
+}
+
+
+// Determine the local box size if the box size is constant. 
+// If the box size varies over the local tree then size will be 
+// -1,-1,-1.
+//
+// returns true if the box size is constant and false if the box size varies 
+bool vtkSpyPlotReader::GetLocalBoxSize(vtkSpyPlotBlockIterator *biter,
+                                       int localBoxSize[3]) const
+{
+  // get first box size 
+  vtkSpyPlotBlock *block;
+  biter->Start();
+  biter->GetUniReader()->MakeCurrent();
+  block = biter->GetBlock();
+  int thisBoxSize[3];
+  block->GetDimensions(localBoxSize);
+  // compare to all others
+  for ( biter->Next(); biter->IsActive(); biter->Next())
+    {
+    block = biter->GetBlock();
+    biter->GetUniReader()->MakeCurrent();
+    block->GetDimensions(thisBoxSize);
+    for (int q=0;q<3;++q)
+      {
+      // if the size changes stop
+      if (thisBoxSize[q]!=localBoxSize[q])
+        {
+        localBoxSize[0] = -1;
+        localBoxSize[1] = -1;
+        localBoxSize[2] = -1;
+        return false;
+        }
+      }
+    }
+  // box size is a constant locally
+  return true;
+}
+
+// Determines if the box size is a constant over the entire data set
+// if so sets this->GlobalBoxSize to that size, otehrwise sets 
+// it to -1,-1,-1
+void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator *biter)
+{
+  // Get the local box size
+  int localBoxSize[3] = {0,0,0};
+  bool isConstantLocally
+      = this->GetLocalBoxSize(biter, localBoxSize);
+
+  // If we are not running in parallel then the local
+  // size is the global size
+  if (!this->Controller)
+    {
+    if (isConstantLocally)
+      {
+      for (int q=0; q<3; ++q)
+        {
+        this->BoxSize[q]=localBoxSize[q];
+        }
+      }
+    else
+      {
+      for (int q=0; q<3; ++q)
+        {
+        this->BoxSize[q]=-1;
+        }
+      }
+    return;
+    }
+  vtkCommunicator *comm = this->Controller->GetCommunicator();
+  if (!comm)
+    {
+    vtkErrorMacro("Couldn't get the communicator.");
+    return;
+    }
+
+  // To decide weather or not box size is constant...
+  // 1) get the smallest box size across procs
+  int globalBoxSize[3] = {-1,-1,-1};
+  if (!comm->AllReduce(localBoxSize, globalBoxSize, 3, vtkCommunicator::MIN_OP))
+    {
+      vtkErrorMacro("Communication error getting the smallest box size.");
+    }
+  // 2) check if box size is smaller some where else
+  bool isConstantGlobally=true;
+  for (int q=0; q<3; ++q)
+    {
+    if (localBoxSize[q]!=globalBoxSize[q])
+      {
+      isConstantGlobally=false;
+      }
+    }
+  // 3) send a flag indicating change/no change occured
+  int lFlag=!isConstantLocally||!isConstantGlobally ? -1 : 1;
+  int gFlag=0;
+  if (!comm->AllReduce(&lFlag,&gFlag,1, vtkCommunicator::MIN_OP))
+    {
+      vtkErrorMacro("Communication error occurred verifying that box size is constant.");
+    }
+  // set the global box size acordingly
+  switch( gFlag )
+    {
+    // box size varies
+    case -1:
+      for (int q=0; q<3; ++q)
+        {
+        this->BoxSize[q]=-1;
+        }
+      break;
+    // box size is constant
+    case 1:
+      for (int q=0; q<3; ++q)
+        {
+        this->BoxSize[q]=localBoxSize[q];
+        }
+        break;
+    default:
+      vtkErrorMacro("Invalid flag value verifying that box size is constant.");
+    }
+ return;
+}
+
 // This functions return 1 if the bounds have been set
 void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
                                       int nBlocks, int progressInterval)
@@ -1458,9 +1757,25 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
 
   needsFixing = block->GetAMRInformation(*(this->Bounds),
                                          level, spacing,
-                                         origin, extents, 
+                                         origin, extents,
                                          realExtents,
-                                         realDims);
+                                         realDims); 
+
+/*  double bds[6];
+  this->Bounds->GetBounds(bds);
+  cerr << "{\n";
+  cerr << "level:       [" << *level << "]\n";
+  cerr << "Origin:      [" << origin[0] << "," << origin[1] << "," << origin[2] << "]\n";
+  cerr << "Spacing:     [" << spacing[0] << "," << spacing[1] << "," << spacing[2] << "]\n";
+  cerr << "extents:     [" << extents[0] << "," << extents[1] << "," << extents[2] << "|"
+                           << extents[3] << "," << extents[4] << "," << extents[5] << "]\n";
+  cerr << "realExtents: [" << realExtents[0] << "," << realExtents[1] << "," << realExtents[2] << ","
+                           << realExtents[3] << "," << realExtents[4] << "," << realExtents[5] << "]\n";
+  cerr << "realDims:    [" << realDims[0] << "," << realDims[1] << "," << realDims[2] << "]\n";
+  cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
+                           << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
+  cerr << "}\n"*/;
+
 
   int loCorner[3], hiCorner[3];
   loCorner[0] = realExtents[0];
@@ -1483,7 +1798,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
   ug->Delete();
   return needsFixing;
 }
-                                  
+
 int vtkSpyPlotReader::PrepareData(vtkMultiBlockDataSet *hb,
                                   vtkSpyPlotBlock *block,
                                   vtkRectilinearGrid **rg,
