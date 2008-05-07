@@ -26,9 +26,9 @@ pxm.RegisterProxy("sources",  "my reader", reader)
 #========================================================
 filter = servermanager.filters.ProgrammableFilter()
 filter.GetProperty("Script").SetElement(0, """
-input = self.GetUnstructuredGridInput()
+input = self.GetInputDataObject(0, 0)
 
-output = self.GetUnstructuredGridOutput()
+output = self.GetOutputDataObject(0)
 output.DeepCopy(input)
 
 """)
@@ -88,9 +88,9 @@ pxm.RegisterProxy("sources",  "my reader", reader)
 #========================================================
 filter = servermanager.filters.ProgrammableFilter()
 filter.GetProperty("Script").SetElement(0, """
-input = self.GetUnstructuredGridInput()
+input = self.GetInputDataObject(0, 0)
 
-output = self.GetUnstructuredGridOutput()
+output = self.GetOutputDataObject(0)
 output.DeepCopy(input)
 
 """)
