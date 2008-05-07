@@ -48,6 +48,7 @@ class pqAnimationManager;
 class pqAnimationPanel;
 class pqAnimationScene;
 class pqAnimationViewWidget;
+class pqColorScaleToolbar;
 class pqDockWindowInterface;
 class pqGenericViewModule;
 class pqLookmarkManagerModel;
@@ -231,6 +232,9 @@ public:
 
   /// Returns the lookmark model.
   pqLookmarkManagerModel* getLookmarkManagerModel();
+
+  /// Gets the color scale editor manager.
+  pqColorScaleToolbar* getColorScaleEditorManager();
 
   /// Asks the user to make a new server connection, if none exists.
   bool makeServerConnectionIfNoneExists();

@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqApplicationOptionsDialog.h"
 #include "pqCameraDialog.h"
+#include "pqColorScaleToolbar.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqCustomFilterDefinitionModel.h"
 #include "pqCustomFilterDefinitionWizard.h"
@@ -209,6 +210,7 @@ public:
     LookmarkToolbar(0),
     ToolTipTrapper(0),
     InCreateSource(false),
+    ColorScale(0),
     LinksManager(0),
     TimerLog(0), 
     QuickLaunchDialog(parent)
@@ -269,6 +271,8 @@ public:
   QPointer<pqCameraDialog> CameraDialog;
 
   bool InCreateSource;
+
+  QPointer<pqColorScaleToolbar> ColorScale;
   
   QPointer<pqProxyTabWidget> ProxyPanel;
   QPointer<pqAnimationManager> AnimationManager;
@@ -578,6 +582,11 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(serverManagerExtensionLoaded()),
     &this->Implementation->ViewExporterManager,
     SLOT(refresh()));
+
+  // Register the color scale editor manager with the application so it
+  // can be used by the display panels.
+  core->registerManager("COLOR_SCALE_EDITOR",
+      this->getColorScaleEditorManager());
 }
 
 //-----------------------------------------------------------------------------
@@ -955,13 +964,30 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
   
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(toolbar)
     << pqSetName("displayColor");
-    
-  toolbar->addWidget(display_color);
+
+  QList<QAction *> toolActions = toolbar->actions();
+  toolbar->insertWidget(toolActions[1], display_color);
 
   QObject::connect(this->getObjectInspectorDriver(),
                    SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
                    display_color, 
                    SLOT(setRepresentation(pqDataRepresentation*)));
+
+  this->getColorScaleEditorManager()->setColorWidget(display_color);
+}
+
+pqColorScaleToolbar* pqMainWindowCore::getColorScaleEditorManager()
+{
+  if(!this->Implementation->ColorScale)
+    {
+    this->Implementation->ColorScale = new pqColorScaleToolbar(this);
+    this->connect(this->getObjectInspectorDriver(),
+        SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
+        this->Implementation->ColorScale, 
+        SLOT(setActiveRepresentation(pqDataRepresentation*)));
+    }
+
+  return this->Implementation->ColorScale;
 }
 
 //-----------------------------------------------------------------------------

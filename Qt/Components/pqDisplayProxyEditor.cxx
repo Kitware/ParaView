@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView client includes
 #include "pqApplicationCore.h"
-#include "pqColorScaleEditor.h"
+#include "pqColorScaleToolbar.h"
 #include "pqCubeAxesEditorDialog.h"
 #include "pqFileDialog.h"
 #include "pqPipelineRepresentation.h"
@@ -591,19 +591,13 @@ void pqDisplayProxyEditor::updateEnableState()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::openColorMapEditor()
 {
-  if(this->Internal->Representation.isNull())
+  // Get the color scale editor from the application core's registry.
+  pqColorScaleToolbar *colorScale = qobject_cast<pqColorScaleToolbar *>(
+      pqApplicationCore::instance()->manager("COLOR_SCALE_EDITOR"));
+  if(colorScale)
     {
-    return;
+    colorScale->editColorMap(this->Internal->Representation);
     }
-
-  // Create a color map editor and set the display.
-  if(!this->ColorScaleEditor)
-    {
-    this->ColorScaleEditor = new pqColorScaleEditor(this);
-    this->ColorScaleEditor->setRepresentation(this->Internal->Representation);
-    this->ColorScaleEditor->setAttribute(Qt::WA_DeleteOnClose);
-    }
-  this->ColorScaleEditor->show();
 }
 
 //-----------------------------------------------------------------------------

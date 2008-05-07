@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqAnimationPanel.h>
 #include <pqAnimationViewWidget.h>
 #include <pqApplicationCore.h>
+#include <pqColorScaleToolbar.h>
 #include <pqComparativeVisPanel.h>
 //#include <pqLookmarkToolbar.h>
 #include <pqMainWindowCore.h>
@@ -685,6 +686,12 @@ MainWindow::MainWindow() :
   QObject::connect(this->Implementation->Core.getObjectInspectorDriver(),
     SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
     sbva, SLOT(setActiveRepresentation(pqDataRepresentation*)));
+
+  // Set up the color map tool buttons.
+  pqColorScaleToolbar *colorScale =
+      this->Implementation->Core.getColorScaleEditorManager();
+  colorScale->setColorAction(this->Implementation->UI.actionEditColorMap);
+  colorScale->setRescaleAction(this->Implementation->UI.actionResetRange);
 
   // Set up Center Axes toolbar.
   QObject::connect(

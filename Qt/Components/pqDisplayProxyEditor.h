@@ -35,12 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QList>
 #include <QVariant>
-#include <QPointer>
 #include "pqDisplayPanel.h"
 
 class pqDisplayProxyEditorInternal;
 class pqPipelineRepresentation;
-class pqColorScaleEditor;
 
 /// Widget which provides an editor for the properties of a display.
 class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public pqDisplayPanel
@@ -85,8 +83,6 @@ protected:
   
   QVariant specularColor() const;
   void setSpecularColor(QVariant);
-
-  QPointer<pqColorScaleEditor> ColorScaleEditor;
 
 private:
   bool DisableSlots;

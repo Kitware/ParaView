@@ -40,6 +40,7 @@
         <file>Icons/pqEdgeMapData16.png</file>
         <file>Icons/pqEdgeSetData16.png</file>
         <file>Icons/pqEditCamera16.png</file>
+        <file>Icons/pqEditColor24.png</file>
         <file>Icons/pqElemData16.png</file>
         <file>Icons/pqElemMapData16.png</file>
         <file>Icons/pqElemSetData16.png</file>
@@ -132,6 +133,7 @@
         <file>Icons/pqResetCamera32.png</file>
         <file>Icons/pqResetCenter24.png</file>
         <file>Icons/pqResetCenter32.png</file>
+        <file>Icons/pqResetRange24.png</file>
         <file>Icons/pqRotate16.png</file>
         <file>Icons/pqRotate24.png</file>
         <file>Icons/pqRotate32.png</file>

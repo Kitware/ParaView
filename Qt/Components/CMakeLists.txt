@@ -75,6 +75,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqColorPresetManager.h
   pqColorPresetModel.h
   pqColorScaleEditor.h
+  pqColorScaleToolbar.h
   pqComboBoxDomain.h
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.h
@@ -374,6 +375,8 @@ ADD_LIBRARY(pqComponents
   pqColorPresetModel.h
   pqColorScaleEditor.cxx
   pqColorScaleEditor.h
+  pqColorScaleToolbar.cxx
+  pqColorScaleToolbar.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
   pqComparativeTracksWidget.cxx

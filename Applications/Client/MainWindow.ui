@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>25</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -37,43 +37,56 @@
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
+   <widget class="QMenu" name="menuFile" >
     <property name="title" >
-     <string>&amp;Tools</string>
+     <string>&amp;File</string>
     </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="actionToolsCreateLookmark" />
-    <addaction name="actionToolsManageLinks" />
-    <addaction name="actionToolsAddCameraLink" />
-    <addaction name="actionManage_Plugins" />
+    <widget class="QMenu" name="menuRecentFiles" >
+     <property name="title" >
+      <string>Recent Files</string>
+     </property>
+    </widget>
+    <addaction name="actionFileOpen" />
+    <addaction name="menuRecentFiles" />
     <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="actionTesting_Window_Size" />
+    <addaction name="actionFileLoadServerState" />
+    <addaction name="actionFileSaveServerState" />
     <addaction name="separator" />
-    <addaction name="actionToolsTimerLog" />
-    <addaction name="actionToolsOutputWindow" />
+    <addaction name="actionFileSaveData" />
+    <addaction name="actionFileSaveScreenshot" />
+    <addaction name="actionExport" />
     <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
+    <addaction name="actionFileSaveAnimation" />
+    <addaction name="actionFileSaveGeometry" />
+    <addaction name="separator" />
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+    <addaction name="separator" />
+    <addaction name="actionFileExit" />
    </widget>
-   <widget class="QMenu" name="menuFilters" >
+   <widget class="QMenu" name="menuEdit" >
     <property name="title" >
-     <string>F&amp;ilters</string>
+     <string>&amp;Edit</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuAnimation" >
-    <property name="title" >
-     <string>A&amp;nimation</string>
-    </property>
-    <addaction name="actionVCRFirstFrame" />
-    <addaction name="actionVCRPreviousFrame" />
-    <addaction name="actionVCRPlay" />
-    <addaction name="actionVCRNextFrame" />
-    <addaction name="actionVCRLastFrame" />
-    <addaction name="actionVCRLoop" />
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionChangeInput" />
+    <addaction name="actionDelete" />
+    <addaction name="actionDelete_All" />
+    <addaction name="separator" />
+    <addaction name="actionMoveMode" />
+    <addaction name="actionSelectionMode" />
+    <addaction name="actionSelectSurfacePoints" />
+    <addaction name="actionSelect_Frustum" />
+    <addaction name="actionSelectFrustumPoints" />
+    <addaction name="actionSelect_Block" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
+    <addaction name="actionEditViewSettings" />
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -106,61 +119,48 @@
     <addaction name="menuToolbars" />
     <addaction name="separator" />
    </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-    <addaction name="separator" />
-    <addaction name="actionChangeInput" />
-    <addaction name="actionDelete" />
-    <addaction name="actionDelete_All" />
-    <addaction name="separator" />
-    <addaction name="actionMoveMode" />
-    <addaction name="actionSelectionMode" />
-    <addaction name="actionSelectSurfacePoints" />
-    <addaction name="actionSelect_Frustum" />
-    <addaction name="actionSelectFrustumPoints" />
-    <addaction name="actionSelect_Block" />
-    <addaction name="separator" />
-    <addaction name="actionEditSettings" />
-    <addaction name="actionEditViewSettings" />
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>&amp;Sources</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuFile" >
+   <widget class="QMenu" name="menuFilters" >
     <property name="title" >
-     <string>&amp;File</string>
+     <string>F&amp;ilters</string>
     </property>
-    <widget class="QMenu" name="menuRecentFiles" >
-     <property name="title" >
-      <string>Recent Files</string>
-     </property>
-    </widget>
-    <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
+   </widget>
+   <widget class="QMenu" name="menuAnimation" >
+    <property name="title" >
+     <string>A&amp;nimation</string>
+    </property>
+    <addaction name="actionVCRFirstFrame" />
+    <addaction name="actionVCRPreviousFrame" />
+    <addaction name="actionVCRPlay" />
+    <addaction name="actionVCRNextFrame" />
+    <addaction name="actionVCRLastFrame" />
+    <addaction name="actionVCRLoop" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionToolsCreateLookmark" />
+    <addaction name="actionToolsManageLinks" />
+    <addaction name="actionToolsAddCameraLink" />
+    <addaction name="actionManage_Plugins" />
     <addaction name="separator" />
-    <addaction name="actionFileLoadServerState" />
-    <addaction name="actionFileSaveServerState" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="actionTesting_Window_Size" />
     <addaction name="separator" />
-    <addaction name="actionFileSaveData" />
-    <addaction name="actionFileSaveScreenshot" />
-    <addaction name="actionExport" />
+    <addaction name="actionToolsTimerLog" />
+    <addaction name="actionToolsOutputWindow" />
     <addaction name="separator" />
-    <addaction name="actionFileSaveAnimation" />
-    <addaction name="actionFileSaveGeometry" />
-    <addaction name="separator" />
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-    <addaction name="separator" />
-    <addaction name="actionFileExit" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -305,6 +305,8 @@
     <number>4</number>
    </attribute>
    <addaction name="actionScalarBarVisibility" />
+   <addaction name="actionEditColorMap" />
+   <addaction name="actionResetRange" />
   </widget>
   <widget class="QToolBar" name="representationToolbar" >
    <property name="windowTitle" >
@@ -1270,6 +1272,37 @@
   <action name="actionExport" >
    <property name="text" >
     <string>Export</string>
+   </property>
+  </action>
+  <action name="actionEditColorMap" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqEditColor24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Edit Color Map</string>
+   </property>
+   <property name="statusTip" >
+    <string>Edit Color Map</string>
+   </property>
+  </action>
+  <action name="actionResetRange" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetRange24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Reset Range</string>
+   </property>
+   <property name="toolTip" >
+    <string>Rescale to Data Range</string>
+   </property>
+   <property name="statusTip" >
+    <string>Rescale to Data Range</string>
    </property>
   </action>
  </widget>
