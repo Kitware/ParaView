@@ -67,6 +67,7 @@
   <Filter name="ExtractSelectionOverTime" />
   <Filter name="ExtractDataSets" />
   <Filter name="FeatureEdges" />
+  <Filter name="GenerateIdScalars"/>
   <Filter name="Glyph" />
   <Filter name="Gradient" />
   <Filter name="GradientMagnitude" />

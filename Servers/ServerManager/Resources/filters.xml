@@ -478,6 +478,41 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="GenerateIdScalars" class="vtkIdFilter"
+     label="Generate Ids">
+     <Documentation
+        long_help="Generate scalars from point and cell ids."
+        short_help="Generate scalars from point and cell ids.">
+This filter generates scalars  using cell and point ids. That is, the point attribute data scalars are generated from the point ids, and the cell attribute data scalars or field data are generated from the the cell ids.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            This property specifies the input to the Cell Data to Point Data filter.
+          </Documentation>
+     </InputProperty>
+     <StringVectorProperty 
+        name="ArrayName" 
+        command="SetIdsArrayName" 
+        number_of_elements="1"
+        default_values="Ids">
+        <Documentation>
+          The name of the array that will contain ids.
+        </Documentation>
+     </StringVectorProperty> 
+
+   <!-- End GenerateIdScalars -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData"
      label="Clean">
      <Documentation
