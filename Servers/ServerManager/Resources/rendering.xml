@@ -5564,7 +5564,7 @@
           <Entry value="0" text="Projected tetra" />
           <Entry value="1" text="HAVS" />
           <Entry value="2" text="Z sweep" />
-          <Entry value="4" text="Bunyk ray cast" />
+          <Entry value="3" text="Bunyk ray cast" />
         </EnumerationDomain>
       </IntVectorProperty>
 
