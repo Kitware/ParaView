@@ -6285,7 +6285,7 @@ Tessellate a higher-order dataset.
        <InputArrayDomain
          name="input_array"
          attribute_type="cell"
-         number_of_components="1"/>
+         /><!--number_of_components="1"-->
      </InputProperty>
 
      <!-- Material Fraction Array-->

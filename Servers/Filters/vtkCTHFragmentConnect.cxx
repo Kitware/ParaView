@@ -63,7 +63,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.22");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.23");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -5551,7 +5551,7 @@ void vtkCTHFragmentConnect::CopyIntegratedAttributesToFragments(
     {
     waa[i]=vtkDoubleArray::New();
     waa[i]->SetName(this->FragmentWeightedAverages[i]->GetName());
-    waa[i]->SetNumberOfComponents(1);
+    waa[i]->SetNumberOfComponents(this->FragmentWeightedAverages[i]->GetNumberOfComponents());
     waa[i]->SetNumberOfTuples(numPoints);
     }
   // summation
@@ -5560,7 +5560,7 @@ void vtkCTHFragmentConnect::CopyIntegratedAttributesToFragments(
     {
     sa[i]=vtkDoubleArray::New();
     sa[i]->SetName(this->FragmentSums[i]->GetName());
-    sa[i]->SetNumberOfComponents(1);
+    sa[i]->SetNumberOfComponents(this->FragmentSums[i]->GetNumberOfComponents());
     sa[i]->SetNumberOfTuples(numPoints);
     }
 
