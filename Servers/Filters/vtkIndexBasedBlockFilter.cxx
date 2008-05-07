@@ -40,7 +40,7 @@
 #include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.17");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.18");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -255,7 +255,14 @@ int vtkIndexBasedBlockFilter::RequestData(
 
   if (this->OriginalIndicesArray)
     {
-    output->GetFieldData()->AddArray(this->OriginalIndicesArray);
+    // We add OriginalIndicesArray only if the output doesn't already have some
+    // other arrays which typically get added by the vtkPVExtractSelection
+    // filter.
+    if (output->GetFieldData()->GetArray("vtkOriginalPointIds")==0 &&
+      output->GetFieldData()->GetArray("vtkOriginalCellIds")==0)
+      {
+      output->GetFieldData()->AddArray(this->OriginalIndicesArray);
+      }
     this->OriginalIndicesArray->Delete();
     this->OriginalIndicesArray = 0;
     }
