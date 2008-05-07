@@ -1119,7 +1119,7 @@ void MainWindow::onPlaying(bool playing)
       &this->Implementation->Core.VCRController(), SLOT(onPause()));
     this->Implementation->UI.actionVCRPlay->setIcon(
       QIcon(":/pqWidgets/Icons/pqVcrPause24.png"));
-    this->Implementation->UI.actionVCRPlay->setText("Pa&amp;use");
+    this->Implementation->UI.actionVCRPlay->setText("Pa&use");
     }
   else
     {
@@ -1129,7 +1129,7 @@ void MainWindow::onPlaying(bool playing)
       &this->Implementation->Core.VCRController(), SLOT(onPause()));
     this->Implementation->UI.actionVCRPlay->setIcon(
       QIcon(":/pqWidgets/Icons/pqVcrPlay24.png"));
-    this->Implementation->UI.actionVCRPlay->setText("&amp;Play");
+    this->Implementation->UI.actionVCRPlay->setText("&Play");
     }
 
   this->Implementation->Core.setSelectiveEnabledState(!playing);
