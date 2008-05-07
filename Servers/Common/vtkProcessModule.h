@@ -339,22 +339,27 @@ public:
   virtual void CreateLogFile();
 
   // Description:
-  // For loggin from Tcl start and end execute events.  We do not have c
-  // pointers to all filters.
+  // For logging start and end execute events.
   void LogStartEvent(const char* str);
   void LogEndEvent(const char* str);
 
   // Description:
-  // More timer log access methods.  Static methods are not accessible 
-  // from tcl.  We need a timer object on all procs.
+  // More timer log access methods. 
   void SetLogBufferLength(int length);
+  void SetLogBufferLength(vtkIdType connectionID,
+                          vtkTypeUInt32 servers,
+                          int length);
   void ResetLog();
+  void ResetLog(vtkIdType connectionID, vtkTypeUInt32 servers);
   void SetEnableLog(int flag);
+  void SetEnableLog(vtkIdType connectionID, vtkTypeUInt32 servers,
+                    int flag);
 
   // Description:
   // Time threshold for event (start-end) when getting the log with indents.
-  // We do not have a timer object on all procs.  Statics do not work with Tcl.
   vtkSetMacro(LogThreshold, double);
+  void SetLogThreshold(vtkIdType connectionID, vtkTypeUInt32 servers,
+                       double threshold);
   vtkGetMacro(LogThreshold, double);
 
   // Description:

@@ -106,7 +106,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.80");
+vtkCxxRevisionMacro(vtkProcessModule, "1.81");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1475,10 +1475,37 @@ void vtkProcessModule::LogEndEvent(const char* str)
       << " KB" << endl;
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetLogBufferLength(vtkIdType connectionID,
+                                          vtkTypeUInt32 servers,
+                                          int length)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "SetLogBufferLength"
+         << length
+         << vtkClientServerStream::End;
+  this->SendStream(connectionID, servers, stream);
+}
+
 //----------------------------------------------------------------------------
 void vtkProcessModule::SetLogBufferLength(int length)
 {
   vtkTimerLog::SetMaxEntries(length);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::ResetLog(vtkIdType connectionID,
+                                vtkTypeUInt32 servers)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "ResetLog"
+         << vtkClientServerStream::End;
+  this->SendStream(connectionID, servers, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -1488,9 +1515,37 @@ void vtkProcessModule::ResetLog()
 }
 
 //----------------------------------------------------------------------------
+void vtkProcessModule::SetEnableLog(vtkIdType connectionID,
+                                    vtkTypeUInt32 servers,
+                                    int flag)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "SetEnableLog"
+         << flag
+         << vtkClientServerStream::End;
+  this->SendStream(connectionID, servers, stream);
+}
+
+//----------------------------------------------------------------------------
 void vtkProcessModule::SetEnableLog(int flag)
 {
   vtkTimerLog::SetLogging(flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SetLogThreshold(vtkIdType connectionID, 
+                                       vtkTypeUInt32 servers,
+                                       double threshold)
+{
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "SetLogThreshold"
+         << threshold
+         << vtkClientServerStream::End;
+  this->SendStream(connectionID, servers, stream);
 }
 
 //============================================================================
