@@ -130,18 +130,18 @@ pqBarChartRepresentation *pqPlotViewHistogram::getCurrentRepresentation() const
 
 void pqPlotViewHistogram::setCurrentRepresentation(pqBarChartRepresentation *display)
 {
-  // Update the lookup table.
-  display->updateLookupTable();
   vtkSMProxy* lut = 0;
-  if(display)
+  if (display)
     {
+    // Update the lookup table.
+    display->updateLookupTable();
     lut = pqSMAdaptor::getProxyProperty(
         display->getProxy()->GetProperty("LookupTable"));
     }
 
   this->Internal->ColorScheme.setMapIndexToColor(true);
   this->Internal->ColorScheme.setScalarsToColors(lut);
-  if(this->Internal->LastUsedRepresentation == display)
+  if (this->Internal->LastUsedRepresentation == display)
     {
     return;
     }
