@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkVolumeRepresentationPreprocessor, "1.1");
+vtkCxxRevisionMacro(vtkVolumeRepresentationPreprocessor, "1.2");
 vtkStandardNewMacro(vtkVolumeRepresentationPreprocessor);
 
 //----------------------------------------------------------------------------
@@ -153,10 +153,13 @@ vtkDataSet *vtkVolumeRepresentationPreprocessor::MultiBlockToDataSet(
 /// Choose which block to volume render.  Ignored if input is not multiblock.
 void vtkVolumeRepresentationPreprocessor::SetExtractedBlockIndex(int index)
 {
-  this->ExtractedBlockIndex = index;
-  this->ExtractBlockFilter->RemoveAllIndices();
-  this->ExtractBlockFilter->AddIndex(this->ExtractedBlockIndex);
-  this->Modified();
+  if (this->ExtractedBlockIndex != index)
+    {
+    this->ExtractedBlockIndex = index;
+    this->ExtractBlockFilter->RemoveAllIndices();
+    this->ExtractBlockFilter->AddIndex(this->ExtractedBlockIndex);
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------

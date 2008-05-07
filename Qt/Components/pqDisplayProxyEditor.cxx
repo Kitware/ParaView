@@ -136,7 +136,7 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
     this, SLOT(updateAllViews()));
   QObject::connect(this->Internal->EditCubeAxes, SIGNAL(clicked(bool)),
     this, SLOT(editCubeAxes()));
-  QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged ()),
+  QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged()),
     this, SLOT(volumeBlockSelected()));
 }
 
@@ -771,7 +771,7 @@ void pqDisplayProxyEditor::volumeBlockSelected()
       vtkSMDataRepresentationProxy* repr =
         this->Internal->Representation->getRepresentationProxy();
       pqSMAdaptor::setElementProperty(
-        repr->GetProperty("ExtractedBlockIndex"), selectedIndex-1);
+        repr->GetProperty("ExtractedBlockIndex"), selectedIndex);
       repr->UpdateVTKObjects();
       this->Internal->Representation->renderViewEventually();
       this->Internal->ColorBy->reloadGUI();
