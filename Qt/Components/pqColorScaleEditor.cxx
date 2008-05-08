@@ -1666,7 +1666,16 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
     this->Form->Links.addPropertyLink(
         this->Form->LabelOpacity, "value", SIGNAL(valueChanged(double)),
         proxy, proxy->GetProperty("LabelOpacity"));
-
+    this->Form->Links.addPropertyLink(
+        this->Form->AutomaticLabelFormat, "checked", SIGNAL(toggled(bool)),
+        proxy, proxy->GetProperty("AutomaticLabelFormat"));   
+    this->Form->Links.addPropertyLink(
+        this->Form->LabelFormat, "text", SIGNAL(textChanged(const QString&)),
+        proxy, proxy->GetProperty("LabelFormat"));
+    this->connect(this->Form->AutomaticLabelFormat, SIGNAL(toggled(bool)),
+                  this, SLOT(updateLabelFormatControls()));
+    this->updateLabelFormatControls();
+    
     this->Form->Links.addPropertyLink(this->Form->NumberOfLabels,
         "value", SIGNAL(valueChanged(int)),
         proxy, proxy->GetProperty("NumberOfLabels"));
@@ -1693,6 +1702,13 @@ void pqColorScaleEditor::enableLegendControls(bool enable)
   this->Form->CountLabel->setEnabled(enable);
   this->Form->AspectRatio->setEnabled(enable);
   this->Form->AspectRatioLabel->setEnabled(enable);
+}
+
+void pqColorScaleEditor::updateLabelFormatControls()
+{
+  bool autoFormat = this->Form->AutomaticLabelFormat->isChecked();
+  this->Form->LabelFormatLabel->setEnabled(!autoFormat);
+  this->Form->LabelFormat->setEnabled(!autoFormat);
 }
 
 void pqColorScaleEditor::makeDefault()

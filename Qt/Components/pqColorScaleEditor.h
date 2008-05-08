@@ -112,6 +112,7 @@ private slots:
   void setLegendComponent(const QString &text);
   void setLegendTitle(const QString &name, const QString &component);
   void updateLegendTitle();
+  void updateLabelFormatControls();
   //@}
 
   /// \name Cleanup Methods

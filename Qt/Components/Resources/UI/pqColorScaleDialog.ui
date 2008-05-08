@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>435</width>
-    <height>424</height>
+    <width>399</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -481,49 +481,6 @@
        <property name="verticalSpacing" >
         <number>6</number>
        </property>
-       <item row="4" column="0" colspan="5" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="2" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="3" >
-        <widget class="QLabel" name="AspectRatioLabel" >
-         <property name="text" >
-          <string>Aspect Ratio</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="4" >
-        <widget class="QDoubleSpinBox" name="AspectRatio" >
-         <property name="minimum" >
-          <double>0.010000000000000</double>
-         </property>
-         <property name="value" >
-          <double>20.000000000000000</double>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0" colspan="5" >
         <widget class="QCheckBox" name="ShowColorLegend" >
          <property name="whatsThis" >
@@ -802,38 +759,20 @@
           <string>Labels</string>
          </property>
          <layout class="QGridLayout" >
-          <property name="leftMargin" >
-           <number>9</number>
-          </property>
-          <property name="topMargin" >
-           <number>9</number>
-          </property>
-          <property name="rightMargin" >
-           <number>9</number>
-          </property>
-          <property name="bottomMargin" >
-           <number>9</number>
-          </property>
-          <property name="horizontalSpacing" >
-           <number>6</number>
-          </property>
-          <property name="verticalSpacing" >
-           <number>6</number>
-          </property>
-          <item row="1" column="1" >
-           <widget class="QSpinBox" name="LabelFontSize" >
-            <property name="minimum" >
-             <number>1</number>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_8" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-            <property name="maximum" >
-             <number>1024</number>
-            </property>
-            <property name="value" >
-             <number>12</number>
+            <property name="text" >
+             <string>Font</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="5" >
+          <item row="0" column="1" colspan="6" >
            <widget class="QComboBox" name="LabelFont" >
             <property name="sizePolicy" >
              <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
@@ -861,27 +800,7 @@
             </item>
            </widget>
           </item>
-          <item row="0" column="0" >
-           <widget class="QLabel" name="label_8" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text" >
-             <string>Font</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" >
-           <widget class="QLabel" name="label_7" >
-            <property name="text" >
-             <string>Size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6" >
+          <item row="0" column="7" >
            <layout class="QHBoxLayout" >
             <property name="spacing" >
              <number>0</number>
@@ -948,39 +867,23 @@
             </item>
            </layout>
           </item>
-          <item row="1" column="4" >
-           <widget class="QDoubleSpinBox" name="LabelOpacity" >
-            <property name="whatsThis" >
-             <string>Used to set the label opacity.</string>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_7" >
+            <property name="text" >
+             <string>Size</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QSpinBox" name="LabelFontSize" >
+            <property name="minimum" >
+             <number>1</number>
             </property>
             <property name="maximum" >
-             <double>1.000000000000000</double>
+             <number>1024</number>
             </property>
-            <property name="singleStep" >
-             <double>0.100000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="5" colspan="2" >
-           <widget class="pqColorChooserButton" name="LabelColorButton" >
-            <property name="whatsThis" >
-             <string>Click this button to set the label color.</string>
-            </property>
-            <property name="text" >
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3" >
-           <widget class="QLabel" name="label_9" >
-            <property name="sizePolicy" >
-             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text" >
-             <string>Opacity</string>
+            <property name="value" >
+             <number>12</number>
             </property>
            </widget>
           </item>
@@ -996,6 +899,59 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QLabel" name="label_9" >
+            <property name="sizePolicy" >
+             <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text" >
+             <string>Opacity</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4" colspan="2" >
+           <widget class="QDoubleSpinBox" name="LabelOpacity" >
+            <property name="whatsThis" >
+             <string>Used to set the label opacity.</string>
+            </property>
+            <property name="maximum" >
+             <double>1.000000000000000</double>
+            </property>
+            <property name="singleStep" >
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="6" colspan="2" >
+           <widget class="pqColorChooserButton" name="LabelColorButton" >
+            <property name="whatsThis" >
+             <string>Click this button to set the label color.</string>
+            </property>
+            <property name="text" >
+             <string>Color</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3" >
+           <widget class="QCheckBox" name="AutomaticLabelFormat" >
+            <property name="text" >
+             <string>Automatic Label Format</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4" >
+           <widget class="QLabel" name="LabelFormatLabel" >
+            <property name="text" >
+             <string>Label Format</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5" colspan="3" >
+           <widget class="QLineEdit" name="LabelFormat" />
           </item>
          </layout>
         </widget>
@@ -1019,6 +975,49 @@
           <string>Used to edit and display the number of labels.</string>
          </property>
         </widget>
+       </item>
+       <item row="3" column="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="3" column="3" >
+        <widget class="QLabel" name="AspectRatioLabel" >
+         <property name="text" >
+          <string>Aspect Ratio</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="4" >
+        <widget class="QDoubleSpinBox" name="AspectRatio" >
+         <property name="minimum" >
+          <double>0.010000000000000</double>
+         </property>
+         <property name="value" >
+          <double>20.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="5" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -1072,6 +1071,8 @@
   <tabstop>LabelFontSize</tabstop>
   <tabstop>LabelOpacity</tabstop>
   <tabstop>LabelColorButton</tabstop>
+  <tabstop>AutomaticLabelFormat</tabstop>
+  <tabstop>LabelFormat</tabstop>
   <tabstop>NumberOfLabels</tabstop>
   <tabstop>AspectRatio</tabstop>
  </tabstops>

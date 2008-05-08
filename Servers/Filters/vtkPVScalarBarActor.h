@@ -51,11 +51,21 @@ public:
   vtkGetMacro(AspectRatio, double);
   vtkSetMacro(AspectRatio, double);
 
+  // Description:
+  // If true (the default), the printf format used for the labels will be
+  // automatically generated to make the numbers best fit within the widget.  If
+  // false, the LabelFormat ivar will be used.
+  vtkGetMacro(AutomaticLabelFormat, int);
+  vtkSetMacro(AutomaticLabelFormat, int);
+  vtkBooleanMacro(AutomaticLabelFormat, int);
+
 protected:
   vtkPVScalarBarActor();
   ~vtkPVScalarBarActor();
 
   double AspectRatio;
+
+  int AutomaticLabelFormat;
 
   virtual float GetFontScale(vtkViewport *viewport);
 

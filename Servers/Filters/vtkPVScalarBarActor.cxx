@@ -35,13 +35,14 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.2");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.3");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
 vtkPVScalarBarActor::vtkPVScalarBarActor()
 {
   this->AspectRatio = 20.0;
+  this->AutomaticLabelFormat = 1;
 }
 
 vtkPVScalarBarActor::~vtkPVScalarBarActor()
@@ -53,6 +54,7 @@ void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "AspectRatio: " << this->AspectRatio << endl;
+  os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat <<endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,7 +91,7 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
   this->TextMappers = new vtkTextMapper * [this->NumberOfLabels];
   this->TextActors = new vtkActor2D * [this->NumberOfLabels];
 
-  char format[20];
+  char format[512];
   char string[512];
 
   double fontScaling = this->GetFontScale(viewport);
@@ -147,35 +149,42 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
 //       targetHeight = vtkstd::min(targetHeight, propSize[1]-barHeight);
       }
 
-    // Get the maximum number of characters we can comfortably put in each
-    // label without making it smaller.
-    int targetStringLength;
-    for (targetStringLength = 3; targetStringLength < 100; targetStringLength++)
+    if (this->AutomaticLabelFormat)
       {
-      vtkstd::fill_n(string, targetStringLength, '0');
-      string[targetStringLength] = '\0';
-      this->TextMappers[0]->SetInput(string);
-      this->TextMappers[0]->SetConstrainedFontSize(viewport,
-                                                   VTK_INT_MAX, targetHeight);
-      int expectedWidth = this->TextMappers[0]->GetWidth(viewport);
-      if (expectedWidth > targetWidth) break;
-      }
-    targetStringLength--;
+      // Get the maximum number of characters we can comfortably put in each
+      // label without making it smaller.
+      int targetStringLength;
+      for (targetStringLength = 3; targetStringLength<100; targetStringLength++)
+        {
+        vtkstd::fill_n(string, targetStringLength, '0');
+        string[targetStringLength] = '\0';
+        this->TextMappers[0]->SetInput(string);
+        this->TextMappers[0]->SetConstrainedFontSize(viewport,
+                                                     VTK_INT_MAX, targetHeight);
+        int expectedWidth = this->TextMappers[0]->GetWidth(viewport);
+        if (expectedWidth > targetWidth) break;
+        }
+      targetStringLength--;
 
-    // Find the limits of the exponents.
-    double lowExp  = (range[0] == 0.0) ? 1.0 : log10(MY_ABS(range[0]));
-    double highExp = (range[1] == 0.0) ? 1.0 : log10(MY_ABS(range[1]));
+      // Find the limits of the exponents.
+      double lowExp  = (range[0] == 0.0) ? 1.0 : log10(MY_ABS(range[0]));
+      double highExp = (range[1] == 0.0) ? 1.0 : log10(MY_ABS(range[1]));
 
-    if (   (vtkstd::min(lowExp, highExp) < -4.0)
-        || (vtkstd::max(lowExp, highExp) > targetStringLength-2) )
-      {
-      // Use exponential formating
-      sprintf(format, "%%-0.%de", vtkstd::max(1, targetStringLength-7));
+      if (   (vtkstd::min(lowExp, highExp) < -4.0)
+          || (vtkstd::max(lowExp, highExp) > targetStringLength-2) )
+        {
+        // Use exponential formating
+        sprintf(format, "%%-#0.%de", vtkstd::max(1, targetStringLength-7));
+        }
+      else
+        {
+        // Use floating point formating
+        sprintf(format, "%%-#0.%dg", targetStringLength-2);
+        }
       }
     else
       {
-      // Use floating point formating
-      sprintf(format, "%%-0.%dg", targetStringLength-2);
+      sprintf(format, "%s", this->LabelFormat);
       }
 
     for (int i = 0; i < this->NumberOfLabels; i++)

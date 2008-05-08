@@ -7091,6 +7091,7 @@
           <Property name="LookupTable" />
           <Property name="Orientation" />
           <Property name="Title" />
+          <Property name="AutomaticLabelFormat" />
           <Property name="LabelFormat" />
           <Property name="NumberOfLabels" />
           <Property name="AspectRatio" />
