@@ -621,7 +621,7 @@ void pqDisplayProxyEditor::zoomToData()
     }
 
   double bounds[6];
-  this->Internal->Representation->getDataBounds(bounds);
+  this->Internal->Representation->getRepresentationProxy()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
     pqRenderView* renModule = qobject_cast<pqRenderView*>(
