@@ -50,8 +50,27 @@ public:
   pqOutputPortComboBox(QWidget* parent=0);
   ~pqOutputPortComboBox();
 
+  /// Enable/Disable changing of the combo-box selected index based on the
+  /// active source/port. Default is true i.e. enabled.
+  void setAutoUpdateIndex(bool val)
+    { this->AutoUpdateIndex = val; }
+  bool autoUpdateIndex() const
+    { return this->AutoUpdateIndex; }
+
+  /// Makes is possible to add custom items to the combo-box.
+  /// \c port can be NULL.
+  void addCustomEntry(const QString& label, pqOutputPort* port);
+
   /// Returns the currently selected output port.
   pqOutputPort* currentPort() const;
+
+  /// May be called once after creation to initialize the widget with already
+  /// existing sources.
+  void fillExistingPorts();
+
+public slots:
+  /// Sets the current index to be the one representing the indicated port.
+  void setCurrentPort(pqOutputPort* port);
 
 signals:
   /// Fired when the current index changes.
@@ -74,6 +93,9 @@ private slots:
 
   /// Called when a new source is removed.
   void removeSource(pqPipelineSource* source);
+
+protected:
+  bool AutoUpdateIndex;
 
 private:
   pqOutputPortComboBox(const pqOutputPortComboBox&); // Not implemented.

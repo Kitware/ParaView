@@ -185,6 +185,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   #pqSourceInfoModel.h
   pqSourcesMenuManager.h
   pqSpreadSheetDisplayEditor.h
+  pqSpreadSheetViewDecorator.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
@@ -264,6 +265,7 @@ SET(UI_FORMS
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSignalAdaptorKeyFrameValue.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
+  Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
   Resources/UI/pqTimerLogDisplay.ui
@@ -610,6 +612,8 @@ ADD_LIBRARY(pqComponents
   pqStateLoader.h
   pqSpreadSheetDisplayEditor.cxx
   pqSpreadSheetDisplayEditor.h
+  pqSpreadSheetViewDecorator.cxx
+  pqSpreadSheetViewDecorator.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.cxx

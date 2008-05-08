@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainter>
 #include <QPen>
 #include <QApplication>
+#include <QVBoxLayout>
 
 // ParaView Includes.
 #include "pqOutputPort.h"
@@ -239,6 +240,7 @@ public:
     delete this->Table;
     }
 
+  QPointer<QWidget> Container;
   QPointer<QTableView> Table;
   pqSpreadSheetViewModel Model;
   pqSpreadSheetViewSelectionModel SelectionModel;
@@ -274,6 +276,12 @@ pqSpreadSheetView::pqSpreadSheetView(
     {
     this->onAddRepresentation(rep);
     }
+
+  this->Internal->Container = new QWidget();
+  QVBoxLayout *layout = new QVBoxLayout(this->Internal->Container);
+  layout->setSpacing(2);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->addWidget(this->Internal->Table);
 }
 
 //-----------------------------------------------------------------------------
@@ -282,11 +290,10 @@ pqSpreadSheetView::~pqSpreadSheetView()
   delete this->Internal;
 }
 
-
 //-----------------------------------------------------------------------------
 QWidget* pqSpreadSheetView::getWidget()
 {
-  return this->Internal->Table;
+  return this->Internal->Container;
 }
 
 //-----------------------------------------------------------------------------
@@ -313,7 +320,9 @@ void pqSpreadSheetView::updateRepresentationVisibility(
     this->Internal->Model.getRepresentationProxy() == repr->getProxy())
     {
     this->Internal->Model.setRepresentation(0);
+    emit this->showing(0);
     }
+
   if (!visible || !repr)
     {
     return;
@@ -329,7 +338,9 @@ void pqSpreadSheetView::updateRepresentationVisibility(
       }
     }
 
-  this->Internal->Model.setRepresentation(qobject_cast<pqDataRepresentation*>(repr));
+  pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
+  this->Internal->Model.setRepresentation(dataRepr);
+  emit this->showing(dataRepr);
 }
 
 //-----------------------------------------------------------------------------

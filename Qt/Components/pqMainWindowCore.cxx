@@ -125,6 +125,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSplitViewUndoElement.h"
 #include "pqSpreadSheetView.h"
+#include "pqSpreadSheetViewDecorator.h"
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
@@ -2791,16 +2792,21 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
 void pqMainWindowCore::onViewCreated(pqView* view)
 {
   pqPipelineSource* source = 0;
-  if (qobject_cast<pqSpreadSheetView*>(view) && 
-    (source = this->getActiveSource()) != 0 &&
-    !this->Implementation->PendingDisplayManager.isPendingDisplay(source))
+  pqSpreadSheetView* spreadSheet = qobject_cast<pqSpreadSheetView*>(view);
+  if (spreadSheet)
     {
-    // If a new spreadsheet view is created, we show the active source in it by
-    // default.
-    pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(
-      source->getOutputPort(0), view);
-    // trigger an eventual-render.
-    view->render();
+    new pqSpreadSheetViewDecorator(spreadSheet);
+
+    if ((source = this->getActiveSource()) != 0 &&
+      !this->Implementation->PendingDisplayManager.isPendingDisplay(source))
+      {
+      // If a new spreadsheet view is created, we show the active source in it by
+      // default.
+      pqApplicationCore::instance()->getObjectBuilder()->createDataRepresentation(
+        source->getOutputPort(0), view);
+      // trigger an eventual-render.
+      view->render();
+      }
     }
 }
 

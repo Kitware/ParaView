@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 class vtkSMSourceProxy;
+class pqDataRepresentation;
 
 /// View for spread-sheet view. It can show data from any source/filter on the
 /// client. 
@@ -67,6 +68,11 @@ public:
   
   /// Currently, this view can show only Extraction filters.
   virtual bool canDisplay(pqOutputPort* opPort) const;
+
+signals:
+  /// Fired when the currently shown representation changes. \c repr may be
+  /// NULL.
+  void showing(pqDataRepresentation* repr);
 
 protected slots:
   /// Called when a new repr is added.

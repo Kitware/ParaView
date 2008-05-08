@@ -56,11 +56,33 @@ pqOutputPortComboBox::pqOutputPortComboBox(QWidget* _parent) : Superclass(_paren
   QObject::connect(core->getServerManagerModel(),
     SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(removeSource(pqPipelineSource*)));
+  this->AutoUpdateIndex = true;
 }
 
 //-----------------------------------------------------------------------------
 pqOutputPortComboBox::~pqOutputPortComboBox()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputPortComboBox::fillExistingPorts()
+{
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smmodel = core->getServerManagerModel();
+
+  QList<pqPipelineSource*> sources = 
+    smmodel->findItems<pqPipelineSource*>(0);
+  foreach (pqPipelineSource* source, sources)
+    {
+    this->addSource(source);
+    }
+
+}
+
+//-----------------------------------------------------------------------------
+void pqOutputPortComboBox::addCustomEntry(const QString& name, pqOutputPort* port)
+{
+  this->addItem(name, QVariant::fromValue((void*)port));
 }
 
 //-----------------------------------------------------------------------------
@@ -137,8 +159,24 @@ void pqOutputPortComboBox::nameChanged(pqServerManagerModelItem* item)
 }
 
 //-----------------------------------------------------------------------------
+void pqOutputPortComboBox::setCurrentPort(pqOutputPort* port)
+{
+  QVariant _data = QVariant::fromValue((void*)port);
+  int index = this->findData(_data);
+  if (index != -1)
+    {
+    this->setCurrentIndex(index);
+    } 
+}
+
+//-----------------------------------------------------------------------------
 void pqOutputPortComboBox::onCurrentChanged(pqServerManagerModelItem* item)
 {
+  if (!this->AutoUpdateIndex)
+    {
+    return;
+    }
+
   pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
   pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
   if (src)
@@ -146,17 +184,7 @@ void pqOutputPortComboBox::onCurrentChanged(pqServerManagerModelItem* item)
     port = src->getOutputPort(0);
     }
 
-  if (!port)
-    {
-    return;
-    }
-
-  QVariant _data = QVariant::fromValue((void*)port);
-  int index = this->findData(_data);
-  if (index != -1)
-    {
-    this->setCurrentIndex(index);
-    }
+  this->setCurrentPort(port);
 }
 
 //-----------------------------------------------------------------------------
@@ -177,3 +205,5 @@ void pqOutputPortComboBox::onCurrentIndexChanged(int /*changed*/)
   pqOutputPort* port = this->currentPort();
   emit this->currentIndexChanged(port);
 }
+
+
