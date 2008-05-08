@@ -126,4 +126,17 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
       this->Spreadsheet->render();
       }
     }
+  else
+    {
+    QList<pqRepresentation*> reprs = this->Spreadsheet->getRepresentations();
+    foreach (pqRepresentation* repr, reprs)
+      {
+      if (repr->isVisible())
+        {
+        repr->setVisible(false);
+        this->Spreadsheet->render();
+        break; // since only 1 repr can be visible at a time.
+        }
+      }
+    }
 }
