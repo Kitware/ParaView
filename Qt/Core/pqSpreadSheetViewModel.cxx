@@ -480,6 +480,10 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
         {
         title = "Point ID";
         }
+      else if (title == "vtkCompositeIndexArray")
+        {
+        title = "Block Number";
+        }
 
       return QVariant(title);
       }
