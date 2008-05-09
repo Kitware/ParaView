@@ -63,7 +63,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.23");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.24");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -899,12 +899,6 @@ void vtkCTHFragmentConnectBlock::AddNeighbor(
   int axis, 
   int maxFlag)
 {
-//   if (this->Level == 4 && this->BaseCellExtent[0] == 208 && this->BaseCellExtent[2] == 224 && this->BaseCellExtent[4] == 160)
-//     {
-//     cerr << "Debug\n";
-//     }
-
-
   if (maxFlag)
     { // max neighbor
     this->Neighbors[2*axis+1].push_back(neighbor);
@@ -1183,11 +1177,6 @@ void vtkCTHFragmentLevel::SetStandardBlockDimensions(int dims[3])
 int vtkCTHFragmentLevel::AddBlock(vtkCTHFragmentConnectBlock* block)
 {
   int xIdx, yIdx, zIdx;
-
-//   if (block->GetLevel() == 4 && block->LevelBlockId == 24)
-//     {
-//     cerr << "Debug.\n";
-//     }
 
   // First make sure the level is correct.
   // We assume that the block dimensions are correct.
@@ -1763,22 +1752,30 @@ void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
     {
     // The purpose for passing a list into the method is no longer.
     // We could simplify this method.
-    this->FindFaceNeighbors(block->GetLevel(), blockIndex, 
-                            axis, 0, &neighbors);
-    for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
-      {
-      neighbor = neighbors[ii];
-      block->AddNeighbor(neighbor, axis, 0);
-      neighbor->AddNeighbor(block, axis, 1);
+    if (ext[2*axis] == blockIndex[axis] * this->StandardBlockDimensions[axis])
+      { // I had trouble with ghost blocks that did not span the 
+      // entire standard block.  They had inappropriate neighbors.
+      this->FindFaceNeighbors(block->GetLevel(), blockIndex, 
+                              axis, 0, &neighbors);
+      for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
+        {
+        neighbor = neighbors[ii];
+        block->AddNeighbor(neighbor, axis, 0);
+        neighbor->AddNeighbor(block, axis, 1);
+        }
       }
 
-    this->FindFaceNeighbors(block->GetLevel(), blockIndex,
-                           axis, 1, &neighbors);
-    for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
-      {
-      neighbor = neighbors[ii];
-      block->AddNeighbor(neighbor, axis, 1);
-      neighbor->AddNeighbor(block, axis, 0);
+    if (ext[2*axis + 1] == ((blockIndex[axis]+1) * this->StandardBlockDimensions[axis])-1)
+      { // I had trouble with ghost blocks that did not span the 
+      // entire standard block.  They had inappropriate neighbors.
+      this->FindFaceNeighbors(block->GetLevel(), blockIndex,
+                             axis, 1, &neighbors);
+      for (unsigned int ii = 0; ii < neighbors.size(); ++ii)
+        {
+        neighbor = neighbors[ii];
+        block->AddNeighbor(neighbor, axis, 1);
+        neighbor->AddNeighbor(block, axis, 0);
+        }
       }
     }
 }
