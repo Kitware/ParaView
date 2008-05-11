@@ -6310,7 +6310,53 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
-     <!-- Summation Array -->
+     <!-- Mass Array-->
+     <StringVectorProperty
+       name="SelectMassArray"
+       command="SelectMassArray"
+       clean_command="UnselectAllMassArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Select Mass Arrays">
+       <Documentation>
+         Specifies the arrays from which to compute fragment mass and moments.
+       </Documentation>
+       <ArrayListDomain 
+         name="array_list" 
+         data_type="VTK_FLOAT VTK_DOUBLE" 
+         attribute_type="Scalars">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- override gui no to set default -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="WriteOutputTableFile" 
+        command="SetWriteOutputTableFile" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set, then attributes of the fragments produced by the filter are written to a text file.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+        name="OutputTableFileNameBase"
+        command="SetOutputTableFileNameBase"
+        animateable="0"
+        number_of_elements="1">
+        <Documentation>
+          This property specifies the base including path of where to write the fragment attributes.
+        </Documentation>
+     </StringVectorProperty>
+
+     <!-- Summation Array 
      <StringVectorProperty
        name="SelectSummationArray"
        command="SelectSummationArray"
@@ -6330,10 +6376,9 @@ Tessellate a higher-order dataset.
          </RequiredProperties>
        </ArrayListDomain>
        <Hints>
-         <!-- override gui no to set default-->
          <NoDefault /> 
        </Hints>
-     </StringVectorProperty>
+     </StringVectorProperty>-->
 
      <!-- Volume weighted average Array -->
      <StringVectorProperty

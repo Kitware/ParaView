@@ -55,70 +55,127 @@ public:
 
   // PARAVIEW interface stuff
 
-  // Material sellection
+  /// Material sellection
+  // Description:
   // Add a single array
   void SelectMaterialArray(const char *name);
+  // Description:
   // remove a single array
   void UnselectMaterialArray( const char *name );
+  // Description:
   // remove all arrays
   void UnselectAllMaterialArrays();
-
+  // Description:
   // Enable/disable processing on an array
   void SetMaterialArrayStatus( const char* name,
                                int status );
+  // Description:
   // Get enable./disable status for a given array
   int GetMaterialArrayStatus(const char* name);
   int GetMaterialArrayStatus(int index);
+  // Description:
   // Query the number of available arrays
   int GetNumberOfMaterialArrays();
+  // Description:
   // Get the name of a specific array
   const char *GetMaterialArrayName(int index);
 
-  // WeightedAverage attribute sellection
+  /// Mass sellection
+  // Description:
+  // Add a single array
+  void SelectMassArray(const char *name);
+  // Description:
+  // remove a single array
+  void UnselectMassArray( const char *name );
+  // Description:
+  // remove all arrays
+  void UnselectAllMassArrays();
+  // Description:
+  // Enable/disable processing on an array
+  void SetMassArrayStatus( const char* name,
+                               int status );
+  // Description:
+  // Get enable./disable status for a given array
+  int GetMassArrayStatus(const char* name);
+  int GetMassArrayStatus(int index);
+  // Description:
+  // Query the number of available arrays
+  int GetNumberOfMassArrays();
+  // Description:
+  // Get the name of a specific array
+  const char *GetMassArrayName(int index);
+
+  /// WeightedAverage attribute sellection
+  // Description:
   // Add a single array
   void SelectWeightedAverageArray(const char *name);
+  // Description:
   // remove a single array
   void UnselectWeightedAverageArray( const char *name );
+  // Description:
   // remove all arrays
   void UnselectAllWeightedAverageArrays();
 
+  // Description:
   // Enable/disable processing on an array
   void SetWeightedAverageArrayStatus( const char* name,
                                   int status );
+  // Description:
   // Get enable./disable status for a given array
   int GetWeightedAverageArrayStatus(const char* name);
   int GetWeightedAverageArrayStatus(int index);
+  // Description:
   // Query the number of available arrays
   int GetNumberOfWeightedAverageArrays();
+  // Description:
   // Get the name of a specific array
   const char *GetWeightedAverageArrayName(int index);
 
-  // Summation attribute sellection
+  /// Summation attribute sellection
+  // Description:
   // Add a single array
   void SelectSummationArray(const char *name);
+  // Description:
   // remove a single array
   void UnselectSummationArray( const char *name );
+  // Description:
   // remove all arrays
   void UnselectAllSummationArrays();
-
+  // Description:
   // Enable/disable processing on an array
   void SetSummationArrayStatus( const char* name,
                                   int status );
+  // Description:
   // Get enable./disable status for a given array
   int GetSummationArrayStatus(const char* name);
   int GetSummationArrayStatus(int index);
+  // Description:
   // Query the number of available arrays
   int GetNumberOfSummationArrays();
+  // Description:
   // Get the name of a specific array
   const char *GetSummationArrayName(int index);
 
-
-
-  // volume fraction 
+  /// Volume Fraction
+  // Description:
+  // Volume fraction which volxels are included in a frgament.
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
 
-  // sets modified if array selection changes 
+  /// Output file
+  // Description:
+  // Name the file to save a table of fragment attributes to.
+  vtkSetStringMacro(OutputTableFileNameBase);
+  vtkGetStringMacro(OutputTableFileNameBase);
+  // Description:
+  // If true, save the results of the filter in a text file
+  vtkSetMacro(WriteOutputTableFile,int);
+  vtkGetMacro(WriteOutputTableFile,int);
+  vtkBooleanMacro(WriteOutputTableFile,int);
+
+
+  // Description:
+  // Sets modified if array selection changes.
   static void SelectionModifiedCallback( vtkObject*,
                                          unsigned long,
                                          void* clientdata,
@@ -131,6 +188,8 @@ protected:
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
+
+  vtkPolyData *NewFragmentMesh();
 
   int ProcessBlock(int blockId);
 
@@ -192,7 +251,7 @@ protected:
   void AddEquivalence(
     vtkCTHFragmentConnectIterator *neighbor1,
     vtkCTHFragmentConnectIterator *neighbor2);
-  void ResolveEquivalences(vtkIntArray* fragmentIdArray);
+  void ResolveEquivalences();
   void GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
   void ShareGhostEquivalences(
     vtkCTHFragmentEquivalenceSet* globalSet,
@@ -203,20 +262,26 @@ protected:
   void MergeGhostEquivalenceSets(
     vtkCTHFragmentEquivalenceSet* globalSet);
   void ResolveAndPartitionFragments();
-  // copy any integrated attribute(including volume)
+  // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data set
-  void CopyIntegratedAttributesToFragments(
-    vtkIntArray* fragmentIds,
-    vtkDataSet* output );
+  void CopyAttributesToFragments();
+  // Write a text file containing local fragment attributes.
+  int WriteFragmentAttributesToTextFile(int materialId);
+  // Build the output data
+  int BuildOutput(vtkMultiBlockDataSet *mbds, int materialId);
+
   // integration helper, returns 0 if the source array 
   // type is unsupported.
-  int Accumulate(vtkstd::vector<double> &dest, // scalar/vector result
+  int Accumulate(double *dest,         // scalar/vector result
                  vtkDataArray *src,    // array to accumulate from
-                 int nComps,           // 
+                 int nComps,           //
                  int srcCellIndex,     // which cell
                  double weight);       // weight of contribution
-
-
+  int AccumulateMoments(
+               double *moments,      // =(Myz, Mxz, Mxy, m)
+               vtkDataArray *massArray,//
+               int srcCellIndex,     // from which cell in mass
+               double *X);
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
@@ -224,6 +289,7 @@ protected:
   void DeleteAllBlocks();
   int InitializeBlocks( vtkHierarchicalBoxDataSet* input, 
                         vtkstd::string &materialFractionArrayName,
+                        vtkstd::string &massArrayName,
                         vtkstd::vector<vtkstd::string> &averagedArrayNames,
                         vtkstd::vector<vtkstd::string> &summedArrayNames );
   void AddBlock(vtkCTHFragmentConnectBlock* block);
@@ -257,16 +323,15 @@ protected:
   // in the range of 0 to 255
   double scaledMaterialFractionThreshold;
 
-  vtkIntArray *BlockIdArray;
-  vtkIntArray *LevelArray;
   // while processing a material array this holds
   // a pointer to the output poly data
-  // data set, At other time its not valid
+  // data set
   vtkPolyData *CurrentFragmentMesh;
-  // while processing an individual material 
-  // this points to the name of the fragment array
-  // At other times its not valid
-  const char *CurrentFragmentIdArrayName;
+  // TODO merge with ResolvedFragments in a "fragment container"
+  // see note below
+  vtkstd::vector<vtkPolyData *> FragmentMeshes;
+  // NOTE: these need not be Deleted as they are copied
+  // without incr ref count into ResolvedFragments.
 
   // Local id of current fragment
   int FragmentId;
@@ -277,21 +342,28 @@ protected:
   // per-process indexing until fragments have been resolved
   vtkDoubleArray* FragmentVolumes;
 
+  // Accumulator for moments of the current fragment
+  vtkstd::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
+  // Final moments indexed by fragment id.
+  vtkDoubleArray *FragmentMoments;
+
   // Weighted average, where weights correspond to fragment volume.
-  // Accumulators one for each array to average
+  // Accumulators one for each array to average, scalar or vector
   vtkstd::vector<vtkstd::vector<double> > FragmentWeightedAverage;
-  // Final weighted averages are indexed by fragment id.
+  // Final weighted averages indexed by fragment id.
   vtkstd::vector<vtkDoubleArray *>FragmentWeightedAverages;
   // number of arrays for which to compute the weighted average
-  int nToAverage;
+  int NToAverage;
+  // Names of the arrays to average.
+  vtkstd::vector<vtkstd::string> WeightedAverageArrayNames;
 
   // Sum of data over the fragment.
   // Accumulators, one for each array to sum
   vtkstd::vector<vtkstd::vector<double> > FragmentSum;
-  // Final weighted averages are indexed by fragment id.
+  // Final sums indexed by fragment id.
   vtkstd::vector<vtkDoubleArray *>FragmentSums;
   // number of arrays for which to compute the weighted average
-  int nToSum;
+  int NToSum;
 
 
 //   // I am going to try to integrate the cell attriubtes here.
@@ -312,6 +384,18 @@ protected:
   int *LocalToGlobalOffsets;
   int TotalNumberOfRawFragments;
   int NumberOfResolvedFragments;
+  // Array that holds fragments after they have been resolved(local and global).
+  // This array is to be sized by the number of resolved fragments(all procs)
+  // If this proc doesn't have a piece or fragment then the coresponding enrty
+  // is 0. This is the global structure to the output data set as well.
+  // TODO is this the best datastructure?? NO
+  // pros-fast lookup by global id, 
+  // cons-size
+  // given the sizes of cth datasets involved this will likely need to change...
+  // TODO encapsulate this in a "fragment container", hide details of set/get, new,clear etc...
+  vtkstd::vector<vtkPolyData *> ResolvedFragments;
+  // list of global ids of what we own
+  vtkstd::vector<int> ResolvedFragmentIds;
 
   double GlobalOrigin[3];
   double RootSpacing[3];
@@ -345,18 +429,21 @@ protected:
     vtkCTHFragmentConnectIterator* neighbor,
     vtkCTHFragmentConnectIterator* reference);
 
-  // Create an array of loading factors a measure of the process work
+/**  // Create an array of loading factors a measure of the process work
   // load that each fragment piece represents. Indexed by fragement id.
   // These are used for load ballancing purposes as fragment pieces are 
   // collected.
   vtkIntArray *LoadArray;
-  void BuildLocalLoadArray(vtkIntArray *loadArray);
+  void BuildLocalLoadArray(vtkIntArray *loadArray);*/
 
   // PARAVIEW interface data
   vtkDataArraySelection *MaterialArraySelection;
+  vtkDataArraySelection *MassArraySelection;
   vtkDataArraySelection *WeightedAverageArraySelection;
   vtkDataArraySelection *SummationArraySelection;
   vtkCallbackCommand *SelectionObserver;
+  char *OutputTableFileNameBase;
+  int WriteOutputTableFile;
 
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.

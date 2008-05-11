@@ -18,52 +18,54 @@
 
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
-
+// Pipeline
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+// PV interface
+#include "vtkCallbackCommand.h"
+#include "vtkDataArraySelection.h"
+// Data sets
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkImageData.h"
 #include "vtkUniformGrid.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkHierarchicalBoxDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkAMRBox.h"
-
+// Arrays
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkCharArray.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
-#include "vtkDataArraySelection.h"
-
+// IO
 #include "vtkDataSetWriter.h"
 #include "vtkXMLPolyDataWriter.h"
-
-#include "vtkCallbackCommand.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkInformation.h"
-#include "vtkInformationVector.h"
-
+// Filters
+#include "vtkAppendPolyData.h"
 #include "vtkMarchingCubesCases.h"
-
-#include <math.h>
-
+// STL
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
-
 #include "vtkstd/vector"
 using vtkstd::vector;
-
 #include "vtkstd/string"
 using vtkstd::string;
+// ansi c
+#include <math.h>
 
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.24");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.25");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -166,18 +168,124 @@ vtkStandardNewMacro(vtkCTHFragmentConnect);
 // Compressing data - for faster visualization.
 //
 
+//NOTE
+// Potential performance issues. Some of these on inner loop
+// so the occur often...
+// 
+// I used vector<vector<double>> where we could use vector<double[3]> if we 
+// make the assumption that the maximum number of components of an array
+// is 3...
+// 
+// rather than pass vector<double> vd& I could pass double *p=&vd[0]
+// I am assuming that vd[i] is slower than p[i]...
+// 
+// Could store pointer to polys, points and arrays rather than 
+// use GetPoints, GetCells, GetCellData()->GetArray()...
 
-// put various helper functions here
-namespace __cth{
+
+// put various helper functions here temporarily,if they might be 
+// of general use
+namespace __util{
 // vector memory management helper
-void ClearVectorOfVtkDoubleArrays( vector<vtkDoubleArray *> &V )
+template<class T>
+void ClearVectorOfVtkPointers( vector<T *> &V )
 {
   int n=V.size();
   for (int i=0; i<n; ++i)
     {
-    V[i]->Delete();
+    if (V[i]!=0)
+      {
+      V[i]->Delete();
+      }
     }
   V.clear();
+}
+// vtk object memory managment helper
+template<class T>
+inline
+void ReNewVtkPointer(T *&pv)
+{
+  if (pv!=0)
+    {
+    pv->Delete();
+    }
+  pv=T::New();
+}
+// vtk object memory managment helper
+template<class T>
+inline
+void ReleaseVtkPointer(T *&pv)
+{
+  assert("Attempted to release a null pointer." && pv!=0);
+  pv->Delete();
+  pv=0;
+}
+// zero vector
+template<class T>
+inline
+void FillVector( vector<T> &V, const T &v)
+{
+  int n=V.size();
+  for (int i=0; i<n; ++i)
+    {
+    V[i]=v;
+    }
+}
+// Copier to copy from an array where type is not known 
+// into a destination buffer.
+// returns 0 if the type of the source array
+// is not supported.
+template<class T>
+inline
+int CopyTuple(T *dest,          // scalar/vector
+              vtkDataArray *src,//
+              int nComps,       //
+              int srcCellIndex) // weight of contribution
+{
+  // convert cell index to array index
+  int srcIndex=nComps*srcCellIndex;
+  // copy
+  switch ( src->GetDataType() )
+    {
+    case VTK_FLOAT:{
+      float *thisTuple
+        = dynamic_cast<vtkFloatArray *>(src)->GetPointer(srcIndex);
+      for (int q=0; q<nComps; ++q)
+        {
+        dest[q]=static_cast<T>(thisTuple[q]);
+        }}
+    break;
+    case VTK_DOUBLE:{
+      double *thisTuple
+        = dynamic_cast<vtkDoubleArray *>(src)->GetPointer(srcIndex);
+      for (int q=0; q<nComps; ++q)
+        {
+        dest[q]=static_cast<T>(thisTuple[q]);
+        }}
+    break;
+    case VTK_INT:{
+      int *thisTuple
+        = dynamic_cast<vtkIntArray *>(src)->GetPointer(srcIndex);
+      for (int q=0; q<nComps; ++q)
+        {
+        dest[q]=static_cast<T>(thisTuple[q]);
+        }}
+    break;
+    case VTK_UNSIGNED_INT:{
+      unsigned int *thisTuple
+        = dynamic_cast<vtkUnsignedIntArray *>(src)->GetPointer(srcIndex);
+      for (int q=0; q<nComps; ++q)
+        {
+        dest[q]=static_cast<T>(thisTuple[q]);
+        }}
+    break;
+    default:
+    assert( "This data type is unsupported."
+            && 0 );
+    return 0;
+    break;
+    }
+  return 1;
 }
 // vtk data array selection helper
 int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
@@ -463,11 +571,12 @@ public:
   void Initialize(int blockId, vtkImageData* imageBlock, int level, 
                   double globalOrigin[3], double rootSapcing[3],
                   string &volumeFractionArrayName,
+                  string &massArrayName,
                   vector<string> &averagedArrayNames,
                   vector<string> &summedArrayNames);
 
   // Determine the extent without overlap using the standard block
-  // dimensions.
+  // dimensions. (ie indexes region excluding ghosts)
   void ComputeBaseExtent(int blockDims[3]);
 
   // For ghost layers received by other processes.
@@ -488,7 +597,8 @@ public:
   void GetPointExtent(int ext[6]);
   void GetCellExtent(int ext[6]);
   void GetCellIncrements(int incs[3]);
-  const int*  GetCellIncrements() {return this->CellIncrements;}
+  const int* GetCellIncrements() {return this->CellIncrements;}
+  // Get the cell extents that exclude the ghosts.
   void GetBaseCellExtent(int ext[6]);
   // This was a major time consumer so use the pointer directly.
   const int* GetBaseCellExtent() { return this->BaseCellExtent;}
@@ -529,7 +639,8 @@ public:
 
     return this->ArraysToSum[id];
   }
-
+  //
+  vtkDataArray *GetMassArray(){ return this->MassArray; }
 
   // For basis of face coordinate systems.
   // -x,x,-y,y,-z,z
@@ -561,15 +672,18 @@ private:
   // we need to know the name, and number of components
   // during integration/resolution process
   vector<vtkDataArray *>ArraysToAverage; // do not delete
-  int nToAverage;
+  int NToAverage;
   vector<vtkDataArray *>ArraysToSum; // do not delete
-  int nToSum;
+  int NToSum;
+  vtkDataArray *MassArray; // do not delete
 
   // We might as well store the increments.
   int CellIncrements[3];
   // Extent of the cell arrays as in memory.
+  // All cells.
   int CellExtent[6];
   // Useful for neighbor computations and to avoid processing overlapping cells.
+  // Cell extents that exclude the ghost cells.
   int BaseCellExtent[6];
 
   // The blocks do not follow the convention of sharing an origin.
@@ -602,8 +716,8 @@ vtkCTHFragmentConnectBlock::vtkCTHFragmentConnectBlock ()
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
 
-  int nToAverage=0;
-  int nToSum=0;
+  this->NToAverage=0;
+  this->NToSum=0;
 }
 //----------------------------------------------------------------------------
 vtkCTHFragmentConnectBlock::~vtkCTHFragmentConnectBlock()
@@ -647,6 +761,7 @@ void vtkCTHFragmentConnectBlock::Initialize(
   double globalOrigin[3],
   double rootSpacing[3],
   string &volumeFractionArrayName,
+  string &massArrayName,
   vector<string> &averagedArrayNames,
   vector<string> &summedArrayNames )
 {
@@ -682,20 +797,18 @@ void vtkCTHFragmentConnectBlock::Initialize(
   // get a pointer to the volume fraction data
   vtkDataArray* volumeFractionArray 
     = this->Image->GetCellData()->GetArray(volumeFractionArrayName.c_str());
-
   assert( "Could not find volume fraction array." 
           && volumeFractionArray );
-
   this->VolumeFractionArray 
     = (unsigned char*)(volumeFractionArray->GetVoidPointer(0));
 
   // get arrays to integrate
   // chose to work with array of vtkDataArray
   // becuase that way vectors are easier to handle.
-  this->nToAverage=averagedArrayNames.size();
+  this->NToAverage=averagedArrayNames.size();
   this->ArraysToAverage.clear();
-  this->ArraysToAverage.resize(this->nToAverage,0);
-  for (int i=0; i<nToAverage; ++i)
+  this->ArraysToAverage.resize(this->NToAverage,0);
+  for (int i=0; i<this->NToAverage; ++i)
     {
     this->ArraysToAverage[i]
       = this->Image->GetCellData()->GetArray(averagedArrayNames[i].c_str());
@@ -703,10 +816,10 @@ void vtkCTHFragmentConnectBlock::Initialize(
     assert( "\nCould not find array to weighted average.\n"
             && this->ArraysToAverage[i] );
     }
-  this->nToSum=summedArrayNames.size();
+  this->NToSum=summedArrayNames.size();
   this->ArraysToSum.clear();
-  this->ArraysToSum.resize(this->nToSum,0);
-  for (int i=0; i<nToSum; ++i)
+  this->ArraysToSum.resize(this->NToSum,0);
+  for (int i=0; i<this->NToSum; ++i)
     {
     this->ArraysToSum[i]
       = this->Image->GetCellData()->GetArray(summedArrayNames[i].c_str());
@@ -714,6 +827,11 @@ void vtkCTHFragmentConnectBlock::Initialize(
     assert( "\nCould not find array to sum.\n"
             && this->ArraysToSum[i] );
     }
+  // Get the mass array
+  this->MassArray
+    = this->Image->GetCellData()->GetArray(massArrayName.c_str());
+  assert( "Could not find mass array."
+          && this->MassArray );
 
   // Since CTH does not use convention that all blocks share an origin,
   // We must compute a new extent to help locate neighboring blocks.
@@ -977,6 +1095,7 @@ int* vtkCTHFragmentConnectBlock::GetBaseFragmentIdPointer()
 
   return ptr;
 }
+//----------------------------------------------------------------------------
 // returns the index from the lower left cell 
 // that gets you to the first non-ghost cell
 int vtkCTHFragmentConnectBlock::GetBaseFlatIndex()
@@ -990,7 +1109,18 @@ int vtkCTHFragmentConnectBlock::GetBaseFlatIndex()
                                     - this->CellExtent[4]);
   return idx;
 }
-
+//----------------------------------------------------------------------------
+// Returns the coordinate of the cell center in the first 
+// non-ghost cell.
+// void vtkCTHFragmentConnectBlock::GetBaseCellCenter(double *cellCenter)
+// {
+//   cellCenter[0]=this->Origin[0]
+//         + this->Spacing[0]*(0.5+this->BaseCellExtent[0]-this->CellExtent[0]);
+//   cellCenter[1]=this->Origin[1]
+//         + this->Spacing[1]*(0.5+this->BaseCellExtent[2]-this->CellExtent[2]);
+//   cellCenter[2]=this->Origin[2]
+//         + this->Spacing[2]*(0.5+this->BaseCellExtent[4]-this->CellExtent[4]);
+// }
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnectBlock::ExtractExtent(unsigned char* buf, int ext[6])
 {
@@ -1255,8 +1385,8 @@ public:
   vtkCTHFragmentConnectBlock* Block;
   unsigned char*              VolumeFractionPointer; // pointer to a specific voxel's data
   int*                        FragmentIdPointer; // pointer to a specific voxel
-  int                         Index[3];
-  int                         FlatIndex;
+  int                         Index[3];      // relative to the CTH data set's index space
+  int                         FlatIndex;     // relative to this block's index space
 };
 void vtkCTHFragmentConnectIterator::Initialize()
 {
@@ -1266,7 +1396,6 @@ void vtkCTHFragmentConnectIterator::Initialize()
   this->Index[0] = this->Index[1] = this->Index[2] = 0;
   this->FlatIndex=0;
 }
-
 
 //============================================================================
 
@@ -1432,6 +1561,11 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->MaterialArraySelection->AddObserver( vtkCommand::ModifiedEvent,
                                              this->SelectionObserver );
 
+  // pv interface for mass array
+  this->MassArraySelection = vtkDataArraySelection::New();
+  this->MassArraySelection->AddObserver( vtkCommand::ModifiedEvent,
+                                             this->SelectionObserver );
+
   // pv interface for integrated arrays
   this->WeightedAverageArraySelection=vtkDataArraySelection::New();
   this->WeightedAverageArraySelection->AddObserver( vtkCommand::ModifiedEvent,
@@ -1441,6 +1575,9 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->SummationArraySelection->AddObserver( vtkCommand::ModifiedEvent,
                                               this->SelectionObserver );
 
+  this->OutputTableFileNameBase=0;
+  this->WriteOutputTableFile=0;
+
   this->NumberOfInputBlocks = 0;
   this->InputBlocks = 0;
   this->Controller = vtkMultiProcessController::GetGlobalController();
@@ -1449,6 +1586,10 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 
   this->FragmentId = 0;
   this->FragmentVolume = 0.0;
+  this->FragmentVolumes = 0;
+  this->FragmentMoment.resize(4,0.0);
+  this->FragmentMoments = 0;
+
   this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
   this->LocalToGlobalOffsets = 0;
   this->TotalNumberOfRawFragments = 0;
@@ -1456,11 +1597,10 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 
   this->FaceNeighbors = new vtkCTHFragmentConnectIterator[32];
 
-  this->CurrentFragmentIdArrayName = 0;
   this->CurrentFragmentMesh = 0;
 
-  this->nToAverage = 0;
-  this->nToSum = 0;
+  this->NToAverage = 0;
+  this->NToSum = 0;
 
   this->MaterialFractionThreshold = 0.5;
   this->scaledMaterialFractionThreshold = 127.5;
@@ -1482,9 +1622,15 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
     this->FragmentVolumes->Delete();
     this->FragmentVolumes = 0;
     }
+  
+  if ( this->FragmentMoments )
+    {
+    this->FragmentMoments->Delete();
+    this->FragmentMoments = 0;
+    }
 
-  __cth::ClearVectorOfVtkDoubleArrays( this->FragmentWeightedAverages );
-  __cth::ClearVectorOfVtkDoubleArrays( this->FragmentSums );
+  __util::ClearVectorOfVtkPointers( this->FragmentWeightedAverages );
+  __util::ClearVectorOfVtkPointers( this->FragmentSums );
 
   delete this->EquivalenceSet;
   this->EquivalenceSet = 0;
@@ -1506,6 +1652,11 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->SummationArraySelection=0;
 
   this->SelectionObserver->Delete();
+
+  if (this->OutputTableFileNameBase!=0)
+    {
+    delete [] this->OutputTableFileNameBase;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1586,6 +1737,7 @@ void vtkCTHFragmentConnect::DeleteAllBlocks()
 // Initialize blocks from multi block input.
 int vtkCTHFragmentConnect::InitializeBlocks( vtkHierarchicalBoxDataSet* input,
                                              string &materialFractionArrayName,
+                                             string &massArrayName,
                                              vector<string> &averagedArrayNames,
                                              vector<string> &summedArrayNames )
 {
@@ -1597,8 +1749,6 @@ int vtkCTHFragmentConnect::InitializeBlocks( vtkHierarchicalBoxDataSet* input,
 
   // Just in case
   this->DeleteAllBlocks();
-
-  //cerr << "start processing blocks\n" << endl;
 
   // We need all blocks to share a common extent index.
   // We find a common origin as the minimum most point in level 0.
@@ -1648,6 +1798,7 @@ int vtkCTHFragmentConnect::InitializeBlocks( vtkHierarchicalBoxDataSet* input,
                            this->GlobalOrigin,
                            this->RootSpacing,
                            materialFractionArrayName,
+                           massArrayName,
                            averagedArrayNames,
                            summedArrayNames );
         // For debugging:
@@ -2660,6 +2811,52 @@ void vtkCTHFragmentConnect::AddBlock(vtkCTHFragmentConnectBlock* block)
 }
 
 
+//
+vtkPolyData *vtkCTHFragmentConnect::NewFragmentMesh()
+{
+  // The generated fragments for this material are placed here
+  // until they are resolved and partitioned
+  vtkPolyData *newPiece = vtkPolyData::New();
+
+  // mesh
+  vtkPoints* points = vtkPoints::New();
+  newPiece->SetPoints(points);
+  points->Delete();
+
+  vtkCellArray* polys = vtkCellArray::New();
+  newPiece->SetPolys(polys);
+  polys->Delete();
+
+  // The Id, and integrated attributes will be added later
+  // as field data after the fragment pieces have been resolved.
+
+  // Add cell array for color by scalars that are 
+  // averaged. This is original data not the average.
+  for (int i=0; i<this->NToAverage; ++i)
+    {
+    vtkDoubleArray *waa=vtkDoubleArray::New();
+    waa->SetName(this->WeightedAverageArrayNames[i].c_str());
+    waa->SetNumberOfComponents(this->FragmentWeightedAverage[i].size());
+    newPiece->GetCellData()->AddArray(waa);
+    waa->Delete();
+    }
+
+  // for debugging purposes...
+  #ifndef NDEBUG
+  vtkIntArray *blockIdArray = vtkIntArray::New();
+  blockIdArray->SetName("BlockId");
+  newPiece->GetCellData()->AddArray(blockIdArray);
+  blockIdArray->Delete();
+
+  vtkIntArray *levelArray = vtkIntArray::New();
+  levelArray->SetName("Level");
+  newPiece->GetCellData()->AddArray(levelArray);
+  levelArray->Delete();
+  #endif
+
+  return newPiece;
+}
+
 //----------------------------------------------------------------------------
 // Filter operates on Materials, generating fragments by connecting
 // voxels where the threshold is value is attained. It can sum 
@@ -2690,19 +2887,31 @@ int vtkCTHFragmentConnect::RequestData(
   // TODO  we should build a vector of material arrays for single pass processing
   // Get arrays to process based on array selection status
   vector<string> MaterialArrayNames;
-  vector<string> WeightedAverageArrayNames;
+  vector<string> MassArrayNames;
   vector<string> SummedArrayNames;
+  this->WeightedAverageArrayNames.clear();
+
   int nMaterials 
-    = __cth::GetEnabledArrayNames(this->MaterialArraySelection,MaterialArrayNames);
-  this->nToAverage
-    = __cth::GetEnabledArrayNames(this->WeightedAverageArraySelection,WeightedAverageArrayNames);
-  this->nToSum
-    = __cth::GetEnabledArrayNames(this->SummationArraySelection,SummedArrayNames);
+    = __util::GetEnabledArrayNames(this->MaterialArraySelection,MaterialArrayNames);
+  int nMassArrays
+    = __util::GetEnabledArrayNames(this->MassArraySelection,MassArrayNames);
+  this->NToAverage
+    = __util::GetEnabledArrayNames(this->WeightedAverageArraySelection,
+                                  this->WeightedAverageArrayNames);
+  this->NToSum
+    = __util::GetEnabledArrayNames(this->SummationArraySelection,SummedArrayNames);
 
   // anything to do?
-  if ( nMaterials == 0)
+  if ( nMaterials==0)
     {
     vtkErrorMacro("No material fraction specified.");
+    return 0;
+    }
+  // Is input completely specified?
+  if (nMassArrays!=nMaterials)
+    {
+    vtkErrorMacro("Number of mass arrays must match"
+                  "the number of material fractions.");
     return 0;
     }
 
@@ -2722,11 +2931,18 @@ int vtkCTHFragmentConnect::RequestData(
   // in the future in a single pass
   for (int i=0; i<nMaterials; ++i)
     {
-    // prepare for this pass...
+    // TODO move prep to its own method
+    /// prepare for this pass...
     this->FragmentId = 0;
     this->FragmentVolume = 0.0;
-    this->FragmentVolumes = vtkDoubleArray::New();
+    __util::ReNewVtkPointer(this->FragmentVolumes);
     this->FragmentVolumes->SetName("Fragment Volume");
+
+    this->FragmentMoment.clear();
+    this->FragmentMoment.resize(4,0.0);
+    __util::ReNewVtkPointer(this->FragmentMoments);
+    this->FragmentMoments->SetNumberOfComponents(4);
+    this->FragmentMoments->SetName("Fragment Moments");
 
     // Below for each integrated array we figure out if we 
     // are integrating vector or scalars, in order to build the 
@@ -2744,104 +2960,71 @@ int vtkCTHFragmentConnect::RequestData(
     // 1) Weighted average of attribute over the fragment
     // set up containers
     this->FragmentWeightedAverage.clear();
-    this->FragmentWeightedAverage.resize( this->nToAverage );
-    __cth::ClearVectorOfVtkDoubleArrays( this->FragmentWeightedAverages );
-    this->FragmentWeightedAverages.clear();
-    this->FragmentWeightedAverages.resize( this->nToAverage );
+    this->FragmentWeightedAverage.resize( this->NToAverage );
+    __util::ClearVectorOfVtkPointers( this->FragmentWeightedAverages );
+    this->FragmentWeightedAverages.resize( this->NToAverage );
     // set up data array and accumulator for each weighted average
-    for (int i=0; i<this->nToAverage; ++i)
+    for (int j=0; j<this->NToAverage; ++j)
       {
       // data array
-      const char *thisArrayName=WeightedAverageArrayNames[i].c_str();
+      const char *thisArrayName=this->WeightedAverageArrayNames[j].c_str();
       vtkDataArray *nameTestDa
         = nameTestId->GetCellData()->GetArray(thisArrayName);
       assert( "Couldn't access the named integration array"
               && nameTestDa);
-      this->FragmentWeightedAverages[i]=vtkDoubleArray::New();
+      this->FragmentWeightedAverages[j]=vtkDoubleArray::New();
       int nComp=nameTestDa->GetNumberOfComponents();
-      this->FragmentWeightedAverages[i]->SetNumberOfComponents(nComp);
+      this->FragmentWeightedAverages[j]->SetNumberOfComponents(nComp);
       ostringstream osIntegratedArrayName;
       osIntegratedArrayName << "VolumeWeightedAverage-"
                             << thisArrayName;
-      this->FragmentWeightedAverages[i]->SetName( osIntegratedArrayName.str().c_str() );
+      this->FragmentWeightedAverages[j]->SetName( osIntegratedArrayName.str().c_str() );
       // accumulator
-      this->FragmentWeightedAverage[i].resize( nComp, 0.0 );
+      this->FragmentWeightedAverage[j].resize( nComp, 0.0 );
       }
     // 2) Weighted summation of attribute over the fragment
     // set up containers
     this->FragmentSum.clear();
-    this->FragmentSum.resize( this->nToSum );
-    __cth::ClearVectorOfVtkDoubleArrays( this->FragmentSums );
-    this->FragmentSums.clear();
-    this->FragmentSums.resize( this->nToSum );
+    this->FragmentSum.resize( this->NToSum );
+    __util::ClearVectorOfVtkPointers( this->FragmentSums );
+    this->FragmentSums.resize( this->NToSum );
     // set up data array and accumulator for each weighted average
-    for (int i=0; i<this->nToSum; ++i)
+    for (int j=0; j<this->NToSum; ++j)
       {
       // data array
-      const char *thisArrayName=SummedArrayNames[i].c_str();
+      const char *thisArrayName=SummedArrayNames[j].c_str();
       vtkDataArray *nameTestDa
         = nameTestId->GetCellData()->GetArray(thisArrayName);
       assert( "Couldn't access the named integration array"
               && nameTestDa);
-      this->FragmentSums[i]=vtkDoubleArray::New();
+      this->FragmentSums[j]=vtkDoubleArray::New();
       int nComp=nameTestDa->GetNumberOfComponents();
-      this->FragmentSums[i]->SetNumberOfComponents(nComp);
+      this->FragmentSums[j]->SetNumberOfComponents(nComp);
       ostringstream osIntegratedArrayName;
       osIntegratedArrayName << "Summation-"
                             << thisArrayName;
-      this->FragmentSums[i]->SetName( osIntegratedArrayName.str().c_str() );
+      this->FragmentSums[j]->SetName( osIntegratedArrayName.str().c_str() );
       // accumulator
-      this->FragmentSum[i].resize( nComp, 0.0 );
+      this->FragmentSum[j].resize( nComp, 0.0 );
       }
-
-    // The generated fragments for this material are placed here
-    // until they are resolved and partitioned
-    this->CurrentFragmentMesh = vtkPolyData::New();
+    /// end  prep
 
     this->EquivalenceSet->Initialize();
 
-    this->BlockIdArray = vtkIntArray::New();
-    this->BlockIdArray->SetName("BlockId");
-    this->LevelArray = vtkIntArray::New();
-    this->LevelArray->SetName("Level");
-    this->CurrentFragmentMesh->GetCellData()->AddArray(this->BlockIdArray);
-    this->CurrentFragmentMesh->GetCellData()->AddArray(this->LevelArray);
-
-    vtkPoints* points = vtkPoints::New();
-    this->CurrentFragmentMesh->SetPoints(points);
-    points->Delete();
-    vtkCellArray* polys = vtkCellArray::New();
-    this->CurrentFragmentMesh->SetPolys(polys);
-    polys->Delete();
-
-    // Id Scalars holds the computed index of the fragment.
-    vtkIntArray* idScalars = vtkIntArray::New();
-
-    // construct an array name that identifies material
-//     ostringstream ossFragIdName;
-//     ossFragIdName << "Fragment id - " << MaterialArrayNames[i];
-
-    // TODO use point or cell data insetad of scalars??
-//     idScalars->SetName(ossFragIdName.str().c_str());
-    idScalars->SetName("Fragment Id");
-    this->CurrentFragmentMesh->GetPointData()->SetScalars( idScalars ); 
-
-    // save this for use in helper methods, to access this id array
-    // during this iteration of this loop
-    this->CurrentFragmentIdArrayName 
-      = this->CurrentFragmentMesh->GetPointData()->GetScalars()->GetName();
-
     this->InitializeBlocks( hbdsInput,
                             MaterialArrayNames[i],
+                            MassArrayNames[i],
                             WeightedAverageArrayNames,
                             SummedArrayNames );
 
+    double progressPerBlock=progressPerArray/(double)this->NumberOfInputBlocks/2.0;
     int blockId;
     for (blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
       {
+      // build fragments
       this->ProcessBlock(blockId);
+      this->UpdateProgress( (double)blockId*progressPerBlock );
       }
-    this->UpdateProgress( (double)i*0.25*progressPerArray );
 
     //char tmp[128];
     //sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
@@ -2849,33 +3032,24 @@ int vtkCTHFragmentConnect::RequestData(
     //sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
     //this->SaveGhostSurfaces(tmp);
 
-    this->ResolveEquivalences(idScalars);
-    this->UpdateProgress( (double)i*0.5*progressPerArray );
-    this->CopyIntegratedAttributesToFragments(idScalars,dynamic_cast<vtkDataSet*>(this->CurrentFragmentMesh));
+    this->ResolveEquivalences();
     this->DeleteAllBlocks();
-    ///end proc
+    this->BuildOutput(outputMbds, i);
 
-    // add a leaf to multi block, and inc material index
-    // TODO this needs to change...
-    this->CurrentFragmentMesh->Update();
-    outputMbds->SetBlock( i, this->CurrentFragmentMesh );
-    this->UpdateProgress( (double)i*progressPerArray );
-
-    idScalars->Delete();
-    this->BlockIdArray->Delete();
-    this->BlockIdArray = 0;
-    this->LevelArray->Delete();
-    this->LevelArray = 0;
+    if ( this->GetWriteOutputTableFile()
+         && this->OutputTableFileNameBase )
+      {
+      this->WriteFragmentAttributesToTextFile(i);
+      }
 
     // clean up fragment attributes
-    this->FragmentVolumes->Delete();
-    this->FragmentVolumes=0;
-    __cth::ClearVectorOfVtkDoubleArrays( this->FragmentWeightedAverages );
-    __cth::ClearVectorOfVtkDoubleArrays( this->FragmentSums );
-
-    // Mark data for helpers as invalid
-    this->CurrentFragmentMesh = 0;
-    this->CurrentFragmentIdArrayName = 0;
+    __util::ReleaseVtkPointer(this->FragmentVolumes);
+    __util::ReleaseVtkPointer(this->FragmentMoments);
+    __util::ClearVectorOfVtkPointers( this->FragmentWeightedAverages );
+    __util::ClearVectorOfVtkPointers( this->FragmentSums );
+    __util::ClearVectorOfVtkPointers( this->ResolvedFragments ); // note: do not clear FragmentMeshes, these are they
+    this->ResolvedFragmentIds.clear();
+    // TODO what else??
     }
 
   return 1;
@@ -2894,7 +3068,7 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
   vtkCTHFragmentConnectIterator* yIterator = new vtkCTHFragmentConnectIterator;
   vtkCTHFragmentConnectIterator* zIterator = new vtkCTHFragmentConnectIterator;
   zIterator->Block = block;
-  // set iterator to reference first no ghost cell
+  // set iterator to reference first non ghost cell
   zIterator->VolumeFractionPointer = block->GetBaseVolumeFractionPointer();
   zIterator->FragmentIdPointer = block->GetBaseFragmentIdPointer();
   zIterator->FlatIndex = block->GetBaseFlatIndex();
@@ -2906,6 +3080,7 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
   const int *ext;
   int cellIncs[3];
   block->GetCellIncrements(cellIncs);
+
   ext = block->GetBaseCellExtent();
   for (iz = ext[4]; iz <= ext[5]; ++iz)
     {
@@ -2918,44 +3093,54 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
       for (ix = ext[0]; ix <= ext[1]; ++ix)
         {
         xIterator->Index[0] = ix;
+        // TODO loop over multiple material arrays & check if we have fragment
+        // hmmm, but what about set of blocks?? We need to then mark voxel has 
+        // used in a material but available for the others. We could just use which ever
+        // material has the largest fraction, then disable that voxel for all, that would be easier,
+        // but not quite right for small(<50%) material fractions...Not going to do that.
+        // FragmentIdPointer needs to then be an array of pointers on for each material....
         if (*(xIterator->FragmentIdPointer) == -1 && 
             *(xIterator->VolumeFractionPointer) > this->scaledMaterialFractionThreshold)
           { // We have a new fragment.
+          this->CurrentFragmentMesh=this->NewFragmentMesh();
           this->EquivalenceSet->AddEquivalence(this->FragmentId,this->FragmentId);
           // We have to mark every voxel we push on the queue.
+          // TODO for each material, see above
           *(xIterator->FragmentIdPointer) = this->FragmentId;
           // There should be no need to clear the queue.
           queue->Push(xIterator);
           this->ConnectFragment(queue);
+          // save the current fragment mesh
+          // the id is implicit given by its position in the vector, but only
+          // until fragments are resolved. After resolution we add addributes such 
+          // as id, volume, summations averages, etc..
+          this->FragmentMeshes.push_back( this->CurrentFragmentMesh );
           // Save the volume from the last fragment.
           this->FragmentVolumes->InsertTuple1(this->FragmentId, this->FragmentVolume);
           // clear the volume accumulator
           this->FragmentVolume = 0.0;
+          // Save the moments from the last fragment
+          this->FragmentMoments->InsertTuple(this->FragmentId,
+                                             &this->FragmentMoment[0]);
+          // clear the moment accumulator
+          __util::FillVector(this->FragmentMoment, 0.0);
           // for the averaged scalars/vectors...
-          for (int i=0; i<this->nToAverage; ++i)
+          for (int i=0; i<this->NToAverage; ++i)
             {
             // update the integrated value, independent of ncomps
             this->FragmentWeightedAverages[i]->InsertTuple(this->FragmentId, 
                                                            &this->FragmentWeightedAverage[i][0]);
             // clear the accumulator
-            int nComps=this->FragmentWeightedAverage[i].size();
-            for (int q=0; q<nComps; ++q)
-              {
-              this->FragmentWeightedAverage[i][q]=0.0;
-              }
+            __util::FillVector(this->FragmentWeightedAverage[i],0.0);
             }
           // for the summed scalars/vectors...
-          for (int i=0; i<this->nToSum; ++i)
+          for (int i=0; i<this->NToSum; ++i)
             {
             // update the integrated value, independent of ncomps
             this->FragmentSums[i]->InsertTuple(this->FragmentId,
                                                &this->FragmentSum[i][0]);
             // clear the accumulator
-            int nComps=this->FragmentSum[i].size();
-            for (int q=0; q<nComps; ++q)
-              {
-              this->FragmentSum[i][q]=0.0;
-              }
+            __util::FillVector(this->FragmentSum[i],0.0);
             }
           // Move to next fragment.
           ++this->FragmentId;
@@ -3202,11 +3387,8 @@ void vtkCTHFragmentConnect::CreateFace(
 
   // Add points to the output.  Create separate points for each triangle.
   // We can worry about merging points later.
-  // FragmentIds get merged later.
   vtkCTHFragmentConnectIterator* cornerNeighbors[8];
-  vtkIntArray* idScalars =
-    vtkIntArray::SafeDownCast(this->CurrentFragmentMesh->GetPointData()->GetScalars());
-  vtkPoints *points = this->CurrentFragmentMesh->GetPoints();
+  vtkPoints *points = this->CurrentFragmentMesh->GetPoints();  //TODO for performance store?
   vtkCellArray *polys = this->CurrentFragmentMesh->GetPolys();
   vtkIdType quadCornerIds[4];
   vtkIdType quadMidIds[4];
@@ -3258,7 +3440,6 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i7] = &(this->FaceNeighbors[11]);
   this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors);
   quadCornerIds[0] = points->InsertNextPoint(this->FaceCornerPoints);
-  idScalars->InsertTuple1(quadCornerIds[0], this->FragmentId);
   cornerNeighbors[i0] = &(this->FaceNeighbors[4]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[5]);
   cornerNeighbors[i2] = &(this->FaceNeighbors[6]);
@@ -3269,7 +3450,6 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i7] = &(this->FaceNeighbors[15]);
   this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors);
   quadCornerIds[1] = points->InsertNextPoint(this->FaceCornerPoints+3);
-  idScalars->InsertTuple1(quadCornerIds[1], this->FragmentId);
   cornerNeighbors[i0] = &(this->FaceNeighbors[16]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[17]);
   cornerNeighbors[i2] = &(this->FaceNeighbors[18]);
@@ -3280,7 +3460,6 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i7] = &(this->FaceNeighbors[27]);
   this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors);
   quadCornerIds[2] = points->InsertNextPoint(this->FaceCornerPoints+6);
-  idScalars->InsertTuple1(quadCornerIds[2], this->FragmentId);
   cornerNeighbors[i0] = &(this->FaceNeighbors[20]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[21]);
   cornerNeighbors[i2] = &(this->FaceNeighbors[22]);
@@ -3291,7 +3470,6 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i7] = &(this->FaceNeighbors[31]);
   this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors);
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
-  idScalars->InsertTuple1(quadCornerIds[3], this->FragmentId);
 
 //   if ( quadCornerIds[3] > 74503) // 74507
 //     {
@@ -3311,7 +3489,6 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i7] = &(this->FaceNeighbors[13]);
     this->SubVoxelPositionCorner(this->FaceEdgePoints, cornerNeighbors);
     quadMidIds[0] = points->InsertNextPoint(this->FaceEdgePoints);
-    idScalars->InsertTuple1(quadMidIds[0], this->FragmentId);
     }
   if (this->FaceEdgeFlags[1])
     {
@@ -3325,7 +3502,6 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i7] = &(this->FaceNeighbors[19]);
     this->SubVoxelPositionCorner(this->FaceEdgePoints+3, cornerNeighbors);
     quadMidIds[1] = points->InsertNextPoint(this->FaceEdgePoints+3);
-    idScalars->InsertTuple1(quadMidIds[1], this->FragmentId);
     }
   if (this->FaceEdgeFlags[2])
     {
@@ -3339,7 +3515,6 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i7] = &(this->FaceNeighbors[23]);
     this->SubVoxelPositionCorner(this->FaceEdgePoints+6, cornerNeighbors);
     quadMidIds[2] = points->InsertNextPoint(this->FaceEdgePoints+6);
-    idScalars->InsertTuple1(quadMidIds[2], this->FragmentId);
     }
   if (this->FaceEdgeFlags[3])
     {
@@ -3353,7 +3528,6 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i7] = &(this->FaceNeighbors[29]);
     this->SubVoxelPositionCorner(this->FaceEdgePoints+9, cornerNeighbors);
     quadMidIds[3] = points->InsertNextPoint(this->FaceEdgePoints+9);
-    idScalars->InsertTuple1(quadMidIds[3], this->FragmentId);
     }
 
   // Now there are 9 possibilities 
@@ -3547,15 +3721,43 @@ void vtkCTHFragmentConnect::CreateFace(
       vtkErrorMacro("Unexpected edge case:" << caseIdx);
     }
 
-  // Cell data attributes for debugging.
   vtkIdType numTris = polys->GetNumberOfCells() - startTriId;
+  // averaged array values on fragment surface
+  // for coloring by scalar. Copy the original
+  // data into the fragment surface.
+  vector<double> thisTup(3);
+  for (int i=0; i<this->NToAverage; ++i)
+    {
+    // original
+    vtkDataArray *srcArray
+      = in->Block->GetArrayToAvergage(i);
+    int nComps
+      = srcArray->GetNumberOfComponents();
+    thisTup.resize(nComps);
+    __util::CopyTuple(&thisTup[0],srcArray,nComps,in->FlatIndex);
+
+    // fragment
+    vtkDoubleArray *destArray
+      = dynamic_cast<vtkDoubleArray *>(this->CurrentFragmentMesh->GetCellData()->GetArray(i));
+    for (vtkIdType ii = 0; ii < numTris; ++ii)
+      {
+      destArray->InsertNextTuple(&thisTup[0]);
+      }
+    }
+  // Cell data attributes for debugging.
+  #ifndef NDEBUG
+  vtkIntArray *levelArray
+    = dynamic_cast<vtkIntArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray("Level"));
+
+  vtkIntArray *blockIdArray
+    = dynamic_cast<vtkIntArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray("BlockId"));
 
   for (vtkIdType ii = 0; ii < numTris; ++ii)
     {
-    this->LevelArray->InsertNextValue(in->Block->GetLevel());
-    //this->BlockIdArray->InsertNextValue(iterator->Block->GetBlockId());
-    this->BlockIdArray->InsertNextValue(in->Block->LevelBlockId);
+    levelArray->InsertNextValue(in->Block->GetLevel());
+    blockIdArray->InsertNextValue(in->Block->LevelBlockId);
     }
+  #endif
 }
 
 //----------------------------------------------------------------------------
@@ -3799,7 +4001,7 @@ void vtkCTHFragmentConnect::FindNeighbor(
   const int* ext;
   ext = refBlock->GetBaseCellExtent();
   int refLevel = refBlock->GetLevel();
-  
+
   if (refLevel > faceLevel)
     {
     neighborIdx[0] = faceIdx[0] << (refLevel-faceLevel);
@@ -4105,12 +4307,13 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
 
 // integration helper, returns 0 if the source array 
 // type is unsupported.
+inline
 int vtkCTHFragmentConnect::Accumulate(
-               vector<double> &dest, // scalar/vector result
+               double *dest,         // scalar/vector result
                vtkDataArray *src,    // array to accumulate from
                int nComps,           // 
                int srcCellIndex,     // which cell
-               double weight)        // weight of contribution
+               double weight)       // weight of contributions(one for each component)
 {
   // convert cell index to array index
   int srcIndex=nComps*srcCellIndex;
@@ -4142,6 +4345,45 @@ int vtkCTHFragmentConnect::Accumulate(
   return 1;
 }
 
+// integration helper, returns 0 if the source array 
+// type is unsupported.
+inline
+int vtkCTHFragmentConnect::AccumulateMoments(
+               double *moments,      // =(Myz, Mxz, Mxy, m)
+               vtkDataArray *massArray,//
+               int srcCellIndex,     // from which cell in mass
+               double *X)            // =(x,y,z)
+{
+  // accumulate based on data types
+  switch ( massArray->GetDataType() )
+    {
+    case VTK_FLOAT:{
+      float *mass
+        = dynamic_cast<vtkFloatArray *>(massArray)->GetPointer(srcCellIndex);
+      for (int q=0; q<3; ++q)
+        {
+        moments[q]+=mass[0]*X[q];
+        }
+      moments[3]+=mass[0];}
+    break;
+    case VTK_DOUBLE:{
+      double *mass
+        = dynamic_cast<vtkDoubleArray *>(massArray)->GetPointer(srcCellIndex);
+      for (int q=0; q<3; ++q)
+        {
+        moments[q]+=mass[0]*X[q];
+        }
+      moments[3]+=mass[0];}
+    break;
+    default:
+    assert( "This data type is unsupported."
+            && 0 );
+    return 0;
+    break;
+    }
+  return 1;
+}
+
 //----------------------------------------------------------------------------
 // Depth first search marking voxels.
 // This extracts faces at the same time.
@@ -4156,12 +4398,12 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
     vtkCTHFragmentConnectIterator iterator;
     queue->Pop(&iterator);
     // Lets integrate when we remove the iterator from the queue.
-    // We could also do it wehn we add the iterator to the queue, but
+    // We could also do it when we add the iterator to the queue, but
     // the adds occur in so many places.
     if (iterator.Block->GetGhostFlag() == 0)
       {
       // accumlate fragment volume
-      double *dX=iterator.Block->GetSpacing();
+      const double *dX=iterator.Block->GetSpacing();
       #ifdef USE_VOXEL_VOLUME
       double voxelVolumeFrac = dX[0]*dX[1]*dX[2];
       #else
@@ -4171,13 +4413,13 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
       this->FragmentVolume+=voxelVolumeFrac;
 
       // accumulate weighted average
-      for (int i=0; i<this->nToAverage; ++i)
+      for (int i=0; i<this->NToAverage; ++i)
         {
         vtkDataArray *arrayToIntegrate
           = iterator.Block->GetArrayToAvergage(i);
         int nComps
           = arrayToIntegrate->GetNumberOfComponents();
-        this->Accumulate( this->FragmentWeightedAverage[i],
+        this->Accumulate( &this->FragmentWeightedAverage[i][0],
                           arrayToIntegrate,
                           nComps,
                           iterator.FlatIndex,
@@ -4185,18 +4427,28 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
         }
 
       // accumulate sum
-      for (int i=0; i<this->nToSum; ++i)
+      for (int i=0; i<this->NToSum; ++i)
         {
         vtkDataArray *arrayToIntegrate
           = iterator.Block->GetArrayToSum(i);
         int nComps
           = arrayToIntegrate->GetNumberOfComponents();
-        this->Accumulate( this->FragmentSum[i],
+        this->Accumulate( &this->FragmentSum[i][0],
                           arrayToIntegrate,
                           nComps,
                           iterator.FlatIndex,
-                          1 );
+                          1.0 );
         }
+
+      // Accumulate mass and moments
+      const double *X0=iterator.Block->GetOrigin();
+      double X[3]={X0[0]+dX[0]*(0.5+iterator.Index[0]),
+                   X0[1]+dX[1]*(0.5+iterator.Index[1]),
+                   X0[2]+dX[2]*(0.5+iterator.Index[2])};
+      this->AccumulateMoments(&this->FragmentMoment[0],
+                              iterator.Block->GetMassArray(),
+                              iterator.FlatIndex,
+                              X);
       }
 
     // Create another iterator on the stack for recursion.
@@ -4518,7 +4770,7 @@ void vtkCTHFragmentConnect::SaveBlockSurfaces(const char* fileName)
     levelArray->InsertNextValue(level);
     levelArray->InsertNextValue(level);
     }
-    
+
   pd->SetPoints(pts);
   pd->SetPolys(faces);
   levelArray->SetName("Level");
@@ -4530,7 +4782,6 @@ void vtkCTHFragmentConnect::SaveBlockSurfaces(const char* fileName)
   w->SetInput(pd);
   w->SetFileName(fileName);
   w->Write();
-  
   w->Delete();
 
   pd->Delete();
@@ -4857,6 +5108,63 @@ void vtkCTHFragmentConnect::SetMaterialArrayStatus( const char* name,
     this->MaterialArraySelection->DisableArray(name);
     }
 }
+// PV interface to Mass arrays
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SelectMassArray( const char *arrayName )
+{
+  this->MassArraySelection->AddArray( arrayName );
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::UnselectMassArray( const char *arrayName )
+{
+  this->MassArraySelection->RemoveArrayByName( arrayName );
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::UnselectAllMassArrays()
+{
+  this->MassArraySelection->RemoveAllArrays();
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetNumberOfMassArrays()
+{
+  return this->MassArraySelection->GetNumberOfArrays();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkCTHFragmentConnect::GetMassArrayName(int index)
+{
+  return this->MassArraySelection->GetArrayName(index);
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetMassArrayStatus(const char* name)
+{
+  return this->MassArraySelection->ArrayIsEnabled(name);
+}
+
+//-----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::GetMassArrayStatus(int index)
+{
+  return this->MassArraySelection->GetArraySetting(index);
+}
+
+//-----------------------------------------------------------------------------
+void vtkCTHFragmentConnect::SetMassArrayStatus( const char* name, 
+                                                    int status )
+{
+  vtkDebugMacro("Set cell array \"" << name << "\" status to: " << status);
+  if(status)
+    {
+    this->MassArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->MassArraySelection->DisableArray(name);
+    }
+}
 
 
 // PV interface to the material fraction
@@ -4900,9 +5208,15 @@ void vtkCTHFragmentConnect::AddEquivalence(
 // When we enter this method the equivalent set has been resolved so
 // it is indexed by global raw (generated by connectivity) fragment ids and the
 // values are a sequential final global fragment ids.
-// The volume array is indexed by local raw fragment indexes.
+// The attribute arrays (volume, summation, weighted averages etc..) are
+//  indexed by local raw fragment indexes.
+//
 // When this method finishes, all processes have a volume array indexed
 // by the final global fragment ids and the values are the volumes.
+// 
+//  TODO, do all process need all attributes(including for fragments which
+//  they do not own)?? No. How much of a pain to figure out who gets what??
+//  But, it is nice to have all attributes...or maybe they can discard what they don't need??
 void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
 {
   int nFragments=this->NumberOfResolvedFragments;
@@ -4928,8 +5242,13 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     this->Controller->Send(this->FragmentVolumes, 0, thisMsg);
     ++thisMsg;
 
+    // send moment array
+    this->FragmentMoments->Squeeze();
+    this->Controller->Send(this->FragmentMoments, 0, thisMsg);
+    ++thisMsg;
+
     // send volume weighted averaged arrays
-    for (int i=0; i<this->nToAverage; ++i)
+    for (int i=0; i<this->NToAverage; ++i)
       {
       // cerr << myProc << "@" << thisMsg << " Sent:\n" << *this->FragmentWeightedAverages[i];
       this->FragmentWeightedAverages[i]->Squeeze();
@@ -4938,7 +5257,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       }
 
     // send summation arrays
-    for (int i=0; i<this->nToSum; ++i)
+    for (int i=0; i<this->NToSum; ++i)
       {
       // cerr << myProc << "@" << thisMsg << " Sent:\n" << *this->FragmentSums[i];
       this->FragmentSums[i]->Squeeze();
@@ -4947,30 +5266,35 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       }
 
     // process 0 resolves things...
+
+    // TODO
     // and re-distributes fragments such that
     // each fragment resides completely on a single process.
 
     // receive the resolved volume array
-    this->FragmentVolumes->Delete();
-    this->FragmentVolumes=vtkDoubleArray::New();
+    __util::ReNewVtkPointer(this->FragmentVolumes);
     this->Controller->Receive(this->FragmentVolumes, 0, thisMsg);
     // cerr << myProc << "@" << thisMsg << "Received:\n" << *this->FragmentVolumes;
     ++thisMsg;
 
+    // receive the resolved moments array
+    __util::ReNewVtkPointer(this->FragmentMoments);
+    this->Controller->Receive(this->FragmentMoments, 0, thisMsg);
+    // cerr << myProc << "@" << thisMsg << "Received:\n" << *this->FragmentMoments;
+    ++thisMsg;
+
     // receive the broadcasted resolved weighted average arrays.
-    for (int i=0; i<this->nToAverage; ++i)
+    for (int i=0; i<this->NToAverage; ++i)
       {
-      this->FragmentWeightedAverages[i]->Delete();
-      this->FragmentWeightedAverages[i]=vtkDoubleArray::New();
+      __util::ReNewVtkPointer(this->FragmentWeightedAverages[i]);
       this->Controller->Receive( this->FragmentWeightedAverages[i],0, thisMsg );
-      // cerr << myProc << "@" << thisMsg << "Received:\n" << *this->FragmentWeightedAverages[i];
+      //cerr << myProc << "@" << thisMsg << "Received:\n" << *this->FragmentWeightedAverages[i];
       ++thisMsg;
       }
     // receive the broadcasted resolved summation arrays.
-    for (int i=0; i<this->nToSum; ++i)
+    for (int i=0; i<this->NToSum; ++i)
       {
-      this->FragmentSums[i]->Delete();
-      this->FragmentSums[i]=vtkDoubleArray::New();
+      __util::ReNewVtkPointer(this->FragmentSums[i]);
       this->Controller->Receive( this->FragmentSums[i],0, thisMsg );
       // cerr << myProc << "@" << thisMsg << "Received:\n" << *this->FragmentSums[i];
       ++thisMsg;
@@ -4986,10 +5310,17 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     resolvedVolumeArray->SetNumberOfTuples(nFragments);
     resolvedVolumeArray->SetName(this->FragmentVolumes->GetName());
 
+    // allocate the resolved moments array
+    const int nMomentComps=4;
+    vtkDoubleArray *resolvedMomentArray=vtkDoubleArray::New();
+    resolvedMomentArray->SetNumberOfComponents(nMomentComps);
+    resolvedMomentArray->SetNumberOfTuples(nFragments);
+    resolvedMomentArray->SetName(this->FragmentMoments->GetName());
+
     // Allocate the resolved integrated arrays.
     // weighted average
-    vector<vtkDoubleArray *> resolvedAveragedArrays(this->nToAverage,static_cast<vtkDoubleArray*>(0));
-    for (int i=0; i<this->nToAverage; ++i)
+    vector<vtkDoubleArray *> resolvedAveragedArrays(this->NToAverage,static_cast<vtkDoubleArray*>(0));
+    for (int i=0; i<this->NToAverage; ++i)
       {
       resolvedAveragedArrays[i]=vtkDoubleArray::New();
       resolvedAveragedArrays[i]->SetNumberOfComponents(this->FragmentWeightedAverages[i]->GetNumberOfComponents());
@@ -4997,8 +5328,8 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       resolvedAveragedArrays[i]->SetName(this->FragmentWeightedAverages[i]->GetName());
       }
     // sum
-    vector<vtkDoubleArray *> resolvedSummedArrays(this->nToSum,static_cast<vtkDoubleArray*>(0));
-    for (int i=0; i<this->nToSum; ++i)
+    vector<vtkDoubleArray *> resolvedSummedArrays(this->NToSum,static_cast<vtkDoubleArray*>(0));
+    for (int i=0; i<this->NToSum; ++i)
       {
       resolvedSummedArrays[i]=vtkDoubleArray::New();
       resolvedSummedArrays[i]->SetNumberOfComponents(this->FragmentSums[i]->GetNumberOfComponents());
@@ -5027,7 +5358,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
 
     double *pRes=resolvedVolumeArray->GetPointer(0);
     memset( pRes, 0, sizeof(double)*nFragments);
-    int q=0; //global index
+    int q=0; // index to equiv set
     for (int i=0; i<numProcs; ++i)
       {
       int nUnresolved=volumeArrays[i]->GetNumberOfTuples();
@@ -5040,10 +5371,48 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
         }
       }
 
+    // gather moment arrays
+    vector<vtkDoubleArray *>momentArrays(numProcs,static_cast<vtkDoubleArray*>(0));
+    // mine
+    momentArrays[0]=this->FragmentMoments;
+    // everyone else's
+    for (int i=1; i<numProcs; ++i)
+      {
+      momentArrays[i]=vtkDoubleArray::New();
+      this->Controller->Receive( momentArrays[i], i, thisMsg);
+      // cerr << myProc << "@" << thisMsg << " Received:\n" << *momentArrays[i];
+      }
+    ++thisMsg;
+
+    // Sum up the moment from equivalent fragments.
+    pRes=resolvedMomentArray->GetPointer(0);
+    memset( pRes, 0, sizeof(double)*nFragments*nMomentComps);
+    q=0; //global index
+    for (int i=0; i<numProcs; ++i)
+      {
+      int nUnresolved=momentArrays[i]->GetNumberOfTuples();
+      for (int j=0; j<nUnresolved; ++j)
+        {
+        int finalId=this->EquivalenceSet->GetEquivalentSetId(q);
+
+        double *finalTuple
+          = resolvedMomentArray->GetPointer(finalId*nMomentComps);
+
+        const double *thisTuple
+          = momentArrays[i]->GetPointer(j*nMomentComps);
+
+        for (int k=0; k<nMomentComps; ++k)
+          {
+          finalTuple[k]+=thisTuple[k];
+          }
+        ++q;
+        }
+      }
+
     // weighted average
     // gather
-    vector<vector<vtkDoubleArray *> >averagedArrays(this->nToAverage);
-    for (int i=0; i<this->nToAverage; ++i)
+    vector<vector<vtkDoubleArray *> >averagedArrays(this->NToAverage);
+    for (int i=0; i<this->NToAverage; ++i)
       {
       averagedArrays[i].resize(numProcs,static_cast<vtkDoubleArray*>(0));
       // mine 
@@ -5058,12 +5427,12 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       ++thisMsg;
       }
     // Sum partial weighted average from equivalent fragments
-    for (int k=0; k<this->nToAverage; ++k)
+    for (int k=0; k<this->NToAverage; ++k)
       {
       double *pRes=resolvedAveragedArrays[k]->GetPointer(0);
       int nComps=resolvedAveragedArrays[k]->GetNumberOfComponents();
       memset( pRes, 0, sizeof(double)*nFragments*nComps);
-      int q=0; //global index
+      int q=0; // index to equiv set
       for (int i=0; i<numProcs; ++i)
         {
         int nUnresolved=averagedArrays[k][i]->GetNumberOfTuples();
@@ -5080,9 +5449,9 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
           const double *fragmentVolume
             = resolvedVolumeArray->GetPointer(finalId);
 
-          for (int i=0; i<nComps; ++i)
+          for (int ii=0; ii<nComps; ++ii)
             {
-            finalTuple[i]+=thisTuple[i]/fragmentVolume[0];
+            finalTuple[ii]+=thisTuple[ii]/fragmentVolume[0];
             }
           ++q;
           }
@@ -5090,8 +5459,8 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       }
     // summation
     // gather
-    vector<vector<vtkDoubleArray *> >summedArrays(this->nToSum);
-    for (int i=0; i<this->nToSum; ++i)
+    vector<vector<vtkDoubleArray *> >summedArrays(this->NToSum);
+    for (int i=0; i<this->NToSum; ++i)
       {
       summedArrays[i].resize(numProcs,static_cast<vtkDoubleArray*>(0));
       // mine 
@@ -5106,7 +5475,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
       ++thisMsg;
       }
     // Sum partial sum from equivalent fragments
-    for (int k=0; k<this->nToSum; ++k)
+    for (int k=0; k<this->NToSum; ++k)
       {
       double *pRes=resolvedSummedArrays[k]->GetPointer(0);
       int nComps=resolvedSummedArrays[k]->GetNumberOfComponents();
@@ -5125,9 +5494,9 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
           const double *thisTuple
             = summedArrays[k][i]->GetPointer(j*nComps);
 
-          for (int i=0; i<nComps; ++i)
+          for (int ii=0; ii<nComps; ++ii)
             {
-            finalTuple[i]+=thisTuple[i];
+            finalTuple[ii]+=thisTuple[ii];
             }
           ++q;
           }
@@ -5146,8 +5515,20 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
         }
       ++thisMsg;
 
+      // broadcast resolved moment array
+      // mine
+      this->FragmentMoments->Delete();
+      this->FragmentMoments=resolvedMomentArray;
+      // everyone else's
+      for (int i=1; i<numProcs; ++i)
+        {
+        // cerr << myProc << "@" << thisMsg << " Sent:\n" << *resolvedVolumeArray;
+        this->Controller->Send(resolvedMomentArray, i, thisMsg);
+        }
+      ++thisMsg;
+
       // broadcast resolved averaged arrays
-      for (int k=0; k<this->nToAverage; ++k)
+      for (int k=0; k<this->NToAverage; ++k)
         {
         // mine 
         this->FragmentWeightedAverages[k]=resolvedAveragedArrays[k];
@@ -5161,7 +5542,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
         }
 
       // broadcast resolved summed arrays
-      for (int k=0; k<this->nToSum; ++k)
+      for (int k=0; k<this->NToSum; ++k)
         {
         // mine 
         this->FragmentSums[k]=resolvedSummedArrays[k];
@@ -5178,7 +5559,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
 
 
 //----------------------------------------------------------------------------
-void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
+void vtkCTHFragmentConnect::ResolveEquivalences()
 {
   int myProc = this->Controller->GetLocalProcessId();
   int numProcs = this->Controller->GetNumberOfProcesses();
@@ -5191,19 +5572,66 @@ void vtkCTHFragmentConnect::ResolveEquivalences(vtkIntArray* fragmentIdArray)
   this->GatherEquivalenceSets(this->EquivalenceSet);
   int localToGlobal = this->LocalToGlobalOffsets[myProc];
 
-  // Now change the ids in the cell / point array.
-  int num = fragmentIdArray->GetNumberOfTuples();
-  for (int ii = 0; ii < num; ++ii)
+  // TODO some of this belongs ina "fragment container class" see notes in header.
+  // Now update the fragment pieces themselves
+  // up until this point their id was implicit in their location
+  // in the array, now the resolution process has invalidated that.
+  // Create the ResolvedFragments array such that our fragments are
+  // indexed by their global id, if a fragment is not local then
+  // its entry is 0. And local pieces of the same fragment have been 
+  // merged. As we go, build a list of what we own, so we won't
+  // have to search for what we have.
+  this->ResolvedFragmentIds.clear(); // list of what we own
+  __util::ClearVectorOfVtkPointers(this->ResolvedFragments);
+  this->ResolvedFragments.resize(this->NumberOfResolvedFragments,
+                                 static_cast<vtkPolyData *>(0));
+
+  int nPieces=this->FragmentMeshes.size();
+  for (int localId=0; localId<nPieces; ++localId)
     {
-    int id = fragmentIdArray->GetValue(ii);
-    assert("Id out of range." && id>=0);
-    int newId = this->EquivalenceSet->GetEquivalentSetId(id+localToGlobal);
-    fragmentIdArray->SetValue(ii,newId);
+    // find out this guy's global id
+    int globalId
+      = this->EquivalenceSet->GetEquivalentSetId(localId+localToGlobal);
+    // make a note to ourselves
+    this->ResolvedFragmentIds.push_back(globalId);
+    // If we have a mesh that is globally unused then
+    // we copy, but if not, it's a local piece that has been
+    // resolved and we need to append.
+    vtkPolyData *destMesh=this->ResolvedFragments[globalId];
+    vtkPolyData *srcMesh=this->FragmentMeshes[localId];
+    if (destMesh==0)
+      {
+      this->ResolvedFragments[globalId]=srcMesh;
+      }
+    else
+      {
+      // merge two local pieces
+      // TODO It's more effcient to batch the appends, but check 
+      // how often this gets hit more than once for the same fragment...
+      vtkAppendPolyData *apf=vtkAppendPolyData::New();
+      apf->AddInput(destMesh);
+      apf->AddInput(srcMesh);
+      vtkPolyData *mergedMesh=apf->GetOutput();
+      mergedMesh->Update();
+      mergedMesh->Register(0); //TODO Do I have to?
+      this->ResolvedFragments[globalId]=mergedMesh;
+      apf->Delete();
+      srcMesh->Delete();
+      destMesh->Delete();
+      }
     }
+  // We still own pointers to these meshes, or we have already 
+  // deleted them. So do not delete these.
+  this->FragmentMeshes.clear();
+
+  /// TODO gather & broadcast loading, as in an all to all with varying lengths
 
   // Use the resolved ids to resolve volumes and integrated 
   // attributes.
   this->ResolveAndPartitionFragments();
+
+  // Update fragment attributes
+  this->CopyAttributesToFragments();
 
   delete [] this->NumberOfRawFragmentsInProcess;
   this->NumberOfRawFragmentsInProcess = 0;
@@ -5499,6 +5927,295 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
     delete [] buf;
     }
 }
+//----------------------------------------------------------------------------
+// After the attributes have been resolved copy them in to the 
+// fragment data sets. We put each one as a 1 tuple array
+// in the field data, and for now we copy each to the point data
+// as well. My hope is that the point data can be eliminated...
+void vtkCTHFragmentConnect::CopyAttributesToFragments()
+{
+  int nLocalFragments=this->ResolvedFragmentIds.size();
+  for (int i=0; i<nLocalFragments; ++i)
+    {
+    // get the fragment
+    int globalId=this->ResolvedFragmentIds[i];
+    vtkPolyData *thisFragment=ResolvedFragments[globalId];
+    assert( "Fragment is not local." && thisFragment);
+    int nPoints=thisFragment->GetNumberOfPoints();
+
+    // add a attributes to field data
+    vtkFieldData *fd=thisFragment->GetFieldData();
+    vtkPointData *pd=thisFragment->GetPointData();
+    // Fragment id
+    // field data
+    vtkIntArray *fdId=vtkIntArray::New();
+    fdId->SetName("Id");
+    fdId->SetNumberOfComponents(1);
+    fdId->SetNumberOfTuples(1);
+    fdId->SetValue(0,globalId);
+    fd->AddArray(fdId);
+    fdId->Delete();
+    // point data
+    vtkIntArray *pdId=vtkIntArray::New();
+    pdId->SetName("Id");
+    pdId->SetNumberOfComponents(1);
+    pdId->SetNumberOfTuples(nPoints);
+    pdId->FillComponent(0,globalId);
+    pd->AddArray(pdId);
+    pdId->Delete();
+
+    // volume
+    double V
+      = this->FragmentVolumes->GetValue(globalId);
+    // field data
+    vtkDoubleArray *fdVol=vtkDoubleArray::New();
+    fdVol->SetName("Volume");
+    fdVol->SetNumberOfComponents(1);
+    fdVol->SetNumberOfTuples(1);
+    fdVol->SetValue(0,V);
+    fd->AddArray(fdVol);
+    fdVol->Delete();
+    // point data
+    vtkDataArray *pdVol=vtkDoubleArray::New();
+    pdVol->SetName("Volume");
+    pdVol->SetNumberOfComponents(1);
+    pdVol->SetNumberOfTuples(nPoints);
+    pdVol->FillComponent(0,V);
+    pd->AddArray(pdVol);
+    pdVol->Delete();
+
+    // Moments
+    const int nMomentComps=4;
+    const char *name
+      = this->FragmentMoments->GetName();
+    double *srcTuple
+      = this->FragmentMoments->GetTuple(globalId);
+    // field data
+    vtkDoubleArray *fdMom=vtkDoubleArray::New();
+    fdMom->SetName(name);
+    fdMom->SetNumberOfComponents(nMomentComps);
+    fdMom->SetNumberOfTuples(1);
+    fdMom->SetTuple(0,srcTuple);
+    fd->AddArray(fdMom);
+    fdMom->Delete();
+    // point data
+    vtkDoubleArray *pdMom=vtkDoubleArray::New();
+    pdMom->SetName(name);
+    pdMom->SetNumberOfComponents(nMomentComps);
+    pdMom->SetNumberOfTuples(nPoints);
+    for (int q=0; q<nMomentComps; ++q)
+      {
+      pdMom->FillComponent(q,srcTuple[q]);
+      }
+    pd->AddArray(pdMom);
+    pdMom->Delete();
+
+    //Mass
+    // field data
+    vtkDoubleArray *fdM=vtkDoubleArray::New();
+    fdM->SetName("Mass");
+    fdM->SetNumberOfComponents(1);
+    fdM->SetNumberOfTuples(1);
+    fdM->SetValue(0,srcTuple[3]);
+    fd->AddArray(fdM);
+    fdM->Delete();
+    // point data
+    vtkDataArray *pdM=vtkDoubleArray::New();
+    pdM->SetName("Mass");
+    pdM->SetNumberOfComponents(1);
+    pdM->SetNumberOfTuples(nPoints);
+    pdM->FillComponent(0,V);
+    pd->AddArray(pdM);
+    pdM->Delete();
+
+    // weighted averages
+    for (int j=0; j<this->NToAverage; ++j)
+      {
+      int nComps
+        = this->FragmentWeightedAverages[j]->GetNumberOfComponents();
+      const char *name
+        = this->FragmentWeightedAverages[j]->GetName();
+      double *srcTuple
+        = this->FragmentWeightedAverages[j]->GetTuple(globalId);
+
+      // field data
+      vtkDoubleArray *fdVwa=vtkDoubleArray::New();
+      fdVwa->SetName(name);
+      fdVwa->SetNumberOfComponents(nComps);
+      fdVwa->SetNumberOfTuples(1);
+      fdVwa->SetTuple(0,srcTuple);
+      fd->AddArray(fdVwa);
+      fdVwa->Delete();
+
+      // point data
+      vtkDoubleArray *pdVwa=vtkDoubleArray::New();
+      pdVwa->SetName(name);
+      pdVwa->SetNumberOfComponents(nComps);
+      pdVwa->SetNumberOfTuples(nPoints);
+      for (int q=0; q<nComps; ++q)
+        {
+        pdVwa->FillComponent(q,srcTuple[q]);
+        }
+      pd->AddArray(pdVwa);
+      pdVwa->Delete();
+      }
+    // summations
+    for (int j=0; j<this->NToSum; ++j)
+      {
+      int nComps
+        = this->FragmentSums[j]->GetNumberOfComponents();
+      const char *name
+        = this->FragmentSums[j]->GetName();
+      double *srcTuple
+        = this->FragmentSums[j]->GetTuple(globalId);
+
+      // field data
+      vtkDoubleArray *fdS=vtkDoubleArray::New();
+      fdS->SetName(name);
+      fdS->SetNumberOfComponents(nComps);
+      fdS->SetNumberOfTuples(1);
+      fdS->SetTuple(0,srcTuple);
+      fd->AddArray(fdS);
+      fdS->Delete();
+
+      // point data
+      vtkDoubleArray *pdS=vtkDoubleArray::New();
+      pdS->SetName(name);
+      pdS->SetNumberOfComponents(nComps);
+      pdS->SetNumberOfTuples(nPoints);
+      for (int q=0; q<nComps; ++q)
+        {
+        pdS->FillComponent(q,srcTuple[q]);
+        }
+      pd->AddArray(pdS);
+      pdS->Delete();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+// For now each block is a multipiece associated with the material. The multipiece is 
+// built of many polydata where each polydata is a fragment. for now fragments may be split across
+// procs.
+// 
+// return 0 if an error occurs.
+int vtkCTHFragmentConnect::BuildOutput(vtkMultiBlockDataSet *mbds, int materialId)
+{
+  // Add fragments to the multipiece. 
+  vtkMultiPieceDataSet *mpds=vtkMultiPieceDataSet::New();
+  mpds->SetNumberOfPieces(this->NumberOfResolvedFragments);
+  // note, when the pieces are allocated they are initialized to 0
+  // therefor we don't need to loop over all of them.
+  int nLocalFragments=this->ResolvedFragmentIds.size();
+  for (int i=0; i<nLocalFragments; ++i)
+    {
+    int globalId=this->ResolvedFragmentIds[i];
+    mpds->SetPiece(globalId,this->ResolvedFragments[globalId]);
+    }
+  // Add multipiece to the multiblock
+  mbds->SetBlock(materialId,mpds);
+  mpds->Delete();
+  return 1;
+}
+
+// //----------------------------------------------------------------------------
+// // Release all resources we have associated with fragments we own.
+// int vtkCTHFragmentConnect::ClearFragments()
+// {
+// 
+// }
+
+//----------------------------------------------------------------------------
+// Write the fragment attribute to a text file. Each process
+// writes its pieces, so duplicates might arise, however
+// the attributes are global so that they should have the same
+// value.
+// TODO material id 
+int vtkCTHFragmentConnect::WriteFragmentAttributesToTextFile(int materialId)
+{
+  int myProcId=this->Controller->GetLocalProcessId();
+
+  // open the file
+  ostringstream fileName;
+  fileName << this->OutputTableFileNameBase
+           << "."
+           << myProcId
+           << "."
+           << materialId
+           << ".cthfc";
+
+  ofstream fout;
+  fout.open(fileName.str().c_str());
+  if ( !fout.is_open() )
+    {
+    vtkErrorMacro("Could not open" << fileName.str() );
+    return 0;
+    }
+
+  // all fragments store the same info so we get the first
+  // and use that to build the file header
+  int firstLocalId=this->ResolvedFragmentIds[0];
+  vtkFieldData *rf0fd=this->ResolvedFragments[firstLocalId]->GetFieldData();
+  int nAttributes=rf0fd->GetNumberOfArrays();
+  int nLocalFragments=this->ResolvedFragmentIds.size();
+
+  // write header
+  fout << "Header:{" << endl;
+  fout << "Process id:" << myProcId << endl;
+  fout << "Number total:" << this->NumberOfResolvedFragments << endl;
+  fout << "Number local:" << nLocalFragments << endl;
+  fout << "Number of attributes:" << nAttributes << endl;
+  fout << "}" << endl;
+  // write attribute names
+  fout << "Attributes:{" << endl;
+  for (int i=0; i<nAttributes; ++i)
+    {
+    vtkDataArray *aa=rf0fd->GetArray(i);
+    fout << "\""
+         << aa->GetName()
+         << "\", "
+         << aa->GetNumberOfComponents()
+         << endl;
+    }
+  fout << "}" << endl;
+  // write attributes
+  fout << "Attribute Data:{" << endl;
+  for (int i=0; i<nLocalFragments; ++i)
+    {
+    int globalId=this->ResolvedFragmentIds[i];
+    vtkFieldData *fd=this->ResolvedFragments[globalId]->GetFieldData();
+    // first
+    vtkDataArray *aa=fd->GetArray(0);
+    int nComps=aa->GetNumberOfComponents();
+    vector<double> tup;
+    tup.resize(nComps);
+    __util::CopyTuple(&tup[0],aa,nComps,0);
+    fout << tup[0];
+    for (int q=1; q<nComps; ++q)
+      {
+      fout << " " << tup[q];
+      }
+    // rest
+    for (int j=1; j<nAttributes; ++j)
+      {
+      fout << ", ";
+      aa=fd->GetArray(j);
+      nComps=aa->GetNumberOfComponents();
+      tup.resize(nComps);
+      __util::CopyTuple(&tup[0],aa,nComps,0);
+      fout << tup[0];
+      for (int q=1; q<nComps; ++q)
+        {
+        fout << " " << tup[q];
+        }
+      }
+    fout << endl;
+    }
+  fout << "}" << endl;
+  fout.flush();
+  fout.close();
+}
+
 
 
 // //----------------------------------------------------------------------------
@@ -5524,82 +6241,6 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
 //   output->GetPointData()->AddArray(va);
 //   va->Delete();
 // }
-
-//----------------------------------------------------------------------------
-// Integrated attributes are coppied to all polys of a fragment
-// so that they may be colored by integrated value. 
-void vtkCTHFragmentConnect::CopyIntegratedAttributesToFragments(
-  vtkIntArray* fragmentIds,
-  vtkDataSet* output )
-{
-  int numPoints = fragmentIds->GetNumberOfTuples();
-  int* idPtr = fragmentIds->GetPointer(0);
-
-  // make point data array for volume
-  vtkDoubleArray* va = vtkDoubleArray::New();
-  va->SetName("FragmentVolume");
-  va->SetNumberOfComponents(1);
-  va->SetNumberOfTuples(numPoints);
-
-  // make point data array for integrated attributes
-  // weighted average
-  vector<vtkDoubleArray *> waa(this->nToAverage,static_cast<vtkDoubleArray*>(0));
-  for (int i=0; i<this->nToAverage; ++i)
-    {
-    waa[i]=vtkDoubleArray::New();
-    waa[i]->SetName(this->FragmentWeightedAverages[i]->GetName());
-    waa[i]->SetNumberOfComponents(this->FragmentWeightedAverages[i]->GetNumberOfComponents());
-    waa[i]->SetNumberOfTuples(numPoints);
-    }
-  // summation
-  vector<vtkDoubleArray *> sa(this->nToSum,static_cast<vtkDoubleArray*>(0));
-  for (int i=0; i<this->nToSum; ++i)
-    {
-    sa[i]=vtkDoubleArray::New();
-    sa[i]->SetName(this->FragmentSums[i]->GetName());
-    sa[i]->SetNumberOfComponents(this->FragmentSums[i]->GetNumberOfComponents());
-    sa[i]->SetNumberOfTuples(numPoints);
-    }
-
-  // copy the volume and integrated results which are 
-  // indexed by fragment id to each node of each triangle
-  // in the output data
-  for (int i=0; i<numPoints; ++i)
-    {
-    //copy volume
-    va->SetTuple(i, this->FragmentVolumes->GetPointer(*idPtr));
-    // copy weighted average
-    for (int j=0; j<this->nToAverage; ++j)
-      {
-      waa[j]->SetTuple(i,this->FragmentWeightedAverages[j]->GetPointer(*idPtr));
-      }
-    // copy sum
-    for (int j=0; j<this->nToSum; ++j)
-      {
-      sa[j]->SetTuple(i,this->FragmentSums[j]->GetPointer(*idPtr));
-      }
-    ++idPtr;
-    }
-
-  // Insert into output and clean up
-  // volume
-  output->GetPointData()->AddArray(va);
-  va->Delete();
-  // weighted average
-  for (int i=0; i<this->nToAverage; ++i)
-    {
-    output->GetPointData()->AddArray(waa[i]);
-    waa[i]->Delete();
-    }
-  // sum
-  for (int i=0; i<this->nToSum; ++i)
-    {
-    output->GetPointData()->AddArray(sa[i]);
-    sa[i]->Delete();
-    }
-}
-
-
 
 /*
 //----------------------------------------------------------------------------
@@ -5694,4 +6335,103 @@ void vtkCTHFragmentConnect::FinializeAttributeIntegration(..)
 
 */
 
+// convert arbitrary array of local ids to gloabl ids
+//   // Now change the ids in the cell / point array.
+//   int num = fragmentIdArray->GetNumberOfTuples();
+//   for (int ii = 0; ii < num; ++ii)
+//     {
+//     int id = fragmentIdArray->GetValue(ii);
+//     assert("Id out of range." && id>=0);
+//     int newId = this->EquivalenceSet->GetEquivalentSetId(id+localToGlobal);
+//     fragmentIdArray->SetValue(ii,newId);
+//     }
 
+
+// //----------------------------------------------------------------------------
+// // Integrated attributes are coppied to all polys of a fragment
+// // so that they may be colored by integrated value. 
+// void vtkCTHFragmentConnect::CopyIntegratedAttributesToFragments(
+//   vtkIntArray* fragmentIds,
+//   vtkDataSet* output )
+// {
+//   vector<int> test(this->FragmentVolumes->GetNumberOfTuples(),0);
+// 
+//   int numPoints = fragmentIds->GetNumberOfTuples();
+//   int* idPtr = fragmentIds->GetPointer(0);
+// 
+//   // make point data array for volume
+//   vtkDoubleArray* va = vtkDoubleArray::New();
+//   va->SetName("FragmentVolume");
+//   va->SetNumberOfComponents(1);
+//   va->SetNumberOfTuples(numPoints);
+// 
+//   // make point data array for integrated attributes
+//   // weighted average
+//   vector<vtkDoubleArray *> waa(this->NToAverage,static_cast<vtkDoubleArray*>(0));
+//   for (int i=0; i<this->NToAverage; ++i)
+//     {
+//     waa[i]=vtkDoubleArray::New();
+//     waa[i]->SetName(this->FragmentWeightedAverages[i]->GetName());
+//     waa[i]->SetNumberOfComponents(this->FragmentWeightedAverages[i]->GetNumberOfComponents());
+//     waa[i]->SetNumberOfTuples(numPoints);
+//     }
+//   // summation
+//   vector<vtkDoubleArray *> sa(this->NToSum,static_cast<vtkDoubleArray*>(0));
+//   for (int i=0; i<this->NToSum; ++i)
+//     {
+//     sa[i]=vtkDoubleArray::New();
+//     sa[i]->SetName(this->FragmentSums[i]->GetName());
+//     sa[i]->SetNumberOfComponents(this->FragmentSums[i]->GetNumberOfComponents());
+//     sa[i]->SetNumberOfTuples(numPoints);
+//     }
+// 
+//   // copy the volume and integrated results which are 
+//   // indexed by fragment id to each node of each triangle
+//   // in the output data
+//   for (int i=0; i<numPoints; ++i)
+//     {
+//     // test
+//     test[*idPtr]=1;
+//     //copy volume
+//     va->SetTuple(i, this->FragmentVolumes->GetPointer(*idPtr));
+//     // copy weighted average
+//     for (int j=0; j<this->NToAverage; ++j)
+//       {
+//       waa[j]->SetTuple(i,this->FragmentWeightedAverages[j]->GetPointer(*idPtr));
+//       }
+//     // copy sum
+//     for (int j=0; j<this->NToSum; ++j)
+//       {
+//       sa[j]->SetTuple(i,this->FragmentSums[j]->GetPointer(*idPtr));
+//       }
+//     ++idPtr;
+//     }
+// 
+//   // Insert into output and clean up
+//   // volume
+//   output->GetPointData()->AddArray(va);
+//   va->Delete();
+//   // weighted average
+//   for (int i=0; i<this->NToAverage; ++i)
+//     {
+//     output->GetPointData()->AddArray(waa[i]);
+//     waa[i]->Delete();
+//     }
+//   // sum
+//   for (int i=0; i<this->NToSum; ++i)
+//     {
+//     output->GetPointData()->AddArray(sa[i]);
+//     sa[i]->Delete();
+//     }
+// 
+//   // test
+//   cerr << "Found not used:{" << endl;
+//   for (int i=0; i<test.size(); ++i)
+//     {
+//     if (test[i]==0)
+//       {
+//       cerr << i << ",";
+//       }
+//     }
+//   cerr << "}\n";
+// }
