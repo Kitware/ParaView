@@ -7271,8 +7271,7 @@
       </InputProperty>
 
       <SubProxy>
-        <Proxy name="Append" proxygroup="filters"
-          proxyname="CompositeDataToUnstructuredGridFilter" />
+        <Proxy name="Append" proxygroup="filters" proxyname="MergeBlocks" />
       </SubProxy>
 
       <SubProxy>

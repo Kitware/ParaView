@@ -7443,11 +7443,12 @@ This property controls how the filter works to generate tensor cell data. You ca
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="CompositeDataToUnstructuredGridFilter"
-      class="vtkCompositeDataToUnstructuredGridFilter">
+   <SourceProxy name="MergeBlocks"
+      class="vtkCompositeDataToUnstructuredGridFilter"
+      label="Merge Blocks">
       <Documentation
         short_help="Appends vtkCompositeDataSet leaves into a single vtkUnstructuredGrid" >
-      vtkCompositeDataToUnstructuredGridFilter appends all vtkUnstructuredGrid
+      vtkCompositeDataToUnstructuredGridFilter appends all vtkDataSet
       leaves of the input composite dataset to a single unstructure grid. The
       subtree to be combined can be choosen using the SubTreeCompositeIndex. If 
       the SubTreeCompositeIndex is a leaf node, then no appending is required.
@@ -7456,7 +7457,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       <InputProperty name="Input"
         command="SetInputConnection">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkUnstructuredGrid" />
+          <DataType value="vtkCompositeDataSet" />
         </DataTypeDomain>
         <Documentation>
           Set the input composite dataset.
@@ -7466,14 +7467,20 @@ This property controls how the filter works to generate tensor cell data. You ca
       <IntVectorProperty name="SubTreeCompositeIndex"
         command="SetSubTreeCompositeIndex"
         number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0"/>
+        default_values="0"
+        is_internal="1">
+        <CompositeTreeDomain name="tree" mode="all">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+        </CompositeTreeDomain>
         <Documentation>
-          Select the index of the subtree to be appended.
+          Select the index of the subtree to be appended. 
+          For now, this property is internal.
         </Documentation>
       </IntVectorProperty>
 
-      <!-- End of CompositeDataToUnstructuredGridFilter -->
+      <!-- End of MergeBlocks -->
     </SourceProxy>
 
   </ProxyGroup>

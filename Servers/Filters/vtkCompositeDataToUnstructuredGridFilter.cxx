@@ -22,7 +22,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
-vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.1");
+vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.2");
 //----------------------------------------------------------------------------
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
@@ -42,6 +42,7 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
 {
   vtkCompositeDataSet* cd = vtkCompositeDataSet::GetData(inputVector[0], 0);
   vtkUnstructuredGrid* ug = vtkUnstructuredGrid::GetData(inputVector[0], 0);
+  vtkDataSet* ds = vtkDataSet::GetData(inputVector[0], 0);
   vtkUnstructuredGrid* output = vtkUnstructuredGrid::GetData(outputVector, 0);
 
   if (ug)
@@ -50,72 +51,86 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
     return 1;
     }
 
-  if (!cd)
-    {
-    vtkErrorMacro("Input must either be vtkUnstructuredGrid "
-      "or vtkCompositeDataSet.");
-    return 0;
-    }
 
-  if (this->SubTreeCompositeIndex == 0)
+  vtkAppendFilter* appender = vtkAppendFilter::New();
+  if (ds)
     {
-    this->ExecuteSubTree(cd, output);
+    this->AddDataSet(ds, appender);
     }
-
-  vtkCompositeDataIterator* iter = cd->NewIterator();
-  iter->VisitOnlyLeavesOff();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal() && 
-    iter->GetCurrentFlatIndex() <= this->SubTreeCompositeIndex;
-    iter->GoToNextItem())
+  else if (cd)
     {
-    if (iter->GetCurrentFlatIndex() == this->SubTreeCompositeIndex)
+    if (this->SubTreeCompositeIndex == 0)
       {
-      vtkDataObject* curDO = iter->GetCurrentDataObject();
-      vtkCompositeDataSet* curCD = vtkCompositeDataSet::SafeDownCast(curDO);
-      vtkUnstructuredGrid* curUG = vtkUnstructuredGrid::SafeDownCast(curDO);
-      if (curUG)
-        {
-        output->ShallowCopy(curUG);
-        }
-      else if (curCD)
-        {
-        this->ExecuteSubTree(curCD, output);
-        }
-      break;
+      this->ExecuteSubTree(cd, appender);
       }
-    }
-  iter->Delete();
 
+    vtkCompositeDataIterator* iter = cd->NewIterator();
+    iter->VisitOnlyLeavesOff();
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal() && 
+      iter->GetCurrentFlatIndex() <= this->SubTreeCompositeIndex;
+      iter->GoToNextItem())
+      {
+      if (iter->GetCurrentFlatIndex() == this->SubTreeCompositeIndex)
+        {
+        vtkDataObject* curDO = iter->GetCurrentDataObject();
+        vtkCompositeDataSet* curCD = vtkCompositeDataSet::SafeDownCast(curDO);
+        vtkUnstructuredGrid* curUG = vtkUnstructuredGrid::SafeDownCast(curDO);
+        vtkDataSet* curDS = vtkUnstructuredGrid::SafeDownCast(curDO);
+        if (curUG)
+          {
+          output->ShallowCopy(curUG);
+          // NOTE: Not using the appender at all.
+          }
+        else if (curDS)
+          {
+          this->AddDataSet(curDS, appender);
+          }
+        else if (curCD)
+          {
+          this->ExecuteSubTree(curCD, appender);
+          }
+        break;
+        }
+      }
+    iter->Delete();
+    }
+
+  if (appender->GetNumberOfInputConnections(0) > 0)
+    {
+    appender->Update();
+    output->ShallowCopy(appender->GetOutput());
+    }
+
+  appender->Delete();
   return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkCompositeDataToUnstructuredGridFilter::ExecuteSubTree(
-  vtkCompositeDataSet* curCD, vtkUnstructuredGrid* output)
+  vtkCompositeDataSet* curCD, vtkAppendFilter* appender)
 {
-  vtkAppendFilter* appender = vtkAppendFilter::New();
-  int counter = 0;
-
   vtkCompositeDataIterator* iter2 = curCD->NewIterator();
   for (iter2->InitTraversal(); !iter2->IsDoneWithTraversal();
     iter2->GoToNextItem())
     {
-    vtkUnstructuredGrid* curUG = 
-      vtkUnstructuredGrid::SafeDownCast(iter2->GetCurrentDataObject());
-    if (curUG)
+    vtkDataSet* curDS = 
+      vtkDataSet::SafeDownCast(iter2->GetCurrentDataObject());
+    if (curDS)
       {
-      appender->AddInput(curUG);
-      counter++;
+      appender->AddInput(curDS);
       }
     }
   iter2->Delete();
+}
 
-  if (counter > 0)
-    {
-    appender->Update();
-    output->ShallowCopy(appender->GetOutput());
-    }
-  appender->Delete();
+//----------------------------------------------------------------------------
+void vtkCompositeDataToUnstructuredGridFilter::AddDataSet(
+  vtkDataSet* ds, vtkAppendFilter* appender)
+{
+  vtkDataSet* clone = ds->NewInstance();
+  clone->ShallowCopy(clone);
+  appender->AddInput(clone);
+  clone->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -124,7 +139,7 @@ int vtkCompositeDataToUnstructuredGridFilter::FillInputPortInformation(
 {
   info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
   info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
-  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkUnstructuredGrid");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;
 }
 

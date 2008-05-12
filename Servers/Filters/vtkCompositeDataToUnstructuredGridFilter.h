@@ -27,6 +27,8 @@
 #include "vtkUnstructuredGridAlgorithm.h"
 
 class vtkCompositeDataSet;
+class vtkAppendFilter;
+
 class VTK_EXPORT vtkCompositeDataToUnstructuredGridFilter : 
   public vtkUnstructuredGridAlgorithm
 {
@@ -52,7 +54,9 @@ protected:
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
-  void ExecuteSubTree(vtkCompositeDataSet* cd, vtkUnstructuredGrid* output);
+  void AddDataSet(vtkDataSet* ds, vtkAppendFilter* appender);
+
+  void ExecuteSubTree(vtkCompositeDataSet* cd, vtkAppendFilter* output);
   unsigned int SubTreeCompositeIndex;
 private:
   vtkCompositeDataToUnstructuredGridFilter(const vtkCompositeDataToUnstructuredGridFilter&); // Not implemented

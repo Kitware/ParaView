@@ -79,6 +79,7 @@
   <Filter name="LoopSubdivisionFilter" />
   <Filter name="MaskPoints" />
   <Filter name="Median" />
+  <Filter name="MergeBlocks" />
   <Filter name="MeshQuality" />
   <Filter name="OctreeDepthLimit" />
   <Filter name="OctreeDepthScalars" />
