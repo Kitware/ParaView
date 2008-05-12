@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.28");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.29");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -1883,6 +1883,20 @@ int vtkCTHFragmentConnect::InitializeBlocks( vtkHierarchicalBoxDataSet* input,
 void vtkCTHFragmentConnect::CheckLevelsForNeighbors(
   vtkCTHFragmentConnectBlock* block)
 {
+//   int exts[6] = {64, 79, 112, 127, 96, 111};
+//   bool match = true;
+//   for (int idx=0; idx<6; idx++)
+//     {
+//     if (block->GetBaseCellExtent()[idx] != exts[idx])
+//       {
+//       match = false;
+//       break;
+//       }
+//     }
+//   if (match)
+//     {
+//     cout << "Stop here" << endl;
+//     }
   vtkstd::vector<vtkCTHFragmentConnectBlock*> neighbors;
   vtkCTHFragmentConnectBlock* neighbor;
   int blockIndex[3];
@@ -2024,7 +2038,14 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
       if ( ! faceMaxFlag)
         { // min face.  Neighbor one to "left".
         idx[faceAxis] -= 1;
+        // But boundary voxel is to the "right".
+        boundaryVoxelIdx = ((idx[faceAxis]+1) * this->StandardBlockDimensions[faceAxis]) -1;
         }
+      else
+        { // This neighbor is to right,  boundary to left / min
+        boundaryVoxelIdx = idx[faceAxis] * this->StandardBlockDimensions[faceAxis];
+        }
+
       // Loop over all possible blocks touching this face.
       tmp[faceAxis] = idx[faceAxis];
       for (int ii = 0; ii < p2; ++ii)
@@ -3508,7 +3529,7 @@ void vtkCTHFragmentConnect::CreateFace(
   this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors);
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
 
-//   if ( quadCornerIds[3] > 74503) // 74507
+//   if ( quadCornerIds[3] > 45502) // 74507
 //     {
 //     cerr << "Debug\n";
 //     }
@@ -4065,10 +4086,8 @@ void vtkCTHFragmentConnect::FindNeighbor(
 
   int tmpLevel;
   int recheck = 1;
-  int count = 0;
-  while (recheck && count < 4)
+  while (recheck)
     {
-    count++;
     recheck = 0;
     // Check each axis and direction for the extent leaving the bounds.
     for (int axis = 0; axis < 3; ++axis)
