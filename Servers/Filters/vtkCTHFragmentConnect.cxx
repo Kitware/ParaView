@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.26");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.27");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -321,9 +321,9 @@ ostream &operator<<(ostream &sout, vtkDoubleArray &da)
   for (int i=0; i<nTup; ++i)
     {
     double *thisTup=da.GetTuple(i);
-    for (int i=0; i<nComp; ++i)
+    for (int q=0; q<nComp; ++q)
       {
-      sout << thisTup[i] << ",";
+      sout << thisTup[q] << ",";
       }
       sout << (char)0x08 << "\n";
     }
@@ -624,7 +624,7 @@ public:
   vtkCTHFragmentConnectBlock* GetFaceNeighbor(int face, int neighborId)
     {return (vtkCTHFragmentConnectBlock*)(this->Neighbors[face][neighborId]);}
   //
-  vtkDataArray *GetArrayToAvergage(int id)
+  vtkDataArray *GetArrayToAvergage(unsigned int id)
   {
     assert( id>=0 &&
             id<this->ArraysToAverage.size() );
@@ -749,8 +749,8 @@ vtkCTHFragmentConnectBlock::~vtkCTHFragmentConnectBlock()
   this->Spacing[0] = this->Spacing[1] = this->Spacing[2] = 0.0;
   this->Origin[0] = this->Origin[1] = this->Origin[2] = 0.0;
 
-  int nToAverage=0;
-  int nToSum=0;
+  this->NToAverage=0;
+  this->NToSum=0;
 }
 
 //----------------------------------------------------------------------------
@@ -3051,7 +3051,8 @@ int vtkCTHFragmentConnect::RequestData(
       {
       // build fragments
       this->ProcessBlock(blockId);
-      this->UpdateProgress( (double)blockId*progressPerBlock );
+      progress+=progressPerBlock;
+      this->UpdateProgress( progress );
       }
 
     //char tmp[128];
@@ -5384,18 +5385,18 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     ///vtkCTHFragmentToProcMap fpMap;
     ///fpMap.Initialize(numProcs,nFragments);
 
-    double *pRes=resolvedVolumeArray->GetPointer(0);
-    memset( pRes, 0, sizeof(double)*nFragments);
-    int q=0; // index to equiv set
+    double *pResolved=resolvedVolumeArray->GetPointer(0);
+    memset( pResolved, 0, sizeof(double)*nFragments);
+    int equivalentSetIndex=0; // index to equiv set
     for (int i=0; i<numProcs; ++i)
       {
       int nUnresolved=volumeArrays[i]->GetNumberOfTuples();
       for (int j=0; j<nUnresolved; ++j)
         {
-        int finalId=this->EquivalenceSet->GetEquivalentSetId(q);
+        int finalId=this->EquivalenceSet->GetEquivalentSetId(equivalentSetIndex);
         ///fpMap.SetProcOwnsPiece(i,finalId);
-        pRes[finalId]+=*volumeArrays[i]->GetPointer(j);
-        ++q;
+        pResolved[finalId]+=*volumeArrays[i]->GetPointer(j);
+        ++equivalentSetIndex;
         }
       }
 
@@ -5413,15 +5414,16 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     ++thisMsg;
 
     // Sum up the moment from equivalent fragments.
-    pRes=resolvedMomentArray->GetPointer(0);
-    memset( pRes, 0, sizeof(double)*nFragments*nMomentComps);
-    q=0; //global index
+    pResolved=resolvedMomentArray->GetPointer(0);
+    memset( pResolved, 0, sizeof(double)*nFragments*nMomentComps);
+    equivalentSetIndex=0; //global index
     for (int i=0; i<numProcs; ++i)
       {
       int nUnresolved=momentArrays[i]->GetNumberOfTuples();
       for (int j=0; j<nUnresolved; ++j)
         {
-        int finalId=this->EquivalenceSet->GetEquivalentSetId(q);
+        int finalId
+          = this->EquivalenceSet->GetEquivalentSetId(equivalentSetIndex);
 
         double *finalTuple
           = resolvedMomentArray->GetPointer(finalId*nMomentComps);
@@ -5433,7 +5435,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
           {
           finalTuple[k]+=thisTuple[k];
           }
-        ++q;
+        ++equivalentSetIndex;
         }
       }
 
@@ -5457,16 +5459,16 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     // Sum partial weighted average from equivalent fragments
     for (int k=0; k<this->NToAverage; ++k)
       {
-      double *pRes=resolvedAveragedArrays[k]->GetPointer(0);
+      pResolved=resolvedAveragedArrays[k]->GetPointer(0);
       int nComps=resolvedAveragedArrays[k]->GetNumberOfComponents();
-      memset( pRes, 0, sizeof(double)*nFragments*nComps);
-      int q=0; // index to equiv set
+      memset( pResolved, 0, sizeof(double)*nFragments*nComps);
+      equivalentSetIndex=0; // index to equiv set
       for (int i=0; i<numProcs; ++i)
         {
         int nUnresolved=averagedArrays[k][i]->GetNumberOfTuples();
         for (int j=0; j<nUnresolved; ++j)
           {
-          int finalId=this->EquivalenceSet->GetEquivalentSetId(q);
+          int finalId=this->EquivalenceSet->GetEquivalentSetId(equivalentSetIndex);
 
           double *finalTuple
             = resolvedAveragedArrays[k]->GetPointer(finalId*nComps);
@@ -5481,7 +5483,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
             {
             finalTuple[ii]+=thisTuple[ii]/fragmentVolume[0];
             }
-          ++q;
+          ++equivalentSetIndex;
           }
         }
       }
@@ -5505,16 +5507,16 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
     // Sum partial sum from equivalent fragments
     for (int k=0; k<this->NToSum; ++k)
       {
-      double *pRes=resolvedSummedArrays[k]->GetPointer(0);
+      pResolved=resolvedSummedArrays[k]->GetPointer(0);
       int nComps=resolvedSummedArrays[k]->GetNumberOfComponents();
-      memset( pRes, 0, sizeof(double)*nFragments*nComps);
-      int q=0; //global index
+      memset( pResolved, 0, sizeof(double)*nFragments*nComps);
+      equivalentSetIndex=0; //global index
       for (int i=0; i<numProcs; ++i)
         {
         int nUnresolved=summedArrays[k][i]->GetNumberOfTuples();
         for (int j=0; j<nUnresolved; ++j)
           {
-          int finalId=this->EquivalenceSet->GetEquivalentSetId(q);
+          int finalId=this->EquivalenceSet->GetEquivalentSetId(equivalentSetIndex);
 
           double *finalTuple
             = resolvedSummedArrays[k]->GetPointer(finalId*nComps);
@@ -5526,7 +5528,7 @@ void vtkCTHFragmentConnect::ResolveAndPartitionFragments()
             {
             finalTuple[ii]+=thisTuple[ii];
             }
-          ++q;
+          ++equivalentSetIndex;
           }
         }
       }
@@ -5965,6 +5967,10 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
   int nLocalFragments=this->ResolvedFragmentIds.size();
   for (int i=0; i<nLocalFragments; ++i)
     {
+    int nComps=0;
+    const char *name=0;
+    const double *srcTuple=0;
+
     // get the fragment
     int globalId=this->ResolvedFragmentIds[i];
     vtkPolyData *thisFragment=ResolvedFragments[globalId];
@@ -6013,15 +6019,13 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     pdVol->Delete();
 
     // Moments
-    const int nMomentComps=4;
-    const char *name
-      = this->FragmentMoments->GetName();
-    double *srcTuple
-      = this->FragmentMoments->GetTuple(globalId);
+    nComps=this->FragmentMoments->GetNumberOfComponents();
+    name=this->FragmentMoments->GetName();
+    srcTuple=this->FragmentMoments->GetTuple(globalId);
     // field data
     vtkDoubleArray *fdMom=vtkDoubleArray::New();
     fdMom->SetName(name);
-    fdMom->SetNumberOfComponents(nMomentComps);
+    fdMom->SetNumberOfComponents(3);
     fdMom->SetNumberOfTuples(1);
     fdMom->SetTuple(0,srcTuple);
     fd->AddArray(fdMom);
@@ -6029,9 +6033,9 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     // point data
     vtkDoubleArray *pdMom=vtkDoubleArray::New();
     pdMom->SetName(name);
-    pdMom->SetNumberOfComponents(nMomentComps);
+    pdMom->SetNumberOfComponents(3);
     pdMom->SetNumberOfTuples(nPoints);
-    for (int q=0; q<nMomentComps; ++q)
+    for (int q=0; q<3; ++q)
       {
       pdMom->FillComponent(q,srcTuple[q]);
       }
@@ -6055,6 +6059,32 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     pdM->FillComponent(0,V);
     pd->AddArray(pdM);
     pdM->Delete();
+
+    // Center of mass
+    double com[3];
+    for (int q=0; q<3; ++q) 
+      {
+      com[q]=srcTuple[q]/srcTuple[3];
+      }
+    // field data
+    vtkDoubleArray *fdCom=vtkDoubleArray::New();
+    fdCom->SetName("Center of Mass");
+    fdCom->SetNumberOfComponents(3);
+    fdCom->SetNumberOfTuples(1);
+    fdCom->SetTuple(0,com);
+    fd->AddArray(fdCom);
+    fdCom->Delete();
+    // point data
+    vtkDoubleArray *pdCom=vtkDoubleArray::New();
+    pdCom->SetName("Center of Mass");
+    pdCom->SetNumberOfComponents(3);
+    pdCom->SetNumberOfTuples(nPoints);
+    for (int q=0; q<3; ++q)
+      {
+      pdCom->FillComponent(q,com[q]);
+      }
+    pd->AddArray(pdCom);
+    pdCom->Delete();
 
     // weighted averages
     for (int j=0; j<this->NToAverage; ++j)
@@ -6242,6 +6272,8 @@ int vtkCTHFragmentConnect::WriteFragmentAttributesToTextFile(int materialId)
   fout << "}" << endl;
   fout.flush();
   fout.close();
+
+  return 1;
 }
 
 

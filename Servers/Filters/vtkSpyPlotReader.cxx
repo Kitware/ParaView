@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.60");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.61");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -1538,9 +1538,9 @@ void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
       if (sendBuf[0]>recvBuf[j])
         {
         // copy
-        for (int i=0; i<4; ++i)
+        for (int q=0; q<4; ++q)
           {
-          sendBuf[i]=recvBuf[j+i];
+          sendBuf[q]=recvBuf[j+q];
           }
         }
       }
