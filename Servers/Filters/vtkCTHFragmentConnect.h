@@ -348,6 +348,8 @@ protected:
   vtkstd::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
   // Final moments indexed by fragment id.
   vtkDoubleArray *FragmentMoments;
+  // let us know if the user has specified a mass array
+  bool ComputeMoments;
 
   // Weighted average, where weights correspond to fragment volume.
   // Accumulators one for each array to average, scalar or vector
