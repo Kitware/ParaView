@@ -158,6 +158,8 @@ protected:
   
   int CheckAttributes(vtkDataObject* input);
 
+  vtkCompositeDataSet* FillPartialArrays(vtkCompositeDataSet* input);
+
   // Callback registered with the InternalProgressObserver.
   static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
                                                void* clientdata, void*);

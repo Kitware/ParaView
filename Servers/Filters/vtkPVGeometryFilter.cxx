@@ -53,7 +53,10 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnsignedIntArray.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.80");
+#include <vtkstd/map>
+#include <vtkstd/string>
+
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.81");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -160,6 +163,111 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
     iter->Delete();
     }
   return 0;
+}
+
+typedef vtkstd::map<vtkstd::string, vtkDataSetAttributes*> vtkArrayMap;
+
+//----------------------------------------------------------------------------
+static void vtkBuildArrayMap(vtkDataSetAttributes* dsa, vtkArrayMap& arrayMap)
+{
+  int numArrays = dsa->GetNumberOfArrays();
+  for (int kk=0; kk < numArrays; kk++)
+    {
+    vtkDataArray* array = dsa->GetArray(kk);
+    if (!array || !array->GetName())
+      {
+      continue;
+      }
+
+    if (arrayMap.find(array->GetName()) == arrayMap.end())
+      {
+      arrayMap[array->GetName()] = dsa;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+static void vtkFillPartialArrays(vtkDataSetAttributes* dsa, 
+  vtkArrayMap& arrayMap, vtkIdType count)
+{
+  vtkArrayMap::iterator iter;
+  for (iter = arrayMap.begin(); iter != arrayMap.end(); ++iter)
+    {
+    if (dsa->GetArray(iter->first.c_str()) == NULL)
+      {
+      vtkDataArray* srcArray = iter->second->GetArray(iter->first.c_str());
+      vtkDataArray* clone = srcArray->NewInstance();
+      clone->SetName(srcArray->GetName());
+      clone->SetNumberOfComponents(srcArray->GetNumberOfComponents());
+      clone->SetNumberOfTuples(count);
+      for (int cc=0; cc < clone->GetNumberOfComponents(); cc++)
+        {
+        clone->FillComponent(cc, 0.0);
+        }
+      dsa->AddArray(clone);
+      // if the newly added array is an attribute in the original field data,
+      // then it must be marked as an attribute for vtkAppendPolyData to work
+      // correctly.
+      for (int kk=0; kk < vtkDataSetAttributes::NUM_ATTRIBUTES; kk++)
+        {
+        if (iter->second->GetAttribute(kk) == srcArray)
+          {
+          dsa->SetActiveAttribute(clone->GetName(), kk);
+          }
+        }
+      clone->Delete();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkCompositeDataSet* vtkPVGeometryFilter::FillPartialArrays(
+  vtkCompositeDataSet* input)
+{
+  if (!input)
+    {
+    return NULL;
+    }
+
+  vtkArrayMap arrayMapPD;
+  vtkArrayMap arrayMapCD;
+
+
+  vtkCompositeDataSet* output = input->NewInstance();
+  output->CopyStructure(input);
+  vtkCompositeDataIterator* iter = input->NewIterator();
+
+  // build arrayMap with representative arrays for each array name.
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
+      {
+      ::vtkBuildArrayMap(ds->GetPointData(), arrayMapPD);
+      ::vtkBuildArrayMap(ds->GetCellData(), arrayMapCD);
+      }
+
+    vtkDataSet* clone = ds->NewInstance();
+    clone->ShallowCopy(ds);
+    output->SetDataSet(iter, clone);
+    clone->Delete();
+    }
+  iter->Delete();
+
+  // Now fill partial arrays.
+  iter = output->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
+      {
+      ::vtkFillPartialArrays(ds->GetPointData(), arrayMapPD, ds->GetNumberOfPoints());
+      ::vtkFillPartialArrays(ds->GetCellData(), arrayMapCD, ds->GetNumberOfCells());
+      }
+    }
+
+  iter->Delete();
+  return output;
 }
 
 //----------------------------------------------------------------------------
@@ -294,7 +402,11 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     return 0;
     }
 
-  if (this->CheckAttributes(mgInput))
+  // fills partial array.
+  vtkSmartPointer<vtkCompositeDataSet> constructuredInput;
+  constructuredInput.TakeReference(this->FillPartialArrays(mgInput));
+
+  if (this->CheckAttributes(constructuredInput))
     {
     return 0;
     }
@@ -303,12 +415,14 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   int numInputs = 0;
 
   int retVal = 0;
-  if (this->ExecuteCompositeDataSet(mgInput, append, numInputs))
+  if (this->ExecuteCompositeDataSet(constructuredInput, append, numInputs))
     {
     if (numInputs > 0)
       {
       append->Update();
       }
+    append->Update();
+
     output->ShallowCopy(append->GetOutput());
     append->Delete();
     retVal = 1;
