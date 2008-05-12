@@ -52,11 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHeaderView>
 #include <QItemDelegate>
+#include <QMessageBox>
 #include <QPointer>
 #include <QScrollArea>
 #include <QtDebug>
-#include <QVBoxLayout>
 #include <QTimer>
+#include <QVBoxLayout>
 
 #include "pq3DWidgetFactory.h"
 #include "pqActiveView.h"
@@ -1373,6 +1374,40 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
   int outputType = this->getContentType();
 
   vtkSMSourceProxy* curSelSource = this->Implementation->getSelectionSource();
+
+  if (curSelSource && 
+    port->getServer()->isRemote() &&
+    (outputType == vtkSelection::INDICES || outputType == vtkSelection::GLOBALIDS))
+    {
+    // BUG: 6783. Warn user when converting a Frustum|Threshold selection to
+    // an id based selection.
+    if (strcmp(curSelSource->GetXMLName(), "FrustumSelectionSource") == 0 ||
+      strcmp(curSelSource->GetXMLName(), "ThresholdSelectionSource") == 0)
+      {
+      // We need to determine how many ids are present approximately.
+      vtkSMSourceProxy* sourceProxy = 
+        vtkSMSourceProxy::SafeDownCast(port->getSource()->getProxy());
+      vtkPVDataInformation* selectedInformation = sourceProxy->GetSelectionOutput(
+        port->getPortNumber())->GetDataInformation();
+      int fdType = pqSMAdaptor::getElementProperty(
+        curSelSource->GetProperty("FieldType")).toInt();
+      if ((fdType == vtkSelection::POINT && 
+          selectedInformation->GetNumberOfPoints() > 10000) ||
+        (fdType == vtkSelection::CELL && 
+         selectedInformation->GetNumberOfCells() > 10000))
+        {
+        if (QMessageBox::warning(this, tr("Convert Selection"),
+            tr("This selection converion can potentially result in fetching a "
+              "large amount of data to the client.\n"
+              "Are you sure you want to continue?"),
+            QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel) !=
+          QMessageBox::Ok)
+          {
+          curSelSource = 0;
+          }
+        }
+      }
+    }
 
   vtkSMSourceProxy* selSource = vtkSMSourceProxy::SafeDownCast(
     vtkSMSelectionHelper::ConvertSelection(outputType,

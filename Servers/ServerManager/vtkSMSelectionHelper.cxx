@@ -42,7 +42,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.15");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.16");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -459,29 +459,31 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
     return selectionSourceProxy;
     }
 
-  if (outputType == vtkSelection::INDICES && selectionSourceProxy &&
-    strcmp(inproxyname, "GlobalIDSelectionSource") == 0)
+  if (outputType == vtkSelection::INDICES && selectionSourceProxy)
     {
-    vtkSMVectorProperty* ids = vtkSMVectorProperty::SafeDownCast(
+    vtkSMVectorProperty* ids = 0;
+    ids = vtkSMVectorProperty::SafeDownCast(
       selectionSourceProxy->GetProperty("IDs"));
-    if (ids->GetNumberOfElements() > 0)
+    // this "if" condition does not do any conversion in input is GLOBALIDS
+    // selection with no ids.
+    
+    if (!ids || ids->GetNumberOfElements() > 0)
       {
-      // convert from global IDs to indices.
+      // convert from *anything* to indices.
       return vtkSMSelectionHelper::ConvertInternal(
         vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
         dataSource, dataPort, vtkSelection::INDICES);
       }
     }
-  else if (outputType == vtkSelection::GLOBALIDS && selectionSourceProxy && (
-      strcmp(inproxyname, "IDSelectionSource") == 0 ||
-      strcmp(inproxyname, "HierarchicalDataIDSelectionSource") == 0||
-      strcmp(inproxyname, "CompositeDataIDSelectionSource")==0))
+  else if (outputType == vtkSelection::GLOBALIDS && selectionSourceProxy)
     {
     vtkSMVectorProperty* ids = vtkSMVectorProperty::SafeDownCast(
       selectionSourceProxy->GetProperty("IDs"));
-    if (ids->GetNumberOfElements() > 0)
+    // This "if" condition avoid doing any conversion if input is a ID based
+    // selection and has no ids.
+    if (!ids || ids->GetNumberOfElements() > 0)
       {
-      // convert from ID seelction to global IDs.
+      // convert from *anything* to global IDs.
       return vtkSMSelectionHelper::ConvertInternal(
         vtkSMSourceProxy::SafeDownCast(selectionSourceProxy),
         dataSource, dataPort, vtkSelection::GLOBALIDS);
