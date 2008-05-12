@@ -340,8 +340,18 @@
       <DoubleVectorProperty
         name="CameraParallelScale"
         command="SetParallelScale"
+        information_property="CameraParallelScaleInfo"
         number_of_elements="1"
         default_values="1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="CameraParallelScaleInfo"
+        command="GetParallelScale"
+        number_of_elements="1"
+        information_only="1"
+        default_values="1.0" >
+        <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -3737,6 +3747,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
         </ExposedProperties>
@@ -4237,6 +4248,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4305,6 +4317,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4377,6 +4390,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4451,6 +4465,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4519,6 +4534,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <!-- Hide CameraParallelProjection, since CameraParallelProjection is
             always true in this view. 
           <Property name="CameraParallelProjection" />
@@ -4587,6 +4603,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4658,6 +4675,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->
@@ -4730,6 +4748,7 @@
           <Property name="CameraClippingRangeInfo" />
           <Property name="CameraClippingRange" />
           <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelProjection" />
           <Property name="EyeAngle" />
           <!-- Interactor -->

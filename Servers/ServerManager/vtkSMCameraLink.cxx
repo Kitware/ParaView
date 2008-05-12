@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.16");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.17");
 
 //---------------------------------------------------------------------------
 class vtkSMCameraLink::vtkInternals
@@ -127,6 +127,7 @@ const char* vtkSMCameraLink::vtkInternals::LinkedPropertyNames[] =
   "CameraFocalPointInfo", "CameraFocalPoint",
   "CameraViewUpInfo", "CameraViewUp",
   "CenterOfRotation", "CenterOfRotation",
+  "CameraParallelScaleInfo", "CameraParallelScale",
   0
 };
 
