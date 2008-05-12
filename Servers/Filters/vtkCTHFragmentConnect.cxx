@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.25");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.26");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -1952,6 +1952,16 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
   int p2;
   int axis1 = (faceAxis+1)%3;
   int axis2 = (faceAxis+2)%3;
+  const int* ext;
+  
+  // Stuff to compare extent with standard block to make sure neighbors
+  // actually touch.  Ghost cells can be a part of a standard block.
+  int neighborExtIdx = 2*faceAxis;
+  if ( ! faceMaxFlag)
+    {
+    ++neighborExtIdx;
+    }
+  int boundaryVoxelIdx;
 
   result->clear();
 
@@ -1976,16 +1986,28 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
         if ( ! faceMaxFlag)
           { // min face.  Neighbor one to "left".
           tmp[faceAxis] -= 1;
+          // But boundary voxel is to the "right".
+          boundaryVoxelIdx = ((tmp[faceAxis]+1) * this->StandardBlockDimensions[faceAxis]) -1;
+          }
+        else
+          { // This neighbor is to right,  boundary to left / min
+          boundaryVoxelIdx = tmp[faceAxis] * this->StandardBlockDimensions[faceAxis];
           }
         neighbor = this->Levels[level]->GetBlock(tmp[0], tmp[1], tmp[2]);
         if (neighbor)
           {
-          // Useful for compute required ghost extents.
-          if ( ! neighbor->GetGhostFlag())
+          // Since ghost blocks do not extend to the edge of the grid, 
+          // we need to check that the extent.touches the edge.
+          ext = neighbor->GetBaseCellExtent();
+          if (ext[neighborExtIdx] == boundaryVoxelIdx)
             {
-            retVal = 1;
+            // Useful for compute required ghost extents.
+            if ( ! neighbor->GetGhostFlag())
+              {
+              retVal = 1;
+              }
+            result->push_back(neighbor);
             }
-          result->push_back(neighbor);
           }
         }
       }
@@ -2014,12 +2036,18 @@ int vtkCTHFragmentConnect::FindFaceNeighbors(
           neighbor = this->Levels[level]->GetBlock(tmp[0], tmp[1], tmp[2]);
           if (neighbor)
             {
-            // Useful for compute required ghost extents.
-            if ( ! neighbor->GetGhostFlag())
+            // Since ghost blocks do not extend to the edge of the grid, 
+            // we need to check that the extent.touches the edge.
+            ext = neighbor->GetBaseCellExtent();
+            if (ext[neighborExtIdx] == boundaryVoxelIdx)
               {
-              retVal = 1;
+              // Useful for compute required ghost extents.
+              if ( ! neighbor->GetGhostFlag())
+                {
+                retVal = 1;
+                }
+              result->push_back(neighbor);
               }
-            result->push_back(neighbor);
             }
           }
         }
