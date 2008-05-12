@@ -287,7 +287,7 @@ protected:
   int NumberOfInputBlocks;
   vtkCTHFragmentConnectBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks( vtkHierarchicalBoxDataSet* input, 
+  int InitializeBlocks( vtkHierarchicalBoxDataSet* input,
                         vtkstd::string &materialFractionArrayName,
                         vtkstd::string &massArrayName,
                         vtkstd::vector<vtkstd::string> &averagedArrayNames,
@@ -322,6 +322,9 @@ protected:
   // The extraction filter uses a scaled threshold
   // in the range of 0 to 255
   double scaledMaterialFractionThreshold;
+  // 
+  char *MaterialFractionArrayName;
+  vtkSetStringMacro(MaterialFractionArrayName);
 
   // while processing a material array this holds
   // a pointer to the output poly data
@@ -335,7 +338,6 @@ protected:
 
   // Local id of current fragment
   int FragmentId;
-
   // Accumulator for the volume of the current fragment.
   double FragmentVolume;
   // Fragment volumes indexed by the fragment id. It's a local
@@ -382,8 +384,14 @@ protected:
   // when resoving other attributes like volume
   int *NumberOfRawFragmentsInProcess;  // in each process.
   int *LocalToGlobalOffsets;
-  int TotalNumberOfRawFragments;
+  int TotalNumberOfRawFragments; 
   int NumberOfResolvedFragments;
+  // The count over mulitiple passes(multuiple materials)
+  int ResolvedFragmentCount;
+  // Material id, each pass involves a different material use this to 
+  // tag fragments by material.
+  int MaterialId;
+
   // Array that holds fragments after they have been resolved(local and global).
   // This array is to be sized by the number of resolved fragments(all procs)
   // If this proc doesn't have a piece or fragment then the coresponding enrty

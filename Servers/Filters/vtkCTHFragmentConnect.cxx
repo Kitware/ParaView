@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.27");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.28");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -626,16 +626,14 @@ public:
   //
   vtkDataArray *GetArrayToAvergage(unsigned int id)
   {
-    assert( id>=0 &&
-            id<this->ArraysToAverage.size() );
+    assert( id<this->ArraysToAverage.size() );
 
     return this->ArraysToAverage[id];
   }
   //
-  vtkDataArray *GetArrayToSum(int id)
+  vtkDataArray *GetArrayToSum(unsigned int id)
   {
-    assert( id>=0 &&
-            id<this->ArraysToSum.size() );
+    assert( id<this->ArraysToSum.size() );
 
     return this->ArraysToSum[id];
   }
@@ -1594,6 +1592,8 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->LocalToGlobalOffsets = 0;
   this->TotalNumberOfRawFragments = 0;
   this->NumberOfResolvedFragments = 0;
+  this->ResolvedFragmentCount=0;
+  this->MaterialId=0;
 
   this->FaceNeighbors = new vtkCTHFragmentConnectIterator[32];
 
@@ -2955,9 +2955,13 @@ int vtkCTHFragmentConnect::RequestData(
   // array that it processes
   outputMbds->SetNumberOfBlocks( nMaterials );
 
+
+
+  this->ResolvedFragmentCount=0;
+
   // process enabled material arrays, currently in multiple passes
   // in the future in a single pass
-  for (int i=0; i<nMaterials; ++i)
+  for (this->MaterialId=0; this->MaterialId<nMaterials; ++this->MaterialId)
     {
     // TODO move prep to its own method
     /// prepare for this pass...
@@ -3040,8 +3044,8 @@ int vtkCTHFragmentConnect::RequestData(
     this->EquivalenceSet->Initialize();
 
     this->InitializeBlocks( hbdsInput,
-                            MaterialArrayNames[i],
-                            MassArrayNames[i],
+                            MaterialArrayNames[this->MaterialId],
+                            MassArrayNames[this->MaterialId],
                             WeightedAverageArrayNames,
                             SummedArrayNames );
 
@@ -3063,13 +3067,17 @@ int vtkCTHFragmentConnect::RequestData(
 
     this->ResolveEquivalences();
     this->DeleteAllBlocks();
-    this->BuildOutput(outputMbds, i);
+    this->BuildOutput(outputMbds, this->MaterialId);
 
     if ( this->GetWriteOutputTableFile()
          && this->OutputTableFileNameBase )
       {
-      this->WriteFragmentAttributesToTextFile(i);
+      this->WriteFragmentAttributesToTextFile(this->MaterialId);
       }
+
+    // update the resolved fragment count, so that next pass will start
+    // where we left off here
+    this->ResolvedFragmentCount+=this->NumberOfResolvedFragments;
 
     // clean up fragment attributes
     __util::ReleaseVtkPointer(this->FragmentVolumes);
@@ -5982,11 +5990,12 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     vtkPointData *pd=thisFragment->GetPointData();
     // Fragment id
     // field data
+    int resolvedGlobalId=globalId+this->ResolvedFragmentCount;
     vtkIntArray *fdId=vtkIntArray::New();
     fdId->SetName("Id");
     fdId->SetNumberOfComponents(1);
     fdId->SetNumberOfTuples(1);
-    fdId->SetValue(0,globalId);
+    fdId->SetValue(0,resolvedGlobalId);
     fd->AddArray(fdId);
     fdId->Delete();
     // point data
@@ -5994,9 +6003,27 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     pdId->SetName("Id");
     pdId->SetNumberOfComponents(1);
     pdId->SetNumberOfTuples(nPoints);
-    pdId->FillComponent(0,globalId);
+    pdId->FillComponent(0,resolvedGlobalId);
     pd->AddArray(pdId);
     pdId->Delete();
+
+    // Material Id
+    // field data
+    vtkIntArray *fdMid=vtkIntArray::New();
+    fdMid->SetName("Material Id");
+    fdMid->SetNumberOfComponents(1);
+    fdMid->SetNumberOfTuples(1);
+    fdMid->SetValue(0,this->MaterialId);
+    fd->AddArray(fdMid);
+    fdMid->Delete();
+    // point data
+    vtkIntArray *pdMid=vtkIntArray::New();
+    pdMid->SetName("Material Id");
+    pdMid->SetNumberOfComponents(1);
+    pdMid->SetNumberOfTuples(nPoints);
+    pdMid->FillComponent(0,this->MaterialId);
+    pd->AddArray(pdMid);
+    pdMid->Delete();
 
     // volume
     double V
@@ -6089,11 +6116,11 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     // weighted averages
     for (int j=0; j<this->NToAverage; ++j)
       {
-      int nComps
+      nComps
         = this->FragmentWeightedAverages[j]->GetNumberOfComponents();
-      const char *name
+      name
         = this->FragmentWeightedAverages[j]->GetName();
-      double *srcTuple
+      srcTuple
         = this->FragmentWeightedAverages[j]->GetTuple(globalId);
 
       // field data
@@ -6120,11 +6147,11 @@ void vtkCTHFragmentConnect::CopyAttributesToFragments()
     // summations
     for (int j=0; j<this->NToSum; ++j)
       {
-      int nComps
+      nComps
         = this->FragmentSums[j]->GetNumberOfComponents();
-      const char *name
+      name
         = this->FragmentSums[j]->GetName();
-      double *srcTuple
+      srcTuple
         = this->FragmentSums[j]->GetTuple(globalId);
 
       // field data
