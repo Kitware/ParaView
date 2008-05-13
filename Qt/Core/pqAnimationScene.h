@@ -89,6 +89,9 @@ public:
   /// Overridden to create the default pipeline time animation cue.
   virtual void setDefaultPropertyValues();
 
+  /// Returns the current animation time.
+  double getAnimationTime() const;
+
 signals:
   /// Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);
@@ -157,6 +160,10 @@ private slots:
 
   /// Called on animation tick.
   void onTick(vtkObject* caller, unsigned long, void*, void* info);
+
+  /// called when "AnimationTime" property changes. We fire the animationTime()
+  /// signal.
+  void onAnimationTimePropertyChanged();
 private:
   pqAnimationScene(const pqAnimationScene&); // Not implemented.
   void operator=(const pqAnimationScene&); // Not implemented.

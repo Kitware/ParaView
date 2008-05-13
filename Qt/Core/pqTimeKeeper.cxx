@@ -140,6 +140,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
     {
     emit this->timeStepsChanged();
     }
+
+  emit this->timeChanged();
 }
 
 //-----------------------------------------------------------------------------

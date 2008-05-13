@@ -65,13 +65,11 @@ static uint qHash(QPointer<T> p)
 class pqAnimationScene::pqInternals
 {
 public:
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMPropertyLink> TimestepValuesLink;
   QSet<QPointer<pqAnimationCue> > Cues;
   QPointer<pqAnimationCue> GlobalTimeCue;
   pqInternals()
     {
-    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->TimestepValuesLink = vtkSmartPointer<vtkSMPropertyLink>::New();
     }
 };
@@ -82,37 +80,42 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
 : pqProxy(group, name, proxy, server, _parent)
 {
   this->Internals = new pqAnimationScene::pqInternals();
-  this->Internals->VTKConnect->Connect(proxy->GetProperty("Cues"),
+  vtkEventQtSlotConnect* connector = this->getConnector();
+
+  connector->Connect(proxy->GetProperty("Cues"),
     vtkCommand::ModifiedEvent, this, SLOT(onCuesChanged()));
-  this->Internals->VTKConnect->Connect(proxy,
+  connector->Connect(proxy,
     vtkCommand::AnimationCueTickEvent, 
     this, SLOT(onTick(vtkObject*, unsigned long, void*, void*)));
-  this->Internals->VTKConnect->Connect(proxy, vtkCommand::StartEvent,
+  connector->Connect(proxy, vtkCommand::StartEvent,
     this, SIGNAL(beginPlay()));
-  this->Internals->VTKConnect->Connect(proxy, vtkCommand::EndEvent,
+  connector->Connect(proxy, vtkCommand::EndEvent,
     this, SIGNAL(endPlay()));
 
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("PlayMode"), vtkCommand::ModifiedEvent,
     this, SIGNAL(playModeChanged()));
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("Loop"), vtkCommand::ModifiedEvent,
     this, SIGNAL(loopChanged()));
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("NumberOfFrames"), vtkCommand::ModifiedEvent,
     this, SIGNAL(frameCountChanged()));
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("TimeSteps"), vtkCommand::ModifiedEvent,
     this, SIGNAL(timeStepsChanged()));
 
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
-  this->Internals->VTKConnect->Connect(
+  connector->Connect(
     proxy->GetProperty("EndTime"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
+  connector->Connect(
+    proxy->GetProperty("AnimationTime"), vtkCommand::ModifiedEvent,
+    this, SLOT(onAnimationTimePropertyChanged()));
   this->onCuesChanged();
-
+  this->onAnimationTimePropertyChanged();
 
   // Initialize the time keeper.
   this->setupTimeTrack();
@@ -449,9 +452,20 @@ void pqAnimationScene::setAnimationTime(double time)
   pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("AnimationTime"),
     time);
   this->getProxy()->UpdateProperty("AnimationTime");
-  emit this->animationTime(time);
 }
 
+//-----------------------------------------------------------------------------
+void pqAnimationScene::onAnimationTimePropertyChanged()
+{
+  emit this->animationTime(this->getAnimationTime());
+}
+
+//-----------------------------------------------------------------------------
+double pqAnimationScene::getAnimationTime() const
+{
+ return pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("AnimationTime")).toDouble();
+}
 
 //-----------------------------------------------------------------------------
 void pqAnimationScene::onTick(vtkObject*, unsigned long, void*, void* info)

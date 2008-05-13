@@ -435,6 +435,8 @@ void pqAnimationPanel::onScenePlayModeChanged()
       {
       this->Internal->ToolbarCurrentTimeIndexWidget->setEnabled(true);
       }
+    this->onTimeChanged(
+      this->Internal->ActiveScene->getAnimationTime());
     }
 }
 
