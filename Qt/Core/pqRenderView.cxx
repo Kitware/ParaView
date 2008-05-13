@@ -215,6 +215,9 @@ void pqRenderView::initializeWidgets()
 // undo/redo, this method won't be called. 
 void pqRenderView::setDefaultPropertyValues()
 {
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
   this->Superclass::setDefaultPropertyValues();
   this->clearUndoStack();
 }
