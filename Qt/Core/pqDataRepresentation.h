@@ -92,6 +92,10 @@ public:
   /// of the proxy and sets them to default values.
   virtual void setDefaultPropertyValues();
 
+  /// Returns the data size for the full-res data.
+  /// This may trigger a pipeline update to obtain correct data sizes.
+  unsigned long getFullResMemorySize();
+
 protected slots:
   /// called when input property on display changes. We must detect if
   /// (and when) the display is connected to a new proxy.

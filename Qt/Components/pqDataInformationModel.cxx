@@ -43,8 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
+#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
+#include "pqView.h"
 
 struct pqSourceInfo
 {
@@ -54,6 +56,8 @@ struct pqSourceInfo
   quint64 NumberOfPoints;
   double MemorySize;
   bool DataInformationValid;
+  bool GeometryInformationValid;
+  double GeometrySize;
   double Bounds[6];
   double TimeSpan[2];
 
@@ -84,6 +88,8 @@ struct pqSourceInfo
     this->NumberOfPoints = 0;
     this->MemorySize = 0;
     this->DataInformationValid = false;
+    this->GeometrySize = 0;
+    this->GeometryInformationValid = false;
     }
 
   QVariant getName() const
@@ -129,6 +135,17 @@ struct pqSourceInfo
       }
     return QVariant("Unavailable");
     }
+
+  QVariant getGeometrySize() const
+    {
+    if (this->GeometryInformationValid)
+      {
+      return QVariant(this->GeometrySize);
+      }
+
+    return QVariant("Unavailable");
+    }
+
   QVariant getBounds() const
     {
     if (this->DataInformationValid)
@@ -232,6 +249,7 @@ struct pqSourceInfo
 class pqDataInformationModelInternal 
 {
 public:
+  QPointer<pqView> View;
   QList<pqSourceInfo > Sources;
   vtkTimeStamp UpdateTime;
 
@@ -301,7 +319,7 @@ int pqDataInformationModel::rowCount(
 int pqDataInformationModel::columnCount(
   const QModelIndex &vtkNotUsed(parent) /*= QModelIndex()*/) const
 {
-  return 7;
+  return pqDataInformationModel::Max_Columns;
 }
 
 
@@ -383,6 +401,15 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       }
     break;
 
+  case pqDataInformationModel::GeometrySize:
+    // Geometry size for active view.
+    switch (role)
+      {
+    case Qt::DisplayRole:
+      return info.getGeometrySize();
+      }
+    break;
+
   case pqDataInformationModel::Bounds:
     // Spatial Bounds.
     switch (role)
@@ -430,6 +457,9 @@ QVariant pqDataInformationModel::headerData(int section,
 
       case pqDataInformationModel::MemorySize:
         return QVariant("Memory (MB)");
+
+      case pqDataInformationModel::GeometrySize:
+        return QVariant("Geometry Size (MB)");
 
       case pqDataInformationModel::Bounds:
         return QVariant("Spatial Bounds");
@@ -514,8 +544,8 @@ void pqDataInformationModel::refreshModifiedData()
       dataInfo->GetTimeSpan(iter->TimeSpan);
       iter->DataInformationValid = true;
 
-      emit this->dataChanged(this->index(row_no, 0),
-        this->index(row_no, 4));
+      emit this->dataChanged(this->index(row_no, Name),
+        this->index(row_no, pqDataInformationModel::Max_Columns-1));
       }
     }
 }
@@ -545,3 +575,54 @@ pqOutputPort* pqDataInformationModel::getItemFor(const QModelIndex& idx) const
   return this->Internal->Sources[idx.row()].OutputPort;
 }
 
+//-----------------------------------------------------------------------------
+void pqDataInformationModel::setActiveView(pqView* view)
+{
+  if (this->Internal->View == view)
+    {
+    return;
+    }
+
+  if (this->Internal->View)
+    {
+    QObject::disconnect(this->Internal->View, 0, this, 0);
+    }
+
+  this->Internal->View = view;
+
+  if (view)
+    {
+    QObject::connect(view, SIGNAL(endRender()),
+      this, SLOT(refreshGeometrySizes()));
+    }
+
+  this->refreshGeometrySizes();
+}
+
+//-----------------------------------------------------------------------------
+void pqDataInformationModel::refreshGeometrySizes()
+{
+  // Must be called only after endRender() when we are assured that all
+  // representations are up-to-date.
+  QList<pqSourceInfo>::iterator iter;
+  for (iter = this->Internal->Sources.begin(); 
+    iter != this->Internal->Sources.end(); ++iter)
+    {
+    pqSourceInfo& sourceInfo = (*iter);
+    sourceInfo.GeometryInformationValid = false;
+    pqOutputPort* port = sourceInfo.OutputPort;
+    if (this->Internal->View)
+      {
+      pqDataRepresentation* repr = port->getRepresentation(this->Internal->View);
+      if (!repr || !repr->isVisible())
+        {
+        continue;
+        }
+      sourceInfo.GeometryInformationValid = true;
+      sourceInfo.GeometrySize = repr->getFullResMemorySize()/1000.0;
+      }
+    }
+
+  emit this->dataChanged(this->index(0, pqDataInformationModel::GeometrySize),
+    this->index(this->rowCount()-1, pqDataInformationModel::GeometrySize));
+}

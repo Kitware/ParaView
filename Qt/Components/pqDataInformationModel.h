@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataInformationModelInternal;
 class pqOutputPort;
 class pqPipelineSource;
+class pqView;
 
 class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
 {
@@ -86,6 +87,14 @@ public slots:
   // all know sources and update data if information for any source changed.
   void refreshModifiedData();
 
+  /// Called when the active view changes. Need to correctly show the geometry
+  /// size for the source.
+  void setActiveView(pqView* view);
+
+private slots:
+  /// Called at end of every render since geometry sizes may have changed.
+  void refreshGeometrySizes();
+
 private:
   pqDataInformationModelInternal* Internal;
 
@@ -96,8 +105,10 @@ private:
     CellCount,
     PointCount,
     MemorySize,
+    GeometrySize,
     Bounds,
-    TimeSpan
+    TimeSpan,
+    Max_Columns
     };
 };
 
