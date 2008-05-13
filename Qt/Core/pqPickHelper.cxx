@@ -111,12 +111,36 @@ pqPickHelper::pqPickHelper(QObject* _parent/*=null*/)
 {
   this->Internal = new pqInternal(this);
   this->Mode = INTERACT;
+  this->DisableCount = 0;
 }
 
 //-----------------------------------------------------------------------------
 pqPickHelper::~pqPickHelper()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqPickHelper::DisabledPush()
+{
+  this->DisableCount++;
+  if (this->DisableCount == 1)
+    {
+    emit this->enabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPickHelper::DisabledPop()
+{
+  if (this->DisableCount > 0)
+    {
+    this->DisableCount--;
+    if (this->DisableCount == 0 && this->Internal->RenderView)
+      {
+      emit this->enabled(true);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -137,7 +161,7 @@ void pqPickHelper::setView(pqView* view)
 
   this->Internal->RenderView = renView;
   this->Mode = INTERACT;
-  emit this->enabled(renView!=0);
+  emit this->enabled((renView!=0) && (this->DisableCount==0));
 }
 
 //-----------------------------------------------------------------------------
@@ -184,6 +208,7 @@ int pqPickHelper::setPickOn(int selectionMode)
   this->Mode = selectionMode;
   emit this->modeChanged(this->Mode);
   emit this->picking(true);
+  emit this->startPicking();
   return 1;
 }
 
@@ -225,6 +250,7 @@ int pqPickHelper::setPickOff()
   this->Mode = INTERACT;
   emit this->modeChanged(this->Mode);
   emit this->picking(false);
+  emit this->stopPicking();
   return 1;
 }
 

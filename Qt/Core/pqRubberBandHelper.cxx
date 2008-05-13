@@ -118,6 +118,7 @@ pqRubberBandHelper::pqRubberBandHelper(QObject* _parent/*=null*/)
 {
   this->Internal = new pqInternal(this);
   this->Mode = INTERACT;
+  this->DisableCount = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -125,6 +126,30 @@ pqRubberBandHelper::~pqRubberBandHelper()
 {
   delete this->Internal;
 }
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::DisabledPush()
+{
+  this->DisableCount++;
+  if (this->DisableCount == 1)
+    {
+    emit this->enabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::DisabledPop()
+{
+  if (this->DisableCount > 0)
+    {
+    this->DisableCount--;
+    if (this->DisableCount == 0 && this->Internal->RenderView)
+      {
+      emit this->enabled(true);
+      }
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::setView(pqView* view)
@@ -144,7 +169,7 @@ void pqRubberBandHelper::setView(pqView* view)
 
   this->Internal->RenderView = renView;
   this->Mode = INTERACT;
-  emit this->enabled(renView!=0);
+  emit this->enabled((renView != 0) && (this->DisableCount == 0));
 }
 
 //-----------------------------------------------------------------------------
@@ -191,6 +216,7 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
   this->Mode = selectionMode;
   emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(false);
+  emit this->startSelection();
   return 1;
 }
 
@@ -232,6 +258,7 @@ int pqRubberBandHelper::setRubberBandOff()
   this->Mode = INTERACT;
   emit this->selectionModeChanged(this->Mode);
   emit this->interactionModeChanged(true);
+  emit this->stopSelection();
   return 1;
 }
 

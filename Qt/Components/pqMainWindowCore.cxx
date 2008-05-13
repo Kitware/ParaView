@@ -361,6 +361,14 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     &pqActiveView::instance(), SIGNAL(changed(pqView*)),
     &this->Implementation->RenderViewSelectionHelper, SLOT(setView(pqView*)));
 
+  // BUG #5924. Disable selection with picking the center of rotation.
+  QObject::connect(
+    &this->Implementation->RenderViewPickHelper, SIGNAL(startPicking()),
+    &this->Implementation->RenderViewSelectionHelper, SLOT(DisabledPush()));
+  QObject::connect(
+    &this->Implementation->RenderViewPickHelper, SIGNAL(stopPicking()),
+    &this->Implementation->RenderViewSelectionHelper, SLOT(DisabledPop()));
+
   // Connect up the pqLookmarkManagerModel and pqLookmarkBrowserModel
   this->Implementation->LookmarkManagerModel = new pqLookmarkManagerModel(this);
 
@@ -551,6 +559,14 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(
     &pqActiveView::instance(), SIGNAL(changed(pqView*)),
     &this->Implementation->RenderViewPickHelper, SLOT(setView(pqView*)));
+
+  // BUG #5924. Don't want to let picking be enabled when selecting.
+  QObject::connect(
+    &this->Implementation->RenderViewSelectionHelper, SIGNAL(startSelection()),
+    &this->Implementation->RenderViewPickHelper, SLOT(DisabledPush()));
+  QObject::connect(
+    &this->Implementation->RenderViewSelectionHelper, SIGNAL(stopSelection()),
+    &this->Implementation->RenderViewPickHelper, SLOT(DisabledPop()));
 
   QObject::connect(&this->Implementation->RenderViewPickHelper, 
                    SIGNAL(pickFinished(double, double, double)),

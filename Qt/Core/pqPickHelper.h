@@ -80,12 +80,22 @@ public slots:
 
   /// Instantly picks and fires pickFinished().
   void pick();
+
+  /// Called to disable picking.
+  void DisabledPush();
+  
+  /// Called to pop disabling of picking. If there are as many DisabledPop() as
+  /// DisabledPush(), the picking will be enabled.
+  void DisabledPop();
+
 signals:
   /// fired after mouse up in pick mode
   void pickFinished(double x, double y, double z);
 
   /// fired by beginPick() and endPick().
   void picking(bool);
+  void startPicking();
+  void stopPicking();
 
   void enabled(bool enable);
 
@@ -98,6 +108,7 @@ protected:
   int setPickOff();
   int Mode;
   int Xe, Ye;
+  int DisableCount;
 
 private:
   class pqInternal;

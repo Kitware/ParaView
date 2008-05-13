@@ -91,6 +91,13 @@ public slots:
   /// Has any effect only if active view is a render view.
   void endSelection();
 
+  /// Called to disable selection.
+  void DisabledPush();
+  
+  /// Called to pop disabling of selection. If there are as many DisabledPop() as
+  /// DisabledPush(), the selection will be enabled.
+  void DisabledPop();
+
 signals:
   /// fired after mouse up in selection mode
   void selectionFinished(int xmin, int ymin, int xmax, int ymax);
@@ -106,11 +113,16 @@ signals:
   /// This is inverse of selectionModeChanged signal, provided for convenience.
   void interactionModeChanged(bool notselectable);
 
+  /// Fired to mark the start and ends of election.
+  void startSelection();
+  void stopSelection();
+
 protected:
   int setRubberBandOn(int mode);
   int setRubberBandOff();
   int Mode;
   int Xs, Ys, Xe, Ye;
+  int DisableCount;
 
 private:
   class pqInternal;
