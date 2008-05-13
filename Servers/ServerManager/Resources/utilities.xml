@@ -782,8 +782,7 @@
         command="SetAnimationTime"
         update_self="1"
         number_of_elements="1"
-        default_values="none"
-        is_internal="1">
+        default_values="none">
         <Documentation>
           Set the current animation time.
         </Documentation>
