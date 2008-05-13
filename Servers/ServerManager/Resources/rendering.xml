@@ -4836,6 +4836,10 @@
         <!-- GeometryFilter for selection pipeline -->
         <Proxy name="GeometryFilter"
           proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseOutline" />
+        </ExposedProperties>
+
       </SubProxy>
 
       <SubProxy>
@@ -5911,6 +5915,7 @@
           <Property name="CellLabelFontSize" exposed_name="SelectionCellLabelFontSize" />
           <Property name="CellFieldDataArrayIndex" exposed_name="SelectionCellFieldDataArrayIndex" />
           <Property name="CellFieldDataArrayName" exposed_name="SelectionCellFieldDataArrayName" />
+          <Property name="UseOutline" exposed_name="SelectionUseOutline"/>
         </ExposedProperties>
       </SubProxy>
 
