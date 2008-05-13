@@ -208,11 +208,11 @@ void pqComboBoxDomain::internalDomainChanged()
     {
     // save previous value to put back
     QString old = combo->currentText();
-    combo->blockSignals(true);
+    bool prev = combo->blockSignals(true);
     combo->clear();
     combo->addItems(domain);
     combo->setCurrentIndex(-1);
-    combo->blockSignals(false);
+    combo->blockSignals(prev);
     int foundOld = combo->findText(old);
     if(foundOld >= 0)
       {

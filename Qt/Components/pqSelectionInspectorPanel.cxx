@@ -751,15 +751,22 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
     this->Implementation->spinBoxOpacity_Cell, "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionCellLabelOpacity"));
 
+
+  bool prev = this->Implementation->comboLabelMode_Point->blockSignals(true);
   this->Implementation->PointLabelArrayDomain = new pqComboBoxDomain(
     this->Implementation->comboLabelMode_Point,
     reprProxy->GetProperty("SelectionPointFieldDataArrayName"));
   this->Implementation->PointLabelArrayDomain->addString("Point IDs");
+  this->updateSelectionPointLabelArrayName();
+  this->Implementation->comboLabelMode_Point->blockSignals(prev);
 
+  prev = this->Implementation->comboLabelMode_Cell->blockSignals(true);
   this->Implementation->CellLabelArrayDomain = new pqComboBoxDomain(
     this->Implementation->comboLabelMode_Cell,
     reprProxy->GetProperty("SelectionCellFieldDataArrayName"));
   this->Implementation->CellLabelArrayDomain->addString("Cell IDs");
+  this->updateSelectionCellLabelArrayName();
+  this->Implementation->comboLabelMode_Cell->blockSignals(prev);
 }
 
 //-----------------------------------------------------------------------------
@@ -811,7 +818,7 @@ void pqSelectionInspectorPanel::setupSelectionLabelGUI()
 
   QObject::connect(this->Implementation->comboLabelMode_Point, 
     SIGNAL(currentIndexChanged(const QString&)),
-    this, SLOT(updatePointLabelMode(const QString&)), Qt::QueuedConnection);
+    this, SLOT(updatePointLabelMode(const QString&)));
   QObject::connect(this->Implementation->comboLabelMode_Point, 
     SIGNAL(currentIndexChanged(const QString&)), 
     this, SLOT(updateRepresentationViews()), Qt::QueuedConnection);
