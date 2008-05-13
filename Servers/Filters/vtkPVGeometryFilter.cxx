@@ -56,7 +56,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.81");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.82");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -421,8 +421,6 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       {
       append->Update();
       }
-    append->Update();
-
     output->ShallowCopy(append->GetOutput());
     append->Delete();
     retVal = 1;
