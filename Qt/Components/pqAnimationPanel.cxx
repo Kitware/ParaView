@@ -1026,6 +1026,7 @@ void pqAnimationPanel::updateToolbarCurrentTime(const QString& str)
   if (this->Internal->ToolbarCurrentTimeWidget->text() != str)
     {
     this->Internal->ToolbarCurrentTimeWidget->setText(str);
+    this->Internal->ToolbarCurrentTimeWidget->setCursorPosition(0);
     }
 }
 
