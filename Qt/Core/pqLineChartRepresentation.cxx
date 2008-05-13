@@ -978,14 +978,20 @@ void pqLineChartRepresentation::startSeriesUpdate(bool force)
       if(numComponents > 1)
         {
         int comp = 0;
-        if(inStatus)
+        if(inStatus && k < status.size())
           {
           // See how many components are already added. More entries
           // may be needed.
-          QString nextName;
-          for(nextName = status[k].toString(); nextName == current; comp++)
+          QString nextName = status[k].toString();
+          while(nextName == current)
             {
             k += STATUS_ROW_LENGTH;
+            comp++;
+            if(k >= status.size())
+              {
+              break;
+              }
+
             nextName = status[k].toString();
             }
           }
