@@ -23,7 +23,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.23");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.24");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -35,14 +35,12 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->ViewXMLName = 0;
-  this->SetViewXMLName("RenderView");
+  this->PreferredViewTypeFunctionPtr = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::~vtkSMPQStateLoader()
 {
-  this->SetViewXMLName(0);
   delete this->PQInternal;
 }
 
@@ -50,55 +48,47 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
-  // Check if the proxy requested is a render module.
-  if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
+  // Check if the proxy requested is a view module.
+  if (xml_group && xml_name && strcmp(xml_group, "views") == 0
+      && this->PreferredViewTypeFunctionPtr)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
-    if (prototype && prototype->IsA("vtkSMRenderViewProxy"))
+    if (prototype && prototype->IsA("vtkSMViewProxy"))
       {
-      if (!this->PQInternal->PreferredViews.empty())
-        {
-        // Return a preferred render view if one exists.
-        vtkSMViewProxy *renMod = this->PQInternal->PreferredViews.front();
-        renMod->Register(this);
-        this->PQInternal->PreferredViews.pop_front();
-        return renMod;
-        }
+      // Retrieve the view type that should be used/created
+      const char* preferred_xml_name = 
+        (*this->PreferredViewTypeFunctionPtr)(this->GetConnectionID(),xml_name);
 
-      // Can't use exiting module (none present, or all present are have
-      // already been used, hence we allocate a new one.
-      return this->Superclass::NewProxyInternal(xml_group, 
-        this->ViewXMLName);
-      }
-    else if(prototype && prototype->IsA("vtkSMViewProxy"))
-      {
-      // If it is some other kind of view, handle separately
+      // Look for a view of this type among our preferred views, return the
+      // first one found
       if (!this->PQInternal->PreferredViews.empty())
         {
-        // Return a preferred view of the same type if one exists.
+        // Return a preferred render view if one exists of this type.
         vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator iter = 
           this->PQInternal->PreferredViews.begin();
         while(iter != this->PQInternal->PreferredViews.end())
           {
-          if(strcmp((*iter)->GetXMLName(),xml_name)==0)
+          vtkSMViewProxy *viewProxy = *iter;
+          if(strcmp(viewProxy->GetXMLName(), preferred_xml_name)==0)
             {
-            (*iter)->Register(this);
-            this->PQInternal->PreferredViews.remove(*iter);
-            return (*iter);
+            viewProxy->Register(this);
+            this->PQInternal->PreferredViews.erase(iter);
+            return viewProxy;
             }
           iter++;
           }
         }
 
-      // Can't use existing module (none present of the same type, 
+      // Can't use existing module (none present, none of the correct type, 
       // or all present are have already been used, hence we allocate a new one.
-      return this->Superclass::NewProxyInternal(xml_group, xml_name);
+      return this->Superclass::NewProxyInternal(xml_group, preferred_xml_name);
       }
     }
 
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
+
 
 //---------------------------------------------------------------------------
 void vtkSMPQStateLoader::AddPreferredView(vtkSMViewProxy *view)
@@ -152,7 +142,4 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ViewXMLName: " 
-    << (this->ViewXMLName? this->ViewXMLName : "(none)")
-    << endl;
 }

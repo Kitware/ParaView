@@ -60,6 +60,10 @@ protected:
   vtkSMServerProxyManagerReviver();
   ~vtkSMServerProxyManagerReviver();
 
+  // Callback that returns the type of view the state loader should create
+  // when it encounters a view with the given xml name in the state.
+  static const char* GetPreferredViewType(int connectionID, const char *xml_name);
+
   void FilterStateXML(vtkPVXMLElement* root);
 private:
   vtkSMServerProxyManagerReviver(const vtkSMServerProxyManagerReviver&); // Not implemented.

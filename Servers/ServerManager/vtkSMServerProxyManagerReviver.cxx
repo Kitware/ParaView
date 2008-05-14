@@ -31,7 +31,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.12");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.13");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -135,14 +135,7 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
   loader->SetConnectionID(
     vtkProcessModuleConnectionManager::GetSelfConnectionID());
   loader->SetReviveProxies(1);
-
-  loader->SetViewXMLName("RenderView");
-
-#ifdef VTK_USE_MPI
-# ifdef PARAVIEW_USE_ICE_T
-  loader->SetViewXMLName("IceTCompositeView");
-# endif
-#endif
+  loader->SetPreferredViewTypeFunction(&this->GetPreferredViewType);
 
   // The process module on the client side keeps track of the unique IDs.
   // We need to synchornize the IDs on the client side, so that when new IDs
@@ -202,6 +195,20 @@ void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMServerProxyManagerReviver::GetPreferredViewType (int connectionID, const char *xml_name)
+{
+  vtkstd::string view_type = "RenderView";
+
+#ifdef VTK_USE_MPI
+# ifdef PARAVIEW_USE_ICE_T
+  view_type = "IceTCompositeView";
+# endif
+#endif
+
+  return view_type.c_str();
 }
 
 //-----------------------------------------------------------------------------

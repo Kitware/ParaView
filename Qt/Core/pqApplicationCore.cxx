@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -364,9 +365,6 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
       {
       pqLoader->AddPreferredView(renderView->getViewProxy());
       }
-    // Tell the state loader what type of render view subclass to create.
-    pqLoader->SetViewXMLName(
-      server->getRenderViewXMLName().toAscii().data());
     }
 
   this->LoadingState = true;
@@ -513,5 +511,25 @@ void pqApplicationCore::quit()
     scene->pause();
     }
   QCoreApplication::instance()->quit();
+}
+
+//-----------------------------------------------------------------------------
+const char* pqApplicationCore::getPreferredViewType (int connectionID, const char *xml_name)
+{
+  if(strcmp(xml_name,"RenderView")==0 ||
+     strcmp(xml_name,"ClientServerRenderView")==0 ||
+     strcmp(xml_name,"IceTMultiDisplayRenderView")==0 ||
+     strcmp(xml_name,"IceTDesktopRenderView")==0 ||
+     strcmp(xml_name,"IceTCompositeView")==0 )
+    {
+    if(connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      return "RenderView";
+      }
+
+    return vtkSMRenderViewProxy::GetSuggestedRenderViewType(connectionID);
+    }
+
+  return xml_name;
 }
 
