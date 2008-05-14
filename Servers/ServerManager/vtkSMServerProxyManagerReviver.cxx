@@ -31,7 +31,7 @@
 
 #include <vtksys/ios/sstream>
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.13");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.14");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -198,7 +198,7 @@ void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSMServerProxyManagerReviver::GetPreferredViewType (int connectionID, const char *xml_name)
+const char* vtkSMServerProxyManagerReviver::GetPreferredViewType (int vtkNotUsed(connectionID), const char *xml_name)
 {
   vtkstd::string view_type = "RenderView";
 
