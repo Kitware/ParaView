@@ -189,6 +189,7 @@ public:
       {
       if(QString("ExodusReader") == proxy->getProxy()->GetXMLName() ||
          QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
+         QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
 #ifdef PARAVIEW_USE_SILO
          QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
 #endif
