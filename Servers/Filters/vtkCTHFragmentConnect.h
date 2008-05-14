@@ -188,11 +188,19 @@ protected:
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
+  virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
+  // Set up the result arrays for the calculations we are about to 
+  // make.
+  void PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
+                      vtkstd::vector<vtkstd::string> &weightedAverageArrayNames,
+                      vtkstd::vector<vtkstd::string> &summedArrayNames);
+  // Craete a new fragment/piece.
   vtkPolyData *NewFragmentMesh();
-
+  // Process each cell, looking for fragments.
   int ProcessBlock(int blockId);
-
+  // Cell has been identified as inside the fragment. Integrate, and
+  // generate fragement surface etc...
   void ConnectFragment(vtkCTHFragmentConnectRingBuffer* iterator);
   void GetNeighborIterator(
         vtkCTHFragmentConnectIterator* next,
@@ -263,12 +271,15 @@ protected:
     vtkCTHFragmentEquivalenceSet* globalSet);
   void ResolveAndPartitionFragments();
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
-  // into the fragment polys in the output data set
-  void CopyAttributesToFragments();
+  // into the fragment polys in the output data sets. 
+  void CopyAttributesToOutput0();
+  void CopyAttributesToOutput1();
   // Write a text file containing local fragment attributes.
-  int WriteFragmentAttributesToTextFile(int materialId);
+  int WriteFragmentAttributesToTextFile();
   // Build the output data
-  int BuildOutput(vtkMultiBlockDataSet *mbds, int materialId);
+  int BuildOutputs(vtkMultiBlockDataSet *mbdsOutput0,
+                  vtkMultiBlockDataSet *mbdsOutput1,
+                  int materialId);
 
   // integration helper, returns 0 if the source array 
   // type is unsupported.
@@ -330,11 +341,9 @@ protected:
   // a pointer to the output poly data
   // data set
   vtkPolyData *CurrentFragmentMesh;
-  // TODO merge with ResolvedFragments in a "fragment container"
-  // see note below
+  // As peices/fragments are found they are stored here
+  // until resolution.
   vtkstd::vector<vtkPolyData *> FragmentMeshes;
-  // NOTE: these need not be Deleted as they are copied
-  // without incr ref count into ResolvedFragments.
 
   // Local id of current fragment
   int FragmentId;
@@ -346,7 +355,7 @@ protected:
 
   // Accumulator for moments of the current fragment
   vtkstd::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
-  // Final moments indexed by fragment id.
+  // Final moments indexed by fragment id
   vtkDoubleArray *FragmentMoments;
   // let us know if the user has specified a mass array
   bool ComputeMoments;
@@ -384,28 +393,26 @@ protected:
   // This array give an offset into the global array for each process.
   // The array is computed when we resolve ids, and is used 
   // when resoving other attributes like volume
-  int *NumberOfRawFragmentsInProcess;  // in each process.
-  int *LocalToGlobalOffsets;
-  int TotalNumberOfRawFragments; 
-  int NumberOfResolvedFragments;
-  // The count over mulitiple passes(multuiple materials)
+  int *NumberOfRawFragmentsInProcess;  // in each process by proc id for a single material
+  int *LocalToGlobalOffsets;     // indexes into a gathered array of local ids by proc id
+  int TotalNumberOfRawFragments; // over all processes for a single material
+  int NumberOfResolvedFragments; // over all processes for a single material
+  // Total number of fragments over all materials, used to
+  // generate a unique id for each fragment.
   int ResolvedFragmentCount;
   // Material id, each pass involves a different material use this to 
   // tag fragments by material.
   int MaterialId;
 
-  // Array that holds fragments after they have been resolved(local and global).
-  // This array is to be sized by the number of resolved fragments(all procs)
-  // If this proc doesn't have a piece or fragment then the coresponding enrty
-  // is 0. This is the global structure to the output data set as well.
-  // TODO is this the best datastructure?? NO
-  // pros-fast lookup by global id, 
-  // cons-size
-  // given the sizes of cth datasets involved this will likely need to change...
-  // TODO encapsulate this in a "fragment container", hide details of set/get, new,clear etc...
-  vtkstd::vector<vtkPolyData *> ResolvedFragments;
-  // list of global ids of what we own
-  vtkstd::vector<int> ResolvedFragmentIds;
+  // For each material an array of resolved fragments. Blocks are multi piece
+  // of poly data. The multipiece is much like a std vector of poly data *.
+  // multi block is indexed by material.
+  vtkMultiBlockDataSet *ResolvedFragments;
+  // for each material a list of global ids of what we own.
+  vtkstd::vector<vtkstd::vector<int> > ResolvedFragmentIds;
+  // A polydata with points at fragment centers, same structure 
+  // as the resolved fragments.
+  vtkMultiBlockDataSet *ResolvedFragmentCenters;
 
   double GlobalOrigin[3];
   double RootSpacing[3];
