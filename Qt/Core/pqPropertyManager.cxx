@@ -132,6 +132,17 @@ void pqPropertyManagerProperty::removeLink(
 }
 
 //-----------------------------------------------------------------------------
+void pqPropertyManagerProperty::removeAllLinks()
+{
+  QList<pqPropertyManagerPropertyLink*>::iterator iter;
+  for (iter = this->Links.begin(); iter != this->Links.end(); ++iter)
+    {
+    delete (*iter);
+    }
+  this->Links.clear();
+}
+
+//-----------------------------------------------------------------------------
 pqPropertyManagerPropertyLink::pqPropertyManagerPropertyLink(
   pqPropertyManagerProperty* p, 
   QObject* o, const char* prop, const char* signal)
@@ -258,6 +269,19 @@ void pqPropertyManager::unregisterLink(
       this->Internal->Properties.erase(iter);
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqPropertyManager::removeAllLinks()
+{
+  this->Internal->Links.removeAllPropertyLinks();
+  foreach (pqPropertyManagerProperty* property, this->Internal->Properties)
+    {
+    property->removeAllLinks();
+    delete property;
+    }
+
+  this->Internal->Properties.clear();
 }
 
 //-----------------------------------------------------------------------------

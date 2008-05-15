@@ -69,6 +69,10 @@ public:
   /// the server manager
   bool isModified() const;
 
+  // Call this method to un-links all property links 
+  // maintained by this object.
+  void removeAllLinks();
+
 signals:
   /// Signal emitted when there are possible properties to send down to
   /// the server manager
@@ -127,6 +131,7 @@ public:
   void setValue(const QVariant&);
   void addLink(QObject* o, const char* property, const char* signal);
   void removeLink(QObject* o, const char* property, const char* signal);
+  void removeAllLinks();
   int numberOfLinks() const { return Links.size(); }
 signals:
   void propertyChanged();

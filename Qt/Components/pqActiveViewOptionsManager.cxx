@@ -211,6 +211,7 @@ void pqActiveViewOptionsManager::setActiveView(pqView *view)
       // Clean up the current options dialog.
       this->Internal->IgnoreClose = true;
       this->Internal->Current->closeOptions();
+      this->Internal->Current->changeView(0);
       this->Internal->IgnoreClose = false;
       this->Internal->Current = options;
       if(this->Internal->Current)

@@ -122,11 +122,8 @@ QStringList pqRenderViewOptions::getPageList()
   
 void pqRenderViewOptions::setView(pqView* view)
 {
-  if(this->Internal->RenderView)
-    {
-    // disconnect widgets from current render view
-    this->disconnectGUI();
-    }
+  // disconnect widgets from current render view
+  this->disconnectGUI();
   this->Internal->RenderView = qobject_cast<pqRenderView*>(view);
   if(this->Internal->RenderView)
     {
@@ -217,6 +214,7 @@ void pqRenderViewOptions::connectGUI()
 
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewOptions::resetAnnotation()
 {
   this->Internal->OrientationAxes->setChecked(this->Internal->RenderView->getOrientationAxesVisibility());
@@ -231,45 +229,10 @@ void pqRenderViewOptions::resetAnnotation()
     this->Internal->RenderView->getCenterAxesVisibility()? Qt::Checked : Qt::Unchecked);
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewOptions::disconnectGUI()
 {
-  vtkSMProxy* proxy = this->Internal->RenderView->getProxy();
-
-  // link stuff on the general tab
-  this->Internal->Links.unregisterLink(this->Internal->ColorAdaptor, "color",
-    SIGNAL(colorChanged(const QVariant&)),
-    proxy, proxy->GetProperty("Background"));
-  
-  this->Internal->Links.unregisterLink(this->Internal->parallelProjection, "checked",
-    SIGNAL(stateChanged(int)),
-    proxy, proxy->GetProperty("CameraParallelProjection"));
- 
-  // link default light params
-  this->Internal->Links.unregisterLink(this->Internal->DefaultLightSwitch, "checked", 
-    SIGNAL(toggled(bool)),
-    proxy, proxy->GetProperty("LightSwitch"));
-  pqSignalAdaptorSliderRange* sliderAdaptor;
-  sliderAdaptor = new pqSignalAdaptorSliderRange(this->Internal->LightIntensity);
-  this->Internal->Links.unregisterLink(sliderAdaptor, "value",
-    SIGNAL(valueChanged(double)),
-    proxy, proxy->GetProperty("LightIntensity"));
-  this->Internal->Links.unregisterLink(this->Internal->LightIntensity_Edit, "text",
-    SIGNAL(textChanged(const QString&)),
-    proxy, proxy->GetProperty("LightIntensity"));
-  pqSignalAdaptorColor* lightColorAdaptor;
-  lightColorAdaptor = new pqSignalAdaptorColor(this->Internal->SetLightColor,
-    "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)),
-    false);
-  this->Internal->Links.unregisterLink(lightColorAdaptor, "color",
-    SIGNAL(colorChanged(const QVariant&)),
-    proxy, proxy->GetProperty("LightDiffuseColor"));
-
-
-  // link light kit params
-  pqNamedWidgets::unlink(this->Internal->UseLight, proxy, &this->Internal->Links);
-  this->Internal->Links.unregisterLink(this->Internal->UseLight, "checked", SIGNAL(toggled(bool)),
-    proxy, proxy->GetProperty("UseLight"));
+  this->Internal->Links.removeAllLinks();
 }
 
 //-----------------------------------------------------------------------------
