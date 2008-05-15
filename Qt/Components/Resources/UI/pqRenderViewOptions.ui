@@ -147,7 +147,7 @@
           </size>
          </property>
          <property name="title" >
-          <string>Default Light</string>
+          <string>Headlight</string>
          </property>
          <property name="checkable" >
           <bool>true</bool>
@@ -236,7 +236,7 @@
           </size>
          </property>
          <property name="title" >
-          <string>Light Kit Parameters</string>
+          <string>Light Kit</string>
          </property>
          <property name="checkable" >
           <bool>true</bool>
