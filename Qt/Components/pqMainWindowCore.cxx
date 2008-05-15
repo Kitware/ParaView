@@ -984,7 +984,14 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
     << pqSetName("displayColor");
 
   QList<QAction *> toolActions = toolbar->actions();
-  toolbar->insertWidget(toolActions[1], display_color);
+  if(toolActions.size() > 1)
+    {
+    toolbar->insertWidget(toolActions[1], display_color);
+    }
+  else
+    {
+    toolbar->addWidget(display_color);
+    }
 
   QObject::connect(this->getObjectInspectorDriver(),
                    SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
