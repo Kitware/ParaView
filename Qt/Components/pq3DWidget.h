@@ -91,10 +91,15 @@ public:
 signals:
   /// Notifies observers that widget visibility has changed
   void widgetVisibilityChanged(bool);
+
   /// Notifies observers that the user is dragging the 3D widget
   void widgetStartInteraction();
+
   /// Notifies observers that the user is done dragging the 3D widget
   void widgetEndInteraction();
+
+  /// Notifies observers that the user is dragging the 3D widget
+  void widgetInteraction();
 
 public slots:
   /// Sets 3D widget visibility

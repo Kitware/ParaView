@@ -273,7 +273,7 @@
         name="Bounds"
         command="SetBounds"
         number_of_elements="6"
-        default_values="0 1 0 1 0 1" >
+        default_values="none" >
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Position"
@@ -299,9 +299,25 @@
         number_of_elements="3"
         animateable="1"
         update_self="1"
-        default_values="0.0 0.0 0.0" >
+        default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no 
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+        <PropertyGroup type="Box">
+          <Property name="Position" function="Position" />
+          <Property name="Rotation" function="Rotation" />
+          <Property name="Scale" function="Scale" />
+          <Property name="Bounds" function="PlaceWidget" />
+        </PropertyGroup>
+
+      </Hints>
+      <!-- End of Box -->
     </BoxProxy>
     
     <Proxy name="Sphere" class="vtkSphere">
@@ -348,32 +364,59 @@
         command="SetPosition"
         number_of_elements="3"
         update_self="1"
-        animateable="1"
         label="Translate"
+        information_property="PositionInfo"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PositionInfo"
+        command="GetPosition"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty
         name="Rotation"
         command="SetRotation"
         number_of_elements="3"
         update_self="1"
-        animateable="1"
+        information_property="RotationInfo"
         label="Rotate"
         default_values="0.0 0.0 0.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RotationInfo"
+        command="GetOrientation"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty
         name="Scale"
         command="SetScale"
         number_of_elements="3"
         update_self="1"
-        animateable="1"
         label="Scale"
+        information_property="ScaleInfo"
         default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ScaleInfo"
+        command="GetScale"
+        information_only="1"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
     </TransformProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="matrices">
@@ -420,13 +463,6 @@
   </ProxyGroup>
   
   <ProxyGroup name="3d_widgets">
-    <Proxy name="3DWidgetsBase">
-      <DoubleVectorProperty
-        name="PlaceFactor"
-        command="SetPlaceFactor"
-        number_of_elements="1"
-        default_values="1.0" />
-    </Proxy>
 
     <Proxy name="SliderWidget" class="vtkSliderWidget">
       <ProxyProperty name="Representation"
@@ -581,6 +617,26 @@
                          default_values="0">
         <BooleanDomain/>
       </IntVectorProperty>
+      <!-- End of AbstractWidget -->
+    </Proxy>
+
+    <Proxy name="BoxWidget2" class="vtkBoxWidget2">
+      <Documentation>
+        Proxy for vtkBoxWidget2.
+      </Documentation>
+
+      <ProxyProperty name="Representation"
+        command="SetRepresentation">
+      </ProxyProperty>
+
+      <IntVectorProperty name="Enabled" 
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- End of BoxWidget2 -->
     </Proxy>
 
     <!-- End of ProxyGroup 3d_widgets -->
@@ -1769,6 +1825,78 @@
        </Hints>
     <!-- End PointSource -->
     </SourceProxy>
+
+    <TransformProxy name="Transform3" class="vtkTransform" label="Transform">
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        update_self="1"
+        label="Translate"
+        information_property="PositionInfo"
+        default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PositionInfo"
+        command="GetPosition"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Rotation"
+        command="SetRotation"
+        number_of_elements="3"
+        update_self="1"
+        information_property="RotationInfo"
+        label="Rotate"
+        default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RotationInfo"
+        command="GetOrientation"
+        information_only="1"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        update_self="1"
+        label="Scale"
+        information_property="ScaleInfo"
+        default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="ScaleInfo"
+        command="GetScale"
+        information_only="1"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+       <Hints>
+        <PropertyGroup type="Box">
+          <Property name="Position" function="Position" />
+          <Property name="Rotation" function="Rotation" />
+          <Property name="Scale" function="Scale" />
+        </PropertyGroup>
+<!--
+         <ProxyList>
+           <Link name="DummyInput" with_property="Input" />
+         </ProxyList>
+         -->
+       </Hints>
+    </TransformProxy>
   </ProxyGroup>
 
   <ProxyGroup name="misc">

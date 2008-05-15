@@ -32,17 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidget.h"
 
 // ParaView Server Manager includes.
+#include "vtkEventQtSlotConnect.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMInputProperty.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -51,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
+#include "pqBoxWidget.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqLineSourceWidget.h"
 #include "pqPipelineFilter.h"
@@ -69,12 +71,14 @@ public:
     WidgetVisible(true),
     Selected(false)
   {
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   }
     
   vtkSmartPointer<vtkSMProxy> ReferenceProxy;
   vtkSmartPointer<vtkSMNewWidgetRepresentationProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
   vtkSmartPointer<vtkPVXMLElement> Hints;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> > PropertyMap;
 
@@ -134,6 +138,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
       if (widgetType == "Plane")
         {
         widget = new pqImplicitPlaneWidget(refProxy, pxy, 0);
+        }
+      else if (widgetType == "Box")
+        {
+        widget = new pqBoxWidget(refProxy, pxy, 0);
         }
       else if (widgetType == "Handle")
         {
@@ -251,9 +259,11 @@ void pq3DWidget::onControlledPropertyChanged()
 //-----------------------------------------------------------------------------
 void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
 {
- vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  this->Internal->VTKConnect->Disconnect();
+
+    vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   pqRenderView* rview = this->renderView();
- if (rview && widget)
+  if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
@@ -261,7 +271,20 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     rview->getRenderViewProxy()->RemoveRepresentation(widget);
     rview->render();
     }
+
   this->Internal->WidgetProxy = pxy;
+
+  if (pxy)
+    {
+    this->Internal->VTKConnect->Connect(pxy, vtkCommand::StartInteractionEvent,
+      this, SIGNAL(widgetStartInteraction()));
+    this->Internal->VTKConnect->Connect(pxy, vtkCommand::StartInteractionEvent,
+      this, SLOT(setModified()));
+    this->Internal->VTKConnect->Connect(pxy, vtkCommand::InteractionEvent,
+      this, SIGNAL(widgetInteraction()));
+    this->Internal->VTKConnect->Connect(pxy, vtkCommand::EndInteractionEvent,
+      this, SIGNAL(widgetEndInteraction()));
+    }
 
   if (rview && pxy)
     {
@@ -401,14 +424,13 @@ void pq3DWidget::reset()
     ++iter)
     {
     iter.key()->Copy(iter.value());
-    iter.key()->Modified();
     }
 
   if (this->Internal->WidgetProxy)
     {
     this->Internal->WidgetProxy->UpdateVTKObjects();
     this->Internal->WidgetProxy->UpdatePropertyInformation();
-    pqApplicationCore::instance()->render();
+    this->render();
     }
   this->blockSignals(false);
 }

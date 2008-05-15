@@ -1537,6 +1537,62 @@
      </ProxyProperty>
     </ImplicitPlaneRepresentationProxy>
 
+    <BoxRepresentationProxy name="BoxRepresentation" class="vtkBoxRepresentation">
+      <Documentation>
+        Proxy for vtkBoxRepresentation. Don't confuse this with the
+        vtkSMRepresentation proxy for the box widget (which is the
+        BoxWidgetRepresentation).
+      </Documentation>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty 
+        name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+        name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.01" />
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Renderer" command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="Transform"
+          proxygroup="transforms" proxyname="Transform2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Position" /> 
+          <Property name="PositionInfo" /> 
+          <Property name="Rotation" /> 
+          <Property name="RotationInfo" /> 
+          <Property name="Scale" /> 
+          <Property name="ScaleInfo" /> 
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of BoxRepresentation -->
+    </BoxRepresentationProxy>
+
     <Proxy name="ScalarBarRepresentation" 
            class="vtkScalarBarRepresentation">
 
@@ -7054,6 +7110,40 @@
           <Property name="Enabled" />
         </ExposedProperties>
       </SubProxy>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="BoxWidgetRepresentation">
+      <Documentation>
+        Representation proxy for the the box widget. This includes the
+        widget/representation proxies for the box 3D widget.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="BoxRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+          <Property name="Position" />
+          <Property name="PositionInfo" />
+          <Property name="Rotation" />
+          <Property name="RotationInfo" />
+          <Property name="Scale" />
+          <Property name="ScaleInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="BoxWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of BoxWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
 
     <NewWidgetRepresentationProxy name="SliderWidgetRepresentation">

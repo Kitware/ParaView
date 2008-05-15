@@ -31,6 +31,7 @@ SET(Kit_SRCS
   vtkSMBooleanKeyFrameProxy.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
+  vtkSMBoxRepresentationProxy.cxx
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx

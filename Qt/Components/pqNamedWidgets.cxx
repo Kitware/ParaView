@@ -1331,10 +1331,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
       }
     }
   iter->Delete();
-  panelLayout->addItem(new QSpacerItem(0,0,
-                                       QSizePolicy::Expanding,
-                                       QSizePolicy::Expanding), 
-                       rowCount, 0, 1, 2);
+  panelLayout->setRowStretch(rowCount, 1);
   panelLayout->invalidate();
 }
 

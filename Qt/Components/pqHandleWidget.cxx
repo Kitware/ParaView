@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 #include <vtkSMDoubleVectorProperty.h>
-#include <vtkMemberFunctionCommand.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSmartPointer.h>
@@ -66,13 +65,6 @@ public:
   
   /// Stores the Qt widgets
   Ui::pqHandleWidget* const UI;
-
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> StartDragObserver;
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> DragObserver;
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> EndDragObserver;
   pqPropertyLinks Links;
 };
 
@@ -85,13 +77,6 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
 {
   // enable picking.
   this->pickingSupported(QKeySequence(tr("P")));
-
-  this->Implementation->StartDragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetStartDrag));
-  this->Implementation->DragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetDrag));
-  this->Implementation->EndDragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetEndDrag));
 
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
@@ -182,13 +167,6 @@ void pqHandleWidget::createWidget(pqServer* server)
   this->Implementation->Links.addPropertyLink(
     adaptor, "value", SIGNAL(valueChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 2);
-
-  widget->AddObserver(vtkCommand::StartInteractionEvent,
-    this->Implementation->StartDragObserver);
-  widget->AddObserver(vtkCommand::InteractionEvent,
-    this->Implementation->DragObserver);
-  widget->AddObserver(vtkCommand::EndInteractionEvent,
-    this->Implementation->EndDragObserver);
 }
 
 //-----------------------------------------------------------------------------
@@ -196,14 +174,8 @@ void pqHandleWidget::cleanupWidget()
 {
   this->Implementation->Links.removeAllPropertyLinks();
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  if(widget)
+  if (widget)
     {
-    widget->RemoveObserver(
-      this->Implementation->EndDragObserver);
-    widget->RemoveObserver(
-      this->Implementation->StartDragObserver);
-    widget->RemoveObserver(
-      this->Implementation->DragObserver);
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
     }
@@ -247,24 +219,5 @@ void pqHandleWidget::onResetBounds()
   this->resetBounds();
   this->render();
 
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::on3DWidgetStartDrag()
-{
-  this->setModified();
-  emit widgetStartInteraction();
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::on3DWidgetDrag()
-{
-  this->setModified();
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::on3DWidgetEndDrag()
-{
-  emit widgetEndInteraction();
 }
 

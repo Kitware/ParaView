@@ -1275,8 +1275,8 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="None" />
               <Proxy group="implicit_functions" name="Plane" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
@@ -3288,8 +3288,7 @@ The Transform filter allows you to specify the position, size, and orientation o
               <Group name="transforms"/>
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
-              <!-- Eventually, this transform will flaunt a 3D widget -->
-              <Proxy group="transforms" name="Transform2" />
+              <Proxy group="extended_sources" name="Transform3" />
            </ProxyListDomain>
            <Documentation>
              The values in this property allow you to specify the transform (translation, rotation, and scaling) to apply to the input dataset.
@@ -3582,8 +3581,8 @@ This filter extracts the portion of the input dataset that lies along the specif
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
@@ -3656,8 +3655,8 @@ To use this filter you must specify a region  (implicit function). You must also
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
@@ -3747,8 +3746,8 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Scalar" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
@@ -5644,8 +5643,8 @@ This filter operates on all types of data sets, and it returns unstructured grid
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>
@@ -5810,8 +5809,8 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
-              <!--
               <Proxy group="implicit_functions" name="Box" />
+              <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->
            </ProxyListDomain>

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
-   Module:    pqHandleWidget.h
+   Program: ParaView
+   Module:    pqBoxWidget.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.2. 
-
-   See License_v1.2.txt for the full ParaQ license.
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2. 
+   
+   See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -28,25 +28,22 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqBoxWidget_h 
+#define __pqBoxWidget_h
 
-#ifndef _pqHandleWidget_h
-#define _pqHandleWidget_h
-
-#include "pqProxy.h"
 #include "pq3DWidget.h"
-#include "pqComponentsExport.h"
 
-/// Provides a complete Qt UI for working with a 3D handle widget
-class PQCOMPONENTS_EXPORT pqHandleWidget : public pq3DWidget
+class pqServer;
+
+/// Provides UI for Box Widget.
+class PQCOMPONENTS_EXPORT pqBoxWidget : public pq3DWidget
 {
   Q_OBJECT
-  
-public:
   typedef pq3DWidget Superclass;
-
-  pqHandleWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* p);
-  ~pqHandleWidget();
+public:
+  pqBoxWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
+  virtual ~pqBoxWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -56,12 +53,11 @@ public:
   /// and hints have been set.
   virtual void resetBounds();
 
-private slots:
-  /// Called to reset the 3D widget bounds to the reference proxy bounds
-  void onResetBounds();
+  /// accept the changes. Overridden to hide handles.
+  virtual void accept();
 
-  /// Called when the user changes widget visibility
-  void onWidgetVisibilityChanged(bool visible);
+  /// reset the changes. Overridden to hide handles.
+  virtual void reset();
 
 protected:
   /// Internal method to create the widget.
@@ -70,12 +66,20 @@ protected:
   /// Internal method to cleanup widget.
   void cleanupWidget();
 
-  /// Called on pick.
-  virtual void pick(double, double, double);
+private slots:
+  /// Called when the user changes widget visibility
+  void onWidgetVisibilityChanged(bool visible);
 
+  void showHandles();
+  void hideHandles();
 private:
+  pqBoxWidget(const pqBoxWidget&); // Not implemented.
+  void operator=(const pqBoxWidget&); // Not implemented.
+
   class pqImplementation;
-  pqImplementation* const Implementation;
+  pqImplementation* Implementation;
 };
 
 #endif
+
+

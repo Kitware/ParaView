@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 
 #include <vtkMath.h>
-#include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
@@ -64,13 +63,11 @@ public:
   {
     this->Links.setUseUncheckedProperties(false);
     this->Links.setAutoUpdateVTKObjects(true);
-    this->Observer = vtkEventQtSlotConnect::New();
     this->PickPoint1 = true;
   }
   
   ~pqImplementation()
   {
-    this->Observer->Delete();
   }
   
   /// Stores the Qt widgets
@@ -82,7 +79,6 @@ public:
   
   /// Maps Qt widgets to the 3D widget
   pqPropertyLinks Links;
-  vtkEventQtSlotConnect* Observer;
 
   bool PickPoint1;
 };
@@ -146,17 +142,8 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
     pqApplicationCore::instance()->getServerManagerModel();
   
   this->createWidget(smmodel->findServer(o->GetConnectionID()));
-  
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
-
-  this->Implementation->Observer->Connect(this->getWidgetProxy(),
-    vtkCommand::StartInteractionEvent,
-    this, SLOT(setModified()));
-  this->Implementation->Observer->Connect(this->getWidgetProxy(),
-    vtkCommand::InteractionEvent,
-    this, SLOT(setModified()));
-  
 }
 
 //-----------------------------------------------------------------------------

@@ -45,7 +45,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDoubleValidator>
 
 #include <vtkCamera.h>
-#include <vtkMemberFunctionCommand.h>
 #include <vtkPVDataInformation.h>
 #include <vtkRenderer.h>
 #include <vtkSmartPointer.h>
@@ -77,12 +76,6 @@ public:
   
   /// Stores the Qt widgets
   Ui::pqImplicitPlaneWidget* const UI;
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> StartDragObserver;
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> DragObserver;
-  /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> EndDragObserver;
   
   vtkSMDoubleVectorProperty* OriginProperty;
   vtkSMDoubleVectorProperty* NormalProperty;
@@ -104,13 +97,6 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
   this->ScaleOrigin[1] = 0;
   this->ScaleOrigin[2] = 0;
 
-  this->Implementation->StartDragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
-  this->Implementation->DragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetDrag));
-  this->Implementation->EndDragObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
-    
   this->Implementation->UI->setupUi(this);
   this->Implementation->UI->show3DWidget->setChecked(this->widgetVisible());
 
@@ -137,7 +123,7 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
   connect(this->Implementation->UI->useCameraNormal,
     SIGNAL(clicked()), this, SLOT(onUseCameraNormal()));
   connect(this->Implementation->UI->resetBounds,
-    SIGNAL(clicked()), this, SLOT(onResetBounds()));
+    SIGNAL(clicked()), this, SLOT(resetBounds()));
   connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
 
@@ -164,6 +150,10 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWi
     SIGNAL(editingFinished()), 
     this, SLOT(render()), Qt::QueuedConnection);
 
+  // We need to mark the plane when inteaction starts.
+  QObject::connect(this, SIGNAL(widgetStartInteraction()),
+    this, SLOT(onStartInteraction()));
+
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(o->GetConnectionID()));
@@ -185,12 +175,6 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
   this->setWidgetProxy(widget);
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
-  widget->AddObserver(vtkCommand::StartInteractionEvent,
-    this->Implementation->StartDragObserver);
-  widget->AddObserver(vtkCommand::InteractionEvent,
-    this->Implementation->DragObserver);
-  widget->AddObserver(vtkCommand::EndInteractionEvent,
-    this->Implementation->EndDragObserver);
 
   // Now bind the GUI widgets to the 3D widget.
 
@@ -249,12 +233,6 @@ void pqImplicitPlaneWidget::cleanupWidget()
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if(widget)
     {
-    widget->RemoveObserver(
-      this->Implementation->EndDragObserver);
-    widget->RemoveObserver(
-      this->Implementation->StartDragObserver);
-    widget->RemoveObserver(
-      this->Implementation->DragObserver);
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
     }
@@ -367,12 +345,6 @@ void pqImplicitPlaneWidget::setScaleOrigin(double orgin[3])
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::onResetBounds()
-{
-  this->resetBounds();
-}
-
-//-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::resetBounds()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
@@ -436,23 +408,20 @@ void pqImplicitPlaneWidget::resetBounds()
       origin->SetElements(input_origin);
       }
     widget->UpdateProperty("Origin");
-    if(this->renderView())
-      {
-      this->renderView()->render();
-      }
     this->setModified();
+    this->render();
     }
 }
 
 void pqImplicitPlaneWidget::accept()
 {
-  Superclass::accept();
+  this->Superclass::accept();
   this->hidePlane();
 }
 
 void pqImplicitPlaneWidget::reset()
 {
-  Superclass::reset();
+  this->Superclass::reset();
   this->hidePlane();
 }
 
@@ -581,21 +550,9 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
     }
 }
 
-void pqImplicitPlaneWidget::on3DWidgetStartDrag()
+void pqImplicitPlaneWidget::onStartInteraction()
 {
-  this->setModified();
-  emit widgetStartInteraction();
   this->showPlane();
-}
-
-void pqImplicitPlaneWidget::on3DWidgetDrag()
-{
-  this->setModified();
-}
-
-void pqImplicitPlaneWidget::on3DWidgetEndDrag()
-{
-  emit widgetEndInteraction();
 }
 
 void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)

@@ -92,8 +92,6 @@ protected:
 private slots:
   /// Called to show/hide the 3D widget
   void onShow3DWidget(bool);
-  /// Called to reset the 3D widget bounds to the bounding box proxy's
-  void onResetBounds();
   /// Called to set the widget origin to the center of the bounding box proxy's data
   void onUseCenterBounds();
   /// Called to set the widget normal to the X axis
@@ -105,11 +103,7 @@ private slots:
   /// Called to set the widget normal to the camera direction
   void onUseCameraNormal();
   /// Called when the user starts dragging the 3D widget
-  void on3DWidgetStartDrag();
-  /// Called when the user is dragging the 3D widget
-  void on3DWidgetDrag();
-  /// Called when the user stops dragging the 3D widget
-  void on3DWidgetEndDrag();
+  void onStartInteraction();
   /// Called whenever the 3D widget visibility is modified
   void onWidgetVisibilityChanged(bool visible);
 
