@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.40");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.41");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -529,7 +529,7 @@ void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
 
   vtkSMStringVectorProperty* dsrc = vtkSMStringVectorProperty::SafeDownCast(
     src);
-  if (dsrc)
+  if (dsrc && dsrc->Initialized)
     {
     bool modified = false;
     if (this->Internals->Values != dsrc->Internals->Values ||

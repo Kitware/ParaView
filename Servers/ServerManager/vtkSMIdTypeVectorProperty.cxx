@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.18");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -455,7 +455,7 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
 
   vtkSMIdTypeVectorProperty* dsrc = vtkSMIdTypeVectorProperty::SafeDownCast(
     src);
-  if (dsrc)
+  if (dsrc && dsrc->Initialized)
     {
     bool modified = false;
     if (this->Internals->Values != dsrc->Internals->Values)
