@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.31");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.32");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -6373,10 +6373,10 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   ReleaseVtkPointer(da);
   // Compute the center of mass from the moments, and build 
   // cells.
-  vtkCellArray *va=vtkCellArray::New();
-  va->Allocate(2*this->NumberOfResolvedFragments);
-  va->SetNumberOfCells(this->NumberOfResolvedFragments);
-  vtkIdType *verts=va->GetPointer();
+  vtkIdTypeArray *va=vtkIdTypeArray::New();
+  va->SetNumberOfTuples(2*this->NumberOfResolvedFragments);
+  vtkIdType *verts
+    = va->GetPointer(0);
   vtkPoints *pts=vtkPoints::New();
   pts->SetDataTypeToDouble();
   da=dynamic_cast<vtkDoubleArray *>(pts->GetData());
@@ -6388,10 +6388,9 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   for (int i=0; i<this->NumberOfResolvedFragments; ++i)
     {
     verts[0]=1;
-    verts[0]=i+this->ResolvedFragmentCount;
+    verts[1]=i;//+this->ResolvedFragmentCount;
     verts+=2;
-//     vtkIdType cellId=i+this->ResolvedFragmentCount;
-//     va->InsertNextCell(1,&cellId);
+
     for (int q=0; q<3; ++q)
       {
       com[q]=moments[q]/moments[3];
@@ -6401,8 +6400,12 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
     }
   resolvedFragmentCenters->SetPoints(pts);
   pts->Delete();
-//   resolvedFragmentCenters->SetVerts(va);
+  vtkCellArray *cells=vtkCellArray::New();
+  cells->SetCells(static_cast<vtkIdType>(this->NumberOfResolvedFragments),va);
+  resolvedFragmentCenters->SetVerts(cells); //TODO why does this give PV a stomach ache??
+  cells->Delete();
   va->Delete();
+
 //   resolvedFragmentCenters->SetNumberOfVerts(this->NumberOfResolvedFragments);
 // TODO figure out why things don't work right with verts
 }
