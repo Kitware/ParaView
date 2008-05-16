@@ -76,6 +76,11 @@ protected:
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
+  // A default callback that returns the type of view the state loader should 
+  // create when it encounters a view with the given xml name in the state.
+  // This function can be overridden by the UI.
+  static const char* GetPreferredViewType(int connectionID, const char *xml_name);
+
 //BTX
   const char* (*PreferredViewTypeFunctionPtr)(int connectionID, const char*);
 //ETX

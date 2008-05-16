@@ -18,12 +18,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSmartPointer.h"
 #include <vtkstd/list>
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.24");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.25");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -35,7 +36,7 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->PreferredViewTypeFunctionPtr = 0;
+  this->SetPreferredViewTypeFunction(&this->GetPreferredViewType);
 }
 
 //-----------------------------------------------------------------------------
@@ -136,6 +137,12 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
       }
     }
   this->Superclass::RegisterProxyInternal(group, name, proxy);
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID, const char *xml_name)
+{
+  return vtkSMRenderViewProxy::GetSuggestedRenderViewType(connectionID);
 }
 
 //-----------------------------------------------------------------------------
