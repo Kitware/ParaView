@@ -68,12 +68,12 @@ pqDistanceWidget::~pqDistanceWidget()
 //-----------------------------------------------------------------------------
 void pqDistanceWidget::updateDistance()
 {
-  vtkSMProxy* proxy = this->getWidgetProxy();
+  vtkSMProxy* wproxy = this->getWidgetProxy();
 
   vtkSMDoubleVectorProperty* dvp1 = vtkSMDoubleVectorProperty::SafeDownCast(
-    proxy->GetProperty("Point1WorldPosition"));
+    wproxy->GetProperty("Point1WorldPosition"));
   vtkSMDoubleVectorProperty* dvp2 = vtkSMDoubleVectorProperty::SafeDownCast(
-    proxy->GetProperty("Point2WorldPosition"));
+    wproxy->GetProperty("Point2WorldPosition"));
   double distance =  vtkMath::Distance2BetweenPoints(dvp1->GetElements(), dvp2->GetElements());
   this->Label->setText(QString("<b>Distance:</b> <i>%1</i> ").arg(distance));
 }
