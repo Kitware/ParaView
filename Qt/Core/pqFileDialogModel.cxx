@@ -273,8 +273,7 @@ public:
   /// and points slashes in the correct direction for the server
   const QString cleanPath(const QString& Path)
   {
-    QString result = QDir::cleanPath(Path);
-    result.replace('/', this->Separator);
+    QString result = QDir::cleanPath(QDir::fromNativeSeparators(Path));
     return result.trimmed();
   }
 
