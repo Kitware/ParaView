@@ -451,6 +451,10 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
+void pqServerResource::setPath(const QStringList& files)
+{
+}
+
 const pqServerResource pqServerResource::sessionServer() const
 {
   if(this->Implementation->Scheme != "session")

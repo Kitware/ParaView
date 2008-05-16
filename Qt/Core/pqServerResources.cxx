@@ -194,6 +194,18 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
           }
         QStringList files;
         files.push_back(resource.path());
+        QString extrafilesCount = resource.data("extrafilesCount");
+        if (!extrafilesCount.isEmpty() && extrafilesCount.toInt() > 0)
+          {
+          for (int cc=0; cc < extrafilesCount.toInt(); cc++)
+            {
+            QString extrafile = resource.data(QString("file.%1").arg(cc));
+            if (!extrafile.isEmpty())
+              {
+              files.push_back(extrafile);
+              }
+            }
+          }
         reader = builder->createReader(
           readerGroup, readerName, files, server);
         if (ustack)

@@ -434,7 +434,7 @@ private slots:
 
   /// Called when a new reader is created by the GUI.
   /// We add the reader to the recent files menu.
-  void onReaderCreated(pqPipelineSource* reader, const QString& filename);
+  void onReaderCreated(pqPipelineSource* reader, const QStringList& filenames);
 
   /// Called when any pqProxy or subclass is created,
   /// We update the undo stack to include an element

@@ -245,6 +245,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
   emit this->readerCreated(reader, files[0]);
+  emit this->readerCreated(reader, files);
   emit this->proxyCreated(reader);
   return reader;
 }

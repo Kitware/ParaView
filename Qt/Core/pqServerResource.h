@@ -137,6 +137,7 @@ public:
     
   const QString path() const;
   void setPath(const QString&);
+  void setPath(const QStringList&);
 
   const pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);

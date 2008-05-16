@@ -200,6 +200,7 @@ signals:
   /// is requested by the GUI. It wont be triggered when the python client
   /// creates the source or when state is loaded or on undo/redo. 
   void readerCreated(pqPipelineSource*, const QString& filename);
+  void readerCreated(pqPipelineSource*, const QStringList& filename);
 
   /// Fired on successful completion of createView().
   /// Remember that this signal is fired only when the creation of the object

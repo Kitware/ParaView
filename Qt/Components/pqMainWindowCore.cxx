@@ -453,8 +453,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     Qt::QueuedConnection);
 
   this->connect(builder, 
-    SIGNAL(readerCreated(pqPipelineSource*, const QString&)),
-    this, SLOT(onReaderCreated(pqPipelineSource*, const QString&)));
+    SIGNAL(readerCreated(pqPipelineSource*, const QStringList&)),
+    this, SLOT(onReaderCreated(pqPipelineSource*, const QStringList&)));
 
   this->connect(builder, SIGNAL(sourceCreated(pqPipelineSource*)),
     this, SLOT(onSourceCreation(pqPipelineSource*)));
@@ -2668,9 +2668,9 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
 //-----------------------------------------------------------------------------
 /// Called when a new reader is created by the GUI.
 void pqMainWindowCore::onReaderCreated(pqPipelineSource* reader, 
-  const QString& filename)
+  const QStringList& files)
 {
-  if (!reader)
+  if (!reader || files.size() == 0)
     {
     return;
     }
@@ -2680,9 +2680,14 @@ void pqMainWindowCore::onReaderCreated(pqPipelineSource* reader,
 
   // Add this to the list of recent server resources ...
   pqServerResource resource = server->getResource();
-  resource.setPath(filename);
+  resource.setPath(files[0]);
   resource.addData("readergroup", reader->getProxy()->GetXMLGroup());
   resource.addData("reader", reader->getProxy()->GetXMLName());
+  resource.addData("extrafilesCount", QString("%1").arg(files.size()-1));
+  for (int cc=1; cc < files.size(); cc++)
+    {
+    resource.addData(QString("file.%1").arg(cc-1), files[cc]);
+    }
   core->serverResources().add(resource);
   core->serverResources().save(*core->settings());
 }
