@@ -298,6 +298,7 @@ IF(BUILD_TESTING)
     ExodusPanel
     ExodusWriter
     ExodusXML
+    ExTimeseries
     ExtractBlock
     ExtractLevel
     Flow
