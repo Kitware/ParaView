@@ -359,6 +359,7 @@ protected:
   void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
   int UseOffscreenRenderingForScreenshots;
+  bool LightKitAdded;
 
   // Description:
   // Get the number of polygons this render module is rendering
