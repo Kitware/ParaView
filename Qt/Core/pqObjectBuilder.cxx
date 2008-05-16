@@ -175,11 +175,31 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     return 0;
     }
 
-  QFileInfo fileInfo(files[0]);
+  unsigned int numFiles = files.size();
+  QString reg_name = QFileInfo(files[0]).fileName();
+
+  if (numFiles > 1)
+    {
+    // Find the largest prefix that matches all filenames, and then append a '*'
+    // to signify that it is a collection of files.  If they all start with
+    // something different, just give up and add the '*' anyway.
+    for (unsigned int i = 1; i < numFiles; i++)
+      {
+      QString nextFile = QFileInfo(files[i]).fileName();
+      if (nextFile.startsWith(reg_name)) continue;
+      QString commonPrefix = reg_name;
+      do
+        {
+        commonPrefix.chop(1);
+        } while (!nextFile.startsWith(commonPrefix) && !commonPrefix.isEmpty());
+      if (commonPrefix.isEmpty()) break;
+      reg_name = commonPrefix;
+      }
+    reg_name += '*';
+    }
 
   vtkSMProxy* proxy = 
-    this->createProxyInternal(sm_group, sm_name, server, "sources", 
-      fileInfo.fileName());
+    this->createProxyInternal(sm_group, sm_name, server, "sources", reg_name);
   if (!proxy)
     {
     return 0;
@@ -205,8 +225,7 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
       return 0;
       }
 
-    unsigned int numElems = files.size();
-    if (numElems == 1 || !prop->GetRepeatCommand())
+    if (numFiles == 1 || !prop->GetRepeatCommand())
       {
       pqSMAdaptor::setElementProperty(prop, files[0]);
       }
