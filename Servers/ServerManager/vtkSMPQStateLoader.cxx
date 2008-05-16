@@ -24,7 +24,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.25");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.26");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -140,7 +140,7 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID, const char *xml_name)
+const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID, const char *vtkNotUsed(xml_name))
 {
   return vtkSMRenderViewProxy::GetSuggestedRenderViewType(connectionID);
 }
