@@ -51,6 +51,7 @@ SET(Kit_SRCS
   vtkSMDataRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDimensionsDomain.cxx
+  vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx

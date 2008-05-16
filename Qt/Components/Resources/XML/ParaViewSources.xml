@@ -20,5 +20,6 @@
   <Source name="SuperquadricSource" />
   <Source name="TextSource" />
   <Source name="TimeSource" />
+  <Source name="Ruler" />
   <Source name="RTAnalyticSource" />
 </ParaViewSources>

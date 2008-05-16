@@ -556,6 +556,48 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="Ruler" class="vtkLineSource" label="Ruler">
+      <Documentation
+         long_help="This is a line source that can be used to measure distance between two points"
+         short_help="Create a ruler">
+        The ruler can be used to interactively (using a 3D widget) or manually
+        (using the entries on the user interface) specify two points and then
+        determine the distance between the two points.
+      </Documentation>
+      <DoubleVectorProperty
+         name="Point1"
+         command="SetPoint1"
+         number_of_elements="3"
+         animateable="1"
+         default_values="-0.5 0.0 0.0" >
+         <DoubleRangeDomain name="range" />
+         <Documentation>
+           This property controls the coordinates of the first endpoint of the line.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Point2"
+         command="SetPoint2"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.5 0.0 0.0" >
+         <DoubleRangeDomain name="range" />
+         <Documentation>
+           This property controls the coordinates of the second endpoint of the line.
+         </Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="Distance" label="Distance">
+          <Property function="Point1WorldPosition" name="Point1" />
+          <Property function="Point2WorldPosition" name="Point2" />
+        </PropertyGroup>
+      </Hints>
+   <!-- End Line -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource"
                 label="Mandelbrot">
       <Documentation

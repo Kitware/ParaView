@@ -86,7 +86,8 @@ public:
 /////////////////////////////////////////////////////////////////////////
 // pqLineWidget
 
-pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
+pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p,
+  const char* xmlname/*="LineWidgetRepresentation"*/) :
   Superclass(o, pxy, p),
   Implementation(new pqImplementation())
 {
@@ -141,7 +142,7 @@ pqLineWidget::pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   
-  this->createWidget(smmodel->findServer(o->GetConnectionID()));
+  this->createWidget(smmodel->findServer(o->GetConnectionID()), xmlname);
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
 }
@@ -291,11 +292,11 @@ void pqLineWidget::onZAxis()
 }
 
 //-----------------------------------------------------------------------------
-void pqLineWidget::createWidget(pqServer* server)
+void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
 {
   vtkSMNewWidgetRepresentationProxy* const widget =
-    pqApplicationCore::instance()->get3DWidgetFactory()->
-    get3DWidget("LineSourceWidgetRepresentation", server);
+    pqApplicationCore::instance()->get3DWidgetFactory()->get3DWidget(
+      xmlname, server);
   this->setWidgetProxy(widget);
 
   widget->UpdateVTKObjects();

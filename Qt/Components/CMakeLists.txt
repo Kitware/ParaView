@@ -96,6 +96,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDisplayProxyEditor.h
   pqDisplayProxyEditorWidget.h
   pqDisplayRepresentationWidget.h
+  pqDistanceWidget.h
   pqEditServerStartupDialog.h
   pqExodusIIPanel.h
   pqExodusPanel.h
@@ -426,6 +427,8 @@ ADD_LIBRARY(pqComponents
   pqDisplayProxyEditorWidget.cxx
   pqDisplayRepresentationWidget.cxx
   pqDisplayRepresentationWidget.h
+  pqDistanceWidget.cxx
+  pqDistanceWidget.h
   pqEditServerStartupDialog.cxx
   pqEditServerStartupDialog.h
   pqExodusIIPanel.cxx

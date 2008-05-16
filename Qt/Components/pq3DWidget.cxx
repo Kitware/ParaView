@@ -53,15 +53,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
 #include "pqBoxWidget.h"
+#include "pqDistanceWidget.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqLineSourceWidget.h"
+#include "pqPickHelper.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
 #include "pqSMAdaptor.h"
-#include "pqPickHelper.h"
 
 class pq3DWidgetInternal
 {
@@ -158,6 +159,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
       else if (widgetType == "Line")
         {
         widget = new pqLineWidget(refProxy, pxy, 0);
+        }
+      else if (widgetType == "Distance")
+        {
+        widget = new pqDistanceWidget(refProxy, pxy, 0);
         }
 
       if (widget)

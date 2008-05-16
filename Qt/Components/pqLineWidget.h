@@ -46,7 +46,8 @@ class PQCOMPONENTS_EXPORT pqLineWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0);
+  pqLineWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p = 0, 
+    const char* xmlname="LineWidgetRepresentation");
   ~pqLineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
@@ -75,7 +76,7 @@ private slots:
   void onWidgetVisibilityChanged(bool visible);
 
 private:
-  void createWidget(pqServer* server);
+  void createWidget(pqServer* server, const QString& xmlname);
   void getReferenceBoundingBox(double center[3], double size[3]);
 
   class pqImplementation;

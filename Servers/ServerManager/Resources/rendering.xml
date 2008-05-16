@@ -1455,6 +1455,64 @@
      </ProxyProperty>
     </Proxy>
 
+    <DistanceRepresentation2DProxy name="DistanceRepresentation2D" class="vtkDistanceRepresentation2D">
+
+     <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="Point1WorldPosition"
+        command="SetPoint1WorldPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point1WorldPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="Point1WorldPositionInfo"
+        command="GetPoint1WorldPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="Point2WorldPosition"
+        command="SetPoint2WorldPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point2WorldPositionInfo"
+        default_values="1 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty name="Point2WorldPositionInfo"
+        command="GetPoint2WorldPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+     
+     <DoubleVectorProperty 
+        name="PlaceWidget"
+        is_internal="1"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <ProxyProperty name="Renderer" command="SetRenderer">
+       <ProxyGroupDomain name="groups">
+         <Group name="renderers"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
+     <!-- End of DistanceRepresentation2D -->
+    </DistanceRepresentation2DProxy>
+
     <ImplicitPlaneRepresentationProxy 
            name="ImplicitPlaneRepresentation" 
            class="vtkImplicitPlaneRepresentation">
@@ -7108,6 +7166,32 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="DistanceWidgetRepresentation">
+      <SubProxy>
+        <Proxy name="Prop2D" 
+          proxygroup="props" proxyname="DistanceRepresentation2D">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Point1WorldPositionInfo" />
+          <Property name="Point1WorldPosition" />
+          <Property name="Point2WorldPositionInfo" />
+          <Property name="Point2WorldPosition" />
+          <Property name="PlaceWidget" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="DistanceWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+          <Property name="ProcessEvents" />
         </ExposedProperties>
       </SubProxy>
     </NewWidgetRepresentationProxy>

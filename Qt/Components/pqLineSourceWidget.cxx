@@ -71,7 +71,7 @@ public:
 // pqLineSourceWidget
 
 pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p) :
-  Superclass(o, pxy, p),
+  Superclass(o, pxy, p, "LineSourceWidgetRepresentation"),
   Implementation(new pqImplementation())
 {
   this->Implementation->UI.setupUi(
