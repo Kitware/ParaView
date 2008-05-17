@@ -234,7 +234,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
+           <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
            <InputArrayDomain name="input_array" attribute_type="point"
