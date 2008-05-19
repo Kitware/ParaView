@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.33");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.34");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -681,7 +681,7 @@ void vtkCTHFragmentToProcMap::Clear()
 }
 
 //
-void vtkCTHFragmentToProcMap::vtkCTHFragmentToProcMap::Initialize(
+void vtkCTHFragmentToProcMap::Initialize(
               int nProcs,
               int nFragments)
 {
