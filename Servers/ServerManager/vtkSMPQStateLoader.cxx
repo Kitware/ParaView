@@ -24,7 +24,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.26");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.27");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -82,11 +82,18 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
         }
 
       // Can't use existing module (none present, none of the correct type, 
-      // or all present are have already been used, hence we allocate a new one.
-      return this->Superclass::NewProxyInternal(xml_group, preferred_xml_name);
+      // or all present are have already been used, hence we allocate a new one
+      // of the preferred type.
+      vtkSMProxy* preferred_prototype = 
+              pxm->GetPrototypeProxy(xml_group, preferred_xml_name);
+      if(preferred_prototype)
+        {
+        return this->Superclass::NewProxyInternal(xml_group, preferred_xml_name);
+        }
       }
     }
 
+  // If all else fails, let the superclass handle it:
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
 
