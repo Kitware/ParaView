@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <pqWidgetEventTranslator.h>
 #include "pqCoreExport.h"
+#include <QPointer>
 
 class pqFileDialog;
 
@@ -58,7 +59,7 @@ private:
   pqFileDialogEventTranslator(const pqFileDialogEventTranslator&);
   pqFileDialogEventTranslator& operator=(const pqFileDialogEventTranslator&);
 
-  pqFileDialog* CurrentObject;
+  QPointer<pqFileDialog> CurrentObject;
 
 private slots:
   void onFilesSelected(const QString&);

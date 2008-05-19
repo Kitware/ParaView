@@ -40,8 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 pqFileDialogEventTranslator::pqFileDialogEventTranslator(QObject* p) 
-  : pqWidgetEventTranslator(p),
-  CurrentObject(0)
+  : pqWidgetEventTranslator(p)
 {
 }
 
@@ -55,26 +54,15 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
     if(object)
       break;
     }
+  
   if(!object)
     return false;
 
-  // Handle remaining enter / leave events for the dialog only ...
-  if(object == Object)
+  if(Event->type() == QEvent::FocusIn && !this->CurrentObject)
     {
-    switch(Event->type())
-      {
-      case QEvent::Enter:
-        this->CurrentObject = object;
-        connect(object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
-        connect(object, SIGNAL(rejected()), this, SLOT(onCancelled()));
-        break;
-      case QEvent::Leave:
-        disconnect(Object, 0, this, 0);
-        this->CurrentObject = 0;
-        break;
-      default:
-        break;
-      }
+    this->CurrentObject = object;
+    connect(object, SIGNAL(fileAccepted(const QString&)), this, SLOT(onFilesSelected(const QString&)));
+    connect(object, SIGNAL(rejected()), this, SLOT(onCancelled()));
     }
       
   return true;
