@@ -149,6 +149,9 @@ public:
   /// Apply the settings from QSettings to this render module
   /// Overridden to load axes specific settings.
   virtual void restoreSettings(bool only_global);
+
+  /// restore the default light parameters
+  virtual void restoreDefaultLightSettings();
 public:
   /// Returns a array of 9 ManipulatorType objects defining
   /// default set of camera manipulators used by this type of view.

@@ -223,6 +223,16 @@ void pqRenderView::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderView::restoreDefaultLightSettings()
+{
+  this->Superclass::restoreDefaultLightSettings();
+  vtkSMProxy* proxy = this->getProxy();
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+  proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
 // Create a center axes if one doesn't already exist.
 void pqRenderView::initializeCenterAxes()
 {
