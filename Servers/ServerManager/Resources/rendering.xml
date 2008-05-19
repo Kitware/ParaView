@@ -1106,12 +1106,16 @@
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       
-      <IntVectorProperty name="ScaledText"
-        command="SetScaledText"
+      <IntVectorProperty name="TextScaleMode"
+        command="SetTextScaleMode"
         number_of_elements="1"
         default_values="1"
         animateable="0">
-        <BooleanDomain name="bool"/>
+        <EnumerationDomain>
+          <Entry value="0" text="None" />
+          <Entry value="1" text="Prop" />
+          <Entry value="2" text="Viewport" />
+        </EnumerationDomain>
       </IntVectorProperty>
 
       <ProxyProperty name="TextProperty"
@@ -7357,7 +7361,7 @@
           proxygroup="props" proxyname="TextActor">
         </Proxy>
         <ExposedProperties>
-          <Property name="ScaledText"/>
+          <Property name="TextScaleMode"/>
           <Property name="TextProperty"/>
         </ExposedProperties>
       </SubProxy>
@@ -7436,7 +7440,7 @@
           <Property name="Position2Info" />
           <Property name="WindowLocation" />
 
-          <Property name="ScaledText"/>
+          <Property name="TextScaleMode"/>
           <Property name="Resizable"/>
 
           <!-- properties for Text -->

@@ -65,11 +65,11 @@ void pqTextRepresentation::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("Enabled"),1);
   pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("ScaledText"),0);
+    proxy->GetProperty("TextScaleMode"),2);
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("Resizable"),0);
   pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("FontSize"),24);
+    proxy->GetProperty("FontSize"),18);
 
   proxy->UpdateVTKObjects();
 }

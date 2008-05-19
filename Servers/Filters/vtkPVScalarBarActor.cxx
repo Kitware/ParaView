@@ -25,6 +25,7 @@
 #include "vtkPVScalarBarActor.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkTextActor.h"
 #include "vtkScalarsToColors.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
@@ -35,7 +36,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.3");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.4");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -57,29 +58,6 @@ void vtkPVScalarBarActor::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "AutomaticLabelFormat: " << this->AutomaticLabelFormat <<endl;
 }
 
-//-----------------------------------------------------------------------------
-float vtkPVScalarBarActor::GetFontScale(vtkViewport *viewport)
-{
-  // Setting sizes based on point size is great, but it doesn't work that well
-  // in ParaView.  First of all, windows are constantly being resized, and it is
-  // expected that all of its contents will be resized as well.  In fact, the
-  // scalar bar size will be resized and it will look funny of the fonts did not
-  // scale as well.  Second, although it is usually accepted that the font
-  // should be based on a 72 DPI (typical for a monitor), that is often not the
-  // case for the images.  Tile displays throw that way off.  It is also
-  // incorrect when saving out images for inclusions in papers or animations.
-  // Instead, let us assume that the long dimension of the viewport is 6 inches
-  // (the typical text width in a paper) and then resize the font accordingly.
-
-  int *viewportSize = viewport->GetSize();
-
-  // Pretend the long dimension is the "width"
-  int viewportWidth = vtkstd::max(viewportSize[0], viewportSize[1]);
-
-  // Scale based on the assumtion of a 6 inch wide image at 72 DPI.
-  return (double)viewportWidth/(6*72);
-}
-
 //----------------------------------------------------------------------------
 void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize, 
                                                 int *propSize,
@@ -94,7 +72,7 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
   char format[512];
   char string[512];
 
-  double fontScaling = this->GetFontScale(viewport);
+  double fontScaling = vtkTextActor::GetFontScale(viewport);
 
   int barWidth, barHeight;
   if (this->Orientation == VTK_ORIENT_VERTICAL)
@@ -281,7 +259,7 @@ void vtkPVScalarBarActor::SizeTitle(int *titleSize, int *vtkNotUsed(propSize),
   this->TitleMapper->GetSize(viewport, targetSize);
 
   // Resize the font based on the viewport size.
-  double fontScale = this->GetFontScale(viewport);
+  double fontScale = vtkTextActor::GetFontScale(viewport);
   targetSize[0] = (int)(fontScale*targetSize[0]);
   targetSize[1] = (int)(fontScale*targetSize[1]);
 

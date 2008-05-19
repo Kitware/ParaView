@@ -67,8 +67,6 @@ protected:
 
   int AutomaticLabelFormat;
 
-  virtual float GetFontScale(vtkViewport *viewport);
-
   virtual void AllocateAndSizeLabels(int *labelSize, int *propSize,
                                      vtkViewport *viewport, double *range);
 
