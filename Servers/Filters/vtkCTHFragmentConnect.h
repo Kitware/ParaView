@@ -35,16 +35,17 @@ class vtkDoubleArray;
 class vtkCellArray;
 class vtkCellData;
 class vtkIntArray;
+class vtkMultiProcessController;
+class vtkDataArraySelection;
+class vtkCallbackCommand;
+// specific to us
 class vtkCTHFragmentLevel;
 class vtkCTHFragmentConnectBlock;
 class vtkCTHFragmentConnectIterator;
 class vtkCTHFragmentEquivalenceSet;
 class vtkCTHFragmentConnectRingBuffer;
 class vtkCTHMaterialFragmentArray;
-class vtkMultiProcessController;
-class vtkDataArraySelection;
-class vtkCallbackCommand;
-
+class vtkCTHFragmentPieceLoading;
 
 class VTK_EXPORT vtkCTHFragmentConnect : public vtkMultiBlockDataSetAlgorithm
 {
@@ -269,7 +270,19 @@ protected:
     int* procOffset);
   void MergeGhostEquivalenceSets(
     vtkCTHFragmentEquivalenceSet* globalSet);
-  void ResolveAndPartitionFragments();
+  // Sum/finalize attribute's contribution for those 
+  // which are split over multiple processes.
+  void ResolveFragmentAttributes();
+  //
+  void ResolveLocalFragmentGeometry();
+  void ResolveRemoteFragmentGeometry();
+  void BuildLoadingArray(
+                vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+  int PackLoadingArray(int *&buffer);
+  int UnPackLoadingArray(
+                int *buffer, int bufSize,
+                vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data sets. 
   void CopyAttributesToOutput0();

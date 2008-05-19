@@ -6309,6 +6309,19 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
+     <!-- Material fraction value -->
+     <DoubleVectorProperty
+       name="MaterialFractionThreshold"
+       command="SetMaterialFractionThreshold"
+       number_of_elements="1"
+       default_values="0.5"
+       label="Material Fraction Threshold">
+       <DoubleRangeDomain name="range" min="0.08" max="1" />
+       <Documentation>
+         Threshold value used to determine inclusion/excluision from the fragment set.
+       </Documentation>
+     </DoubleVectorProperty>
+
      <!-- Mass Array-->
      <StringVectorProperty
        name="SelectMassArray"
@@ -6332,27 +6345,6 @@ Tessellate a higher-order dataset.
          <!-- override gui no to set default -->
          <NoDefault />
        </Hints>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="WriteOutputTableFile" 
-        command="SetWriteOutputTableFile" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this property is set, then attributes of the fragments produced by the filter are written to a text file.
-       </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty
-        name="OutputTableFileNameBase"
-        command="SetOutputTableFileNameBase"
-        animateable="0"
-        number_of_elements="1">
-        <Documentation>
-          This property specifies the base including path of where to write the fragment attributes.
-        </Documentation>
      </StringVectorProperty>
 
      <!-- Summation Array 
@@ -6403,19 +6395,30 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
-     <DoubleVectorProperty
-       name="MaterialFractionThreshold"
-       command="SetMaterialFractionThreshold"
-       number_of_elements="1"
-       default_values="0.5"
-       label="Material Fraction Threshold">
-       <DoubleRangeDomain name="range" min="0.08" max="1" />
+     <!-- Write a csv file -->
+     <IntVectorProperty 
+        name="WriteOutputTableFile" 
+        command="SetWriteOutputTableFile" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
        <Documentation>
-         Threshold value used to determine inclusion/excluision from the fragment set.
+         If this property is set, then attributes of the fragments produced by the filter are written to a text file.
        </Documentation>
-     </DoubleVectorProperty>
-     <!-- End CTHFragmentConnect -->
+     </IntVectorProperty>
+
+     <StringVectorProperty
+        name="OutputTableFileNameBase"
+        command="SetOutputTableFileNameBase"
+        animateable="0"
+        number_of_elements="1">
+        <Documentation>
+          This property specifies the base including path of where to write the fragment attributes.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End CTHFragmentConnect -->
    </SourceProxy>
+
 
    <!-- ==================================================================== -->
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
