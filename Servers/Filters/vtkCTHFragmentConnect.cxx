@@ -65,7 +65,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.34");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.35");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -413,6 +413,8 @@ class vtkCTHFragmentProcessLoading
 ostream &operator<<(ostream &sout, vtkCTHFragmentProcessLoading &fp)
 {
   sout << "(" << fp.GetId() << "," << fp.GetLoadFactor() << ")";
+
+  return sout;
 }
 
 /*
@@ -650,8 +652,8 @@ class vtkCTHFragmentToProcMap
     // fragment id -> count num procs
     vector<int> ProcCount;
 
-    int nProcs;     // number of procs
-    int nFragments; // number of fragments to map
+    int NProcs;     // number of procs
+    int NFragments; // number of fragments to map
     int PieceToProcMapSize; // length of map array
     int BitsPerInt; // number of bits in an integer
     friend class vtkCTHFragmentToProcRemapper;
@@ -674,8 +676,8 @@ void vtkCTHFragmentToProcMap::Clear()
 {
   this->PieceToProcMap.clear();
   this->ProcCount.clear();
-  this->nProcs=0;
-  this->nFragments=0;
+  this->NProcs=0;
+  this->NFragments=0;
   this->PieceToProcMapSize=0;
   this->BitsPerInt=0;
 }
@@ -687,8 +689,8 @@ void vtkCTHFragmentToProcMap::Initialize(
 {
   this->Clear();
 
-  this->nProcs=nProcs;
-  this->nFragments=nFragments;
+  this->NProcs=nProcs;
+  this->NFragments=nFragments;
   this->BitsPerInt=8*sizeof(int);
   this->PieceToProcMapSize=nFragments/this->BitsPerInt+1;
 
@@ -705,13 +707,15 @@ vtkCTHFragmentToProcMap &vtkCTHFragmentToProcMap::operator=(
               const vtkCTHFragmentToProcMap &other)
 {
   this->DeepCopy(other);
+
+  return *this;
 }
 //
 void vtkCTHFragmentToProcMap::DeepCopy(
               const vtkCTHFragmentToProcMap &from)
 {
-  this->nProcs=from.nProcs;
-  this->nFragments=from.nFragments;
+  this->NProcs=from.NProcs;
+  this->NFragments=from.NFragments;
   this->PieceToProcMapSize=from.PieceToProcMapSize;
   this->BitsPerInt=from.BitsPerInt;
   this->PieceToProcMap=from.PieceToProcMap;
@@ -723,10 +727,10 @@ bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
 {
   assert( "Invalid fragment id"
           && fragmentId >= 0
-          && fragmentId < this->nFragments );
+          && fragmentId < this->NFragments );
   assert( "Invalid proc id"
           && procId >= 0
-          && procId < this->nProcs );
+          && procId < this->NProcs );
 
   int maskIdx=fragmentId/this->BitsPerInt;
   int maskBit=1<<fragmentId%this->BitsPerInt;
@@ -738,10 +742,10 @@ void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int procId, int fragmentId)
 {
   assert( "Invalid fragment id"
           && fragmentId >= 0
-          && fragmentId < this->nFragments );
+          && fragmentId < this->NFragments );
   assert( "Invalid proc id"
           && procId >= 0
-          && procId < this->nProcs );
+          && procId < this->NProcs );
 
   // set bit in this proc's mask array
   int maskIdx=fragmentId/this->BitsPerInt;
@@ -758,13 +762,12 @@ vector<int> vtkCTHFragmentToProcMap::WhoHasAPiece(
 {
   assert( "Invalid proc id"
           && excludeProc >= 0
-          && excludeProc < this->nProcs );
+          && excludeProc < this->NProcs );
 
-  int statusBits=0;
   vector<int> whoHasList;
   //whoHasList.reserve(32); // typical bad case might have 26 owners
 
-  for (int procId=0; procId<this->nProcs; ++procId)
+  for (int procId=0; procId<this->NProcs; ++procId)
     {
     if ( procId==excludeProc )
       {
@@ -785,11 +788,10 @@ vector<int> vtkCTHFragmentToProcMap::WhoHasAPiece(
 vector<int> vtkCTHFragmentToProcMap::WhoHasAPiece(
                 int fragmentId) const
 {
-  int statusBits=0;
   vector<int> whoHasList;
   whoHasList.reserve(32); // typical bad case might have 26 owners
 
-  for (int procId=0; procId<this->nProcs; ++procId)
+  for (int procId=0; procId<this->NProcs; ++procId)
     {
      int maskIdx=fragmentId/this->BitsPerInt;
      int maskBit=1<<fragmentId%this->BitsPerInt;
@@ -1087,6 +1089,8 @@ int vtkCTHFragmentPieceTransactionMatrix::UnPack(int *buf)
         }
       }
     }
+
+  return 1;
 }
 //
 void vtkCTHFragmentPieceTransactionMatrix::Broadcast(
@@ -1567,7 +1571,7 @@ void vtkCTHFragmentConnectBlock::Initialize(
   vtkImageData* image, 
   int level,
   double globalOrigin[3],
-  double rootSpacing[3], //TODO rootspacing not used
+  double rootSpacing[3],
   string &volumeFractionArrayName,
   string &massArrayName,
   vector<string> &averagedArrayNames,
@@ -6114,8 +6118,8 @@ void vtkCTHFragmentConnect::AddEquivalence(
 void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 {
   int myProcId = this->Controller->GetLocalProcessId();
-  int nProcs = this->Controller->GetNumberOfProcesses();
-  vtkCommunicator *comm=this->Controller->GetCommunicator();
+  //int nProcs = this->Controller->GetNumberOfProcesses();
+  //vtkCommunicator *comm=this->Controller->GetCommunicator();
 
   /// Resolve id's, create local structural information 
   /// and merge split local geometry
