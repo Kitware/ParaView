@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.29");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.30");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -537,6 +537,7 @@ void vtkPVFileInformation::GetSpecialDirectories()
 #else // _WIN32
 #if defined (__APPLE__ )
   //-------- Get the List of Mounted Volumes from the System
+  
   int idx = 1;
   HFSUniStr255 hfsname;
   FSRef ref;
@@ -548,29 +549,32 @@ void vtkPVFileInformation::GetSpecialDirectories()
       {
       CFStringRef url;
       url = CFURLCopyFileSystemPath(resolvedUrl, kCFURLPOSIXPathStyle);
-      CFStringRef cfname = CFStringCreateWithCharacters(kCFAllocatorDefault,
-          hfsname.unicode, hfsname.length);
-
-      CFIndex pathSize = CFStringGetLength(url)+1;
-      vtkstd::vector<char> pathChars(pathSize, 0);
-      OSStatus pathStatus = CFStringGetCString(url, &pathChars[0], pathSize,
-          kCFStringEncodingASCII);
-
-      pathSize = CFStringGetLength(cfname)+1;
-      vtkstd::vector<char> nameChars(pathSize, 0);
-      OSStatus nameStatus = CFStringGetCString(cfname, &nameChars[0], pathSize,
-          kCFStringEncodingASCII);
-
-      if (pathStatus && nameStatus)
+      if(url)
         {
-        vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<
-            vtkPVFileInformation>::New();
-        info->SetFullPath( &(pathChars.front() ));
-        info->SetName( &(nameChars.front() ));
-        info->Type = DRIVE;
-        this->Contents->AddItem(info);
+        CFStringRef cfname = CFStringCreateWithCharacters(kCFAllocatorDefault,
+            hfsname.unicode, hfsname.length);
+
+        CFIndex pathSize = CFStringGetLength(url)+1;
+        vtkstd::vector<char> pathChars(pathSize, 0);
+        OSStatus pathStatus = CFStringGetCString(url, &pathChars[0], pathSize,
+            kCFStringEncodingASCII);
+
+        pathSize = CFStringGetLength(cfname)+1;
+        vtkstd::vector<char> nameChars(pathSize, 0);
+        OSStatus nameStatus = CFStringGetCString(cfname, &nameChars[0], pathSize,
+            kCFStringEncodingASCII);
+
+        if (pathStatus && nameStatus)
+          {
+          vtkSmartPointer<vtkPVFileInformation> info = vtkSmartPointer<
+              vtkPVFileInformation>::New();
+          info->SetFullPath( &(pathChars.front() ));
+          info->SetName( &(nameChars.front() ));
+          info->Type = DRIVE;
+          this->Contents->AddItem(info);
+          }
+        CFRelease(cfname);
         }
-      CFRelease(cfname);
       CFRelease(resolvedUrl);
       }
     }
