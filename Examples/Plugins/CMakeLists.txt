@@ -1,5 +1,5 @@
 
-SUBDIRS(SMFilter ParametricSource)
+SUBDIRS(Filter ParametricSource)
 
 IF(PARAVIEW_BUILD_QT_GUI)
   SUBDIRS(GUIToolBar Reader GUIObjectPanel GUIView Writer)
