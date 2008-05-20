@@ -66,7 +66,7 @@ using vtkstd::string;
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.36");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.37");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
@@ -6349,7 +6349,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
         resolvedFragments->SetPiece(fragmentId, static_cast<vtkPolyData *>(0));
         vector<int>::iterator curEnd=resolvedFragmentIds.end();
         vector<int>::iterator newEnd
-          = remove(resolvedFragmentIds.begin(),curEnd,fragmentId);
+          = vtkstd::remove(resolvedFragmentIds.begin(),curEnd,fragmentId);
         resolvedFragmentIds.erase(newEnd,curEnd);
         assert( "More than one piece found." && (curEnd-newEnd)==1 );
         }
