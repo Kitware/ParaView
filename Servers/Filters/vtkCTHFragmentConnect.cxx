@@ -59,13 +59,14 @@ using vtksys_ios::ostringstream;
 using vtkstd::vector;
 #include "vtkstd/string"
 using vtkstd::string;
+#include "vtkstd/algorithm"
 // ansi c
 #include <math.h>
 
 // 0 is not visited, positive is an actual ID.
 #define PARTICLE_CONNECT_EMPTY_ID -1
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.35");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.36");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //
