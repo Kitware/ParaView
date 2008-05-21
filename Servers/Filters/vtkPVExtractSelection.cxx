@@ -36,13 +36,13 @@ class vtkPVExtractSelection::vtkSelectionVector :
 };
 
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.10");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.11");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
 vtkPVExtractSelection::vtkPVExtractSelection()
 {
-  this->SetNumberOfOutputPorts(2);
+  this->SetNumberOfOutputPorts(3);
 }
 
 //----------------------------------------------------------------------------
@@ -76,20 +76,24 @@ int vtkPVExtractSelection::RequestDataObject(
     return 0;
     }
 
-  vtkInformation* info = outputVector->GetInformationObject(1);
-  vtkSelection *selOut = vtkSelection::GetData(info);
-  if (!selOut || !selOut->IsA("vtkSelection")) 
+  // Second and third outputs are selections
+  for (int i = 1; i <= 2; ++i)
     {
-    vtkDataObject* newOutput = vtkSelection::New();
-    if (!newOutput)
+    vtkInformation* info = outputVector->GetInformationObject(i);
+    vtkSelection *selOut = vtkSelection::GetData(info);
+    if (!selOut || !selOut->IsA("vtkSelection")) 
       {
-      vtkErrorMacro("Could not create vtkSelectionOutput");
-      return 0;
+      vtkDataObject* newOutput = vtkSelection::New();
+      if (!newOutput)
+        {
+        vtkErrorMacro("Could not create vtkSelectionOutput");
+        return 0;
+        }
+      newOutput->SetPipelineInformation(info);
+      this->GetOutputPortInformation(i)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
+      newOutput->Delete();
       }
-    newOutput->SetPipelineInformation(info);
-    this->GetOutputPortInformation(1)->Set(
-      vtkDataObject::DATA_EXTENT_TYPE(), newOutput->GetExtentType());
-    newOutput->Delete();
     }
 
   return 1;
@@ -130,6 +134,11 @@ int vtkPVExtractSelection::RequestData(
     {
     return 1;
     }
+
+  // Simply pass the input selection into the third output
+  vtkSelection *passThroughSelection = vtkSelection::SafeDownCast(
+    outputVector->GetInformationObject(2)->Get(vtkDataObject::DATA_OBJECT()));
+  passThroughSelection->ShallowCopy(sel);
 
   // If input selection content type is vtkSelection::BLOCKS, then we simply
   // need to shallow copy the input as the output.
