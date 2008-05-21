@@ -6946,6 +6946,12 @@
 
       <SubProxy>
         <SourceProxy name="Reduction" class="vtkAppendSelection">
+          <IntVectorProperty name="AppendByUnion"
+            command="SetAppendByUnion"
+            number_of_elements="1"
+            default_values="0">
+            <BooleanDomain name="bool" />
+          </IntVectorProperty>
         </SourceProxy>
       </SubProxy>
     </BlockDeliveryRepresentationProxy>

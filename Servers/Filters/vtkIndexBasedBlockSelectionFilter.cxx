@@ -32,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkIndexBasedBlockSelectionFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.6");
+vtkCxxRevisionMacro(vtkIndexBasedBlockSelectionFilter, "1.7");
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockSelectionFilter::vtkIndexBasedBlockSelectionFilter()
 {
@@ -144,6 +144,9 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
 
   vtkInformation* outProperties = output->GetProperties();
 
+  // Just set from defaults in case the method returns before it reaches the
+  // end. Note that all the keys set here will be overridden with
+  // outProperties->Copy(inProperties) is called later.
   int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
   outProperties->Set(vtkSelection::PROCESS_ID(), myId);
   output->SetContentType(vtkSelection::INDICES);
@@ -185,7 +188,12 @@ int vtkIndexBasedBlockSelectionFilter::RequestData(
     return 1;
     }
 
-  return this->RequestDataInternal(input, output, datainput);
+  int status = this->RequestDataInternal(input, output, datainput);
+
+  // Ensure that process ID is set correctly, since RequestDataInternal() may
+  // have cleared it.
+  outProperties->Set(vtkSelection::PROCESS_ID(), myId);
+  return status;
 }
 
 //----------------------------------------------------------------------------
@@ -363,10 +371,20 @@ int vtkIndexBasedBlockSelectionFilter::RequestDataInternal(vtkSelection* input,
   for (iter = selections.begin(); iter != selections.end(); iter++)
     {
     vtkSmartPointer<vtkSelection> outChild = vtkSmartPointer<vtkSelection>::New();
-    if ((*iter)->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()))
+    if ((*iter)->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()) ||
+      (*iter)->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()))
       {
-      unsigned int hi = (*iter)->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX());
-      vtkIdType pieceOffset = pieceOffsets[hi];
+      unsigned int piece_no = 0;
+      if ((*iter)->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX()))
+        {
+        piece_no = (*iter)->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX());
+        }
+      else // if (*iter)->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX())
+        {
+        piece_no = (*iter)->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()) -
+          this->BlockFilter->GetCurrentCIndex();
+        }
+      vtkIdType pieceOffset = pieceOffsets[piece_no];
       vtkIdType startIndex = (pieceOffset > this->StartIndex? 0 : this->StartIndex - pieceOffset);
       vtkIdType endIndex = (pieceOffset > this->StartIndex? this->EndIndex-pieceOffset: this->EndIndex);
       if (!this->RequestDataInternal(startIndex, endIndex, *iter, outChild))

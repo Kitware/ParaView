@@ -40,7 +40,7 @@
 #include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.18");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.19");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -61,7 +61,6 @@ vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
   this->PointCoordinatesArray = 0;
   this->StructuredCoordinatesArray = 0;
   this->OriginalIndicesArray = 0;
-  this->PieceNumberArray = 0;
   this->CompositeIndexArray = 0;
 
   this->CurrentCIndex = 0;
@@ -232,23 +231,23 @@ int vtkIndexBasedBlockFilter::RequestData(
       }
     }
 
-  if (!output->GetFieldData())
+  vtkSmartPointer<vtkFieldData> fieldData = output->GetFieldData();
+
+  if (fieldData.GetPointer() == 0)
     {
-    vtkFieldData* temp = vtkFieldData::New();
-    output->SetFieldData(temp);
-    temp->Delete();
+    fieldData = vtkSmartPointer<vtkFieldData>::New();
     }
 
   if (this->PointCoordinatesArray)
     {
-    output->GetFieldData()->AddArray(this->PointCoordinatesArray);
+    fieldData->AddArray(this->PointCoordinatesArray);
     this->PointCoordinatesArray->Delete();
     this->PointCoordinatesArray = 0;
     }
 
   if (this->StructuredCoordinatesArray)
     {
-    output->GetFieldData()->AddArray(this->StructuredCoordinatesArray);
+    fieldData->AddArray(this->StructuredCoordinatesArray);
     this->StructuredCoordinatesArray->Delete();
     this->StructuredCoordinatesArray = 0;
     }
@@ -258,32 +257,26 @@ int vtkIndexBasedBlockFilter::RequestData(
     // We add OriginalIndicesArray only if the output doesn't already have some
     // other arrays which typically get added by the vtkPVExtractSelection
     // filter.
-    if (output->GetFieldData()->GetArray("vtkOriginalPointIds")==0 &&
-      output->GetFieldData()->GetArray("vtkOriginalCellIds")==0)
+    if (fieldData->GetArray("vtkOriginalPointIds")==0 &&
+      fieldData->GetArray("vtkOriginalCellIds")==0)
       {
-      output->GetFieldData()->AddArray(this->OriginalIndicesArray);
+      fieldData->AddArray(this->OriginalIndicesArray);
       }
     this->OriginalIndicesArray->Delete();
     this->OriginalIndicesArray = 0;
     }
 
-  if (this->PieceNumberArray)
-    {
-    if (input->GetNumberOfPieces() > 1)
-      {
-      output->GetFieldData()->AddArray(this->PieceNumberArray);
-      }
-    this->PieceNumberArray->Delete();
-    this->PieceNumberArray = 0;
-    }
-
   if (this->CompositeIndexArray)
     {
-    output->GetFieldData()->AddArray(this->CompositeIndexArray);
+    fieldData->AddArray(this->CompositeIndexArray);
     this->CompositeIndexArray->Delete();
     this->CompositeIndexArray = 0;
     }
 
+  // Essential to set the field data at the end so that the number of rows count
+  // in the vtkTable output is set up correctly. This seems like a bug in
+  // vtkTable.
+  output->SetFieldData(fieldData);
   return 1;
 }
 
@@ -432,14 +425,6 @@ void vtkIndexBasedBlockFilter::PassBlock(
     this->OriginalIndicesArray->Allocate(this->EndIndex-this->StartIndex+1);
     }
 
-  if (!this->PieceNumberArray)
-    {
-    this->PieceNumberArray = vtkIdTypeArray::New();
-    this->PieceNumberArray->SetName("Piece Number");
-    this->PieceNumberArray->SetNumberOfComponents(1);
-    this->PieceNumberArray->Allocate(this->EndIndex-this->StartIndex+1);
-    }
-
   if (this->CompositeIndexArray)
     {
     if (this->CompositeIndexArray->GetNumberOfComponents() == 2)
@@ -463,7 +448,7 @@ void vtkIndexBasedBlockFilter::PassBlock(
         endIndex-startIndex+1);
       for (vtkIdType cc=startIndex; cc <= endIndex; cc++)
         {
-        *ptr = this->CurrentCIndex; 
+        *ptr = (this->CurrentCIndex + pieceNumber);
         ptr++;
         }
       }
@@ -473,7 +458,6 @@ void vtkIndexBasedBlockFilter::PassBlock(
   for (vtkIdType inIndex = startIndex; inIndex <= endIndex; ++inIndex)
     {
     this->OriginalIndicesArray->InsertNextValue(inIndex);
-    this->PieceNumberArray->InsertNextValue(pieceNumber);
     outFD->InsertNextTuple(inIndex, inFD);
 
     if (this->FieldType == POINT && psInput)
@@ -507,6 +491,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
   // is what would have been passed through.
   vtkIdType blockStartIndex = this->Block*this->BlockSize;
   vtkIdType blockEndIndex = blockStartIndex + this->BlockSize - 1;
+  // cout << "Whole Range: " << blockStartIndex << "--> " << blockEndIndex << endl;
 
   // Now all the data is not in single vtkDataSet instance and hence the bulk of
   // this method.
@@ -549,7 +534,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
       // we use number-of-points and not number-of-tuples in point data, since
       // even if no point data is available, we are passing the point
       // coordinates over.
-      numFields += input->GetNumberOfPoints();
+      numFields += piece->GetNumberOfPoints();
       }
     }
 
@@ -562,12 +547,12 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
     return true;
     }
 
-  int myId = this->Controller->GetLocalProcessId();
 
+  int myId = this->Controller->GetLocalProcessId();
   vtkCommunicator* comm = this->Controller->GetCommunicator();
   vtkIdType mydataStartIndex=0;
 
-  if(this->FieldType == FIELD)
+  if (this->FieldType == FIELD)
     {
     // When working with field data, only use the data from one process,
     // hence no communication with other processes is necessary.
@@ -617,8 +602,9 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
   // pieces in the vtkMultiPieceDataSet were appended together (with duplicate
   // cells and points).
 
-  // cout << myId <<  ": Delivering : " << startIndex << " --> " 
-  // << endIndex << endl;
+  // cout << myId << ": Num OF Tuples: " << numFields << endl;
+  // cout << myId << ": Delivering : " << startIndex << " --> " 
+  //   << endIndex << endl;
   return true;
 }
 

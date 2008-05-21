@@ -100,6 +100,11 @@ public:
   // Computes the range of indices to be passed through.
   bool DetermineBlockIndices(vtkMultiPieceDataSet* input,
     vtkIdType& startIndex, vtkIdType& endIndex);
+
+  // Description:
+  // Get the composite index of the first piece in the vtkMultiPieceDataSet
+  // returned by GetPieceToProcess().
+  vtkGetMacro(CurrentCIndex, unsigned int);
   //ETX
 
 //BTX
@@ -146,7 +151,6 @@ protected:
   vtkDoubleArray* PointCoordinatesArray;
   vtkIdTypeArray* StructuredCoordinatesArray;
   vtkIdTypeArray* OriginalIndicesArray;
-  vtkIdTypeArray* PieceNumberArray;
   vtkUnsignedIntArray* CompositeIndexArray;
 
   vtkMultiProcessController* Controller;
