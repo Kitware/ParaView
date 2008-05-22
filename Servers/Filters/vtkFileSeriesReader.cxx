@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.9");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.10");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -220,16 +220,22 @@ vtkstd::set<int> vtkFileSeriesReaderTimeRanges::ChooseInputs(
                                                         vtkInformation *outInfo)
 {
   vtkstd::set<int> indices;
-
-  // get the update times
-  int numUpTimes = 
-    outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-  double *upTimes =
-    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-
-  for (int i = 0; i < numUpTimes; i++)
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
     {
-    indices.insert(this->GetIndexForTime(upTimes[i]));
+    // get the update times
+    int numUpTimes = 
+      outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+    double *upTimes =
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+
+    for (int i = 0; i < numUpTimes; i++)
+      {
+      indices.insert(this->GetIndexForTime(upTimes[i]));
+      }
+    }
+  else
+    {
+    indices.insert(0);
     }
 
   return indices;
@@ -554,6 +560,11 @@ int vtkFileSeriesReader::RequestUpdateExtent(
     // some saved data set.
     return 0;
     }
+  if (inputs.size() == 0)
+    {
+    vtkErrorMacro("Inputs are not set.");
+    return 0;
+    }
 
   int index = *(inputs.begin());
   // Make sure that the reader file name is set correctly and that
@@ -563,11 +574,13 @@ int vtkFileSeriesReader::RequestUpdateExtent(
   // I'm not sure if the executive will wipe out this information before
   // RequestData is called, and I don't think I care.  I'm just setting this
   // here for completeness.
-  vtkstd::vector<double> times
-    = this->Internal->TimeRanges->GetTimesForInput(index, outInfo);
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
-               &times[0], times.size());
-
+  if(outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    vtkstd::vector<double> times
+      = this->Internal->TimeRanges->GetTimesForInput(index, outInfo);
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
+                 &times[0], times.size());
+    }
   return 1;
 }
 
