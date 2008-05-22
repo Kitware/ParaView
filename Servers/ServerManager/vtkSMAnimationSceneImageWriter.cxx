@@ -47,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.12");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.13");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -107,6 +107,7 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
 
   this->FileCount = 0;
 
+#if !defined(__APPLE__)      
   // Iterate over all views and enable offscreen rendering. This avoid toggling
   // of the offscreen rendering flag on every frame.
   unsigned int num_modules = this->AnimationScene->GetNumberOfViewModules();
@@ -122,6 +123,7 @@ bool vtkSMAnimationSceneImageWriter::SaveInitialize()
         }
       }
     }
+#endif      
 
   return true;
 }

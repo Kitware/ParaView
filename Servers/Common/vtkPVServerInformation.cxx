@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.14");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -113,7 +113,11 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
 
   options->GetTileDimensions(this->TileDimensions);
   options->GetTileMullions(this->TileMullions);
+#if !defined(__APPLE__)
   this->UseOffscreenRendering = options->GetUseOffscreenRendering();
+#else
+  this->UseOffscreenRendering = 0;
+#endif  
   this->Timeout = options->GetTimeout();
   this->SetRenderModuleName(options->GetRenderModuleName());
 
