@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.30");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.31");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -593,8 +593,8 @@ void vtkPVFileInformation::GetSpecialDirectories()
         CFDictionaryRef dr = (CFDictionaryRef)CFArrayGetValueAtIndex(r, i);
         if (dr && CFDictionaryGetTypeID() == CFGetTypeID(dr))
           {
-          CFStringRef name;
-          CFStringRef url;
+          CFStringRef name = 0;
+          CFStringRef url = 0;
           CFDataRef alias;
           if (CFDictionaryGetValueIfPresent(dr, CFSTR("Name"),
               (const void**)&name) && CFDictionaryGetValueIfPresent(dr,
@@ -622,6 +622,12 @@ void vtkPVFileInformation::GetSpecialDirectories()
                 }
               DisposeHandle((Handle)tAliasHdl);
               }
+
+            if(!url || !name)
+              {
+              continue;
+              }
+
             // now put the name and path into a FileInfo Object
             CFIndex pathSize = CFStringGetLength(url)+1;
             vtkstd::vector<char> pathChars(pathSize, 0);
