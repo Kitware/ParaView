@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.63");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.64");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort
@@ -58,7 +58,7 @@ struct vtkSMSourceProxyInternals
   typedef vtkstd::vector<vtkSMSourceProxyOutputPort> VectorOfPorts;
   VectorOfPorts OutputPorts;
   vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> > SelectionProxies;
-
+  
   // Resizes output ports and ensures that Name for each port is initialized to
   // the default.
   void ResizeOutputPorts(unsigned int newsize)
@@ -273,21 +273,7 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 void vtkSMSourceProxy::UpdatePipeline()
 {
   int i;
-  if (!this->GetID().IsNull() &&
-    strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") == 0)
-    { 
-    // Cannot set the update extent until we get the output.  Need to call
-    // update before we can get the output.  Cannot not update whole extent
-    // of every source.  Multiblock should fix this.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream command;
-    command << vtkClientServerStream::Invoke 
-            << this->GetID() << "Update" 
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, command);
-    return;
-    }
-    
+
   this->CreateOutputPorts(); 
   int num = this->GetNumberOfOutputPorts();
   for (i=0; i < num; ++i)
@@ -295,7 +281,8 @@ void vtkSMSourceProxy::UpdatePipeline()
     this->GetOutputPort(i)->UpdatePipeline();
     }
 
-  this->InvalidateDataInformation();
+  this->PostUpdateData();
+  //this->InvalidateDataInformation();
 }
 
 //---------------------------------------------------------------------------
@@ -305,21 +292,6 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
 {
   int i;
 
-  if (!this->GetID().IsNull() &&
-    strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") == 0)
-    { 
-    // Cannot set the update extent until we get the output.  Need to call
-    // update before we can get the output.  Cannot not update whole extent
-    // of every source.  Multiblock should fix this.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream command;
-    command << vtkClientServerStream::Invoke 
-            << this->GetID() << "Update" 
-            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, command);
-    return;
-    }
-    
   this->CreateOutputPorts();
   int num = this->GetNumberOfOutputPorts();
   for (i=0; i < num; ++i)
@@ -327,7 +299,8 @@ void vtkSMSourceProxy::UpdatePipeline(double time)
     this->GetOutputPort(i)->UpdatePipeline(time);
     }
 
-  this->InvalidateDataInformation();
+  this->PostUpdateData();
+  //this->InvalidateDataInformation();
 }
 
 //---------------------------------------------------------------------------
@@ -534,6 +507,13 @@ void vtkSMSourceProxy::RemoveAllOutputPorts()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMSourceProxy::PostUpdateData()
+{
+  this->InvalidateDataInformation();
+  this->Superclass::PostUpdateData();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMSourceProxy::CleanInputs(const char* method)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -590,25 +570,20 @@ void vtkSMSourceProxy::AddInput(unsigned int inputPort,
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSourceProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMSourceProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
-  if (this->OutputPortsCreated && !this->GetNumberOfOutputPorts())
-    {
-    this->UpdatePipeline();
-    }
-
   // Mark the extract selection proxies modified as well.
   // This is needed to be done explicitly since we don't use vtkSMInputProperty
   // to connect this proxy to the input of the extract selection filter.
   vtkstd::vector<vtkSmartPointer<vtkSMSourceProxy> >::iterator iter;
   for (iter = this->PInternals->SelectionProxies.begin();
     iter != this->PInternals->SelectionProxies.end(); ++iter)
-  {
-  iter->GetPointer()->MarkModified(modifiedProxy);
-  }
+    {
+    iter->GetPointer()->MarkDirty(modifiedProxy);
+    }
 
-  this->Superclass::MarkModified(modifiedProxy);
-  this->InvalidateDataInformation();
+  this->Superclass::MarkDirty(modifiedProxy);
+  // this->InvalidateDataInformation();
 }
 
 //---------------------------------------------------------------------------
@@ -620,7 +595,7 @@ void vtkSMSourceProxy::UpdateSelfAndAllInputs()
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
-  unsigned int idx, bool update/*=true*/)
+  unsigned int idx)
 {
   this->CreateOutputPorts();
   if (idx >= this->GetNumberOfOutputPorts())
@@ -628,36 +603,8 @@ vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation(
     return 0;
     }
 
-  if (!this->DataInformationValid)
-    {
-    if (update)
-      {
-      // Make sure the output filter is up-to-date before
-      // getting information.
-      this->UpdatePipeline();
-      this->DataInformationValid = true;
-      }
-    }
+  this->DataInformationValid = true;
   return this->GetOutputPort(idx)->GetDataInformation();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSourceProxy::InvalidateDataInformation(int invalidateConsumers)
-{
-  if (invalidateConsumers)
-    {
-    unsigned int numConsumers = this->GetNumberOfConsumers();
-    for (unsigned int i=0; i<numConsumers; i++)
-      {
-      vtkSMSourceProxy* cons = vtkSMSourceProxy::SafeDownCast(
-        this->GetConsumerProxy(i));
-      if (cons)
-        {
-        cons->InvalidateDataInformation(invalidateConsumers);
-        }
-      }
-    }
-  this->InvalidateDataInformation();
 }
 
 //----------------------------------------------------------------------------

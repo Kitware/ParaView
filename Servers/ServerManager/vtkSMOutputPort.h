@@ -49,6 +49,10 @@ public:
     { return this->DataInformation; }
 
   // Description:
+  // Returns the classname of the data object on this output port.
+  const char* GetDataClassName();
+
+  // Description:
   // Returns classname information.
   vtkPVClassNameInformation* GetClassNameInformation();
 

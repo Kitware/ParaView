@@ -38,7 +38,7 @@
 //
 // Subclasses are free to not use any strategies at all. In which case they have
 // to provide implementations for Update(), UpdateRequired(),
-// MarkModified(), SetUpdateTimeInternal(), GetRepresentedDataInformation(),
+// MarkDirty(), SetUpdateTimeInternal(), GetRepresentedDataInformation(),
 // GetFullResMemorySize(), GetDisplayedMemorySize(), GetLODMemorySize().
 // This class provides default implementation for these methods for 
 // representations using a collection of strategies. If these startegies are
@@ -135,13 +135,6 @@ public:
   vtkGetMacro(UseViewUpdateTime, bool);
 
   // Description:
-  // Overridden to make the Strategy modified as well.
-  // The strategy is not marked modified if the modifiedProxy == this, 
-  // thus if the changes to representation itself invalidates the data pipelines
-  // it must explicity mark the strategy invalid.
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
   // Fill the activeStrategies collection with strategies that are currently
   // active i.e. being used.
   virtual void GetActiveStrategies(
@@ -203,6 +196,13 @@ public:
   // Returns the data size for the full-res data.
   // This may trigger a pipeline update to obtain correct data sizes.
   virtual unsigned long GetFullResMemorySize();
+
+  // Description:
+  // Overridden to make the Strategy modified as well.
+  // The strategy is not marked modified if the modifiedProxy == this, 
+  // thus if the changes to representation itself invalidates the data pipelines
+  // it must explicity mark the strategy invalid.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
 protected:
   vtkSMDataRepresentationProxy();

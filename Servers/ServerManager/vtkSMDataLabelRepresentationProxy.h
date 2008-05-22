@@ -62,17 +62,17 @@ public:
   int GetCellFontSizeCM();
 
   // Description:
-  // Overridden to make the Strategy modified as well.
-  // The strategy is not marked modified if the modifiedProxy == this, 
-  // thus if the changes to representation itself invalidates the data pipelines
-  // it must explicitly mark the strategy invalid.
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
   // Get Visibility of the representation
   // Return true, if both cell and point labels are invisible; 
   //        false, if either is visible
   virtual bool GetVisibility();
+
+  // Description:
+  // Overridden to make the Strategy modified as well.
+  // The strategy is not marked modified if the modifiedProxy == this, 
+  // thus if the changes to representation itself invalidates the data pipelines
+  // it must explicitly mark the strategy invalid.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
 protected:
   vtkSMDataLabelRepresentationProxy();

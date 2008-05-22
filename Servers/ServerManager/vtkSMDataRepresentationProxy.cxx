@@ -53,7 +53,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.10");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -302,21 +302,21 @@ void vtkSMDataRepresentationProxy::AddStrategy(
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMDataRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   // If some changes to the representation proxy invalidate the data
-  // then we must expilictly call Strategy->MarkModified();
+  // then we must expilictly call Strategy->MarkDirty();
   if (modifiedProxy != this)
     {
     vtkSMRepresentationStrategyVector::iterator iter;
     for (iter = this->RepresentationStrategies->begin(); 
       iter != this->RepresentationStrategies->end(); ++iter)
       {
-      iter->GetPointer()->MarkModified(modifiedProxy);
+      iter->GetPointer()->MarkDirty(modifiedProxy);
       }
     }
 
-  this->Superclass::MarkModified(modifiedProxy);
+  this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------

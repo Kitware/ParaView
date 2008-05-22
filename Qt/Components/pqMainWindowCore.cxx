@@ -289,6 +289,8 @@ public:
   pqCoreTestUtility TestUtility;
   pqActiveServer ActiveServer;
   pqQuickLaunchDialog QuickLaunchDialog;
+  
+  QPointer<pqPipelineSource> PreviouslySelectedSource;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -821,18 +823,6 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
   dock_widget->setWidget(statistics_view);
 
   pqUndoStack* const undo_stack = this->Implementation->UndoStack;
-  
-  // Undo/redo operations can potentially change data information,
-  // hence we must refresh the data on undo/redo.
-  QObject::connect(undo_stack,      SIGNAL(undone()),
-                   statistics_view, SLOT(refreshData()));
-  QObject::connect(undo_stack,      SIGNAL(redone()),
-                   statistics_view, SLOT(refreshData()));
-  QObject::connect(this,            SIGNAL(postAccept()),
-                   statistics_view, SLOT(refreshData()));    
-    QObject::connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()),
-                   statistics_view,               SLOT(refreshData()));
-     
 }
 
 //-----------------------------------------------------------------------------
@@ -2387,6 +2377,21 @@ void pqMainWindowCore::onSelectionChanged()
     this->Implementation->FiltersMenuManager->updateEnableState();
     }
 
+  if (this->Implementation->PreviouslySelectedSource)
+    {
+    QObject::disconnect(this->Implementation->PreviouslySelectedSource, 
+        SIGNAL(dataUpdated(pqPipelineSource*)),
+        this->Implementation->FiltersMenuManager,
+        SLOT(updateEnableState()));
+    }
+  this->Implementation->PreviouslySelectedSource = source;
+
+  if (source)
+    {
+    QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
+        this->Implementation->FiltersMenuManager, SLOT(updateEnableState()));
+    }
+  
   // Update the server connect/disconnect actions.
   // emit this->enableServerConnect(numServers == 0); -- it's always possible to
   //      create a new connection, it just implies that we'll disconnect before
@@ -2834,11 +2839,6 @@ void pqMainWindowCore::onViewCreated(pqView* view)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onPostAccept()
 {
-  if (this->Implementation->FiltersMenuManager)
-    {
-    this->Implementation->FiltersMenuManager->updateEnableState();
-    }
-
   emit this->postAccept();
 }
 

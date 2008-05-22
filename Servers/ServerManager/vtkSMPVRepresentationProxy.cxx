@@ -37,7 +37,7 @@ inline void vtkSMPVRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.19");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -393,14 +393,14 @@ void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPVRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMPVRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (modifiedProxy != this && this->ActiveRepresentation)
     {
-    this->ActiveRepresentation->MarkModified(modifiedProxy);
+    this->ActiveRepresentation->MarkDirty(modifiedProxy);
     }
 
-  this->Superclass::MarkModified(modifiedProxy);
+  this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //----------------------------------------------------------------------------

@@ -109,15 +109,7 @@ vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
     return 0;
     }
 
-
-  if (update)
-    {
-    pqTimeKeeper* timekeeper = this->getSource()->getServer()->getTimeKeeper();
-    double time = timekeeper->getTime();
-    source->UpdatePipeline(time);
-    }
-
-  return source->GetDataInformation(this->PortNumber, false);
+  return source->GetDataInformation(this->PortNumber);
 }
 
 //-----------------------------------------------------------------------------

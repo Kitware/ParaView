@@ -2787,7 +2787,7 @@
   </ProxyGroup>
 
   <ProxyGroup name="strategies">
-    <SimpleStrategy name="PolyDataStrategy" class="">
+    <SimpleStrategy name="PolyDataStrategy">
       <Documentation>
         Representation stragegy can be used for poly data surface rendering with
         LOD. (Does not support client-server/parallel pipelines).

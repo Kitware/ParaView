@@ -150,10 +150,6 @@ public:
   vtkGetObjectMacro(RepresentedDataInformation, vtkPVDataInformation);
 
   // Description:
-  // Overridden to clear data valid flags.
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
   // Returns if the strategy is currently using LOD 
   // i.e. (UseLOD && EnableLOD).
   bool GetUseLOD();
@@ -170,12 +166,16 @@ public:
   vtkSetMacro(KeepLODPipelineUpdated, bool);
   vtkGetMacro(KeepLODPipelineUpdated, bool);
 
+  // Description:
+  // Overridden to clear data valid flags.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
+
 //BTX
 protected:
   vtkSMRepresentationStrategy();
   ~vtkSMRepresentationStrategy();
 
-  // Description:
+// Description:
   // Overridden to call BeginCreateVTKObjects() and EndCreateVTKObjects()
   // before creating the objects.
   virtual void CreateVTKObjects();

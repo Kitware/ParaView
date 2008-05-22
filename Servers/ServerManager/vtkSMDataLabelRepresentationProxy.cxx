@@ -484,14 +484,14 @@ void vtkSMDataLabelRepresentationProxy::SetUpdateTime(double time)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMDataLabelRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMDataLabelRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (modifiedProxy != this)
     {
     this->GeometryIsValid = 0;
     }
 
-  this->Superclass::MarkModified(modifiedProxy);
+  this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //-----------------------------------------------------------------------------

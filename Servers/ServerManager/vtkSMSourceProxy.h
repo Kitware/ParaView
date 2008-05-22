@@ -75,7 +75,7 @@ public:
   {
     this->AddInput(0, input, 0, method);
   }
-
+  
   // Description:
   // Calls method on all VTK sources. Used by the input property 
   // to remove inputs. Made public to allow access by wrappers. Do
@@ -142,23 +142,10 @@ public:
   // be updated before gathering the data information.
   vtkPVDataInformation* GetDataInformation()
   {
-    return this->GetDataInformation(0, true);
+    return this->GetDataInformation(0);
   }
-  vtkPVDataInformation* GetDataInformation(unsigned int outputIdx, 
-    bool update=true);
+  vtkPVDataInformation* GetDataInformation(unsigned int outputIdx);
     
-  // Description:
-  // Chains to superclass as well as mark the data information as
-  // invalid (next time data information is requested, it will be
-  // re-created).
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
-  // Mark the data information as invalid. If invalidateConsumers
-  // is true, all consumers' data information is also marked as
-  // invalid.
-  void InvalidateDataInformation(int invalidateConsumers);
-
   // Description:
   // This method saves state information about the proxy
   // which can be used to revive the proxy using server side objects
@@ -226,6 +213,11 @@ public:
   // Set server ids on self and sub-proxies.
   // Overridden to set servers on the output ports.
   virtual void SetServers(vtkTypeUInt32 servers);
+  
+  // Description:
+  // Marks the selection proxies dirty as well as chain to superclass.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -236,8 +228,11 @@ protected:
 
   int ProcessSupport;
 
+  // After the algorithm executes, this will be set to false.
+  // Once a client fetches new data using GetDataInformation(),
+  // this will be set to true.
   bool DataInformationValid;
-
+  
   // Description:
   // Mark the data information as invalid.
   void InvalidateDataInformation();
@@ -266,6 +261,10 @@ protected:
     vtkSMOutputPort* port, vtkSMDocumentation* doc);
   void RemoveAllOutputPorts();
 
+  // Description:
+  // Overwritten from superclass to invoke 
+  virtual void PostUpdateData();
+  
   int DoInsertExtractPieces;
   int SelectionProxiesCreated;
 

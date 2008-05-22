@@ -69,6 +69,10 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   bool update_pipeline) const
 {
   pqPipelineSource* source = opPort->getSource();
+  if (update_pipeline)
+    {
+    source->updatePipeline();
+    }
   
   vtkPVXMLElement* hints = source->getHints();
   vtkPVXMLElement* viewElement = hints? 

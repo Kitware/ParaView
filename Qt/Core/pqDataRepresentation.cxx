@@ -220,18 +220,11 @@ vtkPVDataInformation* pqDataRepresentation::getRepresentedDataInformation(
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataInformation* pqDataRepresentation::getInputDataInformation(
-  bool update/*=true*/) const
+vtkPVDataInformation* pqDataRepresentation::getInputDataInformation() const
 {
   if (!this->getInput())
     {
     return 0;
-    }
-
-  if (update)
-    {
-    // this will update the pipeline without any data movements.
-    this->getRepresentedDataInformation(true);
     }
 
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
@@ -239,8 +232,7 @@ vtkPVDataInformation* pqDataRepresentation::getInputDataInformation(
   if (source)
     {
     return source->GetDataInformation(
-      this->getOutputPortFromInput()->getPortNumber(),
-      update);
+      this->getOutputPortFromInput()->getPortNumber());
     }
   return 0;
 }

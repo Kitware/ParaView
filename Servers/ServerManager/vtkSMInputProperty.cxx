@@ -18,15 +18,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoaderBase.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.20");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.21");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -115,6 +114,7 @@ void vtkSMInputProperty::AppendCommandToStream(
       this->IPInternals->PreviousOutputPorts.push_back(
         this->GetOutputPortForConnection(i));
       proxy->AddConsumer(this, cons);
+      cons->AddProducer(this, proxy);
 
       *str << vtkClientServerStream::Invoke 
            << objectId 

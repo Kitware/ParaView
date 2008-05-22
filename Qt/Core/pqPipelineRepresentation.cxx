@@ -872,7 +872,7 @@ pqPipelineRepresentation::getColorFieldRange(const QString& array, int component
   vtkPVArrayInformation* representedInfo = this->Internal->getArrayInformation(
     field.toAscii().data(), fieldType);
 
-  vtkPVDataInformation* inputInformation = this->getInputDataInformation(true);
+  vtkPVDataInformation* inputInformation = this->getInputDataInformation();
   vtkPVArrayInformation* inputInfo = this->Internal->getArrayInformation(
     field.toAscii().data(), fieldType, inputInformation);
 

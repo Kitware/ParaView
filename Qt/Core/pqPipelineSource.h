@@ -119,6 +119,9 @@ public:
   /// of the proxy and sets them to default values. 
   void setDefaultPropertyValues();
 
+  /// Update the pipeline with the current time
+  void updatePipeline();
+  
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* source, 
@@ -144,6 +147,10 @@ signals:
   /// Also fired when representationAdded or representationRemoved is fired
   /// since that too implies change in source visibility.
   void visibilityChanged(pqPipelineSource* source, pqDataRepresentation* repr);
+  
+  /// Fired right after the underlying algorithm updates (executes).
+  /// This can be used to update data information and other similar tasks. 
+  void dataUpdated(pqPipelineSource* source);
 
 protected slots:
   /// Called when the visibility of any representation for this source changes.
@@ -159,6 +166,7 @@ private slots:
   void portRepresentationAdded(pqOutputPort* op, pqDataRepresentation* cons);
   void portRepresentationRemoved(pqOutputPort* op, pqDataRepresentation* cons);
   void portVisibilityChanged(pqOutputPort* op, pqDataRepresentation* cons);
+  void dataUpdated();
 
 protected:
   friend class pqPipelineFilter;

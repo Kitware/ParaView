@@ -90,13 +90,6 @@ public:
   virtual void SetViewUpdateTime(double time);
 
   // Description:
-  // Overridden to make the Strategy modified as well.
-  // The strategy is not marked modified if the modifiedProxy == this, 
-  // thus if the changes to representation itself invalidates the data pipelines
-  // it must explicity mark the strategy invalid.
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
   // Fill the activeStrategies collection with strategies that are currently
   // active i.e. being used.
   virtual void GetActiveStrategies(
@@ -144,6 +137,13 @@ public:
   // Get the bounds and transform according to rotation, translation, and scaling.
   // Returns true if the bounds are "valid" (and false otherwise)
   virtual bool GetBounds(double bounds[6]);
+
+  // Description:
+  // Overridden to make the Strategy modified as well.
+  // The strategy is not marked dirty if the modifiedProxy == this, 
+  // thus if the changes to representation itself invalidates the data pipelines
+  // it must explicity mark the strategy invalid.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
 //BTX
   enum RepresentationType

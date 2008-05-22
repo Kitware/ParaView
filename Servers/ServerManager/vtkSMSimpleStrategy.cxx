@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.12");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -82,7 +82,9 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputp
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherInformation(vtkPVInformation* info)
 {
-  this->UpdatePipeline();
+  this->UpdatePipeline(); // Update to get the geometry information;
+                          // used to get sizes etc. to make collection
+                          // decisions etc.
 
   // For simple strategy information sub-pipline is same as the full pipeline
   // since no data movements are involved.
@@ -121,6 +123,8 @@ void vtkSMSimpleStrategy::UpdatePipeline()
   else
     {
     this->UpdateSuppressor->InvokeCommand("ForceUpdate");
+    // This is called for its side-effects; i.e. to force a PostUpdateData()
+    this->UpdateSuppressor->UpdatePipeline();
     }
   this->Superclass::UpdatePipeline();
 }

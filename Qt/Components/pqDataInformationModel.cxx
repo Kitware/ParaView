@@ -474,6 +474,45 @@ QVariant pqDataInformationModel::headerData(int section,
 }
 
 //-----------------------------------------------------------------------------
+void pqDataInformationModel::dataUpdated(pqPipelineSource* changedSource)
+{
+  QList<pqSourceInfo>::iterator iter;
+  int row_no = 0;
+  for (iter = this->Internal->Sources.begin(); 
+    iter != this->Internal->Sources.end(); ++iter, row_no++)
+    {
+    pqOutputPort* port = iter->OutputPort;
+    pqPipelineSource* source = port->getSource();
+    
+    if (source != changedSource)
+      {
+      continue;
+      }
+    
+    vtkPVDataInformation* dataInfo = port->getDataInformation(false);
+    if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
+      {
+      iter->MTime = dataInfo->GetMTime();
+      iter->DataType = dataInfo->GetDataSetType();
+      iter->DataTypeName = dataInfo->GetPrettyDataTypeString();
+      if (dataInfo->GetCompositeDataSetType() >= 0)
+        {
+        iter->DataType = dataInfo->GetCompositeDataSetType();
+        }
+      iter->NumberOfCells = dataInfo->GetNumberOfCells();
+      iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
+      iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
+      dataInfo->GetBounds(iter->Bounds);      
+      dataInfo->GetTimeSpan(iter->TimeSpan);
+      iter->DataInformationValid = true;
+  
+      emit this->dataChanged(this->index(row_no, Name),
+        this->index(row_no, pqDataInformationModel::Max_Columns-1));
+      }
+    }  
+}
+
+//-----------------------------------------------------------------------------
 void pqDataInformationModel::addSource(pqPipelineSource* source)
 {
   if (this->Internal->contains(source))
@@ -490,6 +529,9 @@ void pqDataInformationModel::addSource(pqPipelineSource* source)
     this->Internal->Sources.push_back(source->getOutputPort(cc));
     }
   this->endInsertRows();
+  
+  QObject::connect(source, SIGNAL(dataUpdated(pqPipelineSource*)),
+      this, SLOT(dataUpdated(pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -508,46 +550,8 @@ void pqDataInformationModel::removeSource(pqPipelineSource* source)
       }
     this->endRemoveRows();
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqDataInformationModel::refreshModifiedData()
-{
-  QList<pqSourceInfo>::iterator iter;
-  int row_no = 0;
-  for (iter = this->Internal->Sources.begin(); 
-    iter != this->Internal->Sources.end(); ++iter, row_no++)
-    {
-    pqOutputPort* port = iter->OutputPort;
-    pqPipelineSource* source = port->getSource();
-
-    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
-    // Get data information only if the proxy has output ports.
-    if (!proxy || !proxy->GetOutputPortsCreated())
-      {
-      continue;
-      }
-    vtkPVDataInformation* dataInfo = port->getDataInformation(false);
-    if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
-      {
-      iter->MTime = dataInfo->GetMTime();
-      iter->DataType = dataInfo->GetDataSetType();
-      iter->DataTypeName = dataInfo->GetPrettyDataTypeString();
-      if (dataInfo->GetCompositeDataSetType() >= 0)
-        {
-        iter->DataType = dataInfo->GetCompositeDataSetType();
-        }
-      iter->NumberOfCells = dataInfo->GetNumberOfCells();
-      iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
-      iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
-      dataInfo->GetBounds(iter->Bounds);      
-      dataInfo->GetTimeSpan(iter->TimeSpan);
-      iter->DataInformationValid = true;
-
-      emit this->dataChanged(this->index(row_no, Name),
-        this->index(row_no, pqDataInformationModel::Max_Columns-1));
-      }
-    }
+  
+  QObject::disconnect(source, 0, this, 0);
 }
 
 //-----------------------------------------------------------------------------

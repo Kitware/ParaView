@@ -264,7 +264,7 @@ class SourceProxy(Proxy):
         vtkPVDataInformation"""
         if self.SMProxy:
             return DataInformation( \
-                self.SMProxy.GetDataInformation(idx, False), \
+                self.SMProxy.GetDataInformation(idx), \
                 self.SMProxy, idx)
                 
 class Property(object):
@@ -608,7 +608,7 @@ class DataInformation(object):
         does not cause execution of the underlying object. In certain
         cases, you may have to call UpdatePipeline() on the proxy."""
         if self.Proxy:
-            self.Proxy.GetDataInformation(self.Idx, False)
+            self.Proxy.GetDataInformation(self.Idx)
             
     def GetDataSetType(self):
         """Returns the dataset type as defined in vtkDataObjectTypes."""

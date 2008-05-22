@@ -118,6 +118,9 @@ protected slots:
   /// or an already active panel is accepted. 
   virtual void updateInformationAndDomains();
 
+  /// Called after the algorithm executes.
+  void dataUpdated();
+  
 protected:
   bool event(QEvent* e);
 

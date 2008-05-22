@@ -175,12 +175,12 @@ public:
   // Update the value of one property (pushed to the server) if it is
   // modified.  If the object has not been created, it will be created
   // first. If force is true, the property is pushed even if it not
-  // modified.
-  void UpdateProperty(const char* name)
+  // modified. Return true if UpdateProperty pushes the property value.
+  bool UpdateProperty(const char* name)
     {
-      this->UpdateProperty(name, 0);
+      return this->UpdateProperty(name, 0);
     }
-  void UpdateProperty(const char* name, int force);
+  bool UpdateProperty(const char* name, int force);
 
   // Description:
   // Convenience method equivalent to UpdateProperty(name, 1).
@@ -268,6 +268,21 @@ public:
   vtkSMProperty* GetConsumerProperty(unsigned int idx);
 
   // Description:
+  // Returns the number of proxies this proxy depends on (uses or is
+  // connected to through the pipeline).
+  unsigned int GetNumberOfProducers();
+
+  // Description:
+  // Returns a proxy this proxy depends on, given index.
+  vtkSMProxy* GetProducerProxy(unsigned int idx);
+
+  // Description:
+  // Returns the property holding a producer proxy given an index. Note
+  // that this is a property of this proxy and it points to the producer
+  // proxy.
+  vtkSMProperty* GetProducerProperty(unsigned int idx);
+
+  // Description:
   // Assigned by the XML parser. The name assigned in the XML
   // configuration. Can be used to figure out the origin of the
   // proxy.
@@ -351,13 +366,8 @@ public:
     int proxyPropertyCopyFlag);
   
   // Description:
-  // Calls MarkModified() on all consumers. Sub-classes
-  // should add their functionality and call this.
+  // Calls MarkDirty() and invokes ModifiedEvent.
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
-  // Description:
-  // Calls MarkModified() on all consumers.
-  virtual void MarkConsumersAsModified(vtkSMProxy* modifiedProxy);
 
   // Description:
   // Returns the self ID as string. If the name was overwritten
@@ -414,9 +424,19 @@ public:
   // to create a new proxy that is identical the present state of this proxy.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
+  // Description:
+  // Dirty means this algorithm will execute during next update.
+  // This all marks all consumers as dirty.
+  virtual void MarkDirty(vtkSMProxy* modifiedProxy);
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
+
+  // Description:
+  // Calls MarkDirty() on all consumers.
+  virtual void MarkConsumersAsDirty(vtkSMProxy* modifiedProxy);
+
 
   // Description:
   // Overloaded for garbage collection.
@@ -623,6 +643,26 @@ protected:
   // Remove all consumers.
   void RemoveAllConsumers();
 
+  // Description:
+  // Called by an proxy/input property to add property, proxy pair
+  // to the list of producers.
+  void AddProducer(vtkSMProperty* property, vtkSMProxy* proxy);
+  
+  // Description:
+  // Remove the property,proxy pair from the list of producers.
+  void RemoveProducer(vtkSMProperty* property, vtkSMProxy* proxy);
+
+  // Description:
+  // This method is called after the algorithm(s) (if any) associated
+  // with this proxy execute. Subclasses overwrite this method to
+  // add necessary functionality.
+  virtual void PostUpdateData();
+  
+  // When an algorithm proxy is marked modified, NeedsUpdate is
+  // set to true. In PostUpdateData(), NeedsUpdate is set to false.
+  // This is used to keep track of data information validity.
+  bool NeedsUpdate;
+  
   // Description:
   // Creates a new proxy and initializes it by calling ReadXMLAttributes()
   // with the right XML element.

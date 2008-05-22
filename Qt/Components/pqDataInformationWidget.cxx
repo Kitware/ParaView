@@ -143,9 +143,3 @@ void pqDataInformationWidget::showBodyContextMenu(const QPoint& _pos)
     this->View->horizontalHeader()->setVisible(action->isChecked());
     }
 }
-
-//-----------------------------------------------------------------------------
-void pqDataInformationWidget::refreshData()
-{
-  this->Model->refreshModifiedData();
-}

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.5");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -205,9 +205,16 @@ vtkPVClassNameInformation* vtkSMOutputPort::GetClassNameInformation()
 }
 
 //----------------------------------------------------------------------------
+const char* vtkSMOutputPort::GetDataClassName()
+{
+  return this->GetClassNameInformation()->GetVTKClassName();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMOutputPort::InvalidateDataInformation()
 {
   this->DataInformationValid = false;
+  this->ClassNameInformationValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -225,12 +232,10 @@ void vtkSMOutputPort::GatherDataInformation(int doUpdate)
   this->DataInformation->Initialize();
   pm->GatherInformation(this->ConnectionID, this->Servers, 
                         this->DataInformation, this->GetID());
-  if (doUpdate)
-    {
-    this->DataInformationValid = true;
-    }
+
+  this->DataInformationValid = true;
+
   pm->SendCleanupPendingProgress(this->ConnectionID);
-  this->InvokeEvent(vtkCommand::UpdateInformationEvent);
 }
 
 //----------------------------------------------------------------------------

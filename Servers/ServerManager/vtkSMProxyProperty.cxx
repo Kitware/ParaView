@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.50");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.51");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -51,7 +51,6 @@ vtkSMProxyProperty::vtkSMProxyProperty()
   this->RepeatCommand = 0;
   this->RemoveCommand = 0;
   this->IsInternal = 0;
-  this->AddConsumer = 1;
   this->NullOnEmpty = 0;
 }
 
@@ -123,6 +122,7 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
     vtkSMProxy* toAppend = iter1->GetPointer();
     this->AppendProxyToStream(toAppend, str, objectId, 1);
     toAppend->RemoveConsumer(this, cons);
+    cons->RemoveProducer(this, toAppend);
     }
 
   // Add the proxies to add.
@@ -134,10 +134,8 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
     // Keep track of all proxies that point to this as a
     // consumer so that we can remove this from the consumer
     // list later if necessary.
-    if (this->AddConsumer)
-      {
-      toAppend->AddConsumer(this, cons);
-      }
+    toAppend->AddConsumer(this, cons);
+    cons->AddProducer(this, toAppend);
     this->AppendProxyToStream(toAppend, str, objectId, 0);
     }
  
@@ -185,9 +183,10 @@ void vtkSMProxyProperty::AppendCommandToStream(
       // consumer so that we can remove this from the consumer
       // list later if necessary
       this->AddPreviousProxy(proxy);
-      if (proxy && this->AddConsumer)
+      if (proxy)
         {
         proxy->AddConsumer(this, cons);
+        cons->AddProducer(this, proxy);
         }
       this->AppendProxyToStream(proxy, str, objectId, 0);
       }
@@ -277,6 +276,7 @@ void vtkSMProxyProperty::RemoveConsumerFromPreviousProxies(vtkSMProxy* cons)
     if (it->GetPointer())
       {
       it->GetPointer()->RemoveConsumer(this, cons);
+      cons->RemoveProducer(this, it->GetPointer());
       }
     }
 }
@@ -508,12 +508,6 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if (remove_command)
     {
     this->SetRemoveCommand(remove_command);
-    }
-
-  int add_consumer;
-  if (element->GetScalarAttribute("add_consumer", & add_consumer))
-    {
-    this->SetAddConsumer(add_consumer);
     }
 
   int null_on_empty;

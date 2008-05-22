@@ -3745,8 +3745,8 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
-              <Proxy group="implicit_functions" name="Scalar" />
               <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Scalar" />
               <!--
               <Proxy group="implicit_functions" name="Sphere" />
               -->

@@ -21,6 +21,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyLink.h"
+#include "vtkWeakPointer.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -60,16 +61,16 @@ struct vtkSMProxyInternals
   typedef vtkstd::map<vtkStdString,  vtkSmartPointer<vtkSMProxy> > ProxyMap;
   ProxyMap SubProxies;
 
-  struct ConsumerInfo
+  struct ConnectionInfo
   {
-    ConsumerInfo(vtkSMProperty* prop, vtkSMProxy* prox) : Property(prop),
+    ConnectionInfo(vtkSMProperty* prop, vtkSMProxy* prox) : Property(prop),
       Proxy(prox) {};
-    vtkSMProperty* Property;
-    vtkSMProxy* Proxy;
+    vtkWeakPointer<vtkSMProperty> Property;
+    vtkWeakPointer<vtkSMProxy> Proxy;
   };
-  vtkstd::vector<ConsumerInfo> Consumers;
+  vtkstd::vector<ConnectionInfo> Consumers;
+  vtkstd::vector<ConnectionInfo> Producers;
  
-
   struct ExposedPropertyInfo
   {
     vtkStdString SubProxyName;

@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMTextSourceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMTextSourceRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMTextSourceRepresentationProxy::vtkSMTextSourceRepresentationProxy()
 {
@@ -227,14 +227,14 @@ void vtkSMTextSourceRepresentationProxy::Update(vtkSMViewProxy* view)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTextSourceRepresentationProxy::MarkModified(vtkSMProxy* modifiedProxy)
+void vtkSMTextSourceRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
 {
   if (modifiedProxy != this)
     {
     this->Dirty = true;
     }
 
-  this->Superclass::MarkModified(modifiedProxy);
+  this->Superclass::MarkDirty(modifiedProxy);
 }
 
 //-----------------------------------------------------------------------------

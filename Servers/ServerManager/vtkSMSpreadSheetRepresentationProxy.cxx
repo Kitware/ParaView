@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
@@ -194,8 +194,8 @@ vtkIdType vtkSMSpreadSheetRepresentationProxy::GetMaximumNumberOfItems()
 {
   vtkPVDataInformation* info =
     this->SelectionOnly?
-    this->GetInputProxy()->GetSelectionOutput(this->OutputPort)->GetDataInformation(0, false):
-    this->GetInputProxy()->GetDataInformation(this->OutputPort, false);
+    this->GetInputProxy()->GetSelectionOutput(this->OutputPort)->GetDataInformation(0):
+    this->GetInputProxy()->GetDataInformation(this->OutputPort);
 
   if (!info)
     {

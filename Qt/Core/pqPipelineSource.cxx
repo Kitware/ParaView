@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager.
 #include "vtkClientServerStream.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
@@ -128,6 +129,8 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
 
       this->Internal->OutputPorts.push_back(op);
       }
+    this->getConnector()->Connect(source, vtkCommand::UpdateDataEvent,
+        this, SLOT(dataUpdated()));
     }
 }
 
@@ -139,6 +142,20 @@ pqPipelineSource::~pqPipelineSource()
     delete opport;
     }
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::updatePipeline()
+{
+  pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
+  double time = timekeeper->getTime();
+  vtkSMSourceProxy::SafeDownCast(this->getProxy())->UpdatePipeline(time);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::dataUpdated()
+{
+  emit this->dataUpdated(this);
 }
 
 //-----------------------------------------------------------------------------

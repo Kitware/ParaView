@@ -107,15 +107,9 @@ pqProxyPanel::pqProxyPanel(vtkSMProxy* pxy, QWidget* p) :
     this->Implementation->Proxy, vtkCommand::ModifiedEvent,
     this, SLOT(proxyModifiedEvent()));
 
-  // update domains when undo/redo happens
-  pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
-  if(undoStack)
-    {
-    connect(undoStack, SIGNAL(undone()), this,
-      SLOT(updateInformationAndDomains()));
-    connect(undoStack, SIGNAL(redone()), this,
-      SLOT(updateInformationAndDomains()));
-    }
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->Proxy, vtkCommand::UpdateDataEvent,
+    this, SLOT(dataUpdated()), 0, 0, Qt::QueuedConnection);
 }
 
 //-----------------------------------------------------------------------------
@@ -140,6 +134,16 @@ pqPropertyManager* pqProxyPanel::propertyManager()
 pqView* pqProxyPanel::view() const
 {
   return this->Implementation->View;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyPanel::dataUpdated()
+{
+  this->Implementation->InformationObsolete = true;
+  if (this->Implementation->Selected)
+    {
+    this->updateInformationAndDomains();
+    }
 }
 
 //-----------------------------------------------------------------------------

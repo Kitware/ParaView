@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {
@@ -128,6 +128,8 @@ void vtkSMUnstructuredDataParallelStrategy::UpdateDistributedData()
     // TODO: How to handle this when using cache?
     // We need to call this only if cache won't be used.
     this->PreDistributorSuppressor->InvokeCommand("ForceUpdate");
+    // This is called for its side-effects; i.e. to force a PostUpdateData()
+    this->PreDistributorSuppressor->UpdatePipeline();
     }
 }
 
@@ -185,18 +187,8 @@ void vtkSMUnstructuredDataParallelStrategy::CreatePipelineInternal(
   // UpdateSuppressor. Since there are no distributors on the client
   // (or data server), we directly connect the PreDistributorSuppressor to the
   // UpdateSuppressor on the client and data server.
-
-  stream  << vtkClientServerStream::Invoke
-          << predistributorsuppressor->GetID()
-          << "GetOutputPort" << 0
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << updatesuppressor->GetID()
-          << "SetInputConnection" << 0
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+  this->Connect(predistributorsuppressor, updatesuppressor);
+  updatesuppressor->UpdateVTKObjects();
 
   // Now send to the render server.
   // This order of sending first to CLIENT|DATA_SERVER and then to render server

@@ -62,9 +62,8 @@ public:
   pqOutputPort* getOutputPortFromInput() const;
 
   /// Returns the data information for the data coming into the representation
-  /// as input. If update=true, the representation will be updated proir to
-  /// obtaining the data information.
-  vtkPVDataInformation* getInputDataInformation(bool update=true) const;
+  /// as input. 
+  vtkPVDataInformation* getInputDataInformation() const;
 
   /// Returns the represented data information. Depending on the representation
   /// this may differ from the input data information eg. if the representation

@@ -25,7 +25,6 @@
 #include "vtkInformationStringKey.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkPVDataInformation.h"
 #include "vtkPVSelectionInformation.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
@@ -34,6 +33,7 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkUnsignedIntArray.h"
@@ -42,7 +42,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.16");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.17");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -431,15 +431,16 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertSelection(int outputType,
 
   case vtkSelection::INDICES:
       {
-      vtkPVDataInformation* di = dataSource->GetDataInformation(dataPort, true);
+      const char* dataName = 
+        dataSource->GetOutputPort(dataPort)->GetDataClassName();
       outproxyname = "IDSelectionSource";
-      if (di->GetCompositeDataClassName())
+      if (dataName)
         {
-        if (strcmp(di->GetCompositeDataClassName(), "vtkHierarchicalBoxDataSet")==0)
+        if (strcmp(dataName, "vtkHierarchicalBoxDataSet") == 0)
           {
           outproxyname = "HierarchicalDataIDSelectionSource";
           }
-        else
+        else if (strcmp(dataName, "vtkMultiBlockDataSet") == 0)
           {
           outproxyname = "CompositeDataIDSelectionSource";
           }
