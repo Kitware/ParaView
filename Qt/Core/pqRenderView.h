@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QAction;
 class QVTKWidget;
 class vtkSMRenderViewProxy;
+class vtkCollection;
 
 // This is a PQ abstraction of a render view.
 class PQCORE_EXPORT pqRenderView : public pqRenderViewBase
@@ -105,6 +106,10 @@ public:
   /// center of rotation as well.
   bool getResetCenterWithCamera() const
     { return this->ResetCenterWithCamera; }
+
+  /// Get whether selection will be done on multiple representations.
+  bool getUseMultipleRepresentationSelection() const
+    { return this->UseMultipleRepresentationSelection; }
 
   /// Get center axes visibility.
   bool getCenterAxesVisibility() const;
@@ -192,6 +197,10 @@ public slots:
   void setResetCenterWithCamera(bool b)
     { this->ResetCenterWithCamera = b;}
 
+  /// Set whether selection will be done on multiple representations.
+  void setUseMultipleRepresentationSelection(bool b)
+    { this->UseMultipleRepresentationSelection = b;}
+
   /// start the link to other view process
   void linkToOtherView();
 
@@ -242,6 +251,9 @@ protected:
   // user reset the camera.
   bool ResetCenterWithCamera;
 
+  // When true, the selection will be performed on all representations.
+  bool UseMultipleRepresentationSelection;
+
   /// Updates undo stack without actually performing the undo/redo actions.
   void fakeUndoRedo(bool redo, bool self);
 
@@ -282,7 +294,10 @@ protected:
 private: 
   class pqInternal;
   pqInternal* Internal;
-  pqOutputPort* selectOnSurfaceInternal(int rect[4]);
+  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>);
+  void emitSelectionSignal(QList<pqOutputPort*>);
+  void collectSelectionPorts(vtkCollection* selectedRepresentations,
+    vtkCollection* selectionSources, QList<pqOutputPort*> pqPorts);
 
   static ManipulatorType DefaultManipulatorTypes[9];
 };

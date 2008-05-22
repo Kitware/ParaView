@@ -184,6 +184,14 @@ signals:
   /// signal.
   void progress(const QString& message, int percent_progress);
 
+  /// Fired when UseMultipleRepresentationSelection is set to on and
+  /// selection on multiple representations is made in this view. 
+  /// \c opports is a list of opport, and opport is the output port for 
+  ///    the source that got selected. the selection input on the source 
+  ///    proxy for the opport must already have been 
+  ///    initialized to a selection source.
+   void multipleSelected(QList<pqOutputPort*> opports);
+
 private slots:
   /// Called when the "Representations" property changes.
   void onRepresentationsChanged();

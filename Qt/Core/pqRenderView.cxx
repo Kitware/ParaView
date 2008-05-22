@@ -140,6 +140,7 @@ pqRenderView::pqRenderView( const QString& group,
     0, 0, Qt::QueuedConnection);
 
   this->ResetCenterWithCamera = true;
+  this->UseMultipleRepresentationSelection = false;
   this->getConnector()->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
@@ -750,15 +751,83 @@ void pqRenderView::resetViewDirection(
 //-----------------------------------------------------------------------------
 void pqRenderView::selectOnSurface(int rect[4])
 {
-  pqOutputPort* opPort = this->selectOnSurfaceInternal(rect);
-
-  // Fire selection event to let the world know that this view selected
-  // something.
-  emit this->selected(opPort);
+  QList<pqOutputPort*> opPorts;
+  this->selectOnSurfaceInternal(rect, opPorts);
+  this->emitSelectionSignal(opPorts);
 }
 
 //-----------------------------------------------------------------------------
-pqOutputPort* pqRenderView::selectOnSurfaceInternal(int rect[4])
+void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
+{
+  // Fire selection event to let the world know that this view selected
+  // something.
+  if(opPorts.count()>0)
+    {
+    emit this->selected(opPorts.value(0));
+    }
+  else
+    {
+    emit this->selected(0);
+    }
+
+  if(this->UseMultipleRepresentationSelection)
+    {
+    emit this->multipleSelected(opPorts);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::collectSelectionPorts(
+  vtkCollection* selectedRepresentations,
+  vtkCollection* selectionSources, 
+  QList<pqOutputPort*> pqPorts)
+{
+  if(!selectedRepresentations ||
+    selectedRepresentations->GetNumberOfItems()<=0)
+    {
+    return;
+    }
+  
+  if(!selectionSources ||
+    selectionSources->GetNumberOfItems()<=0)
+    {
+    return;
+    }
+
+  if(selectedRepresentations->GetNumberOfItems()!=
+    selectionSources->GetNumberOfItems())
+    {
+    return;
+    }
+
+  for(int i=0; i<selectedRepresentations->GetNumberOfItems(); i++)
+    {
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      selectedRepresentations->GetItemAsObject(i));
+    vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
+      selectionSources->GetItemAsObject(i));
+
+    pqServerManagerModel* smmodel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
+    if (!repr)
+      {
+      // No data display was selected (or none that is registered).
+      continue;
+      }
+
+    pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+    vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+      opPort->getSource()->getProxy());
+    selectedSource->SetSelectionInput(opPort->getPortNumber(),
+      selectionSource, 0);
+    pqPorts.append(opPort);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::selectOnSurfaceInternal(
+  int rect[4], QList<pqOutputPort*> pqOutputPorts)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 
@@ -769,36 +838,40 @@ pqOutputPort* pqRenderView::selectOnSurfaceInternal(int rect[4])
   vtkSmartPointer<vtkCollection> selectionSources = 
     vtkSmartPointer<vtkCollection>::New();
   if (!renderModuleP->SelectOnSurface(rect[0], rect[1], rect[2], rect[3], 
-      selectedRepresentations, selectionSources, surfaceSelections, false))
+      selectedRepresentations, selectionSources, surfaceSelections, 
+      this->UseMultipleRepresentationSelection))
     {
-    return 0;
+    return;
     }
 
   if (selectedRepresentations->GetNumberOfItems()<=0)
     {
-    return 0;
+    return;
     }
 
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    selectedRepresentations->GetItemAsObject(0));
-  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
-    selectionSources->GetItemAsObject(0));
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
-  if (!repr)
+  for(int i=0; i<selectedRepresentations->GetNumberOfItems(); i++)
     {
-    // No data display was selected (or none that is registered).
-    return 0;
-    }
+    vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
+      selectedRepresentations->GetItemAsObject(i));
+    vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
+      selectionSources->GetItemAsObject(i));
 
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  selectedSource->SetSelectionInput(opPort->getPortNumber(),
-    selectionSource, 0);
-  return opPort;
+    pqServerManagerModel* smmodel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
+    if (!repr)
+      {
+      // No data display was selected (or none that is registered).
+      continue;
+      }
+
+    pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+    vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+      opPort->getSource()->getProxy());
+    selectedSource->SetSelectionInput(opPort->getPortNumber(),
+      selectionSource, 0);
+    pqOutputPorts.append(opPort);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -812,49 +885,27 @@ void pqRenderView::selectPointsOnSurface(int rect[4])
     vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> selectionSources = 
     vtkSmartPointer<vtkCollection>::New();
+
+  QList<pqOutputPort*> pqPorts;
   if (!renderModuleP->SelectOnSurface(rect[0], rect[1], rect[2], rect[3], 
-      selectedRepresentations, selectionSources, surfaceSelections, false, true))
+      selectedRepresentations, selectionSources, surfaceSelections, 
+      this->UseMultipleRepresentationSelection, true))
     {
-    emit this->selected(0);
+    this->emitSelectionSignal(pqPorts);
     return;
     }
 
-  if (selectedRepresentations->GetNumberOfItems()<=0)
-    {
-    emit this->selected(0);
-    return;
-    }
-
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    selectedRepresentations->GetItemAsObject(0));
-  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
-    selectionSources->GetItemAsObject(0));
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
-  if (!repr)
-    {
-    // No data display was selected (or none that is registered).
-    emit this->selected(0);
-    return;
-    }
-
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  selectedSource->SetSelectionInput(opPort->getPortNumber(),
-    selectionSource, 0);
+  this->collectSelectionPorts(selectedRepresentations, 
+    selectionSources, pqPorts);
 
   // Fire selection event to let the world know that this view selected
   // something.
-  emit this->selected(opPort);
+  this->emitSelectionSignal(pqPorts);
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderView::selectFrustum(int rect[4])
 {
-
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 
   vtkSmartPointer<vtkCollection> selectedRepresentations = 
@@ -863,43 +914,22 @@ void pqRenderView::selectFrustum(int rect[4])
     vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> selectionSources = 
     vtkSmartPointer<vtkCollection>::New();
+  
+  QList<pqOutputPort*> pqPorts;
   if (!renderModuleP->SelectFrustum(rect[0], rect[1], rect[2], rect[3], 
-    selectedRepresentations, selectionSources, frustumSelections, false))
-  {
-    emit this->selected(0);
+    selectedRepresentations, selectionSources, frustumSelections, 
+    this->UseMultipleRepresentationSelection))
+    {
+    this->emitSelectionSignal(pqPorts);
     return;
-  }
+    }
 
-  if (selectedRepresentations->GetNumberOfItems()<=0)
-  {
-    emit this->selected(0);
-    return;
-  }
-
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    selectedRepresentations->GetItemAsObject(0));
-  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
-    selectionSources->GetItemAsObject(0));
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
-  if (!repr)
-  {
-    // No data display was selected (or none that is registered).
-    emit this->selected(0);
-    return;
-  }
-
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  selectedSource->SetSelectionInput(opPort->getPortNumber(),
-    selectionSource, 0);
+  this->collectSelectionPorts(selectedRepresentations, 
+    selectionSources, pqPorts);
 
   // Fire selection event to let the world know that this view selected
   // something.
-  emit this->selected(opPort);
+  this->emitSelectionSignal(pqPorts);
 }
 
 //-----------------------------------------------------------------------------
@@ -914,43 +944,22 @@ void pqRenderView::selectFrustumPoints(int rect[4])
     vtkSmartPointer<vtkCollection>::New();
   vtkSmartPointer<vtkCollection> selectionSources = 
     vtkSmartPointer<vtkCollection>::New();
+
+  QList<pqOutputPort*> pqPorts;
   if (!renderModuleP->SelectFrustum(rect[0], rect[1], rect[2], rect[3], 
-    selectedRepresentations, selectionSources, frustumSelections, false, true))
-  {
-    emit this->selected(0);
+    selectedRepresentations, selectionSources, frustumSelections, 
+    this->UseMultipleRepresentationSelection, true))
+    {
+    this->emitSelectionSignal(pqPorts);
     return;
-  }
+    }
 
-  if (selectedRepresentations->GetNumberOfItems()<=0)
-  {
-    emit this->selected(0);
-    return;
-  }
-
-  vtkSMRepresentationProxy* repr = vtkSMRepresentationProxy::SafeDownCast(
-    selectedRepresentations->GetItemAsObject(0));
-  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
-    selectionSources->GetItemAsObject(0));
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqDataRepresentation* pqRepr = smmodel->findItem<pqDataRepresentation*>(repr);
-  if (!repr)
-  {
-    // No data display was selected (or none that is registered).
-    emit this->selected(0);
-    return;
-  }
-
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-  selectedSource->SetSelectionInput(opPort->getPortNumber(),
-    selectionSource, 0);
+  this->collectSelectionPorts(selectedRepresentations, 
+    selectionSources, pqPorts);
 
   // Fire selection event to let the world know that this view selected
   // something.
-  emit this->selected(opPort);
+  this->emitSelectionSignal(pqPorts);
 }
 
 
@@ -958,25 +967,31 @@ void pqRenderView::selectFrustumPoints(int rect[4])
 void pqRenderView::selectBlock(int rectangle[4])
 {
   bool block = this->blockSignals(true);
-  pqOutputPort* port = this->selectOnSurfaceInternal(rectangle);
-  if (port)
-    {
-    vtkSMSourceProxy* selSource = port->getSelectionInput();
-    vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-      port->getSource()->getProxy());
+  QList<pqOutputPort*> opPorts;
+  this->selectOnSurfaceInternal(rectangle, opPorts);
 
-    // convert the index based selection to vtkSelection::BLOCKS selection.
-    vtkSMSourceProxy* newSelSource = vtkSMSourceProxy::SafeDownCast(
-      vtkSMSelectionHelper::ConvertSelection(vtkSelection::BLOCKS,
-        selSource,
-        selectedSource, port->getPortNumber()));
-    selectedSource->SetSelectionInput(port->getPortNumber(), newSelSource, 0);
-    if (newSelSource)
+  for(int i=0; i<opPorts.count(); i++)
+    {
+    pqOutputPort* port = opPorts.value(i);
+    if (port)
       {
-      newSelSource->Delete();
+      vtkSMSourceProxy* selSource = port->getSelectionInput();
+      vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+        port->getSource()->getProxy());
+
+      // convert the index based selection to vtkSelection::BLOCKS selection.
+      vtkSMSourceProxy* newSelSource = vtkSMSourceProxy::SafeDownCast(
+        vtkSMSelectionHelper::ConvertSelection(vtkSelection::BLOCKS,
+          selSource,
+          selectedSource, port->getPortNumber()));
+      selectedSource->SetSelectionInput(port->getPortNumber(), newSelSource, 0);
+      if (newSelSource)
+        {
+        newSelSource->Delete();
+        }
       }
     }
 
   this->blockSignals(block);
-  emit this->selected(port);
+  this->emitSelectionSignal(opPorts);
 }
