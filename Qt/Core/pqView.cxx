@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqProgressManager.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -118,11 +119,19 @@ pqView::pqView( const QString& type,
   QObject::connect(&this->Internal->RenderTimer, SIGNAL(timeout()),
     this, SLOT(forceRender()));
 
-
   pqServerManagerModel* smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
   QObject::connect(smModel, SIGNAL(representationAdded(pqRepresentation*)),
     this, SLOT(representationCreated(pqRepresentation*)));
+
+  pqProgressManager* pmManager = pqApplicationCore::instance()->getProgressManager();
+  if (pmManager)
+    {
+    QObject::connect(this, SIGNAL(beginProgress()), pmManager, SLOT(beginProgress()));
+    QObject::connect(this, SIGNAL(endProgress()), pmManager, SLOT(endProgress()));
+    QObject::connect(this, SIGNAL(progress(const QString&, double)),
+      pmManager, SLOT(setProgress(const QString&, double)));
+    }
 }
 
 //-----------------------------------------------------------------------------

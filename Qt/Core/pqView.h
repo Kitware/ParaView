@@ -171,6 +171,19 @@ signals:
   ///    have been initialized to a selection source.
   void selected(pqOutputPort* opport);
 
+  /// Fired before doing any actions that may result in progress events that
+  /// must be reported by the client.
+  void beginProgress();
+
+  /// Fired after performing any actions that may result in progress events.
+  /// Must match beginProgress() calls.
+  void endProgress();
+
+  /// Fired to notify the current execution progress. This will be generally
+  /// have any effect only if beginProgress() has been fired before firing this
+  /// signal.
+  void progress(const QString& message, int percent_progress);
+
 private slots:
   /// Called when the "Representations" property changes.
   void onRepresentationsChanged();

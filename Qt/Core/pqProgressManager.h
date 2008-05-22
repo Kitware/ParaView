@@ -86,6 +86,10 @@ public slots:
   /// Enables progress. 
   void setEnableProgress(bool);
 
+  /// Convenience slots that simply call setEnableProgress().
+  void beginProgress() { this->setEnableProgress(true); }
+  void endProgress() { this->setEnableProgress(false); }
+
   /// Enables abort.
   void setEnableAbort(bool);
 
