@@ -6066,6 +6066,11 @@
           <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
           <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
         </ExposedProperties>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Color" />
+          <Exception name="Visibility" />
+        </ShareProperties>
       </SubProxy>
     <!-- End of PVRepresentationBase -->
     </PVRepresentationProxy>
@@ -7604,6 +7609,36 @@
           pipeline or use "UpdateTime" set on the representation instead.
         </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1"
+        animateable="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1"
+        update_self="1"
+        animateable="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1"
+        animateable="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
 
       <SubProxy>
         <SourceProxy name="OutlineFilter" class="vtkOutlineFilter">

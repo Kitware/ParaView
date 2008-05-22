@@ -24,14 +24,19 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkBoundingBox.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMCubeAxesRepresentationProxy::vtkSMCubeAxesRepresentationProxy()
 {
   this->OutlineFilter = 0;
   this->CubeAxesActor = 0;
+  this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
+  this->Orientation[0] = this->Orientation[1] = this->Orientation[2] = 0.0;
+  this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -183,9 +188,49 @@ void vtkSMCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
     vtkPVDataInformation* info = output->GetDataInformation();
     if (info)
       {
+      double *scale = this->Scale;
+      double *position = this->Position;
+      double *rotation = this->Orientation;
+      double bds[6];
+      if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
+          position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
+          rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
+        {
+        const double *bounds = info->GetBounds();
+        vtkSmartPointer<vtkTransform> transform = 
+          vtkSmartPointer<vtkTransform>::New();
+        transform->Translate(position);
+        transform->RotateZ(rotation[2]);
+        transform->RotateX(rotation[0]);
+        transform->RotateY(rotation[1]);
+        transform->Scale(scale);
+        vtkBoundingBox bbox;
+        int i, j, k;
+        double origX[3], x[3];
+        bool first = true;
+        for (i = 0; i < 2; i++)
+          {
+          origX[0] = bounds[i];
+          for (j = 0; j < 2; j++)
+            {
+            origX[1] = bounds[2 + j];
+            for (k = 0; k < 2; k++)
+              {
+              origX[2] = bounds[4 + k];
+              transform->TransformPoint(origX, x);
+              bbox.AddPoint(x);
+              }
+            }
+          }
+        bbox.GetBounds(bds);
+        }
+      else 
+        {
+        info->GetBounds(bds);
+        }
       vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
         this->CubeAxesActor->GetProperty("Bounds"));
-      dvp->SetElements(info->GetBounds());
+      dvp->SetElements(bds);
       this->CubeAxesActor->UpdateVTKObjects();
       }
     }

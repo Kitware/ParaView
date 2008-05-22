@@ -37,9 +37,10 @@
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkBoundingBox.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.28");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -215,6 +216,7 @@ bool vtkSMSurfaceRepresentationProxy::GetBounds(double bounds[6])
     double origX[3], x[3];
     double bds[6];
     bool first = true;
+    vtkBoundingBox bbox;
     for (i = 0; i < 2; i++)
       {
       origX[0] = bounds[i];
@@ -225,33 +227,12 @@ bool vtkSMSurfaceRepresentationProxy::GetBounds(double bounds[6])
           {
           origX[2] = bounds[4 + k];
           transform->TransformPoint(origX, x);
-          if (first)
-            {
-            bds[0] = bds[1] = x[0];
-            bds[2] = bds[3] = x[1];
-            bds[4] = bds[5] = x[2];
-            first = false;
-            }
-          else
-            {
-            if (x[0] < bds[0]) { bds[0] = x[0]; }  
-            else if (x[0] > bds[1]) { bds[1] = x[0]; }  
-            if (x[1] < bds[2]) { bds[2] = x[1]; }  
-            else if (x[1] > bds[3]) { bds[3] = x[1]; }  
-            if (x[2] < bds[4]) { bds[4] = x[2]; }  
-            else if (x[2] > bds[5]) { bds[5] = x[2]; }  
-            }
+          bbox.AddPoint(x);
           }
         }
       }
-    bounds[0] = bds[0];
-    bounds[1] = bds[1];
-    bounds[2] = bds[2];
-    bounds[3] = bds[3];
-    bounds[4] = bds[4];
-    bounds[5] = bds[5];
+    bbox.GetBounds(bounds);
     }
-
   return true;
 }
 

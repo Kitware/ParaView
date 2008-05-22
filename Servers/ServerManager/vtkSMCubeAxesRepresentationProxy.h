@@ -36,6 +36,15 @@ public:
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); }
 
+  vtkSetVector3Macro(Position, double);
+  vtkGetVector3Macro(Position, double);
+
+  vtkSetVector3Macro(Orientation, double);
+  vtkGetVector3Macro(Orientation, double);
+
+  vtkSetVector3Macro(Scale, double);
+  vtkGetVector3Macro(Scale, double);
+
 //BTX
 protected:
   vtkSMCubeAxesRepresentationProxy();
@@ -75,6 +84,7 @@ protected:
   vtkSMProxy* CubeAxesActor;
   vtkSMProxy* Property;
   vtkSMRepresentationStrategy* Strategy;
+  double Position[3], Scale[3], Orientation[3];
 private:
   vtkSMCubeAxesRepresentationProxy(const vtkSMCubeAxesRepresentationProxy&); // Not implemented
   void operator=(const vtkSMCubeAxesRepresentationProxy&); // Not implemented
