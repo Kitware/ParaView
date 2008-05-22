@@ -129,8 +129,8 @@ pqView::pqView( const QString& type,
     {
     QObject::connect(this, SIGNAL(beginProgress()), pmManager, SLOT(beginProgress()));
     QObject::connect(this, SIGNAL(endProgress()), pmManager, SLOT(endProgress()));
-    QObject::connect(this, SIGNAL(progress(const QString&, double)),
-      pmManager, SLOT(setProgress(const QString&, double)));
+    QObject::connect(this, SIGNAL(progress(const QString&, int)),
+      pmManager, SLOT(setProgress(const QString&, int)));
     }
 }
 
