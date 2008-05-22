@@ -264,7 +264,13 @@ void pqGlobalRenderViewOptions::init()
   
   QObject::connect(this->Internal->resetCameraDefault,
     SIGNAL(clicked()), this, SLOT(resetDefaultCameraManipulators()));
-  
+
+#if defined(__APPLE__)
+  // Offscreen rendering is not needed on Mac (and it doesn't work on some
+  // cards.
+  this->Internal->useOffscreenRenderingForScreenshots->setEnabled(false);
+  this->Internal->useOffscreenRenderingForScreenshots->setChecked(false);
+#endif
 }
 
 void pqGlobalRenderViewOptions::setPage(const QString &page)
