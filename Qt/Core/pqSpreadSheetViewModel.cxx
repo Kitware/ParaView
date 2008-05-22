@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVCompositeDataInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
@@ -60,8 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqSMAdaptor.h"
 #include "pqDataRepresentation.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
@@ -793,52 +790,4 @@ bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
     }
 
   return false;
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
-{
-  vtkSMProxy* reprProxy = this->getRepresentationProxy();
-  int cur_index = pqSMAdaptor::getElementProperty(
-    reprProxy->GetProperty("CompositeDataSetIndex")).toInt();
-
-  pqOutputPort* input_port = this->getRepresentation()->getOutputPortFromInput();
-  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
-    input_port->getSource()->getProxy());
-
-  vtkSMSourceProxy* extractSelection = inputProxy->GetSelectionOutput(
-    input_port->getPortNumber());
-  if (!extractSelection)
-    {
-    return;
-    }
-
-  vtkPVDataInformation* mbInfo = extractSelection->GetDataInformation();
-  if (!mbInfo || !mbInfo->GetCompositeDataClassName())
-    {
-    return;
-    }
-
-  vtkPVDataInformation* blockInfo = mbInfo->GetDataInformationForCompositeIndex(cur_index);
-  if (blockInfo && blockInfo->GetNumberOfPoints() > 0)
-    {
-    return;
-    }
-
-  // find first index with non-empty points.
-  int index = 0;
-  vtkPVDataInformation* info = mbInfo;
-  while (info && ((info->GetCompositeDataClassName() &&
-    !info->GetCompositeDataInformation()->GetDataIsMultiPiece()) ||
-      info->GetNumberOfPoints()==0))
-    {
-    index++;
-    info = mbInfo->GetDataInformationForCompositeIndex(index);
-    }
-  if (info)
-    {
-    pqSMAdaptor::setElementProperty(
-      reprProxy->GetProperty("CompositeDataSetIndex"), index);
-    reprProxy->UpdateVTKObjects();
-    }
 }

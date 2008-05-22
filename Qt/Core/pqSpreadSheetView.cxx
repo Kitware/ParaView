@@ -32,10 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetView.h"
 
 // Server Manager Includes.
-#include "vtkSMProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMSpreadSheetRepresentationProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMSpreadSheetRepresentationProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QHeaderView>
@@ -50,13 +49,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 // ParaView Includes.
-#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+#include "pqDataRepresentation.h"
 #include "pqServer.h"
-#include "pqSMAdaptor.h"
 #include "pqSpreadSheetViewModel.h"
 #include "pqSpreadSheetViewSelectionModel.h"
+#include "pqPipelineSource.h"
 
 //-----------------------------------------------------------------------------
 class pqSpreadSheetView::pqDelegate : public QItemDelegate
@@ -265,7 +263,6 @@ pqSpreadSheetView::pqSpreadSheetView(
   QObject::connect(
     this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
     this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
-  QObject::connect(this, SIGNAL(beginRender()), this, SLOT(onBeginRender()));
   QObject::connect(this, SIGNAL(endRender()), this, SLOT(onEndRender()));
 
   QObject::connect(
@@ -344,29 +341,6 @@ void pqSpreadSheetView::updateRepresentationVisibility(
   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
   this->Internal->Model.setRepresentation(dataRepr);
   emit this->showing(dataRepr);
-}
-
-//-----------------------------------------------------------------------------
-void pqSpreadSheetView::onBeginRender()
-{
-  // If in "selection-only" mode, and showing composite dataset, we want to make
-  // sure that we are shown a block with non-empty cells/points (if possible).
-  vtkSMProxy* repr = this->Internal->Model.getRepresentationProxy();
-  if (repr)
-    {
-    if (pqSMAdaptor::getElementProperty(repr->GetProperty("SelectionOnly")).toBool())
-      {
-      this->Internal->Model.resetCompositeDataSetIndex();
-      /*
-      unsigned int current_index = pqSMAdaptor::getElementProperty(
-        repr->GetProperty("CompositeDataSetIndex")).toUInt();
-
-      pqOutputPort* inputPort = repr->
-      vtkPVDataInformation* info = 
-      repr->GetProperty("CompositeDataSetIndex")->ResetToDefault();
-      */
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------

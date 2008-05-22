@@ -121,10 +121,6 @@ public:
   // Returns the vtk indices for the view indices. 
   QSet<vtkIndex> getVTKIndices(const QModelIndexList& indexes);
 
-  /// Resets the composite dataset index on the representation to point to the
-  /// first non-empty block.
-  void resetCompositeDataSetIndex();
-
 signals:
   void requestDelayedUpdate() const;
 
