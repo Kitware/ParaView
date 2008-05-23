@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.41");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.42");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -31,7 +31,6 @@ struct vtkSMStringVectorPropertyInternals
   vtkstd::vector<vtkStdString> UncheckedValues;
   vtkstd::vector<vtkStdString> LastPushedValues;
   vtkstd::vector<int> ElementTypes;
-  vtkstd::vector<char> Initialized;
   vtkstd::vector<vtkStdString> DefaultValues;
 
   void UpdateLastPushedValues()
@@ -45,7 +44,6 @@ struct vtkSMStringVectorPropertyInternals
   void Resize(unsigned int num)
     {
     this->Values.resize(num);
-    this->Initialized.resize(num, 0);
     this->UncheckedValues.resize(num);
     }
 };
@@ -92,7 +90,7 @@ int vtkSMStringVectorProperty::GetElementType(unsigned int idx)
 void vtkSMStringVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (this->InformationOnly)
+  if (this->InformationOnly || !this->Initialized)
     {
     return;
     }
@@ -110,22 +108,8 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
       << vtkClientServerStream::End;
     }
 
-  // If none of the strings are initialized, don't send them.
   int i;
   int numArgs = this->GetNumberOfElements();
-  int numInitArgs = 0;
-  for(i=0; i<numArgs; i++)
-    {
-    if (this->Internals->Initialized[i])
-      {
-      numInitArgs++;
-      }
-    }
-  if (numInitArgs == 0)
-    {
-    return;
-    }
-
   if (!this->RepeatCommand)
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
@@ -281,7 +265,6 @@ int vtkSMStringVectorProperty::SetElements(unsigned int count, const char* value
   for (unsigned int cc=0; cc < count; cc++)
     {
     this->Internals->Values[cc] = values[cc]? values[cc]: "";
-    this->Internals->Initialized[cc] = 1;
     }
   this->Initialized = true;
   this->Modified();
@@ -324,9 +307,10 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
-  this->Internals->Initialized[idx] = 1;
-  this->Modified();
+  // Make sure to initialize BEFORE Modified() is called. Otherwise,
+  // the value would not be pushed.
   this->Initialized = true;
+  this->Modified();
   return 1;
 }
 
@@ -532,13 +516,15 @@ void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
   if (dsrc && dsrc->Initialized)
     {
     bool modified = false;
-    if (this->Internals->Values != dsrc->Internals->Values ||
-      this->Internals->Initialized != dsrc->Internals->Initialized)
+    if (this->Internals->Values != dsrc->Internals->Values )
       {
       this->Internals->Values = dsrc->Internals->Values;
-      this->Internals->Initialized = dsrc->Internals->Initialized;
       modified = true;
       }
+    // If we were not initialized, we are now modified even if the value
+    // did not change
+    modified = modified || !this->Initialized;
+    this->Initialized = true;
 
     this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
     if (modified)

@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.18");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.19");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -68,7 +68,7 @@ vtkSMIdTypeVectorProperty::~vtkSMIdTypeVectorProperty()
 void vtkSMIdTypeVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (this->InformationOnly)
+  if (this->InformationOnly || !this->Initialized)
     {
     return;
     }
@@ -218,8 +218,10 @@ int vtkSMIdTypeVectorProperty::SetElement(unsigned int idx, vtkIdType value)
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
+  // Make sure to initialize BEFORE Modified() is called. Otherwise,
+  // the value would not be pushed.
+  this->Initialized = true;    
   this->Modified();
-  this->Initialized = true;
   return 1;
 }
 
@@ -463,6 +465,10 @@ void vtkSMIdTypeVectorProperty::Copy(vtkSMProperty* src)
       this->Internals->Values = dsrc->Internals->Values;
       modified = true;
       }
+    // If we were not initialized, we are now modified even if the value
+    // did not change
+    modified = modified || !this->Initialized;
+    this->Initialized = true;
 
     this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
     if (modified)
@@ -478,10 +484,10 @@ void vtkSMIdTypeVectorProperty::ResetToDefaultInternal()
   if (this->Internals->DefaultValues != this->Internals->Values &&
     this->Internals->DefaultsValid)
     {
-    this->Internals->Values.clear();
-    this->Internals->Values.insert(this->Internals->Values.end(),
-      this->Internals->DefaultValues.begin(),
-      this->Internals->DefaultValues.end());
+    this->Internals->Values = this->Internals->DefaultValues;
+    // Make sure to initialize BEFORE Modified() is called. Otherwise,
+    // the value would not be pushed.
+    this->Initialized = true;    
     this->Modified();
     }
 }

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.40");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.41");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -74,11 +74,12 @@ void vtkSMDoubleVectorProperty::UpdateLastPushedValues()
   this->Internals->UpdateLastPushedValues();
 }
 
+#include "vtkSMProxy.h"
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::AppendCommandToStream(
-  vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy* p, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (this->InformationOnly)
+  if (this->InformationOnly || !this->Initialized)
     {
     return;
     }
@@ -242,8 +243,10 @@ int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
-  this->Modified();
+  // Make sure to initialize BEFORE Modified() is called. Otherwise,
+  // the value would not be pushed.
   this->Initialized = true;
+  this->Modified();
   return 1;
 }
 
@@ -497,11 +500,15 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
     bool modified = false;
     if (this->Internals->Values != dsrc->Internals->Values)
       {
-      modified = true;
       this->Internals->Values = dsrc->Internals->Values;
+      modified = true;
       }
+    // If we were not initialized, we are now modified even if the value
+    // did not change
+    modified = modified || !this->Initialized;
+    this->Initialized = true;
+
     this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
-    
     if (modified)
       {
       this->Modified();
@@ -515,10 +522,10 @@ void vtkSMDoubleVectorProperty::ResetToDefaultInternal()
   if (this->Internals->DefaultValues != this->Internals->Values &&
       this->Internals->DefaultsValid)
     {
-    this->Internals->Values.clear();
-    this->Internals->Values.insert(this->Internals->Values.end(),
-      this->Internals->DefaultValues.begin(),
-      this->Internals->DefaultValues.end());
+    this->Internals->Values = this->Internals->DefaultValues;
+    // Make sure to initialize BEFORE Modified() is called. Otherwise,
+    // the value would not be pushed.
+    this->Initialized = true;    
     this->Modified();
     }
 }

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.35");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.36");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -70,7 +70,7 @@ vtkSMIntVectorProperty::~vtkSMIntVectorProperty()
 void vtkSMIntVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (this->InformationOnly)
+  if (this->InformationOnly || !this->Initialized)
     {
     return;
     }
@@ -228,8 +228,10 @@ int vtkSMIntVectorProperty::SetElement(unsigned int idx, int value)
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
-  this->Modified();
+  // Make sure to initialize BEFORE Modified() is called. Otherwise,
+  // the value would not be pushed.
   this->Initialized = true;
+  this->Modified();
   return 1;
 }
 
@@ -471,9 +473,13 @@ void vtkSMIntVectorProperty::Copy(vtkSMProperty* src)
     
     if (this->Internals->Values != dsrc->Internals->Values)
       {
-      modified = true;
       this->Internals->Values = dsrc->Internals->Values;
+      modified = true;
       }
+    // If we were not initialized, we are now modified even if the value
+    // did not change
+    modified = modified || !this->Initialized;
+    this->Initialized = true;
   
     this->Internals->UncheckedValues = dsrc->Internals->UncheckedValues;
     if (modified)
@@ -489,10 +495,10 @@ void vtkSMIntVectorProperty::ResetToDefaultInternal()
   if (this->Internals->DefaultValues != this->Internals->Values &&
       this->Internals->DefaultsValid)
     {
-    this->Internals->Values.clear();
-    this->Internals->Values.insert(this->Internals->Values.end(),
-      this->Internals->DefaultValues.begin(),
-      this->Internals->DefaultValues.end());
+    this->Internals->Values = this->Internals->DefaultValues;
+    // Make sure to initialize BEFORE Modified() is called. Otherwise,
+    // the value would not be pushed.
+    this->Initialized = true;    
     this->Modified();
     }
 }
