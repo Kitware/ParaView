@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorMapWidget.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
-#include "pqLineEditNumberValidator.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
@@ -67,6 +66,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QtDebug>
 #include <QVariant>
+#include <QIntValidator>
+#include <QDoubleValidator>
 
 #include "vtkColorTransferFunction.h"
 #include "vtkEventQtSlotConnect.h"
@@ -209,18 +210,15 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Add the color scale presets menu.
   this->loadBuiltinColorPresets();
 
+  // TODO would be nice to give them their own validators with their own ranges
   // Make sure the line edits only allow number inputs.
-  pqLineEditNumberValidator *validator =
-      new pqLineEditNumberValidator(true, this);
-  this->Form->ScalarValue->installEventFilter(validator);
-  this->Form->Opacity->installEventFilter(validator);
-  validator = new pqLineEditNumberValidator(false, this);
-  this->Form->TableSizeText->installEventFilter(validator);
+  QDoubleValidator *doubleValidator = new QDoubleValidator(this);
+  this->Form->ScalarValue->setValidator(doubleValidator);
+  this->Form->Opacity->setValidator(doubleValidator);
+  this->Form->ScalarOpacityUnitDistance->setValidator(doubleValidator);
 
-  // Why are we not using QDoubleValidator?
-  validator = new pqLineEditNumberValidator(true, this);
-  this->Form->TableSizeText->installEventFilter(validator);
-  this->Form->ScalarOpacityUnitDistance->installEventFilter(validator);
+  QIntValidator *intValidator = new QIntValidator(this);
+  this->Form->TableSizeText->setValidator(intValidator);
 
   // Connect the color scale widgets.
   this->connect(this->Form->ScalarValue, SIGNAL(editingFinished()),

@@ -41,8 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqRescaleRangeForm;
-class QTimer;
-
 
 class PQCOMPONENTS_EXPORT pqRescaleRange : public QDialog
 {
@@ -52,29 +50,15 @@ public:
   pqRescaleRange(QWidget *parent=0);
   virtual ~pqRescaleRange();
 
-  double getMinimum() const {return this->Minimum;}
-  double getMaximum() const {return this->Maximum;}
+  double getMinimum() const;
+  double getMaximum() const;
   void setRange(double min, double max);
 
+protected slots:
+  void validate();
+
 protected:
-  virtual void hideEvent(QHideEvent *e);
-
-private slots:
-  void handleMinimumEdited();
-  void handleMaximumEdited();
-  void applyTextChanges();
-
-private:
-  void setMinimum();
-  void setMaximum();
-
-private:
   pqRescaleRangeForm *Form;
-  QTimer *EditDelay;
-  double Minimum;
-  double Maximum;
-  bool MinChanged;
-  bool MaxChanged;
 };
 
 #endif

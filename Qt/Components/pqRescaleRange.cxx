@@ -36,9 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRescaleRange.h"
 #include "ui_pqRescaleRangeDialog.h"
 
-#include "pqLineEditNumberValidator.h"
-#include <QTimer>
-
+#include <QDoubleValidator>
 
 class pqRescaleRangeForm : public Ui::pqRescaleRangeDialog {};
 
@@ -47,29 +45,21 @@ pqRescaleRange::pqRescaleRange(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Form = new pqRescaleRangeForm();
-  this->EditDelay = new QTimer(this);
-  this->Minimum = 0.0;
-  this->Maximum = 0.0;
-  this->MinChanged = false;
-  this->MaxChanged = false;
 
   // Set up the ui.
   this->Form->setupUi(this);
-  this->EditDelay->setSingleShot(true);
 
   // Make sure the line edits only allow number inputs.
-  pqLineEditNumberValidator *validator =
-      new pqLineEditNumberValidator(true, this);
-  this->Form->MinimumScalar->installEventFilter(validator);
-  this->Form->MaximumScalar->installEventFilter(validator);
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Form->MinimumScalar->setValidator(validator);
+  this->Form->MaximumScalar->setValidator(validator);
 
   // Connect the gui elements.
-  this->connect(this->Form->MinimumScalar, SIGNAL(textEdited(const QString &)),
-      this, SLOT(handleMinimumEdited()));
-  this->connect(this->Form->MaximumScalar, SIGNAL(textEdited(const QString &)),
-      this, SLOT(handleMaximumEdited()));
-  this->connect(this->EditDelay, SIGNAL(timeout()),
-      this, SLOT(applyTextChanges()));
+  this->connect(this->Form->MinimumScalar, SIGNAL(textChanged(const QString &)),
+      this, SLOT(validate()));
+  this->connect(this->Form->MaximumScalar, SIGNAL(textChanged(const QString &)),
+      this, SLOT(validate()));
+  
   this->connect(this->Form->RescaleButton, SIGNAL(clicked()),
       this, SLOT(accept()));
   this->connect(this->Form->CancelButton, SIGNAL(clicked()),
@@ -79,98 +69,49 @@ pqRescaleRange::pqRescaleRange(QWidget *widgetParent)
 pqRescaleRange::~pqRescaleRange()
 {
   delete this->Form;
-  delete this->EditDelay;
 }
 
 void pqRescaleRange::setRange(double min, double max)
 {
   if(min > max)
     {
-    this->Minimum = max;
-    this->Maximum = min;
-    }
-  else
-    {
-    this->Minimum = min;
-    this->Maximum = max;
+    double tmp = min;
+    min = max;
+    max = tmp;
     }
 
   // Update the displayed range.
-  this->Form->MinimumScalar->setText(QString::number(this->Minimum, 'g', 6));
-  this->Form->MaximumScalar->setText(QString::number(this->Maximum, 'g', 6));
+  this->Form->MinimumScalar->setText(QString::number(min, 'g', 6));
+  this->Form->MaximumScalar->setText(QString::number(max, 'g', 6));
 }
 
-void pqRescaleRange::hideEvent(QHideEvent *e)
+double pqRescaleRange::getMinimum() const
 {
-  // If the edit delay timer is active, set the final user entry.
-  if(this->EditDelay->isActive())
+  return this->Form->MinimumScalar->text().toDouble();
+}
+
+double pqRescaleRange::getMaximum() const
+{
+  return this->Form->MaximumScalar->text().toDouble();
+}
+
+void pqRescaleRange::validate()
+{
+  int dummy;
+  QString tmp1 = this->Form->MinimumScalar->text();
+  QString tmp2 = this->Form->MaximumScalar->text();
+
+  if(this->Form->MinimumScalar->validator()->validate(tmp1, dummy) ==
+    QValidator::Acceptable &&
+     this->Form->MaximumScalar->validator()->validate(tmp2, dummy) ==
+    QValidator::Acceptable &&
+    tmp1.toDouble() <= tmp2.toDouble())
     {
-    this->EditDelay->stop();
-    this->applyTextChanges();
-    }
-
-  QDialog::hideEvent(e);
-}
-
-void pqRescaleRange::handleMinimumEdited()
-{
-  this->MinChanged = true;
-  this->EditDelay->start(600);
-}
-
-void pqRescaleRange::handleMaximumEdited()
-{
-  this->MaxChanged = true;
-  this->EditDelay->start(600);
-}
-
-void pqRescaleRange::applyTextChanges()
-{
-  if(this->MinChanged)
-    {
-    this->MinChanged = true;
-    this->setMinimum();
-    }
-
-  if(this->MaxChanged)
-    {
-    this->MaxChanged = true;
-    this->setMaximum();
-    }
-}
-
-void pqRescaleRange::setMinimum()
-{
-  // Get the value from the line edit.
-  double value = this->Form->MinimumScalar->text().toDouble();
-
-  // Make sure the value is less than the maximum.
-  if(value > this->Maximum)
-    {
-    this->Minimum = this->Maximum;
-    this->Form->MinimumScalar->setText(this->Form->MaximumScalar->text());
+    this->Form->RescaleButton->setEnabled(true);
     }
   else
     {
-    this->Minimum = value;
+    this->Form->RescaleButton->setEnabled(false);
     }
 }
-
-void pqRescaleRange::setMaximum()
-{
-  // Get the value from the line edit.
-  double value = this->Form->MaximumScalar->text().toDouble();
-
-  // Make sure the value is greater than the maximum.
-  if(value < this->Minimum)
-    {
-    this->Maximum = this->Minimum;
-    this->Form->MaximumScalar->setText(this->Form->MinimumScalar->text());
-    }
-  else
-    {
-    this->Maximum = value;
-    }
-}
-
 

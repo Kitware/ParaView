@@ -44,8 +44,6 @@ SET(QtWidgets_SRCS
   pqFlatTreeView.h
   pqIntRangeWidget.cxx
   pqIntRangeWidget.h
-  pqLineEditNumberValidator.cxx
-  pqLineEditNumberValidator.h
   pqListWidgetCheckHelper.cxx
   pqListWidgetCheckHelper.h
   pqListWidgetItemObject.cxx
