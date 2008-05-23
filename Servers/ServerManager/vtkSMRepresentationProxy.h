@@ -50,7 +50,7 @@ public:
   // information, it must fire vtkCommand::StartEvent and vtkCommand::EndEvent
   // to mark the start and end of the update.
   virtual void Update() { this->Update(0); };
-  virtual void Update(vtkSMViewProxy*) { };
+  virtual void Update(vtkSMViewProxy*) { this->PostUpdateData(); };
 
   // Description:
   // Returns if the representation's input has changed since most recent
