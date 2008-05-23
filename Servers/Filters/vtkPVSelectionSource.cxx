@@ -115,7 +115,7 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.4");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.5");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -123,7 +123,7 @@ vtkPVSelectionSource::vtkPVSelectionSource()
   this->SetNumberOfOutputPorts(1);
 
   this->Internal = new vtkInternal();
-  this->Mode = FRUSTUM;
+  this->Mode = ID;
   this->ContainingCells = 1;
   this->Inverse = 0;
   this->ArrayName = NULL;
