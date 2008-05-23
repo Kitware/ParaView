@@ -780,7 +780,7 @@ void pqRenderView::emitSelectionSignal(QList<pqOutputPort*> opPorts)
 void pqRenderView::collectSelectionPorts(
   vtkCollection* selectedRepresentations,
   vtkCollection* selectionSources, 
-  QList<pqOutputPort*> pqPorts)
+  QList<pqOutputPort*>& pqPorts)
 {
   if(!selectedRepresentations ||
     selectedRepresentations->GetNumberOfItems()<=0)
@@ -827,7 +827,7 @@ void pqRenderView::collectSelectionPorts(
 
 //-----------------------------------------------------------------------------
 void pqRenderView::selectOnSurfaceInternal(
-  int rect[4], QList<pqOutputPort*> pqOutputPorts)
+  int rect[4], QList<pqOutputPort*>& pqOutputPorts)
 {
   vtkSMRenderViewProxy* renderModuleP = this->getRenderViewProxy();
 

@@ -294,10 +294,10 @@ protected:
 private: 
   class pqInternal;
   pqInternal* Internal;
-  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>);
+  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&);
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, QList<pqOutputPort*> pqPorts);
+    vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts);
 
   static ManipulatorType DefaultManipulatorTypes[9];
 };
