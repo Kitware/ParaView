@@ -163,6 +163,13 @@ public:
   void SetMaterialFractionThreshold(double fraction);
   vtkGetMacro(MaterialFractionThreshold, double);
 
+  /// OBB 
+  // Description:
+  // Turn on/off OBB calculations
+  vtkSetMacro(WriteOutputTableFile,int);
+  vtkGetMacro(WriteOutputTableFile,int);
+  vtkBooleanMacro(WriteOutputTableFile,int);
+
   /// Output file
   // Description:
   // Name the file to save a table of fragment attributes to.
@@ -170,9 +177,9 @@ public:
   vtkGetStringMacro(OutputTableFileNameBase);
   // Description:
   // If true, save the results of the filter in a text file
-  vtkSetMacro(WriteOutputTableFile,int);
-  vtkGetMacro(WriteOutputTableFile,int);
-  vtkBooleanMacro(WriteOutputTableFile,int);
+  vtkSetMacro(ComputeOBB,int);
+  vtkGetMacro(ComputeOBB,int);
+  vtkBooleanMacro(ComputeOBB,int);
 
 
   // Description:
@@ -270,18 +277,100 @@ protected:
     int* procOffset);
   void MergeGhostEquivalenceSets(
     vtkCTHFragmentEquivalenceSet* globalSet);
+
   // Sum/finalize attribute's contribution for those 
   // which are split over multiple processes.
-  void ResolveFragmentAttributes();
-  //
+  int ResolveIntegratedAttributes(const int controllingProcId);
+  // Initialize our attribute arrays to ho9ld resolved attributes
+  int PrepareToResolveIntegratedAttributes();
+
+  // Send my integrated attributes to another process.
+  int SendIntegratedAttributes(const int recipientProcId);
+  // Receive integrated attributes from another process.
+  int ReceiveIntegratedAttributes(const int sourceProcId);
+  // Size buffers etc...
+  int PrepareToCollectIntegratedAttributes(
+          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&volumes,
+          vtkstd::vector<vtkDoubleArray *>&moments,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+  // Free resources.
+  int CleanUpAfterCollectIntegratedAttributes(
+          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&volumes,
+          vtkstd::vector<vtkDoubleArray *>&moments,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+  // Receive all integrated attribute arrays from all other 
+  // processes.
+  int CollectIntegratedAttributes(
+          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&volumes,
+          vtkstd::vector<vtkDoubleArray *>&moments,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
+  // Send my integrated attributes to all other processes.
+  int BroadcastIntegratedAttributes(const int sourceProcessId);
+  // Send my geometric attribuites to a controler.
+  int SendGeometricAttributes(const int controllingProcId);
+  // size buffers & new containers
+  int PrepareToCollectGeometricAttributes(
+          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&coaabb,
+          vtkstd::vector<vtkDoubleArray *>&obb,
+          vtkstd::vector<int *> &ids);
+  // Free resources.
+  int CleanUpAfterCollectGeometricAttributes(
+          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&coaabb,
+          vtkstd::vector<vtkDoubleArray *>&obb,
+          vtkstd::vector<int *> &ids);
+  // Recieve all geometric attributes from all other
+  // processes.
+  int CollectGeometricAttributes(
+          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkDoubleArray *>&coaabb,
+          vtkstd::vector<vtkDoubleArray *>&obb,
+          vtkstd::vector<int *> &ids);
+  // size local copy to hold all.
+  int PrepareToMergeGeometricAttributes();
+  // Gather geometric attributes on a single process.
+  int GatherGeometricAttributes(const int recipientProcId);
+  // Copy an attribute array into the tail of a buffer
+  int PackAttribute(
+          double *buffer,
+          vtkIdType *header,
+          vtkDoubleArray *attribute,
+          int id);
+  // Copy from a  buffer into an attribute array
+  int UnPackAttribute(
+          const double *buffer,
+          const vtkIdType *header,
+          vtkDoubleArray *attribute,
+          const int nComps,
+          const int id,
+          const bool copyFlag);
+  // Copy fragment ids into the tail of a buffer
+  int PackIds(
+          void *buffer,
+          const vtkIdType *header);
+  // Copy fragment ids from a the tail of a buffer
+  int UnPackIds(
+          const void *buffer,
+          const vtkIdType *header,
+          int *&ids,
+          const bool copyFlag);
+  // Merge fragment's geometry that are split on this process
   void ResolveLocalFragmentGeometry();
+  // Merge fragment's geometry that are split across processes
   void ResolveRemoteFragmentGeometry();
   void BuildLoadingArray(
-                vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+          vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
   int PackLoadingArray(int *&buffer);
   int UnPackLoadingArray(
-                int *buffer, int bufSize,
-                vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+          int *buffer, int bufSize,
+          vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
 
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data sets. 
@@ -302,10 +391,16 @@ protected:
                  int srcCellIndex,     // which cell
                  double weight);       // weight of contribution
   int AccumulateMoments(
-               double *moments,      // =(Myz, Mxz, Mxy, m)
+               double *moments,        // =(Myz, Mxz, Mxy, m)
                vtkDataArray *massArray,//
-               int srcCellIndex,     // from which cell in mass
+               int srcCellIndex,       // from which cell in mass
                double *X);
+  // Compute the geomteric attributes that have been requested.
+  int ComputeGeometricAttributes();
+  int ComputeFragmentOBB();
+  int ComputeFragmentAABBCenters();
+//   int ComputeFragmentMVBB();
+
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
@@ -368,15 +463,17 @@ protected:
 
   // Accumulator for moments of the current fragment
   vtkstd::vector<double> FragmentMoment; // =(Myz, Mxz, Mxy, m)
-  // Final moments indexed by fragment id
+  // Moments indexed by fragment id
   vtkDoubleArray *FragmentMoments;
+  // Centers of fragment AABBs, only computed if moments are not
+  vtkDoubleArray *FragmentAABBCenters;
   // let us know if the user has specified a mass array
   bool ComputeMoments;
 
   // Weighted average, where weights correspond to fragment volume.
   // Accumulators one for each array to average, scalar or vector
   vtkstd::vector<vtkstd::vector<double> > FragmentWeightedAverage;
-  // Final weighted averages indexed by fragment id.
+  // weighted averages indexed by fragment id.
   vtkstd::vector<vtkDoubleArray *>FragmentWeightedAverages;
   // number of arrays for which to compute the weighted average
   int NToAverage;
@@ -386,10 +483,15 @@ protected:
   // Sum of data over the fragment.
   // Accumulators, one for each array to sum
   vtkstd::vector<vtkstd::vector<double> > FragmentSum;
-  // Final sums indexed by fragment id.
+  // sums indexed by fragment id.
   vtkstd::vector<vtkDoubleArray *>FragmentSums;
   // number of arrays for which to compute the weighted average
   int NToSum;
+
+  // OBB indexed by fragment id
+  vtkDoubleArray *FragmentOBBs;
+  // turn on/off OBB calculation
+  bool ComputeOBB;
 
 
 //   // I am going to try to integrate the cell attriubtes here.
@@ -458,13 +560,6 @@ protected:
     int faceIndex[3], int faceLevel, 
     vtkCTHFragmentConnectIterator* neighbor,
     vtkCTHFragmentConnectIterator* reference);
-
-/**  // Create an array of loading factors a measure of the process work
-  // load that each fragment piece represents. Indexed by fragement id.
-  // These are used for load ballancing purposes as fragment pieces are 
-  // collected.
-  vtkIntArray *LoadArray;
-  void BuildLocalLoadArray(vtkIntArray *loadArray);*/
 
   // PARAVIEW interface data
   vtkDataArraySelection *MaterialArraySelection;

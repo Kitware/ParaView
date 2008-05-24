@@ -6271,6 +6271,9 @@ Tessellate a higher-order dataset.
        TODO document CTH Fragment Extract Filter.
      </Documentation>
 
+     <OutputPort name="geometry" index="0" />
+     <OutputPort name="statistics" index="1" />
+
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -6309,7 +6312,7 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
-     <!-- Material fraction value -->
+     <!-- Material fraction -->
      <DoubleVectorProperty
        name="MaterialFractionThreshold"
        command="SetMaterialFractionThreshold"
@@ -6394,6 +6397,18 @@ Tessellate a higher-order dataset.
          <NoDefault />
        </Hints>
      </StringVectorProperty>
+
+     <!-- Compute OBB -->
+     <IntVectorProperty
+        name="ComputeOBB"
+        command="SetComputeOBB"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set, then the Oriented Bounding Box for each fragment is computed.
+       </Documentation>
+     </IntVectorProperty>
 
      <!-- Write a csv file -->
      <IntVectorProperty 
