@@ -64,7 +64,7 @@ using vtkstd::string;
 // ansi c
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.40");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.41");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -879,7 +879,7 @@ bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
   int maskIdx=fragmentId/this->BitsPerInt;
   int maskBit=1<<fragmentId%this->BitsPerInt;
 
-  return maskBit & this->PieceToProcMap[procId][maskIdx];
+  return static_cast<bool>(maskBit & this->PieceToProcMap[procId][maskIdx]);
 }
 
 void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int procId, int fragmentId)
@@ -982,7 +982,7 @@ class vtkCTHFragmentPieceTransaction
       this->Data[REMOTE_PROC]=remoteProc;
     }
     //
-    bool Empty() const{ return this->Data[TYPE]; }
+    bool Empty() const{ return static_cast<bool>(this->Data[TYPE]); }
     //
     void Clear()
     {
@@ -2537,7 +2537,7 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
                                               this->SelectionObserver );
 
   this->OutputTableFileNameBase=0;
-  this->WriteOutputTableFile=0;
+  this->WriteOutputTableFile=false;
 
   this->NumberOfInputBlocks = 0;
   this->InputBlocks = 0;
@@ -2666,29 +2666,6 @@ void vtkCTHFragmentConnect::DeleteAllBlocks()
       }
     }
 }
-
-// //----------------------------------------------------------------------------
-// // Initialize a single block from an image input.
-// int vtkCTHFragmentConnect::InitializeBlocks( vtkImageData* input,
-//                                              const char *arrayName )
-// {
-//   // Just in case
-//   this->DeleteAllBlocks();
-// 
-//   // TODO: We need to check the CELL_DATA and the correct volume fraction array.
-// 
-//   vtkCTHFragmentConnectBlock* block;
-//   this->InputBlocks = new vtkCTHFragmentConnectBlock*[1];
-//   this->NumberOfInputBlocks = 1;
-//   block = this->InputBlocks[0] = new vtkCTHFragmentConnectBlock;
-// 
-//   block->Initialize( 0, input, 0,
-//                      input->GetOrigin(),
-//                      input->GetSpacing(),
-//                      arrayName );
-// 
-//   return VTK_OK;
-// }
 
 //----------------------------------------------------------------------------
 // Initialize blocks from multi block input.

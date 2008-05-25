@@ -490,15 +490,6 @@ protected:
   // turn on/off OBB calculation
   bool ComputeOBB;
 
-
-//   // I am going to try to integrate the cell attriubtes here.
-//   // The simplest thing to do is keep the arrays in a vtkCellData object.
-//   vtkCellData* IntegratedFragmentAttributes;
-//   // I am going to do the actual integration in a raw memory buffer.
-//   // It is flexible with no complicated arbitrary structure.
-//   // I just iterate through the buffer casting the pointer to the correct types.
-//   void* IntegrationBuffer;
-
   // This is getting a bit ugly but ...
   // When we resolve (merge equivalent) fragments we need a mapping
   // from local ids to global ids.
@@ -565,7 +556,7 @@ protected:
   vtkDataArraySelection *SummationArraySelection;
   vtkCallbackCommand *SelectionObserver;
   char *OutputTableFileNameBase;
-  int WriteOutputTableFile;
+  bool WriteOutputTableFile;
 
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.
