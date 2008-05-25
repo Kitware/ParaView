@@ -166,9 +166,8 @@ public:
   /// OBB 
   // Description:
   // Turn on/off OBB calculations
-  vtkSetMacro(WriteOutputTableFile,int);
-  vtkGetMacro(WriteOutputTableFile,int);
-  vtkBooleanMacro(WriteOutputTableFile,int);
+  vtkSetMacro(ComputeOBB,bool);
+  vtkGetMacro(ComputeOBB,bool);
 
   /// Output file
   // Description:
@@ -177,10 +176,8 @@ public:
   vtkGetStringMacro(OutputTableFileNameBase);
   // Description:
   // If true, save the results of the filter in a text file
-  vtkSetMacro(ComputeOBB,int);
-  vtkGetMacro(ComputeOBB,int);
-  vtkBooleanMacro(ComputeOBB,int);
-
+  vtkSetMacro(WriteOutputTableFile,bool);
+  vtkGetMacro(WriteOutputTableFile,bool);
 
   // Description:
   // Sets modified if array selection changes.

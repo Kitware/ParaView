@@ -64,7 +64,7 @@ using vtkstd::string;
 // ansi c
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.39");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.40");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -8500,7 +8500,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       verts[0]=1;
       verts[1]=i;
       verts+=2;
-      } 
+      }
     }
   resolvedFragmentCenters->SetPoints(pts);
   pts->Delete();
