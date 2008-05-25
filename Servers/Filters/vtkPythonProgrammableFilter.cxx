@@ -30,7 +30,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.29");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.30");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -96,12 +96,21 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 //----------------------------------------------------------------------------
 void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
 {
+  int refCount = this->GetReferenceCount();
   this->Superclass::UnRegister(o);
-  bool hasRefLoop = this->Implementation->PythonVarDefined ? true : false;
-  if (this->GetReferenceCount() == 3 && hasRefLoop)
+  // If refCount was 1, the object is already gone. Do nothing.
+  if (refCount > 1)
     {
-    this->Implementation->DestroyInterpretor();
-    }
+    // If there is a python variable pointing to this object, we have
+    // a reference loop. This loop causes the ref count to be 3. If
+    // we detect this to be the case, we first delete the interp to
+    // break the reference loop.
+    bool hasRefLoop = this->Implementation->PythonVarDefined ? true : false;
+    if (this->GetReferenceCount() == 3 && hasRefLoop)
+      {
+      this->Implementation->DestroyInterpretor();
+      }
+    }  
 }
 
 //----------------------------------------------------------------------------
