@@ -64,7 +64,7 @@ using vtkstd::string;
 // ansi c
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.38");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.39");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -4018,6 +4018,11 @@ int vtkCTHFragmentConnect::RequestData(
     vtkDebugMacro("No material fraction specified.");
     return 1;
     }
+  // let us look up names
+  if (nMassArrays<nMaterials)
+    {
+    MassArrayNames.resize(nMaterials);
+    }
 
   // 
   this->BuildOutputs(mbdsOutput0,mbdsOutput1,nMaterials);
@@ -7015,7 +7020,7 @@ int vtkCTHFragmentConnect::PrepareToCollectGeometricAttributes(
     {
     ResizeVectorOfVtkPointers(coaabb,nProcs);
     coaabb[myProcId]->Delete();
-    coaabb[myProcId]=this->FragmentMoments;
+    coaabb[myProcId]=this->FragmentAABBCenters;
     }
   // obb
   if (this->ComputeOBB)
@@ -8361,12 +8366,12 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
 // gather all of the centers of axis aligned bounding boxes.
 void vtkCTHFragmentConnect::CopyAttributesToOutput1()
 {
-  // We didn't just compute the moments then skip.
-  // Output will be empty.
-  if (this->ComputeMoments==false)
-    {
-    return;
-    }
+//   // We didn't just compute the moments then skip.
+//   // Output will be empty.
+//   if (this->ComputeMoments==false)
+//     {
+//     return;
+//     }
 
   vtkPolyData *resolvedFragmentCenters
     = dynamic_cast<vtkPolyData *>(this->ResolvedFragmentCenters->GetBlock(this->MaterialId));
@@ -8407,11 +8412,14 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   da->SetName( this->FragmentVolumes->GetName() );
   pd->AddArray(da);
   // 3 mass
-  ReNewVtkPointer(da);
-  da->SetName("Mass");
-  da->SetNumberOfTuples(this->NumberOfResolvedFragments);
-  da->CopyComponent(0,this->FragmentMoments,3);
-  pd->AddArray(da);
+  if (this->ComputeMoments)
+    {
+    ReNewVtkPointer(da);
+    da->SetName("Mass");
+    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
+    da->CopyComponent(0,this->FragmentMoments,3);
+    pd->AddArray(da);
+    }
   // 4 obb's
   if (this->ComputeOBB)
     {
@@ -8459,6 +8467,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   vtkIdType *verts
     = va->GetPointer(0);
   vtkPoints *pts=vtkPoints::New();
+  // use center of mass if available
   if (this->ComputeMoments)
     {
     pts->SetDataTypeToDouble();
@@ -8482,9 +8491,16 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       moments+=4;
       }
     }
+  // use center of axis aligned bounding box
   else
     {
     pts->SetData(this->FragmentAABBCenters);
+    for (int i=0; i<this->NumberOfResolvedFragments; ++i)
+      {
+      verts[0]=1;
+      verts[1]=i;
+      verts+=2;
+      } 
     }
   resolvedFragmentCenters->SetPoints(pts);
   pts->Delete();
@@ -8566,7 +8582,7 @@ int vtkCTHFragmentConnect::ComputeFragmentAABBCenters()
   vtkMultiPieceDataSet *resolvedFragments
     = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
 
-  int nLocal=resolvedFragments->GetNumberOfPieces();
+  int nLocal=resolvedFragmentIds.size();
 
   // AABB set up
   double aabb[6];
