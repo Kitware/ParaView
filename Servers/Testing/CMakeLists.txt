@@ -18,6 +18,8 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSpyPlotReaderMap.h
       vtkSpyPlotUniReader.h
       vtkUndoStackInternal.h
+      vtkSMPropertyHelper.h
+      vtkInitializationHelper.h
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)

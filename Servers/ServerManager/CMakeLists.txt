@@ -102,6 +102,7 @@ SET(Kit_SRCS
   vtkSMPSWriterProxy.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
+  vtkSMPropertyHelper.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
@@ -219,11 +220,13 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
+  vtkSMPropertyHelper.cxx
   ABSTRACT
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
+  vtkSMPropertyHelper.cxx
   WRAP_EXCLUDE)
 
 
