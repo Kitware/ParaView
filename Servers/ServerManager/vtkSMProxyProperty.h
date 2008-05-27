@@ -120,6 +120,11 @@ public:
   }
 
   // Description:
+  // Sets the number of proxies. If the new number is greater than the current
+  // number of proxies, then NULL will be inserted.
+  virtual void SetNumberOfProxies(unsigned int num);
+
+  // Description:
   // Returns the number of proxies.
   unsigned int GetNumberOfProxies();
 

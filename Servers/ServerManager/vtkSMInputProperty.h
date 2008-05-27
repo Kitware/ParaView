@@ -91,6 +91,11 @@ public:
   }
 
   // Description:
+  // Sets the number of proxies. If the new number is greater than the current
+  // number of proxies, then NULL will be inserted.
+  virtual void SetNumberOfProxies(unsigned int num);
+
+  // Description:
   // Sets the value of the property to the list of proxies specified.
   virtual void SetProxies(unsigned int numElements, 
     vtkSMProxy* proxies[], unsigned int outputports[]);
