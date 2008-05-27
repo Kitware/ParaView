@@ -108,6 +108,7 @@ public:
   QMap<vtkSMProxy *, pqPlotViewLineChartItem *> Representations;
   pqChartLegendModel *Legend;
   pqLineChartSeries::ChartAxes IndexAxes[4];
+  pqLineChartSeries::SequenceType Type;
 };
 
 
@@ -171,6 +172,7 @@ pqPlotViewLineChartInternal::pqPlotViewLineChartInternal()
   this->Layer = 0;
   this->Model = 0;
   this->Legend = 0;
+  this->Type = pqLineChartSeries::Line;
 
   // Set up the index to series chart axes map.
   this->IndexAxes[0] = pqLineChartSeries::BottomLeft;
@@ -206,6 +208,19 @@ pqPlotViewLineChart::~pqPlotViewLineChart()
   delete this->Internal;
 }
 
+//----------------------------------------------------------------------------
+void pqPlotViewLineChart::setSequenceType(pqLineChartSeries::SequenceType type)
+{
+  this->Internal->Type = type;
+}
+
+//----------------------------------------------------------------------------
+pqLineChartSeries::SequenceType pqPlotViewLineChart::getSequenceType() const
+{
+  return this->Internal->Type;
+}
+
+//----------------------------------------------------------------------------
 void pqPlotViewLineChart::initialize(pqChartArea *chartArea,
     pqChartLegendModel *legend)
 {
@@ -395,6 +410,9 @@ void pqPlotViewLineChart::update(bool force)
           displayList.insert(series->RepresentationName, components);
           }
 
+        // Set the series type.
+        series->Model->setSequenceType(this->Internal->Type); 
+
         ++series;
         }
       }
@@ -472,6 +490,9 @@ void pqPlotViewLineChart::update(bool force)
           plot->Model->setChartAxes(this->Internal->IndexAxes[plot->Chart]);
           int index = this->Internal->Model->getNumberOfSeries();
           this->Internal->Model->appendSeries(plot->Model);
+
+          // Set the series type.
+          plot->Model->setSequenceType(this->Internal->Type); 
 
           // Update the series options.
           bool changedOptions = false;

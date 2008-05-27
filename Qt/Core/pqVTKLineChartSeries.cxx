@@ -50,6 +50,8 @@ public:
   vtkSmartPointer<vtkDataArray> XArray;
   vtkSmartPointer<vtkDataArray> YArray;
   QList<int> BreakList;
+
+  pqLineChartSeries::SequenceType SequenceType;
 };
 
 
@@ -59,6 +61,7 @@ pqVTKLineChartSeriesInternal::pqVTKLineChartSeriesInternal()
 {
   this->XArray = 0;
   this->YArray = 0;
+  this->SequenceType = pqLineChartSeries::Line;
 }
 
 
@@ -91,7 +94,12 @@ int pqVTKLineChartSeries::getTotalNumberOfPoints() const
 
 pqLineChartSeries::SequenceType pqVTKLineChartSeries::getSequenceType(int) const
 {
-  return pqLineChartSeries::Line;
+  return this->Internal->SequenceType;
+}
+
+void pqVTKLineChartSeries::setSequenceType(pqLineChartSeries::SequenceType type)
+{
+  this->Internal->SequenceType = type;
 }
 
 int pqVTKLineChartSeries::getNumberOfPoints(int sequence) const

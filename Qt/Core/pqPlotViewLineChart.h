@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCoreExport.h"
 #include <QObject>
+#include "pqLineChartSeries.h"
 
 class pqChartArea;
 class pqChartLegendModel;
@@ -72,6 +73,9 @@ public:
   void addRepresentation(pqLineChartRepresentation *lineChart);
   void removeRepresentation(pqLineChartRepresentation *lineChart);
   void removeAllRepresentations();
+
+  void setSequenceType(pqLineChartSeries::SequenceType type);
+  pqLineChartSeries::SequenceType getSequenceType() const;
 
 public:
   pqPlotViewLineChartInternal *Internal;

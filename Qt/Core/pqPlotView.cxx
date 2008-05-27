@@ -383,19 +383,31 @@ void pqPlotView::forceRender()
 void pqPlotView::renderInternal()
 {
   this->Internal->RenderRequestPending = false;
-  if(this->Internal->Histogram)
+
+  vtkSMProxy *proxy = this->getProxy();
+  if (this->Internal->Histogram)
     {
     this->Internal->Histogram->update();
     }
 
-  if(this->Internal->LineChart)
+  if (this->Internal->LineChart)
     {
-    this->Internal->LineChart->update();
+    pqLineChartSeries::SequenceType type = 
+      static_cast<pqLineChartSeries::SequenceType>(
+        pqSMAdaptor::getElementProperty(proxy->GetProperty("Type")).toInt());
+    if (type != this->Internal->LineChart->getSequenceType())
+      {
+      this->Internal->LineChart->setSequenceType(type);
+      this->Internal->LineChart->update(true);
+      }
+    else
+      {
+      this->Internal->LineChart->update(false);
+      }
     }
 
   // Update the chart legend.
   QList<QVariant> values;
-  vtkSMProxy *proxy = this->getProxy();
   this->Internal->ShowLegend = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("ShowLegend")).toInt() != 0;
   if((this->Internal->LegendModel->getNumberOfEntries() == 0 ||

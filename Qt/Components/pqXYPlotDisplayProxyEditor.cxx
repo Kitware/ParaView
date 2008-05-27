@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetItemObject.h"
-
+#include "pqView.h"
 
 //-----------------------------------------------------------------------------
 class pqLineSeriesEditorModelItem
@@ -790,6 +790,26 @@ void pqXYPlotDisplayProxyEditor::setDisplay(pqRepresentation* disp)
     proxy, proxy->GetProperty("CompositeDataSetIndex"));
   QObject::connect(this->Internal->CompositeIndexAdaptor, SIGNAL(valuesChanged()),
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
+
+  // Although plot type is a view property, I am showing it here for sake of
+  // simplicity. It's going to change soon anyways.
+  vtkSMProxy* viewProxy = display->getView()->getProxy();
+  if (viewProxy)
+    {
+    new pqComboBoxDomain(
+      this->Internal->PlotType, viewProxy->GetProperty("Type"));
+
+    pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(this->Internal->PlotType);
+    this->Internal->Links.addPropertyLink(adaptor,
+      "currentText", SIGNAL(currentTextChanged(const QString&)),
+      viewProxy, viewProxy->GetProperty("Type"));
+    QObject::connect(adaptor, SIGNAL(currentTextChanged(const QString&)),
+      this, SLOT(updateAllViews()), Qt::QueuedConnection);
+    }
+  else
+    {
+    this->Internal->PlotType->setEnabled(false);
+    }
 
   this->reloadSeries();
 }

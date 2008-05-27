@@ -80,6 +80,10 @@ public:
   void setDataArrays(vtkDataArray *xArray, vtkDataArray *yArray,
       vtkDataArray *mask=0, int xComponent=0, int yComponent=0);
 
+  /// Set the type for the sequence i.e. pqLineChartSeries::Line,
+  /// pqLineChartSeries::Point etc. Default is pqLineChartSeries::Line.
+  void setSequenceType(pqLineChartSeries::SequenceType type);
+
 public:
   static vtkSmartPointer<vtkDataArray> createArray(vtkDataArray *array,
       int component);

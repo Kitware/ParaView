@@ -3708,6 +3708,16 @@
         <IntRangeDomain name="range" min="0" max="2" />
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="Type"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Scatter Plot" />
+          <Entry value="2" text="Line Plot" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <!-- End of XYPlotView -->
     </ViewProxy>
 
