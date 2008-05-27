@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.9");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.10");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -190,10 +190,24 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
         this->Internals->ExposedPropertyIterator->second.SubProxyName.c_str());
       if (!proxy)
         {
+        vtkErrorMacro(<< "In proxy " << this->Proxy->GetXMLName()
+                      << " cannot find sub proxy "
+                      << this->Internals->ExposedPropertyIterator->second.SubProxyName.c_str()
+                      << " that is supposed to contain exposed property "
+                      << this->Internals->ExposedPropertyIterator->first.c_str());
         return 0;
         }
-      return proxy->GetProperty(
-        this->Internals->ExposedPropertyIterator->second.PropertyName.c_str());
+      vtkSMProperty *property = proxy->GetProperty(
+         this->Internals->ExposedPropertyIterator->second.PropertyName.c_str());
+      if (!property)
+        {
+        vtkErrorMacro(<< "In proxy " << this->Proxy->GetXMLName()
+                      << " cannot find exposed property "
+                      << this->Internals->ExposedPropertyIterator->second.PropertyName.c_str()
+                      << " in sub proxy "
+                      << this->Internals->ExposedPropertyIterator->second.SubProxyName.c_str());
+        }
+      return property;
       }
     }
   return 0;
