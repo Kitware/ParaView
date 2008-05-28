@@ -34,7 +34,7 @@ class VTK_EXPORT vtkSMSurfaceRepresentationProxy :
 public:
   static vtkSMSurfaceRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMSurfaceRepresentationProxy, vtkSMPropRepresentationProxy);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Views typically support a mechanism to create a selection in the view
@@ -53,12 +53,12 @@ public:
 
   // Description:
   // Set the scalar coloring mode
-  void SetColorAttributeType(int type);
+  virtual void SetColorAttributeType(int type);
 
   // Description:
   // Set the scalar color array name. If array name is 0 or "" then scalar
   // coloring is disabled.
-  void SetColorArrayName(const char* name);
+  virtual void SetColorArrayName(const char* name);
 
   // Description:
   // Set the ambient coefficient. This is used only when representation type is
@@ -103,7 +103,7 @@ public:
   // Set the representation type.
   // repr can be VTK_SURFACE or VTK_WIREFRAME or VTK_POINTS or
   // VTK_SURFACE_WITH_EDGES.
-  void SetRepresentation(int repr);
+  virtual void SetRepresentation(int repr);
 
   // Description:
   // Returns the proxy for the prop.
@@ -166,13 +166,13 @@ protected:
   // Given a surface selection for this representation, this returns a new
   // vtkSelection for the selected cells/points in the input of this
   // representation.
-  void ConvertSurfaceSelectionToVolumeSelection(
+  virtual void ConvertSurfaceSelectionToVolumeSelection(
    vtkSelection* input, vtkSelection* output);
 
   // Description:
   // Internal method to update actual diffuse/specular/ambient coefficients used
   // based on the representation.
-  void UpdateShadingParameters();
+  virtual void UpdateShadingParameters();
 
   vtkSMSourceProxy* GeometryFilter;
   vtkSMProxy* Mapper;

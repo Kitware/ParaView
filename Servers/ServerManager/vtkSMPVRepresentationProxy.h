@@ -37,7 +37,7 @@ public:
 
   // Description:
   // Set the type of representation. 
-  void SetRepresentation(int type);
+  virtual void SetRepresentation(int type);
   vtkGetMacro(Representation, int);
 
   // Description:
