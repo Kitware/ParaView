@@ -1437,7 +1437,7 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    <SourceProxy name="PedigreeIDSelectionSource" class="vtkPVSelectionSource"
       base_proxygroup="sources" base_proxyname="SelectionSourceBase">
       <Documentation>
-        GlobalIDSelectionSource is a source producing a global ID based
+        PedigreeIDSelectionSource is a source producing a pedigree ID based
         selection. 
       </Documentation>
 
