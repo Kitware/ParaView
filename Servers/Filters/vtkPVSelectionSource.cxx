@@ -104,6 +104,7 @@ public:
   typedef vtkstd::vector<double> VectorOfDoubles;
 
 
+  SetOfIDs PedigreeIDs;
   SetOfIDs GlobalIDs;
   SetOfIDs Blocks;
   SetOfIDType IDs;
@@ -115,7 +116,7 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.5");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.6");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -161,6 +162,22 @@ void vtkPVSelectionSource::RemoveAllGlobalIDs()
 {
   this->Mode = GLOBALIDS;
   this->Internal->GlobalIDs.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::AddPedigreeID(vtkIdType id)
+{
+  this->Mode = PEDIGREEIDS;
+  this->Internal->PedigreeIDs.insert(id);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::RemoveAllPedigreeIDs()
+{
+  this->Mode = PEDIGREEIDS;
+  this->Internal->PedigreeIDs.clear();
   this->Modified();
 }
 
@@ -364,6 +381,21 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       vtkInternal::SetOfIDs::iterator iter;
       for (iter = this->Internal->GlobalIDs.begin();
         iter != this->Internal->GlobalIDs.end(); ++iter)
+        {
+        source->AddID(-1, *iter);
+        }
+      source->Update();
+      output->ShallowCopy(source->GetOutput());
+      }
+    break;
+
+  case PEDIGREEIDS:
+      {
+      source->SetContentType(vtkSelection::PEDIGREEIDS);
+      source->RemoveAllIDs();
+      vtkInternal::SetOfIDs::iterator iter;
+      for (iter = this->Internal->PedigreeIDs.begin();
+        iter != this->Internal->PedigreeIDs.end(); ++iter)
         {
         source->AddID(-1, *iter);
         }

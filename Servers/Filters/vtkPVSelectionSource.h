@@ -41,6 +41,11 @@ public:
   void RemoveAllGlobalIDs();
 
   // Description:
+  // Add pedigree IDs.
+  void AddPedigreeID(vtkIdType id);
+  void RemoveAllPedigreeIDs();
+
+  // Description:
   // Add a (piece, id) to the selection set. The source will generate
   // only the ids for which piece == UPDATE_PIECE_NUMBER.
   // If piece == -1, the id applies to all pieces.
@@ -118,7 +123,8 @@ protected:
     HIERARCHICALID,
     THRESHOLDS,
     LOCATIONS,
-    BLOCKS
+    BLOCKS,
+    PEDIGREEIDS
     };
 
   Modes Mode;

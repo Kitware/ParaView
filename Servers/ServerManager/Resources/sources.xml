@@ -1434,6 +1434,30 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="PedigreeIDSelectionSource" class="vtkPVSelectionSource"
+      base_proxygroup="sources" base_proxyname="SelectionSourceBase">
+      <Documentation>
+        GlobalIDSelectionSource is a source producing a global ID based
+        selection. 
+      </Documentation>
+
+     <IdTypeVectorProperty name="IDs"
+        command="AddPedigreeID" 
+        clean_command="RemoveAllPedigreeIDs"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1"
+        default_values="0"
+        label="Pedigree IDs">
+        <Documentation>
+          The list of IDs that will be added to the selection produced by the
+          selection source.
+        </Documentation>
+     </IdTypeVectorProperty> 
+     <!-- End of PedigreeIDSelectionSource -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
    <SourceProxy name="IDSelectionSource" class="vtkPVSelectionSource"
       base_proxygroup="sources" base_proxyname="SelectionSourceBase">
      <Documentation>
