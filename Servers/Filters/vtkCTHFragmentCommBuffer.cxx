@@ -58,7 +58,7 @@ void vtkCTHFragmentCommBuffer::Initialize(
   // header
   this->HeaderSize=DESCR_BASE+nBlocks;
   this->Header=new vtkIdType[this->HeaderSize];
-  bzero(this->Header,this->HeaderSize*sizeof(vtkIdType));
+  memset(this->Header,0,this->HeaderSize*sizeof(vtkIdType));
   this->Header[PROC_ID]=procId;
 }
 //----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ void vtkCTHFragmentCommBuffer::SizeHeader(int nBlocks)
   // header
   this->HeaderSize=DESCR_BASE+nBlocks;
   this->Header=new vtkIdType[this->HeaderSize];
-  bzero(this->Header,this->HeaderSize*sizeof(vtkIdType));
+  memset(this->Header,0,this->HeaderSize*sizeof(vtkIdType));
 }
 //----------------------------------------------------------------------------
 void vtkCTHFragmentCommBuffer::SizeBuffer(int nBytes)
