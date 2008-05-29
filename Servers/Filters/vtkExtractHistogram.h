@@ -18,8 +18,12 @@
 
 #include "vtkRectilinearGridAlgorithm.h"
 
+//BTX
 class vtkDoubleArray;
+class vtkFieldData;
 class vtkIntArray;
+struct vtkEHInternals;
+//ETX
 
 // .NAME vtkExtractHistogram - Extract histogram data (binned values) from any 
 // dataset
@@ -47,6 +51,15 @@ public:
   // Controls the number of bins N in the output histogram data
   vtkSetClampMacro(BinCount, int, 1, VTK_LARGE_INTEGER);
   vtkGetMacro(BinCount, int);
+  
+  // Description:
+  // This option controls whether the algorithm calculates averages
+  // of variables other than the primary variable that fall into each
+  // bin. False by default.
+  vtkSetMacro(CalculateAverages, int);
+  vtkGetMacro(CalculateAverages, int);
+  vtkBooleanMacro(CalculateAverages, int);
+  
 protected: 
   vtkExtractHistogram();
   ~vtkExtractHistogram();
@@ -71,16 +84,28 @@ protected:
   // Initialize the bin_extents using the data range for the selected 
   // array.
   virtual bool InitializeBinExtents(
-    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents);
+    vtkInformationVector** inputVector, 
+    vtkDoubleArray* bin_extents, 
+    double& min, double& max);
 
-  void BinAnArray(vtkDataArray *src, vtkIntArray *vals, vtkDoubleArray *exts);
+  void BinAnArray(
+    vtkDataArray *src, 
+    vtkIntArray *vals, 
+    double min, double max,
+    vtkFieldData* field);
 
   int Component;
   int BinCount;
+  int CalculateAverages;
 
+  vtkEHInternals* Internal;
+  
 private:
   void operator=(const vtkExtractHistogram&); // Not implemented
   vtkExtractHistogram(const vtkExtractHistogram&); // Not implemented
+  
+  int GetInputFieldAssociation();
+  vtkFieldData* GetInputFieldData(vtkDataObject* input);
 };
 
 #endif

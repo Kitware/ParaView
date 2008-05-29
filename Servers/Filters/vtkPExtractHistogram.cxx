@@ -15,9 +15,11 @@
 #include "vtkPExtractHistogram.h"
 
 #include "vtkAttributeDataReductionFilter.h"
+#include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkReductionFilter.h"
@@ -29,9 +31,10 @@
 #endif
 
 #include <vtkstd/string>
+#include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.5");
+vtkCxxRevisionMacro(vtkPExtractHistogram, "1.6");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
@@ -49,12 +52,14 @@ vtkPExtractHistogram::~vtkPExtractHistogram()
 //-----------------------------------------------------------------------------
 bool vtkPExtractHistogram::InitializeBinExtents(
   vtkInformationVector** inputVector,
-  vtkDoubleArray* bin_extents)
+  vtkDoubleArray* bin_extents,
+  double& min, double& max)
 {
   if (!this->Controller || this->Controller->GetNumberOfProcesses() <= 1)
     {
     // Nothing extra to do for single process.
-    return this->Superclass::InitializeBinExtents(inputVector, bin_extents);
+    return this->Superclass::InitializeBinExtents(inputVector, 
+      bin_extents, min, max);
     }
 #ifndef VTK_USE_MPI
   return this->Superclass::InitializeBinExtents(inputVector, bin_extents);
@@ -77,12 +82,15 @@ bool vtkPExtractHistogram::InitializeBinExtents(
 
   //get local range and array name. if I don't have that array locally,
   //then my contribution will be marked as invalid and ignored
-  if (this->Superclass::InitializeBinExtents(inputVector, bin_extents))
+  bool retVal = false;
+  if (this->Superclass::InitializeBinExtents(inputVector, bin_extents,
+        min, max))
     {
     data[0] = 1.0;
     data[1] = bin_extents->GetValue(0);
     data[2] = bin_extents->GetValue(this->BinCount);
     array_name = bin_extents->GetName();
+    retVal = true;
     }
 
   // If the requested component is out-of-range for the input, we return an
@@ -164,6 +172,8 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     range[1] = range[0]+1;
     }
 
+  min = range[0];
+  max = range[1];
   double bin_delta = (range[1] - range[0]) / this->BinCount;
   bin_extents->SetValue(0, range[0]);
   for(int i = 1; i < this->BinCount; ++i)
@@ -171,7 +181,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
     bin_extents->SetValue(i, range[0] + (i * bin_delta));
     }
   bin_extents->SetValue(this->BinCount, range[1]);
-  return true;
+  return retVal;
 #endif
 }
 
@@ -219,6 +229,31 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
   if (isRoot)
     {
     output->ShallowCopy(reduceFilter->GetOutput());
+    if (this->CalculateAverages)
+      {
+      vtkDataArray* bin_values = 
+        output->GetCellData()->GetArray("bin_values");
+      vtksys::RegularExpression reg_ex("^(.*)_average$");
+      int numArrays = output->GetCellData()->GetNumberOfArrays();
+      for (int i=0; i<numArrays; i++)
+        {
+        vtkDataArray* array = output->GetCellData()->GetArray(i);
+        if (array && reg_ex.find(array->GetName()))
+          {
+          int numComps = array->GetNumberOfComponents();
+          vtkstd::string name = reg_ex.match(1) + "_total";
+          vtkDataArray* tarray = output->GetCellData()->GetArray(name.c_str());
+          for (vtkIdType idx=0; idx<this->BinCount; idx++)
+            {
+            for (int j=0; j<numComps; j++)
+              {
+              array->SetComponent(idx, j,
+                tarray->GetComponent(idx, j)/bin_values->GetTuple1(idx));
+              }
+            }
+          }
+        }
+      }
     }
   return 1;
 }

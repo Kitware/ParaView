@@ -49,7 +49,8 @@ protected:
   // Initialize the bin_extents using the data range for the selected 
   // array.
   virtual bool InitializeBinExtents(
-    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents);
+    vtkInformationVector** inputVector, vtkDoubleArray* bin_extents,
+    double& min, double& max);
 
   vtkMultiProcessController* Controller;
 private:

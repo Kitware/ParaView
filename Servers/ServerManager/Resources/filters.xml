@@ -7055,6 +7055,19 @@ This filter extracts a list of datasets from hierarchical datasets.
         </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty 
+        name="CalculateAverages" 
+        command="SetCalculateAverages" 
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         This option controls whether the algorithm calculates averages
+         of variables other than the primary variable that fall into each
+         bin.
+       </Documentation>
+     </IntVectorProperty>
+
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
        <View type="BarChartView" />

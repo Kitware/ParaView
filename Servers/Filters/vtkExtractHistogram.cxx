@@ -15,22 +15,42 @@
 #include "vtkExtractHistogram.h"
 
 #include "vtkCellData.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkDoubleArray.h"
-#include "vtkOnePieceExtentTranslator.h"
+#include "vtkGraph.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkIntArray.h"
 #include "vtkIOStream.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkOnePieceExtentTranslator.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkIntArray.h"
-#include "vtkCompositeDataSet.h"
-#include "vtkCompositeDataIterator.h"
+
+#include <vtkstd/vector>
+#include <vtkstd/map>
+#include <vtkstd/string>
+
+struct vtkEHInternals
+{
+  vtkEHInternals() : FieldAssociation(-1) {}
+  struct ArrayValuesType
+    {
+    // The total of the values per bin - the second vector
+    // is for arrays with multiple components
+    vtkstd::vector<vtkstd::vector<double> > TotalValues;
+    };
+  typedef vtkstd::map<vtkstd::string, ArrayValuesType> ArrayMapType;
+  ArrayMapType ArrayValues;
+  int FieldAssociation;
+};
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.18");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.19");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -42,11 +62,14 @@ vtkExtractHistogram::vtkExtractHistogram() :
     0,
     vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
     vtkDataSetAttributes::SCALARS);
+  this->Internal = new vtkEHInternals;
+  this->CalculateAverages = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::~vtkExtractHistogram()
 {
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
@@ -129,9 +152,49 @@ int vtkExtractHistogram::RequestUpdateExtent(
 }
 
 //-----------------------------------------------------------------------------
+int vtkExtractHistogram::GetInputFieldAssociation()
+{
+  vtkInformationVector *inArrayVec = 
+    this->Information->Get(INPUT_ARRAYS_TO_PROCESS());
+  vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(0);
+  return inArrayInfo->Get(vtkDataObject::FIELD_ASSOCIATION());
+}
+
+//-----------------------------------------------------------------------------
+vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
+{
+  if (this->Internal->FieldAssociation < 0)
+    {
+    this->Internal->FieldAssociation = this->GetInputFieldAssociation();
+    }
+    
+  switch (this->Internal->FieldAssociation)
+    {
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    case vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS:
+      return vtkDataSet::SafeDownCast(input)->GetPointData();
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+      return vtkDataSet::SafeDownCast(input)->GetCellData();
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_NONE:
+      return input->GetFieldData();
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+      return vtkGraph::SafeDownCast(input)->GetVertexData();
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+      return vtkGraph::SafeDownCast(input)->GetEdgeData();
+      break;
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
 bool vtkExtractHistogram::InitializeBinExtents(
   vtkInformationVector** inputVector,
-  vtkDoubleArray* bin_extents)
+  vtkDoubleArray* bin_extents,
+  double& min, double& max)
 {
   double range[2];
   range[0] = VTK_DOUBLE_MAX;
@@ -154,11 +217,9 @@ bool vtkExtractHistogram::InitializeBinExtents(
       {
       vtkDataObject *dObj = cdit->GetCurrentDataObject();      
       vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
-      if (
-        data_array &&
-        !(this->Component < 0 && 
-          this->Component >= data_array->GetNumberOfComponents())
-        )
+      if (data_array &&
+          !(this->Component < 0 && 
+          this->Component >= data_array->GetNumberOfComponents()))
         {
         if (!foundone)
           {
@@ -218,6 +279,8 @@ bool vtkExtractHistogram::InitializeBinExtents(
     range[1] = range[0]+1;
     }    
 
+  min = range[0];
+  max = range[1];
   double bin_delta = (range[1] - range[0]) / this->BinCount;
   bin_extents->SetValue(0, range[0]);
   for(int i = 1; i < this->BinCount; ++i)
@@ -229,9 +292,10 @@ bool vtkExtractHistogram::InitializeBinExtents(
 }
 
 //-----------------------------------------------------------------------------
-void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array, 
+void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
                                      vtkIntArray *bin_values,
-                                     vtkDoubleArray *bin_extents)
+                                     double min, double max,
+                                     vtkFieldData* field)
 {
   // If the requested component is out-of-range for the input,
   // the bin_values will be 0, so no need to do any actual counting.
@@ -243,6 +307,7 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
     }
 
   int num_of_tuples = data_array->GetNumberOfTuples();
+  double bin_delta = (max-min)/this->BinCount;
   for(int i = 0; i != num_of_tuples; ++i)
     {
     if (i%1000 == 0)
@@ -250,20 +315,34 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
       this->UpdateProgress(0.10 + 0.90*i/num_of_tuples);
       }
     const double value = data_array->GetComponent(i, this->Component);
-    for(int j = 0; j != this->BinCount; ++j)
+    int index = (value - min) / bin_delta;
+    // If the value is equal to max, include it in the last bin.
+    index = ( index == this->BinCount ? index - 1 : index );
+    bin_values->SetValue(index, bin_values->GetValue(index)+1);
+    
+    if (this->CalculateAverages)
       {
-      // if we're at the last bin, and this value didn't go in any other bin,
-      // it goes in the last one
-      if(j == this->BinCount - 1)
+      // Get all other arrays, add their value to the bin
+      // For each bin, we will need 2 values per array ->
+      // total, num. elements
+      // at the end, divide each total by num. elements
+      int num_arrays = field->GetNumberOfArrays();
+      for (int idx=0; idx<num_arrays; idx++)
         {
-        bin_values->SetValue(j, bin_values->GetValue(j) + 1);
-        break;
-        }
-      // check that the value is less than the right hand value of the bin
-      else if(value < bin_extents->GetValue(j+1))
-        {
-        bin_values->SetValue(j, bin_values->GetValue(j) + 1);
-        break;
+        vtkDataArray* array = field->GetArray(idx);
+        if (array != data_array && array->GetName())
+          {
+          vtkEHInternals::ArrayValuesType& arrayValues =
+            this->Internal->ArrayValues[array->GetName()];
+          arrayValues.TotalValues.resize(this->BinCount);
+          int numComps = array->GetNumberOfComponents();
+          arrayValues.TotalValues[index].resize(numComps);
+          for (int comp=0; comp<numComps; comp++)
+            {
+            arrayValues.TotalValues[index][comp] +=
+              array->GetComponent(i, comp);
+            }
+          }
         }
       }
     }
@@ -273,7 +352,7 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
 int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
                                      vtkInformationVector** inputVector, 
                                      vtkInformationVector* outputVector)
-{
+{  
   // Build an empty output grid in advance, so we can bail-out if we
   // encounter any problems
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
@@ -288,7 +367,6 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_extents->SetName("bin_extents");
   bin_extents->FillComponent(0, 0.0);
   output_data->SetXCoordinates(bin_extents);
-  output_data->GetPointData()->AddArray(bin_extents);
 
   // Insert values into bins ...
   vtkIntArray* const bin_values = vtkIntArray::New();
@@ -296,7 +374,6 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_values->SetNumberOfTuples(this->BinCount);
   bin_values->SetName("bin_values");
   bin_values->FillComponent(0, 0.0);
-  output_data->GetCellData()->AddArray(bin_values);
 
   vtkDoubleArray* const otherCoords = vtkDoubleArray::New();
   otherCoords->SetNumberOfComponents(1);
@@ -307,12 +384,16 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   otherCoords->Delete();
 
   // Initializes the bin_extents array.
-  if (!this->InitializeBinExtents(inputVector, bin_extents))
+  double min, max;
+  if (!this->InitializeBinExtents(inputVector, bin_extents, min, max))
     {
     bin_values->Delete();
     bin_extents->Delete();
-    return 0;
+    this->Internal->ArrayValues.clear();
+    return 1;
     }
+  output_data->GetPointData()->AddArray(bin_extents);
+  output_data->GetCellData()->AddArray(bin_values);
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -326,7 +407,8 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
       {
       vtkDataObject *dObj = cdit->GetCurrentDataObject();      
       vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
-      this->BinAnArray(data_array, bin_values, bin_extents);
+      this->BinAnArray(data_array, bin_values, min, max,
+        this->GetInputFieldData(dObj));
       cdit->GoToNextItem();
       }
     cdit->Delete();
@@ -334,10 +416,62 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   else
     {
     vtkDataArray* data_array = this->GetInputArrayToProcess(0, inputVector);
-    this->BinAnArray(data_array, bin_values, bin_extents);
+    this->BinAnArray(data_array, bin_values, min, max,
+      this->GetInputFieldData(input));
     }
+  
+  if (this->CalculateAverages)
+    {
+    vtkEHInternals::ArrayMapType::iterator iter = 
+      this->Internal->ArrayValues.begin();
+    for(; iter != this->Internal->ArrayValues.end(); iter++)
+      {
+      vtkSmartPointer<vtkDoubleArray> da = 
+        vtkSmartPointer<vtkDoubleArray>::New();
+      vtkstd::string newname = iter->first + "_total";
+      da->SetName(newname.c_str());
+      vtkSmartPointer<vtkDoubleArray> aa = 
+        vtkSmartPointer<vtkDoubleArray>::New();
+      vtkstd::string newname2 = iter->first + "_average";
+      aa->SetName(newname2.c_str());
+      int numComps = iter->second.TotalValues[0].size();
+      da->SetNumberOfComponents(numComps);
+      da->SetNumberOfTuples(this->BinCount);
+      aa->SetNumberOfComponents(numComps);
+      aa->SetNumberOfTuples(this->BinCount);
+      for (vtkIdType i=0; i<this->BinCount; i++)
+        {
+        for (int j=0; j<numComps; j++)
+          {
+          if (iter->second.TotalValues[i].size() == (unsigned int)numComps)
+            {
+            da->SetValue(i*numComps+j, iter->second.TotalValues[i][j]);
+            if (bin_values->GetValue(i))
+              {
+              aa->SetValue(i*numComps+j, 
+                iter->second.TotalValues[i][j]/bin_values->GetValue(i));
+              }
+            else
+              {
+              aa->SetValue(i*numComps+j, 0);
+              }
+            }
+          else
+            {
+            da->SetValue(i*numComps+j, 0);
+            aa->SetValue(i*numComps+j, 0);
+            }
+          }
+        }
+      output_data->GetCellData()->AddArray(da);
+      output_data->GetCellData()->AddArray(aa);
+      }
+
+    this->Internal->ArrayValues.clear();
+    }
+
   bin_values->Delete();
   bin_extents->Delete();
-
+    
   return 1;
 }
