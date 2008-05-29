@@ -7062,7 +7062,40 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- End ExtractHistogram -->
    </SourceProxy>
 
-   
+   <!-- ==================================================================== -->
+   <SourceProxy name="ScatterPlot" class="vtkDataSetToRectilinearGrid"
+                label="Scatter Plot">
+     <Documentation
+        long_help="Creates a scatter plot from a dataset."
+        short_help="Creates a scatter plot from a dataset.">
+        This filter creates a scatter plot from a dataset. In point data mode,
+        it uses the X point coordinates as the default X array. All other arrays
+        are passed to the output and can be used in the scatter plot. In cell
+        data mode, the first single component array is used as the default X
+        array.
+     </Documentation>
+    
+     <InputProperty name="Input" command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            This property specifies the input to the filter.
+          </Documentation>
+     </InputProperty>
+
+     <Hints>
+        <Visibility replace_input="0" />
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
+     </Hints>
+   <!-- End ScatterPlot -->
+   </SourceProxy>
+      
    <!-- ==================================================================== -->
    <SourceProxy name="RectilinearGridGeometryFilter" class="vtkRectilinearGridGeometryFilter">
       <Documentation

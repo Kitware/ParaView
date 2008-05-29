@@ -99,6 +99,7 @@
   <Filter name="ReflectionFilter" />
   <Filter name="RibbonFilter" />
   <Filter name="RotationalExtrusionFilter" />
+  <Filter name="ScatterPlot"/>
   <Filter name="ShrinkFilter" />
   <Filter name="SmoothPolyDataFilter" />
   <Filter name="StreamTracer" />
