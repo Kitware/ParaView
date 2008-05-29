@@ -123,12 +123,18 @@ public:
 pqPipelineRepresentation::pqPipelineRepresentation(
   const QString& group,
   const QString& name,
-  vtkSMPropRepresentationProxy* display,
+  vtkSMProxy* display,
   pqServer* server, QObject* p/*=null*/):
   Superclass(group, name, display, server, p)
 {
   this->Internal = new pqPipelineRepresentation::pqInternal();
-  this->Internal->RepresentationProxy = display;
+  this->Internal->RepresentationProxy
+    = vtkSMPropRepresentationProxy::SafeDownCast(display);
+
+  if (!this->Internal->RepresentationProxy)
+    {
+    qFatal("Display given is not a vtkSMPropRepresentationProxy.");
+    }
 
   // If any of these properties change, we know that the coloring for the
   // representation has been affected.

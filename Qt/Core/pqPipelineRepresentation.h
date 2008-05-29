@@ -66,7 +66,7 @@ public:
   // \c parent:- QObject parent.
   pqPipelineRepresentation( const QString& group, 
                             const QString& name,
-                            vtkSMPropRepresentationProxy* repr, 
+                            vtkSMProxy* repr, 
                             pqServer* server,
                             QObject* parent=NULL);
   virtual ~pqPipelineRepresentation();
