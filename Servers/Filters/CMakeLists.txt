@@ -14,6 +14,8 @@ SET(Filters_SRCS
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkCTHFragmentConnect.cxx
+  vtkCTHFragmentIntersect.cxx
+  vtkCTHFragmentCommBuffer.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
@@ -153,6 +155,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSpyPlotIStream.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotReaderMap.cxx
+  vtkCTHFragmentCommBuffer.cxx
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES(

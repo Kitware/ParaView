@@ -47,6 +47,7 @@
   <Filter name="Clip" />
   <Filter name="Contour" />
   <Filter name="CTHFragmentConnect"/>
+  <Filter name="CTHFragmentIntersect"/>
   <Filter name="CTHPart" />
   <Filter name="Curvatures" />
   <Filter name="Cut" />

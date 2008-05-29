@@ -1365,7 +1365,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
          The value of this property is the volume fraction value for the surface.
        </Documentation>
      </DoubleVectorProperty>
-   <!-- End CTHPart -->
+    <!-- End CTHPart -->
    </SourceProxy>
 
    <!-- ==================================================================== -->
@@ -6264,7 +6264,7 @@ Tessellate a higher-order dataset.
    <SourceProxy 
      name="CTHFragmentConnect" 
      class="vtkCTHFragmentConnect"
-     label="Extract CTH Boundaries and Fragments">
+     label="Extract CTH Fragments">
      <Documentation
        long_help="TODO long help"
        short_help="TODO short help">
@@ -6434,6 +6434,62 @@ Tessellate a higher-order dataset.
    <!-- End CTHFragmentConnect -->
    </SourceProxy>
 
+<!-- ==================================================================== -->
+   <SourceProxy 
+     name="CTHFragmentIntersect" 
+     class="vtkCTHFragmentIntersect"
+     label="Intersect CTH Fragments">
+     <Documentation
+       long_help="Perform geometric intersections on the output of the CTH Fragment Connnect filter."
+       short_help="TODO">
+       TODO.
+     </Documentation>
+
+     <!-- Out -->
+     <OutputPort name="geometry" index="0" />
+     <OutputPort name="statistics" index="1" />
+     <!-- In -->
+     <InputProperty
+       name="Input"
+       command="SetGeometryInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+     </InputProperty>
+     <InputProperty
+       name="Source"
+       command="SetStatisticsInputConnection">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+     </InputProperty>
+    <!-- Cut functuion -->
+    <ProxyProperty name="CutFunction" command="SetCutFunction"
+        label="Slice Type">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <!--
+              <Proxy group="implicit_functions" name="Sphere" />
+              -->
+           </ProxyListDomain>
+           <Documentation>
+             This property sets the parameters of the slice function.
+           </Documentation>
+     </ProxyProperty>
+   <!-- End CTHFragmentIntersect -->
+   </SourceProxy>
 
    <!-- ==================================================================== -->
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
