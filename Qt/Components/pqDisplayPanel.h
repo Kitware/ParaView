@@ -61,6 +61,9 @@ public slots:
   /// Representation is visible in.
   virtual void updateAllViews();
 
+  /// Called when the data information has changed.
+  virtual void dataUpdated();
+
 protected:
   QPointer<pqRepresentation> Representation;
 };

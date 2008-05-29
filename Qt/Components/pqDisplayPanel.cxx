@@ -31,10 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqDisplayPanel.h"
+#include "pqDataRepresentation.h"
+#include "pqPipelineSource.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
 
 pqDisplayPanel::pqDisplayPanel(pqRepresentation* display, QWidget* p)
   : QWidget(p), Representation(display)
 {
+  pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(display);
+  if (dataRepr)
+    {
+    pqPipelineSource* input = dataRepr->getInput();
+    QObject::connect(input, SIGNAL(dataUpdated(pqPipelineSource*)), 
+      this, SLOT(dataUpdated()));
+    this->dataUpdated();
+    }
 }
 
 pqDisplayPanel::~pqDisplayPanel()
@@ -48,6 +60,16 @@ pqRepresentation* pqDisplayPanel::getRepresentation()
 
 void pqDisplayPanel::reloadGUI()
 {
+}
+
+void pqDisplayPanel::dataUpdated()
+{
+  vtkSMProxy* proxy = this->Representation->getProxy();
+  vtkSMProperty* prop = proxy->GetProperty("Input");
+  if (prop)
+    {
+    prop->UpdateDependentDomains();
+    }
 }
 
 void pqDisplayPanel::updateAllViews()
