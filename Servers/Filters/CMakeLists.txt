@@ -19,24 +19,20 @@ SET(Filters_SRCS
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
-#  vtkCellSelect.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientServerMoveData.cxx
-#  vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx
-#  vtkDataAnalysisFilter.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
   vtkFileSeriesReader.cxx
-#  vtkGroup.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
@@ -113,7 +109,6 @@ SET(Filters_SRCS
   vtkPVVisibleCellSelector.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
-#  vtkSelectInputs.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
