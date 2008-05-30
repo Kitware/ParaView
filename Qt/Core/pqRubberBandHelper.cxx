@@ -328,6 +328,7 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
     return;
     }
 
+  bool ctrl = rwi->GetControlKey();
   int* eventpos = rwi->GetEventPosition();
   switch(eventId)
     {
@@ -363,11 +364,11 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
         switch (this->Mode)
           {
         case SELECT:
-          this->Internal->RenderView->selectOnSurface(rectOut);
+          this->Internal->RenderView->selectOnSurface(rectOut, ctrl);
           break;
 
         case SELECT_POINTS:
-          this->Internal->RenderView->selectPointsOnSurface(rectOut);
+          this->Internal->RenderView->selectPointsOnSurface(rectOut, ctrl);
           break;
 
         case FRUSTUM:
@@ -379,7 +380,7 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
           break;
 
         case BLOCKS:
-          this->Internal->RenderView->selectBlock(rectOut);
+          this->Internal->RenderView->selectBlock(rectOut, ctrl);
           break;
           }
         }

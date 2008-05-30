@@ -76,6 +76,12 @@ public:
   static vtkSMProxy* ConvertSelection(int outputType,
     vtkSMProxy* selectionSourceProxy,
     vtkSMSourceProxy* dataSource, int outputport);
+
+  // Description:
+  // Updates output to be a combination of (input | output) if the two selection
+  // sources are mergeable. Returns true if merge successful.
+  static bool MergeSelection(vtkSMSourceProxy* output, vtkSMSourceProxy* input);
+
 protected:
   vtkSMSelectionHelper() {};
   ~vtkSMSelectionHelper() {};

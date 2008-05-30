@@ -163,6 +163,20 @@ public:
   static const ManipulatorType* getDefaultManipulatorTypes()
     { return pqRenderView::DefaultManipulatorTypes; }
 
+  /// Creates a new surface selection given the rectangle in display
+  /// coordinates.
+  void selectOnSurface(int rectangle[4], bool expand=false);
+  void selectPointsOnSurface(int rectangle[4], bool expand=false);
+
+  /// Creates a new frustum selection given the rectangle in display
+  /// coordinates.
+  void selectFrustum(int rectangle[4]);
+  void selectFrustumPoints(int rectangle[4]);
+
+  /// Creates a "block" selection given the rectangle in display coordinates.
+  /// block selection is selection of a block in a composite dataset.
+  void selectBlock(int rectangle[4], bool expand=false);
+
 public slots:
   // Toggle the orientation axes visibility.
   void setOrientationAxesVisibility(bool visible);
@@ -211,20 +225,6 @@ public slots:
   /// Called to redo interaction.
   /// View modules supporting interaction undo must override this method.
   virtual void redo();
-
-  /// Creates a new surface selection given the rectangle in display
-  /// coordinates.
-  void selectOnSurface(int rectangle[4]);
-  void selectPointsOnSurface(int rectangle[4]);
-
-  /// Creates a new frustum selection given the rectangle in display
-  /// coordinates.
-  void selectFrustum(int rectangle[4]);
-  void selectFrustumPoints(int rectangle[4]);
-
-  /// Creates a "block" selection given the rectangle in display coordinates.
-  /// block selection is selection of a block in a composite dataset.
-  void selectBlock(int rectangle[4]);
 
 private slots:
   // Called when vtkSMRenderViewProxy fires
@@ -294,10 +294,12 @@ protected:
 private: 
   class pqInternal;
   pqInternal* Internal;
-  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&);
+  void selectOnSurfaceInternal(int rect[4], QList<pqOutputPort*>&, 
+    bool select_points, bool expand, bool select_blocks);
   void emitSelectionSignal(QList<pqOutputPort*>);
   void collectSelectionPorts(vtkCollection* selectedRepresentations,
-    vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts);
+    vtkCollection* selectionSources, QList<pqOutputPort*> &pqPorts,
+    bool expand, bool select_blocks);
 
   static ManipulatorType DefaultManipulatorTypes[9];
 };

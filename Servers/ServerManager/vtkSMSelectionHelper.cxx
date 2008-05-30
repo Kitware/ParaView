@@ -34,6 +34,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkUnsignedIntArray.h"
@@ -42,7 +43,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.17");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.18");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -584,4 +585,81 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
   selInfo->Delete();
 
   return outSource;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMSelectionHelper::MergeSelection(vtkSMSourceProxy* output, 
+  vtkSMSourceProxy* input)
+{
+  // Currently only index based selections i.e. ids, global ids based selections
+  // are mergeable and that too only is input and output are identical in all
+  // respects (except the indices ofcourse).
+  if (!output || !input || 
+    strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
+    {
+    return false;
+    }
+
+  if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() != 
+    vtkSMPropertyHelper(input, "FieldType").GetAsInt())
+    {
+    return false;
+    }
+
+  if (vtkSMPropertyHelper(output, "ContainingCells").GetAsInt() != 
+    vtkSMPropertyHelper(input, "ContainingCells").GetAsInt())
+    {
+    return false;
+    }
+
+  if (vtkSMPropertyHelper(output, "InsideOut").GetAsInt() != 
+    vtkSMPropertyHelper(input, "InsideOut").GetAsInt())
+    {
+    return false;
+    }
+
+  // mergs IDs or Blocks properties.
+  if (output->GetProperty("IDs") && input->GetProperty("IDs"))
+    {
+    vtkSMPropertyHelper outputIDs(output, "IDs");
+    vtkSMPropertyHelper inputIDs(input, "IDs");
+
+    vtkstd::vector<vtkIdType> ids;
+    unsigned int cc;
+    unsigned int count = inputIDs.GetNumberOfElements();
+    for (cc=0; cc < count; cc++)
+      {
+      ids.push_back(inputIDs.GetAsIdType(cc));
+      }
+    count = outputIDs.GetNumberOfElements();
+    for (cc=0; cc < count; cc++)
+      {
+      ids.push_back(outputIDs.GetAsIdType(cc));
+      }
+    outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    return true;
+    }
+
+  if (output->GetProperty("Blocks") && input->GetProperty("Blocks"))
+    {
+    vtkSMPropertyHelper outputIDs(output, "Blocks");
+    vtkSMPropertyHelper inputIDs(input, "Blocks");
+
+    vtkstd::vector<vtkIdType> ids;
+    unsigned int cc;
+    unsigned int count = inputIDs.GetNumberOfElements();
+    for (cc=0; cc < count; cc++)
+      {
+      ids.push_back(inputIDs.GetAsIdType(cc));
+      }
+    count = outputIDs.GetNumberOfElements();
+    for (cc=0; cc < count; cc++)
+      {
+      ids.push_back(outputIDs.GetAsIdType(cc));
+      }
+    outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    return true;
+    }
+
+  return false;
 }
