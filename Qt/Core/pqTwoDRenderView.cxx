@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqRepresentation.h"
+#include "pqDataRepresentation.h"
 
 pqTwoDRenderView::ManipulatorType pqTwoDRenderView::DefaultManipulatorTypes[9] = 
 {
@@ -155,11 +155,20 @@ bool pqTwoDRenderView::canDisplay(pqOutputPort* opPort) const
 //-----------------------------------------------------------------------------
 void pqTwoDRenderView::updateVisibility(pqRepresentation* curRepr, bool visible)
 {
+  if (!qobject_cast<pqDataRepresentation*>(curRepr))
+    {
+    return;
+    }
+
   if (visible)
     {
     QList<pqRepresentation*> reprs = this->getRepresentations();
     foreach (pqRepresentation* repr, reprs)
       {
+      if (!qobject_cast<pqDataRepresentation*>(repr))
+        {
+        continue;
+        }
       if (repr != curRepr && repr->isVisible())
         {
         repr->setVisible(false);

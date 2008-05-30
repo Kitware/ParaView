@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
-#include "pqRenderView.h"
+#include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
@@ -48,7 +48,7 @@ class pqScalarBarVisibilityAdaptor::pqInternal
 {
 public:
   QPointer<pqPipelineRepresentation> ActiveDisplay;
-  QPointer<pqRenderView> ActiveRenderView;
+  QPointer<pqRenderViewBase> ActiveRenderView;
   QPointer<pqScalarsToColors> ActiveLUT;
 };
 
@@ -96,7 +96,7 @@ void pqScalarBarVisibilityAdaptor::setActiveRepresentation(
     if(this->Internal->ActiveDisplay)
       {
       this->Internal->ActiveRenderView =  
-        qobject_cast<pqRenderView *>(display->getView());
+        qobject_cast<pqRenderViewBase *>(display->getView());
       QObject::connect(this->Internal->ActiveDisplay,
           SIGNAL(visibilityChanged(bool)), 
           this, SLOT(updateState()), Qt::QueuedConnection);

@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
-#include "pqRenderView.h"
+#include "pqRenderViewBase.h"
 #include "pqRescaleRange.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
@@ -361,7 +361,7 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
   this->initColorScale();
   if(this->ColorMap)
     {
-    pqRenderView *renderModule = qobject_cast<pqRenderView *>(
+    pqRenderViewBase *renderModule = qobject_cast<pqRenderViewBase *>(
         this->Display->getView());
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
     }
@@ -1102,7 +1102,7 @@ void pqColorScaleEditor::checkForLegend()
 {
   if(!this->Form->MakingLegend && this->ColorMap)
     {
-    pqRenderView *view = qobject_cast<pqRenderView *>(
+    pqRenderViewBase *view = qobject_cast<pqRenderViewBase *>(
         this->Display->getView());
     this->setLegend(this->ColorMap->getScalarBar(view));
     }
@@ -1119,7 +1119,7 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       this->Form->MakingLegend = true;
       pqObjectBuilder *builder =
           pqApplicationCore::instance()->getObjectBuilder();
-      pqRenderView *renderModule = qobject_cast<pqRenderView *>(
+      pqRenderViewBase *renderModule = qobject_cast<pqRenderViewBase *>(
           this->Display->getView());
       pqScalarBarRepresentation *legend = builder->createScalarBarDisplay(
           this->ColorMap, renderModule);

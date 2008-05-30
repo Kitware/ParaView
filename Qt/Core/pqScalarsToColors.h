@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqScalarsToColorsInternal;
 class pqScalarBarRepresentation;
-class pqRenderView;
+class pqRenderViewBase;
 
 /// pqScalarsToColors is a represents a vtkScalarsToColors proxy.
 class PQCORE_EXPORT pqScalarsToColors : public pqProxy
@@ -50,7 +50,7 @@ public:
 
   /// Returns the first scalar bar visible in the given render module,
   /// if any.
-  pqScalarBarRepresentation* getScalarBar(pqRenderView* ren) const;
+  pqScalarBarRepresentation* getScalarBar(pqRenderViewBase* ren) const;
 
   /// Returns if the lookup table's scalar range is locked.
   bool getScalarRangeLock() const;

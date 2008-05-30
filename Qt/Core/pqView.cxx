@@ -262,6 +262,7 @@ void pqView::onRepresentationsChanged()
       QObject::connect(repr, SIGNAL(visibilityChanged(bool)),
         this, SLOT(onRepresentationVisibilityChanged(bool)));
       emit this->representationAdded(repr);
+      emit this->representationVisibilityChanged(repr, repr->isVisible());
       }
     }
 
@@ -276,6 +277,7 @@ void pqView::onRepresentationsChanged()
       repr->setView(0);
       iter = this->Internal->Representations.erase(iter);
       QObject::disconnect(repr, 0, this, 0);
+      emit this->representationVisibilityChanged(repr, false);
       emit this->representationRemoved(repr);
       }
     else
