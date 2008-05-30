@@ -103,6 +103,11 @@ public:
   /// Returns if the save was successful.
   bool saveImage(int width, int height, const QString& filename);
 
+  /// \brief
+  ///   Resets the multi-view to its original state.
+  /// \param removed Used to return all the removed widgets.
+  virtual void reset(QList<QWidget*> &removed);
+
 signals:
   /// Fired when the active view module changes.
   void activeViewChanged(pqView*);

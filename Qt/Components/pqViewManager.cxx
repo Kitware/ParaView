@@ -437,6 +437,17 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 }
 
 //-----------------------------------------------------------------------------
+void pqViewManager::reset(QList<QWidget*> &removed)
+{
+  foreach (pqMultiViewFrame* frame, this->Internal->PendingFrames)
+    {
+    this->onFrameRemoved(frame);
+    }
+
+  this->Superclass::reset(removed);
+}
+
+//-----------------------------------------------------------------------------
 void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
 {
   if (!frame || !view)

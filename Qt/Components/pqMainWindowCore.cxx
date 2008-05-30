@@ -821,8 +821,6 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
     << pqSetName("statisticsView");
     
   dock_widget->setWidget(statistics_view);
-
-  pqUndoStack* const undo_stack = this->Implementation->UndoStack;
 }
 
 //-----------------------------------------------------------------------------
@@ -1973,6 +1971,10 @@ void pqMainWindowCore::onServerDisconnect()
     }
   QList<QWidget*> removed;
   this->Implementation->MultiViewManager.reset(removed);
+  foreach (QWidget* widget, removed)
+    {
+    delete widget;
+    }
 
   pqEventDispatcher::processEventsAndWait(1);
 
