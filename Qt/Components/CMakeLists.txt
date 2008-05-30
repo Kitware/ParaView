@@ -186,6 +186,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   #pqSourceInfoIcons.h
   #pqSourceInfoModel.h
   pqSourcesMenuManager.h
+  pqSphereWidget.h
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
   pqStreamTracerPanel.h
@@ -267,6 +268,7 @@ SET(UI_FORMS
   Resources/UI/pqServerBrowser.ui
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSignalAdaptorKeyFrameValue.ui
+  Resources/UI/pqSphereWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqStreamTracerPanel.ui
@@ -613,6 +615,8 @@ ADD_LIBRARY(pqComponents
   #pqSourceProxyInfo.h
   pqSourcesMenuManager.cxx
   pqSourcesMenuManager.h
+  pqSphereWidget.cxx
+  pqSphereWidget.h
   pqSplitViewUndoElement.cxx
   pqSplitViewUndoElement.h
   pqStateLoader.cxx

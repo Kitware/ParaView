@@ -1276,9 +1276,7 @@ Extract CTH Parts is a specialized filter for visualizing the data from a CTH si
               <Proxy group="implicit_functions" name="None" />
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              This property specifies whether to clip the dataset, and if so, it also specifies the parameters of the plane with which to clip.
@@ -3582,9 +3580,7 @@ This filter extracts the portion of the input dataset that lies along the specif
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              This property sets the parameters of the slice function.
@@ -3656,9 +3652,7 @@ To use this filter you must specify a region  (implicit function). You must also
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              This property sets the region used to extract cells.
@@ -3746,10 +3740,8 @@ The Clip filter cuts away a portion of the input data set using an implicit plan
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <Proxy group="implicit_functions" name="Scalar" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
+              <Proxy group="implicit_functions" name="Scalar" />
            </ProxyListDomain>
            <Documentation>
              This property specifies the parameters of the clip function (an implicit plane) used to clip the dataset.
@@ -5644,9 +5636,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              Set the parameters of the clip function.
@@ -5810,9 +5800,7 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              Set the parameters to the implicit function used for cutting.
@@ -6480,9 +6468,7 @@ Tessellate a higher-order dataset.
            <ProxyListDomain name="proxy_list">
               <Proxy group="implicit_functions" name="Plane" />
               <Proxy group="implicit_functions" name="Box" />
-              <!--
               <Proxy group="implicit_functions" name="Sphere" />
-              -->
            </ProxyListDomain>
            <Documentation>
              This property sets the parameters of the slice function.

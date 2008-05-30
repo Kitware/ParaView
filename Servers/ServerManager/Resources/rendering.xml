@@ -1311,8 +1311,7 @@
      </DoubleVectorProperty>
     </Proxy>
 
-    <Proxy
-           name="HandleRepresentation"
+    <Proxy name="HandleRepresentation"
            class="vtkPointHandleRepresentation3D">
 
      <IntVectorProperty
@@ -1654,6 +1653,107 @@
 
       <!-- End of BoxRepresentation -->
     </BoxRepresentationProxy>
+
+    <Proxy name="SphereRepresentation" class="vtkSphereRepresentation">
+      <Documentation>
+        Proxy for vtkSphereRepresentation. Don't confuse this with the
+        vtkSMRepresentation proxy for the sphere widget (which is the
+        SphereWidgetRepresentation).
+      </Documentation>
+
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty 
+        name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty 
+        name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.01" />
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Renderer" command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+           Set the representation (i.e., appearance) of the sphere. Different
+            representations are useful depending on the application. 
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Off" value="0" />
+          <Entry text="Wireframe" value="1" />
+          <Entry text="Surface" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Center"
+        command="SetCenter"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0"
+        information_property="CenterInfo">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+           The center position of the sphere. Note that this may
+           adjust the direction from the handle to the center, as well as
+           the radius of the sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="CenterInfo"
+        command="GetCenter"
+        information_only="1" >
+        <SimpleDoubleInformationHelper /> 
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Radius"
+        command="SetRadius"
+        number_of_elements="1"
+        default_values="0.5"
+        information_property="RadiusInfo">
+        <DoubleRangeDomain name="range" min="0.0" />
+        <Documentation>
+          The radius of sphere. Default is 0.5. Note that this may
+          modify the position of the handle based on the handle direction.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="RadiusInfo"
+        command="GetRadius"
+        information_only="1" >
+        <SimpleDoubleInformationHelper /> 
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="HandleVisibility"
+        command="SetHandleVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- End of SphereRepresentation -->
+    </Proxy>
 
     <Proxy name="ScalarBarRepresentation" 
            class="vtkScalarBarRepresentation">
@@ -7285,6 +7385,39 @@
       </SubProxy>
 
       <!-- End of BoxWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="SphereWidgetRepresentation">
+      <Documentation>
+        Representation proxy for the the sphere widget. This includes the
+        widget/representation proxies for the sphere 3D widget.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="SphereRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+          <Property name="Representation" />
+          <Property name="Center" />
+          <Property name="CenterInfo" />
+          <Property name="Radius" />
+          <Property name="RadiusInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="SphereWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of SphereWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
 
     <NewWidgetRepresentationProxy name="SliderWidgetRepresentation">

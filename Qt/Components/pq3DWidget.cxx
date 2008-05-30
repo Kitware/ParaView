@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqRenderView.h"
 #include "pqSMAdaptor.h"
+#include "pqSphereWidget.h"
 
 class pq3DWidgetInternal
 {
@@ -163,6 +164,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
       else if (widgetType == "Distance")
         {
         widget = new pqDistanceWidget(refProxy, pxy, 0);
+        }
+      else if (widgetType == "Sphere")
+        {
+        widget = new pqSphereWidget(refProxy, pxy, 0);
         }
 
       if (widget)
