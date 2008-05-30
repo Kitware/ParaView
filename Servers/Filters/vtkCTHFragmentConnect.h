@@ -46,6 +46,7 @@ class vtkCTHFragmentEquivalenceSet;
 class vtkCTHFragmentConnectRingBuffer;
 class vtkCTHMaterialFragmentArray;
 class vtkCTHFragmentPieceLoading;
+class vtkCTHFragmentCommBuffer;
 
 class VTK_EXPORT vtkCTHFragmentConnect : public vtkMultiBlockDataSetAlgorithm
 {
@@ -287,14 +288,14 @@ protected:
   int ReceiveIntegratedAttributes(const int sourceProcId);
   // Size buffers etc...
   int PrepareToCollectIntegratedAttributes(
-          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
   // Free resources.
   int CleanUpAfterCollectIntegratedAttributes(
-          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
@@ -302,7 +303,7 @@ protected:
   // Receive all integrated attribute arrays from all other 
   // processes.
   int CollectIntegratedAttributes(
-          vtkstd::vector<double *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
@@ -313,20 +314,20 @@ protected:
   int SendGeometricAttributes(const int controllingProcId);
   // size buffers & new containers
   int PrepareToCollectGeometricAttributes(
-          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&coaabb,
           vtkstd::vector<vtkDoubleArray *>&obb,
           vtkstd::vector<int *> &ids);
   // Free resources.
   int CleanUpAfterCollectGeometricAttributes(
-          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&coaabb,
           vtkstd::vector<vtkDoubleArray *>&obb,
           vtkstd::vector<int *> &ids);
   // Recieve all geometric attributes from all other
   // processes.
   int CollectGeometricAttributes(
-          vtkstd::vector<char *> &buffers,
+          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&coaabb,
           vtkstd::vector<vtkDoubleArray *>&obb,
           vtkstd::vector<int *> &ids);
@@ -334,30 +335,6 @@ protected:
   int PrepareToMergeGeometricAttributes();
   // Gather geometric attributes on a single process.
   int GatherGeometricAttributes(const int recipientProcId);
-  // Copy an attribute array into the tail of a buffer
-  int PackAttribute(
-          double *buffer,
-          vtkIdType *header,
-          vtkDoubleArray *attribute,
-          int id);
-  // Copy from a  buffer into an attribute array
-  int UnPackAttribute(
-          const double *buffer,
-          const vtkIdType *header,
-          vtkDoubleArray *attribute,
-          const int nComps,
-          const int id,
-          const bool copyFlag);
-  // Copy fragment ids into the tail of a buffer
-  int PackIds(
-          void *buffer,
-          const vtkIdType *header);
-  // Copy fragment ids from a the tail of a buffer
-  int UnPackIds(
-          const void *buffer,
-          const vtkIdType *header,
-          int *&ids,
-          const bool copyFlag);
   // Merge fragment's geometry that are split on this process
   void ResolveLocalFragmentGeometry();
   // Merge fragment's geometry that are split across processes

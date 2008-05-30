@@ -126,6 +126,8 @@ protected:
 
   /// PARAVIEW interface data
   vtkImplicitFunction *CutFunction;
+  double Progress;
+  double ProgressIncrement;
 
 private:
   vtkCTHFragmentIntersect(const vtkCTHFragmentIntersect&);  // Not implemented.

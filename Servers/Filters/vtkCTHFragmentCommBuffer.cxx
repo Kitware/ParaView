@@ -50,16 +50,16 @@ void vtkCTHFragmentCommBuffer::Initialize(
                 int nBlocks,
                 int nBytes)
 {
-  // buffer
-  CheckAndReleaseArrayPointer(this->Buffer);
-  this->Buffer=new char[nBytes];
-  this->Header[BUFFER_SIZE]=nBytes;
-  this->EOD=0;
   // header
   this->HeaderSize=DESCR_BASE+nBlocks;
   this->Header=new vtkIdType[this->HeaderSize];
   memset(this->Header,0,this->HeaderSize*sizeof(vtkIdType));
   this->Header[PROC_ID]=procId;
+  // buffer
+  CheckAndReleaseArrayPointer(this->Buffer);
+  this->Buffer=new char[nBytes];
+  this->Header[BUFFER_SIZE]=nBytes;
+  this->EOD=0;
 }
 //----------------------------------------------------------------------------
 void vtkCTHFragmentCommBuffer::SizeHeader(int nBlocks)

@@ -106,7 +106,7 @@ class vtkCTHFragmentCommBuffer
     int UnPack(double *&rData,const int nComps,const int nTups,const bool copyFlag);
     int UnPack(int *&rData,const int nComps,const int nTups,const bool copyFlag);
     int UnPack(vtkDoubleArray *da,const int nComps,const int nTups,const bool copyFlag);
-    static void Resize(vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers);
+    //static void Resize(vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers);
   private:
     int BufferSize;
     int EOD;

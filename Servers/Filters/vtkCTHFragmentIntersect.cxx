@@ -57,7 +57,7 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.2");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.3");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
 
 //----------------------------------------------------------------------------
@@ -77,6 +77,8 @@ vtkCTHFragmentIntersect::vtkCTHFragmentIntersect()
   this->StatsIn=0;
   this->StatsOut=0;
   this->NBlocks=0;
+
+  this->Progress=0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -285,6 +287,9 @@ int vtkCTHFragmentIntersect::PrepareToProcessRequest()
   this->IdentifyLocalFragments();
   // configure the cutter
   this->Cutter->SetCutFunction(this->CutFunction);
+  // other
+  this->Progress=0.0;
+  this->ProgressIncrement=0.75/(double)this->NBlocks;
 
   return 1;
 }
@@ -336,6 +341,8 @@ int vtkCTHFragmentIntersect::Intersect()
         intersectionOut->Delete();
         }
       }
+    this->Progress+=this->ProgressIncrement;
+    this->UpdateProgress(this->Progress);
     }
   return 1;
 }
@@ -767,10 +774,13 @@ int vtkCTHFragmentIntersect::RequestData(
     }
   // Execute
   this->Intersect();
+  this->UpdateProgress(0.75);
   // Gather on controller for I/O
   this->GatherGeometricAttributes(0);
+  this->UpdateProgress(0.90);
   // Copy
   this->CopyAttributesToStatsOutput(0);
+  this->UpdateProgress(0.99);
   // clean up
   this->CleanUpAfterRequest();
 
