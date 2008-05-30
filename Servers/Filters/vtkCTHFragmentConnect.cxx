@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.43");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.44");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -6493,7 +6493,6 @@ int vtkCTHFragmentConnect::CollectGeometricAttributes(
 // return 0 on error
 int vtkCTHFragmentConnect::SendGeometricAttributes(const int recipientProcId)
 {
-  const int nProcs=this->Controller->GetNumberOfProcesses();
   const int myProcId=this->Controller->GetLocalProcessId();
   const int msgBase=200000;
 
