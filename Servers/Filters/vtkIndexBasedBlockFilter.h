@@ -80,6 +80,12 @@ public:
   vtkSetMacro(ProcessID, int);
   vtkGetMacro(ProcessID, int);
 
+  // Description:
+  // When set (default) the vtkOriginalIndices array will be added to the
+  // output. Can be overridden by setting this flag to 0.
+  vtkSetMacro(GenerateOriginalIds, int);
+  vtkGetMacro(GenerateOriginalIds, int);
+
   //BTX
   enum FieldDataType
     {
@@ -157,6 +163,7 @@ protected:
   vtkIdType BlockSize;
   vtkIdType Block;
 
+  int GenerateOriginalIds;
   int FieldType;
   vtkIdType StartIndex;
   vtkIdType EndIndex;

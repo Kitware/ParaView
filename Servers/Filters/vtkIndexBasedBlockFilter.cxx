@@ -40,7 +40,7 @@
 #include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.19");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.20");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -62,6 +62,8 @@ vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
   this->StructuredCoordinatesArray = 0;
   this->OriginalIndicesArray = 0;
   this->CompositeIndexArray = 0;
+
+  this->GenerateOriginalIds = 1;
 
   this->CurrentCIndex = 0;
   this->CurrentHIndex = 0;
@@ -257,11 +259,7 @@ int vtkIndexBasedBlockFilter::RequestData(
     // We add OriginalIndicesArray only if the output doesn't already have some
     // other arrays which typically get added by the vtkPVExtractSelection
     // filter.
-    if (fieldData->GetArray("vtkOriginalPointIds")==0 &&
-      fieldData->GetArray("vtkOriginalCellIds")==0)
-      {
-      fieldData->AddArray(this->OriginalIndicesArray);
-      }
+    fieldData->AddArray(this->OriginalIndicesArray);
     this->OriginalIndicesArray->Delete();
     this->OriginalIndicesArray = 0;
     }
@@ -417,7 +415,7 @@ void vtkIndexBasedBlockFilter::PassBlock(
     this->StructuredCoordinatesArray->Allocate(this->EndIndex-this->StartIndex+1);
     }
 
-  if (!this->OriginalIndicesArray)
+  if (!this->OriginalIndicesArray && this->GenerateOriginalIds)
     {
     this->OriginalIndicesArray = vtkIdTypeArray::New();
     this->OriginalIndicesArray->SetName("vtkOriginalIndices");
@@ -457,7 +455,10 @@ void vtkIndexBasedBlockFilter::PassBlock(
   // cout << "PassThrough: " << startIndex << " --> " << endIndex << endl;
   for (vtkIdType inIndex = startIndex; inIndex <= endIndex; ++inIndex)
     {
-    this->OriginalIndicesArray->InsertNextValue(inIndex);
+    if (this->OriginalIndicesArray)
+      {
+      this->OriginalIndicesArray->InsertNextValue(inIndex);
+      }
     outFD->InsertNextTuple(inIndex, inFD);
 
     if (this->FieldType == POINT && psInput)
@@ -612,6 +613,7 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
 void vtkIndexBasedBlockFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GenerateOriginalIds: " << this->GenerateOriginalIds << endl;
   os << indent << "Block: " << this->Block << endl;
   os << indent << "BlockSize: " << this->BlockSize << endl;
   os << indent << "FieldType: " << this->FieldType << endl;
