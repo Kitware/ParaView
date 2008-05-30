@@ -556,7 +556,7 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="Ruler" class="vtkLineSource" label="Ruler">
+   <SourceProxy name="Ruler" class="vtkPVNullSource" label="Ruler">
       <Documentation
          long_help="This is a line source that can be used to measure distance between two points"
          short_help="Create a ruler">
@@ -566,9 +566,7 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
       </Documentation>
       <DoubleVectorProperty
          name="Point1"
-         command="SetPoint1"
          number_of_elements="3"
-         animateable="1"
          default_values="-0.5 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>
@@ -578,9 +576,7 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
 
       <DoubleVectorProperty
          name="Point2"
-         command="SetPoint2"
          number_of_elements="3"
-         animateable="1"
          default_values="0.5 0.0 0.0" >
          <DoubleRangeDomain name="range" />
          <Documentation>

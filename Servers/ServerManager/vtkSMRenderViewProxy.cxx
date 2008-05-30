@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.67");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.68");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1820,8 +1820,21 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
       pxm->NewProxy("representations", "UniformGridRepresentation"));
     }
 
-  return vtkSMRepresentationProxy::SafeDownCast(
+  prototype = pxm->GetPrototypeProxy("representations",
+    "GeometryRepresentation");
+  pp = vtkSMInputProperty::SafeDownCast(
+    prototype->GetProperty("Input"));
+  pp->RemoveAllUncheckedProxies();
+  pp->AddUncheckedInputConnection(source, opport);
+  bool g = (pp->IsInDomains()>0);
+  pp->RemoveAllUncheckedProxies();
+  if (g)
+    {
+    return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "GeometryRepresentation"));
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

@@ -37,9 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkImageData.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QList>
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqImageUtil.h"
 #include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
@@ -563,9 +565,17 @@ bool pqRenderViewBase::eventFilter(QObject* caller, QEvent* e)
 //-----------------------------------------------------------------------------
 bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
 {
-  if (!opPort || 
-     this->getServer()->GetConnectionID() != 
-     opPort->getServer()->GetConnectionID())
+  pqPipelineSource* source = opPort? opPort->getSource() :0;
+  vtkSMSourceProxy* sourceProxy = source? 
+    vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
+  if(!opPort|| !source ||
+    opPort->getServer()->GetConnectionID() !=
+    this->getServer()->GetConnectionID() || !sourceProxy ||
+    sourceProxy->GetOutputPortsCreated()==0)
+    {
+    return false;
+    }
+  if (opPort->getDataInformation(false)->GetDataSetType() == -1)
     {
     return false;
     }

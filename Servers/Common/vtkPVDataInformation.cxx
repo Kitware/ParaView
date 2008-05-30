@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.51");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.52");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -491,6 +491,12 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     {
     vtkErrorMacro("Could not cast object to a known data set: "
                   << (object?object->GetClassName():"(null"));
+    return;
+    }
+
+  if (strcmp(dobj->GetProducerPort()->GetProducer()->GetClassName(), "vtkPVNullSource") == 0)
+    {
+    // Don't gather any data information from the hypothetical null source.
     return;
     }
 
