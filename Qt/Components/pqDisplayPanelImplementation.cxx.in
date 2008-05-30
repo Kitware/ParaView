@@ -91,6 +91,16 @@ bool @PANEL_NAME@Implementation::canCreatePanel(pqRepresentation* display) const
     return false;
     }
 
-  return QString("@PANEL_XML_NAME@") == display->getProxy()->GetXMLName();
+  QString displayName = display->getProxy()->GetXMLName();
+
+  QStringList creatableDisplayNames
+    = QString("@PANEL_XML_NAME@").split(';', QString::SkipEmptyParts);
+
+  foreach(QString name, creatableDisplayNames)
+    {
+    if (displayName == name) return true;
+    }
+
+  return false;
 }
 
