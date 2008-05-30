@@ -57,7 +57,7 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.1");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.2");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
 
 //----------------------------------------------------------------------------
@@ -76,6 +76,7 @@ vtkCTHFragmentIntersect::vtkCTHFragmentIntersect()
   this->GeomOut=0;
   this->StatsIn=0;
   this->StatsOut=0;
+  this->NBlocks=0;
 }
 
 //----------------------------------------------------------------------------
@@ -151,17 +152,19 @@ int vtkCTHFragmentIntersect::CopyInputStructureStats(
                 vtkMultiBlockDataSet *dest,
                 vtkMultiBlockDataSet *src)
 {
-  int nBlocks=src->GetNumberOfBlocks();
-  dest->SetNumberOfBlocks(nBlocks);
+  assert("Unexpected number of blocks in the statistics input."
+         && this->NBlocks==src->GetNumberOfBlocks() );
+
+  dest->SetNumberOfBlocks(this->NBlocks);
 
   // do we have an empty data set??
-  if (nBlocks==0)
+  if (this->NBlocks==0)
     {
     return 0;
     }
   // copy point data structure, to get the names
   // and numbers of components.
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     vtkPolyData *srcPd
       = dynamic_cast<vtkPolyData *>(src->GetBlock(blockId));
@@ -188,18 +191,17 @@ int vtkCTHFragmentIntersect::CopyInputStructureGeom(
                 vtkMultiBlockDataSet *dest,
                 vtkMultiBlockDataSet *src)
 {
-  int nBlocks=src->GetNumberOfBlocks();
-  dest->SetNumberOfBlocks(nBlocks);
+  dest->SetNumberOfBlocks(this->NBlocks);
 
   // do we have an empty data set??
-  if (nBlocks==0)
+  if (this->NBlocks==0)
     {
     return 0;
     }
 
   // for non-empty data sets we expect that all
   // blocks are multipiece of polydata (geom)
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     vtkMultiPieceDataSet *srcFragments
       = dynamic_cast<vtkMultiPieceDataSet *>(src->GetBlock(blockId));
@@ -233,12 +235,11 @@ int vtkCTHFragmentIntersect::CopyInputStructureGeom(
 // return 0 on error.
 int vtkCTHFragmentIntersect::IdentifyLocalFragments()
 {
-  int nBlocks=this->GeomIn->GetNumberOfBlocks();
   int nProcs=this->Controller->GetNumberOfProcesses();
   this->FragmentIds.clear();
-  this->FragmentIds.resize(nBlocks);
+  this->FragmentIds.resize(this->NBlocks);
   // look in each material 
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     vtkMultiPieceDataSet *fragments
       = dynamic_cast<vtkMultiPieceDataSet *>(this->GeomIn->GetBlock(blockId));
@@ -265,9 +266,15 @@ int vtkCTHFragmentIntersect::IdentifyLocalFragments()
 // Probe the input, configure internals and output accordingly
 //
 // return 0 on error.
-int vtkCTHFragmentIntersect::PrepareForIntersection()
+int vtkCTHFragmentIntersect::PrepareToProcessRequest()
 {
-  // prepare the output data
+  // containers hold arrays for each block
+  this->NBlocks=this->GeomIn->GetNumberOfBlocks();
+  // size containers
+  ResizeVectorOfVtkArrayPointers(
+    this->IntersectionCenters,3,0,"centers",this->NBlocks);
+  this->IntersectionIds.resize(this->NBlocks);
+  // prepare the output data sets
   if ( (this->CopyInputStructureGeom(this->GeomOut,this->GeomIn)==0)
        || (this->CopyInputStructureStats(this->StatsOut,this->StatsIn)==0) )
     {
@@ -278,11 +285,6 @@ int vtkCTHFragmentIntersect::PrepareForIntersection()
   this->IdentifyLocalFragments();
   // configure the cutter
   this->Cutter->SetCutFunction(this->CutFunction);
-  // size containers
-  int nBlocks=this->GeomIn->GetNumberOfBlocks();
-  ResizeVectorOfVtkArrayPointers(
-    this->IntersectionCenters,3,0,"centers",nBlocks);
-  this->IntersectionIds.resize(nBlocks);
 
   return 1;
 }
@@ -295,8 +297,7 @@ int vtkCTHFragmentIntersect::PrepareForIntersection()
 int vtkCTHFragmentIntersect::Intersect()
 {
   // look in each material
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     vtkDoubleArray *centers=this->IntersectionCenters[blockId];
     vector<int> &ids=this->IntersectionIds[blockId];
@@ -358,10 +359,8 @@ int vtkCTHFragmentIntersect::CollectGeometricAttributes(
   const int nProcs=this->Controller->GetNumberOfProcesses();
   const int msgBase=200000;
 
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
-
   // size header.
-  vtkCTHFragmentCommBuffer::SizeHeader(buffers,nBlocks);
+  vtkCTHFragmentCommBuffer::SizeHeader(buffers,this->NBlocks);
 
   // gather
   for (int procId=0; procId<nProcs; ++procId)
@@ -389,7 +388,7 @@ int vtkCTHFragmentIntersect::CollectGeometricAttributes(
             thisMsgId);
     ++thisMsgId;
     // unpack buffer
-    for (int blockId=0; blockId<nBlocks; ++blockId)
+    for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
       {
       int nFragments
         = buffers[procId].GetNumberOfFragments(blockId);
@@ -412,15 +411,14 @@ int vtkCTHFragmentIntersect::SendGeometricAttributes(const int recipientProcId)
 {
   const int msgBase=200000;
 
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
   const int nCompsPerBlock=3; // centers
-  vector<int> nFragments(nBlocks);
+  vector<int> nFragments(this->NBlocks);
 
   // size buffer & initialize header
   vtkCTHFragmentCommBuffer buffer;
-  buffer.SizeHeader(nBlocks);
+  buffer.SizeHeader(this->NBlocks);
   int nBytes=0;
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     nFragments[blockId]=this->IntersectionIds[blockId].size();
     nBytes  // attributes(double) + ids(int)
@@ -430,7 +428,7 @@ int vtkCTHFragmentIntersect::SendGeometricAttributes(const int recipientProcId)
   buffer.SizeBuffer(nBytes);
 
   // pack attributes & ids
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     // centers
     buffer.Pack(this->IntersectionCenters[blockId]);
@@ -470,7 +468,6 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
 {
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
 
   // buffers
   buffers.resize(nProcs);
@@ -484,7 +481,7 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
       }
     else
       {
-      ResizeVectorOfVtkPointers(centers[procId],nBlocks);
+      ResizeVectorOfVtkPointers(centers[procId],this->NBlocks);
       }
     }
   // ids
@@ -493,7 +490,7 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
     {
     if (procId==myProcId)
       {
-      for (int blockId=0; blockId<nBlocks; ++blockId)
+      for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
         {
         // Because we are going to us IntersectionIds to 
         // hold the merged ids we copy our ids to a temp array.
@@ -507,7 +504,7 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
       }
     else
       {
-      ids[procId].resize(nBlocks,static_cast<int *>(0));
+      ids[procId].resize(this->NBlocks,static_cast<int *>(0));
       }
     }
   return 1;
@@ -523,7 +520,6 @@ int vtkCTHFragmentIntersect::CleanUpAfterCollectGeometricAttributes(
 {
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
 
   // centers
   for (int procId=0; procId<nProcs; ++procId)
@@ -533,7 +529,7 @@ int vtkCTHFragmentIntersect::CleanUpAfterCollectGeometricAttributes(
   // ids
   // clean up local temp array. Remote procs are
   // using the comm buffers, they are managed there.
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     delete [] ids[myProcId][blockId];
     }
@@ -545,28 +541,28 @@ int vtkCTHFragmentIntersect::CleanUpAfterCollectGeometricAttributes(
 }
 
 //----------------------------------------------------------------------------
-// Size local arrays in preparation for merge. These need to be
-// large enough to hold data from all processes.
+// Look at an incoming data array and size local arrays in 
+// preparation for merge. These need to be large enough to 
+// hold data from all processes.
 //
 // return 0 on error.
 int vtkCTHFragmentIntersect::PrepareToMergeGeometricAttributes(
-                vector<vtkCTHFragmentCommBuffer> &buffers,
                 vector<vector<vtkDoubleArray *> > &centers)
 {
   const int nProcs=this->Controller->GetNumberOfProcesses();
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
+
   // compute size gathered arrays
-  vector<int> nCenters(nBlocks,0);
+  vector<int> nCenters(this->NBlocks,0);
   for (int procId=0; procId<nProcs; ++procId)
     {
-    for (int blockId=0; blockId<nBlocks; ++blockId)
+    for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
       {
       nCenters[blockId]
         += centers[procId][blockId]->GetNumberOfTuples();
       }
     }
   // size gathered arrays
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     //centers
     NewVtkArrayPointer(
@@ -588,7 +584,6 @@ int vtkCTHFragmentIntersect::GatherGeometricAttributes(
 {
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
-  const int nBlocks=this->GeomIn->GetNumberOfBlocks();
 
   if (myProcId==recipientProcId)
     {
@@ -599,11 +594,11 @@ int vtkCTHFragmentIntersect::GatherGeometricAttributes(
     this->PrepareToCollectGeometricAttributes(buffers,centers,ids);
     this->CollectGeometricAttributes(buffers,centers,ids);
     // merge
-    this->PrepareToMergeGeometricAttributes(buffers,centers);
-    vector<int> mergedIdx(nBlocks,0);// counts merged so far
+    this->PrepareToMergeGeometricAttributes(centers);
+    vector<int> mergedIdx(this->NBlocks,0);// counts merged so far
     for (int procId=0; procId<nProcs; ++procId)
       {
-      for (int blockId=0; blockId<nBlocks; ++blockId)
+      for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
         {
         const int idx=mergedIdx[blockId];
         const int nToMerge
@@ -662,8 +657,7 @@ int vtkCTHFragmentIntersect::CopyAttributesToStatsOutput(
   // cerr << "ids:" << endl;
   // cerr << this->IntersectionIds;
 
-  int nBlocks=this->GeomIn->GetNumberOfBlocks();
-  for (int blockId=0; blockId<nBlocks; ++blockId)
+  for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
     vtkPolyData *statsPd
       = dynamic_cast<vtkPolyData *>(this->StatsOut->GetBlock(blockId));
@@ -721,7 +715,7 @@ int vtkCTHFragmentIntersect::CleanUpAfterRequest()
   this->GeomOut=0;
   this->StatsIn=0;
   this->StatsOut=0;
-
+  this->NBlocks=0;
   return 1;
 }
 
@@ -767,7 +761,7 @@ int vtkCTHFragmentIntersect::RequestData(
     vtkMultiBlockDataSet::SafeDownCast( outInfo->Get(vtkDataObject::DATA_OBJECT()) );
 
   // Configure
-  if (this->PrepareForIntersection()==0)
+  if (this->PrepareToProcessRequest()==0)
     {
     return 0;
     }

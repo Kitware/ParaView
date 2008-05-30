@@ -158,7 +158,7 @@ int vtkCTHFragmentCommBuffer::UnPack(vtkDoubleArray *da,
                   const int nComps, const int nTups, const bool copyFlag)
 {
   int ret=0;
-  double *pData;
+  double *pData=0;
   if (copyFlag)
     {
     da->SetNumberOfComponents(nComps);

@@ -22,7 +22,6 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 #include "vtkstd/vector" // using vector internally. ok for leaf classes.
 #include "vtkstd/string" // ...then same is true of string
-#include "iostream"
 
 class vtkPolyData;
 //class vtkMultiBlockDataSet;
@@ -77,7 +76,7 @@ protected:
         vtkMultiBlockDataSet *dest,
         vtkMultiBlockDataSet *src);
   //
-  int PrepareForIntersection();
+  int PrepareToProcessRequest();
   //
   int Intersect();
   // Send my geometric attribuites to a single process.
@@ -100,7 +99,6 @@ protected:
           vtkstd::vector<vtkstd::vector<int *> >&ids);
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes(
-          vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&centers);
   // Gather geometric attributes on a single process.
   int GatherGeometricAttributes(const int recipientProcId);
@@ -112,9 +110,9 @@ protected:
   /// data 
   //
   vtkMultiProcessController* Controller;
-  // ids of what we own
+  // Global ids of what we own before the intersection.
   vtkstd::vector<vtkstd::vector<int> >FragmentIds;
-  // 
+  // Centers and global fragment ids. an array for each block.
   vtkstd::vector<vtkDoubleArray *>IntersectionCenters;
   vtkstd::vector<vtkstd::vector<int> >IntersectionIds;
   //
@@ -124,6 +122,7 @@ protected:
   vtkMultiBlockDataSet *GeomOut;
   vtkMultiBlockDataSet *StatsIn;
   vtkMultiBlockDataSet *StatsOut;
+  unsigned int NBlocks;
 
   /// PARAVIEW interface data
   vtkImplicitFunction *CutFunction;
