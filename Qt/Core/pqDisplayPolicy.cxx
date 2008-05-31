@@ -179,9 +179,10 @@ pqView* pqDisplayPolicy::getPreferredView(
       }
     }
 
-  if (!currentView)
+  if (!currentView || (currentView && !currentView->canDisplay(opPort)))
     {
-    // The user has selected a frame that is empty or the source does not
+    // The user has selected a frame that is empty or the current view cannot
+    // show the data and the the source does not
     // recommend any view type. Hence we create a render view.
     currentView = builder->createView(pqRenderView::renderViewType(),
       opPort->getServer());

@@ -106,7 +106,8 @@ public:
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
   /// is of the preferred type, returns it. Otherwise a new view of the preferred 
-  /// type may be created and returned.
+  /// type may be created and returned. A new 3D view will be created if the
+  /// view has no preferred view type and the active view cannot show the data.
   virtual pqView* getPreferredView(pqOutputPort* opPort, pqView* view) const;
 };
 
