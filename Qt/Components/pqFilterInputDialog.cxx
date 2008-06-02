@@ -256,16 +256,14 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
   this->Sources = new pqFlatTreeView(this);
   this->Sources->setObjectName("Sources");
   this->Sources->getHeader()->hide();
-  this->Sources->setMaximumWidth(150);
-  this->Sources->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  this->Sources->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   baseLayout->addWidget(this->Sources, 1, 1, 2, 1);
 
   // Create the preview pane and add it to the right.
   this->Preview = new pqFlatTreeView(this);
   this->Preview->setObjectName("Preview");
   this->Preview->getHeader()->hide();
-  this->Preview->setMaximumWidth(150);
-  this->Preview->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+  this->Preview->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   baseLayout->addWidget(this->Preview, 1, 3, 2, 1);
 
   // Add the separator and the dialog buttons.
