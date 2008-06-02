@@ -1107,7 +1107,6 @@ def LoadState(filename, connection=None):
     loader = vtkSMPQStateLoader()
     rvname = vtkSMRenderViewProxy.GetSuggestedRenderViewType(connection.ID)
     if rvname:
-        loader.SetRenderViewXMLName(rvname)
         pm = ProxyManager()
         pm.LoadState(filename, ActiveConnection.ID, loader)
         views = GetRenderViews()
