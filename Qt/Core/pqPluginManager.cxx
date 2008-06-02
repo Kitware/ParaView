@@ -251,8 +251,6 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
       pqPluginManager::loadClientExtension(lib, dummy);
       }
     }
-
-  emit this->extensionsLoaded();
 }
 
 //-----------------------------------------------------------------------------
