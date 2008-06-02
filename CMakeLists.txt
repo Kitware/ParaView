@@ -173,10 +173,14 @@ IF (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 ENDIF (PARAVIEW_ENABLE_PYTHON AND PV_TARGET_SUPPORTS_SHARED_LIBS)
 
 IF (PARAVIEW_ENABLE_PYTHON)
+  SET(VTK_WRAP_PYTHON ON CACHE INTERNAL "" FORCE)
+
   # ParaView python uses NewInterpretor API, which cannot be used with the
   # python's thread support API (PyGIL*). Hence, we disable all thread support.
   # No mutiple threads in paraview. Sorry.
   SET(VTK_NO_PYTHON_THREADS 1 CACHE INTERNAL "Build VTK with MPI support" FORCE)
+ELSE (PARAVIEW_ENABLE_PYTHON)
+  SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################

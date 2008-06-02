@@ -168,7 +168,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
       ${PVCommandOptions_SRCS} 
     )
   SET(KIT_PYTHON_LIBS
-    vtkCommonPythonD vtkPVServerCommon vtk${KIT}CS
+    vtkCommonPythonD vtkFilteringPythonD vtkIOPythonD vtkPVServerCommon vtk${KIT}CS
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)

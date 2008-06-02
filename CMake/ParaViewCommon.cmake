@@ -36,7 +36,6 @@ SET(VTK_FIND_STRING_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/FindStrin
 
 SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
-SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_JAVA OFF CACHE INTERNAL "" FORCE)
 SET(VTK_USE_MATROX_IMAGING OFF CACHE INTERNAL "" FORCE)
 
@@ -169,6 +168,15 @@ SET(VTK_INSTALL_HAS_CMAKE_24 ${PV_INSTALL_HAS_CMAKE_24})
 
 SET(VTK_INSTALL_NO_DOCUMENTATION 1)
 SET(VTK_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
+
+# This will disable installing of vtkpython executable and the vtk python 
+# module. This is essential since we don't want to conflict with kosher VTK
+# installations.
+SET (VTK_INSTALL_NO_PYTHON 1)
+SET (VTK_INSTALL_NO_VTKPYTHON 1)
+# Tell VTK to install python extension modules using CMake so they get installed
+# with the other python extension modules ParaView creates.
+SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 
 SET(KWCommon_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(KWCommon_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
@@ -352,6 +360,22 @@ ELSE(VTK_USE_SYSTEM_ZLIB)
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
+# Configure Python wrapping
+IF(PARAVIEW_ENABLE_PYTHON)
+  FIND_PACKAGE(PythonLibs REQUIRED)
+  INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+  ADD_SUBDIRECTORY(Utilities/VTKPythonWrapping)
+  IF(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKPythonWrapping_INSTALL_LIBRARIES 0)
+  ELSE(PV_INSTALL_NO_LIBRARIES)
+    SET(VTKPythonWrapping_INSTALL_LIBRARIES 1)
+  ENDIF(PV_INSTALL_NO_LIBRARIES)
+  SET(VTKPythonWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(VTKPythonWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+  MARK_AS_ADVANCED(PYTHON_INCLUDE_PATH PYTHON_LIBRARY)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
+
+#########################################################################
 # Configure HDF5
 OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
 MARK_AS_ADVANCED(PARAVIEW_USE_SYSTEM_HDF5)
@@ -468,21 +492,6 @@ SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   )
 ADD_SUBDIRECTORY(Utilities/VTKClientServer)
-
-#########################################################################
-# Configure Python wrapping
-IF(PARAVIEW_ENABLE_PYTHON)
-  FIND_PACKAGE(PythonLibs REQUIRED)
-  ADD_SUBDIRECTORY(Utilities/VTKPythonWrapping)
-  IF(PV_INSTALL_NO_LIBRARIES)
-    SET(VTKPythonWrapping_INSTALL_LIBRARIES 0)
-  ELSE(PV_INSTALL_NO_LIBRARIES)
-    SET(VTKPythonWrapping_INSTALL_LIBRARIES 1)
-  ENDIF(PV_INSTALL_NO_LIBRARIES)
-  SET(VTKPythonWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(VTKPythonWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-  MARK_AS_ADVANCED(PYTHON_INCLUDE_PATH PYTHON_LIBRARY)
-ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
 # Configure Tcl Wraping.
