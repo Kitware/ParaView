@@ -94,6 +94,9 @@ signals:
   /// come from a plugin or an xml file
   void serverManagerExtensionLoaded();
 
+  /// signal for when all extensions (client and server) have been loaded
+  void extensionsLoaded();
+
 protected:
 
   LoadStatus loadClientExtension(const QString& lib, QString& error);
