@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.68");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.69");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1377,7 +1377,7 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
                                          vtkCollection* selectedRepresentations,
                                          vtkCollection* selectionSources,
                                          vtkCollection* frustumSelections,
-                                         bool vtkNotUsed(multiple_selections),
+                                         bool multiple_selections,
                                          bool ofPoints/*=false*/)
 {
   int displayRectangle[4] = {x0, y0, x1, y1};
@@ -1506,7 +1506,10 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
       selectedRepresentations->AddItem(repr);
 
       selectionSource->Delete();
-      break;
+      if(!multiple_selections)
+        {
+        break;
+        }
       }
     }
 
