@@ -261,7 +261,7 @@ public:
     this->FileInformation.TakeReference(vtkPVFileInformation::New());
 
     // current path
-    vtkPVFileInformation* info = this->GetData(false, ".", false);
+    vtkPVFileInformation* info = this->GetData(false, "", ".", false);
     this->CurrentPath = info->GetFullPath();
   }
   
@@ -282,7 +282,7 @@ public:
                                 const QString& path,
                                 bool specialDirs)
     {
-    return this->GetData(dirListing, "", path, specialDirs);
+    return this->GetData(dirListing, this->CurrentPath, path, specialDirs);
     }
 
   /// query the file system for information
@@ -521,8 +521,7 @@ QString pqFileDialogModel::absoluteFilePath(const QString& path)
     }
 
   vtkPVFileInformation* info;
-  info = this->Implementation->GetData(false,
-    this->getCurrentPath(), path, false);
+  info = this->Implementation->GetData(false, path, false);
   return this->Implementation->cleanPath(info->GetFullPath());
 }
 
