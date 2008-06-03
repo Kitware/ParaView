@@ -631,33 +631,41 @@ bool pqFileDialogModel::rmdir(const QString& dirName)
   
   bool ret = false;
   
-  vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
-  vtkTypeUInt32 servers = this->Implementation->isRemote() ? 
-                         vtkProcessModule::DATA_SERVER :
-                         vtkProcessModule::CLIENT;
-
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
-  stream << vtkClientServerStream::Invoke
-        << dirID << "DeleteDirectory" 
-        << dirPath.toAscii().data()
-        << vtkClientServerStream::End;
-  pm->SendStream(conn, servers, stream);
-  
-  vtkClientServerStream result = pm->GetLastResult(conn, servers);
-  if(result.GetNumberOfMessages() == 1 && 
-     result.GetNumberOfArguments(0) == 1)
+  if (this->Implementation->isRemote())
     {
-    int tmp;
-    if(result.GetArgument(0, 0, &tmp) && tmp)
-      {
-      ret = true;
-      }
-    }
+    vtkIdType conn = this->Implementation->getServer()->GetConnectionID();
+    vtkTypeUInt32 servers = this->Implementation->isRemote() ? 
+                           vtkProcessModule::DATA_SERVER :
+                           vtkProcessModule::CLIENT;
 
-  pm->DeleteStreamObject(dirID, stream);
-  pm->SendStream(conn, servers, stream);
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    vtkClientServerID dirID = pm->NewStreamObject("vtkDirectory", stream);
+    stream << vtkClientServerStream::Invoke
+          << dirID << "DeleteDirectory" 
+          << dirPath.toAscii().data()
+          << vtkClientServerStream::End;
+    pm->SendStream(conn, servers, stream);
+    
+    vtkClientServerStream result = pm->GetLastResult(conn, servers);
+    if(result.GetNumberOfMessages() == 1 && 
+       result.GetNumberOfArguments(0) == 1)
+      {
+      int tmp;
+      if(result.GetArgument(0, 0, &tmp) && tmp)
+        {
+        ret = true;
+        }
+      }
+
+    pm->DeleteStreamObject(dirID, stream);
+    pm->SendStream(conn, servers, stream);
+    }
+  else
+    {
+    // File system is local.
+    ret = (vtkDirectory::DeleteDirectory(dirPath.toAscii().data()) != 0);
+    }
   
   QString cPath = this->Implementation->cleanPath(this->getCurrentPath());
   vtkPVFileInformation* info;
