@@ -1,4 +1,7 @@
 PROJECT (PQGUI)
+IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND CMAKE_POLICY)
 
 #########################################################################
 # Setup Qt
@@ -15,7 +18,10 @@ ELSE(NOT QT4_FOUND)
 # can delete this check, but you are on your own.
 STRING(REGEX MATCH "^4\\.2\\.[0-9]+" qt_version_tmp "${QTVERSION}")
 IF (NOT qt_version_tmp)
-  MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.2.")
+  STRING(REGEX MATCH "^4\\.3\\.[0-9]+" qt_version_tmp2 "${QTVERSION}")
+  IF (NOT qt_version_tmp2)
+    MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.2 or 4.3.")
+  ENDIF (NOT qt_version_tmp2)
 ENDIF (NOT qt_version_tmp)
 
 # help CMake fine QtUiTools on Mac (binary install)
