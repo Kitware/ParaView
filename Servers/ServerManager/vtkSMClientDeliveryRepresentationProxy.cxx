@@ -28,7 +28,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.20");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
@@ -246,32 +246,43 @@ void vtkSMClientDeliveryRepresentationProxy::SetGenerateProcessIds(int pt)
 //-----------------------------------------------------------------------------
 vtkDataObject* vtkSMClientDeliveryRepresentationProxy::GetOutput()
 {
-  vtkAlgorithm* dp;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkAlgorithm* dp = 0;
   if (this->PostProcessorProxy)
     {
     dp = vtkAlgorithm::SafeDownCast(
-      pm->GetObjectFromID(this->PostProcessorProxy->GetID())); 
+      this->PostProcessorProxy->GetClientSideObject()); 
     }
   else
     {
-    if (pm && this->StrategyProxy && this->StrategyProxy->GetOutput())
+    if (this->StrategyProxy && this->StrategyProxy->GetOutput())
       {
       dp = vtkAlgorithm::SafeDownCast(
-        pm->GetObjectFromID(this->StrategyProxy->GetOutput()->GetID()));
-      }
-    else
-      {
-      dp = NULL;
+        this->StrategyProxy->GetOutput()->GetClientSideObject());
       }
     }
 
-  if (dp == NULL)
+  return dp? dp->GetOutputDataObject(0) : NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkAlgorithmOutput* vtkSMClientDeliveryRepresentationProxy::GetOutputPort()
+{
+  vtkAlgorithm* dp = 0;
+  if (this->PostProcessorProxy)
     {
-    return NULL;
+    dp = vtkAlgorithm::SafeDownCast(
+      this->PostProcessorProxy->GetClientSideObject()); 
+    }
+  else
+    {
+    if (this->StrategyProxy && this->StrategyProxy->GetOutput())
+      {
+      dp = vtkAlgorithm::SafeDownCast(
+        this->StrategyProxy->GetOutput()->GetClientSideObject());
+      }
     }
 
-  return dp->GetOutputDataObject(0);
+  return dp? dp->GetOutputPort(0) : NULL;
 }
 
 //----------------------------------------------------------------------------

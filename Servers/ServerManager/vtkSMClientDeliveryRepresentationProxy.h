@@ -24,6 +24,7 @@
 #include "vtkSMDataRepresentationProxy.h"
 
 class vtkDataObject;
+class vtkAlgorithmOutput;
 class vtkSMClientDeliveryStrategyProxy;
 
 class VTK_EXPORT vtkSMClientDeliveryRepresentationProxy : 
@@ -37,6 +38,11 @@ public:
   // Description:
   // Get the data that was collected to the client
   virtual vtkDataObject* GetOutput();
+
+  // Description:
+  // Returns the client side output port for the algorithm producing the output
+  // returned by GetOutput().
+  virtual vtkAlgorithmOutput* GetOutputPort();
 
   // Description:
   // Called to update the Display. Default implementation does nothing.
