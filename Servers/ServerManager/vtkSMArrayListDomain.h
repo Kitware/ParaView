@@ -33,6 +33,11 @@
 //    - VTK_VOID, and 0 are equivalent to not specifying, meaning any data type
 //      is allowed
 // @endverbatim
+// Additionally, vtkSMArrayListDomain support 'default_values' attribute which
+// specifies a string (only 1 string value is supported). When
+// SetDefaultValues() is called, if the array name specified as 'default_values'
+// is present in the domain, then that will be used, otherwise, it simply uses
+// the first available array (which is default).
 // .SECTION See Also
 // vtkSMDomain vtkSMProxyProperty vtkSMInputArrayDomain
 

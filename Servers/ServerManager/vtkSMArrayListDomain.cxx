@@ -33,7 +33,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.15");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.16");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -369,6 +369,13 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
   if (this->GetNumberOfStrings() > 0)
     {
     const char* array = this->GetString(0);
+    const char* defaultValue = svp->GetDefaultValue(0);
+    unsigned int temp;
+    if (defaultValue && this->IsInDomain(defaultValue, temp))
+      {
+      array = defaultValue;
+      }
+
     if (svp->GetNumberOfElements() == 5)
       {
       svp->SetElement(4, array);
