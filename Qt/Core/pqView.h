@@ -52,7 +52,7 @@ class vtkSMViewProxy;
 class PQCORE_EXPORT pqView : public pqProxy
 {
   Q_OBJECT
-
+  typedef pqProxy Superclass;
 public:
   virtual ~pqView();
 
@@ -204,19 +204,25 @@ private slots:
   void representationCreated(pqRepresentation* repr);
 
 protected:
-  // Constructor:
-  // \c type  :- view type.
-  // \c group :- SManager registration group.
-  // \c name  :- SManager registration name.
-  // \c view  :- View proxy.
-  // \c server:- server on which the proxy is created.
-  // \c parent:- QObject parent.
+  /// Constructor:
+  /// \c type  :- view type.
+  /// \c group :- SManager registration group.
+  /// \c name  :- SManager registration name.
+  /// \c view  :- View proxy.
+  /// \c server:- server on which the proxy is created.
+  /// \c parent:- QObject parent.
   pqView( const QString& type,
           const QString& group, 
           const QString& name, 
           vtkSMViewProxy* view, 
           pqServer* server, 
           QObject* parent=NULL);
+
+  /// Use this method to initialize the pqObject state using the
+  /// underlying vtkSMProxy. This needs to be done only once,
+  /// after the object has been created. 
+  /// Overridden to update the list of representations currently available.
+  virtual void initialize();
 
 private:
   pqView(const pqView&); // Not implemented.

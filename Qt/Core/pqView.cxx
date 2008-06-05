@@ -109,11 +109,6 @@ pqView::pqView( const QString& type,
   this->Internal->VTKConnect->Connect(view,
     vtkCommand::EndEvent, this, SIGNAL(endRender()));
 
-  // If the render module already has some representations in it when it is
-  // registered, this method will detect them and sync the GUI state with the 
-  // SM state.
-  this->onRepresentationsChanged();
-
   this->Internal->RenderTimer.setSingleShot(true);
   this->Internal->RenderTimer.setInterval(1);
   QObject::connect(&this->Internal->RenderTimer, SIGNAL(timeout()),
@@ -152,6 +147,17 @@ pqView::~pqView()
 vtkSMViewProxy* pqView::getViewProxy() const
 {
   return vtkSMViewProxy::SafeDownCast(this->getProxy());
+}
+
+//-----------------------------------------------------------------------------
+void pqView::initialize()
+{
+  this->Superclass::initialize();
+
+  // If the render module already has some representations in it when it is
+  // registered, this method will detect them and sync the GUI state with the 
+  // SM state.
+  this->onRepresentationsChanged();
 }
 
 //-----------------------------------------------------------------------------
