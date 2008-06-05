@@ -373,7 +373,6 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     pxm->LoadState(rootElement, server->GetConnectionID(), loader);
-    pxm->UpdateRegisteredProxiesInOrder(0);
     }
 
 
