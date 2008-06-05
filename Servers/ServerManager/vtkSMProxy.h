@@ -429,6 +429,10 @@ public:
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // Returns the client side object associated with the VTKObjectID (if any).
+  vtkObjectBase* GetClientSideObject();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -763,10 +767,6 @@ protected:
   // Description:
   // Client/server id of the VTK object this is a proxy of.
   vtkClientServerID VTKObjectID;
-
-  // Description:
-  // Returns the client side object associated with the VTKObjectID (if any).
-  vtkObjectBase* GetClientSideObject();
 
 private:
   vtkSMProxyInternals* Internals;
