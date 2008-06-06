@@ -1750,6 +1750,37 @@
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool" />
+        <Documentation>
+          The handle sits on the surface of the sphere and may be moved around
+          the surface by picking (left mouse) and then moving. The position
+          of the handle can be retrieved, this is useful for positioning 
+          cameras and lights. By default, the handle is turned off.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HandleText"
+        command="SetHandleText"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/disable a label that displays the location of the handle in
+          spherical coordinates (radius,theta,phi). The two angles, theta and
+          phi, are displayed in degrees. Note that phi is measured from the
+          north pole down towards the equator; and theta is the angle around 
+          the north/south axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="RadialLine"
+        command="SetRadialLine"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Enable/disable a radial line segment that joins the center of the
+          outer sphere and the handle.
+        </Documentation>
       </IntVectorProperty>
 
       <!-- End of SphereRepresentation -->
