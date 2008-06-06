@@ -50,7 +50,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.19");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.20");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -218,8 +218,8 @@ bool vtkExtractHistogram::InitializeBinExtents(
       vtkDataObject *dObj = cdit->GetCurrentDataObject();      
       vtkDataArray* data_array = this->GetInputArrayToProcess(0, dObj);
       if (data_array &&
-          !(this->Component < 0 && 
-          this->Component >= data_array->GetNumberOfComponents()))
+          this->Component >= 0 && 
+          this->Component < data_array->GetNumberOfComponents())
         {
         if (!foundone)
           {
