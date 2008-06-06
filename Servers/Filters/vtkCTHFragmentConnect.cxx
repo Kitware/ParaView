@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.44");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.45");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -6971,6 +6971,11 @@ int vtkCTHFragmentConnect::BroadcastIntegratedAttributes(
     {
     for (int procId=0; procId<nProcs; ++procId)
       {
+      // skip me
+      if (procId==sourceProcId)
+        {
+        continue;
+        }
       this->SendIntegratedAttributes(procId);
       }
     }
