@@ -64,6 +64,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
 
+inline QString pqObjectBuilderGetName(vtkSMProxy* proxy,
+  pqNameCount *nameGenerator)
+{
+  QString label = proxy->GetXMLLabel();
+  label.remove(' ');
+  return QString("%1%2").arg(label).arg(
+    nameGenerator->GetCountAndIncrement(label));
+}
+
 //-----------------------------------------------------------------------------
 pqObjectBuilder::pqObjectBuilder(QObject* _parent/*=0*/) :QObject(_parent)
 {
@@ -75,7 +84,6 @@ pqObjectBuilder::~pqObjectBuilder()
 {
   delete this->NameGenerator;
 }
-
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
@@ -331,8 +339,7 @@ pqView* pqObjectBuilder::createView(const QString& type,
 
   proxy->SetConnectionID(server->GetConnectionID());
 
-  QString name = QString("%1%2").arg(proxy->GetXMLName()).arg(
-    this->NameGenerator->GetCountAndIncrement(proxy->GetXMLName()));
+  QString name = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
   pxm->RegisterProxy("views", name.toAscii().data(), proxy);
   proxy->Delete();
 
@@ -671,13 +678,6 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     return 0;
     }
 
-  QString actual_regname = reg_name;
-  if (reg_name.isEmpty())
-    {
-    actual_regname = QString("%1%2").arg(sm_name).arg(
-      this->NameGenerator->GetCountAndIncrement(sm_name));
-    }
-
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
@@ -689,6 +689,12 @@ vtkSMProxy* pqObjectBuilder::createProxyInternal(const QString& sm_group,
     return 0;
     }
   proxy->SetConnectionID(server->GetConnectionID());
+
+  QString actual_regname = reg_name;
+  if (reg_name.isEmpty())
+    {
+    actual_regname = ::pqObjectBuilderGetName(proxy, this->NameGenerator);
+    }
 
   pxm->RegisterProxy(reg_group.toAscii().data(), 
     actual_regname.toAscii().data(), proxy);
