@@ -7035,7 +7035,12 @@ This filter extracts a list of datasets from hierarchical datasets.
         number_of_elements="1" 
         default_values="0" 
         animateable="0"> 
-        <IntRangeDomain name="range" min="0" max="15"/>
+        <NumberOfComponentsDomain name="comps">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+               <Property name="SelectInputArray" function="ArraySelection"/>
+          </RequiredProperties>
+        </NumberOfComponentsDomain>
         <Documentation>
           The value of this property specifies the array component from which the histogram should be computed.
         </Documentation>
