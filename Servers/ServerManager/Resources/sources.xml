@@ -562,7 +562,8 @@ The Line source can be used to interactively (using a 3D widget) or manually (us
          short_help="Create a ruler">
         The ruler can be used to interactively (using a 3D widget) or manually
         (using the entries on the user interface) specify two points and then
-        determine the distance between the two points.
+        determine the distance between the two points. To place points on the
+        surface of any dataset, one can use the 'p' key shortcut.
       </Documentation>
       <DoubleVectorProperty
          name="Point1"
