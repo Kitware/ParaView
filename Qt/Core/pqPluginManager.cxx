@@ -49,13 +49,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVEnvironmentInformationHelper.h"
 #include "vtksys/SystemTools.hxx"
 
+#include "pqApplicationCore.h"
+#include "pqAutoStartInterface.h"
+#include "pqFileDialogModel.h"
 #include "pqPlugin.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqApplicationCore.h"
 #include "pqSMAdaptor.h"
-#include "pqFileDialogModel.h"
 
+//-----------------------------------------------------------------------------
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
 {
@@ -67,15 +69,35 @@ pqPluginManager::pqPluginManager(QObject* p)
                    this, SLOT(onServerDisconnected(pqServer*)));
 }
 
+//-----------------------------------------------------------------------------
 pqPluginManager::~pqPluginManager()
 {
+  foreach (QObject* iface, this->Interfaces)
+    {
+    pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
+    if (asi)
+      {
+      asi->shutdown();
+      }
+    }
+
+  foreach (QObject* iface, this->ExtraInterfaces)
+    {
+    pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
+    if (asi)
+      {
+      asi->shutdown();
+      }
+    }
 }
 
+//-----------------------------------------------------------------------------
 QObjectList pqPluginManager::interfaces()
 {
   return this->Interfaces + this->ExtraInterfaces;
 }
 
+//-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* server, const QString& lib,
                                        QString& error)
 {
@@ -123,6 +145,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
   return success;
 }
 
+//-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& lib, QString& error)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
@@ -177,6 +200,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
         foreach(QObject* iface, ifaces)
           {
           this->Interfaces.append(iface);
+          this->handleAutoStartPlugins(iface, true);
           emit this->guiInterfaceLoaded(iface);
           }
         }
@@ -195,6 +219,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
   return success;
 }
 
+//-----------------------------------------------------------------------------
 static QStringList getLibraries(const QString& path, pqServer* server)
 {
   QStringList libs;
@@ -225,6 +250,7 @@ static QStringList getLibraries(const QString& path, pqServer* server)
   return libs;
 }
 
+//-----------------------------------------------------------------------------
 void pqPluginManager::loadExtensions(pqServer* server)
 {
   QStringList plugin_paths = this->pluginPaths(server);
@@ -292,39 +318,64 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   return success;
 }
 
+//-----------------------------------------------------------------------------
 QStringList pqPluginManager::loadedExtensions(pqServer* server)
 {
   return this->Extensions.values(server);
 }
 
+//-----------------------------------------------------------------------------
 void pqPluginManager::addInterface(QObject* iface)
 {
   if(!this->ExtraInterfaces.contains(iface))
     {
     this->ExtraInterfaces.append(iface);
+    this->handleAutoStartPlugins(iface, true);
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPluginManager::removeInterface(QObject* iface)
 {
   int idx = this->ExtraInterfaces.indexOf(iface);
   if(idx != -1)
     {
     this->ExtraInterfaces.removeAt(idx);
+    this->handleAutoStartPlugins(iface, false);
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPluginManager::onServerConnected(pqServer* server)
 {
   this->loadExtensions(server);
 }
 
+//-----------------------------------------------------------------------------
 void pqPluginManager::onServerDisconnected(pqServer* server)
 {
   // remove referenced plugins
   this->Extensions.remove(server);
 }
 
+//-----------------------------------------------------------------------------
+void pqPluginManager::handleAutoStartPlugins(QObject* iface, bool startup)
+{
+  pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
+  if (asi)
+    {
+    if (startup)
+      {
+      asi->startup();
+      }
+    else
+      {
+      asi->shutdown();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 QStringList pqPluginManager::pluginPaths(pqServer* server)
 {
   QString pv_plugin_path;

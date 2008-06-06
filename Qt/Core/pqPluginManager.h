@@ -95,14 +95,16 @@ signals:
   void serverManagerExtensionLoaded();
 
 protected:
-
   LoadStatus loadClientExtension(const QString& lib, QString& error);
   LoadStatus loadServerExtension(pqServer* server, const QString& lib, QString& error);
+
+  /// Handles pqAutoStartInterface plugins.
+  void handleAutoStartPlugins(QObject* iface, bool startup);
 
 protected slots:
   void onServerConnected(pqServer*);
   void onServerDisconnected(pqServer*);
-
+  
 private:
 
   QObjectList Interfaces;
