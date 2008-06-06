@@ -181,11 +181,16 @@ pqView* pqDisplayPolicy::getPreferredView(
 
   if (!currentView || (currentView && !currentView->canDisplay(opPort)))
     {
-    // The user has selected a frame that is empty or the current view cannot
-    // show the data and the the source does not
-    // recommend any view type. Hence we create a render view.
-    currentView = builder->createView(pqRenderView::renderViewType(),
-      opPort->getServer());
+    vtkPVDataInformation* info = opPort->getDataInformation(false);
+    // GetDataSetType() == -1 signifies that there's no data to show.
+    if (info->GetDataSetType() != -1)
+      {
+      // The user has selected a frame that is empty or the current view cannot
+      // show the data and the the source does not
+      // recommend any view type. Hence we create a render view.
+      currentView = builder->createView(pqRenderView::renderViewType(),
+        opPort->getServer());
+      }
     }
 
   // No hints. We don't know what type of view is suitable
