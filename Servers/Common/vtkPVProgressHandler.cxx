@@ -14,13 +14,14 @@
 =========================================================================*/
 #include "vtkPVProgressHandler.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkClientServerInterpreter.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
-#include "vtkClientServerInterpreter.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.8");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.9");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -50,6 +51,17 @@ public:
   vtkMPICommunicator::Request ProgressRequest;
 #endif
 };
+
+inline const char* vtkGetProgressText(vtkObjectBase* o)
+{
+  vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(o);
+  if (alg && alg->GetProgressText())
+    {
+    return alg->GetProgressText();
+    }
+
+  return o->GetClassName();
+}
 
 //****************************************************************************
 //----------------------------------------------------------------------------
@@ -177,7 +189,7 @@ void vtkPVProgressHandler::InvokeProgressEvent(vtkProcessModule* app,
     {
     case vtkPVProgressHandler::SingleProcess:
       vtkDebugMacro("This is the gui and I got the progress: " << val);
-      this->LocalDisplayProgress(app, o->GetClassName(), val);
+      this->LocalDisplayProgress(app, ::vtkGetProgressText(o), val);
       break;
     case vtkPVProgressHandler::SingleProcessMPI:
       vtkDebugMacro("This is the gui and I got progress. I need to handle "
@@ -195,7 +207,7 @@ void vtkPVProgressHandler::InvokeProgressEvent(vtkProcessModule* app,
                     << val);
       if ( !filter )
         {
-        filter = o->GetClassName();
+        filter = ::vtkGetProgressText(o);
         }
       this->LocalDisplayProgress(app, filter, val);
       break;
@@ -241,7 +253,7 @@ void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
   vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
   if ( base )
     {
-    this->LocalDisplayProgress(app, base->GetClassName(), progress);
+    this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
     }
   else
     {
@@ -273,7 +285,7 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
     {
     char buffer[1024];
     buffer[0] = progress;
-    sprintf(buffer+1, "%s", base->GetClassName());
+    sprintf(buffer+1, "%s", ::vtkGetProgressText(base));
     int len = strlen(buffer+1) + 2;
     controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
     }
@@ -453,7 +465,7 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
           {
           if ( this->ProgressType == vtkPVProgressHandler::SingleProcessMPI )
             {
-            this->LocalDisplayProgress(app, base->GetClassName(), progress);
+            this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
             }
           else
             {
@@ -463,7 +475,7 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
               {
               char buffer[1024];
               buffer[0] = progress;
-              sprintf(buffer+1, "%s", base->GetClassName());
+              sprintf(buffer+1, "%s", ::vtkGetProgressText(base));
               int len = strlen(buffer+1) + 2;
               controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
               }
