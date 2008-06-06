@@ -182,7 +182,8 @@ vtkstd::string FilterDescription(vtkstd::string description)
     {
     description = regExp.match(1);
     }
-  vtksys::SystemTools::ReplaceString(description,"\n","<br/><br/>\n");
+  vtksys::SystemTools::ReplaceString(description,"\n\n","<br/><br/>\n");
+  vtksys::SystemTools::ReplaceString(description,"\n","<br/>\n");
   return description;
 }
 
