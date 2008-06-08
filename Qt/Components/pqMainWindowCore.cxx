@@ -1696,7 +1696,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     return;
     }
 
-  if (writer->IsA("vtkSMPSWriterProxy"))
+  if (writer->IsA("vtkSMPSWriterProxy") && source->getServer()->getNumberOfPartitions() > 1)
     {
     QMessageBox::StandardButton result = 
       QMessageBox::question(

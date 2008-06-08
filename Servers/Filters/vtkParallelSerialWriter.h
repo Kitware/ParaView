@@ -21,13 +21,15 @@
 #ifndef __vtkParallelSerialWriter_h
 #define __vtkParallelSerialWriter_h
 
-#include "vtkPolyDataAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
-class VTK_EXPORT vtkParallelSerialWriter : public vtkPolyDataAlgorithm
+class vtkPolyData;
+
+class VTK_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkParallelSerialWriter* New();
-  vtkTypeRevisionMacro(vtkParallelSerialWriter, vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkParallelSerialWriter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -74,18 +76,6 @@ protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter();
 
-  void SetWriterFileName();
-  void WriteInternal();
-
-  vtkAlgorithm* Writer;
-  char* FileNameMethod;
-  int Piece;
-  int NumberOfPieces;
-  int GhostLevel;
-
-  // The name of the output file.
-  char* FileName;
-  
   int RequestUpdateExtent(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
@@ -96,6 +86,20 @@ protected:
 private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&); // Not implemented.
   void operator=(const vtkParallelSerialWriter&); // Not implemented.
+  
+  void WriteAFile(const char* fname, vtkPolyData* input);
+
+  void SetWriterFileName(const char* fname);
+  void WriteInternal();
+
+  vtkAlgorithm* Writer;
+  char* FileNameMethod;
+  int Piece;
+  int NumberOfPieces;
+  int GhostLevel;
+
+  // The name of the output file.
+  char* FileName;
 };
 
 #endif

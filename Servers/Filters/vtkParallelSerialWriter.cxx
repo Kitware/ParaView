@@ -16,17 +16,25 @@
 
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
+
+#include <vtkstd/string>
+
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.2");
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.3");
 
 vtkCxxSetObjectMacro(vtkParallelSerialWriter,Writer,vtkAlgorithm);
 
@@ -98,25 +106,75 @@ int vtkParallelSerialWriter::RequestData(
   vtkInformationVector** inputVector,
   vtkInformationVector* vtkNotUsed(outputVector))
 {
+if (!this->Writer)
+  {
+  vtkErrorMacro("No internal writer specified. Cannot write.");
+  return 0;
+  }
+
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkSmartPointer<vtkDataObject> inputCopy;
-  inputCopy.TakeReference(input->NewInstance());
-  inputCopy->ShallowCopy(input);
-
-  if (!this->Writer)
+  vtkPolyData* pdInput = vtkPolyData::SafeDownCast(input);
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input);
+  if (pdInput)
     {
-    vtkErrorMacro("No internal writer specified. Cannot write.");
-    return 0;
+    vtkSmartPointer<vtkPolyData> inputCopy;
+    inputCopy.TakeReference(pdInput->NewInstance());
+    inputCopy->ShallowCopy(pdInput);
+  
+    this->WriteAFile(this->FileName, inputCopy);
     }
+  else if (cds)
+    {
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(cds->NewIterator());
+    iter->SetSkipEmptyNodes(0);
+    for(iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkDataObject* curObj = iter->GetCurrentDataObject();
+      vtkSmartPointer<vtkPolyData> pd;
+      if (curObj)
+        {
+        pd = vtkPolyData::SafeDownCast(curObj);
+        if (!pd.GetPointer())
+          {
+          vtkErrorMacro("Cannot write data object of type: "
+              << curObj->GetClassName());
+          }
+        }
+      if (!pd.GetPointer())
+        {
+        pd.TakeReference(vtkPolyData::New());
+        }
+      unsigned int idx = iter->GetCurrentFlatIndex();
+      vtkstd::string path = 
+        vtksys::SystemTools::GetFilenamePath(this->FileName);
+      vtkstd::string fnamenoext =
+        vtksys::SystemTools::GetFilenameWithoutLastExtension(this->FileName);
+      vtkstd::string ext =
+        vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
+      vtksys_ios::ostringstream fname;
+      fname << path << "/" << fnamenoext << idx << ext;
+      
+      this->WriteAFile(fname.str().c_str(), pd);
+      }
+    }
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkParallelSerialWriter::WriteAFile(const char* fname,
+    vtkPolyData* input)
+{
   vtkMultiProcessController* controller = 
     vtkProcessModule::GetProcessModule()->GetController();
-
+  
   vtkSmartPointer<vtkMPIMoveData> md = vtkSmartPointer<vtkMPIMoveData>::New();
   md->SetOutputDataType(VTK_POLY_DATA);
   md->SetController(controller);
   md->SetMoveModeToCollect();
-  md->SetInputConnection(0, inputCopy->GetProducerPort());
+  md->SetInputConnection(0, input->GetProducerPort());
   md->UpdateInformation();
   vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
@@ -129,7 +187,7 @@ int vtkParallelSerialWriter::RequestData(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
   md->Update();
-
+  
   vtkDataObject* output = md->GetOutputDataObject(0);
   vtkSmartPointer<vtkDataObject> outputCopy;
   outputCopy.TakeReference(output->NewInstance());
@@ -138,11 +196,10 @@ int vtkParallelSerialWriter::RequestData(
   if (controller->GetLocalProcessId() == 0)
     {
     this->Writer->SetInputConnection(outputCopy->GetProducerPort());
-    this->SetWriterFileName();
+    this->SetWriterFileName(fname);
     this->WriteInternal();
+    this->Writer->SetInputConnection(0);
     }
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -184,7 +241,7 @@ void vtkParallelSerialWriter::WriteInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkParallelSerialWriter::SetWriterFileName()
+void vtkParallelSerialWriter::SetWriterFileName(const char* fname)
 {
   if (this->Writer && this->FileName)
     {
@@ -197,7 +254,7 @@ void vtkParallelSerialWriter::SetWriterFileName()
       vtkClientServerInterpreter* interp = pm->GetInterpreter();
       vtkClientServerStream stream;
       stream << vtkClientServerStream::Invoke
-             << csId << this->FileNameMethod << this->FileName
+             << csId << this->FileNameMethod << fname
              << vtkClientServerStream::End;
       interp->ProcessStream(stream);
       }

@@ -1,4 +1,31 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <WriterProxy name="STLWriter" class="vtkSTLWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write stereo lithography files.">
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of STLWriter -->
+    </WriterProxy>
+  </ProxyGroup>
+
   <ProxyGroup name="writers">
     <Proxy name="ParallelWriterBase" class="not-used">
       <Documentation
@@ -647,38 +674,8 @@
       <!-- End of PLYWriter -->
     </PSWriterProxy>
 
-    <WriterProxy name="STLWriter" class="vtkSTLWriter"
-      base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <Documentation
-        short_help="Write stereo lithography files.">
-        STLWriter writes stereo lithography (.stl) files in either ASCII or
-        binary form. Stereo lithography files only contain triangles. If
-        polygons with more than 3 vertices are present, only the first 3
-        vertices are written.  Use TriangleFilter to convert polygons to
-        triangles.
-      </Documentation>
-      <InputProperty name="Input" command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkPolyData"/>
-        </DataTypeDomain>
-        <Documentation>
-          The input filter/source whose output dataset is to written to the
-          file.
-        </Documentation>
-      </InputProperty>
-      <Hints>
-        <Property name="Input" show="0"/>
-        <Property name="FileName" show="0"/>
-      </Hints>
-      <!-- End of STLWriter -->
-    </WriterProxy>
-
     <PSWriterProxy name="PSTLWriter" class="vtkParallelSerialWriter"
-      file_name_method="SetFileName" parallel_only="1">
+      file_name_method="SetFileName">
       <Documentation
         short_help="Write stereo lithography files.">
         STLWriter writes stereo lithography (.stl) files in either ASCII or
@@ -690,7 +687,7 @@
       </Documentation>
       <SubProxy>
         <Proxy name="Writer"
-          proxygroup="writers" proxyname="STLWriter">
+          proxygroup="internal_writers" proxyname="STLWriter">
         </Proxy>
         <ExposedProperties>
           <Property name="FileType" />
@@ -701,7 +698,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
         <Documentation>
