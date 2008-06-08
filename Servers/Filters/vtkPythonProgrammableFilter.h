@@ -82,11 +82,6 @@ public:
   vtkSetMacro(OutputDataSetType, int);
   vtkGetMacro(OutputDataSetType, int);
 
-  // Description:
-  // This is overridden to break a cyclic reference between "this" and 
-  // this->Interpretor which has a self that points to "this".
-  virtual void UnRegister(vtkObjectBase *o);
-
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();

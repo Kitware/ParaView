@@ -30,7 +30,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.30");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.31");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ class vtkPythonProgrammableFilterImplementation
 {
 public:
   vtkPythonProgrammableFilterImplementation() :
-    Interpretor(NULL), PythonVarDefined(false)
+    Interpretor(NULL)
   {
   }
 
@@ -49,7 +49,6 @@ public:
     {
       if (this->Interpretor)
         {
-        this->PythonVarDefined = false;
         // The following is necessary because the Delete() may
         // cause the destruction of vtkPythonProgrammableFilter
         // which calls DestroyInterpretor() in its destructor.
@@ -66,11 +65,6 @@ public:
   // Stores name-value parameters that will be passed to running scripts
   ParametersT Parameters;
 
-  // PythonVarDefined is true if python interp has a variable
-  // that points to this filter. This means thatthere is reference 
-  // loop due to:
-  // filter <-> interpretor
-  bool PythonVarDefined;
 };
 
 //----------------------------------------------------------------------------
@@ -91,26 +85,6 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 
   this->Implementation->DestroyInterpretor();
   delete this->Implementation;
-}
-
-//----------------------------------------------------------------------------
-void vtkPythonProgrammableFilter::UnRegister(vtkObjectBase *o)
-{
-  int refCount = this->GetReferenceCount();
-  this->Superclass::UnRegister(o);
-  // If refCount was 1, the object is already gone. Do nothing.
-  if (refCount > 1)
-    {
-    // If there is a python variable pointing to this object, we have
-    // a reference loop. This loop causes the ref count to be 3. If
-    // we detect this to be the case, we first delete the interp to
-    // break the reference loop.
-    bool hasRefLoop = this->Implementation->PythonVarDefined ? true : false;
-    if (this->GetReferenceCount() == 3 && hasRefLoop)
-      {
-      this->Implementation->DestroyInterpretor();
-      }
-    }  
 }
 
 //----------------------------------------------------------------------------
@@ -312,39 +286,28 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   fscript += "\n";
   this->Implementation->Interpretor->RunSimpleString(fscript.c_str());
 
-  if (!this->Implementation->PythonVarDefined)
-    {
-    vtkstd::string initscript;
-    initscript = "from paraview import vtk\n";
+  vtkstd::string runscript;
+  runscript = "from paraview import vtk\n";
 
-    // Set self to point to this
-    char addrofthis[1024];
-    sprintf(addrofthis, "%p", this);    
-    char *aplus = addrofthis; 
-    if ((addrofthis[0] == '0') && 
-        ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
-      {
-      aplus += 2; //skip over "0x"
-      }
-    initscript += "_progfilter = vtk.vtkProgrammableFilter('";
-    initscript += aplus;
-    initscript += "')\n";
-    this->Implementation->Interpretor->RunSimpleString(initscript.c_str());
-    // The interpretor has a pointer to the filter therefore there is
-    // a reference loop.
-    this->Implementation->PythonVarDefined = true;
+  // Set self to point to this
+  char addrofthis[1024];
+  sprintf(addrofthis, "%p", this);    
+  char *aplus = addrofthis; 
+  if ((addrofthis[0] == '0') && 
+      ((addrofthis[1] == 'x') || addrofthis[1] == 'X'))
+    {
+    aplus += 2; //skip over "0x"
     }
   
-  vtkstd::string runscript;
   // Call the function
   runscript += funcname;
-  runscript += "(_progfilter)\n";
+  runscript += "(vtk.vtkProgrammableFilter('";
+  runscript += aplus;
+  runscript += "'))\n";
 
   this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
 
   this->Implementation->Interpretor->FlushMessages();
-  //this->Implementation->Interpretor->Delete();
-  //this->Implementation->Interpretor = NULL;
 }
 
 //----------------------------------------------------------------------------
