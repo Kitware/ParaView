@@ -24,6 +24,34 @@
       </Hints>
       <!-- End of STLWriter -->
     </WriterProxy>
+    
+    <WriterProxy name="PLYWriter" class="vtkPLYWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write polygonal data in Stanford University PLY format.">
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+        <Property name="FileType" show="0"/>
+      </Hints>
+      <!-- End of PLYWriter -->
+    </WriterProxy>
+
+    
   </ProxyGroup>
 
   <ProxyGroup name="writers">
@@ -597,38 +625,8 @@
       <!-- End of PDataSetWriter -->
     </PSWriterProxy>
 
-    <WriterProxy name="PLYWriter" class="vtkPLYWriter"
-      base_proxygroup="writers" base_proxyname="DataWriterBase">
-      <Documentation
-        short_help="Write polygonal data in Stanford University PLY format.">
-        Writer to write polygonal data in Stanford University PLY format. The 
-        data can be written in either binary (little or big endian) or ASCII 
-        representation. As for PointData and CellData, vtkPLYWriter cannot 
-        handle normals or vectors. It only handles RGB PointData and CellData. 
-      </Documentation>
-      <InputProperty name="Input" command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkPolyData"/>
-        </DataTypeDomain>
-        <Documentation>
-          The input filter/source whose output dataset is to written to the
-          file.
-        </Documentation>
-      </InputProperty>
-      <Hints>
-        <Property name="Input" show="0"/>
-        <Property name="FileName" show="0"/>
-        <Property name="FileType" show="0"/>
-      </Hints>
-      <!-- End of PLYWriter -->
-    </WriterProxy>
-
     <PSWriterProxy name="PPLYWriter" class="vtkParallelSerialWriter"
-      file_name_method="SetFileName" parallel_only="1">
+      file_name_method="SetFileName">
       <Documentation
         short_help="Write polygonal data in Stanford University PLY format.">
         Writer to write polygonal data in Stanford University PLY format. The 
@@ -640,7 +638,7 @@
       </Documentation>
       <SubProxy>
         <Proxy name="Writer"
-          proxygroup="writers" proxyname="PLYWriter">
+          proxygroup="internal_writers" proxyname="PLYWriter">
         </Proxy>
         <ExposedProperties>
           <Property name="FileType" />
@@ -651,7 +649,7 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
+        <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
         <Documentation>
