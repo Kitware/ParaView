@@ -201,7 +201,7 @@ int pqView::getNumberOfVisibleRepresentations() const
   for (int i=0; i<this->Internal->Representations.size(); i++)
     {
     pqRepresentation *repr = this->Internal->Representations[i];
-    if(repr->isVisible())
+    if (repr && repr->isVisible())
       {
       count++;
       }
