@@ -68,15 +68,21 @@ echo "Fixups using install_name_tool..."
 echo ""
 echo "Stage 1 - fix all the Qt dylib's"
 
+if [ "${QT_LIB_DIR}" = "/Library/Frameworks" ]; then
+  QTLIBSTR=""
+else
+  QTLIBSTR="${QT_LIB_DIR}/"
+fi
+
 for a in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
   if [ -e "${QT_LIB_DIR}/$a" ]; then
       echo -n .
       file=$(basename "${QT_LIB_DIR}/$a")
       for executable in ${EXECUTABLES}; do
-          install_name_tool "${executable}" -change "${QT_LIB_DIR}/$a" @executable_path/${file}
+          install_name_tool "${executable}" -change "${QTLIBSTR}$a" @executable_path/${file}
       done
       for executable in ${SUB_EXECUTABLES}; do
-          install_name_tool "${executable}" -change "${QT_LIB_DIR}/$a" @executable_path/../../../${file}
+          install_name_tool "${executable}" -change "${QTLIBSTR}$a" @executable_path/../../../${file}
       done
       install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
       
@@ -91,8 +97,8 @@ for a in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
           echo "Stage 1.b.${QT_LIB_DIR}/$a"
       fi
       for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
-          libfile=$(basename "${QT_LIB_DIR}/${lib}")
-          install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
+          libfile=$(basename "${QTLIBSTR}${lib}")
+          install_name_tool paraview.app/Contents/MacOS/${file} -change "${QTLIBSTR}${lib}" @executable_path/${libfile}
       done
   fi
 done
@@ -147,8 +153,8 @@ for a in $(cd "${ParaView_BINARY_DIR}/bin" && ls *.so *.dylib); do
             echo "Stage 2.b.${ParaView_BINARY_DIR}/bin/$a"
         fi
         for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
-            libfile=$(basename "${QT_LIB_DIR}/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
+            libfile=$(basename "${QTLIBSTR}${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QTLIBSTR}${lib}" @executable_path/${libfile}
         done
     fi
 done
@@ -182,8 +188,8 @@ for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* lib
             echo "Stage 2.b.${FFMPEG_LIB_DIR}/$a"
         fi
         for lib in $(cd "${QT_LIB_DIR}" && ls *.dylib); do
-            libfile=$(basename "${QT_LIB_DIR}/${lib}")
-            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QT_LIB_DIR}/${lib}" @executable_path/${libfile}
+            libfile=$(basename "${QTLIBSTR}${lib}")
+            install_name_tool paraview.app/Contents/MacOS/${file} -change "${QTLIBSTR}${lib}" @executable_path/${libfile}
         done
     fi
 done
@@ -197,25 +203,25 @@ echo "Stage 3 - Fix all the Qt Frameworks"
 for a in QtCore QtGui QtNetwork QtXml QtAssistant QtSql; do
   install_name_tool -id @executable_path/../Frameworks/$a.framework/Versions/4/$a paraview.app/Contents/Frameworks/$a.framework/Versions/4/$a
   for executable in ${EXECUTABLES}; do
-    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a
+    install_name_tool "${executable}" -change ${QTLIBSTR}$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a
   done
   for executable in ${SUB_EXECUTABLES}; do
-    install_name_tool "${executable}" -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../../../../Frameworks/$a.framework/Versions/4/$a
+    install_name_tool "${executable}" -change ${QTLIBSTR}$a.framework/Versions/4/$a @executable_path/../../../../Frameworks/$a.framework/Versions/4/$a
   done
 
   if [ "x$DEBUG" = "x1" ]; then
     echo "Stage 3.a.$a"
   fi
   for b in QtCore QtGui QtNetwork QtXml QtAssistant QtSql; do
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/Versions/4/$a
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/Versions/Current/$a
-    install_name_tool -change ${QT_LIB_DIR}/$b.framework/Versions/4/$b @loader_path/../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/$a
+    install_name_tool -change ${QTLIBSTR}$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/Versions/4/$a
+    install_name_tool -change ${QTLIBSTR}$b.framework/Versions/4/$b @loader_path/../../../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/Versions/Current/$a
+    install_name_tool -change ${QTLIBSTR}$b.framework/Versions/4/$b @loader_path/../$b.framework/Versions/4/$b paraview.app/Contents/Frameworks/$a.framework/$a
   done
   if [ "x$DEBUG" = "x1" ]; then
     echo "Stage 3.b.$a"
   fi
   for b in $(ls paraview.app/Contents/MacOS/*.dylib); do
-    install_name_tool -change ${QT_LIB_DIR}/$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a $b
+    install_name_tool -change ${QTLIBSTR}$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a $b
   done
 done
 
