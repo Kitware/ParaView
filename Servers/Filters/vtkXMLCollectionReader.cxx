@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.19");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.20");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -82,6 +82,8 @@ vtkXMLCollectionReader::vtkXMLCollectionReader()
 
   this->InternalForceMultiBlock = false;
   this->ForceOutputTypeToMultiBlock = 0;
+  
+  this->CurrentOutput = -1;
 }
 
 //----------------------------------------------------------------------------
@@ -253,18 +255,7 @@ int vtkXMLCollectionReader::FillOutputPortInformation(int, vtkInformation *info)
 //----------------------------------------------------------------------------
 void vtkXMLCollectionReader::SetupEmptyOutput()
 {
-  vtkExecutive* exec = this->GetExecutive();
-  vtkInformation* info = exec->GetOutputInformation(0);
-
-  vtkDataObject* doOutput = 
-    info->Get(vtkDataObject::DATA_OBJECT());
-  vtkCompositeDataSet* hb = 
-    vtkCompositeDataSet::SafeDownCast(doOutput);
-  if (!hb)
-    {
-    return;
-    }
-  hb->Initialize();
+  this->GetCurrentOutput()->Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -483,7 +474,7 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
   int n = static_cast<int>(this->Internal->RestrictedDataSets.size());
   this->Internal->Readers.resize(n);
 
-  vtkInformation* outInfo = this->GetExecutive()->GetOutputInformation(0);
+  vtkInformation* outInfo = this->GetCurrentOutputInformation();
   int updatePiece = outInfo->Get(
     vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int updateNumPieces = outInfo->Get(
@@ -515,6 +506,7 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
                     "unless the output is forced to be multi-block");
       return;
       }
+    this->CurrentOutput = 0;
     this->ReadAFile(0,
                     updatePiece,
                     updateNumPieces,

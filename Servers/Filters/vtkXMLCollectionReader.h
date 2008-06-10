@@ -161,6 +161,8 @@ protected:
 private:
   vtkXMLCollectionReader(const vtkXMLCollectionReader&);  // Not implemented.
   void operator=(const vtkXMLCollectionReader&);  // Not implemented.
+  
+  int CurrentOutput;
 };
 
 #endif
