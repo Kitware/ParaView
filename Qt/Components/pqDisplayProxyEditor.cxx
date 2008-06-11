@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 
 // ParaView widget includes
 #include "pqSignalAdaptors.h"
@@ -147,6 +148,7 @@ pqDisplayProxyEditor::~pqDisplayProxyEditor()
   delete this->Internal;
 }
 
+
 //-----------------------------------------------------------------------------
 /// set the proxy to repr display properties for
 void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr) 
@@ -191,9 +193,8 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   // setup cube axes visibility.
   if ((prop = reprProxy->GetProperty("CubeAxesVisibility")) != 0)
     {
-    this->Internal->Links->addPropertyLink(this->Internal->ShowCubeAxes,
-      "checked", SIGNAL(stateChanged(int)),
-      reprProxy, prop);
+     QObject::connect(this->Internal->ShowCubeAxes, SIGNAL(toggled(bool)),
+       this, SLOT(cubeAxesVisibilityChanged()));
     this->Internal->AnnotationGroup->show();
     }
   else
@@ -461,7 +462,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
-
+//-----------------------------------------------------------------------------
+pqPipelineRepresentation* pqDisplayProxyEditor::getRepresentation()
+{
+  return this->Internal->Representation;
+}
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setupGUIConnections()
 {
@@ -727,13 +732,30 @@ void pqDisplayProxyEditor::updateMaterial(int vtkNotUsed(idx))
     }
 #endif
 }
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::cubeAxesVisibilityChanged()
+{
+  vtkSMProxy* reprProxy = (this->Internal->Representation)? this->Internal->Representation->getProxy() : NULL;
+  vtkSMProperty* prop = 0;
 
+  // setup cube axes visibility.
+  if ((prop = reprProxy->GetProperty("CubeAxesVisibility")) != 0)
+    {
+    pqSMAdaptor::setElementProperty(prop, this->Internal->ShowCubeAxes->isChecked());
+    reprProxy->UpdateVTKObjects();
+    }
+}
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::editCubeAxes()
 {
   pqCubeAxesEditorDialog dialog(this);
   dialog.setRepresentationProxy(this->Internal->Representation->getProxy());
   dialog.exec();
+}
+//----------------------------------------------------------------------------
+bool pqDisplayProxyEditor::isCubeAxesVisible()
+{
+  return this->Internal->ShowCubeAxes->isChecked();
 }
 
 //-----------------------------------------------------------------------------

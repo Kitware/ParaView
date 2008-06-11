@@ -68,14 +68,16 @@ protected slots:
   void zoomToData();
   void updateEnableState();
   void updateMaterial(int idx);
-  void editCubeAxes();
+  virtual void editCubeAxes();
+  virtual void cubeAxesVisibilityChanged();
   void sliceDirectionChanged();
   void selectedMapperChanged();
   void volumeBlockSelected();
 protected:
 
   /// Set the display whose properties we want to edit.
-  void setRepresentation(pqPipelineRepresentation* display);
+  virtual void setRepresentation(pqPipelineRepresentation* display);
+  pqPipelineRepresentation* getRepresentation();
   void updateSelectionLabelModes();
 
   pqDisplayProxyEditorInternal* Internal;
@@ -83,6 +85,10 @@ protected:
   
   QVariant specularColor() const;
   void setSpecularColor(QVariant);
+
+  bool isCubeAxesVisible();
+
+
 
 private:
   bool DisableSlots;
