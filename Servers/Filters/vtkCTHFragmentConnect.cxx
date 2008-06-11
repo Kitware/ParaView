@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.46");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.47");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -2387,6 +2387,10 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->MaterialArraySelection->Delete();
   this->MaterialArraySelection=0;
 
+  this->MassArraySelection->RemoveObserver( this->SelectionObserver );
+  this->MassArraySelection->Delete();
+  this->MassArraySelection=0;
+
   this->WeightedAverageArraySelection->RemoveObserver( this->SelectionObserver );
   this->WeightedAverageArraySelection->Delete();
   this->WeightedAverageArraySelection=0;
@@ -2913,6 +2917,7 @@ int vtkCTHFragmentConnect::GetNumberOfLocalBlocks(
     ++nLocalBlocks;
     it->GoToNextItem();
     }
+  it->Delete();
   return nLocalBlocks;
 }
 
@@ -3669,6 +3674,7 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
     {
     testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
     }
+  hbdsIt->Delete();
   // if we got a null pointer then this indicates that 
   // we do not have any blocks on this process.
 
@@ -6117,7 +6123,7 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
       apf->AddInput(srcMesh);
       vtkPolyData *mergedMesh=apf->GetOutput();
       mergedMesh->Update();
-      //mergedMesh->Register(0); //TODO Do I have to? no because multi piece does it
+      //mergedMesh->Register(0); // Do I have to? no because multi piece does it
       resolvedFragments->SetPiece(globalId, mergedMesh);
       apf->Delete();
       ReleaseVtkPointer(srcMesh);
@@ -7428,6 +7434,8 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
   // Copy the equivalences to the local set for returning our results.
   // The ids will be the global ids so the GetId method will work.
   set->DeepCopy(globalSet);
+
+  delete globalSet;
 }
 
 //----------------------------------------------------------------------------
@@ -7472,6 +7480,7 @@ void vtkCTHFragmentConnect::MergeGhostEquivalenceSets(
         }
       }
     }
+  delete [] tmp;
 
   // Make the set ids sequential.
   this->NumberOfResolvedFragments = globalSet->ResolveEquivalences();
