@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.45");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.46");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -1617,6 +1617,9 @@ void vtkCTHFragmentConnectBlock::Initialize(
   this->CellIncrements[2] = this->CellIncrements[1] * (imageExt[3]-imageExt[2]);
 
   // As a sanity check, compare spacing and level.
+  #ifdef NDEBUG
+  (void)rootSpacing; // avoid a compiler warning when assert goes away
+  #endif
   assert( "Spacing does not look correct for CTH AMR structure."
           && (int)(rootSpacing[0] / this->Spacing[0] + 0.5) == (1<<(this->Level))
           && (int)(rootSpacing[1] / this->Spacing[1] + 0.5) == (1<<(this->Level))
@@ -3661,9 +3664,13 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
   hbdsIt->VisitOnlyLeavesOn();
   hbdsIt->SkipEmptyNodesOn();
   hbdsIt->InitTraversal();
-  vtkImageData *testImage
-    = dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
-  assert( "Unable to get image data." && testImage );
+  vtkImageData *testImage=0;
+  if ( !hbdsIt->IsDoneWithTraversal() )
+    {
+    testImage=dynamic_cast<vtkImageData *>(hbdsInput->GetDataSet(hbdsIt));
+    }
+  // if we got a null pointer then this indicates that 
+  // we do not have any blocks on this process.
 
   // Configure data structures
   // 1) Weighted average of attribute over the fragment
@@ -3677,12 +3684,18 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
     {
     // data array
     const char *thisArrayName=weightedAverageArrayNames[j].c_str();
-    vtkDataArray *testArray
-      = testImage->GetCellData()->GetArray(thisArrayName);
-    assert( "Couldn't access the named array."
-            && testArray);
+    // if we have blocks on this process, we need to copy the 
+    // array structure from them.
+    int nComp=1;
+    if (testImage)
+      {
+      vtkDataArray *testArray
+        = testImage->GetCellData()->GetArray(thisArrayName);
+      assert( "Couldn't access the named array."
+              && testArray);
+      nComp=testArray->GetNumberOfComponents();
+      }
     this->FragmentWeightedAverages[j]=vtkDoubleArray::New();
-    int nComp=testArray->GetNumberOfComponents();
     this->FragmentWeightedAverages[j]->SetNumberOfComponents(nComp);
     ostringstream osIntegratedArrayName;
     osIntegratedArrayName << "VolumeWeightedAverage-"
@@ -3702,12 +3715,18 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
     {
     // data array
     const char *thisArrayName=summedArrayNames[j].c_str();
-    vtkDataArray *testArray
-      = testImage->GetCellData()->GetArray(thisArrayName);
-    assert( "Couldn't access the named array."
-            && testArray);
+    // if we have blocks on this process, we need to copy the 
+    // array structure from them.
+    int nComp=1;
+    if (testImage)
+      {
+      vtkDataArray *testArray
+        = testImage->GetCellData()->GetArray(thisArrayName);
+      assert( "Couldn't access the named array."
+              && testArray);
+      nComp=testArray->GetNumberOfComponents();
+      }
     this->FragmentSums[j]=vtkDoubleArray::New();
-    int nComp=testArray->GetNumberOfComponents();
     this->FragmentSums[j]->SetNumberOfComponents(nComp);
     ostringstream osIntegratedArrayName;
     osIntegratedArrayName << "Summation-"

@@ -72,6 +72,7 @@ public:
   static vtkSpyPlotReader* New();
   vtkTypeRevisionMacro(vtkSpyPlotReader,vtkCompositeDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
+  void PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myProcId);
 
   // Description:
   // Get and set the file name. It is either the name of the case file or the
@@ -84,7 +85,7 @@ public:
   // given in seconds.
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
-  
+
   // Description:
   // If true, the reader distributes files over processors. If false,
   // the reader distributes blocks over processors. Default is false.
@@ -94,7 +95,7 @@ public:
   vtkSetMacro(DistributeFiles,int);
   vtkGetMacro(DistributeFiles,int);
   vtkBooleanMacro(DistributeFiles,int);
-  
+
   // Description:
   // If true, the reader generate a cell array in each block that
   // stores the level in the hierarchy, starting from 0.
@@ -102,7 +103,7 @@ public:
   vtkSetMacro(GenerateLevelArray,int);
   vtkGetMacro(GenerateLevelArray,int);
   vtkBooleanMacro(GenerateLevelArray,int);
-  
+
   // Description:
   // If true, the reader generate a cell array in each block that
   // stores a unique but not necessarily contiguous id.
@@ -118,7 +119,7 @@ public:
   vtkSetMacro(GenerateActiveBlockArray,int);
   vtkGetMacro(GenerateActiveBlockArray,int);
   vtkBooleanMacro(GenerateActiveBlockArray,int);
-  
+
   // Description:
   // If true, the reader will convert volume fraction arrays to unsigned char.
   // True by default.
@@ -144,7 +145,7 @@ public:
   // Get the data array selection tables used to configure which data
   // arrays are loaded by the reader.
   vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
-  
+
   // Description:
   // Cell array selection
   int GetNumberOfCellArrays();
@@ -154,11 +155,9 @@ public:
 
   // Description:
   // Set the controller used to coordinate parallel reading.
-  void SetController(vtkMultiProcessController* controller);
-  
-  // Return the controller used to coordinate parallel reading. By default,
-  // it is the global controller.
-  vtkGetObjectMacro(Controller,vtkMultiProcessController);
+  // The "global controller" has all processes while the 
+  // "controller" has only those who have blocks.
+  void SetGlobalController(vtkMultiProcessController* controller);
 
   // Description:
   // Determine if the file can be readed with this reader.
@@ -280,13 +279,12 @@ protected:
                         vtkInformationVector* outputVector);
 
   void AddGhostLevelArray(int numLevels);
+  int AddBlockIdArray(vtkCompositeDataSet *cds);
+  int AddAttributes(vtkHierarchicalBoxDataSet *hbds);
+  int AddActiveBlockArray(vtkCellData *cd,vtkIdType nCells,unsigned char status);
 
   // Have all the readers have the same global level structure
-  void SetGlobalLevels(vtkCompositeDataSet *hb,
-                       int processNumber,
-                       int numProcessors,
-                       int rightHasBounds,
-                       int leftHasBounds);
+  void SetGlobalLevels(vtkCompositeDataSet *cds);
   // Description:
   // Get and set the current file name. Protected because
   // this method should only be used internally
@@ -304,9 +302,20 @@ protected:
 
   int IsAMR; // AMR (hierarchy of uniform grids)
   // or flat mesh (set of rectilinear grids)?
-  
-  vtkMultiProcessController *Controller;
-  
+
+  // access to all processes
+  vtkMultiProcessController *GlobalController;
+  // access to processes who have blocks
+  vtkMultiProcessController *ReadController;
+  // acess to processors who have no blocks
+  vtkMultiProcessController *AttributeController;
+
+  // Description:
+  // Set the current time step.
+  int UpdateTimeStep(vtkInformation *requestInfo,
+                     vtkInformationVector *outputInfo,
+                     vtkCompositeDataSet *hb);
+
   // The file format stores a vector field as separated scalar component
   // fields. This method rebuilds the vector field from those scalar
   // component fields.

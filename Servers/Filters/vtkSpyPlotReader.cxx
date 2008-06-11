@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkIntArray.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkProcessGroup.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
@@ -53,6 +54,13 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 #include <cctype>
 
+///
+#include "vtksys/ios/sstream"
+using vtkstd::string;
+using vtksys_ios::ostringstream;
+// #include "gdbClusterUtils.h"
+// #include "signal.h"
+///
 
 #define vtkMIN(x, y) \
   (\
@@ -62,15 +70,11 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.61");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.62");
 vtkStandardNewMacro(vtkSpyPlotReader);
-vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
-void createSpyPlotLevelArray(vtkCellData *cd, int size, int level);
-
-//=============================================================================
-
-
+static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level);
 
 //-----------------------------------------------------------------------------
 vtkSpyPlotReader::vtkSpyPlotReader()
@@ -99,9 +103,10 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->DownConvertVolumeFraction = 1;
   this->MergeXYZComponents = 1;
 
-  this->Controller = 0;
-  this->SetController(vtkMultiProcessController::GetGlobalController());
-  
+  // this has all of the processes.
+  this->GlobalController = 0;
+  this->SetGlobalController(vtkMultiProcessController::GetGlobalController());
+
   this->DistributeFiles=0; // by default, distribute blocks, not files.
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
@@ -122,7 +127,7 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
   delete this->Map;
   delete this->Bounds;
   this->Map = 0;
-  this->SetController(0);
+  this->SetGlobalController(0);
 }
 
 
@@ -160,7 +165,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
                                          vtkInformationVector **inputVector, 
                                          vtkInformationVector *outputVector)
 {
-  if(this->Controller==0)
+  if(this->GlobalController==0)
     {
     vtkErrorMacro("Controller not specified. This reader requires controller to be set.");
     //return 0;
@@ -230,7 +235,7 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
       {
       b = 1;
       }
-    
+
     if ((esize > b) && isdigit(a[b]))
       {
       currentNum = static_cast<int>(strtol(&(a[b]), &ep, 10));
@@ -240,14 +245,14 @@ int vtkSpyPlotReader::UpdateSpyDataFile(vtkInformation* request,
         }
       }
     }
-  
+
   if (!isASeries)
     {
     this->SetCurrentFileName(this->FileName);
 
     vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt = 
       this->Map->Files.find(this->FileName);
-    
+
     vtkSpyPlotUniReader* oldReader = 0;
     if ( mapIt != this->Map->Files.end() )
       {
@@ -558,60 +563,27 @@ int vtkSpyPlotRemoveBadGhostCells(DataType* dataType, vtkDataArray* dataArray, i
   dataArray->SetNumberOfTuples(realDims[0]*realDims[1]*realDims[2]);
   return 1;
 }
-
 //-----------------------------------------------------------------------------
-int vtkSpyPlotReader::RequestData(
-  vtkInformation *request,
-  vtkInformationVector **vtkNotUsed(inputVector),
-  vtkInformationVector *outputVector)
+int vtkSpyPlotReader::UpdateTimeStep(vtkInformation *requestInfo,
+                                     vtkInformationVector *outputInfoVec,
+                                     vtkCompositeDataSet *outputData)
 {
-  vtkDebugMacro( "--------------------------- Request Data --------------------------------" );
-  vtkSpyPlotUniReader* uniReader = 0;
+  vtkInformation *outputInfo=outputInfoVec->GetInformationObject(0);
 
-  vtkstd::vector<vtkRectilinearGrid*> grids;
-
-  vtkInformation *info=outputVector->GetInformationObject(0);
-  vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
-  vtkCompositeDataSet *hb=vtkCompositeDataSet::SafeDownCast(doOutput);  
-  if(!hb)
-    {
-    vtkErrorMacro("The output is not a CompositeDataSet");
-    return 0;
-    }
-  if (!info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) ||
-      !info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
-    {
-    vtkErrorMacro("Expected information not found. "
-                  "Cannot provide update extent.");
-    return 0;
-    }
-
-  int tsLength =
-    info->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-  double* steps =
-    info->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-
-  hb->Initialize(); // remove all previous blocks
-  //int numFiles = this->Map->Files.size();
-
-  // By setting SetMaximumNumberOfPieces(-1) 
-  // then GetUpdateNumberOfPieces() should always return the number
-  // of processors in the parallel job and GetUpdatePiece() should
-  // return the specific process number
-  int processNumber = 
-    info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
-  int numProcessors =
-    info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-  
   // Update the timestep.
-  if(info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+  int tsLength =
+    outputInfo->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  double* steps =
+    outputInfo->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  //
+  if(outputInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
     {
     // Get the requested time step. We only supprt requests of a single time
     // step in this reader right now
     double *requestedTimeSteps = 
-      info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
+      outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
     //double timeValue = requestedTimeSteps[0];
-    
+
     // find the first time value larger than requested time value
     // this logic could be improved
     //int cnt = 0;
@@ -620,7 +592,7 @@ int vtkSpyPlotReader::RequestData(
     //  cnt++;
     //  }
     //this->CurrentTimeStep = cnt;
-    
+
     int cnt=0;
     int closestStep=0;
     double minDist=-1;
@@ -638,21 +610,168 @@ int vtkSpyPlotReader::RequestData(
     this->CurrentTimeStep=closestStep;
 
     this->TimeRequestedFromPipeline = true;
-    this->UpdateMetaData(request, outputVector);
+    this->UpdateMetaData(requestInfo, outputInfoVec);
     this->TimeRequestedFromPipeline = false;
     }
   else
     {
-    this->UpdateMetaData(request, outputVector);
+    this->UpdateMetaData(requestInfo, outputInfoVec);
     }
 
-  hb->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
+  outputData->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),
                             steps+this->CurrentTimeStep, 1);
-  
+
+  return 1;
+}
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::AddBlockIdArray(vtkCompositeDataSet *cds)
+{
+  int blockId=0;
+  vtkSmartPointer<vtkCompositeDataIterator> cdIter;
+  cdIter.TakeReference(cds->NewIterator());
+  cdIter->VisitOnlyLeavesOn();
+  cdIter->TraverseSubTreeOn();
+  for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal();
+    cdIter->GoToNextItem(), blockId++)
+    {
+    vtkDataObject *dataObject = cdIter->GetCurrentDataObject();
+    if (dataObject!=0)
+      {
+      vtkDataSet *ds = vtkDataSet::SafeDownCast(dataObject);
+      assert("check: ds_exists" && ds!=0);
+
+      // Add the block id cell data array
+      vtkCellData *cd=ds->GetCellData();
+      vtkDataArray *array=cd->GetArray("blockId");
+      if(array!=0)
+        {
+        cd->RemoveArray("blockId"); // if this is not the first step,
+        // make sure we have a clean array
+        }
+      array = vtkIntArray::New();
+      cd->AddArray(array);
+      array->Delete();
+      array->SetName("blockId");
+      array->SetNumberOfComponents(1);
+      vtkIdType numCells = ds->GetNumberOfCells();
+      array->SetNumberOfTuples(numCells);
+      array->FillComponent(0,blockId);
+      }
+    }
+
+  return 1;
+}
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::AddActiveBlockArray(
+      vtkCellData *cd,
+      vtkIdType nCells,
+      unsigned char status)
+{
+  vtkUnsignedCharArray* activeArray = vtkUnsignedCharArray::New();
+  activeArray->SetName("ActiveBlock");
+  //vtkIdType numCells=realDims[0]*realDims[1]*realDims[2];
+  activeArray->SetNumberOfTuples(nCells);
+  activeArray->FillComponent(0,status);
+//   for (vtkIdType myIdx=0; myIdx<numCells; myIdx++)
+//     {
+//     activeArray->SetValue(myIdx, block->IsActive());
+//     }
+  cd->AddArray(activeArray);
+  activeArray->Delete();
+
+  return 1;
+}
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::AddAttributes(vtkHierarchicalBoxDataSet *hbds)
+{
+  // global bounds
+  double b[6];
+  this->Bounds->GetBounds(b);
+  vtkDoubleArray *da = vtkDoubleArray::New();
+  da->SetNumberOfComponents(1);
+  da->SetNumberOfTuples(6);
+  da->SetName("GlobalBounds");
+  for (int q=0; q<6; ++q)
+    {
+    da->SetValue(q, b[q]);
+    }
+  hbds->GetFieldData()->AddArray( da );
+  da->Delete();
+  // global box size
+  vtkIntArray *ia = vtkIntArray::New();
+  ia->SetNumberOfComponents(1);
+  ia->SetNumberOfTuples(3);
+  ia->SetName("GlobalBoxSize");
+  for (int q=0; q<3; ++q)
+    {
+    ia->SetValue(q, this->BoxSize[q]);
+    }
+  hbds->GetFieldData()->AddArray( ia );
+  ia->Delete();
+  // minimum level in use
+  ia = vtkIntArray::New();
+  ia->SetNumberOfComponents(1);
+  ia->SetNumberOfTuples(1);
+  ia->SetName("MinLevel");
+  ia->SetValue(0, this->MinLevel);
+  hbds->GetFieldData()->AddArray( ia );
+  ia->Delete();
+  // grid spacing on the min level
+  da = vtkDoubleArray::New();
+  da->SetNumberOfComponents(1);
+  da->SetNumberOfTuples(3);
+  da->SetName("MinLevelSpacing");
+  for (int q=0; q<3; ++q)
+    {
+    da->SetValue(q, this->MinLevelSpacing[q]);
+    }
+  hbds->GetFieldData()->AddArray( da );
+  da->Delete();
+
+  return 1;
+}
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::RequestData(
+  vtkInformation *request,
+  vtkInformationVector **vtkNotUsed(inputVector),
+  vtkInformationVector *outputVector)
+{
+  vtkDebugMacro( "--------------------------- Request Data --------------------------------" );
+  vtkSpyPlotUniReader* uniReader = 0;
+
+  vtkstd::vector<vtkRectilinearGrid*> grids;
+
+  vtkInformation *info=outputVector->GetInformationObject(0);
+  vtkDataObject *doOutput=info->Get(vtkDataObject::DATA_OBJECT());
+  vtkCompositeDataSet *cds=vtkCompositeDataSet::SafeDownCast(doOutput);
+  if(!cds)
+    {
+    vtkErrorMacro("The output is not a CompositeDataSet");
+    return 0;
+    }
+  if (!info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) ||
+      !info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
+    {
+    vtkErrorMacro("Expected information not found. "
+                  "Cannot provide update extent.");
+    return 0;
+    }
+
+  cds->Initialize(); // remove all previous blocks
+  //int numFiles = this->Map->Files.size();
+
+  const int myGlobalProcId
+    = this->GlobalController->GetLocalProcessId();
+  const int nProcsAll
+    = this->GlobalController->GetNumberOfProcesses();
+
+  // Set to the requested timestep
+  this->UpdateTimeStep(request,outputVector,cds);
+
   // Tell all of the unireaders that they need to make to check to see
   // if they are current
   this->Map->TellReadersToCheck(this);
-  
+
   vtkSpyPlotBlock *block;
   vtkSpyPlotBlockIterator *blockIterator;
   if(this->DistributeFiles)
@@ -666,279 +785,145 @@ int vtkSpyPlotReader::RequestData(
     blockIterator=new vtkSpyPlotBlockDistributionBlockIterator;
     }
 
-  blockIterator->Init(numProcessors,processNumber,this,this->Map,
-                      this->CurrentTimeStep);
+  // Block iterator could use either the global proc id and number of
+  // processes from the global control or those from the sub controller
+  blockIterator->Init(
+                nProcsAll,
+                myGlobalProcId,
+                this,
+                this->Map,
+                this->CurrentTimeStep);
 
-#if 1 // skip loading for valgrind test
-  
-  int total_num_of_blocks = blockIterator->GetNumberOfBlocksToProcess();
-  int progressInterval = total_num_of_blocks / 10 + 1;
+  int nBlocks = blockIterator->GetNumberOfBlocksToProcess();
+  int progressInterval = nBlocks / 10 + 1;
   int rightHasBounds = 0;
   int leftHasBounds = 0;
 
   // TODO collect the functions that gather meta data 
   // in one place and collect the data in a single pass
-  // TODO move the MakeCurrent outside of metadata funcs
-  // TODO Remove meta data arrays from field data prior to
-  // adding new ones.
+  // TODO move the MakeCurrent outside of meta data gather funcs
 
   // Note that in the process of getting the bounds 
-  // all of the readers will get updated appropriately  
-  this->SetGlobalBounds(blockIterator, total_num_of_blocks,
+  // all of the readers will get updated appropriately
+  this->SetGlobalBounds(blockIterator, nBlocks,
                         progressInterval, &rightHasBounds,
                         &leftHasBounds);
-  // Set the global bounds of the reader
-  double b[6];
-  this->Bounds->GetBounds(b);
-  if (!this->Bounds->IsValid())
-    {
-    // There were no bounds set - reader must have no blocks
-    delete blockIterator;
-    return 1;
-    }
-  // TODO get rid of this, and fix filter to use
-  // field data
-  info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
-
   // Determine if the box size is constant
-  // and set the size if so, -1 is used
-  // as a flag indicating its not constant
   this->SetGlobalBoxSize( blockIterator );
-
   // Determine the minimum level in use
   // and its grid spacing
   this->SetGlobalMinLevelAndSpacing( blockIterator );
-
   // export global bounds, minimum level, spacing, and box size
-  // in field data memebers for use by downstream filters
+  // in field data arrays for use by downstream filters
   vtkHierarchicalBoxDataSet *hbds 
-        = vtkHierarchicalBoxDataSet::SafeDownCast(hb);
+        = vtkHierarchicalBoxDataSet::SafeDownCast(cds);
   if ( hbds )
     {
-    // global bounds
-    vtkDoubleArray *da = vtkDoubleArray::New();
-    da->SetNumberOfComponents(1);
-    da->SetNumberOfTuples(6);
-    da->SetName("GlobalBounds");
-    for (int q=0; q<6; ++q)
-      {
-      da->SetValue(q, b[q]);
-      }
-    hbds->GetFieldData()->AddArray( da );
-    da->Delete();
-    // global box size
-    vtkIntArray *ia = vtkIntArray::New();
-    ia->SetNumberOfComponents(1);
-    ia->SetNumberOfTuples(3);
-    ia->SetName("GlobalBoxSize");
-    for (int q=0; q<3; ++q)
-      {
-      ia->SetValue(q, this->BoxSize[q]);
-      }
-    hbds->GetFieldData()->AddArray( ia );
-    ia->Delete();
-    // minimum level in use
-    ia = vtkIntArray::New();
-    ia->SetNumberOfComponents(1);
-    ia->SetNumberOfTuples(1);
-    ia->SetName("MinLevel");
-    ia->SetValue(0, this->MinLevel);
-    hbds->GetFieldData()->AddArray( ia );
-    ia->Delete();
-    // grid spacing on the min level
-    da = vtkDoubleArray::New();
-    da->SetNumberOfComponents(1);
-    da->SetNumberOfTuples(3);
-    da->SetName("MinLevelSpacing");
-    for (int q=0; q<3; ++q)
-      {
-      da->SetValue(q, this->MinLevelSpacing[q]);
-      }
-    hbds->GetFieldData()->AddArray( da );
-    da->Delete();
+    this->AddAttributes(hbds);
     }
 
-  // Read all files
-
-  //vtkDebugMacro("there is (are) "<<numFiles<<" file(s)");
-  // Read only the part of the file for this processNumber.
-  int current_block_number;
- for(blockIterator->Start(), current_block_number=1; 
-      blockIterator->IsActive();
-      blockIterator->Next(), current_block_number++)
+  // read in the data
+  if (nBlocks!=0)
     {
-    if ( !(current_block_number % progressInterval) )
-      {
-      this->UpdateProgress(
-        0.6 + 
-        0.4 * static_cast<double>(current_block_number)/total_num_of_blocks);
-      }
-    block=blockIterator->GetBlock();
-    int numFields=blockIterator->GetNumberOfFields();
-    uniReader=blockIterator->GetUniReader();
+    // TODO This filter can use the arrays
+    // in field data instead.
+    double b[6];
+    this->Bounds->GetBounds(b);
+    info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
 
-    int dims[3];
-    int blockID = blockIterator->GetBlockID();
-    int level = 0;
-    int hasBadGhostCells;
-    int realExtents[6];
-    int realDims[3];
-    int extents[6];
-    vtkCellData* cd;
-   
-    // Get the dimensions of the block
-    block->GetDimensions(dims);
-    if (this->IsAMR)
+    // Read the blocks/files that are assigned to this process
+    int current_block_number;
+    for(blockIterator->Start(), current_block_number=1;
+        blockIterator->IsActive();
+        blockIterator->Next(), current_block_number++)
       {
-      hasBadGhostCells = this->PrepareAMRData(
-        vtkHierarchicalBoxDataSet::SafeDownCast(hb), block, &level, 
-        extents, realExtents, realDims, &cd);
-      }
-    else
-      {
-      vtkRectilinearGrid *rg;
-      vtkDebugMacro( "Preparing Block: " << blockID << " " 
-                     << uniReader->GetFileName() );
-      hasBadGhostCells = this->PrepareData(
-        vtkMultiBlockDataSet::SafeDownCast(hb), block, &rg, extents, realExtents,
-        realDims, &cd);
-      grids.push_back(rg);
-      }
-
-    vtkDebugMacro("Executing block: " << blockID);
-    // uniReader->PrintMemoryUsage();
-
-    // Now we need to deal with the field data and mapout
-    // where the true ghost cells are
-    if(!hasBadGhostCells)
-      {
-      this->UpdateFieldData(numFields, dims, level, blockID,
-                            uniReader, cd);
-      }
-    else // we have some bad ghost cells
-      {
-      this->UpdateBadGhostFieldData(numFields, dims, realDims,
-                                    realExtents, level, blockID,
-                                    uniReader, cd);
-      }
-    // Add active block array, for debugging
-    if (this->GenerateActiveBlockArray)
-      {
-      vtkUnsignedCharArray* activeArray = vtkUnsignedCharArray::New();
-      activeArray->SetName("ActiveBlock");
-      vtkIdType numCells=realDims[0]*realDims[1]*realDims[2];
-      activeArray->SetNumberOfTuples(numCells);
-      for (vtkIdType myIdx=0; myIdx<numCells; myIdx++)
+      if ( !(current_block_number % progressInterval) )
         {
-        activeArray->SetValue(myIdx, block->IsActive());
+        this->UpdateProgress(
+          0.6 + 
+          0.4 * static_cast<double>(current_block_number)/nBlocks);
         }
-      cd->AddArray(activeArray);
-      activeArray->Delete();
-      }
+      block=blockIterator->GetBlock();
+      int numFields=blockIterator->GetNumberOfFields();
+      uniReader=blockIterator->GetUniReader();
 
-    if (this->MergeXYZComponents)
-      {
-      this->MergeVectors(cd);
-      }
-    } // for
-  delete blockIterator;
+      int dims[3];
+      int blockID = blockIterator->GetBlockID();
+      int level = 0;
+      int hasBadGhostCells;
+      int realExtents[6];
+      int realDims[3];
+      int extents[6];
+      vtkCellData* cd;
 
-#endif //  if 0 skip loading for valgrind test
-  // All files seem to have 1 ghost level.
-//  this->AddGhostLevelArray(1);
+      // Get the dimensions of the block
+      block->GetDimensions(dims);
 
-  // At this point, each processor has its own blocks
-  // They have to exchange the blocks they have get a unique id for
-  // each block over the all dataset.
-
-
-  // Update the number of levels.  
-  if(this->Controller)
-    {
-    this->SetGlobalLevels(hb, processNumber, numProcessors,
-                          rightHasBounds, leftHasBounds);
-    }
- 
-  // Set the unique block id cell data
-  if(this->GenerateBlockIdArray)
-    {
-    int blockId=0;
-    vtkSmartPointer<vtkCompositeDataIterator> cdIter;
-    cdIter.TakeReference(hb->NewIterator());
-    cdIter->VisitOnlyLeavesOn();
-    cdIter->TraverseSubTreeOn();
-    for (cdIter->InitTraversal(); !cdIter->IsDoneWithTraversal();
-      cdIter->GoToNextItem(), blockId++)
-      {
-      vtkDataObject *dataObject = cdIter->GetCurrentDataObject();
-      if (dataObject!=0)
+      // read block
+      if (this->IsAMR)
         {
-        vtkDataSet *ds = vtkDataSet::SafeDownCast(dataObject);
-        assert("check: ds_exists" && ds!=0);
-        
-        // Add the block id cell data array
-        vtkCellData *cd=ds->GetCellData();
-        vtkDataArray *array=cd->GetArray("blockId");
-        if(array!=0)
-          {
-          cd->RemoveArray("blockId"); // if this is not the first step,
-          // make sure we have a clean array
-          }
-        array = vtkIntArray::New();
-        cd->AddArray(array);
-        array->Delete();
-
-        array->SetName("blockId");
-        array->SetNumberOfComponents(1);
-        vtkIdType numCells = ds->GetNumberOfCells();
-        array->SetNumberOfTuples(numCells);
-        int *ptr=static_cast<int *>(array->GetVoidPointer(0));
-        for(vtkIdType k=0; k < numCells; k++)
-          {
-          ptr[k]=blockId;
-          }
-        }
-      }
-    }
-  
-#if 0
-  unsigned int numberOfLevels=hb->GetNumberOfLevels();
-  unsigned int level;
-  //  Display the block list for each level
-  numberOfLevels=hb->GetNumberOfLevels();
-  for (level = 0; level<numberOfLevels; level++)
-    {
-    cout<<processNumber<<" level="<<level<<"/"<<numberOfLevels<<endl;
-    int totalNumberOfDataSets=hb->GetNumberOfDataSets(level);
-    int i;
-    for (i = 0; i<totalNumberOfDataSets; i++)
-      {
-      cout<<processNumber<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
-//       if(hb->GetDataSet(level,i)==0)
-        {
-        cout<<" Void"<<endl;
+        hasBadGhostCells
+          = this->PrepareAMRData(hbds, block, &level,
+                                 extents, realExtents,
+                                 realDims, &cd);
         }
       else
         {
-        cout<<" Exists"<<endl;
+        vtkRectilinearGrid *rg;
+        vtkDebugMacro( "Preparing Block: " << blockID << " " 
+                      << uniReader->GetFileName() );
+        hasBadGhostCells = this->PrepareData(
+          vtkMultiBlockDataSet::SafeDownCast(cds), block, &rg, extents, realExtents,
+          realDims, &cd);
+        grids.push_back(rg);
+        }
+
+      vtkDebugMacro("Executing block: " << blockID);
+
+      // Deal with the field data and map out where the true 
+      // ghost cells are
+      if(!hasBadGhostCells)
+        {
+        this->UpdateFieldData(numFields, dims, level, blockID,
+                              uniReader, cd);
+        }
+      else // we have some bad ghost cells
+        {
+        this->UpdateBadGhostFieldData(numFields, dims, realDims,
+                                      realExtents, level, blockID,
+                                      uniReader, cd);
+        }
+      // Add active block array, for debugging
+      if (this->GenerateActiveBlockArray)
+        {
+        this->AddActiveBlockArray(cd,
+                                  realDims[0]*realDims[1]*realDims[2],
+                                  block->IsActive());
+        }
+      // vectorize
+      if (this->MergeXYZComponents)
+        {
+        this->MergeVectors(cd);
         }
       }
+    delete blockIterator;
     }
-#endif
-  
-  /*
-    vtkstd::vector<vtkRectilinearGrid*>::iterator it;
-    for ( it = grids.begin(); it != grids.end(); ++ it )
-    {
-    (*it)->Print(cout);
-    int cc;
-    for ( cc = 0; cc < (*it)->GetCellData()->GetNumberOfArrays(); ++ cc )
-    {
-    (*it)->GetCellData()->GetArray(cc)->Print(cout);
-    }
-    }
-  */
-  
+
+    // At this point, each processor has its own blocks
+    // They have to exchange the blocks they have get a unique id for
+    // each block over the all dataset.
+
+    // Update the number of levels.
+    if(this->GlobalController)
+      {
+      this->SetGlobalLevels(cds);
+      }
+    // Set the unique block id cell data
+    if(this->GenerateBlockIdArray)
+      {
+      this->AddBlockIdArray(cds);
+      }
+
   return 1;
 }
 
@@ -1370,7 +1355,45 @@ void vtkSpyPlotReader::SetMergeXYZComponents(int merge)
   this->MergeXYZComponents = merge;
   this->Modified();
 }
-
+//-----------------------------------------------------------------------------
+void vtkSpyPlotReader::PrintBlockList(vtkHierarchicalBoxDataSet *hbds, int myProcId)
+{
+  unsigned int numberOfLevels=hbds->GetNumberOfLevels();
+  unsigned int level;
+  //  Display the block list for each level
+  numberOfLevels=hbds->GetNumberOfLevels();
+  for (level = 0; level<numberOfLevels; level++)
+    {
+    cout<<myProcId<<" level="<<level<<"/"<<numberOfLevels<<endl;
+    int totalNumberOfDataSets=hbds->GetNumberOfDataSets(level);
+    int i;
+    for (i = 0; i<totalNumberOfDataSets; i++)
+      {
+      cout<<myProcId<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
+      vtkAMRBox box;
+       if(hbds->GetDataSet(level,i,box)==0)
+        {
+        cout<<" Void"<<endl;
+        }
+      else
+        {
+        cout<<" Exists"<<endl;
+        }
+      }
+    }
+  /*
+    vtkstd::vector<vtkRectilinearGrid*>::iterator it;
+    for ( it = grids.begin(); it != grids.end(); ++ it )
+    {
+    (*it)->Print(cout);
+    int cc;
+    for ( cc = 0; cc < (*it)->GetCellData()->GetNumberOfArrays(); ++ cc )
+    {
+    (*it)->GetCellData()->GetArray(cc)->Print(cout);
+    }
+    }
+  */
+}
 //-----------------------------------------------------------------------------
 void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -1444,20 +1467,41 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     os << "CellDataArraySelection:" << endl;
     this->CellDataArraySelection->PrintSelf(os, indent.GetNextIndent());
     }
-  if ( this->Controller)
+  if ( this->GlobalController)
+    {
+    os << "GlobalController:" << endl;
+    this->GlobalController->PrintSelf(os, indent.GetNextIndent());
+    }
+  if ( this->GlobalController)
     {
     os << "Controller:" << endl;
-    this->Controller->PrintSelf(os, indent.GetNextIndent());
+    this->GlobalController->PrintSelf(os, indent.GetNextIndent());
+    }
+  if ( this->AttributeController)
+    {
+    os << "Controller:" << endl;
+    this->AttributeController->PrintSelf(os, indent.GetNextIndent());
     }
 }
-
+// Get the minimum level that actuall has data and 
+// its grid spacing. If this process has no blocks
+// then we return spacing and min level close to infinity.
 void vtkSpyPlotReader::GetLocalMinLevelAndSpacing(
                               vtkSpyPlotBlockIterator *biter,
                               int *localMinLevel,
                               double spacing[3]) const
 {
-  // get first blocks level
   biter->Start();
+  // If there are no blocks locally we set
+  // the spacing and min level close to infinity
+  // and return
+  if (!biter->IsActive())
+    {
+    localMinLevel[0]=VTK_INT_MAX;
+    spacing[0]=spacing[1]=spacing[2]=VTK_DOUBLE_MAX;
+    return;
+    }
+  // get first block's level
   biter->GetUniReader()->MakeCurrent();
   vtkSpyPlotBlock *thisBlock= biter->GetBlock();
   *localMinLevel = thisBlock->GetLevel();
@@ -1475,24 +1519,26 @@ void vtkSpyPlotReader::GetLocalMinLevelAndSpacing(
       *localMinLevel=thisMinLevel;
       }
     }
-  // now that we have a ptr to the block with minimum 
-  // level.  We can get the spacing there.
+  // now that we have the block with minimum 
+  // level, we can get the spacing from him.
   minLevelBlock->GetSpacing(spacing);
 
   return;
 }
-
+//
 void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
                             vtkSpyPlotBlockIterator *biter)
 {
   // get the local min level and its spacing
+  // if there are no blocks locally these will be
+  // close to infinity.
   int localMinLevel;
   double localMinLevelSpacing[3];
   this->GetLocalMinLevelAndSpacing(biter,&localMinLevel,localMinLevelSpacing);
 
   // If we are not running in parallel then the local
-  // size is the global size
-  if (!this->Controller)
+  // min level and spacing is the global min level and spacing
+  if (!this->GlobalController)
     {
     this->MinLevel=localMinLevel;
     for (int q=0; q<3; ++q)
@@ -1501,12 +1547,7 @@ void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
       }
     return;
     }
-  vtkCommunicator *comm = this->Controller->GetCommunicator();
-  if (!comm)
-    {
-    vtkErrorMacro("Couldn't get the communicator.");
-    return;
-    }
+
   // package the level and its spacing because
   // we want to reduce min level but also need
   // its associated spacing to go along for the ride.
@@ -1515,15 +1556,12 @@ void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
                      localMinLevelSpacing[1],
                      localMinLevelSpacing[2]};
   // collect the information on proc 0
-  int numProcs=comm->GetNumberOfProcesses();
-  int myRank=comm->GetLocalProcessId();
+  int numProcs=this->GlobalController->GetNumberOfProcesses();
+  int myRank=this->GlobalController->GetLocalProcessId();
 
   // proc 0 gets a bigger buffer to collect all the data
   double *recvBuf = myRank==0 ? new double[4*numProcs] : 0;
-  if (!comm->Gather( sendBuf, recvBuf, 4, 0))
-    {
-    vtkErrorMacro("Communication error gathering the local minimum level and spacing.");
-    }
+  this->GlobalController->Gather( sendBuf, recvBuf, 4, 0);
 
   // reduce min level while preserving its
   // associated spacing
@@ -1547,10 +1585,8 @@ void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
     }
   // proc 0 knows the min level and spacing 
   // share this with everyone else
-  if (!comm->Broadcast(sendBuf,4,0))
-    {
-    vtkErrorMacro("Communication error broadcasting the local minimum level and spacing.");
-    }
+  this->GlobalController->Broadcast(sendBuf,4,0);
+
   // now everyone has the min level and associated grid spacing
   this->MinLevel=(int)sendBuf[0];
   for (int q=0; q<3; ++q)
@@ -1560,17 +1596,28 @@ void vtkSpyPlotReader::SetGlobalMinLevelAndSpacing(
 }
 
 
-// Determine the local box size if the box size is constant. 
+// Determine the local box size if the box size is constant.
 // If the box size varies over the local tree then size will be 
 // -1,-1,-1.
+// The case where there are no blocks is treated as if the block size
+// is constant and the size will be
+// inf, inf, inf
 //
 // returns true if the box size is constant and false if the box size varies 
 bool vtkSpyPlotReader::GetLocalBoxSize(vtkSpyPlotBlockIterator *biter,
                                        int localBoxSize[3]) const
 {
-  // get first box size 
   vtkSpyPlotBlock *block;
   biter->Start();
+  // see if there are any blocks on this process
+  // if not then, we'll call block size constant
+  // and set the size close to infinite
+  if (!biter->IsActive())
+    {
+    localBoxSize[0]=localBoxSize[1]=localBoxSize[2]=VTK_INT_MAX;
+    return true;
+    }
+  // get first box's size 
   biter->GetUniReader()->MakeCurrent();
   block = biter->GetBlock();
   int thisBoxSize[3];
@@ -1609,7 +1656,7 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator *biter)
 
   // If we are not running in parallel then the local
   // size is the global size
-  if (!this->Controller)
+  if (!this->GlobalController)
     {
     if (isConstantLocally)
       {
@@ -1627,25 +1674,28 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator *biter)
       }
     return;
     }
-  vtkCommunicator *comm = this->Controller->GetCommunicator();
-  if (!comm)
-    {
-    vtkErrorMacro("Couldn't get the communicator.");
-    return;
-    }
 
   // To decide weather or not box size is constant...
   // 1) get the smallest box size across procs
   int globalBoxSize[3] = {-1,-1,-1};
-  if (!comm->AllReduce(localBoxSize, globalBoxSize, 3, vtkCommunicator::MIN_OP))
-    {
-      vtkErrorMacro("Communication error getting the smallest box size.");
-    }
-  // 2) check if box size is smaller some where else
+  this->GlobalController->AllReduce(localBoxSize, globalBoxSize, 3, vtkCommunicator::MIN_OP);
+
+  // 2) check if box size we have is the same as the 
+  // box size that the other procs have.
   bool isConstantGlobally=true;
   for (int q=0; q<3; ++q)
     {
-    if (localBoxSize[q]!=globalBoxSize[q])
+    // if we have no blocks then we have to 
+    // get the true size from other procs, and pretend 
+    // that size is constant locally
+    if (localBoxSize[q]==VTK_INT_MAX )
+      {
+      localBoxSize[q]=globalBoxSize[q];
+      }
+    // if we have blocks the n we just check to see if
+    // what we have is the same as what the others
+    // have.
+    else if (localBoxSize[q]!=globalBoxSize[q])
       {
       isConstantGlobally=false;
       }
@@ -1653,10 +1703,8 @@ void vtkSpyPlotReader::SetGlobalBoxSize(vtkSpyPlotBlockIterator *biter)
   // 3) send a flag indicating change/no change occured
   int lFlag=!isConstantLocally||!isConstantGlobally ? -1 : 1;
   int gFlag=0;
-  if (!comm->AllReduce(&lFlag,&gFlag,1, vtkCommunicator::MIN_OP))
-    {
-      vtkErrorMacro("Communication error occurred verifying that box size is constant.");
-    }
+  this->GlobalController->AllReduce(&lFlag,&gFlag,1, vtkCommunicator::MIN_OP);
+
   // set the global box size acordingly
   switch( gFlag )
     {
@@ -1689,6 +1737,15 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
   double progressFactor = 0.4 / static_cast<double>(nBlocks);
   vtkSpyPlotBlock *block;
 
+  // every one has bounds, the procs with no blocks
+  // have canonical empty bounds.
+  this->Bounds->SetBounds( VTK_DOUBLE_MAX,
+                          -VTK_DOUBLE_MAX,
+                           VTK_DOUBLE_MAX,
+                          -VTK_DOUBLE_MAX,
+                           VTK_DOUBLE_MAX,
+                          -VTK_DOUBLE_MAX);
+
   biter->Start();
   for (i = 0; biter->IsActive(); i++, biter->Next())
     {
@@ -1705,7 +1762,7 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
     this->Bounds->AddBounds(bounds);
     }
 }
-    
+
 // Returns 1 if the bounds are valid else 0
 void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
                                        int total_num_of_blocks, 
@@ -1716,33 +1773,38 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
   // Get the local bounds of this reader
   this->GetLocalBounds(biter, total_num_of_blocks,
                        progressInterval);
- 
+
   // If we are not running in parallel then the local
   // bounds are the global bounds
-  if (!this->Controller)
+  if (!this->GlobalController)
     {
     return;
     }
-  vtkCommunicator *comm = this->Controller->GetCommunicator();
+  vtkCommunicator *comm = this->GlobalController->GetCommunicator();
   if (!comm)
     {
     return;
     }
 
-  int processNumber = biter->GetProcessorId();
-  int numProcessors = biter->GetNumberOfProcessors();
+  int processNumber=this->GlobalController->GetLocalProcessId();
+  int numProcessors=this->GlobalController->GetNumberOfProcesses();
+
   if (!comm->ComputeGlobalBounds(processNumber, numProcessors,
                                  this->Bounds, rightHasBounds,
-                                 leftHasBounds, 
+                                 leftHasBounds,
                                  VTK_MSG_SPY_READER_HAS_BOUNDS,
                                  VTK_MSG_SPY_READER_LOCAL_BOUNDS,
                                  VTK_MSG_SPY_READER_GLOBAL_BOUNDS))
     {
     vtkErrorMacro("Problem occurred getting the global bounds");
     }
+
+  double bounds[6];
+  this->Bounds->GetBounds(bounds);
+
  return;
 }
-  
+
 int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                                      vtkSpyPlotBlock *block, 
                                      int *level,
@@ -1776,7 +1838,6 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                            << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
   cerr << "}\n"*/;
 
-
   int loCorner[3], hiCorner[3];
   loCorner[0] = realExtents[0];
   hiCorner[0] = realExtents[1];
@@ -1785,10 +1846,8 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
   loCorner[2] = realExtents[4];
   hiCorner[2] = realExtents[5];
 
-  // TODO: is this always 3D?
   vtkAMRBox box(3,loCorner,hiCorner);
 
-  //vtkImageData* ug = vtkImageData::New();
   vtkUniformGrid* ug = vtkUniformGrid::New();
   hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
   ug->SetSpacing(spacing);
@@ -1900,7 +1959,7 @@ void vtkSpyPlotReader::UpdateFieldData(int numFields, int dims[3],
   // Mark the bounding cells as ghost cells of level 1.
   vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
   ghostArray->SetNumberOfTuples(totalSize);
-  ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+  ghostArray->SetName("vtkGhostLevels");
   cd->AddArray(ghostArray);
   ghostArray->Delete();
   int planeSize = dims[0]*dims[1];
@@ -1956,7 +2015,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
     realPtDims[cc]=realDims[cc]+1;
     ptDims[cc]=dims[cc]+1;
     }
-  
+
   for ( field = 0; field < numFields; field ++ )
     {
     fname = uniReader->GetCellFieldName(field);
@@ -1968,13 +2027,13 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
         cd->RemoveArray(fname); // if this is not the first step,
         // make sure we have a clean array
         }
-      
+
       array = uniReader->GetCellFieldData(blockID, field, &fixed);
       //vtkDebugMacro( << __LINE__ << " Read data block: " << blockID 
       // << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
       //array->Print(cout);
-      
+
       if ( !fixed )
         {
         vtkDebugMacro( " Fix bad ghost cells for the array: " << blockID 
@@ -1988,7 +2047,7 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
                                             ptDims, realPtDims));
           }
         uniReader->MarkCellFieldDataFixed(blockID, field);
-      
+
         }
       else
         {
@@ -1996,13 +2055,13 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
         }
       }
     }
-  
+
   // Add a level array, for debugging
   if(this->GenerateLevelArray)
     {
     createSpyPlotLevelArray(cd, totalSize, level);
     }
-  
+
   // Mark the remains ghost cell as real ghost cells of level 1.
   vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
   ghostArray->SetNumberOfTuples(totalSize);
@@ -2057,13 +2116,44 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
       }
     }
 }
-
-void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
-                                       int processNumber,
-                                       int numProcessors,
-                                       int rightHasBounds,
-                                       int leftHasBounds)
+/*
+int vtkSpyPlotReader::DistributeGlobalStructure(vtkCompositeDataSet *cds)
 {
+  // two cases hierarchical box data and multi block of rectilinear 
+  // grids
+
+  vtkMultiBlockDataSet* mbDS =
+    vtkMultiBlockDataSet::SafeDownCast(composite);
+
+  assert("check: ds must be hierarchical or multiblock" && (hbDS || mbDS));
+
+  if (this->AMR)
+    {
+    vtkHierarchicalBoxDataSet* hbdS 
+    = dynamic_cast<vtkHierarchicalBoxDataSet *>(cds);
+
+    unsigned int nLevelsLocal=hbds->GetNumberOfLevels();
+    unsigned int nLevelsGlobal=0;
+    this->GlobalController->AllReduce(
+                &nLevelsLocal,
+                &nLevelsGlobal,
+                1,vtkCommunicator::MAX_OP);
+    
+    }
+
+  return 1;
+}*/
+
+//-----------------------------------------------------------------------------
+// synch data set structure
+void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite)
+{
+  // Force the inclusion of empty datatsets.
+  bool rightHasBounds=true; //TODO 
+  bool leftHasBounds=true;
+  int processNumber=this->GlobalController->GetLocalProcessId();
+  int numProcessors=this->GlobalController->GetNumberOfProcesses();
+
   int parent = 0;
   int left= vtkCommunicator::GetLeftChildProcessor(processNumber);
   int right=left+1;
@@ -2071,7 +2161,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
     {
     parent= vtkCommunicator::GetParentProcessor(processNumber);
     }
-  
+
   vtkHierarchicalBoxDataSet* hbDS = 
     vtkHierarchicalBoxDataSet::SafeDownCast(composite);
   vtkMultiBlockDataSet* mbDS =
@@ -2094,7 +2184,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
       if(leftHasBounds)
         {
         // Grab the number of levels from left child
-        this->Controller->Receive(&ulintMsgValue, 1, left,
+        this->GlobalController->Receive(&ulintMsgValue, 1, left,
                                   VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
         if(numberOfLevels<ulintMsgValue)
           {
@@ -2106,7 +2196,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
         if(rightHasBounds)
           {
           // Grab the number of levels from right child
-          this->Controller->Receive(&ulintMsgValue, 1, right,
+          this->GlobalController->Receive(&ulintMsgValue, 1, right,
                                     VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
           if(numberOfLevels<ulintMsgValue)
             {
@@ -2115,38 +2205,38 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
           }
         }
       }
-    
+
     ulintMsgValue=numberOfLevels;
-    
+
     // Send local to parent, Receive global from the parent.
     if(processNumber>0) // not root (nothing to do if root)
       {
 //      parent=this->GetParentProcessor(processNumber);
-      this->Controller->Send(&ulintMsgValue, 1, parent,
+      this->GlobalController->Send(&ulintMsgValue, 1, parent,
                              VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
-      this->Controller->Receive(&ulintMsgValue, 1, parent,
+      this->GlobalController->Receive(&ulintMsgValue, 1, parent,
                                 VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
       numberOfLevels=ulintMsgValue;
       }
-    
+
     // Send it to children.
     if(left<numProcessors)
       {
       if(leftHasBounds)
         {
-        this->Controller->Send(&ulintMsgValue, 1, left,
+        this->GlobalController->Send(&ulintMsgValue, 1, left,
                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
         }
       if(right<numProcessors)
         {
         if(rightHasBounds)
           {
-          this->Controller->Send(&ulintMsgValue, 1, right,
+          this->GlobalController->Send(&ulintMsgValue, 1, right,
                                  VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
           }
         }
       }
-    
+
     if(numberOfLevels>hbDS->GetNumberOfLevels())
       {
       hbDS->SetNumberOfLevels(numberOfLevels);
@@ -2170,7 +2260,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
       if(leftHasBounds)
         {
         // Grab info the number of datasets from left child
-        this->Controller->Receive(&intMsgValue, 1, left,
+        this->GlobalController->Receive(&intMsgValue, 1, left,
                                   VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
         leftNumberOfDataSets=intMsgValue;
         }
@@ -2179,13 +2269,13 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
         if(rightHasBounds)
           {
           // Grab info the number of datasets from right child
-          this->Controller->Receive(&intMsgValue, 1, right,
+          this->GlobalController->Receive(&intMsgValue, 1, right,
                                     VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
           rightNumberOfDataSets=intMsgValue;
           }
         }
       }
-    
+
     int globalIndex;
     if(processNumber==0) // root
       {
@@ -2197,26 +2287,26 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
       {
       // Send local to parent, Receive global from the parent.
       intMsgValue=numberOfDataSets+leftNumberOfDataSets+rightNumberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, parent,
+      this->GlobalController->Send(&intMsgValue, 1, parent,
                              VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-      this->Controller->Receive(&intMsgValue, 1, parent,
+      this->GlobalController->Receive(&intMsgValue, 1, parent,
                                 VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
       totalNumberOfDataSets=intMsgValue;
-      this->Controller->Receive(&intMsgValue, 1, parent,
+      this->GlobalController->Receive(&intMsgValue, 1, parent,
                                 VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
       globalIndex=intMsgValue;
       }
-    
+
     // Send it to children.
     if(left<numProcessors)
       {
       if(leftHasBounds)
         {
         intMsgValue=totalNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, left,
+        this->GlobalController->Send(&intMsgValue, 1, left,
                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
         intMsgValue=globalIndex+numberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, left,
+        this->GlobalController->Send(&intMsgValue, 1, left,
                                VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
         }
       if(right<numProcessors)
@@ -2224,15 +2314,15 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
         if(rightHasBounds)
           {
           intMsgValue=totalNumberOfDataSets;
-          this->Controller->Send(&intMsgValue, 1, right,
+          this->GlobalController->Send(&intMsgValue, 1, right,
                                  VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
           intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
-          this->Controller->Send(&intMsgValue, 1, right,
+          this->GlobalController->Send(&intMsgValue, 1, right,
                                  VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
           }
         }
       }
-    
+
     // Update the level.
     if(totalNumberOfDataSets>numberOfDataSets)
       {
@@ -2294,7 +2384,7 @@ void vtkSpyPlotReader::SetGlobalLevels(vtkCompositeDataSet *composite,
     } 
 }
 
-void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)
+static void createSpyPlotLevelArray(vtkCellData *cd, int size, int level)
 {
   vtkDataArray *array=cd->GetArray("levels");
   if(array!=0)
