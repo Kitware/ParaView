@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.69");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.70");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1201,23 +1201,15 @@ void vtkSMRenderViewProxy::ResetPolygonsPerSecondResults()
 //-----------------------------------------------------------------------------
 int vtkSMRenderViewProxy::IsSelectionAvailable()
 { 
-  //check if we are not supposed to turn compositing on (in parallel)
-  //the paraview gui uses a big number to say never composite
-  //it we are not supposed to turn it on, then disallow selections
-  double compThresh = 0;
   vtkSMMultiProcessRenderView *me2 = 
     vtkSMMultiProcessRenderView::SafeDownCast(this);
   if (me2 != NULL)
     {
-    compThresh = me2->GetRemoteRenderThreshold();
-    if (compThresh > 100.0) //the highest setting in the paraview gui
-      {
-      return 0;
-      }
-
     if (!me2->GetRemoteRenderAvailable())
       {
       // Cannot remote render.
+      vtkErrorMacro("Selection not supported since it's not possible "
+        "to render on the server side");
       return 0;
       }
     }
@@ -1233,6 +1225,7 @@ int vtkSMRenderViewProxy::IsSelectionAvailable()
   rwin->GetColorBufferSizes(rgba);
   if (rgba[0] < 8 || rgba[1] < 8 || rgba[2] < 8)
     {
+    vtkErrorMacro("Selection not supported due to insufficied color depth.");
     return 0;
     }
 
