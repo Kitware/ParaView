@@ -45,6 +45,10 @@ public:
   pqSourcesMenuManager(QMenu* menu);
   virtual ~pqSourcesMenuManager();
 
+public slots:
+  /// Set the enable state for all actions and the menu.
+  void setEnabled(bool enable);
+
 protected:
   virtual bool filter(const QString& name);
 

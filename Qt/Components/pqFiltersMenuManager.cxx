@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqFiltersMenuManager::pqFiltersMenuManager(QMenu* _menu): Superclass(_menu)
 {
+  this->Enabled = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -97,6 +98,10 @@ void pqFiltersMenuManager::updateEnableState()
       }
     action->setEnabled(false);
     if (outputPorts.size() == 0)
+      {
+      continue;
+      }
+    if (!this->Enabled)
       {
       continue;
       }

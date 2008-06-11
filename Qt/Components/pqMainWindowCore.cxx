@@ -655,6 +655,8 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
       this, SLOT(onCreateSource(const QString&)));
     QObject::connect(this, SIGNAL(refreshSourcesMenu()),
       fmm, SLOT(update()));
+    QObject::connect(this, SIGNAL(enableSourceCreate(bool)),
+      fmm, SLOT(setEnabled(bool)));
     this->Implementation->SourcesMenuManager= fmm;
     fmm->initialize();
     }
@@ -676,7 +678,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       this, SLOT(onCreateFilter(const QString&)));
     QObject::connect(this, SIGNAL(refreshFiltersMenu()),
       fmm, SLOT(update()));
-
+    QObject::connect(this, SIGNAL(enableFilterCreate(bool)),
+      fmm, SLOT(setEnabled(bool)));
     this->Implementation->FiltersMenuManager = fmm;
     fmm->initialize();
     
@@ -2372,12 +2375,6 @@ void pqMainWindowCore::onSelectionChanged()
   pqRenderView* renderView = qobject_cast<pqRenderView*>(view);
   bool pendingDisplays = 
     this->Implementation->PendingDisplayManager.getNumberOfPendingDisplays() > 0;
-
-  // Update the filters menu.
-  if (!pendingDisplays && this->Implementation->FiltersMenuManager)
-    {
-    this->Implementation->FiltersMenuManager->updateEnableState();
-    }
 
   if (this->Implementation->PreviouslySelectedSource)
     {

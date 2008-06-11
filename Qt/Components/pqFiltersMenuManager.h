@@ -49,9 +49,19 @@ public slots:
   /// Called to update the enable state of the menu items. 
   void updateEnableState();
 
+  /// When enable==false, all actions will be forced disabled. When
+  /// enable==true, equivalent to calling updateEnableState().
+  void setEnabled(bool enable)
+    { 
+    this->Enabled = enable;
+    this->updateEnableState();
+    }
+
 private:
   pqFiltersMenuManager(const pqFiltersMenuManager&); // Not implemented.
   void operator=(const pqFiltersMenuManager&); // Not implemented.
+
+  bool Enabled;
 };
 
 #endif

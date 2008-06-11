@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 // Qt Includes.
+#include <QMenu>
+#include <QAction>
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
@@ -49,7 +51,18 @@ pqSourcesMenuManager::pqSourcesMenuManager(QMenu* _menu): Superclass(_menu)
 pqSourcesMenuManager::~pqSourcesMenuManager()
 {
 }
+
+//-----------------------------------------------------------------------------
+void pqSourcesMenuManager::setEnabled(bool enable)
+{
+  QList<QAction*> cur_actions = this->menu()->actions();
+  foreach (QAction* action, cur_actions)
+    {
+    action->setEnabled(enable);
+    }
+}
   
+//-----------------------------------------------------------------------------
 bool pqSourcesMenuManager::filter(const QString& name)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
