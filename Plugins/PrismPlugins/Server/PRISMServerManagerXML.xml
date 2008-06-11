@@ -1,4 +1,361 @@
 <ServerManagerConfiguration>
+ <ProxyGroup name="props">
+    <PrismCubeAxesRepresentationProxy name="PrismCubeAxesRepresentation">
+      <Documentation>
+        CubeAxesRepresentation is a representation for any dataobject which
+        simply shows an axes along the bounding box of the dataobject.
+      </Documentation>
+
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <Documentation>
+          Input around which the bound box is to be shown.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+      <SubProxy>
+        <SourceProxy name="OutlineFilter" class="vtkOutlineFilter">
+          <!-- 
+            Outline filter generates a partial outline on all processes.
+          -->
+          <InputProperty name="Input"
+            command="SetInputConnection">
+               <DataTypeDomain name="input_type">
+                 <DataType value="vtkDataSet"/>
+               </DataTypeDomain>
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Prop2D" 
+          proxygroup="props" proxyname="PrismCubeAxesActor" />
+        <ExposedProperties>
+          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
+          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
+          <Property exposed_name="CubeAxesInertia" name="Inertia" />
+          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property name="Visibility" />
+          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
+          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
+          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
+          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
+          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
+          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
+          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
+          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
+          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
+          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
+          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
+          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Property"
+          proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property exposed_name="CubeAxesColor" name="Color" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of PrismCubeAxesRepresentation -->
+    </PrismCubeAxesRepresentationProxy>
+
+    <Proxy name="PrismCubeAxesActor" class="vtkPrismCubeAxesActor">
+      <Documentation>
+        Proxy for vtPrismkCubeAxesActor.
+      </Documentation>
+
+      <ProxyProperty name="Property"
+        command="SetProperty"
+        immediate_update="1">
+        <Documentation>
+          Set the property used to determine the appearance of the axes.
+        </Documentation>
+      </ProxyProperty>
+      
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this actor.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+
+      <DoubleVectorProperty name="Bounds"
+        command="SetBounds"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+        <Documentation>
+          Set the bounds for this cube axes.
+        </Documentation>
+
+        <DoubleRangeDomain />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Ranges"
+        command="SetRanges"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1">
+        <Documentation>
+          Set the ranges for this cube axes.
+        </Documentation>
+
+        <DoubleRangeDomain />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseRanges"
+        command="SetUseRanges"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this actor.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FlyMode"
+        command="SetFlyMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Outer Edges" value="0" />
+          <Entry text="Closest Triad" value="1" />
+          <Entry text="Furthest Triad" value="2" />
+          <Entry text="Static Triad" value="3" />
+          <Entry text="Static Edges" value="4" />
+        </EnumerationDomain>
+        <Documentation>
+          Specify a mode to control how the axes are drawn: either static, 
+          closest triad, furthest triad or outer edges in relation to the 
+          camera position.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Inertia"
+        command="SetInertia"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+        <Documentation>
+          Set the inertial factor that controls how often (i.e, how
+          many renders) the axes can switch position (jump from one axes 
+          to another).
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="CornerOffset"
+        command="SetCornerOffset"
+        number_of_elements="1"
+        default_values="0.0">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          Specify an offset value to "pull back" the axes from the corner at
+          which they are joined to avoid overlap of axes labels. The 
+          "CornerOffset" is the fraction of the axis length to pull back.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="XTitle"
+        command="SetXTitle"
+        number_of_elements="1"
+        default_values="X-Axis">
+        <Documentation>
+          Set the title for the X axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YTitle"
+        command="SetYTitle"
+        number_of_elements="1"
+        default_values="Y-Axis">
+        <Documentation>
+          Set the title for the Y axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZTitle"
+        command="SetZTitle"
+        number_of_elements="1"
+        default_values="Z-Axis">
+        <Documentation>
+          Set the title for the Z axis.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty  name="XAxisVisibility"
+        command="SetXAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if X axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisVisibility"
+        command="SetYAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Y axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisVisibility"
+        command="SetZAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if Z axis is visible.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisTickVisibility"
+        command="SetXAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisTickVisibility"
+        command="SetYAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisTickVisibility"
+        command="SetZAxisTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="XAxisMinorTickVisibility"
+        command="SetXAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="YAxisMinorTickVisibility"
+        command="SetYAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty  name="ZAxisMinorTickVisibility"
+        command="SetZAxisMinorTickVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Specify if minor ticks are visible on the Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="XGridLines"
+        command="SetDrawXGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to X axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="YGridLines"
+        command="SetDrawYGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Y axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ZGridLines"
+        command="SetDrawZGridlines"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Specify if grid lines are drawn parallel to Z axis.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="TickLocation"
+        command="SetTickLocation"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Inside" value="0" />
+          <Entry text="Outside" value="1" />
+          <Entry text="Both" value="2" />
+        </EnumerationDomain>
+        <Documentation>
+          Set the location of tick marks.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of PrismCubeAxesActor -->
+    </Proxy>
+ </ProxyGroup>
  <ProxyGroup name="PrismFilters">
    <SourceProxy name="PrismFilter"
                 class="vtkPrismFilter">
@@ -55,6 +412,33 @@
          <Entry value="304" text="304: Electron EOS"/>
        </EnumerationDomain>
      </IntVectorProperty>
+
+      <DoubleVectorProperty name="RangesInfo"
+        command="GetRanges"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+      </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="XAxisVarNameInfo"
+        command="GetXAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="YAxisVarNameInfo"
+        command="GetYAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ZAxisVarNameInfo"
+        command="GetZAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty 
         name="XAxisVariableName" 

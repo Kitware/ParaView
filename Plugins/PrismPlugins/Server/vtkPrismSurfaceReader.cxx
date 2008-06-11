@@ -26,7 +26,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.2");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.3");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -58,6 +58,15 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
   this->Internal = new MyInternal();
 
   this->SetNumberOfInputPorts(0);
+  this->Range[0]=0.0;
+  this->Range[1]=0.0;
+  this->Range[2]=0.0;
+  this->Range[3]=0.0;
+  this->Range[4]=0.0;
+  this->Range[5]=0.0;
+
+
+
 }
 
 int vtkPrismSurfaceReader::IsValidFile()
@@ -225,6 +234,8 @@ int vtkPrismSurfaceReader::GetTableArrayStatus(const char* name)
 }
 
 
+
+
 //----------------------------------------------------------------------------
 int vtkPrismSurfaceReader::RequestData(
   vtkInformation *vtkNotUsed(request),
@@ -240,8 +251,7 @@ int vtkPrismSurfaceReader::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkPointSet *input = this->Internal->RectGridGeometry->GetOutput();
-
-
+ 
   vtkPoints *inPts;
   vtkDataArray *inScalars;
   vtkDataArray *outScalars;
@@ -251,6 +261,7 @@ int vtkPrismSurfaceReader::RequestData(
   double s;
   double bounds[6];
   int tableID;
+  double *range;
  
   
   output->CopyStructure( input );
@@ -280,6 +291,9 @@ int vtkPrismSurfaceReader::RequestData(
   //
 
   inScalars = input->GetPointData()->GetArray(this->GetTableArrayNameToProcess());
+  range=inScalars->GetRange();
+  this->Range[4]=range[0];
+  this->Range[5]=range[1];
   outScalars = output->GetPointData()->GetArray(this->GetTableArrayNameToProcess());
 
   tableID=this->Internal->Reader->GetTable();
@@ -358,6 +372,12 @@ int vtkPrismSurfaceReader::RequestData(
 
   newPts->GetBounds(bounds);
 
+  this->Range[0]=bounds[0];
+  this->Range[1]=bounds[1];
+  this->Range[2]=bounds[2];
+  this->Range[3]=bounds[3];
+  this->Range[4]=bounds[4];
+  this->Range[5]=bounds[5];
 
   double delta[3] = {
     bounds[1] - bounds[0],
@@ -380,8 +400,7 @@ int vtkPrismSurfaceReader::RequestData(
     this->Scale[0]=smVal/delta[0];
     this->Scale[1]=smVal/delta[1];
     this->Scale[2]=smVal/delta[2];
- 
-
+  
     for (ptId=0; ptId < numPts; ptId++)
       {
 

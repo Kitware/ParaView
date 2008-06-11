@@ -15,6 +15,7 @@ Module:    vtkPrismFilter.h
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 
 class vtkIntArray;
+class vtkDoubleArray;
 
 class VTK_EXPORT vtkPrismFilter : public vtkAlgorithm 
 {
@@ -83,13 +84,16 @@ public:
   void SetTableArrayStatus(const char* name, int flag);
   int GetTableArrayStatus(const char* name);
 
-
   void SetXAxisVarName( const char *name );
   void SetYAxisVarName( const char *name );
   void SetZAxisVarName( const char *name );
   const char *GetXAxisVarName();
   const char *GetYAxisVarName(); 
   const char *GetZAxisVarName(); 
+
+
+ vtkDoubleArray* GetRanges();
+ 
 
 protected:
   vtkPrismFilter();

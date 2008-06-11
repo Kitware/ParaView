@@ -16,6 +16,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+  ${ParaView_SOURCE_DIR}/Plugins/PrismPlugins/Server
   ${pqComponents_SOURCE_DIR}
   ${pqComponents_BINARY_DIR}
   ${pqCore_SOURCE_DIR}
@@ -32,11 +33,21 @@ INCLUDE_DIRECTORIES(
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
-SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR})
+SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR} ${pqComponents_SOURCE_DIR} )
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h)
+SET(KIT Prism)
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator PrismInstantiator_SRCS
+  vtkSMPrismCubeAxesRepresentationProxy.cxx
+  VTK_EXPORT
+  "${CMAKE_CURRENT_BINARY_DIR}" "")
+
+
+
+
+QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h)
 
 SET(UI_RESOURCES
   Resources/Prism.qrc
@@ -63,9 +74,9 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
                           GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
-                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE}
-                    GUI_SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx 
-                                ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
+                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels
+                    SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx
+                    GUI_SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx PrismDisplayProxyEditor.cxx PrismDisplayPanelsImplementation.cxx  ${PrismInstantiator_SRCS} ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
   
 
 ENDIF(QT4_FOUND)

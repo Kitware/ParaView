@@ -7,6 +7,7 @@ Module:    vtkPrismFilter.cxx
 =========================================================================*/
 #include "vtkPrismFilter.h"
 
+#include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkMath.h"
 #include "vtkInformation.h"
@@ -27,7 +28,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.5");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.6");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -35,11 +36,13 @@ class vtkPrismFilter::MyInternal
   public:
 
     vtkPrismSurfaceReader *Reader;
-
+    vtkDoubleArray* RangeArray;
     vtkstd::string AxisVarName[3];
     double Scale[3];
     MyInternal()
       {
+      this->RangeArray = vtkDoubleArray::New();
+
       this->Reader = vtkPrismSurfaceReader::New();
       this->AxisVarName[0]      = "none";
       this->AxisVarName[1]      = "none";
@@ -226,6 +229,8 @@ int vtkPrismFilter::GetTableArrayStatus(const char* name)
     }
   return this->Internal->Reader->GetTableArrayStatus(name);
 }
+
+
 
 //----------------------------------------------------------------------------
 int vtkPrismFilter::RequestData(
@@ -418,6 +423,28 @@ int vtkPrismFilter::RequestGeometryData(
   
   return 1;
 }
+
+
+vtkDoubleArray* vtkPrismFilter::GetRanges()
+{
+double *r=this->Internal->Reader->GetRange();
+this->Internal->RangeArray->Initialize();
+this->Internal->RangeArray->SetNumberOfComponents(1);
+this->Internal->RangeArray->InsertNextValue(r[0]);
+this->Internal->RangeArray->InsertNextValue(r[1]);
+this->Internal->RangeArray->InsertNextValue(r[2]);
+this->Internal->RangeArray->InsertNextValue(r[3]);
+this->Internal->RangeArray->InsertNextValue(r[4]);
+this->Internal->RangeArray->InsertNextValue(r[5]);
+
+
+
+
+
+return this->Internal->RangeArray;
+}
+
+
 
 void vtkPrismFilter::SetXAxisVarName( const char *name )
 {

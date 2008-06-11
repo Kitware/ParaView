@@ -80,7 +80,7 @@ public:
 
   //The calculated values used to scale the surface;
   vtkGetVectorMacro(Scale,double,3);
-
+  vtkGetVectorMacro(Range,double,6);
 
 
 protected:
@@ -89,6 +89,7 @@ protected:
 
 
   double Scale[3];
+  double Range[6];
 
 
   //BTX 
