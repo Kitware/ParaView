@@ -166,8 +166,7 @@ pqView* pqDisplayPolicy::getPreferredView(
 
   if (!view_type.isNull())
     {
-    QString proxy_name = view_type;
-    if (currentView && currentView->getProxy()->GetXMLName() == proxy_name)
+    if (currentView && currentView->getViewType() == view_type)
       {
       // nothing to do, active view is preferred view.
       }
