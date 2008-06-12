@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -240,6 +240,21 @@ void vtkSMSelectionRepresentationProxy::Update(vtkSMViewProxy* view)
     this->Prop3D->UpdateProperty("EnableLOD");
     }
 
+  if (this->ViewInformation->Has(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
+    && this->ViewInformation->Get(
+      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+    {
+    // We must use LOD on client side.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke
+            << this->Prop3D->GetID()
+            << "SetEnableLOD" << 1
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+    }
+
   if(this->LabelRepresentation && this->LabelRepresentation->GetVisibility())
     {
     this->LabelRepresentation->Update(view);
@@ -254,20 +269,26 @@ void vtkSMSelectionRepresentationProxy::SetUpdateTime(double time)
     {
     this->LabelRepresentation->SetUpdateTime(time);
     }
+}
 
-  if (this->ViewInformation->Has(
-      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())
-    && this->ViewInformation->Get(
-      vtkSMIceTMultiDisplayRenderViewProxy::CLIENT_RENDER())==1)
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::SetUseViewUpdateTime(bool use)
+{
+  this->Superclass::SetUseViewUpdateTime(use);
+  if (this->LabelRepresentation)
     {
-    // We must use LOD on client side.
-    vtkClientServerStream stream;
-    stream  << vtkClientServerStream::Invoke
-            << this->Prop3D->GetID()
-            << "SetEnableLOD" << 1
-            << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID, vtkProcessModule::CLIENT, stream);   
+    this->LabelRepresentation->SetUseViewUpdateTime(use);
+    }
+
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSelectionRepresentationProxy::SetViewUpdateTime(double time)
+{
+  this->Superclass::SetViewUpdateTime(time);
+  if (this->LabelRepresentation)
+    {
+    this->LabelRepresentation->SetViewUpdateTime(time);
     }
 }
 

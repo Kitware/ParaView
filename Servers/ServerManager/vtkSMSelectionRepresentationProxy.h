@@ -72,6 +72,18 @@ public:
   // Returns the proxy for the prop.
   vtkGetObjectMacro(Prop3D, vtkSMProxy);
 
+  // Description:
+  // When set to true, the UpdateTime for this representation is linked to the
+  // ViewTime for the view to which this representation is added (default
+  // behaviour). Otherwise the update time is independent of the ViewTime.
+  // Overridden to pass value to internal representations. 
+  virtual void SetUseViewUpdateTime(bool);
+
+  // Description:
+  // Called by the view to pass the view's update time to the representation.
+  // Overridden to pass value to internal representations. 
+  virtual void SetViewUpdateTime(double time);
+
 //BTX
 protected:
   vtkSMSelectionRepresentationProxy();

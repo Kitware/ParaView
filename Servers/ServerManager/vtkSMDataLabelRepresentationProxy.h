@@ -51,10 +51,6 @@ public:
   virtual void Update() { this->Update(0); }
 
   // Description:
-  // Set the update time passed on to the update suppressor.
-  virtual void SetUpdateTime(double time);
- 
-  // Description:
   // Accessors to the font size in the sub proxy.
   void SetPointFontSizeCM(int size);
   int GetPointFontSizeCM();
@@ -78,6 +74,12 @@ protected:
   vtkSMDataLabelRepresentationProxy();
   ~vtkSMDataLabelRepresentationProxy();
 
+  // Description:
+  // Pass the actual update time to use to all strategies.
+  // When not using strategies, make sure that this method is overridden to pass
+  // the update time correctly.
+  virtual void SetUpdateTimeInternal(double time);
+  
   void SetupPipeline();
   void SetupDefaults();
 
