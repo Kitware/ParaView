@@ -36,7 +36,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.23");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -113,16 +113,12 @@ void vtkSMIceTCompositeViewProxy::InitializeForMultiView(vtkSMViewProxy* view)
     }
 
   this->SharedParallelRenderManagerID = 
-    otherView->SharedParallelRenderManagerID.IsNull()?
-    otherView->ParallelRenderManager->GetID():
-    otherView->SharedParallelRenderManagerID; 
+    otherView->ParallelRenderManager->GetID();
 
-  this->SharedMultiViewManagerID = otherView->SharedMultiViewManagerID.IsNull()?
-    (otherView->MultiViewManager? otherView->MultiViewManager->GetID() : vtkClientServerID(0)) : 
-    otherView->SharedMultiViewManagerID; 
+  this->SharedMultiViewManagerID = otherView->MultiViewManager? 
+    otherView->MultiViewManager->GetID() : vtkClientServerID(0);
 
-  this->SharedRenderWindowID = otherView->SharedRenderWindowID.IsNull()?
-    otherView->RenderWindowProxy->GetID() : otherView->SharedRenderWindowID;
+  this->SharedRenderWindowID = otherView->RenderWindowProxy->GetID();
 
   this->Superclass::InitializeForMultiView(view);
 }

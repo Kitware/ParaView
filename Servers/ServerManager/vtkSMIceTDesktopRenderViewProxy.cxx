@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.15");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -73,10 +73,7 @@ void vtkSMIceTDesktopRenderViewProxy::InitializeForMultiView(
     return;
     }
 
-  this->SharedServerRenderSyncManagerID =
-    otherView->SharedServerRenderSyncManagerID.IsNull()?
-    otherView->RenderSyncManager->GetID():
-    otherView->SharedServerRenderSyncManagerID;
+  this->SharedServerRenderSyncManagerID = otherView->RenderSyncManager->GetID();
 
   this->Superclass::InitializeForMultiView(view);
 }
