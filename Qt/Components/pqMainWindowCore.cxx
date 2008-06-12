@@ -2948,10 +2948,8 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
   pqServerManagerSelection selected =
       *core->getSelectionModel()->selectedItems();
 
-  QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
 
   QMap<QString, QList<pqOutputPort*> > namedInputs;
-  QList<pqOutputPort*> allInputs;
   QList<pqOutputPort*> selectedOutputPorts;
 
   // Determine the list of selected output ports.
@@ -2969,13 +2967,14 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
       }
     }
 
+  QList<const char*> inputPortNames = pqPipelineFilter::getInputPorts(prototype);
   namedInputs[inputPortNames[0]] = selectedOutputPorts;
 
   // If the filter has more than 1 input ports, we are simply going to ask the 
   // user to make selection for the inputs for each port. We may change that in 
   // future to be smarter.
   int numInputPorts = inputPortNames.size();
-  if (numInputPorts > 1)
+  if (pqPipelineFilter::getRequiredInputPorts(prototype).size() > 1)
     {
     vtkSmartPointer<vtkSMProxy> filterProxy;
     filterProxy.TakeReference(pxm->NewProxy("filters", xmlname.toAscii().data()));
@@ -3012,62 +3011,16 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
       {
       QString portName = filter->getInputPortName(cc);
       namedInputs[portName] = dialog.getFilterInputs(portName);
-      allInputs += namedInputs[portName];
       }
 
     delete model;
     delete filter;
-    }
-  else if (numInputPorts == 1)
-    {
-    allInputs += selectedOutputPorts;
     }
 
   this->Implementation->UndoStack->beginUndoSet(
     QString("Create '%1'").arg(xmlname));
   pqPipelineSource* filter = builder->createFilter("filters", xmlname, 
     namedInputs, this->getActiveServer());
-  if (filter)
-    {
-    vtkSMProxy* proxy = filter->getProxy();
-    // If the GUI created a "ExtractCellSelection"
-    // filter, we need to copy the active selection over to the filter.
-    if (proxy->GetXMLName() == QString("ExtractCellSelection") ||
-      proxy->GetXMLName() == QString("ExtractCellsOverTime") ||
-      proxy->GetXMLName() == QString("ExtractPointSelection") ||
-      proxy->GetXMLName() == QString("ExtractPointsOverTime"))
-      {
-      // If a selection exists on the input to this filter,
-      // we initialize the filter with that selection.
-      if (allInputs.contains(
-          this->Implementation->SelectionManager.getSelectedPort()))
-        {
-        QList<QPair<int, vtkIdType> > indices = 
-          this->Implementation->SelectionManager.getIndices();
-        int cc;
-        QList<QVariant> values;
-        for (cc=0; cc < indices.size(); cc++)
-          {
-          values << indices[cc].first << indices[cc].second;
-          }
-
-        pqSMAdaptor::setMultipleElementProperty(
-          proxy->GetProperty("Indices"), values);
-
-        values.clear();
-        QList<vtkIdType> gids = 
-          this->Implementation->SelectionManager.getGlobalIDs();
-        for (cc=0; cc < gids.size(); cc++)
-          {
-          values << gids[cc];
-          }
-            
-        pqSMAdaptor::setMultipleElementProperty(
-          proxy->GetProperty("GlobalIDs"), values);
-        proxy->UpdateVTKObjects();
-        }
-      }
-    }
   this->Implementation->UndoStack->endUndoSet();
 
   return filter;

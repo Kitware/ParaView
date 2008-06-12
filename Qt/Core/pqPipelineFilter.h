@@ -54,6 +54,11 @@ public:
   /// Returns the inputs ports on any proxy.
   static QList<const char*> getInputPorts(vtkSMProxy*);
 
+  /// Returns the required inputs ports on any proxy.
+  /// This is generally same as getInputPorts() except if the property has a
+  /// "hint" saying it's optional.
+  static QList<const char*> getRequiredInputPorts(vtkSMProxy*);
+
   /// Returns the number of input ports available on this filter.
   int getNumberOfInputPorts() const;
 

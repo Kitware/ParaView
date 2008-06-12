@@ -98,11 +98,10 @@ pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
     }
 }
 
-//-----------------------------------------------------------------------------
-QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
+static void pqPipelineFilterGetInputProperties(QList<const char*> &list,
+  vtkSMProxy* proxy, 
+  bool skip_optional)
 {
-  QList<const char*> list;
-
   vtkSmartPointer<vtkSMPropertyIterator> propIter;
   propIter.TakeReference(proxy->NewPropertyIterator());
   for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
@@ -116,6 +115,12 @@ QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
         {
         // hints suggest that this input property is not to be considered by the
         // GUI.
+        continue;
+        }
+
+      if (hints && skip_optional && hints->FindNestedElementByName("Optional"))
+        {
+        // skip optional inputs.
         continue;
         }
 
@@ -146,7 +151,21 @@ QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
         }
       }
     }
+}
 
+//-----------------------------------------------------------------------------
+QList<const char*> pqPipelineFilter::getInputPorts(vtkSMProxy* proxy)
+{
+  QList<const char*> list;
+  pqPipelineFilterGetInputProperties(list, proxy, false);
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+QList<const char*> pqPipelineFilter::getRequiredInputPorts(vtkSMProxy* proxy)
+{
+  QList<const char*> list;
+  pqPipelineFilterGetInputProperties(list, proxy, true);
   return list;
 }
 
