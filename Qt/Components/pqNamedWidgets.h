@@ -36,9 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 
 #include "pqComponentsExport.h"
+
 class QWidget;
 class QGridLayout;
 class pqPropertyManager;
+class QStringList;
 
 /** Links Qt widgets with server manager properties by name.
 
@@ -77,7 +79,8 @@ public:
   static void createWidgets(QGridLayout* l, vtkSMProxy* pxy);
 
   /// Link a collection of Qt child widgets with server manager properties by name
-  static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
+  static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager,
+                         const QStringList* exceptions=NULL);
   /// Remove links between Qt widgets and server manager properties
   static void unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
 

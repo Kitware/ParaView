@@ -93,7 +93,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetSelectionHelper.h"
 
 //-----------------------------------------------------------------------------
-void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
+void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, 
+  pqPropertyManager* property_manager,
+  const QStringList* exceptions/*=0*/)
 {
   if(!parent || !proxy || !property_manager)
     {
@@ -105,6 +107,10 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     {
     // all property names with special characters are changed
     QString propertyName = iter->GetKey();
+    if (exceptions && exceptions->contains(propertyName))
+      {
+      continue;
+      }
     propertyName.replace(':', '_');
     
     // escape regex chars

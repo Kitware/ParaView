@@ -29,8 +29,12 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqNamedObjectPanel.h"
+
+#include "vtkPVXMLElement.h"
+#include "vtkCollection.h"
+
+#include "pq3DWidget.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
 #include "pqProxy.h"
@@ -47,6 +51,26 @@ pqNamedObjectPanel::~pqNamedObjectPanel()
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  pqNamedWidgets::link(this, this->proxy(), this->propertyManager());
+  // Don't link properties that form a property group (Look at BUG #7175).
+  QStringList exceptions;
+  QList<pq3DWidget*> widgets = this->findChildren<pq3DWidget*>();
+  foreach (pq3DWidget* widget, widgets)
+    {
+    vtkCollection* elements = vtkCollection::New();
+    vtkPVXMLElement* widgetHints = widget->getHints();
+    widgetHints->GetElementsByName("Property", elements);
+    for (int cc=0; cc < elements->GetNumberOfItems(); ++cc)
+      {
+      vtkPVXMLElement* child = vtkPVXMLElement::SafeDownCast(
+        elements->GetItemAsObject(cc));
+      if (!child)
+        {
+        continue;
+        }
+      exceptions.push_back(child->GetAttribute("name"));
+      }
+    elements->Delete();
+    }
+  pqNamedWidgets::link(this, this->proxy(), this->propertyManager(), &exceptions);
 }
 
