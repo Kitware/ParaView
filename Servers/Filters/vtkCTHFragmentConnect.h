@@ -534,6 +534,10 @@ protected:
   vtkCallbackCommand *SelectionObserver;
   char *OutputTableFileNameBase;
   bool WriteOutputTableFile;
+  double Progress;
+  double ProgressMaterialInc;
+  double ProgressBlockInc;
+  double ProgressResolutionInc;
 
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.

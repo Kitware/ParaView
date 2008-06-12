@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.47");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.48");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -2356,6 +2356,11 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 
   this->MaterialFractionThreshold = 0.5;
   this->scaledMaterialFractionThreshold = 127.5;
+
+  this->Progress=0.0;
+  this->ProgressMaterialInc=0.0;
+  this->ProgressBlockInc=0.0;
+  this->ProgressResolutionInc=0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -2405,6 +2410,10 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
     {
     delete [] this->OutputTableFileNameBase;
     }
+  this->Progress=0.0;
+  this->ProgressMaterialInc=0.0;
+  this->ProgressBlockInc=0.0;
+  this->ProgressResolutionInc=0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -3808,14 +3817,18 @@ int vtkCTHFragmentConnect::RequestData(
     MassArrayNames.resize(nMaterials);
     }
 
-  // 
+  // set up structure in the output data sets 
   this->BuildOutputs(mbdsOutput0,mbdsOutput1,nMaterials);
 
-  double progress = 0.0;
-  double progressPerArray = 1.0/(double)nMaterials;
+  //
+  this->ProgressMaterialInc=1.0/(double)nMaterials;
+  this->ProgressResolutionInc=1.0/this->ProgressMaterialInc/2.0/9.0;
   // process enabled material arrays
   for (this->MaterialId=0; this->MaterialId<nMaterials; ++this->MaterialId)
     {
+    this->Progress=this->MaterialId*this->ProgressMaterialInc;
+    this->UpdateProgress(this->Progress);
+
     // moments are only calculated for given mass arrays
     this->ComputeMoments
       = this->MaterialId<nMassArrays ? true : false;
@@ -3831,17 +3844,15 @@ int vtkCTHFragmentConnect::RequestData(
                             MassArrayNames[this->MaterialId],
                             WeightedAverageArrayNames,
                             SummedArrayNames );
-
-    double progressPerBlock
-      = progressPerArray/(double)this->NumberOfInputBlocks/2.0;
-
+    //
+    this->ProgressBlockInc
+      = this->ProgressMaterialInc/(double)this->NumberOfInputBlocks/2.0;
+    //
     int blockId;
     for (blockId = 0; blockId < this->NumberOfInputBlocks; ++blockId)
       {
       // build fragments
       this->ProcessBlock(blockId);
-      progress+=progressPerBlock;
-      this->UpdateProgress( progress );
       }
 
     //char tmp[128];
@@ -3850,15 +3861,17 @@ int vtkCTHFragmentConnect::RequestData(
     //sprintf(tmp, "C:/Law/tmp/cthGhost%d.vtp", this->Controller->GetLocalProcessId());
     //this->SaveGhostSurfaces(tmp);
 
+    // resolve: Merge local and remote geometry 
+    // correct integrated attributes, finialize integrations
     this->ResolveEquivalences();
-    this->DeleteAllBlocks();
 
     // update the resolved fragment count, so that next pass will start
     // where we left off here
     this->ResolvedFragmentCount+=this->NumberOfResolvedFragments;
 
-    /// clean after pass
-    // TODO make this into a function
+    // clean after pass
+    this->DeleteAllBlocks();
+    //
     ReleaseVtkPointer(this->FragmentVolumes);
     if (this->ComputeMoments)
       {
@@ -3874,8 +3887,7 @@ int vtkCTHFragmentConnect::RequestData(
       }
     ClearVectorOfVtkPointers( this->FragmentWeightedAverages );
     ClearVectorOfVtkPointers( this->FragmentSums );
-    // TODO what else??
-    ///
+    //
     }
   // Write all fragment attributes that we own to a text file.
   if ( this->GetWriteOutputTableFile()
@@ -3892,6 +3904,16 @@ int vtkCTHFragmentConnect::RequestData(
 //----------------------------------------------------------------------------
 int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::ProcessBlock("
+               << blockId
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressBlockInc;
+  this->UpdateProgress(this->Progress);
+
+
   vtkCTHFragmentConnectBlock* block = this->InputBlocks[blockId];
   if (block == 0)
     {
@@ -6068,6 +6090,14 @@ void vtkCTHFragmentConnect::AddEquivalence(
 // Merge fragment pieces which are split locally.
 void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::ResolveLocalFragmentGeometry("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   const int myProcId = this->Controller->GetLocalProcessId();
   //int nProcs = this->Controller->GetNumberOfProcesses();
   //vtkCommunicator *comm=this->Controller->GetCommunicator();
@@ -6138,6 +6168,14 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 // Merge fragment pieces which are split across processes
 void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
   vtkCommunicator *comm=this->Controller->GetCommunicator();
@@ -6679,6 +6717,14 @@ int vtkCTHFragmentConnect::PrepareToMergeGeometricAttributes()
 int vtkCTHFragmentConnect::GatherGeometricAttributes(
                 const int recipientProcId)
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::gatherGeometricAttributes("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
 
@@ -6982,6 +7028,14 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
 int vtkCTHFragmentConnect::BroadcastIntegratedAttributes(
                 const int sourceProcId)
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::BroadcastIntegratedAttributes("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
 
@@ -7192,6 +7246,8 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
 int vtkCTHFragmentConnect::ResolveIntegratedAttributes(
                 const int controllingProcId)
 {
+
+
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
 
@@ -7359,6 +7415,14 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
 void vtkCTHFragmentConnect::GatherEquivalenceSets(
   vtkCTHFragmentEquivalenceSet* set)
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::GatherEquivalenceSets("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   const int numProcs = this->Controller->GetNumberOfProcesses();
   const int myProcId = this->Controller->GetLocalProcessId();
   const int numLocalMembers = set->GetNumberOfMembers();
@@ -7651,6 +7715,14 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
 // as well. My hope is that the point data can be eliminated.
 void vtkCTHFragmentConnect::CopyAttributesToOutput0()
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput0("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   vector<int> &resolvedFragmentIds
     = this->ResolvedFragmentIds[this->MaterialId];
 
@@ -7884,12 +7956,13 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
 // gather all of the centers of axis aligned bounding boxes.
 void vtkCTHFragmentConnect::CopyAttributesToOutput1()
 {
-//   // We didn't just compute the moments then skip.
-//   // Output will be empty.
-//   if (this->ComputeMoments==false)
-//     {
-//     return;
-//     }
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput1("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
 
   vtkPolyData *resolvedFragmentCenters
     = dynamic_cast<vtkPolyData *>(this->ResolvedFragmentCenters->GetBlock(this->MaterialId));
@@ -8140,6 +8213,14 @@ int vtkCTHFragmentConnect::ComputeFragmentAABBCenters()
 // return 0 on error.
 int vtkCTHFragmentConnect::ComputeGeometricAttributes()
 {
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::ComputeGeometricAttributes("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
   // coaabb
   if (!this->ComputeMoments)
     {
