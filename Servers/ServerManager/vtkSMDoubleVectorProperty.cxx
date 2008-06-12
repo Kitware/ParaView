@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.41");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.42");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -74,10 +74,10 @@ void vtkSMDoubleVectorProperty::UpdateLastPushedValues()
   this->Internals->UpdateLastPushedValues();
 }
 
-#include "vtkSMProxy.h"
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::AppendCommandToStream(
-  vtkSMProxy* p, vtkClientServerStream* str, vtkClientServerID objectId )
+  vtkSMProxy* vtkNotUsed(proxy), vtkClientServerStream* str, 
+  vtkClientServerID objectId )
 {
   if (this->InformationOnly || !this->Initialized)
     {
