@@ -2588,8 +2588,10 @@ void pqMainWindowCore::onServerCreation(pqServer* server)
   if (curView != "None" && !curView.isEmpty()) 
     {
     // When a server is created, we create a new render view for it.
-    pqView* view = core->getObjectBuilder()->createView(curView, server);
-    view->render();
+    if(pqView* view = core->getObjectBuilder()->createView(curView, server))
+      {
+      view->render();
+      }
     }
 
   // Show warning dialogs before server times out.
