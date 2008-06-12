@@ -131,6 +131,7 @@ SET(Kit_SRCS
   vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetRepresentationProxy.cxx
+  vtkSMSelectionDeliveryRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
   vtkSMSelectionLink.cxx
   vtkSMSelectionLinkProxy.cxx
