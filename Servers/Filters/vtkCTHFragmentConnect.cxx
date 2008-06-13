@@ -67,7 +67,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.48");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.49");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -2361,6 +2361,55 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->ProgressMaterialInc=0.0;
   this->ProgressBlockInc=0.0;
   this->ProgressResolutionInc=0.0;
+
+  // DEBUG
+  #ifdef vtkCTHFragmentConnectDEBUG
+  // build an identifier string
+  int nProcs=this->Controller->GetNumberOfProcesses();
+  int myProcId=this->Controller->GetLocalProcessId();
+  const int hostNameSize=256;
+  char hostname[hostNameSize]={'\0'};
+  gethostname(hostname, hostNameSize);
+  int pid=getpid();
+  const int hrpSize=512;
+  char hrp[hrpSize]={'\0'};
+  sprintf(hrp,"%s : %d : %d",hostname,myProcId,pid);
+  // move all identifiers to controller
+  char *hrpBuffer=0;
+  if (myProcId==0)
+    {
+    hrpBuffer=new char [nProcs*hrpSize];
+    }
+  this->Controller->Gather(hrp,hrpBuffer,hrpSize,0);
+  // put identifiers into a file 
+  if (myProcId==0)
+    {
+    ostream &sout=cerr;
+    // open a file in the current working directory
+    ofstream hrpFile;
+    hrpFile.open("cthfc.pid");
+    char *thisHrp=hrpBuffer;
+    if (hrpFile.is_open())
+      {
+      for (int procId=0; procId<nProcs; ++procId)
+        {
+        hrpFile << thisHrp << endl;
+        thisHrp+=hrpSize;
+        };
+      hrpFile.close();
+      }
+    // if we can't open a file send to stderr
+    else
+      {
+      for (int procId=0; procId<nProcs; ++procId)
+        {
+        cerr << thisHrp << endl;
+        thisHrp+=hrpSize;
+        }
+      }
+    delete [] hrpBuffer;
+    }
+  #endif
 }
 
 //----------------------------------------------------------------------------
