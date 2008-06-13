@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QResource>
 
 #include "vtkSMXMLParser.h"
+#include "vtkPVPluginLoader.h"
+#include "vtkStringArray.h"
 #include "vtkProcessModule.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
@@ -103,42 +105,65 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
-  if(pxy && !lib.isEmpty())
+  if(server)
     {
-    pxy->SetConnectionID(server->GetConnectionID());
-    // data & render servers
-    pxy->SetServers(vtkProcessModule::SERVERS);
-    vtkSMProperty* prop = pxy->GetProperty("FileName");
-    pqSMAdaptor::setElementProperty(prop, lib);
-    pxy->UpdateVTKObjects();
-    pxy->UpdatePropertyInformation();
-    prop = pxy->GetProperty("Loaded");
-    success = pqSMAdaptor::getElementProperty(prop).toInt() ? LOADED : NOTLOADED;
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
+    if(pxy && !lib.isEmpty())
+      {
+      pxy->SetConnectionID(server->GetConnectionID());
+      // data & render servers
+      pxy->SetServers(vtkProcessModule::SERVERS);
+      vtkSMProperty* prop = pxy->GetProperty("FileName");
+      pqSMAdaptor::setElementProperty(prop, lib);
+      pxy->UpdateVTKObjects();
+      pxy->UpdatePropertyInformation();
+      prop = pxy->GetProperty("Loaded");
+      success = pqSMAdaptor::getElementProperty(prop).toInt() ? LOADED : NOTLOADED;
+      if(success == LOADED)
+        {
+        prop = pxy->GetProperty("ServerManagerXML");
+        QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
+        foreach(QVariant xml, xmls)
+          {
+          vtkSmartPointer<vtkSMXMLParser> parser = vtkSmartPointer<vtkSMXMLParser>::New();
+          parser->Parse(xml.toString().toAscii().data());
+          parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
+          }
+        }
+      else
+        {
+        error =
+          pqSMAdaptor::getElementProperty(pxy->GetProperty("Error")).toString();
+        }
+      pxy->UnRegister(NULL);
+      }
+    }
+  else
+    {
+    vtkSmartPointer<vtkPVPluginLoader> loader =
+      vtkSmartPointer<vtkPVPluginLoader>::New();
+    loader->SetFileName(lib.toAscii().data());
+    success = loader->GetLoaded() ? LOADED : NOTLOADED;
     if(success == LOADED)
       {
-      prop = pxy->GetProperty("ServerManagerXML");
-      QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
-      foreach(QVariant xml, xmls)
+      vtkStringArray* xmls = loader->GetServerManagerXML();
+      for(int i=0; i<xmls->GetNumberOfValues(); i++)
         {
-        vtkSMXMLParser* parser = vtkSMXMLParser::New();
-        parser->Parse(xml.toString().toAscii().data());
+        vtkSmartPointer<vtkSMXMLParser> parser = vtkSmartPointer<vtkSMXMLParser>::New();
+        parser->Parse(xmls->GetValue(i).c_str());
         parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
-        parser->Delete();
         }
       }
     else
       {
-      error =
-        pqSMAdaptor::getElementProperty(pxy->GetProperty("Error")).toString();
+      error = loader->GetError();
       }
-    pxy->UnRegister(NULL);
     }
   
   if(success == LOADED)
     {
-    this->Extensions.insert(server, lib);
+    this->addExtension(server, lib);
     emit this->serverManagerExtensionLoaded();
     }
 
@@ -156,7 +181,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
     if(QResource::registerResource(lib))
       {
       success = LOADED;
-      this->Extensions.insert(NULL, lib);
+      this->addExtension(NULL, lib);
       emit this->guiExtensionLoaded();
       }
     else
@@ -174,7 +199,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
       parser->Parse(dat.data());
       parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
       parser->Delete();
-      this->Extensions.insert(NULL, lib);
+      this->addExtension(NULL, lib);
       success = LOADED;
       emit this->serverManagerExtensionLoaded();
       }
@@ -194,7 +219,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
         {
         pqpluginObject->setParent(this);  // take ownership to clean up later
         success = LOADED;
-        this->Extensions.insert(NULL, lib);
+        this->addExtension(NULL, lib);
         emit this->guiExtensionLoaded();
         QObjectList ifaces = pqplugin->interfaces();
         foreach(QObject* iface, ifaces)
@@ -267,15 +292,7 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
   QStringList libs = ::getLibraries(path, server);
   foreach(QString lib, libs)
     {
-    QString dummy;
-    if(server)
-      {
-      pqPluginManager::loadServerExtension(server, lib, dummy);
-      }
-    else
-      {
-      pqPluginManager::loadClientExtension(lib, dummy);
-      }
+    this->loadExtension(server, lib);
     }
 }
 
@@ -283,27 +300,33 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   pqServer* server, const QString& lib, QString* errorReturn)
 {
-  LoadStatus success = NOTLOADED;
+  LoadStatus success1 = NOTLOADED;
+  LoadStatus success2 = NOTLOADED;
   QString error;
-  
-  if(this->Extensions.values(server).contains(lib))
+
+  // treat builtin server as null
+  if(server && !server->isRemote())
+    {
+    server = NULL;
+    }
+ 
+  // check if it is already loaded 
+  if(this->loadedExtensions(server).contains(lib))
     {
     return ALREADYLOADED;
     }
   
-  if(server)
-    {
-    // look for SM stuff in the plugin
-    success = pqPluginManager::loadServerExtension(server, lib, error);
-    }
+  // always look for SM/VTK stuff in the plugin
+  success1 = pqPluginManager::loadServerExtension(server, lib, error);
 
   if(!server)
     {
     // check if this plugin has gui stuff in it
-    success = loadClientExtension(lib, error);
+    success2 = loadClientExtension(lib, error);
     }
-  
-  if(success == NOTLOADED)
+ 
+  // return an error if it failed to load 
+  if(success1 == NOTLOADED && success2 == NOTLOADED)
     {
     if(!errorReturn)
       {
@@ -315,12 +338,22 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
       }
     }
 
-  return success;
+  // return success if any client or server stuff was found in it
+  if(success1 == LOADED || success2 == LOADED)
+    {
+    return LOADED;
+    }
+
+  return NOTLOADED;
 }
 
 //-----------------------------------------------------------------------------
 QStringList pqPluginManager::loadedExtensions(pqServer* server)
 {
+  if(server && !server->isRemote())
+    {
+    server = NULL;
+    }
   return this->Extensions.values(server);
 }
 
@@ -480,4 +513,13 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
   QStringList plugin_paths = pv_plugin_path.split(';', QString::SkipEmptyParts);
   return plugin_paths;
 }
+  
+void pqPluginManager::addExtension(pqServer* server, const QString& lib)
+{
+  if(!this->Extensions.values(server).contains(lib))
+    {
+    this->Extensions.insert(server, lib);
+    }
+}
+
 

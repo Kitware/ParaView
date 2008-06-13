@@ -155,25 +155,20 @@ QString pqPluginDialog::loadPlugin(pqServer* server)
 
 QString pqPluginDialog::loadPlugin(pqServer* server, const QString& plugin)
 {
-  QString error1, error2;
+  QString error;
   QString ret = plugin;
+  // now pass it off to the plugin manager to load everything that this 
+  // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  /* a local plugin may contain both server side code and client code */
-  pqPluginManager::LoadStatus result1 = pm->loadExtension(server, plugin, &error1);
-  pqPluginManager::LoadStatus result2 = pqPluginManager::LOADED;
-  if(!server)
-    {
-    result2 = pm->loadExtension(this->Server, plugin, &error2);
-    }
+  pqPluginManager::LoadStatus result = pm->loadExtension(server, plugin, &error);
   
-  if(result1 == pqPluginManager::NOTLOADED && 
-     result2 == pqPluginManager::NOTLOADED)
+  if(result == pqPluginManager::NOTLOADED)
     {
-    QMessageBox::information(NULL, "Plugin Load Failed", !error1.isEmpty() ? error1 : error2);
+    QMessageBox::information(NULL, "Plugin Load Failed", error);
     ret = QString();
     }
 
-  if(result1 != pqPluginManager::LOADED && result2 != pqPluginManager::LOADED)
+  if(result != pqPluginManager::LOADED)
     {
     ret = QString();
     }
@@ -215,14 +210,7 @@ void pqPluginDialog::refreshLocal()
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
   foreach(QString p, pm->loadedExtensions(NULL))
     {
-    allplugins.append(QString("client - %1").arg(p));
-    }
-  if(!this->Server->isRemote())
-    {
-    foreach(QString p, pm->loadedExtensions(this->Server))
-      {
-      allplugins.append(QString("server - %1").arg(p));
-      }
+    allplugins.append(p);
     }
 
   this->localPlugins->clear();

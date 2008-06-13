@@ -51,7 +51,8 @@ public:
 
   enum LoadStatus { LOADED, NOTLOADED, ALREADYLOADED };
 
-  /// attempt to load an extension
+  /// attempt to load an extension on a server
+  /// if server is NULL, extension will be loaded on client side
   /// return status on success, if NOTLOADED was returned, the error is reported
   /// If errorMsg is non-null, then errors are not reported, but the error
   /// message is put in the errorMsg string
@@ -97,6 +98,9 @@ signals:
 protected:
   LoadStatus loadClientExtension(const QString& lib, QString& error);
   LoadStatus loadServerExtension(pqServer* server, const QString& lib, QString& error);
+
+  // add to the list if it isn't already there
+  void addExtension(pqServer* server, const QString& lib);
 
   /// Handles pqAutoStartInterface plugins.
   void handleAutoStartPlugins(QObject* iface, bool startup);
