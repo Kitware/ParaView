@@ -40,7 +40,7 @@
 #include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.20");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.21");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -169,15 +169,16 @@ int vtkIndexBasedBlockFilter::RequestData(
   // If input is composite dataset then this method will return the dataset in
   // that composite dataset to process.
   vtkMultiPieceDataSet* input = this->GetPieceToProcess(actualInput);
-  if (!input)
-    {
-    return 1;
-    }
 
   // Do communication and decide which processes pass what data through.
   if (!this->DetermineBlockIndices(input, this->StartIndex, this->EndIndex))
     {
     return 0;
+    }
+
+  if (!input)
+    {
+    return 1;
     }
 
   if (this->StartIndex < 0 || this->EndIndex < 0 || this->EndIndex < this->StartIndex)
@@ -484,6 +485,7 @@ void vtkIndexBasedBlockFilter::PassBlock(
 bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input,
   vtkIdType& startIndex, vtkIdType& endIndex)
 {
+  // NOTE: input may be NULL.
   startIndex = -1;
   endIndex = -1;
 
@@ -500,44 +502,48 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
   // vtkMultiPieceDataSet is to be treated as a whole dataset append together
   // (with duplicate points and cells). 
 
-  vtkSmartPointer<vtkCompositeDataIterator> iter;
-  iter.TakeReference(input->NewIterator());
-
   vtkIdType numFields = 0;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+  if (input)
     {
-    vtkDataSet* piece = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
-    if (!piece)
-      {
-      continue;
-      }
-    switch (this->FieldType)
-      {
-    case CELL:
-      numFields += piece->GetCellData()->GetNumberOfTuples();
-      break;
+    vtkSmartPointer<vtkCompositeDataIterator> iter;
+    iter.TakeReference(input->NewIterator());
 
-    case FIELD:
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+      {
+      vtkDataSet* piece = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+      if (!piece)
         {
-        vtkIdType pieceFields = 0;  
-        vtkIdType tempNumFields = 0;
-        for(vtkIdType i=0; i<input->GetFieldData()->GetNumberOfArrays(); i++)
-          { 
-          tempNumFields = input->GetFieldData()->GetArray(i)->GetNumberOfTuples();
-          pieceFields = tempNumFields > pieceFields? tempNumFields : pieceFields;
-          }
-        numFields += pieceFields;
+        continue;
         }
-      break;
+      switch (this->FieldType)
+        {
+      case CELL:
+        numFields += piece->GetCellData()->GetNumberOfTuples();
+        break;
 
-    case POINT:
-    default:
-      // we use number-of-points and not number-of-tuples in point data, since
-      // even if no point data is available, we are passing the point
-      // coordinates over.
-      numFields += piece->GetNumberOfPoints();
+      case FIELD:
+          {
+          vtkIdType pieceFields = 0;  
+          vtkIdType tempNumFields = 0;
+          for(vtkIdType i=0; i<input->GetFieldData()->GetNumberOfArrays(); i++)
+            { 
+            tempNumFields = input->GetFieldData()->GetArray(i)->GetNumberOfTuples();
+            pieceFields = tempNumFields > pieceFields? tempNumFields : pieceFields;
+            }
+          numFields += pieceFields;
+          }
+        break;
+
+      case POINT:
+      default:
+        // we use number-of-points and not number-of-tuples in point data, since
+        // even if no point data is available, we are passing the point
+        // coordinates over.
+        numFields += piece->GetNumberOfPoints();
+        }
       }
     }
+
 
   int numProcs = this->Controller? this->Controller->GetNumberOfProcesses():1;
   if (numProcs<=1)
@@ -547,7 +553,6 @@ bool vtkIndexBasedBlockFilter::DetermineBlockIndices(vtkMultiPieceDataSet* input
     // cout  << "Delivering : " << startIndex << " --> " << endIndex << endl;
     return true;
     }
-
 
   int myId = this->Controller->GetLocalProcessId();
   vtkCommunicator* comm = this->Controller->GetCommunicator();
