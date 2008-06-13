@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
@@ -174,6 +175,15 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   return filter;
 }
 
+inline QString pqObjectBuilderGetPath(const QString& filename, bool use_dir)
+{
+  if (use_dir)
+    {
+    return QFileInfo(filename).path();
+    }
+  return filename;
+}
+
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
     const QString& sm_name, const QStringList& files, pqServer* server)
@@ -233,16 +243,25 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
       return 0;
       }
 
+    // If there's a hint on the property indicating that this property expects a
+    // directory name, then, we will set the directory name on it.
+    bool use_dir = false;
+    if (prop->GetHints() && prop->GetHints()->FindNestedElementByName("UseDirectoryName"))
+      {
+      use_dir = true;
+      }
+
     if (numFiles == 1 || !prop->GetRepeatCommand())
       {
-      pqSMAdaptor::setElementProperty(prop, files[0]);
+      pqSMAdaptor::setElementProperty(prop, 
+        pqObjectBuilderGetPath(files[0], use_dir));
       }
     else
       {
       QList<QVariant> values;
       foreach (QString file, files)
         {
-        values.push_back(file);
+        values.push_back(pqObjectBuilderGetPath(file, use_dir));
         }
       pqSMAdaptor::setMultipleElementProperty(prop, values);
       }
