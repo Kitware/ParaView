@@ -6,8 +6,6 @@
 # the low and high point of the elevation filter can be initialized
 # in the z-direction
 
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
-
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 SET(SM_SOURCES vtkSMMyElevationProxy.cxx vtkSMMyBoundsDomain.cxx)
@@ -17,6 +15,5 @@ SET(SM_SOURCES vtkSMMyElevationProxy.cxx vtkSMMyBoundsDomain.cxx)
 # and we need the plugin to be loaded on the client side
 ADD_PARAVIEW_PLUGIN(SMMyProxy "1.0"
   SERVER_MANAGER_XML MyProxy.xml
-  SERVER_MANAGER_SOURCES ${SM_SOURCES}
-  GUI_SOURCES ${Instantiator_SRCS})
+  SERVER_MANAGER_SOURCES ${SM_SOURCES})
 
