@@ -1,5 +1,7 @@
 # Requires ParaView_SOURCE_DIR and ParaView_BINARY_DIR to be set.
 
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+
 # helper PV_PLUGIN_LIST_CONTAINS macro
 MACRO(PV_PLUGIN_LIST_CONTAINS var value)
   SET(${var})
@@ -98,6 +100,8 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   SET(CS_SRCS)
   IF(HDRS)
     VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
+    VTK_MAKE_INSTANTIATOR3(vtkSM${Name}Instantiator INST_SRCS "${ARGN}"
+      VTK_EXPORT "${CMAKE_CURRENT_BINARY_DIR}" "")
     SET(HAVE_SRCS 1)
   ELSE(HDRS)
     SET(HAVE_SRCS 0)
@@ -107,7 +111,7 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
     "${ParaView_SOURCE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in"
     "${CMAKE_CURRENT_BINARY_DIR}/vtkPVPluginInit_${Name}.cxx" @ONLY)
 
-  SET(${OUTSRCS} ${CS_SRCS} ${XML_HEADER}
+  SET(${OUTSRCS} ${CS_SRCS} ${INST_SRCS} ${XML_HEADER}
     ${CMAKE_CURRENT_BINARY_DIR}/vtkPVPluginInit_${Name}.cxx
     )
   
