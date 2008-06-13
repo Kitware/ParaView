@@ -12,13 +12,6 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 SET(SM_SOURCES vtkSMMyElevationProxy.cxx vtkSMMyBoundsDomain.cxx)
 
-# need to create methods to let the server manager know how to 
-# instantiate the custom classes specified in the server manager xml
-VTK_MAKE_INSTANTIATOR3(vtkSMMyProxyInstantiator Instantiator_SRCS
-                       "${SM_SOURCES}"
-                       VTK_EXPORT
-                       "${CMAKE_CURRENT_BINARY_DIR}" "")
-
 # we need server manager wrappings for SM_SOURCES
 # put instantiators in GUI_SOURCES because they are client side
 # and we need the plugin to be loaded on the client side
