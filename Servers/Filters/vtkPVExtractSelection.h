@@ -47,6 +47,11 @@ public:
   // Constructor
   static vtkPVExtractSelection *New();
 
+  // Description:
+  // Removes all inputs from input port 1.
+  void RemoveAllSelectionsInputs()
+    { this->SetInputConnection(1, 0); }
+
 //BTX
 protected:
   vtkPVExtractSelection();

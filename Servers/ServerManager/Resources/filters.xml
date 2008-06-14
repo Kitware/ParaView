@@ -7250,7 +7250,8 @@ This filter extracts a list of datasets from hierarchical datasets.
 
      <InputProperty
          name="Input"
-         command="SetInputConnection">
+         command="SetInputConnection"
+         clean_command="RemoveAllInputs">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>
@@ -7265,7 +7266,8 @@ This filter extracts a list of datasets from hierarchical datasets.
 
      <InputProperty
          name="Selection"
-         command="SetSelectionConnection">
+         command="SetSelectionConnection"
+         clean_command="RemoveAllSelectionsInputs">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
          <Group name="filters"/>

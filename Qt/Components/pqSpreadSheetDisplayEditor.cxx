@@ -70,7 +70,8 @@ pqSpreadSheetDisplayEditor::pqSpreadSheetDisplayEditor(
     this->Internal->CompositeTree, 
     vtkSMIntVectorProperty::SafeDownCast(
       repr->getProxy()->GetProperty("CompositeDataSetIndex")), 
-    true);
+    /*autoUpdateVisibility=*/true,
+    /*showSelectedElementCounts=*/true);
 
   this->setRepresentationInternal(repr);
 

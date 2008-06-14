@@ -37,6 +37,7 @@ SET(Kit_SRCS
   vtkPVClassNameInformation.cxx
   vtkPVClientServerIdCollectionInformation.cxx
   vtkPVCompositeDataInformation.cxx
+  vtkPVCompositeDataInformationIterator.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSizeInformation.cxx

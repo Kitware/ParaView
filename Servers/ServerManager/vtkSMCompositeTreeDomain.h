@@ -28,9 +28,11 @@
 #define __vtkSMCompositeTreeDomain_h
 
 #include "vtkSMDomain.h"
+#include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
-class vtkSMInputProperty;
 class vtkPVDataInformation;
+class vtkSMInputProperty;
+class vtkSMSourceProxy;
 
 // TODO: CHANGE NAME OF THIS CLASS
 class VTK_EXPORT vtkSMCompositeTreeDomain : public vtkSMDomain
@@ -50,6 +52,16 @@ public:
   // Get the vtkPVDataInformation which provides the tree structure for the
   // composite dataset.
   vtkGetObjectMacro(Information, vtkPVDataInformation);
+
+  // Description:
+  // Returns the source proxy whose data information is returned by
+  // GetInformation().
+  vtkSMSourceProxy* GetSource();
+
+  // Description:
+  // Returns the port for the source proxy from which the data information is
+  // obtained by GetInformation().
+  vtkGetMacro(SourcePort, int);
 
   // Description:
   // Is the (unchecked) value of the property in the domain? Overwritten by
@@ -103,7 +115,9 @@ protected:
   vtkTimeStamp UpdateTime;
   vtkPVDataInformation* LastInformation; // not reference counted.
 
+  vtkWeakPointer<vtkSMSourceProxy> Source;
   int Mode;
+  int SourcePort;
 private:
   vtkSMCompositeTreeDomain(const vtkSMCompositeTreeDomain&); // Not implemented
   void operator=(const vtkSMCompositeTreeDomain&); // Not implemented

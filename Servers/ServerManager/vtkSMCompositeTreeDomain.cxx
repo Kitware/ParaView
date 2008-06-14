@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
-vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.4");
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
@@ -31,17 +31,23 @@ vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
   this->Information = 0;
   this->LastInformation = 0;
   this->Mode = ALL;
+  this->Source = 0;
+  this->SourcePort = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::~vtkSMCompositeTreeDomain()
 {
+  this->Source = 0;
+  this->SourcePort = 0;
   this->SetInformation(0);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMCompositeTreeDomain::Update(vtkSMProperty*)
 {
+  this->Source = 0;
+  this->SourcePort = 0;
   this->SetInformation(0);
 
   vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
@@ -65,6 +71,12 @@ void vtkSMCompositeTreeDomain::InvokeModifiedIfChanged()
 }
 
 //---------------------------------------------------------------------------
+vtkSMSourceProxy* vtkSMCompositeTreeDomain::GetSource()
+{
+  return this->Source.GetPointer();
+}
+
+//---------------------------------------------------------------------------
 void vtkSMCompositeTreeDomain::Update(vtkSMInputProperty *ip)
 {
   unsigned int i;
@@ -81,6 +93,8 @@ void vtkSMCompositeTreeDomain::Update(vtkSMInputProperty *ip)
         {
         continue;
         }
+      this->Source = sp;
+      this->SourcePort = ip->GetUncheckedOutputPortForConnection(i);
       this->SetInformation(info);
       this->InvokeModifiedIfChanged();
       return;
@@ -102,6 +116,8 @@ void vtkSMCompositeTreeDomain::Update(vtkSMInputProperty *ip)
         {
         continue;
         }
+      this->Source = sp;
+      this->SourcePort = ip->GetOutputPortForConnection(i);
       this->SetInformation(info);
       this->InvokeModifiedIfChanged();
       return;

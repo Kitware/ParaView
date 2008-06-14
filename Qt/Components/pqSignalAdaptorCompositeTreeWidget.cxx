@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 #include <QPointer>
@@ -126,6 +127,8 @@ public:
 
 
 };
+
+//-----------------------------------------------------------------------------
 class pqSignalAdaptorCompositeTreeWidget::pqInternal
 {
 public:
@@ -134,10 +137,10 @@ public:
   vtkSmartPointer<vtkSMOutputPort> OutputPort;
   vtkSmartPointer<vtkSMCompositeTreeDomain> Domain;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnectSelection;
 
   QList<pqTreeWidgetItemObject*> Items;
   int DomainMode;
-
 };
 
 //-----------------------------------------------------------------------------
@@ -147,6 +150,7 @@ void pqSignalAdaptorCompositeTreeWidget::constructor(
   this->Internal = new pqInternal();
   this->Internal->TreeWidget = tree;
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->VTKConnectSelection = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->AutoUpdateWidgetVisibility = autoUpdateVisibility;
   
   this->Internal->DomainMode = vtkSMCompositeTreeDomain::ALL; 
@@ -155,16 +159,18 @@ void pqSignalAdaptorCompositeTreeWidget::constructor(
 
   this->ShowIndex = false;
   this->ShowDatasetsInMultiPiece = false;
+  this->ShowSelectedElementCounts = false;
 }
 
 //-----------------------------------------------------------------------------
 pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
   QTreeWidget* tree, vtkSMIntVectorProperty* smproperty, 
-  bool autoUpdateVisibility/*=false*/):
+  bool autoUpdateVisibility/*=false*/,
+  bool showSelectedElementCounts/*false*/):
   Superclass(tree)
 {
   this->constructor(tree, autoUpdateVisibility);
-
+  this->ShowSelectedElementCounts = showSelectedElementCounts;
   this->Internal->Property = smproperty;
   if (!smproperty)
     {
@@ -231,7 +237,8 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
   int domainMode,
   IndexModes indexMode,
   bool selectMultiple,
-  bool autoUpdateVisibility) : Superclass(tree)
+  bool autoUpdateVisibility,
+  bool showSelectedElementCounts) : Superclass(tree)
 {
   this->constructor(tree, autoUpdateVisibility);
 
@@ -243,12 +250,13 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
 
   this->ShowIndex = true;
   this->ShowDatasetsInMultiPiece = true;
+  this->ShowSelectedElementCounts = showSelectedElementCounts;
   this->CheckMode = selectMultiple? MULTIPLE_ITEMS : SINGLE_ITEM;
   this->IndexMode = indexMode;
   this->Internal->DomainMode = domainMode;
   this->Internal->OutputPort = port;
   this->Internal->VTKConnect->Connect(
-    port, vtkCommand::UpdateInformationEvent,
+    port, vtkCommand::UpdateDataEvent,
     this, SLOT(portInformationChanged()));
   this->portInformationChanged();
 }
@@ -447,8 +455,11 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
   
   pqTreeWidgetItemObject* root = new pqCompositeTreeWidgetItem(
     this->Internal->TreeWidget, QStringList("Root"));
+  root->setData(0, ORIGINAL_LABEL, "Root");
+  root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
   this->updateItemFlags();
+  this->updateSelectionCounts();
   
   // now update check state.
   this->setValues(widgetvalues);
@@ -458,6 +469,17 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
     {
     this->Internal->TreeWidget->setVisible(
       dInfo->GetCompositeDataInformation()->GetDataIsComposite()==1);
+    }
+
+  if (this->ShowSelectedElementCounts)
+    {
+    this->setupSelectionUpdatedCallback(
+      this->Internal->Domain->GetSource(),
+      this->Internal->Domain->GetSourcePort());
+    }
+  else
+    {
+    this->setupSelectionUpdatedCallback(NULL, 0);
     }
 }
 
@@ -470,15 +492,18 @@ void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
   this->Internal->TreeWidget->clear();
 
   vtkPVDataInformation* dInfo = 
-    this->Internal->OutputPort->GetCachedDataInformation();
+    this->Internal->OutputPort->GetDataInformation();
 
   this->FlatIndex = 0;
   this->LevelNo = 0;
 
   pqTreeWidgetItemObject* root = new pqCompositeTreeWidgetItem(
     this->Internal->TreeWidget, QStringList("Root"));
+  root->setData(0, ORIGINAL_LABEL, "Root");
+  root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
   this->updateItemFlags();
+  this->updateSelectionCounts();
 
   // now update check state.
   this->setValues(widgetvalues);
@@ -489,9 +514,13 @@ void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
     this->Internal->TreeWidget->setVisible(
       dInfo->GetCompositeDataInformation()->GetDataIsComposite()==1);
     }
+
+  this->setupSelectionUpdatedCallback(NULL, 0);
 }
 
 //-----------------------------------------------------------------------------
+// For all elements in the tree, this method determines if the item is checkable
+// (given the current mode).
 void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
 {
   if (this->Internal->DomainMode == vtkSMCompositeTreeDomain::NONE)
@@ -541,6 +570,8 @@ void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
 }
 
 //-----------------------------------------------------------------------------
+/// Called when an item check state is toggled. This is used only when
+/// this->CheckMode == SINGLE_ITEM. We uncheck all other items.
 void pqSignalAdaptorCompositeTreeWidget::updateCheckState(bool checked)
 {
   pqTreeWidgetItemObject* item = qobject_cast<pqTreeWidgetItemObject*>(this->sender());
@@ -599,6 +630,8 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
 
         pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
           QStringList(childLabel));
+        child->setToolTip(0, child->text(0));
+        child->setData(0, ORIGINAL_LABEL, childLabel);
         this->buildTree(child, NULL);
         child->setData(0, DATASET_INDEX, cc);
         child->setData(0, LEVEL_NUMBER, this->LevelNo);
@@ -649,6 +682,8 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
       {
       pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
         QStringList(childLabel));
+      child->setData(0, ORIGINAL_LABEL, childLabel);
+      child->setToolTip(0, child->text(0));
       this->buildTree(child, cinfo->GetDataInformation(cc));
       child->setData(0, LEVEL_NUMBER, this->LevelNo);
       this->LevelNo++;
@@ -661,3 +696,70 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
+{
+  if (!this->ShowSelectedElementCounts)
+    {
+    // Nothing to do.
+    return;
+    }
+
+  if (!this->Internal->Domain)
+    {
+    return;
+    }
+  
+  // Iterate over the selection data information and then update the labels.
+  vtkSMSourceProxy* sourceProxy = this->Internal->Domain->GetSource();
+  if (!sourceProxy->GetSelectionOutput(this->Internal->Domain->GetSourcePort()))
+    {
+    return;
+    }
+  vtkPVDataInformation* info = sourceProxy->GetSelectionOutput(
+    this->Internal->Domain->GetSourcePort())->GetDataInformation();
+
+  foreach (pqTreeWidgetItemObject* item, this->Internal->Items)
+    {
+    if (item->data(0, NODE_TYPE).toInt() != LEAF)
+      {
+      continue;
+      }
+
+    unsigned int flat_index = item->data(0, FLAT_INDEX).toUInt();
+    vtkPVDataInformation* subInfo = info->GetDataInformationForCompositeIndex(
+      static_cast<int>(flat_index));
+    if (subInfo)
+      {
+      item->setText(0, QString("%1 (%2, %3)").
+        arg(item->data(0, ORIGINAL_LABEL).toString()).arg(subInfo->GetNumberOfPoints()).
+        arg(subInfo->GetNumberOfCells()));
+      item->setToolTip(0, item->text(0));
+      }
+    else
+      {
+      item->setText(0, QString("%1").
+        arg(item->data(0, ORIGINAL_LABEL).toString()));
+      item->setToolTip(0, item->text(0));
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Set up the callback to know when the selection changes, so that we can
+/// update the selected cells/points counts.
+void pqSignalAdaptorCompositeTreeWidget::setupSelectionUpdatedCallback(
+  vtkSMSourceProxy* source, unsigned int port)
+{
+  this->Internal->VTKConnectSelection->Disconnect();
+  if (source)
+    {
+    vtkSMSourceProxy* selProxy = source->GetSelectionOutput(port);
+    if (selProxy)
+      {
+      this->Internal->VTKConnectSelection->Connect(
+        selProxy, vtkCommand::UpdateDataEvent,
+        this, SLOT(updateSelectionCounts()), 0, 0, Qt::QueuedConnection);
+      }
+    }
+}

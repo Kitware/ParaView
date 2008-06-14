@@ -42,6 +42,7 @@ class QTreeWidget;
 class vtkPVDataInformation;
 class vtkSMIntVectorProperty;
 class vtkSMOutputPort;
+class vtkSMSourceProxy;
 
 /// pqSignalAdaptorCompositeTreeWidget is used to connect a property with
 /// vtkSMCompositeTreeDomain as its domain to a Tree widget. It updates the tree
@@ -63,8 +64,15 @@ public:
 
   /// Constructor. \c domain is used to build the tree layout to show in the
   /// widget.
+  /// \c autoUpdateWidgetVisibility -  is true, the tree widget is hidden if the
+  ///                                  data information says that the data is
+  ///                                  not composite.
+  /// \c showSelectedElementCounts - when true, next to each leaf node, an entry
+  ///                                will be added showing the number of
+  ///                                selected elements (cells|points).
   pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMIntVectorProperty* smproperty,
-    bool autoUpdateWidgetVisibility=false);
+    bool autoUpdateWidgetVisibility=false,
+    bool showSelectedElementCounts=false);
 
   /// Alternate constructor. 
   /// \c outputport - the output port producing the composite dataset to show. 
@@ -78,11 +86,15 @@ public:
   /// \c autoUpdateWidgetVisibility -  is true, the tree widget is hidden if the
   ///                                  data information says that the data is
   ///                                  not composite.
+  /// \c showSelectedElementCounts - when true, next to each leaf node, an entry
+  ///                                will be added showing the number of
+  ///                                selected elements (cells|points).
   pqSignalAdaptorCompositeTreeWidget(QTreeWidget*, vtkSMOutputPort* outputport,
     int domainMode,
     IndexModes indexMode=INDEX_MODE_FLAT,
     bool selectMultiple=false,
-    bool autoUpdateWidgetVisibility=false);
+    bool autoUpdateWidgetVisibility=false,
+    bool showSelectedElementCounts=false);
 
   /// Destructor
   virtual ~pqSignalAdaptorCompositeTreeWidget();
@@ -124,10 +136,17 @@ private slots:
   /// this->CheckMode == SINGLE_ITEM. We uncheck all other items.
   void updateCheckState(bool checked);
 
+  /// Called to update the labels to show the current selected elements
+  /// information.
+  void updateSelectionCounts();
+
 private:
   pqSignalAdaptorCompositeTreeWidget(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
   void operator=(const pqSignalAdaptorCompositeTreeWidget&); // Not implemented.
 
+  /// Set up the callback to know when the selection changes, so that we can
+  /// update the selected cells/points counts.
+  void setupSelectionUpdatedCallback(vtkSMSourceProxy* source, unsigned int port);
 
   void buildTree(pqTreeWidgetItemObject* item, 
     vtkPVDataInformation* info);
@@ -144,6 +163,7 @@ private:
     LEVEL_NUMBER = Qt::UserRole+1,
     DATASET_INDEX = Qt::UserRole+2,
     NODE_TYPE = Qt::UserRole+3,
+    ORIGINAL_LABEL = Qt::UserRole+4
     };
 
   enum NodeTypes
@@ -171,6 +191,8 @@ private:
   bool AutoUpdateWidgetVisibility;
 
   bool ShowIndex;
+
+  bool ShowSelectedElementCounts;
 
   // When set to true, all pieces within a  multipiece are shown.
   bool ShowDatasetsInMultiPiece;
