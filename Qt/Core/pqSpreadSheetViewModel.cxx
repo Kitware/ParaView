@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVCompositeDataInformationIterator.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
@@ -59,6 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqSMAdaptor.h"
 #include "pqDataRepresentation.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 
 static uint qHash(pqSpreadSheetViewModel::vtkIndex index)
 {
@@ -190,9 +194,7 @@ void pqSpreadSheetViewModel::setRepresentationProxy(
     if (repr)
       {
       // when repr updates, the view is dirty.
-      this->Internal->VTKConnect->Connect(repr, vtkCommand::EndEvent,
-        this, SLOT(markDirty()));
-      this->Internal->VTKConnect->Connect(repr, vtkCommand::PropertyModifiedEvent,
+      this->Internal->VTKConnect->Connect(repr, vtkCommand::UpdateDataEvent,
         this, SLOT(markDirty()));
       }
     }
@@ -201,6 +203,7 @@ void pqSpreadSheetViewModel::setRepresentationProxy(
 //-----------------------------------------------------------------------------
 void pqSpreadSheetViewModel::markDirty()
 {
+  // cout << "markDirty" << endl;
   this->Internal->Dirty = true;
 }
 
@@ -514,9 +517,13 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
     column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
       "vtkOriginalPointIds" : "vtkOriginalCellIds";
     }
-
   vtkIdTypeArray* indexcolumn = vtkIdTypeArray::SafeDownCast(
     activeBlock->GetColumnByName(column_name));
+  if (!indexcolumn)
+    {
+    qDebug() << "indexcolumn missing" ;
+    return QModelIndex();
+    }
 
   vtkIdTypeArray* pidcolumn = vtkIdTypeArray::SafeDownCast(
     activeBlock->GetColumnByName("vtkOriginalProcessIds"));
@@ -790,4 +797,58 @@ bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
     }
 
   return false;
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
+{
+  vtkSMProxy* reprProxy = this->getRepresentationProxy();
+  int cur_index = pqSMAdaptor::getElementProperty(
+    reprProxy->GetProperty("CompositeDataSetIndex")).toInt();
+
+  pqOutputPort* input_port = this->getRepresentation()->getOutputPortFromInput();
+  vtkSMSourceProxy* inputProxy = vtkSMSourceProxy::SafeDownCast(
+    input_port->getSource()->getProxy());
+
+  vtkSMSourceProxy* extractSelection = inputProxy->GetSelectionOutput(
+    input_port->getPortNumber());
+  if (!extractSelection)
+    {
+    return;
+    }
+
+  vtkPVDataInformation* mbInfo = extractSelection->GetDataInformation();
+  if (!mbInfo || !mbInfo->GetCompositeDataClassName())
+    {
+    return;
+    }
+
+  vtkPVDataInformation* blockInfo = mbInfo->GetDataInformationForCompositeIndex(cur_index);
+  if (blockInfo && blockInfo->GetNumberOfPoints() > 0)
+    {
+    return;
+    }
+
+
+  // find first index with non-empty points.
+  vtkPVCompositeDataInformationIterator* iter = vtkPVCompositeDataInformationIterator::New();
+  iter->SetDataInformation(mbInfo);
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkPVDataInformation* curInfo = iter->GetCurrentDataInformation();
+    if (!curInfo || curInfo->GetCompositeDataClassName() != 0)
+      {
+      continue;
+      }
+    if (curInfo->GetDataSetType() != -1 && curInfo->GetNumberOfPoints() > 0)
+      {
+      cur_index = static_cast<int>(iter->GetCurrentFlatIndex());
+      break;
+      }
+    }
+  iter->Delete();
+
+  pqSMAdaptor::setElementProperty(
+    reprProxy->GetProperty("CompositeDataSetIndex"), cur_index);
+  reprProxy->UpdateVTKObjects();
 }
