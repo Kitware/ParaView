@@ -292,7 +292,8 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
   QStringList libs = ::getLibraries(path, server);
   foreach(QString lib, libs)
     {
-    this->loadExtension(server, lib);
+    QString dummy;
+    this->loadExtension(server, lib, &dummy);
     }
 }
 
