@@ -11,6 +11,7 @@
   <property name="assistantdocs">doc</property>
 </profile>
 
+<!-- DON'T FORGET TO ADD LINKS TO  index.html WHEN YOU ADD NEW SUBSECTION -->
 <DCF ref="Documentation/index.html" icon="images/handbook.png" title="ParaView">
   <section ref="Documentation/GUIOverview.html" title="Interface Overview"/>
   <section ref="Documentation/FileMenu.html" title="File Menu">

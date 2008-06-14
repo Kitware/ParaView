@@ -29,3 +29,11 @@ table.PropertiesTable {
 tr.PropertiesTableHeading {
   background: #85a8bc;
 }
+
+div.toc {
+  background: #DDDDDD;
+  border: 1px solid #000000;
+  margin: 2em 2em;
+  padding: 1em;
+  width: 30em;
+}
