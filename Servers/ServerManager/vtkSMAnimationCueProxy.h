@@ -152,9 +152,6 @@ protected:
   friend class vtkSMAnimationSceneProxy;
 //ETX
 
-  int Caching; // flag indicating if the animation is to use Cache.
-    // The SMAnimationScene synchrinized this flag for all cues it maintains.
- 
   vtkSMProxy* AnimatedProxy;
   int AnimatedElement;
   char *AnimatedPropertyName;
