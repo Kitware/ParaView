@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyListDomain.h"
@@ -377,6 +378,30 @@ void pqPipelineSource::setDefaultPropertyValues()
       diter->GetProperty()->ResetToDefault();
       }
     diter->Delete();
+    }
+
+  this->createAnimationHelpersIfNeeded();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::createAnimationHelpersIfNeeded()
+{
+  QList<vtkSMProxy*> helpers = this->getHelperProxies("RepresentationAnimationHelper");
+  if (helpers.size() == 0)
+    {
+    // Create animation helper which assists in animating display properties.
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    int numPorts = this->getNumberOfOutputPorts();
+    for (int cc=0; cc < numPorts; cc++)
+      {
+      vtkSMProxy* helper = pxm->NewProxy("misc", "RepresentationAnimationHelper");
+      helper->SetConnectionID(this->getProxy()->GetConnectionID());
+      helper->UpdateVTKObjects();
+      vtkSMPropertyHelper(helper, "Source").Add(this->getProxy());
+      helper->UpdateVTKObjects();
+      this->addHelperProxy("RepresentationAnimationHelper", helper);
+      helper->Delete();
+      }
     }
 }
 

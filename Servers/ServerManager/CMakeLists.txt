@@ -127,6 +127,7 @@ SET(Kit_SRCS
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
+  vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
   vtkSMScalarBarActorProxy.cxx

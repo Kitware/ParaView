@@ -82,8 +82,11 @@ private:
 
   void buildPropertyListInternal(vtkSMProxy* proxy, const QString& labelPrefix);
   void addSMPropertyInternal(const QString& label, 
-    vtkSMProxy* proxy, const QString& propertyname, int index);
+    vtkSMProxy* proxy, const QString& propertyname, int index,
+    bool is_display_property=false, unsigned int display_port=0);
 
+  /// Add properties that control the display parameters.
+  void addDisplayProperties(vtkSMProxy* proxy);
   bool UseBlankEntry;
 public:
   class pqInternal;

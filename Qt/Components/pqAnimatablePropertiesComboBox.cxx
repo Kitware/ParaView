@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMVectorProperty.h"
 
@@ -43,6 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView Includes.
+#include "pqApplicationCore.h"
+#include "pqPipelineSource.h"
+#include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -62,6 +65,14 @@ public:
     vtkSmartPointer<vtkSMProxy> Proxy;
     QString Name;
     int Index;
+    bool IsDisplayProperty;
+    unsigned int DisplayPort;
+    PropertyInfo()
+      {
+      this->Index = 0;
+      this->IsDisplayProperty = false;
+      this->DisplayPort = 0;
+      }
     };
 };
 
@@ -122,6 +133,7 @@ void pqAnimatablePropertiesComboBox::buildPropertyList()
     this->addSMPropertyInternal("<select>", 0, QString(), -1);
     }
   this->buildPropertyListInternal(this->Internal->Source, QString());
+  this->addDisplayProperties(this->Internal->Source);
 }
 
 //-----------------------------------------------------------------------------
@@ -179,6 +191,33 @@ void pqAnimatablePropertiesComboBox::buildPropertyListInternal(vtkSMProxy* proxy
       }
     }
 }
+//-----------------------------------------------------------------------------
+void pqAnimatablePropertiesComboBox::addDisplayProperties(vtkSMProxy* proxy)
+{
+  if (!proxy || !proxy->IsA("vtkSMSourceProxy"))
+    {
+    return;
+    }
+
+  vtkSMSourceProxy* sourceProxy = static_cast<vtkSMSourceProxy*>(proxy);
+  unsigned int numports = sourceProxy->GetNumberOfOutputPorts();
+  for (unsigned int kk=0; kk < numports; kk++)
+    {
+    QString suffix;
+    if (numports > 1)
+      {
+      suffix = QString(" [%1]").arg(sourceProxy->GetOutputPortName(kk));
+      }
+
+    this->addSMPropertyInternal(
+      QString("%1%2").arg("Visibility").arg(suffix), 
+      proxy, "Visibility" , 0, true, kk);
+
+    this->addSMPropertyInternal(
+      QString("%1%2").arg("Opacity").arg(suffix), 
+      proxy, "Opacity", 0, true, kk);
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqAnimatablePropertiesComboBox::addSMProperty(const QString& label, 
@@ -196,12 +235,14 @@ void pqAnimatablePropertiesComboBox::addSMProperty(const QString& label,
 //-----------------------------------------------------------------------------
 void pqAnimatablePropertiesComboBox::addSMPropertyInternal(
   const QString& label, vtkSMProxy* proxy, const QString& propertyname, 
-  int index)
+  int index, bool is_display_property/*=false*/, unsigned int display_port/*=0*/)
 {
   pqInternal::PropertyInfo info;
   info.Proxy = proxy;
   info.Name = propertyname;
   info.Index = index;
+  info.IsDisplayProperty = is_display_property;
+  info.DisplayPort = display_port;
   this->addItem(label, QVariant::fromValue(info));
 }
 
@@ -213,6 +254,17 @@ vtkSMProxy* pqAnimatablePropertiesComboBox::getCurrentProxy() const
     {
     QVariant _data = this->itemData(index);
     pqInternal::PropertyInfo info = _data.value<pqInternal::PropertyInfo>();
+    if (info.IsDisplayProperty)
+      {
+      pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+      pqPipelineSource* src = smmodel->findItem<pqPipelineSource*>(info.Proxy);
+      if (src)
+        {
+        src->createAnimationHelpersIfNeeded();
+        }
+      return src->getHelperProxies("RepresentationAnimationHelper")[info.DisplayPort];
+      }
+
     return info.Proxy;
     }
   return 0;

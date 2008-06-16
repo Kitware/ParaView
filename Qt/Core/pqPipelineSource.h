@@ -121,6 +121,9 @@ public:
 
   /// Update the pipeline with the current time
   void updatePipeline();
+
+  /// Animation helper is used to animate display properties for this source.
+  void createAnimationHelpersIfNeeded();
   
 signals:
   /// fired when a connection is created between two pqPipelineSources.

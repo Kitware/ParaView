@@ -166,9 +166,20 @@ public:
             {
             vtkSMProperty* prop =
               pqproxy->getProxy()->GetProperty(key.toAscii().data());
-            QString pp = prop->GetXMLLabel();
             QString n = pqproxy->getSMName();
-            name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
+            if (prop)
+              {
+              QString pp = prop->GetXMLLabel();
+              name = QString("%1 - %2 - %3").arg(n).arg(pp).arg(p);
+              }
+            else
+              {
+              name = QString("%1 - %2").arg(n).arg(p);
+              if (helpers.size() > 0)
+                {
+                name = QString("%1 [%2]").arg(name).arg(idx);
+                }
+              }
             }
           }
         }
@@ -780,7 +791,7 @@ void pqAnimationViewWidget::createTrack()
     vtkSMProperty* prop = curProxy->GetProperty(pname.toAscii().data());
     QList<QVariant> mins;
     QList<QVariant> maxs;
-    if(pindex == -1)
+    if(pindex == -1 && prop)
       {
       QList<QList<QVariant> > domains =
         pqSMAdaptor::getMultipleElementPropertyDomain(prop);

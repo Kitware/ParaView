@@ -2285,6 +2285,34 @@
       <!-- End of KdTreeManager -->
     </Proxy>
 
+    <RepresentationAnimationHelperProxy name="RepresentationAnimationHelper">
+      <Documentation>
+        Used to help in animation representation properties.
+      </Documentation>
+      <ProxyProperty name="Source"
+        update_self="1"
+        command="SetSourceProxy" />
+
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        update_self="1"
+        number_of_elements="1"
+        default_values="none">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="Opacity"
+        command="SetOpacity"
+        update_self="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+      </DoubleVectorProperty>
+
+      <!-- End of RepresentationAnimationHelper -->
+    </RepresentationAnimationHelperProxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 
