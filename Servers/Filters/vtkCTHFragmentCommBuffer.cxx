@@ -70,7 +70,7 @@ void vtkCTHFragmentCommBuffer::SizeHeader(int nBlocks)
   memset(this->Header,0,this->HeaderSize*sizeof(vtkIdType));
 }
 //----------------------------------------------------------------------------
-void vtkCTHFragmentCommBuffer::SizeBuffer(int nBytes)
+void vtkCTHFragmentCommBuffer::SizeBuffer(vtkIdType nBytes)
 {
   // buffer
   CheckAndReleaseArrayPointer(this->Buffer);
