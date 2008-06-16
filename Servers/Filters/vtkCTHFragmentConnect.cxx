@@ -55,6 +55,8 @@
 #include "vtkAppendPolyData.h"
 #include "vtkMarchingCubesCases.h"
 // STL
+#include "vtksys/ios/fstream"
+using vtksys_ios::ofstream;
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
 #include "vtkstd/vector"
@@ -67,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.49");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.50");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -192,7 +194,7 @@ ostream &operator<<(ostream &sout, vtkDoubleArray &da)
 {
   sout << "Name:          " << da.GetName() << endl;
 
-  int nTup = da.GetNumberOfTuples();
+  vtkIdType nTup = da.GetNumberOfTuples();
   int nComp = da.GetNumberOfComponents();
 
   sout << "NumberOfComps: " << nComp << endl;
@@ -213,8 +215,6 @@ ostream &operator<<(ostream &sout, vtkDoubleArray &da)
 }
 
 //============================================================================
-
-
 /**
 Description:
 Data structure that describes a fragments loading.
@@ -226,21 +226,21 @@ class vtkCTHFragmentPieceLoading
     enum {ID=0,LOADING=1,SIZE=2};
     vtkCTHFragmentPieceLoading(){ this->Initialize(-1,0); }
     ~vtkCTHFragmentPieceLoading(){ this->Initialize(-1,0); }
-    void Initialize(int id, int loading)
+    void Initialize(int id, vtkIdType loading)
     {
       this->Data[ID]=id;
       this->Data[LOADING]=loading;
     }
     // Description:
     // Place into a buffer (id, loading)
-    void Pack(int *buf)
+    void Pack(vtkIdType *buf)
     {
       buf[ID]=this->Data[ID];
       buf[LOADING]=this->Data[LOADING];
     }
     // Description:
     // Initialize from a buffer (id, loading)
-    void UnPack(int *buf)
+    void UnPack(vtkIdType *buf)
     {
       this->Data[ID]=buf[ID];
       this->Data[LOADING]=buf[LOADING];
@@ -248,13 +248,13 @@ class vtkCTHFragmentPieceLoading
     // Description:
     // Set/Get
     int GetId() const{ return this->Data[ID]; }
-    int GetLoading() const{ return this->Data[LOADING]; }
-    void SetLoading(int loading){ this->Data[LOADING]=loading; }
+    vtkIdType GetLoading() const{ return this->Data[LOADING]; }
+    void SetLoading(vtkIdType loading){ this->Data[LOADING]=loading; }
     // Description:
     // Adds to laoding and returns the updated loading.
-    int UpdateLoading(int update){ return this->Data[LOADING]+=update; }
+    int UpdateLoading(vtkIdType update){ return this->Data[LOADING]+=update; }
   private:
-    int Data[SIZE];
+    vtkIdType Data[SIZE];
 };
 
 /**
@@ -269,7 +269,7 @@ class vtkCTHFragmentProcessLoading
     //
     ~vtkCTHFragmentProcessLoading(){ this->Initialize(-1,0); }
     //
-    void Initialize(int id, int loadFactor)
+    void Initialize(int id, vtkIdType loadFactor)
     {
       this->Data[ID]=id;
       this->Data[LOADING]=loadFactor;
@@ -287,14 +287,14 @@ class vtkCTHFragmentProcessLoading
     //
     int GetId() const{ return this->Data[ID]; }
     //
-    int GetLoadFactor() const{ return this->Data[LOADING]; }
+    vtkIdType GetLoadFactor() const{ return this->Data[LOADING]; }
     //
-    int UpdateLoadFactor(int loadFactor)
+    vtkIdType UpdateLoadFactor(vtkIdType loadFactor)
     {
       return this->Data[LOADING]+=loadFactor;
     }
   private:
-    int Data[SIZE];
+    vtkIdType Data[SIZE];
 };
 
 ostream &operator<<(ostream &sout, vtkCTHFragmentProcessLoading &fp)
@@ -354,11 +354,11 @@ class vtkCTHFragmentProcessPriorityQueue
     // Assigns a fragment to the next available
     // node, returns the node id. Updates the heap
     // oredering according to the adjusted loadFactor.
-    int AssignFragmentToProcess(int loadFactor);
+    int AssignFragmentToProcess(vtkIdType loadFactor);
     //Description:
     // Update the given processes load factor. Updates
     // the heap order accordingly.
-    void UpdateProcessLoadFactor(int procId, int loadFactor);
+    void UpdateProcessLoadFactor(int procId, vtkIdType loadFactor);
     // DESCRIPTION
     // Print the heap
     void Print(/*ostream &sout*/);
@@ -429,7 +429,7 @@ void vtkCTHFragmentProcessPriorityQueue::Initialize(int nProcs)
   this->Clear();
   this->EOH=nProcs+1;
   this->HeapSize=this->ComputeHeapSize(nProcs+1);
-  this->Heap 
+  this->Heap
     = new vtkCTHFragmentProcessLoading[this->HeapSize];
   this->NProcs=nProcs;
   this->ProcLocation.resize(this->NProcs,0);
@@ -454,7 +454,7 @@ void vtkCTHFragmentProcessPriorityQueue::Clear()
   this->ProcLocation.clear();
 }
 //
-int vtkCTHFragmentProcessPriorityQueue::AssignFragmentToProcess(int loadFactor)
+int vtkCTHFragmentProcessPriorityQueue::AssignFragmentToProcess(vtkIdType loadFactor)
 {
   int asignedToId=this->Heap[1].GetId();
   this->Heap[1].UpdateLoadFactor(loadFactor);
@@ -464,7 +464,7 @@ int vtkCTHFragmentProcessPriorityQueue::AssignFragmentToProcess(int loadFactor)
 //
 void vtkCTHFragmentProcessPriorityQueue::UpdateProcessLoadFactor(
                 int procId,
-                int loadFactor)
+                vtkIdType loadFactor)
 {
   int idx=this->ProcLocation[procId];
   this->Heap[idx].UpdateLoadFactor(loadFactor);
@@ -672,7 +672,7 @@ bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
 
   return static_cast<bool>(maskBit & this->PieceToProcMap[procId][maskIdx]);
 }
-
+//
 void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int procId, int fragmentId)
 {
   assert( "Invalid fragment id"
@@ -1083,7 +1083,6 @@ void vtkCTHFragmentPieceTransactionMatrix::Print()
       }
     }
 }
-
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
 // from different processes.
@@ -1166,9 +1165,9 @@ void vtkCTHFragmentEquivalenceSet::DeepCopy(vtkCTHFragmentEquivalenceSet* in)
 //----------------------------------------------------------------------------
 void vtkCTHFragmentEquivalenceSet::Print()
 {
-  int num = this->GetNumberOfMembers();
+  vtkIdType num = this->GetNumberOfMembers();
   cerr << num << endl;
-  for (int ii = 0; ii < num; ++ii)
+  for (vtkIdType ii = 0; ii < num; ++ii)
     {
     cerr << "  " << ii << " : " << this->GetEquivalentSetId(ii) << endl;
     }
@@ -2384,7 +2383,6 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   // put identifiers into a file 
   if (myProcId==0)
     {
-    ostream &sout=cerr;
     // open a file in the current working directory
     ofstream hrpFile;
     hrpFile.open("cthfc.pid");
@@ -6206,7 +6204,7 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
       resolvedFragments->SetPiece(globalId, mergedMesh);
       apf->Delete();
       ReleaseVtkPointer(srcMesh);
-      //destMesh->Delete(); no because multi piece does it
+      //destMesh->Delete(); // no because multi piece does it
       }
     }
   // These have been loaded into the resolved fragments
@@ -6277,7 +6275,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
       int bufSize=0;
       comm->Receive(&bufSize,1,procId,thisMsgId);
       // incoming
-      int *buffer=new int [bufSize];
+      vtkIdType *buffer=new vtkIdType [bufSize];
       comm->Receive(buffer,bufSize,procId,thisMsgId+1);
       this->UnPackLoadingArray(buffer,bufSize,loadingArrays[procId]);
       delete [] buffer;
@@ -6317,7 +6315,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
         // who has the pieces?
         vector<int> owners=f2pm.WhoHasAPiece(fragmentId);
         // how much load will he add to the recipient?
-        int loading=0;
+        vtkIdType loading=0;
         for (int i=0; i<nSplitOver; ++i)
           {
           loading+=loadingArrays[owners[i]][fragmentId].GetLoading();
@@ -6336,7 +6334,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
             continue;
             }
           // Update loading of the previous owner.
-          int loss=loadingArrays[owners[i]][fragmentId].GetLoading();
+          vtkIdType loss=loadingArrays[owners[i]][fragmentId].GetLoading();
           Q.UpdateProcessLoadFactor(owners[i],-loss);
           // Add the requisite transactions.
           // recipient executes a recv from owner
@@ -6355,7 +6353,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
     int thisMsgId=msgBase;
 
     // create and send my loading array
-    int *buffer=0;
+    vtkIdType *buffer=0;
     int bufSize=this->PackLoadingArray(buffer);
     comm->Send(&bufSize,1,controllingProcId,thisMsgId);
     ++thisMsgId;
@@ -6469,7 +6467,7 @@ void vtkCTHFragmentConnect::BuildLoadingArray(
 // or fragment piece that we own. Return the size in ints
 // of the packed buffer and the buffer itself. Pass in a
 // pointer intialized to null, allocation is internal.
-int vtkCTHFragmentConnect::PackLoadingArray(int *&buffer)
+int vtkCTHFragmentConnect::PackLoadingArray(vtkIdType *&buffer)
 {
   assert( "Buffer appears to have been pre-allocated."
           && buffer==0 );
@@ -6481,8 +6479,8 @@ int vtkCTHFragmentConnect::PackLoadingArray(int *&buffer)
 
   vtkCTHFragmentPieceLoading pl;
   const int bufSize=pl.SIZE*nLocal;
-  buffer = new int [bufSize];
-  int *pBuf=buffer;
+  buffer = new vtkIdType [bufSize];
+  vtkIdType *pBuf=buffer;
   for (int i=0; i<nLocal; ++i)
     {
     int globalId=this->ResolvedFragmentIds[this->MaterialId][i];
@@ -6502,7 +6500,7 @@ int vtkCTHFragmentConnect::PackLoadingArray(int *&buffer)
 // Given a fragment loading array that has been packed into an int array
 // unpack. Return the number of fragments and the unpacked array.
 int vtkCTHFragmentConnect::UnPackLoadingArray(
-                int *buffer,
+                vtkIdType *buffer,
                 int bufSize,
                 vector<vtkCTHFragmentPieceLoading> &loadingArray)
 {
@@ -6513,7 +6511,7 @@ int vtkCTHFragmentConnect::UnPackLoadingArray(
 
   const int nPieces=bufSize/sizeOfPl;
   loadingArray.resize(nPieces);
-  int *pBuf=buffer;
+  vtkIdType *pBuf=buffer;
   for (int i=0; i<nPieces; ++i)
     {
     loadingArray[i].UnPack(pBuf);
@@ -6624,7 +6622,7 @@ int vtkCTHFragmentConnect::SendGeometricAttributes(const int recipientProcId)
   int totalNumberOfComps
     = (!this->ComputeMoments ? 3 : 0)   // coaabb + obb
       + (this->ComputeOBB ? this->FragmentOBBs->GetNumberOfComponents(): 0);
-  const unsigned int bufferSize  // coaabb(double) + obb(double) + ids(int)
+  const vtkIdType bufferSize  // coaabb(double) + obb(double) + ids(int)
     = nLocal*(sizeof(int)+totalNumberOfComps*sizeof(double));
   //
   vtkCTHFragmentCommBuffer buffer;
@@ -6790,7 +6788,7 @@ int vtkCTHFragmentConnect::GatherGeometricAttributes(
     this->PrepareToMergeGeometricAttributes();
     for (int procId=0; procId<nProcs; ++procId)
       {
-      int nFromRemoteProc;
+      vtkIdType nFromRemoteProc;
       double *pRemote;
       double *pLocal;
       int nComps;
@@ -6801,7 +6799,7 @@ int vtkCTHFragmentConnect::GatherGeometricAttributes(
         pRemote=coaabb[procId]->GetPointer(0);
         pLocal=this->FragmentAABBCenters->GetPointer(0);
         nComps=3;
-        for (int i=0; i<nFromRemoteProc; ++i)
+        for (vtkIdType i=0; i<nFromRemoteProc; ++i)
           {
           int resIdx=nComps*ids[procId][i];
           for (int q=0; q<nComps; ++q)
@@ -6818,7 +6816,7 @@ int vtkCTHFragmentConnect::GatherGeometricAttributes(
         pRemote=obb[procId]->GetPointer(0);
         pLocal=this->FragmentOBBs->GetPointer(0);
         nComps=this->FragmentOBBs->GetNumberOfComponents();
-        for (int i=0; i<nFromRemoteProc; ++i)
+        for (vtkIdType i=0; i<nFromRemoteProc; ++i)
           {
           int resIdx=nComps*ids[procId][i];
           for (int q=0; q<nComps; ++q)
@@ -7005,7 +7003,7 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
   const int msgBase=200000;
 
   // estimate buffer size (in bytes)
-  const unsigned int nToSend
+  const vtkIdType nToSend
     = this->FragmentVolumes->GetNumberOfTuples();
   unsigned int totalNumberOfComps
     = 1 + (this->ComputeMoments ? 4 : 0); // volume + moments
@@ -7019,7 +7017,7 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
     totalNumberOfComps
       += this->FragmentSums[i]->GetNumberOfComponents();
     }
-  const unsigned int bufferSize
+  const vtkIdType bufferSize
     = nToSend*totalNumberOfComps*sizeof(double);
 
   // prepare a comm buffer
@@ -7233,7 +7231,7 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
 {
   int nComps;
   double *pResolved=0;
-  int bytesPerComponent
+  vtkIdType bytesPerComponent
     = sizeof(double)*this->NumberOfResolvedFragments;
 
   // volume

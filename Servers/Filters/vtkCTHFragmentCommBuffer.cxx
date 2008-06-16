@@ -48,7 +48,7 @@ void vtkCTHFragmentCommBuffer::Clear()
 void vtkCTHFragmentCommBuffer::Initialize(
                 int procId,
                 int nBlocks,
-                int nBytes)
+                vtkIdType nBytes)
 {
   // header
   this->HeaderSize=DESCR_BASE+nBlocks;
@@ -90,7 +90,7 @@ void vtkCTHFragmentCommBuffer::SizeBuffer()
 //----------------------------------------------------------------------------
 // Append data array to the buffer. Returns the byte index where 
 // the array was written.
-int vtkCTHFragmentCommBuffer::Pack(vtkDoubleArray *da)
+vtkIdType vtkCTHFragmentCommBuffer::Pack(vtkDoubleArray *da)
 {
   return this->Pack(da->GetPointer(0),
                     da->GetNumberOfComponents(),
@@ -99,17 +99,17 @@ int vtkCTHFragmentCommBuffer::Pack(vtkDoubleArray *da)
 //----------------------------------------------------------------------------
 // Append data to the buffer. Returns the byte index
 // where the array was written to.
-int vtkCTHFragmentCommBuffer::Pack(
+vtkIdType vtkCTHFragmentCommBuffer::Pack(
                 const double *pData,
                 const int nComps,
-                const int nTups)
+                const vtkIdType nTups)
 {
-  int byteIdx=this->EOD;
+  vtkIdType byteIdx=this->EOD;
 
   double *pBuffer
     = reinterpret_cast<double *>(this->Buffer+this->EOD);
   // pack
-  for (int i=0; i<nTups; ++i)
+  for (vtkIdType i=0; i<nTups; ++i)
     {
     for (int q=0; q<nComps; ++q)
       {
@@ -126,17 +126,17 @@ int vtkCTHFragmentCommBuffer::Pack(
 //----------------------------------------------------------------------------
 // Append data to the buffer. Returns the byte index
 // where the array was written to.
-int vtkCTHFragmentCommBuffer::Pack(
+vtkIdType vtkCTHFragmentCommBuffer::Pack(
                 const int *pData,
                 const int nComps,
-                const int nTups)
+                const vtkIdType nTups)
 {
-  int byteIdx=this->EOD;
+  vtkIdType byteIdx=this->EOD;
 
   int *pBuffer
     = reinterpret_cast<int *>(this->Buffer+this->EOD);
   // pack
-  for (int i=0; i<nTups; ++i)
+  for (vtkIdType i=0; i<nTups; ++i)
     {
     for (int q=0; q<nComps; ++q)
       {
@@ -154,8 +154,11 @@ int vtkCTHFragmentCommBuffer::Pack(
 // Pull data from the current location in the buffer 
 // into a double array. Before the unpack the array
 // is (re)sized.
-int vtkCTHFragmentCommBuffer::UnPack(vtkDoubleArray *da,
-                  const int nComps, const int nTups, const bool copyFlag)
+int vtkCTHFragmentCommBuffer::UnPack(
+                vtkDoubleArray *da,
+                const int nComps,
+                const vtkIdType nTups,
+                const bool copyFlag)
 {
   int ret=0;
   double *pData=0;
@@ -184,7 +187,7 @@ int vtkCTHFragmentCommBuffer::UnPack(vtkDoubleArray *da,
 int vtkCTHFragmentCommBuffer::UnPack(
                 double *&rData,
                 const int nComps,
-                const int nTups,
+                const vtkIdType nTups,
                 const bool copyFlag)
 {
   // locate
@@ -196,7 +199,7 @@ int vtkCTHFragmentCommBuffer::UnPack(
   if (copyFlag)
     {
     double *pData=rData;
-    for (int i=0; i<nTups; ++i)
+    for (vtkIdType i=0; i<nTups; ++i)
       {
       for (int q=0; q<nComps; ++q)
         {
@@ -222,7 +225,7 @@ int vtkCTHFragmentCommBuffer::UnPack(
 int vtkCTHFragmentCommBuffer::UnPack(
                 int *&rData,
                 const int nComps,
-                const int nTups,
+                const vtkIdType nTups,
                 const bool copyFlag)
 {
   // locate
@@ -234,7 +237,7 @@ int vtkCTHFragmentCommBuffer::UnPack(
   if (copyFlag)
     {
     int *pData=rData;
-    for (int i=0; i<nTups; ++i)
+    for (vtkIdType i=0; i<nTups; ++i)
       {
       for (int q=0; q<nComps; ++q)
         {
