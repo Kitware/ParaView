@@ -341,9 +341,9 @@ protected:
   void ResolveRemoteFragmentGeometry();
   void BuildLoadingArray(
           vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
-  int PackLoadingArray(int *&buffer);
+  int PackLoadingArray(vtkIdType *&buffer);
   int UnPackLoadingArray(
-          int *buffer, int bufSize,
+          vtkIdType *buffer, int bufSize,
           vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
 
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
