@@ -294,6 +294,10 @@ OPTION(PARAVIEW_ALWAYS_SECURE_CONNECTION
   "Build ParaView with enforced secure connection (--connect-id)" OFF)
 MARK_AS_ADVANCED(PARAVIEW_ALWAYS_SECURE_CONNECTION)
 
+# Change VTK default, since VTK is set up to enable TK when python wrapping is
+# enabled.
+OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
+
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 ADD_SUBDIRECTORY(VTK)
