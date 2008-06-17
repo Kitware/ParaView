@@ -39,10 +39,11 @@ class vtkSMDocumentation;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
+class vtkSMProxyManagerExtension;
 class vtkSMProxyManagerObserver;
+class vtkSMProxyManagerProxySet;
 class vtkSMStateLoader;
 class vtkStringList;
-class vtkSMProxyManagerProxySet;
 
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -415,6 +416,15 @@ public:
   // Returns the patch version number eg. if version is 2.9.1 
   // this method will return 1.
   int GetVersionPatch();
+
+  // Description:
+  // Register a proxy manager extension. Returns true if the registration is
+  // successful.
+  bool RegisterExtension(vtkSMProxyManagerExtension* ext);
+
+  // Description:
+  // Unregister a previously register extension.
+  void UnRegisterExtension(vtkSMProxyManagerExtension* ext);
 
 protected:
   vtkSMProxyManager();

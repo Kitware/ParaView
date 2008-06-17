@@ -116,6 +116,7 @@ SET(Kit_SRCS
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
   vtkSMProxyManager.cxx
+  vtkSMProxyManagerExtension.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
@@ -224,6 +225,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyManagerExtension.cxx
   ABSTRACT
   )
 

@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.71");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.72");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1614,6 +1614,42 @@ vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
       }
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+// Description:
+// Register a proxy manager extension. Returns true if the registration is
+// successful.
+bool vtkSMProxyManager::RegisterExtension(vtkSMProxyManagerExtension* ext)
+{
+  if (!ext || !ext->CheckCompatibility(this->GetVersionMajor(), 
+      this->GetVersionMinor(), this->GetVersionPatch()))
+    {
+    return false;
+    }
+
+  ext->Register(this);
+  this->UnRegisterExtension(ext);
+  this->Internals->Extensions.push_back(ext);
+  ext->UnRegister(this);
+  return true;
+}
+
+//---------------------------------------------------------------------------
+// Description:
+// Unregister a previously register extension.
+void vtkSMProxyManager::UnRegisterExtension(vtkSMProxyManagerExtension* ext)
+{
+  vtkSMProxyManagerInternals::ExtensionsType::iterator iter;
+  for (iter = this->Internals->Extensions.begin();
+    iter != this->Internals->Extensions.end(); ++iter)
+    {
+    if (iter->GetPointer() == ext)
+      {
+      this->Internals->Extensions.erase(iter);
+      break;
+      }
+    }
 }
 
 //---------------------------------------------------------------------------

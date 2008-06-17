@@ -20,6 +20,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMLink.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManagerExtension.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -202,6 +203,10 @@ struct vtkSMProxyManagerInternals
     LinkType;
   LinkType RegisteredLinkMap;
 
+  // Data structure for proxy manager extensions.
+  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxyManagerExtension> > ExtensionsType;
+  ExtensionsType Extensions;
+
   // Helper method to retrieve the proxy element.
   vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName)
     {
@@ -209,6 +214,8 @@ struct vtkSMProxyManagerInternals
       {
       return 0;
       }
+    vtkPVXMLElement* element = 0;
+
     // Find the XML element from the proxy.
     // 
     vtkSMProxyManagerInternals::GroupMapType::iterator it =
@@ -220,11 +227,19 @@ struct vtkSMProxyManagerInternals
 
       if (it2 != it->second.end())
         {
-        vtkPVXMLElement* element = it2->second.GetPointer();
-        return element;
+        element = it2->second.GetPointer();
         }
       }
-    return 0;
+
+    vtkSMProxyManagerInternals::ExtensionsType::iterator extensionsIter;
+    for (extensionsIter = this->Extensions.begin();
+      extensionsIter != this->Extensions.end(); ++extensionsIter)
+      {
+      element = extensionsIter->GetPointer()->GetProxyElement(
+        groupName, proxyName, element);
+      }
+
+    return element;
     }
 };
 
