@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqBarChartDisplayProxyEditor.h"
 #include "pqDisplayPanelInterface.h"
+#include "pqDisplayPanelDecoratorInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqOutputPort.h"
@@ -307,6 +308,17 @@ void pqDisplayProxyEditorWidget::updatePanel()
       this->Internal->DisplayPanel->setEnabled(false);
       }
     }
+
+  foreach(QObject* iface, ifaces)
+    {
+    pqDisplayPanelDecoratorInterface* piface =
+      qobject_cast<pqDisplayPanelDecoratorInterface*>(iface);
+    if (piface && piface->canDecorate(this->Internal->DisplayPanel))
+      {
+      piface->decorate(this->Internal->DisplayPanel);
+      }
+    }
+
   this->layout()->addWidget(this->Internal->DisplayPanel);
 }
 
