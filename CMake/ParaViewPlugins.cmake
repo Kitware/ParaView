@@ -90,18 +90,29 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   ENDIF(PARAVIEW_PROCESS_XML_EXECUTABLE)
 
   SET(HDRS)
+  SET(REALSRCS)
+  SET(INST_SRCS)
+
   FOREACH(SRC ${ARGN})
     GET_FILENAME_COMPONENT(src_name "${SRC}" NAME_WE)
     GET_FILENAME_COMPONENT(src_path "${SRC}" ABSOLUTE)
     GET_FILENAME_COMPONENT(src_path "${src_path}" PATH)
-    SET(HDRS ${HDRS} "${src_path}/${src_name}.h")
+    SET(HDR "${src_path}/${src_name}.h")
+    SET(HDRS ${HDRS} "${HDR}")
+    IF(NOT HDR MATCHES ${SRC})
+      SET(REALSRCS ${REALSRCS} ${SRC})
+    ENDIF(NOT HDR MATCHES ${SRC})
   ENDFOREACH(SRC ${ARGN})
   
   SET(CS_SRCS)
   IF(HDRS)
     VTK_WRAP_ClientServer(${Name} CS_SRCS "${HDRS}")
-    VTK_MAKE_INSTANTIATOR3(vtkSM${Name}Instantiator INST_SRCS "${ARGN}"
-      VTK_EXPORT "${CMAKE_CURRENT_BINARY_DIR}" "")
+    # only generate the instantiator code for cxx classes that'll be included in
+    # the plugin
+    IF(REALSRCS)
+      VTK_MAKE_INSTANTIATOR3(vtkSM${Name}Instantiator INST_SRCS "${REALSRCS}"
+        VTK_EXPORT "${CMAKE_CURRENT_BINARY_DIR}" "")
+    ENDIF(REALSRCS)
     SET(HAVE_SRCS 1)
   ELSE(HDRS)
     SET(HAVE_SRCS 0)
