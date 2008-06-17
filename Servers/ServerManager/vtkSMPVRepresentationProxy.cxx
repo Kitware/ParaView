@@ -19,10 +19,15 @@
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
 #include "vtkProperty.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMSurfaceRepresentationProxy.h"
+
+#include <vtkstd/map>
+#include <vtkstd/set>
 
 inline void vtkSMPVRepresentationProxySetInt(
   vtkSMProxy* proxy, const char* pname, int val)
@@ -32,131 +37,118 @@ inline void vtkSMPVRepresentationProxySetInt(
   if (ivp)
     {
     ivp->SetElement(0, val);
+    proxy->UpdateProperty(pname);
     }
-  proxy->UpdateProperty(pname);
 }
 
+class vtkSMPVRepresentationProxy::vtkInternals
+{
+public:
+  struct vtkValue
+    {
+    vtkSMDataRepresentationProxy* Representation;
+    int Value;
+    vtkstd::string Text;
+    vtkValue(vtkSMDataRepresentationProxy* repr= 0, int value=-1, const char* text="")
+      {
+      this->Representation = repr;
+      this->Value = value;
+      this->Text = text? text : "";
+      }
+    };
+
+  typedef vtkstd::map<int, vtkValue> RepresentationProxiesMap;
+  RepresentationProxiesMap RepresentationProxies;
+
+  // This is in some sense unnecessary, since the RepresentationProxies map
+  // keeps this information, however, this makes it easy to iterate over unique
+  // proxies.
+  typedef vtkstd::set<vtkSMDataRepresentationProxy*> RepresentationProxiesSet;
+  RepresentationProxiesSet UniqueRepresentationProxies;
+};
+
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.20");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
   this->Representation = VTK_SURFACE;
-  this->SurfaceRepresentation = 0;
-  this->VolumeRepresentation = 0;
-  this->OutlineRepresentation = 0;
   this->CubeAxesRepresentation = 0;
   this->CubeAxesVisibility = 0;
   this->ActiveRepresentation = 0;
-  this->SliceRepresentation = 0;
+
+  this->Internals = new vtkInternals();
 }
 
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::~vtkSMPVRepresentationProxy()
 {
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::SetViewInformation(vtkInformation* info)
 {
   this->Superclass::SetViewInformation(info);
-  if (this->SurfaceRepresentation)
-    {
-    this->SurfaceRepresentation->SetViewInformation(info);
-    }
 
-  if (this->OutlineRepresentation)
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->OutlineRepresentation->SetViewInformation(info);
-    }
-
-  if (this->VolumeRepresentation)
-    {
-    this->VolumeRepresentation->SetViewInformation(info);
+    (*iter)->SetViewInformation(info);
     }
 
   if (this->CubeAxesRepresentation)
     {
     this->CubeAxesRepresentation->SetViewInformation(info);
     }
-
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->SetViewInformation(info);
-    }
-
 }
 
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
 {
-  this->SurfaceRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
-    this->GetSubProxy("SurfaceRepresentation"));
-  this->VolumeRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
-    this->GetSubProxy("VolumeRepresentation"));
-  this->SliceRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
-    this->GetSubProxy("SliceRepresentation"));
-  this->OutlineRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
-    this->GetSubProxy("OutlineRepresentation"));
+  vtkSMProxy* inputProxy = this->GetInputProxy();
   this->CubeAxesRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
     this->GetSubProxy("CubeAxesRepresentation"));
-
-  this->Connect(this->GetInputProxy(), this->SurfaceRepresentation,
+  this->Connect(inputProxy, this->CubeAxesRepresentation,
     "Input", this->OutputPort);
-  this->Connect(this->GetInputProxy(), this->OutlineRepresentation, 
-    "Input", this->OutputPort);
-  this->Connect(this->GetInputProxy(), this->CubeAxesRepresentation,
-    "Input", this->OutputPort);
-
-  vtkSMPVRepresentationProxySetInt(this->SurfaceRepresentation, "Visibility", 0);
-  vtkSMPVRepresentationProxySetInt(this->OutlineRepresentation, "Visibility", 0);
   vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility", 0);
 
-  if (this->VolumeRepresentation)
-    {
-    this->Connect(this->GetInputProxy(), this->VolumeRepresentation,
-      "Input", this->OutputPort);
-    vtkSMPVRepresentationProxySetInt(this->VolumeRepresentation, "Visibility", 0);
-    }
+  vtkSMSurfaceRepresentationProxy* surfaceRepr = 
+    vtkSMSurfaceRepresentationProxy::SafeDownCast(
+      this->GetSubProxy("SurfaceRepresentation"));
 
-  if (this->SliceRepresentation)
-    {
-    this->Connect(this->GetInputProxy(), this->SliceRepresentation,
-      "Input", this->OutputPort);
-    vtkSMPVRepresentationProxySetInt(this->SliceRepresentation, "Visibility",
-      0);
-    }
-
-
-  // Fire start/end events fired by the representations so that the world knows
-  // that the representation has been updated,
   vtkCommand* observer = this->GetObserver();
-  this->SurfaceRepresentation->AddObserver(vtkCommand::StartEvent, observer);
-  this->SurfaceRepresentation->AddObserver(vtkCommand::EndEvent, observer);
-
-  this->OutlineRepresentation->AddObserver(vtkCommand::StartEvent, observer);
-  this->OutlineRepresentation->AddObserver(vtkCommand::EndEvent, observer);
-
-  if (this->VolumeRepresentation)
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->VolumeRepresentation->AddObserver(vtkCommand::StartEvent, observer);
-    this->VolumeRepresentation->AddObserver(vtkCommand::EndEvent, observer);
-    }
+    vtkSMDataRepresentationProxy* repr = (*iter);
+    this->Connect(inputProxy, repr, "Input", this->OutputPort);
+    vtkSMPVRepresentationProxySetInt(repr, "Visibility", 0);
 
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->AddObserver(vtkCommand::StartEvent, observer);
-    this->SliceRepresentation->AddObserver(vtkCommand::EndEvent, observer);
-    }
+    // Fire start/end events fired by the representations so that the world knows
+    // that the representation has been updated,
+    // FIXME: need to revisit this following the data information update
+    // changes.
+    repr->AddObserver(vtkCommand::StartEvent, observer);
+    repr->AddObserver(vtkCommand::EndEvent, observer);
 
+    if (!surfaceRepr)
+      {
+      surfaceRepr = vtkSMSurfaceRepresentationProxy::SafeDownCast(repr);
+      }
+    }
 
   // Setup the ActiveRepresentation pointer.
   int repr = this->Representation;
   this->Representation = -1;
   this->SetRepresentation(repr);
 
-  this->LinkSelectionProp(vtkSMSurfaceRepresentationProxy::SafeDownCast(
-      this->SurfaceRepresentation)->GetProp3D());
+  if (surfaceRepr)
+    {
+    this->LinkSelectionProp(surfaceRepr->GetProp3D());
+    }
 
   // This will pass the ViewInformation to all the representations.
   this->SetViewInformation(this->ViewInformation);
@@ -167,17 +159,14 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
-  this->SurfaceRepresentation->AddToView(view);
-  this->OutlineRepresentation->AddToView(view);
-  if (this->VolumeRepresentation)
-    {
-    this->VolumeRepresentation->AddToView(view);
-    }
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->AddToView(view);
-    }
   this->CubeAxesRepresentation->AddToView(view);
+
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
+    {
+    (*iter)->AddToView(view);
+    }
 
   return this->Superclass::AddToView(view);
 }
@@ -185,16 +174,13 @@ bool vtkSMPVRepresentationProxy::AddToView(vtkSMViewProxy* view)
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 {
-  this->SurfaceRepresentation->RemoveFromView(view);
-  this->OutlineRepresentation->RemoveFromView(view);
-  if (this->VolumeRepresentation)
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->VolumeRepresentation->RemoveFromView(view);
+    (*iter)->RemoveFromView(view);
     }
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->RemoveFromView(view);
-    }
+
   this->CubeAxesRepresentation->RemoveFromView(view);
   return this->Superclass::RemoveFromView(view);
 }
@@ -204,67 +190,27 @@ void vtkSMPVRepresentationProxy::SetRepresentation(int repr)
 {
   if (this->Representation != repr)
     {
+    vtkInternals::RepresentationProxiesMap::iterator iter = 
+      this->Internals->RepresentationProxies.find(repr);
+    if (iter == this->Internals->RepresentationProxies.end())
+      {
+      vtkErrorMacro("Representation type " << repr << " not supported.");
+      return;
+      }
+
+
     this->Representation = repr;
     if (this->ActiveRepresentation)
       {
       vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 0);
       }
 
-    switch (this->Representation)
+    this->ActiveRepresentation = iter->second.Representation;
+    if (this->ActiveRepresentation->GetProperty("Representation") &&
+      iter->second.Value != -1)
       {
-    case OUTLINE:
-      this->ActiveRepresentation = this->OutlineRepresentation;
-      break;
-
-    case VOLUME:
-      if (this->VolumeRepresentation)
-        {
-        this->ActiveRepresentation = this->VolumeRepresentation;
-        break;
-        }
-      else
-        {
-        vtkErrorMacro("Volume representation not supported.");
-        this->SetRepresentation(OUTLINE);
-        return;
-        }
-
-    case SLICE:
-      if (this->SliceRepresentation)
-        {
-        this->ActiveRepresentation = this->SliceRepresentation;
-        break;
-        }
-      else
-        {
-        vtkErrorMacro("Slice representation not supported.");
-        this->SetRepresentation(OUTLINE);
-        return;
-        }
-
-    case POINTS:
-      this->ActiveRepresentation = this->SurfaceRepresentation;
       vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
-        "Representation", VTK_POINTS);
-      break;
-
-    case WIREFRAME:
-      this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
-        "Representation", VTK_WIREFRAME);
-      break;
-
-    case SURFACE_WITH_EDGES:
-      this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
-        "Representation", VTK_SURFACE_WITH_EDGES);
-      break;
-
-    case SURFACE:
-    default:
-      this->ActiveRepresentation = this->SurfaceRepresentation;
-      vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, 
-        "Representation", VTK_SURFACE);
+        "Representation", iter->second.Value);
       }
 
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 
@@ -344,16 +290,14 @@ bool vtkSMPVRepresentationProxy::UpdateRequired()
 void vtkSMPVRepresentationProxy::SetUpdateTime(double time)
 {
   this->Superclass::SetUpdateTime(time);
-  this->SurfaceRepresentation->SetUpdateTime(time);
-  this->OutlineRepresentation->SetUpdateTime(time);
-  if (this->VolumeRepresentation)
+
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->VolumeRepresentation->SetUpdateTime(time);
+    (*iter)->SetUpdateTime(time);
     }
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->SetUpdateTime(time);
-    }
+
   this->CubeAxesRepresentation->SetUpdateTime(time);
 }
 
@@ -362,15 +306,11 @@ void vtkSMPVRepresentationProxy::SetUseViewUpdateTime(bool use)
 {
   this->Superclass::SetUseViewUpdateTime(use);
 
-  this->SurfaceRepresentation->SetUseViewUpdateTime(use);
-  this->OutlineRepresentation->SetUseViewUpdateTime(use);
-  if (this->VolumeRepresentation)
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->VolumeRepresentation->SetUseViewUpdateTime(use);
-    }
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->SetUseViewUpdateTime(use);
+    (*iter)->SetUseViewUpdateTime(use);
     }
   this->CubeAxesRepresentation->SetUseViewUpdateTime(use);
 }
@@ -379,15 +319,12 @@ void vtkSMPVRepresentationProxy::SetUseViewUpdateTime(bool use)
 void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
 {
   this->Superclass::SetViewUpdateTime(time);
-  this->SurfaceRepresentation->SetViewUpdateTime(time);
-  this->OutlineRepresentation->SetViewUpdateTime(time);
-  if (this->VolumeRepresentation)
+
+  vtkInternals::RepresentationProxiesSet::iterator iter;
+  for (iter = this->Internals->UniqueRepresentationProxies.begin();
+    iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
-    this->VolumeRepresentation->SetViewUpdateTime(time);
-    }
-  if (this->SliceRepresentation)
-    {
-    this->SliceRepresentation->SetViewUpdateTime(time);
+    (*iter)->SetViewUpdateTime(time);
     }
   this->CubeAxesRepresentation->SetViewUpdateTime(time);
 }
@@ -478,6 +415,71 @@ bool vtkSMPVRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
 bool vtkSMPVRepresentationProxy::GetBounds(double bounds[6])
 {
   return this->ActiveRepresentation->GetBounds(bounds);
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPVRepresentationProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+
+  // <Option representation="101" subproxy="SurfaceLICRepresentation" value="2" />
+  unsigned int numElemens = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElemens; cc++)
+    {
+    vtkPVXMLElement* child = element->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), "Option") == 0)
+      {
+      int representation = -1;
+      if (!child->GetScalarAttribute("representation", &representation))
+        {
+        vtkErrorMacro("Missing required attribute 'representation'");
+        return 0;
+        }
+      const char* name = child->GetAttribute("subproxy");
+      vtkSMDataRepresentationProxy* subproxy = 
+        vtkSMDataRepresentationProxy::SafeDownCast(this->GetSubProxy(name));
+      if (!subproxy)
+        {
+        vtkErrorMacro("Missing data representation subproxy '" << name << "'");
+        return 0;
+        }
+
+      const char* text = child->GetAttribute("text");
+      int value = -1;
+      child->GetScalarAttribute("value", &value);
+      this->Internals->RepresentationProxies[representation] =
+        vtkInternals::vtkValue(subproxy, value, text);
+      this->Internals->UniqueRepresentationProxies.insert(subproxy);
+      }
+    }
+
+  // Now update the "Representation" property domain to reflect the options
+  // available.
+  vtkSMProperty* repProp = this->GetProperty("Representation");
+  if (repProp)
+    {
+    vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
+      repProp->GetDomain("enum"));
+    if (enumDomain)
+      {
+      // Add strings for all types >= USER_DEFINED.
+      vtkInternals::RepresentationProxiesMap::iterator iter;
+      for (iter = this->Internals->RepresentationProxies.begin();
+        iter != this->Internals->RepresentationProxies.end(); ++iter)
+        {
+        if (iter->first >= vtkSMPVRepresentationProxy::USER_DEFINED &&
+          !iter->second.Text.empty())
+          {
+          enumDomain->AddEntry(iter->second.Text.c_str(), iter->first);
+          }
+        }
+      }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------

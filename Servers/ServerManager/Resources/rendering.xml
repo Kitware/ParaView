@@ -5217,6 +5217,10 @@
         <InputArrayDomain name="input_array_any"
           attribute_type="any">
         </InputArrayDomain>
+        <InputArrayDomain name="input_vectors"
+          number_of_components="3"
+          optional="1">
+        </InputArrayDomain>
       </InputProperty>
 
       <DoubleVectorProperty name="UpdateTime"
@@ -6247,6 +6251,11 @@
         This representation is used to show geometry as
         Surface/Outline/Points/Wireframe.
       </Documentation>
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
 
       <InputProperty 
         name="Input"
@@ -6284,6 +6293,12 @@
         This representation is used to show unstructured grid as
         Surface/Outline/Points/Wireframe/Volume
       </Documentation>
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="4" subproxy="VolumeRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
 
       <InputProperty 
         name="Input"
@@ -6339,6 +6354,13 @@
         This representation is used to show image data as
         Surface/Outline/Points/Wireframe/Volume/Slice.
       </Documentation>
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="4" subproxy="VolumeRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
+      <Option representation="6" subproxy="SliceRepresentation" />
 
       <InputProperty 
         name="Input"

@@ -154,7 +154,8 @@ public:
     OUTLINE=3,
     VOLUME=4,
     SURFACE_WITH_EDGES=5,
-    SLICE=6
+    SLICE=6,
+    USER_DEFINED=100
     };
 protected:
   vtkSMPVRepresentationProxy();
@@ -177,20 +178,21 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view); 
 
-  vtkSMDataRepresentationProxy* SurfaceRepresentation;
-  vtkSMDataRepresentationProxy* VolumeRepresentation;
-  vtkSMDataRepresentationProxy* OutlineRepresentation;
-  vtkSMDataRepresentationProxy* SliceRepresentation;
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
   vtkSMDataRepresentationProxy* ActiveRepresentation;
   vtkSMDataRepresentationProxy* CubeAxesRepresentation;
 
-
   int Representation;
   int CubeAxesVisibility;
-
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPVRepresentationProxy&); // Not implemented
+
+  class vtkInternals;
+  vtkInternals* Internals;
 //ETX
 };
 
