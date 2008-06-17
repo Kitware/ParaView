@@ -32,10 +32,10 @@
 #if @HAVE_XML@
 
 namespace {
-  class StaticInit
+  class StaticInitXML
   {
     public:
-    StaticInit()
+    StaticInitXML()
     {
       static char* xmls[] = 
       {
@@ -45,7 +45,7 @@ namespace {
       XMLString = xmls;
       NumberOfStrings = sizeof(xmls) / sizeof(char*);
     }
-    ~StaticInit()
+    ~StaticInitXML()
     {
       // clean up new'd arrays
       for(int i=0; i<NumberOfStrings; i++)
@@ -56,26 +56,45 @@ namespace {
     char** XMLString;
     int NumberOfStrings;
   };
+
 }
 
 // entry point to get XML as a string
 C_EXPORT void C_DECL ParaViewPluginXMLList(int& num, char** & xml)
 {
-  static StaticInit staticinit;
+  static StaticInitXML staticinit;
   num = staticinit.NumberOfStrings;
   xml = staticinit.XMLString;
 }
 #endif // HAVE_XML
 
 #if @HAVE_SRCS@
-class vtkClientServerInterpreter;
+
+#include "vtkProcessModule.h"
+#include "vtkClientServerInterpreter.h"
+
 extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
-// entry point to initialize this plugin with the client/server interpreter
-C_EXPORT void C_DECL ParaViewPluginInit(vtkClientServerInterpreter *arlu)
-{
-  @MODULE_NAME@_Initialize(arlu);
+namespace {
+  class StaticInitSMWrappings
+  {
+    public:
+    StaticInitSMWrappings(void (*initfunc)(vtkClientServerInterpreter*))
+    {
+      // try to tell paraview what client/server wrappings this plugin provides
+      // if the process module isn't initialize, its because someone linked
+      // against this plugin directly and it got loaded before paraview
+      // initialized.  In that case, its the developer's job to call the 
+      // @MODULE_NAME@_Initialize function at the appropriate time.
+      vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
+      if(processModule && processModule->GetInterpreter())
+      {
+        (*initfunc)(processModule->GetInterpreter());
+      }
+    }
+  };
 }
+static StaticInitSMWrappings InitSMWrappings(@MODULE_NAME@_Initialize);
 
 #endif // HAVE_SRCS
 
