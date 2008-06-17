@@ -77,7 +77,6 @@ protected:
 
   /// Set the display whose properties we want to edit.
   virtual void setRepresentation(pqPipelineRepresentation* display);
-  pqPipelineRepresentation* getRepresentation();
   void updateSelectionLabelModes();
 
   pqDisplayProxyEditorInternal* Internal;

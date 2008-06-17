@@ -462,11 +462,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
-//-----------------------------------------------------------------------------
-pqPipelineRepresentation* pqDisplayProxyEditor::getRepresentation()
-{
-  return this->Internal->Representation;
-}
+
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::setupGUIConnections()
 {
