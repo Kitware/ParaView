@@ -43,6 +43,35 @@ MACRO(PV_PLUGIN_PARSE_ARGUMENTS prefix arg_names option_names)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PV_PLUGIN_PARSE_ARGUMENTS)
 
+
+# Macro to generate a header xml given an XML.
+MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)
+  IF(PARAVIEW_PROCESS_XML_EXECUTABLE)
+    FOREACH(TMPXML ${XMLFile})
+      GET_FILENAME_COMPONENT(TMP_XML_FILE "${TMPXML}" ABSOLUTE)
+      GET_FILENAME_COMPONENT(XML_NAME "${TMPXML}" NAME_WE)
+      SET(XML_FILES ${XML_FILES} ${TMP_XML_FILE})
+      SET(HAVE_XML 1)
+    ENDFOREACH(TMPXML)
+
+    IF(HAVE_XML)
+      SET(XML_HEADER "${CMAKE_CURRENT_BINARY_DIR}/vtkSMXML_${Name}.h")
+
+      ADD_CUSTOM_COMMAND(
+        OUTPUT "${XML_HEADER}"
+        DEPENDS ${XML_FILES} "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
+        COMMAND "${PARAVIEW_PROCESS_XML_EXECUTABLE}"
+        ARGS "${XML_HEADER}" "vtkSM" "XML" "GetString" ${XML_FILES}
+        )
+
+      SET (${OUT_XML_HEADER} ${XML_HEADER})
+    ENDIF(HAVE_XML)
+
+  ELSE(PARAVIEW_PROCESS_XML_EXECUTABLE)
+    MESSAGE("kwProcessXML not found.  Plugin may not build correctly")
+  ENDIF(PARAVIEW_PROCESS_XML_EXECUTABLE)
+ENDMACRO(GENERATE_SERVER_MANAGER_XML_HEADER)
+
 # create plugin glue code for a server manager extension
 # consisting of server manager XML and VTK classes
 # sets OUTSRCS with the generated code
@@ -117,7 +146,8 @@ MACRO(ADD_SERVER_MANAGER_EXTENSION OUTSRCS Name XMLFile)
   ELSE(HDRS)
     SET(HAVE_SRCS 0)
   ENDIF(HDRS)
-  
+
+
   CONFIGURE_FILE(
     "${ParaView_SOURCE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in"
     "${CMAKE_CURRENT_BINARY_DIR}/vtkPVPluginInit_${Name}.cxx" @ONLY)
