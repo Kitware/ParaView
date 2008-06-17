@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.52");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.53");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -409,6 +409,10 @@ int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
       }
     }
   this->RemoveAllUncheckedProxies();
+  if (this->PPInternals->Proxies.size() <= idx)
+    {
+    this->PPInternals->Proxies.resize(idx+1);
+    }
 
   this->PPInternals->Proxies[idx] = proxy;
   this->Modified();
