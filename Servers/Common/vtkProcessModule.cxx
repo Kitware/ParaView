@@ -106,7 +106,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.81");
+vtkCxxRevisionMacro(vtkProcessModule, "1.82");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1839,6 +1839,8 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseMPI: " << this->UseMPI << endl;
   os << indent << "SendStreamToClientOnly: " 
     << this->SendStreamToClientOnly << endl;
+  os << indent 
+    << (this->LastProgressName? this->LastProgressName : "(none)") << endl;
  
   os << indent << "Interpreter: " ;
   if (this->Interpreter)

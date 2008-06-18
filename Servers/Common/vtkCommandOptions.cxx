@@ -34,7 +34,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.9");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.10");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -339,8 +339,14 @@ void vtkCommandOptions::ComputeApplicationPath()
 void vtkCommandOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "XMLConfigFile: " << (this->XMLConfigFile?this->XMLConfigFile:"(none)") << endl;
-  os << indent << "UnknownArgument: " << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
-  os << indent << "ErrorMessage: " << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
+  os << indent << "XMLConfigFile: " 
+    << (this->XMLConfigFile?this->XMLConfigFile:"(none)") << endl;
+  os << indent << "UnknownArgument: " 
+    << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
+  os << indent << "ErrorMessage: " 
+    << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
+  os << indent << "ApplicationPath: " 
+    << (this->ApplicationPath? this->ApplicationPath : "(none)") << endl;
+
 }

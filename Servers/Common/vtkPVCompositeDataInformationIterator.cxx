@@ -38,7 +38,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCompositeDataInformationIterator);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformationIterator, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformationIterator, "1.2");
 vtkCxxSetObjectMacro(vtkPVCompositeDataInformationIterator, DataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkPVCompositeDataInformationIterator::vtkPVCompositeDataInformationIterator()
@@ -117,6 +117,7 @@ void vtkPVCompositeDataInformationIterator::PrintSelf(ostream& os, vtkIndent ind
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DataInformation: " << this->DataInformation << endl;
+  os << indent << "CurrentFlatIndex: " << this->CurrentFlatIndex << endl;
 }
 
 

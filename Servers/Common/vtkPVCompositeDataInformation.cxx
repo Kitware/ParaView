@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.14");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.15");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -62,6 +62,8 @@ vtkPVCompositeDataInformation::~vtkPVCompositeDataInformation()
 void vtkPVCompositeDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "DataIsMultiPiece: " << this->DataIsMultiPiece << endl;
+  os << indent << "DataIsComposite: " << this->DataIsComposite << endl;
 }
 
 //----------------------------------------------------------------------------
