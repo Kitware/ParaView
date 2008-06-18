@@ -2293,11 +2293,11 @@
         update_self="1"
         command="SetSourceProxy" />
 
-
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         update_self="1"
         number_of_elements="1"
+        is_internal="1"
         default_values="none">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
@@ -2306,6 +2306,7 @@
         command="SetOpacity"
         update_self="1"
         number_of_elements="1"
+        is_internal="1"
         default_values="none">
         <DoubleRangeDomain name="range" min="0.0" max="1.0" />
       </DoubleVectorProperty>
