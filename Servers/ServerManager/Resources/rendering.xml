@@ -4897,7 +4897,6 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
         </ExposedProperties>
