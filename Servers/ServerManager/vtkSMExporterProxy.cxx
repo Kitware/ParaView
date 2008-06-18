@@ -14,14 +14,13 @@
 =========================================================================*/
 #include "vtkSMExporterProxy.h"
 
-#include "vtkExporter.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMMultiProcessRenderView.h"
+#include "vtkSMViewProxy.h"
 
-vtkStandardNewMacro(vtkSMExporterProxy);
-vtkCxxRevisionMacro(vtkSMExporterProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMExporterProxy, "1.2");
+vtkCxxSetObjectMacro(vtkSMExporterProxy, View, vtkSMViewProxy);
 //----------------------------------------------------------------------------
 vtkSMExporterProxy::vtkSMExporterProxy()
 {
@@ -36,50 +35,6 @@ vtkSMExporterProxy::~vtkSMExporterProxy()
 {
   this->SetView(0);
   this->SetFileExtension(0);
-}
-
-//----------------------------------------------------------------------------
-bool vtkSMExporterProxy::CanExport(vtkSMProxy* view)
-{
-  return (view && view->IsA("vtkSMRenderViewProxy"));
-}
-
-//----------------------------------------------------------------------------
-void vtkSMExporterProxy::SetView(vtkSMRenderViewProxy* view)
-{
-  vtkSetObjectBodyMacro(View, vtkSMRenderViewProxy, view);
-  if (this->ObjectsCreated)
-    {
-    vtkRenderWindow* renWin = this->View? this->View->GetRenderWindow() : 0;
-    vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
-    if (exporter)
-      {
-      exporter->SetRenderWindow(renWin);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMExporterProxy::Write()
-{
-  vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
-  if (exporter && this->View)
-    {
-    vtkSMMultiProcessRenderView* mrv = 
-      vtkSMMultiProcessRenderView::SafeDownCast(this->View);
-    double old_threshold = 0.0;
-    if (mrv)
-      {
-      old_threshold = mrv->GetRemoteRenderThreshold();
-      mrv->SetRemoteRenderThreshold(VTK_DOUBLE_MAX);
-      mrv->StillRender();
-      }
-    exporter->Write();
-    if (mrv)
-      {
-      mrv->SetRemoteRenderThreshold(old_threshold);
-      }
-    }
 }
 
 //----------------------------------------------------------------------------

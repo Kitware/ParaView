@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMExporterProxy - proxy for vtkExporter subclasses.
+// .NAME vtkSMExporterProxy - proxy for view exporters.
 // .SECTION Description
 // vtkSMExporterProxy is a proxy for vtkExporter subclasses. It makes it
 // possible to export render views using these exporters.
@@ -22,28 +22,27 @@
 
 #include "vtkSMProxy.h"
 
-class vtkSMRenderViewProxy;
+class vtkSMViewProxy;
 
 class VTK_EXPORT vtkSMExporterProxy : public vtkSMProxy
 {
 public:
-  static vtkSMExporterProxy* New();
   vtkTypeRevisionMacro(vtkSMExporterProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the view proxy to export.
-  void SetView(vtkSMRenderViewProxy* view);
-  vtkGetObjectMacro(View, vtkSMRenderViewProxy);
+  void SetView(vtkSMViewProxy* view);
+  vtkGetObjectMacro(View, vtkSMViewProxy);
 
   // Description:
   // Exports the view.
-  virtual void Write();
+  virtual void Write()=0;
 
   // Description:
   // Returns if the view can be exported. 
   // Default implementation return true if the view is a render view.
-  virtual bool CanExport(vtkSMProxy*);
+  virtual bool CanExport(vtkSMProxy*) = 0;
 
   // Description:
   // Returns the suggested file extension for this exporter.
@@ -57,7 +56,7 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
   vtkSetStringMacro(FileExtension);
-  vtkSMRenderViewProxy* View;
+  vtkSMViewProxy* View;
   char* FileExtension;
 private:
   vtkSMExporterProxy(const vtkSMExporterProxy&); // Not implemented

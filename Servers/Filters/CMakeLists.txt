@@ -24,6 +24,7 @@ SET(Filters_SRCS
   vtkCompleteArrays.cxx
   vtkCompositeAnimationPlayer.cxx
   vtkCompositeDataToUnstructuredGridFilter.cxx
+  vtkCSVExporter.cxx
   vtkCSVReader.cxx
   vtkCSVWriter.cxx
   vtkDataSetToRectilinearGrid.cxx

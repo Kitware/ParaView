@@ -46,6 +46,7 @@ SET(Kit_SRCS
   vtkSMCompoundSourceProxy.cxx
   vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConnectionCleanerProxy.cxx
+  vtkSMCSVExporterProxy.cxx
   vtkSMCubeAxesRepresentationProxy.cxx
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
@@ -128,6 +129,7 @@ SET(Kit_SRCS
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
+  vtkSMRenderViewExporterProxy.cxx
   vtkSMRepresentationAnimationHelperProxy.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
@@ -226,6 +228,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
   vtkSMProxyManagerExtension.cxx
+  vtkSMExporterProxy.cxx
   ABSTRACT
   )
 
