@@ -17,8 +17,16 @@ objectA = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiVi
 QtTesting.playCommand(objectA, 'activate', '')
 QtTesting.playCommand(object6, 'activate', 'ProbeLine')
 QtTesting.playCommand(object5, 'activate', '')
+
+object1 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/WindowCaption'
+QtTesting.playCommand(object1, 'mousePress', '1,1,0,23,6')
+QtTesting.playCommand(object1, 'mouseRelease', '1,0,0,23,6')
 QtTesting.playCommand(object2, 'activate', 'RTAnalyticSource')
 QtTesting.playCommand(object5, 'activate', '')
+
+object2 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/WindowCaption'
+QtTesting.playCommand(object2, 'mousePress', '1,1,0,89,9')
+QtTesting.playCommand(object2, 'mouseRelease', '1,0,0,89,9')
 
 objectB = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(objectB, 'activate', '')
