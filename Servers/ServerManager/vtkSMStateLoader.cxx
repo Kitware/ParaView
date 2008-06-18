@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.28");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.29");
 vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -67,8 +67,12 @@ vtkSMStateLoader::~vtkSMStateLoader()
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
 {
-  // Ensure that the proxy is created before it is registered.
-  proxy->UpdateVTKObjects();
+  if (!this->ReviveProxies)
+    {
+    // Ensure that the proxy is created before it is registered, unless we are
+    // reviving the server-side server manager, which needs special handling.
+    proxy->UpdateVTKObjects();
+    }
   this->RegisterProxy(id, proxy);
 }
 
