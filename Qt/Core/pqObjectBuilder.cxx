@@ -742,7 +742,7 @@ QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy) const
   while(!piter->IsAtEnd())
     {
     vtkSMProperty* prop = piter->GetProperty();
-    if (prop->IsA("vtkSMStringVectorProperty"))
+    if (prop && prop->IsA("vtkSMStringVectorProperty"))
       {
       vtkSmartPointer<vtkSMDomainIterator> diter;
       diter.TakeReference(prop->NewDomainIterator());
