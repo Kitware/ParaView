@@ -7,7 +7,9 @@ exceptionsList = [ 'MainWindow/variableToolbar/QWidgetAction0',
                    'MainWindow/mainToolBar/QAction2',
                    'MainWindow/currentTimeToolbar/QWidgetAction0',
                    'MainWindow/currentTimeToolbar/QWidgetAction1',
-                   'MainWindow/currentTimeToolbar/QWidgetAction2'
+                   'MainWindow/currentTimeToolbar/QWidgetAction2',
+                   'MainWindow/actionEditColorMap',
+                   'MainWindow/actionResetRange'
                    ]
 
 # test that all actions in the tool bars are in the menus
