@@ -20,7 +20,7 @@
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMTimeKeeperProxy);
-vtkCxxRevisionMacro(vtkSMTimeKeeperProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTimeKeeperProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
 {
@@ -94,6 +94,7 @@ void vtkSMTimeKeeperProxy::SetTime(double time)
 void vtkSMTimeKeeperProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Time: " << this->Time << endl;
 }
 
 

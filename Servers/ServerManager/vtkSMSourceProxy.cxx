@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.64");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.65");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort
@@ -838,4 +838,6 @@ void vtkSMSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DataInformationValid: " << this->DataInformationValid << endl;
+  os << indent << "OutputPortsCreated: " << this->OutputPortsCreated << endl;
+  os << indent << "ProcessSupport: " << this->ProcessSupport << endl;
 }

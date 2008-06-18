@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMCompositeTreeDomain);
-vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMCompositeTreeDomain, "1.5");
 vtkCxxSetObjectMacro(vtkSMCompositeTreeDomain, Information, vtkPVDataInformation);
 //----------------------------------------------------------------------------
 vtkSMCompositeTreeDomain::vtkSMCompositeTreeDomain()
@@ -210,6 +210,7 @@ void vtkSMCompositeTreeDomain::PrintSelf(ostream& os, vtkIndent indent)
     os << "UNKNOWN";
     }
   os << endl;
+  os << indent << "SourcePort: " << this->SourcePort << endl;
 }
 
 

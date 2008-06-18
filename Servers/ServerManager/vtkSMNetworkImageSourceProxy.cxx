@@ -20,7 +20,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMNetworkImageSourceProxy);
-vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMNetworkImageSourceProxy::vtkSMNetworkImageSourceProxy()
 {
@@ -142,6 +142,8 @@ void vtkSMNetworkImageSourceProxy::UpdateImage()
 void vtkSMNetworkImageSourceProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FileName: "
+    << (this->FileName? this->FileName : "(none)") << endl;
 }
 
 

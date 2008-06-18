@@ -28,7 +28,7 @@
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCubeAxesRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMCubeAxesRepresentationProxy::vtkSMCubeAxesRepresentationProxy()
 {
@@ -207,7 +207,7 @@ void vtkSMCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
         vtkBoundingBox bbox;
         int i, j, k;
         double origX[3], x[3];
-        bool first = true;
+        // bool first = true;
         for (i = 0; i < 2; i++)
           {
           origX[0] = bounds[i];
@@ -240,6 +240,16 @@ void vtkSMCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
 void vtkSMCubeAxesRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Scale: " << 
+    this->Scale[0] << ", " << this->Scale[1] << ", " << this->Scale[2] << endl;
+  os << indent << "Position: " 
+    << this->Position[0] << ", " 
+    << this->Position[1] << ", " 
+    << this->Position[2] << endl;
+  os << indent << "Orientation: " 
+    << this->Orientation[0] << ", " 
+    << this->Orientation[1] << ", " 
+    << this->Orientation[2] << endl;
 }
 
 

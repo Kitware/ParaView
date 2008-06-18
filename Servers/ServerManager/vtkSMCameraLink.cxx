@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.17");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.18");
 
 //---------------------------------------------------------------------------
 class vtkSMCameraLink::vtkInternals
@@ -349,6 +349,8 @@ int vtkSMCameraLink::LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* l
 void vtkSMCameraLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SynchronizeInteractiveRenders: " 
+    << this->SynchronizeInteractiveRenders << endl;
 }
 
 

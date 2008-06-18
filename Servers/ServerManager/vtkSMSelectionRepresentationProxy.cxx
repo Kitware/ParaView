@@ -30,7 +30,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSelectionRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMSelectionRepresentationProxy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMSelectionRepresentationProxy::vtkSMSelectionRepresentationProxy()
 {
@@ -335,6 +335,9 @@ void vtkSMSelectionRepresentationProxy::UpdateVisibility()
 void vtkSMSelectionRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Prop3D: " << this->Prop3D << endl;
+  os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
+  os << indent << "CellLabelVisibility: " << this->CellLabelVisibility << endl;
 }
 
 

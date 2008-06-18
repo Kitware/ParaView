@@ -23,7 +23,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::vtkSMTwoDRenderViewProxy()
 {
@@ -194,6 +194,7 @@ bool vtkSMTwoDRenderViewProxy::BeginCreateVTKObjects()
 void vtkSMTwoDRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderView: " << this->RenderView << endl;
 }
 
 

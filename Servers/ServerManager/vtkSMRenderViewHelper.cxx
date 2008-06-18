@@ -18,7 +18,7 @@
 #include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMRenderViewHelper);
-vtkCxxRevisionMacro(vtkSMRenderViewHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMRenderViewHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkSMRenderViewHelper::vtkSMRenderViewHelper()
 {
@@ -61,6 +61,7 @@ vtkRenderWindow* vtkSMRenderViewHelper::GetRenderWindow()
 void vtkSMRenderViewHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderViewProxy: " << this->RenderViewProxy << endl;
 }
 
 

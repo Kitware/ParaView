@@ -26,7 +26,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPropRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMPropRepresentationProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMPropRepresentationProxy::vtkSMPropRepresentationProxy()
 {
@@ -259,6 +259,7 @@ void vtkSMPropRepresentationProxy::SetViewUpdateTime(double time)
 void vtkSMPropRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "SelectionVisibility: " << this->SelectionVisibility << endl;
 }
 
 

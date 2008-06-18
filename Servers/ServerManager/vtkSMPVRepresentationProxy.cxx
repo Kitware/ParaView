@@ -68,7 +68,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -513,6 +513,7 @@ void vtkSMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
     os << "(unknown)";
     }
   os << endl;
+  os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
 }
 
 

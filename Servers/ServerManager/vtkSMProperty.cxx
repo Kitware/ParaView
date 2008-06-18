@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.57");
+vtkCxxRevisionMacro(vtkSMProperty, "1.58");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -579,6 +579,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InformationProperty: " << this->InformationProperty << endl;
   os << indent << "Animateable: " << this->Animateable << endl;
   os << indent << "Internal: " << this->IsInternal << endl;
+  os << indent << "Repeatable: " << this->Repeatable << endl;
   os << indent << "Documentation: " << this->Documentation << endl;
   os << indent << "Hints: " ;
   if (this->Hints)
