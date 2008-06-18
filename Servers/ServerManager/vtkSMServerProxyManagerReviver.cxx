@@ -29,9 +29,11 @@
 #include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
 #include "vtkToolkits.h" // for VTK_USE_MPI
 
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/ios/sstream>
+
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.15");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.16");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -198,17 +200,34 @@ void vtkSMServerProxyManagerReviver::FilterStateXML(vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSMServerProxyManagerReviver::GetPreferredViewType (int vtkNotUsed(connectionID), const char *vtkNotUsed(xml_name))
+const char* vtkSMServerProxyManagerReviver::GetPreferredViewType(
+  int vtkNotUsed(connectionID), const char *xml_name)
 {
-  vtkstd::string view_type = "RenderView";
-
+  vtksys::RegularExpression re2DRenderView("^2D.*RenderView$");
+  vtksys::RegularExpression reRenderView(".*RenderView$");
+  
+  if (xml_name && re2DRenderView.find(xml_name))
+    {
 #ifdef VTK_USE_MPI
 # ifdef PARAVIEW_USE_ICE_T
-  view_type = "IceTCompositeView";
+    return "2DIceTCompositeView";
 # endif
 #endif
+    return "2DRenderView";
+    }
 
-  return view_type.c_str();
+
+  if (xml_name && reRenderView.find(xml_name))
+    {
+#ifdef VTK_USE_MPI
+# ifdef PARAVIEW_USE_ICE_T
+    return "IceTCompositeView";
+# endif
+#endif
+    return "RenderView";
+    }
+
+  return xml_name;
 }
 
 //-----------------------------------------------------------------------------
