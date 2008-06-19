@@ -64,6 +64,13 @@ public:
   void setUpdateSelectionWithCurrent(bool state)
     { this->UpdateSelectionWithCurrent = state; }
 
+  /// When set to something other than the empty string, only allows sources
+  /// which output a specific data type, empty by default.
+  void setAllowedDataType(const QString& type)
+    { this->AllowedDataType = type; }
+  QString allowedDataType()
+    { return this->AllowedDataType; }
+
   /// Returns the currently selected source, if any.
   pqPipelineSource* currentSource() const;
 
@@ -76,6 +83,10 @@ public slots:
 
   /// Change the current item to the indicated source.
   void setCurrentSource(pqPipelineSource* source);
+  void setCurrentSource(vtkSMProxy* source);
+
+  /// Populate the combobox with all relevant sources.
+  void populateComboBox();
 
 signals:
   /// Fired when a new source is added.
@@ -105,6 +116,7 @@ protected slots:
 protected:
   bool UpdateCurrentWithSelection;
   bool UpdateSelectionWithCurrent;
+  QString AllowedDataType;
 
 private:
   pqSourceComboBox(const pqSourceComboBox&); // Not implemented.

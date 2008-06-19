@@ -32,7 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSourceComboBox.h"
 
 // Server Manager Includes.
+#include "vtkPVClassNameInformation.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 
 // Qt Includes.
 
@@ -48,6 +51,7 @@ pqSourceComboBox::pqSourceComboBox(QWidget* _parent) : Superclass(_parent)
 {
   this->UpdateCurrentWithSelection = false;
   this->UpdateSelectionWithCurrent = false;
+  this->AllowedDataType = "";
 
   QObject::connect(pqApplicationCore::instance()->getSelectionModel(),
     SIGNAL(currentChanged(pqServerManagerModelItem*)),
@@ -73,16 +77,61 @@ void pqSourceComboBox::onCurrentIndexChanged(int vtkNotUsed(changed))
 //-----------------------------------------------------------------------------
 void pqSourceComboBox::addSource(pqPipelineSource* source)
 {
-  if (source)
+  QObject::connect(source, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
+    this, SLOT(populateComboBox()));
+  this->populateComboBox();
+}
+
+//-----------------------------------------------------------------------------
+void pqSourceComboBox::populateComboBox()
+{
+  pqServerManagerModel* smm = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  unsigned int port = 0;
+  // Remove any existing things that shouldn't be here
+  for (int i = this->count() - 1; i >= 0; --i)
     {
-    vtkSMProxy* proxy = source->getProxy();
+    QVariant _data = this->itemData(i);
+    vtkClientServerID cid (_data.value<vtkTypeUInt32>());
+    pqPipelineSource* source = smm->findItem<pqPipelineSource*>(cid);
+    bool shouldBeIn = false;
+    if (source)
+      {
+      vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
+      shouldBeIn = this->AllowedDataType.length() == 0 || (
+        proxy->GetOutputPortsCreated() && 
+        this->AllowedDataType == proxy->GetOutputPort(port)->GetClassNameInformation()->GetVTKClassName());
+      }
+    if (!shouldBeIn)
+      {
+      this->removeItem(i);
+      if (source)
+        {
+        QObject::disconnect(source, 0, this, 0);
+        emit this->sourceRemoved(source);
+        }
+      }
+    }
+
+  // Add any things that now should be here
+  QList<pqPipelineSource*> sources = pqFindItems<pqPipelineSource*>(smm);
+  for (int i = 0; i < sources.size(); ++i)
+    {
+    pqPipelineSource* source = sources[i];
+    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(source->getProxy());
     QVariant _data = QVariant(proxy->GetSelfID().ID);
     if (this->findData(_data) == -1)
       {
-      this->addItem(source->getSMName(), _data);
-      QObject::connect(source, SIGNAL(nameChanged(pqServerManagerModelItem*)),
-        this, SLOT(nameChanged(pqServerManagerModelItem*)));
-      emit this->sourceAdded(source);
+      bool shouldBeIn = this->AllowedDataType.length() == 0 || (
+        proxy->GetOutputPortsCreated() && 
+        this->AllowedDataType == proxy->GetOutputPort(port)->GetClassNameInformation()->GetVTKClassName());
+      if (shouldBeIn)
+        {
+        this->addItem(source->getSMName(), _data);
+        QObject::connect(source, SIGNAL(nameChanged(pqServerManagerModelItem*)),
+          this, SLOT(nameChanged(pqServerManagerModelItem*)));
+        emit this->sourceAdded(source);
+        }
       }
     }
 }
@@ -140,6 +189,17 @@ void pqSourceComboBox::setCurrentSource(pqPipelineSource* source)
   if (source)
     {
     QVariant _data = QVariant(source->getProxy()->GetSelfID().ID);
+    int index = this->findData(_data);
+    this->setCurrentIndex(index);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSourceComboBox::setCurrentSource(vtkSMProxy* source)
+{
+  if (source)
+    {
+    QVariant _data = QVariant(source->GetSelfID().ID);
     int index = this->findData(_data);
     this->setCurrentIndex(index);
     }
