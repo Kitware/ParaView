@@ -49,6 +49,7 @@
 
 #include <vtkstd/map>
 #include <vtkstd/new>
+#include <vtkstd/vector>
 
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -73,6 +74,31 @@ public:
   // CleanupPendingProgress request.
   vtkTypeUInt32 ProgressServersFlag;
 };
+
+//*****************************************************************************
+class vtkProcessModule::vtkInterpreterInitializationCallbackVector : 
+  public vtkstd::vector<vtkProcessModule::InterpreterInitializationCallback>
+{
+};
+
+//*****************************************************************************
+// Used to clean up the vtkProcessModule::InitializationCallbacks vector.
+class vtkProcessModuleCleanup
+{
+public:
+  inline void Use()
+    {
+    }
+  ~vtkProcessModuleCleanup()
+    {
+    delete vtkProcessModule::InitializationCallbacks;
+    vtkProcessModule::InitializationCallbacks = 0;
+    }
+
+};
+
+vtkProcessModule::vtkInterpreterInitializationCallbackVector* vtkProcessModule::InitializationCallbacks = 0;
+static vtkProcessModuleCleanup vtkProcessModuleCleanupGlobal;
 
 //*****************************************************************************
 class vtkProcessModuleObserver : public vtkCommand
@@ -106,13 +132,15 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.82");
+vtkCxxRevisionMacro(vtkProcessModule, "1.83");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
 //-----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
 {
+  vtkProcessModuleCleanupGlobal.Use();
+
   this->Internals = new vtkProcessModuleInternals;
   this->ConnectionManager = 0;
   this->Interpreter = 0;
@@ -896,6 +924,24 @@ void vtkProcessModule::Finalize()
 }
 
 //-----------------------------------------------------------------------------
+void vtkProcessModule::InitializeInterpreter(InterpreterInitializationCallback callback)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm && pm->GetInterpreter())
+    {
+    (*callback)(pm->GetInterpreter());
+    }
+  else
+    {
+    if (!vtkProcessModule::InitializationCallbacks)
+      {
+      vtkProcessModule::InitializationCallbacks = new vtkInterpreterInitializationCallbackVector();
+      }
+    vtkProcessModule::InitializationCallbacks->push_back(callback);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkProcessModule::InitializeInterpreter()
 {
   if (this->Interpreter)
@@ -956,6 +1002,21 @@ void vtkProcessModule::InitializeInterpreter()
     << this->GetProcessModuleID() << this
     << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(css); 
+
+  // If any initialization callbacks were registered, call them.
+  if (this->InitializationCallbacks)
+    {
+    vtkInterpreterInitializationCallbackVector& callbacks = 
+      (*this->InitializationCallbacks);
+   vtkInterpreterInitializationCallbackVector::iterator iter;
+   for (iter = callbacks.begin(); iter != callbacks.end(); ++iter)
+     {
+     if (*iter)
+       {
+       (*(*iter))(this->GetInterpreter());
+       }
+     }
+    }
 }
 
 //-----------------------------------------------------------------------------

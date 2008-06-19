@@ -77,22 +77,19 @@ extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
 namespace {
   class StaticInitSMWrappings
-  {
-    public:
-    StaticInitSMWrappings(void (*initfunc)(vtkClientServerInterpreter*))
     {
-      // try to tell paraview what client/server wrappings this plugin provides
-      // if the process module isn't initialize, its because someone linked
-      // against this plugin directly and it got loaded before paraview
-      // initialized.  In that case, its the developer's job to call the 
-      // @MODULE_NAME@_Initialize function at the appropriate time.
-      vtkProcessModule* processModule = vtkProcessModule::GetProcessModule();
-      if(processModule && processModule->GetInterpreter())
+  public:
+    StaticInitSMWrappings(void (*initfunc)(vtkClientServerInterpreter*))
       {
-        (*initfunc)(processModule->GetInterpreter());
+      // This will call (*initfunc)(processModule->GetInterpreter()) if the
+      // process module has been initialized. Otherwise, it will register the
+      // callback with the process module so that when it gets intialized, the
+      // callback will be called. 
+      // This removes the need for calling the @MODULE_NAME@_Initialize function
+      // explicitly if an application is linking against the plugin directly.
+      vtkProcessModule::InitializeInterpreter(initfunc);
       }
-    }
-  };
+    };
 }
 static StaticInitSMWrappings InitSMWrappings(@MODULE_NAME@_Initialize);
 

@@ -34,6 +34,7 @@ class vtkClientServerStream;
 class vtkDataObject;
 class vtkKWProcessStatistics;
 class vtkMultiProcessController;
+class vtkProcessModuleCleanup;
 class vtkProcessModuleConnection;
 class vtkProcessModuleConnectionManager;
 class vtkProcessModuleGUIHelper;
@@ -612,6 +613,15 @@ public:
   // Description:
   // Finalize debug log.
   static void FinalizeDebugLog();
+
+  typedef void (*InterpreterInitializationCallback)(vtkClientServerInterpreter*);
+
+  // Description:
+  // Use this method to initialize the interpreter. This register the callback
+  // if the process module hasn't been created yet, so that the callbacks get
+  // invoked once the process module is created. This is generally necessary for
+  // plugins.
+  static void InitializeInterpreter(InterpreterInitializationCallback callback);
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -748,6 +758,10 @@ private:
 
   vtkIdType LastConnectionID;
   static ostream* DebugLogStream;
+
+  friend class vtkProcessModuleCleanup;
+  class vtkInterpreterInitializationCallbackVector;
+  static vtkInterpreterInitializationCallbackVector* InitializationCallbacks;
 //ETX
 };
 
