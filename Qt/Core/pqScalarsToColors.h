@@ -88,6 +88,10 @@ public:
   Mode getVectorMode() const;
   int getVectorComponent() const;
 
+  /// Convenience method to update the titles for all color legends showing this 
+  /// lookup table. This only updates the component part of the title.
+  void updateScalarBarTitles(const QString& component);
+
 public slots:
   // This method checks if this LUT is used by any display,
   // if not, it hides all the scalars bar showing this LUT.

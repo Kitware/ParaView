@@ -170,7 +170,6 @@ void pqDisplayColorWidget::onComponentActivated(int row)
   if(display)
     {
     pqScalarsToColors* lut = display->getLookupTable();
-
     if(row == 0)
       {
       lut->setVectorMode(pqScalarsToColors::MAGNITUDE, -1);
@@ -179,7 +178,8 @@ void pqDisplayColorWidget::onComponentActivated(int row)
       {
       lut->setVectorMode(pqScalarsToColors::COMPONENT, row-1);
       }
-    display->updateLookupTableScalarRange();
+    lut->updateScalarBarTitles(this->Components->itemText(row));
+    display->resetLookupTableScalarRange();
     display->renderViewEventually();
     }
 }
@@ -300,7 +300,14 @@ void pqDisplayColorWidget::updateComponents()
       this->Components->addItem("Magnitude");
       for(int i=0; i<numComponents; i++)
         {
-        this->Components->addItem(QString("%1").arg(i));
+        if (numComponents == 3)
+          {
+          this->Components->addItem(QString("%1").arg(static_cast<char>('X'+i)));
+          }
+        else
+          {
+          this->Components->addItem(QString("%1").arg(i));
+          }
         }
       
       if(lut->getVectorMode() == pqScalarsToColors::MAGNITUDE)

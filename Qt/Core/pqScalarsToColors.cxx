@@ -268,6 +268,15 @@ void pqScalarsToColors::setVectorMode(Mode mode, int comp)
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarsToColors::updateScalarBarTitles(const QString& component)
+{
+  foreach(pqScalarBarRepresentation* sb, this->Internal->ScalarBars)
+    {
+    sb->setTitle(sb->getTitle().first, component);
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqScalarsToColors::Mode pqScalarsToColors::getVectorMode() const
 {
   if (pqSMAdaptor::getEnumerationProperty(

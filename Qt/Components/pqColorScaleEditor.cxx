@@ -933,9 +933,8 @@ void pqColorScaleEditor::setComponent(int index)
   this->ColorMap->setVectorMode( 
     (component == -1) ? pqScalarsToColors::MAGNITUDE : pqScalarsToColors::COMPONENT,
     component);
-
   // Update the color legend title.
-  this->setLegendComponent(this->Form->Component->itemText(index));
+  this->ColorMap->updateScalarBarTitles(this->Form->Component->itemText(index));
 
   // Update the scalar range if the range is set from the data.
   if(this->Form->UseAutoRescale->isChecked())
@@ -1009,16 +1008,7 @@ void pqColorScaleEditor::rescaleToNewRange()
 
 void pqColorScaleEditor::rescaleToDataRange()
 {
-  QString colorField = this->Display->getColorField();
-  int component_no = -1;
-  if(this->ColorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
-    {
-    component_no = this->ColorMap->getVectorComponent();
-    }
-
-  QPair<double, double> range = 
-      this->Display->getColorFieldRange(colorField, component_no);
-  this->setScalarRange(range.first, range.second);
+  this->Display->resetLookupTableScalarRange();
 }
 
 void pqColorScaleEditor::setUseDiscreteColors(bool on)

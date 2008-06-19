@@ -129,9 +129,9 @@ QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
   QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|[0-9]+)\\b");
   if (!reg.exactMatch(title))
     {
-    return QPair<QString, QString>(title, "");
+    return QPair<QString, QString>(title.trimmed(), "");
     }
-  return QPair<QString, QString>(reg.cap(1), reg.cap(2));
+  return QPair<QString, QString>(reg.cap(1).trimmed(), reg.cap(2).trimmed());
 }
 
 //-----------------------------------------------------------------------------
