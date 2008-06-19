@@ -275,10 +275,10 @@ void pqPropertyManager::unregisterLink(
 void pqPropertyManager::removeAllLinks()
 {
   this->Internal->Links.removeAllPropertyLinks();
-  foreach (pqPropertyManagerProperty* property, this->Internal->Properties)
+  foreach (pqPropertyManagerProperty* pqproperty, this->Internal->Properties)
     {
-    property->removeAllLinks();
-    delete property;
+    pqproperty->removeAllLinks();
+    delete pqproperty;
     }
 
   this->Internal->Properties.clear();

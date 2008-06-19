@@ -99,7 +99,7 @@ vtkSMOutputPort* pqOutputPort::getOutputPortProxy() const
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataInformation* pqOutputPort::getDataInformation(bool update) const
+vtkPVDataInformation* pqOutputPort::getDataInformation(bool vtkNotUsed(update)) const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());

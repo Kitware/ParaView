@@ -20,7 +20,7 @@
 #include "vtkSMMultiProcessRenderView.h"
 
 vtkStandardNewMacro(vtkSMRenderViewExporterProxy);
-vtkCxxRevisionMacro(vtkSMRenderViewExporterProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMRenderViewExporterProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMRenderViewExporterProxy::vtkSMRenderViewExporterProxy()
 {
@@ -57,7 +57,6 @@ void vtkSMRenderViewExporterProxy::Write()
       }
 
     vtkRenderWindow* renWin = rv->GetRenderWindow();
-    vtkExporter* exporter = vtkExporter::SafeDownCast(this->GetClientSideObject());
     exporter->SetRenderWindow(renWin);
     exporter->Write();
     exporter->SetRenderWindow(0);

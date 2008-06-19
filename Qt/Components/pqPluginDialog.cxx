@@ -160,15 +160,15 @@ QString pqPluginDialog::loadPlugin(pqServer* server, const QString& plugin)
   // now pass it off to the plugin manager to load everything that this 
   // shared library has
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  pqPluginManager::LoadStatus result = pm->loadExtension(server, plugin, &error);
+  pqPluginManager::LoadStatus loadresult = pm->loadExtension(server, plugin, &error);
   
-  if(result == pqPluginManager::NOTLOADED)
+  if (loadresult == pqPluginManager::NOTLOADED)
     {
     QMessageBox::information(NULL, "Plugin Load Failed", error);
     ret = QString();
     }
 
-  if(result != pqPluginManager::LOADED)
+  if (loadresult != pqPluginManager::LOADED)
     {
     ret = QString();
     }
