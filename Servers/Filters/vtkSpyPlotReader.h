@@ -305,10 +305,6 @@ protected:
 
   // access to all processes
   vtkMultiProcessController *GlobalController;
-  // access to processes who have blocks
-  vtkMultiProcessController *ReadController;
-  // acess to processors who have no blocks
-  vtkMultiProcessController *AttributeController;
 
   // Description:
   // Set the current time step.

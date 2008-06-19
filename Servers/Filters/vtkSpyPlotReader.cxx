@@ -70,7 +70,7 @@ using vtksys_ios::ostringstream;
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.63");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.64");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1471,16 +1471,6 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "GlobalController:" << endl;
     this->GlobalController->PrintSelf(os, indent.GetNextIndent());
-    }
-  if ( this->GlobalController)
-    {
-    os << "Controller:" << endl;
-    this->GlobalController->PrintSelf(os, indent.GetNextIndent());
-    }
-  if ( this->AttributeController)
-    {
-    os << "Controller:" << endl;
-    this->AttributeController->PrintSelf(os, indent.GetNextIndent());
     }
 }
 // Get the minimum level that actuall has data and 
