@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.103");
+vtkCxxRevisionMacro(vtkSMProxy, "1.104");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1737,11 +1737,8 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+void vtkSMProxy::ReadCoreXMLAttributes(vtkPVXMLElement* element)
 {
-  this->SetXMLElement(element);
-
   const char* className = element->GetAttribute("class");
   if(className)
     {
@@ -1761,11 +1758,6 @@ int vtkSMProxy::ReadXMLAttributes(
     this->SetXMLLabel(xmllabel);
     }
 
-  if (!this->CreateProxyHierarchy(pm, element))
-    {
-    return 0;
-    }
-
   // Locate documentation.
   for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
     {
@@ -1778,6 +1770,21 @@ int vtkSMProxy::ReadXMLAttributes(
       {
       this->SetHints(subElem);
       }
+    }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  this->SetXMLElement(element);
+
+  // Read the common attributes.
+  this->ReadCoreXMLAttributes(element);
+
+  if (!this->CreateProxyHierarchy(pm, element))
+    {
+    return 0;
     }
   this->SetXMLElement(0);
   return 1;

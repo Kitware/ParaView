@@ -684,6 +684,11 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
   // Description:
+  // Used by ReadXMLAttributes() to read the very core attributes such as
+  // documentaion, hints, name etc.
+  void ReadCoreXMLAttributes(vtkPVXMLElement* element);
+
+  // Description:
   // Handle events fired by subproxies.
   virtual void ExecuteSubProxyEvent(vtkSMProxy* o, unsigned long event, 
     void* data);

@@ -7595,6 +7595,218 @@ This property controls how the filter works to generate tensor cell data. You ca
       <!-- End of MergeBlocks -->
     </SourceProxy>
 
+   <!-- ==================================================================== -->
+    <CompoundSourceProxy name="NormalGlyphs" label="Normal Glyphs">
+      <Documentation>
+        Filter computing surface normals.
+      </Documentation>
+      <Proxy group="filters" type="DataSetSurfaceFilter" id="1013" servers="1" compound_name="ExtractSurface2">
+        <Property name="Input" id="1013.Input" number_of_elements="1">
+          <Domain name="groups" id="1013.Input.groups">
+            <Group value="sources"/>
+            <Group value="filters"/>
+          </Domain>
+          <Domain name="input_type" id="1013.Input.input_type">
+            <DataType value="vtkDataSet"/>
+          </Domain>
+        </Property>
+        <Property name="PieceInvariant" id="1013.PieceInvariant" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="1013.PieceInvariant.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="PolyDataNormals" id="1224" servers="1" compound_name="GenerateSurfaceNormals1">
+        <Property name="ComputeCellNormals" id="1224.ComputeCellNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="1224.ComputeCellNormals.bool"/>
+        </Property>
+        <Property name="Consistency" id="1224.Consistency" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="1224.Consistency.bool"/>
+        </Property>
+        <Property name="FeatureAngle" id="1224.FeatureAngle" number_of_elements="1">
+          <Element index="0" value="30"/>
+          <Domain name="range" id="1224.FeatureAngle.range">
+            <Min index="0" value="0"/>
+            <Max index="0" value="180"/>
+          </Domain>
+        </Property>
+        <Property name="FlipNormals" id="1224.FlipNormals" number_of_elements="1">
+          <Element index="0" value="0"/>
+          <Domain name="bool" id="1224.FlipNormals.bool"/>
+        </Property>
+        <Property name="Input" id="1224.Input" number_of_elements="1">
+          <Proxy value="1013" output_port="0"/>
+          <Domain name="groups" id="1224.Input.groups">
+            <Group value="sources"/>
+            <Group value="filters"/>
+          </Domain>
+          <Domain name="input_type" id="1224.Input.input_type">
+            <DataType value="vtkPolyData"/>
+          </Domain>
+        </Property>
+        <Property name="NonManifoldTraversal" id="1224.NonManifoldTraversal" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="1224.NonManifoldTraversal.bool"/>
+        </Property>
+        <Property name="PieceInvariant" id="1224.PieceInvariant" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="1224.PieceInvariant.bool"/>
+        </Property>
+        <Property name="Splitting" id="1224.Splitting" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="1224.Splitting.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="Glyph" id="2429" servers="1" compound_name="Glyph1">
+        <Property name="Input" id="2429.Input" number_of_elements="1">
+          <Proxy value="1224" output_port="0"/>
+          <Domain name="groups" id="2429.Input.groups">
+            <Group value="sources"/>
+            <Group value="filters"/>
+          </Domain>
+          <Domain name="input_array1" id="2429.Input.input_array1">
+            <InputArray attribute_type="point" number_of_components="1"/>
+          </Domain>
+          <Domain name="input_array2" id="2429.Input.input_array2">
+            <InputArray attribute_type="point" number_of_components="3"/>
+          </Domain>
+          <Domain name="input_type" id="2429.Input.input_type">
+            <DataType value="vtkDataSet"/>
+          </Domain>
+        </Property>
+        <Property name="MaximumNumberOfPoints" id="2429.MaximumNumberOfPoints" number_of_elements="1">
+          <Element index="0" value="5000"/>
+          <Domain name="range" id="2429.MaximumNumberOfPoints.range">
+            <Min index="0" value="0"/>
+          </Domain>
+        </Property>
+        <Property name="RandomMode" id="2429.RandomMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="2429.RandomMode.bool"/>
+        </Property>
+        <Property name="SelectInputScalars" id="2429.SelectInputScalars" number_of_elements="5">
+          <Element index="0" value=""/>
+          <Element index="1" value=""/>
+          <Element index="2" value=""/>
+          <Element index="3" value=""/>
+          <Element index="4" value=""/>
+          <Domain name="array_list" id="2429.SelectInputScalars.array_list"/>
+        </Property>
+        <Property name="SelectInputVectors" id="2429.SelectInputVectors" number_of_elements="5">
+          <Element index="0" value="1"/>
+          <Element index="1" value=""/>
+          <Element index="2" value=""/>
+          <Element index="3" value=""/>
+          <Element index="4" value="Normals"/>
+          <Domain name="array_list" id="2429.SelectInputVectors.array_list">
+            <String text="Normals"/>
+          </Domain>
+        </Property>
+        <Property name="SetOrient" id="2429.SetOrient" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="2429.SetOrient.bool"/>
+        </Property>
+        <Property name="SetScaleFactor" id="2429.SetScaleFactor" number_of_elements="1">
+          <Element index="0" value="1.97781"/>
+          <Domain name="bounds" id="2429.SetScaleFactor.bounds">
+            <Min index="0" value="0"/>
+            <Max index="0" value="1.97781"/>
+          </Domain>
+          <Domain name="scalar_range" id="2429.SetScaleFactor.scalar_range"/>
+          <Domain name="vector_range" id="2429.SetScaleFactor.vector_range">
+            <Min index="0" value="0"/>
+            <Min index="1" value="0"/>
+            <Min index="2" value="1"/>
+            <Min index="3" value="1"/>
+            <Max index="0" value="0"/>
+            <Max index="1" value="0"/>
+            <Max index="2" value="1"/>
+            <Max index="3" value="1"/>
+          </Domain>
+        </Property>
+        <Property name="SetScaleMode" id="2429.SetScaleMode" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="enum" id="2429.SetScaleMode.enum">
+            <Entry value="0" text="scalar"/>
+            <Entry value="1" text="vector"/>
+            <Entry value="2" text="vector_components"/>
+            <Entry value="3" text="off"/>
+          </Domain>
+        </Property>
+        <Property name="Source" id="2429.Source" number_of_elements="1">
+          <Proxy value="2432" output_port="0"/>
+          <Domain name="groups" id="2429.Source.groups">
+            <Group value="sources"/>
+            <Group value="glyph_sources"/>
+          </Domain>
+          <Domain name="input_type" id="2429.Source.input_type">
+            <DataType value="vtkPolyData"/>
+          </Domain>
+          <Domain name="proxy_list" id="2429.Source.proxy_list">
+            <Proxy value="2432"/>
+            <Proxy value="2433"/>
+            <Proxy value="2434"/>
+            <Proxy value="2435"/>
+            <Proxy value="2436"/>
+            <Proxy value="2437"/>
+            <Proxy value="2438"/>
+          </Domain>
+        </Property>
+        <Property name="UseMaskPoints" id="2429.UseMaskPoints" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="2429.UseMaskPoints.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="sources" type="ArrowSource" id="2432" servers="1" compound_name="auto_2432">
+        <Property name="ShaftRadius" id="2432.ShaftRadius" number_of_elements="1">
+          <Element index="0" value="0.03"/>
+          <Domain name="range" id="2432.ShaftRadius.range">
+            <Min index="0" value="0"/>
+            <Max index="0" value="5"/>
+          </Domain>
+        </Property>
+        <Property name="ShaftResolution" id="2432.ShaftResolution" number_of_elements="1">
+          <Element index="0" value="6"/>
+          <Domain name="range" id="2432.ShaftResolution.range">
+            <Min index="0" value="0"/>
+            <Max index="0" value="128"/>
+          </Domain>
+        </Property>
+        <Property name="TipLength" id="2432.TipLength" number_of_elements="1">
+          <Element index="0" value="0.35"/>
+          <Domain name="range" id="2432.TipLength.range">
+            <Min index="0" value="0"/>
+            <Max index="0" value="1"/>
+          </Domain>
+        </Property>
+        <Property name="TipRadius" id="2432.TipRadius" number_of_elements="1">
+          <Element index="0" value="0.1"/>
+          <Domain name="range" id="2432.TipRadius.range">
+            <Min index="0" value="0"/>
+            <Max index="0" value="10"/>
+          </Domain>
+        </Property>
+        <Property name="TipResolution" id="2432.TipResolution" number_of_elements="1">
+          <Element index="0" value="6"/>
+          <Domain name="range" id="2432.TipResolution.range">
+            <Min index="0" value="1"/>
+            <Max index="0" value="128"/>
+          </Domain>
+        </Property>
+      </Proxy>
+      <ExposedProperties>
+        <Property name="FeatureAngle" proxy_name="GenerateSurfaceNormals1" exposed_name="Feature Angle"/>
+        <Property name="SetOrient" proxy_name="Glyph1" exposed_name="Glyph Orient"/>
+        <Property name="MaximumNumberOfPoints" proxy_name="Glyph1" exposed_name="Glyph Max. Points"/>
+        <Property name="RandomMode" proxy_name="Glyph1" exposed_name="Glyph Random Mode"/>
+        <Property name="SetScaleFactor" proxy_name="Glyph1" exposed_name="Glyph Scale Factor"/>
+        <Property name="SetScaleMode" proxy_name="Glyph1" exposed_name="Glyph Scale Mode"/>
+        <Property name="Input" proxy_name="ExtractSurface2" exposed_name="Input"/>
+      </ExposedProperties>
+      <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
+    </CompoundSourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

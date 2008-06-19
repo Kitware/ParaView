@@ -123,5 +123,6 @@
   <Filter name="UnstructuredGradient" />
   <Filter name="WarpScalar" />
   <Filter name="WarpVector" />
+  <Filter name="NormalGlyphs" />
 
 </ParaViewFilters>
