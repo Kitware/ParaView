@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.2");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.3");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
@@ -65,11 +65,25 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   
   vtkTransform *transform = vtkTransform::New();
   vtkCamera *camera = ren->GetActiveCamera();
+
+  double scale = vtkMath::Norm(camera->GetPosition());
+  if (scale <= 0.0)
+    {
+    scale = vtkMath::Norm(camera->GetFocalPoint());
+    if (scale <= 0.0)
+      {
+      scale = 1.0;
+      }
+    }
+  double* temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0]/scale, temp[1]/scale, temp[2]/scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0]/scale, temp[1]/scale, temp[2]/scale);
+
   double v2[3];
-  
   // translate to center
   transform->Identity();
-  transform->Translate(this->Center[0], this->Center[1], this->Center[2]);
+  transform->Translate(this->Center[0]/scale, this->Center[1]/scale, this->Center[2]/scale);
   
   int dx = rwi->GetLastEventPosition()[0] - x;
   int dy = rwi->GetLastEventPosition()[1] - y;
@@ -85,10 +99,17 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   transform->RotateWXYZ(-360.0 * dy / size[1], v2[0], v2[1], v2[2]);
   
   // translate back
-  transform->Translate(-this->Center[0], -this->Center[1], -this->Center[2]);
+  transform->Translate(-this->Center[0]/scale, -this->Center[1]/scale, -this->Center[2]/scale);
   
   camera->ApplyTransform(transform);
   camera->OrthogonalizeViewUp();
+
+  // For rescale back.
+  temp = camera->GetFocalPoint();
+  camera->SetFocalPoint(temp[0]*scale, temp[1]*scale, temp[2]*scale);
+  temp = camera->GetPosition();
+  camera->SetPosition(temp[0]*scale, temp[1]*scale, temp[2]*scale);
+
   ren->ResetCameraClippingRange();
   
   rwi->Render();
