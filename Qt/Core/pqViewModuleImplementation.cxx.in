@@ -103,7 +103,10 @@ pqView* @ARG_VIEW_TYPE@Implementation::createView(const QString& viewtype,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  if(viewtype == "@ARG_VIEW_TYPE@")
+  if(   (viewtype == "@ARG_VIEW_TYPE@")
+     || (viewtype == "@ARG_VIEW_XML_NAME@")
+     || (viewtype == QString("@ARG_VIEW_XML_NAME@%1")
+                                         .arg(server->getRenderViewXMLName())) )
     {
     return new @ARG_VIEW_TYPE@("@ARG_VIEW_TYPE@", group, viewname, viewmodule, server, p);
     }
