@@ -21,7 +21,7 @@
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkTrackballPan, "1.1");
+vtkCxxRevisionMacro(vtkTrackballPan, "1.2");
 vtkStandardNewMacro(vtkTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -74,8 +74,8 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
 
     // These are different because y is flipped.
     int *size = ren->GetSize();
-    float dx = (float)(x - rwi->GetLastEventPosition()[0]) / (float)(size[1]);
-    float dy = (float)(rwi->GetLastEventPosition()[1] - y) / (float)(size[1]);
+    double dx = (double)(x - rwi->GetLastEventPosition()[0]) / (double)(size[1]);
+    double dy = (double)(rwi->GetLastEventPosition()[1] - y) / (double)(size[1]);
 
     scale = camera->GetParallelScale();
     dx *= scale * 2.0;
@@ -97,7 +97,7 @@ void vtkTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     {
     double depth, worldPt[4], lastWorldPt[4];
     
-    float center[3];
+    double center[3];
     this->GetCenter(center);
     ren->SetWorldPoint(center[0], center[1], center[2], 1.0);
     

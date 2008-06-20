@@ -44,7 +44,7 @@ protected:
   vtkPVTrackballZoom();
   ~vtkPVTrackballZoom();
 
-  float ZoomScale;
+  double ZoomScale;
 
   vtkPVTrackballZoom(const vtkPVTrackballZoom&); // Not implemented
   void operator=(const vtkPVTrackballZoom&); // Not implemented

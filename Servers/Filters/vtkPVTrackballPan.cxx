@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.2");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.3");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -75,8 +75,8 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
 
     // These are different because y is flipped.
     int *size = ren->GetSize();
-    float dx = (float)(x - rwi->GetLastEventPosition()[0]) / (float)(size[1]);
-    float dy = (float)(rwi->GetLastEventPosition()[1] - y) / (float)(size[1]);
+    double dx = (double)(x - rwi->GetLastEventPosition()[0]) / (double)(size[1]);
+    double dy = (double)(rwi->GetLastEventPosition()[1] - y) / (double)(size[1]);
 
     scale = camera->GetParallelScale();
     dx *= scale * 2.0;

@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.1");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.2");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
@@ -71,8 +71,8 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   transform->Identity();
   transform->Translate(this->Center[0], this->Center[1], this->Center[2]);
   
-  float dx = rwi->GetLastEventPosition()[0] - x;
-  float dy = rwi->GetLastEventPosition()[1] - y;
+  int dx = rwi->GetLastEventPosition()[0] - x;
+  int dy = rwi->GetLastEventPosition()[1] - y;
   
   // azimuth
   camera->OrthogonalizeViewUp();

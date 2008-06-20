@@ -84,9 +84,9 @@ public:
   // Propagates the center to the interactor style.
   // Currently, center of rotation is propagated only with the 
   // interactor style is a vtkPVInteractorStyle or subclass.
-  vtkGetVector3Macro(CenterOfRotation, float);
-  void SetCenterOfRotation(float x, float y, float z);
-  void SetCenterOfRotation(float xyz[3])
+  vtkGetVector3Macro(CenterOfRotation, double);
+  void SetCenterOfRotation(double x, double y, double z);
+  void SetCenterOfRotation(double xyz[3])
     {
     this->SetCenterOfRotation(xyz[0], xyz[1], xyz[2]);
     }
@@ -98,7 +98,7 @@ protected:
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;
 
-  float CenterOfRotation[3];
+  double CenterOfRotation[3];
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented

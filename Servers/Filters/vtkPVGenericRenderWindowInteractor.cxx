@@ -66,7 +66,7 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.6");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.7");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -93,8 +93,8 @@ vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SetCenterOfRotation(float x,
-  float y, float z)
+void vtkPVGenericRenderWindowInteractor::SetCenterOfRotation(double x,
+  double y, double z)
 {
   if (this->CenterOfRotation[0] != x ||
     this->CenterOfRotation[1] != y ||

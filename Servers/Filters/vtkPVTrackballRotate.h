@@ -41,15 +41,15 @@ public:
 
   // Description:
   // For setting the center of rotation.
-  vtkSetVector3Macro(Center, float);
-  vtkGetVector3Macro(Center, float);
+  vtkSetVector3Macro(Center, double);
+  vtkGetVector3Macro(Center, double);
   
 protected:
   vtkPVTrackballRotate();
   ~vtkPVTrackballRotate();
 
-  float Center[3];
-  float DisplayCenter[2];
+  double Center[3];
+  double DisplayCenter[2];
 
   vtkPVTrackballRotate(const vtkPVTrackballRotate&); // Not implemented
   void operator=(const vtkPVTrackballRotate&); // Not implemented

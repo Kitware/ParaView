@@ -64,8 +64,8 @@ public:
 
   // Description:
   // For setting the center of rotation.
-  vtkSetVector3Macro(Center, float);
-  vtkGetVector3Macro(Center, float);
+  vtkSetVector3Macro(Center, double);
+  vtkGetVector3Macro(Center, double);
 
   // Description:
   // Set and get the manipulator name.
@@ -86,8 +86,8 @@ protected:
   int Shift;
   int Control;
 
-  float Center[3];
-  float DisplayCenter[2];
+  double Center[3];
+  double DisplayCenter[2];
   void ComputeDisplayCenter(vtkRenderer *ren);
 
   vtkCameraManipulatorGUIHelper* GUIHelper;

@@ -23,7 +23,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.1");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.2");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -92,7 +92,7 @@ void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*,
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
-                           float, float ispeed)
+                           double, double ispeed)
 {
   if ( this->FlyFlag || !this->GetGUIHelper() )
     {
@@ -112,7 +112,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
   // We are flying now!
   this->FlyFlag = 1;
 
-  float speed; 
+  double speed; 
   
   // The first time through we don't want to move
   int first = 1;
@@ -122,8 +122,8 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     {
     double *range = cam->GetClippingRange();
     double dist = 0.5 * (range[1] + range[0]);
-    float lastx = rwi->GetLastEventPosition()[0];
-    float lasty = size[1] - rwi->GetLastEventPosition()[1] - 1;
+    double lastx = rwi->GetLastEventPosition()[0];
+    double lasty = size[1] - rwi->GetLastEventPosition()[1] - 1;
 
     // Compute a new render time if appropriate (delta time).
     if ( ! first )
@@ -143,8 +143,8 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
 
     // Compute angle ralative to viewport.
     // These values will be from -0.5 to 0.5
-    float vx = (size[0]/2 - lastx) / (float)(size[0]);
-    float vy = (size[1]/2 - lasty) / (float)(size[0]);
+    double vx = (size[0]/2 - lastx) / (double)(size[0]);
+    double vy = (size[1]/2 - lasty) / (double)(size[0]);
 
     // Convert to world angle by multiplying by view angle.
     // (Speed up rotation for wide angle views).
@@ -181,8 +181,8 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     
     // Now figure out if we should slow down our speed because
     // we are trying to make a sharp turn
-    vx = (float)(size[0]/2 - lastx) / (float)(size[0]);
-    vy = (float)(size[1]/2 - lasty) / (float)(size[1]);
+    vx = (double)(size[0]/2 - lastx) / (double)(size[0]);
+    vy = (double)(size[1]/2 - lasty) / (double)(size[1]);
     vx = (vx<0)?(-vx):(vx);
     vy = (vy<0)?(-vy):(vy);
     vx = (vx > vy)?(vx):(vy);
@@ -214,7 +214,7 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     // In parallel we need to adjust the parallel scale
     if ( cam->GetParallelProjection() )
       {
-      float scale = cam->GetParallelScale();
+      double scale = cam->GetParallelScale();
       if (dist > 0.0 && dist > speed)
         {
         scale = scale * (dist-speed) / dist;

@@ -69,8 +69,8 @@ public:
   // Also changing the CenterOfRotation during interaction
   // i.e. after a button press but before a button up
   // has no effect until the next button press.
-  vtkSetVector3Macro(CenterOfRotation, float);
-  vtkGetVector3Macro(CenterOfRotation, float);
+  vtkSetVector3Macro(CenterOfRotation, double);
+  vtkGetVector3Macro(CenterOfRotation, double);
 
   // Description:
   // Do not let the superclass do anything with a char event.
@@ -81,7 +81,7 @@ protected:
   ~vtkPVInteractorStyle();
 
   vtkCameraManipulator *Current;
-  float CenterOfRotation[3];
+  double CenterOfRotation[3];
 
   // The CameraInteractors also store there button and modifier.
   vtkCollection *CameraManipulators;

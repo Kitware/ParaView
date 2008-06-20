@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.1");
+vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.2");
 vtkStandardNewMacro(vtkPVTrackballRoll);
 
 //-------------------------------------------------------------------------
@@ -84,8 +84,8 @@ void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer *ren,
   
   // - divide by madnitudes to get angle
   double angle = vtkMath::RadiansToDegrees() * zCross /
-    (sqrt(static_cast<float>(x1*x1 + y1*y1)) *
-     sqrt(static_cast<float>(x2*x2 + y2*y2)));
+    (sqrt(static_cast<double>(x1*x1 + y1*y1)) *
+     sqrt(static_cast<double>(x2*x2 + y2*y2)));
   
   // translate to center
   transform->Identity();

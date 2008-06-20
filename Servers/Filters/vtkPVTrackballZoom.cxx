@@ -20,7 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.1");
+vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.2");
 vtkStandardNewMacro(vtkPVTrackballZoom);
 
 //-------------------------------------------------------------------------
@@ -43,12 +43,12 @@ void vtkPVTrackballZoom::OnButtonDown(int, int, vtkRenderer *ren,
 
   if (camera->GetParallelProjection())
     {
-    this->ZoomScale = 1.5 / (float)size[1];
+    this->ZoomScale = 1.5 / (double)size[1];
     }
   else
     {
     double *range = camera->GetClippingRange();
-    this->ZoomScale = 1.5 * range[1] / (float)size[1];
+    this->ZoomScale = 1.5 * range[1] / (double)size[1];
     }
 }
 

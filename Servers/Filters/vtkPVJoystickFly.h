@@ -60,7 +60,7 @@ protected:
   double CameraZAxis[3];
 
   void Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi, 
-           float scale, float speed);
+           double scale, double speed);
   void ComputeCameraAxes(vtkRenderer*);
 
   vtkPVJoystickFly(const vtkPVJoystickFly&); // Not implemented
