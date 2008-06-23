@@ -144,16 +144,17 @@ int pqMain::Run(pqOptions * options)
 }
 
 //----------------------------------------------------------------------------
-int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* helper)
+int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* aHelper)
 {
   int argc = app.argc();
   char** argv = app.argv();
+  helper = aHelper;
 
   vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
-  vtkPVMain* pvmain = vtkPVMain::New();
-  pqOptions* options = pqOptions::New();
+  pvmain = vtkPVMain::New();
+  options = pqOptions::New();
   // We may define a PQCLIENT enum, if necessary.
   options->SetProcessType(vtkPVOptions::PVCLIENT);
  
@@ -168,6 +169,7 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* helper)
     ret = helper->Run(options);
     }
 
+  // note: helper is passed in
   helper->Delete();
   options->Delete();
   pvmain->Delete();

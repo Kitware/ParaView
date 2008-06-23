@@ -40,8 +40,11 @@ class pqOptions;
 class vtkPVMain;
 class QApplication;
 
-/// Helper class that wraps all of the boilerplate to create a ParaView client
-/// into one function
+/*! \brief
+ * Helper class that wraps all of the boilerplate to create a ParaView client
+ * into a small number of functions -- one, or three depending on whether the
+ * client wants control of the Qt event loop, or not.
+ */ 
 class PQCORE_EXPORT pqMain
 {
 public:
