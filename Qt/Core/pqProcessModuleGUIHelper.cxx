@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.25");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.26");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -195,7 +195,6 @@ int pqProcessModuleGUIHelper::preAppExec(int argc, char** argv,
     return 1;
     }
 
-  int status = 1;
   if (this->Implementation->Window)
     {
     this->Implementation->Window->show();
