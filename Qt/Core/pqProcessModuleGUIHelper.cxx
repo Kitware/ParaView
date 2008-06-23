@@ -67,23 +67,23 @@ public:
     EnableProgress(false),
     ReadyEnableProgress(false),
     LastProgress(0)
-  {
+    {
     // Redirect Qt debug output to VTK ...
     qInstallMsgHandler(QtMessageOutput);
-  }
+    }
 
   ~pqImplementation()
-  {
+    {
     this->SMApplication->Finalize();
     this->SMApplication->Delete();
     delete this->Window;
     delete this->OutputWindow;
     delete this->ApplicationCore;
-  }
+    }
 
   /// Routes Qt debug output through the VTK output window mechanism
   static void QtMessageOutput(QtMsgType type, const char *msg)
-  {
+    {
     switch(type)
       {
       case QtDebugMsg:
@@ -99,7 +99,7 @@ public:
         vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
         break;
       }
-  }
+    }
 
   /// Converts VTK debug output into Qt signals
   vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.24");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.25");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -145,6 +145,19 @@ void pqProcessModuleGUIHelper::showOutputWindow()
   this->Implementation->OutputWindow->activateWindow();
 }
 
+//-----------------------------------------------------------------------------
+void pqProcessModuleGUIHelper::showWindow()
+{
+  this->Implementation->Window->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqProcessModuleGUIHelper::hideWindow()
+{
+  this->Implementation->Window->hide();
+}
+
+//-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::InitializeSMApplication()
 {
   this->Implementation->SMApplication->Initialize();
@@ -153,7 +166,26 @@ void pqProcessModuleGUIHelper::InitializeSMApplication()
 }
 
 //-----------------------------------------------------------------------------
+// 6-23-2008: pqProcessModuleGUIHelper::RunGUIStart now calls preAppExec(),
+// appExec(), and postAppExec()
 int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
+  int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
+{
+  int status = this->preAppExec(argc, argv, int(0), int(0));
+  if (status != 0)
+    {
+    return status;
+    }
+  status = appExec();
+  if (status != 0)
+    {
+    return status;
+    }
+  return postAppExec();
+}
+
+//-----------------------------------------------------------------------------
+int pqProcessModuleGUIHelper::preAppExec(int argc, char** argv,
   int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
 {
   this->InitializeSMApplication();
@@ -188,11 +220,29 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     // // Create the default connection.
     // pqServerResource resource = pqServerResource("builtin:");
     // this->Implementation->ApplicationCore->createServer(resource);
+    }
 
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int pqProcessModuleGUIHelper::appExec()
+{
+  if (this->Implementation->Window)
+    {
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();
-    status = app->exec();
+    return app->exec();
     }
+
+  // in case the Window didn't get created for some reason...
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int pqProcessModuleGUIHelper::postAppExec()
+{
+  int status = 0;
   this->FinalizeApplication();
 
   // If there were any errors from Qt / VTK, ensure that we return an error code

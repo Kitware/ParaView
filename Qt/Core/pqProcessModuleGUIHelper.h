@@ -61,7 +61,8 @@ public:
   /// Start the GUI event loop.
   virtual int RunGUIStart(int argc, char** argv, int numServerProcs, int myId);
 
-  /// Open a connection dialog GUI. Called when default Connection to server fails.
+  /// Open a connection dialog GUI. Called when default Connection to
+  /// server fails.
   virtual int OpenConnectionDialog(int *) { return 0; }
 
   /// Handle progress events.
@@ -87,11 +88,18 @@ public:
   // return the test utility
   virtual pqTestUtility* TestUtility();
 
-  /// Dangerous option that disables the debug output window, intended for demo purposes only
+  /// Dangerous option that disables the debug output window, intended for
+  /// demo purposes only
   void disableOutputWindow();
 
   /// Show the output window.
   virtual void showOutputWindow();
+
+  /// show the main window
+  virtual void showWindow();
+
+  /// hide the main window
+  virtual void hideWindow();
 
 protected:
   /// InitializeSMApplication initializes the vtkSMApplication.
@@ -100,6 +108,26 @@ protected:
   /// InitializeApplication initializes the QApplication and
   /// the MainWindow.
   virtual int InitializeApplication(int argc, char** argv);
+
+  ///
+  /// The three methods constitute the RunGUIStart operations:
+  ///   pre-app, app, and post-app
+  /// They are provided as a convenience for users who want to be able to
+  /// re-implement pqProcessModuleGUIHelper, for example to create a
+  /// custom paraview client, supply their own application and event handling,
+  /// but re-use the default process module startup code.
+  ///
+  /// preAppExec does everything up to appExec(), for example initializes the
+  /// vtkSMApplication, shows the window, etc.
+  /// (see pqProcessModuleGUIHelper.cxx)
+  virtual int preAppExec(int argc, char** argv, int numServerProcs, int myId);
+
+  /// appExec executes the QApplication::exec()
+  virtual int appExec();
+
+  /// postAppExec does everything after appExec(), for example cleans up the
+  /// main window (see pqProcessModuleGUIHelper.cxx)
+  virtual int postAppExec();
 
   /// Cleans up the main window.
   virtual void FinalizeApplication();
@@ -127,4 +155,3 @@ private:
 };
 
 #endif
-

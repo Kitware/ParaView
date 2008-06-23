@@ -30,20 +30,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMain_h
-#define _pqMain_h
+#ifndef __pqMain_h
+#define __pqMain_h
 
 #include "pqCoreExport.h"
 
 class pqProcessModuleGUIHelper;
+class pqOptions;
+class vtkPVMain;
 class QApplication;
 
-/// Helper class that wraps all of the boilerplate to create a ParaView client into one function
+/// Helper class that wraps all of the boilerplate to create a ParaView client
+/// into one function
 class PQCORE_EXPORT pqMain
 {
 public:
-  /// Call pqMain::Run() in your client's main(), returning the result
+  /// Call pqMain::preRun() in your client's main(), returning the result
+  static int preRun(QApplication& app, pqProcessModuleGUIHelper* helper,
+    pqOptions * & options);
+
+  /// Call pqMain::Run() in your client's main(), returning the result.
+  /// this overloaded method is intended to be run stand-alone, i.e. 
+  /// when not running preRun() nor postRun()
   static int Run(QApplication& app, pqProcessModuleGUIHelper* helper);
+
+  /// Call pqMain::Run() in your client's main(), returning the result. This
+  /// overload of Run is intended to be run after preRun(...)
+  static int Run(pqOptions * options);
+
+  /// call pqMain::postRun() for cleanup - this calls Delete() on pvmain,
+  /// options, and helper members
+  static void postRun();
+
+protected:
+  static vtkPVMain                * pvmain;
+  static pqOptions                * options;
+  static pqProcessModuleGUIHelper * helper;
 };
 
-#endif // !_pqMain_h
+#endif // !__pqMain_h
