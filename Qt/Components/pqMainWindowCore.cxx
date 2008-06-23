@@ -648,7 +648,15 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
     {
     pqSourcesMenuManager*fmm = new pqSourcesMenuManager(menu);
     fmm->setXMLGroup("sources");
-    fmm->setFilteringXMLDir(":/ParaViewResources");
+    QDir custom(":/CustomResources");
+    if (custom.exists("CustomSources.xml"))
+      {
+      fmm->setFilteringXMLDir(":/CustomResources");
+      }
+    else
+      {
+      fmm->setFilteringXMLDir(":/ParaViewResources");
+      }
     fmm->setElementTagName("Source");
     fmm->setRecentlyUsedMenuSize(0);
     QObject::connect(fmm, SIGNAL(selected(const QString&)),
@@ -671,7 +679,15 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     {
     pqFiltersMenuManager *fmm = new pqFiltersMenuManager(menu);
     fmm->setXMLGroup("filters");
-    fmm->setFilteringXMLDir(":/ParaViewResources");
+    QDir custom(":/CustomResources");
+    if (custom.exists("CustomFilters.xml"))
+      {
+      fmm->setFilteringXMLDir(":/CustomResources");
+      }
+    else
+      {
+      fmm->setFilteringXMLDir(":/ParaViewResources");
+      }
     fmm->setElementTagName("Filter");
     fmm->setRecentlyUsedMenuSize(10);
     QObject::connect(fmm, SIGNAL(selected(const QString&)),

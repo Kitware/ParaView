@@ -311,8 +311,13 @@ QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
 //-----------------------------------------------------------------------------
 void pqWriterFactory::loadFileTypes()
 {
-  QString readersDirName = ":/ParaViewResources";
+  QString readersDirName(":/CustomResources");
   QDir readersDir(readersDirName);
+  if (!readersDir.exists("CustomWriters.xml"))
+    {
+    readersDirName=":/ParaViewResources";
+    readersDir.setPath(readersDirName);
+    }
   QStringList resources = readersDir.entryList(QDir::Files);
   foreach(QString resource, resources)
     {

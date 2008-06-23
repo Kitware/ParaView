@@ -419,8 +419,13 @@ QString pqReaderFactory::getExtensionTypeString(pqPipelineSource* reader)
 //-----------------------------------------------------------------------------
 void pqReaderFactory::loadFileTypes()
 {
-  QString readersDirName = ":/ParaViewResources";
+  QString readersDirName(":/CustomResources");
   QDir readersDir(readersDirName);
+  if (!readersDir.exists("CustomReaders.xml"))
+    {
+    readersDirName=":/ParaViewResources";
+    readersDir.setPath(readersDirName);
+    }
   QStringList resources = readersDir.entryList(QDir::Files);
   foreach(QString resource, resources)
     {
