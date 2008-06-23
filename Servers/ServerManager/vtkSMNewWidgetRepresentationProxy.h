@@ -51,6 +51,10 @@ public:
   // Get the bounds for the representation.  Returns true if successful.
   virtual bool GetBounds(double bounds[6]);
 
+  // Description:
+  // Get the widget for the representation.
+  vtkGetObjectMacro(Widget, vtkAbstractWidget);
+
 //BTX
 protected:
   vtkSMNewWidgetRepresentationProxy();
