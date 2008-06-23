@@ -8,19 +8,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>382</width>
-    <height>459</height>
+    <width>315</width>
+    <height>473</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Adjusting Camera</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="pqCollapsedGroup" name="viewsGroup" >
@@ -28,10 +37,19 @@
       <string>Standard Views</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
+      <property name="spacing" >
        <number>6</number>
       </property>
-      <property name="spacing" >
+      <property name="leftMargin" >
+       <number>6</number>
+      </property>
+      <property name="topMargin" >
+       <number>6</number>
+      </property>
+      <property name="rightMargin" >
+       <number>6</number>
+      </property>
+      <property name="bottomMargin" >
        <number>6</number>
       </property>
       <item>
@@ -170,59 +188,14 @@
       <string>Center of Rotation</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>6</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="0" column="2" >
-       <widget class="QDoubleSpinBox" name="CenterZ" >
-        <property name="decimals" >
-         <number>6</number>
-        </property>
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
+      <item row="0" column="0" >
+       <widget class="QLineEdit" name="CenterX" />
       </item>
       <item row="0" column="1" >
-       <widget class="QDoubleSpinBox" name="CenterY" >
-        <property name="decimals" >
-         <number>6</number>
-        </property>
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="CenterY" />
       </item>
-      <item row="0" column="0" >
-       <widget class="QDoubleSpinBox" name="CenterX" >
-        <property name="decimals" >
-         <number>6</number>
-        </property>
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="CenterZ" />
       </item>
       <item row="1" column="0" colspan="3" >
        <widget class="QCheckBox" name="AutoResetCenterOfRotation" >
@@ -243,38 +216,24 @@
       <string>Camera Positions</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>6</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
        <number>6</number>
       </property>
-      <item row="0" column="3" >
-       <widget class="QDoubleSpinBox" name="position2" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" >
-       <widget class="QDoubleSpinBox" name="position1" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
+      <property name="rightMargin" >
+       <number>6</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>6</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>6</number>
+      </property>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_22" >
         <property name="text" >
@@ -303,97 +262,42 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QDoubleSpinBox" name="position0" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QDoubleSpinBox" name="focalPoint0" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QDoubleSpinBox" name="viewUp0" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1" >
        <widget class="QDoubleSpinBox" name="viewAngle" >
-        <property name="maximum" >
-         <double>360.000000000000000</double>
-        </property>
         <property name="minimum" >
          <double>-360.000000000000000</double>
         </property>
+        <property name="maximum" >
+         <double>360.000000000000000</double>
+        </property>
        </widget>
       </item>
-      <item row="2" column="2" >
-       <widget class="QDoubleSpinBox" name="viewUp1" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-       </widget>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="position0" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="position1" />
+      </item>
+      <item row="0" column="3" >
+       <widget class="QLineEdit" name="position2" />
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="focalPoint0" />
       </item>
       <item row="1" column="2" >
-       <widget class="QDoubleSpinBox" name="focalPoint1" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="focalPoint1" />
       </item>
       <item row="1" column="3" >
-       <widget class="QDoubleSpinBox" name="focalPoint2" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-        <property name="singleStep" >
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="focalPoint2" />
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="viewUp0" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="viewUp1" />
       </item>
       <item row="2" column="3" >
-       <widget class="QDoubleSpinBox" name="viewUp2" >
-        <property name="maximum" >
-         <double>10000.000000000000000</double>
-        </property>
-        <property name="minimum" >
-         <double>-10000.000000000000000</double>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="viewUp2" />
       </item>
      </layout>
     </widget>
@@ -404,18 +308,28 @@
       <string>Camera Orientation</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>6</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>6</number>
+      </property>
+      <property name="rightMargin" >
+       <number>6</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>6</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="2" >
        <widget class="QLabel" name="label_20" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>3</hsizetype>
-          <vsizetype>5</vsizetype>
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -475,40 +389,38 @@
       </item>
       <item row="2" column="1" >
        <widget class="QDoubleSpinBox" name="azimuthAngle" >
-        <property name="maximum" >
-         <double>360.000000000000000</double>
-        </property>
         <property name="minimum" >
          <double>-360.000000000000000</double>
+        </property>
+        <property name="maximum" >
+         <double>360.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="1" column="1" >
        <widget class="QDoubleSpinBox" name="elevationAngle" >
-        <property name="maximum" >
-         <double>360.000000000000000</double>
-        </property>
         <property name="minimum" >
          <double>-360.000000000000000</double>
+        </property>
+        <property name="maximum" >
+         <double>360.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="0" column="1" >
        <widget class="QDoubleSpinBox" name="rollAngle" >
-        <property name="maximum" >
-         <double>360.000000000000000</double>
-        </property>
         <property name="minimum" >
          <double>-360.000000000000000</double>
+        </property>
+        <property name="maximum" >
+         <double>360.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="1" column="2" >
        <widget class="QLabel" name="label_21" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>3</hsizetype>
-          <vsizetype>5</vsizetype>
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -521,9 +433,7 @@
       <item row="2" column="2" >
        <widget class="QLabel" name="label_16" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>3</hsizetype>
-          <vsizetype>5</vsizetype>
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -538,11 +448,20 @@
    </item>
    <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>6</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
      </property>
      <item>
       <spacer>
@@ -560,9 +479,7 @@
      <item>
       <widget class="QPushButton" name="closeButton" >
        <property name="sizePolicy" >
-        <sizepolicy>
-         <hsizetype>0</hsizetype>
-         <vsizetype>0</vsizetype>
+        <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -585,12 +502,17 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>closeButton</tabstop>
   <tabstop>viewXPlus</tabstop>
-  <tabstop>viewYPlus</tabstop>
-  <tabstop>viewZPlus</tabstop>
   <tabstop>viewXMinus</tabstop>
+  <tabstop>viewYPlus</tabstop>
   <tabstop>viewYMinus</tabstop>
+  <tabstop>viewZPlus</tabstop>
   <tabstop>viewZMinus</tabstop>
+  <tabstop>CenterX</tabstop>
+  <tabstop>CenterY</tabstop>
+  <tabstop>CenterZ</tabstop>
+  <tabstop>AutoResetCenterOfRotation</tabstop>
   <tabstop>position0</tabstop>
   <tabstop>position1</tabstop>
   <tabstop>position2</tabstop>
@@ -601,13 +523,12 @@
   <tabstop>viewUp1</tabstop>
   <tabstop>viewUp2</tabstop>
   <tabstop>viewAngle</tabstop>
-  <tabstop>rollButton</tabstop>
   <tabstop>rollAngle</tabstop>
-  <tabstop>elevationButton</tabstop>
+  <tabstop>rollButton</tabstop>
   <tabstop>elevationAngle</tabstop>
-  <tabstop>azimuthButton</tabstop>
+  <tabstop>elevationButton</tabstop>
   <tabstop>azimuthAngle</tabstop>
-  <tabstop>closeButton</tabstop>
+  <tabstop>azimuthButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
