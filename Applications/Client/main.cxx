@@ -59,6 +59,8 @@ int main(int argc, char* argv[])
   dir.cdUp();
   dir.cd("Plugins");
   QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
-  return pqMain::Run(app, ProcessModuleGUIHelper::New());
+  ProcessModuleGUIHelper * processModeulGUI = ProcessModuleGUIHelper::New();
+  return pqMain::Run(app, processModeulGUI);
+  processModeulGUI->Delete();
 }
 
