@@ -516,6 +516,40 @@ MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_AUTO_START)
 
+# Create implementation for a custom display panel decorator interface.
+# Decorators are used to add additional decorations to display panels.
+# ADD_PARAVIEW_DISPLAY_PANEL(
+#    OUTIFACES
+#    OUTSRCS
+#    CLASS_NAME classname
+#    PANEL_TYPES type1 type2 ..)
+# CLASS_NAME   : The class name for the decorator. The decorator must be a
+#                QObject subclass. The display panel is passed as the parent for
+#                the object.
+# PANEL_TYPES  : list of classnames for the display panel which this decorator
+#                can decorate.
+MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR OUTIFACES OUTSRCS)
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;PANEL_TYPES" "" ${ARGN})
+
+  SET(${OUTIFACES} ${ARG_CLASS_NAME})
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  SET(ACTION_MOC_SRCS)
+  QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      )
+ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR)
+
 # create implementation for a Qt/ParaView plugin given a 
 # module name and a list of interfaces
 # ADD_PARAVIEW_GUI_EXTENSION(OUTSRCS NAME INTERFACES iface1;iface2;iface3)
