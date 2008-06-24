@@ -48,7 +48,7 @@ public:
   pqStandardViewModules(QObject* o);
   ~pqStandardViewModules();
 
-  QStringList viewTypes() const;
+  virtual QStringList viewTypes() const;
   QStringList displayTypes() const;
   QString viewTypeName(const QString&) const;
 
