@@ -171,10 +171,11 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
     ret = helper->Run(options);
     }
 
-  // note: helper is passed in by caller, let's assume the caller will free up
-  // memory
-  // JG: 6-24-2008:  removed; helper->Delete();   (assume caller does cleanup)
-
+  // note: helper is passed in by caller, we should probably rely on 
+  // caller freeing up memory,
+  // 6-24-2008: but taking it out may be breaking the dashboards, so perhaps
+  // for the time being it should go back in.
+  helper->Delete();
   options->Delete();
   pvmain->Delete();
   vtkPVMain::Finalize();

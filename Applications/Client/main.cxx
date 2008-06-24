@@ -61,6 +61,7 @@ int main(int argc, char* argv[])
   QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
   ProcessModuleGUIHelper * processModeulGUI = ProcessModuleGUIHelper::New();
   return pqMain::Run(app, processModeulGUI);
-  processModeulGUI->Delete();
+
+  //processModeulGUI->Delete();
 }
 
