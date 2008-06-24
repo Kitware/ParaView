@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/SPCTH/restarted/sample.spcth-timeseries" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,12,89" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,9,206" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,9,206" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,4,69" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,7,166" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,7,166" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus" command="mousePress" arguments="1,1,0,11,7,/11:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CellArrayStatus" command="mouseRelease" arguments="1,0,0,11,7,/11:0" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="CTHPart" />
+  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton2" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="MainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+</pqevents>

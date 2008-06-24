@@ -320,6 +320,7 @@ IF(BUILD_TESTING)
     SelectReader
     SimpleInteraction
     Slice
+    SPTimeseries
     StreamTracer
     StreamTracerUpdates
     TemporalInterpolator
