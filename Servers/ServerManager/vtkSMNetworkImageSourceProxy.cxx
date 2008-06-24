@@ -20,7 +20,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMNetworkImageSourceProxy);
-vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMNetworkImageSourceProxy::vtkSMNetworkImageSourceProxy()
 {
@@ -135,6 +135,16 @@ void vtkSMNetworkImageSourceProxy::UpdateImage()
           << reply
           << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, stream);
+  reply.Reset();
+
+  stream << vtkClientServerStream::Invoke
+         << this->GetID()
+         << "ClearBuffers"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  // just to ensure that last result cache is released.
+  pm->GetLastResult(this->ConnectionID, this->SourceProcess);
+
   this->UpdateNeeded = false;
 }
 

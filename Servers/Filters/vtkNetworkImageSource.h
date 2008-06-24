@@ -51,6 +51,11 @@ public:
   // Pass in a vtkClientServerStream containing a string that is a binary-
   // encoded .vtk dataset containing a vtkImageData.
   void ReadImageFromString(vtkClientServerStream &css);
+
+  // Description:
+  // Clears extra internal buffers. Note this invalidates the value returned by
+  // GetImageAsString().
+  void ClearBuffers();
   
 protected:
   vtkNetworkImageSource();

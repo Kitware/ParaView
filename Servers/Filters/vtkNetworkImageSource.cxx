@@ -33,7 +33,7 @@
 
 
 vtkStandardNewMacro(vtkNetworkImageSource);
-vtkCxxRevisionMacro(vtkNetworkImageSource, "1.2");
+vtkCxxRevisionMacro(vtkNetworkImageSource, "1.3");
 //----------------------------------------------------------------------------
 vtkNetworkImageSource::vtkNetworkImageSource()
 {
@@ -115,6 +115,12 @@ const vtkClientServerStream& vtkNetworkImageSource::GetImageAsString()
                   << vtkClientServerStream::End;
   writer->Delete();
   return (*this->Reply);
+}
+
+//----------------------------------------------------------------------------
+void vtkNetworkImageSource::ClearBuffers()
+{
+  this->Reply->Reset();
 }
 
 //----------------------------------------------------------------------------
