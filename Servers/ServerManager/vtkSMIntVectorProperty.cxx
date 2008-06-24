@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.36");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.37");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -152,7 +152,15 @@ void vtkSMIntVectorProperty::SetNumberOfElements(unsigned int num)
     }
   this->Internals->Values.resize(num, 0);
   this->Internals->UncheckedValues.resize(num, 0);
-  this->Initialized = false;
+  if (num == 0)
+    {
+    // If num == 0, then we already have the intialized values (so to speak).
+    this->Initialized = true;
+    }
+  else
+    {
+    this->Initialized = false;
+    }
   this->Modified();
 }
 

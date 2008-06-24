@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.42");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.43");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -177,7 +177,15 @@ void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
     return;
     }
   this->Internals->Resize(num);
-  this->Initialized = false;
+  if (num == 0)
+    {
+    // If num == 0, then we already have the intialized values (so to speak).
+    this->Initialized = true;
+    }
+  else
+    {
+    this->Initialized = false;
+    }
   this->Modified();
 }
 
