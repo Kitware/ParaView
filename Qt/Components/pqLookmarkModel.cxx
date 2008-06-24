@@ -280,7 +280,8 @@ void pqLookmarkModel::load(
     return;
     }
 
-  pqApplicationCore::instance()->loadState(stateElement,server,loader);
+  pqApplicationCore::instance()->loadState(stateElement,server,loader, 
+    /* reuse_views=*/true);
 
   // If this is a render module with no previous visible representations
   // and RestoreCamera is turned off, reset the camera.

@@ -330,8 +330,8 @@ void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadState(vtkPVXMLElement* rootElement, 
-                                  pqServer* server,
-                                  vtkSMStateLoader* arg_loader/*=NULL*/)
+  pqServer* server, vtkSMStateLoader* arg_loader/*=NULL*/,
+  bool reuse_views/*=false*/)
 {
   if (!server || !rootElement)
     {
@@ -356,14 +356,20 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     }
 
   vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-  if (pqLoader)
+
+  // Preferred view stuff needs to be deprecated BIG TIME! For now, I am letting
+  // it be since the lookmark stuff uses it.
+  QList<pqView*> current_views = 
+    this->Internal->ServerManagerModel->findItems<pqView*>(server);
+  foreach (pqView* view, current_views)
     {
-    // tell the state loader to use the existing render modules before creating new ones
-    QList<pqRenderView*> renderViews = this->Internal->ServerManagerModel->
-      findItems<pqRenderView*>(server);
-    foreach (pqRenderView* renderView, renderViews)
+    if (pqLoader && reuse_views && qobject_cast<pqRenderView*>(view))
       {
-      pqLoader->AddPreferredView(renderView->getViewProxy());
+      pqLoader->AddPreferredView(view->getViewProxy());
+      }
+    else
+      {
+      this->Internal->ObjectBuilder->destroy(view);
       }
     }
 
