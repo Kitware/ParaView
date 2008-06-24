@@ -246,12 +246,37 @@ public:
   enum 
     {
     IDS = 0,
-    GLOBALIDS = 1,
-    FRUSTUM = 2,
-    LOCATIONS = 3,
-    THRESHOLDS = 4,
-    BLOCKS = 5
+    FRUSTUM = 1,
+    LOCATIONS = 2,
+    THRESHOLDS = 3,
+    BLOCKS = 4,
+    GLOBALIDS = 5 // GLOBALIDS has to be last 
     };
+
+  static const char* getText(int val)
+    {
+    switch (val)
+      {
+    case IDS:
+      return "IDs";
+      
+    case GLOBALIDS:
+      return "Global IDs";
+
+    case FRUSTUM:
+      return "Frustum";
+
+    case LOCATIONS:
+      return "Locations";
+
+    case THRESHOLDS:
+      return "Thresholds";
+
+    case BLOCKS:
+      return "Blocks";
+      }
+    return "Unknown";
+    }
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -400,6 +425,10 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* mgr)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
 {
+  if (this->Implementation->InputPort)
+    {
+    QObject::disconnect(this->Implementation->InputPort->getSource(), 0, this, 0);
+    }
   this->Implementation->InputPort = opport;
 
   QString selectedObjectLabel = "<b>[none]</b>";
@@ -439,8 +468,14 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
   // update the enable state of the panel.
   this->updateEnabledState();
 
-  // TODO: Need to determine if GlobalID selection is possible on this input and
-  // disallow the user from creating one if not.
+  if (opport)
+    {
+    // Need to determine if GlobalID selection is possible on this input and
+    // disallow the user from creating one if not.
+    this->updateSelectionTypesAvailable();
+    QObject::connect(opport->getSource(), SIGNAL(dataUpdated(pqPipelineSource*)),
+      this, SLOT(updateSelectionTypesAvailable()), Qt::QueuedConnection);
+    }
 
   // TODO: This needs to be changed to use domains where-ever possible.
   this->updateThreholdDataArrays();
@@ -775,7 +810,7 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
   this->Implementation->ThresholdScalarArray->clear();
   if (!this->Implementation->InputPort)
     {
-    //this->Implementation->stackedWidget->
+    //this->Implementation->itemsStackedWidget->
     return;
     }
 
@@ -1087,7 +1122,7 @@ void pqSelectionInspectorPanel::newValue()
 {
   QTreeWidget* activeTree = 0;
   pqSignalAdaptorTreeWidget* adaptor = 0;
-  switch (this->Implementation->stackedWidget->currentIndex())
+  switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
@@ -1138,7 +1173,7 @@ void pqSelectionInspectorPanel::newValue()
 void pqSelectionInspectorPanel::deleteValue()
 {
   QTreeWidget* activeTree = 0;
-  switch (this->Implementation->stackedWidget->currentIndex())
+  switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
@@ -1174,7 +1209,7 @@ void pqSelectionInspectorPanel::deleteValue()
 void pqSelectionInspectorPanel::deleteAllValues()
 {
   QTreeWidget* activeTree = 0;
-  switch (this->Implementation->stackedWidget->currentIndex())
+  switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
     activeTree = this->Implementation->Indices;
@@ -1215,6 +1250,7 @@ void pqSelectionInspectorPanel::onFieldTypeChanged(const QString& type)
     {
     this->Implementation->checkboxContainCell->setEnabled(false);
     }
+  this->updateSelectionTypesAvailable();
 }
 
 //-----------------------------------------------------------------------------
@@ -1302,7 +1338,7 @@ void pqSelectionInspectorPanel::onTableGrown(pqTreeWidgetItemObject* item)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString& )
+void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 {
   if (this->Implementation->UpdatingGUI)
     {
@@ -1342,7 +1378,7 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
 //-----------------------------------------------------------------------------
 int pqSelectionInspectorPanel::getContentType() const
 {
-  switch (this->Implementation->comboSelectionType->currentIndex())
+  switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
     return vtkSelection::INDICES; 
@@ -1670,4 +1706,46 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
     values24);
   this->Implementation->FrustumWidget->UpdateVTKObjects();
   this->updateRepresentationViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
+{
+  if (!this->Implementation->InputPort)
+    {
+    return;
+    }
+
+  vtkPVDataInformation* info = this->Implementation->InputPort->getDataInformation(false);
+  vtkPVDataSetAttributesInformation* attrInfo = 0;
+
+  if (this->Implementation->comboFieldType->currentText() == QString("POINT"))
+    {
+    attrInfo = info->GetPointDataInformation();
+    }
+  else
+    {
+    attrInfo = info->GetCellDataInformation();
+    }
+
+  int cur_index = this->Implementation->comboSelectionType->currentIndex();
+  
+  // If currently we are showing a GlobalID based selection and the global IDs
+  // disappear from under us, we don't remove them from the combo.
+  bool has_gids = attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS) || 
+    (cur_index == pqImplementation::GLOBALIDS);
+
+  bool prev = this->Implementation->comboSelectionType->blockSignals(true);
+  this->Implementation->comboSelectionType->clear();
+  for (int cc = pqImplementation::IDS; cc <= pqImplementation::GLOBALIDS; cc++)
+    {
+    if (!has_gids && cc == pqImplementation::GLOBALIDS)
+      {
+      continue;
+      }
+    this->Implementation->comboSelectionType->addItem(
+      pqImplementation::getText(cc));
+    }
+  this->Implementation->comboSelectionType->blockSignals(prev);
+  this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
 }

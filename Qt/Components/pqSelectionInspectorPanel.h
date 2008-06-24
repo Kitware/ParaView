@@ -129,6 +129,8 @@ protected slots:
   /// Called when ShowFrustum checkbox is toggled.
   void updateFrustum();
 
+  /// Called to update the types of selections available.
+  void updateSelectionTypesAvailable();
 protected:
   /// Sets up the GUI by created default signal/slot bindings etc.
   void setupGUI();

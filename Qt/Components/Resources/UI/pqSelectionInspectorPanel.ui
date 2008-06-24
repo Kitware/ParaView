@@ -245,7 +245,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QStackedWidget" name="stackedWidget" >
+         <widget class="QStackedWidget" name="itemsStackedWidget" >
           <property name="autoFillBackground" >
            <bool>false</bool>
           </property>
@@ -373,120 +373,6 @@
               </item>
               <item row="1" column="0" >
                <widget class="QPushButton" name="Delete" >
-                <property name="enabled" >
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip" >
-                 <string>Delete selected values from the current set</string>
-                </property>
-                <property name="text" >
-                 <string>Delete</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="page_GlobalDs" >
-           <layout class="QVBoxLayout" >
-            <property name="spacing" >
-             <number>3</number>
-            </property>
-            <property name="leftMargin" >
-             <number>3</number>
-            </property>
-            <property name="topMargin" >
-             <number>3</number>
-            </property>
-            <property name="rightMargin" >
-             <number>3</number>
-            </property>
-            <property name="bottomMargin" >
-             <number>3</number>
-            </property>
-            <item>
-             <widget class="pqTreeWidget" name="GlobalIDs" >
-              <property name="alternatingRowColors" >
-               <bool>true</bool>
-              </property>
-              <property name="rootIsDecorated" >
-               <bool>false</bool>
-              </property>
-              <property name="sortingEnabled" >
-               <bool>true</bool>
-              </property>
-              <column>
-               <property name="text" >
-                <string>Global IDs</string>
-               </property>
-              </column>
-             </widget>
-            </item>
-            <item>
-             <layout class="QGridLayout" >
-              <property name="leftMargin" >
-               <number>0</number>
-              </property>
-              <property name="topMargin" >
-               <number>0</number>
-              </property>
-              <property name="rightMargin" >
-               <number>0</number>
-              </property>
-              <property name="bottomMargin" >
-               <number>0</number>
-              </property>
-              <property name="horizontalSpacing" >
-               <number>2</number>
-              </property>
-              <property name="verticalSpacing" >
-               <number>2</number>
-              </property>
-              <item row="0" column="0" >
-               <widget class="QPushButton" name="NewValue_GlobalIDs" >
-                <property name="toolTip" >
-                 <string>Add a single value to the current set</string>
-                </property>
-                <property name="statusTip" >
-                 <string>Add a single value to the current set.</string>
-                </property>
-                <property name="text" >
-                 <string>New Value</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1" >
-               <widget class="QPushButton" name="DeleteAll_GlobalIDs" >
-                <property name="enabled" >
-                 <bool>true</bool>
-                </property>
-                <property name="toolTip" >
-                 <string>Delete all values</string>
-                </property>
-                <property name="text" >
-                 <string>Delete All</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1" >
-               <widget class="QPushButton" name="NewRange_GlobalIDs" >
-                <property name="enabled" >
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip" >
-                 <string>Add a single value to the current set</string>
-                </property>
-                <property name="statusTip" >
-                 <string>Add a single value to the current set.</string>
-                </property>
-                <property name="text" >
-                 <string>New Range</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0" >
-               <widget class="QPushButton" name="Delete_GlobalIDs" >
                 <property name="enabled" >
                  <bool>true</bool>
                 </property>
@@ -842,6 +728,120 @@
                </property>
               </column>
              </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_Global_IDs" >
+           <layout class="QVBoxLayout" >
+            <property name="spacing" >
+             <number>3</number>
+            </property>
+            <property name="leftMargin" >
+             <number>3</number>
+            </property>
+            <property name="topMargin" >
+             <number>3</number>
+            </property>
+            <property name="rightMargin" >
+             <number>3</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="pqTreeWidget" name="GlobalIDs" >
+              <property name="alternatingRowColors" >
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated" >
+               <bool>false</bool>
+              </property>
+              <property name="sortingEnabled" >
+               <bool>true</bool>
+              </property>
+              <column>
+               <property name="text" >
+                <string>Global IDs</string>
+               </property>
+              </column>
+             </widget>
+            </item>
+            <item>
+             <layout class="QGridLayout" >
+              <property name="leftMargin" >
+               <number>0</number>
+              </property>
+              <property name="topMargin" >
+               <number>0</number>
+              </property>
+              <property name="rightMargin" >
+               <number>0</number>
+              </property>
+              <property name="bottomMargin" >
+               <number>0</number>
+              </property>
+              <property name="horizontalSpacing" >
+               <number>2</number>
+              </property>
+              <property name="verticalSpacing" >
+               <number>2</number>
+              </property>
+              <item row="0" column="0" >
+               <widget class="QPushButton" name="NewValue_GlobalIDs" >
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1" >
+               <widget class="QPushButton" name="DeleteAll_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete all values</string>
+                </property>
+                <property name="text" >
+                 <string>Delete All</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1" >
+               <widget class="QPushButton" name="NewRange_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>false</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Add a single value to the current set</string>
+                </property>
+                <property name="statusTip" >
+                 <string>Add a single value to the current set.</string>
+                </property>
+                <property name="text" >
+                 <string>New Range</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" >
+               <widget class="QPushButton" name="Delete_GlobalIDs" >
+                <property name="enabled" >
+                 <bool>true</bool>
+                </property>
+                <property name="toolTip" >
+                 <string>Delete selected values from the current set</string>
+                </property>
+                <property name="text" >
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -1916,16 +1916,16 @@
   <connection>
    <sender>comboSelectionType</sender>
    <signal>currentIndexChanged(int)</signal>
-   <receiver>stackedWidget</receiver>
+   <receiver>itemsStackedWidget</receiver>
    <slot>setCurrentIndex(int)</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>269</x>
-     <y>14</y>
+     <x>234</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>264</x>
-     <y>175</y>
+     <x>241</x>
+     <y>339</y>
     </hint>
    </hints>
   </connection>
