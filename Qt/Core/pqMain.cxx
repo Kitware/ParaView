@@ -110,10 +110,12 @@ pqOptions * pqMain::options = NULL;
 pqProcessModuleGUIHelper * pqMain::helper = NULL;
 
 //----------------------------------------------------------------------------
-int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* help,
-  pqOptions * & options)
+int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
+  pqOptions * & optionsIn)
 {
-  helper = help;
+  helper = helperIn;
+  options = optionsIn;
+
   int argc = app.argc();
   char** argv = app.argv();
 
@@ -122,11 +124,11 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* help,
 
   pvmain = vtkPVMain::New();
 
-  if (options == NULL)
+  if (optionsIn == NULL)
     {
-    options = pqOptions::New();
+    optionsIn = pqOptions::New();
     // We may define a PQCLIENT enum, if necessary.
-    options->SetProcessType(vtkPVOptions::PVCLIENT);\
+    optionsIn->SetProcessType(vtkPVOptions::PVCLIENT);\
     }
  
   // This creates the Process Module and initializes it.
@@ -144,11 +146,11 @@ int pqMain::Run(pqOptions * options)
 }
 
 //----------------------------------------------------------------------------
-int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* aHelper)
+int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
 {
   int argc = app.argc();
   char** argv = app.argv();
-  helper = aHelper;
+  helper = helperIn;
 
   vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
@@ -169,8 +171,10 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* aHelper)
     ret = helper->Run(options);
     }
 
-  // note: helper is passed in
-  helper->Delete();
+  // note: helper is passed in by caller, let's assume the caller will free up
+  // memory
+  // JG: 6-24-2008:  removed; helper->Delete();   (assume caller does cleanup)
+
   options->Delete();
   pvmain->Delete();
   vtkPVMain::Finalize();
@@ -182,9 +186,10 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* aHelper)
 //----------------------------------------------------------------------------
 void pqMain::postRun()
 {
-  if (helper) helper->Delete();
-  if (options) options->Delete();
+  // only delete pvmain, as it was allocated in this file/class, rely on caller
+  // to properly delete helper and options.
   if (pvmain) pvmain->Delete();
+
   vtkPVMain::Finalize();
   vtkProcessModule::SetProcessModule(0);
 }

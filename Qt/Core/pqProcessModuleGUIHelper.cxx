@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.26");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.27");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -231,7 +231,8 @@ int pqProcessModuleGUIHelper::appExec()
     {
     // Starts the event loop.
     QCoreApplication* app = QApplication::instance();
-    return app->exec();
+    int status = app->exec();
+    return status;
     }
 
   // in case the Window didn't get created for some reason...

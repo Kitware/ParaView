@@ -48,12 +48,13 @@ class QApplication;
 class PQCORE_EXPORT pqMain
 {
 public:
-  /// Call pqMain::preRun() in your client's main(), returning the result
-  static int preRun(QApplication& app, pqProcessModuleGUIHelper* helper,
+  /// Call pqMain::preRun() in your client's main(), returning the result.
+  /// NOTE: use preRun() only with associated Run() and postRun()
+  static int preRun(QApplication& app, pqProcessModuleGUIHelper * helper,
     pqOptions * & options);
 
   /// Call pqMain::Run() in your client's main(), returning the result.
-  /// this overloaded method is intended to be run stand-alone, i.e. 
+  /// This overloaded method is intended to be run stand-alone, i.e. 
   /// when not running preRun() nor postRun()
   static int Run(QApplication& app, pqProcessModuleGUIHelper* helper);
 
@@ -61,8 +62,10 @@ public:
   /// overload of Run is intended to be run after preRun(...)
   static int Run(pqOptions * options);
 
-  /// call pqMain::postRun() for cleanup - this calls Delete() on pvmain,
-  /// options, and helper members
+  /// call pqMain::postRun() for cleanup - this calls Delete() on pvmain ivar
+  /// only. Since options, and helper are passed in to preRun() it is assumed
+  /// the caller will free any memory allocated for those objects.
+  /// NOTE: use postRun() only with associated preRun() Run()
   static void postRun();
 
 protected:
