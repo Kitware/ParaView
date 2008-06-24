@@ -468,6 +468,54 @@ MACRO(ADD_PARAVIEW_DOCK_WINDOW OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_DOCK_WINDOW)
 
+
+# Create implementation for an auto start interface.
+# ADD_PARAVIEW_AUTO_START(
+#   OUTIFACES
+#   OUTSRCS
+#   CLASS_NAME classname
+#   [STARTUP startup callback method name]
+#   [SHUTDOWN shutdown callback method name]
+# )
+# CLASS_NAME : is the name of the class that implements 2 methods which will be
+#              called on startup and shutdown. The names of these methods can be
+#              optionally specified using STARTUP and SHUTDOWN.
+# STARTUP    : name of the method on class CLASS_NAME which should be called 
+#              when the plugins loads. Default is startup.
+# SHUTDOWN   : name pf the method on class CLASS_NAME which should be called
+#              when the application shuts down. Default is shutdown.
+MACRO(ADD_PARAVIEW_AUTO_START OUTIFACES OUTSRCS)
+  SET(ARG_STARTUP)
+  SET(ARG_SHUTDOWN)
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;STARTUP;SHUTDOWN" "" ${ARGN})
+
+  IF (NOT ARG_STARTUP)
+    SET (ARG_STARTUP startup)
+  ENDIF (NOT ARG_STARTUP)
+
+  IF (NOT ARG_SHUTDOWN)
+    SET (ARG_SHUTDOWN shutdown)
+  ENDIF (NOT ARG_SHUTDOWN)
+  
+  SET(${OUTIFACES} ${ARG_CLASS_NAME})
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  SET(ACTION_MOC_SRCS)
+  QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      )
+ENDMACRO(ADD_PARAVIEW_AUTO_START)
+
 # create implementation for a Qt/ParaView plugin given a 
 # module name and a list of interfaces
 # ADD_PARAVIEW_GUI_EXTENSION(OUTSRCS NAME INTERFACES iface1;iface2;iface3)
