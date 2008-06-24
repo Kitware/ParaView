@@ -101,7 +101,7 @@ public:
   /// can be determined as the preferred view.
   /// If update_pipeline is set, then the pipeline will be update prior to
   /// fetching the data information from the port.
-  QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const;
+  virtual QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const;
 
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
