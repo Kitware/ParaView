@@ -36,7 +36,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.4");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.5");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -70,7 +70,7 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
   this->TextActors = new vtkActor2D * [this->NumberOfLabels];
 
   char format[512];
-  char string[512];
+  char string[1024];
 
   double fontScaling = vtkTextActor::GetFontScale(viewport);
 
@@ -200,6 +200,7 @@ void vtkPVScalarBarActor::AllocateAndSizeLabels(int *labelSize,
           }
         }
 
+      // Potential of buffer overrun (onto the stack) here.
       sprintf(string, format, val);
       this->TextMappers[i]->SetInput(string);
 
