@@ -1658,7 +1658,7 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
         this->Form->AutomaticLabelFormat, "checked", SIGNAL(toggled(bool)),
         proxy, proxy->GetProperty("AutomaticLabelFormat"));   
     this->Form->Links.addPropertyLink(
-        this->Form->LabelFormat, "text", SIGNAL(textChanged(const QString&)),
+        this->Form->LabelFormat, "text", SIGNAL(editingFinished()),
         proxy, proxy->GetProperty("LabelFormat"));
     this->connect(this->Form->AutomaticLabelFormat, SIGNAL(toggled(bool)),
                   this, SLOT(updateLabelFormatControls()));
