@@ -77,7 +77,12 @@ class vtkCTHFragmentCommBuffer
     // Description:
     // Get a pointer to the header.
     vtkIdType *GetHeader() const { return this->Header; }
-
+    // Description:
+    // Get the total memory used.
+    vtkIdType Capacity()
+    {
+      return this->GetHeaderSize()+this->GetBufferSize();
+    }
     // Description:
     // Set the number of fragments for a given block.
     void SetNumberOfFragments(
@@ -110,7 +115,6 @@ class vtkCTHFragmentCommBuffer
     int UnPack(vtkDoubleArray *da,const int nComps,const vtkIdType nTups,const bool copyFlag);
     //static void Resize(vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers);
   private:
-    vtkIdType BufferSize;
     vtkIdType EOD;
     char *Buffer;
     int HeaderSize;

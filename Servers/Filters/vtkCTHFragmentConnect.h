@@ -265,6 +265,9 @@ protected:
   void AddEquivalence(
     vtkCTHFragmentConnectIterator *neighbor1,
     vtkCTHFragmentConnectIterator *neighbor2);
+  //
+  void PrepareForResolveEquivalences();
+  //
   void ResolveEquivalences();
   void GatherEquivalenceSets(vtkCTHFragmentEquivalenceSet* set);
   void ShareGhostEquivalences(
@@ -340,11 +343,11 @@ protected:
   // Merge fragment's geometry that are split across processes
   void ResolveRemoteFragmentGeometry();
   void BuildLoadingArray(
-          vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+          vtkstd::vector<vtkIdType> &loadingArray);
   int PackLoadingArray(vtkIdType *&buffer);
   int UnPackLoadingArray(
           vtkIdType *buffer, int bufSize,
-          vtkstd::vector<vtkCTHFragmentPieceLoading> &loadingArray);
+          vtkstd::vector<vtkIdType> &loadingArray);
 
   // copy any integrated attributes (volume, id, weighted averages, sums, etc)
   // into the fragment polys in the output data sets. 

@@ -21,7 +21,6 @@ using vtkstd::vector;
 vtkCTHFragmentCommBuffer::vtkCTHFragmentCommBuffer()
 {
   // buffer
-  this->BufferSize=0;
   this->EOD=0;
   this->Buffer=0;
   // header
@@ -37,7 +36,6 @@ vtkCTHFragmentCommBuffer::~vtkCTHFragmentCommBuffer()
 void vtkCTHFragmentCommBuffer::Clear()
 { 
   // buffer
-  this->BufferSize=0;
   this->EOD=0;
   CheckAndReleaseArrayPointer(this->Buffer);
   // header
@@ -72,6 +70,8 @@ void vtkCTHFragmentCommBuffer::SizeHeader(int nBlocks)
 //----------------------------------------------------------------------------
 void vtkCTHFragmentCommBuffer::SizeBuffer(vtkIdType nBytes)
 {
+  assert("Header must be allocated before buffer is sized."
+         && this->Header!=0 );
   // buffer
   CheckAndReleaseArrayPointer(this->Buffer);
   this->Buffer=new char[nBytes];
@@ -81,11 +81,12 @@ void vtkCTHFragmentCommBuffer::SizeBuffer(vtkIdType nBytes)
 //----------------------------------------------------------------------------
 void vtkCTHFragmentCommBuffer::SizeBuffer()
 {
+  assert("Header must be allocated before buffer is sized."
+         && this->Header!=0 );
   // buffer
   CheckAndReleaseArrayPointer(this->Buffer);
   this->Buffer=new char[this->Header[BUFFER_SIZE]];
   this->EOD=0;
-  this->BufferSize=this->Header[BUFFER_SIZE];
 }
 //----------------------------------------------------------------------------
 // Append data array to the buffer. Returns the byte index where 

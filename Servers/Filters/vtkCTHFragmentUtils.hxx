@@ -293,4 +293,5 @@ int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
   return nEnabled;
 }
 };
+
 #endif
