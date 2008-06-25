@@ -1262,10 +1262,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
    <!-- End Test3DWidget -->
    </SourceProxy>
 
-   <SourceProxy name="NetworkImageSource" class="vtkNetworkImageSource">
-   <!-- End NetworkImageSource -->
-   </SourceProxy>
-
    <!-- ==================================================================== -->
    <SourceProxy name="TextSource" class="vtkPVTextSource" 
       label="Text">
