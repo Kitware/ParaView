@@ -20,6 +20,7 @@
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/set>
@@ -97,26 +98,46 @@ public:
       }
     };
 
+  struct PedigreeIDType
+    {
+    vtkStdString Domain;
+    vtkIdType ID;
+    PedigreeIDType(vtkStdString domain, vtkIdType id)
+      {
+      this->Domain = domain;
+      this->ID = id;
+      }
+    bool operator < (const PedigreeIDType& other) const
+      {
+      if (this->Domain == other.Domain)
+        {
+        return (this->ID < other.ID);
+        }
+      return (this->Domain < other.Domain);
+      }
+    };
+
   typedef vtkstd::set<vtkIdType> SetOfIDs;
   typedef vtkstd::set<IDType> SetOfIDType;
   typedef vtkstd::set<CompositeIDType> SetOfCompositeIDType;
   typedef vtkstd::set<HierarchicalIDType> SetOfHierarchicalIDType;
+  typedef vtkstd::set<PedigreeIDType> SetOfPedigreeIDType;
   typedef vtkstd::vector<double> VectorOfDoubles;
 
 
-  SetOfIDs PedigreeIDs;
   SetOfIDs GlobalIDs;
   SetOfIDs Blocks;
   SetOfIDType IDs;
   SetOfCompositeIDType CompositeIDs;
   SetOfHierarchicalIDType HierarchicalIDs;
+  SetOfPedigreeIDType PedigreeIDs;
   VectorOfDoubles Locations;
   VectorOfDoubles Thresholds;
 };
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.6");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.7");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -166,10 +187,10 @@ void vtkPVSelectionSource::RemoveAllGlobalIDs()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionSource::AddPedigreeID(vtkIdType id)
+void vtkPVSelectionSource::AddPedigreeID(const char* domain, vtkIdType id)
 {
   this->Mode = PEDIGREEIDS;
-  this->Internal->PedigreeIDs.insert(id);
+  this->Internal->PedigreeIDs.insert(vtkInternal::PedigreeIDType(domain, id));
   this->Modified();
 }
 
@@ -278,8 +299,6 @@ void vtkPVSelectionSource::RemoveAllThresholds()
 //----------------------------------------------------------------------------
 void vtkPVSelectionSource::SetArrayName(const char* arrayName)
 {
-  this->Mode = THRESHOLDS;
-
   if (this->ArrayName == NULL && arrayName == NULL) 
     { 
     return;
@@ -391,16 +410,40 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case PEDIGREEIDS:
       {
-      source->SetContentType(vtkSelection::PEDIGREEIDS);
+      output->SetContentType(vtkSelection::SELECTIONS);
+      source->SetContentType(vtkSelection::INDICES);
       source->RemoveAllIDs();
-      vtkInternal::SetOfIDs::iterator iter;
+      vtkInternal::SetOfPedigreeIDType::iterator iter;
       for (iter = this->Internal->PedigreeIDs.begin();
         iter != this->Internal->PedigreeIDs.end(); ++iter)
         {
-        source->AddID(-1, *iter);
+        if (iter == this->Internal->PedigreeIDs.begin() || !source->GetArrayName() ||
+            source->GetArrayName() != iter->Domain)
+          {
+          if (iter != this->Internal->PedigreeIDs.begin())
+            {
+            source->Update();
+            vtkSelection* clone = vtkSelection::New();
+            clone->ShallowCopy(source->GetOutput());
+            clone->SetContentType(vtkSelection::PEDIGREEIDS);
+            output->AddChild(clone);
+            clone->Delete();
+            }
+
+          source->RemoveAllIDs();
+          source->SetArrayName(iter->Domain.c_str());
+          }
+        source->AddID(-1, iter->ID);
         }
-      source->Update();
-      output->ShallowCopy(source->GetOutput());
+      if (this->Internal->PedigreeIDs.size() > 0)
+        {
+        source->Update();
+        vtkSelection* clone = vtkSelection::New();
+        clone->ShallowCopy(source->GetOutput());
+        clone->SetContentType(vtkSelection::PEDIGREEIDS);
+        output->AddChild(clone);
+        clone->Delete();
+        }
       }
     break;
 

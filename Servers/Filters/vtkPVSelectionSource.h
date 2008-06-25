@@ -41,8 +41,8 @@ public:
   void RemoveAllGlobalIDs();
 
   // Description:
-  // Add pedigree IDs.
-  void AddPedigreeID(vtkIdType id);
+  // Add pedigree IDs in a particular domain.
+  void AddPedigreeID(const char* domain, vtkIdType id);
   void RemoveAllPedigreeIDs();
 
   // Description:

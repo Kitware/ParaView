@@ -1438,19 +1438,20 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         selection. 
       </Documentation>
 
-     <IdTypeVectorProperty name="IDs"
+     <StringVectorProperty name="IDs"
         command="AddPedigreeID" 
         clean_command="RemoveAllPedigreeIDs"
         repeat_command="1"
-        number_of_elements_per_command="1"
-        number_of_elements="1"
-        default_values="0"
+        number_of_elements_per_command="2"
+        number_of_elements="2"
+        element_types="2 0"
+        default_values="id 0"
         label="Pedigree IDs">
         <Documentation>
           The list of IDs that will be added to the selection produced by the
-          selection source.
+          selection source, specified by the pair (domain, id).
         </Documentation>
-     </IdTypeVectorProperty> 
+     </StringVectorProperty>
      <!-- End of PedigreeIDSelectionSource -->
    </SourceProxy>
 
@@ -1548,16 +1549,6 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
           the selection source.
         </Documentation>
      </DoubleVectorProperty>
-
-     <StringVectorProperty name="ArrayName"
-       command="SetArrayName"
-       number_of_elements="1"
-       default_values="Text">
-        <Documentation>
-           For threshold and value selection, this controls the name of the
-           scalar array that will be thresholded within.
-        </Documentation>
-     </StringVectorProperty>
 
      <!-- End of ThresholdSelectionSource -->
    </SourceProxy>
