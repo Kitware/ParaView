@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.73");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.74");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -226,6 +226,11 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
       vtkSMCompoundProxyDefinitionLoader::New();
     vtkSMCompoundSourceProxy* cproxy = loader->LoadDefinition(pelement);
     loader->Delete();
+    if (cproxy)
+      {
+      cproxy->SetXMLName(proxyname);
+      cproxy->SetXMLGroup(groupname);
+      }
     return cproxy;
     }
 
