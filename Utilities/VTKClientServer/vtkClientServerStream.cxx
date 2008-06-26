@@ -251,8 +251,8 @@ void vtkClientServerStream::Reserve(size_t size)
 void vtkClientServerStream::Reset()
 {
   // Empty the entire stream.
-  this->Internal->Data.erase(this->Internal->Data.begin(),
-                             this->Internal->Data.end());
+  vtkClientServerStreamInternals::DataType().swap(this->Internal->Data);
+  
   this->Internal->ValueOffsets.erase(this->Internal->ValueOffsets.begin(),
                                      this->Internal->ValueOffsets.end());
   this->Internal->MessageIndexes.erase(this->Internal->MessageIndexes.begin(),
