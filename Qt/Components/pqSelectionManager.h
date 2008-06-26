@@ -45,8 +45,10 @@ class pqRenderView;
 class pqSelectionManagerImplementation;
 class pqView;
 class vtkDataObject;
+class vtkSelection;
 class vtkSMClientDeliveryRepresentationProxy;
 class vtkSMProxy;
+class vtkSMSourceProxy;
 
 /// pqSelectionManager is the nexus for introspective surface selection in 
 //  paraview. 
@@ -84,6 +86,10 @@ public:
 
   /// For the current selection, returns the list of indices selected.
   QList<QPair<int, vtkIdType> > getIndices(vtkSMProxy* selectionSource,pqOutputPort* opport);
+
+  /// Make a selection source proxy for a client-side selection.
+  /// Only supports pedigree id selections.
+  static vtkSMSourceProxy* createSelectionSource(vtkSelection* s, vtkIdType connId);
 
 signals:
   /// Fired when the selection changes. Argument is the pqOutputPort (if any)

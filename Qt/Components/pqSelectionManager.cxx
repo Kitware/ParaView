@@ -55,10 +55,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMClientDeliveryStrategyProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 class pqSelectionManagerImplementation
@@ -405,3 +407,66 @@ QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(vtkSMProxy* selecti
   strategy->Delete();
   return indices;
 }
+
+//-----------------------------------------------------------------------------
+vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, vtkIdType connId)
+{
+  // Create a selection source proxy
+  vtkSMProxyManager* pm = vtkSMProxyManager::GetProxyManager();
+  vtkSMSourceProxy* selectionSource = vtkSMSourceProxy::SafeDownCast(
+    pm->NewProxy("sources", "PedigreeIDSelectionSource"));
+  selectionSource->SetConnectionID(connId);
+
+  // Fill the selection source with the selection
+  vtkSmartPointer<vtkSelection> dummyParent =
+    vtkSmartPointer<vtkSelection>::New();
+  if (sel->GetContentType() != vtkSelection::SELECTIONS)
+    {
+    dummyParent->SetContentType(vtkSelection::SELECTIONS);
+    dummyParent->AddChild(sel);
+    sel = dummyParent;
+    }
+  vtkSMStringVectorProperty* p = vtkSMStringVectorProperty::SafeDownCast(
+    selectionSource->GetProperty("IDs"));
+  p->SetNumberOfElements(0);
+  vtkSMStringVectorProperty* sp = vtkSMStringVectorProperty::SafeDownCast(
+    selectionSource->GetProperty("StringIDs"));
+  sp->SetNumberOfElements(0);
+  unsigned int curId = 0;
+  unsigned int curStringId = 0;
+  for (int c = 0; c < sel->GetNumberOfChildren(); ++c)
+    {
+    vtkSelection* curSel = sel->GetChild(c);
+    vtkAbstractArray* ids = curSel->GetSelectionList();
+    if (ids)
+      {
+      // Set the ids from the selection
+      vtkIdType numTuples = ids->GetNumberOfTuples();
+      for (vtkIdType i = 0; i < numTuples; ++i)
+        {
+        vtkVariant v = ids->GetVariantValue(i);
+        if (v.IsString())
+          {
+          sp->SetElement(2*curStringId+0, ids->GetName());
+          sp->SetElement(2*curStringId+1, v.ToString());
+          ++curStringId;
+          }
+        else
+          {
+          p->SetElement(2*curId+0, ids->GetName());
+          p->SetElement(2*curId+1, v.ToString());
+          ++curId;
+          }
+        }
+      }
+    }
+  selectionSource->UpdateProperty("IDs");
+  selectionSource->UpdateProperty("StringIDs");
+
+  // Set field type to vertices by default.
+  vtkSMPropertyHelper(selectionSource, "FieldType").Set(3);
+  selectionSource->UpdateProperty("FieldType");
+
+  return selectionSource;
+}
+
