@@ -117,11 +117,31 @@ public:
       }
     };
 
+  struct PedigreeStringIDType
+    {
+    vtkStdString Domain;
+    vtkStdString ID;
+    PedigreeStringIDType(vtkStdString domain, vtkStdString id)
+      {
+      this->Domain = domain;
+      this->ID = id;
+      }
+    bool operator < (const PedigreeStringIDType& other) const
+      {
+      if (this->Domain == other.Domain)
+        {
+        return (this->ID < other.ID);
+        }
+      return (this->Domain < other.Domain);
+      }
+    };
+
   typedef vtkstd::set<vtkIdType> SetOfIDs;
   typedef vtkstd::set<IDType> SetOfIDType;
   typedef vtkstd::set<CompositeIDType> SetOfCompositeIDType;
   typedef vtkstd::set<HierarchicalIDType> SetOfHierarchicalIDType;
   typedef vtkstd::set<PedigreeIDType> SetOfPedigreeIDType;
+  typedef vtkstd::set<PedigreeStringIDType> SetOfPedigreeStringIDType;
   typedef vtkstd::vector<double> VectorOfDoubles;
 
 
@@ -131,13 +151,14 @@ public:
   SetOfCompositeIDType CompositeIDs;
   SetOfHierarchicalIDType HierarchicalIDs;
   SetOfPedigreeIDType PedigreeIDs;
+  SetOfPedigreeStringIDType PedigreeStringIDs;
   VectorOfDoubles Locations;
   VectorOfDoubles Thresholds;
 };
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.7");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.8");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -199,6 +220,22 @@ void vtkPVSelectionSource::RemoveAllPedigreeIDs()
 {
   this->Mode = PEDIGREEIDS;
   this->Internal->PedigreeIDs.clear();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::AddPedigreeStringID(const char* domain, const char* id)
+{
+  this->Mode = PEDIGREEIDS;
+  this->Internal->PedigreeStringIDs.insert(vtkInternal::PedigreeStringIDType(domain, id));
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionSource::RemoveAllPedigreeStringIDs()
+{
+  this->Mode = PEDIGREEIDS;
+  this->Internal->PedigreeStringIDs.clear();
   this->Modified();
 }
 
@@ -412,6 +449,8 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       {
       output->SetContentType(vtkSelection::SELECTIONS);
       source->SetContentType(vtkSelection::INDICES);
+
+      // Add integer IDs
       source->RemoveAllIDs();
       vtkInternal::SetOfPedigreeIDType::iterator iter;
       for (iter = this->Internal->PedigreeIDs.begin();
@@ -436,6 +475,41 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
         source->AddID(-1, iter->ID);
         }
       if (this->Internal->PedigreeIDs.size() > 0)
+        {
+        source->Update();
+        vtkSelection* clone = vtkSelection::New();
+        clone->ShallowCopy(source->GetOutput());
+        clone->SetContentType(vtkSelection::PEDIGREEIDS);
+        output->AddChild(clone);
+        clone->Delete();
+        }
+
+      // Add string IDs
+      source->RemoveAllStringIDs();
+      vtkInternal::SetOfPedigreeStringIDType::iterator siter;
+      for (siter = this->Internal->PedigreeStringIDs.begin();
+        siter != this->Internal->PedigreeStringIDs.end(); ++siter)
+        {
+        if (siter == this->Internal->PedigreeStringIDs.begin() ||
+            !source->GetArrayName() ||
+            source->GetArrayName() != siter->Domain)
+          {
+          if (siter != this->Internal->PedigreeStringIDs.begin())
+            {
+            source->Update();
+            vtkSelection* clone = vtkSelection::New();
+            clone->ShallowCopy(source->GetOutput());
+            clone->SetContentType(vtkSelection::PEDIGREEIDS);
+            output->AddChild(clone);
+            clone->Delete();
+            }
+
+          source->RemoveAllIDs();
+          source->SetArrayName(siter->Domain.c_str());
+          }
+        source->AddStringID(-1, siter->ID.c_str());
+        }
+      if (this->Internal->PedigreeStringIDs.size() > 0)
         {
         source->Update();
         vtkSelection* clone = vtkSelection::New();

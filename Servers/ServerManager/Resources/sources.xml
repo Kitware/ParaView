@@ -1444,7 +1444,22 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         default_values="id 0"
         label="Pedigree IDs">
         <Documentation>
-          The list of IDs that will be added to the selection produced by the
+          The list of integer IDs that will be added to the selection produced by the
+          selection source, specified by the pair (domain, id).
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty name="StringIDs"
+        command="AddPedigreeStringID" 
+        clean_command="RemoveAllPedigreeStringIDs"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        number_of_elements="2"
+        element_types="2 2"
+        default_values="id foo"
+        label="Pedigree String IDs">
+        <Documentation>
+          The list of string IDs that will be added to the selection produced by the
           selection source, specified by the pair (domain, id).
         </Documentation>
      </StringVectorProperty>

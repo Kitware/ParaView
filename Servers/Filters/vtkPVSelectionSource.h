@@ -41,9 +41,14 @@ public:
   void RemoveAllGlobalIDs();
 
   // Description:
-  // Add pedigree IDs in a particular domain.
+  // Add integer pedigree IDs in a particular domain.
   void AddPedigreeID(const char* domain, vtkIdType id);
   void RemoveAllPedigreeIDs();
+
+  // Description:
+  // Add string pedigree IDs in a particular domain.
+  void AddPedigreeStringID(const char* domain, const char* id);
+  void RemoveAllPedigreeStringIDs();
 
   // Description:
   // Add a (piece, id) to the selection set. The source will generate
