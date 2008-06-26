@@ -118,7 +118,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.27");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.28");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -176,12 +176,13 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     {
     return status;
     }
-  status = appExec();
-  if (status != 0)
-    {
-    return status;
-    }
-  return postAppExec();
+
+  // There are several reasons, why appExec() could return non-null (failure).
+  // In any case, the windows etc. that were created ain preAppExec() need to
+  // cleaned up. Hence it's essential we call postAppExec().
+  status = this->appExec();
+  int postExecStatus = this->postAppExec();
+  return status==0? postExecStatus : status;
 }
 
 //-----------------------------------------------------------------------------
