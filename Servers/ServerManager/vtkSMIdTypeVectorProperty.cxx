@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.20");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.21");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -389,6 +389,7 @@ int vtkSMIdTypeVectorProperty::LoadState(vtkPVXMLElement* element,
     element = actual_element;
     }
 
+  bool prev = this->SetBlockModifiedEvents(true);
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
     {
@@ -407,9 +408,13 @@ int vtkSMIdTypeVectorProperty::LoadState(vtkPVXMLElement* element,
         }
       }
     }
+  this->SetBlockModifiedEvents(prev);
 
   // Do not immediately update. Leave it to the loader.
-  this->Modified();
+  if (this->GetPendingModifiedEvents())
+    {
+    this->Modified();
+    }
   this->ImmediateUpdate = prevImUpdate;
 
   return 1;

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.37");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.38");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -399,6 +399,7 @@ int vtkSMIntVectorProperty::LoadState(vtkPVXMLElement* element,
     element = actual_element;
     }
 
+  bool prev = this->SetBlockModifiedEvents(true);
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
     {
@@ -417,9 +418,13 @@ int vtkSMIntVectorProperty::LoadState(vtkPVXMLElement* element,
         }
       }
     }
+  this->SetBlockModifiedEvents(prev);
 
   // Do not immediately update. Leave it to the loader.
-  this->Modified();
+  if (this->GetPendingModifiedEvents())
+    {
+    this->Modified();
+    }
   this->ImmediateUpdate = prevImUpdate;
 
   return 1;

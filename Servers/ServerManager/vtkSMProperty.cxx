@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.58");
+vtkCxxRevisionMacro(vtkSMProperty, "1.59");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -62,8 +62,10 @@ vtkSMProperty::vtkSMProperty()
   this->IsInternal = 1;
   this->Documentation = 0;
   this->Repeatable = 0;
-
+  
   this->Hints = 0;
+  this->BlockModifiedEvents = false;
+  this->PendingModifiedEvents = false;
 }
 
 //---------------------------------------------------------------------------

@@ -227,6 +227,21 @@ public:
   // this property, if any, otherwise returns NULL.
   vtkGetObjectMacro(Hints, vtkPVXMLElement);
 
+  // Description:
+  // Overridden to support blocking of modified events.
+  virtual void Modified()
+    {
+    if (this->BlockModifiedEvents)
+      {
+      this->PendingModifiedEvents = true;
+      }
+    else
+      {
+      this->Superclass::Modified();
+      this->PendingModifiedEvents = false;
+      }
+    }
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -364,6 +379,20 @@ protected:
 
   int Repeatable;
 
+  // Description:
+  // Block/unblock modified events, returns the current state of the block flag.
+  bool SetBlockModifiedEvents(bool block)
+    {
+    bool prev = this->BlockModifiedEvents;
+    this->BlockModifiedEvents = block;
+    return prev;
+    }
+
+  // Description:
+  // Returns if any modified evetns are pending.
+  // This gets cleared when Modified() is called.
+  vtkGetMacro(PendingModifiedEvents, bool);
+
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
   void operator=(const vtkSMProperty&); // Not implemented
@@ -372,6 +401,9 @@ private:
   // Given the string, this method will create and set a well-formated
   // string as XMLLabel.
   void CreatePrettyLabel(const char* name);
+
+  bool PendingModifiedEvents;
+  bool BlockModifiedEvents;
 };
 
 #endif
