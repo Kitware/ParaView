@@ -245,6 +245,7 @@ void pqProxyInformationWidget::fillDataInformation(
   this->Ui->zRange->setText(tr("NA"));
 
   this->Ui->groupExtent->setVisible(false);
+  this->Ui->dataTimeLabel->setVisible(false);
 
   // if dataInformation->GetNumberOfDataSets() == 0, that means that the data
   // information does not have any valid values.
@@ -264,6 +265,13 @@ void pqProxyInformationWidget::fillDataInformation(
   QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
                                      0, 'e', 2);
   this->Ui->memory->setText(memory);
+
+  if (dataInformation->GetHasTime())
+    {
+    this->Ui->dataTimeLabel->setVisible(true);
+    this->Ui->dataTimeLabel->setText(
+      QString("Current data time step: <b>%1</b>").arg(dataInformation->GetTime()));
+    }
 
   vtkPVDataSetAttributesInformation* info[2];
   info[0] = dataInformation->GetPointDataInformation();

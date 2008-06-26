@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.53");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.54");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -159,6 +159,8 @@ void vtkPVDataInformation::Initialize()
   this->SetCompositeDataClassName(0);
   this->TimeSpan[0] = VTK_DOUBLE_MAX;
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
+  this->HasTime = 0;
+  this->Time = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -274,6 +276,33 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyCommonMetaData(vtkDataObject* data)
+{
+  // Gather some common stuff
+  vtkInformation *pinfo = data->GetPipelineInformation();
+  if (!pinfo)
+    {
+    return;
+    }
+
+  if (pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
+    {
+    double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    this->TimeSpan[0] = times[0];
+    this->TimeSpan[1] = times[1];
+    }
+
+  vtkInformation *dinfo = data->GetInformation();
+  if (dinfo->Has(vtkDataObject::DATA_TIME_STEPS()) &&
+    dinfo->Length(vtkDataObject::DATA_TIME_STEPS()) == 1)
+    {
+    double time = dinfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+    this->Time = time;
+    this->HasTime = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 {
   int idx;
@@ -367,15 +396,6 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
   if(fd && fd->GetNumberOfArrays()>0)
     {
     this->FieldDataInformation->CopyFromFieldData(fd);
-    }
-
-  //Copy time span from the dataset's producing algorithm
-  vtkInformation *pinfo = data->GetPipelineInformation();
-  if (pinfo && pinfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()))
-    {
-    double *times = pinfo->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
-    this->TimeSpan[0] = times[0];
-    this->TimeSpan[1] = times[1];
     }
 }
 
@@ -512,6 +532,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (cds)
     {
     this->CopyFromCompositeDataSet(cds);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -519,6 +540,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ds)
     {
     this->CopyFromDataSet(ds);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -526,6 +548,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (ads)
     {
     this->CopyFromGenericDataSet(ads);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -533,6 +556,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if( graph)
     {
     this->CopyFromGraph(graph);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -540,6 +564,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (table)
     {
     this->CopyFromTable(table);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -547,6 +572,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   if (selection)
     {
     this->CopyFromSelection(selection);
+    this->CopyCommonMetaData(dobj);
     return;
     }
 
@@ -554,6 +580,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
   // object types, this isn't an error condition - just
   // display the name of the data object and return quietly.
   this->SetDataClassName(dobj->GetClassName());
+  this->CopyCommonMetaData(dobj);
 }
 
 //----------------------------------------------------------------------------
@@ -717,6 +744,12 @@ void vtkPVDataInformation::AddInformation(
   if (times[1] > this->TimeSpan[1])
     {
     this->TimeSpan[1] = times[1];
+    }
+
+  if (!this->HasTime && info->GetHasTime())
+    {
+    this->Time = info->GetTime();
+    this->HasTime = 1;
     }
 }
 
@@ -891,6 +924,8 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
        << this->NumberOfRows
        << this->MemorySize
        << this->PolygonCount
+       << this->Time 
+       << this->HasTime
        << vtkClientServerStream::InsertArray(this->Bounds, 6)
        << vtkClientServerStream::InsertArray(this->Extent, 6);
 
@@ -999,6 +1034,16 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->PolygonCount))
     {
     vtkErrorMacro("Error parsing memory size.");
+    return;
+    }
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->Time))
+    {
+    vtkErrorMacro("Error parsing Time.");
+    return;
+    }
+  if(!CSS_GET_NEXT_ARGUMENT(css, 0, &this->HasTime))
+    {
+    vtkErrorMacro("Error parsing has-time.");
     return;
     }
   if(!CSS_GET_NEXT_ARGUMENT2(css, 0, this->Bounds, 6))

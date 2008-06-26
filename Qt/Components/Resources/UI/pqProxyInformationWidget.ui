@@ -10,9 +10,7 @@
    </rect>
   </property>
   <property name="sizePolicy" >
-   <sizepolicy>
-    <hsizetype>7</hsizetype>
-    <vsizetype>7</vsizetype>
+   <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -21,11 +19,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="pqTreeWidget" name="compositeTree" >
@@ -42,10 +49,22 @@
       <string>Properties</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>4</number>
       </property>
       <item row="0" column="0" >
@@ -71,10 +90,22 @@
       <string>Statistics</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>4</number>
       </property>
       <item row="3" column="1" >
@@ -139,9 +170,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>7</vsizetype>
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -150,18 +179,28 @@
       <string>Data Arrays</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
        <number>4</number>
       </property>
-      <item row="0" column="0" >
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>4</number>
+      </property>
+      <item row="1" column="0" >
        <widget class="pqTreeWidget" name="dataArrays" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>13</hsizetype>
-          <vsizetype>3</vsizetype>
+         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Ignored" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -186,6 +225,13 @@
         </column>
        </widget>
       </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="dataTimeLabel" >
+        <property name="text" >
+         <string>Current data time step: &lt;b>$TIME$&lt;/b></string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -195,10 +241,22 @@
       <string>Extents</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="1" column="2" >
@@ -262,9 +320,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>5</hsizetype>
-       <vsizetype>5</vsizetype>
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -273,10 +329,22 @@
       <string>Bounds</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>4</number>
       </property>
       <item row="2" column="0" >
@@ -340,9 +408,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4" >
      <property name="sizePolicy" >
-      <sizepolicy>
-       <hsizetype>7</hsizetype>
-       <vsizetype>7</vsizetype>
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -351,18 +417,28 @@
       <string>Time</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>4</number>
       </property>
       <item row="0" column="0" >
        <widget class="pqTreeWidget" name="timeValues" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>13</hsizetype>
-          <vsizetype>3</vsizetype>
+         <sizepolicy vsizetype="MinimumExpanding" hsizetype="Ignored" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>

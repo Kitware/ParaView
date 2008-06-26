@@ -31,6 +31,7 @@
 
 class vtkCollection;
 class vtkCompositeDataSet;
+class vtkDataObject;
 class vtkDataSet;
 class vtkGenericDataSet;
 class vtkGraph;
@@ -135,6 +136,14 @@ public:
   vtkGetVector2Macro(TimeSpan, double);
 
   // Description:
+  // Returns if the Time is set.
+  vtkGetMacro(HasTime, int);
+
+  // Description:
+  // Returns the data time if, GetHasTime() return true.
+  vtkGetMacro(Time, double);
+
+  // Description:
   // Returns if the data type is structured.
   int IsDataStructured();
 
@@ -151,6 +160,7 @@ protected:
   void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);
   void CopyFromSelection(vtkSelection* selection);
+  void CopyCommonMetaData(vtkDataObject*);
 
   // Data information collected from remote processes.
   int            DataSetType;
@@ -164,6 +174,8 @@ protected:
   double         Bounds[6];
   int            Extent[6];
   double         TimeSpan[2];
+  double         Time;
+  int            HasTime;
 
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
