@@ -20,12 +20,12 @@ using vtkstd::vector;
 //----------------------------------------------------------------------------
 vtkCTHFragmentCommBuffer::vtkCTHFragmentCommBuffer()
 {
-  // buffer
-  this->EOD=0;
-  this->Buffer=0;
   // header
   this->HeaderSize=0;
   this->Header=0;
+  // buffer
+  this->EOD=0;
+  this->Buffer=0;
 }
 //----------------------------------------------------------------------------
 vtkCTHFragmentCommBuffer::~vtkCTHFragmentCommBuffer()
@@ -62,6 +62,7 @@ void vtkCTHFragmentCommBuffer::Initialize(
 //----------------------------------------------------------------------------
 void vtkCTHFragmentCommBuffer::SizeHeader(int nBlocks)
 {
+  this->Clear();
   // header
   this->HeaderSize=DESCR_BASE+nBlocks;
   this->Header=new vtkIdType[this->HeaderSize];

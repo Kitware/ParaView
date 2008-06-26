@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.51");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.52");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -6540,16 +6540,16 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 
       #ifdef vtkCTHFragmentConnectDEBUG
       cerr << "[" << __LINE__ << "] "
-         << controllingProcId
-         << " total loading after fragment localization "
-         << loadingBefore/1E6
-         << " M polys."
-         << endl;
+           << controllingProcId
+           << " total loading after fragment localization "
+           << loadingBefore/1E6
+           << " M polys."
+           << endl;
       Q.PrintProcessLoading();
-      // cerr << "[" << __LINE__ << "] "
-      //       << controllingProcId
-      //       << " Transactions are to be executed:" << endl;
-      // TM.Print();
+      cerr << "[" << __LINE__ << "] "
+           << myProcId
+           << " the transaction matrix is:" << endl;
+      TM.Print();
       #endif
     }
   // All processes send fragment loading to controller.
@@ -6643,6 +6643,12 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
         }
       }
     }
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " fragment localization completed."
+       << endl;
+  #endif
 }
 
 //----------------------------------------------------------------------------
@@ -7134,7 +7140,7 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
        << myProcId 
        << " holding "
        << holding/1E6
-       << " in comm buffers."
+       << " MB in comm buffers."
        << endl;
   #endif
   return 1;
@@ -7828,6 +7834,18 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
     totalNumberOfIds += numIds;
     }
   this->TotalNumberOfRawFragments = totalNumberOfIds;
+
+  #ifdef vtkCTHFragmentConnectDEBUG
+  if (myProcId==0)
+    {
+    cerr << "[" << __LINE__ << "] "
+        << myProcId
+        << " there are "
+        << totalNumberOfIds
+        << " fragments."
+        << endl;
+    }
+  #endif
 
   // Change the set to a global set.
   vtkCTHFragmentEquivalenceSet *globalSet = new vtkCTHFragmentEquivalenceSet;

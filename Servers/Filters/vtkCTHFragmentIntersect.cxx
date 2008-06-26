@@ -14,8 +14,6 @@
 =========================================================================*/
 #include "vtkCTHFragmentIntersect.h"
 
-
-
 #include "vtkObject.h"
 #include "vtkObjectFactory.h"
 // Pipeline
@@ -31,6 +29,7 @@
 #include "vtkCompositeDataIterator.h"
 // Arrays
 #include "vtkDataObject.h"
+#include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
@@ -57,8 +56,89 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.3");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.4");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
+
+#ifdef vtkCTHFragmentIntersectDEBUG
+template<class T>
+static void writeTuple(ostream &sout,T *tup, int nComp)
+{
+  if (nComp==1)
+    {
+    sout << tup[0];
+    }
+  else
+    {
+    sout << "(" << tup[0];
+    for (int q=1; q<nComp; ++q)
+      {
+      sout << ", " << tup[q];
+      }
+    sout << ")";
+    }
+}
+//
+static ostream &operator<<(ostream &sout, vtkDoubleArray &da)
+{
+  sout << "Name:          " << da.GetName() << endl;
+
+  int nTup = da.GetNumberOfTuples();
+  int nComp = da.GetNumberOfComponents();
+
+  sout << "NumberOfComps: " << nComp << endl;
+  sout << "NumberOfTuples:" << nTup << endl;
+  if (nTup==0)
+    {
+    sout << "{}" << endl;
+    }
+  else
+    {
+    sout << "{";
+    double *thisTup=da.GetTuple(0);
+    writeTuple(sout, thisTup, nComp);
+    for (int i=1; i<nTup; ++i)
+      {
+      thisTup=da.GetTuple(i);
+      sout << ", ";
+      writeTuple(sout, thisTup, nComp);
+      }
+    sout << "}" << endl;
+    }
+  return sout;
+}
+//
+static ostream &operator<<(ostream &sout, vector<vtkDoubleArray *> &vda)
+{
+  int nda=vda.size();
+  for (int i=0; i<nda; ++i)
+    {
+    sout << "[" << i << "]\n" << *vda[i] << endl;
+    }
+  return sout;
+}
+//
+static ostream &operator<<(ostream &sout, vector<vector<int> >&vvi)
+{
+  int nv=vvi.size();
+  for (int i=0; i<nv; ++i)
+    {
+    sout << "[" << i << "]{";
+    int ni=vvi[i].size();
+    if (ni<1) 
+      {
+      sout << "}" << endl;
+      continue;
+      }
+    sout << vvi[i][0];
+    for (int j=1; j<ni; ++j)
+      {
+      sout << vvi[i][j] << ",";
+      }
+    sout << "}" << endl;
+    }
+  return sout;
+}
+#endif
 
 //----------------------------------------------------------------------------
 vtkCTHFragmentIntersect::vtkCTHFragmentIntersect()
@@ -183,6 +263,7 @@ int vtkCTHFragmentIntersect::CopyInputStructureStats(
     }
   return 1;
 }
+
 //----------------------------------------------------------------------------
 // Make a destination data set with the same structure as the
 // source. The sources are expected to be multi block of either
@@ -215,6 +296,17 @@ int vtkCTHFragmentIntersect::CopyInputStructureGeom(
       destFragments->SetNumberOfPieces(nSrcFragments);
       dest->SetBlock(blockId, destFragments);
       destFragments->Delete();
+
+      #ifdef vtkCTHFragmentIntersectDEBUG
+      cerr << "[" << __LINE__ << "]"
+           << "[" << this->Controller->GetLocalProcessId() << "]"
+           << "Input block "
+           << blockId
+           << " has "
+           << nSrcFragments
+           << " fragments."
+           << endl;
+      #endif
       }
     else
       {
@@ -226,9 +318,6 @@ int vtkCTHFragmentIntersect::CopyInputStructureGeom(
     }
   return 1;
 }
-
-
-
 
 //----------------------------------------------------------------------------
 // Build a list of fragment ids which we own. The id is the
@@ -259,7 +348,16 @@ int vtkCTHFragmentIntersect::IdentifyLocalFragments()
         this->FragmentIds[blockId].push_back(fragmentId);
         }
       }
+      // free extra memory
+      vector<int>(this->FragmentIds[blockId]).swap(this->FragmentIds[blockId]);
     }
+
+  #ifdef vtkCTHFragmentIntersectDEBUG
+  cerr << "[" << __LINE__ << "]" 
+       << "[" << this->Controller->GetLocalProcessId() << "]"
+       << "found local ids:"
+       << this->FragmentIds;
+  #endif
 
   return 1;
 }
@@ -341,9 +439,22 @@ int vtkCTHFragmentIntersect::Intersect()
         intersectionOut->Delete();
         }
       }
+    // free extra memory
+    centers->Squeeze();
+    vector<int>(ids).swap(ids);
+
     this->Progress+=this->ProgressIncrement;
     this->UpdateProgress(this->Progress);
     }
+
+  #ifdef vtkCTHFragmentIntersectDEBUG
+  cerr << "[" << __LINE__ << "]"
+       << "[" << this->Controller->GetLocalProcessId() << "]"
+       << "intersection produced:"
+       << endl
+       << this->IntersectionCenters
+       << this->IntersectionIds;
+  #endif
   return 1;
 }
 
@@ -399,9 +510,9 @@ int vtkCTHFragmentIntersect::CollectGeometricAttributes(
       {
       int nFragments
         = buffers[procId].GetNumberOfFragments(blockId);
-      // centers
+      // centers, memory managed by comm buffer.
       buffers[procId].UnPack(centers[procId][blockId],3,nFragments,false);
-      // ids
+      // ids, memory managed by comm buffer.
       buffers[procId].UnPack(ids[procId][blockId],1,nFragments,false);
       }
     }
@@ -495,6 +606,8 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
   ids.resize(nProcs);
   for (int procId=0; procId<nProcs; ++procId)
     {
+    ids[procId].resize(this->NBlocks,static_cast<int *>(0));
+    //
     if (procId==myProcId)
       {
       for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
@@ -509,13 +622,10 @@ int vtkCTHFragmentIntersect::PrepareToCollectGeometricAttributes(
           }
         }
       }
-    else
-      {
-      ids[procId].resize(this->NBlocks,static_cast<int *>(0));
-      }
     }
   return 1;
 }
+
 //------------------------------------------------------------------------------
 // Configure buffers and containers, and put our data in.
 //
@@ -658,11 +768,13 @@ int vtkCTHFragmentIntersect::CopyAttributesToStatsOutput(
     return 1;
     }
 
-  // // debug
-  // cerr << "centers:" << endl;
-  // cerr << this->IntersectionCenters;
-  // cerr << "ids:" << endl;
-  // cerr << this->IntersectionIds;
+  #ifdef vtkCTHFragmentIntersectDEBUG
+  cerr << "[" << __LINE__ << "]"
+       << "[" << myProcId << "]"
+       << "copying to stats output:"
+       << this->IntersectionCenters
+       << this->IntersectionIds;
+  #endif
 
   for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
     {
