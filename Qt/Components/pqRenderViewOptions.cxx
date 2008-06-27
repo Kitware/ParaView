@@ -50,6 +50,7 @@ class pqRenderViewOptions::pqInternal : public Ui::pqRenderViewOptions
 public:
   QPointer<pqRenderView> RenderView;
   pqPropertyManager Links;
+  pqPropertyManager LightsLinks;
   pqSignalAdaptorColor *ColorAdaptor;
 };
 
@@ -66,6 +67,8 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
 
   // enable the apply button when things are changed
   QObject::connect(&this->Internal->Links, SIGNAL(modified()),
+          this, SIGNAL(changesAvailable()));
+  QObject::connect(&this->Internal->LightsLinks, SIGNAL(modified()),
           this, SIGNAL(changesAvailable()));
   
   QObject::connect(this->Internal->restoreDefault,
@@ -140,6 +143,7 @@ void pqRenderViewOptions::applyChanges()
     }
 
   this->Internal->Links.accept();
+  this->Internal->LightsLinks.accept();
   
   this->Internal->RenderView->setOrientationAxesVisibility(this->Internal->OrientationAxes->isChecked());
 
@@ -162,6 +166,7 @@ void pqRenderViewOptions::applyChanges()
 void pqRenderViewOptions::resetChanges()
 {
   this->Internal->Links.reject();
+  this->Internal->LightsLinks.reject();
   this->resetAnnotation();
 }
 
@@ -182,15 +187,15 @@ void pqRenderViewOptions::connectGUI()
   
   
   // link default light params
-  this->Internal->Links.registerLink(this->Internal->DefaultLightSwitch, "checked", 
+  this->Internal->LightsLinks.registerLink(this->Internal->DefaultLightSwitch, "checked", 
     SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("LightSwitch"));
   pqSignalAdaptorSliderRange* sliderAdaptor;
   sliderAdaptor = new pqSignalAdaptorSliderRange(this->Internal->LightIntensity);
-  this->Internal->Links.registerLink(sliderAdaptor, "value",
+  this->Internal->LightsLinks.registerLink(sliderAdaptor, "value",
     SIGNAL(valueChanged(double)),
     proxy, proxy->GetProperty("LightIntensity"));
-  this->Internal->Links.registerLink(this->Internal->LightIntensity_Edit, "text",
+  this->Internal->LightsLinks.registerLink(this->Internal->LightIntensity_Edit, "text",
     SIGNAL(textChanged(const QString&)),
     proxy, proxy->GetProperty("LightIntensity"));
   pqSignalAdaptorColor* lightColorAdaptor;
@@ -198,14 +203,23 @@ void pqRenderViewOptions::connectGUI()
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)),
     false);
-  this->Internal->Links.registerLink(lightColorAdaptor, "color",
+  this->Internal->LightsLinks.registerLink(lightColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("LightDiffuseColor"));
 
 
   // link light kit params
-  pqNamedWidgets::link(this->Internal->UseLight, proxy, &this->Internal->Links);
-  this->Internal->Links.registerLink(this->Internal->UseLight, "checked", SIGNAL(toggled(bool)),
+  pqNamedWidgets::link(this->Internal->UseLight, proxy, &this->Internal->LightsLinks);
+
+  // Need to explicitly link all the wacky-named properties
+  this->Internal->LightsLinks.registerLink(this->Internal->FillLightK_F_Ratio, "value",
+    SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("FillLightK:F Ratio"));
+  this->Internal->LightsLinks.registerLink(this->Internal->BackLightK_B_Ratio, "value",
+    SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("BackLightK:B Ratio"));
+  this->Internal->LightsLinks.registerLink(this->Internal->HeadLightK_H_Ratio, "value",
+    SIGNAL(valueChanged(double)), proxy, proxy->GetProperty("HeadLightK:H Ratio"));
+
+  this->Internal->LightsLinks.registerLink(this->Internal->UseLight, "checked", SIGNAL(toggled(bool)),
     proxy, proxy->GetProperty("UseLight"));
 
   this->resetAnnotation();
@@ -233,6 +247,7 @@ void pqRenderViewOptions::resetAnnotation()
 void pqRenderViewOptions::disconnectGUI()
 {
   this->Internal->Links.removeAllLinks();
+  this->Internal->LightsLinks.removeAllLinks();
 }
 
 //-----------------------------------------------------------------------------
@@ -253,6 +268,7 @@ void pqRenderViewOptions::resetLights()
     {
     // TODO: this doesn't let the user cancel to get previous lights back
     this->Internal->RenderView->restoreDefaultLightSettings();
+    this->Internal->LightsLinks.reject();
     emit this->changesAvailable();
     }
 }
