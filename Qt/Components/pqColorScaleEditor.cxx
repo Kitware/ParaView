@@ -1303,23 +1303,14 @@ void pqColorScaleEditor::initColorScale()
         this->Display->getColorField());
     this->Form->Component->setEnabled(numComponents > 1);
     this->Form->ComponentLabel->setEnabled(numComponents > 1);
-    if(numComponents > 1)
+    if (numComponents > 1)
       {
       this->Form->Component->addItem("Magnitude", QVariant(-1));
-      if(numComponents <= 3)
+      for (int cc=0; cc < numComponents; cc++)
         {
-        const char *titles[] = {"X", "Y", "Z"};
-        for(int cc = 0; cc < numComponents; cc++)
-          {
-          this->Form->Component->addItem(titles[cc], QVariant(cc));
-          }
-        }
-      else
-        {
-        for(int cc = 0; cc < numComponents; cc++)
-          {
-          this->Form->Component->addItem(QString::number(cc), QVariant(cc));
-          }
+        this->Form->Component->addItem(
+          pqScalarBarRepresentation::getDefaultComponentLabel(cc, numComponents),
+          QVariant(cc));
         }
 
       int index = 0;

@@ -126,7 +126,7 @@ QPair<QString, QString> pqScalarBarRepresentation::getTitle() const
 {
   QString title = pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("Title")).toString();
-  QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|[0-9]+)\\b");
+  QRegExp reg("(.*)\\b(Magnitude|X|Y|Z|XX|XY|XZ|YX|YY|YZ|ZX|ZY|ZZ|[0-9]+)\\b");
   if (!reg.exactMatch(title))
     {
     return QPair<QString, QString>(title.trimmed(), "");
@@ -172,17 +172,33 @@ void pqScalarBarRepresentation::makeTitle(pqPipelineRepresentation* display)
   if (num_components > 1 && 
     mode == pqScalarsToColors::COMPONENT && component_no >= 0)
     {
-    if (num_components <= 3 && component_no < 3)
-      {
-      const char* titles[] = { "X", "Y", "Z"};
-      component = titles[component_no];
-      }
-    else
-      {
-      component = QString::number(component_no);
-      }
+    component = pqScalarBarRepresentation::getDefaultComponentLabel(
+      component_no,  num_components);
     }
   this->setTitle(arrayname, component);
+}
+
+//-----------------------------------------------------------------------------
+QString pqScalarBarRepresentation::getDefaultComponentLabel(
+  int component_no, int num_components)
+{
+  QString component;
+  if (num_components <= 3 && component_no < 3)
+    {
+    const char* titles[] = { "X", "Y", "Z"};
+    component = titles[component_no];
+    }
+  else if (num_components == 6)
+    {
+    const char* titles[] ={"XX", "YY", "ZZ", "XY", "YZ", "XZ"};
+    // Assume this is a symmetric matrix.
+    component = titles[component_no];
+    }
+  else
+    {
+    component = QString::number(component_no);
+    }
+  return component;
 }
 
 //-----------------------------------------------------------------------------

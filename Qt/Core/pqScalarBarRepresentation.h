@@ -76,6 +76,9 @@ public:
 
   virtual void setDefaultPropertyValues();
 
+  /// Returns the default string for showing the given component.
+  static QString getDefaultComponentLabel(int component_no, int numComps);
+
 protected slots:
   void onLookupTableModified();
 

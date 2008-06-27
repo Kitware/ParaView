@@ -44,10 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 
 #include "pqApplicationCore.h"
-#include "pqPipelineRepresentation.h"
 #include "pqOutputPort.h"
-#include "pqUndoStack.h"
+#include "pqPipelineRepresentation.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
@@ -300,14 +301,9 @@ void pqDisplayColorWidget::updateComponents()
       this->Components->addItem("Magnitude");
       for(int i=0; i<numComponents; i++)
         {
-        if (numComponents == 3)
-          {
-          this->Components->addItem(QString("%1").arg(static_cast<char>('X'+i)));
-          }
-        else
-          {
-          this->Components->addItem(QString("%1").arg(i));
-          }
+        this->Components->addItem(
+          pqScalarBarRepresentation::getDefaultComponentLabel(
+            i, numComponents));
         }
       
       if(lut->getVectorMode() == pqScalarsToColors::MAGNITUDE)

@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqPipelineFilter.h"
 #include "pqSMAdaptor.h"
+#include "pqScalarBarRepresentation.h"
 #include "ui_pqCalculatorPanel.h"
 
 class pqCalculatorPanel::pqInternal 
@@ -431,7 +432,8 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
         }
       else
         {
-        QString n = name + QString("_%1").arg(j);
+        QString n = name + QString("_%1").arg(
+          pqScalarBarRepresentation::getDefaultComponentLabel(j, numComponents));
         QStringList d;
         d.append(name);
         d.append(QString("%1").arg(j));
