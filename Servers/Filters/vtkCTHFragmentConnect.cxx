@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.52");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.53");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -3945,7 +3945,7 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
 // and its center.
 //TODO use same array name for frag id on multiple materials, and use global id
 int vtkCTHFragmentConnect::RequestData(
-  vtkInformation *vtkNotUsed(request),
+  vtkInformation *request,
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
@@ -3980,6 +3980,21 @@ int vtkCTHFragmentConnect::RequestData(
   outInfo = outputVector->GetInformationObject(1);
   vtkMultiBlockDataSet *mbdsOutput1 =
     vtkMultiBlockDataSet::SafeDownCast( outInfo->Get(vtkDataObject::DATA_OBJECT()) );
+
+  int fromPort = request->Get(vtkExecutive::FROM_OUTPUT_PORT());
+  outInfo = outputVector->GetInformationObject(fromPort);
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
 
   // TODO  we should build a vector of material arrays for single pass processing
   // Get arrays to process based on array selection status
