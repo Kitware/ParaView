@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.10");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.11");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -571,6 +571,9 @@ int vtkFileSeriesReader::RequestUpdateExtent(
   // RequestInformation has been called.
   this->RequestInformationForInput(index);
 
+  // I commented out the following block because it is probably not important
+  // and it is causing a crash in some circumstances (bug #7253).
+#if 0
   // I'm not sure if the executive will wipe out this information before
   // RequestData is called, and I don't think I care.  I'm just setting this
   // here for completeness.
@@ -581,6 +584,7 @@ int vtkFileSeriesReader::RequestUpdateExtent(
     outInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),
                  &times[0], times.size());
     }
+#endif
   return 1;
 }
 
