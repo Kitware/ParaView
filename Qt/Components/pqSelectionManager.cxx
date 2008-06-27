@@ -434,7 +434,7 @@ vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, v
   sp->SetNumberOfElements(0);
   unsigned int curId = 0;
   unsigned int curStringId = 0;
-  for (int c = 0; c < sel->GetNumberOfChildren(); ++c)
+  for (unsigned int c = 0; c < sel->GetNumberOfChildren(); ++c)
     {
     vtkSelection* curSel = sel->GetChild(c);
     vtkAbstractArray* ids = curSel->GetSelectionList();
