@@ -59,6 +59,9 @@ public:
   /// reset the changes. Overridden to hide handles.
   virtual void reset();
 
+  /// Overridden to update widget placement based on data bounds.
+  virtual void select();
+
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);

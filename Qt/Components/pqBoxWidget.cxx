@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkSMNewWidgetRepresentationProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 
 // Qt Includes.
 #include <QDoubleValidator>
@@ -150,6 +150,21 @@ void pqBoxWidget::createWidget(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
+// update widget bounds.
+void pqBoxWidget::select()
+{
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  double input_bounds[6];
+  if (widget  && this->getReferenceInputBounds(input_bounds))
+    {
+    vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
+    widget->UpdateVTKObjects();
+    }
+
+  this->Superclass::select();
+}
+
+//-----------------------------------------------------------------------------
 void pqBoxWidget::resetBounds()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
@@ -159,13 +174,8 @@ void pqBoxWidget::resetBounds()
     return;
     }
 
-  if (vtkSMDoubleVectorProperty* const place_widget =
-    vtkSMDoubleVectorProperty::SafeDownCast(
-      widget->GetProperty("PlaceWidget")))
-    {
-    place_widget->SetElements(input_bounds);
-    widget->UpdateVTKObjects();
-    }
+  vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
+  widget->UpdateVTKObjects();
 
   this->setModified();
   this->render();

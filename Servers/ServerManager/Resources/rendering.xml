@@ -1579,6 +1579,14 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
+     <DoubleVectorProperty 
+        name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.2">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
      <Property
        name="OnInteraction"
        command="OnInteraction"

@@ -50,6 +50,10 @@
 #include "vtkSMStringVectorProperty.h"
 
 #include <assert.h>
+inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
+{
+  return x < y? x : y;
+}
 
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
@@ -180,6 +184,27 @@ int vtkSMPropertyHelper::GetAsInt(unsigned int index /*=0*/)
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count)
+{
+  switch (this->Type)
+    {
+    SM_TEMPLATE_MACRO_NUM(
+      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      for (unsigned int cc=0; cc < count; cc++)
+        {
+        values[cc] = static_cast<int>(SMProperty->GetElement(cc));
+        }
+      return count;
+    );
+
+  default:
+    vtkGenericWarningMacro("Call not supported for the current property type.");
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
 {
   switch (this->Type)
@@ -218,6 +243,27 @@ double vtkSMPropertyHelper::GetAsDouble(unsigned int index /*=0*/)
     {
     SM_TEMPLATE_MACRO_NUM(
       return static_cast<double>(SMProperty->GetElement(index)));
+
+  default:
+    vtkGenericWarningMacro("Call not supported for the current property type.");
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count)
+{
+  switch (this->Type)
+    {
+    SM_TEMPLATE_MACRO_NUM(
+      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      for (unsigned int cc=0; cc < count; cc++)
+        {
+        values[cc] = static_cast<double>(SMProperty->GetElement(cc));
+        }
+      return count;
+    );
 
   default:
     vtkGenericWarningMacro("Call not supported for the current property type.");
@@ -279,6 +325,27 @@ void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
   default:
     vtkGenericWarningMacro("Call not supported for the current property type.");
     }
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count)
+{
+  switch (this->Type)
+    {
+    SM_TEMPLATE_MACRO_NUM(
+      count = ::vtkSMPropertyHelperMin(SMProperty->GetNumberOfElements(), count);
+      for (unsigned int cc=0; cc < count; cc++)
+        {
+        values[cc] = static_cast<vtkIdType>(SMProperty->GetElement(cc));
+        }
+      return count;
+    );
+
+  default:
+    vtkGenericWarningMacro("Call not supported for the current property type.");
+    }
+
+  return 0;
 }
 #endif
 

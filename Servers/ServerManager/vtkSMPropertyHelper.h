@@ -96,6 +96,7 @@ public:
   void Set(unsigned int index, int value);
   void Set(const int* values, unsigned int count);
   int GetAsInt(unsigned int index = 0);
+  unsigned int Get(int* values, unsigned int count);
 
   // Description:
   // Set/Get methods with \c double API. Calling these method on
@@ -105,6 +106,7 @@ public:
   void Set(unsigned int index, double value);
   void Set(const double* values, unsigned int count);
   double GetAsDouble(unsigned int index = 0);
+  unsigned int Get(double* values, unsigned int count);
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
   // Description:
@@ -114,6 +116,7 @@ public:
     { this->Set(0, value); }
   void Set(unsigned int index, vtkIdType value);
   void Set(const vtkIdType* values, unsigned int count);
+  unsigned int Get(vtkIdType* values, unsigned int count);
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0);
 

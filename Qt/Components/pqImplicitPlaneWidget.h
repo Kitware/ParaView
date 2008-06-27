@@ -53,19 +53,18 @@ public:
   pqImplicitPlaneWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
   ~pqImplicitPlaneWidget();
 
-  /// A implicit plane widget can optionally have  a ScaleFactor/ScaleOrigin
-  /// which affects how the widget is placed on reset bounds.
-  void setScaleFactor(double scale[3]);
-  void setScaleOrigin(double origin[3]);
-
 public slots:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   virtual void resetBounds();
 
   /// accept the changes
   void accept();
+
   /// reset the changes
   void reset();
+
+  /// Overridden to update widget placement based on data bounds.
+  virtual void select();
 
 protected:
   
@@ -115,8 +114,6 @@ private:
   void setNormalProperty(vtkSMProperty*);
   void setOriginProperty(vtkSMProperty*);
 
-  double ScaleFactor[3];
-  double ScaleOrigin[3];
   class pqImplementation;
   pqImplementation* const Implementation;
 };
