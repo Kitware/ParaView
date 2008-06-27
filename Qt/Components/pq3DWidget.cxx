@@ -528,7 +528,7 @@ void pq3DWidget::updateWidgetVisibility()
     
   const bool widget_enabled = widget_visible;
   
-  if(this->Internal->WidgetProxy && this->renderView())
+  if (this->Internal->WidgetProxy && this->renderView())
     {
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(
@@ -546,10 +546,8 @@ void pq3DWidget::updateWidgetVisibility()
 
     this->Internal->WidgetProxy->UpdateVTKObjects();
 
-    // We don't need to explicitly call a render here since the 
-    // vtkAbstractWidget render the views when enable/visibily 
-    // state changes.
-    //pqApplicationCore::instance()->render();
+    // need to render since the widget visibility state changed.
+    this->render();
     }
   this->updatePickShortcut();
 }
