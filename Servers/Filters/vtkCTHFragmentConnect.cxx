@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.58");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.59");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -307,25 +307,6 @@ ostream &operator<<(ostream &sout, vtkCTHFragmentProcessLoading &fp)
 
   return sout;
 }
-// //
-// ostream &operator<<(ostream &sout, 
-//   vector<vector<vtkCTHFragmentProcessLoading> > &pla)
-// {
-//   int nProcs=pla.size();
-//   for (int procId=0; procId<nProcs; ++procId)
-//     {
-//     cerr << "Fragment loading on process " << procId << ":" << endl;
-//     int nLocalFragments=pla[procId].size();
-//     for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
-//       {
-//       sout << pla[procId][fragmentIdx] << ", ";
-//       }
-//     sout << endl;
-//     }
-// 
-//   return sout;
-// }
-
 
 /*
 Minimum ordered heap based priority queue.
@@ -626,16 +607,7 @@ unsigned int vtkCTHFragmentProcessPriorityQueue::ComputeHeapSize(unsigned int nI
          && i!=bitsPerInt-1);
 
   return size;
-//   int bitsPerInt=sizeof(int)*8;
-//   int size=nItems-1;
-//   for (int i=1; i<bitsPerInt; i<<=1)
-//     {
-//     size = size | size >> i;
-//     }
-//   return size+1;
 }
-
-
 
 /**
 Data structure which allows constant time determination 
@@ -3935,7 +3907,7 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
 // and its center.
 //TODO use same array name for frag id on multiple materials, and use global id
 int vtkCTHFragmentConnect::RequestData(
-  vtkInformation *request,
+  vtkInformation *vtkNotUsed(request),
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
@@ -3971,20 +3943,20 @@ int vtkCTHFragmentConnect::RequestData(
   vtkMultiBlockDataSet *mbdsOutput1 =
     vtkMultiBlockDataSet::SafeDownCast( outInfo->Get(vtkDataObject::DATA_OBJECT()) );
 
-  int fromPort = request->Get(vtkExecutive::FROM_OUTPUT_PORT());
-  outInfo = outputVector->GetInformationObject(fromPort);
-  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
-  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+//   int fromPort = request->Get(vtkExecutive::FROM_OUTPUT_PORT());
+//   outInfo = outputVector->GetInformationObject(fromPort);
+//   mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+//   mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+//   mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+//   mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+//   mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+//   mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+//       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
 
   // Get arrays to process based on array selection status
   vector<string> MaterialArrayNames;
