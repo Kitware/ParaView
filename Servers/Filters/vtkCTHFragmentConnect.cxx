@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.56");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.57");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -2504,9 +2504,9 @@ int vtkCTHFragmentConnectRingBuffer::Pop(vtkCTHFragmentConnectIterator* item)
 vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 {
   this->Controller = vtkMultiProcessController::GetGlobalController();
-  int myProcId=this->Controller->GetLocalProcessId();
 
   #ifdef vtkCTHFragmentConnectDEBUG
+  int myProcId=this->Controller->GetLocalProcessId();
   this->MyPid=WritePidFile(this->Controller->GetCommunicator(),"cthfc.pid");
   cerr << "[" << __LINE__ << "] "
        << myProcId

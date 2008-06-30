@@ -34,6 +34,7 @@ using vtksys_ios::ostringstream;
 using vtkstd::vector;
 #include<vtkstd/string>
 using vtkstd::string;
+#include<vtkstd/algorithm>
 // other
 #include<assert.h>
 
@@ -355,6 +356,7 @@ string GetMemoryUsage(int pid, int line, int procId)
 {
   ostringstream memoryUsage;
 
+  #ifndef WIN32
   ostringstream statusFileName;
   statusFileName << "/proc/" << pid << "/status";
   ifstream statusFile;
@@ -396,6 +398,7 @@ string GetMemoryUsage(int pid, int line, int procId)
          << statusFileName
          << "." << endl;
     }
+  #endif
 
   return memoryUsage.str();
 }
