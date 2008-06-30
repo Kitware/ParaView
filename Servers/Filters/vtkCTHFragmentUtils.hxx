@@ -300,6 +300,7 @@ int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
     }
   return nEnabled;
 }
+#ifdef vtkCTHFragmentConnectDEBUG
 //
 int WritePidFile(vtkCommunicator *comm, string pidFileName)
 {
@@ -356,7 +357,6 @@ string GetMemoryUsage(int pid, int line, int procId)
 {
   ostringstream memoryUsage;
 
-  #ifndef WIN32
   ostringstream statusFileName;
   statusFileName << "/proc/" << pid << "/status";
   ifstream statusFile;
@@ -398,10 +398,10 @@ string GetMemoryUsage(int pid, int line, int procId)
          << statusFileName
          << "." << endl;
     }
-  #endif
 
   return memoryUsage.str();
 }
+#endif
 //
 void PrintHistogram(vector<int> &bins)
 {
