@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineRepresentation;
 class pqScalarsToColors;
+class vtkUndoElement;
 
 // PQ object for a scalar bar. Keeps itself connected with the pqScalarsToColors
 // object, if any.
@@ -79,8 +80,25 @@ public:
   /// Returns the default string for showing the given component.
   static QString getDefaultComponentLabel(int component_no, int numComps);
 
+signals:
+  /// Fired just before the color is changed on the underlying proxy.
+  /// This must be hooked to an undo stack to record the
+  /// changes in a undo set.
+  void begin(const QString&);
+
+  /// Fired just after the color is changed on the underlying proxy.
+  /// This must be hooked to an undo stack to record the
+  /// changes in a undo set.
+  void end();
+  
+  /// For undo-stack.
+  void addToActiveUndoSet(vtkUndoElement* element);
+
 protected slots:
   void onLookupTableModified();
+
+  void startInteraction();
+  void endInteraction();
 
 protected:
   /// flag set to true, when the scalarbar has been hidden by

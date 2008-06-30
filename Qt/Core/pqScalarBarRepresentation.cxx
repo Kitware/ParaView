@@ -34,7 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxy.h"
+#include "vtkSMUndoElement.h"
 
 #include <QtDebug>
 #include <QPointer>
@@ -46,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqScalarBarRepresentation::pqInternal
@@ -70,8 +73,26 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
   this->Internal->VTKConnect->Connect(scalarbar->GetProperty("LookupTable"),
     vtkCommand::ModifiedEvent, this, SLOT(onLookupTableModified()));
 
+  // Listen to start/end interactions to update the application undo-redo stack
+  // correctly.
+  this->Internal->VTKConnect->Connect(scalarbar, vtkCommand::StartInteractionEvent,
+    this, SLOT(startInteraction()));
+  this->Internal->VTKConnect->Connect(scalarbar, vtkCommand::EndInteractionEvent,
+    this, SLOT(endInteraction()));
+
   // load default values.
   this->onLookupTableModified();
+
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    QObject::connect(this, SIGNAL(begin(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this, SIGNAL(addToActiveUndoSet(vtkUndoElement*)),
+      stack, SLOT(addToActiveUndoSet(vtkUndoElement*)));
+    QObject::connect(this, SIGNAL(end()),
+      stack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -222,5 +243,37 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LabelFontSize"), 12);
 
   proxy->UpdateVTKObjects();
+}
+
+#define PUSH_PROPERTY(name) \
+{\
+  vtkSMPropertyModificationUndoElement* elem =\
+  vtkSMPropertyModificationUndoElement::New();\
+  elem->SetConnectionID(proxy->GetConnectionID());\
+  elem->ModifiedProperty(proxy, name);\
+  emit this->addToActiveUndoSet(elem);\
+  elem->Delete();\
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarRepresentation::startInteraction()
+{
+  emit this->begin("Move Color Legend");
+  
+  vtkSMProxy* proxy = this->getProxy();
+  PUSH_PROPERTY("Position");
+  PUSH_PROPERTY("Position2");
+  PUSH_PROPERTY("Orientation");
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarBarRepresentation::endInteraction()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  PUSH_PROPERTY("Position");
+  PUSH_PROPERTY("Position2");
+  PUSH_PROPERTY("Orientation");
+
+  emit this->end();
 }
 

@@ -1838,6 +1838,25 @@
          <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        number_of_elements="1"
+        information_property="OrientationInfo"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Horizontal"/>
+          <Entry value="1" text="Vertical"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="OrientationInfo"
+        command="GetOrientation"
+        information_only="1" >
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
       <ProxyProperty name="Renderer" command="SetRenderer">
         <ProxyGroupDomain name="groups">
           <Group name="renderers"/>
@@ -7601,8 +7620,10 @@
           <Property name="Visibility"/>
           <Property name="Position"/>
           <Property name="Position2"/>
+          <Property name="Orientation" />
           <Property name="PositionInfo"/>
           <Property name="Position2Info"/>
+          <Property name="OrientationInfo" />
         </ExposedProperties>
       </SubProxy>
 
@@ -7612,7 +7633,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="LookupTable" />
-          <Property name="Orientation" />
           <Property name="Title" />
           <Property name="AutomaticLabelFormat" />
           <Property name="LabelFormat" />
