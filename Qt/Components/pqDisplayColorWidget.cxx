@@ -170,6 +170,7 @@ void pqDisplayColorWidget::onComponentActivated(int row)
   pqPipelineRepresentation* display = this->getRepresentation();
   if(display)
     {
+    emit this->begin("Color Component Change");
     pqScalarsToColors* lut = display->getLookupTable();
     if(row == 0)
       {
@@ -181,6 +182,8 @@ void pqDisplayColorWidget::onComponentActivated(int row)
       }
     lut->updateScalarBarTitles(this->Components->itemText(row));
     display->resetLookupTableScalarRange();
+    emit this->end();
+
     display->renderViewEventually();
     }
 }
