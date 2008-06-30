@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.55");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.56");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -2513,8 +2513,6 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
        << " memory commitment entering vtkCTHFragmentConnect is:"
        << endl
        << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
-  #else
-  this->MyPid=-1;
   #endif
 
   // Pipeline
