@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.54");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.55");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -967,6 +967,10 @@ class vtkCTHFragmentPieceTransactionMatrix
     // un-initialized state.
     void Clear();
     // Description:
+    // Get the number of transaction a given process will
+    // execute.
+    vtkIdType GetNumberOfTransactions(int procId);
+    // Description:
     // Given a proc and a fragment, return a ref to
     // the associated list of tranactions.
     vector<vtkCTHFragmentPieceTransaction> &GetTransactions(
@@ -998,9 +1002,11 @@ class vtkCTHFragmentPieceTransactionMatrix
     // will be allocated, and is expected to be null
     // on entry.
     vtkIdType Pack(int *&buffer);
+    vtkIdType PackRow(int *&buffer);
     // Load state from a buffer containing a Pack'ed
     // transaction matrix. 0 is returned on error.
     int UnPack(int *buffer);
+    int UnPackRow(int *buffer);
     int NProcs;
     int NFragments;
     vector<vtkCTHFragmentPieceTransaction> *Matrix;
@@ -1072,6 +1078,75 @@ vtkCTHFragmentPieceTransactionMatrix::GetTransactions(
 {
   int idx=fragmentId+procId*this->NFragments;
   return this->Matrix[idx];
+}
+//
+inline 
+vtkIdType 
+vtkCTHFragmentPieceTransactionMatrix::GetNumberOfTransactions(
+                int procId)
+{
+  int nTransactions=0;
+
+  for (int fragmentId=0; fragmentId<this->NFragments; ++fragmentId)
+    {
+    nTransactions+=this->GetTransactions(fragmentId,procId).size();
+    }
+
+  return nTransactions;
+}
+// 
+vtkIdType vtkCTHFragmentPieceTransactionMatrix::PackRow(int *&buf)
+{
+/*
+the packed row has this structure:
+
+[nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]
+    /\           /\               /\
+    |            |                |
+  f0,p0        f1,p0            fN,p0 
+*/
+
+  // caller should not allocate memory.
+  assert( "Buffer appears to be pre-allocated."
+          && buf==0 );
+
+  //int matIdx=i+j*this->NFragments;
+  //int nTransactions=this->Matrix[matIdx].size();
+
+  const int transactionSize
+    = vtkCTHFragmentPieceTransaction::SIZE;
+
+  const vtkIdType bufSize = this->NFragments         // transaction count for each fragment
+        + transactionSize*this->NumberOfTransactions // enough to store all transactions
+        + 2;                                         // nFragments, nProcs
+
+  buf = new int[bufSize];
+  // header
+  buf[0]=this->NFragments;
+  buf[1]=this->NProcs;
+  vtkIdType bufIdx=2;
+
+  for (int j=0; j<this->NProcs; ++j)
+    {
+    for (int i=0; i<this->NFragments; ++i)
+      {
+      int matIdx=i+j*this->NFragments;
+      int nTransactions=this->Matrix[matIdx].size();
+
+      // put the count for this i,j
+      buf[bufIdx]=nTransactions;
+      ++bufIdx;
+
+      // put this i,j's transaction list
+      for (int q=0; q<nTransactions; ++q)
+        {
+        this->Matrix[matIdx][q].Pack(&buf[bufIdx]);
+        bufIdx+=transactionSize;
+        }
+      }
+    }
+  // now bufIdx is number of ints we have stored
+  return bufIdx;
 }
 // 
 vtkIdType vtkCTHFragmentPieceTransactionMatrix::Pack(int *&buf)
@@ -2428,6 +2503,20 @@ int vtkCTHFragmentConnectRingBuffer::Pop(vtkCTHFragmentConnectIterator* item)
 // of 0.0. ComputeNormal is on, ComputeGradients is off and ComputeScalars is on.
 vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 {
+  this->Controller = vtkMultiProcessController::GetGlobalController();
+  int myProcId=this->Controller->GetLocalProcessId();
+
+  #ifdef vtkCTHFragmentConnectDEBUG
+  this->MyPid=WritePidFile(this->Controller->GetCommunicator(),"cthfc.pid");
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment entering vtkCTHFragmentConnect is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #else
+  this->MyPid=-1;
+  #endif
+
   // Pipeline
   // 0 output multi-block
   // 1 polydata, proc 0 fills with attributes, all others fill with empty polydata
@@ -2463,7 +2552,6 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
 
   this->NumberOfInputBlocks = 0;
   this->InputBlocks = 0;
-  this->Controller = vtkMultiProcessController::GetGlobalController();
   this->GlobalOrigin[0]=this->GlobalOrigin[1]=this->GlobalOrigin[2]=0.0;
   this->RootSpacing[0]=this->RootSpacing[1]=this->RootSpacing[2]=1.0;
 
@@ -2498,54 +2586,6 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->ProgressMaterialInc=0.0;
   this->ProgressBlockInc=0.0;
   this->ProgressResolutionInc=0.0;
-
-  // DEBUG
-  #ifdef vtkCTHFragmentConnectDEBUG
-  // build an identifier string
-  int nProcs=this->Controller->GetNumberOfProcesses();
-  int myProcId=this->Controller->GetLocalProcessId();
-  const int hostNameSize=256;
-  char hostname[hostNameSize]={'\0'};
-  gethostname(hostname, hostNameSize);
-  int pid=getpid();
-  const int hrpSize=512;
-  char hrp[hrpSize]={'\0'};
-  sprintf(hrp,"%s : %d : %d",hostname,myProcId,pid);
-  // move all identifiers to controller
-  char *hrpBuffer=0;
-  if (myProcId==0)
-    {
-    hrpBuffer=new char [nProcs*hrpSize];
-    }
-  this->Controller->Gather(hrp,hrpBuffer,hrpSize,0);
-  // put identifiers into a file 
-  if (myProcId==0)
-    {
-    // open a file in the current working directory
-    ofstream hrpFile;
-    hrpFile.open("cthfc.pid");
-    char *thisHrp=hrpBuffer;
-    if (hrpFile.is_open())
-      {
-      for (int procId=0; procId<nProcs; ++procId)
-        {
-        hrpFile << thisHrp << endl;
-        thisHrp+=hrpSize;
-        };
-      hrpFile.close();
-      }
-    // if we can't open a file send to stderr
-    else
-      {
-      for (int procId=0; procId<nProcs; ++procId)
-        {
-        cerr << thisHrp << endl;
-        thisHrp+=hrpSize;
-        }
-      }
-    delete [] hrpBuffer;
-    }
-  #endif
 }
 
 //----------------------------------------------------------------------------
@@ -3945,7 +3985,7 @@ void vtkCTHFragmentConnect::PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
 // and its center.
 //TODO use same array name for frag id on multiple materials, and use global id
 int vtkCTHFragmentConnect::RequestData(
-  vtkInformation *vtkNotUsed(request),
+  vtkInformation *request,
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
@@ -3981,7 +4021,21 @@ int vtkCTHFragmentConnect::RequestData(
   vtkMultiBlockDataSet *mbdsOutput1 =
     vtkMultiBlockDataSet::SafeDownCast( outInfo->Get(vtkDataObject::DATA_OBJECT()) );
 
-  // TODO  we should build a vector of material arrays for single pass processing
+  int fromPort = request->Get(vtkExecutive::FROM_OUTPUT_PORT());
+  outInfo = outputVector->GetInformationObject(fromPort);
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  mbdsOutput0->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+  mbdsOutput1->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+
   // Get arrays to process based on array selection status
   vector<string> MaterialArrayNames;
   vector<string> MassArrayNames;
@@ -4019,6 +4073,20 @@ int vtkCTHFragmentConnect::RequestData(
   // process enabled material arrays
   for (this->MaterialId=0; this->MaterialId<nMaterials; ++this->MaterialId)
     {
+    #ifdef vtkCTHFragmentConnectDEBUG
+    int myProcId=this->Controller->GetLocalProcessId();
+    cerr << "[" << __LINE__ << "] "
+         << myProcId
+         << " is processing Material "
+         << this->MaterialId
+         << "." << endl
+         << "[" << __LINE__ << "] "
+         << myProcId
+         << " memory commitment at begin of pass is:"
+         << endl
+         << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+    #endif
+
     this->Progress=this->MaterialId*this->ProgressMaterialInc;
     this->UpdateProgress(this->Progress);
 
@@ -4047,7 +4115,6 @@ int vtkCTHFragmentConnect::RequestData(
       // build fragments
       this->ProcessBlock(blockId);
       }
-
     //char tmp[128];
     //sprintf(tmp, "C:/Law/tmp/cthSurface%d.vtp", this->Controller->GetLocalProcessId());
     //this->SaveBlockSurfaces(tmp);
@@ -6447,12 +6514,12 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
     // cerr << "[" << __LINE__ << "] "
     //       << loadingArrays 
     //       << endl;
-    cerr << "[" << __LINE__ << "] "
-         << controllingProcId
-         << " holding "
-         << (nProcs*this->NumberOfResolvedFragments*sizeof(vtkIdType))/1E6
-         << " MB in loading arrays."
-         << endl;
+    // cerr << "[" << __LINE__ << "] "
+    //       << controllingProcId
+    //       << " holding "
+    //       << (nProcs*this->NumberOfResolvedFragments*sizeof(vtkIdType))/1E6
+    //       << " MB in loading arrays."
+    //       << endl;
     #endif
 
     // Build fragment to proc map, and priority queue
@@ -6489,6 +6556,8 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
          << " M polys."
          << endl;
     Q.PrintProcessLoading();
+    vector<int> splitting(nProcs+1,0);
+    int nSplit=0;
     #endif
 
     // Decide who needs to move and build coresponding 
@@ -6499,6 +6568,10 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
       int nSplitOver=f2pm.GetProcCount(fragmentId);
       if (nSplitOver>1)
         {
+        #ifdef vtkCTHFragmentConnectDEBUG
+        ++splitting[nSplitOver];
+        ++nSplit;
+        #endif
         // who has the pieces?
         vector<int> owners=f2pm.WhoHasAPiece(fragmentId);
         // how much load will he add to the recipient?
@@ -6547,9 +6620,24 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
            << endl;
       Q.PrintProcessLoading();
       cerr << "[" << __LINE__ << "] "
+           << controllingProcId
+           << " splitting:"
+           << endl;
+      PrintHistogram(splitting);
+      cerr << "[" << __LINE__ << "] "
            << myProcId
-           << " the transaction matrix is:" << endl;
-      TM.Print();
+           << " total number of fragments "
+           << this->NumberOfResolvedFragments
+           << endl;
+      cerr << "[" << __LINE__ << "] "
+           << myProcId
+           << " total number split "
+           << nSplit
+           << endl;
+      // cerr << "[" << __LINE__ << "] "
+      //      << myProcId
+      //      << " the transaction matrix is:" << endl;
+      // TM.Print();
       #endif
     }
   // All processes send fragment loading to controller.
@@ -6569,12 +6657,12 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
   // Brodcast the transaction matrix
   TM.Broadcast(comm, controllingProcId);
   #ifdef vtkCTHFragmentConnectDEBUG
-  cerr << "[" << __LINE__ << "] "
-       << myProcId
-       << " holding "
-       << TM.Capacity()/1E6
-       << " MB in the transaction matrix."
-       << endl;
+  // cerr << "[" << __LINE__ << "] "
+  //      << myProcId
+  //      << " holding "
+  //      << TM.Capacity()/1E6
+  //      << " MB in the transaction matrix."
+  //      << endl;
   #endif
   // Execute transactions
   for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
@@ -7136,12 +7224,12 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
       }
     }
   #ifdef vtkCTHFragmentConnectDEBUG
-  cerr << "[" << __LINE__ << "] "
-       << myProcId 
-       << " holding "
-       << holding/1E6
-       << " MB in comm buffers."
-       << endl;
+  // cerr << "[" << __LINE__ << "] "
+  //      << myProcId
+  //      << " holding "
+  //      << holding/1E6
+  //      << " MB in comm buffers."
+  //      << endl;
   #endif
   return 1;
 }
@@ -7220,12 +7308,12 @@ int vtkCTHFragmentConnect::ReceiveIntegratedAttributes(
     }
 
   #ifdef vtkCTHFragmentConnectDEBUG
-  cerr << "[" << __LINE__ << "] "
-       << this->Controller->GetLocalProcessId()
-       << " holding "
-       << holding/1E6
-       << " MB in comm buffers."
-       << endl;
+  // cerr << "[" << __LINE_ << "] "
+  //      << this->Controller->GetLocalProcessId()
+  //      << " holding "
+  //      << holding/1E6
+  //      << " MB in comm buffers."
+  //      << endl;
   #endif
   return 1;
 }
@@ -7305,12 +7393,12 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
   ++thisMsgId;
 
   #ifdef vtkCTHFragmentConnectDEBUG
-  cerr << "[" << __LINE__ << "] "
-       << this->Controller->GetLocalProcessId()
-       << " holding "
-       << holding/1E6
-       << " MB in comm buffers."
-       << endl;
+  //   cerr << "[" << __LINE__ << "] "
+  //        << this->Controller->GetLocalProcessId()
+  //        << " holding "
+  //        << holding/1E6
+  //        << " MB in comm buffers."
+  //        << endl;
   #endif
   return 1;
 }
@@ -7537,13 +7625,13 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
     }
 
   #ifdef vtkCTHFragmentConnectDEBUG
-  int myProcId=this->Controller->GetLocalProcessId();
-  cerr << "[" << __LINE__ << "] "
-       << myProcId
-       << " holding "
-       << holding/1E6
-       << " MB for resolved integrated attributes."
-       << endl;
+  //   int myProcId=this->Controller->GetLocalProcessId();
+  //   cerr << "[" << __LINE__ << "] "
+  //        << myProcId
+  //        << " holding "
+  //        << holding/1E6
+  //        << " MB for resolved integrated attributes."
+  //        << endl;
   #endif
   return 1;
 }
@@ -7728,31 +7816,39 @@ void vtkCTHFragmentConnect::PrepareForResolveEquivalences()
     += (unsigned long)this->FragmentMeshes.capacity()*sizeof(vtkPolyData *);
 
   #ifdef vtkCTHFragmentConnectDEBUG
-  int myProcId=this->Controller->GetLocalProcessId();
-  cerr << "[" << __LINE__ << "] "
-       << myProcId 
-       << " is holding "
-       << holdingEqs/1E6 
-       << " MB in EquivanlenceSet."
-       << endl;
-  cerr << "[" << __LINE__ << "] "
-       << myProcId 
-       << " is holding "
-       << holdingIntAttr/1E6 
-       << " MB in integration arrays."
-       << endl;
-  cerr << "[" << __LINE__ << "] " 
-       << myProcId 
-       << " is holding "
-       << holdingGeomPtr/1E6 
-       << " MB in geometry container."
-       << endl;
+  //   int myProcId=this->Controller->GetLocalProcessId();
+  //   cerr << "[" << __LINE__ << "] "
+  //        << myProcId 
+  //        << " is holding "
+  //        << holdingEqs/1E6 
+  //        << " MB in EquivanlenceSet."
+  //        << endl;
+  //   cerr << "[" << __LINE__ << "] "
+  //        << myProcId 
+  //        << " is holding "
+  //        << holdingIntAttr/1E6 
+  //        << " MB in integration arrays."
+  //        << endl;
+  //   cerr << "[" << __LINE__ << "] " 
+  //        << myProcId 
+  //        << " is holding "
+  //        << holdingGeomPtr/1E6 
+  //        << " MB in geometry container."
+  //        << endl;
   #endif
 }
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::ResolveEquivalences()
 {
-  int numProcs = this->Controller->GetNumberOfProcesses();
+  int numProcs=this->Controller->GetNumberOfProcesses();
+  #ifdef vtkCTHFragmentConnectDEBUG
+  int myProcId=this->Controller->GetLocalProcessId();
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment entering ResolveEquivalences is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   // These get resused for efer attribute we need to merge so I made the ivars.
   this->NumberOfRawFragmentsInProcess = new int[numProcs];
@@ -7761,25 +7857,60 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
   // Resolve intraprocess and extra process equivalences.
   // This also renumbers set ids to be sequential.
   this->GatherEquivalenceSets(this->EquivalenceSet);
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after GatherEquivalenceSets is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   // Gather and merge fragments for whose geometry is split
   // and build the output dataset as we go.
   this->ResolveLocalFragmentGeometry();
   this->ResolveRemoteFragmentGeometry();
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after ResolveLocal/RemoteFragmentGeometry is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   // Accumulate contributions from fragemnts who were 
   // previously split.
   this->ResolveIntegratedAttributes(0);
   this->BroadcastIntegratedAttributes(0);
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after ResolveIntegratedAttributes is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   // Compute geometric attributes, and gather them for 
   // stats output.
   this->ComputeGeometricAttributes();
   this->GatherGeometricAttributes(0);
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after ComputeGeometricAttributes is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   // Copy attributes into the output data sets.
   this->CopyAttributesToOutput0();
   this->CopyAttributesToOutput1();
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after CopyAttributesToOutput0/1 is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
 
   delete [] this->NumberOfRawFragmentsInProcess;
   this->NumberOfRawFragmentsInProcess = 0;
@@ -7835,18 +7966,6 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
     }
   this->TotalNumberOfRawFragments = totalNumberOfIds;
 
-  #ifdef vtkCTHFragmentConnectDEBUG
-  if (myProcId==0)
-    {
-    cerr << "[" << __LINE__ << "] "
-        << myProcId
-        << " there are "
-        << totalNumberOfIds
-        << " fragments."
-        << endl;
-    }
-  #endif
-
   // Change the set to a global set.
   vtkCTHFragmentEquivalenceSet *globalSet = new vtkCTHFragmentEquivalenceSet;
   // This just initializes the set so that every set has one member.
@@ -7894,12 +8013,12 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
   set->DeepCopy(globalSet);
 
   #ifdef vtkCTHFragmentConnectDEBUG
-  cerr << "[" << __LINE__ << "] "
-       << myProcId 
-       << " holding "
-       << (unsigned long)set->Capacity()*sizeof(int)/1E6
-       << " MB in EquivalenceSet."
-       << endl;
+  //   cerr << "[" << __LINE__ << "] "
+  //        << myProcId 
+  //        << " holding "
+  //        << (unsigned long)set->Capacity()*sizeof(int)/1E6
+  //        << " MB in EquivalenceSet."
+  //        << endl;
   #endif
 
   delete globalSet;

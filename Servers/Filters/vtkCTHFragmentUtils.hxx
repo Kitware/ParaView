@@ -16,6 +16,8 @@
 #ifndef __vtkCTHFragmentUtil_h
 #define __vtkCTHFragmentUtil_h
 
+// Vtk
+#include<vtkCommunicator.h>
 // Vtk containers
 #include<vtkDoubleArray.h>
 #include<vtkFloatArray.h>
@@ -23,6 +25,11 @@
 #include<vtkUnsignedIntArray.h>
 #include<vtkDataArraySelection.h>
 // STL
+#include "vtksys/ios/fstream"
+using vtksys_ios::ofstream;
+using vtksys_ios::ifstream;
+#include "vtksys/ios/sstream"
+using vtksys_ios::ostringstream;
 #include<vtkstd/vector>
 using vtkstd::vector;
 #include<vtkstd/string>
@@ -292,6 +299,132 @@ int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
     }
   return nEnabled;
 }
-};
+//
+int WritePidFile(vtkCommunicator *comm, string pidFileName)
+{
+  // build an identifier string
+  // "host : rank : pid"
+  int nProcs=comm->GetNumberOfProcesses();
+  int myProcId=comm->GetLocalProcessId();
+  const int hostNameSize=256;
+  char hostname[hostNameSize]={'\0'};
+  gethostname(hostname, hostNameSize);
+  int pid=getpid();
+  const int hrpSize=512;
+  char hrp[hrpSize]={'\0'};
+  sprintf(hrp,"%s : %d : %d",hostname,myProcId,pid);
+  // move all identifiers to controller
+  char *hrpBuffer=0;
+  if (myProcId==0)
+    {
+    hrpBuffer=new char [nProcs*hrpSize];
+    }
+  comm->Gather(hrp,hrpBuffer,hrpSize,0);
+  // put identifiers into a file 
+  if (myProcId==0)
+    {
+    // open a file in the current working directory
+    ofstream hrpFile;
+    hrpFile.open(pidFileName.c_str());
+    char *thisHrp=hrpBuffer;
+    if (hrpFile.is_open())
+      {
+      for (int procId=0; procId<nProcs; ++procId)
+        {
+        hrpFile << thisHrp << endl;
+        thisHrp+=hrpSize;
+        };
+      hrpFile.close();
+      }
+    // if we can't open a file send to stderr
+    else
+      {
+      for (int procId=0; procId<nProcs; ++procId)
+        {
+        cerr << thisHrp << endl;
+        thisHrp+=hrpSize;
+        }
+      }
+    delete [] hrpBuffer;
+    }
 
+  return pid;
+}
+//
+string GetMemoryUsage(int pid, int line, int procId)
+{
+  ostringstream memoryUsage;
+
+  ostringstream statusFileName;
+  statusFileName << "/proc/" << pid << "/status";
+  ifstream statusFile;
+  statusFile.open(statusFileName.str().c_str());
+  if (statusFile.is_open())
+    {
+    const int cbufSize=1024;
+    char cbuf[cbufSize]={'\0'};
+    while (statusFile.good())
+      {
+      statusFile.getline(cbuf,cbufSize);
+      string content(cbuf);
+      if (content.find("VmSize")!=string::npos
+          || content.find("VmRSS")!=string::npos
+          || content.find("VmData")!=string::npos)
+        {
+        int tabStart=content.find_first_of("\t ");
+        int tabSpan=1;
+        while (content[tabStart+tabSpan]=='\t'
+               || content[tabStart+tabSpan]==' ')
+          {
+          ++tabSpan;
+          }
+        string formattedContent
+          = content.substr(0,tabStart-1)+" "+content.substr(tabStart+tabSpan);
+        memoryUsage << "[" << line << "] "
+                    << procId << " "
+                    << formattedContent
+                    << endl;
+        }
+      }
+    statusFile.close();
+    }
+  else
+    {
+    cerr << "[" << line << "] "
+         << procId
+         << " could not open "
+         << statusFileName
+         << "." << endl;
+    }
+
+  return memoryUsage.str();
+}
+//
+void PrintHistogram(vector<int> &bins)
+{
+  const int maxWidth=40;
+  const int n=bins.size();
+  if (n==0)
+    {
+    return;
+    }
+  int maxBin=*max_element(bins.begin(),bins.end());
+  for (int i=0; i<n; ++i)
+    {
+    if (bins[i]==0)
+      {
+      continue;
+      }
+    // clip at width of 40.
+    int wid= maxBin<maxWidth ? bins[i] : bins[i]*maxWidth/maxBin;
+    cerr << "[" << i << "]*";
+    for (int j=1; j<wid; ++j)
+      {
+      cerr << "*";
+      }
+    cerr << "(" << bins[i] << ")" << endl;
+    }
+  return;
+}
+};
 #endif

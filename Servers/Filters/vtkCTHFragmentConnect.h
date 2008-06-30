@@ -541,7 +541,10 @@ protected:
   double ProgressMaterialInc;
   double ProgressBlockInc;
   double ProgressResolutionInc;
-
+  // Debug
+  #ifdef vtkCTHFragmentConnectDEBUG
+  int MyPid;
+  #endif
 private:
   vtkCTHFragmentConnect(const vtkCTHFragmentConnect&);  // Not implemented.
   void operator=(const vtkCTHFragmentConnect&);  // Not implemented.
