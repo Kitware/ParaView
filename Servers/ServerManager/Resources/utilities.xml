@@ -2311,7 +2311,10 @@
     <RenderViewExporterProxy name="X3DExporter" class="vtkX3DExporter"
       file_extension="x3d">
       <Documentation short_help="X3D Files" long_help="Export X3D Files">
-        Exporter to export a single render view to an X3D file.
+        vtkX3DExporter is a render window exporter which writes out the
+        renderered scene into an X3D file. X3D is an XML-based format for
+        representation 3D scenes (similar to VRML). Check out
+        http://www.web3d.org/x3d/ for more details.
       </Documentation>
 
       <StringVectorProperty name="FileName"
@@ -2339,6 +2342,26 @@
           Triggers exporting of the view.
         </Documentation>
       </Property>
+
+      <IntVectorProperty name="Binary"
+        command="SetBinary"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Turn on binary mode
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Fastest"
+        command="SetFastest"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          In binary mode use fastest instead of best compression.
+        </Documentation>
+      </IntVectorProperty>
 
       <!-- End of X3DExporter -->
     </RenderViewExporterProxy>
