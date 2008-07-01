@@ -20,6 +20,7 @@
 #include<vtkType.h>
 
 class vtkDoubleArray;
+class vtkFloatArray;
 // class vtkCTHFragmentCommBuffer;
 // ostream &operator<<(ostream &sout,const vtkCTHFragmentCommBuffer &fcb);
 
@@ -84,8 +85,8 @@ class vtkCTHFragmentCommBuffer
       return this->GetHeaderSize()+this->GetBufferSize();
     }
     // Description:
-    // Set the number of fragments for a given block.
-    void SetNumberOfFragments(
+    // Set the number of tuples for a given block.
+    void SetNumberOfTuples(
             int blockId,
             vtkIdType nFragments)
     {
@@ -93,8 +94,8 @@ class vtkCTHFragmentCommBuffer
       this->Header[idx]=nFragments;
     }
     // Description:
-    // Get the number of fragments for a given block
-    vtkIdType GetNumberOfFragments(int blockId) const
+    // Get the number of tuples for a given block
+    vtkIdType GetNumberOfTuples(int blockId) const
     {
       int idx=DESCR_BASE+blockId;
       return this->Header[idx];
@@ -103,16 +104,20 @@ class vtkCTHFragmentCommBuffer
     // Append the data to the buffer. Return the index where
     // the data was written.
     vtkIdType Pack(const double *pData,const int nComps,const vtkIdType nTups);
+    vtkIdType Pack(const float *pData,const int nComps,const vtkIdType nTups);
     vtkIdType Pack(const int *pData,const int nComps,const vtkIdType nTups);
     vtkIdType Pack(vtkDoubleArray *da);
+    vtkIdType Pack(vtkFloatArray *da);
     // Description:
     // Prepare to un pack the buffer.
     void InitUnpack(){ this->EOD=0; }
     // Description:
     // Extract the next array from the buffer
     int UnPack(double *&rData,const int nComps,const vtkIdType nTups,const bool copyFlag);
+    int UnPack(float *&rData,const int nComps,const vtkIdType nTups,const bool copyFlag);
     int UnPack(int *&rData,const int nComps,const vtkIdType nTups,const bool copyFlag);
     int UnPack(vtkDoubleArray *da,const int nComps,const vtkIdType nTups,const bool copyFlag);
+    int UnPack(vtkFloatArray *da,const int nComps,const vtkIdType nTups,const bool copyFlag);
     //static void Resize(vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers);
   private:
     vtkIdType EOD;

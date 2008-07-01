@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.59");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.60");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -176,6 +176,95 @@ vtkStandardNewMacro(vtkCTHFragmentConnect);
 // Compressing data - for faster visualization.
 //
 
+
+class vtkCTHFragmentPointAccumulator
+{
+  public:
+    vtkCTHFragmentPointAccumulator()
+    {
+      this->PtStore=0;
+      this->NPts=0;
+    }
+    ~vtkCTHFragmentPointAccumulator()
+    {
+      this->Clear();
+    }
+    // Description:
+    // Free resources mark as empty.
+    void Clear()
+    {
+      CheckAndReleaseCArrayPointer(this->PtStore);
+      this->NPts=0;
+    }
+    //Description:
+    bool Empty()
+    {
+      return this->NPts==0;
+    }
+    // Description:
+    // Extend and geta pointer to the newly added 
+    // memory
+    float *Expand(vtkIdType n)
+    {
+      const int bytesPerPoint=3*sizeof(float);
+      // extend
+      vtkIdType newNPts=this->NPts+n;
+      float *newPointStore
+        = static_cast<float *>(realloc(this->PtStore,newNPts*bytesPerPoint));
+      if (newPointStore==0)
+        {
+        #ifndef NDEBUG
+        abort();
+        #else
+        throw(vtkstd::bad_alloc);
+        #endif
+        }
+      // mark begin of new
+      float *writePointer=newPointStore+this->NPts;
+      // update
+      this->PtStore=newPointStore;
+      this->NPts=newNPts;
+
+      return writePointer;
+    }
+    // Description:
+    // Adds an array of points at the end of
+    // the internal store.
+    void Accumulate(float *pts, vtkIdType n)
+    {
+      const int bytesPerPoint=3*sizeof(float);
+      // extend
+      float *writePointer=this->Expand(n);
+      // copy at end
+      memcpy(writePointer,pts,n*bytesPerPoint);
+    }
+    // Description:
+    // Adds an array of points at the end of
+    // the internal store.
+    void Accumulate(vtkFloatArray *pts)
+    {
+      this->Accumulate(pts->GetPointer(0),pts->GetNumberOfTuples());
+    }
+    // Description:
+    // Creates a vtkPoints data structure from
+    // the internal store. Caller to delete the points.
+    vtkPoints *BuildVtkPoints()
+    {
+      vtkFloatArray *da=vtkFloatArray::New();
+      da->SetNumberOfComponents(3);
+      da->SetArray(this->PtStore,this->NPts,1);
+      vtkPoints *pts=vtkPoints::New();
+      pts->SetDataTypeToFloat();
+      pts->SetData(da);
+      da->Delete();
+
+      return pts;
+    }
+
+  private:
+    float *PtStore;
+    vtkIdType NPts;
+};
 
 //============================================================================
 /**
@@ -3745,6 +3834,7 @@ vtkPolyData *vtkCTHFragmentConnect::NewFragmentMesh()
 
   // mesh
   vtkPoints* points = vtkPoints::New();
+  points->SetDataTypeToFloat();
   newPiece->SetPoints(points);
   points->Delete();
 
@@ -6662,6 +6752,327 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 }
 
 //----------------------------------------------------------------------------
+// Merge fragment pieces which are split across processes
+void vtkCTHFragmentConnect::ProcessSplitFragmentGeometry()
+{
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::ResolveFragmentCenters("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
+  const int myProcId = this->Controller->GetLocalProcessId();
+  const int nProcs = this->Controller->GetNumberOfProcesses();
+  vtkCommunicator *comm=this->Controller->GetCommunicator();
+
+//   vector<int> &resolvedFragmentIds
+//     = this->ResolvedFragmentIds[this->MaterialId];
+
+  vtkMultiPieceDataSet *resolvedFragments
+    = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
+  assert( "Couldn't get the resolved fragnments."
+          && resolvedFragments );
+
+  // container for gathered points.
+  vector<vtkPoints *> fragmentPoints;
+
+  // Here we resolve fragment geomtery that is split across processes.
+  // A controlling process gathers structural information regarding
+  // the fragment to process distribution, creates a blue print of the
+  // moves that must occur to place the split pieces on a single process.
+  // These moves are executed, split geomtery is megered and local structural
+  // data is updated. After all fragment's geometry entrirely on single process.
+  const int controllingProcId=0;
+  const int msgBase=200000;
+
+  // anything to resolve?
+  if (nProcs==1)
+    {
+    return;
+    }
+
+  vtkCTHFragmentPieceTransactionMatrix TM;
+  TM.Initialize(this->NumberOfResolvedFragments,nProcs);
+
+  // controler receives loading information and
+  // builds the transaction matrix.
+  if (myProcId==controllingProcId)
+    {
+    int thisMsgId=msgBase;
+
+    // fragment indexed arrays, with number of polys
+    vector<vector<vtkIdType> >loadingArrays;
+    loadingArrays.resize(nProcs);
+    // Gather loading arrays
+    // mine
+    this->BuildLoadingArray(loadingArrays[controllingProcId]);
+    // others
+    for (int procId=0; procId<nProcs; ++procId)
+      {
+      if (procId==controllingProcId)
+        {
+        continue;
+        }
+      // size of incoming
+      int bufSize=0;
+      comm->Receive(&bufSize,1,procId,thisMsgId);
+      // incoming
+      vtkIdType *buffer=new vtkIdType [bufSize];
+      comm->Receive(buffer,bufSize,procId,thisMsgId+1);
+      this->UnPackLoadingArray(buffer,bufSize,loadingArrays[procId]);
+      delete [] buffer;
+      }
+    ++thisMsgId;
+    ++thisMsgId;
+
+    // Build fragment to proc map, and priority queue
+    vtkCTHFragmentToProcMap f2pm;
+    f2pm.Initialize(nProcs,this->NumberOfResolvedFragments);
+    vtkCTHFragmentProcessPriorityQueue Q;
+    Q.Initialize(nProcs);
+    vtkCTHFragmentProcessLoading *heap=Q.GetHeap();
+    for (int procId=0; procId<nProcs; ++procId)
+      {
+      // sum up the loading contribution from all local fragments
+      // and make a note of who owns what.
+      vtkCTHFragmentProcessLoading &prl=heap[procId+1]; // indexed from 1
+      for (int fragmentId=0;
+           fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
+        {
+        vtkIdType loading=loadingArrays[procId][fragmentId];
+        if (loading>0)
+          {
+          prl.UpdateLoadFactor(loading);
+          f2pm.SetProcOwnsPiece(procId,fragmentId);
+          }
+        }
+      }
+    // sort the processes by loading
+    Q.InitialHeapify();
+    // 
+    vtkIdType loadingBefore=Q.GetTotalLoading();
+    #ifdef vtkCTHFragmentConnectDEBUG
+    cerr << "[" << __LINE__ << "] "
+         << controllingProcId
+         << " total loading before fragment localization "
+         << loadingBefore/1E6
+         << " M polys."
+         << endl;
+    Q.PrintProcessLoading();
+    vector<int> splitting(nProcs+1,0);
+    int nSplit=0;
+    #endif
+
+    // who will do processing??
+    int recipient=Q.AssignFragmentToProcess(0);
+
+    // Decide who needs to move and build coresponding 
+    // transaction matrix
+    for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
+      {
+      // if the fragment is split then we need to move him
+      int nSplitOver=f2pm.GetProcCount(fragmentId);
+      if (nSplitOver>1)
+        {
+        #ifdef vtkCTHFragmentConnectDEBUG
+        ++splitting[nSplitOver];
+        ++nSplit;
+        #endif
+        // who has the pieces?
+        vector<int> owners=f2pm.WhoHasAPiece(fragmentId);
+        // how much load will he add to the recipient?
+        vtkIdType loading=0;
+        for (int i=0; i<nSplitOver; ++i)
+          {
+          loading+=loadingArrays[owners[i]][fragmentId];
+          }
+        /// who will do processing??
+        /// int recipient=Q.AssignFragmentToProcess(loading);
+
+        // Add the transactions to make the move, and
+        // update current owners loading to reflect the loss.
+        vtkCTHFragmentPieceTransaction ta;
+        for (int i=0; i<nSplitOver; ++i)
+          {
+          /// // Update loading of the previous owner.
+          /// vtkIdType loss=loadingArrays[owners[i]][fragmentId];
+          /// Q.UpdateProcessLoadFactor(owners[i],-loss);
+          // need to move this piece?
+          if (owners[i]==recipient)
+            {
+            continue;
+            }
+          // Add the requisite transactions.
+          // recipient executes a recv from owner
+          ta.Initialize('R',owners[i]);
+          TM.PushTransaction(fragmentId,recipient,ta);
+          // owner executes a send to recipient
+          ta.Initialize('S',recipient);
+          TM.PushTransaction(fragmentId,owners[i],ta);
+          }
+        }
+      }
+      vtkIdType loadingAfter=Q.GetTotalLoading();
+      assert("Laoding has changed during construction "
+             "of the transaction matrix."
+             && loadingAfter==loadingBefore );
+
+      #ifdef vtkCTHFragmentConnectDEBUG
+      cerr << "[" << __LINE__ << "] "
+           << controllingProcId
+           << " total loading after fragment localization "
+           << loadingBefore/1E6
+           << " M polys."
+           << endl;
+      Q.PrintProcessLoading();
+      cerr << "[" << __LINE__ << "] "
+           << controllingProcId
+           << " splitting:"
+           << endl;
+      PrintHistogram(splitting);
+      cerr << "[" << __LINE__ << "] "
+           << myProcId
+           << " total number of fragments "
+           << this->NumberOfResolvedFragments
+           << endl;
+      cerr << "[" << __LINE__ << "] "
+           << myProcId
+           << " total number split "
+           << nSplit
+           << endl;
+      // cerr << "[" << __LINE__ << "] "
+      //      << myProcId
+      //      << " the transaction matrix is:" << endl;
+      // TM.Print();
+      #endif
+    }
+  // All processes send fragment loading to controller.
+  else
+    {
+    int thisMsgId=msgBase;
+
+    // create and send my loading array
+    vtkIdType *buffer=0;
+    int bufSize=this->PackLoadingArray(buffer);
+    comm->Send(&bufSize,1,controllingProcId,thisMsgId);
+    ++thisMsgId;
+    comm->Send(buffer,bufSize,controllingProcId,thisMsgId);
+    ++thisMsgId;
+    }
+
+  // Brodcast the transaction matrix
+  TM.Broadcast(comm, controllingProcId);
+
+  // Execute transactions
+  for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
+    {
+    // point buffer
+    vtkCTHFragmentPointAccumulator accumulator;
+
+    // get my list of transactions
+    vector<vtkCTHFragmentPieceTransaction> &transactionList
+      = TM.GetTransactions(fragmentId,myProcId);
+    // execute
+    int nTransactions=transactionList.size();
+    for (int i=0; i<nTransactions; ++i)
+      {
+      vtkCTHFragmentPieceTransaction &ta=transactionList[i];
+      /// send
+      if (ta.GetType()=='S')
+        {
+        vtkPolyData *localMesh
+          = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(fragmentId));
+        assert( "Send transaction requires a mesh that is not local." 
+                && localMesh!=0 );
+
+        // get the points of this piece
+        vtkFloatArray *ptsArray
+          = dynamic_cast<vtkFloatArray *>(localMesh->GetPoints()->GetData());
+        const vtkIdType bytesPerPoint=3*sizeof(float);
+        const vtkIdType nPoints=ptsArray->GetNumberOfTuples();
+        const vtkIdType bufferSize=bytesPerPoint*nPoints;
+        // prepare a comm buffer
+        vtkCTHFragmentCommBuffer buffer;
+        buffer.Initialize(myProcId,1,bufferSize);
+        buffer.SetNumberOfTuples(0,nPoints);
+        buffer.Pack(ptsArray);
+        // send the buffer in two parts, first the header
+        this->Controller->Send(
+                buffer.GetHeader(),
+                buffer.GetHeaderSize(),
+                ta.GetRemoteProc(),
+                fragmentId);
+        // followed by points
+        this->Controller->Send(
+                buffer.GetBuffer(),
+                buffer.GetBufferSize(),
+                ta.GetRemoteProc(),
+                2*fragmentId);
+        }
+      /// receive
+      else if (ta.GetType()=='R')
+        {
+        // prepare the comm buffer to receive attribute data
+        // pertaining to a single block(material)
+        vtkCTHFragmentCommBuffer buffer;
+        buffer.SizeHeader(1);
+        // recieve buffer's header
+        this->Controller->Receive(
+                buffer.GetHeader(),
+                buffer.GetHeaderSize(),
+                ta.GetRemoteProc(),
+                fragmentId);
+        // size buffer via on incoming header
+        buffer.SizeBuffer();
+        // receive attribute's data
+        this->Controller->Receive(
+                buffer.GetBuffer(),
+                buffer.GetBufferSize(),
+                ta.GetRemoteProc(),
+                2*fragmentId);
+        // unpack attribue data, with an explicit copy 
+        // into a local array
+        vtkIdType nPoints=buffer.GetNumberOfTuples(0);
+        float *writePointer=accumulator.Expand(nPoints);
+        buffer.UnPack(writePointer,3,nPoints,true);
+        }
+      else
+        {
+        assert("Invalid transaction type." && 0);
+        }
+      }
+      // if we received any points then process them here
+      if (!accumulator.Empty())
+        {
+        // TODO OBB here
+        #ifdef vtkCTHFragmentConnectDEBUG
+        if (nTransactions>4)
+          {
+          cerr << "[" << __LINE__ << "] "
+              << myProcId
+              << " memory commitment during localization of "
+              << nTransactions
+              << " is:"
+              << endl
+              << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+          }
+        #endif
+        accumulator.Clear();
+        }
+    }
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " fragment localization completed."
+       << endl;
+  #endif
+}
+
+
+
+//----------------------------------------------------------------------------
 // Build the loading array for the fragment pieces that we own.
 void vtkCTHFragmentConnect::BuildLoadingArray(
                 vector<vtkIdType> &loadingArray)
@@ -6806,7 +7217,7 @@ int vtkCTHFragmentConnect::CollectGeometricAttributes(
     // here we are setting pointer into the buffer rather than
     // explicitly copying the data.
     const unsigned int nToUnpack
-      = buffers[procId].GetNumberOfFragments(0);
+      = buffers[procId].GetNumberOfTuples(0);
     // coaabb
     if (!this->ComputeMoments)
       {
@@ -6856,7 +7267,7 @@ int vtkCTHFragmentConnect::SendGeometricAttributes(const int recipientProcId)
   //
   vtkCTHFragmentCommBuffer buffer;
   buffer.Initialize(myProcId,1,bufferSize);
-  buffer.SetNumberOfFragments(0,nLocal);
+  buffer.SetNumberOfTuples(0,nLocal);
 
   // pack attributes into buffer
   // center of aabb
@@ -7122,7 +7533,7 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
     // unpack attribute data
     // We will point into the comm buffer rather than copy
     const unsigned int nToUnpack
-      = buffers[procId].GetNumberOfFragments(0);
+      = buffers[procId].GetNumberOfTuples(0);
     // volume
     buffers[procId].UnPack(volumes[procId],1,nToUnpack,false);
     // moments
@@ -7192,7 +7603,7 @@ int vtkCTHFragmentConnect::ReceiveIntegratedAttributes(
   // unpack attribue data, with an explicit copy 
   // into a local array
   const unsigned int nToUnPack
-    = buffer.GetNumberOfFragments(0);
+    = buffer.GetNumberOfTuples(0);
   // volume
   ReNewVtkArrayPointer(
           this->FragmentVolumes,
@@ -7229,14 +7640,6 @@ int vtkCTHFragmentConnect::ReceiveIntegratedAttributes(
             this->FragmentSums[i],nCompsSum,nToUnPack,true);
     }
 
-  #ifdef vtkCTHFragmentConnectDEBUG
-  // cerr << "[" << __LINE_ << "] "
-  //      << this->Controller->GetLocalProcessId()
-  //      << " holding "
-  //      << holding/1E6
-  //      << " MB in comm buffers."
-  //      << endl;
-  #endif
   return 1;
 }
 
@@ -7274,7 +7677,7 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
   // We size the buffer, and set the number of fragments.
   vtkCTHFragmentCommBuffer buffer;
   buffer.Initialize(myProcId,1,bufferSize);
-  buffer.SetNumberOfFragments(0,nToSend);
+  buffer.SetNumberOfTuples(0,nToSend);
   holding+=(unsigned long long)buffer.Capacity();
 
   // pack attributes into the buffer
@@ -7314,14 +7717,6 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
           thisMsgId);
   ++thisMsgId;
 
-  #ifdef vtkCTHFragmentConnectDEBUG
-  //   cerr << "[" << __LINE__ << "] "
-  //        << this->Controller->GetLocalProcessId()
-  //        << " holding "
-  //        << holding/1E6
-  //        << " MB in comm buffers."
-  //        << endl;
-  #endif
   return 1;
 }
 
@@ -7790,7 +8185,8 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
   // Gather and merge fragments for whose geometry is split
   // and build the output dataset as we go.
   this->ResolveLocalFragmentGeometry();
-  this->ResolveRemoteFragmentGeometry();
+  ///this->ResolveRemoteFragmentGeometry();
+  this->ProcessSplitFragmentGeometry();
   #ifdef vtkCTHFragmentConnectDEBUG
   cerr << "[" << __LINE__ << "] "
        << myProcId

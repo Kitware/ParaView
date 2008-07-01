@@ -342,6 +342,8 @@ protected:
   void ResolveLocalFragmentGeometry();
   // Merge fragment's geometry that are split across processes
   void ResolveRemoteFragmentGeometry();
+  // Gather split points and process
+  void ProcessSplitFragmentGeometry();
   void BuildLoadingArray(
           vtkstd::vector<vtkIdType> &loadingArray);
   int PackLoadingArray(vtkIdType *&buffer);
@@ -496,6 +498,8 @@ protected:
   // A polydata with points at fragment centers, same structure 
   // as the resolved fragments.
   vtkMultiBlockDataSet *ResolvedFragmentCenters;
+  //
+  vtkstd::vector<vtkPoints *> ResolvedFragmentPoints;
 
   double GlobalOrigin[3];
   double RootSpacing[3];

@@ -56,7 +56,7 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.4");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.5");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
 
 #ifdef vtkCTHFragmentIntersectDEBUG
@@ -509,7 +509,7 @@ int vtkCTHFragmentIntersect::CollectGeometricAttributes(
     for (unsigned int blockId=0; blockId<this->NBlocks; ++blockId)
       {
       int nFragments
-        = buffers[procId].GetNumberOfFragments(blockId);
+        = buffers[procId].GetNumberOfTuples(blockId);
       // centers, memory managed by comm buffer.
       buffers[procId].UnPack(centers[procId][blockId],3,nFragments,false);
       // ids, memory managed by comm buffer.
@@ -541,7 +541,7 @@ int vtkCTHFragmentIntersect::SendGeometricAttributes(const int recipientProcId)
     nFragments[blockId]=this->IntersectionIds[blockId].size();
     nBytes  // attributes(double) + ids(int)
       += nFragments[blockId]*(nCompsPerBlock*sizeof(double)+sizeof(int));
-    buffer.SetNumberOfFragments(blockId,nFragments[blockId]);
+    buffer.SetNumberOfTuples(blockId,nFragments[blockId]);
     }
   buffer.SizeBuffer(nBytes);
 

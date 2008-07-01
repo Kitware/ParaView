@@ -214,6 +214,18 @@ void CheckAndReleaseArrayPointer(T *&pv)
   delete [] pv;
   pv=0;
 }
+// memory managment helper
+template<class T>
+inline
+void CheckAndReleaseCArrayPointer(T *&pv)
+{
+  if (pv==0)
+    {
+    return;
+    }
+  free(pv);
+  pv=0;
+}
 // zero vector
 template<class T>
 inline

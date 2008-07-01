@@ -99,6 +99,15 @@ vtkIdType vtkCTHFragmentCommBuffer::Pack(vtkDoubleArray *da)
                     da->GetNumberOfTuples());
 }
 //----------------------------------------------------------------------------
+// Append data array to the buffer. Returns the byte index where 
+// the array was written.
+vtkIdType vtkCTHFragmentCommBuffer::Pack(vtkFloatArray *da)
+{
+  return this->Pack(da->GetPointer(0),
+                    da->GetNumberOfComponents(),
+                    da->GetNumberOfTuples());
+}
+//----------------------------------------------------------------------------
 // Append data to the buffer. Returns the byte index
 // where the array was written to.
 vtkIdType vtkCTHFragmentCommBuffer::Pack(
@@ -122,6 +131,33 @@ vtkIdType vtkCTHFragmentCommBuffer::Pack(
     }
   // update next pack location
   this->EOD+=nComps*nTups*sizeof(double);
+
+  return byteIdx;
+}
+//----------------------------------------------------------------------------
+// Append data to the buffer. Returns the byte index
+// where the array was written to.
+vtkIdType vtkCTHFragmentCommBuffer::Pack(
+                const float *pData,
+                const int nComps,
+                const vtkIdType nTups)
+{
+  vtkIdType byteIdx=this->EOD;
+
+  float *pBuffer
+    = reinterpret_cast<float *>(this->Buffer+this->EOD);
+  // pack
+  for (vtkIdType i=0; i<nTups; ++i)
+    {
+    for (int q=0; q<nComps; ++q)
+      {
+      pBuffer[q]=pData[q];
+      }
+    pBuffer+=nComps;
+    pData+=nComps;
+    }
+  // update next pack location
+  this->EOD+=nComps*nTups*sizeof(float);
 
   return byteIdx;
 }
@@ -181,6 +217,45 @@ int vtkCTHFragmentCommBuffer::UnPack(
     da->SetArray(pData,arraySize,1);
     }
   return ret;
+}
+
+//----------------------------------------------------------------------------
+// Extract data from the buffer. Copy flag indicates weather to
+// copy or set pointer to buffer.
+int vtkCTHFragmentCommBuffer::UnPack(
+                float *&rData,
+                const int nComps,
+                const vtkIdType nTups,
+                const bool copyFlag)
+{
+  // locate
+  float *pBuffer
+    = reinterpret_cast<float *>(this->Buffer+this->EOD);
+
+  // unpack
+  // copy from buffer
+  if (copyFlag)
+    {
+    float *pData=rData;
+    for (vtkIdType i=0; i<nTups; ++i)
+      {
+      for (int q=0; q<nComps; ++q)
+        {
+        pData[q]=pBuffer[q];
+        }
+      pBuffer+=nComps;
+      pData+=nComps;
+      }
+    }
+  // point into buffer
+  else
+    {
+    rData=pBuffer;
+    }
+  // update next read location
+  this->EOD+=nComps*nTups*sizeof(float);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
