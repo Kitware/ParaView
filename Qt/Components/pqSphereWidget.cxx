@@ -89,6 +89,9 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   QObject::connect(this->Implementation->resetBounds,
     SIGNAL(clicked()), this, SLOT(resetBounds()));
 
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(setModified()));
+
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(refProxy->GetConnectionID()));
