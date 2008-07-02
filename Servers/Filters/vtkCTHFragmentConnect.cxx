@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.61");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.62");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -366,7 +366,7 @@ void PrintPieceLoadingHistogram(
 
   int nProcs=pla.size();
   // get min and max loading
-  vtkIdType minLoading=1<<((sizeof(vtkIdType)*8)-2);
+  vtkIdType minLoading=(vtkIdType)1<<((sizeof(vtkIdType)*8)-2);
   vtkIdType maxLoading=0;
   for (int procId=0; procId<nProcs; ++procId)
     {
