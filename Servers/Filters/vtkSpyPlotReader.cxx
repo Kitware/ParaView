@@ -70,7 +70,7 @@ using vtksys_ios::ostringstream;
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.65");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.66");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1188,12 +1188,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
     }
   if (prefixFlag)
     {
-    const char* newname = n1+1;
-    while (*newname != '\0' && *newname == ' ')
-      {
-      newname++;
-      }
-    newArray->SetName(newname);
+    newArray->SetName(n1+1);
     }
   else
     {
