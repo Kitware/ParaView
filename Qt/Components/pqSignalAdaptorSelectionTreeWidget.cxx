@@ -184,8 +184,10 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
     {
     return;
     }
-  
-  this->Internal->Property->ResetToDefault();
+ 
+  // Domain changes should not change the property values. This is overriding
+  // the value loaded from state files etc.
+  // this->Internal->Property->ResetToDefault();
   
   QList<QList<QVariant> > newValues =
     pqSMAdaptor::getSelectionProperty(this->Internal->Property);
