@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.60");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.61");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -176,7 +176,19 @@ vtkStandardNewMacro(vtkCTHFragmentConnect);
 // Compressing data - for faster visualization.
 //
 
-
+//============================================================================
+/**
+Description:
+Class to append data arrays of points. The template types
+are T_CPP for the c data type and T_VTK for the VTK data type.
+Eg: if T_CCP==double the T_VTK must be vtkDoubleArray.
+The main difference between the way this works and if you
+were to do the same thing with a data array is
+that here the memory grows by exactly what is needed, and
+in VTK data arrays the memory will grow by at least twice
+what is requested.
+*/
+template<typename T_CPP, class T_VTK>
 class vtkCTHFragmentPointAccumulator
 {
   public:
@@ -204,13 +216,13 @@ class vtkCTHFragmentPointAccumulator
     // Description:
     // Extend and geta pointer to the newly added 
     // memory
-    float *Expand(vtkIdType n)
+    T_CPP *Expand(vtkIdType n)
     {
-      const int bytesPerPoint=3*sizeof(float);
+      const int bytesPerPoint=3*sizeof(T_CPP);
       // extend
       vtkIdType newNPts=this->NPts+n;
-      float *newPointStore
-        = static_cast<float *>(realloc(this->PtStore,newNPts*bytesPerPoint));
+      T_CPP *newPointStore
+        = static_cast<T_CPP *>(realloc(this->PtStore,newNPts*bytesPerPoint));
       if (newPointStore==0)
         {
         #ifndef NDEBUG
@@ -220,7 +232,7 @@ class vtkCTHFragmentPointAccumulator
         #endif
         }
       // mark begin of new
-      float *writePointer=newPointStore+this->NPts;
+      T_CPP *writePointer=newPointStore+this->NPts;
       // update
       this->PtStore=newPointStore;
       this->NPts=newNPts;
@@ -228,20 +240,20 @@ class vtkCTHFragmentPointAccumulator
       return writePointer;
     }
     // Description:
-    // Adds an array of points at the end of
+    // Adds an array of points to the end of
     // the internal store.
-    void Accumulate(float *pts, vtkIdType n)
+    void Accumulate(T_CPP *pts, vtkIdType n)
     {
-      const int bytesPerPoint=3*sizeof(float);
       // extend
-      float *writePointer=this->Expand(n);
+      T_CPP *writePointer=this->Expand(n);
       // copy at end
+      const int bytesPerPoint=3*sizeof(T_CPP);
       memcpy(writePointer,pts,n*bytesPerPoint);
     }
     // Description:
     // Adds an array of points at the end of
     // the internal store.
-    void Accumulate(vtkFloatArray *pts)
+    void Accumulate(T_VTK *pts)
     {
       this->Accumulate(pts->GetPointer(0),pts->GetNumberOfTuples());
     }
@@ -250,11 +262,10 @@ class vtkCTHFragmentPointAccumulator
     // the internal store. Caller to delete the points.
     vtkPoints *BuildVtkPoints()
     {
-      vtkFloatArray *da=vtkFloatArray::New();
+      T_VTK *da=T_VTK::New();
       da->SetNumberOfComponents(3);
       da->SetArray(this->PtStore,this->NPts,1);
       vtkPoints *pts=vtkPoints::New();
-      pts->SetDataTypeToFloat();
       pts->SetData(da);
       da->Delete();
 
@@ -262,11 +273,10 @@ class vtkCTHFragmentPointAccumulator
     }
 
   private:
-    float *PtStore;
+    T_CPP *PtStore;
     vtkIdType NPts;
 };
 
-//============================================================================
 /**
 Description:
 Data structure that describes a fragments loading.
@@ -347,6 +357,73 @@ ostream &operator<<(ostream &sout,
     }
   return sout;
 }
+//
+void PrintPieceLoadingHistogram(
+   vector<vector<vtkIdType> > &pla)
+{
+//   cerr << "loading array:" <<endl;
+//   cerr << pla << endl;
+
+  int nProcs=pla.size();
+  // get min and max loading
+  vtkIdType minLoading=1<<((sizeof(vtkIdType)*8)-2);
+  vtkIdType maxLoading=0;
+  for (int procId=0; procId<nProcs; ++procId)
+    {
+    int nPieces=pla[procId].size();
+    for (int pieceId=0; pieceId<nPieces; ++pieceId)
+      {
+      vtkIdType loading=pla[procId][pieceId];
+      if (loading>0 
+          && minLoading>loading)
+        {
+        minLoading=loading;
+        }
+      if (maxLoading<loading)
+        {
+        maxLoading=loading;
+        }
+      }
+    }
+  // generate histogram
+  const vtkIdType nBins=40;
+  const vtkIdType binWidth=(maxLoading-minLoading)/nBins;
+  const vtkIdType r=(maxLoading-minLoading)%nBins;
+  vector<int> hist(nBins,0);
+  for (int procId=0; procId<nProcs; ++procId)
+    {
+    int nPieces=pla[procId].size();
+    for (int pieceId=0; pieceId<nPieces; ++pieceId)
+      {
+      vtkIdType loading=pla[procId][pieceId];
+      if (loading==0) 
+        {
+        continue;
+        }
+      for (int binId=0; binId<nBins; ++binId)
+        {
+        vtkIdType binTop=minLoading+(binId+1)*binWidth+binId*r;
+        if (loading<=binTop)
+          {
+          ++hist[binId];
+          break;
+          }
+        }
+      }
+    }
+  // generate bin ids
+  vector<vtkIdType> binIds(nBins);
+  for (int binId=0; binId<nBins; ++binId)
+    {
+    binIds[binId]=static_cast<int>(minLoading+(binId+1)*binWidth);
+    }
+  // print
+  cerr << "minLoading: " << minLoading << endl;
+  cerr << "maxLoading: " << maxLoading << endl;
+  cerr << "binWidth:   " << binWidth << endl;
+  cerr << "nBins:      " << nBins << endl;
+  PrintHistogram(hist,binIds);
+}
 
 /**
 Type to represent a node in a multiprocess job
@@ -397,7 +474,7 @@ ostream &operator<<(ostream &sout, vtkCTHFragmentProcessLoading &fp)
   return sout;
 }
 
-/*
+/**
 Minimum ordered heap based priority queue.
 
 Particular to this application:
@@ -6826,6 +6903,13 @@ void vtkCTHFragmentConnect::ProcessSplitFragmentGeometry()
       }
     ++thisMsgId;
     ++thisMsgId;
+    #ifdef vtkCTHFragmentConnectDEBUG
+    cerr << "[" << __LINE__ << "] "
+          << controllingProcId
+          << " loading histogram:" 
+          << endl;
+    PrintPieceLoadingHistogram(loadingArrays);
+    #endif
 
     // Build fragment to proc map, and priority queue
     vtkCTHFragmentToProcMap f2pm;
@@ -6969,7 +7053,7 @@ void vtkCTHFragmentConnect::ProcessSplitFragmentGeometry()
   for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
     {
     // point buffer
-    vtkCTHFragmentPointAccumulator accumulator;
+    vtkCTHFragmentPointAccumulator<float, vtkFloatArray> accumulator;
 
     // get my list of transactions
     vector<vtkCTHFragmentPieceTransaction> &transactionList

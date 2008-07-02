@@ -463,7 +463,8 @@ ostream &operator<<(ostream &sout,
 }
 #endif
 //
-void PrintHistogram(vector<int> &bins)
+template<typename TCnt, typename TLabel>
+void PrintHistogram(vector<TCnt> &bins, vector<TLabel> &binIds)
 {
   const int maxWidth=40;
   const int n=bins.size();
@@ -480,13 +481,28 @@ void PrintHistogram(vector<int> &bins)
       }
     // clip at width of 40.
     int wid= maxBin<maxWidth ? bins[i] : bins[i]*maxWidth/maxBin;
-    cerr << "[" << i << "]*";
+    cerr << "{" << setw(12) << vtkstd::left << binIds[i] << "}*";
     for (int j=1; j<wid; ++j)
       {
       cerr << "*";
       }
     cerr << "(" << bins[i] << ")" << endl;
     }
+  return;
+}
+//
+template<typename TCnt>
+void PrintHistogram(vector<TCnt> &bins)
+{
+  // generate default labels, 0...n
+  const int n=bins.size();
+  vector<int> binIds(n);
+  for (int i=0; i<n; ++i)
+    {
+    binIds[i]=i;
+    }
+  //
+  PrintHistogram(bins,binIds);
   return;
 }
 };
