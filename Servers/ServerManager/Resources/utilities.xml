@@ -2343,6 +2343,15 @@
         </Documentation>
       </Property>
 
+      <!-- End of X3DExporter -->
+    </RenderViewExporterProxy>
+
+    <RenderViewExporterProxy name="X3DExporterBinary" class="vtkX3DExporter"
+      base_proxygroup="exporters" base_proxyname="X3DExporter"
+      file_extension="x3db" >
+      <Documentation>
+        Binary x3d exporter
+      </Documentation>
       <IntVectorProperty name="Binary"
         command="SetBinary"
         number_of_elements="1"
@@ -2362,8 +2371,6 @@
           In binary mode use fastest instead of best compression.
         </Documentation>
       </IntVectorProperty>
-
-      <!-- End of X3DExporter -->
     </RenderViewExporterProxy>
 
     <RenderViewExporterProxy name="VRMLExporter" class="vtkVRMLExporter"
