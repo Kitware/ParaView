@@ -69,7 +69,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.62");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.63");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -228,7 +228,7 @@ class vtkCTHFragmentPointAccumulator
         #ifndef NDEBUG
         abort();
         #else
-        throw(vtkstd::bad_alloc);
+        throw vtkstd::bad_alloc();
         #endif
         }
       // mark begin of new
