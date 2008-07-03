@@ -8,6 +8,14 @@ MACRO(GET_IMAGE_THRESHOLD_ARG variable testname)
   ENDIF (${testname}_THRESHOLD)
 ENDMACRO(GET_IMAGE_THRESHOLD_ARG)
 
+MACRO(GET_REVERSE_CONNECT_ARG variable testname)
+# Macro used to obtain when this test must use reverse connection
+  SET (${variable})
+  IF (${testname}_REVERSE_CONNECT)
+    SET (${variable} --test-rc)
+  ENDIF (${testname}_REVERSE_CONNECT)
+ENDMACRO(GET_REVERSE_CONNECT_ARG)
+
 SET(QT_USE_QTASSISTANT TRUE)
 SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
 SET(QT_USE_QTUITOOLS TRUE)
@@ -361,6 +369,9 @@ IF(BUILD_TESTING)
   SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
   SET (XdmfReadImageDataCollection_THRESHOLD 20)
 
+  # Make these tests use reverse connection.
+  SET (CutMulti_REVERSE_CONNECT TRUE)
+
   # Test compositing for a few client server and client render server tests.
   SET(COMPOSITING_XML_TESTS_WITH_BASELINES
     Calculator
@@ -382,7 +393,8 @@ IF(BUILD_TESTING)
     MARK_AS_ADVANCED(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     FOREACH(test ${XML_TESTS_WITH_BASELINES})
       GET_IMAGE_THRESHOLD_ARG(THRESHOLD_CMD ${test})
-      
+      GET_REVERSE_CONNECT_ARG(REVERSE_CONNECTION_CMD ${test})
+
       ADD_TEST(pqClient${test}-Builtin
         ${TEST_BINARY}
         --test-directory=${PARAVIEW_TEST_DIR}
@@ -394,6 +406,7 @@ IF(BUILD_TESTING)
       
       ADD_TEST(pqClient${test}-ClientServer
         ${TEST_BINARY} --test-server
+        ${REVERSE_CONNECTION_CMD}
         --test-directory=${PARAVIEW_TEST_DIR}
         -dr
         --run-test=${TEST_XML}/${test}.xml
@@ -404,6 +417,7 @@ IF(BUILD_TESTING)
       IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
         ADD_TEST(pqClient${test}-ClientRenderServer
           ${TEST_BINARY} --test-render-server
+          ${REVERSE_CONNECTION_CMD}
           --test-directory=${PARAVIEW_TEST_DIR}
           -dr
           --run-test=${TEST_XML}/${test}.xml

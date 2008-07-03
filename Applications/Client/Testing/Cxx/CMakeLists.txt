@@ -15,8 +15,10 @@ MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
 
 SET(ConnectionXMLs
   ManualConnectCS
+  ManualConnectCS-rc
   ManualConnectBuiltin
   ManualConnectCRSDS
+  ManualConnectCRSDS-rc
   ManualConnectCSRR
   ManualConnectCRSDSRR
   )
@@ -30,11 +32,17 @@ ENDFOREACH(xml)
 SET(CONNECT_TO_SERVER_SCRIPT
   ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCS.xml)
 
+SET(CONNECT_TO_SERVER_REVERSE_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCS-rc.xml)
+
 SET(CONNECT_TO_BUILTIN_SCRIPT
   ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectBuiltin.xml)
 
 SET(CONNECT_TO_RS_DS_SCRIPT
   ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDS.xml)
+
+SET(CONNECT_TO_RS_DS_REVERSE_SCRIPT
+  ${CMAKE_CURRENT_BINARY_DIR}/ManualConnectCRSDS-rc.xml)
 
 # client / server with remote rendering
 SET(CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT

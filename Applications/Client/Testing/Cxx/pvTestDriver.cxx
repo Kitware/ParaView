@@ -637,6 +637,17 @@ int pvTestDriver::Main(int argc, char* argv[])
       return 1;
 #endif
       }
+    else if (this->ReverseConnection)
+      {
+#ifdef CONNECT_TO_RS_DS_REVERSE_SCRIPT
+      vtkstd::string temp = CONNECT_TO_RS_DS_REVERSE_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);
+#else
+      cerr << "CONNECT_TO_RS_DS_REVERSE_SCRIPT must be specified." << endl;
+      VTK_CLEAN_PROCESSES;
+      return 1;
+#endif
+      }
     else
       {
 #ifdef CONNECT_TO_RS_DS_SCRIPT
@@ -659,6 +670,17 @@ int pvTestDriver::Main(int argc, char* argv[])
 #else
       cerr << "CONNECT_TO_SERVER_REMOTE_RENDER_SCRIPT must be specified."
            << endl;
+      VTK_CLEAN_PROCESSES;
+      return 1;
+#endif
+      }
+    else if (this->ReverseConnection)
+      {
+#ifdef CONNECT_TO_SERVER_REVERSE_SCRIPT
+      vtkstd::string temp = CONNECT_TO_SERVER_REVERSE_SCRIPT;
+      this->ClientPostFlags.push_back("--run-test-init=" + temp);
+#else
+      cerr << "CONNECT_TO_SERVER_SCRIPT must be specified." << endl;
       VTK_CLEAN_PROCESSES;
       return 1;
 #endif

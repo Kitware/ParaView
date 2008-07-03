@@ -1465,6 +1465,21 @@ bool pqMainWindowCore::makeServerConnectionIfNoneExists()
     return false;
     }
 
+  // It is possible that we are waiting for a reverse connection to connect
+  // (this happends when playing back tests esp.). So wait until that reverse
+  // connection stuff is done with
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  while (pm->IsAcceptingConnections())
+    {
+    pqEventDispatcher::processEventsAndWait(10);
+    }
+
+  if (core->getServerManagerModel()->getNumberOfItems<pqServer*>() != 0)
+    {
+    // the waiting resulted in a successful connection, return true.
+    return true;
+    }
+
   return this->makeServerConnection();
 }
 

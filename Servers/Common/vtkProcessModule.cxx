@@ -132,7 +132,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.83");
+vtkCxxRevisionMacro(vtkProcessModule, "1.84");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -602,6 +602,12 @@ void vtkProcessModule::StopAcceptingAllConnections()
 void vtkProcessModule::StopAcceptingConnections(int id)
 {
   this->ConnectionManager->StopAcceptingConnections(id);
+}
+
+//-----------------------------------------------------------------------------
+bool vtkProcessModule::IsAcceptingConnections()
+{
+  return this->ConnectionManager->IsAcceptingConnections();
 }
 
 //-----------------------------------------------------------------------------

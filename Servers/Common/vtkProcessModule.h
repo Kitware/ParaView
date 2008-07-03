@@ -521,6 +521,12 @@ public:
   void StopAcceptingAllConnections();
 
   // Description:
+  // Returns if the process module is correctly accepting connections on any
+  // port. This typically means its waiting for some remote process to connect
+  // to it.
+  bool IsAcceptingConnections();
+
+  // Description:
   // This creates a new SelfConnection. This is experimental feature.
   vtkIdType ConnectToSelf();
 

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqServerResource.h>
 
 #include <QCloseEvent>
-
+#include "vtkObjectFactory.h"
 class pqServerStartupDialog::pqImplementation
 {
 public:
@@ -68,7 +68,10 @@ pqServerStartupDialog::pqServerStartupDialog(
   
   this->Implementation->UI.message->setText(
     QString("Please wait while server %1 starts ...").arg(full_server.toURI()));
-    
+   
+  // this message is essential for testing to work correctly for reverse
+  // connections.
+  cout << "Waiting for server..." << endl;
   this->setModal(true);
 }
 

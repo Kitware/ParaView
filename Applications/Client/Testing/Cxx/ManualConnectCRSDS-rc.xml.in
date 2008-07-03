@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <!--
+    Connection script for Client-Server-Reverse Connection
+  -->
+  <!-- Start Disable LightKit -->
+  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,35,11,/1:0" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,35,11,/1:0" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,14,11" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,14,11" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,15,6" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,15,6" />
+  <pqevent object="MainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <!-- End Disable LightKit -->
+
+  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionServerConnect" />
+  <pqevent object="MainWindow/ServerStartupBrowser/addServer" command="activate" arguments="" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="key" arguments="16777248" />
+  <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="RenderServerDataServer-rc" />
+  <pqevent object="pqCreateServerStartupDialog/type" command="set_string" arguments="Client / Data Server / Render Server (reverse connection)" />
+  <pqevent object="pqCreateServerStartupDialog/dataServerHost" command="set_string" arguments="localhost" />  
+  <pqevent object="pqCreateServerStartupDialog/renderServerHost" command="set_string" arguments="localhost" />
+  <pqevent object="pqCreateServerStartupDialog/okButton" command="activate" arguments="" />
+  <pqevent object="pqEditServerStartupDialog/type" command="set_string" arguments="Manual" />
+  <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerStartupBrowser/startups" command="mousePress" arguments="1,1,0,67,5,/0:0" />
+  <pqevent object="MainWindow/ServerStartupBrowser/startups" command="mouseRelease" arguments="1,0,0,67,5,/0:0" />
+  <pqevent object="MainWindow/ServerStartupBrowser/connect" command="activate" arguments="" />
+</pqevents>

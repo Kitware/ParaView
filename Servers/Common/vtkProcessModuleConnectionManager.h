@@ -175,6 +175,12 @@ public:
   int AcceptConnectionsOnPort(int port, int type);
 
   // Description:
+  // Returns if the process module is correctly accepting connections on any
+  // port. This typically means its waiting for some remote process to connect
+  // to it.
+  bool IsAcceptingConnections();
+
+  // Description:
   // Stop accepting connections on a server socket with the given id.
   // This is the id returned on AcceptConnectionsOnPort().
   void StopAcceptingConnections(int id);

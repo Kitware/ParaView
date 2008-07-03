@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.22");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -213,6 +213,7 @@ void vtkProcessModuleConnectionManager::StopAcceptingConnections(int id)
   ss->CloseSocket();
   this->Internals->IntToServerSocketMap.erase(iter);
 }
+
 //-----------------------------------------------------------------------------
 void vtkProcessModuleConnectionManager::StopAcceptingAllConnections()
 {
@@ -225,6 +226,12 @@ void vtkProcessModuleConnectionManager::StopAcceptingAllConnections()
     ss->CloseSocket();   
     }
   this->Internals->IntToServerSocketMap.clear();
+}
+
+//-----------------------------------------------------------------------------
+bool vtkProcessModuleConnectionManager::IsAcceptingConnections()
+{
+  return (this->Internals->IntToServerSocketMap.size() > 0);
 }
 
 //-----------------------------------------------------------------------------
