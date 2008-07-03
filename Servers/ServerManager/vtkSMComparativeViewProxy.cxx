@@ -69,7 +69,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.20");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -154,6 +154,9 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
     this->GetSubProxy("AnimationSceneX"));
   this->AnimationSceneY = vtkSMAnimationSceneProxy::SafeDownCast(
     this->GetSubProxy("AnimationSceneY"));
+
+ // vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
+ //   source->getProxy()->GetProperty("TimestepValues"));
 
   this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, 
     this->SceneObserver);
@@ -275,6 +278,7 @@ static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::AddNewView()
 {
+
   vtkSMViewProxy* rootView = this->GetRootView();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -538,7 +542,10 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     this->UpdateFilmStripVisualization(this->AnimationSceneX);
     }
 
-  for (iter = this->Internal->Views.begin(); 
+    /*
+    // I'm not sure why this block of code was needed?
+    // It called SetUseCache(false) which caused bad behavior.
+    for (iter = this->Internal->Views.begin(); 
        iter != this->Internal->Views.end(); ++iter)
     {
     // Mark all representations as updated; this won't cause any real updation
@@ -546,7 +553,7 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     iter->GetPointer()->UpdateAllRepresentations();
     iter->GetPointer()->SetUseCache(false);
     }
-
+    */
   this->SceneOutdated = false;
 }
 
@@ -554,6 +561,12 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
 void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
   vtkSMAnimationSceneProxy* scene)
 {
+
+  // Set EndTime to the number of views in comparative view.
+  // Think of this as the number of key frames in the animation.
+  // Next, for each frame in the CV, set that frame's time to an
+  // intermediate value between this->TimeRange[0] and this->TimeRange[1].
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     scene->GetProperty("EndTime"));
   dvp->SetElement(0, this->Dimensions[0]*this->Dimensions[1]-1);
@@ -563,7 +576,7 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
   this->Internal->ActiveIndexY = 0;
 
   double increment =  (this->TimeRange[1] - this->TimeRange[0])/
-    (this->Dimensions[0]*this->Dimensions[1]);
+    (this->Dimensions[0]*this->Dimensions[1]-1);
 
   for (int view_index=0; 
     view_index < this->Dimensions[0]*this->Dimensions[1]; ++view_index)
@@ -574,6 +587,9 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 
     double time = this->TimeRange[0] + view_index*increment;
     view->SetViewUpdateTime(time);
+
+    //Print the view index and view time for debugging...
+    //printf("view[%d]->SetViewUpdateTime(%f)\n",view_index,time);
 
     // HACK: This ensure that obsolete cache is never used when the CV is being
     // generated.

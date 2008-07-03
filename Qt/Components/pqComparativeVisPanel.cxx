@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 // Qt Includes.
 #include <QHeaderView>
@@ -53,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
 #include "pqPropertyLinks.h"
+#include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -104,6 +106,7 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
     this, SLOT(modeChanged(const QString&)), Qt::QueuedConnection);
   this->Internal->YAxisGroup->setVisible(false);
 
+  // Call updateView when "Update" pushbutton is clicked.
   QObject::connect(this->Internal->Update, SIGNAL(clicked()),
     this, SLOT(updateView()), Qt::QueuedConnection);
 
@@ -116,16 +119,19 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
 
+  // Add source to pqSourceComboBox when source is added to pipeline
   QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this->Internal->XObject, SLOT(addSource(pqPipelineSource*)));
-  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
-    this->Internal->XObject, SLOT(removeSource(pqPipelineSource*)));
-
   QObject::connect(smmodel, SIGNAL(sourceAdded(pqPipelineSource*)),
     this->Internal->YObject, SLOT(addSource(pqPipelineSource*)));
+
+  // Remove source from pqSourceComboBox when source is remove from pipeline
+  QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
+    this->Internal->XObject, SLOT(removeSource(pqPipelineSource*)));
   QObject::connect(smmodel, SIGNAL(preSourceRemoved(pqPipelineSource*)),
     this->Internal->YObject, SLOT(removeSource(pqPipelineSource*)));
 
+  // Set pqAnimatablePropertiesComboBox when pqSourceComboBox changes
   QObject::connect(
     this->Internal->XObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
     this->Internal->XProperty, SLOT(setSource(vtkSMProxy*)));
@@ -133,6 +139,7 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
     this->Internal->YObject, SIGNAL(currentIndexChanged(vtkSMProxy*)),
     this->Internal->YProperty, SLOT(setSource(vtkSMProxy*)));
 
+  // Call propertyChanged() when pqAnimatablePropertiesComboBox changes
   QObject::connect(
     this->Internal->XProperty, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(xpropertyChanged()));
@@ -175,14 +182,17 @@ void pqComparativeVisPanel::setView(pqView* view)
 
   this->setEnabled(true);
 
+  // Connect XFrames spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
   this->Internal->Links.addPropertyLink(
     this->Internal->XFrames, "value", SIGNAL(valueChanged(int)),
     viewProxy, viewProxy->GetProperty("Dimensions"), 0);
 
+  // Connect YFrames spinbox value to vtkSMComparativeViewProxy's "Dimensions" property
   this->Internal->Links.addPropertyLink(
     this->Internal->YFrames, "value", SIGNAL(valueChanged(int)),
     viewProxy, viewProxy->GetProperty("Dimensions"), 1);
 
+  // Connect mode combobox to vtkSMComparativeViewProxy's "Mode" property
   this->Internal->Links.addPropertyLink(
     this->Internal->ModeAdaptor, "currentText", 
     SIGNAL(currentTextChanged(const QString&)),
@@ -192,11 +202,24 @@ void pqComparativeVisPanel::setView(pqView* view)
 //-----------------------------------------------------------------------------
 void pqComparativeVisPanel::updateView()
 {
+
   if (this->Internal->View)
     {
     this->Internal->Links.accept();
+
+    // This could be handled differently, but for now lets
+    // set the timerange to the currently selected source object's
+    // TimestepValues (if it has them)
+    this->setTimeRangeFromSource(this->Internal->XObject->currentSource()->getProxy());
+
     vtkSMComparativeViewProxy* viewProxy = this->Internal->View->getComparativeRenderViewProxy();
+
+    // Until some bug fixes are completed, lets force the scene outdated
+    // before calling UpdateVisualization().
+    viewProxy->MarkSceneOutdated();
     viewProxy->UpdateVisualization();
+
+    // Do we really need to call this?
     this->Internal->View->render();
     }
 }
@@ -250,6 +273,33 @@ void pqComparativeVisPanel::ypropertyChanged()
       this->Internal->View->getProxy()->GetProperty("YCues"),
       proxy, pname, index);
     this->Internal->View->getProxy()->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
+{
+  if (!source || !this->Internal->View)
+    {
+    return;
+    }
+
+  // Get TimeRange property
+  vtkSMDoubleVectorProperty* timeRangeProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Internal->View->getComparativeRenderViewProxy()->GetProperty("TimeRange"));
+
+  // Try to get TimestepValues property from the source proxy
+  vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
+    source->GetProperty("TimestepValues"));
+
+  // Set the TimeRange to the first and last of TimestepValues.
+  if (tsv && timeRangeProp && tsv->GetNumberOfElements())
+    {
+    double tBegin = tsv->GetElement(0);
+    double tEnd = tsv->GetElement(tsv->GetNumberOfElements()-1);
+    timeRangeProp->SetElement(0, tBegin);
+    timeRangeProp->SetElement(1, tEnd);
+    this->Internal->View->getComparativeRenderViewProxy()->UpdateProperty("TimeRange");
     }
 }
 

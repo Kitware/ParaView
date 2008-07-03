@@ -64,6 +64,10 @@ protected slots:
   /// When the selection of the property to animate on Y axis changes.
   void ypropertyChanged();
 
+  /// If vtkSMProxy has a TimestepValues property then this method will set the
+  /// TimeRange property of vtkSMComparativeViewProxy to reflect the values.
+  void setTimeRangeFromSource(vtkSMProxy*);
+
 protected:
   void activateCue(vtkSMProperty* cuesProperty, 
   vtkSMProxy* animatedProxy, const QString& animatedPName, int animatedIndex);

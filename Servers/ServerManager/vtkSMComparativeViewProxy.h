@@ -141,8 +141,7 @@ public:
   vtkGetVector2Macro(Spacing, int);
 
   // Description:
-  // Set the time range for film-strip visualization.
-  // This is temporary API.
+  // Set the time range and mark the scene outdated.
   void SetTimeRange (double min, double max)
     {
     if ( (this->TimeRange[0] != min) || (this->TimeRange[1] != max))
@@ -153,11 +152,19 @@ public:
       this->MarkSceneOutdated();
       }
     }
+
   void SetTimeRange(double x[2])
     {
     this->SetTimeRange(x[0], x[1]);
     }
   vtkGetVector2Macro(TimeRange, double);
+
+  // Description:
+  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
+  // comparative vis by replaying the animation(s).
+  // Temporarily public.
+  void MarkSceneOutdated()
+    { this->SceneOutdated=true; }
 
 //BTX
 protected:
@@ -186,12 +193,6 @@ protected:
   // Description:
   // Update timestrip scene.
   void UpdateFilmStripVisualization(vtkSMAnimationSceneProxy* scene);
-
-  // Description:
-  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
-  // comparative vis by replaying the animation(s).
-  void MarkSceneOutdated()
-    { this->SceneOutdated=true; }
 
   // Description:
   // Update layout for internal views.

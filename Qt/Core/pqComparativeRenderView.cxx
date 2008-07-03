@@ -206,4 +206,5 @@ void pqComparativeRenderView::onComparativeVisLayoutChanged()
     }
   
   currentViews->Delete();
+
 }
