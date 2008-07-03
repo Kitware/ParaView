@@ -3337,10 +3337,53 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
+          <InputArrayDomain name="input_array1" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+          <InputArrayDomain name="input_array2" attribute_type="point"
+                            number_of_components="3" optional="1"/>
           <Documentation>
             This property specifies the input to the Tube filter.
           </Documentation>
      </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Scalars">
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+               input_domain_name="input_array1">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the scalar array on which to
+            operate. The indicated array may be used for scaling the tubes.
+            (See the VaryRadius property.)
+          </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        default_values="1" 
+        label="Vectors">  <!-- default value=1 so normals go to the right place -->
+          <ArrayListDomain name="array_list" attribute_type="Vectors"
+               input_domain_name="input_array2">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property indicates the name of the vector array on which to
+            operate. The indicated array may be used for scaling and/or
+            orienting the tubes. (See the VaryRadius property.)
+          </Documentation>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="NumberOfSides" 
@@ -3390,9 +3433,13 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
          <Entry value="0" text="Off"/>
          <Entry value="1" text="By Scalar"/>
          <Entry value="2" text="By Vector"/>
+         <Entry value="3" text="By Absolute Scalar"/>
        </EnumerationDomain>
        <Documentation>
-         The property determines whether/how to vary the radius of the tube. If varying by scalar (1), the tube radius is based on the point-based scalar values in the dataset. If it is varied by vector, the vector magnitude is used in varying the radius.
+         The property determines whether/how to vary the radius of the tube. If
+         varying by scalar (1), the tube radius is based on the point-based
+         scalar values in the dataset. If it is varied by vector, the vector
+         magnitude is used in varying the radius.
        </Documentation>
      </IntVectorProperty>
 
@@ -3403,7 +3450,9 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
          default_values="10" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          If varying the radius (VaryRadius property), the property sets the maximum tube radius in terms of a multiple of the minimum radius. If not varying the radius, this value has no effect.
+          If varying the radius (VaryRadius property), the property sets the
+          maximum tube radius in terms of a multiple of the minimum radius. If
+          not varying the radius, this value has no effect.
         </Documentation>
       </DoubleVectorProperty>
    <!-- End TubeFilter -->
