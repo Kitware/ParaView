@@ -615,6 +615,11 @@
                          default_values="1">
         <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
+      <IntVectorProperty name="StaticMode"
+                         command="SetStatic"
+                         number_of_elements="1"
+                         default_values="0">
+      </IntVectorProperty>
     </SourceProxy>
 
     <SourceProxy name="ProjectedTetrahedraMapper" 
@@ -5452,6 +5457,7 @@
           <Property name="UseLookupTableScalarRange" />
           <Property name="ClippingPlanes" />
           <Property name="NumberOfSubPieces" />
+          <Property name="StaticMode" />
         </ExposedProperties>
       </SubProxy>
 
@@ -5791,6 +5797,7 @@
           <Property name="UseLookupTableScalarRange" />
           <Property name="ClippingPlanes" />
           <Property name="NumberOfSubPieces" />
+          <Property name="StaticMode" />
         </ExposedProperties>
       </SubProxy>
 
@@ -6215,6 +6222,7 @@
 
           <!-- Mapper properties -->
           <Property name="LookupTable" />
+          <Property name="StaticMode" />
           <Property name="MapScalars" />
           <Property name="ImmediateModeRendering" />
           <Property name="InterpolateScalarsBeforeMapping" />
