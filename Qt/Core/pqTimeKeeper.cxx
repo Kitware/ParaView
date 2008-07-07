@@ -113,7 +113,7 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
     this, SLOT(sourceRemoved(pqPipelineSource*)));
 
   QObject::connect(smmodel, SIGNAL(viewAdded(pqView*)),
-    this, SLOT(viewAdded(pqView*)), Qt::QueuedConnection);
+    this, SLOT(viewAdded(pqView*)));
   QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
     this, SLOT(viewRemoved(pqView*)));
 
@@ -347,7 +347,7 @@ void pqTimeKeeper::viewAdded(pqView* view)
   if (!pp->IsProxyAdded(view->getProxy()))
     {
     pp->AddProxy(view->getProxy());
-    this->getProxy()->UpdateVTKObjects();
+    this->getProxy()->UpdateProperty("Views");
     }
 }
 
@@ -359,6 +359,6 @@ void pqTimeKeeper::viewRemoved(pqView* view)
   if (pp->IsProxyAdded(view->getProxy()))
     {
     pp->RemoveProxy(view->getProxy());
-    this->getProxy()->UpdateVTKObjects();
+    this->getProxy()->UpdateProperty("Views");
     }
 }

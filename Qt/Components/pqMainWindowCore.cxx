@@ -799,8 +799,7 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   QObject::connect(driver, SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
                    proxyPanel, SLOT(setRepresentation(pqDataRepresentation*)));
   QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
-                   proxyPanel, SLOT(setView(pqView*)), 
-                   Qt::QueuedConnection);
+                   proxyPanel, SLOT(setView(pqView*)));
 
   return proxyPanel;
 }

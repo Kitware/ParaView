@@ -60,7 +60,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.16");
+vtkCxxRevisionMacro(pqStateLoader, "1.17");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -230,7 +230,19 @@ int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
           element->GetAttribute("name") == QString("Views"))
           {
           proxyElement->RemoveNestedElement(element);
-          break;
+          cc--;
+          max--;
+          continue;
+          }
+        // We don't want to upload the values from "TimestepValues" property
+        // either since that's populated by the GUI. 
+        if (element->GetName() == QString("Property") &&
+          element->GetAttribute("name") == QString("TimestepValues"))
+          {
+          proxyElement->RemoveNestedElement(element);
+          cc--;
+          max--;
+          continue;
           }
         }
       }
