@@ -7,6 +7,7 @@
 
 #include <QVTKWidget.h>
 #include <vtkObjectFactory.h>
+#include <vtkSmartPointer.h>
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -109,7 +110,8 @@ vtkStandardNewMacro(GUIHelper);
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-  return pqMain::Run(app, GUIHelper::New());
+  vtkSmartPointer<GUIHelper> helper = vtkSmartPointer<GUIHelper>::New();
+  return pqMain::Run(app, helper);
 }
 
 
