@@ -223,7 +223,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.24");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.25");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -386,6 +386,20 @@ int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
   this->Internal->ReleaseControl();
   PyThreadState_Swap(cur);
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPythonInterpretor::AddPythonPath(const char* path)
+{
+  if (!this->Internal->Interpretor)
+    {
+    vtkErrorMacro("SubInterpretor not initialized. Call InitializeSubInterpretor().");
+    return;
+    }
+
+  this->MakeCurrent();
+  vtkPythonAppInitPrependPythonPath(path);
+  this->ReleaseControl();
 }
 
 //-----------------------------------------------------------------------------

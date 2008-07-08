@@ -102,6 +102,11 @@ public:
   // interpretor was initialized.
   void ClearMessages();
 
+  // Description:
+  // Add a directory to python path.
+  // Can be called only after InitializeSubInterpretor().
+  void AddPythonPath(const char*);
+
 protected:
   vtkPVPythonInterpretor();
   ~vtkPVPythonInterpretor();
