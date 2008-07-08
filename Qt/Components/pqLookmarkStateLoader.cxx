@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.22");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.23");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -527,7 +527,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       }
     }
   else if (strcmp(proxyElement->GetName(), "Proxy")==0 && 
-      (strcmp(proxyElement->GetAttribute("type"), "RenderView")==0 ||
+      (proxy->IsA("vtkSMRenderViewProxy") ||
        strcmp(proxyElement->GetAttribute("type"), "ClientGraphView")==0 ) )
     {
     unsigned int max = proxyElement->GetNumberOfNestedElements();
@@ -541,6 +541,11 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       name = element->GetAttribute("name");
       if (element->GetName() == QString("Property") &&
          name.contains("Camera") && !this->Internal->RestoreCamera)
+        {
+        toRemove.push_back(element);
+        }
+      else if (strcmp(element->GetName(), "Property") == 0 &&
+        (name == "GUISize" || name == "ViewPosition" || name == "ViewSize"))
         {
         toRemove.push_back(element);
         }
