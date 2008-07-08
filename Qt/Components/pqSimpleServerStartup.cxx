@@ -567,10 +567,20 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       {
       val = widget5->itemData(widget5->currentIndex()).toString();
       }
-      
+
+    bool option_readonly;
+    option_readonly = QString(xml_option->GetAttribute("readonly")) == "true";
     this->Implementation->Options[option_name] = val;
-    // remember defaults
-    xml_option->GetNestedElement(0)->SetAttribute("default", val.toAscii().data());
+    if (! option_readonly)
+      {
+      // only update the default if the readonly attribute is false
+      xml_option->GetNestedElement(0)->SetAttribute("default",
+        val.toAscii().data());
+      }
+    else 
+      {
+        bool here = true;
+      }
     }
 
   if(this->Implementation->Options.contains("PV_SERVER_PORT"))
