@@ -26,11 +26,12 @@
 #include "vtkProcessModule.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtkstd/algorithm>
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.31");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.32");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -73,6 +74,7 @@ vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
 {
   this->Script = NULL;
   this->InformationScript = NULL;
+  this->PythonPath = 0;
   this->SetExecuteMethod(vtkPythonProgrammableFilter::ExecuteScript, this);
   this->OutputDataSetType = VTK_POLY_DATA;
 }
@@ -82,6 +84,7 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
 {
   this->SetScript(NULL);
   this->SetInformationScript(NULL);
+  this->SetPythonPath(0);
 
   this->Implementation->DestroyInterpretor();
   delete this->Implementation;
@@ -235,6 +238,15 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
       GetOptions()->GetArgv0();
     this->Implementation->Interpretor->InitializeSubInterpretor(
       1, (char**)&argv0);
+    if (this->PythonPath)
+      {
+      vtkstd::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(
+        this->PythonPath, ';');
+      for (unsigned int cc=0; cc < static_cast<unsigned int>(paths.size()); cc++)
+        {
+        this->Implementation->Interpretor->AddPythonPath(paths[cc].c_str());
+        }
+      }
     }
 
   // Construct a script that defines a function
@@ -341,4 +353,6 @@ void vtkPythonProgrammableFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "OutputDataSetType: " << this->OutputDataSetType << endl;
+  os << indent << "PythonPath: " 
+    << (this->PythonPath? this->PythonPath : "(none)") << endl;
 }

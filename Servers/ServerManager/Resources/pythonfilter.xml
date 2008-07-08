@@ -97,6 +97,16 @@ Interpretor, a python interpretor to run the script upon the first
        animateable="0">
      </StringVectorProperty>
 
+     <StringVectorProperty
+       name="PythonPath"
+       command="SetPythonPath"
+       number_of_elements="1">
+       <Documentation>
+         A semi-colon (;) separated list of directories to add to the python library
+         search path.
+       </Documentation>
+     </StringVectorProperty>
+
     <!-- End ProgrammableFilter -->
     </SourceProxy>
 
@@ -197,6 +207,16 @@ Interpretor, a python interpretor to run the script upon the first
        animateable="0">
      </StringVectorProperty>
 
+     <StringVectorProperty
+       name="PythonPath"
+       command="SetPythonPath"
+       number_of_elements="1">
+       <Documentation>
+         A semi-colon (;) separated list of directories to add to the python library
+         search path.
+       </Documentation>
+     </StringVectorProperty>
+
     <!-- End PythonScript -->
     </SourceProxy>
 
@@ -284,6 +304,16 @@ Interpretor, a python interpretor to run the script upon the first
        number_of_elements_per_command="2"
        clean_command="ClearParameters"
        animateable="0">
+     </StringVectorProperty>
+
+     <StringVectorProperty
+       name="PythonPath"
+       command="SetPythonPath"
+       number_of_elements="1">
+       <Documentation>
+         A semi-colon (;) separated list of directories to add to the python library
+         search path.
+       </Documentation>
      </StringVectorProperty>
 
     <!-- End ProgrammableSource -->

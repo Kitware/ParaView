@@ -82,6 +82,12 @@ public:
   vtkSetMacro(OutputDataSetType, int);
   vtkGetMacro(OutputDataSetType, int);
 
+  // Description:
+  // A semi-colon (;) separated list of directories to add to the python library
+  // search path.
+  vtkSetStringMacro(PythonPath);
+  vtkGetStringMacro(PythonPath);
+
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
@@ -107,6 +113,7 @@ protected:
 
   char *Script;
   char *InformationScript;
+  char *PythonPath;
   int OutputDataSetType;
 
 private:
