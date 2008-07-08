@@ -105,16 +105,16 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkXdmfCS_Initialize(pm->GetInterpreter());
 }
 
-vtkPVMain * pqMain::pvmain = NULL;
-pqOptions * pqMain::options = NULL;
-pqProcessModuleGUIHelper * pqMain::helper = NULL;
+vtkPVMain * pqMain::PVMain = NULL;
+pqOptions * pqMain::PVOptions = NULL;
+pqProcessModuleGUIHelper * pqMain::PVHelper = NULL;
 
 //----------------------------------------------------------------------------
 int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
   pqOptions * & optionsIn)
 {
-  helper = helperIn;
-  options = optionsIn;
+  PVHelper = helperIn;
+  PVOptions = optionsIn;
 
   int argc = app.argc();
   char** argv = app.argv();
@@ -122,7 +122,7 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
   vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
-  pvmain = vtkPVMain::New();
+  PVMain = vtkPVMain::New();
 
   if (optionsIn == NULL)
     {
@@ -132,7 +132,7 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
     }
  
   // This creates the Process Module and initializes it.
-  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, 
+  int ret = PVMain->Initialize(PVOptions, PVHelper, ParaViewInitializeInterpreter, 
                                argc, argv);
 
   return ret;
@@ -142,7 +142,7 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
 int pqMain::Run(pqOptions * options)
 {
   vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
-  return helper->Run(options);
+  return PVHelper->Run(options);
 }
 
 //----------------------------------------------------------------------------
@@ -150,29 +150,29 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
 {
   int argc = app.argc();
   char** argv = app.argv();
-  helper = helperIn;
+  PVHelper = helperIn;
 
   vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
-  pvmain = vtkPVMain::New();
-  options = pqOptions::New();
+  PVMain = vtkPVMain::New();
+  PVOptions = pqOptions::New();
   // We may define a PQCLIENT enum, if necessary.
-  options->SetProcessType(vtkPVOptions::PVCLIENT);
+  PVOptions->SetProcessType(vtkPVOptions::PVCLIENT);
  
   // This creates the Process Module and initializes it.
-  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, 
+  int ret = PVMain->Initialize(PVOptions, PVHelper, ParaViewInitializeInterpreter, 
                                argc, argv);
   if (!ret)
     {
     // Tell process module that we support Multiple connections.
     // This must be set before starting the event loop.
     vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
-    ret = helper->Run(options);
+    ret = PVHelper->Run(PVOptions);
     }
 
-  options->Delete();
-  pvmain->Delete();
+  PVOptions->Delete();
+  PVMain->Delete();
   vtkPVMain::Finalize();
   vtkProcessModule::SetProcessModule(0);
   
@@ -182,9 +182,12 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
 //----------------------------------------------------------------------------
 void pqMain::postRun()
 {
-  // only delete pvmain, as it was allocated in this file/class, rely on caller
+  // only delete PVMain, as it was allocated in this file/class, rely on caller
   // to properly delete helper and options.
-  if (pvmain) pvmain->Delete();
+  if (PVMain) 
+    {
+    PVMain->Delete();
+    }
 
   vtkPVMain::Finalize();
   vtkProcessModule::SetProcessModule(0);

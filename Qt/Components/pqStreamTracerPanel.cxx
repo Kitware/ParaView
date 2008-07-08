@@ -91,8 +91,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   this->Implementation->UI.setupUi(&this->Implementation->UIContainer);
   
   // Get the boundaries of the new proxy ...
-  double proxy_center[3];
-  double proxy_size[3];
+  double proxy_center[3] = {0.0, 0.0, 0.0};
+  double proxy_size[3] = {0.0, 0.0, 0.0};
 
   if(vtkSMProxyProperty* const input_property =
     vtkSMProxyProperty::SafeDownCast(

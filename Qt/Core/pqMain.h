@@ -69,9 +69,9 @@ public:
   static void postRun();
 
 protected:
-  static vtkPVMain                * pvmain;
-  static pqOptions                * options;
-  static pqProcessModuleGUIHelper * helper;
+  static vtkPVMain                * PVMain;
+  static pqOptions                * PVOptions;
+  static pqProcessModuleGUIHelper * PVHelper;
 };
 
 #endif // !__pqMain_h
