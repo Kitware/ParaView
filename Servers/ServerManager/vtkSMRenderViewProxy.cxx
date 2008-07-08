@@ -22,6 +22,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCommand.h"
+#include "vtkDataArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkErrorCode.h"
 #include "vtkExtractSelectedFrustum.h"
@@ -32,6 +33,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
@@ -90,7 +92,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.70");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.71");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1055,6 +1057,36 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   if (useOffscreenRenderingForScreenshots && !prevOffscreen)
     {
     this->GetRenderWindow()->SetOffScreenRendering(0);
+    }
+
+  if (useOffscreenRenderingForScreenshots)
+    {
+    vtkDataArray* scalars = capture->GetPointData()->GetScalars();
+    bool invalid_image = true;
+    for (int comp=0; comp < scalars->GetNumberOfComponents(); comp++)
+      {
+      double range[2];
+      scalars->GetRange(range, comp);
+      if (range[0] != 0.0 || range[1] != 0.0)
+        {
+        invalid_image = false;
+        break;
+        }
+      }
+
+    if (invalid_image)
+      {
+      // free up current image.
+      capture->Delete();
+      capture = 0;
+      vtkWarningMacro("Disabling offscreen rendering since empty image was detected.");
+      this->UseOffscreenRenderingForScreenshots = false;
+      if (prevOffscreen)
+        {
+        this->GetRenderWindow()->SetOffScreenRendering(0);
+        }
+      return this->CaptureWindow(magnification);
+      }
     }
 #endif
 
