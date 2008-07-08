@@ -144,6 +144,7 @@ pqChartAxis *pqHistogramChart::getYAxis() const
     {
     return chartArea->getAxis(pqChartAxis::Right);
     }
+  return 0;
 }
 
 void pqHistogramChart::setModel(pqHistogramModel *model)
