@@ -50,7 +50,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.20");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.21");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -315,7 +315,7 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
       this->UpdateProgress(0.10 + 0.90*i/num_of_tuples);
       }
     const double value = data_array->GetComponent(i, this->Component);
-    int index = (value - min) / bin_delta;
+    int index = static_cast<int>((value - min) / bin_delta);
     // If the value is equal to max, include it in the last bin.
     index = ( index == this->BinCount ? index - 1 : index );
     bin_values->SetValue(index, bin_values->GetValue(index)+1);

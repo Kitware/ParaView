@@ -61,24 +61,24 @@ QStringList @ARG_VIEW_TYPE@OptionsImplementation::viewTypes() const
 }
 
 pqActiveViewOptions* @ARG_VIEW_TYPE@OptionsImplementation::createActiveViewOptions(
-  const QString& type, QObject* parent)
+  const QString& type, QObject* arg_parent)
 {
 #if @HAVE_ACTIVE_VIEW_OPTIONS@
   if(this->viewTypes().contains(type))
     {
-    return new @ARG_ACTIVE_VIEW_OPTIONS@(parent);
+    return new @ARG_ACTIVE_VIEW_OPTIONS@(arg_parent);
     }
 #endif
   return NULL;
 }
 
 pqOptionsContainer* @ARG_VIEW_TYPE@OptionsImplementation::createGlobalViewOptions(
-  const QString& type, QWidget* parent)
+  const QString& type, QWidget* arg_parent)
 {
 #if @HAVE_GLOBAL_VIEW_OPTIONS@
   if(this->viewTypes().contains(type))
     {
-    return new @ARG_GLOBAL_VIEW_OPTIONS@(parent);
+    return new @ARG_GLOBAL_VIEW_OPTIONS@(arg_parent);
     }
 #endif
   return NULL;
