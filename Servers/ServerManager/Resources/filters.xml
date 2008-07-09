@@ -2707,7 +2707,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter" 
+   <SourceProxy name="ReflectionFilter" class="vtkPReflectionFilter" 
     label="Reflect">
     <Documentation
        long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
