@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.54");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -74,6 +74,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfDataSets = 0;
   this->TimeSpan[0] = VTK_DOUBLE_MAX;
   this->TimeSpan[1] = -VTK_DOUBLE_MAX;
+  this->HasTime = 0;
+  this->Time = 0.0;
 }
 
 //----------------------------------------------------------------------------
