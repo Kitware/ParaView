@@ -170,6 +170,19 @@ public:
   vtkSetMacro(ComputeOBB,bool);
   vtkGetMacro(ComputeOBB,bool);
 
+  /// Loading
+  //Description:
+  // Set the upper bound(in number of polygons) that will
+  // be used to exclude processes from work sharing
+  // during memory intensive portions of the algorithm.
+  // acceptable values are [1 INF), however the default
+  // is 1,000,000 polys. Increasing increases parallelism
+  // while decresing reduces parallelism. Setting too low 
+  // can cause problems. For instance if it's set so low 
+  // that all processes are excluded.
+  void SetUpperLoadingBound(int nPolys);
+  vtkGetMacro(UpperLoadingBound,int);
+
   /// Output file
   // Description:
   // Name the file to save a table of fragment attributes to.
@@ -342,8 +355,9 @@ protected:
   void ResolveLocalFragmentGeometry();
   // Merge fragment's geometry that are split across processes
   void ResolveRemoteFragmentGeometry();
-  // Gather split points and process
-  void ProcessSplitFragmentGeometry();
+  // Given a global id convert it to a local id(index into id array)
+  int GlobalToLocalId(int globalId);
+  //
   void BuildLoadingArray(
           vtkstd::vector<vtkIdType> &loadingArray);
   int PackLoadingArray(vtkIdType *&buffer);
@@ -375,9 +389,9 @@ protected:
                int srcCellIndex,       // from which cell in mass
                double *X);
   // Compute the geomteric attributes that have been requested.
-  int ComputeGeometricAttributes();
-  int ComputeFragmentOBB();
-  int ComputeFragmentAABBCenters();
+  void ComputeGeometricAttributes();
+  int ComputeLocalFragmentOBB();
+  int ComputeLocalFragmentAABBCenters();
 //   int ComputeFragmentMVBB();
 
   // Format input block into an easy to access array with
@@ -472,6 +486,10 @@ protected:
   // turn on/off OBB calculation
   bool ComputeOBB;
 
+  // Upper bound used to exclude heavily loaded procs
+  // from work sharing. Reducing may aliviate oom issues.
+  int UpperLoadingBound;
+
   // This is getting a bit ugly but ...
   // When we resolve (merge equivalent) fragments we need a mapping
   // from local ids to global ids.
@@ -493,8 +511,11 @@ protected:
   // of poly data. The multipiece is much like a std vector of poly data *.
   // multi block is indexed by material.
   vtkMultiBlockDataSet *ResolvedFragments;
-  // for each material a list of global ids of what we own.
+  // for each material a list of global ids of pieces we own.
   vtkstd::vector<vtkstd::vector<int> > ResolvedFragmentIds;
+  // List of split fragments
+  vtkstd::vector<int> FragmentSplitMarker;
+
   // A polydata with points at fragment centers, same structure 
   // as the resolved fragments.
   vtkMultiBlockDataSet *ResolvedFragmentCenters;
