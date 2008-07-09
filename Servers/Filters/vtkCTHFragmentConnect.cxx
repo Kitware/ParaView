@@ -70,7 +70,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.64");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.65");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -7136,9 +7136,8 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       }
     // sort the processes by loading
     Q.InitialHeapify();
-    // 
-    vtkIdType loadingBefore=Q.GetTotalLoading();
     #ifdef vtkCTHFragmentConnectDEBUG
+    vtkIdType loadingBefore=Q.GetTotalLoading();
     cerr << "[" << __LINE__ << "] "
          << controllingProcId
          << " total loading before fragment localization "
