@@ -6345,7 +6345,7 @@ Tessellate a higher-order dataset.
        </ArrayListDomain>
        <Hints>
          <!-- override gui no to set default -->
-         <NoDefault />
+         <!-- <NoDefault /> -->
        </Hints>
      </StringVectorProperty>
 
@@ -6468,6 +6468,20 @@ Tessellate a higher-order dataset.
           This property specifies the base including path of where to write the fragment attributes.
         </Documentation>
      </StringVectorProperty>
+
+     <!-- loading bounds -->
+     <IntVectorProperty
+       name="UpperLoadingBound"
+       command="SetUpperLoadingBound"
+       number_of_elements="1"
+       default_values="-1"
+       label="Loading Bound">
+       <DoubleRangeDomain name="range" min="-1" max="2000000000" />
+       <Documentation>
+         Bound in polygons above which process are excluded from work sharing.
+       </Documentation>
+     </IntVectorProperty>
+
    <!-- End CTHFragmentConnect -->
    </SourceProxy>
 
