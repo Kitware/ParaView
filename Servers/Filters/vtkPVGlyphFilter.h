@@ -44,7 +44,7 @@ public:
   
   // Description:
   // Set/get whether to mask points
-  vtkSetMacro(UseMaskPoints, int);
+  void SetUseMaskPoints(int useMaskPoints);
   vtkGetMacro(UseMaskPoints, int);
 
   // Description:
@@ -88,11 +88,13 @@ protected:
   int UseMaskPoints;
   int InputIsUniformGrid;
   
+  bool BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
+  vtkIdType BlockSampleStride;
   vtkIdType BlockPointCounter;
   vtkIdType BlockNextPoint;
-  vtkIdType BlockNumPts;
+  vtkIdType BlockNumGlyphedPts;
 
   int RandomMode;
 
