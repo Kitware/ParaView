@@ -70,7 +70,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.65");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.66");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -6686,8 +6686,6 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
     else
       {
       // merge two local pieces
-      // TODO It's more effcient to batch the appends, but check 
-      // how often this gets hit more than once for the same fragment...
       vtkAppendPolyData *apf=vtkAppendPolyData::New();
       apf->AddInput(destMesh);
       apf->AddInput(srcMesh);
@@ -6711,6 +6709,8 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 // NOTE: this results in extreme memory consumption for large 
 // fragments. Do not use. Re-implemented to temp. localize only 
 // the points.
+// NOTE: Gathering PolyData requires 1-3GB while gathering its
+// points only requires 10-100MB....
 void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 {
   ostringstream progressMesg;
@@ -6790,12 +6790,6 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
     // cerr << "[" << __LINE__ << "] "
     //       << loadingArrays 
     //       << endl;
-    // cerr << "[" << __LINE__ << "] "
-    //       << controllingProcId
-    //       << " holding "
-    //       << (nProcs*this->NumberOfResolvedFragments*sizeof(vtkIdType))/1E6
-    //       << " MB in loading arrays."
-    //       << endl;
     #endif
 
     // Build fragment to proc map, and priority queue
@@ -6827,7 +6821,7 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
     vtkIdType loadingBefore=Q.GetTotalLoading();
     cerr << "[" << __LINE__ << "] "
          << controllingProcId
-         << " total loading before fragment localization "
+         << " total loading "
          << loadingBefore/1E6
          << " M polys."
          << endl;
@@ -6979,8 +6973,8 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
         else
           {
           // merge two fragment pieces
-          // TODO It's more effcient to batch the appends, but check 
-          // how often this gets hit more than once for the same fragment...
+          // It's more effcient to batch the appends, but the
+          // majority of split fragments only have two pieces.
           vtkAppendPolyData *apf=vtkAppendPolyData::New();
           apf->AddInput(localMesh);
           apf->AddInput(remoteMesh);
@@ -7060,8 +7054,8 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
   // the fragment to process distribution, creates a blue print of the
   // moves that must occur to place the split pieces on a single process.
   // These moves are executed, the attributes are calculated, and the result
-  // are broadcast back. Then for the fragments that are not split the
-  // attributes are computed.
+  // are broadcast back top geoometry owners. Then for the fragments that 
+  // are not split the attributes are computed.
   const int controllingProcId=0;
   const int msgBase=200000;
 
@@ -7152,7 +7146,8 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
     // Who will do attribute processing for fragments
     // that are split? We weed out processes that are
     // highly loaded and cycle through the group that 
-    // remains assigning to each.
+    // remains assigning to each until all work has
+    // been alloted.
     vtkCTHFragmentProcessRingBuffer procRing;
     procRing.Initialize(Q, this->UpperLoadingBound);
     #ifdef vtkCTHFragmentConnectDEBUG
@@ -7925,7 +7920,6 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
   const int myProcId=this->Controller->GetLocalProcessId();
   const int nProcs=this->Controller->GetNumberOfProcesses();
   const int msgBase=200000;
-  unsigned long long holding=0;
 
   // size buffer's header's
   // here we work with a single block(material)
@@ -7956,7 +7950,6 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
             procId,
             thisMsgId);
     ++thisMsgId;
-    holding+=(unsigned long long)buffers[procId].Capacity();
     // unpack attribute data
     // We will point into the comm buffer rather than copy
     const unsigned int nToUnpack
@@ -7983,14 +7976,7 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
       buffers[procId].UnPack(sums[procId][i],nCompsSum,nToUnpack,false);
       }
     }
-  #ifdef vtkCTHFragmentConnectDEBUG
-  // cerr << "[" << __LINE__ << "] "
-  //      << myProcId
-  //      << " holding "
-  //      << holding/1E6
-  //      << " MB in comm buffers."
-  //      << endl;
-  #endif
+
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -8002,7 +7988,6 @@ int vtkCTHFragmentConnect::ReceiveIntegratedAttributes(
                 const int sourceProcId)
 {
   const int msgBase=200000;
-  unsigned long long holding=0;
 
   // prepare the comm buffer to receive attribute data
   // pertaining to a single block(material)
@@ -8026,7 +8011,7 @@ int vtkCTHFragmentConnect::ReceiveIntegratedAttributes(
           sourceProcId,
           thisMsgId);
   ++thisMsgId;
-  holding+=buffer.Capacity();
+
   // unpack attribue data, with an explicit copy 
   // into a local array
   const unsigned int nToUnPack
@@ -8079,7 +8064,6 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
 {
   const int myProcId=this->Controller->GetLocalProcessId();
   const int msgBase=200000;
-  unsigned long long holding=0;
 
   // estimate buffer size (in bytes)
   const vtkIdType nToSend
@@ -8100,12 +8084,11 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
     = nToSend*totalNumberOfComps*sizeof(double);
 
   // prepare a comm buffer
-  // Will use on a single block(material) of attribute data
+  // Will use only a single block(material) of attribute data
   // We size the buffer, and set the number of fragments.
   vtkCTHFragmentCommBuffer buffer;
   buffer.Initialize(myProcId,1,bufferSize);
   buffer.SetNumberOfTuples(0,nToSend);
-  holding+=(unsigned long long)buffer.Capacity();
 
   // pack attributes into the buffer
   // volume
@@ -8309,8 +8292,6 @@ int vtkCTHFragmentConnect::CleanUpAfterCollectIntegratedAttributes(
 // return 0 on error.
 int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
 {
-  unsigned long long holding=0;
-
   int nComps;
   double *pResolved=0;
   vtkIdType bytesPerComponent
@@ -8325,7 +8306,6 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
       this->FragmentVolumes->GetName());
   pResolved=this->FragmentVolumes->GetPointer(0);
   memset( pResolved, 0, bytesPerComponent);
-  holding+=bytesPerComponent;
   // moments
   if (this->ComputeMoments)
     {
@@ -8337,7 +8317,6 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
         this->FragmentMoments->GetName());
     pResolved=this->FragmentMoments->GetPointer(0);
     memset( pResolved, 0, nComps*bytesPerComponent);
-    holding+=(unsigned long long)nComps*bytesPerComponent;
     }
   // averages
   for (int i=0; i<this->NToAverage; ++i)
@@ -8351,7 +8330,6 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
         this->FragmentWeightedAverages[i]->GetName());
     pResolved=this->FragmentWeightedAverages[i]->GetPointer(0);
     memset( pResolved, 0, nComps*bytesPerComponent);
-    holding+=(unsigned long long)nComps*bytesPerComponent;
     }
   // sums
   for (int i=0; i<this->NToSum; ++i)
@@ -8365,18 +8343,8 @@ int vtkCTHFragmentConnect::PrepareToResolveIntegratedAttributes()
         this->FragmentSums[i]->GetName());
     pResolved=this->FragmentSums[i]->GetPointer(0);
     memset( pResolved, 0, nComps*bytesPerComponent);
-    holding+=(unsigned long long)nComps*bytesPerComponent;
     }
 
-  #ifdef vtkCTHFragmentConnectDEBUG
-  //   int myProcId=this->Controller->GetLocalProcessId();
-  //   cerr << "[" << __LINE__ << "] "
-  //        << myProcId
-  //        << " holding "
-  //        << holding/1E6
-  //        << " MB for resolved integrated attributes."
-  //        << endl;
-  #endif
   return 1;
 }
 
@@ -8409,7 +8377,9 @@ int vtkCTHFragmentConnect::ResolveIntegratedAttributes(
 
     // prepare for resolution
     this->PrepareToResolveIntegratedAttributes();
-    // resolve
+    /// resolve attributes
+    // First pass we'll resolve attributes which
+    // are needed to resolve other attributes (eg weights)
     int procBaseEqSetId=0;
     for (int procId=0; procId<nProcs; ++procId)
       {
@@ -8448,6 +8418,19 @@ int vtkCTHFragmentConnect::ResolveIntegratedAttributes(
           ++eqSetId;
           }
         }
+      procBaseEqSetId+=nUnresolved;
+      }
+
+    // Second pass, resolve attributes which depend on 
+    // other attributes (eg weighted averages)
+    procBaseEqSetId=0;
+    for (int procId=0; procId<nProcs; ++procId)
+      {
+      int eqSetId;
+      double *pResolved;
+      const double *pUnresolved;
+      int nUnresolved=this->NumberOfRawFragmentsInProcess[procId];
+
       // averages
       double *pWt;  // these have to do with weights
       int nCompsWt; // soon we will have multiple weights
@@ -8523,63 +8506,25 @@ void vtkCTHFragmentConnect::PrepareForResolveEquivalences()
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
-  unsigned long holdingIntAttr=0;
-  unsigned long holdingEqs=0;
-  unsigned long holdingGeomPtr=0;
-
   // equivalences
   this->EquivalenceSet->Squeeze();
-  holdingEqs
-    +=(unsigned long)this->EquivalenceSet->Capacity()*sizeof(int);
   // volume
   this->FragmentVolumes->Squeeze();
-  holdingIntAttr 
-    +=(unsigned long)this->FragmentVolumes->Capacity()*sizeof(double);
   // weighted average
   if ( this->ComputeMoments )
     {
     this->FragmentMoments->Squeeze();
-    holdingIntAttr
-      +=(unsigned long)this->FragmentMoments->Capacity()*sizeof(double);
     }
   for (int i=0; i<this->NToAverage; ++i)
     {
     this->FragmentWeightedAverages[i]->Squeeze();
-    holdingIntAttr
-      +=(unsigned long)this->FragmentWeightedAverages[i]->Capacity()*sizeof(double);
     }
   for (int i=0; i<this->NToSum; ++i)
     {
     this->FragmentSums[i]->Squeeze();
-    holdingIntAttr
-      +=(unsigned long)this->FragmentSums[i]->Capacity()*sizeof(double);
     }
   // geometry container
   vector<vtkPolyData *>(this->FragmentMeshes).swap(this->FragmentMeshes);
-  holdingGeomPtr 
-    += (unsigned long)this->FragmentMeshes.capacity()*sizeof(vtkPolyData *);
-
-  #ifdef vtkCTHFragmentConnectDEBUG
-  //   int myProcId=this->Controller->GetLocalProcessId();
-  //   cerr << "[" << __LINE__ << "] "
-  //        << myProcId 
-  //        << " is holding "
-  //        << holdingEqs/1E6 
-  //        << " MB in EquivanlenceSet."
-  //        << endl;
-  //   cerr << "[" << __LINE__ << "] "
-  //        << myProcId 
-  //        << " is holding "
-  //        << holdingIntAttr/1E6 
-  //        << " MB in integration arrays."
-  //        << endl;
-  //   cerr << "[" << __LINE__ << "] " 
-  //        << myProcId 
-  //        << " is holding "
-  //        << holdingGeomPtr/1E6 
-  //        << " MB in geometry container."
-  //        << endl;
-  #endif
 }
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::ResolveEquivalences()
@@ -8755,15 +8700,6 @@ void vtkCTHFragmentConnect::GatherEquivalenceSets(
   // Copy the equivalences to the local set for returning our results.
   // The ids will be the global ids so the GetId method will work.
   set->DeepCopy(globalSet);
-
-  #ifdef vtkCTHFragmentConnectDEBUG
-  //   cerr << "[" << __LINE__ << "] "
-  //        << myProcId 
-  //        << " holding "
-  //        << (unsigned long)set->Capacity()*sizeof(int)/1E6
-  //        << " MB in EquivalenceSet."
-  //        << endl;
-  #endif
 
   delete globalSet;
 }
