@@ -88,7 +88,7 @@ protected:
   int UseMaskPoints;
   int InputIsUniformGrid;
   
-  bool BlockGlyphAllPoints;
+  vtkIdType BlockGlyphAllPoints;
   vtkIdType BlockMaxNumPts;
   vtkIdType BlockOnRatio;
   vtkIdType BlockSampleStride;

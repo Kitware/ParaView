@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.30");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.31");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   this->BlockMaxNumPts = 0;
   this->BlockPointCounter = 0;
   this->BlockNumGlyphedPts = 0;
-  this->BlockGlyphAllPoints=false;
+  this->BlockGlyphAllPoints=0;
 }
 
 //-----------------------------------------------------------------------------
@@ -93,7 +93,7 @@ void vtkPVGlyphFilter::SetUseMaskPoints(int useMaskPoints)
     return;
     }
   this->UseMaskPoints=useMaskPoints;
-  this->BlockGlyphAllPoints= !static_cast<bool>(this->UseMaskPoints);
+  this->BlockGlyphAllPoints= !this->UseMaskPoints;
   this->Modified();
 }
 
@@ -176,7 +176,7 @@ int vtkPVGlyphFilter::RequestData(
   // our implementation of IsPointVisible, for non-composite
   // data, we use vtkMaskFilter and glyph every point it 
   // returns.
-  this->BlockGlyphAllPoints=true;
+  this->BlockGlyphAllPoints=1;
 
   vtkDataSet* dsInput = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -197,7 +197,7 @@ int vtkPVGlyphFilter::RequestData(
     // yes.
     int retVal
       = this->Superclass::RequestData(request, inputVector, outputVector);
-    this->BlockGlyphAllPoints= !static_cast<bool>(this->UseMaskPoints);
+    this->BlockGlyphAllPoints= !this->UseMaskPoints;
     return retVal;
     }
 
@@ -226,7 +226,7 @@ int vtkPVGlyphFilter::RequestData(
   int retVal
     = this->MaskAndExecute(numPts, maxNumPts, dsInput,
                            request, inputVs, outputVector);
-  this->BlockGlyphAllPoints= !static_cast<bool>(this->UseMaskPoints);
+  this->BlockGlyphAllPoints= !this->UseMaskPoints;
 
   inputVs[0]->Delete();
   return retVal;
