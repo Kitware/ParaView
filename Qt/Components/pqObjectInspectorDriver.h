@@ -80,6 +80,13 @@ public:
   /// \param model The selection model.
   void setSelectionModel(pqServerManagerSelectionModel *model);
 
+  /// \brief
+  ///  Returns the currently selected output port.
+  pqOutputPort* getOutputPort()
+  {
+    return this->OutputPort;
+  }
+  
 public slots:
   /// \brief
   ///   Sets the active view.

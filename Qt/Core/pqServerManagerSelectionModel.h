@@ -44,18 +44,18 @@ class pqServerManagerModelItem;
 class pqServerManagerSelection;
 class pqServerManagerSelectionModelInternal;
 
-// This is a QItemSelectionModel-like selection model for the
-// pqServerManagerModel. pqServerManagerSelectionModel is part
-// of the "Synchronized Selection" mechanism, which makes it 
-// possible for different Qt views based on different Qt models, all
-// of which are based on thq pqServerManagerModel to coordintae selection
-// state.
+/// This is a QItemSelectionModel-like selection model for the
+/// pqServerManagerModel. pqServerManagerSelectionModel is part
+/// of the "Synchronized Selection" mechanism, which makes it 
+/// possible for different Qt views based on different Qt models, all
+/// of which are based on thq pqServerManagerModel to coordintae selection
+/// state.
 class PQCORE_EXPORT pqServerManagerSelectionModel : public QObject
 {
   Q_OBJECT
 public:
-  // Supported selections flags. These are a subset of 
-  // QItemSelectionModel::SelectionFlags.
+  /// Supported selections flags. These are a subset of 
+  /// QItemSelectionModel::SelectionFlags.
   enum SelectionFlag {
     NoUpdate       = QItemSelectionModel::NoUpdate,
     Clear          = QItemSelectionModel::Clear,
@@ -70,23 +70,23 @@ public:
     QObject* parent=NULL);
   virtual ~pqServerManagerSelectionModel();
 
-  // Returns the item that is current, on NULL if
-  // there is no current.
+  /// Returns the item that is current, on NULL if
+  /// there is no current.
   pqServerManagerModelItem* currentItem() const;
 
-  // Set the current item. command can be used to indicate
-  // if the current item should be selected/deselected, or
-  // all selection cleared.
+  /// Set the current item. command can be used to indicate
+  /// if the current item should be selected/deselected, or
+  /// all selection cleared.
   void setCurrentItem(pqServerManagerModelItem* item, 
     pqServerManagerSelectionModel::SelectionFlags command);
 
-  // Returns true if the item is selected.
+  /// Returns true if the item is selected.
   bool isSelected(pqServerManagerModelItem* item) const;
 
-  // Returns the pqServerManagerModel operated on by the selection model.
+  /// Returns the pqServerManagerModel operated on by the selection model.
   pqServerManagerModel* model() const;
 
-  // Returns the list of selected items.
+  /// Returns the list of selected items.
   const pqServerManagerSelection* selectedItems() const;
 
 public slots:
@@ -102,7 +102,7 @@ signals:
 
 private:
   pqServerManagerSelectionModelInternal* Internal;
-  // Cleans up QPointers pointing to null objects in the selection.
+  /// Cleans up QPointers pointing to null objects in the selection.
   void purge();
 };
 
@@ -118,7 +118,7 @@ inline uint qHash(const QPointer<pqServerManagerModelItem>& index)
   return reinterpret_cast<size_t>(static_cast<pqServerManagerModelItem*>(index));
 }
 
-// This is a selection set. For now, it's simply a QList.
+/// This is a selection set. For now, it's simply a QList.
 class PQCORE_EXPORT pqServerManagerSelection : 
   public QList<QPointer<pqServerManagerModelItem> >
 {
