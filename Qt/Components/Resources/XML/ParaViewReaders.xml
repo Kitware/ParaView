@@ -1,16 +1,9 @@
 <ParaViewReaders>
-  <Reader name="ExodusReader"
-          extensions="ex_old"
-          file_description="Exodus">
-  </Reader>
-  <Reader name="ExodusIIReader"
-          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
-          file_description="ExodusII">
-  </Reader>
-  <Reader name="ExodusRestartReader"
-          extensions="ex-timeseries"
-          file_description="Metafile for restarted exodus outputs">
-  </Reader>
+  <!-- 
+    NOTE: Readers are tried in reverse order that they are present in this
+    list i.e. if two readers can read the same extension, then the reader
+    apperaring later will be tried first when reading the file. 
+  -->
   <Reader name="LSDynaReader"
           extensions="d3plot k lsdyna"
           file_description="LSDyna">
@@ -197,6 +190,19 @@
   <Reader name="SiloReader"
           extensions="silo"
           file_description="Silo files">
+  </Reader>
+
+  <Reader name="ExodusReader"
+          extensions="ex_old"
+          file_description="Exodus">
+  </Reader>
+  <Reader name="ExodusIIReader"
+          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          file_description="ExodusII">
+  </Reader>
+  <Reader name="ExodusRestartReader"
+          extensions="ex-timeseries"
+          file_description="Metafile for restarted exodus outputs">
   </Reader>
 
 </ParaViewReaders>
