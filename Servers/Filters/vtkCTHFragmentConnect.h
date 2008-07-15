@@ -107,31 +107,57 @@ public:
   // Get the name of a specific array
   const char *GetMassArrayName(int index);
 
-  /// WeightedAverage attribute sellection
+  /// Volume weighted average attribute sellection
   // Description:
   // Add a single array
-  void SelectWeightedAverageArray(const char *name);
+  void SelectVolumeWtdAvgArray(const char *name);
   // Description:
   // remove a single array
-  void UnselectWeightedAverageArray( const char *name );
+  void UnselectVolumeWtdAvgArray(const char *name);
   // Description:
   // remove all arrays
-  void UnselectAllWeightedAverageArrays();
+  void UnselectAllVolumeWtdAvgArrays();
 
   // Description:
   // Enable/disable processing on an array
-  void SetWeightedAverageArrayStatus( const char* name,
+  void SetVolumeWtdAvgArrayStatus(const char* name,
                                   int status );
   // Description:
   // Get enable./disable status for a given array
-  int GetWeightedAverageArrayStatus(const char* name);
-  int GetWeightedAverageArrayStatus(int index);
+  int GetVolumeWtdAvgArrayStatus(const char* name);
+  int GetVolumeWtdAvgArrayStatus(int index);
   // Description:
   // Query the number of available arrays
-  int GetNumberOfWeightedAverageArrays();
+  int GetNumberOfVolumeWtdAvgArrays();
   // Description:
   // Get the name of a specific array
-  const char *GetWeightedAverageArrayName(int index);
+  const char *GetVolumeWtdAvgArrayName(int index);
+
+  /// Mass weighted average attribute sellection
+  // Description:
+  // Add a single array
+  void SelectMassWtdAvgArray(const char *name);
+  // Description:
+  // remove a single array
+  void UnselectMassWtdAvgArray(const char *name);
+  // Description:
+  // remove all arrays
+  void UnselectAllMassWtdAvgArrays();
+
+  // Description:
+  // Enable/disable processing on an array
+  void SetMassWtdAvgArrayStatus(const char* name,
+                                  int status );
+  // Description:
+  // Get enable./disable status for a given array
+  int GetMassWtdAvgArrayStatus(const char* name);
+  int GetMassWtdAvgArrayStatus(int index);
+  // Description:
+  // Query the number of available arrays
+  int GetNumberOfMassWtdAvgArrays();
+  // Description:
+  // Get the name of a specific array
+  const char *GetMassWtdAvgArrayName(int index);
 
   /// Summation attribute sellection
   // Description:
@@ -212,8 +238,10 @@ protected:
   // Set up the result arrays for the calculations we are about to 
   // make.
   void PrepareForPass(vtkHierarchicalBoxDataSet *hbdsInput,
-                      vtkstd::vector<vtkstd::string> &weightedAverageArrayNames,
-                      vtkstd::vector<vtkstd::string> &summedArrayNames);
+                      vtkstd::vector<vtkstd::string> &volumeWtdAvgArrayNames,
+                      vtkstd::vector<vtkstd::string> &massWtdAvgArrayNames,
+                      vtkstd::vector<vtkstd::string> &summedArrayNames,
+                      vtkstd::vector<vtkstd::string> &integratedArrayNames);
   // Craete a new fragment/piece.
   vtkPolyData *NewFragmentMesh();
   // Process each cell, looking for fragments.
@@ -307,14 +335,16 @@ protected:
           vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
   // Free resources.
   int CleanUpAfterCollectIntegratedAttributes(
           vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
   // Receive all integrated attribute arrays from all other 
   // processes.
@@ -322,7 +352,8 @@ protected:
           vtkstd::vector<vtkCTHFragmentCommBuffer> &buffers,
           vtkstd::vector<vtkDoubleArray *>&volumes,
           vtkstd::vector<vtkDoubleArray *>&moments,
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&averages,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&volumeWtdAvgs,
+          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&massWtdAvgs,
           vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&sums);
   // Send my integrated attributes to all other processes.
   int BroadcastIntegratedAttributes(const int sourceProcessId);
@@ -392,18 +423,20 @@ protected:
   void ComputeGeometricAttributes();
   int ComputeLocalFragmentOBB();
   int ComputeLocalFragmentAABBCenters();
-//   int ComputeFragmentMVBB();
+  // int ComputeFragmentMVBB();
 
   // Format input block into an easy to access array with
   // extra metadata (information) extracted.
   int NumberOfInputBlocks;
   vtkCTHFragmentConnectBlock** InputBlocks;
   void DeleteAllBlocks();
-  int InitializeBlocks( vtkHierarchicalBoxDataSet* input,
-                        vtkstd::string &materialFractionArrayName,
-                        vtkstd::string &massArrayName,
-                        vtkstd::vector<vtkstd::string> &averagedArrayNames,
-                        vtkstd::vector<vtkstd::string> &summedArrayNames );
+  int InitializeBlocks(vtkHierarchicalBoxDataSet* input,
+                       vtkstd::string &materialFractionArrayName,
+                       vtkstd::string &massArrayName,
+                       vtkstd::vector<vtkstd::string> &volumeWtdAvgArrayNames,
+                       vtkstd::vector<vtkstd::string> &massWtdAvgArrayNames,
+                       vtkstd::vector<vtkstd::string> &summedArrayNames,
+                       vtkstd::vector<vtkstd::string> &integratedArrayNames);
   void AddBlock(vtkCTHFragmentConnectBlock* block);
 
   // New methods for connecting neighbors.
@@ -446,6 +479,11 @@ protected:
   // until resolution.
   vtkstd::vector<vtkPolyData *> FragmentMeshes;
 
+  // TODO this could be cleaned up (somewhat) by
+  // addding an integration class which encapsulates
+  // all of the supported operations.
+  ///class vtkCTHFragmentConnectIntegrator
+  ///{
   // Local id of current fragment
   int FragmentId;
   // Accumulator for the volume of the current fragment.
@@ -465,13 +503,31 @@ protected:
 
   // Weighted average, where weights correspond to fragment volume.
   // Accumulators one for each array to average, scalar or vector
-  vtkstd::vector<vtkstd::vector<double> > FragmentWeightedAverage;
+  vtkstd::vector<vtkstd::vector<double> > FragmentVolumeWtdAvg;
   // weighted averages indexed by fragment id.
-  vtkstd::vector<vtkDoubleArray *>FragmentWeightedAverages;
+  vtkstd::vector<vtkDoubleArray *>FragmentVolumeWtdAvgs;
   // number of arrays for which to compute the weighted average
-  int NToAverage;
+  int NVolumeWtdAvgs;
   // Names of the arrays to average.
-  vtkstd::vector<vtkstd::string> WeightedAverageArrayNames;
+  vtkstd::vector<vtkstd::string> VolumeWtdAvgArrayNames;
+
+  // Weighted average, where weights correspond to fragment mass.
+  // Accumulators one for each array to average, scalar or vector
+  vtkstd::vector<vtkstd::vector<double> > FragmentMassWtdAvg;
+  // weighted averages indexed by fragment id.
+  vtkstd::vector<vtkDoubleArray *>FragmentMassWtdAvgs;
+  // number of arrays for which to compute the weighted average
+  int NMassWtdAvgs;
+  // Names of the arrays to average.
+  vtkstd::vector<vtkstd::string> MassWtdAvgArrayNames;
+
+  // Unique list of all integrated array names
+  // it's used construct list of arrays that
+  // will be coppied into output.
+  vtkstd::vector<vtkstd::string> IntegratedArrayNames;
+  vtkstd::vector<int> IntegratedArrayNComp;
+  // number of integrated arrays
+  int NToIntegrate;
 
   // Sum of data over the fragment.
   // Accumulators, one for each array to sum
@@ -480,6 +536,7 @@ protected:
   vtkstd::vector<vtkDoubleArray *>FragmentSums;
   // number of arrays for which to compute the weighted average
   int NToSum;
+  ///};
 
   // OBB indexed by fragment id
   vtkDoubleArray *FragmentOBBs;
@@ -557,7 +614,8 @@ protected:
   // PARAVIEW interface data
   vtkDataArraySelection *MaterialArraySelection;
   vtkDataArraySelection *MassArraySelection;
-  vtkDataArraySelection *WeightedAverageArraySelection;
+  vtkDataArraySelection *VolumeWtdAvgArraySelection;
+  vtkDataArraySelection *MassWtdAvgArraySelection;
   vtkDataArraySelection *SummationArraySelection;
   vtkCallbackCommand *SelectionObserver;
   char *OutputTableFileNameBase;

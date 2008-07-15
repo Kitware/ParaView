@@ -237,10 +237,12 @@ void FillVector( vector<T> &V, const T &v)
     V[i]=v;
     }
 }
-// Copier to copy from an array where type is not known 
-// into a destination buffer.
-// returns 0 if the type of the source array
-// is not supported.
+/**
+Copier to copy from an array where type is not known 
+into a destination buffer.
+returns 0 if the type of the source array
+is not supported.
+*/
 template<class T>
 inline
 int CopyTuple(T *dest,          // scalar/vector
@@ -293,8 +295,12 @@ int CopyTuple(T *dest,          // scalar/vector
     }
   return 1;
 }
-// vtk data array selection helper
-int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
+/**
+Construct a list of the selected array names
+*/
+int GetEnabledArrayNames(
+        vtkDataArraySelection *das,
+        vector<string> &names)
 {
   int nEnabled=das->GetNumberOfArraysEnabled();
   names.resize(nEnabled);
@@ -311,6 +317,56 @@ int GetEnabledArrayNames(vtkDataArraySelection *das, vector<string> &names)
     ++j;
     }
   return nEnabled;
+}
+/**
+Merge selected array names form multiple data
+array selections who list the same arrays.
+Return the number of array that were merged.
+*/
+int MergeEnabledArrayNames(
+        vtkDataArraySelection *das,
+        vector<string> &mergedNames,
+        vector<int> &mergedNamesMarker)
+{
+  int nArraysTotal=das->GetNumberOfArrays();
+  // initial size in subsequent calls data array
+  // selection expected to  be the same size,
+  // order, etc...
+  if (mergedNamesMarker.size()==0)
+    {
+    mergedNamesMarker.resize(nArraysTotal,0);
+    }
+  // check each array in data array selection
+  int nMerged=0;
+  for (int i=0; i<nArraysTotal; ++i)
+    {
+    // skip disabled, or previosly merged arrays
+    if (!das->GetArraySetting(i)
+        || mergedNamesMarker[i]==1)
+      {
+      continue;
+      }
+    ++nMerged;
+    // save names of enabled arrays, inc name count
+    mergedNames.push_back(das->GetArrayName(i));
+    // mark as being merged for future calls
+    mergedNamesMarker[i]=1;
+    }
+  return nMerged;
+}
+/**
+Construct a list of the selected array names
+and merge them into a unique list. Return
+the number enabled.
+*/
+int GetAndMergeEnabledArrayNames(
+        vtkDataArraySelection *das,
+        vector<string> &names,
+        vector<string> &mergedNames,
+        vector<int> &mergedNamesMarker)
+{
+  MergeEnabledArrayNames(das,mergedNames,mergedNamesMarker);
+  return GetEnabledArrayNames(das,names);
 }
 #ifdef vtkCTHFragmentConnectDEBUG
 //

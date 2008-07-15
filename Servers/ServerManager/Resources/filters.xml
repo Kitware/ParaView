@@ -6324,7 +6324,7 @@ Tessellate a higher-order dataset.
        <InputArrayDomain
          name="input_array"
          attribute_type="cell"
-         /><!--number_of_components="1"-->
+         />
      </InputProperty>
 
      <!-- Material Fraction Array-->
@@ -6413,14 +6413,38 @@ Tessellate a higher-order dataset.
 
      <!-- Volume weighted average Array -->
      <StringVectorProperty
-       name="SelectWeightedAverageArray"
-       command="SelectWeightedAverageArray"
-       clean_command="UnselectAllWeightedAverageArrays"
+       name="SelectVolumeWtdAvgArray"
+       command="SelectVolumeWtdAvgArray"
+       clean_command="UnselectAllVolumeWtdAvgArrays"
        repeat_command="1"
        number_of_elements_per_command="1"
        label="Compute volume weighted average over:">
        <Documentation>
          Specifies the arrays from which to volume weighted average.
+       </Documentation>
+       <ArrayListDomain 
+         name="array_list"
+         data_type="VTK_FLOAT VTK_DOUBLE">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <!-- override gui no to set default -->
+         <NoDefault />
+       </Hints>
+     </StringVectorProperty>
+
+     <!-- Volume weighted average Array -->
+     <StringVectorProperty
+       name="SelectMassWtdAvgArray"
+       command="SelectMassWtdAvgArray"
+       clean_command="UnselectAllMassWtdAvgArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Compute mass weighted average over:">
+       <Documentation>
+         Specifies the arrays from which to mass weighted average.
        </Documentation>
        <ArrayListDomain 
          name="array_list"
