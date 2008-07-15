@@ -15,6 +15,7 @@
 
 #include "vtkProcessModule.h"
 #include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
 
 #include "pqMain.h"
 #include "pqProcessModuleGUIHelper.h"
@@ -258,6 +259,6 @@ vtkStandardNewMacro(GUIHelper);
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-  return pqMain::Run(app, GUIHelper::New());
+  return pqMain::Run(app, vtkSmartPointer<GUIHelper>::New());
 }
 
