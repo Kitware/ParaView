@@ -136,7 +136,7 @@
           file_description="POP Ocean Files">
   </Reader>
 
-  <Reader name="AVSucdReader"
+  <Reader name="AVSucdSeriesReader"
           extensions="inp"
           file_description="AVS UCD Binary/ASCII Files">
   </Reader>
