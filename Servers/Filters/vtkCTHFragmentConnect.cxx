@@ -70,7 +70,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.68");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.69");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -941,8 +941,8 @@ class vtkCTHFragmentToProcMap
     void Initialize(int nProcs, int nFragments);
     void DeepCopy(const vtkCTHFragmentToProcMap &from);
     // interface
-    bool GetProcOwnsPiece(int fragmentId) const;
-    bool GetProcOwnsPiece(int procId, int fragmentId) const;
+    int GetProcOwnsPiece(int fragmentId) const;
+    int GetProcOwnsPiece(int procId, int fragmentId) const;
     void SetProcOwnsPiece(int procId, int fragmentId);
     void SetProcOwnsPiece(int fragmentId);
     void UnSetProcOwnsPiece(int procId, int fragmentId);
@@ -1035,13 +1035,13 @@ void vtkCTHFragmentToProcMap::DeepCopy(
   this->PieceToProcMap=from.PieceToProcMap;
 }
 //
-bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
+int vtkCTHFragmentToProcMap::GetProcOwnsPiece(
                 int fragmentId) const
 {
   return this->GetProcOwnsPiece(0,fragmentId);
 }
 //
-bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
+int vtkCTHFragmentToProcMap::GetProcOwnsPiece(
                 int procId,
                 int fragmentId) const
 {
@@ -1055,7 +1055,7 @@ bool vtkCTHFragmentToProcMap::GetProcOwnsPiece(
   int maskIdx=fragmentId/this->BitsPerInt;
   int maskBit=1<<fragmentId%this->BitsPerInt;
 
-  return static_cast<bool>(maskBit & this->PieceToProcMap[procId][maskIdx]);
+  return maskBit & this->PieceToProcMap[procId][maskIdx];
 }
 //
 void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int fragmentId)
@@ -1161,7 +1161,7 @@ class vtkCTHFragmentPieceTransaction
       this->Data[REMOTE_PROC]=remoteProc;
     }
     //
-    bool Empty() const{ return static_cast<bool>(this->Data[TYPE]); }
+    bool Empty() const{ return this->Data[TYPE]==0; }
     //
     void Clear()
     {
@@ -1856,25 +1856,25 @@ public:
   //
   vtkDataArray *GetVolumeWtdAvgArray(int id)
   {
-    assert(id<this->NVolumeWtdAvgs);
+    assert(id>=0 && id<this->NVolumeWtdAvgs);
     return this->VolumeWtdAvgArrays[id];
   }
   //
   vtkDataArray *GetMassWtdAvgArray(int id)
   {
-    assert(id<this->NMassWtdAvgs);
+    assert(id>=0 && id<this->NMassWtdAvgs);
     return this->MassWtdAvgArrays[id];
   }
   //
   vtkDataArray *GetIntegratedArray(int id)
   {
-    assert(id<this->NToIntegrate);
+    assert(id>=0 && id<this->NToIntegrate);
     return this->IntegratedArrays[id];
   }
   //
   vtkDataArray *GetArrayToSum(int id)
   {
-    assert(id<id<this->NToSum);
+    assert(id>=0 && id<this->NToSum);
     return this->ArraysToSum[id];
   }
   //
