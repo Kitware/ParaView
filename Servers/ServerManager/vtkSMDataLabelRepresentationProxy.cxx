@@ -458,6 +458,11 @@ void vtkSMDataLabelRepresentationProxy::Update(
   this->UpdateSuppressorProxy->InvokeCommand("ForceUpdate");
   this->Superclass::Update(view);
 
+  // CellCenterFilter is connected after the update suppressor, so it is
+  // essential that we call UpdatePipeline() on it which ensures that the
+  // PostUpdateData() is called on the filters before the mapper.
+  this->CellCenterFilter->UpdatePipeline();
+
   // This updates the domains for the choosing the correct array name on the
   // mapper.
   this->MapperProxy->GetProperty("Input")->UpdateDependentDomains();
