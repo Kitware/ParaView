@@ -70,7 +70,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.67");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.68");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // 0 is not visited, positive is an actual ID.
@@ -1854,25 +1854,25 @@ public:
     return (vtkCTHFragmentConnectBlock*)(this->Neighbors[face][neighborId]);
   }
   //
-  vtkDataArray *GetVolumeWtdAvgArray(unsigned int id)
+  vtkDataArray *GetVolumeWtdAvgArray(int id)
   {
     assert(id<this->NVolumeWtdAvgs);
     return this->VolumeWtdAvgArrays[id];
   }
   //
-  vtkDataArray *GetMassWtdAvgArray(unsigned int id)
+  vtkDataArray *GetMassWtdAvgArray(int id)
   {
     assert(id<this->NMassWtdAvgs);
     return this->MassWtdAvgArrays[id];
   }
   //
-  vtkDataArray *GetIntegratedArray(unsigned int id)
+  vtkDataArray *GetIntegratedArray(int id)
   {
     assert(id<this->NToIntegrate);
     return this->IntegratedArrays[id];
   }
   //
-  vtkDataArray *GetArrayToSum(unsigned int id)
+  vtkDataArray *GetArrayToSum(int id)
   {
     assert(id<id<this->NToSum);
     return this->ArraysToSum[id];
@@ -8208,7 +8208,7 @@ int vtkCTHFragmentConnect::CollectIntegratedAttributes(
       {
       const unsigned int nCompsAvg
         = this->FragmentMassWtdAvgs[i]->GetNumberOfComponents();
-      buffers[procId].UnPack(volumeWtdAvgs[procId][i],nCompsAvg,nToUnpack,false);
+      buffers[procId].UnPack(massWtdAvgs[procId][i],nCompsAvg,nToUnpack,false);
       }
     // sums
     for (int i=0; i<this->NToSum; ++i)
