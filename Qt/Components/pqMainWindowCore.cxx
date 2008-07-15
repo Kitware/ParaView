@@ -436,11 +436,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
       SIGNAL(finishedRemovingServer()),
       this, SLOT(onSelectionChanged()));
 
-  this->connect(core->getServerManagerModel(),
-      SIGNAL(preSourceRemoved(pqPipelineSource*)),
-      &this->Implementation->PendingDisplayManager, 
-      SLOT(removePendingDisplayForSource(pqPipelineSource*)));
-
   this->connect(builder, SIGNAL(sourceCreated(pqPipelineSource*)),
     this, SLOT(onSourceCreationFinished(pqPipelineSource*)),
     Qt::QueuedConnection);
@@ -602,6 +597,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(serverManagerExtensionLoaded()),
     &this->Implementation->ViewExporterManager,
     SLOT(refresh()));
+  
+  QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
+      &this->Implementation->PendingDisplayManager,
+      SLOT(setActiveView(pqView*)));
 
   // Register the color scale editor manager with the application so it
   // can be used by the display panels.
@@ -789,7 +788,8 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   QObject::connect(object_inspector, SIGNAL(postaccept()),
                    this,             SLOT(onPostAccept()));
   QObject::connect(object_inspector, SIGNAL(accepted()), 
-                   this,             SLOT(createPendingDisplays()));
+                   &this->Implementation->PendingDisplayManager,
+                   SLOT(createPendingDisplays()));
 
   // Use the server manager selection model to determine which page
   // should be shown.
@@ -3119,13 +3119,6 @@ void pqMainWindowCore::disableAutomaticDisplays()
   QObject::disconnect(pqApplicationCore::instance(),
     SIGNAL(finishSourceCreation(pqPipelineSource*)),
     this, SLOT(onSourceCreation(pqPipelineSource*)));
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::createPendingDisplays()
-{
-  pqView* view = pqActiveView::instance().current();
-  this->Implementation->PendingDisplayManager.createPendingDisplays(view);
 }
 
 //-----------------------------------------------------------------------------

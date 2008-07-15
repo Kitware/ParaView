@@ -65,6 +65,7 @@ public:
   /// Returns if the source is pending a display creation
   /// by this manager.
   bool isPendingDisplay(pqPipelineSource*) const;
+
 public slots:
   /// add a source for which a display will eventually be made
   void addPendingDisplayForSource(pqPipelineSource* s);
@@ -72,11 +73,15 @@ public slots:
   /// remove a source for which a display will eventually be made
   void removePendingDisplayForSource(pqPipelineSource* s);
   
-  /// create deferred displays. 
-  void createPendingDisplays(pqView* view);
-
   /// get the number of deferred displays
   int getNumberOfPendingDisplays();
+
+  /// set the active view - the pending representations will be
+  /// created on this view
+  void setActiveView(pqView*);
+
+  /// create deferred displays. 
+  void createPendingDisplays();
 
 signals:
   // signal emitted for whether the state of pending displays changes
@@ -90,6 +95,9 @@ private:
   class MyInternal;
   MyInternal* Internal;
   bool IgnoreAdd;
+
+  /// create deferred displays. 
+  void createPendingDisplays(pqView* view);
 
   pqPendingDisplayManager(const pqPendingDisplayManager&); // Not implemented.
   void operator=(const pqPendingDisplayManager&); // Not implemented.

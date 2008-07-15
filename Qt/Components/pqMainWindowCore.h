@@ -358,8 +358,6 @@ public slots:
 
   void onHelpEnableTooltips(bool enabled = true);
 
-  void createPendingDisplays();
-
   // Called to show the settings dialog.
   void onEditSettings();
   void onEditViewSettings();

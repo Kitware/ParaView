@@ -50,7 +50,6 @@ public:
   
 private slots:
   virtual void onServerCreationFinished(pqServer*);
-  virtual void onPendingDisplaysChanged(bool);
 
 private:
   class pqImplementation;

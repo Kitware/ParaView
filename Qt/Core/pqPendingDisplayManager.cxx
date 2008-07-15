@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineRepresentation.h"
 #include "pqRenderView.h"
+#include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -57,6 +58,7 @@ class pqPendingDisplayManager::MyInternal
 public:
   QList<QPointer< pqPipelineSource> > SourcesSansDisplays;
   QPointer<pqUndoStack> UndoStack;
+  QPointer<pqView> ActiveView;
 };
 
 //-----------------------------------------------------------------------------
@@ -65,6 +67,11 @@ pqPendingDisplayManager::pqPendingDisplayManager(QObject* p)
 {
   this->Internal = new MyInternal;
   this->IgnoreAdd = false;
+  
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(),
+      SIGNAL(preSourceRemoved(pqPipelineSource*)),
+      this, 
+      SLOT(removePendingDisplayForSource(pqPipelineSource*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -236,3 +243,14 @@ int pqPendingDisplayManager::getNumberOfPendingDisplays()
   return this->Internal->SourcesSansDisplays.size();
 }
 
+//-----------------------------------------------------------------------------
+void pqPendingDisplayManager::setActiveView(pqView* view)
+{
+  this->Internal->ActiveView = view;
+}
+
+//-----------------------------------------------------------------------------
+void pqPendingDisplayManager::createPendingDisplays()
+{
+  this->createPendingDisplays(this->Internal->ActiveView);
+}

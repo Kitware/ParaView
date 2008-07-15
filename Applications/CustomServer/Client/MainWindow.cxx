@@ -121,7 +121,7 @@ MainWindow::MainWindow() :
   if (pdm)
     {
     this->connect(pdm, SIGNAL(pendingDisplays(bool)),
-      this, SLOT(onPendingDisplaysChanged(bool)), Qt::QueuedConnection);
+        pdm, SLOT(createPendingDisplays()), Qt::QueuedConnection);
     }
 
   // Setup the multiview render window ...
@@ -159,11 +159,4 @@ void MainWindow::onServerCreationFinished(pqServer* server)
     "CustomSource", server);
 }
 
-void MainWindow::onPendingDisplaysChanged(bool hasDisplays)
-{
-  if(hasDisplays)
-    {
-    this->Implementation->Core.createPendingDisplays();
-    }
-}
 
