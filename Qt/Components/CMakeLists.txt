@@ -17,6 +17,9 @@ IF(PARAVIEW_ENABLE_PYTHON)
 
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
+SET(QT_USE_QTASSISTANT TRUE)
+SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
+
 IF(PARAVIEW_USE_SILO)
   SET(EXTRA_PQ_COMPONENT_MOC_SOURCES pqSiloPanel.h)
   SET(EXTRA_PQ_COMPONENT_SOURCES pqSiloPanel.cxx)
@@ -39,6 +42,7 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
+  ${QT_QTASSISTANTCLIENT_INCLUDE_DIR}
 )
 
 SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_INCLUDE_DIR})
@@ -72,6 +76,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraDialog.h
   pqCameraWidget.h
   pqChartOptionsEditor.h
+  pqClientAboutDialog.h
+  pqClientMainWindow.h
   pqClipPanel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -221,6 +227,8 @@ SET(UI_FORMS
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
+  Resources/UI/pqClientAboutDialog.ui
+  Resources/UI/pqClientMainWindow.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -374,6 +382,12 @@ ADD_LIBRARY(pqComponents
   pqCameraWidget.h
   pqChartOptionsEditor.cxx
   pqChartOptionsEditor.h
+  pqClientAboutDialog.cxx
+  pqClientAboutDialog.h
+  pqClientMainWindow.cxx
+  pqClientMainWindow.h
+  pqClientProcessModuleGUIHelper.cxx
+  pqClientProcessModuleGUIHelper.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
@@ -673,6 +687,7 @@ TARGET_LINK_LIBRARIES(pqComponents
   QVTK
   vtkPVServerManager
   ${PYTHON_LINK_LIBRARIES}
+  ${QT_QTASSISTANT_LIBRARY}
 )
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqComponentsExport.h.in"
