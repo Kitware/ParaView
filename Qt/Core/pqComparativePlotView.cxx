@@ -287,7 +287,7 @@ void pqComparativePlotView::representationsChanged()
     {
 
     // Get the pqView for this view proxy
-    pqPlotView * pqView = this->Internal->ViewMap[view];
+    pqPlotView * plotView = this->Internal->ViewMap[view];
 
     // Get all the representation proxies currently in this view
     vtkCollection* proxyCollection =  vtkCollection::New();
@@ -311,7 +311,7 @@ void pqComparativePlotView::representationsChanged()
     // Note, some of these could be dangling pointers
     // but we're only using them as keys to a map.
     QSet<vtkSMRepresentationProxy*> oldReprProxies =
-        this->Internal->ViewRepresentationMap[pqView].toSet();
+        this->Internal->ViewRepresentationMap[plotView].toSet();
 
     // Define the sets of representations to be added and removed.
     QSet<vtkSMRepresentationProxy*> added = currentReprProxies - oldReprProxies;
@@ -344,9 +344,9 @@ void pqComparativePlotView::representationsChanged()
       if (pqRepr)
         {
         // Add the pqRepresentation and keep track of it in our maps
-        pqView->addRepresentation(pqRepr);
-        this->Internal->ViewRepresentationMap[pqView].append(reprProxy);
-        this->Internal->RepresentationViewMap[pqRepr] = pqView;
+        plotView->addRepresentation(pqRepr);
+        this->Internal->ViewRepresentationMap[plotView].append(reprProxy);
+        this->Internal->RepresentationViewMap[pqRepr] = plotView;
         this->Internal->RepresentationMap[reprProxy] = pqRepr;
         }
       }
@@ -358,8 +358,8 @@ void pqComparativePlotView::representationsChanged()
       pqRepresentation * pqRepr = this->Internal->RepresentationMap.take(reprProxy);
 
       // Remove the representation from its pqView
-      pqPlotView * plotView = this->Internal->RepresentationViewMap[pqRepr];
-      plotView->removeRepresentation(pqRepr);
+      pqPlotView * tempPlotView = this->Internal->RepresentationViewMap[pqRepr];
+      tempPlotView->removeRepresentation(pqRepr);
 
       // Delete the pqRepresentation if it is one we created.
       if (this->Internal->CreatedRepresentations.contains(pqRepr))
