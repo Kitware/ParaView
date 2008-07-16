@@ -64,6 +64,10 @@ public:
   /// Returns the root render view in the comparative view.
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
+  /// Capture the view image into a new vtkImageData with the given magnification
+  /// and return it.
+  virtual vtkImageData* captureImage(int magnification);
+
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
   /// for proxies created by the GUI itself i.e.
