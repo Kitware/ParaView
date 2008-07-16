@@ -49,6 +49,10 @@ class PQCORE_EXPORT pqMain
 {
 public:
   /// Call pqMain::preRun() in your client's main(), returning the result.
+  /// If the parameter options is non-null, then it is assumed the caller
+  /// allocated space for options and is responsible for freeing up memory.
+  /// If the parameter options is null, then ParaView will allocate space for
+  /// options, and free it in postRun().
   /// NOTE: use preRun() only with associated Run() and postRun()
   static int preRun(QApplication& app, pqProcessModuleGUIHelper * helper,
     pqOptions * & options);

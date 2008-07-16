@@ -108,13 +108,13 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
 vtkPVMain * pqMain::PVMain = NULL;
 pqOptions * pqMain::PVOptions = NULL;
 pqProcessModuleGUIHelper * pqMain::PVHelper = NULL;
+static bool PVOptionsAllocatedInternally = false;
 
 //----------------------------------------------------------------------------
 int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
   pqOptions * & optionsIn)
 {
   PVHelper = helperIn;
-  PVOptions = optionsIn;
 
   int argc = app.argc();
   char** argv = app.argv();
@@ -127,9 +127,12 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
   if (optionsIn == NULL)
     {
     optionsIn = pqOptions::New();
+    PVOptionsAllocatedInternally = true;
     // We may define a PQCLIENT enum, if necessary.
-    optionsIn->SetProcessType(vtkPVOptions::PVCLIENT);\
+    optionsIn->SetProcessType(vtkPVOptions::PVCLIENT);
     }
+
+  PVOptions = optionsIn;
  
   // This creates the Process Module and initializes it.
   int ret = PVMain->Initialize(PVOptions, PVHelper, ParaViewInitializeInterpreter, 
@@ -182,12 +185,18 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
 //----------------------------------------------------------------------------
 void pqMain::postRun()
 {
-  // only delete PVMain, as it was allocated in this file/class, rely on caller
-  // to properly delete helper and options.
+  // delete PVMain, as it was allocated in this file/class, rely on caller
+  // to properly delete helper
   if (PVMain) 
     {
     PVMain->Delete();
     }
+
+  // check to see if options was allocated in this class
+  if (PVOptionsAllocatedInternally)
+  {
+    PVOptions->Delete();
+  }
 
   vtkPVMain::Finalize();
   vtkProcessModule::SetProcessModule(0);
