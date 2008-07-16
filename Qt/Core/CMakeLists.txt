@@ -42,6 +42,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBarChartRepresentation.h
   pqCommandServerStartup.h
   pqComparativeRenderView.h
+  pqComparativePlotView.h
   pqCoreTestUtility.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
@@ -159,6 +160,8 @@ ADD_LIBRARY(pqCore
   pqCommandServerStartup.h
   pqComparativeRenderView.cxx
   pqComparativeRenderView.h
+  pqComparativePlotView.cxx
+  pqComparativePlotView.h
   pqCoreExport.h
   pqCoreInit.cxx
   pqCoreInit.h

@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
 #include "pqComparativeRenderView.h"
+#include "pqComparativePlotView.h"
 #include "pqPropertyLinks.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
@@ -63,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqComparativeVisPanel::pqInternal : public Ui::ComparativeView
 {
 public:
-  QPointer<pqComparativeRenderView> View;
+  QPointer<pqView> View;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* ModeAdaptor;
 };
@@ -162,23 +163,28 @@ pqComparativeVisPanel::~pqComparativeVisPanel()
 //-----------------------------------------------------------------------------
 void pqComparativeVisPanel::setView(pqView* view)
 {
-  pqComparativeRenderView* cvView = qobject_cast<pqComparativeRenderView*>(view);
-  if (this->Internal->View == cvView)
+
+  if (this->Internal->View == view)
     {
     return;
     }
 
   this->Internal->Links.removeAllPropertyLinks();
-  this->Internal->View = cvView;
+  this->Internal->View = view;
   this->Internal->AnimationWidget->setComparativeView(
     view? view->getProxy() : 0);
-  if (!cvView)
+
+  // View must be a comparative render/plot view
+  if (   !qobject_cast<pqComparativeRenderView*>(view)
+      && !qobject_cast<pqComparativePlotView*>(view))
     {
+    this->Internal->View = 0;
     this->setEnabled(false);
     return;
     }
 
-  vtkSMComparativeViewProxy* viewProxy = cvView->getComparativeRenderViewProxy();
+  vtkSMComparativeViewProxy* viewProxy =
+    vtkSMComparativeViewProxy::SafeDownCast(view->getProxy());
 
   this->setEnabled(true);
 
@@ -210,9 +216,13 @@ void pqComparativeVisPanel::updateView()
     // This could be handled differently, but for now lets
     // set the timerange to the currently selected source object's
     // TimestepValues (if it has them)
-    this->setTimeRangeFromSource(this->Internal->XObject->currentSource()->getProxy());
+    if (this->Internal->XObject->currentSource())
+      {
+      this->setTimeRangeFromSource(this->Internal->XObject->currentSource()->getProxy());
+      }
 
-    vtkSMComparativeViewProxy* viewProxy = this->Internal->View->getComparativeRenderViewProxy();
+    vtkSMComparativeViewProxy* viewProxy =
+      vtkSMComparativeViewProxy::SafeDownCast(this->Internal->View->getProxy());
 
     // Until some bug fixes are completed, lets force the scene outdated
     // before calling UpdateVisualization().
@@ -286,7 +296,7 @@ void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
 
   // Get TimeRange property
   vtkSMDoubleVectorProperty* timeRangeProp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->Internal->View->getComparativeRenderViewProxy()->GetProperty("TimeRange"));
+    this->Internal->View->getProxy()->GetProperty("TimeRange"));
 
   // Try to get TimestepValues property from the source proxy
   vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -299,7 +309,7 @@ void pqComparativeVisPanel::setTimeRangeFromSource(vtkSMProxy* source)
     double tEnd = tsv->GetElement(tsv->GetNumberOfElements()-1);
     timeRangeProp->SetElement(0, tBegin);
     timeRangeProp->SetElement(1, tEnd);
-    this->Internal->View->getComparativeRenderViewProxy()->UpdateProperty("TimeRange");
+    this->Internal->View->getProxy()->UpdateProperty("TimeRange");
     }
 }
 
@@ -366,5 +376,5 @@ void pqComparativeVisPanel::activateCue(
   pqSMAdaptor::setElementProperty(cueProxy->GetProperty("Enabled"), 1);
   cueProxy->UpdateVTKObjects();
 
-
 }
+

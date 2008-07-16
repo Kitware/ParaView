@@ -26,6 +26,7 @@
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationProxy.h"
+#include "vtkSMProxyProperty.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -69,7 +70,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.21");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -155,9 +156,6 @@ bool vtkSMComparativeViewProxy::BeginCreateVTKObjects()
   this->AnimationSceneY = vtkSMAnimationSceneProxy::SafeDownCast(
     this->GetSubProxy("AnimationSceneY"));
 
- // vtkSMDoubleVectorProperty* tsv = vtkSMDoubleVectorProperty::SafeDownCast(
- //   source->getProxy()->GetProperty("TimestepValues"));
-
   this->AnimationSceneX->AddObserver(vtkCommand::ModifiedEvent, 
     this->SceneObserver);
   this->AnimationSceneY->AddObserver(vtkCommand::ModifiedEvent, 
@@ -207,6 +205,7 @@ void vtkSMComparativeViewProxy::Build(int dx, int dy)
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::UpdateViewLayout()
 {
+
   int width = 
     (this->ViewSize[0] - (this->Dimensions[0]-1)*this->Spacing[0])/this->Dimensions[0];
   int height = 
@@ -228,8 +227,11 @@ void vtkSMComparativeViewProxy::UpdateViewLayout()
 
       ivp = vtkSMIntVectorProperty::SafeDownCast(
         view->GetProperty("ViewSize"));
-      ivp->SetElement(0, width);
-      ivp->SetElement(1, height);
+      if (ivp) // Not all view classes have a ViewSize property
+        {
+        ivp->SetElement(0, width);
+        ivp->SetElement(1, height);
+        }
 
       ivp = vtkSMIntVectorProperty::SafeDownCast(
         view->GetProperty("GUISize"));
@@ -244,7 +246,14 @@ void vtkSMComparativeViewProxy::UpdateViewLayout()
 //----------------------------------------------------------------------------
 vtkSMViewProxy* vtkSMComparativeViewProxy::GetRootView()
 {
-  return this->Internal->Views[0];
+  if (this->Internal->Views.size())
+    {
+    return this->Internal->Views[0];
+    }
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -261,16 +270,22 @@ static void vtkCopyClone(vtkSMProxy* source, vtkSMProxy* clone,
   for (; !iterSource->IsAtEnd() && !iterDest->IsAtEnd();
     iterSource->Next(), iterDest->Next())
     {
+
+    // Skip the property if it is in the exceptions list.
     if (exceptions && 
       exceptions->find(iterSource->GetKey()) != exceptions->end())
       {
       continue;
       }
     vtkSMProperty* destProp = iterDest->GetProperty();
+
+    // Skip the property if it is information only or is internal.
     if (destProp->GetInformationOnly() || destProp->GetIsInternal())
       {
       continue;
       }
+
+    // Copy the property from source to dest
     destProp->Copy(iterSource->GetProperty());
     }
 }
@@ -318,11 +333,10 @@ void vtkSMComparativeViewProxy::AddNewView()
     vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
     vtkCopyClone(repr, newRepr); // create a clone.
-    newRepr->UpdateVTKObjects();
-
     data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
     newView->AddRepresentation(newRepr);
-      
+    newRepr->UpdateVTKObjects();
+
     // Now update data structure to include this view/repr clone.
     data.Clones[newView] = newRepr;
     newRepr->Delete();
@@ -338,7 +352,7 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
     return;
     }
 
-  // Remove all representations in this new.
+  // Remove all representations in this view.
   vtkInternal::MapOfReprClones::iterator reprIter;
   for (reprIter = this->Internal->RepresentationClones.begin();
     reprIter != this->Internal->RepresentationClones.end(); ++reprIter)
@@ -375,42 +389,66 @@ void vtkSMComparativeViewProxy::RemoveView(vtkSMViewProxy* view)
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::AddRepresentation(vtkSMRepresentationProxy* repr)
 {
-  if (repr)
+
+  if (!repr)
     {
-    // Add repr to RootView. Create clones of repr and add them to all other
-    // views.
-    vtkSMViewProxy* rootView = this->GetRootView();
-    rootView->AddRepresentation(repr);
-
-    // We need to save information about the clones we create for this
-    // representation so that we can clean them up later.
-    vtkInternal::RepresentationData data;
-    vtkSMProxyLink* reprLink = vtkSMProxyLink::New();
-    data.Link.TakeReference(reprLink);
-
-    reprLink->AddException("UpdateTime");
-    reprLink->AddLinkedProxy(repr, vtkSMLink::INPUT);
-
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    vtkInternal::VectorOfViews::iterator iter = this->Internal->Views.begin();
-    iter++; // skip root view.
-    for (; iter != this->Internal->Views.end(); ++iter)
-      {
-      vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
-        pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
-      vtkCopyClone(repr, newRepr); // create a clone.
-      newRepr->UpdateVTKObjects();
-
-      reprLink->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
-      iter->GetPointer()->AddRepresentation(newRepr);
-      
-      // Now update data structure to include this view/repr clone.
-      data.Clones[iter->GetPointer()] = newRepr;
-      newRepr->Delete();
-      }
-
-    this->Internal->RepresentationClones[repr] = data;
+    return;
     }
+
+  // Add representation to the root view
+  vtkSMViewProxy* rootView = this->GetRootView();
+  rootView->AddRepresentation(repr);
+
+  // Create clones of representation and add them to all other views.
+  // We will save information about the clones we create
+  // so that we can clean them up later.
+  vtkInternal::RepresentationData data;
+
+  // We'll link the clones' properties to the original
+  // representation using a proxy link.  The "UpdateTime"
+  // property will not be linked however.
+  vtkSMProxyLink* reprLink = vtkSMProxyLink::New();
+  data.Link.TakeReference(reprLink);
+  reprLink->AddLinkedProxy(repr, vtkSMLink::INPUT);
+  reprLink->AddException("UpdateTime");
+
+  // Need the proxy manager to create new representations
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+
+  // For each view
+  vtkInternal::VectorOfViews::iterator iter = this->Internal->Views.begin();
+  iter++; // skip root view.
+  for (; iter != this->Internal->Views.end(); ++iter)
+    {
+
+    // Create a new representation
+    vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
+      pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
+
+    // Made the new representation a clone
+    vtkCopyClone(repr, newRepr);
+    newRepr->UpdateVTKObjects();
+    reprLink->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
+
+    // Add the cloned representation to this view
+    iter->GetPointer()->AddRepresentation(newRepr);
+    
+    // Add the cloned representation to the RepresentationData struct
+    // The clone is added to a map where its view is the key.
+    data.Clones[iter->GetPointer()] = newRepr;
+
+    // Clean up this reference
+    newRepr->Delete();
+    }
+
+  // Add the RepresentationData struct to a map
+  // with the original representation as the key
+  this->Internal->RepresentationClones[repr] = data;
+
+  // Signal that representations have changed
+  this->InvokeEvent(vtkCommand::UserEvent);
+
 
   // Override superclass' AddRepresentation since  repr has already been added
   // to the rootView.
@@ -450,6 +488,8 @@ void vtkSMComparativeViewProxy::RemoveRepresentation(vtkSMRepresentationProxy* r
   vtkSMViewProxy* rootView = this->GetRootView();
   rootView->RemoveRepresentation(repr);
 
+  // Signal that representations have changed
+  this->InvokeEvent(vtkCommand::UserEvent);
 
   // Override superclass' RemoveRepresentation since  repr was not added to this
   // view at all, we added it to (and removed from) the root view.
@@ -588,9 +628,6 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
     double time = this->TimeRange[0] + view_index*increment;
     view->SetViewUpdateTime(time);
 
-    //Print the view index and view time for debugging...
-    //printf("view[%d]->SetViewUpdateTime(%f)\n",view_index,time);
-
     // HACK: This ensure that obsolete cache is never used when the CV is being
     // generated.
     view->SetCacheTime(view->GetCacheTime()+1.0);
@@ -641,12 +678,58 @@ void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
 //----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::GetViews(vtkCollection* collection)
 {
+  if (!collection)
+    {
+    return;
+    }
+
   vtkInternal::VectorOfViews::iterator iter;
   for (iter = this->Internal->Views.begin(); 
        iter != this->Internal->Views.end(); ++iter)
     {
     collection->AddItem(iter->GetPointer());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::GetRepresentationsForView(vtkSMViewProxy* view, 
+      vtkCollection *collection)
+{
+  if (!collection)
+    {
+    return;
+    }
+
+  // Find all representations in this view.
+
+  // For each representation
+  vtkInternal::MapOfReprClones::iterator reprIter;
+  for (reprIter = this->Internal->RepresentationClones.begin();
+    reprIter != this->Internal->RepresentationClones.end(); ++reprIter)
+    {
+
+    if (view == this->GetRootView())
+      {
+      // If the view is the root view, then its representations
+      // are the keys of map we are iterating over
+      collection->AddItem(reprIter->first);
+      continue;
+      }
+
+    // The view is not the root view, so it could be one of the cloned views.
+    // Search the RepresentationData struct for a representation
+    // belonging to the cloned view.
+    vtkInternal::RepresentationData& data = reprIter->second;
+    vtkInternal::RepresentationData::MapOfViewToRepr::iterator cloneIter
+      = data.Clones.find(view);
+    if (cloneIter != data.Clones.end())
+      {
+      // A representation was found, so add it to the collection.
+      vtkSMRepresentationProxy* repr = cloneIter->second.GetPointer();
+      collection->AddItem(repr);
+      }
+    }
+
 }
 
 //----------------------------------------------------------------------------

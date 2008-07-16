@@ -98,6 +98,14 @@ public:
   void GetViews(vtkCollection* collection);
 
   // Description:
+  // Get all internal vtkSMRepresentations for a given view.  If the given
+  // view is not managed by this comparative view it will be ignored.  The
+  // representations should only be used by the GUI for creating representation
+  // clones.  It is not recommended to directly change the properties of the returned
+  // representations.
+  void GetRepresentationsForView(vtkSMViewProxy*, vtkCollection*);
+
+  // Description:
   // Returns the root view proxy.
   vtkSMViewProxy* GetRootView();
 

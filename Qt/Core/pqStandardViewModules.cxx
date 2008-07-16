@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqBarChartRepresentation.h"
 #include "pqComparativeRenderView.h"
+#include "pqComparativePlotView.h"
 #include "pqLineChartRepresentation.h"
 #include "pqPlotView.h"
 #include "pqRenderView.h"
@@ -64,6 +65,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
+    pqComparativePlotView::comparativeXYPlotViewType() <<
+    pqComparativePlotView::comparativeBarChartViewType() <<
     pqSpreadSheetView::spreadsheetViewType();
 }
 
@@ -97,6 +100,14 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqComparativeRenderView::comparativeRenderViewTypeName();
     }
+  else if (type == pqComparativePlotView::comparativeXYPlotViewType())
+    {
+    return pqComparativePlotView::comparativeXYPlotViewTypeName();
+    }
+  else if (type == pqComparativePlotView::comparativeBarChartViewType())
+    {
+    return pqComparativePlotView::comparativeBarChartViewTypeName();
+    }
   else if (type == pqSpreadSheetView::spreadsheetViewType())
     {
     return pqSpreadSheetView::spreadsheetViewTypeName();
@@ -127,6 +138,14 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     QString xmlname = server->getRenderViewXMLName();
     xmlname = "Comparative" + xmlname;
     return pxm->NewProxy("views", xmlname.toAscii().data());
+    }
+  else if(viewtype == pqComparativePlotView::comparativeXYPlotViewType())
+    {
+    return pxm->NewProxy("views", "ComparativeXYPlotView");
+    }
+  else if(viewtype == pqComparativePlotView::comparativeBarChartViewType())
+    {
+    return pxm->NewProxy("views", "ComparativeBarChartView");
     }
   else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
     {
@@ -186,9 +205,19 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
     }
+  else if (viewtype == pqComparativePlotView::comparativeBarChartViewType())
+    {
+    return new pqComparativePlotView(pqPlotView::barChartType(),
+                 group, viewname, viewmodule, server, p);
+    }
+  else if (viewtype == pqComparativePlotView::comparativeXYPlotViewType())
+    {
+    return new pqComparativePlotView(pqPlotView::XYPlotType(),
+                 group, viewname, viewmodule, server, p);
+    }
   else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
-    // Currently we only handle comparative render views.
+    // Handle the other comparative render views.
     return new pqComparativeRenderView(
       group, viewname, viewmodule, server, p);
     }
