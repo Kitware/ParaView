@@ -206,9 +206,10 @@ void pqComparativePlotView::onComparativeVisLayoutChanged()
       this->Internal->ViewRepresentationMap.take(plotView);
 
     // Destroy all reprs in the view
-    foreach(vtkSMRepresentationProxy* reprProxy, reprProxies)
+    QList<vtkSMRepresentationProxy*>::const_iterator reprIterator;
+    for (reprIterator = reprProxies.begin(); reprIterator != reprProxies.end(); ++reprIterator)
       {
-      pqRepresentation * pqRepr = this->Internal->RepresentationMap.take(reprProxy);
+      pqRepresentation * pqRepr = this->Internal->RepresentationMap.take(*reprIterator);
       // Don't need to remove the repr from the view because we are deleting the view.
       delete pqRepr;
       }
@@ -318,9 +319,10 @@ void pqComparativePlotView::representationsChanged()
     QSet<vtkSMRepresentationProxy*> removed = oldReprProxies - currentReprProxies;
 
     // For each representation to be added...
-    foreach(vtkSMRepresentationProxy * reprProxy, added)
+    QSet<vtkSMRepresentationProxy*>::const_iterator reprIterator;
+    for (reprIterator = added.begin(); reprIterator != added.end(); ++reprIterator)
       {
-
+      vtkSMRepresentationProxy * reprProxy = *reprIterator;
       pqRepresentation * pqRepr = 0;
 
       // If its the root view, then we'll look up the pqRepresentation
@@ -352,8 +354,10 @@ void pqComparativePlotView::representationsChanged()
       }
 
     // Delete old representations
-    foreach(vtkSMRepresentationProxy * reprProxy, removed)
+    for (reprIterator = removed.begin(); reprIterator != removed.end(); ++reprIterator)
       {
+      vtkSMRepresentationProxy * reprProxy = *reprIterator;
+
       // Look up the representation and remove it from the map
       pqRepresentation * pqRepr = this->Internal->RepresentationMap.take(reprProxy);
 
