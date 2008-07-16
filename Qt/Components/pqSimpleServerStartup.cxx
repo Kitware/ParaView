@@ -577,10 +577,6 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       xml_option->GetNestedElement(0)->SetAttribute("default",
         val.toAscii().data());
       }
-    else 
-      {
-        bool here = true;
-      }
     }
 
   if(this->Implementation->Options.contains("PV_SERVER_PORT"))
