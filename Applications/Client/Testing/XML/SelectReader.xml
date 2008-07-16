@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="MainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/blow data.myvtk" />
-  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChanged" arguments="/17|0" />
+  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChanged" arguments="/15|0" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
