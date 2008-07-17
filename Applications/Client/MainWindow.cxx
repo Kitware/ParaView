@@ -951,7 +951,7 @@ void MainWindow::makeAssistant()
     QFile file(helper);
     if(file.open(QIODevice::ReadOnly))
       {
-      assistantExe = file.readLine().trimmed() + assistantName;
+      assistantExe = file.readLine().trimmed();
       profileFile = file.readLine().trimmed();
       }
     }
