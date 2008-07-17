@@ -77,7 +77,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraWidget.h
   pqChartOptionsEditor.h
   pqClientAboutDialog.h
-  pqClientMainWindow.h
+#  pqClientMainWindow.h
   pqClipPanel.h
   pqColorPresetManager.h
   pqColorPresetModel.h
@@ -228,7 +228,7 @@ SET(UI_FORMS
   Resources/UI/pqCameraWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqClientAboutDialog.ui
-  Resources/UI/pqClientMainWindow.ui
+#  Resources/UI/pqClientMainWindow.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -384,10 +384,10 @@ ADD_LIBRARY(pqComponents
   pqChartOptionsEditor.h
   pqClientAboutDialog.cxx
   pqClientAboutDialog.h
-  pqClientMainWindow.cxx
-  pqClientMainWindow.h
-  pqClientProcessModuleGUIHelper.cxx
-  pqClientProcessModuleGUIHelper.h
+#  pqClientMainWindow.cxx
+#  pqClientMainWindow.h
+#  pqClientProcessModuleGUIHelper.cxx
+#  pqClientProcessModuleGUIHelper.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
