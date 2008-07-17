@@ -20,6 +20,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkDoubleArray.h"
 #include "vtkExecutive.h"
 #include "vtkHierarchicalBoxDataIterator.h"
@@ -40,7 +41,7 @@
 #include "vtkUnsignedIntArray.h"
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.21");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.22");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -204,7 +205,7 @@ int vtkIndexBasedBlockFilter::RequestData(
   // cout << "Block Indices: " << this->StartIndex << ", " << this->EndIndex << endl;
  
   vtkTable* output = vtkTable::GetData(outputVector, 0);
-  output->SetFieldData(0);
+  output->SetRowData(0);
 
   vtkIdType pieceNumber = 0;
   vtkSmartPointer<vtkCompositeDataIterator> iter;
@@ -234,11 +235,11 @@ int vtkIndexBasedBlockFilter::RequestData(
       }
     }
 
-  vtkSmartPointer<vtkFieldData> fieldData = output->GetFieldData();
+  vtkSmartPointer<vtkDataSetAttributes> fieldData = output->GetRowData();
 
   if (fieldData.GetPointer() == 0)
     {
-    fieldData = vtkSmartPointer<vtkFieldData>::New();
+    fieldData = vtkSmartPointer<vtkDataSetAttributes>::New();
     }
 
   if (this->PointCoordinatesArray)
@@ -275,7 +276,7 @@ int vtkIndexBasedBlockFilter::RequestData(
   // Essential to set the field data at the end so that the number of rows count
   // in the vtkTable output is set up correctly. This seems like a bug in
   // vtkTable.
-  output->SetFieldData(fieldData);
+  output->SetRowData(fieldData);
   return 1;
 }
 

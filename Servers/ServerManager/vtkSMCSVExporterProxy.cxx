@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMCSVExporterProxy.h"
 
+#include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMSpreadSheetRepresentationProxy.h"
@@ -23,7 +24,7 @@
 #include <math.h>
 
 vtkStandardNewMacro(vtkSMCSVExporterProxy);
-vtkCxxRevisionMacro(vtkSMCSVExporterProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMCSVExporterProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMCSVExporterProxy::vtkSMCSVExporterProxy()
 {
@@ -88,9 +89,9 @@ void vtkSMCSVExporterProxy::Write()
       if (!initialized)
         {
         initialized = true;
-        exporter->WriteHeader(table->GetFieldData());
+        exporter->WriteHeader(table->GetRowData());
         }
-      exporter->WriteData(table->GetFieldData());
+      exporter->WriteData(table->GetRowData());
       }
     }
   exporter->Close();

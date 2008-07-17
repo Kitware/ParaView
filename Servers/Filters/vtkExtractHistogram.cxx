@@ -30,6 +30,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkTable.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/map>
@@ -50,7 +51,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.21");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.22");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -185,6 +186,9 @@ vtkFieldData* vtkExtractHistogram::GetInputFieldData(vtkDataObject* input)
       break;
     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
       return vtkGraph::SafeDownCast(input)->GetEdgeData();
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      return vtkTable::SafeDownCast(input)->GetRowData();
       break;
     }
   return 0;
