@@ -265,9 +265,9 @@ vtkImageData* pqComparativeRenderView::captureImage(int magnification)
       if (view)
         {
         // There seems to be a bug where offscreen rendering
-        // does not work with comparative render view, so we
-        // will force offscreen rendering off.
-        //view->SetUseOffscreenRenderingForScreenshots(0);
+        // does not work with comparative view screenshots, so we
+        // will force offscreen rendering off... FIXME!
+        view->SetUseOffscreenRenderingForScreenshots(0);
         
         // Capture the image
         vtkImageData * image = view->CaptureWindow(magnification);
