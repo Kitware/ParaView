@@ -571,7 +571,8 @@ protected:
   // for each material a list of global ids of pieces we own.
   vtkstd::vector<vtkstd::vector<int> > ResolvedFragmentIds;
   // List of split fragments
-  vtkstd::vector<int> FragmentSplitMarker;
+  vtkstd::vector<vtkstd::vector<int> >FragmentSplitMarker;
+  vtkIntArray *FragmentSplitGeometry;
 
   // A polydata with points at fragment centers, same structure 
   // as the resolved fragments.

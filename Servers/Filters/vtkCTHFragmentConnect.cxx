@@ -70,11 +70,8 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.70");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.71");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
-
-// 0 is not visited, positive is an actual ID.
-#define PARTICLE_CONNECT_EMPTY_ID -1
 
 // NOTE:
 //
@@ -2864,6 +2861,7 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->FragmentMoments = 0;
   this->FragmentAABBCenters=0;
   this->FragmentOBBs = 0;
+  this->FragmentSplitGeometry=0;
 
   this->EquivalenceSet = new vtkCTHFragmentEquivalenceSet;
   this->LocalToGlobalOffsets = 0;
@@ -2906,6 +2904,7 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   CheckAndReleaseVtkPointer(this->FragmentMoments);
   CheckAndReleaseVtkPointer(this->FragmentAABBCenters);
   CheckAndReleaseVtkPointer(this->FragmentOBBs);
+  CheckAndReleaseVtkPointer(this->FragmentSplitGeometry);
   ClearVectorOfVtkPointers(this->FragmentVolumeWtdAvgs);
   ClearVectorOfVtkPointers(this->FragmentMassWtdAvgs);
   ClearVectorOfVtkPointers(this->FragmentSums);
@@ -4534,8 +4533,10 @@ int vtkCTHFragmentConnect::RequestData(
     ClearVectorOfVtkPointers(this->FragmentVolumeWtdAvgs);
     ClearVectorOfVtkPointers(this->FragmentMassWtdAvgs);
     ClearVectorOfVtkPointers(this->FragmentSums);
+    CheckAndReleaseVtkPointer(this->FragmentSplitGeometry);
     //
-    }
+    } // for each material
+
   // Write all fragment attributes that we own to a text file.
   if ( this->GetWriteOutputTableFile()
         && this->OutputTableFileNameBase )
@@ -4544,6 +4545,7 @@ int vtkCTHFragmentConnect::RequestData(
     }
   // clean up after all passes complete
   this->ResolvedFragmentIds.clear();
+  this->FragmentSplitMarker.clear();
   #ifdef vtkCTHFragmentConnectDEBUG
   vtkstd::clock_t endTime=vtkstd::clock();
   cerr << "[" << __LINE__ << "] "
@@ -7240,8 +7242,11 @@ int vtkCTHFragmentConnect::GlobalToLocalId(int globalId)
   return -1;
 }
 //----------------------------------------------------------------------------
-// For fragments whose geometry is split across processes, 
-// localize points and compute geometric attributes. eg OBB, AABB center.
+// Identify fragments who are split across processes. These are always
+// generated and coppied to the output. We also may compute various
+// other geometric attributes here. For fragments whose geometry is 
+// split across processes, localize points and compute geometric 
+// attributes. eg OBB, AABB center.
 void vtkCTHFragmentConnect::ComputeGeometricAttributes()
 {
   ostringstream progressMesg;
@@ -7255,16 +7260,12 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
   const int myProcId = this->Controller->GetLocalProcessId();
   const int nProcs = this->Controller->GetNumberOfProcesses();
   vtkCommunicator *comm=this->Controller->GetCommunicator();
-
-  // anything to do?
-  if (this->ComputeMoments && !this->ComputeOBB)
-    {
-    return;
-    }
+  const int controllingProcId=0;
+  const int msgBase=200000;
 
   // Here are the fragment pieces we own. Some are completely
   // localized while others are split across processes. Pieces
-  // with split geometry will be temporarily localized(copy), the 
+  // with split geometry will be temporarily localized(via copy), the 
   // geometry acted on as a whole and the results distributed back 
   // to piece owners. For localized fragments(these aren't pieces) 
   // the situation/ is relatively simple--computation can be made 
@@ -7284,18 +7285,40 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
   // for split fragments and mark them.For any remaining
   // un-marked fragments we can compute geometric attributes
   // directly.
-  this->FragmentSplitMarker.clear();
-  this->FragmentSplitMarker.resize(nLocal,0);
-  // Size the attribute arrays.
-  if (!this->ComputeMoments)
+  vector<int> &fragmentSplitMarker
+    = this->FragmentSplitMarker[this->MaterialId];
+  // intilize to (bool)0 not split. ALl local ops 
+  // on fragments check here. It's coppied to geometry.
+  fragmentSplitMarker.resize(nLocal,0);
+  //
+  if (myProcId==controllingProcId)
     {
-    this->FragmentAABBCenters->SetNumberOfComponents(3);
-    this->FragmentAABBCenters->SetNumberOfTuples(nLocal);
+    NewVtkArrayPointer(
+          this->FragmentSplitGeometry,
+          1,
+          this->NumberOfResolvedFragments,
+          "SplitGeometry");
+    // initialize to 1 (i.e. not split). This holds n-way 
+    // splitting data, only available on controller. It's
+    // coppied tothe stats output.
+    this->FragmentSplitGeometry->FillComponent(0,1);
     }
-  if (this->ComputeOBB)
+
+  // Are we going to be computing anything? Or
+  // just getting the split geometry markers?
+  if (!this->ComputeMoments || this->ComputeOBB)
     {
-    this->FragmentOBBs->SetNumberOfComponents(15);
-    this->FragmentOBBs->SetNumberOfTuples(nLocal);
+    // Size the attribute arrays.
+    if (!this->ComputeMoments)
+      {
+      this->FragmentAABBCenters->SetNumberOfComponents(3);
+      this->FragmentAABBCenters->SetNumberOfTuples(nLocal);
+      }
+    if (this->ComputeOBB)
+      {
+      this->FragmentOBBs->SetNumberOfComponents(15);
+      this->FragmentOBBs->SetNumberOfTuples(nLocal);
+      }
     }
 
   // Here we localize fragment geomtery that is split across processes.
@@ -7306,9 +7329,6 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
   // back to piece owners.
   if (nProcs>1)
     {
-    const int controllingProcId=0;
-    const int msgBase=200000;
-
     vtkCTHFragmentPieceTransactionMatrix TM;
     TM.Initialize(this->NumberOfResolvedFragments,nProcs);
 
@@ -7372,7 +7392,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
             }
           }
         }
-      // sort the processes by loading
+      // Build minimum order heap.
       Q.InitialHeapify();
       #ifdef vtkCTHFragmentConnectDEBUG
       vtkIdType loadingBefore=Q.GetTotalLoading();
@@ -7388,7 +7408,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       #endif
 
       // Who will do attribute processing for fragments
-      // that are split? We weed out processes that are
+      // that are split? We can weed out processes that are
       // highly loaded and cycle through the group that 
       // remains assigning to each until all work has
       // been alloted.
@@ -7403,11 +7423,16 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       #endif
 
       // Decide who needs to move and build coresponding 
-      // transaction matrix
+      // transaction matrix. Along the way store the geometry 
+      // split info (this eliminates some communication later).
+      int *fragmentSplitGeometry
+        = this->FragmentSplitGeometry->GetPointer(0);
+      //
       for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
         {
-        // if the fragment is split then we need to move him
         int nSplitOver=f2pm.GetProcCount(fragmentId);
+        fragmentSplitGeometry[fragmentId]=nSplitOver;
+        // if the fragment is split then we need to move him
         if (nSplitOver>1)
           {
           #ifdef vtkCTHFragmentConnectDEBUG
@@ -7522,148 +7547,50 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
           assert("Send requires a mesh that is not local."
                 && localMesh!=0 );
 
-          vtkCTHFragmentPieceTransaction &ta=transactionList[0];
-
-          // get the points of this piece
-          vtkFloatArray *ptsArray
-            = dynamic_cast<vtkFloatArray *>(localMesh->GetPoints()->GetData());
-          const vtkIdType bytesPerPoint=3*sizeof(float);
-          const vtkIdType nPoints=ptsArray->GetNumberOfTuples();
-          const vtkIdType bufferSize=bytesPerPoint*nPoints;
-          // prepare a comm buffer
-          vtkCTHFragmentCommBuffer buffer;
-          buffer.Initialize(myProcId,1,bufferSize);
-          buffer.SetNumberOfTuples(0,nPoints);
-          buffer.Pack(ptsArray);
-          // send the buffer in two parts, first the header
-          this->Controller->Send(
-                  buffer.GetHeader(),
-                  buffer.GetHeaderSize(),
-                  ta.GetRemoteProc(),
-                  fragmentId);
-          // followed by points
-          this->Controller->Send(
-                  buffer.GetBuffer(),
-                  buffer.GetBufferSize(),
-                  ta.GetRemoteProc(),
-                  2*fragmentId);
-
-          // Recieve the remotely computed attributes
-          this->Controller->Receive(
-                  attributeCommBuffer,
-                  nAttributeComps,
-                  ta.GetRemoteProc(),
-                  3*fragmentId);
-          // save and mark this piece.
+          // I am sending geometry, hence this is a piece
+          // of a split frgament and I need to treat it as 
+          // such from now on.
           int localId=this->GlobalToLocalId(fragmentId);
-          double *pBuf=attributeCommBuffer;
-          if (!this->ComputeMoments)
-            {
-            this->FragmentAABBCenters->SetTuple(localId,pBuf);
-            pBuf+=3;
-            }
-          if (this->ComputeOBB)
-            {
-            this->FragmentOBBs->SetTuple(localId,pBuf);
-            pBuf+=15;
-            }
-          this->FragmentSplitMarker[localId]=1;
-          }
-        /// receive
-        else if (transactionList[0].GetType()=='R')
-          {
-          for (int i=0; i<nTransactions; ++i)
-            {
-            vtkCTHFragmentPieceTransaction &ta=transactionList[i];
+          fragmentSplitMarker[localId]=1;
 
-            // prepare the comm buffer to receive attribute data
-            // pertaining to a single block(material)
+          // Send the geometry and recvieve the results of 
+          // the requested computations.
+          if (!this->ComputeMoments || this->ComputeOBB)
+            {
+            vtkCTHFragmentPieceTransaction &ta=transactionList[0];
+
+            // get the points of this piece
+            vtkFloatArray *ptsArray
+              = dynamic_cast<vtkFloatArray *>(localMesh->GetPoints()->GetData());
+            const vtkIdType bytesPerPoint=3*sizeof(float);
+            const vtkIdType nPoints=ptsArray->GetNumberOfTuples();
+            const vtkIdType bufferSize=bytesPerPoint*nPoints;
+            // prepare a comm buffer
             vtkCTHFragmentCommBuffer buffer;
-            buffer.SizeHeader(1);
-            // recieve buffer's header
-            this->Controller->Receive(
+            buffer.Initialize(myProcId,1,bufferSize);
+            buffer.SetNumberOfTuples(0,nPoints);
+            buffer.Pack(ptsArray);
+            // send the buffer in two parts, first the header
+            this->Controller->Send(
                     buffer.GetHeader(),
                     buffer.GetHeaderSize(),
                     ta.GetRemoteProc(),
                     fragmentId);
-            // size buffer via incoming header
-            buffer.SizeBuffer();
-            // receive points
-            this->Controller->Receive(
+            // followed by points
+            this->Controller->Send(
                     buffer.GetBuffer(),
                     buffer.GetBufferSize(),
                     ta.GetRemoteProc(),
                     2*fragmentId);
-            // unpack points with an explicit copy
-            vtkIdType nPoints=buffer.GetNumberOfTuples(0);
-            float *writePointer=accumulator.Expand(nPoints);
-            buffer.UnPack(writePointer,3,nPoints,true);
-            }
-          // append points that I own.
-          if (localMesh!=0)
-            {
-            // get the points
-            vtkFloatArray *ptsArray
-              = dynamic_cast<vtkFloatArray *>(localMesh->GetPoints()->GetData());
-            // append
-            accumulator.Accumulate(ptsArray);
-            }
 
-          // Get points refernece to the gathered points.
-          vtkPoints *localizedPoints=accumulator.BuildVtkPoints();
-
-          // Compute geometric attributes.
-          double *pBuf=attributeCommBuffer;
-          if (!this->ComputeMoments)
-            {
-            // Compute center of AABB
-            double bounds[6];
-            localizedPoints->GetBounds(bounds);
-            for (int q=0,k=0; q<3; ++q, k+=2)
-              {
-              pBuf[q]=(bounds[k]+bounds[k+1])/2.0;
-              }
-            pBuf+=3;
-            }
-          if (this->ComputeOBB)
-            {
-            // Compute OBB
-            double size[3];
-            // (c_x,c_y,c_z),(max_x,max_y,max_z),(mid_x,mid_y,mid_z),(min_x,min_y,min_z),|max|,|mid|,|min|
-            obbCalc->ComputeOBB(localizedPoints,pBuf,pBuf+3,pBuf+6,pBuf+9,size);
-            // compute magnitudes
-            for (int q=0; q<3; ++q)
-              {
-              pBuf[12+q]=0;
-              }
-            for (int q=0; q<3; ++q)
-              {
-              pBuf[12]+=pBuf[3+q]*pBuf[3+q];
-              pBuf[13]+=pBuf[6+q]*pBuf[6+q];
-              pBuf[14]+=pBuf[9+q]*pBuf[9+q];
-              }
-            for (int q=0; q<3; ++q)
-              {
-              pBuf[12+q]=sqrt(pBuf[12+q]);
-              }
-            pBuf+=15;
-            }
-          // send attributes back to piece owners
-          for (int i=0; i<nTransactions; ++i)
-            {
-            vtkCTHFragmentPieceTransaction &ta=transactionList[i];
-            this->Controller->Send(
+            // Recieve the remotely computed attributes
+            this->Controller->Receive(
                     attributeCommBuffer,
                     nAttributeComps,
                     ta.GetRemoteProc(),
                     3*fragmentId);
-            }
-          // If I own a piece save the results, and mark 
-          // piece as split.
-          if (localMesh!=0)
-            {
-            int localId=this->GlobalToLocalId(fragmentId);
-            pBuf=attributeCommBuffer;
+            // save results
+            double *pBuf=attributeCommBuffer;
             if (!this->ComputeMoments)
               {
               this->FragmentAABBCenters->SetTuple(localId,pBuf);
@@ -7674,21 +7601,142 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
               this->FragmentOBBs->SetTuple(localId,pBuf);
               pBuf+=15;
               }
-            this->FragmentSplitMarker[localId]=1;
             }
-          #ifdef vtkCTHFragmentConnectDEBUG
-          if (nTransactions>=4)
+          }
+        /// receive
+        else if (transactionList[0].GetType()=='R')
+          {
+          // This fragment is split across processes and
+          // I have a piece. From now on I need to treat 
+          // this fragment as split.
+          int localId=-1;
+          if (localMesh!=0)
             {
-            cerr << "[" << __LINE__ << "] "
-                << myProcId
-                << " memory commitment during localization of "
-                << nTransactions
-                << " pieces is:"
-                << endl
-                << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+            localId=this->GlobalToLocalId(fragmentId);
+            fragmentSplitMarker[localId]=1;
             }
-          #endif
-          accumulator.Clear();
+
+          // Receive the geometry, perform the requested 
+          // computations and send back the results.
+          if (!this->ComputeMoments || this->ComputeOBB)
+            {
+            for (int i=0; i<nTransactions; ++i)
+              {
+              vtkCTHFragmentPieceTransaction &ta=transactionList[i];
+
+              // prepare the comm buffer to receive attribute data
+              // pertaining to a single block(material)
+              vtkCTHFragmentCommBuffer buffer;
+              buffer.SizeHeader(1);
+              // recieve buffer's header
+              this->Controller->Receive(
+                      buffer.GetHeader(),
+                      buffer.GetHeaderSize(),
+                      ta.GetRemoteProc(),
+                      fragmentId);
+              // size buffer via incoming header
+              buffer.SizeBuffer();
+              // receive points
+              this->Controller->Receive(
+                      buffer.GetBuffer(),
+                      buffer.GetBufferSize(),
+                      ta.GetRemoteProc(),
+                      2*fragmentId);
+              // unpack points with an explicit copy
+              vtkIdType nPoints=buffer.GetNumberOfTuples(0);
+              float *writePointer=accumulator.Expand(nPoints);
+              buffer.UnPack(writePointer,3,nPoints,true);
+              }
+            // append points that I own.
+            if (localMesh!=0)
+              {
+              // get the points
+              vtkFloatArray *ptsArray
+                = dynamic_cast<vtkFloatArray *>(localMesh->GetPoints()->GetData());
+              // append
+              accumulator.Accumulate(ptsArray);
+              }
+
+            // Get points refernece to the gathered points.
+            vtkPoints *localizedPoints=accumulator.BuildVtkPoints();
+
+            // Compute geometric attributes.
+            double *pBuf=attributeCommBuffer;
+            if (!this->ComputeMoments)
+              {
+              // Compute center of AABB
+              double bounds[6];
+              localizedPoints->GetBounds(bounds);
+              for (int q=0,k=0; q<3; ++q, k+=2)
+                {
+                pBuf[q]=(bounds[k]+bounds[k+1])/2.0;
+                }
+              pBuf+=3;
+              }
+            if (this->ComputeOBB)
+              {
+              // Compute OBB
+              double size[3];
+              // I store the results as follows:
+              // (c_x,c_y,c_z),(max_x,max_y,max_z),(mid_x,mid_y,mid_z),(min_x,min_y,min_z),|max|,|mid|,|min|
+              obbCalc->ComputeOBB(localizedPoints,pBuf,pBuf+3,pBuf+6,pBuf+9,size);
+              // compute magnitudes
+              for (int q=0; q<3; ++q)
+                {
+                pBuf[12+q]=0;
+                }
+              for (int q=0; q<3; ++q)
+                {
+                pBuf[12]+=pBuf[3+q]*pBuf[3+q];
+                pBuf[13]+=pBuf[6+q]*pBuf[6+q];
+                pBuf[14]+=pBuf[9+q]*pBuf[9+q];
+                }
+              for (int q=0; q<3; ++q)
+                {
+                pBuf[12+q]=sqrt(pBuf[12+q]);
+                }
+              pBuf+=15;
+              }
+            // send attributes back to piece owners
+            for (int i=0; i<nTransactions; ++i)
+              {
+              vtkCTHFragmentPieceTransaction &ta=transactionList[i];
+              this->Controller->Send(
+                      attributeCommBuffer,
+                      nAttributeComps,
+                      ta.GetRemoteProc(),
+                      3*fragmentId);
+              }
+            // If I own a piece save the results, and mark 
+            // piece as split.
+            if (localMesh!=0)
+              {
+              pBuf=attributeCommBuffer;
+              if (!this->ComputeMoments)
+                {
+                this->FragmentAABBCenters->SetTuple(localId,pBuf);
+                pBuf+=3;
+                }
+              if (this->ComputeOBB)
+                {
+                this->FragmentOBBs->SetTuple(localId,pBuf);
+                pBuf+=15;
+                }
+              }
+            #ifdef vtkCTHFragmentConnectDEBUG
+            if (nTransactions>=4)
+              {
+              cerr << "[" << __LINE__ << "] "
+                  << myProcId
+                  << " memory commitment during localization of "
+                  << nTransactions
+                  << " pieces is:"
+                  << endl
+                  << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+              }
+            #endif
+            accumulator.Clear();
+            }
           }
         else
           {
@@ -7716,7 +7764,6 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
     {
     this->ComputeLocalFragmentOBB();
     }
-  this->FragmentSplitMarker.clear();
 
   #ifdef vtkCTHFragmentConnectDEBUG
   cerr << "[" << __LINE__ << "] "
@@ -8132,6 +8179,7 @@ int vtkCTHFragmentConnect::GatherGeometricAttributes(
 
   return 1;
 }
+
 
 //----------------------------------------------------------------------------
 // Collect all of  integrated attribute arrays from all
@@ -9270,6 +9318,9 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
   assert( "Couldn't get the resolved fragnments." 
           && resolvedFragments );
 
+  vector<int> &fragmentSplitMarker
+    = this->FragmentSplitMarker[this->MaterialId];
+
   int nLocalFragments=resolvedFragmentIds.size();
   for (int i=0; i<nLocalFragments; ++i)
     {
@@ -9513,7 +9564,25 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
       pd->AddArray(pdS);
       pdS->Delete();
       }
-    }
+    // split geometry marker
+    int splitMark=fragmentSplitMarker[i];
+    // field data
+    vtkIntArray *fdSM=vtkIntArray::New();
+    fdSM->SetName("SplitGeometry");
+    fdSM->SetNumberOfComponents(1);
+    fdSM->SetNumberOfTuples(1);
+    fdSM->SetValue(0,splitMark);
+    fd->AddArray(fdSM);
+    fdSM->Delete();
+    // point data
+    vtkIntArray *pdSM=vtkIntArray::New();
+    pdSM->SetName("SplitGeometry");
+    pdSM->SetNumberOfComponents(1);
+    pdSM->SetNumberOfTuples(nPoints);
+    pdSM->FillComponent(0,splitMark);
+    pd->AddArray(pdSM);
+    pdSM->Delete();
+    } // for each local fragment
 }
 
 //----------------------------------------------------------------------------
@@ -9534,7 +9603,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
     = dynamic_cast<vtkPolyData *>(this->ResolvedFragmentCenters->GetBlock(this->MaterialId));
 
   // only proc 0 will build the point set
-  // all of the attributes are gathered there for 
+  // all of the attributes are gathered there for
   // resolution so he has everything. Set the others to 0.
   const int procId = this->Controller->GetLocalProcessId();
   if (procId!=0)
@@ -9562,7 +9631,6 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   ia->SetNumberOfTuples(this->NumberOfResolvedFragments);
   ia->FillComponent(0,this->MaterialId);
   pd->AddArray(ia);
-  ReleaseVtkPointer(ia);
   // 2 volume
   da=vtkDoubleArray::New();
   da->DeepCopy( this->FragmentVolumes );
@@ -9626,6 +9694,12 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
     pd->AddArray(da);
     }
   ReleaseVtkPointer(da);
+  // m+1 split geometry markers
+  ReNewVtkPointer(ia);
+  ia->DeepCopy(this->FragmentSplitGeometry);
+  ia->SetName("SplitGeometry");
+  pd->AddArray(ia);
+  ReleaseVtkPointer(ia);
   // Compute the fragment centers and build vertices.
   vtkIdTypeArray *va=vtkIdTypeArray::New();
   va->SetNumberOfTuples(2*this->NumberOfResolvedFragments);
@@ -9688,6 +9762,9 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentOBB()
   vtkMultiPieceDataSet *resolvedFragments
     = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
 
+  vector<int> &fragmentSplitMarker
+    = this->FragmentSplitMarker[this->MaterialId];
+
   int nLocal=resolvedFragmentIds.size();
 
   // OBB set up
@@ -9703,7 +9780,7 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentOBB()
     {
     // skip split fragments, these have already been
     // taken care of.
-    if (this->FragmentSplitMarker[i]==1)
+    if (fragmentSplitMarker[i]==1)
       {
       pObb+=15;
       continue;
@@ -9755,6 +9832,9 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentAABBCenters()
   vtkMultiPieceDataSet *resolvedFragments
     = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
 
+  vector<int> &fragmentSplitMarker
+    = this->FragmentSplitMarker[this->MaterialId];
+
   int nLocal=resolvedFragmentIds.size();
 
   // AABB set up
@@ -9769,7 +9849,7 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentAABBCenters()
     {
     // skip fragments with geometry split over multiple 
     // processes. These have been already taken care of.
-    if (this->FragmentSplitMarker[i]==1)
+    if (fragmentSplitMarker[i]==1)
       {
       pCoaabb+=3;
       continue;
@@ -9835,17 +9915,21 @@ int vtkCTHFragmentConnect::BuildOutputs(
     this->ResolvedFragmentCenters->SetBlock(i,pd);
     pd->Delete();
     }
-  // Prepare our list of ownership. list indexed by
-  // material id.
+  // Prepare ownership lists ...
   this->ResolvedFragmentIds.clear();
   this->ResolvedFragmentIds.resize(nMaterials);
-  // this counts total over all materials, and is used to
+  // and the split geometry markers...
+  this->FragmentSplitMarker.clear();
+  this->FragmentSplitMarker.resize(nMaterials);
+  // both are indexed first by material id, second
+  // by local fragment id.
+
+  // This counts total over all materials, and is used to
   // generate a unique id for each fragment.
   this->ResolvedFragmentCount=0;
 
   return 1;
 }
-
 
 //----------------------------------------------------------------------------
 // Write the fragment attribute to a text file. Each process
