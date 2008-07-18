@@ -147,8 +147,10 @@ protected:
   // if any. When RenderInternal() is called, it is assured that the 
   // DelegatePainter is in sync with this painter i.e. UpdateDelegatePainter()
   // has been called.
-  virtual void RenderInternal(vtkRenderer* renderer, vtkActor* actor, 
-    unsigned long typeflags);
+  virtual void RenderInternal(vtkRenderer *renderer,
+                              vtkActor *actor, 
+                              unsigned long typeflags,
+                              bool forceCompileOnly);
 
   // Description:
   // Internal method passes correct scalars to the Texture and returns 1 if cell

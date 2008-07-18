@@ -47,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkImageSliceMapper);
-vtkCxxRevisionMacro(vtkImageSliceMapper, "1.3");
+vtkCxxRevisionMacro(vtkImageSliceMapper, "1.4");
 //----------------------------------------------------------------------------
 vtkImageSliceMapper::vtkImageSliceMapper()
 {
@@ -333,7 +333,7 @@ void vtkImageSliceMapper::RenderPiece(vtkRenderer* ren, vtkActor* actor)
       {
       this->Painter->SetInput(input);
       }
-    this->Painter->Render(ren, actor, 0xff);
+    this->Painter->Render(ren, actor, 0xff,this->ForceCompileOnly);
     this->TimeToDraw = this->Painter->GetTimeToDraw();
     }
 

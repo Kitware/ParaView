@@ -33,7 +33,7 @@
 #include "vtkTexture.h"
 
 vtkStandardNewMacro(vtkTexturePainter);
-vtkCxxRevisionMacro(vtkTexturePainter, "1.4");
+vtkCxxRevisionMacro(vtkTexturePainter, "1.5");
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE_MODE, Integer);
@@ -198,8 +198,10 @@ int vtkTexturePainter::SetupScalars(vtkImageData* input)
   << ext[5] 
 
 //----------------------------------------------------------------------------
-void vtkTexturePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, 
-    unsigned long typeflags)
+void vtkTexturePainter::RenderInternal(vtkRenderer *renderer,
+                                       vtkActor *actor, 
+                                       unsigned long typeflags,
+                                       bool forceCompileOnly)
 {
   vtkImageData* input = vtkImageData::SafeDownCast(this->GetInput());
   if (this->UpdateTime < input->GetMTime() || this->UpdateTime < this->MTime)
@@ -404,7 +406,7 @@ void vtkTexturePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
   // it was enabled before we disabled it.
   device->MakeLighting(1);
 
-  this->Superclass::RenderInternal(renderer, actor, typeflags);
+  this->Superclass::RenderInternal(renderer, actor, typeflags,forceCompileOnly);
 }
 
 //----------------------------------------------------------------------------
