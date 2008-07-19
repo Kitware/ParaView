@@ -92,7 +92,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.71");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.72");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -464,13 +464,13 @@ void vtkSMRenderViewProxy::SetUseLight(int enable)
     return;
     }
 
-  if (static_cast<bool>(enable) == this->LightKitAdded)
+  if ((enable==1) == this->LightKitAdded)
     {
     // nothing to do.
     return;
     }
 
-  this->LightKitAdded = static_cast<bool>(enable);
+  this->LightKitAdded = enable==1;
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   stream  << vtkClientServerStream::Invoke
