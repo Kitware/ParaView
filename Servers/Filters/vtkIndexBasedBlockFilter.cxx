@@ -40,8 +40,10 @@
 #include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
 
+#define VTK_INDEXBASEDBLOCKFILTER_MAX(x, y) (x>y? x : y)
+
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.22");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.23");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -393,9 +395,9 @@ void vtkIndexBasedBlockFilter::PassBlock(
   int cellDims[3];
   if (this->FieldType == CELL && dimensions)
     {
-    cellDims[0] = dimensions[0] -1;
-    cellDims[1] = dimensions[1] -1;
-    cellDims[2] = dimensions[2] -1;
+    cellDims[0] = VTK_INDEXBASEDBLOCKFILTER_MAX(1, (dimensions[0] -1));
+    cellDims[1] = VTK_INDEXBASEDBLOCKFILTER_MAX(1, (dimensions[1] -1));
+    cellDims[2] = VTK_INDEXBASEDBLOCKFILTER_MAX(1, (dimensions[2] -1));
     dimensions = cellDims;
     }
 
