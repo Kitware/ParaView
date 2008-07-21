@@ -43,7 +43,7 @@
 #define VTK_INDEXBASEDBLOCKFILTER_MAX(x, y) (x>y? x : y)
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.23");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.24");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -287,9 +287,9 @@ void vtkIndexBasedBlockFilter::PassFieldDataBlock(vtkTable* output,
   vtkIdType startIndex, vtkIdType endIndex, vtkDataSet* input)
 {
   vtkFieldData* inFD = input->GetFieldData();
-  vtkFieldData* outFD = vtkFieldData::New();
+  vtkDataSetAttributes* outFD = vtkDataSetAttributes::New();
   outFD->CopyStructure(inFD);
-  output->SetFieldData(outFD);
+  output->SetRowData(outFD);
   outFD->Delete();
 
   for (vtkIdType inIndex=startIndex; inIndex <= endIndex; ++inIndex)
@@ -363,12 +363,12 @@ void vtkIndexBasedBlockFilter::PassBlock(
     return;
     }
 
-  vtkFieldData* outFD = output->GetFieldData();
+  vtkDataSetAttributes* outFD = output->GetRowData();
   if (!outFD)
     {
     // initialize structure if this is the first piece.
-    outFD = vtkFieldData::New();
-    output->SetFieldData(outFD);
+    outFD = vtkDataSetAttributes::New();
+    output->SetRowData(outFD);
     outFD->Delete();
     outFD->CopyStructure(inFD);
     outFD->Allocate(this->EndIndex-this->StartIndex+1);
