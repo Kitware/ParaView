@@ -74,8 +74,7 @@ void pqFileDialogEventTranslator::onFilesSelected(const QString& file)
   data_directory = QDir::cleanPath(QDir::fromNativeSeparators(data_directory));
   if(data_directory.isEmpty())
     {
-    qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
-    return;
+    qWarning() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
     }
 
   QString cleanedFile = QDir::cleanPath(QDir::fromNativeSeparators(file));
