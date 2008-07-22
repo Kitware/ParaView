@@ -70,7 +70,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.22");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -332,10 +332,10 @@ void vtkSMComparativeViewProxy::AddNewView()
 
     vtkSMRepresentationProxy* newRepr = vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy(repr->GetXMLGroup(), repr->GetXMLName()));
-    vtkCopyClone(repr, newRepr); // create a clone.
-    data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT);
-    newView->AddRepresentation(newRepr);
-    newRepr->UpdateVTKObjects();
+    vtkCopyClone(repr, newRepr); // create a clone
+    newRepr->UpdateVTKObjects(); // create objects
+    data.Link->AddLinkedProxy(newRepr, vtkSMLink::OUTPUT); // link properties
+    newView->AddRepresentation(newRepr);  // add representation to view
 
     // Now update data structure to include this view/repr clone.
     data.Clones[newView] = newRepr;
