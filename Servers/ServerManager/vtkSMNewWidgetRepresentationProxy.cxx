@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.11");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -69,6 +69,7 @@ vtkSMNewWidgetRepresentationProxy::vtkSMNewWidgetRepresentationProxy()
   this->Observer = vtkSMNewWidgetRepresentationObserver::New();
   this->Observer->Proxy = this;
   this->Internal = new vtkSMNewWidgetRepresentationInternals;
+  this->StateLoaded = false;
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +202,14 @@ void vtkSMNewWidgetRepresentationProxy::UpdateEnabled()
 }
 
 //-----------------------------------------------------------------------------
+int vtkSMNewWidgetRepresentationProxy::LoadState(vtkPVXMLElement* proxyElement, 
+                          vtkSMStateLoaderBase* loader)
+{
+  this->StateLoaded = true;
+  return this->Superclass::LoadState(proxyElement, loader);
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
@@ -265,6 +274,12 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     vtkSMProperty* info = prop->GetInformationProperty();
     if (info)
       {
+      if (this->StateLoaded)
+        {
+        // This ensures that the property value from the loaded state is
+        // preserved.
+        info->Copy(prop);
+        }
       vtkSMPropertyLink* link = vtkSMPropertyLink::New();
       link->AddLinkedProperty(this, 
                               piter->GetKey(), 
