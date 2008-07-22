@@ -43,6 +43,20 @@ using vtkstd::string;
 namespace {
 // vector memory management helper
 template<class T>
+void ClearVectorOfPointers( vector<T *> &V )
+{
+  int n=V.size();
+  for (int i=0; i<n; ++i)
+    {
+    if (V[i]!=0)
+      {
+      delete V[i];
+      }
+    }
+  V.clear();
+}
+// vector memory management helper
+template<class T>
 void ClearVectorOfVtkPointers( vector<T *> &V )
 {
   int n=V.size();
@@ -469,54 +483,54 @@ string GetMemoryUsage(int pid, int line, int procId)
 
   return memoryUsage.str();
 }
-//
-ostream &operator<<(ostream &sout, vtkDoubleArray &da)
-{
-  sout << "Name:          " << da.GetName() << endl;
-
-  vtkIdType nTup = da.GetNumberOfTuples();
-  int nComp = da.GetNumberOfComponents();
-
-  sout << "NumberOfComps: " << nComp << endl;
-  sout << "NumberOfTuples:" << nTup << endl;
-  sout << "{\n";
-  for (int i=0; i<nTup; ++i)
-    {
-    double *thisTup=da.GetTuple(i);
-    for (int q=0; q<nComp; ++q)
-      {
-      sout << thisTup[q] << ",";
-      }
-      sout << (char)0x08 << "\n";
-    }
-  sout << "}\n";
-
-  return sout;
-}
+// //
+// ostream &operator<<(ostream &sout, vtkDoubleArray &da)
+// {
+//   sout << "Name:          " << da.GetName() << endl;
+// 
+//   vtkIdType nTup = da.GetNumberOfTuples();
+//   int nComp = da.GetNumberOfComponents();
+// 
+//   sout << "NumberOfComps: " << nComp << endl;
+//   sout << "NumberOfTuples:" << nTup << endl;
+//   sout << "{\n";
+//   for (int i=0; i<nTup; ++i)
+//     {
+//     double *thisTup=da.GetTuple(i);
+//     for (int q=0; q<nComp; ++q)
+//       {
+//       sout << thisTup[q] << ",";
+//       }
+//       sout << (char)0x08 << "\n";
+//     }
+//   sout << "}\n";
+// 
+//   return sout;
+// }
 // write a set of loading arrays
-ostream &operator<<(ostream &sout,
-  vector<vector<vtkIdType> > &pla)
-{
-  int nProcs=pla.size();
-  for (int procId=0; procId<nProcs; ++procId)
-    {
-    cerr << "Fragment loading on process " << procId << ":" << endl;
-    int nLocalFragments=pla[procId].size();
-    for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
-      {
-      if (pla[procId][fragmentIdx]>0)
-        {
-        sout << "("
-            << fragmentIdx
-            << ","
-            << pla[procId][fragmentIdx]
-            << "), ";
-        }
-      }
-    sout << endl;
-    }
-  return sout;
-}
+// ostream &operator<<(ostream &sout,
+//   vector<vector<vtkIdType> > &pla)
+// {
+//   int nProcs=pla.size();
+//   for (int procId=0; procId<nProcs; ++procId)
+//     {
+//     cerr << "Fragment loading on process " << procId << ":" << endl;
+//     int nLocalFragments=pla[procId].size();
+//     for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
+//       {
+//       if (pla[procId][fragmentIdx]>0)
+//         {
+//         sout << "("
+//             << fragmentIdx
+//             << ","
+//             << pla[procId][fragmentIdx]
+//             << "), ";
+//         }
+//       }
+//     sout << endl;
+//     }
+//   return sout;
+// }
 #endif
 //
 template<typename TCnt, typename TLabel>

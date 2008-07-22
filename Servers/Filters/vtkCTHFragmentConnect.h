@@ -23,8 +23,8 @@
 #define __vtkCTHFragmentConnect_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector" // using vector internally. ok for leaf classes.
-#include "vtkstd/string" // ...then same is true of string
+#include "vtkstd/vector"
+#include "vtkstd/string"
 
 class vtkDataSet;
 class vtkImageData;

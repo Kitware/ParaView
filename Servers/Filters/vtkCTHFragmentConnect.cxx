@@ -35,7 +35,7 @@
 #include "vtkMultiPieceDataSet.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkAMRBox.h"
-// Arrays
+// Arrays & Containers
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -46,6 +46,7 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkCollection.h"
+#include "vtkPointAccumulator.hxx"
 // IO
 #include "vtkDataSetWriter.h"
 #include "vtkXMLPolyDataWriter.h"
@@ -70,7 +71,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.71");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.72");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -175,120 +176,6 @@ vtkStandardNewMacro(vtkCTHFragmentConnect);
 //
 
 //============================================================================
-/**
-Description:
-Class to append data arrays of points. The template types
-are T_CPP for the c data type and T_VTK for the VTK data type.
-Eg: if T_CCP==double the T_VTK must be vtkDoubleArray.
-The main difference between the way this works and if you
-were to do the same thing with a data array is
-that here the memory grows by exactly what is needed, and
-in VTK data arrays the memory will grow by at least twice
-what is requested.
-*/
-template<typename T_CPP, class T_VTK>
-class vtkCTHFragmentPointAccumulator
-{
-  public:
-    vtkCTHFragmentPointAccumulator()
-    {
-      this->PtStore=0;
-      this->NPts=0;
-    }
-    ~vtkCTHFragmentPointAccumulator()
-    {
-      this->Clear();
-    }
-    // Description:
-    // Free resources mark as empty.
-    void Clear()
-    {
-      CheckAndReleaseCArrayPointer(this->PtStore);
-      this->NPts=0;
-    }
-    //Description:
-    bool Empty()
-    {
-      return this->NPts==0;
-    }
-    // Description:
-    // Extend and geta pointer to the newly added 
-    // memory
-    T_CPP *Expand(vtkIdType n)
-    {
-      const int bytesPerPoint=3*sizeof(T_CPP);
-      // extend
-      vtkIdType newNPts=this->NPts+n;
-      T_CPP *newPointStore
-        = static_cast<T_CPP *>(realloc(this->PtStore,newNPts*bytesPerPoint));
-      if (newPointStore==0)
-        {
-        #ifndef NDEBUG
-        abort();
-        #else
-        throw vtkstd::bad_alloc();
-        #endif
-        }
-      // mark begin of new
-      T_CPP *writePointer=newPointStore+3*this->NPts;
-      // update
-      this->PtStore=newPointStore;
-      this->NPts=newNPts;
-
-      return writePointer;
-    }
-    // Description:
-    // Adds an array of points to the end of
-    // the internal store.
-    void Accumulate(T_CPP *pts, vtkIdType n)
-    {
-      // extend
-      T_CPP *writePointer=this->Expand(n);
-      // copy at end
-      const int bytesPerPoint=3*sizeof(T_CPP);
-      memcpy(writePointer,pts,n*bytesPerPoint);
-    }
-    // Description:
-    // Adds an array of points at the end of
-    // the internal store.
-    void Accumulate(T_VTK *pts)
-    {
-      this->Accumulate(pts->GetPointer(0),pts->GetNumberOfTuples());
-    }
-    // Description:
-    // Creates a vtkPoints data structure from
-    // the internal store. Caller to delete the points.
-    vtkPoints *BuildVtkPoints()
-    {
-      T_VTK *da=T_VTK::New();
-      da->SetNumberOfComponents(3);
-      da->SetArray(this->PtStore,this->NPts,1);
-      vtkPoints *pts=vtkPoints::New();
-      pts->SetData(da);
-      da->Delete();
-
-      return pts;
-    }
-    // Description:
-    void Print()
-    {
-      T_CPP *pBuf=this->PtStore;
-      for (int i=0; i<this->NPts; ++i)
-        {
-        cerr << i << " (" << pBuf[0];
-        for (int q=1; q<3; ++q)
-          {
-          cerr << ", " << pBuf[q];
-          }
-        cerr << ")" << endl;
-        pBuf+=3;
-        }
-    }
-
-  private:
-    T_CPP *PtStore;
-    vtkIdType NPts;
-};
 
 /**
 Description:
@@ -4168,6 +4055,11 @@ vtkPolyData *vtkCTHFragmentConnect::NewFragmentMesh()
   levelArray->SetName("Level");
   newPiece->GetCellData()->AddArray(levelArray);
   levelArray->Delete();
+
+  vtkIntArray *procIdArray=vtkIntArray::New();
+  procIdArray->SetName("ProcId");
+  newPiece->GetCellData()->AddArray(procIdArray);
+  procIdArray->Delete();
   #endif
 
   return newPiece;
@@ -5282,10 +5174,14 @@ void vtkCTHFragmentConnect::CreateFace(
   vtkIntArray *blockIdArray
     = dynamic_cast<vtkIntArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray("BlockId"));
 
+  vtkIntArray *procIdArray
+    = dynamic_cast<vtkIntArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray("ProcId"));
+
   for (vtkIdType ii = 0; ii < numTris; ++ii)
     {
     levelArray->InsertNextValue(in->Block->GetLevel());
     blockIdArray->InsertNextValue(in->Block->LevelBlockId);
+    procIdArray->InsertNextValue(this->Controller->GetLocalProcessId());
     }
   #endif
 }
@@ -7526,7 +7422,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
     for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
       {
       // point buffer
-      vtkCTHFragmentPointAccumulator<float, vtkFloatArray> accumulator;
+      vtkPointAccumulator<float, vtkFloatArray> accumulator;
 
       // get my list of transactions for this fragment
       vector<vtkCTHFragmentPieceTransaction> &transactionList
