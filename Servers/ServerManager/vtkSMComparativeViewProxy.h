@@ -113,7 +113,7 @@ public:
   // Called on every still render. This checks if the comparative visualization
   // needs to be regenerated (following changes to proxies involved in
   // generating the comparative visualization)/tim
-  void UpdateVisualization();
+  void UpdateVisualization(int force=0);
 
   // Description:
   // ViewSize, ViewPosition need to split up among all the component
@@ -168,11 +168,12 @@ public:
   vtkGetVector2Macro(TimeRange, double);
 
   // Description:
-  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
-  // comparative vis by replaying the animation(s).
-  // Temporarily public.
-  void MarkSceneOutdated()
-    { this->SceneOutdated=true; }
+  // Gets the X property and element number currently being compared, if any.
+  virtual bool GetXPropertyAndElement(vtkSMProperty *&, int &);
+
+  // Description:
+  // Gets the Y property and element currently being compared, if any.
+  virtual bool GetYPropertyAndElement(vtkSMProperty *&, int &);
 
 //BTX
 protected:
@@ -205,6 +206,12 @@ protected:
   // Description:
   // Update layout for internal views.
   void UpdateViewLayout();
+
+  // Description:
+  // Marks the view dirty i.e. on next StillRender it needs to regenerate the
+  // comparative vis by replaying the animation(s).
+  void MarkSceneOutdated()
+    { this->SceneOutdated=true; }
 
   int Mode;
   int Dimensions[2];

@@ -224,13 +224,8 @@ void pqComparativeVisPanel::updateView()
     vtkSMComparativeViewProxy* viewProxy =
       vtkSMComparativeViewProxy::SafeDownCast(this->Internal->View->getProxy());
 
-    // Until some bug fixes are completed, lets force the scene outdated
-    // before calling UpdateVisualization().
-    viewProxy->MarkSceneOutdated();
-    viewProxy->UpdateVisualization();
-
-    // Do we really need to call this?
-    this->Internal->View->render();
+    // Call UpdateVisualization with 1 to force the update
+    viewProxy->UpdateVisualization(1);
     }
 }
 

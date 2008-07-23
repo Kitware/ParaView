@@ -63,8 +63,6 @@ public:
                 QObject* parent=NULL);
   virtual ~pqComparativePlotView();
 
-
-
   /// Returns the comparative view proxy.
   vtkSMComparativeViewProxy* getComparativeViewProxy() const;
 
@@ -85,6 +83,14 @@ public slots:
 protected slots:
   /// Called when the layout on the comparative vis changes.
   void onComparativeVisLayoutChanged();
+
+  /// Update the visibility of all plots in comparative view
+  void updateVisibility(pqRepresentation *, bool);
+
+  /// This method may be used to adjust the chart title
+  /// text by inserting comparative variable values or
+  /// time values.
+  virtual void adjustTitleText(const pqPlotView *, QString &);
 
 protected:
 

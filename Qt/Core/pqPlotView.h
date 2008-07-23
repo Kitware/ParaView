@@ -118,6 +118,10 @@ private slots:
   /// Sets the axis layout modified.
   void setAxisLayoutModified();
 
+signals:
+  /// Give listeners a chance to modify chart title text.
+  void beginSetTitleText(const pqPlotView *, QString &);
+
 private:
   pqPlotView(const pqPlotView&); // Not implemented.
   void operator=(const pqPlotView&); // Not implemented.

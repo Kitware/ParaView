@@ -40,8 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMPropertyHelper.h"
 
 // Qt Includes.
 #include <QMap>
@@ -52,15 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Includes.
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
+#include "pqRepresentation.h"
 #include "pqLineChartRepresentation.h"
 #include "pqBarChartRepresentation.h"
-
 #include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
-
 #include "pqChartWidget.h"
 #include "pqChartArea.h"
-#include "pqChartInteractor.h"
 
 class pqComparativePlotView::pqInternal
 {
@@ -104,7 +100,6 @@ pqComparativePlotView::pqComparativePlotView(
   QObject* _parent):
   Superclass(type, group, name, viewProxy, server, _parent)
 {
-  //printf("pqComparativePlotView::pqComparativePlotView: %u\n", this);
   this->Internal = new pqInternal();
   this->Internal->VTKConnect->Connect(
     viewProxy, vtkCommand::ConfigureEvent,
@@ -112,7 +107,9 @@ pqComparativePlotView::pqComparativePlotView(
   this->Internal->VTKConnect->Connect(
     viewProxy, vtkCommand::UserEvent,
     this, SLOT(representationsChanged()));
+
 }
+
 
 //-----------------------------------------------------------------------------
 pqComparativePlotView::~pqComparativePlotView()
@@ -134,6 +131,11 @@ pqComparativePlotView::~pqComparativePlotView()
 void pqComparativePlotView::initialize()
 {
   this->Superclass::initialize();
+
+  this->connect(
+    this, SIGNAL(representationVisibilityChanged(pqRepresentation *, bool)),
+    this, SLOT(updateVisibility(pqRepresentation *, bool)));
+
   this->onComparativeVisLayoutChanged();
 }
 
@@ -167,6 +169,12 @@ vtkSMComparativeViewProxy* pqComparativePlotView::getComparativeViewProxy() cons
 vtkSMViewProxy* pqComparativePlotView::getViewProxy() const
 {
   return this->getComparativeViewProxy()->GetRootView();
+}
+
+//-----------------------------------------------------------------------------
+void pqComparativePlotView::updateVisibility(pqRepresentation * repr, bool vis)
+{
+  this->getComparativeViewProxy()->UpdateVisualization(1);
 }
 
 //-----------------------------------------------------------------------------
@@ -231,6 +239,11 @@ void pqComparativePlotView::onComparativeVisLayoutChanged()
     // need to call initialize.  Calling initialize would requre
     // that pqPlotView lists us as a friend class.
     //plotView->initialize();
+
+    // When the charts set their title text, we might want to insert
+    // some values into the text, such as the value of the comparative variable
+    this->connect(plotView, SIGNAL(beginSetTitleText(const pqPlotView*, QString&)),
+      this, SLOT(adjustTitleText(const pqPlotView*, QString&)) );
 
     // Store the plotview in the map
     this->Internal->ViewMap[view] = plotView;
@@ -376,5 +389,35 @@ void pqComparativePlotView::representationsChanged()
     }
 
 }
+
+//-----------------------------------------------------------------------------
+void pqComparativePlotView::adjustTitleText(const pqPlotView * plotView, QString & titleText)
+{
+  vtkSMProperty * prop = 0;
+  int elementNum = 0;
+  if (titleText.contains("%xprop%", Qt::CaseInsensitive)
+      && this->getComparativeViewProxy()->GetXPropertyAndElement(prop, elementNum))
+    {
+    QVariant value = pqSMAdaptor::getMultipleElementProperty(prop, elementNum);
+    QString replacement = QString("%1").arg(value.toString());
+    titleText.replace("%xprop%", replacement);
+    }
+
+  if (titleText.contains("%yprop%", Qt::CaseInsensitive)
+      && this->getComparativeViewProxy()->GetYPropertyAndElement(prop, elementNum))
+    {
+    QVariant value = pqSMAdaptor::getMultipleElementProperty(prop, elementNum);
+    QString replacement = QString("%1").arg(value.toString());
+    titleText.replace("%yprop%", replacement);
+    }
+
+  if (titleText.contains("%time%", Qt::CaseInsensitive))
+    {
+    vtkSMViewProxy * viewProxy = vtkSMViewProxy::SafeDownCast(plotView->getProxy());
+    QString replacement = QString("%1").arg(viewProxy->GetViewUpdateTime());
+    titleText.replace("%time%", replacement);
+    }
+}
+
 
 

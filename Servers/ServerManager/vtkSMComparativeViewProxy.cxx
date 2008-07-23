@@ -25,6 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMProxyProperty.h"
 
@@ -70,7 +71,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.23");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -547,7 +548,7 @@ vtkSMRepresentationProxy* vtkSMComparativeViewProxy::CreateDefaultRepresentation
 }
 
 //----------------------------------------------------------------------------
-void vtkSMComparativeViewProxy::UpdateVisualization()
+void vtkSMComparativeViewProxy::UpdateVisualization(int force)
 {
   if (!this->AnimationSceneX && !this->AnimationSceneY)
     {
@@ -555,7 +556,7 @@ void vtkSMComparativeViewProxy::UpdateVisualization()
     return;
     }
 
-  if (!this->SceneOutdated)
+  if (!this->SceneOutdated && !force)
     {
     // no need to rebuild.
     return;
@@ -730,6 +731,41 @@ void vtkSMComparativeViewProxy::GetRepresentationsForView(vtkSMViewProxy* view,
       }
     }
 
+}
+
+
+//-----------------------------------------------------------------------------
+bool vtkSMComparativeViewProxy::GetXPropertyAndElement(vtkSMProperty *& prop, int & element)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("XCues"));
+  for (unsigned int i=0; i < pp->GetNumberOfProxies(); ++i)
+    {
+    vtkSMAnimationCueProxy* cue = vtkSMAnimationCueProxy::SafeDownCast(pp->GetProxy(i));
+    if (cue && vtkSMPropertyHelper(cue, "Enabled").GetAsInt())
+      {
+      element = cue->GetAnimatedElement();
+      prop = cue->GetAnimatedProperty();
+      return true;
+      }
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMComparativeViewProxy::GetYPropertyAndElement(vtkSMProperty *& prop, int & element)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("YCues"));
+  for (unsigned int i=0; i < pp->GetNumberOfProxies(); ++i)
+    {
+    vtkSMAnimationCueProxy* cue = vtkSMAnimationCueProxy::SafeDownCast(pp->GetProxy(i));
+    if (cue && vtkSMPropertyHelper(cue, "Enabled").GetAsInt())
+      {
+      element = cue->GetAnimatedElement();
+      prop = cue->GetAnimatedProperty();
+      return true;
+      }
+    }
+  return false;
 }
 
 //----------------------------------------------------------------------------

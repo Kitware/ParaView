@@ -730,6 +730,7 @@ void pqPlotView::updateTitles()
     this->Internal->Chart->setTitle(this->Internal->Title);
     }
 
+  emit this->beginSetTitleText(this, titleText);
   this->Internal->Title->setText(titleText);
   QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
       proxy->GetProperty("ChartTitleFont"));
@@ -796,6 +797,7 @@ void pqPlotView::updateTitles()
       this->Internal->Chart->setAxisTitle(axes[i], this->Internal->AxisTitles[i]);
       }
 
+    emit this->beginSetTitleText(this, titleText);
     this->Internal->AxisTitles[i]->setText(titleText);
     }
 
