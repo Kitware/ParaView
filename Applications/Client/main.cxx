@@ -42,16 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char* argv[])
 {
-  QApplication app(argc, argv);
 
 #ifdef Q_WS_X11
-
   // Using motif style gives us test failures (and its ugly).
   // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
   // let's just use plastique for now
   QApplication::setStyle(new QPlastiqueStyle);
-
 #endif
+
+  QApplication app(argc, argv);
 
   pqComponentsInit();
 
