@@ -85,7 +85,7 @@ protected slots:
   void onComparativeVisLayoutChanged();
 
   /// Update the visibility of all plots in comparative view
-  void updateVisibility(pqRepresentation *, bool);
+  void updateVisibility();
 
   /// This method may be used to adjust the chart title
   /// text by inserting comparative variable values or

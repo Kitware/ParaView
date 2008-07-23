@@ -134,7 +134,7 @@ void pqComparativePlotView::initialize()
 
   this->connect(
     this, SIGNAL(representationVisibilityChanged(pqRepresentation *, bool)),
-    this, SLOT(updateVisibility(pqRepresentation *, bool)));
+    this, SLOT(updateVisibility()));
 
   this->onComparativeVisLayoutChanged();
 }
@@ -172,7 +172,7 @@ vtkSMViewProxy* pqComparativePlotView::getViewProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pqComparativePlotView::updateVisibility(pqRepresentation * repr, bool vis)
+void pqComparativePlotView::updateVisibility()
 {
   this->getComparativeViewProxy()->UpdateVisualization(1);
 }
