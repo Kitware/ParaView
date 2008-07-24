@@ -740,6 +740,7 @@ void pqDisplayProxyEditor::cubeAxesVisibilityChanged()
     pqSMAdaptor::setElementProperty(prop, this->Internal->ShowCubeAxes->isChecked());
     reprProxy->UpdateVTKObjects();
     }
+  this->updateAllViews();
 }
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::editCubeAxes()
