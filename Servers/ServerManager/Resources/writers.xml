@@ -1011,8 +1011,7 @@
       <!-- End of SummaryHelper -->
     </SummaryHelperProxy>
 
-    <PWriterProxy name="CSVWriter" class="vtkPCSVWriter"
-      base_proxygroup="writers" base_proxyname="ParallelWriterBase">
+    <PWriterProxy name="CSVWriter" class="vtkPCSVWriter">
       <Documentation
         short_help="Write CSV files in Parallel">
         Writer to write CSV files, works in parallel or serial.
