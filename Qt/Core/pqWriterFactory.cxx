@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMWriterProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 
@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
+#include "pqOutputPort.h"
 #include "pqServer.h"
 #include "pqPluginManager.h"
 
@@ -81,12 +82,15 @@ struct pqWriterInfo
     }
 
   // Checks if the writer can write the output from the given source proxy.
-  bool canWriteOutput(pqPipelineSource* source) const
+  bool canWriteOutput(pqOutputPort* port) const
     {
-    if (!this->PrototypeProxy.GetPointer() || !source)
+    if (!this->PrototypeProxy.GetPointer() || !port)
       {
       return false;
       }
+
+    pqPipelineSource* source = port->getSource();
+
     vtkSMWriterProxy* writer = vtkSMWriterProxy::SafeDownCast(
       this->PrototypeProxy);
     // If it's not a vtkSMWriterProxy, then we assume that it can
@@ -108,7 +112,7 @@ struct pqWriterInfo
           }
         }
       }
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
       this->PrototypeProxy->GetProperty("Input"));
     if (!pp)
       {
@@ -118,8 +122,10 @@ struct pqWriterInfo
       return false;
       }
     pp->RemoveAllUncheckedProxies();
-    pp->AddUncheckedProxy(source->getProxy());
-    return pp->IsInDomains();
+    pp->AddUncheckedInputConnection(source->getProxy(), port->getPortNumber());
+    bool status = pp->IsInDomains();
+    pp->RemoveAllUncheckedProxies();
+    return status;
     }
 
   // Returns a string for the file type as needed by file dialogs.
@@ -245,7 +251,7 @@ void pqWriterFactory::addFileType(const QString& description,
 
 //-----------------------------------------------------------------------------
 vtkSMProxy* pqWriterFactory::newWriter(const QString& filename,
-  pqPipelineSource* toWrite)
+  pqOutputPort* toWrite)
 {
   if (!toWrite)
     {
@@ -273,7 +279,7 @@ vtkSMProxy* pqWriterFactory::newWriter(const QString& filename,
 }
   
 //-----------------------------------------------------------------------------
-QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
+QString pqWriterFactory::getSupportedFileTypes(pqOutputPort* toWrite)
 {
   QString types = "";
   if (!toWrite)

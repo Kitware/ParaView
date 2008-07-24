@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProxy;
 class pqWriterFactoryInternal;
-class pqPipelineSource;
+class pqOutputPort;
 
 
 // This is a writer factory. The factory must be made file-type aware
@@ -72,13 +72,13 @@ public:
   // Creates a write that can write the output of the \c toWrite source to
   // \c filename file. This allocates a new writer proxy and the caller
   // must call Delete() on the returned proxy.
-  vtkSMProxy* newWriter(const QString& filename, pqPipelineSource* toWrite);
+  vtkSMProxy* newWriter(const QString& filename, pqOutputPort* toWrite);
 
   // Returns a file type filtering string suitable for file dialogs. 
   // Returns only those file formats that can be written using the 
   // output of given and the number of partitions on the data server
   // on which the source exists.
-  QString getSupportedFileTypes(pqPipelineSource* toWrite);
+  QString getSupportedFileTypes(pqOutputPort* toWrite);
 
 public slots:
   // load file types from ":/ParaViewResources/"

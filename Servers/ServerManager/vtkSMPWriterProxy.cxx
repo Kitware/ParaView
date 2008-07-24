@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -127,10 +127,13 @@ void vtkSMPWriterProxy::AddInput(unsigned int inputPort,
     vtkSMInputProperty* ivp  = vtkSMInputProperty::SafeDownCast(
       completeArrays->GetProperty("Input"));
     ivp->RemoveAllProxies();
-    ivp->AddProxy(input);
+    ivp->AddInputConnection(input, outputPort);
     input = completeArrays; // change the actual input to the writer to be
       // output of complete arrays.
+    outputPort = 0; // since input changed, outputPort of the  input 
+                    // should also change.
     completeArrays->UpdateVTKObjects();
+
     }
 
   this->Superclass::AddInput(inputPort, input, outputPort, method);

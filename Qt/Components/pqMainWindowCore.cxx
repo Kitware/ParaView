@@ -1683,8 +1683,17 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveData()
 {
-  pqPipelineSource* source = this->getActiveSource();
-  if (!source)
+  pqOutputPort* port = qobject_cast<pqOutputPort*>(this->getActiveObject());
+  if (!port)
+    {
+    pqPipelineSource* source = this->getActiveSource();
+    if (source)
+      {
+      port = source->getOutputPort(0);
+      }
+    }
+
+  if (!port)
     {
     qDebug() << "No active source, cannot save data.";
     return;
@@ -1692,9 +1701,9 @@ void pqMainWindowCore::onFileSaveData()
 
   // Get the list of writers that can write the output from the given source.
   QString filters = 
-    this->Implementation->WriterFactory.getSupportedFileTypes(source);
+    this->Implementation->WriterFactory.getSupportedFileTypes(port);
 
-  pqFileDialog file_dialog(source->getServer(),
+  pqFileDialog file_dialog(port->getServer(),
     this->Implementation->Parent, tr("Save File:"), QString(), filters);
   file_dialog.setObjectName("FileSaveDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
@@ -1706,12 +1715,22 @@ void pqMainWindowCore::onFileSaveData()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveData(const QStringList& files)
 {
-  pqPipelineSource* source = this->getActiveSource();
-  if (!source)
+  pqOutputPort* port = qobject_cast<pqOutputPort*>(this->getActiveObject());
+  if (!port)
+    {
+    pqPipelineSource* source = this->getActiveSource();
+    if (source)
+      {
+      port = source->getOutputPort(0);
+      }
+    }
+
+  if (!port)
     {
     qDebug() << "No active source, cannot save data.";
     return;
     }
+
   if (files.size() == 0)
     {
     qDebug() << "No file choose to save.";
@@ -1720,7 +1739,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
 
   vtkSmartPointer<vtkSMProxy> proxy;
   proxy.TakeReference(
-    this->Implementation->WriterFactory.newWriter(files[0], source));
+    this->Implementation->WriterFactory.newWriter(files[0], port));
 
   vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
   if (!writer)
@@ -1729,7 +1748,7 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     return;
     }
 
-  if (writer->IsA("vtkSMPSWriterProxy") && source->getServer()->getNumberOfPartitions() > 1)
+  if (writer->IsA("vtkSMPSWriterProxy") && port->getServer()->getNumberOfPartitions() > 1)
     {
     QMessageBox::StandardButton result = 
       QMessageBox::question(
@@ -1751,9 +1770,9 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
     vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"));
   filenameProperty->SetElement(0, files[0].toAscii().data());
 
-  vtkSMProxyProperty *inputProperty = 
-    vtkSMProxyProperty::SafeDownCast(writer->GetProperty("Input"));
-  inputProperty->AddProxy(source->getProxy());
+  pqSMAdaptor::setInputProperty(writer->GetProperty("Input"),
+    port->getSource()->getProxy(),
+    port->getPortNumber());
 
   pqWriterDialog dialog(writer);
 
