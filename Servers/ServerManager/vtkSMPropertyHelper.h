@@ -59,6 +59,16 @@
 
 #include "vtkSMObject.h"
 
+#ifdef INT
+#undef INT
+#endif
+#ifdef DOUBLE
+#undef DOUBLE
+#endif
+#ifdef NONE
+#undef NONE
+#endif
+
 class vtkSMProperty;
 class vtkSMProxy;
 
