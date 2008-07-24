@@ -43,7 +43,7 @@
 #define VTK_INDEXBASEDBLOCKFILTER_MAX(x, y) (x>y? x : y)
 
 vtkStandardNewMacro(vtkIndexBasedBlockFilter);
-vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.24");
+vtkCxxRevisionMacro(vtkIndexBasedBlockFilter, "1.25");
 vtkCxxSetObjectMacro(vtkIndexBasedBlockFilter, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkIndexBasedBlockFilter::vtkIndexBasedBlockFilter()
@@ -109,6 +109,7 @@ vtkMultiPieceDataSet* vtkIndexBasedBlockFilter::GetPieceToProcess(vtkDataObject*
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cd->NewIterator());
     iter->VisitOnlyLeavesOff();
+    iter->SkipEmptyNodesOff();
 
     vtkHierarchicalBoxDataIterator* hbIter = 
       vtkHierarchicalBoxDataIterator::SafeDownCast(iter);
