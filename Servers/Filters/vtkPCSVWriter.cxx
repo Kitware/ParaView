@@ -28,7 +28,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPCSVWriter);
-vtkCxxRevisionMacro(vtkPCSVWriter, "1.4");
+vtkCxxRevisionMacro(vtkPCSVWriter, "1.5");
 
 vtkCxxSetObjectMacro(vtkPCSVWriter, Controller, vtkMultiProcessController);
 
@@ -138,6 +138,13 @@ void vtkPCSVWriter::WriteRectilinearDataInParallel(
     numProcs = this->Controller->GetNumberOfProcesses();
     }
 
+  if (procid == 0)
+    {
+    WriteRectilinearGridData(rectilinearGrid);
+    }
+
+
+#if 0
   vtkIdType numPoints = rectilinearGrid->GetNumberOfPoints();
 
   if ( procid )
@@ -155,7 +162,6 @@ void vtkPCSVWriter::WriteRectilinearDataInParallel(
     vtkRectilinearGrid * rectilinearGridCopy = vtkRectilinearGrid::New();
     rectilinearGridCopy->DeepCopy(rectilinearGrid);
 
-#if 0
 
     vtkIdType numRemoteValidPoints = 0;
 
@@ -187,7 +193,6 @@ void vtkPCSVWriter::WriteRectilinearDataInParallel(
         }
       }
     remoteCSVOutput->Delete();
-#endif
 
     if (procid == 0)
       {
@@ -200,6 +205,7 @@ void vtkPCSVWriter::WriteRectilinearDataInParallel(
     {
     WriteRectilinearGridData(rectilinearGrid);
     }
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -210,53 +216,29 @@ void vtkPCSVWriter::WriteData()
     {
     this->WriteRectilinearDataInParallel(rg);
     }
+  else if (vtkPolyData* pd = vtkPolyData::SafeDownCast(this->GetInput()))
+    {
+    vtkPolyData* clone = vtkPolyData::New();
+    clone->ShallowCopy(pd);
+
+    const char* const infoStr =
+      "input data type is a vtkPolyData."
+      " Converting via vtkPolyLineToRectilinearGridFilter";
+    vtkDebugMacro(<< infoStr);
+    vtkPolyLineToRectilinearGridFilter* p2rgf =
+      vtkPolyLineToRectilinearGridFilter::New();
+    p2rgf->SetInput(clone);
+
+    p2rgf->Update();
+    this->WriteRectilinearDataInParallel(p2rgf->GetOutput());
+
+    p2rgf->Delete();
+    clone->Delete();
+    }
   else
     {
-    vtkDataSet* ds = vtkDataSet::SafeDownCast(this->GetInput());
-    if (ds)
-      {
-      const char* const pdInfoStr =
-        "vtkCSVWriter: input data type needs to be of type vtkPolyData";
-      vtkPointSet* ps = vtkPointSet::SafeDownCast(ds);
-      if (ps)
-        {
-        vtkPolyData* pd = vtkPolyData::SafeDownCast(ps);
-        if (pd)
-          {
-          vtkPolyData* clone = vtkPolyData::New();
-          clone->ShallowCopy(pd);
-
-          const char* const infoStr =
-            "input data type is a vtkPolyData."
-            " Converting via vtkPolyLineToRectilinearGridFilter";
-          vtkDebugMacro(<< infoStr);
-          vtkPolyLineToRectilinearGridFilter* p2rgf =
-            vtkPolyLineToRectilinearGridFilter::New();
-          p2rgf->SetInput(clone);
-
-          p2rgf->Update();
-          this->WriteRectilinearDataInParallel(p2rgf->GetOutput());
-
-          p2rgf->Delete();
-          clone->Delete();
-          }
-        else
-          {
-          vtkDebugMacro(<< pdInfoStr);
-          vtkWarningMacro(<< pdInfoStr);
-          }
-        }
-      else
-        {
-        vtkDebugMacro(<< pdInfoStr);
-        vtkWarningMacro(<< pdInfoStr);
-        }
-      }
-    else
-      {
-      vtkErrorMacro(<< "Bad Ju Ju! The input to vtkCSVWriter must be a "
-        "vtkDataSet");
-      }
+    vtkErrorMacro("input data type needs to be of type vtkPolyData or "
+        "a vtkRectilinearGrid");
     }
 }
 

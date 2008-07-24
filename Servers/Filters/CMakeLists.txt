@@ -125,6 +125,7 @@ SET(Filters_SRCS
 #  vtkTemporalProbeFilter.cxx
   vtkTexturePainter.cxx
   vtkTimestepsAnimationPlayer.cxx
+  vtkTimeSeriesWriter.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
