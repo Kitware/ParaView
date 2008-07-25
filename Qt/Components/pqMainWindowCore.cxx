@@ -328,8 +328,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     SIGNAL(triggerCameraAdjustment(pqView*)),
     this, SLOT(showCameraDialog(pqView*)));
 
-  QObject::connect(&this->Implementation->MultiViewManager,
-    SIGNAL(viewOptionsRequested()), this, SLOT(onEditViewSettings()));
+  this->Implementation->MultiViewManager.setViewOptionsManager(
+    this->getActiveViewOptionsManager());
 
   // Listen to the active render module changed signals.
   QObject::connect(

@@ -98,6 +98,9 @@ public:
   ///   A pointer to the options dialog handler.
   pqActiveViewOptions *getOptions(const QString &viewType) const;
 
+  /// Returns if an options dialog can be shown for the given view.
+  bool canShowOptions(pqView* view) const;
+
 public slots:
   /// \brief
   ///   Sets the active view.

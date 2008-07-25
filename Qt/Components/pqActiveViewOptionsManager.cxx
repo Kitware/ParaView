@@ -285,4 +285,11 @@ pqActiveViewOptions *pqActiveViewOptionsManager::getCurrent() const
   return options;
 }
 
-
+bool pqActiveViewOptionsManager::canShowOptions(pqView* view) const
+{
+  pqView* oldCur = this->Internal->ActiveView;
+  this->Internal->ActiveView = view;
+  pqActiveViewOptions* options = this->getCurrent();
+  this->Internal->ActiveView = oldCur;
+  return (options != NULL);
+}

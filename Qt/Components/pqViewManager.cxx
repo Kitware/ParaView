@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaView includes.
+#include "pqActiveViewOptionsManager.h"
 #include "pqApplicationCore.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
@@ -98,6 +99,7 @@ public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqView> ActiveView;
   QPointer<pqUndoStack> UndoStack;
+  QPointer<pqActiveViewOptionsManager> ViewOptionsManager;
   QMenu ConvertMenu;
   QSignalMapper* LookmarkSignalMapper;
 
@@ -185,6 +187,12 @@ pqViewManager::~pqViewManager()
       }
     }
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::setViewOptionsManager(pqActiveViewOptionsManager* mgr)
+{
+  this->Internal->ViewOptionsManager = mgr;
 }
 
 //-----------------------------------------------------------------------------
@@ -499,10 +507,15 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
   QAction* optionsAction = new QAction(
     QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options", this);
   optionsAction->setObjectName("OptionsButton");
-  optionsAction->setEnabled(true);
+  optionsAction->setEnabled(false);
+  if (this->Internal->ViewOptionsManager && 
+    this->Internal->ViewOptionsManager->canShowOptions(view))
+    {
+    optionsAction->setEnabled(true);
+    }
   frame->addTitlebarAction(optionsAction);
   QObject::connect(optionsAction, SIGNAL(triggered()), 
-    this, SIGNAL(viewOptionsRequested()));
+    this, SLOT(onViewOptionsRequested()));
 
   if (view->supportsUndo())
     {
@@ -1314,6 +1327,11 @@ bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
   return (pqImageUtil::saveImage(fullImage, filename) == vtkErrorCode::NoError);
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+void pqViewManager::onViewOptionsRequested()
+{
+  if (this->Internal->ViewOptionsManager)
+    {
+    this->Internal->ViewOptionsManager->showOptions();
+    }
+}

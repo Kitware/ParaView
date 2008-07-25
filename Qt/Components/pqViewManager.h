@@ -34,10 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 
-class pqView;
+class pqActiveViewOptionsManager;
 class pqMultiViewFrame;
 class pqServer;
 class pqUndoStack;
+class pqView;
 class vtkPVXMLElement;
 class vtkSMStateLoaderBase;
 class vtkUndoElement;
@@ -108,6 +109,11 @@ public:
   /// \param removed Used to return all the removed widgets.
   virtual void reset(QList<QWidget*> &removed);
 
+  /// View options manager is used to show the view options dialog for the
+  /// current view. If the manager is not set, then the view options tool button
+  /// will be disabled.
+  void setViewOptionsManager(pqActiveViewOptionsManager* manager);
+
 signals:
   /// Fired when the active view module changes.
   void activeViewChanged(pqView*);
@@ -134,9 +140,6 @@ signals:
 
   /// Fired when the camera button is clicked.
   void triggerCameraAdjustment(pqView*);
-
-  /// Emitted when the view options button is clicked.
-  void viewOptionsRequested();
 
 private slots:
   /// This will create a view module to fill the frame.
@@ -185,6 +188,9 @@ private slots:
 
   /// Called when the camera button is clicked
   virtual void onCameraTriggered();
+
+  /// Called when the view options button is clicked.
+  void onViewOptionsRequested();
 
 public slots:
   /// Set the active server. This must be called whenever
