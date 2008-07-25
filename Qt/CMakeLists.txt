@@ -14,27 +14,20 @@ IF(QT4_FOUND)
 #  MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.2.")
 #ENDIF (NOT qt_version_tmp)
 
-# help CMake fine QtUiTools on Mac (binary install)
+# help CMake find QtUiTools on Mac (binary install)
 IF(Q_WS_MAC AND QT4_FOUND AND QT_QTCORE_FOUND AND NOT QT_QTUITOOLS_FOUND)
   FIND_LIBRARY(QT_QTUITOOLS_LIBRARY_RELEASE NAMES QtUiTools PATHS ${QT_LIBRARY_DIR})
   _QT4_ADJUST_LIB_VARS(QTUITOOLS)
 ENDIF(Q_WS_MAC AND QT4_FOUND AND QT_QTCORE_FOUND AND NOT QT_QTUITOOLS_FOUND)
 
-# help CMake fine QtAssistant on Mac (framework install)
+# help CMake find QtAssistant on Mac (framework/binary install)
 IF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTASSISTANT_INCLUDE_DIR)
   FIND_PATH(QT_QTASSISTANT_INCLUDE_DIR QtAssistant 
             PATHS ${QT_LIBRARY_DIR}/QtAssistant.framework/Headers
             NO_DEFAULT_PATH)
 ENDIF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTASSISTANT_INCLUDE_DIR)
 
-# help CMake fine QtAssistant on Mac (binary install)
-IF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTASSISTANT_INCLUDE_DIR)
-  FIND_PATH(QT_QTASSISTANT_INCLUDE_DIR QtAssistant 
-            PATHS ${QT_LIBRARY_DIR}/QtAssistant.framework/Headers
-            NO_DEFAULT_PATH)
-ENDIF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTASSISTANT_INCLUDE_DIR)
-
-# help CMake fine QtDesigner on Mac (binary install)
+# help CMake find QtDesigner on Mac (binary install)
 IF(Q_WS_MAC AND QT4_FOUND AND NOT QT_QTDESIGNER_INCLUDE_DIR)
   FIND_PATH(QT_QTDESIGNER_INCLUDE_DIR QDesignerComponents
             PATHS ${QT_LIBRARY_DIR}/QtDesigner.framework/Headers
