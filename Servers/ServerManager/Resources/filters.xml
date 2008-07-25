@@ -6310,6 +6310,7 @@ Tessellate a higher-order dataset.
 
      <OutputPort name="geometry" index="0" />
      <OutputPort name="statistics" index="1" />
+     <OutputPort name="obb representation" index="2" />
 
      <InputProperty
        name="Input"
@@ -6387,30 +6388,6 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
-     <!-- Summation Array 
-     <StringVectorProperty
-       name="SelectSummationArray"
-       command="SelectSummationArray"
-       clean_command="UnselectAllSummationArrays"
-       repeat_command="1"
-       number_of_elements_per_command="1"
-       label="Compute summation over:">
-       <Documentation>
-         Specifies the arrays from which to sum over fragments.
-       </Documentation>
-
-       <ArrayListDomain 
-         name="array_list"
-         data_type="VTK_FLOAT VTK_DOUBLE">
-         <RequiredProperties>
-           <Property name="Input" function="Input"/>
-         </RequiredProperties>
-       </ArrayListDomain>
-       <Hints>
-         <NoDefault /> 
-       </Hints>
-     </StringVectorProperty>-->
-
      <!-- Volume weighted average Array -->
      <StringVectorProperty
        name="SelectVolumeWtdAvgArray"
@@ -6435,7 +6412,7 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
-     <!-- Volume weighted average Array -->
+     <!-- Mass weighted average Array -->
      <StringVectorProperty
        name="SelectMassWtdAvgArray"
        command="SelectMassWtdAvgArray"
@@ -6459,6 +6436,31 @@ Tessellate a higher-order dataset.
        </Hints>
      </StringVectorProperty>
 
+      <!-- do not remove -->
+     <!-- Summation Array 
+     <StringVectorProperty
+       name="SelectSummationArray"
+       command="SelectSummationArray"
+       clean_command="UnselectAllSummationArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1"
+       label="Compute summation over:">
+       <Documentation>
+         Specifies the arrays from which to sum over fragments.
+       </Documentation>
+
+       <ArrayListDomain 
+         name="array_list"
+         data_type="VTK_FLOAT VTK_DOUBLE">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Hints>
+         <NoDefault /> 
+       </Hints>
+     </StringVectorProperty>-->
+
      <!-- Compute OBB -->
      <IntVectorProperty
         name="ComputeOBB"
@@ -6471,7 +6473,11 @@ Tessellate a higher-order dataset.
        </Documentation>
      </IntVectorProperty>
 
-     <!-- Write a csv file -->
+     <!-- Write a csv file:
+          This is not an excel compatible file, it has more
+          information that is stored in headers. Also commas
+          are used on tuple boundaries while spaces are used
+          on component boundaries.-->
      <IntVectorProperty 
         name="WriteOutputTableFile" 
         command="SetWriteOutputTableFile" 
@@ -6493,7 +6499,12 @@ Tessellate a higher-order dataset.
         </Documentation>
      </StringVectorProperty>
 
-     <!-- loading bounds -->
+      <!-- do not remove
+      this is a feature that most users should not
+      need. If memory usage becomes a problem then
+      this gives the user more control over excluding
+      highly loaded processes from memory intesive operations. -->
+     <!-- loading bounds
      <IntVectorProperty
        name="UpperLoadingBound"
        command="SetUpperLoadingBound"
@@ -6504,7 +6515,7 @@ Tessellate a higher-order dataset.
        <Documentation>
          Bound in polygons above which process are excluded from work sharing.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty>-->
 
    <!-- End CTHFragmentConnect -->
    </SourceProxy>

@@ -55,6 +55,7 @@
 #include "vtkOBBTree.h"
 #include "vtkAppendPolyData.h"
 #include "vtkMarchingCubesCases.h"
+#include "vtkCleanPolyData.h"
 // STL
 #include "vtksys/ios/fstream"
 using vtksys_ios::ofstream;
@@ -71,7 +72,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.72");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.73");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -2702,9 +2703,14 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   #endif
 
   // Pipeline
-  // 0 output multi-block
-  // 1 polydata, proc 0 fills with attributes, all others fill with empty polydata
+  // 0 output multi-block -> multi-piece -> polydata
+  // 1 multiblock -> polydata, proc 0 fills with attributes, all others fill with empty polydata
+  // 2 multiblock -> polydata, proc 0 builds representation of OBBs, all others empty
+  #ifdef vtkCTHFragmentConnectDEBUG
+  this->SetNumberOfOutputPorts(3);
+  #else
   this->SetNumberOfOutputPorts(2);
+  #endif
 
   // Setup the selection callback to modify this object when an array
   // selection is changed.
@@ -2756,6 +2762,10 @@ vtkCTHFragmentConnect::vtkCTHFragmentConnect()
   this->NumberOfResolvedFragments = 0;
   this->ResolvedFragmentCount=0;
   this->MaterialId=0;
+
+  this->ResolvedFragments=0;
+  this->ResolvedFragmentCenters=0;
+  this->ResolvedFragmentOBBs=0;
 
   this->FaceNeighbors = new vtkCTHFragmentConnectIterator[32];
 
@@ -2833,6 +2843,43 @@ vtkCTHFragmentConnect::~vtkCTHFragmentConnect()
   this->ProgressMaterialInc=0.0;
   this->ProgressBlockInc=0.0;
   this->ProgressResolutionInc=0.0;
+}
+
+//----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::FillInputPortInformation(int /*port*/,
+                                                    vtkInformation *info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkCTHFragmentConnect::FillOutputPortInformation(int port, vtkInformation *info)
+{
+  // There are two outputs,
+  // 0: multi-block contains fragments
+  // 1: polydata contains center of mass points with attributes
+  // 2: polydata contains OBB.
+  switch (port)
+    {
+    case 0:
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+      break;
+    case 1:
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+      break;
+    #ifdef vtkCTHFragmentConnectDEBUG
+    case 2:
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
+      break;
+    #endif
+    default:
+      assert( 0 && "Invalid output port." );
+      break;
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -4045,7 +4092,7 @@ vtkPolyData *vtkCTHFragmentConnect::NewFragmentMesh()
     }
 
   // for debugging purposes...
-  #ifndef NDEBUG
+  #ifdef vtkCTHFragmentConnectDEBUG
   vtkIntArray *blockIdArray = vtkIntArray::New();
   blockIdArray->SetName("BlockId");
   newPiece->GetCellData()->AddArray(blockIdArray);
@@ -4281,6 +4328,14 @@ int vtkCTHFragmentConnect::RequestData(
   outInfo = outputVector->GetInformationObject(1);
   vtkMultiBlockDataSet *mbdsOutput1 =
     vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  #ifdef vtkCTHFragmentConnectDEBUG
+  // 2
+  outInfo = outputVector->GetInformationObject(2);
+  vtkMultiBlockDataSet *mbdsOutput2 =
+    vtkMultiBlockDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  #else
+  vtkMultiBlockDataSet *mbdsOutput2=0;
+  #endif
 
   // Get arrays to process based on array selection status
   vector<string> MaterialArrayNames;
@@ -4319,11 +4374,16 @@ int vtkCTHFragmentConnect::RequestData(
     }
 
   // set up structure in the output data sets 
-  this->BuildOutputs(mbdsOutput0,mbdsOutput1,nMaterials);
+  this->BuildOutputs(mbdsOutput0,mbdsOutput1,mbdsOutput2,nMaterials);
 
   //
   this->ProgressMaterialInc=1.0/(double)nMaterials;
-  this->ProgressResolutionInc=1.0/this->ProgressMaterialInc/2.0/10.0;
+  #ifdef vtkCTHFragmentConnectDebug
+  this->ProgressResolutionInc=1.0/this->ProgressMaterialInc/2.0/12.0;
+  #else
+  this->ProgressResolutionInc=1.0/this->ProgressMaterialInc/2.0/11.0;
+  #endif
+
   // process enabled material arrays
   for (this->MaterialId=0; this->MaterialId<nMaterials; ++this->MaterialId)
     {
@@ -5167,7 +5227,7 @@ void vtkCTHFragmentConnect::CreateFace(
       }
     }
   // Cell data attributes for debugging.
-  #ifndef NDEBUG
+  #ifdef vtkCTHFragmentConnectDEBUG
   vtkIntArray *levelArray
     = dynamic_cast<vtkIntArray*>(this->CurrentFragmentMesh->GetCellData()->GetArray("Level"));
 
@@ -6080,42 +6140,6 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
     }
 }
 
-
-
-
-
-//----------------------------------------------------------------------------
-int vtkCTHFragmentConnect::FillInputPortInformation(int /*port*/,
-                                                    vtkInformation *info)
-{
-  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkCTHFragmentConnect::FillOutputPortInformation(int port, vtkInformation *info)
-{
-  // There are two outputs,
-  // 0: multi-block contains fragments
-  // 1: polydata contains center of mass points with attributes
-  switch (port)
-    {
-    case 0:
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
-      break;
-    case 1:
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkMultiBlockDataSet");
-      break;
-    default:
-      assert( 0 && "Invalid output port." );
-      break;
-    }
-
-  return 1;
-}
-
-
 //----------------------------------------------------------------------------
 void vtkCTHFragmentConnect::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -6821,6 +6845,87 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
   vector<int>(resolvedFragmentIds).swap(resolvedFragmentIds);
 }
 
+//----------------------------------------------------------------------------
+// Remove duplicate point from local meshes.
+void vtkCTHFragmentConnect::CleanLocalFragmentGeometry()
+{
+  #ifdef vtkCTHFragmentConnectDEBUG
+  // TODO  If we clean the
+  // data and turn transparency on MPI throws an
+  // error which causes all of the servers to 
+  // terminate. so far I have only seen this
+  // with np=4 cth-med. We only need transparency
+  // when we are validating OBB's
+  #endif
+
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::CleanLocalFragmentGeometry("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
+  vector<int> &resolvedFragmentIds
+    = this->ResolvedFragmentIds[this->MaterialId];
+
+  vtkMultiPieceDataSet *resolvedFragments
+    = dynamic_cast<vtkMultiPieceDataSet *>(this->ResolvedFragments->GetBlock(this->MaterialId));
+  assert( "Couldn't get the resolved fragnments."
+          && resolvedFragments );
+  resolvedFragments->SetNumberOfPieces(this->NumberOfResolvedFragments);
+
+  // Only need to merge points.
+  vtkCleanPolyData *cpd=vtkCleanPolyData::New();
+  // These caused some visual effects(rounded corners etc...)
+  // cpd->ConvertLinesToPointsOff();
+  // cpd->ConvertPolysToLinesOff();
+  // cpd->ConvertStripsToPolysOff();
+  // cpd->PointMergingOn();
+
+  #ifdef vtkCTHFragmentConnectDEBUG
+  const int myProcId=this->Controller->GetLocalProcessId();
+  vtkIdType nInitial=0;
+  vtkIdType nFinal=0;
+  #endif
+  // clean each frgament mesh we own.
+  int nLocal=resolvedFragmentIds.size();
+  for (int localId=0; localId<nLocal; ++localId)
+    {
+    // get the material id
+    int fragmentId=resolvedFragmentIds[localId];
+    // get the fragment
+    vtkPolyData *fragmentMesh
+      = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(fragmentId));
+    #ifdef vtkCTHFragmentConnectDEBUG
+    nInitial+=fragmentMesh->GetNumberOfPoints();
+    #endif
+    // clean duplicate points
+    cpd->SetInput(fragmentMesh);
+    vtkPolyData *cleanedFragmentMesh=cpd->GetOutput();
+    cleanedFragmentMesh->Update();
+    #ifdef vtkCTHFragmentConnectDEBUG
+    nFinal+=cleanedFragmentMesh->GetNumberOfPoints();
+    #endif
+    // Free unused resources
+    cleanedFragmentMesh->Squeeze();
+    // Copy and swap dirty old mesh for new cleaned mesh.
+    vtkPolyData *cleanedFragmentMeshOut=vtkPolyData::New();
+    cleanedFragmentMeshOut->ShallowCopy(cleanedFragmentMesh);
+    resolvedFragments->SetPiece(fragmentId,cleanedFragmentMeshOut);
+    cleanedFragmentMeshOut->Delete();
+    }
+  cpd->Delete();
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+         << myProcId
+         << " cleaned "
+         << nInitial-nFinal
+         << " points from local fragments. ("
+         << (int)(100.0*(1.0-(double)nFinal/(double)nInitial)+0.5) 
+         << "%)" << endl;
+  #endif
+}
 //----------------------------------------------------------------------------
 // Merge fragment pieces which are split across processes
 // NOTE: this results in extreme memory consumption for large 
@@ -7553,20 +7658,22 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
               accumulator.Accumulate(ptsArray);
               }
 
-            // Get points refernece to the gathered points.
+            // Get the gathered points in vtk form.
             vtkPoints *localizedPoints=accumulator.BuildVtkPoints();
-
-            // Compute geometric attributes.
+            // Get the AABB and compute its center.
+            double aabb[6];
+            localizedPoints->GetBounds(aabb);
+            double aabbCen[3];
+            for (int q=0,k=0; q<3; ++q, k+=2)
+              {
+              aabbCen[q]=(aabb[k]+aabb[k+1])/2.0;
+              }
             double *pBuf=attributeCommBuffer;
             if (!this->ComputeMoments)
               {
-              // Compute center of AABB
-              double bounds[6];
-              localizedPoints->GetBounds(bounds);
-              for (int q=0,k=0; q<3; ++q, k+=2)
-                {
-                pBuf[q]=(bounds[k]+bounds[k+1])/2.0;
-                }
+              pBuf[0]=aabbCen[0];
+              pBuf[1]=aabbCen[1];
+              pBuf[2]=aabbCen[2];
               pBuf+=3;
               }
             if (this->ComputeOBB)
@@ -7591,8 +7698,71 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
                 {
                 pBuf[12+q]=sqrt(pBuf[12+q]);
                 }
+              // The vtkOBBTree computes axes using covariance
+              // which doesn't work well for amr data. Ideally 
+              // we want the MVBB, so if the AABB is smaller than
+              // the OBB, use the AABB instead.
+              double obbVolume=pBuf[12]*pBuf[13]*pBuf[14];
+              double aabbDx[3];
+              aabbDx[0]=aabb[1]-aabb[0];
+              aabbDx[1]=aabb[3]-aabb[2];
+              aabbDx[2]=aabb[5]-aabb[4];
+              double aabbVolume=fabs(aabbDx[0]*aabbDx[1]*aabbDx[2]);
+              if (aabbVolume<obbVolume)
+                {
+                vtkWarningMacro("AABB volume is less than OBB volume, using AABB."
+                                << " Block Id:" << this->MaterialId 
+                                << " Fragment Id:"
+                                << this->NumberOfResolvedFragments+fragmentId << endl);
+                // corner
+                pBuf[0]=aabb[0];
+                pBuf[1]=aabb[2];
+                pBuf[2]=aabb[4];
+                // sort largest to smallest, and track which of min,mid,max
+                // are in the x,y, or z directions.
+                int maxComp=0;
+                int midComp=1;
+                int minComp=2;
+                if (fabs(aabbDx[0])<fabs(aabbDx[2]))
+                  {
+                  double tmpDx=aabbDx[0];
+                  aabbDx[0]=aabbDx[2];
+                  aabbDx[2]=tmpDx;
+                  int tmpComp=maxComp;
+                  maxComp=minComp;
+                  minComp=tmpComp;
+                  }
+                if (fabs(aabbDx[1])<fabs(aabbDx[2]))
+                  {
+                  double tmpDx=aabbDx[1];
+                  aabbDx[1]=aabbDx[2];
+                  aabbDx[2]=tmpDx;
+                  int tmpComp=midComp;
+                  midComp=minComp;
+                  minComp=tmpComp;
+                  }
+                if (fabs(aabbDx[0])<fabs(aabbDx[1]))
+                  {
+                  double tmpDx=aabbDx[0];
+                  aabbDx[0]=aabbDx[1];
+                  aabbDx[1]=tmpDx;
+                  int tmpComp=maxComp;
+                  maxComp=midComp;
+                  midComp=tmpComp;
+                  }
+                memset(pBuf+3,0,9*sizeof(double));
+                // Set sorted offsets ...
+                pBuf[3+maxComp]=aabbDx[0];
+                pBuf[6+midComp]=aabbDx[1];
+                pBuf[9+minComp]=aabbDx[2];
+                // & magnitudes.
+                pBuf[12]=fabs(aabbDx[0]);
+                pBuf[13]=fabs(aabbDx[1]);
+                pBuf[14]=fabs(aabbDx[2]);
+                }
               pBuf+=15;
               }
+
             // send attributes back to piece owners
             for (int i=0; i<nTransactions; ++i)
               {
@@ -7631,6 +7801,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
                   << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
               }
             #endif
+            localizedPoints->Delete();
             accumulator.Clear();
             }
           }
@@ -8847,6 +9018,16 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
        << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
   #endif
 
+  // Clean duplicate points
+  this->CleanLocalFragmentGeometry();
+  #ifdef vtkCTHFragmentConnectDEBUG
+  cerr << "[" << __LINE__ << "] "
+       << myProcId
+       << " memory commitment after CleanLocalFragmentGeometry is:"
+       << endl
+       << GetMemoryUsage(this->MyPid,__LINE__,myProcId);
+  #endif
+
   // Accumulate contributions from fragemnts who were 
   // previously split.
   this->ResolveIntegratedAttributes(0);
@@ -8875,6 +9056,7 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
   this->CopyAttributesToOutput0();
   this->CopyAttributesToOutput1();
   #ifdef vtkCTHFragmentConnectDEBUG
+  this->CopyAttributesToOutput2();
   cerr << "[" << __LINE__ << "] "
        << myProcId
        << " memory commitment after CopyAttributesToOutput0/1 is:"
@@ -9214,8 +9396,10 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
   assert( "Couldn't get the resolved fragnments." 
           && resolvedFragments );
 
+  #ifdef vtkCTHFragmentConnectDEBUG
   vector<int> &fragmentSplitMarker
     = this->FragmentSplitMarker[this->MaterialId];
+  #endif
 
   int nLocalFragments=resolvedFragmentIds.size();
   for (int i=0; i<nLocalFragments; ++i)
@@ -9461,6 +9645,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
       pdS->Delete();
       }
     // split geometry marker
+    #ifdef vtkCTHFragmentConnectDEBUG
     int splitMark=fragmentSplitMarker[i];
     // field data
     vtkIntArray *fdSM=vtkIntArray::New();
@@ -9478,6 +9663,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
     pdSM->FillComponent(0,splitMark);
     pd->AddArray(pdSM);
     pdSM->Delete();
+    #endif
     } // for each local fragment
 }
 
@@ -9591,10 +9777,12 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
     }
   ReleaseVtkPointer(da);
   // m+1 split geometry markers
+  #ifdef vtkCTHFragmentConnectDEBUG
   ReNewVtkPointer(ia);
   ia->DeepCopy(this->FragmentSplitGeometry);
   ia->SetName("SplitGeometry");
   pd->AddArray(ia);
+  #endif
   ReleaseVtkPointer(ia);
   // Compute the fragment centers and build vertices.
   vtkIdTypeArray *va=vtkIdTypeArray::New();
@@ -9647,6 +9835,148 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
 }
 
 //----------------------------------------------------------------------------
+// This output was added to validate the OBB code. Its is a 
+// multiblock of polydata. On the controlling process (eg 0), this
+// output will contain polydata for each OBB.
+void vtkCTHFragmentConnect::CopyAttributesToOutput2()
+{
+  ostringstream progressMesg;
+  progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput2("
+               << ") , Material "
+               << this->MaterialId;
+  this->SetProgressText(progressMesg.str().c_str());
+  this->Progress+=this->ProgressResolutionInc;
+  this->UpdateProgress(this->Progress);
+
+  // Nothing to do if there are no OBB's.
+  if (!this->ComputeOBB)
+    {
+    return;
+    }
+
+  // only proc 0 will build the OBB representations
+  // all of the attributes are gathered there for
+  // resolution so he has everything. Set the others to 0.
+  const int procId = this->Controller->GetLocalProcessId();
+  if (procId!=0)
+    {
+    //resolvedFragmentCenters->Delete();
+    this->ResolvedFragmentOBBs->SetBlock(this->MaterialId,static_cast<vtkPolyData *>(0));
+    return;
+    }
+
+  // We will graphically represent each OBB with 2 triangle strips.
+  // Each cover three sides like a hot dog bun. 8 points are needed 
+  // for each strip.
+  vtkIdType basePtId=0;
+  vtkPoints *repPts=vtkPoints::New();
+  repPts->SetDataTypeToDouble();
+  repPts->SetNumberOfPoints(8*this->NumberOfResolvedFragments);
+  vtkCellArray *repStrips=vtkCellArray::New();
+  //repStrips->SetNumberOfCells(2*this->NumberOfResolvedFragments);
+  // for each fragment build its obb's representation
+  for (int fragmentId=0; fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
+    {
+    // indexes into obb tuple.
+    const int x0=0;
+    const int d0=3;
+    const int d1=6;
+    const int d2=9;
+    // pt ids.
+    vtkIdType a=basePtId;
+    vtkIdType b=basePtId+1;
+    vtkIdType c=basePtId+2;
+    vtkIdType d=basePtId+3;
+    vtkIdType e=basePtId+4;
+    vtkIdType f=basePtId+5;
+    vtkIdType g=basePtId+6;
+    vtkIdType h=basePtId+7;
+
+    // Get the fragment obb tuple.
+    double obb[15];
+    this->FragmentOBBs->GetTuple(fragmentId,obb);
+
+    // Construct the 8 corners of the OBB.
+    double pts[3];
+    // a
+    pts[0]=obb[x0  ];
+    pts[1]=obb[x0+1];
+    pts[2]=obb[x0+2];
+    repPts->SetPoint(a,pts);
+    // b
+    pts[0]=obb[x0  ]+obb[d0  ];
+    pts[1]=obb[x0+1]+obb[d0+1];
+    pts[2]=obb[x0+2]+obb[d0+2];
+    repPts->SetPoint(b,pts);
+    // c
+    pts[0]=obb[x0  ]+obb[d0  ]+obb[d1  ];
+    pts[1]=obb[x0+1]+obb[d0+1]+obb[d1+1];
+    pts[2]=obb[x0+2]+obb[d0+2]+obb[d1+2];
+    repPts->SetPoint(c,pts);
+    // d
+    pts[0]=obb[x0  ]+obb[d1  ];
+    pts[1]=obb[x0+1]+obb[d1+1];
+    pts[2]=obb[x0+2]+obb[d1+2];
+    repPts->SetPoint(d,pts);
+    // e
+    pts[0]=obb[x0  ]+obb[d2  ];
+    pts[1]=obb[x0+1]+obb[d2+1];
+    pts[2]=obb[x0+2]+obb[d2+2];
+    repPts->SetPoint(e,pts);
+    // f
+    pts[0]=obb[x0  ]+obb[d0  ]+obb[d2  ];
+    pts[1]=obb[x0+1]+obb[d0+1]+obb[d2+1];
+    pts[2]=obb[x0+2]+obb[d0+2]+obb[d2+2];
+    repPts->SetPoint(f,pts);
+    // g
+    pts[0]=obb[x0  ]+obb[d0  ]+obb[d1  ]+obb[d2  ];
+    pts[1]=obb[x0+1]+obb[d0+1]+obb[d1+1]+obb[d2+1];
+    pts[2]=obb[x0+2]+obb[d0+2]+obb[d1+2]+obb[d2+2];
+    repPts->SetPoint(g,pts);
+    // h
+    pts[0]=obb[x0  ]+obb[d1  ]+obb[d2  ];
+    pts[1]=obb[x0+1]+obb[d1+1]+obb[d2+1];
+    pts[2]=obb[x0+2]+obb[d1+2]+obb[d2+2];
+    repPts->SetPoint(h,pts);
+
+    // Build the repStrips' cells.
+    // wrapper 1
+    repStrips->InsertNextCell(8);
+    repStrips->InsertCellPoint(d);
+    repStrips->InsertCellPoint(a);
+    repStrips->InsertCellPoint(c);
+    repStrips->InsertCellPoint(b);
+    repStrips->InsertCellPoint(g);
+    repStrips->InsertCellPoint(f);
+    repStrips->InsertCellPoint(h);
+    repStrips->InsertCellPoint(e);
+
+    // wrapper 2
+    repStrips->InsertNextCell(8);
+    repStrips->InsertCellPoint(c);
+    repStrips->InsertCellPoint(g);
+    repStrips->InsertCellPoint(d);
+    repStrips->InsertCellPoint(h);
+    repStrips->InsertCellPoint(a);
+    repStrips->InsertCellPoint(e);
+    repStrips->InsertCellPoint(b);
+    repStrips->InsertCellPoint(f);
+
+    // next strip
+    basePtId+=8;
+    }
+
+  // Place the obb represntations (points and cells) into 
+  // the output.
+  vtkPolyData *resolvedFragmentOBBs
+    = dynamic_cast<vtkPolyData *>(this->ResolvedFragmentOBBs->GetBlock(this->MaterialId));
+  resolvedFragmentOBBs->SetPoints(repPts);
+  resolvedFragmentOBBs->SetStrips(repStrips);
+  repPts->Delete();
+  repStrips->Delete();
+}
+
+//----------------------------------------------------------------------------
 // For each fragment compute its oriented bounding box(OBB).
 //
 // return 0 on error.
@@ -9682,15 +10012,17 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentOBB()
       continue;
       }
 
+    // get fragment mesh
     int globalId=resolvedFragmentIds[i];
-
     vtkPolyData *thisFragment
       = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(globalId));
 
     // compute OBB
     double size[3];
     // (c_x,c_y,c_z),(max_x,max_y,max_z),(mid_x,mid_y,mid_z),(min_x,min_y,min_z),|max|,|mid|,|min|
-    obbCalc->ComputeOBB(thisFragment,pObb,pObb+3,pObb+6,pObb+9,size);
+    //obbCalc->ComputeOBB(thisFragment,pObb,pObb+3,pObb+6,pObb+9,size);
+    obbCalc->ComputeOBB(thisFragment->GetPoints(),pObb,pObb+3,pObb+6,pObb+9,size);
+
     // compute magnitudes
     for (int q=0; q<3; ++q)
       {
@@ -9786,6 +10118,7 @@ int vtkCTHFragmentConnect::ComputeLocalFragmentAABBCenters()
 int vtkCTHFragmentConnect::BuildOutputs(
                 vtkMultiBlockDataSet *mbdsOutput0,
                 vtkMultiBlockDataSet *mbdsOutput1,
+                vtkMultiBlockDataSet *mbdsOutput2,
                 int nMaterials)
 {
   /// 0
@@ -9796,6 +10129,14 @@ int vtkCTHFragmentConnect::BuildOutputs(
   /// 1
   this->ResolvedFragmentCenters=mbdsOutput1;
   this->ResolvedFragmentCenters->SetNumberOfBlocks(nMaterials);
+  /// 2
+  #ifdef vtkCTHFragmentConnectDEBUG
+  if (this->ComputeOBB)
+    {
+    this->ResolvedFragmentOBBs=mbdsOutput2;
+    this->ResolvedFragmentOBBs->SetNumberOfBlocks(nMaterials);
+    }
+  #endif
   for (int i=0; i<nMaterials; ++i)
     {
     /// 0
@@ -9807,10 +10148,22 @@ int vtkCTHFragmentConnect::BuildOutputs(
     /// 1
     // A single poly data holding all the cell centers.
     // of fragments in this material.
-    vtkPolyData *pd=vtkPolyData::New();
-    this->ResolvedFragmentCenters->SetBlock(i,pd);
-    pd->Delete();
+    vtkPolyData *pdFcc=vtkPolyData::New();
+    this->ResolvedFragmentCenters->SetBlock(i,pdFcc);
+    pdFcc->Delete();
+    /// 2
+    #ifdef vtkCTHFragmentConnectDEBUG
+    // A single poly data holding OBBs of fragments
+    // in this material.
+    if (this->ComputeOBB)
+      {
+      vtkPolyData *pdOBB=vtkPolyData::New();
+      this->ResolvedFragmentOBBs->SetBlock(i,pdOBB);
+      pdOBB->Delete();
+      }
+    #endif
     }
+  /// Global information (i.e. maintained across materials)
   // Prepare ownership lists ...
   this->ResolvedFragmentIds.clear();
   this->ResolvedFragmentIds.resize(nMaterials);

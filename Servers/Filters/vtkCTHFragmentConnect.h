@@ -386,6 +386,8 @@ protected:
   void ResolveLocalFragmentGeometry();
   // Merge fragment's geometry that are split across processes
   void ResolveRemoteFragmentGeometry();
+  // Clean duplicate points from fragment geometry.
+  void CleanLocalFragmentGeometry();
   // Given a global id convert it to a local id(index into id array)
   int GlobalToLocalId(int globalId);
   //
@@ -400,11 +402,13 @@ protected:
   // into the fragment polys in the output data sets. 
   void CopyAttributesToOutput0();
   void CopyAttributesToOutput1();
+  void CopyAttributesToOutput2();
   // Write a text file containing local fragment attributes.
   int WriteFragmentAttributesToTextFile();
   // Build the output data
   int BuildOutputs(vtkMultiBlockDataSet *mbdsOutput0,
                   vtkMultiBlockDataSet *mbdsOutput1,
+                  vtkMultiBlockDataSet *mbdsOutput2,
                   int materialId);
 
   // integration helper, returns 0 if the source array 
@@ -479,7 +483,7 @@ protected:
   // until resolution.
   vtkstd::vector<vtkPolyData *> FragmentMeshes;
 
-  // TODO this could be cleaned up (somewhat) by
+  // TODO? this could be cleaned up (somewhat) by
   // addding an integration class which encapsulates
   // all of the supported operations.
   ///class vtkCTHFragmentConnectIntegrator
@@ -580,6 +584,10 @@ protected:
   //
   vtkstd::vector<vtkPoints *> ResolvedFragmentPoints;
 
+  // A polydata representing OBB, same structure as the resolved
+  // fragments.
+  vtkMultiBlockDataSet *ResolvedFragmentOBBs;
+
   double GlobalOrigin[3];
   double RootSpacing[3];
   int StandardBlockDimensions[3];
@@ -621,6 +629,7 @@ protected:
   vtkCallbackCommand *SelectionObserver;
   char *OutputTableFileNameBase;
   bool WriteOutputTableFile;
+  int DrawOBB;
   double Progress;
   double ProgressMaterialInc;
   double ProgressBlockInc;
