@@ -40,12 +40,39 @@ public:
     COMPARATIVE
     };
   //ETX
+
+  //BTX
+  enum ViewUpdateModeTypes
+    {
+    UPDATE_MODE_NONE,
+    UPDATE_MODE_ROOT,
+    UPDATE_MODE_ALL
+    };
+  //ETX
   
   // Description:
   // Set the mode. In FILM_STRIP mode, AnimationSceneX is used while in
   // COMPARATIVE mode AnimationSceneX as well as AnimationSceneY are used.
   vtkSetMacro(Mode, int);
   vtkGetMacro(Mode, int);
+
+  // Description:
+  // This property determines how individual frames of the comparative view will
+  // update when a source or filter displayed by the view is modified.  When UPDATE_MODE_NONE is
+  // selected, no frames will update until the comparative view is explicity updated. 
+  // When UPDATE_MODE_ROOT is selected, the root frame will update but the other frames will not
+  // update until the comparative view is explicity updated.  When UPDATE_MODE_ALL is selected, all
+  // frames will update.
+  vtkSetMacro(ViewUpdateMode, int);
+  vtkGetMacro(ViewUpdateMode, int);
+
+  // Description:
+  // This property controls how the comparative view displays time.  When show timesteps
+  // is off, the global time is displayed in each frame.  When show timesteps is on, the
+  // comparative view displays different timesteps in each frame.  When show timesteps is
+  // on, the global time is ignored.
+  vtkSetMacro(ShowTimeSteps, int);
+  vtkGetMacro(ShowTimeSteps, int);
 
   // Description:
   // Builds the MxN views. This method simply creates the MxN internal view modules.
@@ -194,6 +221,8 @@ protected:
   // Removes an internal view and all the representations in that view.
   void RemoveView(vtkSMViewProxy* remove);
 
+  void UpdateRootView();
+
   // Description:
   // Update comparative scene.
   void UpdateComparativeVisualization(vtkSMAnimationSceneProxy* sceneX,
@@ -214,6 +243,8 @@ protected:
     { this->SceneOutdated=true; }
 
   int Mode;
+  int ViewUpdateMode;
+  int ShowTimeSteps;
   int Dimensions[2];
   int ViewSize[2];
   int Spacing[2];

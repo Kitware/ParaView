@@ -71,7 +71,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.24");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -87,6 +87,8 @@ vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
   this->Spacing[0] = this->Spacing[1] = 1;
   this->AnimationSceneX = 0;
   this->AnimationSceneY = 0;
+  this->ShowTimeSteps = 1;
+  this->ViewUpdateMode = UPDATE_MODE_ROOT;
 
   this->SceneOutdated = true;
 
@@ -556,8 +558,12 @@ void vtkSMComparativeViewProxy::UpdateVisualization(int force)
     return;
     }
 
-  if (!this->SceneOutdated && !force)
+  if (!this->SceneOutdated && !force && this->ViewUpdateMode != UPDATE_MODE_ALL)
     {
+    if (this->ViewUpdateMode == UPDATE_MODE_ROOT)
+      {
+      this->UpdateRootView();
+      }
     // no need to rebuild.
     return;
     }
@@ -599,6 +605,23 @@ void vtkSMComparativeViewProxy::UpdateVisualization(int force)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMComparativeViewProxy::UpdateRootView()
+{
+  this->AnimationSceneX->SetAnimationTime(0);
+  vtkSMViewProxy* view = this->Internal->Views[0];
+  if (this->GetShowTimeSteps())
+    {
+    view->SetViewUpdateTime(this->TimeRange[0]);
+    }
+  else
+    {
+    view->SetViewUpdateTime(this->GetViewUpdateTime());
+    }
+  view->SetCacheTime(view->GetCacheTime()+1.0);
+  view->StillRender();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
   vtkSMAnimationSceneProxy* scene)
 {
@@ -627,7 +650,15 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
     vtkSMViewProxy* view = this->Internal->Views[view_index];
 
     double time = this->TimeRange[0] + view_index*increment;
-    view->SetViewUpdateTime(time);
+    if (this->GetShowTimeSteps())
+      {
+      double time = this->TimeRange[0] + view_index*increment;
+      view->SetViewUpdateTime(time);
+      }
+    else
+      {
+      view->SetViewUpdateTime(this->GetViewUpdateTime());
+      }
 
     // HACK: This ensure that obsolete cache is never used when the CV is being
     // generated.
@@ -654,6 +685,9 @@ void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
   dvp->SetElement(0, this->Dimensions[1]-1);
   sceneY->UpdateVTKObjects();
 
+  double increment =  (this->TimeRange[1] - this->TimeRange[0])/
+    (this->Dimensions[0]*this->Dimensions[1]-1);
+
   int view_index=0;
   for (int y=0; y < this->Dimensions[1]; y++)
     {
@@ -662,6 +696,16 @@ void vtkSMComparativeViewProxy::UpdateComparativeVisualization(
       {
       sceneX->SetAnimationTime(x);
       vtkSMViewProxy* view = this->Internal->Views[view_index];
+
+      if (this->GetShowTimeSteps())
+        {
+        double time = this->TimeRange[0] + view_index*increment;
+        view->SetViewUpdateTime(time);
+        }
+      else
+        {
+        view->SetViewUpdateTime(this->GetViewUpdateTime());
+        }
 
       // HACK: This ensure that obsolete cache is never used when the CV is being
       // generated.

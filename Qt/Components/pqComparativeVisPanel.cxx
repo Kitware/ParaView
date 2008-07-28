@@ -67,6 +67,7 @@ public:
   QPointer<pqView> View;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* ModeAdaptor;
+  pqSignalAdaptorComboBox* ViewUpdateModeAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -99,6 +100,8 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
   this->Internal->setupUi(this);
   this->Internal->ModeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Mode);
+  this->Internal->ViewUpdateModeAdaptor = 
+    new pqSignalAdaptorComboBox(this->Internal->ViewUpdateMode);
   this->Internal->Links.setUseUncheckedProperties(false);
 
   // When mode changes we want to hide the non-related GUI components.
@@ -157,6 +160,7 @@ pqComparativeVisPanel::pqComparativeVisPanel(QWidget* p):Superclass(p)
 pqComparativeVisPanel::~pqComparativeVisPanel()
 {
   delete this->Internal->ModeAdaptor;
+  delete this->Internal->ViewUpdateModeAdaptor;
   delete this->Internal;
 }
 
@@ -198,11 +202,22 @@ void pqComparativeVisPanel::setView(pqView* view)
     this->Internal->YFrames, "value", SIGNAL(valueChanged(int)),
     viewProxy, viewProxy->GetProperty("Dimensions"), 1);
 
+  // Connect show timesteps check button
+  this->Internal->Links.addPropertyLink(
+    this->Internal->ShowTimeStepsCheck, "checked", SIGNAL(stateChanged(int)),
+    viewProxy, viewProxy->GetProperty("ShowTimeSteps"), 1);
+
   // Connect mode combobox to vtkSMComparativeViewProxy's "Mode" property
   this->Internal->Links.addPropertyLink(
     this->Internal->ModeAdaptor, "currentText", 
     SIGNAL(currentTextChanged(const QString&)),
     viewProxy, viewProxy->GetProperty("Mode"));
+
+  // Connect combobox to vtkSMComparativeViewProxy's "ViewUpdateMode" property
+  this->Internal->Links.addPropertyLink(
+    this->Internal->ViewUpdateModeAdaptor, "currentText", 
+    SIGNAL(currentTextChanged(const QString&)),
+    viewProxy, viewProxy->GetProperty("ViewUpdateMode"));
 }
 
 //-----------------------------------------------------------------------------

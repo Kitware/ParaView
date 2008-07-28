@@ -4493,6 +4493,42 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="ViewUpdateMode"
+        command="SetViewUpdateMode"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="None" />
+          <Entry value="1" text="Root" />
+          <Entry value="2" text="All" />
+        </EnumerationDomain>
+        <Documentation>
+          This property determines how individual frames of the comparative view will
+          update when a source or filter displayed by the view is modified.  When none is
+          selected, no frames will update until the comparative view is explicity updated. 
+          When root is selected, the root frame will update but the other frames will not
+          update until the comparative view is explicity updated.  When all is selected, all
+          frames will update.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowTimeSteps"
+        command="SetShowTimeSteps"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property controls how the comparative view displays time.  When show timesteps
+          is off, the global time is displayed in each frame.  When show timesteps is on, the
+          comparative view displays different timesteps in each frame.  When show timesteps is
+          on, the global time is ignored.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="AnimationSceneX" proxygroup="animation"
           proxyname="AnimationScene">

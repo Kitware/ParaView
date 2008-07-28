@@ -5,108 +5,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>202</width>
-    <height>383</height>
+    <width>313</width>
+    <height>536</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
-   <item row="1" column="0" colspan="2" >
-    <widget class="QGroupBox" name="XAxisGroup" >
-     <property name="title" >
-      <string>Animated Source (X Axis)</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="1" >
-       <widget class="pqAnimatablePropertiesComboBox" name="XProperty" />
-      </item>
-      <item rowspan="2" row="0" column="1" >
-       <widget class="pqSourceComboBox" name="XObject" />
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>Selected Object</string>
-        </property>
-       </widget>
-      </item>
-      <item rowspan="2" row="1" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
-         <string>Property to Animate</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QGroupBox" name="YAxisGroup" >
-     <property name="title" >
-      <string>Animated Source (Y Axis)</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <item row="2" column="1" >
-       <widget class="pqAnimatablePropertiesComboBox" name="YProperty" />
-      </item>
-      <item rowspan="2" row="0" column="1" >
-       <widget class="pqSourceComboBox" name="YObject" />
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Selected Object</string>
-        </property>
-       </widget>
-      </item>
-      <item rowspan="2" row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>Property to Animate</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
       <string>Properties</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
        <number>2</number>
       </property>
+      <property name="verticalSpacing" >
+       <number>2</number>
+      </property>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Mode</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1" >
        <widget class="QComboBox" name="Mode" >
         <item>
@@ -121,13 +58,6 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>Mode</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
@@ -135,6 +65,16 @@
         </property>
         <property name="wordWrap" >
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QSpinBox" name="XFrames" >
+        <property name="minimum" >
+         <number>1</number>
+        </property>
+        <property name="maximum" >
+         <number>30</number>
         </property>
        </widget>
       </item>
@@ -148,36 +88,142 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QSpinBox" name="XFrames" >
-        <property name="maximum" >
-         <number>30</number>
-        </property>
-        <property name="minimum" >
-         <number>1</number>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="1" >
        <widget class="QSpinBox" name="YFrames" >
-        <property name="maximum" >
-         <number>30</number>
-        </property>
         <property name="minimum" >
          <number>1</number>
+        </property>
+        <property name="maximum" >
+         <number>30</number>
         </property>
         <property name="value" >
          <number>1</number>
         </property>
        </widget>
       </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Update mode</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QComboBox" name="ViewUpdateMode" >
+        <property name="toolTip" >
+         <string>This property determines how individual frames of the comparative view will update when a source or filter displayed by the view is modified.  When &lt;b>none&lt;/b> is selected, no frames will update until the &lt;b>Update&lt;/b> button is pressed.  When &lt;b>root&lt;/b> is selected, the root frame will update but the other frames will not update until the &lt;b>Update&lt;/b> button is pressed.  When &lt;b>all&lt;/b> is selected, all frames will update.</string>
+        </property>
+        <item>
+         <property name="text" >
+          <string>None</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Root</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>All</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>Show timesteps</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QCheckBox" name="ShowTimeStepsCheck" >
+        <property name="toolTip" >
+         <string>This property controls how the comparative view displays time.  When &lt;b>show timesteps&lt;/b> is off, the global time is displayed in each frame.  When &lt;b>show timesteps&lt;/b> is on, the comparative view displays different timesteps in each frame.  When &lt;b>show timesteps&lt;/b> is on, the global time is ignored.</string>
+        </property>
+        <property name="layoutDirection" >
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="text" >
+         <string/>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="1" >
-    <widget class="QPushButton" name="Update" >
-     <property name="text" >
-      <string>&amp;Update</string>
+   <item row="1" column="0" colspan="2" >
+    <widget class="QGroupBox" name="XAxisGroup" >
+     <property name="title" >
+      <string>Animated Source (X Axis)</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Selected Object</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="pqSourceComboBox" name="XObject" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Property to Animate</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="pqAnimatablePropertiesComboBox" name="XProperty" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="QGroupBox" name="YAxisGroup" >
+     <property name="title" >
+      <string>Animated Source (Y Axis)</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Selected Object</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="pqSourceComboBox" name="YObject" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Property to Animate</string>
+        </property>
+        <property name="wordWrap" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="pqAnimatablePropertiesComboBox" name="YProperty" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2" >
+    <widget class="pqComparativeTracksWidget" native="1" name="AnimationWidget" >
+     <property name="minimumSize" >
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
      </property>
     </widget>
    </item>
@@ -188,19 +234,16 @@
      </property>
      <property name="sizeHint" >
       <size>
-       <width>40</width>
-       <height>20</height>
+       <width>221</width>
+       <height>28</height>
       </size>
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="pqComparativeTracksWidget" native="1" name="AnimationWidget" >
-     <property name="minimumSize" >
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
+   <item row="4" column="1" >
+    <widget class="QPushButton" name="Update" >
+     <property name="text" >
+      <string>&amp;Update</string>
      </property>
     </widget>
    </item>
