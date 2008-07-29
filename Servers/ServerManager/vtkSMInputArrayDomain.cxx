@@ -26,13 +26,16 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.15");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.16");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
   "point",
   "cell",
-  "any"
+  "any",
+  "vertex",
+  "edge",
+  "row"
 };
 
 //---------------------------------------------------------------------------
@@ -119,6 +122,37 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
       }
     }
 
+  if (this->AttributeType == vtkSMInputArrayDomain::VERTEX||
+      this->AttributeType == vtkSMInputArrayDomain::ANY)
+    {
+    if (this->AttributeInfoContainsArray(proxy, outputport, 
+        info->GetVertexDataInformation()))
+      {
+      return 1;
+      }
+    }
+
+  if (this->AttributeType == vtkSMInputArrayDomain::EDGE||
+      this->AttributeType == vtkSMInputArrayDomain::ANY)
+    {
+    if (this->AttributeInfoContainsArray(proxy, outputport, 
+        info->GetEdgeDataInformation()))
+      {
+      return 1;
+      }
+    }
+
+  if (this->AttributeType == vtkSMInputArrayDomain::ROW||
+      this->AttributeType == vtkSMInputArrayDomain::ANY)
+    {
+    if (this->AttributeInfoContainsArray(proxy, outputport, 
+        info->GetRowDataInformation()))
+      {
+      return 1;
+      }
+    }
+
+
   return 0;
 }
 
@@ -184,6 +218,22 @@ int vtkSMInputArrayDomain::IsFieldValid(
         {
         attributeType = vtkSMInputArrayDomain::CELL;
         }
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS)
+        {
+        // TODO: Handle this case.
+        }
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
+        {
+        attributeType = vtkSMInputArrayDomain::VERTEX;
+        }
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_EDGES)
+        {
+        attributeType = vtkSMInputArrayDomain::EDGE;
+        }
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+        {
+        attributeType = vtkSMInputArrayDomain::ROW;
+        }
       }
     }
 
@@ -199,6 +249,27 @@ int vtkSMInputArrayDomain::IsFieldValid(
        attributeType == vtkSMInputArrayDomain::ANY) )
     {
     isField = this->CheckForArray(arrayInfo, info->GetCellDataInformation());
+    }
+
+  if (!isField &&
+      (attributeType == vtkSMInputArrayDomain::VERTEX||
+       attributeType == vtkSMInputArrayDomain::ANY) )
+    {
+    isField = this->CheckForArray(arrayInfo, info->GetVertexDataInformation());
+    }
+
+  if (!isField &&
+      (attributeType == vtkSMInputArrayDomain::EDGE||
+       attributeType == vtkSMInputArrayDomain::ANY) )
+    {
+    isField = this->CheckForArray(arrayInfo, info->GetEdgeDataInformation());
+    }
+
+  if (!isField &&
+      (attributeType == vtkSMInputArrayDomain::ROW||
+       attributeType == vtkSMInputArrayDomain::ANY) )
+    {
+    isField = this->CheckForArray(arrayInfo, info->GetRowDataInformation());
     }
 
   if (!isField)
@@ -263,25 +334,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
   const char* attribute_type = element->GetAttribute("attribute_type");
   if (attribute_type)
     {
-    if (strcmp(attribute_type, "cell") == 0)
-      {
-      this->SetAttributeType(vtkSMInputArrayDomain::CELL);
-      }
-    else if (strcmp(attribute_type, "point") == 0)
-      {
-      this->SetAttributeType(
-        static_cast<unsigned char>(vtkSMInputArrayDomain::POINT));
-      }
-    else if (strcmp(attribute_type, "any") == 0)
-      {
-      this->SetAttributeType(
-        static_cast<unsigned char>(vtkSMInputArrayDomain::ANY));
-      }
-    else
-      {
-      vtkErrorMacro("Unrecognize attribute type.");
-      return 0;
-      }
+    this->SetAttributeType(attribute_type);
     }
 
   int numComponents;
@@ -296,7 +349,12 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
 //---------------------------------------------------------------------------
 const char* vtkSMInputArrayDomain::GetAttributeTypeAsString()
 {
-  return vtkSMInputArrayDomainAttributeTypes[this->AttributeType];
+  if (this->AttributeType < vtkSMInputArrayDomain::LAST_ATTRIBUTE_TYPE)
+    {
+    return vtkSMInputArrayDomainAttributeTypes[this->AttributeType];
+    }
+
+  return "(invalid)";
 }
 
 //---------------------------------------------------------------------------
@@ -316,7 +374,7 @@ void vtkSMInputArrayDomain::SetAttributeType(const char* type)
       return;
       }
     }
-  vtkErrorMacro("No such attribute type: " << type);
+  vtkErrorMacro("Unrecognized attribute type: " << type);
 }
 
 //---------------------------------------------------------------------------
@@ -325,5 +383,6 @@ void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   
   os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
-  os << indent << "AttributeType: " << this->AttributeType << endl;
+  os << indent << "AttributeType: " << this->AttributeType 
+    << " (" << this->GetAttributeTypeAsString() << ")" << endl;
 }

@@ -16,9 +16,18 @@
 // .SECTION Description
 // vtkSMFieldDataDomain is a sub-class vtkSMEnumerationDomain that looks at 
 // the input in Update() and populates the entry list based on whether
-// there are valid arrays in point or cell data. At most it consists of two
-// entries: ("Point Data", vtkDataSet::POINT_DATA_FIELD) and 
-// ("Cell Data",  vtkDataSet::CELL_DATA_FIELD).
+// there are valid arrays in point/cell/vertex/edge/row data. 
+// At most it consists of two
+// entries: ("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS) and 
+// ("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS) in case of vtkDataSet
+// subclasses 
+// OR
+// ("Vertex Data", vtkDataObject::FIELD_ASSOCIATION_VERTICES) and
+// ("Edge Data", vtkDataObject::FIELD_ASSOCIATION_EDGES) in case of vtkGraph and
+// subclasses 
+// OR
+// ("Row Data", vtkDataObject::FIELD_ASSOCIATION_ROWS) in case of vtkTable and
+// subclasses.
 // It requires Input (vtkSMProxyProperty) property.
 // .SECTION See Also
 // vtkSMEnumerationDomain vtkSMProxyProperty

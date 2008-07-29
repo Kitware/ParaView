@@ -91,6 +91,9 @@ public:
     POINT = 0,
     CELL = 1,
     ANY = 2,
+    VERTEX = 3,
+    EDGE = 4,
+    ROW = 5,
     LAST_ATTRIBUTE_TYPE
   };
 //ETX

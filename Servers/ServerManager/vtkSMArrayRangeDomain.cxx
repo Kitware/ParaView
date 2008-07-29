@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.15");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.16");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -166,6 +166,9 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
     {
     this->SetArrayRange(info->GetPointDataInformation(), arrayName);
     this->SetArrayRange(info->GetCellDataInformation(), arrayName);
+    this->SetArrayRange(info->GetVertexDataInformation(), arrayName);
+    this->SetArrayRange(info->GetEdgeDataInformation(), arrayName);
+    this->SetArrayRange(info->GetRowDataInformation(), arrayName);
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
     {
@@ -174,6 +177,18 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
     {
     this->SetArrayRange(info->GetCellDataInformation(), arrayName);
+    }
+  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::VERTEX)
+    {
+    this->SetArrayRange(info->GetVertexDataInformation(), arrayName);
+    }
+  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::EDGE )
+    {
+    this->SetArrayRange(info->GetEdgeDataInformation(), arrayName);
+    }
+  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ROW)
+    {
+    this->SetArrayRange(info->GetRowDataInformation(), arrayName);
     }
 }
 

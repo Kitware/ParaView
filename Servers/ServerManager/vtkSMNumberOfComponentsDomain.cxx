@@ -25,7 +25,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMNumberOfComponentsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfComponentsDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMNumberOfComponentsDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMNumberOfComponentsDomain::vtkSMNumberOfComponentsDomain()
 {
@@ -145,22 +145,33 @@ void vtkSMNumberOfComponentsDomain::Update(const char* arrayName,
     return;
     }
 
+  int iadAttributeType = iad->GetAttributeType();
   vtkPVArrayInformation* ai = 0;
-  if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ANY )
-    {
-    ai = info->GetPointDataInformation()->GetArrayInformation(arrayName);
-    if (!ai)
-      {
-      ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
-      }
-    }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
+
+  if (iadAttributeType == vtkSMInputArrayDomain::POINT ||
+    iadAttributeType == vtkSMInputArrayDomain::ANY)
     {
     ai = info->GetPointDataInformation()->GetArrayInformation(arrayName);
     }
-  else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
+  else if (iadAttributeType == vtkSMInputArrayDomain::CELL || 
+    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
     {
     ai = info->GetCellDataInformation()->GetArrayInformation(arrayName);
+    }
+  else if (iadAttributeType == vtkSMInputArrayDomain::VERTEX || 
+    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+    {
+    ai = info->GetVertexDataInformation()->GetArrayInformation(arrayName);
+    }
+  else if (iadAttributeType == vtkSMInputArrayDomain::EDGE || 
+    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+    {
+    ai = info->GetEdgeDataInformation()->GetArrayInformation(arrayName);
+    }
+  else if (iadAttributeType == vtkSMInputArrayDomain::ROW || 
+    (iadAttributeType == vtkSMInputArrayDomain::ANY && !ai))
+    {
+    ai = info->GetRowDataInformation()->GetArrayInformation(arrayName);
     }
 
   if (ai)

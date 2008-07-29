@@ -102,9 +102,12 @@ public:
   vtkGetObjectMacro(PointArrayInformation,vtkPVArrayInformation);
 
   // Description:
-  // Access to information about point and cell data.
-  vtkGetObjectMacro(PointDataInformation,vtkPVDataSetAttributesInformation);
-  vtkGetObjectMacro(CellDataInformation,vtkPVDataSetAttributesInformation);
+  // Access to information about point/cell/vertex/edge/row data.
+  vtkGetObjectMacro(PointDataInformation, vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(CellDataInformation, vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(VertexDataInformation, vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(EdgeDataInformation, vtkPVDataSetAttributesInformation);
+  vtkGetObjectMacro(RowDataInformation, vtkPVDataSetAttributesInformation);
 
   // Description:
   // Accesse to information about field data, if any.
@@ -186,6 +189,9 @@ protected:
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
   vtkPVDataSetAttributesInformation* FieldDataInformation;
+  vtkPVDataSetAttributesInformation* VertexDataInformation;
+  vtkPVDataSetAttributesInformation* EdgeDataInformation;
+  vtkPVDataSetAttributesInformation* RowDataInformation;
 
   vtkPVCompositeDataInformation* CompositeDataInformation;
 

@@ -47,7 +47,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.56");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -66,6 +66,9 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CellDataInformation = vtkPVDataSetAttributesInformation::New();
   this->FieldDataInformation = vtkPVDataSetAttributesInformation::New();
+  this->VertexDataInformation = vtkPVDataSetAttributesInformation::New();
+  this->EdgeDataInformation = vtkPVDataSetAttributesInformation::New();
+  this->RowDataInformation = vtkPVDataSetAttributesInformation::New();
   this->CompositeDataInformation = vtkPVCompositeDataInformation::New();
   this->PointArrayInformation = vtkPVArrayInformation::New();
 
@@ -87,6 +90,12 @@ vtkPVDataInformation::~vtkPVDataInformation()
   this->CellDataInformation = NULL;
   this->FieldDataInformation->Delete();
   this->FieldDataInformation = NULL;
+  this->VertexDataInformation->Delete();
+  this->VertexDataInformation = NULL;
+  this->EdgeDataInformation->Delete();
+  this->EdgeDataInformation = NULL;
+  this->RowDataInformation->Delete();
+  this->RowDataInformation = NULL;
   this->CompositeDataInformation->Delete();
   this->CompositeDataInformation = NULL;
   this->PointArrayInformation->Delete();
@@ -120,6 +129,12 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   this->PointDataInformation->PrintSelf(os, i2);
   os << indent << "CellDataInformation " << endl;
   this->CellDataInformation->PrintSelf(os, i2);
+  os << indent << "VertexDataInformation" << endl;
+  this->VertexDataInformation->PrintSelf(os, i2);
+  os << indent << "EdgeDataInformation" << endl;
+  this->EdgeDataInformation->PrintSelf(os, i2);
+  os << indent << "RowDataInformation" << endl;
+  this->RowDataInformation->PrintSelf(os, i2);
   os << indent << "FieldDataInformation " << endl;
   this->FieldDataInformation->PrintSelf(os, i2);
   os << indent << "CompositeDataInformation " << endl;
@@ -154,6 +169,9 @@ void vtkPVDataInformation::Initialize()
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
   this->CellDataInformation->Initialize();
+  this->VertexDataInformation->Initialize();
+  this->EdgeDataInformation->Initialize();
+  this->RowDataInformation->Initialize();
   this->FieldDataInformation->Initialize();
   this->CompositeDataInformation->Initialize();
   this->PointArrayInformation->Initialize();
@@ -200,6 +218,9 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo,
   // Copy attribute information.
   this->PointDataInformation->DeepCopy(dataInfo->GetPointDataInformation());
   this->CellDataInformation->DeepCopy(dataInfo->GetCellDataInformation());
+  this->VertexDataInformation->DeepCopy(dataInfo->GetVertexDataInformation());
+  this->EdgeDataInformation->DeepCopy(dataInfo->GetEdgeDataInformation());
+  this->RowDataInformation->DeepCopy(dataInfo->GetRowDataInformation());
   this->FieldDataInformation->DeepCopy(dataInfo->GetFieldDataInformation());
   if (copyCompositeInformation)
     {
@@ -478,8 +499,8 @@ void vtkPVDataInformation::CopyFromGraph(vtkGraph* data)
   this->NumberOfPoints = data->GetNumberOfVertices();
   this->NumberOfRows = 0;
 
-  this->PointDataInformation->CopyFromFieldData(data->GetVertexData());
-  this->CellDataInformation->CopyFromFieldData(data->GetEdgeData());
+  this->VertexDataInformation->CopyFromFieldData(data->GetVertexData());
+  this->EdgeDataInformation->CopyFromFieldData(data->GetEdgeData());
 }
 
 //----------------------------------------------------------------------------
@@ -496,8 +517,7 @@ void vtkPVDataInformation::CopyFromTable(vtkTable* data)
   this->NumberOfPoints = 0;
   this->NumberOfRows = data->GetNumberOfRows();
 
-  // Copy Point Data information
-  this->PointDataInformation->CopyFromFieldData(data->GetRowData());
+  this->RowDataInformation->CopyFromFieldData(data->GetRowData());
 }
 
 //----------------------------------------------------------------------------
@@ -735,6 +755,9 @@ void vtkPVDataInformation::AddInformation(
   this->PointArrayInformation->AddInformation(info->GetPointArrayInformation());
   this->PointDataInformation->AddInformation(info->GetPointDataInformation());
   this->CellDataInformation->AddInformation(info->GetCellDataInformation());
+  this->VertexDataInformation->AddInformation(info->GetVertexDataInformation());
+  this->EdgeDataInformation->AddInformation(info->GetEdgeDataInformation());
+  this->RowDataInformation->AddInformation(info->GetRowDataInformation());
   this->FieldDataInformation->AddInformation(info->GetFieldDataInformation());
 //  this->GenericAttributesInformation->AddInformation(info->GetGenericAttributesInformation());
 
@@ -951,6 +974,24 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
   dcss.GetData(&data, &length);
   *css << vtkClientServerStream::InsertArray(data, length);
 
+  dcss.Reset();
+
+  this->VertexDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
+
+  dcss.Reset();
+
+  this->EdgeDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
+
+  dcss.Reset();
+
+  this->RowDataInformation->CopyToStream(&dcss);
+  dcss.GetData(&data, &length);
+  *css << vtkClientServerStream::InsertArray(data, length);
+
   *css << this->CompositeDataClassName;
   *css << this->CompositeDataSetType;
 
@@ -1109,6 +1150,54 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     }
   dcss.SetData(&*data.begin(), length);
   this->CellDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
+
+  // Vertex data array information.
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
+    {
+    vtkErrorMacro("Error parsing length of cell data information.");
+    return;
+    }
+  data.resize(length);
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing cell data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
+  this->VertexDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
+
+  // Edge data array information.
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
+    {
+    vtkErrorMacro("Error parsing length of cell data information.");
+    return;
+    }
+  data.resize(length);
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing cell data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
+  this->EdgeDataInformation->CopyFromStream(&dcss);
+  CSS_GET_CUR_INDEX()++;
+
+  // Row data array information.
+  if(!css->GetArgumentLength(0, CSS_GET_CUR_INDEX(), &length))
+    {
+    vtkErrorMacro("Error parsing length of cell data information.");
+    return;
+    }
+  data.resize(length);
+  if(!css->GetArgument(0, CSS_GET_CUR_INDEX(), &*data.begin(), length))
+    {
+    vtkErrorMacro("Error parsing cell data information.");
+    return;
+    }
+  dcss.SetData(&*data.begin(), length);
+  this->RowDataInformation->CopyFromStream(&dcss);
   CSS_GET_CUR_INDEX()++;
 
   const char* compositedataclassname = 0;
