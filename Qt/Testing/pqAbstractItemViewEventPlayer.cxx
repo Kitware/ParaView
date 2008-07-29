@@ -143,6 +143,7 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
       else
         {
         QModelIndex idx = GetIndex(object, args[5]);
+        object->scrollTo(idx);
         QRect r = object->visualRect(idx);
         pt = r.topLeft() + QPoint(x,y);
         }
