@@ -4875,7 +4875,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         label="Maximum Step Length"
         command="SetMaximumIntegrationStep"
         number_of_elements="1"
-        default_values="0.01" >
+        default_values="0.5" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
          If using the Runge-Kutta 4-5 ingrator (IntegratorType property), this property specifies the minimum integration step.
