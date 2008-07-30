@@ -37,7 +37,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkTimeSeriesWriter);
-vtkCxxRevisionMacro(vtkTimeSeriesWriter, "1.1");
+vtkCxxRevisionMacro(vtkTimeSeriesWriter, "1.2");
 
 vtkCxxSetObjectMacro(vtkTimeSeriesWriter,Writer,vtkAlgorithm);
 
@@ -168,18 +168,21 @@ vtkRectilinearGrid* vtkTimeSeriesWriter::AppendBlocks(vtkCompositeDataSet* cds)
     output->SetZCoordinates(tmp);
     tmp->Delete();
     output->GetPointData()->ShallowCopy(appended->GetPointData());
-    vtkDataArray* pts = appended->GetPoints()->GetData();
-    if (pts->GetName())
+    if (appended->GetPoints())
       {
-      output->GetPointData()->AddArray(pts);
-      }
-    else
-      {
-      vtkDataArray* newpts = pts->NewInstance();
-      newpts->DeepCopy(pts);
-      newpts->SetName("Positions");
-      output->GetPointData()->AddArray(newpts);
-      newpts->Delete();
+      vtkDataArray* pts = appended->GetPoints()->GetData();
+      if (pts->GetName())
+        {
+        output->GetPointData()->AddArray(pts);
+        }
+      else
+        {
+        vtkDataArray* newpts = pts->NewInstance();
+        newpts->DeepCopy(pts);
+        newpts->SetName("Positions");
+        output->GetPointData()->AddArray(newpts);
+        newpts->Delete();
+        }
       }
     }
   return output;
