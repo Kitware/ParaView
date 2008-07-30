@@ -49,9 +49,10 @@
 #include "vtkCTHFragmentIdList.h"
 // Io/Ipc
 #include "vtkCTHFragmentCommBuffer.h"
-// Filters
+// Filters etc...
 #include "vtkCutter.h"
 #include "vtkImplicitFunction.h"
+#include "vtkPlane.h"
 // STL
 #include "vtksys/ios/sstream"
 using vtksys_ios::ostringstream;
@@ -65,7 +66,7 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.6");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.7");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
 
 //----------------------------------------------------------------------------
@@ -522,10 +523,30 @@ void vtkCTHFragmentIntersect::ComputeGeometricAttributes()
     // intilize to (bool)0 not split. All local ops 
     // on fragments check here. It's coppied to geometry.
     intersectSplitMarker.resize(nLocal,0);
-
     // Size the attribute arrays
     this->IntersectionCenters[blockId]->SetNumberOfComponents(3);
     this->IntersectionCenters[blockId]->SetNumberOfTuples(nLocal);
+    // Prepare for projection onto the cut function
+    double r0[3],N[3];
+    vtkPlane *plane
+      = dynamic_cast<vtkPlane *>(this->CutFunction);
+    if (plane!=0)
+      {
+      // Get a point on the plane and its
+      // unit normal.
+      plane->GetOrigin(r0);
+      plane->GetNormal(N);
+      double modN=0;
+      for (int q=0; q<3; ++q)
+        {
+        modN+=N[q]*N[q];
+        }
+      modN=sqrt(modN);
+      for (int q=0; q<3; ++q)
+        {
+        N[q]=N[q]/modN;
+        }
+      }
 
     if (nProcs==1)
       {
@@ -688,7 +709,6 @@ void vtkCTHFragmentIntersect::ComputeGeometricAttributes()
 
       // Brodcast the transaction matrix
       TM.Broadcast(comm, controllingProcId);
-
       // Prepare for inverse look of of fragment ids
       vtkCTHFragmentIdList idList;
       idList.Initialize(this->IntersectionIds[blockId],true);
@@ -824,6 +844,19 @@ void vtkCTHFragmentIntersect::ComputeGeometricAttributes()
               {
               aabbCen[q]=(aabb[k]+aabb[k+1])/2.0;
               }
+            // project back onto the plane
+            if (plane!=0)
+              {
+              double d=0;
+              for (int q=0; q<3; ++q)
+                {
+                d+=N[q]*(aabbCen[q]-r0[q]);
+                }
+              for (int q=0; q<3; ++q)
+                {
+                aabbCen[q]-=N[q]*d;
+                }
+              }
 
             // send attributes back to piece owners
             for (int i=0; i<nTransactions; ++i)
@@ -882,6 +915,19 @@ void vtkCTHFragmentIntersect::ComputeGeometricAttributes()
       for (int q=0,k=0; q<3; ++q, k+=2)
         {
         pCoaabb[q]=(aabb[k]+aabb[k+1])/2.0;
+        }
+      // project back onto the plane
+      if (plane!=0)
+        {
+        double d=0;
+        for (int q=0; q<3; ++q)
+          {
+          d+=N[q]*(pCoaabb[q]-r0[q]);
+          }
+        for (int q=0; q<3; ++q)
+          {
+          pCoaabb[q]-=N[q]*d;
+          }
         }
       pCoaabb+=3;
       }// fragment traversal
@@ -1105,7 +1151,6 @@ int vtkCTHFragmentIntersect::CleanUpAfterCollectGeometricAttributes(
 //
 // return 0 on error.
 int vtkCTHFragmentIntersect::PrepareToMergeGeometricAttributes(
-                vector<vector<vtkDoubleArray *> > &centers,
                 vector<vector<int> >&unique)
 {
   // 
@@ -1151,7 +1196,7 @@ int vtkCTHFragmentIntersect::GatherGeometricAttributes(
     this->CollectGeometricAttributes(buffers,centers,ids);
     // merge
     vector<vector<int> >unique;
-    this->PrepareToMergeGeometricAttributes(centers,unique);
+    this->PrepareToMergeGeometricAttributes(unique);
     vector<int> mergedIdx(this->NBlocks,0);// counts merged so far
     for (int procId=0; procId<nProcs; ++procId)
       {

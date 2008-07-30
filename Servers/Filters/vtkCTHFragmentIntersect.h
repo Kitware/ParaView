@@ -112,7 +112,6 @@ protected:
           vtkstd::vector<vtkstd::vector<int *> >&ids);
   // size local copy to hold all.
   int PrepareToMergeGeometricAttributes(
-          vtkstd::vector<vtkstd::vector<vtkDoubleArray *> >&centers,
           vtkstd::vector<vtkstd::vector<int> >&unique);
   // Gather geometric attributes on a single process.
   int GatherGeometricAttributes(const int recipientProcId);
