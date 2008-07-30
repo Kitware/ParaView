@@ -483,6 +483,104 @@ string GetMemoryUsage(int pid, int line, int procId)
 
   return memoryUsage.str();
 }
+
+template<class T>
+void writeTuple(ostream &sout,T *tup, int nComp)
+{
+  if (nComp==1)
+    {
+    sout << tup[0];
+    }
+  else
+    {
+    sout << "(" << tup[0];
+    for (int q=1; q<nComp; ++q)
+      {
+      sout << ", " << tup[q];
+      }
+    sout << ")";
+    }
+}
+//
+ostream &operator<<(ostream &sout, vtkDoubleArray &da)
+{
+  sout << "Name:          " << da.GetName() << endl;
+
+  int nTup = da.GetNumberOfTuples();
+  int nComp = da.GetNumberOfComponents();
+
+  sout << "NumberOfComps: " << nComp << endl;
+  sout << "NumberOfTuples:" << nTup << endl;
+  if (nTup==0)
+    {
+    sout << "{}" << endl;
+    }
+  else
+    {
+    sout << "{";
+    double *thisTup=da.GetTuple(0);
+    writeTuple(sout, thisTup, nComp);
+    for (int i=1; i<nTup; ++i)
+      {
+      thisTup=da.GetTuple(i);
+      sout << ", ";
+      writeTuple(sout, thisTup, nComp);
+      }
+    sout << "}" << endl;
+    }
+  return sout;
+}
+//
+ostream &operator<<(ostream &sout, vector<vtkDoubleArray *> &vda)
+{
+  int nda=vda.size();
+  for (int i=0; i<nda; ++i)
+    {
+    sout << "[" << i << "]\n" << *vda[i] << endl;
+    }
+  return sout;
+}
+//
+ostream &operator<<(ostream &sout, vector<vector<int> >&vvi)
+{
+  int nv=vvi.size();
+  for (int i=0; i<nv; ++i)
+    {
+    sout << "[" << i << "]{";
+    int ni=vvi[i].size();
+    if (ni<1) 
+      {
+      sout << "}" << endl;
+      continue;
+      }
+    sout << vvi[i][0];
+    for (int j=1; j<ni; ++j)
+      {
+      sout << "," << vvi[i][j];
+      }
+    sout << "}" << endl;
+    }
+  return sout;
+}
+//
+ostream &operator<<(ostream &sout, vector<int> &vi)
+{
+  sout << "{";
+  int ni=vi.size();
+  if (ni<1) 
+    {
+    sout << "}";
+    return sout;
+    }
+  sout << vi[0];
+  for (int j=1; j<ni; ++j)
+    {
+    sout << "," << vi[j];
+    }
+  sout << "}";
+
+  return sout;
+}
 // //
 // ostream &operator<<(ostream &sout, vtkDoubleArray &da)
 // {
@@ -575,5 +673,6 @@ void PrintHistogram(vector<TCnt> &bins)
   PrintHistogram(bins,binIds);
   return;
 }
+
 };
 #endif

@@ -35,7 +35,7 @@
 #include "vtkMultiPieceDataSet.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkAMRBox.h"
-// Arrays & Containers
+// Data types, Arrays & Containers
 #include "vtkDataObject.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -47,7 +47,15 @@
 #include "vtkCellData.h"
 #include "vtkCollection.h"
 #include "vtkPointAccumulator.hxx"
-// IO
+#include "vtkCTHFragmentPieceLoading.h"
+#include "vtkCTHFragmentProcessLoading.h"
+#include "vtkCTHFragmentProcessPriorityQueue.h"
+#include "vtkCTHFragmentProcessRing.h"
+#include "vtkCTHFragmentToProcMap.h"
+#include "vtkCTHFragmentPieceTransaction.h"
+#include "vtkCTHFragmentPieceTransactionMatrix.h"
+#include "vtkCTHFragmentIdList.h"
+// IO & IPC
 #include "vtkDataSetWriter.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkCTHFragmentCommBuffer.h"
@@ -72,7 +80,9 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.73");
+#undef vtkCTHFragmentConnectDEBUG
+
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.74");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -178,1265 +188,6 @@ vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 //============================================================================
 
-/**
-Description:
-Data structure that describes a fragments loading.
-Holds its id and its loading factor.
-*/
-class vtkCTHFragmentPieceLoading
-{
-  public:
-    enum {ID=0,LOADING=1,SIZE=2};
-    vtkCTHFragmentPieceLoading(){ this->Initialize(-1,0); }
-    ~vtkCTHFragmentPieceLoading(){ this->Initialize(-1,0); }
-    void Initialize(int id, vtkIdType loading)
-    {
-      this->Data[ID]=id;
-      this->Data[LOADING]=loading;
-    }
-    // Description:
-    // Place into a buffer (id, loading)
-    void Pack(vtkIdType *buf)
-    {
-      buf[ID]=this->Data[ID];
-      buf[LOADING]=this->Data[LOADING];
-    }
-    // Description:
-    // Initialize from a buffer (id, loading)
-    void UnPack(vtkIdType *buf)
-    {
-      this->Data[ID]=buf[ID];
-      this->Data[LOADING]=buf[LOADING];
-    }
-    // Description:
-    // Set/Get
-    int GetId() const{ return this->Data[ID]; }
-    vtkIdType GetLoading() const{ return this->Data[LOADING]; }
-    void SetLoading(vtkIdType loading){ this->Data[LOADING]=loading; }
-    // Description:
-    // Adds to laoding and returns the updated loading.
-    vtkIdType UpdateLoading(vtkIdType update)
-    {
-      assert("Update would make loading negative."
-             && (this->Data[LOADING]+update)>=0);
-      return this->Data[LOADING]+=update;
-    }
-    // Description:
-    // Comparision are made by id.
-    bool operator<(const vtkCTHFragmentPieceLoading &other) const
-    {
-      return this->Data[ID]<other.Data[ID];
-    }
-    bool operator==(const vtkCTHFragmentPieceLoading &other) const
-    {
-      return this->Data[ID]==other.Data[ID];
-    }
-  private:
-    vtkIdType Data[SIZE];
-};
-//
-ostream &operator<<(ostream &sout, vtkCTHFragmentPieceLoading &fp)
-{
-  sout << "(" << fp.GetId() << "," << fp.GetLoading() << ")";
-
-  return sout;
-}
-//
-ostream &operator<<(ostream &sout, 
-  vector<vector<vtkCTHFragmentPieceLoading> > &pla)
-{
-  int nProcs=pla.size();
-  for (int procId=0; procId<nProcs; ++procId)
-    {
-    cerr << "Fragment loading on process " << procId << ":" << endl;
-    int nLocalFragments=pla[procId].size();
-    for (int fragmentIdx=0; fragmentIdx<nLocalFragments; ++fragmentIdx)
-      {
-      sout << pla[procId][fragmentIdx] << ", ";
-      }
-    sout << endl;
-    }
-  return sout;
-}
-//
-void PrintPieceLoadingHistogram(
-   vector<vector<vtkIdType> > &pla)
-{
-//   cerr << "loading array:" <<endl;
-//   cerr << pla << endl;
-
-  int nProcs=pla.size();
-  // get min and max loading
-  vtkIdType minLoading=(vtkIdType)1<<((sizeof(vtkIdType)*8)-2);
-  vtkIdType maxLoading=0;
-  for (int procId=0; procId<nProcs; ++procId)
-    {
-    int nPieces=pla[procId].size();
-    for (int pieceId=0; pieceId<nPieces; ++pieceId)
-      {
-      vtkIdType loading=pla[procId][pieceId];
-      if (loading>0 
-          && minLoading>loading)
-        {
-        minLoading=loading;
-        }
-      if (maxLoading<loading)
-        {
-        maxLoading=loading;
-        }
-      }
-    }
-  // generate histogram
-  const vtkIdType nBins=40;
-  const vtkIdType binWidth=(maxLoading-minLoading)/nBins;
-  const vtkIdType r=(maxLoading-minLoading)%nBins;
-  vector<int> hist(nBins,0);
-  for (int procId=0; procId<nProcs; ++procId)
-    {
-    int nPieces=pla[procId].size();
-    for (int pieceId=0; pieceId<nPieces; ++pieceId)
-      {
-      vtkIdType loading=pla[procId][pieceId];
-      if (loading==0) 
-        {
-        continue;
-        }
-      for (int binId=0; binId<nBins; ++binId)
-        {
-        vtkIdType binTop=minLoading+(binId+1)*binWidth+binId*r;
-        if (loading<=binTop)
-          {
-          ++hist[binId];
-          break;
-          }
-        }
-      }
-    }
-  // generate bin ids
-  vector<vtkIdType> binIds(nBins);
-  for (int binId=0; binId<nBins; ++binId)
-    {
-    binIds[binId]=static_cast<int>(minLoading+(binId+1)*binWidth);
-    }
-  // print
-  cerr << "minLoading: " << minLoading << endl;
-  cerr << "maxLoading: " << maxLoading << endl;
-  cerr << "binWidth:   " << binWidth << endl;
-  cerr << "nBins:      " << nBins << endl;
-  PrintHistogram(hist,binIds);
-}
-
-/**
-Type to represent a node in a multiprocess job
-and its current loading state.
-*/
-class vtkCTHFragmentProcessLoading
-{
-  public:
-    enum {ID=0, LOADING=1, SIZE=2};
-    vtkCTHFragmentProcessLoading(){ this->Initialize(-1,0); }
-    //
-    ~vtkCTHFragmentProcessLoading(){ this->Initialize(-1,0); }
-    //
-    void Initialize(int id, vtkIdType loadFactor)
-    {
-      this->Data[ID]=id;
-      this->Data[LOADING]=loadFactor;
-    }
-    //
-    bool operator<(const vtkCTHFragmentProcessLoading &rhs) const
-    {
-      return this->Data[LOADING]<rhs.Data[LOADING];
-    }
-    //
-    bool operator>(const vtkCTHFragmentProcessLoading &rhs) const
-    {
-      return this->Data[LOADING]>rhs.Data[LOADING];
-    }
-    //
-    int GetId() const{ return this->Data[ID]; }
-    //
-    vtkIdType GetLoadFactor() const{ return this->Data[LOADING]; }
-    //
-    vtkIdType UpdateLoadFactor(vtkIdType loadFactor)
-    {
-      assert("Update would make loading negative."
-             && (this->Data[LOADING]+loadFactor)>=0);
-      return this->Data[LOADING]+=loadFactor;
-    }
-  private:
-    vtkIdType Data[SIZE];
-};
-//
-ostream &operator<<(ostream &sout, vtkCTHFragmentProcessLoading &fp)
-{
-  sout << "(" << fp.GetId() << "," << fp.GetLoadFactor() << ")";
-
-  return sout;
-}
-
-/**
-Minimum ordered heap based priority queue.
-
-Particular to this application:
-1) Queue size is static and given by the number of processes.
-
-Usage:
-  vtkCTHFragmentProcessPriorityQueue Q;
-  Q.Initialize(3);
-  vtkCTHFragmentProcessLoading *H = Q.GetHeap();
-  H[1].Initialize(0,'A');
-  H[2].Initialize(1,'S');
-  H[3].Initialize(2,'O');
-  ...
-  Q.InitialHeapify();
-  ...
-  recip=Q.AssignFragmentToProcess('C');
-  Q.UpdateProcessLoadFactor(donor,-'A');
-  ...
-Caveates:
-Heap indexing is 1 based.
-*/
-class vtkCTHFragmentProcessPriorityQueue
-{
-  public:
-    // Description:
-    // Allocate resources and set to an empty un-intialized state.
-    vtkCTHFragmentProcessPriorityQueue();
-    // Description:
-    // Free resources and set to an un-intialized state.
-    ~vtkCTHFragmentProcessPriorityQueue();
-    // Description:
-    // Allocate resources and set to an empty but intialized state.
-    vtkCTHFragmentProcessPriorityQueue(int nProcs);
-    // Description:
-    // Allocate resources and set to an empty but intialized state.
-    void Initialize(int nProcs);
-    // Description:
-    // Free all resources and return to un-initialized state.
-    void Clear();
-    // Description:
-    // Determine if there are any elements on the heap.
-    bool Empty()
-    {
-      return this->EOH<=1;
-    }
-    // Description:
-    // Get the heap array for direct manipulations.
-    vtkCTHFragmentProcessLoading *GetHeap(){ return this->Heap; }
-    // Description:
-    // Get process location within the heap.
-    vector<int> &GetProcLocations(){ return this->ProcLocation; }
-    // Description:
-    // Assigns a fragment to the next available
-    // node, returns the node id. Updates the heap
-    // oredering according to the adjusted loadFactor.
-    int AssignFragmentToProcess(vtkIdType loadFactor);
-    //Description:
-    // Update the given processes load factor. Updates
-    // the heap order accordingly.
-    void UpdateProcessLoadFactor(int procId, vtkIdType loadFactor);
-    // Description:
-    // Remove the item at the top of the heap.
-    vtkCTHFragmentProcessLoading &Pop();
-    // Description:
-    // Print the heap
-    void Print(/*ostream &sout*/);
-    void PrintProcessLoading();
-    // Description:
-    // Sum loading across all processes.
-    vtkIdType GetTotalLoading();
-    // Description:
-    // Enforce heap ordering on the entire heap,
-    // If the heap is set rather than built by repetitive
-    // insertion this will be needed.
-    void InitialHeapify();
-    // Description:
-    // Strating at the given node, restore the heap
-    // ordering from top to bottom.
-    void HeapifyTopDown(int nodeId);
-    // Description:
-    // Strating at the given node, restore the heap
-    // ordering from bottom to top.
-    void HeapifyBottomUp(int nodeId);
-  private:
-    // Under the hood the heap is a
-    // binary tree and thus we want
-    // its size to be a power of 2.
-    unsigned int ComputeHeapSize(unsigned int nItems);
-    // Exchange two heap items via copy.
-    void Exchange(vtkCTHFragmentProcessLoading &a,
-                  vtkCTHFragmentProcessLoading &b)
-    {
-      vtkCTHFragmentProcessLoading t(a);
-      a=b;
-      b=t;
-    }
-    // Exchange record of two item's position's
-    void Exchange(int aProcId, int bProcId)
-    {
-      int tLocation=this->ProcLocation[aProcId];
-      this->ProcLocation[aProcId]=this->ProcLocation[bProcId];
-      this->ProcLocation[bProcId]=tLocation;
-    }
-    //
-    int NProcs;                // Size of data in the heap.
-    vtkCTHFragmentProcessLoading *Heap; // minimum ordered heap
-    int HeapSize;              // Memory used by heap(power of 2)
-    int EOH;                   // end of heap
-    vector<int> ProcLocation;  // index of a proc's location in the heap.
-};
-
-//
-vtkCTHFragmentProcessPriorityQueue::vtkCTHFragmentProcessPriorityQueue()
-{
-  this->NProcs=0;
-  this->Heap=0;
-  this->HeapSize=0;
-  this->EOH=0;
-}
-//
-vtkCTHFragmentProcessPriorityQueue::~vtkCTHFragmentProcessPriorityQueue()
-{
-  this->Clear();
-}
-//
-vtkCTHFragmentProcessPriorityQueue::vtkCTHFragmentProcessPriorityQueue(
-                                                             int nProcs)
-{
-  this->Initialize(nProcs); 
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::Initialize(int nProcs)
-{
-  assert("Queue is sized statically and must have at least one proccess."
-          && nProcs>0);
-
-  this->Clear();
-  this->EOH=nProcs+1;
-  this->HeapSize=this->ComputeHeapSize(nProcs+1);
-  this->Heap
-    = new vtkCTHFragmentProcessLoading[this->HeapSize];
-  this->NProcs=nProcs;
-  this->ProcLocation.resize(this->NProcs,0);
-  this->Heap[0].Initialize(-1,0);
-  for (int i=1;i<this->EOH; ++i)
-    {
-    this->Heap[i].Initialize(i-1,0);
-    this->ProcLocation[i-1]=i;
-    }
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::Clear()
-{
-  if (this->HeapSize>0)
-    {
-    delete [] this->Heap;
-    this->Heap=0;
-    }
-  this->HeapSize=0;
-  this->EOH=0;
-  this->NProcs=0;
-  this->ProcLocation.clear();
-}
-//
-int vtkCTHFragmentProcessPriorityQueue::AssignFragmentToProcess(
-                                                  vtkIdType loadFactor)
-{
-  int asignedToId=this->Heap[1].GetId();
-  this->Heap[1].UpdateLoadFactor(loadFactor);
-  this->HeapifyTopDown(1);
-  return asignedToId;
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::UpdateProcessLoadFactor(
-                                                  int procId,
-                                                  vtkIdType loadFactor)
-{
-  int idx=this->ProcLocation[procId];
-  this->Heap[idx].UpdateLoadFactor(loadFactor);
-  this->HeapifyBottomUp(idx);
-}
-//
-vtkCTHFragmentProcessLoading &vtkCTHFragmentProcessPriorityQueue::Pop()
-{
-  assert("Queue is empty." && this->EOH>1);
-
-  this->Exchange(this->Heap[1], this->Heap[this->EOH-1]);
-  this->Exchange(this->Heap[1].GetId(), this->Heap[this->EOH-1].GetId());
-  --this->EOH;
-  this->HeapifyTopDown(1);
-
-  return this->Heap[this->EOH];
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::Print(/*ostream &sout*/)
-{
-  ostream &sout=cerr;
-
-  if (this->EOH<1)
-    {
-    sout << "The heap is empty." << endl;
-    return;
-    }
-  //
-  int p=1;
-  while(1)
-    {
-    int beg=1<<(p-1);
-    int end=1<<p;
-    for (int i=beg; i<end; ++i)
-      {
-      if ( i==this->EOH )
-        {
-        sout << "  EOH";
-        return;
-        }
-      sout << this->Heap[i] << ", ";
-      }
-     sout << (char)0x08 << (char)0x08 << endl;
-     ++p;
-    }
-}
-//
-void 
-vtkCTHFragmentProcessPriorityQueue::PrintProcessLoading(
-  /*ostream &sout*/)
-{
-  ostream &sout=cerr;
-
-  if (this->EOH<1)
-    {
-    sout << "The heap is empty." << endl;
-    return;
-    }
-  for (int heapItemIdx=1; heapItemIdx<=this->NProcs; ++heapItemIdx)
-    {
-    sout << this->Heap[heapItemIdx] << endl;
-    }
-}
-//
-vtkIdType
-vtkCTHFragmentProcessPriorityQueue::GetTotalLoading()
-{
-  vtkIdType totalLoading=0;
-
-  if (this->EOH<1)
-    {
-    return 0;
-    }
-  for (int heapItemIdx=1; heapItemIdx<=this->NProcs; ++heapItemIdx)
-    {
-    totalLoading+=this->Heap[heapItemIdx].GetLoadFactor();
-    }
-  return totalLoading;
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::InitialHeapify()
-{
-  for (int i=this->EOH/2; i>=1; --i)
-    {
-    this->HeapifyTopDown(i);
-    }
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::HeapifyBottomUp(int nodeId)
-{
-  int parentNodeId=nodeId/2;
-  while( nodeId>1
-         && this->Heap[parentNodeId]>this->Heap[nodeId] )
-    {
-    this->Exchange(this->Heap[parentNodeId],this->Heap[nodeId]);
-    this->Exchange(this->Heap[parentNodeId].GetId(), this->Heap[nodeId].GetId());
-    nodeId=parentNodeId;
-    parentNodeId/=2;
-    }
-}
-//
-void vtkCTHFragmentProcessPriorityQueue::HeapifyTopDown(int nodeId)
-{
-  while( 2*nodeId<this->EOH )
-    {
-    int childNodeId=2*nodeId;
-    // get the smaller of the two children, 
-    // without going off the end of the heap
-    if (childNodeId+1<this->EOH 
-        && this->Heap[childNodeId+1]<this->Heap[childNodeId])
-      {
-      ++childNodeId;
-      }
-    // if heap condition satsified then stop
-    if (this->Heap[nodeId]<this->Heap[childNodeId])
-      {
-      break;
-      }
-    // restore heap condition at this depth
-    this->Exchange(this->Heap[nodeId], this->Heap[childNodeId]);
-    this->Exchange(this->Heap[nodeId].GetId(), this->Heap[childNodeId].GetId());
-    // go down a level
-    nodeId=childNodeId;
-    }
-}
-// Returns the nearest power of 2 larger.
-unsigned int vtkCTHFragmentProcessPriorityQueue::ComputeHeapSize(unsigned int nItems)
-{
-  unsigned int bitsPerInt=sizeof(unsigned int)*8;
-  unsigned int size=1;
-  unsigned int i=0;
-  for (; i<bitsPerInt-1; ++i)
-    {
-    size<<=1;
-    if (size>=nItems)
-      {
-      break;
-      }
-    }
-  assert("Too many items requested."
-         && i!=bitsPerInt-1);
-
-  return size;
-}
-
-/**
-Data structure used to distribute work amongst available
-processes. The buffer is to intialized from a process
-priority queue such that only those processes with loading
-less than a specified tolerance are included.
-*/
-class vtkCTHFragmentProcessRingBuffer
-{
-  public:
-    // Description:
-    vtkCTHFragmentProcessRingBuffer()
-    {
-      this->Clear();
-    }
-    // Description:
-    ~vtkCTHFragmentProcessRingBuffer()
-    {
-      this->Clear();
-    }
-    // Description:
-    void Clear()
-    {
-      this->NextElement=0;
-      this->BufferSize=0;
-      this->Buffer.clear();
-    }
-    // Description:
-    // Size buffer and point to first element.
-    void Initialize(int nProcs)
-    {
-      this->NextElement=0;
-      this->BufferSize=nProcs;
-      this->Buffer.resize(nProcs);
-    }
-    // Description:
-    // Build from a process loading priority queue.
-    void Initialize(
-        vtkCTHFragmentProcessPriorityQueue &Q,
-        vtkIdType upperLoadingBound)
-    {
-      this->NextElement=0;
-      this->BufferSize=0;
-
-      // check that upper bound does not exclude
-      // all processes.
-      vtkCTHFragmentProcessLoading &pl=Q.Pop();
-      vtkIdType minimumLoading=pl.GetLoadFactor();
-
-      // Make sure at least one process can be used.
-      if (upperLoadingBound!=-1
-          && minimumLoading>upperLoadingBound)
-        {
-        upperLoadingBound=minimumLoading;
-        cerr << "vtkCTHFragmentProcessRingBuffer "
-             << "[" << __LINE__ << "] "
-             << "Error: Upper loading bound excludes all processes."
-             << endl;
-        }
-
-      // Build ring of process ids.
-      this->Buffer.push_back(pl.GetId());
-      ++this->BufferSize;
-      while (!Q.Empty())
-        {
-        pl=Q.Pop();
-        if (upperLoadingBound!=-1
-            && pl.GetLoadFactor()>upperLoadingBound)
-          {
-          break;
-          }
-        this->Buffer.push_back(pl.GetId());
-        ++this->BufferSize;
-        }
-    }
-    // Description:
-    // Get the next process id from the ring.
-    int GetNextId()
-    {
-      int id=this->Buffer[this->NextElement];
-      ++this->NextElement;
-      if (this->NextElement==this->BufferSize)
-        {
-        this->NextElement=0;
-        }
-      return id;
-    }
-    // Description:
-    void Print()
-    {
-      int n=this->Buffer.size();
-      if (n==0)
-        {
-        cerr << "{}";
-        return;
-        }
-      cerr << "{" << this->Buffer[0];
-      for (int i=1; i<n; ++i)
-        {
-        cerr << ", " << this->Buffer[i];
-        }
-      cerr << "}";
-    }
-
-  private:
-    int NextElement;
-    int BufferSize;
-    vector<int> Buffer;
-};
-
-/**
-Data structure which allows constant time determination 
-of weather a given proc has a piece of some fragment,
-and the number of procs which a specified fragment is 
-spread across.
-*/
-class vtkCTHFragmentToProcMap
-{
-  public:
-    vtkCTHFragmentToProcMap(){ this->Clear(); }
-    vtkCTHFragmentToProcMap(int nFragments);
-    vtkCTHFragmentToProcMap(int nProcs, int nFragments);
-    vtkCTHFragmentToProcMap(const vtkCTHFragmentToProcMap &other);
-    vtkCTHFragmentToProcMap &operator=(const vtkCTHFragmentToProcMap &rhs);
-    // logistics
-    void Clear();
-    void Initialize(int nFragments);
-    void Initialize(int nProcs, int nFragments);
-    void DeepCopy(const vtkCTHFragmentToProcMap &from);
-    // interface
-    int GetProcOwnsPiece(int fragmentId) const;
-    int GetProcOwnsPiece(int procId, int fragmentId) const;
-    void SetProcOwnsPiece(int procId, int fragmentId);
-    void SetProcOwnsPiece(int fragmentId);
-    void UnSetProcOwnsPiece(int procId, int fragmentId);
-    void UnSetProcOwnsPiece(int fragmentId);
-    vector<int> WhoHasAPiece(int fragmentId, int excludeProc) const;
-    vector<int> WhoHasAPiece(int fragmentId) const;
-    int GetProcCount(int fragmentId){ return this->ProcCount[fragmentId]; }
-  private:
-    // proc -> fragment -> bit mask, bit is 1 if frag is on proc
-    vector<vector<int> > PieceToProcMap;
-    // fragment id -> count num procs
-    vector<int> ProcCount;
-
-    int NProcs;     // number of procs
-    int NFragments; // number of fragments to map
-    int PieceToProcMapSize; // length of map array
-    int BitsPerInt; // number of bits in an integer
-};
-//
-vtkCTHFragmentToProcMap::vtkCTHFragmentToProcMap(
-              int nFragments)
-{
-  this->Initialize(nFragments);
-}
-//
-vtkCTHFragmentToProcMap::vtkCTHFragmentToProcMap(
-              int nProcs,
-              int nFragments)
-{
-  this->Initialize(nProcs, nFragments);
-}
-//
-vtkCTHFragmentToProcMap::vtkCTHFragmentToProcMap(
-              const vtkCTHFragmentToProcMap &other)
-{
-  this->DeepCopy(other);
-}
-//
-void vtkCTHFragmentToProcMap::Clear()
-{
-  this->PieceToProcMap.clear();
-  this->ProcCount.clear();
-  this->NProcs=0;
-  this->NFragments=0;
-  this->PieceToProcMapSize=0;
-  this->BitsPerInt=0;
-}
-//
-void vtkCTHFragmentToProcMap::Initialize(
-              int nFragments)
-{
-  this->Initialize(1,nFragments);
-}
-//
-void vtkCTHFragmentToProcMap::Initialize(
-              int nProcs,
-              int nFragments)
-{
-  this->Clear();
-
-  this->NProcs=nProcs;
-  this->NFragments=nFragments;
-  this->BitsPerInt=8*sizeof(int);
-  this->PieceToProcMapSize=nFragments/this->BitsPerInt+1;
-
-  this->ProcCount.resize(nFragments,0);
-
-  this->PieceToProcMap.resize(nProcs);
-  for (int i=0; i<nProcs; ++i)
-    {
-    this->PieceToProcMap[i].resize(this->PieceToProcMapSize,0);
-    }
-}
-//
-vtkCTHFragmentToProcMap &vtkCTHFragmentToProcMap::operator=(
-              const vtkCTHFragmentToProcMap &other)
-{
-  this->DeepCopy(other);
-
-  return *this;
-}
-//
-void vtkCTHFragmentToProcMap::DeepCopy(
-              const vtkCTHFragmentToProcMap &from)
-{
-  this->NProcs=from.NProcs;
-  this->NFragments=from.NFragments;
-  this->PieceToProcMapSize=from.PieceToProcMapSize;
-  this->BitsPerInt=from.BitsPerInt;
-  this->PieceToProcMap=from.PieceToProcMap;
-}
-//
-int vtkCTHFragmentToProcMap::GetProcOwnsPiece(
-                int fragmentId) const
-{
-  return this->GetProcOwnsPiece(0,fragmentId);
-}
-//
-int vtkCTHFragmentToProcMap::GetProcOwnsPiece(
-                int procId,
-                int fragmentId) const
-{
-  assert( "Invalid fragment id"
-          && fragmentId >= 0
-          && fragmentId < this->NFragments );
-  assert( "Invalid proc id"
-          && procId >= 0
-          && procId < this->NProcs );
-
-  int maskIdx=fragmentId/this->BitsPerInt;
-  int maskBit=1<<fragmentId%this->BitsPerInt;
-
-  return maskBit & this->PieceToProcMap[procId][maskIdx];
-}
-//
-void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int fragmentId)
-{
-  this->SetProcOwnsPiece(0,fragmentId);
-}
-//
-void vtkCTHFragmentToProcMap::SetProcOwnsPiece(int procId, int fragmentId)
-{
-  assert( "Invalid fragment id"
-          && fragmentId >= 0
-          && fragmentId < this->NFragments );
-  assert( "Invalid proc id"
-          && procId >= 0
-          && procId < this->NProcs );
-
-  // set bit in this proc's mask array
-  int maskIdx=fragmentId/this->BitsPerInt;
-  int maskBit=1<<fragmentId%this->BitsPerInt;
-  this->PieceToProcMap[procId][maskIdx] |= maskBit;
-
-  // inc fragments ownership count
-  ++this->ProcCount[fragmentId];
-}
-//
-vector<int> vtkCTHFragmentToProcMap::WhoHasAPiece(
-                int fragmentId,
-                int excludeProc) const
-{
-  assert( "Invalid proc id"
-          && excludeProc >= 0
-          && excludeProc < this->NProcs );
-
-  vector<int> whoHasList;
-
-  for (int procId=0; procId<this->NProcs; ++procId)
-    {
-    if ( procId==excludeProc )
-      {
-      continue;
-      }
-    int maskIdx=fragmentId/this->BitsPerInt;
-    int maskBit=1<<fragmentId%this->BitsPerInt;
-
-    // this guy has a piece
-    if (maskBit & this->PieceToProcMap[procId][maskIdx])
-      {
-      whoHasList.push_back(procId);
-      }
-    }
-  return whoHasList;
-}
-//
-vector<int> vtkCTHFragmentToProcMap::WhoHasAPiece(
-                int fragmentId) const
-{
-  vector<int> whoHasList;
-
-  for (int procId=0; procId<this->NProcs; ++procId)
-    {
-     int maskIdx=fragmentId/this->BitsPerInt;
-     int maskBit=1<<fragmentId%this->BitsPerInt;
-
-    // this guy has a piece
-    if (maskBit & this->PieceToProcMap[procId][maskIdx])
-      {
-      whoHasList.push_back(procId);
-      }
-    }
-  return whoHasList;
-}
-
-/**
-Description:
-Helper to the transaction matrix.
-
-Data structure that describes a single transaction
-that needs to be executed in the process of 
-moving a fragment piece around.
-
-The fragment to be transacted and the executing process are 
-determined implicitly by where the transaction is stored.
-*/
-class vtkCTHFragmentPieceTransaction
-{
-  public:
-    enum {TYPE=0,REMOTE_PROC=1,SIZE=2};
-    //
-    vtkCTHFragmentPieceTransaction(){ Clear(); }
-    ~vtkCTHFragmentPieceTransaction(){ Clear(); }
-    //
-    vtkCTHFragmentPieceTransaction(
-                    char type,
-                    int remoteProc)
-    {
-      this->Initialize(type,remoteProc);
-    }
-    // 
-    void Initialize(char type,
-                    int remoteProc)
-    {
-      this->Data[TYPE]=(int)type;
-      this->Data[REMOTE_PROC]=remoteProc;
-    }
-    //
-    bool Empty() const{ return this->Data[TYPE]==0; }
-    //
-    void Clear()
-    {
-      this->Data[TYPE]=0;
-      this->Data[REMOTE_PROC]=-1;
-    }
-    //
-    void Pack(int *buf)
-    {
-      buf[0]=this->Data[TYPE];
-      buf[1]=this->Data[REMOTE_PROC];
-    }
-    //
-    void UnPack(int *buf)
-    {
-      this->Data[TYPE]=buf[0];
-      this->Data[REMOTE_PROC]=buf[1];
-    }
-    //
-    char GetType() const{ return (char)this->Data[TYPE]; }
-    //
-    int GetRemoteProc() const{ return this->Data[REMOTE_PROC]; }
-    //
-    int GetFlatSize() const{ return SIZE; }
-  private:
-    int Data[SIZE];
-};
-
-ostream &operator<<(ostream &sout, const vtkCTHFragmentPieceTransaction &ta)
-{
-  sout << "(" << ta.GetType() << "," << ta.GetRemoteProc() << ")";
-
-  return sout;
-}
-
-/**
-Description:
-Container to hold  a sets of transactions (sends/recvs)
-indexed by fragment and proc, inteneded to facilitiate
-moving fragment peices around.
-
-Internaly we have a 2D matrix. On one axis is fragment id
-on the other is proc id.
-
-Transaction are intended to execute in fragment order
-so that no deadlocks occur.
-*/
-class vtkCTHFragmentPieceTransactionMatrix
-{
-  public:
-    // Description:
-    // Set the object to an un-initialized state.
-    vtkCTHFragmentPieceTransactionMatrix();
-    // Description:
-    // Allocate internal resources and set the object
-    // to an initialized state.
-    vtkCTHFragmentPieceTransactionMatrix(int nFragments, int nProcs);
-    // Description:
-    // Free allocated resources and leave the object in an
-    // un-initialized state.
-    ~vtkCTHFragmentPieceTransactionMatrix();
-    void Initialize(int nProcs, int nFragments);
-    // Description:
-    // Free allocated resources and leave the object in an
-    // un-initialized state.
-    void Clear();
-    // Description:
-    // Get the number of transaction a given process will
-    // execute.
-    vtkIdType GetNumberOfTransactions(int procId);
-    // Description:
-    // Given a proc and a fragment, return a ref to
-    // the associated list of tranactions.
-    vector<vtkCTHFragmentPieceTransaction> &GetTransactions(
-                    int fragmentId,
-                    int procId);
-    // Description:
-    // Add a transaction to the end of the given a proc,fragment pair's
-    // transaction list.
-    void PushTransaction(
-                    int fragmentId,
-                    int procId,
-                    vtkCTHFragmentPieceTransaction &transaction);
-    // Description:
-    // Send the transaction matrix on srcProc to all
-    // other procs.
-    void Broadcast(vtkCommunicator *comm, int srcProc);
-    //
-    void Print();
-    // Description:
-    // Tells how much memory the matrix has allocated.
-    vtkIdType Capacity()
-    {
-      return this->FlatMatrixSize
-        + this->NumberOfTransactions*sizeof(vtkCTHFragmentPieceTransaction);
-    }
-  private:
-    // Put the matrix into a buffer for communication.
-    // returns size of the buffer in ints. The buffer
-    // will be allocated, and is expected to be null
-    // on entry.
-    vtkIdType Pack(int *&buffer);
-    vtkIdType PackRow(int *&buffer);
-    // Load state from a buffer containing a Pack'ed
-    // transaction matrix. 0 is returned on error.
-    int UnPack(int *buffer);
-    int UnPackRow(int *buffer);
-    int NProcs;
-    int NFragments;
-    vector<vtkCTHFragmentPieceTransaction> *Matrix;
-    vtkIdType FlatMatrixSize;
-    vtkIdType NumberOfTransactions;
-};
-//
-vtkCTHFragmentPieceTransactionMatrix::vtkCTHFragmentPieceTransactionMatrix()
-{
-  this->NFragments=0;
-  this->NProcs=0;
-  this->FlatMatrixSize=0;
-  this->Matrix=0;
-  this->NumberOfTransactions=0;
-}
-//
-vtkCTHFragmentPieceTransactionMatrix::vtkCTHFragmentPieceTransactionMatrix(
-                int nFragments,
-                int nProcs)
-{
-  this->Initialize(nFragments, nProcs);
-}
-//
-vtkCTHFragmentPieceTransactionMatrix::~vtkCTHFragmentPieceTransactionMatrix()
-{
-  this->Clear();
-}
-//
-void vtkCTHFragmentPieceTransactionMatrix::Clear()
-{
-  this->NFragments=0;
-  this->NProcs=0;
-  if ( this->Matrix )
-    {
-    delete [] this->Matrix;
-    this->Matrix=0;
-    }
-  this->NumberOfTransactions=0;
-}
-//
-void vtkCTHFragmentPieceTransactionMatrix::Initialize(
-                int nFragments,
-                int nProcs)
-{
-  this->Clear();
-
-  this->NFragments=nFragments;
-  this->NProcs=nProcs;
-  this->FlatMatrixSize=nFragments*nProcs;
-  this->Matrix 
-    = new vector<vtkCTHFragmentPieceTransaction>[this->FlatMatrixSize];
-}
-//
-void vtkCTHFragmentPieceTransactionMatrix::PushTransaction(
-                int fragmentId,
-                int procId,
-                vtkCTHFragmentPieceTransaction &transaction)
-{
-  int idx=fragmentId+procId*this->NFragments;
-  this->Matrix[idx].push_back(transaction);
-  ++this->NumberOfTransactions;
-}
-//
-inline
-vector<vtkCTHFragmentPieceTransaction> &
-vtkCTHFragmentPieceTransactionMatrix::GetTransactions(
-                int fragmentId,
-                int procId)
-{
-  int idx=fragmentId+procId*this->NFragments;
-  return this->Matrix[idx];
-}
-//
-inline 
-vtkIdType 
-vtkCTHFragmentPieceTransactionMatrix::GetNumberOfTransactions(
-                int procId)
-{
-  int nTransactions=0;
-
-  for (int fragmentId=0; fragmentId<this->NFragments; ++fragmentId)
-    {
-    nTransactions+=this->GetTransactions(fragmentId,procId).size();
-    }
-
-  return nTransactions;
-}
-// 
-vtkIdType vtkCTHFragmentPieceTransactionMatrix::PackRow(int *&buf)
-{
-/*
-the packed row has this structure:
-
-[nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]
-    /\           /\               /\
-    |            |                |
-  f0,p0        f1,p0            fN,p0 
-*/
-
-  // caller should not allocate memory.
-  assert( "Buffer appears to be pre-allocated."
-          && buf==0 );
-
-  //int matIdx=i+j*this->NFragments;
-  //int nTransactions=this->Matrix[matIdx].size();
-
-  const int transactionSize
-    = vtkCTHFragmentPieceTransaction::SIZE;
-
-  const vtkIdType bufSize = this->NFragments         // transaction count for each fragment
-        + transactionSize*this->NumberOfTransactions // enough to store all transactions
-        + 2;                                         // nFragments, nProcs
-
-  buf = new int[bufSize];
-  // header
-  buf[0]=this->NFragments;
-  buf[1]=this->NProcs;
-  vtkIdType bufIdx=2;
-
-  for (int j=0; j<this->NProcs; ++j)
-    {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
-
-      // put the count for this i,j
-      buf[bufIdx]=nTransactions;
-      ++bufIdx;
-
-      // put this i,j's transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
-        this->Matrix[matIdx][q].Pack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
-      }
-    }
-  // now bufIdx is number of ints we have stored
-  return bufIdx;
-}
-// 
-vtkIdType vtkCTHFragmentPieceTransactionMatrix::Pack(int *&buf)
-{
-/*
-the buffer has this structure:
-
-[nFragments,nProcs][nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]...[nT,T0,...,TN]
-                       /\           /\               /\               /\
-                       |            |                |                |
-                      f0,p0        f1,p0            fN,p0            fN,PN
-*/
-
-  // caller should not allocate memory.
-  assert( "Buffer appears to be pre-allocated."
-          && buf==0 );
-
-  const int transactionSize
-    = vtkCTHFragmentPieceTransaction::SIZE;
-
-  const vtkIdType bufSize = this->FlatMatrixSize     // transaction count for each i,j
-        + transactionSize*this->NumberOfTransactions // enough to store all transactions
-        + 2;                                         // nFragments, nProcs
-
-  buf = new int[bufSize];
-  // header
-  buf[0]=this->NFragments;
-  buf[1]=this->NProcs;
-  vtkIdType bufIdx=2;
-
-  for (int j=0; j<this->NProcs; ++j)
-    {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
-
-      // put the count for this i,j
-      buf[bufIdx]=nTransactions;
-      ++bufIdx;
-
-      // put this i,j's transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
-        this->Matrix[matIdx][q].Pack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
-      }
-    }
-  // now bufIdx is number of ints we have stored
-  return bufIdx;
-}
-//
-int vtkCTHFragmentPieceTransactionMatrix::UnPack(int *buf)
-{
-  assert("Buffer has not been allocated."
-         && buf!=0 );
-
-  const int transactionSize
-    = vtkCTHFragmentPieceTransaction::SIZE;
-
-  this->Initialize(buf[0],buf[1]);
-  int bufIdx=2;
-
-  for (int j=0; j<this->NProcs; ++j)
-    {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      // get the number of transactions for this i,j
-      int nTransactions=buf[bufIdx];
-      ++bufIdx;
-
-      // size the i,j th transaction list
-      int matIdx=i+j*this->NFragments;
-      this->Matrix[matIdx].resize(nTransactions);
-
-      // load the i,j th transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
-        this->Matrix[matIdx][q].UnPack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
-      }
-    }
-
-  return 1;
-}
-//
-void vtkCTHFragmentPieceTransactionMatrix::Broadcast(
-                vtkCommunicator *comm,
-                int srcProc)
-{
-  int myProc=comm->GetLocalProcessId();
-
-  // pack
-  int *buf=0;
-  int bufSize=0;
-  if ( myProc==srcProc )
-    {
-    bufSize=this->Pack(buf);
-    }
-
-  // move
-  comm->Broadcast(&bufSize,1,srcProc);
-  if ( myProc!=srcProc )
-    {
-    buf = new int[bufSize];
-    }
-  comm->Broadcast(buf,bufSize,srcProc);
-
-  // unpack
-  if ( myProc!=srcProc )
-    {
-    this->UnPack(buf);
-    }
-
-  // clean up
-  delete [] buf;
-}
-//
-void vtkCTHFragmentPieceTransactionMatrix::Print()
-{
-  for (int j=0; j<this->NProcs; ++j)
-    {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
-
-      if (nTransactions>0)
-        {
-        cerr << "TM[f=" << i << ",p=" << j << "]=";
-
-        // put this i,j's transaction list
-        for (int q=0; q<nTransactions; ++q)
-          {
-          cerr << this->Matrix[matIdx][q] << ",";
-          }
-        cerr << endl;
-        }
-      }
-    }
-}
 //============================================================================
 // A class that implements an equivalent set.  It is used to combine fragments
 // from different processes.
@@ -4518,12 +3269,14 @@ int vtkCTHFragmentConnect::RequestData(
 //----------------------------------------------------------------------------
 int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::ProcessBlock("
                << blockId
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressBlockInc;
   this->UpdateProgress(this->Progress);
 
@@ -6773,11 +5526,13 @@ void vtkCTHFragmentConnect::AddEquivalence(
 // Merge fragment pieces which are split locally.
 void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::ResolveLocalFragmentGeometry("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -6849,20 +5604,18 @@ void vtkCTHFragmentConnect::ResolveLocalFragmentGeometry()
 // Remove duplicate point from local meshes.
 void vtkCTHFragmentConnect::CleanLocalFragmentGeometry()
 {
-  #ifdef vtkCTHFragmentConnectDEBUG
   // TODO  If we clean the
   // data and turn transparency on MPI throws an
   // error which causes all of the servers to 
   // terminate. so far I have only seen this
-  // with np=4 cth-med. We only need transparency
-  // when we are validating OBB's
-  #endif
-
+  // with np=4 cth-med.
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::CleanLocalFragmentGeometry("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -6935,11 +5688,13 @@ void vtkCTHFragmentConnect::CleanLocalFragmentGeometry()
 // points only requires 10-100MB....
 void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -7224,25 +5979,6 @@ void vtkCTHFragmentConnect::ResolveRemoteFragmentGeometry()
 }
 
 //----------------------------------------------------------------------------
-// Find the local id given a global id to a piece that we own. 
-// If the piece is not local then return is less than 0.
-int vtkCTHFragmentConnect::GlobalToLocalId(int globalId)
-{
-  vector<int> &resolvedFragmentIds
-    = this->ResolvedFragmentIds[this->MaterialId];
-
-  int nLocal=resolvedFragmentIds.size();
-  for (int i=0; i<nLocal; ++i)
-    {
-    if (resolvedFragmentIds[i]==globalId)
-      {
-      return i;
-      }
-    }
-
-  return -1;
-}
-//----------------------------------------------------------------------------
 // Identify fragments who are split across processes. These are always
 // generated and coppied to the output. We also may compute various
 // other geometric attributes here. For fragments whose geometry is 
@@ -7250,11 +5986,13 @@ int vtkCTHFragmentConnect::GlobalToLocalId(int globalId)
 // attributes. eg OBB, AABB center.
 void vtkCTHFragmentConnect::ComputeGeometricAttributes()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::ComputeGeometricAttributes("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -7413,7 +6151,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       // highly loaded and cycle through the group that 
       // remains assigning to each until all work has
       // been alloted.
-      vtkCTHFragmentProcessRingBuffer procRing;
+      vtkCTHFragmentProcessRing procRing;
       procRing.Initialize(Q, this->UpperLoadingBound);
       #ifdef vtkCTHFragmentConnectDEBUG
       cerr << "[" << __LINE__ << "] "
@@ -7508,9 +6246,17 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       ++thisMsgId;
       }
 
+
     // Brodcast the transaction matrix
     TM.Broadcast(comm, controllingProcId);
 
+    // Prepare for a bunch of inverse searches through
+    // local fragment ids. i.e. given a global id find the
+    // local id.
+    vtkCTHFragmentIdList idList;
+    idList.Initialize(resolvedFragmentIds,false);
+
+    // Prepare for various computations.
     int nAttributeComps=0;
     if (!this->ComputeMoments)
       {
@@ -7551,7 +6297,8 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
           // I am sending geometry, hence this is a piece
           // of a split frgament and I need to treat it as 
           // such from now on.
-          int localId=this->GlobalToLocalId(fragmentId);
+          int localId=idList.GetLocalId(fragmentId);
+          assert("Fragment id not found." && localId!=-1);
           fragmentSplitMarker[localId]=1;
 
           // Send the geometry and recvieve the results of 
@@ -7613,7 +6360,8 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
           int localId=-1;
           if (localMesh!=0)
             {
-            localId=this->GlobalToLocalId(fragmentId);
+            localId=idList.GetLocalId(fragmentId);
+            assert("Fragment id not found." && localId!=-1);
             fragmentSplitMarker[localId]=1;
             }
 
@@ -7860,7 +6608,7 @@ void vtkCTHFragmentConnect::BuildLoadingArray(
     vtkPolyData *fragment
       = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(globalId));
 
-    loadingArray[globalId]=fragment->GetNumberOfPolys();
+    loadingArray[globalId]=fragment->GetNumberOfCells();
     }
 }
 
@@ -7890,7 +6638,7 @@ int vtkCTHFragmentConnect::PackLoadingArray(vtkIdType *&buffer)
     vtkPolyData *fragment
       = dynamic_cast<vtkPolyData *>(resolvedFragments->GetPiece(globalId));
 
-    pl.Initialize(globalId,fragment->GetNumberOfPolys());
+    pl.Initialize(globalId,fragment->GetNumberOfCells());
     pl.Pack(pBuf);
     pBuf+=pl.SIZE;
     }
@@ -8174,11 +6922,13 @@ int vtkCTHFragmentConnect::PrepareToMergeGeometricAttributes()
 int vtkCTHFragmentConnect::GatherGeometricAttributes(
                 const int recipientProcId)
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::gatherGeometricAttributes("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -8516,11 +7266,13 @@ int vtkCTHFragmentConnect::SendIntegratedAttributes(
 int vtkCTHFragmentConnect::BroadcastIntegratedAttributes(
                 const int sourceProcId)
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::BroadcastIntegratedAttributes("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -8943,11 +7695,13 @@ int vtkCTHFragmentConnect::ResolveIntegratedAttributes(
 // allocated on our behalf.
 void vtkCTHFragmentConnect::PrepareForResolveEquivalences()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::PrepareForResolveEquivalences("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -9077,11 +7831,13 @@ void vtkCTHFragmentConnect::ResolveEquivalences()
 void vtkCTHFragmentConnect::GatherEquivalenceSets(
   vtkCTHFragmentEquivalenceSet* set)
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::GatherEquivalenceSets("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -9380,11 +8136,13 @@ void vtkCTHFragmentConnect::ReceiveGhostFragmentIds(
 // as well. My hope is that the point data can be eliminated.
 void vtkCTHFragmentConnect::CopyAttributesToOutput0()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput0("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -9673,11 +8431,13 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
 // computed then the centers of axis aligned bounding boxes are used.
 void vtkCTHFragmentConnect::CopyAttributesToOutput1()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput1("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -9840,11 +8600,13 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
 // output will contain polydata for each OBB.
 void vtkCTHFragmentConnect::CopyAttributesToOutput2()
 {
+  #ifdef vtkCTHFragmentConnectDEBUG
   ostringstream progressMesg;
   progressMesg << "vtkCTHFragmentConnect::CopyAttributesToOutput2("
                << ") , Material "
                << this->MaterialId;
   this->SetProgressText(progressMesg.str().c_str());
+  #endif
   this->Progress+=this->ProgressResolutionInc;
   this->UpdateProgress(this->Progress);
 
@@ -10136,7 +8898,10 @@ int vtkCTHFragmentConnect::BuildOutputs(
     this->ResolvedFragmentOBBs=mbdsOutput2;
     this->ResolvedFragmentOBBs->SetNumberOfBlocks(nMaterials);
     }
+  #else
+  (void)mbdsOutput2; // Fixes compiler warning.
   #endif
+
   for (int i=0; i<nMaterials; ++i)
     {
     /// 0

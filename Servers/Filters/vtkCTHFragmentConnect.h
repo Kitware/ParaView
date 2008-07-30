@@ -388,8 +388,6 @@ protected:
   void ResolveRemoteFragmentGeometry();
   // Clean duplicate points from fragment geometry.
   void CleanLocalFragmentGeometry();
-  // Given a global id convert it to a local id(index into id array)
-  int GlobalToLocalId(int globalId);
   //
   void BuildLoadingArray(
           vtkstd::vector<vtkIdType> &loadingArray);
