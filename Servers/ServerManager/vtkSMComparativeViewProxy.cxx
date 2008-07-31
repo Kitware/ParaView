@@ -71,7 +71,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.25");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -649,7 +649,6 @@ void vtkSMComparativeViewProxy::UpdateFilmStripVisualization(
 
     vtkSMViewProxy* view = this->Internal->Views[view_index];
 
-    double time = this->TimeRange[0] + view_index*increment;
     if (this->GetShowTimeSteps())
       {
       double time = this->TimeRange[0] + view_index*increment;
