@@ -1,3 +1,4 @@
+# Exclude these
 IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
   FOREACH(part Common Filters ServerManager)
     ADD_TEST(HeaderTesting-PVServer-${part} ${PYTHON_EXECUTABLE}
@@ -21,7 +22,15 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMPropertyHelper.h
       vtkInitializationHelper.h
       vtkCTHFragmentCommBuffer.h
-      )
+      vtkCTHFragmentIdList.h
+      vtkCTHFragmentIdListItem.h
+      vtkCTHFragmentPieceLoading.h
+      vtkCTHFragmentPieceTransaction.h
+      vtkCTHFragmentPieceTransactionMatrix.h
+      vtkCTHFragmentProcessLoading.h
+      vtkCTHFragmentProcessPriorityQueue.h
+      vtkCTHFragmentProcessRing.h
+      vtkCTHFragmentToProcMap.h)
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 
