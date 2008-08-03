@@ -337,16 +337,16 @@ vtkIdType pqSILModel::parent(vtkIdType vertexId) const
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqSILModel::parent(const QModelIndex& index) const
+QModelIndex pqSILModel::parent(const QModelIndex& idx) const
 {
-  if (!INDEX_IS_VALID(index))
+  if (!INDEX_IS_VALID(idx))
     {
     return QModelIndex();
     }
 
-  if (index.isValid())
+  if (idx.isValid())
     {
-    vtkIdType vertexId = static_cast<vtkIdType>(index.internalId());
+    vtkIdType vertexId = static_cast<vtkIdType>(idx.internalId());
     vtkIdType parentId = this->parent(vertexId);
     return this->makeIndex(parentId);
     }

@@ -107,9 +107,9 @@ QModelIndex pqProxySILModel::mapToSource(const QModelIndex& proxyIndex) const
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySILModel::setSourceModel(QAbstractItemModel *sourceModel)
+void pqProxySILModel::setSourceModel(QAbstractItemModel *srcModel)
 {
-  if (this->sourceModel() == sourceModel)
+  if (this->sourceModel() == srcModel)
     {
     return;
     }
@@ -118,15 +118,19 @@ void pqProxySILModel::setSourceModel(QAbstractItemModel *sourceModel)
     QObject::disconnect(this->sourceModel(), 0, this, 0);
     }
 
-  this->Superclass::setSourceModel(sourceModel);
+  this->Superclass::setSourceModel(srcModel);
 
-  if (sourceModel)
+  if (srcModel)
     {
-    QObject::connect(sourceModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    QObject::connect(
+      srcModel, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
       this, SLOT(sourceDataChanged(const QModelIndex&, const QModelIndex&)));
-    QObject::connect(sourceModel, SIGNAL(modelReset()), this, SIGNAL(modelReset()));
-    QObject::connect(sourceModel, SIGNAL(modelAboutToBeReset()), this, SIGNAL(modelAboutToBeReset()));
-    QObject::connect(sourceModel, SIGNAL(checkStatusChanged()), this, SLOT(onCheckStatusChanged()));
+    QObject::connect(srcModel, SIGNAL(modelReset()),
+      this, SIGNAL(modelReset()));
+    QObject::connect(srcModel, SIGNAL(modelAboutToBeReset()),
+      this, SIGNAL(modelAboutToBeReset()));
+    QObject::connect(srcModel, SIGNAL(checkStatusChanged()), 
+      this, SLOT(onCheckStatusChanged()));
     }
 }
 
@@ -138,10 +142,10 @@ QList<QVariant> pqProxySILModel::values() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProxySILModel::setValues(const QList<QVariant>& values)
+void pqProxySILModel::setValues(const QList<QVariant>& arg)
 {
   pqSILModel* silModel = qobject_cast<pqSILModel*>(this->sourceModel());
-  silModel->setStatus(this->HierarchyName, values);
+  silModel->setStatus(this->HierarchyName, arg);
 }
 
 //-----------------------------------------------------------------------------
