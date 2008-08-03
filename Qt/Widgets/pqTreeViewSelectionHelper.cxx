@@ -130,22 +130,22 @@ void pqTreeViewSelectionHelper::setSelectedItemsCheckState(Qt::CheckState state)
 //-----------------------------------------------------------------------------
 void pqTreeViewSelectionHelper::showContextMenu(const QPoint &pos)
 {
-//  if (this->TreeWidget->selectionModel()->selectedIndexes().size() > 0)
-//    {
-//    QMenu menu;
-//    menu.setObjectName("TreeWidgetCheckMenu");
-//    QAction* check = new QAction("Check", &menu);
-//    QAction* uncheck = new QAction("Uncheck", &menu);
-//    menu.addAction(check);
-//    menu.addAction(uncheck);
-//    QAction* result = menu.exec(this->TreeWidget->mapToGlobal(pos));
-//    if (result == check)
-//      {
-//      this->setSelectedItemsCheckState(Qt::Checked);
-//      }
-//    else if (result == uncheck)
-//      {
-//      this->setSelectedItemsCheckState(Qt::Unchecked);
-//      }
-//    }
+  if (this->TreeView->selectionModel()->selectedIndexes().size() > 0)
+    {
+    QMenu menu;
+    menu.setObjectName("TreeViewCheckMenu");
+    QAction* check = new QAction("Check", &menu);
+    QAction* uncheck = new QAction("Uncheck", &menu);
+    menu.addAction(check);
+    menu.addAction(uncheck);
+    QAction* result = menu.exec(this->TreeView->mapToGlobal(pos));
+    if (result == check)
+      {
+      this->setSelectedItemsCheckState(Qt::Checked);
+      }
+    else if (result == uncheck)
+      {
+      this->setSelectedItemsCheckState(Qt::Unchecked);
+      }
+    }
 }
