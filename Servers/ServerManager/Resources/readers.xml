@@ -2929,12 +2929,16 @@
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="ElementBlockArrayInfo"
+
+     <IntVectorProperty name="SILUpdateStamp"
+        command="GetSILUpdateStamp"
         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementBlock"/>
-     </StringVectorProperty>
+        <SimpleIntInformationHelper />
+        <Documentation>
+          Information property indicating the update stamp of the SIL. Every
+          time the SIL is rebuild, this time stamp is changed.
+        </Documentation>
+     </IntVectorProperty>
      
      <StringVectorProperty
         name="ElementBlockArrayStatus"
@@ -2942,65 +2946,7 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="ElementBlockArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="ElementBlockArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="MaterialArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Material"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="MaterialArrayStatus"
-        command="SetMaterialArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        animateable="0"
-        information_property="MaterialArrayInfo"
-        label="Material Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="MaterialArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which material arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="HierarchyArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Hierarchy"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="HierarchyArrayStatus"
-        command="SetHierarchyArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        animateable="0"
-        information_property="HierarchyArrayInfo"
-        label="Hierarchy Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="HierarchyArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which hierarchy arrays to read.
-       </Documentation>
+        element_types="2 0" >
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -3485,12 +3431,7 @@
          <Property name="EdgeBlockArrayStatus" />
          <Property name="FaceBlockArrayInfo" />
          <Property name="FaceBlockArrayStatus" />
-         <Property name="ElementBlockArrayInfo" />
          <Property name="ElementBlockArrayStatus" />
-         <Property name="MaterialArrayInfo" />
-         <Property name="MaterialArrayStatus" />
-         <Property name="HierarchyArrayInfo" />
-         <Property name="HierarchyArrayStatus" />
          <Property name="GlobalResultArrayInfo" />
          <Property name="GlobalResultArrayStatus" />
          <Property name="PointResultArrayInfo" />

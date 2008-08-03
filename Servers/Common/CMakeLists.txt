@@ -54,6 +54,7 @@ SET(Kit_SRCS
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
+  vtkPVSILInformation.cxx
   vtkPVTimerInformation.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx

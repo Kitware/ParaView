@@ -29,8 +29,8 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqExodusIIPanel.h"
+#include "ui_pqExodusIIPanel.h"
 
 // Qt includes
 #include <QAction>
@@ -42,16 +42,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <QVector>
 #include <QMap>
+#include <QHeaderView>
 
 // VTK includes
 
 // ParaView Server Manager includes
-#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkGraph.h"
+#include "vtkProcessModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVSILInformation.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 // ParaView includes
 #include "pqPropertyManager.h"
@@ -61,33 +68,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqTreeWidgetSelectionHelper.h"
 #include "pqTreeWidgetItemObject.h"
-#include "ui_pqExodusIIPanel.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "pqSILModel.h"
+#include "pqProxySILModel.h"
+#include "pqTreeViewSelectionHelper.h"
 
 class pqExodusIIPanel::pqUI : public QObject, public Ui::ExodusIIPanel 
 {
 public:
-  pqUI(pqExodusIIPanel* p) : QObject(p)
+  /// Specialization of pqSILModel is add support for icons on the 
+  /// "Blocks".
+  class pqExodusIISILModel : public pqSILModel
   {
-    // make a clone of the ExodusIIReader proxy
-    // NOTE: I added the ExodusIIReaderHelper since the new exodus reader
-    //  supports different types of blocks (faces and edges in addition
-    //  to element blocks) so BlockArray___ properties become 
-    //  ElementBlockArray____.
-    // we'll use the clone to help us with the ElementBlock/Material/Hierarchy array
-    // status (keep them in sync and auto check/uncheck hierarchically related 
-    // items in the hierarchy view).
-    vtkSMProxyManager* pm = vtkSMProxy::GetProxyManager();
-    ExodusHelper.TakeReference(pm->NewProxy("misc", "ExodusIIReaderHelper"));
-    ExodusHelper->InitializeAndCopyFromProxy(p->proxy());
-  }
-  vtkSmartPointer<vtkSMProxy> ExodusHelper;
+public:
+  typedef pqSILModel Superclass;
+  pqExodusIISILModel(QObject* p = 0) : Superclass(p) {}
+  QVariant data(const QModelIndex &idx, int role) const
+    {
+    if (role == Qt::DecorationRole && idx.isValid())
+      {
+      vtkIdType vertexId = static_cast<vtkIdType>(idx.internalId());
+      // If this vertex is a block, then show the ELEM_BLOCK icon.
+      if (this->SIL->GetOutDegree(vertexId) == 0)
+        {
+        return QVariant(QPixmap(":/pqWidgets/Icons/pqCellCenterData16.png"));
+        }
+      }
+    return this->Superclass::data(idx, role);
+    }
+  };
+
+public:
+  pqUI(pqExodusIIPanel* p) : QObject(p) 
+   {
+   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+   this->SILUpdateStamp = -1;
+   }
+
+  pqExodusIISILModel SILModel;
   QVector<double> TimestepValues;
   QMap<QTreeWidgetItem*, QString> TreeItemToPropMap;
-
-  QSet<QTreeWidgetItem*> PendingChangedItems;
-  QString PendingChangedItemsPropertyName;
-  QTimer PendingChangedItemsTimer;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  int SILUpdateStamp;
 };
 
 pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
@@ -99,22 +121,81 @@ pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
   this->DisplItem = 0;
   
   this->UI->XMLFileName->setServer(this->referenceProxy()->getServer());
-  
-  this->linkServerManagerProperties();
 
-  this->UI->PendingChangedItemsTimer.setInterval(10/*milliseconds*/);
-  QObject::connect(&this->UI->PendingChangedItemsTimer, SIGNAL(timeout()),
-    this, SLOT(updatePendingChangedItems()));
+  this->UI->VTKConnect->Connect(
+    this->referenceProxy()->getProxy(),
+    vtkCommand::UpdateInformationEvent,
+    this, SLOT(updateSIL()));
+  
+  pqProxySILModel* proxyModel = new pqProxySILModel("Blocks", &this->UI->SILModel);
+  proxyModel->setSourceModel(&this->UI->SILModel);
+  this->UI->Blocks->setModel(proxyModel);
+  this->UI->Blocks->header()->setClickable(true);
+  QObject::connect(this->UI->Blocks->header(), SIGNAL(sectionClicked(int)),
+    proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
+
+  proxyModel = new pqProxySILModel("Assemblies", &this->UI->SILModel);
+  proxyModel->setSourceModel(&this->UI->SILModel);
+  this->UI->Assemblies->setModel(proxyModel);
+  this->UI->Assemblies->header()->setClickable(true);
+  QObject::connect(this->UI->Assemblies->header(), SIGNAL(sectionClicked(int)),
+    proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
+
+  proxyModel = new pqProxySILModel("Materials", &this->UI->SILModel);
+  proxyModel->setSourceModel(&this->UI->SILModel);
+  this->UI->Materials->setModel(proxyModel);
+  this->UI->Materials->header()->setClickable(true);
+  QObject::connect(this->UI->Materials->header(), SIGNAL(sectionClicked(int)),
+    proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
+
+  this->updateSIL();
+
+  this->UI->Blocks->header()->setStretchLastSection(true);
+  this->UI->Assemblies->header()->setStretchLastSection(true);
+  this->UI->Materials->header()->setStretchLastSection(true);
+
+
+  this->linkServerManagerProperties();
 
   QList<pqTreeWidget*> treeWidgets = this->findChildren<pqTreeWidget*>();
   foreach (pqTreeWidget* tree, treeWidgets)
     {
     new pqTreeWidgetSelectionHelper(tree);
     }
+
+  QList<pqTreeView*> treeViews = this->findChildren<pqTreeView*>();
+  foreach (pqTreeView* tree, treeViews)
+    {
+    new pqTreeViewSelectionHelper(tree);
+    }
 }
 
 pqExodusIIPanel::~pqExodusIIPanel()
 {
+}
+
+void pqExodusIIPanel::updateSIL()
+{
+  vtkSMProxy* reader = this->referenceProxy()->getProxy();
+  reader->UpdatePropertyInformation(reader->GetProperty("SILUpdateStamp"));
+
+  int stamp = vtkSMPropertyHelper(reader, "SILUpdateStamp").GetAsInt();
+  if (stamp != this->UI->SILUpdateStamp)
+    {
+    this->UI->SILUpdateStamp = stamp;
+    cout << "pqExodusIIPanel::updateSIL()" << endl;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkPVSILInformation* info = vtkPVSILInformation::New();
+    pm->GatherInformation(reader->GetConnectionID(),
+      vtkProcessModule::DATA_SERVER, info,
+      reader->GetID());
+    this->UI->SILModel.update(info->GetSIL());
+
+    this->UI->Blocks->expandAll();
+    this->UI->Assemblies->expandAll();
+    this->UI->Materials->expandAll();
+    info->Delete();
+    }
 }
 
 void pqExodusIIPanel::reset()
@@ -124,11 +205,7 @@ void pqExodusIIPanel::reset()
   // might have played with them
   vtkSMProxy* pxy = this->proxy();
   pxy->UpdateProperty("EdgeBlockArrayStatus", 1);
-  pxy->UpdateProperty("ElementBlockArrayStatus", 1);
   pxy->UpdateProperty("FaceBlockArrayStatus", 1);
-  pxy->UpdateProperty("MaterialArrayStatus", 1);
-  pxy->UpdateProperty("HierarchyArrayStatus", 1);
-
   pqNamedObjectPanel::reset();
 }
 
@@ -200,6 +277,11 @@ void pqExodusIIPanel::addSelectionToTreeWidget(const QString& name,
 
 void pqExodusIIPanel::linkServerManagerProperties()
 {
+
+  this->propertyManager()->registerLink(
+    this->UI->Blocks->model(), "values", SIGNAL(valuesChanged()),
+    this->proxy(),
+    this->proxy()->GetProperty("ElementBlockArrayStatus"));
 
   // parent class hooks up some of our widgets in the ui
   pqNamedObjectPanel::linkServerManagerProperties();
@@ -295,11 +377,9 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   // blocks
   this->addSelectionsToTreeWidget("EdgeBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_EDGEBLK);
+                                  this->UI->EdgeBlockArrayStatus, PM_EDGEBLK);
   this->addSelectionsToTreeWidget("FaceBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_FACEBLK);
-  this->addSelectionsToTreeWidget("ElementBlockArrayStatus",
-                                  this->UI->BlockArrayStatus, PM_ELEMBLK);
+                                  this->UI->FaceBlockArrayStatus, PM_FACEBLK);
 
   // sets
   this->addSelectionsToTreeWidget("SideSetArrayStatus",
@@ -365,16 +445,6 @@ void pqExodusIIPanel::linkServerManagerProperties()
                    this, SLOT(modeChanged(int)));
   QObject::connect(this->UI->ModeSelectSpinBox, SIGNAL(valueChanged(int)),
                    this, SLOT(modeChanged(int)));
-
-  QObject::connect(this->UI->BlockArrayStatus, 
-    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-    this, SLOT(blockItemChanged(QTreeWidgetItem*)));
-  QObject::connect(this->UI->HierarchyArrayStatus,
-    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-    this, SLOT(hierarchyItemChanged(QTreeWidgetItem*)));
-  QObject::connect(this->UI->MaterialArrayStatus,
-    SIGNAL(itemChanged(QTreeWidgetItem*, int)),
-    this, SLOT(materialItemChanged(QTreeWidgetItem*)));
 
   QObject::connect(this->UI->Refresh,
     SIGNAL(pressed()), this, SLOT(onRefresh()));
@@ -448,208 +518,6 @@ void pqExodusIIPanel::modeChanged(int value)
     this->UI->ModeLabel->setText(
                             QString("%1").arg(this->UI->TimestepValues[value]));
     }
-}
-
-void pqExodusIIPanel::blockItemChanged(QTreeWidgetItem* item)
-{
-  // Use our map to find which property name this tree item belongs to, 
-  // since there are multiple types of blocks (element, edge, face).
-  // Right now we only support element blocks.
-  if(this->UI->TreeItemToPropMap[item] == "ElementBlockArrayStatus")
-    {
-    if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
-      this->UI->PendingChangedItemsPropertyName != "ElementBlockArrayStatus")
-      {
-      this->updatePendingChangedItems();
-      }
-
-    this->UI->PendingChangedItemsPropertyName = "ElementBlockArrayStatus";
-    this->UI->PendingChangedItems.insert(item);
-    this->UI->PendingChangedItemsTimer.start();
-
-
-    //this->selectionItemChanged(item, "ElementBlockArrayStatus");
-    }
-}
-
-void pqExodusIIPanel::hierarchyItemChanged(QTreeWidgetItem* item)
-{
-  if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
-    this->UI->PendingChangedItemsPropertyName != "HierarchyArrayStatus")
-    {
-    this->updatePendingChangedItems();
-    }
-
-  this->UI->PendingChangedItemsPropertyName = "HierarchyArrayStatus";
-  this->UI->PendingChangedItems.insert(item);
-  this->UI->PendingChangedItemsTimer.start();
-//  this->selectionItemChanged(item, "HierarchyArrayStatus");
-}
-
-void pqExodusIIPanel::materialItemChanged(QTreeWidgetItem* item)
-{
-  if (!this->UI->PendingChangedItemsPropertyName.isEmpty() &&
-    this->UI->PendingChangedItemsPropertyName != "MaterialArrayStatus")
-    {
-    this->updatePendingChangedItems();
-    }
-
-  this->UI->PendingChangedItemsPropertyName = "MaterialArrayStatus";
-  this->UI->PendingChangedItems.insert(item);
-  this->UI->PendingChangedItemsTimer.start();
-//  this->selectionItemChanged(item, "MaterialArrayStatus");
-}
-
-//-----------------------------------------------------------------------------
-void pqExodusIIPanel::updatePendingChangedItems()
-{
-  QString propName = this->UI->PendingChangedItemsPropertyName;
-  if (propName.isEmpty() || this->UI->PendingChangedItems.size() == 0)
-    {
-    return;
-    }
-
-  vtkSMProxy* pxy = this->UI->ExodusHelper;
-  vtkSMProperty* blockInfo[3];
-  vtkSMProperty* blockStatus[3];
-  int i;
-
-  blockInfo[0] = pxy->GetProperty("ElementBlockArrayInfo");
-  blockInfo[1] = pxy->GetProperty("HierarchyArrayInfo");
-  blockInfo[2] = pxy->GetProperty("MaterialArrayInfo");
-
-  blockStatus[0] = pxy->GetProperty("ElementBlockArrayStatus");
-  blockStatus[1] = pxy->GetProperty("HierarchyArrayStatus");
-  blockStatus[2] = pxy->GetProperty("MaterialArrayStatus");
-
-
-  vtkSMProperty* prop = NULL;
-  prop = pxy->GetProperty(propName.toAscii().data());
-
-  QList< QList< QVariant > > values;
-  // clear out any old stuff
-  for(i=0; i<3; i++)
-    {
-    pqSMAdaptor::setSelectionProperty(blockStatus[i], values);
-    }
-
-  foreach (QTreeWidgetItem* item, this->UI->PendingChangedItems)
-    {
-    // set only the selections that the user changed
-    pqTreeWidgetItemObject* itemObject = 
-      static_cast<pqTreeWidgetItemObject*>(item);
-    int index = values.size();
-    values.append(QList<QVariant>());
-    values[index].append(itemObject->text(0));
-    values[index].append(itemObject->isChecked());
-    }
-
-  // send change down to the vtkExodusReader
-  pqSMAdaptor::setSelectionProperty(prop, values);
-  pxy->UpdateProperty(propName.toAscii().data());
-
-  // get the new selections back
-  for(i=0; i<3; i++)
-    {
-    pxy->UpdatePropertyInformation(blockInfo[i]);
-    blockStatus[i]->Copy(blockInfo[i]);
-    }
-
-  QTreeWidget* widgets[3] =
-    {
-    this->UI->BlockArrayStatus,
-    this->UI->HierarchyArrayStatus,
-    this->UI->MaterialArrayStatus
-    };
-
-  for(i=0; i<3; i++)
-    {
-    values = pqSMAdaptor::getSelectionProperty(blockStatus[i]);
-    for(int j=0; j<values.size(); j++)
-      {
-      pqTreeWidgetItemObject* treeItemObject;
-      treeItemObject = static_cast<pqTreeWidgetItemObject*>(
-        widgets[i]->topLevelItem(j));
-      treeItemObject->setChecked(values[j][1].toBool());
-      }
-    }
-
-  this->UI->PendingChangedItems.clear();
-  this->UI->PendingChangedItemsPropertyName.clear();
-}
-
-void pqExodusIIPanel::selectionItemChanged(QTreeWidgetItem* item,
-                                         const QString& propName)
-{
-
-  vtkSMProxy* pxy = this->UI->ExodusHelper;
-
-  vtkSMProperty* blockInfo[3];
-  vtkSMProperty* blockStatus[3];
-  int i;
-  
-  //blockInfo[0] = pxy->GetProperty("EdgeBlockArrayInfo");
-  blockInfo[0] = pxy->GetProperty("ElementBlockArrayInfo");
-  //blockInfo[2] = pxy->GetProperty("FaceBlockArrayInfo");
-  blockInfo[1] = pxy->GetProperty("HierarchyArrayInfo");
-  blockInfo[2] = pxy->GetProperty("MaterialArrayInfo");
-  
-  //blockStatus[0] = pxy->GetProperty("EdgeBlockArrayStatus");
-  blockStatus[0] = pxy->GetProperty("ElementBlockArrayStatus");
-  //blockStatus[2] = pxy->GetProperty("FaceBlockArrayStatus");
-  blockStatus[1] = pxy->GetProperty("HierarchyArrayStatus");
-  blockStatus[2] = pxy->GetProperty("MaterialArrayStatus");
-
-  QList< QList< QVariant > > values;
-
-  pqTreeWidgetItemObject* itemObject;
-  itemObject = static_cast<pqTreeWidgetItemObject*>(item);
-  vtkSMProperty* prop = NULL;
-  prop = pxy->GetProperty(propName.toAscii().data());
-  
-  // clear out any old stuff
-  for(i=0; i<3; i++)
-    {
-    pqSMAdaptor::setSelectionProperty(blockStatus[i], values);
-    }
-
-  // set only the single selection the user changed
-  values.append(QList<QVariant>());
-  values[0].append(itemObject->text(0));
-  values[0].append(itemObject->isChecked());
-  // send change down to the vtkExodusReader
-  pqSMAdaptor::setSelectionProperty(prop, values);
-  pxy->UpdateProperty(propName.toAscii().data());
-
-  // get the new selections back
-  for(i=0; i<3; i++)
-    {
-    pxy->UpdatePropertyInformation(blockInfo[i]);
-    blockStatus[i]->Copy(blockInfo[i]);
-    }
-
-  QTreeWidget* widgets[3] =
-    {
-    this->UI->BlockArrayStatus,
-    this->UI->HierarchyArrayStatus,
-    this->UI->MaterialArrayStatus
-    };
-
-  for(i=0; i<3; i++)
-    {
-    values = pqSMAdaptor::getSelectionProperty(blockStatus[i]);
-    for(int j=0; j<values.size(); j++)
-      {
-      pqTreeWidgetItemObject* treeItemObject;
-      treeItemObject = static_cast<pqTreeWidgetItemObject*>(
-                       widgets[i]->topLevelItem(j));
-      if(treeItemObject)
-        {
-        treeItemObject->setChecked(values[j][1].toBool());
-        }
-      }
-    }
-
 }
 
 void pqExodusIIPanel::onRefresh()

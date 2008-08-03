@@ -119,10 +119,31 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////
 // MainWindow
-
+#include <QTreeView>
+#include "pqSILModel.h"
+#include "vtkGraphReader.h"
+#include "vtkExodusIIReaderParser.h"
+#include "vtkMutableDirectedGraph.h"
 MainWindow::MainWindow() :
   Implementation(new pqImplementation(this))
 {
+//  const char* filename = "/home/utkarsh/Kitware/Datasets/Exodus/DART_Examples/output/artifact.dta";
+//
+//  vtkExodusIIReaderParser* parser = vtkExodusIIReaderParser::New();
+//  parser->Go(filename);
+//  pqSILModel* model = new pqSILModel();
+//  model->update(parser->GetSIL());
+//  parser->Delete();
+//
+//  for (int cc=0; cc < 3; cc++)
+//    {
+//    QTreeView* treeView = new QTreeView();
+//    treeView->setModel(model);
+//    treeView->setRootIndex(model->hierarchies()[cc]);
+//    treeView->show(); 
+//    treeView->expandAll();
+//    }
+//
   this->Implementation->UI.setupUi(this);
 
   this->insertToolBarBreak(this->Implementation->UI.variableToolbar);

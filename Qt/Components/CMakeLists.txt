@@ -185,6 +185,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorKeyFrameType.h
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.h
+  pqSILModel.h
+  pqProxySILModel.h
   pqSimpleServerStartup.h
   pqSourceComboBox.h
   #pqSourceHistoryModel.h
@@ -612,6 +614,10 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorSelectionTreeWidget.h
   pqSignalAdaptorTreeWidget.cxx
   pqSignalAdaptorTreeWidget.h
+  pqSILModel.cxx
+  pqSILModel.h
+  pqProxySILModel.cxx
+  pqProxySILModel.h
   pqSimpleServerStartup.cxx
   pqSimpleServerStartup.h
   pqSourceComboBox.cxx
