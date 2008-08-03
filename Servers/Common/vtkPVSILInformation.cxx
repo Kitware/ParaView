@@ -25,7 +25,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVSILInformation);
-vtkCxxRevisionMacro(vtkPVSILInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVSILInformation, "1.2");
 vtkCxxSetObjectMacro(vtkPVSILInformation, SIL, vtkGraph);
 //----------------------------------------------------------------------------
 vtkPVSILInformation::vtkPVSILInformation()
@@ -88,10 +88,13 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
     return;
     }
 
+  vtkGraph* clone = this->SIL->NewInstance();
+  clone->ShallowCopy(this->SIL);
+
   vtkGraphWriter* writer = vtkGraphWriter::New();
   writer->SetFileTypeToBinary();
   writer->WriteToOutputStringOn();
-  writer->SetInput(this->SIL);
+  writer->SetInput(clone);
   writer->Write();
 
   *css << vtkClientServerStream::Reply
@@ -99,8 +102,9 @@ void vtkPVSILInformation::CopyToStream(vtkClientServerStream* css)
          writer->GetBinaryOutputString(),
          writer->GetOutputStringLength())
        << vtkClientServerStream::End;
-  writer->SetInput(0);
+  writer->RemoveAllInputs();
   writer->Delete();
+  clone->Delete();
 }
 
 //----------------------------------------------------------------------------
