@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>Plugin Manager</string>
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="2" >
@@ -29,9 +29,6 @@
       <string>Remote Plugins</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <item row="1" column="0" >
        <spacer>
         <property name="orientation" >
@@ -68,9 +65,6 @@
       <string>Local Plugins</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
       <item row="1" column="1" >
        <widget class="QPushButton" name="loadLocal" >
         <property name="text" >
