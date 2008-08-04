@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqServerManagerModel.h"
-#include "pqSMSignalAdaptors.h"
 
 #include <QDoubleValidator>
 
@@ -172,51 +171,36 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
   // Now bind the GUI widgets to the 3D widget.
 
   // The adaptor is used to format the text value.
-  pqSignalAdaptorDouble* adaptor = 
-    new pqSignalAdaptorDouble(this->Implementation->UI->originX,
-      "text", SIGNAL(textChanged(const QString&)));
 
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", 
-    SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->originX, 
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 0);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->originY,
-    "text", SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->originY,
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 1);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->originZ,
-    "text", SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->originZ,
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 2);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->normalX,
-    "text", SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", 
-    SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->normalX,
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 0);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->normalY,
-    "text", SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->normalY,
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 1);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->normalZ,
-    "text", SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+  this->Implementation->UI->normalZ,
+    "text", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 2);
-
 }
 
 //-----------------------------------------------------------------------------

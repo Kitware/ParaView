@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqSMSignalAdaptors.h"
 
 class pqBoxWidget::pqImplementation : public Ui::pqBoxWidget
 {
@@ -117,11 +116,9 @@ pqBoxWidget::~pqBoxWidget()
 
 #define PVBOXWIDGET_LINK(ui, smproperty, index)\
 {\
-  pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(\
-    this->Implementation->ui, "text",\
-    SIGNAL(textChanged(const QString&)));\
   this->Implementation->Links.addPropertyLink(\
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),\
+    this->Implementation->ui, "text",\
+    SIGNAL(textChanged(const QString&)),\
     widget, widget->GetProperty(smproperty), index);\
 }
 

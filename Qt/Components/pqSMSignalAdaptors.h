@@ -61,33 +61,5 @@ protected:
   QByteArray PropertyName;
 };
 
-
-// This adaptor is used to connect a QWidget (typically a QLineEdit)
-// to a DoubleVectorProperty using a pqPropertyLink.
-// It formats the text shown in the widget to a more
-// readable form. 
-class PQCOMPONENTS_EXPORT pqSignalAdaptorDouble : public QObject
-{
-  Q_OBJECT
-  Q_PROPERTY(QString value READ value WRITE setValue)
-public:
-  pqSignalAdaptorDouble(QObject* parent, const char* property,
-    const char* signal);
-  ~pqSignalAdaptorDouble();
-
-  QString value();
-signals:
-  void valueChanged(const QString&);
-
-public slots:
-  void setValue(const QString& value);
-
-protected slots:
-  void objectSignalFired();
-
-protected:
-  QString PropertyName;
-};
-
 #endif
 

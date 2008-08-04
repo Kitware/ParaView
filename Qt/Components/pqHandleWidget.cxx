@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
-#include "pqSMSignalAdaptors.h"
 
 #include <QDoubleValidator>
 #include <QShortcut>
@@ -147,25 +146,19 @@ void pqHandleWidget::createWidget(pqServer* server)
   widget->UpdateVTKObjects();
   widget->UpdatePropertyInformation();
 
-  pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->worldPositionX, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->worldPositionX, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 0);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->worldPositionY, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->worldPositionY, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 1);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI->worldPositionZ, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI->worldPositionZ, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 2);
 }
 

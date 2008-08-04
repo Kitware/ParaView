@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineWidget.h"
 #include "pqPropertyLinks.h"
 #include "pqProxy.h"
-#include "pqSMSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "vtkEventQtSlotConnect.h"
 
@@ -307,46 +306,34 @@ void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
   this->Implementation->WidgetPoint2 = vtkSMDoubleVectorProperty::SafeDownCast(
     widget->GetProperty("Point2WorldPosition"));
 
-  pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point1X, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point1X, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 0);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point1Y, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point1Y, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 1);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point1Z, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point1Z, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 2);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point2X, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point2X, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 0);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point2Y, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point2Y, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 1);
 
-  adaptor = new pqSignalAdaptorDouble(
-    this->Implementation->UI.point2Z, "text",
-    SIGNAL(textChanged(const QString&)));
   this->Implementation->Links.addPropertyLink(
-    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    this->Implementation->UI.point2Z, "text",
+    SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 2);
 
 }
