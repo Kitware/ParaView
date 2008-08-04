@@ -3427,6 +3427,7 @@
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
          <Property name="Refresh" />
+         <Property name="SILUpdateStamp" />
          <Property name="EdgeBlockArrayInfo" />
          <Property name="EdgeBlockArrayStatus" />
          <Property name="FaceBlockArrayInfo" />
