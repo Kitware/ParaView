@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqDisplayProxyEditor.h"
 
 // Qt includes
+#include <QDoubleValidator>
 #include <QFileInfo>
 #include <QIcon>
 #include <QIntValidator>
@@ -283,55 +284,80 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
 
   // setup for translate
   this->Internal->Links->addPropertyLink(this->Internal->TranslateX,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 0);
+  QDoubleValidator* validator = new QDoubleValidator(this);
+  this->Internal->TranslateX->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->TranslateY,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 1);
+  validator = new QDoubleValidator(this);
+  this->Internal->TranslateY->setValidator(validator);
   
   this->Internal->Links->addPropertyLink(this->Internal->TranslateZ,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Position"), 2);
+  validator = new QDoubleValidator(this);
+  this->Internal->TranslateZ->setValidator(validator);
+
 
   // setup for scale
   this->Internal->Links->addPropertyLink(this->Internal->ScaleX,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 0);
+  validator = new QDoubleValidator(this);
+  this->Internal->ScaleX->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleY,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 1);
+  validator = new QDoubleValidator(this);
+  this->Internal->ScaleY->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->ScaleZ,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Scale"), 2);
+  validator = new QDoubleValidator(this);
+  this->Internal->ScaleZ->setValidator(validator);
 
   // setup for orientation
   this->Internal->Links->addPropertyLink(this->Internal->OrientationX,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 0);
+  validator = new QDoubleValidator(this);
+  this->Internal->OrientationX->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationY,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 1);
+  validator = new QDoubleValidator(this);
+  this->Internal->OrientationY->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->OrientationZ,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Orientation"), 2);
+  validator = new QDoubleValidator(this);
+  this->Internal->OrientationZ->setValidator(validator);
 
   // setup for origin
   this->Internal->Links->addPropertyLink(this->Internal->OriginX,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 0);
+  validator = new QDoubleValidator(this);
+  this->Internal->OriginX->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginY,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 1);
+  validator = new QDoubleValidator(this);
+  this->Internal->OriginY->setValidator(validator);
 
   this->Internal->Links->addPropertyLink(this->Internal->OriginZ,
-    "value", SIGNAL(editingFinished()),
+    "text", SIGNAL(editingFinished()),
     reprProxy, reprProxy->GetProperty("Origin"), 2);
+  validator = new QDoubleValidator(this);
+  this->Internal->OriginZ->setValidator(validator);
 
   // setup for opacity
   this->Internal->Links->addPropertyLink(this->Internal->Opacity,
