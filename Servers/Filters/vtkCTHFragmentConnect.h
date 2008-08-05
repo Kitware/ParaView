@@ -212,12 +212,14 @@ public:
   /// Output file
   // Description:
   // Name the file to save a table of fragment attributes to.
-  vtkSetStringMacro(OutputTableFileNameBase);
-  vtkGetStringMacro(OutputTableFileNameBase);
+  vtkSetStringMacro(OutputBaseName);
+  vtkGetStringMacro(OutputBaseName);
   // Description:
   // If true, save the results of the filter in a text file
-  vtkSetMacro(WriteOutputTableFile,bool);
-  vtkGetMacro(WriteOutputTableFile,bool);
+  vtkSetMacro(WriteGeometryOutput,bool);
+  vtkGetMacro(WriteGeometryOutput,bool);
+  vtkSetMacro(WriteStatisticsOutput,bool);
+  vtkGetMacro(WriteStatisticsOutput,bool);
 
   // Description:
   // Sets modified if array selection changes.
@@ -402,7 +404,8 @@ protected:
   void CopyAttributesToOutput1();
   void CopyAttributesToOutput2();
   // Write a text file containing local fragment attributes.
-  int WriteFragmentAttributesToTextFile();
+  int WriteGeometryOutputToTextFile();
+  int WriteStatisticsOutputToTextFile();
   // Build the output data
   int BuildOutputs(vtkMultiBlockDataSet *mbdsOutput0,
                   vtkMultiBlockDataSet *mbdsOutput1,
@@ -625,8 +628,9 @@ protected:
   vtkDataArraySelection *MassWtdAvgArraySelection;
   vtkDataArraySelection *SummationArraySelection;
   vtkCallbackCommand *SelectionObserver;
-  char *OutputTableFileNameBase;
-  bool WriteOutputTableFile;
+  char *OutputBaseName;
+  bool WriteGeometryOutput;
+  bool WriteStatisticsOutput;
   int DrawOBB;
   double Progress;
   double ProgressMaterialInc;

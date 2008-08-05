@@ -6479,8 +6479,18 @@ Tessellate a higher-order dataset.
           are used on tuple boundaries while spaces are used
           on component boundaries.-->
      <IntVectorProperty 
-        name="WriteOutputTableFile" 
-        command="SetWriteOutputTableFile" 
+        name="WriteGeometryOutput"
+        command="SetWriteGeometryOutput"
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set, then attributes of the fragments produced by the filter are written to a text file.
+       </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty 
+        name="WriteStatisticsOutput"
+        command="SetWriteStatisticsOutput"
         number_of_elements="1"
         default_values="0" > 
        <BooleanDomain name="bool"/>
@@ -6490,8 +6500,8 @@ Tessellate a higher-order dataset.
      </IntVectorProperty>
 
      <StringVectorProperty
-        name="OutputTableFileNameBase"
-        command="SetOutputTableFileNameBase"
+        name="OutputBaseName"
+        command="SetOutputBaseName"
         animateable="0"
         number_of_elements="1">
         <Documentation>
