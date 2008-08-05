@@ -77,6 +77,14 @@ pqColorScaleToolbar::pqColorScaleToolbar(QObject *parentObject)
   this->RescaleAction = 0;
 }
 
+//-----------------------------------------------------------------------------
+pqColorScaleToolbar::~pqColorScaleToolbar()
+{
+  delete this->Internal;
+  this->Internal = 0;
+}
+
+//-----------------------------------------------------------------------------
 void pqColorScaleToolbar::setColorAction(QAction *action)
 {
   if(action != this->ColorAction)

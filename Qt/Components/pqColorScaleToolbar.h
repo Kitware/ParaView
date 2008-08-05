@@ -49,7 +49,7 @@ class PQCOMPONENTS_EXPORT pqColorScaleToolbar : public QObject
 
 public:
   pqColorScaleToolbar(QObject *parent=0);
-  virtual ~pqColorScaleToolbar() {}
+  virtual ~pqColorScaleToolbar();
 
   /// Sets the color map editor/color chooser tool button.
   void setColorAction(QAction *action);
