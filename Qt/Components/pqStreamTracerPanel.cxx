@@ -168,15 +168,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
       }
     else if(source->GetVTKClassName() == QString("vtkLineSource"))
       {
-      if(vtkSMIntVectorProperty* const resolution =
-        vtkSMIntVectorProperty::SafeDownCast(
-          source->GetProperty("Resolution")))
-        {
-        resolution->SetNumberOfElements(1);
-        resolution->SetElement(0, 100);
-        }
-      source->UpdateVTKObjects();
-
       this->Implementation->LineSourceWidget =
         new pqLineSourceWidget(this->proxy(), source, NULL);
       this->Implementation->LineSourceWidget->hideWidget();
@@ -260,14 +251,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
     this->Implementation->LineSourceWidget, SLOT(setView(pqView*)));
 
   QObject::connect(
-    this->Implementation->PointSourceWidget, SIGNAL(modified()),
-    this, SLOT(setModified()));
-
-  QObject::connect(
-    this->Implementation->LineSourceWidget, SIGNAL(modified()),
-    this, SLOT(setModified()));
-
-  QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->PointSourceWidget, SLOT(accept()));
   QObject::connect(
     this, SIGNAL(onaccept()), this->Implementation->LineSourceWidget, SLOT(accept()));
@@ -278,6 +261,15 @@ pqStreamTracerPanel::pqStreamTracerPanel(pqProxy* object_proxy, QWidget* p) :
   
   pqNamedWidgets::link(this, this->proxy(), 
     this->propertyManager());
+
+  QObject::connect(
+    this->Implementation->PointSourceWidget, SIGNAL(modified()),
+    this, SLOT(setModified()));
+
+  QObject::connect(
+    this->Implementation->LineSourceWidget, SIGNAL(modified()),
+    this, SLOT(setModified()));
+
 }
 
 //-----------------------------------------------------------------------------

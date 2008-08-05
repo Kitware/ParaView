@@ -4696,7 +4696,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
            </ProxyGroupDomain>
            <ProxyListDomain name="proxy_list">
               <Proxy group="extended_sources" name="PointSource" />
-              <Proxy group="extended_sources" name="LineSource" />
+              <Proxy group="extended_sources" name="HighResLineSource" />
            </ProxyListDomain>
            <Documentation>
              The value of this property determines how the seeds for the streamlines will be generated.
