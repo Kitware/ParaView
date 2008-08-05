@@ -194,7 +194,7 @@ void pqTextureComboBox::setRepresentation(pqDataRepresentation* repr)
   // When the repr is updated, its likely that the available arrays have
   // changed, and texture coords may have become available. Hence, we update the
   // enabled state.
-  QObject::connect(this->Internal->Representation, SIGNAL(updated()),
+  QObject::connect(this->Internal->Representation, SIGNAL(dataUpdated()),
     this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
   // When the texture attached to the representation changes, we want to update

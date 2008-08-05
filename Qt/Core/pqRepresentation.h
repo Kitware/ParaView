@@ -91,9 +91,6 @@ signals:
   /// hasn't changed.
   void visibilityChanged(bool visible);
 
-  /// Fired whenever Update() is called on the underlying display proxy.
-  void updated();
-
 protected slots:
   /// called when the display visibility property changes.
   virtual void onVisibilityChanged();

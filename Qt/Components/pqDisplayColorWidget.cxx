@@ -354,16 +354,10 @@ void pqDisplayColorWidget::setRepresentation(pqDataRepresentation* display)
         this, SLOT(needReloadGUI()),
         NULL, 0.0);
       }
-    
-    this->VTKConnect->Connect(
-      this->Representation->getOutputPortFromInput()->getOutputPortProxy(),
-      vtkCommand::UpdateInformationEvent, 
-      this, SLOT(needReloadGUI()),
-      NULL, 0.0);
-    
+
     // Every time the display updates, it is possible that the arrays available for 
     // coloring have changed, hence we reload the list.
-    QObject::connect(this->Representation, SIGNAL(updated()), 
+    QObject::connect(this->Representation, SIGNAL(dataUpdated()),
       this, SLOT(needReloadGUI()));
     }
   this->needReloadGUI();

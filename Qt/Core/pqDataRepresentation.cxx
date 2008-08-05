@@ -74,6 +74,8 @@ pqDataRepresentation::pqDataRepresentation(const QString& group,
   this->Internal = new pqDataRepresentationInternal;
   this->Internal->VTKConnect->Connect(repr->GetProperty("Input"),
     vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
+  this->Internal->VTKConnect->Connect(repr, vtkCommand::UpdateDataEvent,
+    this, SIGNAL(dataUpdated()));
 }
 
 //-----------------------------------------------------------------------------

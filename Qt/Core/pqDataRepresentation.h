@@ -95,6 +95,10 @@ public:
   /// This may trigger a pipeline update to obtain correct data sizes.
   unsigned long getFullResMemorySize();
 
+signals:
+  /// Fired when the representation proxy fires the vtkCommand::UpdateDataEvent.
+  void dataUpdated();
+
 protected slots:
   /// called when input property on display changes. We must detect if
   /// (and when) the display is connected to a new proxy.
