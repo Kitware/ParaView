@@ -227,7 +227,7 @@ QModelIndex pqSILModel::index(int row, int column,
     }
     
   // Ensure that the vertexId refers to a non-leaf node.
-  if (!this->isLeaf(vertexId))
+  if (this->SIL && !this->isLeaf(vertexId))
     {
     if (row < this->SIL->GetOutDegree(vertexId))
       {
