@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.3");
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.4");
 
 vtkCxxSetObjectMacro(vtkParallelSerialWriter,Writer,vtkAlgorithm);
 
@@ -129,7 +129,10 @@ if (!this->Writer)
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cds->NewIterator());
     iter->SetSkipEmptyNodes(0);
-    for(iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    int idx;
+    for(idx=0, iter->InitTraversal(); 
+        !iter->IsDoneWithTraversal(); 
+        iter->GoToNextItem(), idx++)
       {
       vtkDataObject* curObj = iter->GetCurrentDataObject();
       vtkSmartPointer<vtkPolyData> pd;
@@ -146,7 +149,6 @@ if (!this->Writer)
         {
         pd.TakeReference(vtkPolyData::New());
         }
-      unsigned int idx = iter->GetCurrentFlatIndex();
       vtkstd::string path = 
         vtksys::SystemTools::GetFilenamePath(this->FileName);
       vtkstd::string fnamenoext =
