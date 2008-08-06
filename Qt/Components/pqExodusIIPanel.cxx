@@ -183,7 +183,6 @@ void pqExodusIIPanel::updateSIL()
   if (stamp != this->UI->SILUpdateStamp)
     {
     this->UI->SILUpdateStamp = stamp;
-    cout << "pqExodusIIPanel::updateSIL()" << endl;
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkPVSILInformation* info = vtkPVSILInformation::New();
     pm->GatherInformation(reader->GetConnectionID(),
