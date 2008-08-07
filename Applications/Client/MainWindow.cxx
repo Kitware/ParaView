@@ -751,25 +751,30 @@ MainWindow::MainWindow() :
 
   // 3d Selection Modes
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(enableSurfaceSelection(bool)),
     this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(enableSurfacePointsSelection(bool)),
     this->Implementation->UI.actionSelectSurfacePoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(enableFrustumSelection(bool)),
     this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(enableFrustumPointSelection(bool)),
     this->Implementation->UI.actionSelectFrustumPoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), SIGNAL(enabled(bool)),
+    this->Implementation->Core.renderViewSelectionHelper(), 
+    SIGNAL(enableBlockSelection(bool)),
     this->Implementation->UI.actionSelect_Block, SLOT(setEnabled(bool)));
 
 
   QObject::connect(
     this->Implementation->UI.actionSelectionMode, SIGNAL(triggered()),
-    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSelection()));
+    this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSurfaceSelection()));
   QObject::connect(
     this->Implementation->UI.actionSelectSurfacePoints, SIGNAL(triggered()),
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginSurfacePointsSelection()));
