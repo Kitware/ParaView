@@ -79,6 +79,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     __init__
     numeric
     util
+    benchmark
     )
 
   # Now copy these files if necessary.
