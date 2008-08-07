@@ -81,7 +81,7 @@ public slots:
 
   /// Begin rubber band surface selection on the view. 
   /// Has any effect only if active view is a render view.
-  void beginSelection();
+  void beginSurfaceSelection();
   void beginSurfacePointsSelection();
   void beginFrustumSelection();
   void beginFrustumPointsSelection();
@@ -104,7 +104,11 @@ signals:
 
   /// Fired to indicate whether the selection can be create on the currently set
   /// view.
-  void enabled(bool enable);
+  void enableSurfaceSelection(bool enabled);
+  void enableSurfacePointsSelection(bool enabled);
+  void enableFrustumSelection(bool enabled);
+  void enableFrustumPointSelection(bool enabled);
+  void enableBlockSelection(bool enabled);
 
   /// Fired with selection mode changes. 
   /// \c selectionMode is enum Modes{...}.
@@ -116,6 +120,9 @@ signals:
   /// Fired to mark the start and ends of election.
   void startSelection();
   void stopSelection();
+
+protected slots:
+  void emitEnabledSignals();
 
 protected:
   int setRubberBandOn(int mode);

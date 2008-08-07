@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 
 // Qt Includes.
-#include <QWidget>
 #include <QCursor>
 #include <QPointer>
-
+#include <QTimer>
+#include <QWidget>
 
 // ParaView includes.
 #include "vtkCommand.h"
@@ -119,6 +119,8 @@ pqRubberBandHelper::pqRubberBandHelper(QObject* _parent/*=null*/)
   this->Internal = new pqInternal(this);
   this->Mode = INTERACT;
   this->DisableCount = 0;
+  QObject::connect(this, SIGNAL(enableSurfaceSelection(bool)),
+    this, SIGNAL(enableBlockSelection(bool)));
 }
 
 //-----------------------------------------------------------------------------
@@ -131,10 +133,7 @@ pqRubberBandHelper::~pqRubberBandHelper()
 void pqRubberBandHelper::DisabledPush()
 {
   this->DisableCount++;
-  if (this->DisableCount == 1)
-    {
-    emit this->enabled(false);
-    }
+  this->emitEnabledSignals();
 }
 
 //-----------------------------------------------------------------------------
@@ -143,13 +142,35 @@ void pqRubberBandHelper::DisabledPop()
   if (this->DisableCount > 0)
     {
     this->DisableCount--;
-    if (this->DisableCount == 0 && this->Internal->RenderView)
-      {
-      emit this->enabled(true);
-      }
+    this->emitEnabledSignals();
     }
 }
 
+
+//-----------------------------------------------------------------------------
+void pqRubberBandHelper::emitEnabledSignals()
+{
+  if (this->DisableCount == 1 || !this->Internal->RenderView)
+    {
+    emit this->enableSurfaceSelection(false);
+    emit this->enableSurfacePointsSelection(false);
+    emit this->enableFrustumSelection(false);
+    emit this->enableFrustumPointSelection(false);
+    return;
+    }
+
+  if (this->DisableCount == 0 && this->Internal->RenderView)
+    {
+    vtkSMRenderViewProxy* proxy = 
+      this->Internal->RenderView->getRenderViewProxy();
+    emit this->enableSurfaceSelection(
+      proxy->IsSelectVisibleCellsAvailable() == NULL);
+    emit this->enableSurfacePointsSelection(
+      proxy->IsSelectVisiblePointsAvailable() == NULL);
+    emit this->enableFrustumSelection(true);
+    emit this->enableFrustumPointSelection(true);
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqRubberBandHelper::setView(pqView* view)
@@ -169,7 +190,7 @@ void pqRubberBandHelper::setView(pqView* view)
 
   this->Internal->RenderView = renView;
   this->Mode = INTERACT;
-  emit this->enabled((renView != 0) && (this->DisableCount == 0));
+  QTimer::singleShot(10, this, SLOT(emitEnabledSignals()));
 }
 
 //-----------------------------------------------------------------------------
@@ -269,7 +290,7 @@ pqRenderView* pqRubberBandHelper::getRenderView() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRubberBandHelper::beginSelection()
+void pqRubberBandHelper::beginSurfaceSelection()
 {
   this->setRubberBandOn(SELECT);
 }

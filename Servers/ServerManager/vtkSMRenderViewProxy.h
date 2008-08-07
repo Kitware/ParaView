@@ -182,11 +182,19 @@ public:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will 
   // quietly return an empty selection.
-  int IsSelectionAvailable();
+  bool IsSelectionAvailable();
+
+  //BTX
+  // Description:
+  // Similar to IsSelectionAvailable(), however, on failure returns the 
+  // error message otherwise 0.
+  virtual const char* IsSelectVisibleCellsAvailable();
+  virtual const char* IsSelectVisiblePointsAvailable();
+  //ETX
 
   // Description:
   // Return a list of visible cells within the provided screen area.
-  vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, 
+  virtual vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, 
     unsigned int x1, unsigned int y1, int ofPoints);
 
   // Description:

@@ -44,6 +44,16 @@ public:
   // inaccessible display.
   vtkGetMacro(RemoteRenderAvailable, bool);
 
+  // Description:
+  // Overridden to ensure that remote rendering is available since remote
+  // rendering is required for visible cell selection.
+  virtual const char* IsSelectVisibleCellsAvailable();
+
+  // Description:
+  // Overridden to force remote rendering before selecting.
+  virtual vtkSelection *SelectVisibleCells(unsigned int x0, unsigned int y0, 
+    unsigned int x1, unsigned int y1, int ofPoints);
+
 //BTX
 protected:
   vtkSMMultiProcessRenderView();

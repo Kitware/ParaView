@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.7");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.8");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -156,6 +156,46 @@ void vtkSMMultiProcessRenderView::EndCreateVTKObjects()
     this->RemoteRenderAvailable = (di->GetCanOpenDisplay() == 1);
     di->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMMultiProcessRenderView::IsSelectVisibleCellsAvailable()
+{
+  const char* msg = this->Superclass::IsSelectVisibleCellsAvailable();
+  if (msg)
+    {
+    return msg;
+    }
+
+  if (!this->GetRemoteRenderAvailable())
+    {
+    // Cannot remote render.
+    return "Selection not supported since it's not possible "
+      "to render on the server side";
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkSelection *vtkSMMultiProcessRenderView::SelectVisibleCells(
+  unsigned int x0, unsigned int y0, 
+  unsigned int x1, unsigned int y1, int ofPoints)
+{
+  if (!this->IsSelectionAvailable())
+    {
+    return this->Superclass::SelectVisibleCells(x0, y0, x1, y1, ofPoints);
+    }
+
+  //Force parallel compositing on for the selection render.
+  //TODO: intelligently code dataserver rank into originalcellids to
+  //make this ugly hack unecessary.
+  double compThresh = this->GetRemoteRenderThreshold();
+  this->SetRemoteRenderThreshold(0.0);
+  vtkSelection* reply = 
+    this->Superclass::SelectVisibleCells(x0, y0, x1, y1, ofPoints);
+  this->SetRemoteRenderThreshold(compThresh);
+  return reply;
 }
 
 //----------------------------------------------------------------------------

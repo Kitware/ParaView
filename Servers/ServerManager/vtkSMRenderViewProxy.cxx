@@ -64,9 +64,6 @@
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkSMMultiProcessRenderView.h"
-#include "vtkProp3DCollection.h"
-
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -92,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.72");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.73");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1231,38 +1228,55 @@ void vtkSMRenderViewProxy::ResetPolygonsPerSecondResults()
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMRenderViewProxy::IsSelectionAvailable()
-{ 
-  vtkSMMultiProcessRenderView *me2 = 
-    vtkSMMultiProcessRenderView::SafeDownCast(this);
-  if (me2 != NULL)
+bool vtkSMRenderViewProxy::IsSelectionAvailable()
+{
+  const char* msg = this->IsSelectVisibleCellsAvailable();
+  if (msg)
     {
-    if (!me2->GetRemoteRenderAvailable())
-      {
-      // Cannot remote render.
-      vtkErrorMacro("Selection not supported since it's not possible "
-        "to render on the server side");
-      return 0;
-      }
+    vtkErrorMacro(<< msg);
+    return false;
     }
 
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
+{ 
   //check if we don't have enough color depth to do color buffer selection
   //if we don't then disallow selection
   int rgba[4];
   vtkRenderWindow *rwin = this->GetRenderWindow();
   if (!rwin)
     {
-    return 0;
+    return "No render window available";
     }
+
   rwin->GetColorBufferSizes(rgba);
   if (rgba[0] < 8 || rgba[1] < 8 || rgba[2] < 8)
     {
-    vtkErrorMacro("Selection not supported due to insufficied color depth.");
-    return 0;
+    return "Selection not supported due to insufficient color depth.";
     }
 
   //yeah!
-  return 1;
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMRenderViewProxy::IsSelectVisiblePointsAvailable()
+{
+  const char* msg = this->IsSelectVisibleCellsAvailable();
+  if (msg)
+    {
+    return msg;
+    }
+
+  vtkRenderWindow *rwin = this->GetRenderWindow();
+  if (!rwin || !rwin->GetStencilCapable())
+    {
+    return "Stencil buffers are not supported.";
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -1688,18 +1702,6 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     this->ForceTriStripUpdate = 0;
     }
 
-  double compThresh = 0.0;
-  //Force parallel compositing on for the selection render.
-  //TODO: intelligently code dataserver rank into originalcellids to
-  //make this ugly hack unecessary.
-  vtkSMMultiProcessRenderView *me2 = 
-    vtkSMMultiProcessRenderView::SafeDownCast(this);
-  if (me2 != NULL)
-    {
-    compThresh = me2->GetRemoteRenderThreshold();
-    me2->SetRemoteRenderThreshold(0.0);
-    }      
-
   if (ofPoints)
     {
     pti->SetDoVertices(1);
@@ -1752,12 +1754,6 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     {
     this->SetUseTriangleStrips(1);
     }
-
-  //Force parallel compositing on for the selection render.
-  if (me2 != NULL)
-    {
-    me2->SetRemoteRenderThreshold(compThresh);
-    }      
 
   for (int i = 0; i < numlayers; i++)
     {
