@@ -64,6 +64,9 @@ pqRepresentation::pqRepresentation( const QString& group,
   this->Internal = new pqRepresentation::pqInternal();
   this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
+  // vtkCommand::EndEvent is fired when the representation is updated.
+  this->Internal->VTKConnect->Connect(
+    repr, vtkCommand::EndEvent, this, SIGNAL(updated()));
   if (repr->GetProperty("Visibility"))
     {
     this->Internal->VTKConnect->Connect(
