@@ -1,8 +1,12 @@
+""" This module can be used to run a simple rendering benchmark test. This
+test renders a sphere with various rendering settings and reports the rendering
+rate achieved in triangles/sec. """
+
 import time
 import sys
 from paraview import servermanager
 
-def render(ss, v, title):
+def render(ss, v, title, nframes):
   print '============================================================'
   print title
   res = []
@@ -10,7 +14,6 @@ def render(ss, v, title):
   for phires in (500, 1000):
     ss.PhiResolution = phires
     c = v.GetActiveCamera()
-    nframes = 60
     v.CameraPosition = [-3, 0, 0]
     v.CameraFocalPoints = [0, 0, 0]
     v.CameraViewUp = [0, 0, 1]
@@ -35,7 +38,11 @@ def render(ss, v, title):
   return res
 
 
-def run():
+def run(filename=None, nframes=60):
+  """ Runs the benchmark. If a filename is specified, it will write the
+  results to that file as csv. The number of frames controls how many times
+  a particular configuration is rendered. Higher numbers lead to more accurate
+  averages. """
   # Turn off progress printing
   if servermanager.progressObserverTag:
     servermanager.ToggleProgressPrinting()
@@ -52,26 +59,30 @@ def run():
   rep = servermanager.CreateRepresentation(ss, v, registrationGroup="representations", registrationName="benchmark rep")
   
   results = []
+
+  # Start with these defaults
+  v.RemoteRenderThreshold = 0
+  v.UseImmediateMode = 0
+  v.UseTriangleStrips = 0
   
   # Test different configurations
-  v.RemoteRenderThreshold = 0
   v.UseImmediateMode = 0
   title = 'display lists, no triangle strips, solid color'
   v.UseTriangleStrips = 0
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   
   title = 'display lists, triangle strips, solid color'
   v.UseTriangleStrips = 1
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   
   v.UseImmediateMode = 1
   title = 'no display lists, no triangle strips, solid color'
   v.UseTriangleStrips = 0
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   
   title = 'no display lists, triangle strips, solid color'
   v.UseTriangleStrips = 1
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   
   # Color by normals
   lt = servermanager.rendering.PVLookupTable()
@@ -85,20 +96,21 @@ def run():
   v.UseImmediateMode = 0
   title = 'display lists, no triangle strips, color by array'
   v.UseTriangleStrips = 0
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
 
   title = 'display lists, triangle strips, color by array'
   v.UseTriangleStrips = 1
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   v.UseImmediateMode = 1
 
+  v.UseImmediateMode = 1
   title = 'no display lists, no triangle strips, color by array'
   v.UseTriangleStrips = 0
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
 
   title = 'no display lists, triangle strips, color by array'
   v.UseTriangleStrips = 1
-  results.append(render(ss, v, title))
+  results.append(render(ss, v, title, nframes))
   
   newr = []
   for r in v.Representations:
@@ -114,11 +126,15 @@ def run():
   
   v.StillRender()
   v = None
-  
-  return results
+
+  if filename:
+    f = open(filename, "w")
+  else:
+    f = sys.stdout
+  print >>f, 'configuration, %d, %d' % (results[0][1][0], results[0][2][0])
+  for i in results:
+    print >>f, '"%s", %g, %g' % (i[0], i[1][1], i[2][1])  
 
 if __name__ == "__main__":
-  import pickle
-  p = pickle.Pickler(open("result.bench", "w"))
   servermanager.Connect()
-  p.dump(run())
+  run()
