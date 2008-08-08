@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqDisplayPolicy.h"
 #include "pqNameCount.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
@@ -474,6 +475,12 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
   // Set the reprProxy's input.
   pqSMAdaptor::setInputProperty(reprProxy->GetProperty("Input"), 
     source->getProxy(), opPort->getPortNumber());
+  // Let application ignore default and hide display of filters if they must.
+  if (pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault())
+    {
+    pqSMAdaptor::setElementProperty(reprProxy->GetProperty("Visibility"),
+                                    0);
+    }
   reprProxy->UpdateVTKObjects();
 
   // Add the reprProxy to render module.

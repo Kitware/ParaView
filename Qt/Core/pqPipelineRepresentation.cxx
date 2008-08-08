@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
+#include "pqDisplayPolicy.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineRepresentation::pqInternal
@@ -215,7 +216,9 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // its messing up with the scalar coloring.
   // this->Superclass::setDefaultPropertyValues();
 
-  if (!this->isVisible())
+  if (!this->isVisible() &&
+      !pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault()
+      )
     {
     // don't worry about invisible displays.
     return;

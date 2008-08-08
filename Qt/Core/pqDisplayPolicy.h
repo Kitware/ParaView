@@ -103,6 +103,14 @@ public:
   /// fetching the data information from the port.
   virtual QString getPreferredViewType(pqOutputPort* opPort, bool update_pipeline) const;
 
+  // Description
+  // Apps can choose whether new filter outputs are hidden upon creation by
+  // overriding this method. The default behavior is to create a representation
+  // such that it obeys to the Visibility from rendering.xml.
+  virtual bool getHideByDefault() const {
+    return false;
+  }
+
 protected:
   /// Determines the type of view that's preferred by the \c source. If \c view
   /// is of the preferred type, returns it. Otherwise a new view of the preferred 
