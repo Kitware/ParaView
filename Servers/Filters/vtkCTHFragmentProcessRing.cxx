@@ -14,21 +14,65 @@
 =========================================================================*/
 #include "vtkCTHFragmentProcessRing.h"
 #include "vtksys/ios/iostream"
+using vtkstd::vector;
 using vtksys_ios::ostream;
 using vtksys_ios::cerr;
 using vtksys_ios::endl;
 //
+// void vtkCTHFragmentProcessRing::Initialize(
+//     vtkCTHFragmentProcessPriorityQueue &Q,
+//     vtkIdType upperLoadingBound)
+// {
+//   this->NextElement=0;
+//   this->BufferSize=0;
+//   this->Buffer.clear();
+// 
+//   // check that upper bound does not exclude
+//   // all processes.
+//   vtkCTHFragmentProcessLoading &pl=Q.Pop();
+//   vtkIdType minimumLoading=pl.GetLoadFactor();
+// 
+//   // Make sure at least one process can be used.
+//   if (upperLoadingBound!=-1
+//       && minimumLoading>upperLoadingBound)
+//     {
+//     upperLoadingBound=minimumLoading;
+//     cerr << "vtkCTHFragmentProcessRing "
+//           << "[" << __LINE__ << "] "
+//           << "Error: Upper loading bound excludes all processes."
+//           << endl;
+//     }
+// 
+//   // Build ring of process ids.
+//   this->Buffer.push_back(pl.GetId());
+//   ++this->BufferSize;
+//   while (!Q.Empty())
+//     {
+//     pl=Q.Pop();
+//     if (upperLoadingBound!=-1
+//         && pl.GetLoadFactor()>upperLoadingBound)
+//       {
+//       break;
+//       }
+//     this->Buffer.push_back(pl.GetId());
+//     ++this->BufferSize;
+//     }
+// }
+//
 void vtkCTHFragmentProcessRing::Initialize(
-    vtkCTHFragmentProcessPriorityQueue &Q,
+    vector<vtkCTHFragmentProcessLoading> &Q,
     vtkIdType upperLoadingBound)
 {
   this->NextElement=0;
   this->BufferSize=0;
   this->Buffer.clear();
 
+  int nItems=Q.size();
+  assert(nItems>0);
+
   // check that upper bound does not exclude
   // all processes.
-  vtkCTHFragmentProcessLoading &pl=Q.Pop();
+  vtkCTHFragmentProcessLoading &pl=Q[0];
   vtkIdType minimumLoading=pl.GetLoadFactor();
 
   // Make sure at least one process can be used.
@@ -45,9 +89,9 @@ void vtkCTHFragmentProcessRing::Initialize(
   // Build ring of process ids.
   this->Buffer.push_back(pl.GetId());
   ++this->BufferSize;
-  while (!Q.Empty())
+  for (int itemId=1; itemId<nItems; ++itemId)
     {
-    pl=Q.Pop();
+    pl=Q[itemId];
     if (upperLoadingBound!=-1
         && pl.GetLoadFactor()>upperLoadingBound)
       {

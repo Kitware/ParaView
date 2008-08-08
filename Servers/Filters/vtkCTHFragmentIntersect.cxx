@@ -41,7 +41,6 @@
 #include "vtkPointAccumulator.hxx"
 #include "vtkCTHFragmentPieceLoading.h"
 #include "vtkCTHFragmentProcessLoading.h"
-#include "vtkCTHFragmentProcessPriorityQueue.h"
 #include "vtkCTHFragmentProcessRing.h"
 #include "vtkCTHFragmentToProcMap.h"
 #include "vtkCTHFragmentPieceTransaction.h"
@@ -66,7 +65,7 @@ using vtkstd::string;
 // other
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.7");
+vtkCxxRevisionMacro(vtkCTHFragmentIntersect, "1.8");
 vtkStandardNewMacro(vtkCTHFragmentIntersect);
 
 //----------------------------------------------------------------------------

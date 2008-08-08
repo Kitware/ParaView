@@ -23,8 +23,8 @@
 #define __vtkCTHFragmentConnect_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector"
-#include "vtkstd/string"
+#include "vtkstd/vector"//
+#include "vtkstd/string"//
 
 class vtkDataSet;
 class vtkImageData;

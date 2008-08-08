@@ -14,14 +14,14 @@
 =========================================================================*/
 // .NAME vtkCTHFragmentIntersect - Geometry intersection operations.
 // .SECTION Description
-// TODO write doc
+// TODO 
 
 #ifndef __vtkCTHFragmentIntersect_h
 #define __vtkCTHFragmentIntersect_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
-#include "vtkstd/vector" // using vector internally. ok for leaf classes.
-#include "vtkstd/string" // ...then same is true of string
+#include "vtkstd/vector"//
+#include "vtkstd/string"//
 
 class vtkPolyData;
 //class vtkMultiBlockDataSet;

@@ -49,7 +49,6 @@
 #include "vtkPointAccumulator.hxx"
 #include "vtkCTHFragmentPieceLoading.h"
 #include "vtkCTHFragmentProcessLoading.h"
-#include "vtkCTHFragmentProcessPriorityQueue.h"
 #include "vtkCTHFragmentProcessRing.h"
 #include "vtkCTHFragmentToProcMap.h"
 #include "vtkCTHFragmentPieceTransaction.h"
@@ -80,7 +79,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.76");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.77");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -5840,17 +5839,17 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       PrintPieceLoadingHistogram(loadingArrays);
       #endif
 
-      // Build fragment to proc map, and priority queue
+      // Build fragment to proc map
       vtkCTHFragmentToProcMap f2pm;
       f2pm.Initialize(nProcs,this->NumberOfResolvedFragments);
-      vtkCTHFragmentProcessPriorityQueue Q;
-      Q.Initialize(nProcs);
-      vtkCTHFragmentProcessLoading *heap=Q.GetHeap();
+      // Build process loading heap.
+      vector<vtkCTHFragmentProcessLoading> heap(nProcs);
       for (int procId=0; procId<nProcs; ++procId)
         {
         // sum up the loading contribution from all local fragments
         // and make a note of who owns what.
-        vtkCTHFragmentProcessLoading &prl=heap[procId+1]; // indexed from 1
+        vtkCTHFragmentProcessLoading &prl=heap[procId];
+        prl.Initialize(procId,0);
         for (int fragmentId=0;
             fragmentId<this->NumberOfResolvedFragments; ++fragmentId)
           {
@@ -5862,18 +5861,16 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
             }
           }
         }
-      // Build minimum order heap.
-      // TODO replace this with stl heap sort/ or quick sort
-      Q.InitialHeapify();
+      // heap sort, least loaded process is in element 0.
+      // Now we can make intelligent decisions about where to
+      // gather geometric attributes. At this point we can but don't ;)
+      partial_sort(heap.begin(), heap.end(), heap.end());
+
       #ifdef vtkCTHFragmentConnectDEBUG
-      vtkIdType loadingBefore=Q.GetTotalLoading();
       cerr << "[" << __LINE__ << "] "
           << controllingProcId
-          << " total loading before fragment localization "
-          << loadingBefore/1E6
-          << " M polys."
-          << endl;
-      Q.PrintProcessLoading();
+          << " total loading before fragment localization:"
+          << endl << heap;
       vector<int> splitting(nProcs+1,0);
       int nSplit=0;
       #endif
@@ -5884,7 +5881,7 @@ void vtkCTHFragmentConnect::ComputeGeometricAttributes()
       // remains assigning to each until all work has
       // been alloted.
       vtkCTHFragmentProcessRing procRing;
-      procRing.Initialize(Q, this->UpperLoadingBound);
+      procRing.Initialize(heap, this->UpperLoadingBound);
       #ifdef vtkCTHFragmentConnectDEBUG
       cerr << "[" << __LINE__ << "] "
           << controllingProcId

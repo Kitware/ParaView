@@ -23,6 +23,7 @@
 #include <cassert>
 #include "vtkType.h"
 #include "vtksys/ios/iostream"
+#include "vtkstd/vector"
 
 class vtkCTHFragmentProcessLoading
 {
@@ -47,9 +48,27 @@ class vtkCTHFragmentProcessLoading
     }
     // Description:
     // Comparision of two objects loading.
+    bool operator<=(const vtkCTHFragmentProcessLoading &rhs) const
+    {
+      return this->Data[LOADING]<=rhs.Data[LOADING];
+    }
+    // Description:
+    // Comparision of two objects loading.
     bool operator>(const vtkCTHFragmentProcessLoading &rhs) const
     {
       return this->Data[LOADING]>rhs.Data[LOADING];
+    }
+    // Description:
+    // Comparision of two objects loading.
+    bool operator>=(const vtkCTHFragmentProcessLoading &rhs) const
+    {
+      return this->Data[LOADING]>=rhs.Data[LOADING];
+    }
+    // Description:
+    // Comparision of two objects loading.
+    bool operator==(const vtkCTHFragmentProcessLoading &rhs) const
+    {
+      return this->Data[LOADING]==rhs.Data[LOADING];
     }
     // Description:
     // Return the process id.
@@ -69,4 +88,5 @@ class vtkCTHFragmentProcessLoading
     vtkIdType Data[SIZE];
 };
 vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkCTHFragmentProcessLoading &fp);
+vtksys_ios::ostream &operator<<(vtksys_ios::ostream &sout, vtkstd::vector<vtkCTHFragmentProcessLoading> &vfp);
 #endif

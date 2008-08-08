@@ -21,7 +21,6 @@ SET(Filters_SRCS
   vtkCTHFragmentPieceTransaction.cxx
   vtkCTHFragmentPieceTransactionMatrix.cxx
   vtkCTHFragmentProcessLoading.cxx
-  vtkCTHFragmentProcessPriorityQueue.cxx
   vtkCTHFragmentProcessRing.cxx
   vtkCTHFragmentToProcMap.cxx
   vtkCameraManipulator.cxx

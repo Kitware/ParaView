@@ -23,7 +23,7 @@
 #define __vtkCTHFragmentProcessRing_h
 
 #include "vtkstd/vector"
-#include "vtkCTHFragmentProcessPriorityQueue.h"
+#include "vtkCTHFragmentProcessLoading.h"
 
 class vtkCTHFragmentProcessRing
 {
@@ -59,9 +59,10 @@ class vtkCTHFragmentProcessRing
         }
     }
     // Description:
-    // Build from a process loading priority queue.
+    // Build from a process loading from a sorted 
+    // vector of process loading items.
     void Initialize(
-        vtkCTHFragmentProcessPriorityQueue &Q,
+        vtkstd::vector<vtkCTHFragmentProcessLoading> &Q,
         vtkIdType upperLoadingBound);
     // Description:
     // Get the next process id from the ring.
