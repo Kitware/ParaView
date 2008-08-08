@@ -57,7 +57,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.59");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.60");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -269,29 +269,6 @@ vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
   return executive;
 }
 
-
-//----------------------------------------------------------------------------
-int vtkPVUpdateSuppressor::RequestUpdateExtent(vtkInformation* vtkNotUsed(request),
-                                  vtkInformationVector** inputVector,
-                                  vtkInformationVector* vtkNotUsed(outputVector))
-{
-  if (!this->Enabled)
-    {
-    vtkInformation* info = inputVector[0]->GetInformationObject(0);
-    vtkStreamingDemandDrivenPipeline* sddp = 
-      vtkStreamingDemandDrivenPipeline::SafeDownCast(
-        vtkExecutive::PRODUCER()->GetExecutive(info));
-    if (sddp)
-      {
-      sddp->SetUpdateExtent(info, this->UpdatePiece, 
-        this->UpdateNumberOfPieces, 0);
-      return 1;
-      }
-    return 0;
-    }
-  return 1;
-}
-
 //----------------------------------------------------------------------------
 int vtkPVUpdateSuppressor::RequestDataObject(
   vtkInformation* vtkNotUsed(reqInfo), 
@@ -333,20 +310,15 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
                                        vtkInformationVector **inputVector,
                                        vtkInformationVector *outputVector)
 {
-  // RequestData is not normally called. If it is called under a special
-  // condition (for example, streaming), shallow copy input to output.
+  // RequestData is only called by its executive when 
+  // (Enabled==off) and thus acting as a passthrough filter
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   vtkDataObject *output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
-  if (!this->Enabled)
-    {
-    output->ShallowCopy(input);
-    return 1;
-    }
-
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  output->ShallowCopy(input);
+  return 1;
 }
 
 //----------------------------------------------------------------------------

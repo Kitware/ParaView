@@ -54,7 +54,7 @@ public:
 
   // Description:
   // Force update on the input.
-  void ForceUpdate();
+  virtual void ForceUpdate();
 
   // Description:
   // Set number of pieces and piece on the data.
@@ -91,9 +91,6 @@ protected:
     vtkInformationVector *outputVector);
   int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
 
   int UpdatePiece;
   int UpdateNumberOfPieces;
