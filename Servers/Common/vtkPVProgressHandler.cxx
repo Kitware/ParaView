@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.9");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.10");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -248,17 +248,20 @@ void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
     this->HandleProgress(0, it->second, myprogress);
     }
   while ( this->ReceiveProgressFromSatellite(&id, &progress) );
-  vtkClientServerID nid;
-  nid.ID = id;
-  vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
-  if ( base )
+  if (id >= 0)
     {
-    this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
-    }
-  else
-    {
-    //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-    //vtkPVApplication::Abort();
+    vtkClientServerID nid;
+    nid.ID = id;
+    vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
+    if ( base )
+      {
+      this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
+      }
+    else
+      {
+      //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
+      //vtkPVApplication::Abort();
+      }
     }
 }
 
