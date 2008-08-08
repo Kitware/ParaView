@@ -82,14 +82,14 @@ IF (PARAVIEW_BUILD_QT_GUI)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
-  SET(QT_MIN_VERSION "4.4.0")
+  SET(QT_MIN_VERSION "4.3.0")
   SET(QT_REQUIRED TRUE)
   FIND_PACKAGE(Qt4)
   IF(NOT QT4_FOUND)
     MESSAGE(SEND_ERROR "Qt ${QT_MIN_VERSION} or greater not found.  Please check the QT_QMAKE_EXECUTABLE variable.")
   ELSE(NOT QT4_FOUND)
     # don't go greater than supported version
-    STRING(REGEX MATCH "^4\\.4\\.[0-9]+" qt_version_tmp "${QTVERSION}")
+    STRING(REGEX MATCH "^4\\.3\\.[0-9]+" qt_version_tmp "${QTVERSION}")
     IF (NOT qt_version_tmp)
       MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.3 (you may need to clean your dirtied cache).")
     ENDIF (NOT qt_version_tmp)
