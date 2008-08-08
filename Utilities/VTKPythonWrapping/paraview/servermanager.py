@@ -330,6 +330,15 @@ class VectorProperty(Property):
     val = property[2]
     property[1:3] = (1, 2)
     """
+    def ConvertValue(self, value):
+       """Converts value to type suitable for vtSM.Property::SetElement()"""
+       if self.SMProperty.IsA("vtkSMIntVectorProperty") and \
+         self.SMProperty.GetDomain("enum") and type(value) == str:
+           domain = self.SMProperty.GetDomain("enum")
+           if domain.HasEntryText(value):
+              return domain.GetEntryValueForText(value)
+       return value
+
     
     def __len__(self):
         """Returns the number of elements."""
@@ -344,7 +353,7 @@ class VectorProperty(Property):
 
     def __setitem__(self, idx, value):
         """Given an index and a value, sets an element."""
-        self.SMProperty.SetElement(idx, value)
+        self.SMProperty.SetElement(idx, self.ConvertValue(value))
         self._UpdateProperty()
 
     def __getslice__(self, min, max):
@@ -362,7 +371,7 @@ class VectorProperty(Property):
         if min < 0 or min > len(self) or max < 0 or max > len(self):
             raise exceptions.IndexError
         for i in range(min, max):
-            self.SMProperty.SetElement(i, values[i-min])
+            self.SMProperty.SetElement(i, self.ConvertValue(values[i-min]))
         self._UpdateProperty()
 
     def __getattr__(self, name):
@@ -386,7 +395,7 @@ class VectorProperty(Property):
            not isinstance(values, list):
             values = (values,)
         for i in range(len(values)):
-            self.SMProperty.SetElement(i, values[i])
+            self.SMProperty.SetElement(i, self.ConvertValue(values[i]))
         self._UpdateProperty()
 
     def Clear(self):

@@ -64,6 +64,14 @@ public:
   // Returns the descriptive string of an enumeration entry.
   const char* GetEntryText(unsigned int idx);
 
+  // Description:
+  // Return 1 is the text is present in the enumeration, otherwise 0.
+  int HasEntryText(const char* text);
+
+  // Description:
+  // Get the value for an enumeration text. The return value is valid only is
+  // HasEntryText() returns 1.
+  int GetEntryValueForText(const char* text);
 //BTX
   // Description:
   // Given an entry text, return the integer value.

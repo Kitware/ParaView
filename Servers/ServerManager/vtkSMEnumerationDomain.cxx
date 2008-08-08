@@ -24,7 +24,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.11");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -67,6 +67,21 @@ int vtkSMEnumerationDomain::GetEntryValue(unsigned int idx)
 const char* vtkSMEnumerationDomain::GetEntryText(unsigned int idx)
 {
   return this->EInternals->Entries[idx].Text.c_str();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMEnumerationDomain::HasEntryText(const char* text)
+{
+  int valid;
+  this->GetEntryValue(text, valid);
+  return valid;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMEnumerationDomain::GetEntryValueForText(const char* text)
+{
+  int valid;
+  return this->GetEntryValue(text, valid);
 }
 
 //---------------------------------------------------------------------------
