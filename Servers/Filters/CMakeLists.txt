@@ -167,7 +167,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkCTHFragmentPieceTransaction.cxx
   vtkCTHFragmentPieceTransactionMatrix.cxx
   vtkCTHFragmentProcessLoading.cxx
-  vtkCTHFragmentProcessPriorityQueue.cxx
   vtkCTHFragmentProcessRing.cxx
   vtkCTHFragmentToProcMap.cxx
   WRAP_EXCLUDE)

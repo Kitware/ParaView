@@ -28,7 +28,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkCTHFragmentPieceTransaction.h
       vtkCTHFragmentPieceTransactionMatrix.h
       vtkCTHFragmentProcessLoading.h
-      vtkCTHFragmentProcessPriorityQueue.h
       vtkCTHFragmentProcessRing.h
       vtkCTHFragmentToProcMap.h)
   ENDFOREACH(part)
