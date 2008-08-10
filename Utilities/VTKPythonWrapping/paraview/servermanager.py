@@ -613,7 +613,10 @@ class DataInformation(object):
         self.Idx = idx
 
     def Update(self):
-        """Update the data information if necessary. Note that this
+        """****Deprecated**** There is no reason anymore to use this method
+        explicitly, it is called automatically when one gets any value from the
+        data information object.
+        Update the data information if necessary. Note that this
         does not cause execution of the underlying object. In certain
         cases, you may have to call UpdatePipeline() on the proxy."""
         if self.Proxy:
@@ -1145,6 +1148,9 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
       render server on rs_host: rs_port.
     """
     global ActiveConnection
+    global fromGUI
+    if fromGUI:
+        raise exceptions.RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
     if ds_host == None:
         connectionId = _connectSelf()
     elif rs_host == None:
@@ -1167,6 +1173,9 @@ def ReverseConnect(port=11111):
     The optional port specified the port to listen to.
     """
     global ActiveConnection
+    global fromGUI
+    if fromGUI:
+        raise exceptions.RuntimeError, "Cannot create a connection through python. Use the GUI to setup the connection."
     connectionId = _connectServer("Reverse connection", port, True)
     if not ActiveConnection:
         ActiveConnection = connectionId
@@ -1176,6 +1185,9 @@ def Disconnect(connection=None):
     """Disconnects the connection. Make sure to clear the proxy manager
     first."""
     global ActiveConnection
+    global fromGUI
+    if fromGUI:
+        raise exceptions.RuntimeError, "Cannot disconnect through python. Use the GUI to disconnect."
     if not connection or connection == ActiveConnection:
         connection = ActiveConnection
         ActiveConnection = None
