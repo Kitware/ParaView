@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAllToNRedistributePolyData);
-vtkCxxRevisionMacro(vtkAllToNRedistributePolyData, "1.5");
+vtkCxxRevisionMacro(vtkAllToNRedistributePolyData, "1.6");
 
 //----------------------------------------------------------------------------
 vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()
@@ -41,7 +41,7 @@ vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData()
 //----------------------------------------------------------------------------
 void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->vtkWeightedRedistributePolyData::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os,indent);
   os << indent << "Number of processes: " << this->NumberOfProcesses << endl;
 }
 
@@ -80,7 +80,7 @@ void vtkAllToNRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     this->SetWeights(numberOfValidProcesses, numProcs-1, 0.);
     }
 
-  this->vtkWeightedRedistributePolyData::MakeSchedule(localSched);
+  this->Superclass::MakeSchedule(localSched);
 
 }
 //*****************************************************************
