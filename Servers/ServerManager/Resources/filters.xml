@@ -2065,9 +2065,20 @@ The Mask Points filter reduces the number of points in the dataset. It operates 
          This property specifies whether to generate vertex cells as the topography of the output. If set to 1, the geometry (vertices) will be displayed in the rendering window; otherwise no geometry will be displayed.
        </Documentation>
      </IntVectorProperty>
-   <!-- End MaskPoints -->
-   </SourceProxy>
 
+     <IntVectorProperty
+        name="SingleVertexPerCell"
+        command="SetSingleVertexPerCell"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Tell filter to only generate one vertex per cell instead of multiple vertices in one cell.
+       </Documentation>
+     </IntVectorProperty>
+     <!-- End MaskPoints -->
+   </SourceProxy>    
+    
    <!-- ==================================================================== -->
    <SourceProxy name="Median" class="vtkImageMedian3D">
     <Documentation
@@ -3755,7 +3766,8 @@ This parameter controls whether to extract cells that are on the boundary of the
      </IntVectorProperty>
 
    <!-- End ExtractGeometry -->
-   </SourceProxy>
+    </SourceProxy>
+
 
    <!-- ==================================================================== -->
    <SourceProxy name="Clip" class="vtkPVClipDataSet">
@@ -5171,9 +5183,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject"/>
-        </DataTypeDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+         <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
         <Documentation>
           This property specifies the input of the Temporal Cache filter.
         </Documentation>
@@ -5210,9 +5222,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject"/>
-        </DataTypeDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+         <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
         <Documentation>
           This property specifies the input of the Temporal Interpolator.
         </Documentation>
@@ -5238,15 +5250,17 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       <!-- End TemporalInterpolator -->
     </SourceProxy>
 
-    <SourceProxy name="TemporalSnapToTimeStep" class="vtkTemporalSnapToTimeStep">
+    <SourceProxy name="TemporalSnapToTimeStep" 
+                 class="vtkTemporalSnapToTimeStep"
+                 label="Temporal Snap-to-Time-Step">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject"/>
-        </DataTypeDomain>
+       <DataTypeDomain name="input_type" composite_data_supported="1">
+         <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
       </InputProperty>
 
       <IntVectorProperty 
@@ -5285,7 +5299,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
+        <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
         <Documentation>
@@ -5294,8 +5308,16 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       </InputProperty>
 
       <DoubleVectorProperty
-         name="Shift"
-         command="SetShift"
+         name="PreShift"
+         command="SetPreShift"
+         number_of_elements="1"
+         default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PostShift"
+         command="SetPostShift"
          number_of_elements="1"
          default_values="0.0" >
         <DoubleRangeDomain name="range"/>
@@ -5315,6 +5337,30 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+         name="Periodic"
+         command="SetPeriodic"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="PeriodicEndCorrection"
+         command="SetPeriodicEndCorrection"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="MaximumNumberOfPeriods"
+         command="SetMaximumNumberOfPeriods"
+         number_of_elements="1"
+         default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" max="100" />
+      </DoubleVectorProperty>
+      
       <DoubleVectorProperty 
          name="TimestepValues"
          information_only="1">
@@ -7433,6 +7479,29 @@ This filter extracts a list of datasets from hierarchical datasets.
          The value of this property is a format string used to display the input time. The format string is specified using printf style.
        </Documentation>
      </StringVectorProperty>
+     
+      <DoubleVectorProperty
+         name="Shift"
+         command="SetShift"
+         number_of_elements="1"
+         default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The amount of time the input is shifted (after scaling).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Scale"
+         command="SetScale"
+         number_of_elements="1"
+         default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The factor by which the input time is scaled.
+        </Documentation>
+      </DoubleVectorProperty>
+     
      <Hints>
        <Visibility replace_input="0" />
      </Hints>

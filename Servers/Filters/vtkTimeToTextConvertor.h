@@ -39,6 +39,16 @@ public:
   vtkSetStringMacro(Format);
   vtkGetStringMacro(Format);
 
+  // Description:
+  // Apply a translation to the time
+  vtkSetMacro(Shift, double);
+  vtkGetMacro(Shift, double);
+
+  // Description:
+  // Apply a scale to the time.
+  vtkSetMacro(Scale, double);
+  vtkGetMacro(Scale, double);
+
 // BTX
 protected:
   vtkTimeToTextConvertor();
@@ -53,7 +63,10 @@ protected:
                                  vtkInformationVector **inputVector,
                                  vtkInformationVector *outputVector);
 
-  char* Format;
+  char  *Format;
+  double Shift;
+  double Scale;
+
 private:
   vtkTimeToTextConvertor(const vtkTimeToTextConvertor&); // Not implemented
   void operator=(const vtkTimeToTextConvertor&); // Not implemented

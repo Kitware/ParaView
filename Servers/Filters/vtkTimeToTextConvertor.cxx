@@ -22,11 +22,13 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
-vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.4");
+vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.5");
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
   this->Format = 0;
+  this->Shift  = 0.0;
+  this->Scale  = 1.1;
   this->SetFormat("Time: %f");
 }
 
@@ -64,7 +66,11 @@ int vtkTimeToTextConvertor::RequestInformation(
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
   return 1;
 }
-
+//----------------------------------------------------------------------------
+inline double vtkTimeToTextConvertor_ForwardConvert(double T0, double shift, double scale)
+{
+  return T0*scale + shift;
+}
 //----------------------------------------------------------------------------
 int vtkTimeToTextConvertor::RequestData(
   vtkInformation* vtkNotUsed(request),
@@ -84,6 +90,7 @@ int vtkTimeToTextConvertor::RequestData(
     && this->Format)
     {
     double time = inputInfo->Get(vtkDataObject::DATA_TIME_STEPS())[0];
+    time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
     }
   else if(outputInfo && 
@@ -92,6 +99,7 @@ int vtkTimeToTextConvertor::RequestData(
     {
     double time = outputInfo->Get(
       vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS())[0];
+    time = vtkTimeToTextConvertor_ForwardConvert(time, this->Shift, this->Scale);
     sprintf(buffer, this->Format, time);
     }
 
