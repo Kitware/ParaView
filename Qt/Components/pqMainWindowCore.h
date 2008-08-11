@@ -272,6 +272,7 @@ signals:
   void refreshFiltersMenu();
   void refreshSourcesMenu();
   void enableExport(bool);
+  void enableTooltips(bool);
   
   /** \todo Hide these private implementation details */
   void postAccept();

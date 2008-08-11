@@ -2353,7 +2353,7 @@ void pqMainWindowCore::onToolsPythonShell()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
 {
-  if(enabled)
+  if (enabled)
     {
     delete this->Implementation->ToolTipTrapper;
     this->Implementation->ToolTipTrapper = 0;
@@ -2362,6 +2362,11 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
     {
     this->Implementation->ToolTipTrapper = new pqToolTipTrapper();
     }
+
+  // Save in settings.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("/EnableTooltips", enabled);
+  emit this->enableTooltips(enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -3536,6 +3541,16 @@ void pqMainWindowCore::applicationInitialize()
       files.push_back(options->GetParaViewDataName());
       this->createReaderOnActiveServer(files);
       }
+    }
+  
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  if (settings->contains("/EnableTooltips"))
+    {
+    this->onHelpEnableTooltips(settings->value("/EnableTooltips").toBool());
+    }
+  else
+    {
+    this->onHelpEnableTooltips(true);
     }
 }
 

@@ -353,9 +353,11 @@ MainWindow::MainWindow() :
     SIGNAL(triggered()), this, SLOT(onHelpHelp()));
 
   connect(this->Implementation->UI.actionHelpEnableTooltips,
-    SIGNAL(triggered(bool)), &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
-  this->Implementation->Core.onHelpEnableTooltips(
-    this->Implementation->UI.actionHelpEnableTooltips->isChecked());
+    SIGNAL(triggered(bool)), 
+    &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
+  connect(&this->Implementation->Core, SIGNAL(enableTooltips(bool)),
+    this->Implementation->UI.actionHelpEnableTooltips,
+    SLOT(setChecked(bool)));
 
   connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
     &this->Implementation->Core.VCRController(), SLOT(onPlay()));
