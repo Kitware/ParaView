@@ -57,7 +57,7 @@ public:
     }
 };
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.61");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.62");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
@@ -308,7 +308,7 @@ int vtkPVUpdateSuppressor::RequestDataObject(
 //----------------------------------------------------------------------------
 int vtkPVUpdateSuppressor::RequestData(vtkInformation* vtkNotUsed(reqInfo),
                                        vtkInformationVector** inputVector,
-                                       vtkInformationVector* youtputVector)
+                                       vtkInformationVector* outputVector)
 {
   // RequestData is only called by its executive when 
   // (Enabled==off) and thus acting as a passthrough filter
