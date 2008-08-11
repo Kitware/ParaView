@@ -42,7 +42,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.26");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.27");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -1202,19 +1202,16 @@ void vtkRedistributePolyData::CopyCells (vtkIdType* numCells,
 
   vtkPoints *outputPoints = output->GetPoints();
   vtkFloatArray* outputPointsArray = 
-    (vtkFloatArray*)(outputPoints->GetData());
+    vtkFloatArray::SafeDownCast(outputPoints->GetData());
   float* outputPointsArrayData = outputPointsArray->GetPointer(0);
 
   vtkPoints *inputPoints = input->GetPoints();
-  vtkFloatArray* inputPointsArray = NULL;
+  void* inputPointsArrayData = NULL;
+  int pointsType = VTK_VOID;
   if (inputPoints != NULL)
     {
-    inputPointsArray = (vtkFloatArray*)(inputPoints->GetData());
-    }
-  float* inputPointsArrayData = NULL;
-  if (inputPointsArray != NULL) 
-    {
-    inputPointsArrayData = inputPointsArray->GetPointer(0);
+    pointsType = inputPoints->GetData()->GetDataType();
+    inputPointsArrayData = inputPoints->GetVoidPointer(0);
     }
 
 #if VTK_REDIST_DO_TIMING
@@ -1346,15 +1343,20 @@ void vtkRedistributePolyData::CopyCells (vtkIdType* numCells,
   int j;
 
   // ... copy x,y,z coordinates ...
-  for (i=0; i<numPoints; i++)
+  switch(pointsType)
     {
-    inLoc = fromPtIds[i]*3;
-    outLoc = i*3;
-    for (j=0;j<3;j++) 
-      {
-      outputPointsArrayData[outLoc+j] = 
-        inputPointsArrayData[inLoc+j];
-      }
+    vtkTemplateMacro(
+      for (i=0; i<numPoints; i++)
+        {
+        inLoc = fromPtIds[i]*3;
+        outLoc = i*3;
+        for (j=0;j<3;j++) 
+          {
+          outputPointsArrayData[outLoc+j] =
+          static_cast<float>(
+            reinterpret_cast<VTK_TT*>(inputPointsArrayData)[inLoc+j]);
+          }
+        });
     }
 
 #if VTK_REDIST_DO_TIMING
@@ -1730,9 +1732,8 @@ void vtkRedistributePolyData::SendCells
   // ... Copy cell points. ...
 
   vtkPoints *inputPoints = input->GetPoints();
-  vtkFloatArray* inputPointsArray 
-    = (vtkFloatArray*)(inputPoints->GetData());
-  float* inputPointsArrayData = inputPointsArray->GetPointer(0);
+  vtkDataArray* inputPointsArray = inputPoints->GetData();
+  void* inputPointsArrayData = inputPointsArray->GetVoidPointer(0);
 
   float* outputPointsArrayData = new float[3*numPoints];
 
@@ -1741,14 +1742,20 @@ void vtkRedistributePolyData::SendCells
 
   int j;
   vtkIdType inLoc, outLoc;
-  for (i=0; i<numPoints; i++)
+  switch (inputPointsArray->GetDataType())
     {
-    inLoc = fromPtIds[i]*3;
-    outLoc = i*3;
-    for (j=0;j<3;j++) 
-      {
-      outputPointsArrayData[outLoc+j] = inputPointsArrayData[inLoc+j];
-      }
+    vtkTemplateMacro(
+      for (i=0; i<numPoints; i++)
+        {
+        inLoc = fromPtIds[i]*3;
+        outLoc = i*3;
+        for (j=0;j<3;j++) 
+          {
+          outputPointsArrayData[outLoc+j] = 
+            static_cast<float>(
+              reinterpret_cast<VTK_TT*>(inputPointsArrayData)[inLoc+j]);
+          }
+        });
     }
 
 
@@ -1859,7 +1866,7 @@ void vtkRedistributePolyData::ReceiveCells
 
   vtkPoints *outputPoints = output->GetPoints();
   vtkFloatArray* outputPointsArray = 
-    (vtkFloatArray*)(outputPoints->GetData());
+    vtkFloatArray::SafeDownCast(outputPoints->GetData());
   float* outputPointsArrayData = outputPointsArray->GetPointer(0);
 
   this->Controller->
