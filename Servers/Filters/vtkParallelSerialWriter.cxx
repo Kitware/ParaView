@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.4");
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.5");
 
 vtkCxxSetObjectMacro(vtkParallelSerialWriter,Writer,vtkAlgorithm);
 
@@ -191,11 +191,12 @@ void vtkParallelSerialWriter::WriteAFile(const char* fname,
   md->Update();
   
   vtkDataObject* output = md->GetOutputDataObject(0);
-  vtkSmartPointer<vtkDataObject> outputCopy;
-  outputCopy.TakeReference(output->NewInstance());
+  vtkSmartPointer<vtkPolyData> outputCopy;
+  outputCopy.TakeReference(vtkPolyData::SafeDownCast(output->NewInstance()));
   outputCopy->ShallowCopy(output);
   
-  if (controller->GetLocalProcessId() == 0)
+  if (controller->GetLocalProcessId() == 0 && 
+      outputCopy->GetNumberOfCells() > 0)
     {
     this->Writer->SetInputConnection(outputCopy->GetProducerPort());
     this->SetWriterFileName(fname);
