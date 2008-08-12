@@ -311,11 +311,7 @@ private:
 
   static ManipulatorType DefaultManipulatorTypes[9];
 
-  void InternalConstructor(const QString& group,
-                           const QString& name, 
-                           vtkSMViewProxy* renModule, 
-                           pqServer* server, 
-                           QObject* parent=NULL);
+  void InternalConstructor(vtkSMViewProxy *renModule);
 };
 
 #endif

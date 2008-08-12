@@ -125,12 +125,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-void pqRenderView::InternalConstructor(const QString& group,
-                                       const QString& name, 
-                                       vtkSMViewProxy* renModule, 
-                                       pqServer* server, 
-                                       QObject* _parent/*=null*/
-                                       )
+void pqRenderView::InternalConstructor(vtkSMViewProxy* renModule)
 {
   this->Internal = new pqRenderView::pqInternal();
 
@@ -154,7 +149,7 @@ pqRenderView::pqRenderView( const QString& group,
                             QObject* _parent/*=null*/) : 
   Superclass(renderViewType(), group, name, renModule, server, _parent)
 {
-  this->InternalConstructor(group, name, renModule, server, _parent);
+  this->InternalConstructor(renModule);
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +161,7 @@ pqRenderView::pqRenderView( const QString& type,
                             QObject* _parent/*=null*/) : 
   Superclass(type, group, name, renModule, server, _parent)
 {
-  this->InternalConstructor(group, name, renModule, server, _parent);
+  this->InternalConstructor(renModule);
 }
 
 //-----------------------------------------------------------------------------
