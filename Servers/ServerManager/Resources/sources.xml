@@ -1558,8 +1558,18 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
         <Documentation>
           The list of thresholds that will be added to the selection produced by
           the selection source.
-        </Documentation>
+        </Documentation> 
      </DoubleVectorProperty>
+
+     <StringVectorProperty name="ArrayName"
+       command="SetArrayName"
+       number_of_elements="1"
+       default_values="Text">
+        <Documentation>
+           For threshold and value selection, this controls the name of the
+           scalar array that will be thresholded within.
+        </Documentation>
+     </StringVectorProperty>
 
      <!-- End of ThresholdSelectionSource -->
    </SourceProxy>
