@@ -123,12 +123,11 @@ public:
 
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
-  vtkSMProxy* getScalarOpacityFunctionProxy() const;
+  virtual vtkSMProxy* getScalarOpacityFunctionProxy();
 
-  /// Set the scalar range for the opacity function. This
-  /// will rescale all the control points to fit the 
-  /// scalar range.
-  void setScalarOpacityRange(double min, double max);
+  /// Returns the pqScalarOpacityFunction object for the piecewise
+  /// function used to map scalars to opacity.
+  virtual pqScalarOpacityFunction* getScalarOpacityFunction();
 
   /// Set representation on the proxy.
   /// If representation is changed to volume, this method ensures that the

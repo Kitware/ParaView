@@ -32,7 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorScaleToolbar.h"
 
+#include "pqBarChartRepresentation.h"
 #include "pqColorScaleEditor.h"
+#include "pqDataRepresentation.h"
 #include "pqDisplayColorWidget.h"
 #include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
@@ -55,7 +57,7 @@ public:
   pqColorScaleToolbarInternal();
   ~pqColorScaleToolbarInternal() {}
 
-  QPointer<pqPipelineRepresentation> Representation;
+  QPointer<pqDataRepresentation> Representation;
   QPointer<pqDisplayColorWidget> ColorBy;
   QPointer<pqColorScaleEditor> ColorScaleEditor;
 };
@@ -129,8 +131,7 @@ void pqColorScaleToolbar::setColorWidget(pqDisplayColorWidget *widget)
 void pqColorScaleToolbar::setActiveRepresentation(
     pqDataRepresentation *display)
 {
-  this->Internal->Representation =
-      qobject_cast<pqPipelineRepresentation *>(display);
+  this->Internal->Representation = display;
   if(!this->Internal->ColorScaleEditor.isNull())
     {
     this->Internal->ColorScaleEditor->setRepresentation(
@@ -138,7 +139,7 @@ void pqColorScaleToolbar::setActiveRepresentation(
     }
 }
 
-void pqColorScaleToolbar::editColorMap(pqPipelineRepresentation *display)
+void pqColorScaleToolbar::editColorMap(pqDataRepresentation *display)
 {
   if(display)
     {
@@ -165,7 +166,13 @@ void pqColorScaleToolbar::changeColor()
 {
   if(!this->Internal->ColorBy.isNull())
     {
-    if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
+    pqBarChartRepresentation *histogram =
+        qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
+    if(histogram)
+      {
+      this->editColorMap(this->Internal->Representation);
+      }
+    else if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
       {
       if(!this->Internal->Representation.isNull())
         {
@@ -209,10 +216,19 @@ void pqColorScaleToolbar::changeColor()
 
 void pqColorScaleToolbar::rescaleRange()
 {
-  if(!this->Internal->Representation.isNull())
+  pqPipelineRepresentation *pipeline =
+      qobject_cast<pqPipelineRepresentation *>(this->Internal->Representation);
+  pqBarChartRepresentation *histogram =
+      qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
+  if(pipeline)
     {
-    this->Internal->Representation->resetLookupTableScalarRange();
-    this->Internal->Representation->renderViewEventually();
+    pipeline->resetLookupTableScalarRange();
+    pipeline->renderViewEventually();
+    }
+  else if(histogram)
+    {
+    histogram->resetLookupTableScalarRange();
+    histogram->renderViewEventually();
     }
 }
 

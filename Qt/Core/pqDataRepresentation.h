@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqDataRepresentationInternal;
 class pqOutputPort;
 class pqPipelineSource;
+class pqScalarOpacityFunction;
 class pqScalarsToColors;
 class vtkPVDataInformation;
 
@@ -81,6 +82,14 @@ public:
   /// Most consumer displays take a lookup table. This method
   /// provides access to the Lookup table, if one exists.
   virtual pqScalarsToColors* getLookupTable();
+
+  /// Returns the proxy for the piecewise function used to
+  /// map scalars to opacity.
+  virtual vtkSMProxy* getScalarOpacityFunctionProxy() {return 0;}
+
+  /// Returns the pqScalarOpacityFunction object for the piecewise
+  /// function used to map scalars to opacity.
+  virtual pqScalarOpacityFunction* getScalarOpacityFunction() {return 0;}
 
   /// Sets default values for the underlying proxy.
   /// This is during the initialization stage of the pqProxy

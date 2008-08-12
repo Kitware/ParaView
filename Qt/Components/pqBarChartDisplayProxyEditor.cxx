@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
+#include "pqApplicationCore.h"
+#include "pqBarChartRepresentation.h"
+#include "pqColorScaleToolbar.h"
 #include "pqComboBoxDomain.h"
 #include "pqRepresentation.h"
 #include "pqPropertyLinks.h"
@@ -77,6 +80,9 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqRepresentation* rep
   QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
     this, SLOT(openColorMapEditor()));
+  QObject::connect(
+    this->Internal->RescaleButton, SIGNAL(clicked()),
+    this, SLOT(rescaleToDataRange()));
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
 
@@ -190,5 +196,27 @@ void pqBarChartDisplayProxyEditor::reloadGUI()
 //-----------------------------------------------------------------------------
 void pqBarChartDisplayProxyEditor::openColorMapEditor()
 {
+  pqBarChartRepresentation *histogram =
+    qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
+
+  // Get the color scale editor from the application core's registry.
+  pqColorScaleToolbar *colorScale = qobject_cast<pqColorScaleToolbar *>(
+      pqApplicationCore::instance()->manager("COLOR_SCALE_EDITOR"));
+  if(colorScale)
+    {
+    colorScale->editColorMap(histogram);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplayProxyEditor::rescaleToDataRange()
+{
+  pqBarChartRepresentation *histogram =
+    qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
+  if(histogram)
+    {
+    histogram->resetLookupTableScalarRange();
+    this->updateAllViews();
+    }
 }
 

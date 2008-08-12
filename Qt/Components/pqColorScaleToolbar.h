@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqColorScaleToolbarInternal;
 class pqDataRepresentation;
 class pqDisplayColorWidget;
-class pqPipelineRepresentation;
 class QAction;
 
 
@@ -65,7 +64,7 @@ public slots:
   void setActiveRepresentation(pqDataRepresentation *display);
 
   /// Shows the edit color map dialog.
-  void editColorMap(pqPipelineRepresentation *display);
+  void editColorMap(pqDataRepresentation *display);
 
   /// Changes the color or color map.
   void changeColor();

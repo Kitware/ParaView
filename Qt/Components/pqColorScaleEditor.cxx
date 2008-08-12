@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqBarChartRepresentation.h"
 #include "pqChartValue.h"
 #include "pqColorMapColorChanger.h"
 #include "pqColorMapModel.h"
 #include "pqColorMapWidget.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
+#include "pqDataRepresentation.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
@@ -50,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqRescaleRange.h"
 #include "pqScalarBarRepresentation.h"
+#include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -78,9 +81,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTransferFunctionViewer.h"
 #include "vtkType.h"
 
-// Temporary switch
-#define USE_VTK_TFE 1
-
 
 class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
 {
@@ -97,9 +97,8 @@ public:
   vtkEventQtSlotConnect *Listener;
   pqColorMapWidget *Gradient;
   pqColorPresetManager *Presets;
-  QPointer<pqPipelineRepresentation> CurrentDisplay;
+  QPointer<pqDataRepresentation> CurrentDisplay;
   int CurrentIndex;
-  bool HasOpacity;
   bool InSetColors;
   bool IgnoreEditor;
   bool IsDormant;
@@ -119,7 +118,6 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->Gradient = 0;
   this->Presets = 0;
   this->CurrentIndex = -1;
-  this->HasOpacity = false;
   this->InSetColors = false;
   this->IgnoreEditor = false;
   this->IsDormant = true;
@@ -135,6 +133,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Viewer = vtkTransferFunctionViewer::New();
   this->Display = 0;
   this->ColorMap = 0;
+  this->OpacityFunction = 0;
   this->Legend = 0;
 
   // Set up the ui.
@@ -143,7 +142,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Presets = new pqColorPresetManager(this);
   this->Form->Presets->restoreSettings();
 
-#if USE_VTK_TFE
   vtkRenderWindow *win = this->Form->ColorScale->GetRenderWindow();
   vtkRenderWindowInteractor *iren = this->Form->ColorScale->GetInteractor();
   this->Viewer->SetInteractor(iren);
@@ -170,29 +168,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(handleEditorAddOrDelete()));
   this->Form->Listener->Connect(this->Viewer, vtkCommand::WidgetModifiedEvent,
       this, SLOT(handleEditorCurrentChanged()));
-#else
-  // Hide the qvtk widget and add in a color map widget.
-  QGridLayout *grid = qobject_cast<QGridLayout *>(
-      this->Form->ScalePage->layout());
-  this->Form->Gradient = new pqColorMapWidget();
-  this->Form->ColorScale->hide();
-  grid->addWidget(this->Form->Gradient, 0, 0, 1, 4);
-  pqColorMapModel *colorModel = new pqColorMapModel(this->Form->Gradient);
-  colorModel->setObjectName("ColorModel");
-  this->Form->Gradient->setModel(colorModel);
-
-  new pqColorMapColorChanger(this->Form->Gradient);
-  this->connect(this->Form->Gradient, SIGNAL(currentPointChanged(int)),
-      this, SLOT(setCurrentPoint(int)));
-  this->connect(colorModel, SIGNAL(colorChanged(int, const QColor &)),
-      this, SLOT(setColors()));
-  this->connect(colorModel, SIGNAL(pointAdded(int)),
-      this, SLOT(handleEditorAdd(int)));
-  this->connect(colorModel, SIGNAL(pointRemoved(int)),
-      this, SLOT(handleEditorAddOrDelete()));
-  this->connect(this->Form->Gradient, SIGNAL(pointMoved(int)),
-      this, SLOT(handleEditorPointMoveFinished()));
-#endif
 
   // Initialize the state of some of the controls.
   this->enableRescaleControls(this->Form->UseAutoRescale->isChecked());
@@ -233,9 +208,6 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
       this, SLOT(savePreset()));
   this->connect(this->Form->PresetButton, SIGNAL(clicked()),
       this, SLOT(loadPreset()));
-
-  this->connect(this->Form->Component, SIGNAL(activated(int)),
-      this, SLOT(setComponent(int)));
 
   this->connect(this->Form->UseLogScale, SIGNAL(toggled(bool)),
       this, SLOT(setLogScale(bool)));
@@ -297,7 +269,7 @@ pqColorScaleEditor::~pqColorScaleEditor()
   this->Viewer->Delete();
 }
 
-void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
+void pqColorScaleEditor::setRepresentation(pqDataRepresentation *display)
 {
   this->Form->CurrentDisplay = display;
   if(this->Form->IsDormant)
@@ -311,6 +283,7 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     }
 
   this->setLegend(0);
+  this->Form->ShowColorLegend->setEnabled(false);
   if(this->Display)
     {
     this->disconnect(this->Display, 0, this, 0);
@@ -324,15 +297,16 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
           this->ColorMap->getProxy()->GetProperty("RGBPoints"));
       }
 
-    if(this->Form->HasOpacity)
+    if(this->OpacityFunction)
       {
       this->Form->Listener->Disconnect(
-          this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"));
+          this->OpacityFunction->getProxy()->GetProperty("Points"));
       }
     }
 
   this->Display = display;
   this->ColorMap = 0;
+  this->OpacityFunction = 0;
   if(this->Display)
     {
     this->connect(this->Display, SIGNAL(destroyed(QObject *)),
@@ -363,6 +337,7 @@ void pqColorScaleEditor::setRepresentation(pqPipelineRepresentation *display)
     {
     pqRenderViewBase *renderModule = qobject_cast<pqRenderViewBase *>(
         this->Display->getView());
+    this->Form->ShowColorLegend->setEnabled(renderModule != 0);
     this->setLegend(this->ColorMap->getScalarBar(renderModule));
     }
 }
@@ -384,7 +359,7 @@ void pqColorScaleEditor::hideEvent(QHideEvent *e)
   QDialog::hideEvent(e);
 
   // Save the current display and view and go dormant.
-  pqPipelineRepresentation *display = this->Form->CurrentDisplay;
+  pqDataRepresentation *display = this->Form->CurrentDisplay;
   this->setRepresentation(0);
   this->Form->IsDormant = true;
   this->Form->CurrentDisplay = display;
@@ -414,38 +389,12 @@ void pqColorScaleEditor::handleEditorAddOrDelete()
     this->setColors();
 
     // Update the current point.
-#if USE_VTK_TFE
     this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
-#else
-    this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
-#endif
 
     // Update the gui controls.
     this->enablePointControls();
     this->updatePointValues();
     }
-}
-
-void pqColorScaleEditor::handleEditorAdd(int index)
-{
-#if !USE_VTK_TFE
-  if(!this->Form->IgnoreEditor)
-    {
-    this->setColors();
-
-    // Set the new point as the current point.
-    this->Form->Gradient->blockSignals(true);
-    this->Form->Gradient->setCurrentPoint(index);
-    this->Form->Gradient->blockSignals(false);
-    this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
-
-    // Update the gui controls.
-    this->enablePointControls();
-    this->updatePointValues();
-    }
-#else
-  index = index;
-#endif
 }
 
 void pqColorScaleEditor::setColors()
@@ -459,7 +408,6 @@ void pqColorScaleEditor::setColors()
   QList<QVariant> opacityPoints;
   this->Form->InSetColors = true;
 
-#if USE_VTK_TFE
   double rgb[3];
   double scalar = 0.0;
   int total = this->Viewer->GetColorFunction()->GetSize();
@@ -469,38 +417,20 @@ void pqColorScaleEditor::setColors()
       {
       scalar = this->Viewer->GetElementScalar(i);
       rgbPoints << scalar << rgb[0] << rgb[1] << rgb[2];
-      if(this->Form->HasOpacity)
+      if(this->OpacityFunction)
         {
         double opacity = this->Viewer->GetElementOpacity(i);
         opacityPoints << scalar << opacity;
         }
       }
     }
-#else
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  for(int i = 0; i < model->getNumberOfPoints(); ++i)
-    {
-    QColor color;
-    pqChartValue scalar;
-    model->getPointValue(i, scalar);
-    model->getPointColor(i, color);
-    rgbPoints << scalar.getDoubleValue() <<
-        color.redF() << color.greenF() << color.blueF();
-    if(this->Form->HasOpacity)
-      {
-      pqChartValue opacity;
-      model->getPointOpacity(i, opacity);
-      opacityPoints << scalar.getDoubleValue() << opacity.getDoubleValue();
-      }
-    }
-#endif
 
   vtkSMProxy *lookupTable = this->ColorMap->getProxy();
   pqSMAdaptor::setMultipleElementProperty(
       lookupTable->GetProperty("RGBPoints"), rgbPoints);
-  if(this->Form->HasOpacity)
+  if(this->OpacityFunction)
     {
-    vtkSMProxy *points = this->Display->getScalarOpacityFunctionProxy();
+    vtkSMProxy *points = this->OpacityFunction->getProxy();
     pqSMAdaptor::setMultipleElementProperty(points->GetProperty("Points"),
         opacityPoints);
     points->UpdateVTKObjects();
@@ -513,7 +443,6 @@ void pqColorScaleEditor::setColors()
 
 void pqColorScaleEditor::changeCurrentColor()
 {
-#if USE_VTK_TFE
   // Get the current index color from the viewer.
   double rgb[3];
   unsigned int index = this->Viewer->GetCurrentElementId();
@@ -529,7 +458,6 @@ void pqColorScaleEditor::changeCurrentColor()
       this->setColors();
       }
     }
-#endif
 }
 
 void pqColorScaleEditor::handlePointsChanged()
@@ -544,30 +472,15 @@ void pqColorScaleEditor::handlePointsChanged()
 
     // Load the new points.
     this->Form->IgnoreEditor = true;
-#if !USE_VTK_TFE
-    pqColorMapModel *model = this->Form->Gradient->getModel();
-    model->startModifyingData();
-#endif
     this->loadColorPoints();
 
-#if USE_VTK_TFE
     this->Viewer->Render();
-#else
-    model->finishModifyingData();
-#endif
 
     // Set the current point on the editor.
     if(index != -1)
       {
-  #if USE_VTK_TFE
       this->Viewer->SetCurrentElementId(index);
       this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
-  #else
-      this->Form->Gradient->blockSignals(true);
-      this->Form->Gradient->setCurrentPoint(index);
-      this->Form->Gradient->blockSignals(false);
-      this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
-  #endif
       }
 
     // Update the displayed values.
@@ -579,14 +492,12 @@ void pqColorScaleEditor::handlePointsChanged()
 
 void pqColorScaleEditor::handleEditorCurrentChanged()
 {
-#if USE_VTK_TFE
   // Get the current index from the viewer.
   if(!this->Form->IgnoreEditor)
     {
     unsigned int id = this->Viewer->GetCurrentElementId();
     this->setCurrentPoint((int)id);
     }
-#endif
 }
 
 void pqColorScaleEditor::setCurrentPoint(int index)
@@ -622,7 +533,6 @@ void pqColorScaleEditor::setValueFromText()
   // Make sure the value is greater than the previous point and less
   // than the next point.
   bool endpoint = this->Form->CurrentIndex == 0;
-#if USE_VTK_TFE
   if(this->Form->CurrentIndex > 0)
     {
     double prev = this->Viewer->GetElementScalar(this->Form->CurrentIndex - 1);
@@ -642,38 +552,10 @@ void pqColorScaleEditor::setValueFromText()
       value = next;
       }
     }
-#else
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  if(this->Form->CurrentIndex > 0)
-    {
-    pqChartValue prev;
-    model->getPointValue(this->Form->CurrentIndex - 1, prev);
-    if(value < prev)
-      {
-      value = prev.getDoubleValue();
-      }
-    }
-
-  endpoint = endpoint ||
-      this->Form->CurrentIndex == model->getNumberOfPoints() - 1;
-  if(this->Form->CurrentIndex < model->getNumberOfPoints() - 1)
-    {
-    pqChartValue next;
-    model->getPointValue(this->Form->CurrentIndex + 1, next);
-    if(value > next)
-      {
-      value = next.getDoubleValue();
-      }
-    }
-#endif
 
   // Set the new value on the point in the editor.
   this->Form->IgnoreEditor = true;
-#if USE_VTK_TFE
   this->Viewer->SetElementScalar(this->Form->CurrentIndex, value);
-#else
-  model->setPointValue(this->Form->CurrentIndex, value);
-#endif
   this->Form->IgnoreEditor = false;
 
   // Update the colors on the proxy.
@@ -686,14 +568,12 @@ void pqColorScaleEditor::setValueFromText()
     this->updateScalarRange(range.first, range.second);
     }
 
-#if USE_VTK_TFE
   this->Viewer->Render();
-#endif
 }
 
 void pqColorScaleEditor::setOpacityFromText()
 {
-  if(this->Form->CurrentIndex == -1 || !this->Form->HasOpacity)
+  if(this->Form->CurrentIndex == -1 || !this->OpacityFunction)
     {
     return;
     }
@@ -720,13 +600,8 @@ void pqColorScaleEditor::setOpacityFromText()
 
   // Set the new opacity on the point in the editor.
   this->Form->IgnoreEditor = true;
-#if USE_VTK_TFE
   this->Viewer->SetElementOpacity(this->Form->CurrentIndex, opacity);
   this->Viewer->Render();
-#else
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  model->setPointOpacity(this->Form->CurrentIndex, pqChartValue(opacity));
-#endif
   this->Form->IgnoreEditor = false;
 
   // Update the colors on the proxy.
@@ -735,13 +610,8 @@ void pqColorScaleEditor::setOpacityFromText()
 
 void pqColorScaleEditor::setColorSpace(int index)
 {
-#if USE_VTK_TFE
   this->Viewer->SetColorSpace(index);
   this->Viewer->Render();
-#else
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  model->setColorSpaceFromInt(index);
-#endif
 
   if(this->ColorMap)
     {
@@ -770,7 +640,6 @@ void pqColorScaleEditor::savePreset()
   pqColorPresetModel *model = this->Form->Presets->getModel();
 
   // Save the current color scale settings as a preset.
-#if USE_VTK_TFE
   double rgb[3];
   double scalar = 0.0;
   pqColorMapModel colorMap;
@@ -781,7 +650,7 @@ void pqColorScaleEditor::savePreset()
     if(this->Viewer->GetElementRGBColor(i, rgb))
       {
       scalar = this->Viewer->GetElementScalar(i);
-      if(this->Form->HasOpacity)
+      if(this->OpacityFunction)
         {
         colorMap.addPoint(pqChartValue(scalar),
             QColor::fromRgbF(rgb[0], rgb[1], rgb[2]),
@@ -796,9 +665,6 @@ void pqColorScaleEditor::savePreset()
     }
 
   model->addColorMap(colorMap, "New Color Preset");
-#else
-  model->addColorMap(*this->Form->Gradient->getModel(), "New Color Preset");
-#endif
 
   // Select the newly added item (the last in the list).
   QItemSelectionModel *selection = this->Form->Presets->getSelectionModel();
@@ -826,7 +692,6 @@ void pqColorScaleEditor::loadPreset()
       this->Form->CurrentIndex = -1;
       int colorSpace = colorMap->getColorSpaceAsInt();
 
-#if USE_VTK_TFE
       QColor color;
       pqChartValue value, opacity;
       pqColorMapModel temp(*colorMap);
@@ -840,7 +705,7 @@ void pqColorScaleEditor::loadPreset()
       vtkPiecewiseFunction *opacities = 0;
       vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
       colors->RemoveAllPoints();
-      if(this->Form->HasOpacity)
+      if(this->OpacityFunction)
         {
         opacities = this->Viewer->GetOpacityFunction();
         opacities->RemoveAllPoints();
@@ -856,7 +721,7 @@ void pqColorScaleEditor::loadPreset()
         temp.getPointValue(i, value);
         colors->AddRGBPoint(value.getDoubleValue(), color.redF(),
             color.greenF(), color.blueF());
-        if(this->Form->HasOpacity)
+        if(this->OpacityFunction)
           {
           temp.getPointOpacity(i, opacity);
           opacities->AddPoint(value.getDoubleValue(),
@@ -867,22 +732,6 @@ void pqColorScaleEditor::loadPreset()
       // Update the color space.
       this->Viewer->SetColorSpace(colorSpace);
       this->Viewer->Render();
-#else
-      pqColorMapModel *model = this->Form->Gradient->getModel();
-      model->startModifyingData();
-      *model = *colorMap;
-      if(this->Form->UseAutoRescale->isChecked() ||
-          colorMap->isRangeNormalized())
-        {
-        QPair<double, double> range = this->ColorMap->getScalarRange();
-        model->setValueRange(range.first, range.second);
-        }
-
-      pqChartValue min, max;
-      model->getValueRange(min, max);
-      this->updateScalarRange(min.getDoubleValue(), max.getDoubleValue());
-      model->finishModifyingData();
-#endif
 
       // Update the color space chooser.
       this->Form->ColorSpace->blockSignals(true);
@@ -911,38 +760,13 @@ void pqColorScaleEditor::loadPreset()
       this->setColors();
 
       // Set up the current point index.
-#if USE_VTK_TFE
       this->Viewer->SetCurrentElementId(0);
       this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
-#else
-      this->Form->Gradient->blockSignals(true);
-      this->Form->Gradient->setCurrentPoint(0);
-      this->Form->Gradient->blockSignals(false);
-      this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
-#endif
 
       this->enablePointControls();
       this->updatePointValues();
       }
     }
-}
-
-void pqColorScaleEditor::setComponent(int index)
-{
-  int component = this->Form->Component->itemData(index).toInt();
-  this->ColorMap->setVectorMode( 
-    (component == -1) ? pqScalarsToColors::MAGNITUDE : pqScalarsToColors::COMPONENT,
-    component);
-  // Update the color legend title.
-  this->ColorMap->updateScalarBarTitles(this->Form->Component->itemText(index));
-
-  // Update the scalar range if the range is set from the data.
-  if(this->Form->UseAutoRescale->isChecked())
-    {
-    this->rescaleToDataRange();
-    }
-
-  this->Display->renderViewEventually();
 }
 
 void pqColorScaleEditor::setLogScale(bool on)
@@ -968,13 +792,9 @@ void pqColorScaleEditor::setLogScale(bool on)
   else
     {
     // Set the log scale flag on the editor.
-#if USE_VTK_TFE
     this->Viewer->GetColorFunction()->SetScale(
         on ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
     this->Viewer->Render();
-#else
-    // TODO
-#endif
 
     lookupTable->UpdateVTKObjects();
     this->Display->renderViewEventually();
@@ -1008,25 +828,29 @@ void pqColorScaleEditor::rescaleToNewRange()
 
 void pqColorScaleEditor::rescaleToDataRange()
 {
-  this->Display->resetLookupTableScalarRange();
+  pqPipelineRepresentation *pipeline =
+      qobject_cast<pqPipelineRepresentation *>(this->Display);
+  pqBarChartRepresentation *histogram =
+      qobject_cast<pqBarChartRepresentation *>(this->Display);
+  if(pipeline)
+    {
+    pipeline->resetLookupTableScalarRange();
+    pipeline->renderViewEventually();
+    }
+  else if(histogram)
+    {
+    histogram->resetLookupTableScalarRange();
+    histogram->renderViewEventually();
+    }
 }
 
 void pqColorScaleEditor::setUseDiscreteColors(bool on)
 {
   // Update the color scale widget and gui controls.
   this->enableResolutionControls(on);
-#if USE_VTK_TFE
+
   // TODO?
   this->Viewer->Render();
-#else
-  int tableSize = 0;
-  if(!on)
-    {
-    tableSize = this->Form->TableSizeText->text().toInt();
-    }
-
-  this->Form->Gradient->setTableSize(tableSize);
-#endif
 
   if(this->ColorMap)
     {
@@ -1059,12 +883,8 @@ void pqColorScaleEditor::setSizeFromSlider(int tableSize)
 
 void pqColorScaleEditor::setTableSize(int tableSize)
 {
-#if USE_VTK_TFE
   // TODO?
   this->Viewer->Render();
-#else
-  this->Form->Gradient->setTableSize(tableSize);
-#endif
 
   if(this->ColorMap)
     {
@@ -1079,9 +899,12 @@ void pqColorScaleEditor::setTableSize(int tableSize)
 void pqColorScaleEditor::setScalarRange(double min, double max)
 {
   // Update the opacity function if volume rendering.
-  this->Form->InSetColors = true;
-  this->Display->setScalarOpacityRange(min, max);
-  this->Form->InSetColors = false;
+  if(this->OpacityFunction)
+    {
+    this->Form->InSetColors = true;
+    this->OpacityFunction->setScalarRange(min, max);
+    this->Form->InSetColors = false;
+    }
 
   // Update the color map and the rendered views.
   this->ColorMap->setScalarRange(min, max);
@@ -1113,7 +936,8 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
           this->Display->getView());
       pqScalarBarRepresentation *legend = builder->createScalarBarDisplay(
           this->ColorMap, renderModule);
-      legend->makeTitle(this->Display);
+      legend->makeTitle(qobject_cast<pqPipelineRepresentation *>(
+          this->Display));
       this->setLegend(legend);
       this->Form->MakingLegend = false;
       }
@@ -1235,19 +1059,14 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
 void pqColorScaleEditor::loadColorPoints()
 {
   // Clean up the previous data.
-#if USE_VTK_TFE
   vtkPiecewiseFunction *opacities = 0;
   vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
   colors->RemoveAllPoints();
-  if(this->Form->HasOpacity)
+  if(this->OpacityFunction)
     {
     opacities = this->Viewer->GetOpacityFunction();
     opacities->RemoveAllPoints();
     }
-#else
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  model->removeAllPoints();
-#endif
 
   if(this->ColorMap)
     {
@@ -1262,27 +1081,17 @@ void pqColorScaleEditor::loadColorPoints()
         lookupTable->GetProperty("RGBPoints"));
     for(int i = 0; (i + 3) < list.size(); i += 4)
       {
-#if USE_VTK_TFE
       colors->AddRGBPoint(list[i].toDouble(), list[i + 1].toDouble(),
           list[i + 2].toDouble(), list[i + 3].toDouble());
-#else
-      QColor color = QColor::fromRgbF(list[i + 1].toDouble(),
-          list[i + 2].toDouble(), list[i + 3].toDouble());
-      model->addPoint(pqChartValue(list[i].toDouble()), color);
-#endif
       }
 
-    if(this->Form->HasOpacity)
+    if(this->OpacityFunction)
       {
       list = pqSMAdaptor::getMultipleElementProperty(
-          this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"));
+          this->OpacityFunction->getProxy()->GetProperty("Points"));
       for(int j = 0; (j + 1) < list.size(); j += 2)
         {
-#if USE_VTK_TFE
         opacities->AddPoint(list[j].toDouble(), list[j + 1].toDouble());
-#else
-        // TODO
-#endif
         }
       }
     }
@@ -1295,60 +1104,24 @@ void pqColorScaleEditor::loadColorPoints()
 
 void pqColorScaleEditor::initColorScale()
 {
-  // Set up the component combo box.
-  this->Form->Component->clear();
-  if(this->Display)
-    {
-    int numComponents = this->Display->getColorFieldNumberOfComponents(
-        this->Display->getColorField());
-    this->Form->Component->setEnabled(numComponents > 1);
-    this->Form->ComponentLabel->setEnabled(numComponents > 1);
-    if (numComponents > 1)
-      {
-      this->Form->Component->addItem("Magnitude", QVariant(-1));
-      for (int cc=0; cc < numComponents; cc++)
-        {
-        this->Form->Component->addItem(
-          pqScalarBarRepresentation::getDefaultComponentLabel(cc, numComponents),
-          QVariant(cc));
-        }
-
-      int index = 0;
-      if(this->ColorMap->getVectorMode() == pqScalarsToColors::COMPONENT)
-        {
-        index = this->ColorMap->getVectorComponent() + 1;
-        }
-
-      this->Form->Component->setCurrentIndex(index);
-      }
-    }
-
   // Clear any pending changes and clear the current point index.
   this->Form->CurrentIndex = -1;
 
   // Ignore changes during editor setup.
   this->Form->IgnoreEditor = true;
 
-#if !USE_VTK_TFE
-  // Notify the color map model that multiple changes will take place.
-  pqColorMapModel *model = this->Form->Gradient->getModel();
-  model->startModifyingData();
-#endif
-
   // See if the display supports opacity editing.
-  bool usingOpacity = false;
   if(this->Display)
     {
-    usingOpacity = this->Display->getRepresentationType() ==
-        vtkSMPVRepresentationProxy::VOLUME;
+    this->OpacityFunction = this->Display->getScalarOpacityFunction();
     }
 
-  if(usingOpacity != this->Form->HasOpacity)
+  bool usingOpacity = this->OpacityFunction != 0;
+  bool hasOpacity = this->Form->ScalarOpacityUnitDistance->isEnabled();
+  if(usingOpacity != hasOpacity)
     {
-    this->Form->HasOpacity = usingOpacity;
-#if USE_VTK_TFE
     this->Viewer->GetColorFunction()->RemoveAllPoints();
-    if(this->Form->HasOpacity)
+    if(this->OpacityFunction)
       {
       this->Viewer->SetModificationTypeToColorAndOpacity();
       }
@@ -1357,23 +1130,21 @@ void pqColorScaleEditor::initColorScale()
       this->Viewer->GetOpacityFunction()->RemoveAllPoints();
       this->Viewer->SetModificationTypeToColor();
       }
-#else
-    // TODO
-#endif
     }
 
-  if(this->Form->HasOpacity)
+  if(this->OpacityFunction)
     {
     this->Form->Listener->Connect(
-        this->Display->getScalarOpacityFunctionProxy()->GetProperty("Points"),
+        this->OpacityFunction->getProxy()->GetProperty("Points"),
         vtkCommand::ModifiedEvent, this, SLOT(handlePointsChanged()));
     this->Form->ReprLinks.addPropertyLink(
       this->Form->ScalarOpacityUnitDistance, "text", SIGNAL(editingFinished()),
       this->Display->getProxy(),
       this->Display->getProxy()->GetProperty("ScalarOpacityUnitDistance"));
     }
-  this->Form->ScaleLabel->setEnabled(this->Form->HasOpacity);
-  this->Form->ScalarOpacityUnitDistance->setEnabled(this->Form->HasOpacity);
+
+  this->Form->ScaleLabel->setEnabled(usingOpacity);
+  this->Form->ScalarOpacityUnitDistance->setEnabled(usingOpacity);
 
   if(this->ColorMap)
     {
@@ -1399,16 +1170,7 @@ void pqColorScaleEditor::initColorScale()
     this->Form->UseDiscreteColors->setChecked(discretize != 0);
     this->Form->UseDiscreteColors->blockSignals(false);
     this->enableResolutionControls(this->Form->UseDiscreteColors->isChecked());
-#if USE_VTK_TFE
     //this->Viewer->SetTableSize(tableSize); // TODO?
-#else
-    if(!this->Form->UseDiscreteColors->isChecked())
-      {
-      tableSize = 0;
-      }
-
-    this->Form->Gradient->setTableSize(tableSize);
-#endif
 
     // Set up the color space combo box.
     int space = pqSMAdaptor::getElementProperty(
@@ -1433,11 +1195,7 @@ void pqColorScaleEditor::initColorScale()
 
     this->Form->ColorSpace->blockSignals(false);
 
-#if USE_VTK_TFE
     this->Viewer->SetColorSpace(this->Form->ColorSpace->currentIndex());
-#else
-    model->setColorSpaceFromInt(this->Form->ColorSpace->currentIndex());
-#endif
 
     // Set up the log scale checkbox. If the log scale is not valid
     // because of the range, loadColorPoints will clear the flag.
@@ -1447,32 +1205,18 @@ void pqColorScaleEditor::initColorScale()
     this->Form->UseLogScale->blockSignals(false);
 
     // Set the log scale flag on the editor.
-#if USE_VTK_TFE
     this->Viewer->GetColorFunction()->SetScale(
         this->Form->UseLogScale->isChecked() ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
-#else
-    // TODO
-#endif
     }
 
   // Load the new color points into the editor.
   this->loadColorPoints();
 
-#if USE_VTK_TFE
   this->Viewer->Render();
 
   // Set the current point.
   this->Viewer->SetCurrentElementId(0);
   this->Form->CurrentIndex = this->Viewer->GetCurrentElementId();
-#else
-  model->finishModifyingData();
-
-  // Set the current point.
-  this->Form->Gradient->blockSignals(true);
-  this->Form->Gradient->setCurrentPoint(0);
-  this->Form->Gradient->blockSignals(false);
-  this->Form->CurrentIndex = this->Form->Gradient->getCurrentPoint();
-#endif
 
   // Update the displayed current point index.
   this->Form->IgnoreEditor = false;
@@ -1483,21 +1227,15 @@ void pqColorScaleEditor::initColorScale()
 void pqColorScaleEditor::enablePointControls()
 {
   bool enable = this->Form->CurrentIndex != -1;
-  this->Form->OpacityLabel->setEnabled(this->Form->HasOpacity);
-  this->Form->Opacity->setEnabled(this->Form->HasOpacity && enable);
+  this->Form->OpacityLabel->setEnabled(this->OpacityFunction != 0);
+  this->Form->Opacity->setEnabled(this->OpacityFunction != 0 && enable);
 
   // The endpoint values are not editable if auto rescale is on.
   if(enable && this->Form->UseAutoRescale->isChecked())
     {
     enable = this->Form->CurrentIndex > 0;
-#if USE_VTK_TFE
     vtkColorTransferFunction *colors = this->Viewer->GetColorFunction();
     enable = enable && this->Form->CurrentIndex < colors->GetSize() - 1;
-#else
-    pqColorMapModel *model = this->Form->Gradient->getModel();
-    enable = enable &&
-        this->Form->CurrentIndex < model->getNumberOfPoints() - 1;
-#endif
     }
 
   this->Form->ScalarValue->setEnabled(enable);
@@ -1512,10 +1250,9 @@ void pqColorScaleEditor::updatePointValues()
     }
   else
     {
-#if USE_VTK_TFE
     double value = this->Viewer->GetElementScalar(this->Form->CurrentIndex);
     this->Form->ScalarValue->setText(QString::number(value, 'g', 6));
-    if(this->Form->HasOpacity)
+    if(this->OpacityFunction)
       {
       double opacity = this->Viewer->GetElementOpacity(
           this->Form->CurrentIndex);
@@ -1525,24 +1262,6 @@ void pqColorScaleEditor::updatePointValues()
       {
       this->Form->Opacity->setText("");
       }
-#else
-    pqChartValue value;
-    pqColorMapModel *model = this->Form->Gradient->getModel();
-    model->getPointValue(this->Form->CurrentIndex, value);
-    this->Form->ScalarValue->setText(
-        QString::number(value.getDoubleValue(), 'g', 6));
-    if(this->Form->HasOpacity)
-      {
-      pqChartValue opacity;
-      model->getPointOpacity(this->Form->CurrentIndex, opacity);
-      this->Form->Opacity->setText(
-          QString::number(opacity.getDoubleValue(), 'g', 6));
-      }
-    else
-      {
-      this->Form->Opacity->setText("");
-      }
-#endif
     }
 }
 
@@ -1564,11 +1283,9 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   this->Form->MinimumLabel->setText(QString::number(min, 'g', 6));
   this->Form->MaximumLabel->setText(QString::number(max, 'g', 6));
 
-#if USE_VTK_TFE
   // Update the editor scalar range.
   this->Viewer->SetWholeScalarRange(min, max);
   this->Viewer->SetVisibleScalarRange(min, max);
-#endif
 
   // Check the scalar range when log scale is on.
   if(this->Form->UseLogScale->isChecked() && min <= 0.0)

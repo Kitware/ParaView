@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartDisplayProxyEditor.h
+   Module:    pqScalarOpacityFunction.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqBarChartDisplayProxyEditor_h
-#define __pqBarChartDisplayProxyEditor_h
 
-#include "pqDisplayPanel.h"
+#ifndef _pqScalarOpacityFunction_h
+#define _pqScalarOpacityFunction_h
 
-class pqRepresentation;
+#include "pqProxy.h"
 
-/// pqBarChartDisplayProxyEditor is the editor widget for
-/// a Bar Chart display.
-class PQCOMPONENTS_EXPORT pqBarChartDisplayProxyEditor : public pqDisplayPanel
+
+class PQCORE_EXPORT pqScalarOpacityFunction : public pqProxy
 {
   Q_OBJECT
+
 public:
-  pqBarChartDisplayProxyEditor(pqRepresentation* display, QWidget* parent=0);
-  virtual ~pqBarChartDisplayProxyEditor();
+  pqScalarOpacityFunction(const QString& group, const QString& name,
+    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  virtual ~pqScalarOpacityFunction();
 
-public slots:
-  /// Forces a reload of the GUI elements that depend on
-  /// the display proxy.
-  void reloadGUI();
-
-protected slots:
-  /// Opens the color map editor.
-  void openColorMapEditor();
-
-  /// Rescales the color map range to the array range.
-  void rescaleToDataRange();
-
-protected:
-  /// Cleans up internal data structures.
-  void cleanup();
-
-private:
-  
-  /// Set the display whose properties this editor is editing.
-  /// This call will raise an error is the display is not
-  /// a BarChartPlotDisplay proxy.
-  void setRepresentation(pqRepresentation* display);
-
-  pqBarChartDisplayProxyEditor(const pqBarChartDisplayProxyEditor&); // Not implemented.
-  void operator=(const pqBarChartDisplayProxyEditor&); // Not implemented.
-
-  class pqInternal;
-  pqInternal* Internal;
+  /// Set the scalar range for the opacity function. This
+  /// will rescale all the control points to fit the 
+  /// scalar range.
+  void setScalarRange(double min, double max);
 };
 
 #endif
-

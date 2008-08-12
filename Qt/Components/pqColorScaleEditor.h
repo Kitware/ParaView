@@ -41,8 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqColorScaleEditorForm;
-class pqPipelineRepresentation;
+class pqDataRepresentation;
 class pqScalarBarRepresentation;
+class pqScalarOpacityFunction;
 class pqScalarsToColors;
 class QHideEvent;
 class QShowEvent;
@@ -59,7 +60,7 @@ public:
   virtual ~pqColorScaleEditor();
 
 public slots:
-  void setRepresentation(pqPipelineRepresentation *display);
+  void setRepresentation(pqDataRepresentation *display);
 
 protected:
   virtual void showEvent(QShowEvent *e);
@@ -71,7 +72,6 @@ private slots:
   void handleEditorPointMoved();
   void handleEditorPointMoveFinished();
   void handleEditorAddOrDelete();
-  void handleEditorAdd(int index);
   void setColors();
   void changeCurrentColor();
 
@@ -86,8 +86,6 @@ private slots:
 
   void savePreset();
   void loadPreset();
-
-  void setComponent(int index);
 
   void setLogScale(bool on);
 
@@ -139,8 +137,9 @@ private:
 private:
   pqColorScaleEditorForm *Form;
   vtkTransferFunctionViewer *Viewer;
-  pqPipelineRepresentation *Display;
+  pqDataRepresentation *Display;
   pqScalarsToColors *ColorMap;
+  pqScalarOpacityFunction *OpacityFunction;
   pqScalarBarRepresentation *Legend;
 };
 

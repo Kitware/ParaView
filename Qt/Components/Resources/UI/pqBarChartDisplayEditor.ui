@@ -5,30 +5,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>203</width>
-    <height>319</height>
+    <width>265</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
-   <property name="spacing" >
-    <number>6</number>
-   </property>
    <item>
     <widget class="QGroupBox" name="ViewGroup" >
      <property name="title" >
       <string>View</string>
      </property>
      <layout class="QHBoxLayout" >
-      <property name="margin" >
+      <property name="spacing" >
        <number>6</number>
       </property>
-      <property name="spacing" >
+      <property name="leftMargin" >
+       <number>6</number>
+      </property>
+      <property name="topMargin" >
+       <number>6</number>
+      </property>
+      <property name="rightMargin" >
+       <number>6</number>
+      </property>
+      <property name="bottomMargin" >
        <number>6</number>
       </property>
       <item>
@@ -50,12 +53,23 @@
       <string>X Axis</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
-       <number>9</number>
-      </property>
-      <property name="spacing" >
-       <number>6</number>
-      </property>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QCheckBox" name="UsePoints" >
+        <property name="toolTip" >
+         <string>&lt;html>When checked the chart will use points instead of point data on the X axis.&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Use Points</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="labelPointComponent" >
+        <property name="text" >
+         <string>Component</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1" >
        <widget class="QComboBox" name="PointComponent" >
         <item>
@@ -85,32 +99,36 @@
       <item row="2" column="1" >
        <widget class="QComboBox" name="XArrayName" />
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="labelPointComponent" >
-        <property name="text" >
-         <string>Component</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="UsePoints" >
-        <property name="toolTip" >
-         <string>&lt;html>When checked the chart will use points instead of point data on the X axis.&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string>Use Points</string>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="0" colspan="2" >
-       <widget class="QPushButton" name="EditColorMapButton" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
-        <property name="text" >
-         <string>Edit Color Map</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" >
+        <item>
+         <spacer>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" >
+           <size>
+            <width>0</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="EditColorMapButton" >
+          <property name="text" >
+           <string>Edit Color Map...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="RescaleButton" >
+          <property name="text" >
+           <string>Rescale to Data Range</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -121,10 +139,22 @@
       <string>Y Axis</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="1" >
@@ -148,7 +178,7 @@
      <property name="sizeHint" >
       <size>
        <width>20</width>
-       <height>16</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>

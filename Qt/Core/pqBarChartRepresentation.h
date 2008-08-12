@@ -87,6 +87,10 @@ public slots:
   /// Updates the lookup table based on the current proxy values.
   void updateLookupTable();
 
+  // Resets the lookup table ranges to match the current range of
+  // the selected array.
+  void resetLookupTableScalarRange();
+
 protected slots:
   /// updates MTime.
   void markModified();

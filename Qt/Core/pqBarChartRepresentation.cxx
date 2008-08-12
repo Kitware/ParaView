@@ -189,6 +189,19 @@ void pqBarChartRepresentation::updateLookupTable()
 }
 
 //-----------------------------------------------------------------------------
+void pqBarChartRepresentation::resetLookupTableScalarRange()
+{
+  vtkDataArray* xArray = this->getXArray();
+  pqScalarsToColors* lut = this->getLookupTable();
+  if(lut && xArray)
+    {
+    double range[2];
+    xArray->GetRange(range);
+    lut->setScalarRange(range[0], range[1]);
+    }
+}
+
+//-----------------------------------------------------------------------------
 vtkRectilinearGrid* pqBarChartRepresentation::getClientSideData() const
 {
   vtkSMClientDeliveryRepresentationProxy* proxy = 

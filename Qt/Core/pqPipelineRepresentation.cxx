@@ -69,6 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
+#include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -82,10 +83,12 @@ class pqPipelineRepresentation::pqInternal
 public:
   vtkSmartPointer<vtkSMPropRepresentationProxy> RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  pqScalarOpacityFunction *Opacity;
 
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->Opacity = 0;
     }
 
   // Convenience method to get array information.
@@ -178,11 +181,30 @@ vtkSMPropRepresentationProxy* pqPipelineRepresentation::getRepresentationProxy()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineRepresentation::getScalarOpacityFunctionProxy() const
+vtkSMProxy* pqPipelineRepresentation::getScalarOpacityFunctionProxy()
 {
   // We may want to create a new proxy is none exists.
   return pqSMAdaptor::getProxyProperty(
     this->getProxy()->GetProperty("ScalarOpacityFunction"));
+}
+
+//-----------------------------------------------------------------------------
+pqScalarOpacityFunction* pqPipelineRepresentation::getScalarOpacityFunction()
+{
+  if(this->getRepresentationType() == vtkSMPVRepresentationProxy::VOLUME)
+    {
+    if(!this->Internal->Opacity)
+      {
+      // TODO: Add the opacity function to the server manager model.
+      this->Internal->Opacity = new pqScalarOpacityFunction(
+        "piecewise_functions", "PiecewiseFunction",
+        this->getScalarOpacityFunctionProxy(), this->getServer(), this);
+      }
+
+    return this->Internal->Opacity;
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -634,7 +656,11 @@ void pqPipelineRepresentation::resetLookupTableScalarRange()
     lut->setScalarRange(range.first, range.second);
 
     // scalar opacity is treated as slave to the lookup table.
-    this->setScalarOpacityRange(range.first, range.second);
+    pqScalarOpacityFunction* opacity = this->getScalarOpacityFunction();
+    if(opacity)
+      {
+      opacity->setScalarRange(range.first, range.second);
+      }
     }
 }
 
@@ -657,72 +683,15 @@ void pqPipelineRepresentation::updateLookupTableScalarRange()
   lut->setWholeScalarRange(range.first, range.second);
 
   // Adjust opacity function range.
-  vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
-  if (opacityFunction && !lut->getScalarRangeLock() &&
-    this->getRepresentationType() == vtkSMPVRepresentationProxy::VOLUME)
+  pqScalarOpacityFunction* opacityFunction = this->getScalarOpacityFunction();
+  if (opacityFunction && !lut->getScalarRangeLock())
     {
     QPair<double, double> adjusted_range = lut->getScalarRange();
 
     // Opacity function always follows the LUT scalar range.
     // scalar opacity is treated as slave to the lookup table.
-    this->setScalarOpacityRange(adjusted_range.first, adjusted_range.second);
+    opacityFunction->setScalarRange(adjusted_range.first, adjusted_range.second);
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineRepresentation::setScalarOpacityRange(double min, double max)
-{
-  // A far more better way would be to create a new pqProxy subclass for
-  // the piecewise function.
-  vtkSMProxy* opacityFunction = this->getScalarOpacityFunctionProxy();
-  if (!opacityFunction)
-    {
-    return;
-    }
-
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    opacityFunction->GetProperty("Points"));
-
-  QList<QVariant> controlPoints = pqSMAdaptor::getMultipleElementProperty(dvp);
-  if (controlPoints.size() == 0)
-    {
-    return;
-    }
-
-  int max_index = dvp->GetNumberOfElementsPerCommand() * (
-    (controlPoints.size()-1)/ dvp->GetNumberOfElementsPerCommand());
-  QPair<double, double> current_range(controlPoints[0].toDouble(),
-    controlPoints[max_index].toDouble());
-
-  // Adjust vtkPiecewiseFunction points to the new range.
-  double dold = (current_range.second - current_range.first);
-  dold = (dold > 0) ? dold : 1;
-
-  double dnew = (max -min);
-
-  if (dnew > 0)
-    {
-    double scale = dnew/dold;
-    for (int cc=0; cc < controlPoints.size(); 
-         cc+= dvp->GetNumberOfElementsPerCommand())
-      {
-      controlPoints[cc] = 
-        scale * (controlPoints[cc].toDouble()-current_range.first) + min;
-      }
-    }
-  else
-    {
-    // allowing an opacity transfer function with a scalar range of 0.
-    // In this case, the piecewise function only contains the endpoints.
-    controlPoints.clear();
-    controlPoints.push_back(min);
-    controlPoints.push_back(0);
-    controlPoints.push_back(max);
-    controlPoints.push_back(1);
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(dvp, controlPoints);
-  opacityFunction->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
