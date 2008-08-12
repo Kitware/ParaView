@@ -143,10 +143,15 @@ void pqColorScaleToolbar::editColorMap(pqPipelineRepresentation *display)
   if(display)
     {
     // Create the color map editor if needed.
-    if(this->Internal->ColorScaleEditor.isNull())
+    if (this->Internal->ColorScaleEditor.isNull())
       {
-      this->Internal->ColorScaleEditor = new pqColorScaleEditor(
-          QApplication::activeWindow());
+      QWidget* parentWidget = qobject_cast<QWidget*>(this->parent());
+      if (!parentWidget)
+        {
+        parentWidget = QApplication::activeWindow();
+        }
+
+      this->Internal->ColorScaleEditor = new pqColorScaleEditor(parentWidget);
       this->Internal->ColorScaleEditor->setAttribute(Qt::WA_DeleteOnClose);
       }
 

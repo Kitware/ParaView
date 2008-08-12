@@ -1003,7 +1003,8 @@ pqColorScaleToolbar* pqMainWindowCore::getColorScaleEditorManager()
 {
   if(!this->Implementation->ColorScale)
     {
-    this->Implementation->ColorScale = new pqColorScaleToolbar(this);
+    this->Implementation->ColorScale = 
+      new pqColorScaleToolbar(this->Implementation->Parent);
     this->connect(this->getObjectInspectorDriver(),
         SIGNAL(representationChanged(pqDataRepresentation*, pqView*)),
         this->Implementation->ColorScale, 
