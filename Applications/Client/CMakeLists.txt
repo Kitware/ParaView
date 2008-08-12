@@ -326,6 +326,7 @@ IF(BUILD_TESTING)
     OrientationAxis
     Plot3DReader
     PropertyLink
+    ReadXMLPolyDataFileSeries
     RectilinearFractal
     RepresentationSelector
     SaveAnimationGeometry

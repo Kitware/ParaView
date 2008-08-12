@@ -22,6 +22,768 @@
    <!-- End legacyreader -->
    </SourceProxy>
 
+   <SourceProxy name="XMLPolyDataReaderCore" 
+                class="vtkXMLPolyDataReader"
+                label="XML Polydata reader">
+     <Documentation
+       short_help="Read VTK XML polydata files."
+       long_help="Read serial VTK XML polydata files.">
+       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK XML polygonal dataset reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLPolyDataReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLUnstructuredGridReaderCore" 
+                class="vtkXMLUnstructuredGridReader"
+                label="XML Unstructured Grid reader">
+     <Documentation
+       short_help="Read VTK XML unstructured grid data files."
+       long_help="Read serial VTK XML unstructured grid data files.">
+       The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK XML unstructured grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLUnstructuredGridReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLImageDataReaderCore" 
+                class="vtkXMLImageDataReader"
+                label="XML Image Data reader">
+     <Documentation
+       short_help="Read VTK XML image data files."
+       long_help="Read serial VTK XML image data files.">
+       The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+   <!-- End XMLImageDataReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLStructuredGridReaderCore" 
+                class="vtkXMLStructuredGridReader"
+                label="XML Structured Grid reader">
+     <Documentation
+       short_help="Read VTK XML structured grid data files."
+       long_help="Read serial VTK XML structured grid data files.">
+       The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK XML structured grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLStructuredGridReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLRectilinearGridReaderCore" 
+                class="vtkXMLRectilinearGridReader"
+                label="XML Rectilinear Grid reader">
+     <Documentation
+       short_help="Read VTK XML rectilinear grid data files."
+       long_help="Read serial VTK XML rectilinear grid data files.">
+       The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        repeatable="1"
+        information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLRectilinearGridReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPPolyDataReaderCore" 
+                class="vtkXMLPPolyDataReader"
+                label="XML Partitioned Polydata reader">
+     <Documentation
+       short_help="Read partitioned VTK XML polydata files."
+       long_help="Read the summary file and the associated VTK XML polydata files.">
+       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the partitioned VTK XML polygonal dataset reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+   <!-- End XMLPPolyDataReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPUnstructuredGridReaderCore" 
+                class="vtkXMLPUnstructuredGridReader"
+                label="XML Partitioned Unstructured Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML unstructured grid files."
+       long_help="Read the summary file and the associated VTK XML unstructured grid files.">
+       The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the partitioned VTK XML unstructured grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLPUnstructuredGridReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPImageDataReaderCore" 
+                class="vtkXMLPImageDataReader"
+                label="XML Partitioned Image Data reader">
+     <Documentation
+       short_help="Read partitioned VTK XML image data files."
+       long_help="Read the summary file and the associated VTK XML image data files.">
+       The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the partitioned VTK XML uniform rectilinear grid (image/volume) reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This propert lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLPImageDataReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPStructuredGridReaderCore" 
+                class="vtkXMLPStructuredGridReader"
+                label="XML Partitioned Structured Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML structured grid files."
+       long_help="Read the summary file and the associated VTK XML structured grid files.">
+       The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the partitioned VTK XML structured grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLPStructuredGridReaderCore -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPRectilinearGridReaderCore" 
+                class="vtkXMLPRectilinearGridReader"
+                label="XML Partitioned Rectilinear Grid reader">
+     <Documentation
+       short_help="Read partitioned VTK XML rectilinear grid files."
+       long_help="Read the summary file and the associated VTK XML rectilinear grid files.">
+       The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the partitioned VTK XML non-uniform rectilinear grid reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End XMLPRectilinearGridReaderCore -->
+   </SourceProxy>
+
    <SourceProxy name="stlreadercore" class="vtkSTLReader" label="STL reader">
      <Documentation
        short_help="Read STL files."
@@ -223,86 +985,453 @@
    <!-- End PVDReader -->
    </SourceProxy>
 
-   <SourceProxy name="XMLPolyDataReader" 
-                class="vtkXMLPolyDataReader"
-                label="XML Polydata reader">
-     <Documentation
-       short_help="Read VTK XML polydata files."
-       long_help="Read serial VTK XML polydata files.">
-       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.
+   <FileSeriesReaderProxy name="XMLPolyDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Polydata reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read VTK XML polydata files."
+                    long_help="Read serial VTK XML polydata files.">
+       The XML Polydata reader reads the VTK XML polydata file format. The standard extension is .vtp.  This reader also supports file series.
      </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK XML polygonal dataset reader.
-        </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="XMLPolyDataReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML polygonal dataset format. The standard extension is .vtp. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
      </StringVectorProperty>
 
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-        <Documentation>
-          Available timestep values.
-        </Documentation>
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
      </DoubleVectorProperty>
 
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
+   </FileSeriesReaderProxy> <!-- XMLPolyDataReader -->
 
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
+   <FileSeriesReaderProxy name="XMLUnstructuredGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Unstructured Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read VTK XML unstructured grid data files."
+                    long_help="Read serial VTK XML unstructured grid data files.">
+       The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLUnstructuredGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
        <Documentation>
-         This property lists which cell-centered arrays to read.
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML unstructured grid data format. The standard extension is .vtu. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
        </Documentation>
      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
        <Documentation>
-         This property lists which point-centered arrays to read.
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLUnstructuredGridReader -->
+
+   <FileSeriesReaderProxy name="XMLImageDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Image Data reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read VTK XML image data files."
+                    long_help="Read serial VTK XML image data files.">
+       The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLImageDataReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
        </Documentation>
      </StringVectorProperty>
-   <!-- End XMLPolyDataReader -->
-   </SourceProxy>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLImageDataReader -->
+
+   <FileSeriesReaderProxy name="XMLStructuredGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Structured Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read VTK XML structured grid data files."
+                    long_help="Read serial VTK XML structured grid data files.">
+       The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLStructuredGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLStructuredGridReader -->
+
+   <FileSeriesReaderProxy name="XMLRectilinearGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Rectilinear Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read VTK XML rectilinear grid data files."
+                    long_help="Read serial VTK XML rectilinear grid data files.">
+       The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLRectilinearGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLRectilinearGridReader -->
+
+   <FileSeriesReaderProxy name="XMLPPolyDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Partitioned Polydata reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read partitioned VTK XML polydata files."
+                    long_help="Read the summary file and the assicoated VTK XML polydata files.">
+       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.  This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="XMLPPolyDataReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLPPolyDataReader -->
+
+   <FileSeriesReaderProxy name="XMLPUnstructuredGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Partitioned Unstructured Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read partitioned VTK XML unstructured grid data files."
+                    long_help="Read the summary file and the associated VTK XML unstructured grid data files.">
+       The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLPUnstructuredGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLPUnstructuredGridReader -->
+
+   <FileSeriesReaderProxy name="XMLPImageDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Partitioned Image Data reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read partitioned VTK XML image data files."
+                    long_help="Read the summary file and the associated VTK XML image data files.">
+       The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLPImageDataReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLPImageDataReader -->
+
+   <FileSeriesReaderProxy name="XMLPStructuredGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Partitioned Structured Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read partitioned VTK XML structured grid data files."
+                    long_help="Read the summary file and the associated VTK XML structured grid data files.">
+       The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLPStructuredGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLPStructuredGridReader -->
+
+   <FileSeriesReaderProxy name="XMLPRectilinearGridReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Partitioned Rectilinear Grid reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read partitioned VTK XML rectilinear grid data files."
+                    long_help="Read the summary file and the associated VTK XML rectilinear grid data files.">
+       The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr. This reader also supports file series.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLPRectilinearGridReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="CellArrayInfo" />
+         <Property name="CellArrayStatus" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   </FileSeriesReaderProxy> <!-- XMLPRectilinearGridReader -->
 
    <SourceProxy name="RTXMLPolyDataReader"
                 class="vtkRTXMLPolyDataReader">
@@ -354,688 +1483,6 @@
         command="ResetReader">
      </Property>
      <!-- End of RTXMLPolyDataReader -->
-   </SourceProxy>
-
-
-   <SourceProxy name="XMLUnstructuredGridReader" 
-                class="vtkXMLUnstructuredGridReader"
-                label="XML Unstructured Grid reader">
-     <Documentation
-       short_help="Read VTK XML unstructured grid data files."
-       long_help="Read serial VTK XML unstructured grid data files.">
-       The XML Unstructured Grid reader reads the VTK XML unstructured grid data file format. The standard extension is .vtu.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK XML unstructured grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-        <Documentation>
-          Available timestep values.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLUnstructuredGridReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLImageDataReader" 
-                class="vtkXMLImageDataReader"
-                label="XML Image Data reader">
-     <Documentation
-       short_help="Read VTK XML image data files."
-       long_help="Read serial VTK XML image data files.">
-       The XML Image Data reader reads the VTK XML image data file format. The standard extension is .vti.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK XML uniform rectilinear (image/volume) data reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-        <Documentation>
-          Available timestep values.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-   <!-- End XMLImageDataReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLStructuredGridReader" 
-                class="vtkXMLStructuredGridReader"
-                label="XML Structured Grid reader">
-     <Documentation
-       short_help="Read VTK XML structured grid data files."
-       long_help="Read serial VTK XML structured grid data files.">
-       The XML Structured Grid reader reads the VTK XML structured grid data file format. The standard extension is .vts.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK XML structured grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-        <Documentation>
-          Available timestep values.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLStructuredGridReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLRectilinearGridReader" 
-                class="vtkXMLRectilinearGridReader"
-                label="XML Rectilinear Grid reader">
-     <Documentation
-       short_help="Read VTK XML rectilinear grid data files."
-       long_help="Read serial VTK XML rectilinear grid data files.">
-       The XML Rectilinear Grid reader reads the VTK XML rectilinear grid data file format. The standard extension is .vtr.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK XML non-uniform rectilinear grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <DoubleVectorProperty 
-        name="TimestepValues"
-        repeatable="1"
-        information_only="1">
-        <TimeStepsInformationHelper/>
-        <Documentation>
-          Available timestep values.
-        </Documentation>
-     </DoubleVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLRectilinearGridReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLPPolyDataReader" 
-                class="vtkXMLPPolyDataReader"
-                label="XML Partitioned Polydata reader">
-     <Documentation
-       short_help="Read partitioned VTK XML polydata files."
-       long_help="Read the summary file and the associated VTK XML polydata files.">
-       The XML Partitioned Polydata reader reads the partitioned VTK polydata file format. It reads the partitioned format's summary file and then the associated VTK XML polydata files. The expected file extension is .pvtp.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the partitioned VTK XML polygonal dataset reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-   <!-- End XMLPPolyDataReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLPUnstructuredGridReader" 
-                class="vtkXMLPUnstructuredGridReader"
-                label="XML Partitioned Unstructured Grid reader">
-     <Documentation
-       short_help="Read partitioned VTK XML unstructured grid files."
-       long_help="Read the summary file and the associated VTK XML unstructured grid files.">
-       The XML Partitioned Unstructured Grid reader reads the partitioned VTK unstructured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML unstructured grid data files. The expected file extension is .pvtu.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the partitioned VTK XML unstructured grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLPUnstructuredGridReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLPImageDataReader" 
-                class="vtkXMLPImageDataReader"
-                label="XML Partitioned Image Data reader">
-     <Documentation
-       short_help="Read partitioned VTK XML image data files."
-       long_help="Read the summary file and the associated VTK XML image data files.">
-       The XML Partitioned Image Data reader reads the partitioned VTK image data file format. It reads the partitioned format's summary file and then the associated VTK XML image data files. The expected file extension is .pvti.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the partitioned VTK XML uniform rectilinear grid (image/volume) reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This propert lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLPImageDataReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLPStructuredGridReader" 
-                class="vtkXMLPStructuredGridReader"
-                label="XML Partitioned Structured Grid reader">
-     <Documentation
-       short_help="Read partitioned VTK XML structured grid files."
-       long_help="Read the summary file and the associated VTK XML structured grid files.">
-       The XML Partitioned Structured Grid reader reads the partitioned VTK structured grid data file format. It reads the partitioned format's summary file and then the associated VTK XML structured grid data files. The expected file extension is .pvts.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the partitioned VTK XML structured grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLPStructuredGridReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLPRectilinearGridReader" 
-                class="vtkXMLPRectilinearGridReader"
-                label="XML Partitioned Rectilinear Grid reader">
-     <Documentation
-       short_help="Read partitioned VTK XML rectilinear grid files."
-       long_help="Read the summary file and the associated VTK XML rectilinear grid files.">
-       The XML Partitioned Rectilinear Grid reader reads the partitioned VTK rectilinear grid file format. It reads the partitioned format's summary file and then the associated VTK XML rectilinear grid files. The expected file extension is .pvtr.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the partitioned VTK XML non-uniform rectilinear grid reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="0" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property lists which point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End XMLPRectilinearGridReader -->
    </SourceProxy>
 
    <FileSeriesReaderProxy name="LegacyVTKFileReader"
