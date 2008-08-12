@@ -147,7 +147,7 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Viewer->SetInteractor(iren);
   this->Viewer->SetRenderWindow(win);
   this->Viewer->SetTransferFunctionEditorType(vtkTransferFunctionViewer::SIMPLE_1D);
-  this->Viewer->SetModificationTypeToColor();
+  this->Viewer->SetModificationTypeToColorAndOpacity();
   this->Viewer->SetWholeScalarRange(0.0, 1.0);
   this->Viewer->SetVisibleScalarRange(0.0, 1.0);
   this->Viewer->SetLockEndPoints(1);
