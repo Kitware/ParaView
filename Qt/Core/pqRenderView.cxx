@@ -125,12 +125,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqRenderView::pqRenderView( const QString& group,
-                            const QString& name, 
-                            vtkSMViewProxy* renModule, 
-                            pqServer* server, 
-                            QObject* _parent/*=null*/) : 
-  Superclass(renderViewType(), group, name, renModule, server, _parent)
+void pqRenderView::InternalConstructor(const QString& group,
+                                       const QString& name, 
+                                       vtkSMViewProxy* renModule, 
+                                       pqServer* server, 
+                                       QObject* _parent/*=null*/
+                                       )
 {
   this->Internal = new pqRenderView::pqInternal();
 
@@ -144,6 +144,29 @@ pqRenderView::pqRenderView( const QString& group,
   this->getConnector()->Connect(
     renModule, vtkCommand::ResetCameraEvent,
     this, SLOT(onResetCameraEvent()));
+}
+
+//-----------------------------------------------------------------------------
+pqRenderView::pqRenderView( const QString& group,
+                            const QString& name, 
+                            vtkSMViewProxy* renModule, 
+                            pqServer* server, 
+                            QObject* _parent/*=null*/) : 
+  Superclass(renderViewType(), group, name, renModule, server, _parent)
+{
+  this->InternalConstructor(group, name, renModule, server, _parent);
+}
+
+//-----------------------------------------------------------------------------
+pqRenderView::pqRenderView( const QString& type,
+                            const QString& group, 
+                            const QString& name, 
+                            vtkSMViewProxy* renModule, 
+                            pqServer* server, 
+                            QObject* _parent/*=null*/) : 
+  Superclass(type, group, name, renModule, server, _parent)
+{
+  this->InternalConstructor(group, name, renModule, server, _parent);
 }
 
 //-----------------------------------------------------------------------------

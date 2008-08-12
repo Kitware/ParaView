@@ -72,7 +72,7 @@ pqComparativeRenderView::pqComparativeRenderView(
   vtkSMViewProxy* viewProxy,
   pqServer* server, 
   QObject* _parent):
-  Superclass(group, name, viewProxy, server, _parent)
+  Superclass(comparativeRenderViewType(), group, name, viewProxy, server, _parent)
 {
   this->Internal = new pqInternal();
   this->Internal->VTKConnect->Connect(

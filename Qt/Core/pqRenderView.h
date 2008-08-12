@@ -62,6 +62,14 @@ public:
                 pqServer* server, 
                 QObject* parent=NULL);
 
+  // This version allows subclasses to substitute their own renderViewType.
+  pqRenderView( const QString& tname,
+                const QString& group,
+                const QString& name, 
+                vtkSMViewProxy* renModule, 
+                pqServer* server, 
+                QObject* parent=NULL);
+
   // Destructor.
   virtual ~pqRenderView();
 
@@ -302,6 +310,12 @@ private:
     bool expand, bool select_blocks);
 
   static ManipulatorType DefaultManipulatorTypes[9];
+
+  void InternalConstructor(const QString& group,
+                           const QString& name, 
+                           vtkSMViewProxy* renModule, 
+                           pqServer* server, 
+                           QObject* parent=NULL);
 };
 
 #endif
