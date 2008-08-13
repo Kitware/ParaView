@@ -105,6 +105,11 @@ public:
   /// this display is being colored, if at all.
   QPair<double, double> getColorFieldRange();
 
+  /// Returns if the array (non-qualified array name) is a partial array in the
+  /// indicated fieldType.
+  /// fieldType=vtkSMDataRepresentationProxy::POINT_DATA|CELL_DATA etc.
+  bool isPartial(const QString& array, int fieldType) const;
+
   /// set the array to color the part by
   void setColorField(const QString& field);
 

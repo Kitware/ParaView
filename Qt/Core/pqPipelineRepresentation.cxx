@@ -824,6 +824,14 @@ int pqPipelineRepresentation::getColorFieldNumberOfComponents(const QString& arr
 }
 
 //-----------------------------------------------------------------------------
+bool pqPipelineRepresentation::isPartial(const QString& array, int fieldType) const
+{
+  vtkPVArrayInformation* info = this->Internal->getArrayInformation(
+    array.toAscii().data(), fieldType, this->getInputDataInformation());
+  return (info? (info->GetIsPartial()==1) : false);
+}
+
+//-----------------------------------------------------------------------------
 QPair<double, double> 
 pqPipelineRepresentation::getColorFieldRange(const QString& array, int component)
 {

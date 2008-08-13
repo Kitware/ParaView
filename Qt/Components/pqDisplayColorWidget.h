@@ -60,7 +60,7 @@ public:
   void clear();
 
   /// Adds a variable to the collection.
-  void addVariable(pqVariableType type, const QString& name);
+  void addVariable(pqVariableType type, const QString& name, bool is_partial);
 
   /// Makes the given variable the "current" selection.  Emits the 
   /// variableChanged() signal.

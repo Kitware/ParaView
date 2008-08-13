@@ -121,10 +121,16 @@ void pqDisplayColorWidget::clear()
 
 //-----------------------------------------------------------------------------
 void pqDisplayColorWidget::addVariable(pqVariableType type, 
-  const QString& name)
+  const QString& arg_name, bool is_partial)
 {
+  QString name = arg_name;
+  if (is_partial)
+    {
+    name += " (partial)";
+    }
+
   // Don't allow duplicates to creep in ...
-  if(-1 != this->Variables->findData(this->variableData(type, name)))
+  if(-1 != this->Variables->findData(this->variableData(type, arg_name)))
     {
     return;
     }
@@ -134,15 +140,17 @@ void pqDisplayColorWidget::addVariable(pqVariableType type,
     {
     case VARIABLE_TYPE_NONE:
       this->Variables->addItem(*this->SolidColorIcon,
-        "Solid Color", this->variableData(type, name));
+        "Solid Color", this->variableData(type, arg_name));
       break;
+
     case VARIABLE_TYPE_NODE:
       this->Variables->addItem(*this->PointDataIcon, name, 
-        this->variableData(type, name));
+        this->variableData(type, arg_name));
       break;
+
     case VARIABLE_TYPE_CELL:
       this->Variables->addItem(*this->CellDataIcon,
-        name, this->variableData(type, name));
+        name, this->variableData(type, arg_name));
       break;
     }
   this->BlockEmission--;
@@ -390,7 +398,7 @@ void pqDisplayColorWidget::reloadGUI()
   pqPipelineRepresentation* display = this->getRepresentation();
   if (!display)
     {
-    this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
+    this->addVariable(VARIABLE_TYPE_NONE, "Solid Color", false);
     this->BlockEmission--;
     this->setEnabled(false);
     return;
@@ -404,17 +412,19 @@ void pqDisplayColorWidget::reloadGUI()
     {
     if (arrayName == "Solid Color")
       {
-      this->addVariable(VARIABLE_TYPE_NONE, arrayName);
+      this->addVariable(VARIABLE_TYPE_NONE, arrayName, false);
       }
     else if (regExpCell.indexIn(arrayName) != -1)
       {
       arrayName = arrayName.replace(regExpCell, "");
-      this->addVariable(VARIABLE_TYPE_CELL, arrayName);
+      this->addVariable(VARIABLE_TYPE_CELL, arrayName, 
+        display->isPartial(arrayName, vtkSMDataRepresentationProxy::CELL_DATA));
       }
     else if (regExpPoint.indexIn(arrayName) != -1)
       {
       arrayName = arrayName.replace(regExpPoint, "");
-      this->addVariable(VARIABLE_TYPE_NODE, arrayName);
+      this->addVariable(VARIABLE_TYPE_NODE, arrayName,
+        display->isPartial(arrayName, vtkSMDataRepresentationProxy::POINT_DATA));
       }
     }
     
