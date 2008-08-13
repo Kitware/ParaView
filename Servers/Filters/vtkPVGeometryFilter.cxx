@@ -56,7 +56,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.82");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.83");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -176,6 +176,11 @@ static void vtkBuildArrayMap(vtkDataSetAttributes* dsa, vtkArrayMap& arrayMap)
     vtkDataArray* array = dsa->GetArray(kk);
     if (!array || !array->GetName())
       {
+      continue;
+      }
+    if (array == dsa->GetNormals() || array == dsa->GetTCoords())
+      {
+      // Normals and Tcoords are not filled up with filling partial arrays.
       continue;
       }
 
