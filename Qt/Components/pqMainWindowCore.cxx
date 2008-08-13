@@ -1755,7 +1755,10 @@ void pqMainWindowCore::onFileSaveData(const QStringList& files)
       QMessageBox::question(
         this->Implementation->Parent,
         "Serial Writer Warning",
-        "This writer will collect all of the data to the first node before writing because it does not support parallel IO. This may cause the first node to run out of memory if the data is large. Are you sure you want to continue?",
+        "This writer will collect all of the data to the first node before "
+        "writing because it does not support parallel IO. This may cause the "
+        "first node to run out of memory if the data is large. "
+        "Are you sure you want to continue?",
         QMessageBox::Ok | QMessageBox::Cancel,
         QMessageBox::Cancel);
     if (result == QMessageBox::Cancel)
