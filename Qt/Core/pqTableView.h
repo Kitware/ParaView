@@ -63,6 +63,8 @@ public:
   /// Save image to vtkImageData. Not supported.
   vtkImageData* captureImage(int /*magnification*/)
     { return NULL; }
+  virtual vtkImageData* captureImage(const QSize& size)
+    { return this->Superclass::captureImage(size); }
 
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely

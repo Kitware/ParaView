@@ -63,6 +63,8 @@ public:
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
+  virtual vtkImageData* captureImage(const QSize& size)
+    { return this->Superclass::captureImage(size); }
 
   /// returns whether a source can be displayed in this view module 
   virtual bool canDisplay(pqOutputPort* opPort) const;

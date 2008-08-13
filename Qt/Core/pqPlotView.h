@@ -68,6 +68,7 @@ public:
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
+  virtual vtkImageData* captureImage(const QSize& asize);
 
   /// Forces an immediate render. Overridden since for plots
   /// rendering actually happens on the GUI side, not merely

@@ -116,6 +116,7 @@ public:
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification) =0;
+  virtual vtkImageData* captureImage(const QSize& size);
 
   /// This method checks if the representation is shown in this view.
   bool hasRepresentation(pqRepresentation* repr) const;

@@ -34,7 +34,11 @@ public:
   // The file is created on the process on which this method is called.
   // Return vtkErrorCode::NoError (0) on success, otherwise returns the error
   // code.
-  static int SaveImage(vtkImageData* image, const char* filename);
+  /// quality [0,100] -- 0 = low, 100=high, -1=default
+  static int SaveImage(vtkImageData* image, const char* filename, 
+    int quality);
+  static int SaveImage(vtkImageData* image, const char* filename)
+    { return vtkSMUtilities::SaveImage(image, filename, -1); }
 
 //BTX
 protected:

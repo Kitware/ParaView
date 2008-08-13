@@ -14,20 +14,25 @@
 =========================================================================*/
 #include "vtkSMUtilities.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkInstantiator.h"
-#include "vtkImageWriter.h"
-#include "vtkImageData.h"
+#include "vtkBMPWriter.h"
 #include "vtkErrorCode.h"
+#include "vtkImageData.h"
+#include "vtkInstantiator.h"
+#include "vtkJPEGWriter.h"
+#include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
+#include "vtkPNMWriter.h"
+#include "vtkTIFFWriter.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMUtilities);
-vtkCxxRevisionMacro(vtkSMUtilities, "1.1");
+vtkCxxRevisionMacro(vtkSMUtilities, "1.2");
 
 //----------------------------------------------------------------------------
-int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename)
+int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename,
+  int quality /*=-1*/)
 {
   if (!filename || !filename[0])
     {
@@ -37,42 +42,35 @@ int vtkSMUtilities::SaveImage(vtkImageData* image, const char* filename)
   vtkstd::string ext = vtksys::SystemTools::GetFilenameLastExtension(filename);
   ext = vtksys::SystemTools::LowerCase(ext);
 
-  const char* writername = 0;
-  if(ext == ".bmp")
+  vtkImageWriter* writer = 0;
+  if (ext == ".bmp")
     {
-    writername = "vtkBMPWriter";
+    writer= vtkBMPWriter::New();
     }
-  else if(ext == ".tif" || ext == ".tiff")
+  else if (ext == ".tif" || ext == ".tiff")
     {
-    writername = "vtkTIFFWriter"; 
+    writer = vtkTIFFWriter::New();
     }
-  else if(ext == ".ppm")
+  else if (ext == ".ppm")
     {
-    writername = "vtkPNMWriter";
+    writer = vtkPNMWriter::New();
     }
-  else if(ext == ".png")
+  else if (ext == ".png")
     {
-    writername = "vtkPNGWriter";
+    writer = vtkPNGWriter::New();
     }
-  else if(ext == ".jpg" || ext == ".jpeg")
+  else if (ext == ".jpg" || ext == ".jpeg")
     {
-    writername = "vtkJPEGWriter";
+    vtkJPEGWriter* jpegWriter = vtkJPEGWriter::New();
+    if (quality >=0 && quality <= 100)
+      {
+      jpegWriter->SetQuality(quality);
+      }
+    writer = jpegWriter;
     }
   else 
     {
     return vtkErrorCode::UnrecognizedFileTypeError;
-    }
-
-  vtkObject* object = vtkInstantiator::CreateInstance(writername);
-  if (!object)
-    {
-    return vtkErrorCode::UnknownError;
-    }
-  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
-  if (!writer)
-    {
-    object->Delete();
-    return vtkErrorCode::UnknownError;
     }
 
   writer->SetInput(image);

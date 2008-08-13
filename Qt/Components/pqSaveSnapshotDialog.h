@@ -50,6 +50,9 @@ public:
   /// Returns the user selected size.
   QSize viewSize() const;
 
+  /// Returns the quality [0, 100] choosen by the user.
+  int quality() const;
+
   /// Set the default all views size. viewSize is used when used when
   /// saveAllViews is false, while all views size is used when saveAllViews is
   /// true.

@@ -141,6 +141,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqQuickLaunchDialog.h"
 #include "pqViewOptionsInterface.h"
 #include "pqViewExporterManager.h"
+#include "pqImageUtil.h"
 
 #include <pqFileDialog.h>
 #include <pqObjectNaming.h>
@@ -1831,21 +1832,25 @@ void pqMainWindowCore::onFileSaveScreenshot()
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   if (file_dialog->exec() == QDialog::Accepted)
     {
-    bool saved;
+    vtkSmartPointer<vtkImageData> img;
     QString file = file_dialog->getSelectedFiles()[0];
     if (ssDialog.saveAllViews())
       {
-      saved = this->multiViewManager().saveImage( 
-        chosenSize.width(), chosenSize.height(), file);
+      img.TakeReference(this->multiViewManager().captureImage( 
+          chosenSize.width(), chosenSize.height()));
       }
     else
       {
-      saved = view->saveImage(
-          chosenSize.width(), chosenSize.height(), file);
+      img.TakeReference(view->captureImage(chosenSize));
       }
-    if (!saved)
+
+    if (img.GetPointer() == NULL)
       {
       qCritical() << "Save Image failed.";
+      }
+    else
+      {
+      pqImageUtil::saveImage(img, file, ssDialog.quality());
       }
     }
 }

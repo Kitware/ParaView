@@ -39,6 +39,7 @@ class pqMultiViewFrame;
 class pqServer;
 class pqUndoStack;
 class pqView;
+class vtkImageData;
 class vtkPVXMLElement;
 class vtkSMStateLoaderBase;
 class vtkUndoElement;
@@ -98,11 +99,10 @@ public:
   /// supported.
   void finishedCapture();
 
-  /// Saves an image for the entire view layout. This internally calls
-  /// prepareForCapture and finishedCapture hence not need to call them
-  /// explicitly.
-  /// Returns if the save was successful.
-  bool saveImage(int width, int height, const QString& filename);
+  /// Saves an image for the entire view layout and returns a new vtkImageData. 
+  /// This internally calls prepareForCapture and finishedCapture hence not need 
+  /// to call them explicitly.
+  vtkImageData* captureImage(int width, int height);
 
   /// \brief
   ///   Resets the multi-view to its original state.

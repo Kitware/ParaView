@@ -67,6 +67,8 @@ public:
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and return it.
   virtual vtkImageData* captureImage(int magnification);
+  virtual vtkImageData* captureImage(const QSize& size)
+    { return this->Superclass::captureImage(size); }
 
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 

@@ -121,7 +121,8 @@ bool pqImageUtil::fromImageData(vtkImageData* vtkimage, QImage& img)
 }
 
 //-----------------------------------------------------------------------------
-int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename)
+int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename, 
+  int quality/*=-1*/)
 {
   int error_code = vtkErrorCode::NoError;
   if (!vtkimage)
@@ -149,14 +150,16 @@ int pqImageUtil::saveImage(vtkImageData* vtkimage, const QString& filename)
     }
   else
     {
-    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toAscii().data());
+    error_code = vtkSMUtilities::SaveImage(vtkimage, filename.toAscii().data(), 
+      quality);
     }
 
   return error_code;
 }
 
 //-----------------------------------------------------------------------------
-int pqImageUtil::saveImage(const QImage& qimage, const QString& filename)
+int pqImageUtil::saveImage(const QImage& qimage, const QString& filename,
+  int quality/*=-1*/)
 {
   int error_code = vtkErrorCode::NoError;
   if (qimage.isNull())
@@ -196,7 +199,7 @@ int pqImageUtil::saveImage(const QImage& qimage, const QString& filename)
     vtkImageData* vtkimage = vtkImageData::New();
     if (pqImageUtil::toImageData(qimage, vtkimage))
       {
-      error_code = pqImageUtil::saveImage(vtkimage, filename);
+      error_code = pqImageUtil::saveImage(vtkimage, filename, quality);
       }
     else
       {

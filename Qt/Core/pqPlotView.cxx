@@ -445,6 +445,23 @@ void pqPlotView::renderInternal()
 }
 
 //-----------------------------------------------------------------------------
+vtkImageData* pqPlotView::captureImage(const QSize& newsize)
+{
+  QWidget* plot_widget = this->getWidget();
+  QSize curSize = plot_widget->size();
+  if (newsize.isValid())
+    {
+    plot_widget->resize(newsize);
+    }
+  vtkImageData* img = this->captureImage(1);
+  if (newsize.isValid())
+    {
+    plot_widget->resize(curSize);
+    }
+  return img;
+}
+
+//-----------------------------------------------------------------------------
 vtkImageData* pqPlotView::captureImage(int magnification)
 {
   QWidget* plot_widget = this->getWidget();

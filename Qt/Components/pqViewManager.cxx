@@ -1280,12 +1280,12 @@ void pqViewManager::finishedCapture()
 }
 
 //-----------------------------------------------------------------------------
-bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
+vtkImageData* pqViewManager::captureImage(int _width, int _height)
 {
   int magnification = this->prepareForCapture(QSize(_width, _height));
 
   // Create full image data.
-  vtkSmartPointer<vtkImageData> fullImage = vtkSmartPointer<vtkImageData>::New();
+  vtkImageData* fullImage = vtkImageData::New();
   fullImage->SetDimensions(_width, _height, 1);
   fullImage->SetScalarTypeToUnsignedChar();
   fullImage->SetNumberOfScalarComponents(3);
@@ -1323,8 +1323,7 @@ bool pqViewManager::saveImage(int _width, int _height, const QString& filename)
     }
 
   this->finishedCapture();
-  // fullImage has the combined image from all views. We simply need to save it.
-  return (pqImageUtil::saveImage(fullImage, filename) == vtkErrorCode::NoError);
+  return fullImage;
 }
 
 //-----------------------------------------------------------------------------

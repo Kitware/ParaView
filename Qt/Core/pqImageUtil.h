@@ -52,12 +52,14 @@ public:
   /// Save an image to a file. Determines the type of the file using the file
   /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
   /// if file is successfully saved).
-  static int saveImage(vtkImageData* vtkimage, const QString& filename);
+  /// quality [0,100] -- 0 = low, 100=high, -1=default
+  static int saveImage(vtkImageData* vtkimage, const QString& filename, int quality=-1);
 
   /// Save an image to a file. Determines the type of the file using the file
   /// extension. Returns the vtkErrorCode on error (vtkErrorCode::NoError i.e. 0
   /// if file is successfully saved).
-  static int saveImage(const QImage& image, const QString& filename);
+  /// quality [0,100] -- 0 = low, 100=high, -1=default
+  static int saveImage(const QImage& image, const QString& filename, int quality=-1);
 };
 
 #endif

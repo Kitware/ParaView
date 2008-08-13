@@ -54,6 +54,9 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
   this->Internal = new pqInternal();
   this->Internal->setupUi(this);
   this->Internal->AspectRatio = 1.0;
+  this->Internal->quality->setMinimum(0);
+  this->Internal->quality->setMaximum(100);
+  this->Internal->quality->setValue(100);
 
   QIntValidator *validator = new QIntValidator(this);
   validator->setBottom(50);
@@ -137,6 +140,12 @@ void pqSaveSnapshotDialog::onLockAspectRatio(bool lock)
     this->Internal->AspectRatio = 
       curSize.width()/static_cast<double>(curSize.height());
     }
+}
+
+//-----------------------------------------------------------------------------
+int pqSaveSnapshotDialog::quality() const
+{
+  return this->Internal->quality->value();
 }
 
 //-----------------------------------------------------------------------------

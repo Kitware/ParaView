@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMViewProxy.h"
+#include "vtkImageData.h"
 
 // Qt includes.
 #include <QList>
@@ -339,4 +340,28 @@ int pqView::computeMagnification(const QSize& fullsize, QSize& viewsize)
 
   viewsize = fullsize/magnification;
   return magnification;
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqView::captureImage(const QSize& fullsize)
+{
+  QWidget* vtkwidget = this->getWidget();
+  QSize cursize = vtkwidget->size();
+  QSize newsize = cursize;
+  int magnification = 1;
+  if (fullsize.isValid())
+    {
+    magnification = pqView::computeMagnification(fullsize, newsize);
+    vtkwidget->resize(newsize);
+    }
+  this->render();
+
+  vtkImageData* vtkimage = this->captureImage(magnification);
+  if (fullsize.isValid())
+    {
+    vtkwidget->resize(newsize);
+    vtkwidget->resize(cursize);
+    this->render();
+    }
+  return vtkimage;
 }
