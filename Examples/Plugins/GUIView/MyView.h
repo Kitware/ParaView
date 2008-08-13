@@ -25,6 +25,7 @@ public:
   /// don't support save images
   bool saveImage(int, int, const QString& ) { return false; }
   vtkImageData* captureImage(int) { return NULL; }
+  vtkImageData* captureImage(const QSize&) { return NULL; }
 
   /// return the QWidget to give to ParaView's view manager
   QWidget* getWidget();
