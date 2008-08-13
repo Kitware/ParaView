@@ -56,7 +56,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.83");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.84");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -174,13 +174,16 @@ static void vtkBuildArrayMap(vtkDataSetAttributes* dsa, vtkArrayMap& arrayMap)
   for (int kk=0; kk < numArrays; kk++)
     {
     vtkDataArray* array = dsa->GetArray(kk);
+
     if (!array || !array->GetName())
       {
       continue;
       }
-    if (array == dsa->GetNormals() || array == dsa->GetTCoords())
+
+    if (array == dsa->GetNormals() || array == dsa->GetTCoords() ||
+      array == dsa->GetGlobalIds() || array == dsa->GetPedigreeIds())
       {
-      // Normals and Tcoords are not filled up with filling partial arrays.
+      // Normals, Tcoords, GIDs, PIDs are not filled up with filling partial arrays.
       continue;
       }
 
@@ -210,16 +213,6 @@ static void vtkFillPartialArrays(vtkDataSetAttributes* dsa,
         clone->FillComponent(cc, 0.0);
         }
       dsa->AddArray(clone);
-      // if the newly added array is an attribute in the original field data,
-      // then it must be marked as an attribute for vtkAppendPolyData to work
-      // correctly.
-      for (int kk=0; kk < vtkDataSetAttributes::NUM_ATTRIBUTES; kk++)
-        {
-        if (iter->second->GetAttribute(kk) == srcArray)
-          {
-          dsa->SetActiveAttribute(clone->GetName(), kk);
-          }
-        }
       clone->Delete();
       }
     }
@@ -243,11 +236,35 @@ vtkCompositeDataSet* vtkPVGeometryFilter::FillPartialArrays(
   vtkCompositeDataIterator* iter = input->NewIterator();
 
   // build arrayMap with representative arrays for each array name.
+  // As far as active attributes are concerned, we only fill in the scalars or
+  // vectors. For appendPolyData to work correctly, it is essential that the
+  // active scalars/vectors are the same array on all the inputs. To avoid
+  // contention, we choose the first available scalars/vectors.
+  vtkstd::string activePScalars, activeCScalars, activePVectors, activeCVectors;
+  
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
     if (ds)
       {
+      if (activePScalars=="" && ds->GetPointData()->GetScalars())
+        {
+        activePScalars = ds->GetPointData()->GetScalars()->GetName();
+        }
+      if (activeCScalars=="" && ds->GetCellData()->GetScalars())
+        {
+        activeCScalars = ds->GetCellData()->GetScalars()->GetName();
+        }
+
+      if (activePVectors=="" && ds->GetPointData()->GetVectors())
+        {
+        activePVectors = ds->GetPointData()->GetVectors()->GetName();
+        }
+      if (activeCVectors=="" && ds->GetCellData()->GetVectors())
+        {
+        activeCVectors = ds->GetCellData()->GetVectors()->GetName();
+        }
+
       ::vtkBuildArrayMap(ds->GetPointData(), arrayMapPD);
       ::vtkBuildArrayMap(ds->GetCellData(), arrayMapCD);
       }
@@ -268,6 +285,23 @@ vtkCompositeDataSet* vtkPVGeometryFilter::FillPartialArrays(
       {
       ::vtkFillPartialArrays(ds->GetPointData(), arrayMapPD, ds->GetNumberOfPoints());
       ::vtkFillPartialArrays(ds->GetCellData(), arrayMapCD, ds->GetNumberOfCells());
+
+      if (activePScalars != "")
+        {
+        ds->GetPointData()->SetActiveScalars(activePScalars.c_str());
+        }
+      if (activeCScalars != "")
+        {
+        ds->GetCellData()->SetActiveScalars(activeCScalars.c_str());
+        }
+      if (activePVectors != "")
+        {
+        ds->GetPointData()->SetActiveVectors(activePVectors.c_str());
+        }
+      if (activeCVectors != "")
+        {
+        ds->GetCellData()->SetActiveVectors(activeCVectors.c_str());
+        }
       }
     }
 
