@@ -140,6 +140,8 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(pqPipelineRepresentation* repr, QWidg
     this, SLOT(editCubeAxes()));
   QObject::connect(this->Internal->compositeTree, SIGNAL(itemSelectionChanged()),
     this, SLOT(volumeBlockSelected()));
+
+  this->DisableSpecularOnScalarColoring = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -549,7 +551,10 @@ void pqDisplayProxyEditor::updateEnableState()
     }
   else
     {
-    this->Internal->LightingGroup->setEnabled(false);
+    if (this->DisableSpecularOnScalarColoring)
+      {
+      this->Internal->LightingGroup->setEnabled(false);
+      }
     this->Internal->ColorInterpolateColors->setEnabled(true);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->ColorMapPage);

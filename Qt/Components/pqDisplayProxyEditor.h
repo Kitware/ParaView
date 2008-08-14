@@ -58,6 +58,11 @@ public:
   /// inform us of display property changes
   void reloadGUI();
 
+  /// When set to true (default) scalar coloring will result in disabling of the
+  /// specular GUI.
+  void setDisableSpecularOnScalarColoring(bool flag)
+    { this->DisableSpecularOnScalarColoring = flag; }
+
 signals:
   void specularColorChanged();
 
@@ -88,7 +93,7 @@ protected:
   bool isCubeAxesVisible();
 
 
-
+  bool DisableSpecularOnScalarColoring;
 private:
   bool DisableSlots;
 };
