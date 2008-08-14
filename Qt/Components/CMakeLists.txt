@@ -208,6 +208,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqVCRController.h
   pqViewContextMenuHandler.h
   pqViewContextMenuManager.h
+  pqViewFrameActionGroup.h
   pqViewManager.h
   pqWidgetRangeDomain.h
   pqWriterDialog.h

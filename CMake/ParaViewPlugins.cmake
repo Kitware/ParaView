@@ -429,6 +429,37 @@ MACRO(ADD_PARAVIEW_ACTION_GROUP OUTIFACES OUTSRCS)
       )
 ENDMACRO(ADD_PARAVIEW_ACTION_GROUP)
 
+# create implementation for a custom view frame action interface
+# ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP(
+#    OUTIFACES
+#    OUTSRCS
+#    CLASS_NAME classname
+#
+#    CLASS_NAME is the name of the class that implements a QActionGroup
+MACRO(ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP OUTIFACES OUTSRCS)
+
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME" "" ${ARGN} )
+ 
+  SET(${OUTIFACES} ${ARG_CLASS_NAME})
+
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  SET(ACTION_MOC_SRCS)
+  QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      )
+ENDMACRO(ADD_PARAVIEW_VIEW_FRAME_ACTION_GROUP)
+
 # create implementation for a dock window interface
 # ADD_PARAVIEW_DOCK_WINDOW(
 #    OUTIFACES

@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSplitViewUndoElement.h"
 #include "pqUndoStack.h"
+#include "pqViewFrameActionGroupInterface.h"
 #include "pqViewModuleInterface.h"
 #include "pqXMLUtil.h"
 
@@ -547,7 +548,18 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       backAction, SLOT(setEnabled(bool)));
     }
 
-
+  // Search for view frame action group plugins and allow them to decide whether
+  // to add their actions to this view type's frame or not.
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqViewFrameActionGroupInterface* agi = qobject_cast<pqViewFrameActionGroupInterface*>(iface);
+    if(agi)
+      {
+      agi->connect(frame, view);
+      }
+    }
 
   this->Internal->Frames.insert(frame, view);
 }
@@ -615,6 +627,20 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
       {
       frame->removeTitlebarAction(backAction);
       delete backAction;
+      }
+    }
+
+  // Search for view frame action group plugins and have them remove their 
+  // actions for this view's frame if need be.
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqViewFrameActionGroupInterface* agi = 
+        qobject_cast<pqViewFrameActionGroupInterface*>(iface);
+    if(agi)
+      {
+      agi->disconnect(frame, view);
       }
     }
 
