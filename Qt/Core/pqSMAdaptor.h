@@ -42,6 +42,7 @@ class QWidget;
 #include "pqCoreExport.h"
 #include <QVariant>
 #include <QList>
+#include <QPair>
 #include "pqSMProxy.h"
 
 Q_DECLARE_METATYPE(QList<QList<QVariant> >)
@@ -191,6 +192,7 @@ public:
   static void setFieldSelectionScalar(vtkSMProperty*, const QString&);
   static void setUncheckedFieldSelectionScalar(vtkSMProperty*, const QString&);
   static QList<QString> getFieldSelectionScalarDomain(vtkSMProperty*);
+  static QList<QPair<QString, bool> > getFieldSelectionScalarDomainWithPartialArrays(vtkSMProperty*);
 
 
   /// Returns a list of domains types for the property. eg.

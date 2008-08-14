@@ -153,11 +153,13 @@ void pqFieldSelectionAdaptor::indexChanged(int index)
   QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
   if(combo)
     {
+    QStringList array = combo->itemData(index).toStringList();
+
     // get attribute mode type
-    QString mode = combo->itemData(index).toString();
+    QString mode = array[0];
     
     // get scalar
-    QString sc = combo->itemText(index);
+    QString sc = array[1];
 
     this->setAttributeModeAndScalar(mode, sc);
     }
@@ -215,14 +217,15 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
   
   foreach(QString mode, possibleModes)
     {
-    QList<QString> arrays;
+    QList<QPair<QString, bool> > arrays;
     pqSMAdaptor::setUncheckedFieldSelectionMode(this->Property, mode);
-    arrays = pqSMAdaptor::getFieldSelectionScalarDomain(this->Property);
+    arrays = pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
     for(int i=0; i<arrays.size(); i++)
       {
       QList<QString> thisArray;
       thisArray.append(mode);
-      thisArray.append(arrays[i]);
+      thisArray.append(arrays[i].first);
+      thisArray.append(arrays[i].second? "1" : "0");
       allArrays.append(thisArray);
       }
     }
@@ -248,13 +251,19 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
       {
       pix = &cellPixmap;
       }
-    if(pix)
+
+    QString arrayName = array[1];
+    if (array[2] == "1")
       {
-      combo->addItem(QIcon(*pix), array[1], array[0]);
+      arrayName += " (partial)";
+      }
+    if (pix)
+      {
+      combo->addItem(QIcon(*pix), arrayName, QVariant(array));
       }
     else
       {
-      combo->addItem(array[1], array[0]);
+      combo->addItem(arrayName, QVariant(array));
       }
     if(array[0] == originalMode && array[1] == originalScalar)
       {

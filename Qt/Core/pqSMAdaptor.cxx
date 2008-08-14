@@ -1887,6 +1887,7 @@ void pqSMAdaptor::setUncheckedFieldSelectionScalar(vtkSMProperty* prop,
     }
 }
 
+//-----------------------------------------------------------------------------
 QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty* prop)
 {
   QList<QString> types;
@@ -1906,6 +1907,32 @@ QList<QString> pqSMAdaptor::getFieldSelectionScalarDomain(vtkSMProperty* prop)
     for(int i=0; i<numEntries; i++)
       {
       types.append(domain->GetString(i));
+      }
+    }
+  return types;
+}
+
+//-----------------------------------------------------------------------------
+QList<QPair<QString, bool> > pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(
+  vtkSMProperty* prop)
+{
+  QList<QPair<QString, bool> > types;
+  if (!prop)
+    {
+    return types;
+    }
+
+  vtkSMStringVectorProperty* Property =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  vtkSMArrayListDomain* domain = prop ?
+    vtkSMArrayListDomain::SafeDownCast(prop->GetDomain("array_list")) : 0;
+  
+  if(Property && domain)
+    {
+    int numEntries = domain->GetNumberOfStrings();
+    for(int i=0; i<numEntries; i++)
+      {
+      types.append(QPair<QString, bool>(domain->GetString(i), domain->IsArrayPartial(i)!=0));
       }
     }
   return types;
