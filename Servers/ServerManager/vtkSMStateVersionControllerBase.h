@@ -42,6 +42,25 @@ public:
   virtual bool Process(vtkPVXMLElement* root) = 0;
 
 //BTX
+  // Description:
+  // Select all 1-level deep children of root with name=childName and
+  // with attributes specified in the childAttrs (if non-null)
+  // and invoke the callback for all such matches.
+  void Select(vtkPVXMLElement* root,
+    const char* childName,
+    const char* childAttrs[],
+    bool (*funcPtr)(vtkPVXMLElement*, void*),
+    void* callData);
+
+  // Description:
+  // Select all 1-level deep children of the root with name=childName and with
+  // attributes specified in the childAttrs (if non-null) and set the newAttrs
+  // on it. Both childAttrs and newAttrs must be terminated by 0.
+  void SelectAndSetAttributes(vtkPVXMLElement* root,
+    const char* childName,
+    const char* childAttrs[],
+    const char* newAttrs[]);
+
 protected:
   vtkSMStateVersionControllerBase();
   ~vtkSMStateVersionControllerBase();
@@ -75,25 +94,6 @@ protected:
         }
       }
     }
-
-  // Description:
-  // Select all 1-level deep children of root with name=childName and
-  // with attributes specified in the childAttrs (if non-null)
-  // and invoke the callback for all such matches.
-  void Select(vtkPVXMLElement* root,
-    const char* childName,
-    const char* childAttrs[],
-    bool (*funcPtr)(vtkPVXMLElement*, void*),
-    void* callData);
-
-  // Description:
-  // Select all 1-level deep children of the root with name=childName and with
-  // attributes specified in the childAttrs (if non-null) and set the newAttrs
-  // on it. Both childAttrs and newAttrs must be terminated by 0.
-  void SelectAndSetAttributes(vtkPVXMLElement* root,
-    const char* childName,
-    const char* childAttrs[],
-    const char* newAttrs[]);
 
   void SelectAndRemove(vtkPVXMLElement* root,
     const char* childName,

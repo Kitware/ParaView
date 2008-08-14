@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.11");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.12");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -55,25 +55,43 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     this->UpdateVersion(version, updated_version);
     }
 
-  if (this->GetMajor(version)==3 && this->GetMinor(version)==0)
+  // Note that we apply to 3.1 changes from 3.0 to 3.2. Odd versions
+  // are floating versions that are somewhere between two releases.
+  // They may or may not have the backwards compatibility issue of
+  // the previous release. We assume that they do because updating
+  // them should not break anything even if they do not.
+  if (this->GetMajor(version)==3 && 
+      (this->GetMinor(version)==0 || this->GetMinor(version)==1))
     {
-    if (this->GetPatch(version) < 2)
+    if (this->GetMinor(version)==0 && this->GetPatch(version) < 2)
       {
       vtkWarningMacro("Due to fundamental changes in the parallel rendering framework "
         "it is not possible to load states with volume rendering correctly "
         "for versions less than 3.0.2.");
       }
-    status = status && this->Process_3_0_To_3_1(root) ;
+    status = status && this->Process_3_0_To_3_2(root) ;
 
     // Since now the state file has been update to version 3.1.0, we must update
     // the version number to reflect that.
-    int updated_version[3] = {3, 1, 0};
+    int updated_version[3] = {3, 2, 0};
     this->UpdateVersion(version, updated_version);
     }
 
+  if (this->GetMajor(version)==3 && 
+      (this->GetMinor(version)==2 || this->GetMinor(version)==3))
+    {
+    status = status && this->Process_3_2_To_3_4(root) ;
+
+    // Since now the state file has been update to version 3.1.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = {3, 4, 0};
+    this->UpdateVersion(version, updated_version);
+    }
   return true;
 }
 
+namespace
+{
 //----------------------------------------------------------------------------
 bool ConvertViewModulesToViews(
   vtkPVXMLElement* root, void* callData)
@@ -287,9 +305,10 @@ bool ConvertPVAnimationSceneToAnimationScene(
     vtkSMStateVersionController*>(callData);
   return self->ConvertPVAnimationSceneToAnimationScene(root);
 }
-
+}
+;
 //----------------------------------------------------------------------------
-bool vtkSMStateVersionController::Process_3_0_To_3_1(vtkPVXMLElement* root)
+bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
 {
     {
     // Remove all MultiViewRenderModule elements.
@@ -546,7 +565,7 @@ bool vtkSMStateVersionController::ConvertLegacyReader(
     "name", "FileName", 0 };
   const char* newAttrs[] = {
     "name", "FileNames", 0};
-  // Replace the "Displays" property with "Representations".
+  // Replace the "FileName" property with "FileNames".
   this->SelectAndSetAttributes(
     parent,
    "Property", attrs, newAttrs);
@@ -607,6 +626,41 @@ bool vtkSMStateVersionController::ConvertPVAnimationSceneToAnimationScene(
     parent->RemoveNestedElement(ctRange);
     }
 
+  return true;
+}
+
+namespace
+{
+//----------------------------------------------------------------------------
+bool ConvertTemporalShiftScale(
+  vtkPVXMLElement* parent, void* callData)
+{
+  vtkSMStateVersionController* self = reinterpret_cast<
+    vtkSMStateVersionController*>(callData);
+  const char* attrs[] = {
+    "name", "Shift", 0 };
+  const char* newAttrs[] = {
+    "name", "PostShift", 0};
+  // Replace the "FileName" property with "FileNames".
+  self->SelectAndSetAttributes(
+    parent,
+   "Property", attrs, newAttrs);
+    
+  return true;
+}
+};
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_2_To_3_4(vtkPVXMLElement* root)
+{
+  {
+  // Select all LegacyVTKFileReader elements 
+  const char* attrs[] = {
+    "type", "TemporalShiftScale", 0};
+  this->Select( root, "Proxy", attrs,
+    &::ConvertTemporalShiftScale, this);
+  }
+  
   return true;
 }
 

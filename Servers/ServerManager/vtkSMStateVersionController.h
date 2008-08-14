@@ -37,7 +37,8 @@ public:
   // Returns false if the conversion failed, else true.
   virtual bool Process(vtkPVXMLElement* root);
 
-  bool Process_3_0_To_3_1(vtkPVXMLElement* root);
+  bool Process_3_0_To_3_2(vtkPVXMLElement* root);
+  bool Process_3_2_To_3_4(vtkPVXMLElement* root);
 
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
