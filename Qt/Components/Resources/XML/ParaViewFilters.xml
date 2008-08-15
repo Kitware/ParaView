@@ -10,7 +10,7 @@
     <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
     <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
     <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
-    <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+    <Filter name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
   </Category>
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
@@ -63,7 +63,7 @@
   <Filter name="ExtractGeometry" />
   <Filter name="ExtractGrid" />
   <Filter name="ExtractHistogram" />
-  <Filter name="ExtractLevel" />
+  <Filter name="ExtractHierarchicalLevel" />
   <Filter name="ExtractSelection" />
   <Filter name="ExtractSelectionOverTime" />
   <Filter name="ExtractDataSets" />

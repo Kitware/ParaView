@@ -661,6 +661,10 @@ protected:
   // with this proxy execute. Subclasses overwrite this method to
   // add necessary functionality.
   virtual void PostUpdateData();
+
+  // Description:
+  // If a proxy is deprecated, prints a warning.
+  bool WarnIfDeprecated();
   
   // When an algorithm proxy is marked modified, NeedsUpdate is
   // set to true. In PostUpdateData(), NeedsUpdate is set to false.
@@ -740,6 +744,7 @@ protected:
   int ArePropertiesModified(int selfOnly = 0);
 
   void SetHints(vtkPVXMLElement* hints);
+  void SetDeprecated(vtkPVXMLElement* deprecated);
 
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
@@ -765,6 +770,7 @@ protected:
 
   vtkSMDocumentation* Documentation;
   vtkPVXMLElement* Hints;
+  vtkPVXMLElement* Deprecated;
 
   // Flag used to break consumer loops.
   int InMarkModified;

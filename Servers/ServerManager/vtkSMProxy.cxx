@@ -38,10 +38,11 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.104");
+vtkCxxRevisionMacro(vtkSMProxy, "1.105");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
+vtkCxxSetObjectMacro(vtkSMProxy, Deprecated, vtkPVXMLElement);
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -137,6 +138,7 @@ vtkSMProxy::vtkSMProxy()
   this->NeedsUpdate = true;
   
   this->Hints = 0;
+  this->Deprecated = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -177,6 +179,7 @@ vtkSMProxy::~vtkSMProxy()
     }
   this->Documentation->Delete();
   this->SetHints(0);
+  this->SetDeprecated(0);
 }
 
 //---------------------------------------------------------------------------
@@ -1139,6 +1142,7 @@ void vtkSMProxy::CreateVTKObjects()
     }
   this->ObjectsCreated = 1;
   this->GetSelfID(); // this will ensure that the SelfID is assigned properly.
+  this->WarnIfDeprecated();
 
   if (this->VTKClassName && this->VTKClassName[0] != '\0')
     {
@@ -1161,6 +1165,23 @@ void vtkSMProxy::CreateVTKObjects()
     {
     it2->second.GetPointer()->CreateVTKObjects();
     }
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxy::WarnIfDeprecated()
+{
+  if (this->Deprecated)
+    {
+    vtkWarningMacro("Proxy (" << this->XMLGroup << ", " << this->XMLName 
+      << ")  has been deprecated in ParaView " <<
+      this->Deprecated->GetAttribute("deprecated_in") << 
+      " and will be removed by ParaView " <<
+      this->Deprecated->GetAttribute("to_remove_in") << ". " <<
+      (this->Deprecated->GetCharacterData()? 
+       this->Deprecated->GetCharacterData() : ""));
+    return true;
+    }
+  return false;
 }
 
 //---------------------------------------------------------------------------
@@ -1769,6 +1790,10 @@ void vtkSMProxy::ReadCoreXMLAttributes(vtkPVXMLElement* element)
     else if (strcmp(subElem->GetName(), "Hints") == 0)
       {
       this->SetHints(subElem);
+      }
+    else if (strcmp(subElem->GetName(), "Deprecated") == 0)
+      {
+      this->SetDeprecated(subElem);
       }
     }
 }

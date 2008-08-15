@@ -6978,7 +6978,7 @@ Tessellate a higher-order dataset.
     </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractLevel" class="vtkExtractLevel"
+   <SourceProxy name="ExtractHierarchicalLevel" class="vtkExtractLevel"
      label="Extract Level">
      <Documentation
         long_help="This filter extracts a range of groups from a hierarchical dataset."
@@ -7025,7 +7025,7 @@ Tessellate a higher-order dataset.
        </Documentation>
      </IntVectorProperty>
 
-    <!-- End ExtractLevel -->
+    <!-- End ExtractHierarchicalLevel -->
    </SourceProxy>
 
    <!-- ==================================================================== -->
@@ -7984,6 +7984,81 @@ This property controls how the filter works to generate tensor cell data. You ca
       <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
     </CompoundSourceProxy>
 
+    <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
+       label="Level Scalars">
+      <Documentation
+         long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
+         short_help="Generate point scalars from level.">
+         DEPRECATED. Use BlockIdScalars or LevelIdScalars instead.
+         The Level Scalars filter uses colors to show levels of a hierarchical dataset.
+      </Documentation>
+      <Deprecated deprecated_in="3.2" to_remove_in="3.4">
+  Please use BlockIdScalars (for multiblock datasets) or LevelIdScalars
+  (for hierarchical box datasets).
+      </Deprecated>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkMultiGroupDataSet"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input to the Level Scalars filter.
+            </Documentation>
+      </InputProperty>
+    <!-- End GroupIdScalars -->
+    </SourceProxy>
+
+    <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup"
+      label="Extract Group">
+      <Documentation
+         long_help="This filter extracts a range of groups from a multigroup dataset."
+         short_help="Extract level.">
+        DEPRECATED. Please use ExtractBlock (for multiblock datasets) or ExtractHierarchicalLevel 
+        (for hierarchical box datasets).
+        This  filter extracts a range of groups from a multigroup dataset    
+      </Documentation>
+      <Deprecated deprecated_in="3.2" to_remove_in="3.4">
+  Please use ExtractBlock (for multiblock datasets) or ExtractHierarchicalLevel 
+  (for hierarchical box datasets).
+      </Deprecated>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkMultiGroupDataSet"/>
+            </DataTypeDomain>
+            <NumberOfGroupsDomain name="multi_group" multiplicity="multiple"/>
+            <Documentation>
+              This property specifies the input to the Extract Group filter.
+            </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty 
+         name="GroupRange" 
+         command="SetGroupRange" 
+         number_of_elements="2"
+         default_values="0 0" > 
+        <NumberOfGroupsDomain name="range">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+        </NumberOfGroupsDomain>
+        <Documentation>
+          This property lists the ids of the minimum and maximum group to extract from the input multigroup dataset.
+        </Documentation>
+      </IntVectorProperty>
+
+    <!-- End ExtractLevel -->
+    </SourceProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>
