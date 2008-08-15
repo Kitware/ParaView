@@ -477,6 +477,19 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
     frame->setMainWidget(NULL);
     }
 
+  // Search for view frame action group plugins and allow them to decide whether
+  // to add their actions to this view type's frame or not.
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqViewFrameActionGroupInterface* agi = qobject_cast<pqViewFrameActionGroupInterface*>(iface);
+    if(agi)
+      {
+      agi->connect(frame, view);
+      }
+    }
+
   pqRenderView* const render_module = 
     qobject_cast<pqRenderView*>(view);
   if(render_module)
@@ -546,19 +559,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       view, SLOT(undo()));
     QObject::connect(view, SIGNAL(canUndoChanged(bool)),
       backAction, SLOT(setEnabled(bool)));
-    }
-
-  // Search for view frame action group plugins and allow them to decide whether
-  // to add their actions to this view type's frame or not.
-  QObjectList ifaces =
-    pqApplicationCore::instance()->getPluginManager()->interfaces();
-  foreach(QObject* iface, ifaces)
-    {
-    pqViewFrameActionGroupInterface* agi = qobject_cast<pqViewFrameActionGroupInterface*>(iface);
-    if(agi)
-      {
-      agi->connect(frame, view);
-      }
     }
 
   this->Internal->Frames.insert(frame, view);
