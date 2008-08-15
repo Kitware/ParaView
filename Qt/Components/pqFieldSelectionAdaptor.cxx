@@ -215,8 +215,9 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
   QString oldUncheckedVal = vtkSMStringVectorProperty::SafeDownCast(
                             this->Property)->GetUncheckedElement(3);
   
-  foreach(QString mode, possibleModes)
+  for (int kk=possibleModes.size()-1; kk >=0; kk--)
     {
+    QString mode = possibleModes[kk];
     QList<QPair<QString, bool> > arrays;
     pqSMAdaptor::setUncheckedFieldSelectionMode(this->Property, mode);
     arrays = pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(this->Property);
