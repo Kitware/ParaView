@@ -348,7 +348,7 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
           new pqSignalAdaptorComboBox(comboBox);
         adaptor->setObjectName("ComboBoxAdaptor");
         property_manager->registerLink(
-          adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+          adaptor, "currentData", SIGNAL(currentTextChanged(const QString&)),
           proxy, SMProperty, 1);  // 1 means link scalar for field selection
         }
       else

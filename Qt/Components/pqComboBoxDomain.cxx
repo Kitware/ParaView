@@ -153,7 +153,9 @@ void pqComboBoxDomain::internalDomainChanged()
     return;
     }
 
-  QList<QString> domain;
+  QList<QString> texts;
+  QList<QVariant> data;
+
   pqSMAdaptor::PropertyType type;
 
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
@@ -163,18 +165,31 @@ void pqComboBoxDomain::internalDomainChanged()
     enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
     foreach(QVariant var, enums)
       {
-      domain.append(var.toString());
+      texts.append(var.toString());
       }
     }
   else if(type == pqSMAdaptor::FIELD_SELECTION)
     {
     if(this->Internal->DomainName == "field_list")
       {
-      domain = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
+      texts = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
       }
     else if(this->Internal->DomainName == "array_list")
       {
-      domain = pqSMAdaptor::getFieldSelectionScalarDomain(this->Internal->Property);
+      QList<QPair<QString, bool> > arrays = 
+        pqSMAdaptor::getFieldSelectionScalarDomainWithPartialArrays(
+          this->Internal->Property);
+      for (int kk=0; kk < arrays.size(); kk++)
+        {
+        QPair<QString, bool> pair = arrays[kk];
+        QString arrayName = pair.first;
+        if (pair.second)
+          {
+          arrayName += " (partial)";
+          }
+        texts.append(arrayName);
+        data.append(pair.first);
+        }
       }
     }
   else if(type == pqSMAdaptor::PROXYSELECTION ||
@@ -184,37 +199,49 @@ void pqComboBoxDomain::internalDomainChanged()
       this->Internal->Property);
     foreach(vtkSMProxy* pxy, proxies)
       {
-      domain.append(pxy->GetXMLLabel());
+      texts.append(pxy->GetXMLLabel());
       }
     }
 
   foreach (QString userStr, this->Internal->UserStrings)
     {
-    if (!domain.contains(userStr))
+    if (!texts.contains(userStr))
       {
-      domain.push_front(userStr);
+      texts.push_front(userStr);
+      data.push_front(userStr);
       }
     }
 
-  // check if the domain didn't change
-  QList<QString> oldDomain;
+  if (texts.size() != data.size())
+    {
+    foreach (QString str, texts)
+      {
+      data.push_back(QVariant(str));
+      }
+    }
+
+  // check if the texts didn't change
+  QList<QVariant> oldData;
 
   for(int i=0; i<combo->count(); i++)
     {
-    oldDomain.append(combo->itemText(i));
+    oldData.append(combo->itemData(i));
     }
 
-  if(oldDomain != domain)
+  if (oldData != data)
     {
     // save previous value to put back
-    QString old = combo->currentText();
+    QVariant old = combo->itemData(combo->currentIndex());
     bool prev = combo->blockSignals(true);
     combo->clear();
-    combo->addItems(domain);
+    for (int cc=0; cc < data.size(); cc++)
+      {
+      combo->addItem(texts[cc], data[cc]);
+      }
     combo->setCurrentIndex(-1);
     combo->blockSignals(prev);
-    int foundOld = combo->findText(old);
-    if(foundOld >= 0)
+    int foundOld = combo->findData(old);
+    if (foundOld >= 0)
       {
       combo->setCurrentIndex(foundOld);
       }
