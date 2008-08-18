@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.85");
+vtkCxxRevisionMacro(vtkProcessModule, "1.86");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -188,13 +188,16 @@ vtkProcessModule::vtkProcessModule()
   this->LastProgress = -1;
   this->LastProgressName = 0;
 
-  // setting this here since this must be initialized on all processes to produce
-  // correct result.
+  // Setting this here since this must be initialized on all processes
+  // to produce correct result.
   // This is essential to ensure that edge-visibility works correctly.
-  vtkMapper::SetResolveCoincidentTopologyToPolygonOffset();
-  // We offset lines/vertices.
-  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetFaces(0);
-  vtkMapper::SetResolveCoincidentTopologyPolygonOffsetParameters(-1.0, -1.0);
+  // We are using a simple Z shift because the polygon offset does not work
+  // well.  It shifts based on the angle of the polygon with respect to the
+  // view plane, which shifts way too much on near perpendicular polygons.
+  // The value to use a the shift is just an emperical, "yeah, that looks
+  // good" value.
+  vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
+  vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 
 #ifdef VTK_USE_MPI
   // ParaView uses Ssend for all Trigger RMI calls. This helps in overcoming
