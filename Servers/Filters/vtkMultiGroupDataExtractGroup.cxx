@@ -22,7 +22,7 @@
 #include "vtkInformation.h"
 
 vtkStandardNewMacro(vtkMultiGroupDataExtractGroup);
-vtkCxxRevisionMacro(vtkMultiGroupDataExtractGroup, "1.1");
+vtkCxxRevisionMacro(vtkMultiGroupDataExtractGroup, "1.2");
 //----------------------------------------------------------------------------
 vtkMultiGroupDataExtractGroup::vtkMultiGroupDataExtractGroup()
 {
@@ -139,6 +139,7 @@ int vtkMultiGroupDataExtractGroup::RequestData(
     el->Update();
     output->ShallowCopy(el->GetOutput());
     el->Delete();
+    return 1;
     }
 
   vtkErrorMacro("Unhandled input type: " << input->GetClassName());
