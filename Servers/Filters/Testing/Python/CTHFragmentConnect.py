@@ -159,7 +159,10 @@ class vtkCTHFragmentConnectTest:
           or name.find('fraction')!=-1
           or name.find('X ')==0
           or name.find('Y ')==0
-          or name.find('Z ')==0):
+          or name.find('Z ')==0
+          or name.find('XX ')==0
+          or name.find('XY ')==0
+          or name.find('YY ')==0):
       #{
         continue;
       #}
@@ -173,6 +176,7 @@ class vtkCTHFragmentConnectTest:
         waaNames.append(name)
       #}
     #}
+    #print waaNames
     return waaNames
   #}
 
@@ -292,7 +296,7 @@ class vtkCTHFragmentConnectTest:
 
 
 # Run the test
-dsf=["SNLVV/small/spcth.0"]
+dsf=["Data/spcth_fc_0.0"]
 cfct=vtkCTHFragmentConnectTest()
 cfct.ProcessCommandLineArguments()
 cfct.Connect(sm)
