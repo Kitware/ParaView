@@ -7083,7 +7083,7 @@ This filter extracts a range of groups from a multiblock dataset
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractDataSets" 
+   <SourceProxy name="ExtractHierarchicalDataSets" 
                 class="vtkExtractDataSets"
                 label="Extract Datasets">
      <Documentation
@@ -8004,7 +8004,7 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Group name="filters"/>
             </ProxyGroupDomain>
             <DataTypeDomain name="input_type">
-              <DataType value="vtkMultiGroupDataSet"/>
+              <DataType value="vtkCompositeDataSet"/>
             </DataTypeDomain>
             <Documentation>
               This property specifies the input to the Level Scalars filter.
@@ -8034,7 +8034,7 @@ This property controls how the filter works to generate tensor cell data. You ca
               <Group name="filters"/>
             </ProxyGroupDomain>
             <DataTypeDomain name="input_type">
-              <DataType value="vtkMultiGroupDataSet"/>
+              <DataType value="vtkCompositeDataSet"/>
             </DataTypeDomain>
             <NumberOfGroupsDomain name="multi_group" multiplicity="multiple"/>
             <Documentation>
@@ -8059,6 +8059,48 @@ This property controls how the filter works to generate tensor cell data. You ca
 
     <!-- End ExtractLevel -->
     </SourceProxy>
+
+    <SourceProxy name="ExtractDataSets" 
+                class="vtkMultiGroupDataExtractDataSets"
+                label="Extract Datasets">
+      <Documentation
+         long_help="This filter extracts a list of datasets from multigroup datasets."
+         short_help="Extract datasets.">
+         DEPRECATED. Please use ExtractBlock (for multiblock datasets) or
+         ExtractHierarchicalDataSets (for hierarchical box datasets).
+         This filter extracts a list of datasets from multigroup datasets.
+      </Documentation>
+      <Deprecated deprecated_in="3.2" to_remove_in="3.4">
+  Please use ExtractBlock (for multiblock datasets) or
+  ExtractHierarchicalDataSets (for hierarchical box datasets).
+      </Deprecated>
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkCompositeDataSet"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input to the Extract Datasets filter.
+            </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty 
+         name="SelectedDataSets" 
+         command="AddDataSet"
+         clean_command="ClearDataSetList"
+         repeat_command="1"
+         number_of_elements_per_command="2">
+         <Documentation>
+           This property provides a list of datasets to extract.
+         </Documentation>
+      </IntVectorProperty>
+   <!-- End ExtractDataSets -->
+   </SourceProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

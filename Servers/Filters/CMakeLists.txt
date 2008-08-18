@@ -156,6 +156,7 @@ SET(Filters_SRCS
 # Backward-Compatibilty classes
   vtkMultiGroupDataGroupIdScalars.cxx
   vtkMultiGroupDataExtractGroup.cxx
+  vtkMultiGroupDataExtractDataSets.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
