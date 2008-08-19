@@ -36,8 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFilter.h"
 #include "pqServer.h"
 
-#include "ui_pqFileDialog.h"
-
 #include <QDir>
 #include <QMessageBox>
 #include <QtDebug>
@@ -46,6 +44,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QLineEdit>
 #include <QAbstractButton>
+#include <QComboBox>
+#include <QAbstractItemView>
+
+class pqFileComboBox : public QComboBox
+{
+public:
+  pqFileComboBox(QWidget* p) : QComboBox(p) {}
+  void showPopup()
+    {
+    QWidget* container = this->view()->parentWidget();
+    container->setMaximumWidth(this->width());
+    QComboBox::showPopup();
+    }
+};
+#include "ui_pqFileDialog.h"
 
 namespace {
 
