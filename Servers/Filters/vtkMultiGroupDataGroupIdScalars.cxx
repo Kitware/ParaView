@@ -23,7 +23,7 @@
 #include "vtkInformation.h"
 #include "vtkUnsignedCharArray.h"
 vtkStandardNewMacro(vtkMultiGroupDataGroupIdScalars);
-vtkCxxRevisionMacro(vtkMultiGroupDataGroupIdScalars, "1.1");
+vtkCxxRevisionMacro(vtkMultiGroupDataGroupIdScalars, "1.2");
 //----------------------------------------------------------------------------
 vtkMultiGroupDataGroupIdScalars::vtkMultiGroupDataGroupIdScalars()
 {
@@ -94,15 +94,15 @@ int vtkMultiGroupDataGroupIdScalars::ColorBlock(vtkDataObject* dObj, int group_n
     iter->TraverseSubTreeOff();
     iter->SkipEmptyNodesOff();
 
-    int group_no = 0;
+    int new_group_no = 0;
     for (iter->InitTraversal();
       !iter->IsDoneWithTraversal();
-      iter->GoToNextItem(), group_no++)
+      iter->GoToNextItem(), new_group_no++)
       {
       vtkDataObject* child = iter->GetCurrentDataObject();
       if (child)
         {
-        this->ColorBlock(child, group_no);
+        this->ColorBlock(child, new_group_no);
         }
       }
     iter->Delete();
