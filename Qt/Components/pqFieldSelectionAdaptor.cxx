@@ -199,13 +199,11 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
   QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
   QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
 
-  QString originalMode;
-  QString originalScalar;
 
+  QVariant originalData;
   if(combo->currentIndex() >= 0)
     {
-    originalMode = combo->itemData(combo->currentIndex()).toString();
-    originalScalar = combo->itemText(combo->currentIndex());
+    originalData = combo->itemData(combo->currentIndex());
     }
 
   this->IsGettingAllDomains = true;
@@ -266,7 +264,7 @@ void pqFieldSelectionAdaptor::internalDomainChanged()
       {
       combo->addItem(arrayName, QVariant(array));
       }
-    if(array[0] == originalMode && array[1] == originalScalar)
+    if (QVariant(array) == originalData)
       {
       newIndex = i;
       }
