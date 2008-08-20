@@ -309,7 +309,7 @@ IF(BUILD_TESTING)
     ExodusIIPanel
     ExodusModeShapes
     ExodusPanel
-    ExodusWriter
+#    ExodusWriter -- ENABLE WHEN WRITER IS ADDED
     ExodusXML
     ExTimeseries
     ExtractBlock
