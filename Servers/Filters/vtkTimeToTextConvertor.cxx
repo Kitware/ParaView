@@ -22,13 +22,13 @@
 #include "vtkTable.h"
 
 vtkStandardNewMacro(vtkTimeToTextConvertor);
-vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.5");
+vtkCxxRevisionMacro(vtkTimeToTextConvertor, "1.6");
 //----------------------------------------------------------------------------
 vtkTimeToTextConvertor::vtkTimeToTextConvertor()
 {
   this->Format = 0;
   this->Shift  = 0.0;
-  this->Scale  = 1.1;
+  this->Scale  = 1.0;
   this->SetFormat("Time: %f");
 }
 
