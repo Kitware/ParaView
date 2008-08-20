@@ -1645,6 +1645,80 @@ def createModule(groupName, mdl=None):
         mdl.__dict__[pname] = cobj
     return mdl
 
+
+def __determineGroup(proxy):
+    """Internal method"""
+    if not proxy:
+        return None
+    xmlgroup = proxy.GetXMLGroup()
+    xmlname = proxy.GetXMLName()
+    if xmlgroup == "sources":
+        return "sources"
+    elif xmlgroup == "filters":
+        return "sources"
+    elif xmlgroup == "views":
+        return "views"
+    elif xmlgroup == "representations":
+        if xmlname == "ScalarBarWidgetRepresentation":
+            return "scalar_bars"
+        return "representations";
+    elif xmlgroup == "lookup_tables":
+        return "lookup_tables"
+    return None
+
+__nameCounter = 0
+def __determineName(proxy, group):
+    global __nameCounter
+    __nameCounter += 1
+    return "%s%d" % (proxy.GetXMLName(), __nameCounter)
+
+def __getName(proxy, group):
+    pxm = ProxyManager()
+    if isinstance(proxy, Proxy):
+        proxy = proxy.SMProxy
+    return pxm.GetProxyName(group, proxy)
+
+def Register(proxy, **extraArgs):
+    """Registers a proxy with the proxy manager. If no 'registrationGroup' is
+    specified, then the group is inferred from the type of the proxy.
+    'registrationName' may be specified to register with a particular name
+    otherwise a default name will be created."""
+    # TODO: handle duplicate registration
+    if "registrationGroup" in extraArgs:
+        registrationGroup = extraArgs["registrationGroup"]
+    else:
+        registrationGroup = __determineGroup(proxy)
+        
+    if "registrationName" in extraArgs:
+        registrationName = extraArgs["registrationName"]
+    else:
+        registrationName = __determineName(proxy, registrationGroup)
+    if registrationGroup and registrationName:
+        pxm = ProxyManager()
+        pxm.RegisterProxy(registrationGroup, registrationName, proxy)
+    else:
+        raise exceptions.RuntimeError, "Registeration error."
+    return (registrationGroup, registrationName);
+
+def UnRegister(proxy, **extraArgs):
+    """UnRegisters proxies registered using Register()."""
+    if "registrationGroup" in extraArgs:
+        registrationGroup = extraArgs["registrationGroup"]
+    else:
+        registrationGroup = __determineGroup(proxy)
+        
+    if "registrationName" in extraArgs:
+        registrationName = extraArgs["registrationName"]
+    else:
+        registrationName = __getName(proxy, registrationGroup)
+
+    if registrationGroup and registrationName:
+        pxm = ProxyManager()
+        pxm.UnRegisterProxy(registrationGroup, registrationName, proxy)
+    else:
+        raise exceptions.RuntimeError, "UnRegisteration error."
+    return (registrationGroup, registrationName);
+
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
     it to the client using Fetch. It returns a tuple of (data, render
