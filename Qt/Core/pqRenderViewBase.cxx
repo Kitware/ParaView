@@ -63,7 +63,6 @@ class pqRenderViewBase::pqInternal
 {
 public:
   QPointer<QWidget> Viewport;
-  QList<pqSMProxy> DefaultCameraManipulators;
   QPoint MouseOrigin;
 
   ~pqInternal()
@@ -152,6 +151,11 @@ void pqRenderViewBase::initialize()
     {
     this->initializeWidgets();
     }
+
+  // Initialize the interactors and all global settings. global-settings
+  // override the values specified in state files or through python client.
+  this->initializeInteractors();
+  this->restoreSettings(/*only_global=*/true);
 }
 
 //-----------------------------------------------------------------------------
@@ -161,10 +165,6 @@ void pqRenderViewBase::initialize()
 // undo/redo, this method won't be called. 
 void pqRenderViewBase::setDefaultPropertyValues()
 {
-  this->createDefaultInteractors(this->Internal->DefaultCameraManipulators);
-  this->setCameraManipulators(
-    this->Internal->DefaultCameraManipulators);
-
   vtkSMProxy* proxy = this->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
@@ -183,14 +183,14 @@ void pqRenderViewBase::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-// This method gets called only with the object is directly created by the GUI
-// i.e. it wont get called when the proxy is loaded from state/undo/redo or 
-// python.
-// TODO: Python paraview modules createView() equivalent should make sure
-// that it sets up some default interactor.
-void pqRenderViewBase::createDefaultInteractors(QList<pqSMProxy>& manips)
+/// This method is called during initialize() to initialize the interactors.
+/// Interactor (interactor style, manipulators etc). Eventually, all the code
+/// that deals with interactor/interactor styles must be removed from the
+/// server manager (rather vtkSMRenderViewProxy). It's the application's
+/// responsibility to set up the interaction capabilities as per the domain.
+void pqRenderViewBase::initializeInteractors()
 {
-  manips.clear();
+  QList<pqSMProxy> manips;
 
   // subclass will give us the default manipulator types.
   const ManipulatorType* defaultManipTypes = 
@@ -203,6 +203,7 @@ void pqRenderViewBase::createDefaultInteractors(QList<pqSMProxy>& manips)
     manips.push_back(manip);
     manip->Delete();
     }
+  this->setCameraManipulators(manips);
 }
 
 //-----------------------------------------------------------------------------
@@ -214,27 +215,25 @@ bool pqRenderViewBase::setCameraManipulators(const QList<pqSMProxy>& manipulator
     }
 
   vtkSMProxy* viewproxy = this->getProxy();
-  
-  this->clearHelperProxies();
-
-  // Register manipulators, then add to interactor style
-  foreach (vtkSMProxy *manip, manipulators)
-    {
-    this->addHelperProxy("Manipulators",manip);
-    }
-
   pqSMAdaptor::setProxyListProperty(
     viewproxy->GetProperty("CameraManipulators"),
     manipulators);
   viewproxy->UpdateVTKObjects();
-
   return true;
 }
 
 //-----------------------------------------------------------------------------
 QList<vtkSMProxy*> pqRenderViewBase::getCameraManipulators() const
 {
-  return this->getHelperProxies("Manipulators");
+  QList<pqSMProxy> manips = pqSMAdaptor::getProxyListProperty(
+    this->getProxy()->GetProperty("CameraManipulators"));
+
+  QList<vtkSMProxy*> reply;
+  foreach (vtkSMProxy* proxy, manips)
+    {
+    reply.push_back(proxy);
+    }
+  return reply;
 }
 
 //-----------------------------------------------------------------------------

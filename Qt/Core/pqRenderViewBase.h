@@ -129,8 +129,12 @@ protected:
   /// using addMenuAction.
   virtual bool eventFilter(QObject* caller, QEvent* e);
 
-  /// Creates default interactor style/manipulators.
-  virtual void createDefaultInteractors(QList<pqSMProxy>& manips);
+  /// This method is called during initialize() to initialize the interactors.
+  /// Interactor (interactor style, manipulators etc). Eventually, all the code
+  /// that deals with interactor/interactor styles must be removed from the
+  /// server manager (rather vtkSMRenderViewProxy). It's the application's
+  /// responsibility to set up the interaction capabilities as per the domain.
+  virtual void initializeInteractors(); 
 
   /// Create a CameraManipulatorProxy given the mouse, key and name.
   /// Whoever calling this is reponsible for deleting the new proxy.

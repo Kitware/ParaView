@@ -2622,7 +2622,12 @@
         name="CameraManipulators"
         command="AddManipulator"
         clean_command="RemoveAllManipulators"
+        is_internal="1"
         repeatable="1">
+        <!-- For now, we are marking this property is_internal so that it won't
+        get saved in state files. 
+        Eventually, we need to take out all the interaction related code from
+        the server manager -->
         <ProxyGroupDomain name="groups">
           <Group name="cameramanipulators" />
         </ProxyGroupDomain>
