@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.73");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.74");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -344,6 +344,9 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
 
   // Set the helper for interaction.
   this->Interactor->SetPVRenderView(this->RenderViewHelper);
+
+  // Mark 2D renderer as non-interactive, since it's a slave to the 3D renderer.
+  this->Renderer2D->SetInteractive(0);
 
   if (pvoptions->GetUseStereoRendering())
     {
