@@ -64,7 +64,12 @@ class pqRenderViewBase::pqInternal
 public:
   QPointer<QWidget> Viewport;
   QPoint MouseOrigin;
+  bool InitializedAfterObjectsCreated;
 
+  pqInternal()
+    {
+    this->InitializedAfterObjectsCreated=false;
+    }
   ~pqInternal()
     {
     delete this->Viewport;
@@ -145,17 +150,27 @@ void pqRenderViewBase::initialize()
     // Under usual circumstances, after UpdateVTKObjects() the
     // render module objects will be created.
     this->getConnector()->Connect(proxy, vtkCommand::UpdateEvent,
-      this, SLOT(initializeWidgets()));
+      this, SLOT(initializeAfterObjectsCreated()));
     }
   else
     {
-    this->initializeWidgets();
+    this->initializeAfterObjectsCreated();
     }
+}
 
-  // Initialize the interactors and all global settings. global-settings
-  // override the values specified in state files or through python client.
-  this->initializeInteractors();
-  this->restoreSettings(/*only_global=*/true);
+//-----------------------------------------------------------------------------
+void pqRenderViewBase::initializeAfterObjectsCreated()
+{
+  if (!this->Internal->InitializedAfterObjectsCreated)
+    {
+    this->Internal->InitializedAfterObjectsCreated = true;
+    this->initializeWidgets();
+
+    // Initialize the interactors and all global settings. global-settings
+    // override the values specified in state files or through python client.
+    this->initializeInteractors();
+    this->restoreSettings(/*only_global=*/true);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -218,7 +233,7 @@ bool pqRenderViewBase::setCameraManipulators(const QList<pqSMProxy>& manipulator
   pqSMAdaptor::setProxyListProperty(
     viewproxy->GetProperty("CameraManipulators"),
     manipulators);
-  viewproxy->UpdateVTKObjects();
+  viewproxy->UpdateProperty("CameraManipulators");
   return true;
 }
 
@@ -387,6 +402,7 @@ void pqRenderViewBase::restoreSettings(bool only_global)
         if (prop && settings->contains(key))
           {
           pqSMAdaptor::setElementProperty(prop, settings->value(key));
+          proxy->UpdateProperty(*substr);
           }
         }
       }
@@ -401,6 +417,7 @@ void pqRenderViewBase::restoreSettings(bool only_global)
           {
           QList<QVariant> value = settings->value(key).value<QList<QVariant> >();
           pqSMAdaptor::setMultipleElementProperty(prop, value);
+          proxy->UpdateProperty(*substr);
           }
         }
       }
@@ -418,11 +435,11 @@ void pqRenderViewBase::restoreSettings(bool only_global)
       if (prop && settings->contains(key))
         {
         pqSMAdaptor::setElementProperty(prop, settings->value(key));
+        proxy->UpdateProperty(*substr);
         }
       }
     }
   settings->endGroup();
-  proxy->UpdateVTKObjects();
 
   settings->beginGroup(this->interactorStyleSettingsGroup());
   // Active Camera Manipulators
