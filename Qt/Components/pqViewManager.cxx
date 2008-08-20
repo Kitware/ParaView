@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QUuid>
 #include <QApplication>
+#include <QScrollArea>
 
 
 // ParaView includes.
@@ -339,8 +340,17 @@ void pqViewManager::onFrameAdded(pqMultiViewFrame* frame)
 
   // Setup the UI shown when no view is present in the frame.
   QWidget* emptyFrame = frame->emptyMainWidget();
+
+  QScrollArea* scrollArea = new QScrollArea(emptyFrame);
+  scrollArea->setFrameShape(QFrame::NoFrame);
+  scrollArea->setWidgetResizable(true);
+  QFrame* frame2 = new QFrame(scrollArea);
+  scrollArea->setWidget(frame2);
   Ui::EmptyView ui;
-  ui.setupUi(emptyFrame);
+  ui.setupUi(frame2);
+
+  QVBoxLayout* vlayout = new QVBoxLayout(emptyFrame);
+  vlayout->addWidget(scrollArea);
 
   this->buildConvertMenu();
 
