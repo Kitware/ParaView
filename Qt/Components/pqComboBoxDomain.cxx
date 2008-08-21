@@ -53,7 +53,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include <pqSMAdaptor.h>
 
-  
+#include <assert.h>
+
 class pqComboBoxDomain::pqInternal
 {
 public:
@@ -166,6 +167,7 @@ void pqComboBoxDomain::internalDomainChanged()
     foreach(QVariant var, enums)
       {
       texts.append(var.toString());
+      data.append(var.toString());
       }
     }
   else if(type == pqSMAdaptor::FIELD_SELECTION)
@@ -173,6 +175,10 @@ void pqComboBoxDomain::internalDomainChanged()
     if(this->Internal->DomainName == "field_list")
       {
       texts = pqSMAdaptor::getFieldSelectionModeDomain(this->Internal->Property);
+      foreach (QString str, texts)
+        {
+        data.push_back(str);
+        }
       }
     else if(this->Internal->DomainName == "array_list")
       {
@@ -200,6 +206,7 @@ void pqComboBoxDomain::internalDomainChanged()
     foreach(vtkSMProxy* pxy, proxies)
       {
       texts.append(pxy->GetXMLLabel());
+      data.append(pxy->GetXMLLabel());
       }
     }
 
@@ -212,13 +219,8 @@ void pqComboBoxDomain::internalDomainChanged()
       }
     }
 
-  if (texts.size() != data.size())
-    {
-    foreach (QString str, texts)
-      {
-      data.push_back(QVariant(str));
-      }
-    }
+  // texts and data must be of the same size.
+  assert(texts.size() == data.size());
 
   // check if the texts didn't change
   QList<QVariant> oldData;
