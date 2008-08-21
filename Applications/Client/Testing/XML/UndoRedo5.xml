@@ -100,8 +100,8 @@ Tests undo-redo for changing of inputs and deletion of sources.
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="actionChangeInput" />
-  <pqevent object="MainWindow/ChangeInputDialog/Sources" command="currentChanged" arguments="/0/1|0" />
-  <pqevent object="MainWindow/ChangeInputDialog/OkButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/ChangeInputDialog/Sources" command="currentChanged" arguments="/0/1|0" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/ChangeInputDialog/OkButton" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />

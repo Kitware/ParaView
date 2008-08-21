@@ -339,7 +339,7 @@ void pqPipelineBrowser::changeInput()
       this->Model->getItemFor(current));
   if(filter)
     {
-    pqFilterInputDialog dialog(QApplication::activeWindow());
+    pqFilterInputDialog dialog(this);
     dialog.setObjectName("ChangeInputDialog");
     pqServerManagerModel *smModel =
         pqApplicationCore::instance()->getServerManagerModel();

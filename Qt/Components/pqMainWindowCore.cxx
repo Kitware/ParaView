@@ -927,7 +927,8 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
 {
   if (!this->Implementation->AnimationManager)
     {
-    this->Implementation->AnimationManager = new pqAnimationManager(this);
+    this->Implementation->AnimationManager = new pqAnimationManager(
+      this->Implementation->Parent);
     QObject::connect(
       &this->Implementation->ActiveServer, SIGNAL(changed(pqServer*)),
       this->Implementation->AnimationManager, 
@@ -3048,7 +3049,7 @@ pqPipelineSource* pqMainWindowCore::createFilterForActiveSource(
     pqPipelineFilter* filter = new pqPipelineFilter(xmlname,
       filterProxy, this->getActiveServer(), this);
     
-    pqFilterInputDialog dialog(QApplication::activeWindow());
+    pqFilterInputDialog dialog(this->Implementation->Parent);
     dialog.setObjectName("SelectInputDialog");
 
     pqServerManagerModel *smModel =

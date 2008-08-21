@@ -430,11 +430,19 @@ bool pqAnimationManager::saveAnimation()
   filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
   filters +="All files(*)";
 
+  QWidget* parent_window = qobject_cast<QWidget*>(this->parent());
+  if (!parent_window)
+    {
+    // QApplication::activateWindow() is set up differntly on Macs resulting in
+    // ambiguities in test playback. Hence we use it as the last resort.
+    parent_window = QApplication::activeWindow();
+    }
+
   // Create a server dialog is disconnect-and-save is true, else create a client
   // dialog.
   pqFileDialog *file_dialog = new pqFileDialog(
     disconnect_and_save?  scene->getServer() : 0,
-    QApplication::activeWindow(),
+    parent_window,
     tr("Save Animation"), QString(), filters);
   file_dialog->setObjectName("FileSaveAnimationDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
