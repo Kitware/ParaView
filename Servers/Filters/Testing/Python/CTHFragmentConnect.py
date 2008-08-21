@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
+import filecmp
 from paraview import servermanager as sm
 
 
@@ -272,8 +273,9 @@ class vtkCTHFragmentConnectTest:
             # test stats output
             statsOutputFile=self.topt["-T"]+os.path.split(self.topt["-V"])[1]+"."+str(testId)+".cthfc.S"
             statsBaseLineFile=self.topt["-V"]+"."+str(testId)+".cthfc.S"
-            tStat=os.system("diff %s %s"%(statsBaseLineFile, statsOutputFile))
-            if (tStat!=0):
+            #tStat=os.system("diff %s %s"%(statsBaseLineFile, statsOutputFile)) 
+            tStat=filecmp.cmp(statsBaseLineFile,statsOutputFile,0)
+            if (tStat!=True):
             #{
               eStr='CTH fragment connect integration test failed '+dataSet+'@'+str(testId)+'.'
               raise ValueError, eStr
