@@ -444,15 +444,31 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       return;
       }
     }
+  
+  QList<QString> myColorFields = this->getColorFields();
 
   // Try to inherit the same array selected by the input.
   if (upstreamDisplay)
     {
-    QList<QString> myColorFields = this->getColorFields();
     const QString &upstreamColorField = upstreamDisplay->getColorField(false);
     if (myColorFields.contains(upstreamColorField))
       {
       this->setColorField(upstreamColorField);
+      return;
+      }
+    }
+
+
+  // We are going to set the default color mode to use solid color i.e. not use
+  // scalar coloring at all. However, for some representations (eg. slice/volume)
+  // this is an error, we have to color by some array. Since no active scalar
+  // were choosen, we simply use the first color array available. (If no arrays
+  // are available, then error will be raised anyways).
+  if (!myColorFields.contains(pqPipelineRepresentation::solidColor()))
+    {
+    if (myColorFields.size() > 0)
+      {
+      this->setColorField(myColorFields[0]);
       return;
       }
     }
