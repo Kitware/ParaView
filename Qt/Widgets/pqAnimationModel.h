@@ -57,14 +57,16 @@ class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
   Q_PROPERTY(bool interactive READ interactive WRITE setInteractive)
 public:
 
-  /// Real or Sequence mode
+  /// Real, Sequence or Custom mode
   /// Real mode shows no tick marks for timesteps
   /// Sequence mode shows evenly spaced ticks for teach timestep
   ///  where the number of ticks can be controled by the ticks property
+  /// Custom shows tick marks at the location indicated by the setTickMarks().
   enum ModeType
     {
     Real,
-    Sequence
+    Sequence,
+    Custom
     };
 
   pqAnimationModel(QGraphicsView* p = 0);
@@ -111,6 +113,9 @@ public slots:
   void setEndTime(double);
   /// set whether this scene is interactive
   void setInteractive(bool);
+  /// set the locations for tick marks if Mode is Custom.
+  /// This also results in a call to setTicks().
+  void setTickMarks(int num, double* tick_marks);
 
 signals:
   // emitted when a track is double clicked on
@@ -155,6 +160,8 @@ private:
   double EndTime;
   int    RowHeight;
   bool   Interactive;
+
+  QList<double> CustomTicks;
   
   // vars to support interaction
   bool   CurrentTimeGrabbed;
@@ -169,6 +176,7 @@ private:
 
   // model that provides names of tracks
   QStandardItemModel Header;
+
 };
 
 #endif // pqAnimationModel_h

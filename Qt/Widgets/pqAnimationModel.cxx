@@ -183,6 +183,18 @@ void pqAnimationModel::setTicks(int f)
   this->Ticks = f;
   this->update();
 }
+
+void pqAnimationModel::setTickMarks(int count, double* times)
+{
+  this->Ticks = count;
+  this->CustomTicks.clear();
+  for (int cc=0; cc < count; cc++)
+    {
+    this->CustomTicks.push_back(times[cc]);
+    }
+  this->update();
+}
+
 void pqAnimationModel::setCurrentTime(double t)
 {
   this->CurrentTime = t;
@@ -224,14 +236,39 @@ double pqAnimationModel::timeFromPosition(double pos)
 
 double pqAnimationModel::timeFromTick(int tick)
 {
+  if (this->Mode == Custom && tick <= this->CustomTicks.size())
+    {
+    return this->CustomTicks[tick];
+    }
+
   double fraction = tick / (this->Ticks-1.0);
   return fraction * (this->EndTime - this->StartTime) + this->StartTime;
 }
 
 int pqAnimationModel::tickFromTime(double time)
 {
+  if (this->Mode == Custom)
+    {
+    double error = 1.0e+299;
+    int index = -1;
+    int cc=0;
+    foreach (double tick_time, this->CustomTicks)
+      {
+      if (error > qAbs(tick_time-time))
+        {
+        error = qAbs(tick_time-time);
+        index = cc;
+        }
+      cc++;
+      }
+    if (index != -1)
+      {
+      return index;
+      }
+    }
+
   double fraction = (time - this->StartTime) /
-                    (this->EndTime - this->StartTime);
+    (this->EndTime - this->StartTime);
   return qRound(fraction * (this->Ticks-1.0));
 }
 
@@ -298,7 +335,7 @@ void pqAnimationModel::drawForeground(QPainter* painter, const QRectF& )
 
   
   // if sequence, draw a tick mark for each frame
-  if(this->mode() == Sequence && this->Ticks > 2)
+  if ((this->mode() == Sequence || this->mode() == Custom) && this->Ticks > 2)
     {
     for(int i=0; i<this->Ticks; i++)
       {
@@ -530,7 +567,7 @@ void pqAnimationModel::mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent)
 
     // snap to ticks in sequence mode
     // (should snap to hints if we find one closer? )
-    if(this->mode() == Sequence)
+    if (this->mode() == Sequence || this->mode() == Custom)
       {
       int tick = this->tickFromTime(time);
       time = this->timeFromTick(tick);

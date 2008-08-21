@@ -218,6 +218,19 @@ public:
       }
     return num;
     }
+
+  QList<QVariant> ticks()
+    {
+    vtkSMProxy* pxy = this->Scene->getProxy();
+    QString mode =
+      pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
+    if(mode == "Snap To TimeSteps")
+      {
+      return pqSMAdaptor::getMultipleElementProperty(
+        pxy->GetProperty("TimeSteps"));
+      }
+    return QList<QVariant>();
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -500,7 +513,7 @@ void pqAnimationViewWidget::updateSceneTimeRange()
 void pqAnimationViewWidget::updateSceneTime()
 {
   double time =
-    this->Internal->Scene->getAnimationSceneProxy()->GetAnimationTime();
+    this->Internal->Scene->getAnimationTime();
 
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
@@ -635,7 +648,7 @@ void pqAnimationViewWidget::updatePlayMode()
     }
   else if(mode == "Snap To TimeSteps")
     {
-    animModel->setMode(pqAnimationModel::Sequence);
+    animModel->setMode(pqAnimationModel::Custom);
     this->Internal->Duration->setEnabled(false);
     this->Internal->DurationLabel->setEnabled(false);
     this->Internal->StartTime->setEnabled(false);
@@ -653,8 +666,21 @@ void pqAnimationViewWidget::updateTicks()
 {
   pqAnimationModel* animModel =
     this->Internal->AnimationWidget->animationModel();
-  int num = this->Internal->numberOfTicks();
-  animModel->setTicks(num);
+  if (animModel->mode() == pqAnimationModel::Custom)
+    {
+    QList<QVariant> ticks = this->Internal->ticks();
+    double *dticks = new double[ticks.size()+1];
+    for (int cc=0; cc < ticks.size(); cc++)
+      {
+      dticks[cc] = ticks[cc].toDouble();
+      }
+    animModel->setTickMarks(ticks.size(), dticks);
+    delete [] dticks;
+    }
+  else
+    {
+    animModel->setTicks(this->Internal->numberOfTicks());
+    }
 }
 
 void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
