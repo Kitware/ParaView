@@ -27,8 +27,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.8");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.9");
 vtkStandardNewMacro(vtkPhastaReader);
+
+vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -459,6 +461,7 @@ vtkPhastaReader::vtkPhastaReader()
   this->FieldFileName = NULL;
   this->SetNumberOfInputPorts(0);
   this->Internal = new vtkPhastaReaderInternal;
+  this->CachedGrid = 0;
 }
 
 vtkPhastaReader::~vtkPhastaReader()
@@ -472,6 +475,7 @@ vtkPhastaReader::~vtkPhastaReader()
     delete [] this->FieldFileName;
     }
   delete this->Internal;
+  this->SetCachedGrid(0);
 }
 
 void vtkPhastaReader::ClearFieldInfo()
@@ -497,8 +501,8 @@ void vtkPhastaReader::SetFieldInfo(const char* paraviewFieldTag,
 }
 
 int vtkPhastaReader::RequestData(vtkInformation*,
-                               vtkInformationVector**,
-                               vtkInformationVector* outputVector)
+                                 vtkInformationVector**,
+                                 vtkInformationVector* outputVector)
 {
   int firstVertexNo = 0;
   int fvn = 0;
@@ -510,42 +514,50 @@ int vtkPhastaReader::RequestData(vtkInformation*,
 
   vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkPoints *points;
 
-  output->Allocate(10000, 2100);
-
-  vtkDataSetAttributes* field = output->GetPointData();
-
-  points = vtkPoints::New();
-
-  vtkDebugMacro(<<"Reading Phasta file...");
-
-  if(!this->GeometryFileName || !this->FieldFileName )
+  if(this->GetCachedGrid())
     {
-    vtkErrorMacro(<<"All input parameters not set.");
-    return 0;
+    // shallow the cached grid that was previously set...
+    vtkDebugMacro("Using a cached copy of the grid.");
+    output->ShallowCopy(this->GetCachedGrid());
     }
-  vtkDebugMacro(<< "Updating ensa with ....");
-  vtkDebugMacro(<< "Geom File : " << this->GeometryFileName);
-  vtkDebugMacro(<< "Field File : " << this->FieldFileName);
+  else
+    {
+    vtkPoints *points;
+    
+    output->Allocate(10000, 2100);
+        
+    points = vtkPoints::New();
+    
+    vtkDebugMacro(<<"Reading Phasta file...");
+    
+    if(!this->GeometryFileName || !this->FieldFileName )
+      {
+      vtkErrorMacro(<<"All input parameters not set.");
+      return 0;
+      }
+    vtkDebugMacro(<< "Updating ensa with ....");
+    vtkDebugMacro(<< "Geom File : " << this->GeometryFileName);
+    vtkDebugMacro(<< "Field File : " << this->FieldFileName);
+    
+    fvn = firstVertexNo;
+    this->ReadGeomFile(this->GeometryFileName, firstVertexNo, points, noOfNodes, noOfCells);
+    /* set the points over here, this is because vtkUnStructuredGrid 
+       only insert points once, next insertion overwrites the previous one */
+    // acbauer is not sure why the above comment is about...
+    output->SetPoints(points);
+    points->Delete();    
+    }
 
-  fvn = firstVertexNo;
-  this->ReadGeomFile(this->GeometryFileName, firstVertexNo, points, noOfNodes, noOfCells);
-
- if (!this->Internal->FieldInfoMap.size())
-   {
-   this->ReadFieldFile(this->FieldFileName, fvn, field, noOfNodes);
-   }
- else
-   {
-   this->ReadFieldFile(this->FieldFileName, fvn, output, noOfDatas);
-   }
-
-  /* set the points over here, this is because vtkUnStructuredGrid 
-     only insert points once, next insertion overwrites the previous one */
-
-  output->SetPoints(points);
-  points->Delete();
+  if (!this->Internal->FieldInfoMap.size())
+    {
+    vtkDataSetAttributes* field = output->GetPointData();
+    this->ReadFieldFile(this->FieldFileName, fvn, field, noOfNodes);
+    }
+  else
+    {
+    this->ReadFieldFile(this->FieldFileName, fvn, output, noOfDatas);
+    }
 
   return 1;
 }
@@ -1045,4 +1057,5 @@ void vtkPhastaReader::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FieldFileName: " 
      << (this->FieldFileName?this->FieldFileName:"(none)")
      << endl;
+  os << indent << "CachedGrid: " << this->CachedGrid << endl;
 }

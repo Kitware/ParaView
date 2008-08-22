@@ -14,9 +14,14 @@
 =========================================================================*/
 #include "vtkPPhastaReader.h"
 
+#include "vtkCellData.h"
+#include "vtkFieldData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkMultiPieceDataSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkPhastaReader.h"
@@ -44,10 +49,13 @@ struct vtkPPhastaReaderInternal
 
   typedef vtkstd::map<int, TimeStepInfo> TimeStepInfoMapType;
   TimeStepInfoMapType TimeStepInfoMap;
+  typedef vtkstd::map<int, vtkSmartPointer<vtkUnstructuredGrid> > 
+  CachedGridsMapType;
+  CachedGridsMapType CachedGrids;
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPPhastaReader, "1.4");
+vtkCxxRevisionMacro(vtkPPhastaReader, "1.5");
 vtkStandardNewMacro(vtkPPhastaReader);
 
 //----------------------------------------------------------------------------
@@ -86,8 +94,8 @@ vtkPPhastaReader::~vtkPPhastaReader()
 
 //----------------------------------------------------------------------------
 int vtkPPhastaReader::RequestData(vtkInformation*,
-                                vtkInformationVector**,
-                                vtkInformationVector* outputVector)
+                                  vtkInformationVector**,
+                                  vtkInformationVector* outputVector)
 {
   // get the data object
   vtkInformation *outInfo = 
@@ -125,14 +133,12 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     return 0;
     }
 
-  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
   // get the current piece being requested
   int piece = 
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
 
-  vtkDebugMacro( << "Current piece: " << piece );
+  int numProcPieces = 
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
 
   if (!this->Parser)
     {
@@ -148,11 +154,12 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
     numPieces = 1;
     }
 
-  // More processors than pieces. Return with empty output.
-  if (piece >= numPieces)
-    {
-    return 1;
-    }
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  output->SetNumberOfBlocks(1);
+  vtkMultiPieceDataSet* MultiPieceDataSet = vtkMultiPieceDataSet::New();
+  output->SetBlock(0, MultiPieceDataSet);
+  MultiPieceDataSet->Delete();
 
   const char* geometryPattern = 0;
   int geomHasPiece, geomHasTime;
@@ -206,83 +213,109 @@ int vtkPPhastaReader::RequestData(vtkInformation*,
   char* geom_name = new char [ strlen(geometryPattern) + 60 ];
   char* field_name = new char [ strlen(fieldPattern) + 60 ];
 
-  if (geomHasTime && geomHasPiece)
+  // now loop over all of the files that I should load
+  for(int loadingPiece=piece;loadingPiece<numPieces;loadingPiece+=numProcPieces)
     {
-    sprintf(geom_name, 
-            geometryPattern, 
-            this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, 
-            piece+1);
-    }
-  else if (geomHasPiece)
-    {
-    sprintf(geom_name, geometryPattern, piece+1);
-    }
-  else if (geomHasTime)
-    {
-    sprintf(geom_name, 
-            geometryPattern, 
-            this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
-    }
-  else
-    {
-    strcpy(geom_name, geometryPattern);
-    }
-
-  if (fieldHasTime && fieldHasPiece)
-    {
-    sprintf(field_name, 
-            fieldPattern, 
-            this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex,
-            piece+1);
-    }
-  else if (fieldHasPiece)
-    {
-    sprintf(field_name, fieldPattern, piece+1);
-    }
-  else if (fieldHasTime)
-    {
-    sprintf(field_name, 
-            fieldPattern, 
-            this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
-    }
-  else
-    {
-    strcpy(geom_name, fieldPattern);
-    }
-
-  vtksys_ios::ostringstream geomFName;
-  vtkstd::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
-  if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
-    {
-    vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
-    if (!path.empty())
+    if (geomHasTime && geomHasPiece)
       {
-      geomFName << path.c_str() << "/";
+      sprintf(geom_name, 
+              geometryPattern, 
+              this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex, 
+              loadingPiece+1);
       }
-    }
-  geomFName << geom_name << ends;
-  this->Reader->SetGeometryFileName(geomFName.str().c_str());
-
-  vtksys_ios::ostringstream fieldFName;
-  vtkstd::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
-  if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
-    {
-    vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
-    if (!path.empty())
+    else if (geomHasPiece)
       {
-      fieldFName << path.c_str() << "/";
+      sprintf(geom_name, geometryPattern, loadingPiece+1);
       }
+    else if (geomHasTime)
+      {
+      sprintf(geom_name, 
+              geometryPattern, 
+              this->Internal->TimeStepInfoMap[this->ActualTimeStep].GeomIndex);
+      }
+    else
+      {
+      strcpy(geom_name, geometryPattern);
+      }
+    
+    if (fieldHasTime && fieldHasPiece)
+      {
+      sprintf(field_name, 
+              fieldPattern, 
+              this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex,
+              loadingPiece+1);
+      }
+    else if (fieldHasPiece)
+      {
+      sprintf(field_name, fieldPattern, loadingPiece+1);
+      }
+    else if (fieldHasTime)
+      {
+      sprintf(field_name, 
+              fieldPattern, 
+              this->Internal->TimeStepInfoMap[this->ActualTimeStep].FieldIndex);
+      }
+    else
+      {
+      strcpy(geom_name, fieldPattern);
+      }
+    
+    vtksys_ios::ostringstream geomFName;
+    vtkstd::string gpath = vtksys::SystemTools::GetFilenamePath(geom_name);
+    if (gpath.empty() || !vtksys::SystemTools::FileIsFullPath(gpath.c_str()))
+      {
+      vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      if (!path.empty())
+        {
+        geomFName << path.c_str() << "/";
+        }
+      }
+    geomFName << geom_name << ends;
+    this->Reader->SetGeometryFileName(geomFName.str().c_str());
+
+    vtksys_ios::ostringstream fieldFName;
+    vtkstd::string fpath = vtksys::SystemTools::GetFilenamePath(field_name);
+    if (fpath.empty() || !vtksys::SystemTools::FileIsFullPath(fpath.c_str()))
+      {
+      vtkstd::string path = vtksys::SystemTools::GetFilenamePath(this->FileName);
+      if (!path.empty())
+        {
+        fieldFName << path.c_str() << "/";
+        }
+      }
+    fieldFName << field_name << ends;
+    this->Reader->SetFieldFileName(fieldFName.str().c_str());
+
+    vtkPPhastaReaderInternal::CachedGridsMapType::iterator CachedCopy = 
+      this->Internal->CachedGrids.find(loadingPiece);
+
+    // if there is a cached copy, use that
+    if(CachedCopy != this->Internal->CachedGrids.end())
+      {
+      this->Reader->SetCachedGrid(CachedCopy->second);
+      }
+
+    this->Reader->Update();
+    
+    if(CachedCopy == this->Internal->CachedGrids.end())
+      {
+      vtkSmartPointer<vtkUnstructuredGrid> cached = 
+        vtkSmartPointer<vtkUnstructuredGrid>::New();
+      cached->ShallowCopy(this->Reader->GetOutput());
+      cached->GetPointData()->Initialize();
+      cached->GetCellData()->Initialize();
+      cached->GetFieldData()->Initialize();
+      this->Internal->CachedGrids[loadingPiece] = cached;
+      }
+    vtkSmartPointer<vtkUnstructuredGrid> copy = 
+      vtkSmartPointer<vtkUnstructuredGrid>::New();
+    copy->ShallowCopy(this->Reader->GetOutput());
+    MultiPieceDataSet->SetPiece(MultiPieceDataSet->GetNumberOfPieces(),copy);
     }
-  fieldFName << field_name << ends;
-  this->Reader->SetFieldFileName(fieldFName.str().c_str());
-
-  this->Reader->Update();
-
-  output->ShallowCopy(this->Reader->GetOutput());
-
+  
   delete [] geom_name;
   delete [] field_name;
-
+  
   if (steps)
     {
     output->GetInformation()->Set(vtkDataObject::DATA_TIME_STEPS(),

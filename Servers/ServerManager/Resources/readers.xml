@@ -2049,7 +2049,7 @@
      <Documentation
        short_help="Read datasets stored in the Phasta format."
        long_help="Read the parallel Phasta meta-file and the underlying Phasta files.">
-       This Phasta reader reads files stored in the Phasta (a CFD package) format. The expected file extension is .pht. The output of this reader is an unstructured grid.
+       This Phasta reader reads files stored in the Phasta (a CFD package) format. The expected file extension is .pht. The output of this reader is a multipiece data set.
      </Documentation>
      <StringVectorProperty
         name="FileName"
@@ -2061,29 +2061,6 @@
           This property specifies the file name for the Phasta reader.
         </Documentation>
      </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="TimeStepRangeInfo"
-        command="GetTimeStepRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="TimeStep"
-        command="SetTimeStepIndex"
-        number_of_elements="1"
-        default_values="0"
-        information_property="TimestepValues">
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="TimeStepRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         This property indicates which timestep in the dataset to load.
-       </Documentation>
-     </IntVectorProperty>
 
      <DoubleVectorProperty 
          name="TimestepValues"

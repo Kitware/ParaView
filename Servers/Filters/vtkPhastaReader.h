@@ -59,6 +59,10 @@ public:
                     int numOfComps,
                     int dataDependency,
                     const char* dataType);
+
+  void SetCachedGrid(vtkUnstructuredGrid*);
+  vtkGetObjectMacro(CachedGrid, vtkUnstructuredGrid);
+
 protected:
   vtkPhastaReader();
   ~vtkPhastaReader();
@@ -84,6 +88,7 @@ protected:
 private:
   char *GeometryFileName;
   char *FieldFileName;
+  vtkUnstructuredGrid* CachedGrid;
 
   int NumberOfVariables; //number of variable in the field file
 

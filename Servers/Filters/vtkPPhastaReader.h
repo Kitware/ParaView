@@ -117,7 +117,7 @@
 #ifndef __vtkPPhastaReader_h
 #define __vtkPPhastaReader_h
 
-#include "vtkUnstructuredGridAlgorithm.h"
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
 class vtkPVXMLParser;
 class vtkPhastaReader;
@@ -126,11 +126,11 @@ class vtkPhastaReader;
 struct vtkPPhastaReaderInternal;
 //ETX
 
-class VTK_EXPORT vtkPPhastaReader : public vtkUnstructuredGridAlgorithm
+class VTK_EXPORT vtkPPhastaReader : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   static vtkPPhastaReader* New();
-  vtkTypeRevisionMacro(vtkPPhastaReader, vtkUnstructuredGridAlgorithm);
+  vtkTypeRevisionMacro(vtkPPhastaReader, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
