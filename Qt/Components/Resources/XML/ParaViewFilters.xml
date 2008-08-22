@@ -71,7 +71,6 @@
   <Filter name="GenerateIdScalars"/>
   <Filter name="Glyph" />
   <Filter name="Gradient" />
-  <Filter name="GradientMagnitude" />
   <Filter name="GroupDataSets" />
   <Filter name="IntegrateAttributes" />
   <Filter name="IntegrateFlowThroughSurface" />
