@@ -2061,7 +2061,7 @@ void vtkClientServerStream::PrintArgumentInternal(ostream& os, int message,
       } break;
     case vtkClientServerStream::string_value:
       {
-      const char* arg;
+      const char* arg = NULL;
       this->GetArgument(message, argument, &arg);
       if(annotate)
         {
@@ -2219,7 +2219,7 @@ void vtkClientServerStream::ArgumentToString(ostream& os, int m, int a,
   // Special case for strings: string0 == null, string() == ""
   if(type == vtkClientServerStream::string_value)
     {
-    const char* arg;
+    const char* arg = NULL;
     this->GetArgument(m, a, &arg);
     if(!arg)
       {
@@ -2266,7 +2266,7 @@ void vtkClientServerStream::ArgumentValueToString(ostream& os,
       } break;
     case vtkClientServerStream::string_value:
       {
-      const char* arg;
+      const char* arg = NULL;
       this->GetArgument(m, a, &arg);
       if(arg)
         {
@@ -2415,7 +2415,7 @@ int vtkClientServerStream::AddMessageFromString(const char* begin,
   while(1)
     {
     // Skip whitespace.
-    while(position < end && *position == ' ' || *position == '\t')
+    while(position < end && (*position == ' ' || *position == '\t'))
       {
       ++position;
       }
