@@ -331,6 +331,10 @@ void pqSimpleServerStartup::startServer(const pqServerResource& server)
 //-----------------------------------------------------------------------------
 void pqSimpleServerStartup::reset()
 {
+  if (this->Implementation->Startup)
+    {
+    QObject::disconnect(this->Implementation->Startup, 0, this, 0);
+    }
   this->Implementation->reset();
   QObject::disconnect(
     pqApplicationCore::instance()->getServerManagerModel(),
