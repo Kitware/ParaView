@@ -5467,27 +5467,17 @@ This filter operates on any type of data set, provided it has point-centered vec
          <Group name="filters"/>
        </ProxyGroupDomain>
        <DataTypeDomain name="input_type" composite_data_supported="1">
-         <DataType value="vtkTemporalDataSet"/>
+         <DataType value="vtkDataObject"/>
        </DataTypeDomain>
        <InputArrayDomain name="input_array" attribute_type="point"
                          number_of_components="3"/>
      </InputProperty>
 
-     <InputProperty
-        name="Source2"
-        command="SetSource2Connection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-     </InputProperty>
-      
       <InputProperty
          name="Source"
-         command="SetSourceConnection">
+         command="AddSourceConnection"
+         clean_command="RemoveAllSources"
+         multiple_input="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -5497,22 +5487,7 @@ This filter operates on any type of data set, provided it has point-centered vec
         </DataTypeDomain>
       </InputProperty>
       
-     <IntVectorProperty
-                       name="EnableSource1"
-                       command="SetEnableSource1"
-                       number_of_elements="1"
-                       default_values="1" >
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-     
-     <IntVectorProperty
-                       name="EnableSource2"
-                       command="SetEnableSource2"
-                       number_of_elements="1"
-                       default_values="0" >
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
+<!--      
      <DoubleVectorProperty
         name="TimeStepResolution"
         command="SetTimeStepResolution"
@@ -5520,7 +5495,7 @@ This filter operates on any type of data set, provided it has point-centered vec
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
-
+-->
      <IntVectorProperty
        name="TimeStep"
        command="SetTimeStep"
@@ -5541,12 +5516,34 @@ This filter operates on any type of data set, provided it has point-centered vec
         information_only="1">
        <TimeStepsInformationHelper/>
      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="StaticSeeds" 
+        command="SetStaticSeeds" 
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Force the use of static seed optimizations
+      </Documentation>
+     </IntVectorProperty> 
+
+     <IntVectorProperty 
+        name="StaticMesh" 
+        command="SetStaticMesh" 
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Force the use of static mesh optimizations
+       </Documentation>
+     </IntVectorProperty>
      
      <IntVectorProperty 
         name="ForceReinjectionEveryNSteps" 
         command="SetForceReinjectionEveryNSteps" 
         number_of_elements="1"
-        default_values="0" >
+        default_values="1" >
      </IntVectorProperty>
 
      <StringVectorProperty 
@@ -5569,6 +5566,18 @@ This filter operates on any type of data set, provided it has point-centered vec
         default_values="0.25" >
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
+      
+      <IntVectorProperty 
+         name="ComputeVorticity" 
+         command="SetComputeVorticity" 
+         number_of_elements="1"
+         default_values="1" >
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Compute vorticity and angular rotation of particles as they progress
+        </Documentation>
+      </IntVectorProperty>
+
 <!--      
       <IntVectorProperty 
         name="InitialIntegrationStepUnit" 
@@ -5637,6 +5646,41 @@ This filter operates on any type of data set, provided it has point-centered vec
      </DoubleVectorProperty>
 -->
 
+      <DoubleVectorProperty
+         name="TerminationTime"
+         command="SetTerminationTime"
+         number_of_elements="1"
+         default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+      
+     <IntVectorProperty 
+        name="TerminationTimeUnit" 
+        label="Termination Time Unit"
+        command="SetTerminationTimeUnit" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Simulation Time"/>
+         <Entry value="1" text="TimeSteps"/>
+       </EnumerationDomain>
+       <Documentation>
+         The termination time may be specified as TimeSteps or Simulation  time       
+       </Documentation>
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="TerminalSpeed"
+         label="Term. Speed"
+         command="SetTerminalSpeed"
+         number_of_elements="1"
+         default_values="0.000000000001" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          If at any point the speed is below the value of this property, the integration is terminated.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <IntVectorProperty 
          name="IgnorePipelineTime" 
          command="SetIgnorePipelineTime" 
@@ -5647,12 +5691,12 @@ This filter operates on any type of data set, provided it has point-centered vec
           Ignore the TIME_ requests made by the pipeline and only use the TimeStep set manually
         </Documentation>
       </IntVectorProperty>
-<!--
+
       <StringVectorProperty 
          name="ParticleFileName" 
          command="SetParticleFileName" 
          number_of_elements="1"
-         default_values="D:/Particles.h5">
+         default_values="/project/csvis/biddisco/ptracer/run-1">
         <Documentation>
           Provide a name for the particle file generated if writing is enabled
         </Documentation>
@@ -5668,7 +5712,7 @@ This filter operates on any type of data set, provided it has point-centered vec
           Turn On/Off particle writing
         </Documentation>
       </IntVectorProperty>
--->      
+      
       <!-- End ParticleTracer -->
    </SourceProxy>
     
