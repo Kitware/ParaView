@@ -1846,21 +1846,6 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
            </Documentation>
       </InputProperty>
 
-     <StringVectorProperty 
-        name="SelectInputScalars" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2">
-            <ArrayListDomain name="array_list" attribute_type="Scalars">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </ArrayListDomain>
-           <Documentation>
-             This property lists the name of the scalar array to use in computing the gradient magnitude.
-           </Documentation>
-     </StringVectorProperty>
-
      <IntVectorProperty 
         name="Dimensionality" 
         command="SetDimensionality" 
