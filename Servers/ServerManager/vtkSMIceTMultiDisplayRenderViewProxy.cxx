@@ -27,13 +27,14 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
   this->EnableTiles = true;
   this->CollectGeometryThreshold = 10.0;
   this->StillRenderImageReductionFactor = 1;
+  this->TileDisplayCompositeThreshold = 20.0;
 
   this->LastClientCollectionDecision = false;
   this->Information->Set(CLIENT_RENDER(), 1);
@@ -96,9 +97,9 @@ void vtkSMIceTMultiDisplayRenderViewProxy::EndCreateVTKObjects()
           << this->RenderSyncManager->GetID()
           << "SetRemoteDisplay" << 0
           << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::RENDER_SERVER_ROOT, stream);
-
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT,
+    stream);
 }
 
 //-----------------------------------------------------------------------------
@@ -134,9 +135,19 @@ void vtkSMIceTMultiDisplayRenderViewProxy::BeginInteractiveRender()
 
 //-----------------------------------------------------------------------------
 bool vtkSMIceTMultiDisplayRenderViewProxy::GetCompositingDecision(
-    unsigned long vtkNotUsed(totalMemory), int vtkNotUsed(stillRender))
+    unsigned long totalMemory, int stillRender)
 {
-  // Always render on the server side.
+  if (!this->RemoteRenderAvailable)
+    {
+    // Cannot remote render due to setup issues.
+    return false;
+    }
+
+  if (static_cast<float>(totalMemory)/1000.0 < this->TileDisplayCompositeThreshold)
+    {
+    return false; // Local render.
+    }
+
   return true;
 }
 
@@ -175,4 +186,6 @@ void vtkSMIceTMultiDisplayRenderViewProxy::PrintSelf(ostream& os, vtkIndent inde
     << this->CollectGeometryThreshold << endl;
   os << indent << "StillRenderImageReductionFactor: " 
     << this->StillRenderImageReductionFactor << endl;
+  os << indent << "TileDisplayCompositeThreshold: " 
+    << this->TileDisplayCompositeThreshold << endl;
 }

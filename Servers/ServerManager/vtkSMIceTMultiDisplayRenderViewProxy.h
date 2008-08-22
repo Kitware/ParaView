@@ -53,6 +53,14 @@ public:
   vtkSetMacro(StillRenderImageReductionFactor, int);
   vtkGetMacro(StillRenderImageReductionFactor, int);
 
+  // Description:
+  // This is simlar to RemoteRenderThreshold except for tile-displays.
+  // Tile-displays totally ignore remote-render threhosld, instead use this
+  // threhosld.
+  vtkSetMacro(TileDisplayCompositeThreshold, double);
+  vtkGetMacro(TileDisplayCompositeThreshold, double);
+
+
 //BTX
 protected:
   vtkSMIceTMultiDisplayRenderViewProxy();
@@ -97,6 +105,7 @@ protected:
 
   double CollectGeometryThreshold;
   int StillRenderImageReductionFactor;
+  double TileDisplayCompositeThreshold;
 
   bool LastClientCollectionDecision;
 private:

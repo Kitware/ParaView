@@ -184,6 +184,7 @@ void pqRenderViewBase::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODResolution"), 50);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("TileDisplayCompositeThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
 
   const int* bg = this->defaultBackgroundColor();
@@ -336,6 +337,7 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "UseTriangleStrips",
   "RenderInterruptsEnabled",
   "RemoteRenderThreshold",
+  "TileDisplayCompositeThreshold",
   "ImageReductionFactor",
   "SquirtLevel",
   "OrderedCompositing",

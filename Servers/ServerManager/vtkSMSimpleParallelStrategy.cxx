@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.20");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -175,19 +175,28 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->Collect->GetProperty("MoveMode"));
 
-  if (!this->GetEnableLOD())
+  int move_mode = 0;
+  if (usecompositing)
     {
-    // LOD pipeline not present, treat full res pipeline as LOD.
-    ivp->SetElement(0,
-      usecompositing? 
-      (this->LODClientRender? vtkMPIMoveData::CLONE: vtkMPIMoveData::PASS_THROUGH) : 
-      vtkMPIMoveData::COLLECT);
+    move_mode = vtkMPIMoveData::PASS_THROUGH;
+    //cout << "PASS_THROUGH" << endl;
     }
   else
     {
-    ivp->SetElement(0,
-      usecompositing? vtkMPIMoveData::PASS_THROUGH : vtkMPIMoveData::COLLECT);
+    if (this->LODClientRender) 
+      {
+      // in tile-display mode.
+      move_mode = vtkMPIMoveData::CLONE;
+      //cout << "CLONE" << endl;
+      }
+    else
+      {
+      move_mode = vtkMPIMoveData::COLLECT;
+      //cout << "COLLECT" << endl;
+      }
     }
+  // LOD pipeline not present, treat full res pipeline as LOD.
+  ivp->SetElement(0, move_mode);
   this->Collect->UpdateProperty("MoveMode");
 
   // It is essential to mark the Collect filter explicitly modified.

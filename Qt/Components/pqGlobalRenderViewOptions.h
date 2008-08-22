@@ -66,6 +66,7 @@ private slots:
   void lodResolutionSliderChanged(int);
   void outlineThresholdSliderChanged(int);
   void compositeThresholdSliderChanged(int);
+  void tileDisplayCompositeThresholdSliderChanged(int value);
   void subsamplingRateSliderChanged(int);
   void squirtLevelRateSliderChanged(int);
   void stillRenderSubsampleRateSliderChanged(int);

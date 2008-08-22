@@ -79,6 +79,11 @@ public:
   // the server.
   vtkGetMacro(RemoteDisplay, int);
 
+  // Description:
+  // The set value is overridden with that set on the server side if the two
+  // don't match.
+  vtkSetMacro(RemoteDisplay, int);
+
   vtkGetMacro(RemoteImageProcessingTime, double);
   vtkGetMacro(TransferTime, double);
   virtual double GetRenderTime() {

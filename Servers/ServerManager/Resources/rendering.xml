@@ -4373,6 +4373,19 @@
         <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
+      <DoubleVectorProperty
+        name="TileDisplayCompositeThreshold"
+        command="SetTileDisplayCompositeThreshold"
+        number_of_elements="1"
+        default_values="20.0"
+        update_self="1">
+        <DoubleRangeDomain name="range" min="0" />
+        <Documentation>
+           The threshold used to determine if the compositing should be used
+           for rendering on the tile display. 
+        </Documentation>
+      </DoubleVectorProperty>
+
       <!-- End of IceTMultiDisplayRenderView -->
     </IceTMultiDisplayRenderViewProxy>
 
@@ -4758,6 +4771,7 @@
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
+          <Property name="TileDisplayCompositeThreshold" />
           <Property name="ImageReductionFactor" />
           <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
@@ -5213,6 +5227,7 @@
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />
+          <Property name="TileDisplayCompositeThreshold" />
           <Property name="ImageReductionFactor" />
           <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
@@ -6528,6 +6543,43 @@
           <Entry value="5" text="Surface With Edges" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <Hints>
+        <InheritRepresentationProperties>
+          <!-- Inherit apperance properties -->
+        
+          <!-- Inherit selection properties -->
+          <Property name="SelectionColor" />
+          <Property name="SelectionLineWidth" />
+          <Property name="SelectionOpacity" />
+          <Property name="SelectionPointSize" />
+          <Property name="SelectionRepresentation" />
+          <Property name="SelectionInterpolation" />
+
+          <!-- Inherit Cube-Axes properties -->
+          <Property name="CubeAxesColor"/>
+          <Property name="CubeAxesCornerOffset"/>
+          <Property name="CubeAxesFlyMode"/>
+          <Property name="CubeAxesInertia"/>
+          <Property name="CubeAxesTickLocation"/>
+          <Property name="CubeAxesXAxisMinorTickVisibility"/>
+          <Property name="CubeAxesXAxisTickVisibility"/>
+          <Property name="CubeAxesXAxisVisibility"/>
+          <Property name="CubeAxesXGridLines"/>
+          <Property name="CubeAxesXTitle"/>
+          <Property name="CubeAxesYAxisMinorTickVisibility"/>
+          <Property name="CubeAxesYAxisTickVisibility"/>
+          <Property name="CubeAxesYAxisVisibility"/>
+          <Property name="CubeAxesYGridLines"/>
+          <Property name="CubeAxesYTitle"/>
+          <Property name="CubeAxesZAxisMinorTickVisibility"/>
+          <Property name="CubeAxesZAxisTickVisibility"/>
+          <Property name="CubeAxesZAxisVisibility"/>
+          <Property name="CubeAxesZGridLines"/>
+          <Property name="CubeAxesZTitle"/>
+          
+        </InheritRepresentationProperties>
+      </Hints>
 
       <!-- End of GeometryRepresentation -->
     </PVRepresentationProxy>
