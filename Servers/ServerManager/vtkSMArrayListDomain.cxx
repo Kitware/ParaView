@@ -33,7 +33,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.17");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.18");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -374,16 +374,16 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
 //---------------------------------------------------------------------------
 int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 {
-  vtkSMStringVectorProperty* svp = 
+  vtkSMStringVectorProperty* svp =
     vtkSMStringVectorProperty::SafeDownCast(prop);
-  if (!prop)
+  if (!svp)
     {
     return 0;
     }
 
   if (this->GetNumberOfStrings() > 0)
     {
-    const char* array = this->GetString(0);
+    const char* array = this->GetString(this->DefaultElement);
     const char* defaultValue = svp->GetDefaultValue(0);
     unsigned int temp;
     if (defaultValue && this->IsInDomain(defaultValue, temp))
