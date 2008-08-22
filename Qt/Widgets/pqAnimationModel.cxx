@@ -184,11 +184,11 @@ void pqAnimationModel::setTicks(int f)
   this->update();
 }
 
-void pqAnimationModel::setTickMarks(int count, double* times)
+void pqAnimationModel::setTickMarks(int cnt, double* times)
 {
-  this->Ticks = count;
+  this->Ticks = cnt;
   this->CustomTicks.clear();
-  for (int cc=0; cc < count; cc++)
+  for (int cc=0; cc < cnt; cc++)
     {
     this->CustomTicks.push_back(times[cc]);
     }
