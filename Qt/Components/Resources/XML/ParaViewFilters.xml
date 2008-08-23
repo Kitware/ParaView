@@ -31,6 +31,16 @@
             icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
 
+  <Category name="Temporal" menu_label="&amp;Temporal">    
+    <Filter name="ParticleTracer" />    
+    <Filter name="TemporalCache" />    
+    <Filter name="TemporalInterpolator" />    
+    <Filter name="TemporalSnapToTimeStep" />    
+    <Filter name="TemporalShiftScale" />    
+    <Filter name="TemporalStatistics" />
+    <Filter name="TimeToTextConvertor" />    
+  </Category>
+
   <Filter name="Append" />
   <Filter name="AppendAttributes" />
   <Filter name="AppendPolyData" />
@@ -108,6 +118,7 @@
   <Filter name="SurfaceVectors" />
   <Filter name="TemporalCache" />
   <Filter name="TemporalInterpolator" />
+  <Filter name="TemporalSnapToTimeStep" />  
   <Filter name="TemporalShiftScale" />
   <Filter name="TemporalStatistics" />
   <Filter name="TessellatorFilter" />
