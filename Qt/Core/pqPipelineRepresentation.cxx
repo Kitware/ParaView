@@ -366,33 +366,19 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   geomInfo = repr->GetRepresentedDataInformation(/*update=*/true);
 
   // Locate input display.
-  pqPipelineFilter* myInput = qobject_cast<pqPipelineFilter*>(this->getInput());
-  pqPipelineRepresentation* upstreamDisplay = 0;
-  if (myInput && myInput->getInputCount() > 0)
+  pqPipelineRepresentation* upstreamDisplay = 
+    qobject_cast<pqPipelineRepresentation*>(
+      this->getRepresentationForUpstreamSource());
+  if (upstreamDisplay)
     {
-    pqPipelineSource* myInputsInput = myInput->getInput(0);
-    upstreamDisplay = qobject_cast<pqPipelineRepresentation*>(
-      myInputsInput->getRepresentation(0, this->getView()));
-    if (upstreamDisplay)
-      {
-      inGeomInfo = upstreamDisplay->getRepresentationProxy()->GetRepresentedDataInformation();
-      }
-    }
-
-  // Propagate solid color from the upstream representation.
-  // In case of slice representation (and similar) there may be no "Color"
-  // property, hence we need to have this check.
-  if (upstreamDisplay && repr->GetProperty("Color") && 
-    upstreamDisplay->getProxy()->GetProperty("Color"))
-    {
-    repr->GetProperty("Color")->Copy(
-      upstreamDisplay->getProxy()->GetProperty("Color"));
+    inGeomInfo = upstreamDisplay->getRepresentationProxy()->
+      GetRepresentedDataInformation();
     }
 
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
-  if(geomInfo)
+  if (geomInfo)
     {
     attrInfo = geomInfo->GetPointDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetPointDataInformation() : 0;
@@ -406,7 +392,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     }
     
   // Check for new cell scalars.
-  if(geomInfo)
+  if (geomInfo)
     {
     attrInfo = geomInfo->GetCellDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetCellDataInformation() : 0;
@@ -457,7 +443,6 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       return;
       }
     }
-
 
   // We are going to set the default color mode to use solid color i.e. not use
   // scalar coloring at all. However, for some representations (eg. slice/volume)

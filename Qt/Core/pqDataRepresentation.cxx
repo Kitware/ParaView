@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
-#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
@@ -237,4 +237,24 @@ vtkPVDataInformation* pqDataRepresentation::getInputDataInformation() const
       this->getOutputPortFromInput()->getPortNumber());
     }
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqDataRepresentation::getRepresentationForUpstreamSource() const
+{
+ pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(this->getInput());
+ pqView* view = this->getView();
+ if (!filter || filter->getInputCount() == 0 || view == 0)
+   {
+   return 0;
+   }
+
+ // find a repre for the input of the filter
+ pqOutputPort* input = filter->getInputs()[0];
+ if (!input)
+   {
+   return 0;
+   }
+
+ return input->getRepresentation(view);
 }

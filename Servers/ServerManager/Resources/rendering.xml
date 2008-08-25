@@ -6547,6 +6547,26 @@
       <Hints>
         <InheritRepresentationProperties>
           <!-- Inherit apperance properties -->
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Texture" />
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="Material" />
+          <Property name="Opacity" />
+          <Property name="PointSize" />
+          <Property name="Shading" />
+          <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
         
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />
@@ -6642,6 +6662,63 @@
         </ExposedProperties>
       </SubProxy>
 
+      <Hints>
+        <InheritRepresentationProperties>
+          <!-- Inherit apperance properties -->
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Texture" />
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="Material" />
+          <Property name="Opacity" />
+          <Property name="PointSize" />
+          <Property name="Shading" />
+          <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+        
+          <!-- Inherit selection properties -->
+          <Property name="SelectionColor" />
+          <Property name="SelectionLineWidth" />
+          <Property name="SelectionOpacity" />
+          <Property name="SelectionPointSize" />
+          <Property name="SelectionRepresentation" />
+          <Property name="SelectionInterpolation" />
+
+          <!-- Inherit Cube-Axes properties -->
+          <Property name="CubeAxesColor"/>
+          <Property name="CubeAxesCornerOffset"/>
+          <Property name="CubeAxesFlyMode"/>
+          <Property name="CubeAxesInertia"/>
+          <Property name="CubeAxesTickLocation"/>
+          <Property name="CubeAxesXAxisMinorTickVisibility"/>
+          <Property name="CubeAxesXAxisTickVisibility"/>
+          <Property name="CubeAxesXAxisVisibility"/>
+          <Property name="CubeAxesXGridLines"/>
+          <Property name="CubeAxesXTitle"/>
+          <Property name="CubeAxesYAxisMinorTickVisibility"/>
+          <Property name="CubeAxesYAxisTickVisibility"/>
+          <Property name="CubeAxesYAxisVisibility"/>
+          <Property name="CubeAxesYGridLines"/>
+          <Property name="CubeAxesYTitle"/>
+          <Property name="CubeAxesZAxisMinorTickVisibility"/>
+          <Property name="CubeAxesZAxisTickVisibility"/>
+          <Property name="CubeAxesZAxisVisibility"/>
+          <Property name="CubeAxesZGridLines"/>
+          <Property name="CubeAxesZTitle"/>
+          
+        </InheritRepresentationProperties>
+      </Hints>
+
       <!-- End of UnstructuredGridRepresentation -->
     </PVRepresentationProxy>
 
@@ -6717,6 +6794,63 @@
           <Property name="SliceMode" />
         </ExposedProperties>
       </SubProxy>
+
+      <Hints>
+        <InheritRepresentationProperties>
+          <!-- Inherit apperance properties -->
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Texture" />
+          <Property name="Ambient" />
+          <Property name="AmbientColor" />
+          <Property name="Color" />
+          <Property name="Diffuse" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          <Property name="Interpolation" />
+          <Property name="LineWidth" />
+          <Property name="Material" />
+          <Property name="Opacity" />
+          <Property name="PointSize" />
+          <Property name="Shading" />
+          <Property name="Specular" />
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+        
+          <!-- Inherit selection properties -->
+          <Property name="SelectionColor" />
+          <Property name="SelectionLineWidth" />
+          <Property name="SelectionOpacity" />
+          <Property name="SelectionPointSize" />
+          <Property name="SelectionRepresentation" />
+          <Property name="SelectionInterpolation" />
+
+          <!-- Inherit Cube-Axes properties -->
+          <Property name="CubeAxesColor"/>
+          <Property name="CubeAxesCornerOffset"/>
+          <Property name="CubeAxesFlyMode"/>
+          <Property name="CubeAxesInertia"/>
+          <Property name="CubeAxesTickLocation"/>
+          <Property name="CubeAxesXAxisMinorTickVisibility"/>
+          <Property name="CubeAxesXAxisTickVisibility"/>
+          <Property name="CubeAxesXAxisVisibility"/>
+          <Property name="CubeAxesXGridLines"/>
+          <Property name="CubeAxesXTitle"/>
+          <Property name="CubeAxesYAxisMinorTickVisibility"/>
+          <Property name="CubeAxesYAxisTickVisibility"/>
+          <Property name="CubeAxesYAxisVisibility"/>
+          <Property name="CubeAxesYGridLines"/>
+          <Property name="CubeAxesYTitle"/>
+          <Property name="CubeAxesZAxisMinorTickVisibility"/>
+          <Property name="CubeAxesZAxisTickVisibility"/>
+          <Property name="CubeAxesZAxisVisibility"/>
+          <Property name="CubeAxesZGridLines"/>
+          <Property name="CubeAxesZTitle"/>
+          
+        </InheritRepresentationProperties>
+      </Hints>
 
       <!-- End of UniformGridRepresentation -->
     </PVRepresentationProxy>

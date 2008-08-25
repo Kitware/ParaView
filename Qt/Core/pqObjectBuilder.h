@@ -270,6 +270,11 @@ protected:
   /// Unregisters a proxy.
   virtual void destroyProxyInternal(pqProxy* proxy);
 
+  /// Called after a data representation to created. 
+  /// This use the <InheritRepresentationProperties /> hints to inherit
+  /// properties from input representation is possible.
+  virtual void initializeInheritedProperties(pqDataRepresentation* repr);
+
   /// Used to create names for registering proxies.
   pqNameCount* NameGenerator;
 
