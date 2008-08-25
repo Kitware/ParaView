@@ -293,4 +293,32 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
   return repr;
 }
 
+//-----------------------------------------------------------------------------
+pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
+  pqView* view, pqOutputPort* port) const
+{
+  if (view && port)
+    {
+    pqDataRepresentation *repr = port->getRepresentation(view);
+    if (repr && repr->isVisible())
+      {
+      // If repr for the view exists and is visible
+      return Visible;
+      }
+    else if (repr || view->canDisplay(port))
+      {
+      // If repr exists, or a new repr can be created for the port (since port
+      // is show-able in the view)
+      return Hidden;
+      }
+    else
+      {
+      // No repr exists, not can one be created.
+      return NotApplicable;
+      }
+    }
+
+  // Default behaviour if no view is present
+  return Hidden;
+}
 

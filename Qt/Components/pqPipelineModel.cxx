@@ -490,19 +490,22 @@ pqPipelineModelItem::VisibleState pqPipelineModelOutput::computeVisibleState(
   // If no view is present, it implies that a suitable type of view
   // will be created.
   pqPipelineModelItem::VisibleState eye = pqPipelineModelItem::NotVisible;
-  if(view)
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqDisplayPolicy* policy = core->getDisplayPolicy();
+  if (policy)
     {
-    pqDataRepresentation *repr = port->getRepresentation(view);
-    if(repr && repr->isVisible())
+    switch (policy->getVisibility(view, port))
       {
+    case pqDisplayPolicy::Visible:
       eye = pqPipelineModelItem::Visible;
-      }
-    else if(repr || view->canDisplay(port))
-      {
+      break;
+
+    case pqDisplayPolicy::Hidden:
       eye = pqPipelineModelItem::NotVisible;
-      }
-    else
-      {
+      break;
+
+    case pqDisplayPolicy::NotApplicable:
+    default:
       eye = pqPipelineModelItem::NotAllowed;
       }
     }
