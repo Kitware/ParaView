@@ -117,7 +117,7 @@ pqBoxWidget::~pqBoxWidget()
 #define PVBOXWIDGET_LINK(ui, smproperty, index)\
 {\
   this->Implementation->Links.addPropertyLink(\
-    this->Implementation->ui, "text",\
+    this->Implementation->ui, "text2",\
     SIGNAL(textChanged(const QString&)),\
     widget, widget->GetProperty(smproperty), index);\
 }

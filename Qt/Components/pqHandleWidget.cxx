@@ -147,17 +147,17 @@ void pqHandleWidget::createWidget(pqServer* server)
   widget->UpdatePropertyInformation();
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionX, "text",
+    this->Implementation->UI->worldPositionX, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 0);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionY, "text",
+    this->Implementation->UI->worldPositionY, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 1);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI->worldPositionZ, "text",
+    this->Implementation->UI->worldPositionZ, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("WorldPosition"), 2);
 }

@@ -13,11 +13,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>0</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
    </property>
    <item>
     <widget class="QCheckBox" name="visible" >
@@ -28,10 +37,22 @@
    </item>
    <item>
     <layout class="QGridLayout" >
-     <property name="margin" >
+     <property name="leftMargin" >
       <number>0</number>
      </property>
-     <property name="spacing" >
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
+     </property>
+     <property name="horizontalSpacing" >
+      <number>6</number>
+     </property>
+     <property name="verticalSpacing" >
       <number>6</number>
      </property>
      <item row="0" column="0" >
@@ -45,23 +66,32 @@
       </widget>
      </item>
      <item row="0" column="3" >
-      <widget class="QLineEdit" name="point1Z" />
+      <widget class="pqLineEdit" name="point1Z" />
      </item>
      <item row="0" column="2" >
-      <widget class="QLineEdit" name="point1Y" />
+      <widget class="pqLineEdit" name="point1Y" />
      </item>
      <item row="0" column="1" >
-      <widget class="QLineEdit" name="point1X" />
+      <widget class="pqLineEdit" name="point1X" />
      </item>
     </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" >
-     <property name="margin" >
-      <number>0</number>
-     </property>
      <property name="spacing" >
       <number>6</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
      </property>
      <item>
       <widget class="QLabel" name="labelPoint2" >
@@ -74,13 +104,13 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="point2X" />
+      <widget class="pqLineEdit" name="point2X" />
      </item>
      <item>
-      <widget class="QLineEdit" name="point2Y" />
+      <widget class="pqLineEdit" name="point2Y" />
      </item>
      <item>
-      <widget class="QLineEdit" name="point2Z" />
+      <widget class="pqLineEdit" name="point2Z" />
      </item>
     </layout>
    </item>
@@ -107,6 +137,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>visible</tabstop>
   <tabstop>point1X</tabstop>

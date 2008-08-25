@@ -174,32 +174,32 @@ void pqImplicitPlaneWidget::createWidget(pqServer* server)
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI->originX, 
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 0);
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI->originY,
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 1);
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI->originZ,
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Origin"), 2);
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI->normalX,
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 0);
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->UI->normalY,
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 1);
 
   this->Implementation->Links.addPropertyLink(
   this->Implementation->UI->normalZ,
-    "text", SIGNAL(textChanged(const QString&)),
+    "text2", SIGNAL(textChanged(const QString&)),
     widget, widget->GetProperty("Normal"), 2);
 }
 

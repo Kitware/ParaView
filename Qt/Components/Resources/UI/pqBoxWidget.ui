@@ -36,13 +36,13 @@
       </widget>
      </item>
      <item row="0" column="1" >
-      <widget class="QLineEdit" name="positionX" />
+      <widget class="pqLineEdit" name="positionX" />
      </item>
      <item row="0" column="2" >
-      <widget class="QLineEdit" name="positionY" />
+      <widget class="pqLineEdit" name="positionY" />
      </item>
      <item row="0" column="3" >
-      <widget class="QLineEdit" name="positionZ" />
+      <widget class="pqLineEdit" name="positionZ" />
      </item>
      <item row="1" column="0" >
       <widget class="QLabel" name="label_2" >
@@ -52,13 +52,13 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QLineEdit" name="rotationX" />
+      <widget class="pqLineEdit" name="rotationX" />
      </item>
      <item row="1" column="2" >
-      <widget class="QLineEdit" name="rotationY" />
+      <widget class="pqLineEdit" name="rotationY" />
      </item>
      <item row="1" column="3" >
-      <widget class="QLineEdit" name="rotationZ" />
+      <widget class="pqLineEdit" name="rotationZ" />
      </item>
      <item row="2" column="0" >
       <widget class="QLabel" name="label_3" >
@@ -68,13 +68,13 @@
       </widget>
      </item>
      <item row="2" column="1" >
-      <widget class="QLineEdit" name="scaleX" />
+      <widget class="pqLineEdit" name="scaleX" />
      </item>
      <item row="2" column="2" >
-      <widget class="QLineEdit" name="scaleY" />
+      <widget class="pqLineEdit" name="scaleY" />
      </item>
      <item row="2" column="3" >
-      <widget class="QLineEdit" name="scaleZ" />
+      <widget class="pqLineEdit" name="scaleZ" />
      </item>
     </layout>
    </item>
@@ -100,6 +100,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

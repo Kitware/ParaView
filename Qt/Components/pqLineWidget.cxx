@@ -307,32 +307,32 @@ void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
     widget->GetProperty("Point2WorldPosition"));
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1X, "text",
+    this->Implementation->UI.point1X, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 0);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1Y, "text",
+    this->Implementation->UI.point1Y, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 1);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point1Z, "text",
+    this->Implementation->UI.point1Z, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint1, 2);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2X, "text",
+    this->Implementation->UI.point2X, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 0);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2Y, "text",
+    this->Implementation->UI.point2Y, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 1);
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->UI.point2Z, "text",
+    this->Implementation->UI.point2Z, "text2",
     SIGNAL(textChanged(const QString&)),
     widget, this->Implementation->WidgetPoint2, 2);
 

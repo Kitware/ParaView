@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqImplicitPlaneWidget</class>
  <widget class="QWidget" name="pqImplicitPlaneWidget" >
   <property name="geometry" >
@@ -16,11 +13,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>0</number>
-   </property>
    <property name="spacing" >
     <number>2</number>
+   </property>
+   <property name="leftMargin" >
+    <number>0</number>
+   </property>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
    </property>
    <item>
     <widget class="QCheckBox" name="show3DWidget" >
@@ -31,10 +37,22 @@
    </item>
    <item>
     <layout class="QGridLayout" >
-     <property name="margin" >
+     <property name="leftMargin" >
       <number>0</number>
      </property>
-     <property name="spacing" >
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
+     </property>
+     <property name="horizontalSpacing" >
+      <number>2</number>
+     </property>
+     <property name="verticalSpacing" >
       <number>2</number>
      </property>
      <item row="1" column="0" >
@@ -45,7 +63,7 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QLineEdit" name="normalX" />
+      <widget class="pqLineEdit" name="normalX" />
      </item>
      <item row="0" column="0" >
       <widget class="QLabel" name="labelOrigin" >
@@ -55,28 +73,40 @@
       </widget>
      </item>
      <item row="1" column="3" >
-      <widget class="QLineEdit" name="normalZ" />
+      <widget class="pqLineEdit" name="normalZ" />
      </item>
      <item row="0" column="3" >
-      <widget class="QLineEdit" name="originZ" />
+      <widget class="pqLineEdit" name="originZ" />
      </item>
      <item row="0" column="2" >
-      <widget class="QLineEdit" name="originY" />
+      <widget class="pqLineEdit" name="originY" />
      </item>
      <item row="1" column="2" >
-      <widget class="QLineEdit" name="normalY" />
+      <widget class="pqLineEdit" name="normalY" />
      </item>
      <item row="0" column="1" >
-      <widget class="QLineEdit" name="originX" />
+      <widget class="pqLineEdit" name="originX" />
      </item>
     </layout>
    </item>
    <item>
     <layout class="QGridLayout" >
-     <property name="margin" >
+     <property name="leftMargin" >
       <number>0</number>
      </property>
-     <property name="spacing" >
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
+     </property>
+     <property name="horizontalSpacing" >
+      <number>0</number>
+     </property>
+     <property name="verticalSpacing" >
       <number>0</number>
      </property>
      <item row="0" column="1" >
@@ -125,7 +155,13 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>pqLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>show3DWidget</tabstop>
   <tabstop>originX</tabstop>
