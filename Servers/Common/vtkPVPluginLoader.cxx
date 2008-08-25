@@ -23,7 +23,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.7");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.8");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -83,11 +83,19 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
     this->ServerManagerXML->Delete();
     }
 
-  this->SetFileName(0);
+  if(this->Error)
+    {
+    delete [] this->Error;
+    }
   
   if(this->SearchPaths)
     {
     delete [] this->SearchPaths;
+    }
+  
+  if(this->FileName)
+    {
+    delete [] this->FileName;
     }
 }
 
