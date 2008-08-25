@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkSMProxyManager.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMProxy.h"
 
 // Qt Includes.
 #include <QMenu>
@@ -65,15 +67,39 @@ void pqSourcesMenuManager::setEnabled(bool enable)
 //-----------------------------------------------------------------------------
 bool pqSourcesMenuManager::filter(const QString& name)
 {
+  bool showit = false;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* prototype = pxm->GetPrototypeProxy(
     this->xmlGroup().toAscii().data(), name.toAscii().data());
   pqObjectBuilder* ob = pqApplicationCore::instance()->getObjectBuilder();
   if(ob->getFileNamePropertyName(prototype).isEmpty())
     {
-    return true;
+    showit = true;
     }
-  return false;
+ 
+  // check for the show option in the hints
+  vtkPVXMLElement* hints = prototype->GetHints();
+  if(hints)
+    {
+    unsigned int numHints = hints->GetNumberOfNestedElements();
+    for (unsigned int i = 0; i < numHints; i++)
+      {
+      vtkPVXMLElement *element = hints->GetNestedElement(i);
+      if (QString("Property") == element->GetName())
+        {
+        QString propertyName = element->GetAttribute("name");
+        int showProperty;
+        if (element->GetScalarAttribute("show", &showProperty))
+          {
+          if (showProperty)
+            {
+            showit = true;
+            }
+          }
+        }
+      }
+    }
+  return showit;
 }
 
 
