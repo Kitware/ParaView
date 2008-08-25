@@ -142,6 +142,7 @@ void  pqAnimationScene::setDefaultPropertyValues()
   this->createCueInternal("TimeAnimationCue",
     this->getServer()->getTimeKeeper()->getProxy(),
     "Time", 0);
+  this->setAnimationTime(0.0);
 }
 
 //-----------------------------------------------------------------------------
