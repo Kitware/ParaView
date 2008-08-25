@@ -75,15 +75,32 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     }
   
   vtkPVXMLElement* hints = source->getHints();
-  vtkPVXMLElement* viewElement = hints? 
-    hints->FindNestedElementByName("View") : 0;
-  QString view_type = viewElement ? 
-    QString(viewElement->GetAttribute("type")) : QString::null;
-
-  if (!view_type.isNull())
+  if (hints)
     {
-    return view_type;
+    for (unsigned int cc=0; cc < hints->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child && child->GetName() &&
+        strcmp(child->GetName(), "View") == 0)
+        {
+        int port;
+        // If port exists, then it must match the port number for this port.
+        if (child->GetScalarAttribute("port", &port))
+          {
+          if (opPort->getPortNumber() != port)
+            {
+            continue;
+            }
+          }
+        if (child->GetAttribute("type"))
+          {
+          return child->GetAttribute("type");
+          }
+        }
+      }
     }
+
+  QString view_type = QString::null;
 
   // HACK: for now, when update_pipeline is false, we don't do any gather
   // information as that can result in progress events which may case Qt paint
