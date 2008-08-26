@@ -64,14 +64,6 @@ SET(VTK_DONT_INCLUDE_USE_X 1)
 # and VTK_USE_RPATH.
 INCLUDE(${VTK_CMAKE_DIR}/vtkSelectSharedLibraries.cmake)
 
-# Disable the install targets if using the rpath feature.
-IF(NOT WIN32)
-  IF(VTK_USE_RPATH)
-    SET(PV_INSTALL_NO_DEVELOPMENT 1)
-    SET(PV_INSTALL_NO_RUNTIME 1)
-  ENDIF(VTK_USE_RPATH)
-ENDIF(NOT WIN32)
-
 # ParaView needs static Tcl/Tk if not using shared libraries.
 IF(NOT BUILD_SHARED_LIBS)
   SET(VTK_TCL_TK_STATIC ON CACHE INTERNAL "" FORCE)
