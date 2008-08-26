@@ -50,21 +50,25 @@ QColor pqColorChooserButton::chosenColor() const
 
 void pqColorChooserButton::setChosenColor(const QColor& color)
 {
-  if(color.isValid() && color != this->Color)
+  if(color.isValid())
     {
-    this->Color = color;
-    int sz = qRound(this->height() * 0.5);
-    
-    QPixmap pix(sz, sz);
-    pix.fill(QColor(0,0,0,0));
-    QPainter painter(&pix);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(QBrush(color));
-    painter.drawEllipse(1,1,sz-2,sz-2);
-    painter.end();
+    if(color != this->Color)
+      {
+      this->Color = color;
+      int sz = qRound(this->height() * 0.5);
+      
+      QPixmap pix(sz, sz);
+      pix.fill(QColor(0,0,0,0));
+      QPainter painter(&pix);
+      painter.setRenderHint(QPainter::Antialiasing, true);
+      painter.setBrush(QBrush(color));
+      painter.drawEllipse(1,1,sz-2,sz-2);
+      painter.end();
 
-    this->setIcon(QIcon(pix));
-    emit this->chosenColorChanged(this->Color);
+      this->setIcon(QIcon(pix));
+      emit this->chosenColorChanged(this->Color);
+      }
+    emit this->validColorChosen(this->Color);
     }
 }
 

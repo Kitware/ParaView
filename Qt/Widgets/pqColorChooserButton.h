@@ -51,6 +51,8 @@ public:
 signals:
   /// signal color changed
   void chosenColorChanged(const QColor&);  
+  /// signal color selected
+  void validColorChosen(const QColor&);  
 public slots:
   /// set the color
   void setChosenColor(const QColor&);
