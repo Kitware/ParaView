@@ -1081,6 +1081,9 @@
         </item>
         <item row="2" column="2" >
          <widget class="QSlider" name="tileDisplayCompositeThreshold" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
           <property name="toolTip" >
            <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines when distributed rendering is used on tile displays. When compositing is enabled, each processes renders the data it has and then the rendering code composites the images together for each tile. When compositing is disabled, geometry is cloned on all processes and each process renders the tile independently. Threshold criteria is based on size of the model in mega bytes. &lt;b>Left:&lt;/b> Always use compositing. &lt;b>Right:&lt;/b> Clone even large models.&lt;/p>&lt;/body>&lt;/html></string>
           </property>
@@ -1332,6 +1335,38 @@
     <hint type="destinationlabel" >
      <x>206</x>
      <y>245</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableTileDisplayCompositing</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tileDisplayCompositeThreshold</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>158</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>277</x>
+     <y>250</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableTileDisplayCompositing</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>tileDisplayCompositeThresholdLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>158</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>411</x>
+     <y>250</y>
     </hint>
    </hints>
   </connection>
