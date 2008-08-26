@@ -27,7 +27,7 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
@@ -135,7 +135,7 @@ void vtkSMIceTMultiDisplayRenderViewProxy::BeginInteractiveRender()
 
 //-----------------------------------------------------------------------------
 bool vtkSMIceTMultiDisplayRenderViewProxy::GetCompositingDecision(
-    unsigned long totalMemory, int stillRender)
+    unsigned long totalMemory, int vtkNotUsed(stillRender))
 {
   if (!this->RemoteRenderAvailable)
     {
