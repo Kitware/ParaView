@@ -776,6 +776,13 @@ QList<QString> pqPipelineRepresentation::getColorFields()
       for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
         {
         vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+        if (representation == vtkSMPVRepresentationProxy::VOLUME &&
+          info->GetNumberOfComponents() != 1)
+          {
+          // Skip vectors when volumerendering.
+          continue;
+          }
+
         QString name = info->GetName();
         name += " (cell)";
         ret.append(name);
@@ -791,6 +798,12 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     for(int i=0; i<pointinfo->GetNumberOfArrays(); i++)
       {
       vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
+      if (representation == vtkSMPVRepresentationProxy::VOLUME &&
+        info->GetNumberOfComponents() != 1)
+        {
+        // Skip vectors when volumerendering.
+        continue;
+        }
       QString name = info->GetName();
       name += " (point)";
       ret.append(name);
