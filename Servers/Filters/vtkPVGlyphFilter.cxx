@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.31");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.32");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -415,6 +415,8 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       double nPtsVisibleOverBlock = nPtsVisibleOverAll*fractionOfPtsInBlock;
       nPtsVisibleOverBlock 
         = nPtsVisibleOverBlock<1.0 ? 1.0 : nPtsVisibleOverBlock;
+      nPtsVisibleOverBlock = (  (nPtsVisibleOverBlock > nPtsNotBlanked)
+                              ? nPtsNotBlanked : nPtsVisibleOverBlock );
       double stride = nPtsNotBlanked/nPtsVisibleOverBlock;
       if (this->UseMaskPoints)
         {
