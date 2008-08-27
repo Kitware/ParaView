@@ -69,15 +69,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorScaleToolbar.h"
 #include "pqCubeAxesEditorDialog.h"
 #include "pqFileDialog.h"
+#include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
-#include "pqSMAdaptor.h"
-#include "pqWidgetRangeDomain.h"
-#include "pqOutputPort.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
+#include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
+#include "pqWidgetRangeDomain.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -86,7 +87,6 @@ public:
     {
     this->Links = new pqPropertyLinks;
     this->InterpolationAdaptor = 0;
-    this->ColorAdaptor = 0;
     this->EdgeColorAdaptor = 0;
     this->SliceDirectionAdaptor = 0;
     this->SliceDomain = 0;
@@ -107,7 +107,6 @@ public:
   // The representation whose properties are being edited.
   QPointer<pqPipelineRepresentation> Representation;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
-  pqSignalAdaptorColor*    ColorAdaptor;
   pqSignalAdaptorColor*    EdgeColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
   pqSignalAdaptorComboBox* SelectedMapperAdaptor;
@@ -208,18 +207,18 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   // setup for choosing color
   if (reprProxy->GetProperty("AmbientColor"))
     {
-    this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
-      "color", SIGNAL(colorChanged(const QVariant&)),
-      reprProxy, reprProxy->GetProperty("AmbientColor"));
-    this->Internal->Links->addPropertyLink(this->Internal->ColorAdaptor,
-      "color", SIGNAL(colorChanged(const QVariant&)),
-      reprProxy, reprProxy->GetProperty("DiffuseColor"));
+    QList<QVariant> curColor = pqSMAdaptor::getMultipleElementProperty(
+      reprProxy->GetProperty("AmbientColor"));
+
+    bool prev = this->Internal->ColorActorColor->blockSignals(true);
+    this->Internal->ColorActorColor->setChosenColor(
+      QColor(qRound(curColor[0].toDouble()*255),
+        qRound(curColor[1].toDouble()*255),
+        qRound(curColor[2].toDouble()*255), 1.0));
+    this->Internal->ColorActorColor->blockSignals(prev);
 
     // setup for specular lighting
     QObject::connect(this->Internal->SpecularWhite, SIGNAL(toggled(bool)),
-      this, SIGNAL(specularColorChanged()));
-    QObject::connect(this->Internal->ColorAdaptor,
-      SIGNAL(colorChanged(const QVariant&)),
       this, SIGNAL(specularColorChanged()));
     this->Internal->Links->addPropertyLink(this->Internal->SpecularIntensity,
       "value", SIGNAL(editingFinished()),
@@ -514,11 +513,11 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->StyleInterpolation);
   this->Internal->InterpolationAdaptor->setObjectName(
     "StyleInterpolationAdapator");
-    
-  this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
-                            this->Internal->ColorActorColor,
-                            "chosenColor",
-                            SIGNAL(chosenColorChanged(const QColor&)), false);
+ 
+  QObject::connect(this->Internal->ColorActorColor,
+    SIGNAL(chosenColorChanged(const QColor&)),
+    this, SLOT(setSolidColor(const QColor&)));
+
   this->Internal->EdgeColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->EdgeColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
@@ -821,6 +820,27 @@ void pqDisplayProxyEditor::volumeBlockSelected()
       this->Internal->ColorBy->reloadGUI();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+// Called when the GUI selection for the solid color changes.
+void pqDisplayProxyEditor::setSolidColor(const QColor& color)
+{
+  QList<QVariant> val;
+  val.push_back(color.red()/255.0);
+  val.push_back(color.green()/255.0);
+  val.push_back(color.blue()/255.0);
+
+  pqApplicationCore::instance()->getUndoStack()->beginUndoSet("Change Solid Color");
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->Representation->getProxy()->GetProperty("AmbientColor"), val);
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->Representation->getProxy()->GetProperty("DiffuseColor"), val);
+
+  // If specular while if off, then we want to update the specular color as
+  // well.
+  emit this->specularColorChanged();
+  pqApplicationCore::instance()->getUndoStack()->endUndoSet();
 }
 
 //-----------------------------------------------------------------------------
