@@ -7823,7 +7823,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       </Proxy>
       <Proxy group="filters" type="PolyDataNormals" id="1224" servers="1" compound_name="GenerateSurfaceNormals1">
         <Property name="ComputeCellNormals" id="1224.ComputeCellNormals" number_of_elements="1">
-          <Element index="0" value="0"/>
+          <Element index="0" value="1"/>
           <Domain name="bool" id="1224.ComputeCellNormals.bool"/>
         </Property>
         <Property name="Consistency" id="1224.Consistency" number_of_elements="1">
@@ -7860,13 +7860,29 @@ This property controls how the filter works to generate tensor cell data. You ca
           <Domain name="bool" id="1224.PieceInvariant.bool"/>
         </Property>
         <Property name="Splitting" id="1224.Splitting" number_of_elements="1">
-          <Element index="0" value="1"/>
+          <Element index="0" value="0"/>
           <Domain name="bool" id="1224.Splitting.bool"/>
+        </Property>
+      </Proxy>
+      <Proxy group="filters" type="CellCenters" id="3392" servers="1" compound_name="CellCenters1">
+        <Property name="Input" id="3392.Input" number_of_elements="1">
+          <Proxy value="1224" output_port="0"/>
+          <Domain name="groups" id="3392.Input.groups">
+            <Group value="sources"/>
+            <Group value="filters"/>
+          </Domain>
+          <Domain name="input_type" id="3392.Input.input_type">
+            <DataType value="vtkDataSet"/>
+          </Domain>
+        </Property>
+        <Property name="VertexCells" id="3392.VertexCells" number_of_elements="1">
+          <Element index="0" value="1"/>
+          <Domain name="bool" id="3392.VertexCells.bool"/>
         </Property>
       </Proxy>
       <Proxy group="filters" type="Glyph" id="2429" servers="1" compound_name="Glyph1">
         <Property name="Input" id="2429.Input" number_of_elements="1">
-          <Proxy value="1224" output_port="0"/>
+          <Proxy value="3392" output_port="0"/>
           <Domain name="groups" id="2429.Input.groups">
             <Group value="sources"/>
             <Group value="filters"/>
@@ -7914,10 +7930,10 @@ This property controls how the filter works to generate tensor cell data. You ca
           <Domain name="bool" id="2429.SetOrient.bool"/>
         </Property>
         <Property name="SetScaleFactor" id="2429.SetScaleFactor" number_of_elements="1">
-          <Element index="0" value="1.97781"/>
+          <Element index="0" value="1.0"/>
           <Domain name="bounds" id="2429.SetScaleFactor.bounds">
             <Min index="0" value="0"/>
-            <Max index="0" value="1.97781"/>
+            <Max index="0" value="1.0"/>
           </Domain>
           <Domain name="scalar_range" id="2429.SetScaleFactor.scalar_range"/>
           <Domain name="vector_range" id="2429.SetScaleFactor.vector_range">
@@ -7932,7 +7948,7 @@ This property controls how the filter works to generate tensor cell data. You ca
           </Domain>
         </Property>
         <Property name="SetScaleMode" id="2429.SetScaleMode" number_of_elements="1">
-          <Element index="0" value="1"/>
+          <Element index="0" value="3"/>
           <Domain name="enum" id="2429.SetScaleMode.enum">
             <Entry value="0" text="scalar"/>
             <Entry value="1" text="vector"/>
@@ -8002,15 +8018,20 @@ This property controls how the filter works to generate tensor cell data. You ca
         </Property>
       </Proxy>
       <ExposedProperties>
-        <Property name="FeatureAngle" proxy_name="GenerateSurfaceNormals1" exposed_name="Feature Angle"/>
-        <Property name="SetOrient" proxy_name="Glyph1" exposed_name="Glyph Orient"/>
         <Property name="MaximumNumberOfPoints" proxy_name="Glyph1" exposed_name="Glyph Max. Points"/>
         <Property name="RandomMode" proxy_name="Glyph1" exposed_name="Glyph Random Mode"/>
         <Property name="SetScaleFactor" proxy_name="Glyph1" exposed_name="Glyph Scale Factor"/>
-        <Property name="SetScaleMode" proxy_name="Glyph1" exposed_name="Glyph Scale Mode"/>
         <Property name="Input" proxy_name="ExtractSurface2" exposed_name="Input"/>
       </ExposedProperties>
       <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
+      <Hints>
+        <!-- Visibility Element can be used to suggest the GUI about
+             visibility of this filter (or its input) on creation.
+             replace_input="0" implies that the input visibility is not
+             changed on creation of this filter (defaults to "1")
+             -->
+        <Visibility replace_input="0" />
+      </Hints>
     </CompoundSourceProxy>
 
     <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
