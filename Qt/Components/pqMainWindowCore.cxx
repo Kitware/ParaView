@@ -3547,9 +3547,21 @@ void pqMainWindowCore::applicationInitialize()
     {
     if (this->makeServerConnectionIfNoneExists())
       {
-      QStringList files;
-      files.push_back(options->GetParaViewDataName());
-      this->createReaderOnActiveServer(files);
+      // We don't directly set the data file name instead use the dialog. This
+      // makes it possible to select a file group.
+      pqFileDialog* dialog = new pqFileDialog(
+        this->getActiveServer(),
+        this->Implementation->Parent, 
+        tr("Internal Open File"), QString(),
+        QString());
+      dialog->setFileMode(pqFileDialog::ExistingFiles);
+      dialog->selectFile(options->GetParaViewDataName());
+      QStringList selectedFiles = dialog->getSelectedFiles();
+      delete dialog;
+
+      //QStringList files;
+      //files.push_back(options->GetParaViewDataName());
+      this->createReaderOnActiveServer(selectedFiles);
       }
     }
   
