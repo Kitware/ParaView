@@ -3300,7 +3300,7 @@
          </RequiredProperties>
        </IntRangeDomain>
        <Documentation>
-         Specify the current mode shape with HasModeShapes in on.
+         Specify the current mode shape when HasModeShapes in on.
        </Documentation>
      </IntVectorProperty>
 
@@ -3778,6 +3778,9 @@
         number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
+       <Documentation>
+         Geometric locations can include displacements. When this option is on, the nodal positions are 'displaced' by the standard exodus displacement vector. If displacements are turned 'off', the user can explicitly add them by applying a warp filter.
+       </Documentation>
      </IntVectorProperty>
 
      <DoubleVectorProperty 
@@ -3786,6 +3789,9 @@
         number_of_elements="1"
         default_values="1" > 
        <DoubleRangeDomain name="range"/>
+       <Documentation>
+         When displacements are being applied, they are scaled by this amount.  Set to 1 for no scaling.
+       </Documentation>
      </DoubleVectorProperty>
      
      <IntVectorProperty 
