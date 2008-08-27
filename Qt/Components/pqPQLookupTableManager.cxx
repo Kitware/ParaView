@@ -138,7 +138,7 @@ protected:
     }
 };
 vtkStandardNewMacro(pqSimpleStateLoader);
-vtkCxxRevisionMacro(pqSimpleStateLoader, "1.13");
+vtkCxxRevisionMacro(pqSimpleStateLoader, "1.14");
 
 //-----------------------------------------------------------------------------
 pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
@@ -224,7 +224,18 @@ void pqPQLookupTableManager::saveAsDefault(pqScalarsToColors* lut)
     }
 
   vtkSMProxy* lutProxy = lut->getProxy();
+
+  // Remove "ScalarRangeInitialized" property, since we want the lookup table to
+  // rescale when it is assciated with a new array.
+  bool old_value = pqSMAdaptor::getElementProperty(
+    lutProxy->GetProperty("ScalarRangeInitialized")).toBool();
+  pqSMAdaptor::setElementProperty(
+    lutProxy->GetProperty("ScalarRangeInitialized"), false);
   this->Internal->DefaultLUTElement.TakeReference(lutProxy->SaveState(0));
+  pqSMAdaptor::setElementProperty(
+    lutProxy->GetProperty("ScalarRangeInitialized"), old_value);
+
+
   vtksys_ios::ostringstream stream;
   this->Internal->DefaultLUTElement->PrintXML(stream, vtkIndent());
 
