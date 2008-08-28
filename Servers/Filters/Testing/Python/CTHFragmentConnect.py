@@ -300,7 +300,7 @@ class vtkCTHFragmentConnectTest:
 
 
 # Run the test
-dsf=["Data/spcth_fc_0.0"]
+dsf=[os.path.join("Data","spcth_fc_0.0")]
 cfct=vtkCTHFragmentConnectTest()
 cfct.ProcessCommandLineArguments()
 cfct.Connect(sm)
