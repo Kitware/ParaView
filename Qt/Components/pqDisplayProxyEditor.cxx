@@ -214,7 +214,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->Internal->ColorActorColor->setChosenColor(
       QColor(qRound(curColor[0].toDouble()*255),
         qRound(curColor[1].toDouble()*255),
-        qRound(curColor[2].toDouble()*255), 1.0));
+        qRound(curColor[2].toDouble()*255), 255));
     this->Internal->ColorActorColor->blockSignals(prev);
 
     // setup for specular lighting
