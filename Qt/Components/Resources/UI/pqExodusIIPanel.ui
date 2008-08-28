@@ -207,7 +207,7 @@
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="pqTreeWidget" name="FaceBlockArrayStatus" >
+        <widget class="pqTreeWidget" name="FaceBlockArrays" >
          <property name="selectionMode" >
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>
@@ -226,7 +226,7 @@
       </attribute>
       <layout class="QGridLayout" >
        <item row="0" column="0" >
-        <widget class="pqTreeWidget" name="EdgeBlockArrayStatus" >
+        <widget class="pqTreeWidget" name="EdgeBlockArrays" >
          <property name="selectionMode" >
           <enum>QAbstractItemView::ExtendedSelection</enum>
          </property>

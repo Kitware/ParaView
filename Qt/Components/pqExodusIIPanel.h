@@ -47,13 +47,12 @@ class PQCOMPONENTS_EXPORT pqExodusIIPanel :
   public pqNamedObjectPanel
 {
   Q_OBJECT
+  typedef pqNamedObjectPanel Superclass;
 public:
   /// constructor
   pqExodusIIPanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
   ~pqExodusIIPanel();
-
-  void reset();
 
 protected slots:
   void applyDisplacements(int);

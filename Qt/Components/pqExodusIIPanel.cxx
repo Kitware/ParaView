@@ -113,7 +113,7 @@ public:
 };
 
 pqExodusIIPanel::pqExodusIIPanel(pqProxy* object_proxy, QWidget* p) :
-  pqNamedObjectPanel(object_proxy, p)
+  Superclass(object_proxy, p)
 {
   this->UI = new pqUI(this);
   this->UI->setupUi(this);
@@ -197,17 +197,6 @@ void pqExodusIIPanel::updateSIL()
     }
 }
 
-void pqExodusIIPanel::reset()
-{
-  // push original values for block status back
-  // onto the vtkExodusReader, as the ExodusHelper
-  // might have played with them
-  vtkSMProxy* pxy = this->proxy();
-  pxy->UpdateProperty("EdgeBlockArrayStatus", 1);
-  pxy->UpdateProperty("FaceBlockArrayStatus", 1);
-  pqNamedObjectPanel::reset();
-}
-
 void pqExodusIIPanel::addSelectionsToTreeWidget(const QString& prop, 
                                       QTreeWidget* tree,
                                       PixmapType pix)
@@ -283,7 +272,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
     this->proxy()->GetProperty("ElementBlockArrayStatus"));
 
   // parent class hooks up some of our widgets in the ui
-  pqNamedObjectPanel::linkServerManagerProperties();
+  this->Superclass::linkServerManagerProperties();
 
   this->DisplItem = 0;
 
@@ -376,9 +365,9 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
   // blocks
   this->addSelectionsToTreeWidget("EdgeBlockArrayStatus",
-                                  this->UI->EdgeBlockArrayStatus, PM_EDGEBLK);
+                                  this->UI->EdgeBlockArrays, PM_EDGEBLK);
   this->addSelectionsToTreeWidget("FaceBlockArrayStatus",
-                                  this->UI->FaceBlockArrayStatus, PM_FACEBLK);
+                                  this->UI->FaceBlockArrays, PM_FACEBLK);
 
   // sets
   this->addSelectionsToTreeWidget("SideSetArrayStatus",
