@@ -518,23 +518,3 @@ void pqApplicationCore::quit()
   QCoreApplication::instance()->quit();
 }
 
-//-----------------------------------------------------------------------------
-const char* pqApplicationCore::getPreferredViewType (int connectionID, const char *xml_name)
-{
-  if(strcmp(xml_name,"RenderView")==0 ||
-     strcmp(xml_name,"ClientServerRenderView")==0 ||
-     strcmp(xml_name,"IceTMultiDisplayRenderView")==0 ||
-     strcmp(xml_name,"IceTDesktopRenderView")==0 ||
-     strcmp(xml_name,"IceTCompositeView")==0 )
-    {
-    if(connectionID == vtkProcessModuleConnectionManager::GetNullConnectionID())
-      {
-      return "RenderView";
-      }
-
-    return vtkSMRenderViewProxy::GetSuggestedRenderViewType(connectionID);
-    }
-
-  return xml_name;
-}
-

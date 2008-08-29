@@ -1117,20 +1117,16 @@ def LoadState(filename, connection=None):
     if not connection:
         raise exceptions.RuntimeError, "Cannot load state without a connection"
     loader = vtkSMPQStateLoader()
-    rvname = vtkSMRenderViewProxy.GetSuggestedRenderViewType(connection.ID)
-    if rvname:
-        pm = ProxyManager()
-        pm.LoadState(filename, ActiveConnection.ID, loader)
-        views = GetRenderViews()
-        for view in views:
-            # Make sure that the client window size matches the
-            # ViewSize property. In paraview, the GUI takes care
-            # of this.
-            if view.GetClassName() == "vtkSMIceTDesktopRenderViewProxy":
-                view.GetRenderWindow().SetSize(view.ViewSize[0], \
-                                               view.ViewSize[1])
-    else:
-        raise exceptions.RuntimeError, "Could not load state because no appropriate render view was found."
+    pm = ProxyManager()
+    pm.LoadState(filename, ActiveConnection.ID, loader)
+    views = GetRenderViews()
+    for view in views:
+        # Make sure that the client window size matches the
+        # ViewSize property. In paraview, the GUI takes care
+        # of this.
+        if view.GetClassName() == "vtkSMIceTDesktopRenderViewProxy":
+            view.GetRenderWindow().SetSize(view.ViewSize[0], \
+                                           view.ViewSize[1])
     
 def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     """
@@ -1251,8 +1247,9 @@ def CreateRenderView(connection=None, **extraArgs):
     if not connection:
         raise exceptions.RuntimeError, "Cannot create render window without connection."
     pxm = ProxyManager()
-    proxy_xml_name = vtkSMRenderViewProxy.GetSuggestedRenderViewType(\
-        connection.ID)
+    prototype = pxm.GetPrototypeProxy("views", "RenderView")
+
+    proxy_xml_name = prototype.GetSuggestedViewType(connection.ID)
     ren_module = None
     if proxy_xml_name:
         ren_module = CreateProxy("views", proxy_xml_name, connection)

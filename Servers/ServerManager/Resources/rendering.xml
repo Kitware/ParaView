@@ -5021,7 +5021,7 @@
       <!-- End of 2DRenderView -->
     </TwoDRenderViewProxy>
 
-    <TwoDRenderViewProxy name="2DIceTCompositeRenderView"
+    <TwoDRenderViewProxy name="2DIceTCompositeView"
       base_proxygroup="views" base_proxyname="ViewBase">
       <Documentation>
         IceT based 2D render view. 

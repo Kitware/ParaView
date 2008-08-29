@@ -79,10 +79,6 @@ pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _pare
   this->ConnectionID = connectionID;
   this->Options = options;
 
-  this->RenderViewXMLName = 
-    vtkSMRenderViewProxy::GetSuggestedRenderViewType(
-      this->ConnectionID);
-
   vtkPVServerInformation* serverInfo = this->getServerInformation();
   if (this->isRemote() && serverInfo && serverInfo->GetTimeout() > 0)
     {
@@ -170,14 +166,6 @@ const pqServerResource& pqServer::getResource()
 vtkIdType pqServer::GetConnectionID() const
 {
   return this->ConnectionID;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMRenderViewProxy* pqServer::newRenderView()
-{
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  return vtkSMRenderViewProxy::SafeDownCast(
-    pxm->NewProxy("views", this->RenderViewXMLName.toAscii().data()));
 }
 
 //-----------------------------------------------------------------------------

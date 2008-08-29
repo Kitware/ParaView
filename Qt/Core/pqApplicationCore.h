@@ -191,11 +191,6 @@ public:
   // Check to see if its in the process of loading a state
   bool isLoadingState(){return this->LoadingState;};
 
-  // Description:
-  // Callback that returns the type of view the state loader should create
-  // when it encounters a view with the given xml name in the state.
-  static const char* getPreferredViewType (int connectionID, const char *xml_name);
-
 public slots:
   /// Called QCoreApplication::quit().
   /// Applications should use this method instead of directly

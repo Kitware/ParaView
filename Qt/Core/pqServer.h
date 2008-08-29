@@ -56,10 +56,6 @@ public:
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
 
-  /// Creates and returns a new render view. A new render view is created and
-  /// it's the responsibility of the caller to delete it.
-  vtkSMRenderViewProxy* newRenderView();
-
   const pqServerResource& getResource();
   void setResource(const pqServerResource &server_resource);
 
@@ -89,9 +85,6 @@ public:
   /// \todo Currently, this method does not actually validate if the server
   /// can instantiate the proxies.
   void getSupportedProxies(const QString& xmlgroup, QList<QString>& names);
-
-  const QString& getRenderViewXMLName() const
-    { return this->RenderViewXMLName; }
 
   /// Returns the PVOptions for this connection. These are client side options.
   vtkPVOptions* getOptions() const;
@@ -142,8 +135,6 @@ private:
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
-
-  QString RenderViewXMLName;
 
   // TODO:
   // Each connection will eventually have a PVOptions object. 

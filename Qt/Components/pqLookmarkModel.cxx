@@ -254,7 +254,6 @@ void pqLookmarkModel::load(
   if (smpqLoader)
     {
     smpqLoader->AddPreferredView(view->getViewProxy());
-    smpqLoader->SetPreferredViewTypeFunction(&pqApplicationCore::instance()->getPreferredViewType);
     }
 
   // set some parameters specific to the lookmark state loader

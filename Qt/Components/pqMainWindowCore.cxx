@@ -540,7 +540,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   // set up state loader.
   pqStateLoader* loader = pqStateLoader::New();
   loader->SetMainWindowCore(this);
-  loader->SetPreferredViewTypeFunction(&pqApplicationCore::instance()->getPreferredViewType);
   core->setStateLoader(loader);
   loader->Delete();
 

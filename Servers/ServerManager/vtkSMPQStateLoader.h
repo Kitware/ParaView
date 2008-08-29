@@ -48,21 +48,6 @@ public:
   void RemovePreferredView(vtkSMViewProxy*);
   void ClearPreferredViews();
 
-  // Description:
-  // Set a function pointer to a callback which will be called every time a 
-  // new view is needed, in order to obtain the actual view type that should be
-  // used/created. If not set, responsibility goes to the superclass to 
-  // create the proxy.
-  // The signature for the callback is:
-  // const char* callback(int connectionID, const char *xml_name)
-//BTX
-  void SetPreferredViewTypeFunction(
-    const char* (fptr)(int connectionID, const char *xml_name))
-    {
-    this->PreferredViewTypeFunctionPtr = fptr;
-    }
-//ETX
-
 protected:
   vtkSMPQStateLoader();
   ~vtkSMPQStateLoader();
@@ -79,11 +64,7 @@ protected:
   // A default callback that returns the type of view the state loader should 
   // create when it encounters a view with the given xml name in the state.
   // This function can be overridden by the UI.
-  static const char* GetPreferredViewType(int connectionID, const char *xml_name);
-
-//BTX
-  const char* (*PreferredViewTypeFunctionPtr)(int connectionID, const char*);
-//ETX
+  const char* GetPreferredViewType(int connectionID, const char *xml_name);
 
   vtkSMPQStateLoaderInternals *PQInternal;
 private:

@@ -14,16 +14,20 @@
 =========================================================================*/
 #include "vtkSMTwoDRenderViewProxy.h"
 
-#include "vtkSMSourceProxy.h"
-#include "vtkSMInputProperty.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkPVServerInformation.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
+
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::vtkSMTwoDRenderViewProxy()
 {
@@ -188,6 +192,21 @@ bool vtkSMTwoDRenderViewProxy::BeginCreateVTKObjects()
   ivp->SetElement(0, 1);
 
   return this->Superclass::BeginCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMTwoDRenderViewProxy::GetSuggestedViewType(vtkIdType connectionID)
+{
+  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RootView"));
+  if (rootView)
+    {
+    vtksys_ios::ostringstream stream;
+    stream << "2D" << rootView->GetSuggestedViewType(connectionID);
+    this->SuggestedViewType = stream.str();
+    return this->SuggestedViewType.c_str();
+    }
+
+  return this->Superclass::GetSuggestedViewType(connectionID);
 }
 
 //----------------------------------------------------------------------------

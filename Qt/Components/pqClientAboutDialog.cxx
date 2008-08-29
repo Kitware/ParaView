@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqClientAboutDialog.h"
-
 #include "ui_pqClientAboutDialog.h"
 
 #include "pqApplicationCore.h"
@@ -43,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMViewProxy.h"
 
 #include <QHeaderView>
 #include "vtksys/ios/sstream"
@@ -148,10 +149,14 @@ void pqClientAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tr
   pqOptions* clientOptions = pqOptions::SafeDownCast(server->getOptions());
   vtkPVServerInformation* serverInfo = server->getServerInformation(); 
 
+  vtkSMViewProxy* renderViewPrototype = vtkSMViewProxy::SafeDownCast(
+    vtkSMProxyManager::GetProxyManager()->GetPrototypeProxy("views", "RenderView"));
+
   if (!server->isRemote())
     {
     ::addItem(tree, "Remote Connection", "No");
-    ::addItem(tree, "Render View Type", server->getRenderViewXMLName());
+    ::addItem(tree, "Render View Type", renderViewPrototype->GetSuggestedViewType(
+        server->GetConnectionID()));
     return;
     }
  
@@ -160,7 +165,8 @@ void pqClientAboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tr
   bool separate_render_server = (scheme == "cdsrs" || scheme == "cdsrsrc");
   bool reverse_connection = (scheme == "csrc" || scheme == "cdsrsrc");
   ::addItem(tree, "Remote Connection", "Yes");
-  ::addItem(tree, "Render View Type", server->getRenderViewXMLName());
+  ::addItem(tree, "Render View Type", renderViewPrototype->GetSuggestedViewType(
+      server->GetConnectionID()));
   ::addItem(tree, "Separate Render Server", separate_render_server? "Yes":"No");
   ::addItem(tree, "Reverse Connection", reverse_connection? "Yes" : "No");
 

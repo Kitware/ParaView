@@ -33,6 +33,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
 class vtkSMComparativeViewProxy::vtkInternal
 {
@@ -66,12 +67,13 @@ public:
 
   unsigned int ActiveIndexX;
   unsigned int ActiveIndexY;
+  vtkstd::string SuggestedViewType;
 };
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.26");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -809,6 +811,21 @@ bool vtkSMComparativeViewProxy::GetYPropertyAndElement(vtkSMProperty *& prop, in
       }
     }
   return false;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMComparativeViewProxy::GetSuggestedViewType(vtkIdType connectionID)
+{
+  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RootView"));
+  if (rootView)
+    {
+    vtksys_ios::ostringstream stream;
+    stream << "Comparative" << rootView->GetSuggestedViewType(connectionID);
+    this->Internal->SuggestedViewType = stream.str();
+    return this->Internal->SuggestedViewType.c_str();
+    }
+
+  return this->Superclass::GetSuggestedViewType(connectionID);
 }
 
 //----------------------------------------------------------------------------

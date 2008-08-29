@@ -20,7 +20,7 @@
 #define __vtkSMTwoDRenderViewProxy_h
 
 #include "vtkSMViewProxy.h"
-
+#include "vtkStdString.h" // needed for vtkStdString.
 class vtkSMRenderViewProxy;
 
 class VTK_EXPORT vtkSMTwoDRenderViewProxy : public vtkSMViewProxy
@@ -81,6 +81,20 @@ public:
     { this->Superclass::SetGUISize(xy); }
 
   vtkGetObjectMacro(RenderView, vtkSMRenderViewProxy);
+
+  // Description:
+  // Generally each view type is different class of view eg. bar char view, line
+  // plot view etc. However in some cases a different view types are indeed the
+  // same class of view the only different being that each one of them works in
+  // a different configuration eg. "RenderView" in builin mode, 
+  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+  // determine what type of view needs to be created for the given class. When
+  // user requests the creation of a view class, the application can call this
+  // method on a prototype instantaiated for the requested class and the
+  // determine the actual xmlname for the view to create.
+  // Overridden to choose the correct type of render view.
+  virtual const char* GetSuggestedViewType(vtkIdType connectionID);
+
 //BTX
 protected:
   vtkSMTwoDRenderViewProxy();
@@ -91,6 +105,7 @@ protected:
   virtual bool BeginCreateVTKObjects();
 
   vtkSMRenderViewProxy* RenderView;
+  vtkStdString SuggestedViewType;
 
 private:
   vtkSMTwoDRenderViewProxy(const vtkSMTwoDRenderViewProxy&); // Not implemented

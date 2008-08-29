@@ -129,47 +129,55 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
                                                    pqServer *server)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  const char* root_xmlname = 0;
   if(viewtype == pqRenderView::renderViewType())
     {
-    return server->newRenderView();
+    root_xmlname = "RenderView";
     }
   else if(viewtype == pqComparativeRenderView::comparativeRenderViewType())
     {
-    QString xmlname = server->getRenderViewXMLName();
-    xmlname = "Comparative" + xmlname;
-    return pxm->NewProxy("views", xmlname.toAscii().data());
+    root_xmlname = "ComparativeRenderView";
     }
   else if(viewtype == pqComparativePlotView::comparativeXYPlotViewType())
     {
-    return pxm->NewProxy("views", "ComparativeXYPlotView");
+    root_xmlname = "ComparativeXYPlotView";
     }
   else if(viewtype == pqComparativePlotView::comparativeBarChartViewType())
     {
-    return pxm->NewProxy("views", "ComparativeBarChartView");
+    root_xmlname = "ComparativeBarChartView";
     }
   else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
     {
-    QString xmlname = server->getRenderViewXMLName();
-    xmlname = "2D" + xmlname;
-    return pxm->NewProxy("views", xmlname.toAscii().data());
+    root_xmlname = "2DRenderView";
     }
   else if(viewtype == pqPlotView::barChartType())
     {
-    return pxm->NewProxy("views", "BarChartView");
+    root_xmlname = "BarChartView";
     }
   else if(viewtype == pqPlotView::XYPlotType())
     {
-    return pxm->NewProxy("views", "XYPlotView");
+    root_xmlname = "XYPlotView";
     }
   else if(viewtype == pqTableView::tableType())
     {
-    return pxm->NewProxy("views", "TableView");
+    root_xmlname = "TableView";
     }
   else if (viewtype == pqSpreadSheetView::spreadsheetViewType())
     {
-    return pxm->NewProxy("views", "SpreadSheetView");
+    root_xmlname = "SpreadSheetView";
     }
-  // Handle creation of RenderView and ComparativeRenderView.
+
+  if (root_xmlname)
+    {
+    vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
+      pxm->GetPrototypeProxy("views", root_xmlname));
+    if (prototype)
+      {
+      return pxm->NewProxy("views",
+        prototype->GetSuggestedViewType(server->GetConnectionID()));
+      }
+    }
+
   return NULL;
 }
 

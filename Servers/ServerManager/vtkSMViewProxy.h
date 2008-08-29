@@ -140,6 +140,23 @@ public:
   virtual void SetUseCache(int);
   vtkGetMacro(UseCache, int);
 
+  // Description:
+  // Generally each view type is different class of view eg. bar char view, line
+  // plot view etc. However in some cases a different view types are indeed the
+  // same class of view the only different being that each one of them works in
+  // a different configuration eg. "RenderView" in builin mode, 
+  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+  // determine what type of view needs to be created for the given class. When
+  // user requests the creation of a view class, the application can call this
+  // method on a prototype instantaiated for the requested class and the
+  // determine the actual xmlname for the view to create. Default implementation
+  // simply returns the XML name for the prototype (which is the case where view
+  // types don't change based on configurations).
+  virtual const char* GetSuggestedViewType(vtkIdType vtkNotUsed(connectionId))
+    {
+    return this->GetXMLName();
+    }
+
 //BTX
 protected:
   vtkSMViewProxy();

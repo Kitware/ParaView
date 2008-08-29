@@ -56,10 +56,6 @@ public:
   // on the client side, this method is invoked on the server side object.
   int ReviveServerServerManager(const char* xmlstate, int maxid);
 
-  // Callback that returns the type of view the state loader should create
-  // when it encounters a view with the given xml name in the state.
-  static const char* GetPreferredViewType(int connectionID, const char *xml_name);
-
 protected:
   vtkSMServerProxyManagerReviver();
   ~vtkSMServerProxyManagerReviver();

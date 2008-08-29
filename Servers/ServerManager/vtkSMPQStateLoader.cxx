@@ -24,7 +24,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.28");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.29");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -36,7 +36,6 @@ struct vtkSMPQStateLoaderInternals
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->PQInternal = new vtkSMPQStateLoaderInternals;
-  this->SetPreferredViewTypeFunction(&this->GetPreferredViewType);
 }
 
 //-----------------------------------------------------------------------------
@@ -50,8 +49,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   const char* xml_group, const char* xml_name)
 {
   // Check if the proxy requested is a view module.
-  if (xml_group && xml_name && strcmp(xml_group, "views") == 0
-      && this->PreferredViewTypeFunctionPtr)
+  if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     vtkSMProxy* prototype = pxm->GetPrototypeProxy(xml_group, xml_name);
@@ -59,7 +57,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
       {
       // Retrieve the view type that should be used/created
       const char* preferred_xml_name = 
-        (*this->PreferredViewTypeFunctionPtr)(this->GetConnectionID(),xml_name);
+        this->GetPreferredViewType(this->GetConnectionID(), xml_name);
 
       // Look for a view of this type among our preferred views, return the
       // first one found
@@ -96,7 +94,6 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
   // If all else fails, let the superclass handle it:
   return this->Superclass::NewProxyInternal(xml_group, xml_name);
 }
-
 
 //---------------------------------------------------------------------------
 void vtkSMPQStateLoader::AddPreferredView(vtkSMViewProxy *view)
@@ -147,9 +144,24 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID, const char *vtkNotUsed(xml_name))
+const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID,
+  const char *xml_name)
 {
-  return vtkSMRenderViewProxy::GetSuggestedRenderViewType(connectionID);
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
+    pxm->GetPrototypeProxy("views", xml_name));
+  if (prototype)
+    {
+    // Generally each view type is different class of view eg. bar char view, line
+    // plot view etc. However in some cases a different view types are indeed the
+    // same class of view the only different being that each one of them works in
+    // a different configuration eg. "RenderView" in builin mode, 
+    // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+    // determine what type of view needs to be created for the given class. 
+    return prototype->GetSuggestedViewType(connectionID);
+    }
+
+  return xml_name;
 }
 
 //-----------------------------------------------------------------------------
