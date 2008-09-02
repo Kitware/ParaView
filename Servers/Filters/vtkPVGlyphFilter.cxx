@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.32");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.33");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -435,7 +435,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
       if (this->MaskPoints->GetRandomMode())
         {
         double r
-          = vtkMath::Random(1.0,this->BlockSampleStride-1.0);
+          = vtkMath::Random(0.0,this->BlockSampleStride-1.0);
         this->BlockNextPoint=static_cast<vtkIdType>(r+0.5);
         }
       else

@@ -321,6 +321,7 @@ IF(BUILD_TESTING)
     LinePlot
     LoadSaveStateAnimation
     LoadState
+    NormalGlyphs
     ObjectInspectorSphere
     OpenSaveData
     OrientationAxis
