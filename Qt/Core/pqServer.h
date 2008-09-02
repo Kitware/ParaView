@@ -100,6 +100,10 @@ public:
   static void setHeartBeatTimeoutSetting(int msec);
   static int getHeartBeatTimeoutSetting();
 
+  /// Convenience method to obtain the renderview xml name for the given
+  /// connection type. This is deprecated and will soon be removed.
+  QString getRenderViewXMLName() const;
+
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);

@@ -169,6 +169,19 @@ vtkIdType pqServer::GetConnectionID() const
 }
 
 //-----------------------------------------------------------------------------
+QString pqServer::getRenderViewXMLName() const
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMRenderViewProxy* prototype = vtkSMRenderViewProxy::SafeDownCast(
+    pxm->GetPrototypeProxy("views","RenderView"));
+  if (prototype)
+    {
+    return prototype->GetSuggestedViewType(this->GetConnectionID());
+    }
+  return QString();
+}
+
+//-----------------------------------------------------------------------------
 int pqServer::getNumberOfPartitions()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
