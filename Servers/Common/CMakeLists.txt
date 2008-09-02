@@ -55,6 +55,7 @@ SET(Kit_SRCS
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
   vtkPVSILInformation.cxx
+  vtkPVTestUtilities.cxx
   vtkPVTimerInformation.cxx
   vtkRemoteConnection.cxx
   vtkSelectionConverter.cxx
@@ -94,6 +95,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVCreateProcessModule
+  vtkPVTestUtilities.cxx
   WRAP_EXCLUDE
   )
 
