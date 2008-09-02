@@ -1,8 +1,3 @@
-
-
-#include <iostream>
-#include <fstream>
-
 #include "vtkCompositeDataPipeline.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMPIController.h"
@@ -16,86 +11,13 @@
 #include "vtkPVTestUtilities.h"
 #include "vtkstd/vector"
 using vtkstd::vector;
+#include "vtksys/ios/iostream"
+using vtksys_ios::iostream;
+#include "vtksys/ios/fstream"
+using vtksys_ios::fstream;
+
 
 using namespace std;
-
-ostream &operator<<(ostream &sout, vector<double> &vd)
-{
-  sout << "(";
-  int n=vd.size();
-  if (n>0)
-  {
-    sout << vd[0];
-    for (int i=1; i<n; ++i)
-    {
-      sout << ", " << vd[i];
-    }
-  }
-  sout << ")";
-  return sout;
-}
-
-bool operator==(vector<double> &left, vector<double> &right)
-{
-  int nL=left.size();
-  int nR=right.size();
-  if (nL!=nR)
-  {
-    return false;
-  }
-  for (int i=0; i<nL; ++i)
-  {
-    double d=fabs(left[i]-right[i]);
-    if (d>1.0e-6)
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
-
-/// Sum points and each point data array in the given data set.
-void SumPointDataArrays(vtkPolyData *pd, vector<double> &sum)
-{
-  int nArrays=pd->GetPointData()->GetNumberOfArrays();
-  sum.clear();
-
-  // sum each of the point components
-  sum.resize(3,0.0);
-  vtkIdType nPoints=pd->GetPoints()->GetNumberOfPoints();
-  for (vtkIdType i=0; i<nPoints; ++i)
-  {
-    double pt[3];
-    pd->GetPoints()->GetPoint(i,pt);
-    for (int q=0; q<3; ++q)
-    {
-      sum[q]+=pt[q];
-    }
-  }
-  // for each array sum each of its components
-  int baseIdx=3;
-  for (int a=0; a<nArrays; ++a)
-  {
-    vtkDataArray *da=pd->GetPointData()->GetArray(a);
-    int nComps=da->GetNumberOfComponents();
-    int currentSize=sum.size();
-    sum.resize(currentSize+nComps,0.0);
-    double tup[32];
-    for (vtkIdType i=0; i<nPoints; ++i)
-    {
-      da->GetTuple(i,tup);
-      for (int q=0; q<nComps; ++q)
-      {
-        sum[baseIdx+q]+=tup[q];
-      }
-    }
-    baseIdx+=nComps;
-  }
-}
-
-
-
 
 /// Test
 int main( int argc, char* argv[] )
