@@ -86,6 +86,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Microsoft Visual Studio/VC98/include"
   ".include.qtcore"
   "Xdmf2/libsrc"
+  ".include.openmpi"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
