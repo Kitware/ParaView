@@ -1322,7 +1322,7 @@ def LoadPlugin(filename, connection=None):
             updateModules()
             
 
-def Fetch(input, arg1=None, arg2=None):
+def Fetch(input, arg1=None, arg2=None, idx=0):
     """ 
     A convenience method that moves data from the server to the client, 
     optionally performing some operation on the data as it moves.
@@ -1348,31 +1348,35 @@ def Fetch(input, arg1=None, arg2=None):
     applied pre-gather and arg2 will be applied post-gather. In parallel
     runs the algorithm will be run on each processor to make intermediate
     results and then again on the root processor over all of the
-    intermediate results to create a global result.  """
+    intermediate results to create a global result.  
+    
+    Optional argument idx is used to specify the output port number to fetch the
+    data from. Default is port 0.
+    """
 
     import types
 
     #create the pipeline that reduces and transmits the data
     gvd = rendering.ClientDeliveryRepresentationBase()
-    gvd.AddInput(input, "DONTCARE") 
+    gvd.AddInput(0, input, idx, "DONTCARE")
   
     if arg1 == None:
         print "getting appended"
 
-        cdinfo = input.GetDataInformation().GetCompositeDataInformation()
+        cdinfo = input.GetDataInformation(idx).GetCompositeDataInformation()
         if cdinfo.GetDataIsComposite():
             print "use composite data append"
             gvd.SetReductionType(5)        
 
-        elif input.GetDataInformation().GetDataClassName() == "vtkPolyData":
+        elif input.GetDataInformation(idx).GetDataClassName() == "vtkPolyData":
             print "use append poly data filter"
             gvd.SetReductionType(1)        
 
-        elif input.GetDataInformation().GetDataClassName() == "vtkRectilinearGrid":
+        elif input.GetDataInformation(idx).GetDataClassName() == "vtkRectilinearGrid":
             print "use append rectilinear grid filter"
             gvd.SetReductionType(4)
 
-        elif input.GetDataInformation().IsA("vtkDataSet"):
+        elif input.GetDataInformation(idx).IsA("vtkDataSet"):
             print "use unstructured append filter"
             gvd.SetReductionType(2)
 
