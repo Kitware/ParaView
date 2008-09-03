@@ -1,6 +1,8 @@
 #include "vtkCompositeDataPipeline.h"
 #include "vtkMultiProcessController.h"
-#include "vtkMPIController.h"
+#include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkDummyController.h"
+
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
@@ -17,13 +19,21 @@ using vtksys_ios::iostream;
 using vtksys_ios::fstream;
 
 
+#ifdef VTK_USE_MPI
+#include "vtkMPIController.h"
+#endif
+
 using namespace std;
 
 /// Test
 int main( int argc, char* argv[] )
 {
   // Initialize MPI if available.
+#ifdef VTK_USE_MPI
   vtkMPIController* controller = vtkMPIController::New(); 
+#else
+  vtkDummyController* controller = vtkDummyController::New();
+#endif
   controller->Initialize(&argc, &argv, 0);
   vtkMultiProcessController::SetGlobalController(controller);
   int myProcId = controller->GetLocalProcessId();
