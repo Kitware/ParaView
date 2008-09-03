@@ -258,6 +258,10 @@ void pqGlobalRenderViewOptions::init()
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
+  QObject::connect(this->Internal->enableTileDisplayCompositing,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
   for ( int cc = 0; cc < this->Internal->CameraControl3DComboBoxList.size(); cc++ )
     {
     QObject::connect(this->Internal->CameraControl3DComboBoxList[cc],
