@@ -46,7 +46,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.19");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.20");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -253,6 +253,15 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
       output->ShallowCopy(input);
       return 1;
       }
+    // Collect and PassThrough.
+    if (this->MoveMode == vtkMPIMoveData::COLLECT_AND_PASS_THROUGH)
+      {
+      // Collect
+      this->DataServerGatherToZero(input, output);
+      // PassThrough
+      output->ShallowCopy(input);
+      return 1;
+      }
     vtkErrorMacro("MoveMode not set.");
     return 0;
     }
@@ -358,6 +367,56 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
     // Render server does nothing
     return 1;
     }
+
+  if (this->MoveMode == vtkMPIMoveData::COLLECT_AND_PASS_THROUGH)
+    {
+    if (this->MPIMToNSocketConnection == 0)
+      {
+      // In client-server mode without render server.
+      if (this->Server == vtkMPIMoveData::DATA_SERVER)
+        {
+        this->DataServerGatherToZero(input, output);
+        this->DataServerSendToClient(output);
+        output->Initialize();
+        output->ShallowCopy(input);
+        return 1;
+        }
+      if (this->Server == vtkMPIMoveData::CLIENT)
+        {
+        this->ClientReceiveFromDataServer(output);
+        return 1;
+        }
+      }
+    else
+      {
+      // in client-dataserver-renderserver mode.
+      if (this->Server == vtkMPIMoveData::DATA_SERVER)
+        {
+        // Pass Through
+        this->DataServerAllToN(input,output,
+          this->MPIMToNSocketConnection->GetNumberOfConnections());
+        this->DataServerSendToRenderServer(output);
+        output->Initialize();
+
+        // Collect to client.
+        this->DataServerGatherToZero(input, output);
+        this->DataServerSendToClient(output);
+        output->Initialize();
+        return 1;
+        }
+      if (this->Server == vtkMPIMoveData::RENDER_SERVER)
+        {
+        this->RenderServerReceiveFromDataServer(output);
+        return 1;
+        }
+      if (this->Server == vtkMPIMoveData::CLIENT)
+        {
+        this->ClientReceiveFromDataServer(output);
+        return 1;
+        }
+      }
+    }
+
   return 1;
 }
 

@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.22");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.23");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -225,7 +225,16 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   int move_mode = 0;
   if (usecompositing)
     {
-    move_mode = vtkMPIMoveData::PASS_THROUGH;
+    if (this->LODClientRender)
+      {
+      // In tile-display mode, we want the collected data on the client side 
+      // for rendering as well.
+      move_mode = vtkMPIMoveData::COLLECT_AND_PASS_THROUGH;
+      }
+    else
+      {
+      move_mode = vtkMPIMoveData::PASS_THROUGH;
+      }
     // cout << "LOD PASS_THROUGH" << endl;
     }
   else

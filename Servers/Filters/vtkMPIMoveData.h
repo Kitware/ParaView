@@ -98,7 +98,8 @@ public:
   enum MoveModes {
     PASS_THROUGH=0,
     COLLECT=1,
-    CLONE=2
+    CLONE=2,
+    COLLECT_AND_PASS_THROUGH=3
   };
 //ETX
 protected:
