@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.21");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.22");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -179,7 +179,7 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
   if (usecompositing)
     {
     move_mode = vtkMPIMoveData::PASS_THROUGH;
-    //cout << "PASS_THROUGH" << endl;
+    // cout << "PASS_THROUGH" << endl;
     }
   else
     {
@@ -187,15 +187,15 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
       {
       // in tile-display mode.
       move_mode = vtkMPIMoveData::CLONE;
-      //cout << "CLONE" << endl;
+      // cout << "CLONE" << endl;
       }
     else
       {
       move_mode = vtkMPIMoveData::COLLECT;
-      //cout << "COLLECT" << endl;
+      // cout << "COLLECT" << endl;
       }
     }
-  // LOD pipeline not present, treat full res pipeline as LOD.
+  
   ivp->SetElement(0, move_mode);
   this->Collect->UpdateProperty("MoveMode");
 
@@ -221,10 +221,29 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
 
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->CollectLOD->GetProperty("MoveMode"));
-  ivp->SetElement(0,
-    usecompositing? 
-    (this->LODClientRender? vtkMPIMoveData::CLONE: vtkMPIMoveData::PASS_THROUGH) : 
-    vtkMPIMoveData::COLLECT);
+
+  int move_mode = 0;
+  if (usecompositing)
+    {
+    move_mode = vtkMPIMoveData::PASS_THROUGH;
+    // cout << "LOD PASS_THROUGH" << endl;
+    }
+  else
+    {
+    if (this->LODClientRender) 
+      {
+      // in tile-display mode.
+      move_mode = vtkMPIMoveData::CLONE;
+      // cout << "LOD CLONE" << endl;
+      }
+    else
+      {
+      move_mode = vtkMPIMoveData::COLLECT;
+      // cout << "LOD COLLECT" << endl;
+      }
+    }
+
+  ivp->SetElement(0, move_mode);
   this->CollectLOD->UpdateProperty("MoveMode");
 
   // It is essential to mark the Collect filter explicitly modified.
