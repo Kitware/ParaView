@@ -59,9 +59,9 @@ public:
   /// \param parent The parent index.
   /// \return
   ///   The number of rows for the given index.
-  virtual int rowCount(const QModelIndex &parent=QModelIndex()) const
+  virtual int rowCount(const QModelIndex &theParent=QModelIndex()) const
     { 
-    return this->sourceModel()->rowCount(this->mapToSource(parent));
+    return this->sourceModel()->rowCount(this->mapToSource(theParent));
     }
 
   /// \brief
@@ -69,9 +69,9 @@ public:
   /// \param parent The parent index.
   /// \return
   ///   The number of columns for the given index.
-  virtual int columnCount(const QModelIndex &parent=QModelIndex()) const
+  virtual int columnCount(const QModelIndex &theParent=QModelIndex()) const
     {
-    return this->sourceModel()->columnCount(this->mapToSource(parent));
+    return this->sourceModel()->columnCount(this->mapToSource(theParent));
     }
 
   /// \brief
@@ -79,9 +79,9 @@ public:
   /// \param parent The parent index.
   /// \return
   ///   True if the given index has child items.
-  virtual bool hasChildren(const QModelIndex &parent=QModelIndex()) const
+  virtual bool hasChildren(const QModelIndex &theParent=QModelIndex()) const
     {
-    return this->sourceModel()->hasChildren(this->mapToSource(parent));
+    return this->sourceModel()->hasChildren(this->mapToSource(theParent));
     }
 
   /// \brief
@@ -92,10 +92,10 @@ public:
   /// \return
   ///   A model index for the given location.
   virtual QModelIndex index(int row, int column,
-      const QModelIndex &parent=QModelIndex()) const
+      const QModelIndex &theParent=QModelIndex()) const
     {
     QModelIndex sourceIndex = 
-      this->sourceModel()->index(row, column, this->mapToSource(parent));
+      this->sourceModel()->index(row, column, this->mapToSource(theParent));
     return this->mapFromSource(sourceIndex);
     }
 
@@ -104,19 +104,19 @@ public:
   /// \param index The model index.
   /// \return
   ///   A model index for the parent of the given index.
-  virtual QModelIndex parent(const QModelIndex &index) const
+  virtual QModelIndex parent(const QModelIndex &theIndex) const
     {
-    QModelIndex sourceIndex = this->sourceModel()->parent(this->mapToSource(index));
+    QModelIndex sourceIndex = this->sourceModel()->parent(this->mapToSource(theIndex));
     return this->mapFromSource(sourceIndex);
     }
 
   /// \brief
   ///  Sets the role data for the item at index to value. Returns 
   ///  true if successful; otherwise returns false.
-  bool setData(const QModelIndex &index, const QVariant& value, 
+  bool setData(const QModelIndex &theIndex, const QVariant& value, 
     int role = Qt::EditRole)
     {
-    return this->sourceModel()->setData(this->mapToSource(index), value, role);
+    return this->sourceModel()->setData(this->mapToSource(theIndex), value, role);
     }
   //@}
 
