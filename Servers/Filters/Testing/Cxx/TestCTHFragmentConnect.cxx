@@ -121,9 +121,9 @@ int main( int argc, char* argv[] )
     if (!mbdsr->CanReadFile(baselinePath))
     {
       // Oops can't read the baseline image
-      delete baselinePath;
-      delete tempDataPath;
-      delete inputDataPath;
+      delete [] baselinePath;
+      delete [] tempDataPath;
+      delete [] inputDataPath;
       mbdsr->Delete();
       frag->Delete();
       controller->Finalize();
@@ -158,9 +158,9 @@ int main( int argc, char* argv[] )
     mbdsr->Delete();
   }
 
-  delete baselinePath;
-  delete tempDataPath;
-  delete inputDataPath;
+  delete [] baselinePath;
+  delete [] tempDataPath;
+  delete [] inputDataPath;
 
   frag->Delete();
   statsOut->Delete();
