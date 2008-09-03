@@ -1,8 +1,6 @@
+#include "vtkToolkits.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkMultiProcessController.h"
-#include "vtkToolkits.h" // For VTK_USE_MPI
-#include "vtkDummyController.h"
-
 #include "vtkMultiBlockDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkPointData.h"
@@ -11,29 +9,32 @@
 #include "vtkXMLMultiBlockDataWriter.h"
 #include "vtkXMLMultiBlockDataReader.h"
 #include "vtkPVTestUtilities.h"
-#include "vtkstd/vector"
-using vtkstd::vector;
-#include "vtksys/ios/iostream"
-using vtksys_ios::iostream;
-#include "vtksys/ios/fstream"
-using vtksys_ios::fstream;
-
-
+//
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
+#else
+#include "vtkDummyController.h"
 #endif
+//
+#include "vtkstd/vector"
+using vtkstd::vector;
 
-using namespace std;
+using namespace vtkstd;
 
 /// Test
+/// Note: This is set upt to run with/without MPI but, due to 
+/// different OBB algorithm being employed for split fragments
+/// the results are different. If we need this to run without MPI
+/// then we'll have to add a baseline data for the serial run 
+/// and the logic to select between the two.
 int main( int argc, char* argv[] )
 {
   // Initialize MPI if available.
-#ifdef VTK_USE_MPI
-  vtkMPIController* controller = vtkMPIController::New(); 
-#else
+  #ifdef VTK_USE_MPI
+  vtkMPIController* controller = vtkMPIController::New();
+  #else
   vtkDummyController* controller = vtkDummyController::New();
-#endif
+  #endif
   controller->Initialize(&argc, &argv, 0);
   vtkMultiProcessController::SetGlobalController(controller);
   int myProcId = controller->GetLocalProcessId();
@@ -93,10 +94,15 @@ int main( int argc, char* argv[] )
   spy->Delete();
   frag->GetOutput()->SetUpdatePiece(myProcId);
   frag->GetOutput()->SetUpdateNumberOfPieces(nProcs);
-  frag->Update();
+  //frag->Update();
 
-  vtkMultiBlockDataSet *statsOut=dynamic_cast<vtkMultiBlockDataSet *>(frag->GetOutput(1));
-  statsOut->Update();
+  // get output and copy (this prevents multiple execution of the pipeline.)
+  vtkMultiBlockDataSet *statsOutTmp
+    = dynamic_cast<vtkMultiBlockDataSet *>(frag->GetOutput(1));
+  statsOutTmp->Update();
+
+  vtkMultiBlockDataSet *statsOut=vtkMultiBlockDataSet::New();
+  statsOut->ShallowCopy(statsOutTmp);
 
   int testStatus=0; // assume good
 
@@ -157,13 +163,10 @@ int main( int argc, char* argv[] )
   delete inputDataPath;
 
   frag->Delete();
+  statsOut->Delete();
   controller->Finalize();
   controller->Delete();
   vtkAlgorithm::SetDefaultExecutivePrototype(0);
 
   return testStatus;
 }
-
-
-
-
