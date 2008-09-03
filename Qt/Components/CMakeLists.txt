@@ -285,6 +285,7 @@ SET(UI_FORMS
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqStreamTracerPanel.ui
   Resources/UI/pqTextDisplayPropertiesWidget.ui
+  Resources/UI/pqThresholdPanel.ui
   Resources/UI/pqTimerLogDisplay.ui
   Resources/UI/pqTwoDRenderViewOptions.ui
   Resources/UI/pqWriterDialog.ui

@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
-        <file>UI/pqThresholdPanel.ui</file>
         <file>Icons/PVSplashScreen.png</file>
         <file>Icons/pq3DView16.png</file>
         <file>Icons/pqAddFavorites16.png</file>

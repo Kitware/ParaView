@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqThresholdPanel_h
 #define _pqThresholdPanel_h
 
-#include "pqLoadedFormObjectPanel.h"
+#include "pqNamedObjectPanel.h"
 #include "pqComponentsExport.h"
 class pqDoubleRangeWidget;
 
 class PQCOMPONENTS_EXPORT pqThresholdPanel :
-  public pqLoadedFormObjectPanel
+  public pqNamedObjectPanel
 {
   Q_OBJECT
 public:
@@ -53,8 +53,8 @@ protected slots:
   void variableChanged();
 
 protected:
-  pqDoubleRangeWidget* Lower;
-  pqDoubleRangeWidget* Upper;
+  class pqUI;
+  pqUI* UI;
 
 };
 

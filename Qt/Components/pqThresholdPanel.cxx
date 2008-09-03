@@ -37,16 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "ui_pqThresholdPanel.h"
+
+
+class pqThresholdPanel::pqUI : public Ui::ThresholdPanel { };
 
 pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqThresholdPanel.ui", pxy, p)
+  pqNamedObjectPanel(pxy, p)
 {
-  this->Lower = this->findChild<pqDoubleRangeWidget*>("ThresholdBetween_0");
-  this->Upper = this->findChild<pqDoubleRangeWidget*>("ThresholdBetween_1");
+  this->UI = new pqUI;
+  this->UI->setupUi(this);
 
-  QObject::connect(this->Lower, SIGNAL(valueEdited(double)),
+  this->linkServerManagerProperties();
+
+  QObject::connect(this->UI->ThresholdBetween_0, SIGNAL(valueEdited(double)),
                    this, SLOT(lowerChanged(double)));
-  QObject::connect(this->Upper, SIGNAL(valueEdited(double)),
+  QObject::connect(this->UI->ThresholdBetween_1, SIGNAL(valueEdited(double)),
                    this, SLOT(upperChanged(double)));
 
   QObject::connect(this->findChild<QComboBox*>("SelectInputScalars"),
@@ -56,23 +62,24 @@ pqThresholdPanel::pqThresholdPanel(pqProxy* pxy, QWidget* p) :
 
 pqThresholdPanel::~pqThresholdPanel()
 {
+  delete this->UI;
 }
 
 void pqThresholdPanel::lowerChanged(double val)
 {
   // clamp the lower threshold if we need to
-  if(this->Upper->value() < val)
+  if(this->UI->ThresholdBetween_1->value() < val)
     {
-    this->Upper->setValue(val);
+    this->UI->ThresholdBetween_1->setValue(val);
     }
 }
 
 void pqThresholdPanel::upperChanged(double val)
 {
   // clamp the lower threshold if we need to
-  if(this->Lower->value() > val)
+  if(this->UI->ThresholdBetween_0->value() > val)
     {
-    this->Lower->setValue(val);
+    this->UI->ThresholdBetween_0->setValue(val);
     }
 }
 
@@ -83,8 +90,8 @@ void pqThresholdPanel::variableChanged()
   QList<QVariant> range = pqSMAdaptor::getElementPropertyDomain(prop);
   if(range.size() == 2 && range[0].isValid() && range[1].isValid())
     {
-    this->Lower->setValue(range[0].toDouble());
-    this->Upper->setValue(range[1].toDouble());
+    this->UI->ThresholdBetween_0->setValue(range[0].toDouble());
+    this->UI->ThresholdBetween_1->setValue(range[1].toDouble());
     }
 }
 
