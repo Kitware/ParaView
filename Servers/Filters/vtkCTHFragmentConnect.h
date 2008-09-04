@@ -19,6 +19,9 @@
 // a particle index as part of the cell data of the output.  It computes
 // the volume of each particle from the volume fraction.
 
+// This will turn on validation and debug i/o of the filter.
+// #define vtkCTHFragmentConnectDEBUG
+
 #ifndef __vtkCTHFragmentConnect_h
 #define __vtkCTHFragmentConnect_h
 

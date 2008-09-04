@@ -14,14 +14,13 @@
 =========================================================================*/
 #include "vtkCTHFragmentConnect.h"
 
-#include "vtkMultiProcessController.h"
-
-#include "vtkObject.h"
-#include "vtkObjectFactory.h"
-// Pipeline
+// Pipeline & VTK 
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObject.h"
+#include "vtkObjectFactory.h"
 // PV interface
 #include "vtkCallbackCommand.h"
 #include "vtkDataArraySelection.h"
@@ -79,8 +78,15 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.77");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.78");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
+
+// NOTE:
+// The filter could be improved by folding in ResolveIntegratedAttributes method into
+// the ResolveGemoetric attributes method. This will be more efficient because
+// only fragments which are split across processes need special treatment and
+// ResolveGeometricAttributes already handles this.
+
 
 // NOTE:
 //
@@ -8020,22 +8026,50 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput0()
       // the feild data, while only dimensions are 
       // provided in the point data.
       srcTuple=this->FragmentOBBs->GetTuple(i);
-      // field data
+      // Field data
       vtkDoubleArray *fdObb=vtkDoubleArray::New();
-      fdObb->SetName("OBB");
-      fdObb->SetNumberOfComponents(15);
+      fdObb->SetName("Bounding Box Origin");
+      fdObb->SetNumberOfComponents(3);
+      fdObb->SetNumberOfTuples(1);
+      fdObb->SetTuple(0,srcTuple);
+      fd->AddArray(fdObb);
+      srcTuple+=3;
+      ReNewVtkPointer(fdObb);
+      fdObb->SetName("Bounding Box Axis 1");
+      fdObb->SetNumberOfComponents(3);
+      fdObb->SetNumberOfTuples(1);
+      fdObb->SetTuple(0,srcTuple);
+      fd->AddArray(fdObb);
+      srcTuple+=3;
+      ReNewVtkPointer(fdObb);
+      fdObb->SetName("Bounding Box Axis 2");
+      fdObb->SetNumberOfComponents(3);
+      fdObb->SetNumberOfTuples(1);
+      fdObb->SetTuple(0,srcTuple);
+      fd->AddArray(fdObb);
+      srcTuple+=3;
+      ReNewVtkPointer(fdObb);
+      fdObb->SetName("Bounding Box Axis 3");
+      fdObb->SetNumberOfComponents(3);
+      fdObb->SetNumberOfTuples(1);
+      fdObb->SetTuple(0,srcTuple);
+      fd->AddArray(fdObb);
+      srcTuple+=3;
+      ReNewVtkPointer(fdObb);
+      fdObb->SetName("Bounding Box Length");
+      fdObb->SetNumberOfComponents(3);
       fdObb->SetNumberOfTuples(1);
       fdObb->SetTuple(0,srcTuple);
       fd->AddArray(fdObb);
       fdObb->Delete();
       // point data
       vtkDoubleArray *pdObb=vtkDoubleArray::New();
-      pdObb->SetName("OBB Dimensions");
+      pdObb->SetName("Bounding Box Length");
       pdObb->SetNumberOfComponents(3);
       pdObb->SetNumberOfTuples(nPoints);
       for (int q=0; q<3; ++q)
         {
-        pdObb->FillComponent(q,srcTuple[12+q]);
+        pdObb->FillComponent(q,srcTuple[q]);
         }
       pd->AddArray(pdObb);
       pdObb->Delete();
@@ -8218,24 +8252,50 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
   // 4 obb's
   if (this->ComputeOBB)
     {
-    // Bounding box (c,max,mid,min)
+    int idx=0;
     ReNewVtkPointer(da);
-    da->SetName("OBB");
-    da->SetNumberOfComponents(12);
-    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
-    for (int q=0; q<12; ++q)
-      {
-      da->CopyComponent(q,this->FragmentOBBs,q);
-      }
-    pd->AddArray(da);
-    // Dimensions of OBB
-    ReNewVtkPointer(da);
-    da->SetName("OBB Dimensions");
+    da->SetName("Boudning Box Origin");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
-    for (int q=0; q<3; ++q)
+    for (int q=0; q<3; ++q, ++idx)
       {
-      da->CopyComponent(q,this->FragmentOBBs,12+q);
+      da->CopyComponent(q,this->FragmentOBBs,idx);
+      }
+    pd->AddArray(da);
+    ReNewVtkPointer(da);
+    da->SetName("Boudning Box Axis 1");
+    da->SetNumberOfComponents(3);
+    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
+    for (int q=0; q<3; ++q, ++idx)
+      {
+      da->CopyComponent(q,this->FragmentOBBs,idx);
+      }
+    pd->AddArray(da);
+    ReNewVtkPointer(da);
+    da->SetName("Boudning Box Axis 2");
+    da->SetNumberOfComponents(3);
+    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
+    for (int q=0; q<3; ++q, ++idx)
+      {
+      da->CopyComponent(q,this->FragmentOBBs,idx);
+      }
+    pd->AddArray(da);
+    ReNewVtkPointer(da);
+    da->SetName("Boudning Box Axis 3");
+    da->SetNumberOfComponents(3);
+    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
+    for (int q=0; q<3; ++q, ++idx)
+      {
+      da->CopyComponent(q,this->FragmentOBBs,idx);
+      }
+    pd->AddArray(da);
+    ReNewVtkPointer(da);
+    da->SetName("Boudning Box Length");
+    da->SetNumberOfComponents(3);
+    da->SetNumberOfTuples(this->NumberOfResolvedFragments);
+    for (int q=0; q<3; ++q, ++idx)
+      {
+      da->CopyComponent(q,this->FragmentOBBs,idx);
       }
     pd->AddArray(da);
     }
