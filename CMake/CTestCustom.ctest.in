@@ -87,6 +87,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ".include.qtcore"
   "Xdmf2/libsrc"
   ".include.openmpi"
+  "warning LNK4098"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
