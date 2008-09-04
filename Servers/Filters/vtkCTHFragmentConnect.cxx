@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtils.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.78");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.79");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -8254,7 +8254,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
     {
     int idx=0;
     ReNewVtkPointer(da);
-    da->SetName("Boudning Box Origin");
+    da->SetName("Bounding Box Origin");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
     for (int q=0; q<3; ++q, ++idx)
@@ -8263,7 +8263,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       }
     pd->AddArray(da);
     ReNewVtkPointer(da);
-    da->SetName("Boudning Box Axis 1");
+    da->SetName("Bounding Box Axis 1");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
     for (int q=0; q<3; ++q, ++idx)
@@ -8272,7 +8272,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       }
     pd->AddArray(da);
     ReNewVtkPointer(da);
-    da->SetName("Boudning Box Axis 2");
+    da->SetName("Bounding Box Axis 2");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
     for (int q=0; q<3; ++q, ++idx)
@@ -8281,7 +8281,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       }
     pd->AddArray(da);
     ReNewVtkPointer(da);
-    da->SetName("Boudning Box Axis 3");
+    da->SetName("Bounding Box Axis 3");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
     for (int q=0; q<3; ++q, ++idx)
@@ -8290,7 +8290,7 @@ void vtkCTHFragmentConnect::CopyAttributesToOutput1()
       }
     pd->AddArray(da);
     ReNewVtkPointer(da);
-    da->SetName("Boudning Box Length");
+    da->SetName("Bounding Box Length");
     da->SetNumberOfComponents(3);
     da->SetNumberOfTuples(this->NumberOfResolvedFragments);
     for (int q=0; q<3; ++q, ++idx)
