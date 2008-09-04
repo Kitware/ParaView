@@ -8,10 +8,11 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkMemberFunctionCommand.h
       vtkProcessModuleConnectionManagerInternals.h
       vtkPVServerOptionsInternals.h
+      vtkPVTestUtities.h
       vtkSMPropertyInternals.h
       vtkSMPropertyInternals.h
       vtkSMProxyInternals.h
-      vtkSMProxyManagerInternals.h      
+      vtkSMProxyManagerInternals.h
       vtkSMRepresentationStrategyVector.h
       vtkSpyPlotBlock.h
       vtkSpyPlotBlockIterator.h
