@@ -12,7 +12,7 @@ if sys.platform == 'darwin':
 
 object1 = 'MainWindow/menubar/menuTools'
 QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
-object2 = 'MainWindow/pqPluginDialog/clientGroup/loadClient'
+object2 = "MainWindow/pqPluginDialog/localGroup/loadLocal"
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'MainWindow/pqPluginDialog/pqFileDialog'
 QtTesting.playCommand(object3, 'filesSelected', libname)
