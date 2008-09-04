@@ -19,8 +19,8 @@
   <pqevent object="pqCreateServerStartupDialog/name" command="key" arguments="16777248" />
   <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="RenderServerDataServer-rc" />
   <pqevent object="pqCreateServerStartupDialog/type" command="set_string" arguments="Client / Data Server / Render Server (reverse connection)" />
-  <pqevent object="pqCreateServerStartupDialog/dataServerHost" command="set_string" arguments="localhost" />  
-  <pqevent object="pqCreateServerStartupDialog/renderServerHost" command="set_string" arguments="localhost" />
+  <pqevent object="pqCreateServerStartupDialog/dataServerHost" command="set_string" arguments="@PV_TEST_SERVER_ROOT@" />  
+  <pqevent object="pqCreateServerStartupDialog/renderServerHost" command="set_string" arguments="@PV_TEST_SERVER_ROOT@" />
   <pqevent object="pqCreateServerStartupDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqEditServerStartupDialog/type" command="set_string" arguments="Manual" />
   <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />

@@ -12,6 +12,9 @@ SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
   "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
 MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
 
+SET(PV_TEST_SERVER_ROOT "localhost" CACHE STRING
+  "Node which servers as the root node for the cluster when testing in parallel")
+MARK_AS_ADVANCED(PV_TEST_SERVER_ROOT)
 
 SET(ConnectionXMLs
   ManualConnectCS

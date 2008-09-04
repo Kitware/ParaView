@@ -14,6 +14,7 @@
   <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionServerConnect" />
   <pqevent object="MainWindow/ServerStartupBrowser/addServer" command="activate" arguments="" />
   <pqevent object="pqCreateServerStartupDialog/name" command="set_string" arguments="ConnectCS" />
+  <pqevent object="pqCreateServerStartupDialog/host" command="set_string" arguments="@PV_TEST_SERVER_ROOT@" />
   <pqevent object="pqCreateServerStartupDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqEditServerStartupDialog/type" command="set_string" arguments="Manual" />
   <pqevent object="pqEditServerStartupDialog/okButton" command="activate" arguments="" />
