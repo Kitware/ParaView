@@ -69,6 +69,8 @@ pqActiveViewOptions* @ARG_VIEW_TYPE@OptionsImplementation::createActiveViewOptio
     return new @ARG_ACTIVE_VIEW_OPTIONS@(arg_parent);
     }
 #endif
+  (void) type;
+  (void) arg_parent;
   return NULL;
 }
 
@@ -81,6 +83,8 @@ pqOptionsContainer* @ARG_VIEW_TYPE@OptionsImplementation::createGlobalViewOption
     return new @ARG_GLOBAL_VIEW_OPTIONS@(arg_parent);
     }
 #endif
+  (void) type;
+  (void) arg_parent;
   return NULL;
 }
 
