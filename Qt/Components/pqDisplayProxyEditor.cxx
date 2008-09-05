@@ -205,10 +205,10 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   // setup for choosing color
-  if (reprProxy->GetProperty("AmbientColor"))
+  if (reprProxy->GetProperty("DiffuseColor"))
     {
     QList<QVariant> curColor = pqSMAdaptor::getMultipleElementProperty(
-      reprProxy->GetProperty("AmbientColor"));
+      reprProxy->GetProperty("DiffuseColor"));
 
     bool prev = this->Internal->ColorActorColor->blockSignals(true);
     this->Internal->ColorActorColor->setChosenColor(
@@ -831,7 +831,11 @@ void pqDisplayProxyEditor::setSolidColor(const QColor& color)
   val.push_back(color.green()/255.0);
   val.push_back(color.blue()/255.0);
 
-  pqApplicationCore::instance()->getUndoStack()->beginUndoSet("Change Solid Color");
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    stack->beginUndoSet("Change Solid Color");
+    }
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->Representation->getProxy()->GetProperty("AmbientColor"), val);
   pqSMAdaptor::setMultipleElementProperty(
@@ -840,7 +844,10 @@ void pqDisplayProxyEditor::setSolidColor(const QColor& color)
   // If specular while if off, then we want to update the specular color as
   // well.
   emit this->specularColorChanged();
-  pqApplicationCore::instance()->getUndoStack()->endUndoSet();
+  if (stack)
+    {
+    stack->endUndoSet();
+    }
 }
 
 //-----------------------------------------------------------------------------
