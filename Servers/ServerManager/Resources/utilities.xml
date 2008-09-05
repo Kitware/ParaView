@@ -2365,6 +2365,42 @@
       <!-- End of VRMLExporter -->
     </CSVExporterProxy>
 
+    <RenderViewExporterProxy name="POVExporter" class="vtkPOVExporter"
+      file_extension="pov">
+      <Documentation short_help="POV Files" long_help="Export POV Ray Files">
+        vtkPOVExporter is a render window exporter which writes out the
+        renderered scene into an POV Ray file. 
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          Name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty name="View"
+        command="SetView"
+        update_self="1"> 
+        <Documentation>  
+          The view to export.
+        </Documentation>
+        <ProxyGroupDomain name="group">
+          <Group name="views"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <Property name="Write" command="Write" 
+        update_self="1">
+        <Documentation> 
+          Triggers exporting of the view.
+        </Documentation>
+      </Property>
+
+      <!-- End of POVExporter -->
+    </RenderViewExporterProxy>
+
     <!-- End of "exporters" -->
   </ProxyGroup>
 
