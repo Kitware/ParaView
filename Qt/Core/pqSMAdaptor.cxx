@@ -473,6 +473,25 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
             }
           }
         }
+
+      vtkSMStringVectorProperty* infoSP = vtkSMStringVectorProperty::SafeDownCast(
+        StringProperty->GetInformationProperty());
+      if (!value.isValid() && infoSP)
+        {
+        // check if the information property is giving us the status for the
+        // array selection.
+
+        numElements = infoSP->GetNumberOfElements();
+        for(int i=0; (i+1)<numElements; i+=2)
+          {
+          if(StringName == infoSP->GetElement(i))
+            {
+            value = infoSP->GetElement(i+1);
+            break;
+            }
+          }
+        }
+
       // make up a zero
       if(!value.isValid())
         {
