@@ -26,6 +26,7 @@
 #cmakedefine VTK_USE_MPI
 #cmakedefine PV_TEST_INIT_COMMAND "@PV_TEST_INIT_COMMAND@"
 #cmakedefine PV_TEST_CLEAN_COMMAND "@PV_TEST_CLEAN_COMMAND@"
+#cmakedefine PV_TEST_CLIENT "@PV_TEST_CLIENT@"
 
 // ssh command to connect to remote machine, usually ssh -l kitware dash8
 #cmakedefine PV_SSH_FLAGS "@PV_SSH_FLAGS@"

@@ -321,6 +321,9 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     if(this->ReverseConnection && type != CLIENT)
       {
       commandLine.push_back("-rc");
+#ifdef PV_TEST_CLIENT
+      commandLine.push_back("-ch=" PV_TEST_CLIENT);
+#endif
       }
 
     if (!this->TestTiledDisplay)

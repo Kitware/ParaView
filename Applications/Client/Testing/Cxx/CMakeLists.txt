@@ -13,8 +13,13 @@ SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
 MARK_AS_ADVANCED(PV_TEST_CLEAN_COMMAND)
 
 SET(PV_TEST_SERVER_ROOT "localhost" CACHE STRING
-  "Node which servers as the root node for the cluster when testing in parallel")
+  "Node which serves as the root node for the cluster when testing in parallel")
 MARK_AS_ADVANCED(PV_TEST_SERVER_ROOT)
+
+SET (PV_TEST_CLIENT "localhost" CACHE STRING
+  "Node which serves as the client node, used to connect from the server side in reverse connection mode.")
+MARK_AS_ADVANCED(PV_TEST_CLIENT)
+
 
 SET(ConnectionXMLs
   ManualConnectCS
