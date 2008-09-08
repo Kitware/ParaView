@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.44");
+vtkCxxRevisionMacro(vtkPVOptions, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -35,6 +35,7 @@ vtkPVOptions::vtkPVOptions()
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
   this->ParaViewDataName = 0;
+  this->StateFileName = 0;
   
   this->ClientRenderServer = 0;
   this->ConnectRenderToData = 0;
@@ -83,6 +84,7 @@ vtkPVOptions::vtkPVOptions()
     }
   this->XMLParser = vtkPVOptionsXMLParser::New();
   this->XMLParser->SetPVOptions(this);
+
 }
 
 //----------------------------------------------------------------------------
@@ -96,6 +98,7 @@ vtkPVOptions::~vtkPVOptions()
   this->SetRenderServerHostName(0);
   this->SetClientHostName(0);
   this->SetMachinesFileName(0);
+  this->SetStateFileName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -205,6 +208,11 @@ void vtkPVOptions::Initialize()
 
   this->AddBooleanArgument("--version", "-V", &this->TellVersion, 
                            "Give the version number and exit.");
+
+  // add new Command Option for loading StateFile (Bug #5711)
+  this->AddArgument("--state", 0, &this->StateFileName,
+    "Load the specified statefile (.pvsm).",
+    vtkPVOptions::PVCLIENT|vtkPVOptions::PARAVIEW);
 }
 
 //----------------------------------------------------------------------------
@@ -393,4 +401,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running to display software version.\n";
     }
+  
+  os << indent << "StateFileName: "
+    << (this->StateFileName?this->StateFileName:"(none)") << endl;
 }

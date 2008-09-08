@@ -73,6 +73,10 @@ public:
   vtkGetStringMacro(ParaViewDataName);
 
   // Description:
+  // State file to load on startup.
+  vtkGetStringMacro(StateFileName); // Bug #5711
+
+  // Description:
   // Valid on PVSERVER and PVDATA_SERVER only. It denotes the time (in minutes)
   // since the time that the connection was established with the server that the
   // server may timeout. timeout <= 0 means no timeout.
@@ -163,6 +167,9 @@ protected:
   int ClientMode;
   int RenderServerMode;
 
+  // Command Option for loading state file(Bug #5711)
+  vtkSetStringMacro(StateFileName);
+  char* StateFileName;
 
 private:
   // Options:

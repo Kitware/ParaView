@@ -3540,28 +3540,36 @@ void pqMainWindowCore::applicationInitialize()
       }
     this->makeDefaultConnectionIfNoneExists();
     }
+  // Now we are assured that some default server connection has been made
+  // (either the one requested by the user on the command line or simply the
+  // default one).
     
   // check for --data option.
   if (options->GetParaViewDataName())
     {
-    if (this->makeServerConnectionIfNoneExists())
-      {
-      // We don't directly set the data file name instead use the dialog. This
-      // makes it possible to select a file group.
-      pqFileDialog* dialog = new pqFileDialog(
-        this->getActiveServer(),
-        this->Implementation->Parent, 
-        tr("Internal Open File"), QString(),
-        QString());
-      dialog->setFileMode(pqFileDialog::ExistingFiles);
-      dialog->selectFile(options->GetParaViewDataName());
-      QStringList selectedFiles = dialog->getSelectedFiles();
-      delete dialog;
+    // We don't directly set the data file name instead use the dialog. This
+    // makes it possible to select a file group.
+    pqFileDialog* dialog = new pqFileDialog(
+      this->getActiveServer(),
+      this->Implementation->Parent, 
+      tr("Internal Open File"), QString(),
+      QString());
+    dialog->setFileMode(pqFileDialog::ExistingFiles);
+    dialog->selectFile(options->GetParaViewDataName());
+    QStringList selectedFiles = dialog->getSelectedFiles();
+    delete dialog;
 
-      //QStringList files;
-      //files.push_back(options->GetParaViewDataName());
-      this->createReaderOnActiveServer(selectedFiles);
-      }
+    //QStringList files;
+    //files.push_back(options->GetParaViewDataName());
+    this->createReaderOnActiveServer(selectedFiles);
+    }
+  else if (options->GetStateFileName())
+    {
+    // check for --state option. (Bug #5711)
+    // NOTE: --data and --state cannnot be specifed at the same time.
+    QStringList files;
+    files.push_back(options->GetStateFileName());
+    this->onFileLoadServerState(files);
     }
   
   pqSettings* settings = pqApplicationCore::instance()->settings();
