@@ -89,27 +89,14 @@ struct pqReaderInfo
     return type;
     }
 
-  bool canReadFile(const QString& filename, pqServer* server) const
+  bool canReadFile(const QString& filename, const QString& extension, pqServer* server) const
     {
     if (!this->PrototypeProxy.GetPointer())
       {
       return false;
       }
 
-    // include check for ".ext.00"
-    QFileInfo info(filename);
-    QString extension = info.completeSuffix();
-    QStringList exts = extension.split('.');
-    bool found = false;
-    foreach(QString ext, exts)
-      {
-      if (this->Extensions.contains(ext))
-        {
-        found = true;
-        break;
-        }
-      }
-    if(!found)
+    if (!this->Extensions.contains(extension))
       {
       return false;
       }
@@ -328,14 +315,22 @@ pqPipelineSource* pqReaderFactory::createReader(const QStringList& files,
 QString pqReaderFactory::getReaderType(const QString& filename, 
   pqServer* server)
 {
-  // loop backwards, allowing extensions to be overloaded
   int num = this->Internal->ReaderList.size();
-  for(int i=0; i<num; i++)
+  QFileInfo finfo(filename);
+  QStringList exts = finfo.completeSuffix().split('.');
+  // start with the last extension component working our way back to handle
+  // cases such as "foo.xyz.vtk" as well as "foo.vtk.000".
+  for (int cc=(exts.size()-1); cc >= 0; cc--)
     {
-    const pqReaderInfo &info = this->Internal->ReaderList[num-i-1];
-    if (info.canReadFile(filename, server))
+    QString extension = exts[cc];
+    // loop backwards, allowing extensions to be overloaded
+    for (int i=num-1; i >= 0; i--)
       {
-      return QString(info.PrototypeProxy->GetXMLName());
+      const pqReaderInfo &info = this->Internal->ReaderList[i];
+      if (info.canReadFile(filename, extension, server))
+        {
+        return QString(info.PrototypeProxy->GetXMLName());
+        }
       }
     }
   return QString();
