@@ -517,6 +517,10 @@ void pqGlobalRenderViewOptions::resetChanges()
   this->Internal->depthPeeling->setChecked(val.toBool());
 
   val = settings->value("UseOffscreenRenderingForScreenshots", true);
+  if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
+    {
+    val = false;
+    }
   this->Internal->useOffscreenRenderingForScreenshots->setChecked(val.toBool());
 
   val = settings->value("RenderInterruptsEnabled", false);

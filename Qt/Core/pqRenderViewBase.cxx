@@ -186,6 +186,13 @@ void pqRenderViewBase::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("TileDisplayCompositeThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
+  // when PV_NO_OFFSCREEN_SCREENSHOTS is set, by default, we disable offscreen
+  // screenshots.
+  if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
+    {
+    pqSMAdaptor::setElementProperty(
+      proxy->GetProperty("UseOffscreenRenderingForScreenshots"), 0);
+    }
 
   const int* bg = this->defaultBackgroundColor();
   vtkSMProperty* backgroundProperty = proxy->GetProperty("Background");
