@@ -324,7 +324,6 @@ IF(BUILD_TESTING)
     NormalGlyphs
     ObjectInspectorSphere
     OpenSaveData
-    OrientationAxis
     Plot3DReader
     PropertyLink
     ReadXMLPolyDataFileSeries
