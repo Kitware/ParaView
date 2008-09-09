@@ -54,14 +54,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <assert.h>
 #include <cctype>
 
-///
-#include "vtksys/ios/sstream"
-using vtkstd::string;
-using vtksys_ios::ostringstream;
-// #include "gdbClusterUtils.h"
-// #include "signal.h"
-///
-
 #define vtkMIN(x, y) \
   (\
    ((x)<(y))?(x):(y)\
@@ -70,7 +62,7 @@ using vtksys_ios::ostringstream;
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.66");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.67");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1730,12 +1722,11 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
 
   // every one has bounds, the procs with no blocks
   // have canonical empty bounds.
-  this->Bounds->SetBounds( VTK_DOUBLE_MAX,
-                          -VTK_DOUBLE_MAX,
-                           VTK_DOUBLE_MAX,
-                          -VTK_DOUBLE_MAX,
-                           VTK_DOUBLE_MAX,
-                          -VTK_DOUBLE_MAX);
+  double *pt;
+  pt=const_cast<double *>(this->Bounds->GetMinPoint());
+  pt[0]=pt[1]=pt[2]= VTK_DOUBLE_MAX;
+  pt=const_cast<double *>(this->Bounds->GetMaxPoint());
+  pt[0]=pt[1]=pt[2]=-VTK_DOUBLE_MAX;
 
   biter->Start();
   for (i = 0; biter->IsActive(); i++, biter->Next())
@@ -1789,9 +1780,6 @@ void vtkSpyPlotReader::SetGlobalBounds(vtkSpyPlotBlockIterator *biter,
     {
     vtkErrorMacro("Problem occurred getting the global bounds");
     }
-
-  double bounds[6];
-  this->Bounds->GetBounds(bounds);
 
  return;
 }
