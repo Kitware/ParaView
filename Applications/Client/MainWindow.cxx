@@ -981,6 +981,9 @@ void MainWindow::makeAssistant()
       {
       assistantExe = file.readLine().trimmed();
       profileFile = file.readLine().trimmed();
+      // CMake escapes spaces, we need to unescape those.
+      assistantExe.replace("\\ ", " ");
+      profileFile.replace("\\ ", " ");
       }
     }
 
@@ -995,6 +998,15 @@ void MainWindow::makeAssistant()
     assistantExe = assistant;
     */
     }
+#if defined (__APPLE__)
+  // trim upto .app in case of Mac
+  int suffixIndex = assistantExe.indexOf(QRegExp(".app/Contents/MacOS/assistant$"));
+  if (suffixIndex != -1)
+    {
+    assistantExe = assistantExe.left(suffixIndex);
+    }
+#endif
+
 
   this->Implementation->AssistantClient =
     new QAssistantClient(assistantExe, this);
