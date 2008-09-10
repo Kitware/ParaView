@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.67");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.68");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1722,11 +1722,11 @@ void vtkSpyPlotReader::GetLocalBounds(vtkSpyPlotBlockIterator *biter,
 
   // every one has bounds, the procs with no blocks
   // have canonical empty bounds.
-  double *pt;
-  pt=const_cast<double *>(this->Bounds->GetMinPoint());
-  pt[0]=pt[1]=pt[2]= VTK_DOUBLE_MAX;
-  pt=const_cast<double *>(this->Bounds->GetMaxPoint());
-  pt[0]=pt[1]=pt[2]=-VTK_DOUBLE_MAX;
+//   double *pt;
+//   pt=const_cast<double *>(this->Bounds->GetMinPoint());
+//   pt[0]=pt[1]=pt[2]= VTK_DOUBLE_MAX;
+//   pt=const_cast<double *>(this->Bounds->GetMaxPoint());
+//   pt[0]=pt[1]=pt[2]=-VTK_DOUBLE_MAX;
 
   biter->Start();
   for (i = 0; biter->IsActive(); i++, biter->Next())
