@@ -40,34 +40,34 @@ public:
   // invalid, calls GatherDataInformation.
   // If data information is gathered then this fires the 
   // vtkCommand::UpdateInformationEvent event.
-  vtkPVDataInformation* GetDataInformation();
+  virtual vtkPVDataInformation* GetDataInformation();
 
   // Description:
   // Simply returns the data information as available on the client, without any
   // gathers from the server side or any pipeline updates.
-  vtkPVDataInformation* GetCachedDataInformation()
+  virtual vtkPVDataInformation* GetCachedDataInformation()
     { return this->DataInformation; }
 
   // Description:
   // Returns the classname of the data object on this output port.
-  const char* GetDataClassName();
+  virtual const char* GetDataClassName();
 
   // Description:
   // Returns classname information.
-  vtkPVClassNameInformation* GetClassNameInformation();
+  virtual vtkPVClassNameInformation* GetClassNameInformation();
 
   // Description:
   // Get the classname of the dataset from server.
-  void GatherClassNameInformation();
+  virtual void GatherClassNameInformation();
 
   // Description:
   // Get information about dataset from server.
   // Fires the vtkCommand::UpdateInformationEvent event.
-  void GatherDataInformation(int doUpdate=1);
+  virtual void GatherDataInformation(int doUpdate=1);
 
   // Description:
   // Mark data information as invalid.
-  void InvalidateDataInformation();
+  virtual void InvalidateDataInformation();
 
   // Description:
   // Returns the index of the port the output is obtained from.
@@ -85,7 +85,7 @@ public:
   // called with recheck=1. This has two consequences: 1. a reference to
   // the old data object is hold and the data object is not released 2.
   // GetDataObjectProxy(0) may return the wrong data object.
-  vtkSMProxy* GetDataObjectProxy(int recheck);
+  virtual vtkSMProxy* GetDataObjectProxy(int recheck);
 
 //BTX
   // Description:
@@ -121,9 +121,22 @@ protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort();
 
+  // Description:
+  // An internal update pipeline method that subclasses may override.
+  virtual void UpdatePipelineInternal(double time, bool doTime);
+
   vtkSMProxy* DataObjectProxy;
   vtkClientServerID ProducerID;
   vtkClientServerID ExecutiveID;
+
+  // The index of the port the output is obtained from.
+  vtkSetMacro(PortIndex, int);
+  int PortIndex;
+
+  vtkPVClassNameInformation* ClassNameInformation;
+  int ClassNameInformationValid;
+  vtkPVDataInformation* DataInformation;
+  bool DataInformationValid;
 
 private:
   vtkSMOutputPort(const vtkSMOutputPort&); // Not implemented
@@ -135,10 +148,6 @@ private:
   
   // Update Pipeline with the given timestep request.
   void UpdatePipeline(double time);
-
-  // The index of the port the output is obtained from.
-  vtkSetMacro(PortIndex, int);
-  int PortIndex;
 
   void InitializeWithIDs(vtkClientServerID outputID, 
                          vtkClientServerID producerID, 
@@ -152,11 +161,6 @@ private:
   // Description:
   // Replace the default extent translator with vtkPVExtentTranslator.
   void CreateTranslatorIfNecessary();
-
-  vtkPVClassNameInformation* ClassNameInformation;
-  int ClassNameInformationValid;
-  vtkPVDataInformation* DataInformation;
-  bool DataInformationValid;
 //ETX
 
 };

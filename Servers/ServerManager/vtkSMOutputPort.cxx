@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.7");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -577,33 +577,18 @@ void vtkSMOutputPort::CreateTranslatorIfNecessary()
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::UpdatePipeline()
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-
-  stream << vtkClientServerStream::Invoke 
-         << this->GetProducerID() << "UpdateInformation"
-         << vtkClientServerStream::End;
-
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() << "GetPartitionId"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke
-         << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
-         << vtkClientServerStream::LastResult 
-         << pm->GetNumberOfPartitions(this->ConnectionID) << 0
-         << vtkClientServerStream::End; 
-
-  stream << vtkClientServerStream::Invoke 
-         << this->GetProducerID() << "Update"
-         << vtkClientServerStream::End;
-
-  pm->SendPrepareProgress(this->ConnectionID);
-  pm->SendStream(this->ConnectionID, this->Servers, stream);
-  pm->SendCleanupPendingProgress(this->ConnectionID);
+  this->UpdatePipelineInternal(0.0, false);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMOutputPort::UpdatePipeline(double time)
+{
+  this->UpdatePipelineInternal(time, true);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMOutputPort::UpdatePipelineInternal(double time, 
+                                             bool doTime)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
@@ -621,10 +606,13 @@ void vtkSMOutputPort::UpdatePipeline(double time)
          << pm->GetNumberOfPartitions(this->ConnectionID) << 0
          << vtkClientServerStream::End; 
 
-  stream << vtkClientServerStream::Invoke
-         << this->GetExecutiveID() << "SetUpdateTimeStep" 
-         << this->PortIndex << time
-         << vtkClientServerStream::End; 
+  if (doTime)
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->GetExecutiveID() << "SetUpdateTimeStep" 
+           << this->PortIndex << time
+           << vtkClientServerStream::End;
+    }
 
   stream << vtkClientServerStream::Invoke 
          << this->GetProducerID() << "Update"
