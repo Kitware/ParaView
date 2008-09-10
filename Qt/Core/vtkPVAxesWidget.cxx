@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -130,11 +130,11 @@ vtkPVAxesWidget::vtkPVAxesWidget()
 vtkPVAxesWidget::~vtkPVAxesWidget()
 {
   this->Observer->Delete();
-  this->SetParentRenderer(NULL);
-  this->Renderer->Delete();
   this->AxesActor->Delete();
   this->OutlineActor->Delete();
   this->Outline->Delete();
+  this->SetParentRenderer(NULL);
+  this->Renderer->Delete();
 }
 
 //----------------------------------------------------------------------------
