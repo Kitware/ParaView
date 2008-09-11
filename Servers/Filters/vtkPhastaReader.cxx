@@ -25,9 +25,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkPointSet.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.9");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.10");
 vtkStandardNewMacro(vtkPhastaReader);
 
 vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
@@ -557,6 +558,35 @@ int vtkPhastaReader::RequestData(vtkInformation*,
   else
     {
     this->ReadFieldFile(this->FieldFileName, fvn, output, noOfDatas);
+    }
+
+  // if there exists point arrays called coordsX, coordsY and coordsZ,
+  // create another array of point data and set the output to use this
+  vtkPointData* pointData = output->GetPointData();
+  vtkDoubleArray* coordsX = vtkDoubleArray::SafeDownCast(
+    pointData->GetArray("coordsX"));
+  vtkDoubleArray* coordsY = vtkDoubleArray::SafeDownCast(
+    pointData->GetArray("coordsY"));
+  vtkDoubleArray* coordsZ = vtkDoubleArray::SafeDownCast(
+    pointData->GetArray("coordsZ"));
+  if(coordsX && coordsY && coordsZ)
+    {
+    vtkIdType numPoints = output->GetPoints()->GetNumberOfPoints();
+    if(numPoints != coordsX->GetNumberOfTuples() || 
+       numPoints != coordsY->GetNumberOfTuples() ||
+       numPoints != coordsZ->GetNumberOfTuples() )
+      {
+      vtkWarningMacro("Wrong number of points for moving mesh.  Using original points.");
+      return 0;
+      }
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    points->DeepCopy(output->GetPoints());
+    for(vtkIdType i=0;i<numPoints;i++)
+      {
+      points->SetPoint(i, coordsX->GetValue(i), coordsY->GetValue(i), 
+                       coordsZ->GetValue(i));
+      }
+    output->SetPoints(points);
     }
 
   return 1;
