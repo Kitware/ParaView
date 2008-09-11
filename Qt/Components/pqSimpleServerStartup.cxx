@@ -38,14 +38,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqCommandServerStartup.h>
 #include <pqCreateServerStartupDialog.h>
 #include <pqEditServerStartupDialog.h>
+#include <pqFileChooserWidget.h>
+#include <pqObjectBuilder.h>
 #include <pqOptions.h>
-#include <pqServer.h>
 #include <pqServerBrowser.h>
+#include <pqServer.h>
 #include <pqServerManagerModel.h>
 #include <pqServerResource.h>
 #include <pqServerStartup.h>
 #include <pqServerStartups.h>
-#include <pqObjectBuilder.h>
+#include <pqSettings.h>
 
 #include <vtkProcessModule.h>
 #include <vtkProcessModuleConnectionManager.h>
@@ -384,6 +386,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     return true;
     }
 
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
   // Dynamically-generate a dialog based on user options ...
   QDialog dialog;
   dialog.setWindowTitle("Start " + this->Implementation->Server.toURI());
@@ -401,127 +405,154 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
   vtkstd::map<QString, QString> false_values;
 
   int num = xml_options->GetNumberOfNestedElements();
-  for(int i=0; i<num; i++)
+  for (int i=0; i<num; i++)
     {
     vtkPVXMLElement* xml_option = xml_options->GetNestedElement(i);
-    if(QString(xml_option->GetName()) == "Option")
+    if (QString(xml_option->GetName()) == "Option")
       {
       const QString option_name = xml_option->GetAttribute("name");
       const QString option_label = xml_option->GetAttribute("label");
-      const bool option_readonly = QString(xml_option->GetAttribute("readonly")) == "true";
+      const bool option_readonly = 
+        (QString(xml_option->GetAttribute("readonly")) == "true");
+      const bool save_option =
+        QVariant(xml_option->GetAttribute("save")).toBool();
 
       vtkPVXMLElement* xml_type = xml_option->GetNestedElement(0);
-      if(xml_type)
+      if (!xml_type)
         {
-        const int row = layout->rowCount();
-        
-        layout->addWidget(new QLabel(option_label + ":"), row, label_column, Qt::AlignLeft | Qt::AlignVCenter);
-        
-        if(QString(xml_type->GetName()) == "Range")
-          {
-          const QString range_type = xml_type->GetAttribute("type");
-          if(range_type == "int")
-            {
-            const QString widget_min = xml_type->GetAttribute("min");
-            const QString widget_max = xml_type->GetAttribute("max");
-            const QString widget_step = xml_type->GetAttribute("step");
-            const QString widget_default = xml_type->GetAttribute("default");
+        continue;
+        }
+      const int row = layout->rowCount();
+      layout->addWidget(new QLabel(option_label + ":"), row, label_column,
+        Qt::AlignLeft | Qt::AlignVCenter);
 
-            QSpinBox* const widget = new QSpinBox();
-            widget->setMinimum(widget_min.toInt());
-            widget->setMaximum(widget_max.toInt());
-            widget->setSingleStep(widget_step.toInt());
-            if(widget_default == "random")
+      QString widget_default;
+      if (save_option)
+        {
+        // if save="true" is set on the Option, then try to get the value from
+        // the settings if available.
+        if (settings->contains(QString("SERVER_STARUP/%1").arg(option_name)))
+          {
+          widget_default =
+            settings->value(QString("SERVER_STARUP/%1").arg(option_name)).toString();
+          }
+        }
+      if (widget_default.isEmpty())
+        {
+        widget_default = xml_type->GetAttribute("default");
+        }
+
+      if (QString(xml_type->GetName()) == "Range")
+        {
+        const QString range_type = xml_type->GetAttribute("type");
+        if(range_type == "int")
+          {
+          const QString widget_min = xml_type->GetAttribute("min");
+          const QString widget_max = xml_type->GetAttribute("max");
+          const QString widget_step = xml_type->GetAttribute("step");
+
+          QSpinBox* const widget = new QSpinBox();
+          widget->setMinimum(widget_min.toInt());
+          widget->setMaximum(widget_max.toInt());
+          widget->setSingleStep(widget_step.toInt());
+          if(widget_default == "random")
+            {
+            // We need a seed that changes every execution. Get the
+            // universal time as double and then add all the bytes
+            // together to get a nice seed without causing any overflow.
+            long rseed = 0;
+            double atime = vtkTimerLog::GetUniversalTime()*1000;
+            char* tc = (char*)&atime;
+            for (unsigned int ic=0; ic<sizeof(double); ic++)
               {
-              // We need a seed that changes every execution. Get the
-              // universal time as double and then add all the bytes
-              // together to get a nice seed without causing any overflow.
-              long rseed = 0;
-              double atime = vtkTimerLog::GetUniversalTime()*1000;
-              char* tc = (char*)&atime;
-              for (unsigned int ic=0; ic<sizeof(double); ic++)
-                {
-                rseed += tc[ic];
-                }
-              vtkMath::RandomSeed(rseed);
-              widget->setValue(static_cast<int>(
+              rseed += tc[ic];
+              }
+            vtkMath::RandomSeed(rseed);
+            widget->setValue(static_cast<int>(
                 vtkMath::Random(widget_min.toInt(), widget_max.toInt())));
-              }
-            else
-              {
-              widget->setValue(widget_default.toInt());
-              }
-            widget->setEnabled(!option_readonly);
-            
-            layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-            widgets[xml_option] = widget;
             }
-          else if(range_type == "double")
+          else
             {
-            const QString widget_min = xml_type->GetAttribute("min");
-            const QString widget_max = xml_type->GetAttribute("max");
-            const QString widget_step = xml_type->GetAttribute("step");
-            const QString widget_precision = xml_type->GetAttribute("precision");
-            const QString widget_default = xml_type->GetAttribute("default");
-
-            QDoubleSpinBox* const widget = new QDoubleSpinBox();
-            widget->setMinimum(widget_min.toDouble());
-            widget->setMaximum(widget_max.toDouble());
-            widget->setSingleStep(widget_step.toDouble());
-            widget->setDecimals(widget_precision.toInt());
-            widget->setValue(widget_default.toDouble());
-            widget->setEnabled(!option_readonly);
-            
-            layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-            widgets[xml_option] = widget;
+            widget->setValue(widget_default.toInt());
             }
-          }
-        else if(QString(xml_type->GetName()) == "String")
-          {
-          const QString widget_default = xml_type->GetAttribute("default");
-          QLineEdit* const widget = new QLineEdit(widget_default);
           widget->setEnabled(!option_readonly);
-          layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
+          layout->addWidget(widget, row, widget_column,
+            Qt::AlignLeft | Qt::AlignVCenter);
           widgets[xml_option] = widget;
           }
-        else if(QString(xml_type->GetName()) == "Boolean")
+        else if(range_type == "double")
           {
-          const QString widget_true = xml_type->GetAttribute("true");
-          const QString widget_false = xml_type->GetAttribute("false");
-          const QString widget_default = xml_type->GetAttribute("default");
-          
-          QCheckBox* const widget = new QCheckBox();
-          widget->setChecked(widget_default == "true");
-          widget->setEnabled(!option_readonly);
-          
-          layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-          widgets[xml_option] = widget;
-          true_values[option_name] = widget_true;
-          false_values[option_name] = widget_false;
-          }
-        else if(QString(xml_type->GetName()) == "Enumeration")
-          {
-          const QString widget_default = xml_type->GetAttribute("default");
-          QComboBox* const widget = new QComboBox();
+          const QString widget_min = xml_type->GetAttribute("min");
+          const QString widget_max = xml_type->GetAttribute("max");
+          const QString widget_step = xml_type->GetAttribute("step");
+          const QString widget_precision = xml_type->GetAttribute("precision");
 
-          int numchild = xml_type->GetNumberOfNestedElements();
-          for(int j=0; j<numchild; j++)
+          QDoubleSpinBox* const widget = new QDoubleSpinBox();
+          widget->setMinimum(widget_min.toDouble());
+          widget->setMaximum(widget_max.toDouble());
+          widget->setSingleStep(widget_step.toDouble());
+          widget->setDecimals(widget_precision.toInt());
+          widget->setValue(widget_default.toDouble());
+          widget->setEnabled(!option_readonly);
+
+          layout->addWidget(widget, row, widget_column,
+            Qt::AlignLeft | Qt::AlignVCenter);
+          widgets[xml_option] = widget;
+          }
+        }
+      else if(QString(xml_type->GetName()) == "String")
+        {
+        QLineEdit* const widget = new QLineEdit(widget_default);
+        widget->setEnabled(!option_readonly);
+        layout->addWidget(widget, row, widget_column,
+          Qt::AlignLeft | Qt::AlignVCenter);
+        widgets[xml_option] = widget;
+        }
+      else if (QString(xml_type->GetName()) == "File")
+        {
+        pqFileChooserWidget* const widget = new pqFileChooserWidget();
+        widget->setEnabled(!option_readonly);
+        widget->setFilename(widget_default);
+        layout->addWidget(widget, row, widget_column,
+          Qt::AlignLeft | Qt::AlignVCenter);
+        widgets[xml_option] = widget;
+        }
+      else if(QString(xml_type->GetName()) == "Boolean")
+        {
+        const QString widget_true = xml_type->GetAttribute("true");
+        const QString widget_false = xml_type->GetAttribute("false");
+
+        QCheckBox* const widget = new QCheckBox();
+        widget->setChecked(widget_default == "true");
+        widget->setEnabled(!option_readonly);
+
+        layout->addWidget(widget, row, widget_column,
+          Qt::AlignLeft | Qt::AlignVCenter);
+        widgets[xml_option] = widget;
+        true_values[option_name] = widget_true;
+        false_values[option_name] = widget_false;
+        }
+      else if(QString(xml_type->GetName()) == "Enumeration")
+        {
+        QComboBox* const widget = new QComboBox();
+
+        int numchild = xml_type->GetNumberOfNestedElements();
+        for(int j=0; j<numchild; j++)
+          {
+          vtkPVXMLElement* xml_enumeration = xml_type->GetNestedElement(j);
+          if(QString(xml_enumeration->GetName()) == "Entry") 
             {
-            vtkPVXMLElement* xml_enumeration = xml_type->GetNestedElement(j);
-            if(QString(xml_enumeration->GetName()) == "Entry") 
-              {
-              const QString xml_value = xml_enumeration->GetAttribute("value");
-              const QString xml_label = xml_enumeration->GetAttribute("label");
-              widget->addItem(xml_label, xml_value);
-              }
+            const QString xml_value = xml_enumeration->GetAttribute("value");
+            const QString xml_label = xml_enumeration->GetAttribute("label");
+            widget->addItem(xml_label, xml_value);
             }
-          
-          widget->setCurrentIndex(widget->findData(widget_default));
-          widget->setEnabled(!option_readonly);
-          
-          layout->addWidget(widget, row, widget_column, Qt::AlignLeft | Qt::AlignVCenter);
-          widgets[xml_option] = widget;
           }
+
+        widget->setCurrentIndex(widget->findData(widget_default));
+        widget->setEnabled(!option_readonly);
+        layout->addWidget(widget, row, widget_column,
+          Qt::AlignLeft | Qt::AlignVCenter);
+        widgets[xml_option] = widget;
         }
       }
     }
@@ -541,10 +572,13 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
   
   layout->addLayout(button_layout, layout->rowCount(), 0, 1, 2);
   
-  if(QDialog::Accepted != dialog.exec())
+  if (QDialog::Accepted != dialog.exec())
+    {
     return false;
+    }
 
-  for(widgets_t::const_iterator option = widgets.begin(); option != widgets.end(); ++option)
+  for (widgets_t::const_iterator option = widgets.begin(); 
+    option != widgets.end(); ++option)
     {
     vtkPVXMLElement* xml_option = option->first;
     const QString option_name = xml_option->GetAttribute("name");
@@ -555,7 +589,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       {
       val = QString::number(widget1->value());
       }
-    else if(QDoubleSpinBox* const widget2 = qobject_cast<QDoubleSpinBox*>(option_widget))
+    else if(QDoubleSpinBox* const widget2 =
+      qobject_cast<QDoubleSpinBox*>(option_widget))
       {
       val = QString::number(widget2->value());
       }
@@ -565,29 +600,43 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       }
     else if(QCheckBox* const widget4 = qobject_cast<QCheckBox*>(option_widget))
       {
-      val = widget4->isChecked() ? true_values[option_name] : false_values[option_name];
+      val = widget4->isChecked() ?
+        true_values[option_name] : false_values[option_name];
       }
     else if(QComboBox* const widget5 = qobject_cast<QComboBox*>(option_widget))
       {
       val = widget5->itemData(widget5->currentIndex()).toString();
       }
+    else if (pqFileChooserWidget* const widget6 =
+      qobject_cast<pqFileChooserWidget*>(option_widget))
+      {
+      val = widget6->filename();
+      }
 
     bool option_readonly;
     option_readonly = QString(xml_option->GetAttribute("readonly")) == "true";
     this->Implementation->Options[option_name] = val;
-    if (! option_readonly)
+    if (!option_readonly)
       {
       // only update the default if the readonly attribute is false
       xml_option->GetNestedElement(0)->SetAttribute("default",
         val.toAscii().data());
       }
+
+    const bool save_option =
+      QVariant(xml_option->GetAttribute("save")).toBool();
+    if (save_option && !option_readonly)
+      {
+      settings->setValue(QString("SERVER_STARUP/%1").arg(option_name), val);
+      }
     }
 
-  if(this->Implementation->Options.contains("PV_SERVER_PORT"))
+  if (this->Implementation->Options.contains("PV_SERVER_PORT"))
     {
     if(!this->Implementation->Options["PV_SERVER_PORT"].isEmpty())
       {
-      this->Implementation->Server.setPort(this->Implementation->Options["PV_SERVER_PORT"].toInt());
+      this->Implementation->Server.setPort(
+        this->Implementation->Options["PV_SERVER_PORT"].toInt());
       }
     }
     
@@ -595,7 +644,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     {
     if(!this->Implementation->Options["PV_DATA_SERVER_PORT"].isEmpty())
       {
-      this->Implementation->Server.setDataServerPort(this->Implementation->Options["PV_DATA_SERVER_PORT"].toInt());
+      this->Implementation->Server.setDataServerPort(
+        this->Implementation->Options["PV_DATA_SERVER_PORT"].toInt());
       }
     }
     
@@ -603,7 +653,8 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     {
     if(!this->Implementation->Options["PV_RENDER_SERVER_PORT"].isEmpty())
       {
-      this->Implementation->Server.setRenderServerPort(this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
+      this->Implementation->Server.setRenderServerPort(
+        this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
       }
     }
 
