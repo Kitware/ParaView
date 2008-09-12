@@ -1,11 +1,24 @@
 <ServerManagerConfiguration>
+  <!-- This is the server manager configuration XML. It defines the interface to
+       our new filter. As a rule of thumb, try to locate the configuration for
+       a filter already in ParaView (in Servers/ServerManager/Resources/*.xml)
+       that matches your filter and then model your xml on it -->
   <ProxyGroup name="filters">
    <SourceProxy name="MyElevationFilter" class="vtkMyElevationFilter" label="MyElevation">
      <Documentation
         long_help="Create point attribute array by projecting points onto an elevation vector."
         short_help="Create a point array representing elevation.">
-The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. The Low Point and High Point define a line onto which each point of the data set is projected. The minimum scalar value is associated with the Low Point, and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to which that point projects.
-The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
+          The Elevation filter generates point scalar values for an input data
+          set along a specified direction vector. The Input menu allows the user
+          to select the data set to which this filter will be applied. The Low
+          Point and High Point define a line onto which each point of the data
+          set is projected. The minimum scalar value is associated with the Low
+          Point, and the maximum scalar value is associated with the High Point.
+          The scalar value for each point in the data set is determined by the
+          location along the line to which that point projects.
+
+          The line can be specified interactively using the 3D line widget. See
+          section 7.4 for more information about this widget.
      </Documentation>
      <InputProperty
         name="Input"
