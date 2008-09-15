@@ -213,7 +213,10 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     }
 
   pqServer* server = this->findServer(proxy->GetConnectionID());
-  if (!server)
+
+  // Warn and return if the server can't be found and connection ID is not null.
+  // If connection ID is null, then it must have been set explicitly by the user.
+  if (!server && proxy->GetConnectionID() != vtkIdType(NULL))
     {
     qDebug() << "Failed to locate server for newly registered proxy ("
       << group << ", " << name << ")";
