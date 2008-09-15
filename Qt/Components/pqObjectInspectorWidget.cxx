@@ -387,20 +387,8 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     this->CurrentPanel->setObjectName("");
     // We don't delete the panel, it's managed by this->PanelStore.
     // Any deletion of any panel must ensure that call pointers 
-    // to the panel ie. this->CurrentPanel, this->QueuedPanels, and this->PanelStore
+    // to the panel ie. this->CurrentPanel and this->PanelStore
     // are updated so that we don't have any dangling pointers.
-    }
-
-  // we have a proxy with pending changes
-  if(this->AcceptButton->isEnabled())
-    {
-    // save the panel
-    if(this->CurrentPanel)
-      {
-      // QueuedPanels keeps track of all modified panels.
-      this->QueuedPanels.insert(this->CurrentPanel->referenceProxy(),
-        this->CurrentPanel);
-      }
     }
 
   this->CurrentPanel = NULL;
@@ -508,10 +496,13 @@ void pqObjectInspectorWidget::accept()
 
   emit this->preaccept();
 
-  // accept all queued panels
-  foreach(pqObjectPanel* p, this->QueuedPanels)
+  // accept all panels that are dirty.
+  foreach(pqObjectPanel* p, this->PanelStore)
     {
-    p->accept();
+    if (p->referenceProxy()->modifiedState() != pqProxy::UNMODIFIED)
+      {
+      p->accept();
+      }
     }
   
   if (this->CurrentPanel)
@@ -520,9 +511,6 @@ void pqObjectInspectorWidget::accept()
     }
  
   emit this->accepted();
-  
-  this->QueuedPanels.clear();
-  
   emit this->postaccept();
   
   if(us)
@@ -539,12 +527,14 @@ void pqObjectInspectorWidget::reset()
 {
   emit this->prereject();
 
-  // reset all queued panels
-  foreach(pqObjectPanel* p, this->QueuedPanels)
+  // reset all panels that are dirty
+  foreach(pqObjectPanel* p, this->PanelStore)
     {
-    p->reset();
+    if (p->referenceProxy()->modifiedState() != pqProxy::UNMODIFIED)
+      {
+      p->reset();
+      }
     }
-  this->QueuedPanels.clear();
   
   if(this->CurrentPanel)
     {
@@ -577,18 +567,12 @@ void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
     SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
     this, SLOT(updateAcceptState()));
 
-  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
-  iter = this->QueuedPanels.find(proxy);
-  if(iter != this->QueuedPanels.end())
-    {
-    this->QueuedPanels.erase(iter);
-    }
-
-  if(this->CurrentPanel && (this->CurrentPanel->referenceProxy() == proxy))
+  if (this->CurrentPanel && (this->CurrentPanel->referenceProxy() == proxy))
     {
     this->CurrentPanel = NULL;
     }
 
+  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->PanelStore.find(proxy);
   if (iter != this->PanelStore.end())
     {

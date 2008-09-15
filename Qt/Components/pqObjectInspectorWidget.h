@@ -145,11 +145,8 @@ private:
   static bool AutoAccept;
   
   pqObjectPanel* CurrentPanel;
-  QMap<pqProxy*, pqObjectPanel*> QueuedPanels;
 
-  // This keeps all the panels created. We keep a list separate from
-  // QueuedPanels, since Accept() is called onn all queued panels in accept.
-  // Ideally, QueuedPanels should only be the panels that are "dirty".
+  // This keeps all the panels created. 
   QMap<pqProxy*, pqObjectPanel*> PanelStore;
 };
 
