@@ -18,7 +18,37 @@
 #include <cassert>
 using vtkstd::vector;
 
-//
+namespace
+{
+
+//-----------------------------------------------------------------------------
+void IdentifyDownStreamRecipients(
+      int child,
+      int nProcs,
+      vector<int> &DSR)
+{
+  DSR.push_back(child);
+
+  // Process left child.
+  child=2*child+1;
+  if (child>=nProcs)
+    {
+    return;
+    }
+  IdentifyDownStreamRecipients(child,nProcs,DSR);
+  // Process right child.
+  ++child;
+  if (child>=nProcs)
+    {
+    return;
+    }
+  IdentifyDownStreamRecipients(child,nProcs,DSR);
+}
+
+};
+
+
+//-----------------------------------------------------------------------------
 vtkCTHFragmentPieceTransactionMatrix::vtkCTHFragmentPieceTransactionMatrix()
 {
   this->NFragments=0;
@@ -27,19 +57,22 @@ vtkCTHFragmentPieceTransactionMatrix::vtkCTHFragmentPieceTransactionMatrix()
   this->Matrix=0;
   this->NumberOfTransactions=0;
 }
-//
+
+//-----------------------------------------------------------------------------
 vtkCTHFragmentPieceTransactionMatrix::vtkCTHFragmentPieceTransactionMatrix(
                 int nFragments,
                 int nProcs)
 {
   this->Initialize(nFragments, nProcs);
 }
-//
+
+//-----------------------------------------------------------------------------
 vtkCTHFragmentPieceTransactionMatrix::~vtkCTHFragmentPieceTransactionMatrix()
 {
   this->Clear();
 }
-//
+
+//-----------------------------------------------------------------------------
 void vtkCTHFragmentPieceTransactionMatrix::Clear()
 {
   this->NFragments=0;
@@ -51,7 +84,8 @@ void vtkCTHFragmentPieceTransactionMatrix::Clear()
     }
   this->NumberOfTransactions=0;
 }
-//
+
+//-----------------------------------------------------------------------------
 void vtkCTHFragmentPieceTransactionMatrix::Initialize(
                 int nFragments,
                 int nProcs)
@@ -64,7 +98,8 @@ void vtkCTHFragmentPieceTransactionMatrix::Initialize(
   this->Matrix 
     = new vector<vtkCTHFragmentPieceTransaction>[this->FlatMatrixSize];
 }
-//
+
+//-----------------------------------------------------------------------------
 void vtkCTHFragmentPieceTransactionMatrix::PushTransaction(
                 int fragmentId,
                 int procId,
@@ -74,61 +109,8 @@ void vtkCTHFragmentPieceTransactionMatrix::PushTransaction(
   this->Matrix[idx].push_back(transaction);
   ++this->NumberOfTransactions;
 }
-// 
-vtkIdType vtkCTHFragmentPieceTransactionMatrix::PackRow(int *&buf)
-{
-/*
-the packed row has this structure:
 
-[nT,T0,...TN][nT,T0,...,TN]...[nT,T0,...,TN]
-    /\           /\               /\
-    |            |                |
-  f0,p0        f1,p0            fN,p0 
-*/
-
-  // caller should not allocate memory.
-  assert( "Buffer appears to be pre-allocated."
-          && buf==0 );
-
-  //int matIdx=i+j*this->NFragments;
-  //int nTransactions=this->Matrix[matIdx].size();
-
-  const int transactionSize
-    = vtkCTHFragmentPieceTransaction::SIZE;
-
-  const vtkIdType bufSize = this->NFragments         // transaction count for each fragment
-        + transactionSize*this->NumberOfTransactions // enough to store all transactions
-        + 2;                                         // nFragments, nProcs
-
-  buf = new int[bufSize];
-  // header
-  buf[0]=this->NFragments;
-  buf[1]=this->NProcs;
-  vtkIdType bufIdx=2;
-
-  for (int j=0; j<this->NProcs; ++j)
-    {
-    for (int i=0; i<this->NFragments; ++i)
-      {
-      int matIdx=i+j*this->NFragments;
-      int nTransactions=this->Matrix[matIdx].size();
-
-      // put the count for this i,j
-      buf[bufIdx]=nTransactions;
-      ++bufIdx;
-
-      // put this i,j's transaction list
-      for (int q=0; q<nTransactions; ++q)
-        {
-        this->Matrix[matIdx][q].Pack(&buf[bufIdx]);
-        bufIdx+=transactionSize;
-        }
-      }
-    }
-  // now bufIdx is number of ints we have stored
-  return bufIdx;
-}
-// 
+//-----------------------------------------------------------------------------
 vtkIdType vtkCTHFragmentPieceTransactionMatrix::Pack(int *&buf)
 {
 /*
@@ -179,7 +161,8 @@ the buffer has this structure:
   // now bufIdx is number of ints we have stored
   return bufIdx;
 }
-//
+
+//-----------------------------------------------------------------------------
 int vtkCTHFragmentPieceTransactionMatrix::UnPack(int *buf)
 {
   assert("Buffer has not been allocated."
@@ -214,31 +197,75 @@ int vtkCTHFragmentPieceTransactionMatrix::UnPack(int *buf)
 
   return 1;
 }
-//
+
+//-----------------------------------------------------------------------------
+// TODO use a tree structured broadcast. The processes are the nodes.
+// starting from process 0 (which is assumed to be the root) each
+// process will send only rows of the matrix that are needed by
+// its children. This will reduce the communication by quite a bit.
 void vtkCTHFragmentPieceTransactionMatrix::Broadcast(
                 vtkCommunicator *comm,
                 int srcProc)
 {
-  int myProc=comm->GetLocalProcessId();
+  int myProcId=comm->GetLocalProcessId();
 
+  /*
+  int nProcs=comm->GetNumberOfProcesses();
+
+  // Identify the process rows which we need to send.
+  // These will be sent in two sets. One set contains
+  // all of the rows which the left child needs to send
+  // to all its childeren. The other set contains those
+  // for the right child.
+  int leftChild=2*myProc+1;
+  vector<int> &leftChildRows;
+  ::IdentifyDownStreamRecipients(leftChild,nProcs,leftChildRows);
+  sort(leftChildRows.begin(),leftChildRows.end());
+  vector::size_type nLeftChildRows=leftChildRows.size();
+  // TODO pack
+
+  int rightChild=leftChild+1;
+  vector<int> &rightChildRows;
+  ::IdentifyDownStreamRecipients(rightChild,nProcs,rightChildRows);
+  sort(rightChildRows.begin(),rightChildRows.end());
+  vector::size_type nRightChildRows=rightChildRows.size();
+  // TODO pack
+
+  // source must send, and receives nothing.
+  // everyone else receives from their parent
+  // and if they have children sends to them.
+  if (myProcId!=0)
+    {
+    int parent=(myProc-1)/2;
+    // TODO recieve from parent
+    // TODO unpack
+    }
+
+  // TODO send to left child
+  // TODO send to right child
+  return;
+  */
+
+  // NOTE: this will be replaced by tree structured
+  // broadcast.
   // pack
   int *buf=0;
   int bufSize=0;
-  if ( myProc==srcProc )
+  if ( myProcId==srcProc )
     {
     bufSize=this->Pack(buf);
     }
 
   // move
   comm->Broadcast(&bufSize,1,srcProc);
-  if ( myProc!=srcProc )
+  if ( myProcId!=srcProc )
     {
     buf = new int[bufSize];
     }
   comm->Broadcast(buf,bufSize,srcProc);
 
   // unpack
-  if ( myProc!=srcProc )
+  if ( myProcId!=srcProc )
     {
     this->UnPack(buf);
     }
@@ -246,7 +273,8 @@ void vtkCTHFragmentPieceTransactionMatrix::Broadcast(
   // clean up
   delete [] buf;
 }
-//
+
+//-----------------------------------------------------------------------------
 void vtkCTHFragmentPieceTransactionMatrix::Print()
 {
   for (int j=0; j<this->NProcs; ++j)
@@ -270,3 +298,7 @@ void vtkCTHFragmentPieceTransactionMatrix::Print()
       }
     }
 }
+
+
+
+

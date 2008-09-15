@@ -27,78 +27,83 @@
 #ifndef __vtkCTHFragmentPieceTransactionMatrix_h
 #define __vtkCTHFragmentPieceTransactionMatrix_h
 
-#include "vtkCTHFragmentPieceTransaction.h"
-#include "vtkType.h"
-#include "vtkstd/vector"
+#include "vtkCTHFragmentPieceTransaction.h" //
+#include "vtkType.h" //
+#include "vtkstd/vector" //
 
 class vtkCommunicator;
 
-
 class vtkCTHFragmentPieceTransactionMatrix
 {
-  public:
-    // Description:
-    // Set the object to an un-initialized state.
-    vtkCTHFragmentPieceTransactionMatrix();
-    // Description:
-    // Allocate internal resources and set the object
-    // to an initialized state.
-    vtkCTHFragmentPieceTransactionMatrix(int nFragments, int nProcs);
-    // Description:
-    // Free allocated resources and leave the object in an
-    // un-initialized state.
-    ~vtkCTHFragmentPieceTransactionMatrix();
-    void Initialize(int nProcs, int nFragments);
-    // Description:
-    // Free allocated resources and leave the object in an
-    // un-initialized state.
-    void Clear();
-    // Description:
-    // Get the number of transaction a given process will
-    // execute.
-    vtkIdType GetNumberOfTransactions(int procId);
-    // Description:
-    // Given a proc and a fragment, return a ref to
-    // the associated list of tranactions.
-    vtkstd::vector<vtkCTHFragmentPieceTransaction> &GetTransactions(
-                    int fragmentId,
-                    int procId);
-    // Description:
-    // Add a transaction to the end of the given a proc,fragment pair's
-    // transaction list.
-    void PushTransaction(
-                    int fragmentId,
-                    int procId,
-                    vtkCTHFragmentPieceTransaction &transaction);
-    // Description:
-    // Send the transaction matrix on srcProc to all
-    // other procs.
-    void Broadcast(vtkCommunicator *comm, int srcProc);
-    //
-    void Print();
-    // Description:
-    // Tells how much memory the matrix has allocated.
-    vtkIdType Capacity()
-    {
-      return this->FlatMatrixSize
-        + this->NumberOfTransactions*sizeof(vtkCTHFragmentPieceTransaction);
-    }
-  private:
-    // Put the matrix into a buffer for communication.
-    // returns size of the buffer in ints. The buffer
-    // will be allocated, and is expected to be null
-    // on entry.
-    vtkIdType Pack(int *&buffer);
-    vtkIdType PackRow(int *&buffer);
-    // Load state from a buffer containing a Pack'ed
-    // transaction matrix. 0 is returned on error.
-    int UnPack(int *buffer);
-    int UnPackRow(int *buffer);
-    int NProcs;
-    int NFragments;
-    vtkstd::vector<vtkCTHFragmentPieceTransaction> *Matrix;
-    vtkIdType FlatMatrixSize;
-    vtkIdType NumberOfTransactions;
+public:
+  // Description:
+  // Set the object to an un-initialized state.
+  vtkCTHFragmentPieceTransactionMatrix();
+  // Description:
+  // Allocate internal resources and set the object
+  // to an initialized state.
+  vtkCTHFragmentPieceTransactionMatrix(int nFragments, int nProcs);
+  // Description:
+  // Free allocated resources and leave the object in an
+  // un-initialized state.
+  ~vtkCTHFragmentPieceTransactionMatrix();
+  void Initialize(int nProcs, int nFragments);
+  // Description:
+  // Free allocated resources and leave the object in an
+  // un-initialized state.
+  void Clear();
+  // Description:
+  // Get the number of transaction a given process will
+  // execute.
+  vtkIdType GetNumberOfTransactions(int procId);
+  // Description:
+  // Given a proc and a fragment, return a ref to
+  // the associated list of tranactions.
+  vtkstd::vector<vtkCTHFragmentPieceTransaction> &GetTransactions(
+                  int fragmentId,
+                  int procId);
+  // Description:
+  // Add a transaction to the end of the given a proc,fragment pair's
+  // transaction list.
+  void PushTransaction(
+                  int fragmentId,
+                  int procId,
+                  vtkCTHFragmentPieceTransaction &transaction);
+  // Description:
+  // Send the transaction matrix on srcProc to all
+  // other procs.
+  void Broadcast(vtkCommunicator *comm, int srcProc);
+  //
+  void Print();
+  // Description:
+  // Tells how much memory the matrix has allocated.
+  vtkIdType Capacity()
+  {
+    return this->FlatMatrixSize
+      + this->NumberOfTransactions*sizeof(vtkCTHFragmentPieceTransaction);
+  }
+private:
+  // Description:
+  // Put the matrix into a buffer for communication.
+  // returns size of the buffer in ints. The buffer
+  // will be allocated, and is expected to be null
+  // on entry.
+  vtkIdType Pack(int *&buffer);
+  // Description:
+  // Put a set of rows into a buffer for communication.
+  // This is used to send a subset of the TM.
+  vtkIdType PackPartial(int *&buffer, int *rows, int nRows);
+  // Description:
+  // Load state from a buffer containing a Pack'ed
+  // transaction matrix. 0 is returned on error.
+  int UnPack(int *buffer);
+  int UnPackPartial(int *buffer);
+  ///
+  int NProcs;
+  int NFragments;
+  vtkstd::vector<vtkCTHFragmentPieceTransaction> *Matrix;
+  vtkIdType FlatMatrixSize;
+  vtkIdType NumberOfTransactions;
 };
 //
 inline
