@@ -126,6 +126,7 @@ public:
   FileMode Mode;
   Ui::pqFileDialog Ui;
   QStringList SelectedFiles;
+  QStringList Filters;
   bool SupressOverwriteWarning;
   
   // remember the last locations we browsed
@@ -338,10 +339,12 @@ pqFileDialog::pqFileDialog(
   if(filterList.empty())
     {
     this->Implementation->Ui.FileType->addItem("All Files (*)");
+    this->Implementation->Filters << "All Files (*)";
     }
   else
     {
     this->Implementation->Ui.FileType->addItems(filterList);
+    this->Implementation->Filters = filterList;
     }
   this->onFilterChange(this->Implementation->Ui.FileType->currentText());
   
@@ -681,6 +684,33 @@ QString pqFileDialog::fixFileExtension(
   QString extensionWildcard = GetWildCardsFromFilter(filter).first();
   QString wantedExtension =
     extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
+
+
+  if (!ext.isEmpty())
+    {
+    // Ensure that the exension the user added is indeed of one of the supported
+    // types. (BUG #7634).
+    QStringList wildCards;
+    foreach (QString curfilter, this->Implementation->Filters)
+      {
+      wildCards += ::GetWildCardsFromFilter(curfilter);
+      }
+    bool pass = false;
+    foreach (QString wildcard, wildCards)
+      {
+      QRegExp regEx = QRegExp(wildcard, Qt::CaseInsensitive, QRegExp::Wildcard);
+      if (regEx.exactMatch(filename))
+        {
+        pass = true;
+        break;
+        }
+      }
+    if (!pass)
+      {
+      // force adding of the wantedExtension.
+      ext = QString();
+      }
+    }
 
   QString fixedFilename = filename;
   if(ext.isEmpty() && !wantedExtension.isEmpty() &&

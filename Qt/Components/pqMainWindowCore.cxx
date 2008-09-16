@@ -1825,7 +1825,6 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;PPM image (*.ppm)";
   filters += ";;JPG image (*.jpg)";
   filters += ";;PDF file (*.pdf)";
-  filters += ";;All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
