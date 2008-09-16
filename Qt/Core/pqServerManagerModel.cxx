@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Server Manager Includes.
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -216,7 +217,8 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
 
   // Warn and return if the server can't be found and connection ID is not null.
   // If connection ID is null, then it must have been set explicitly by the user.
-  if (!server && proxy->GetConnectionID() != vtkIdType(NULL))
+  if (!server && 
+    proxy->GetConnectionID() != vtkProcessModuleConnectionManager::GetNullConnectionID())
     {
     qDebug() << "Failed to locate server for newly registered proxy ("
       << group << ", " << name << ")";
