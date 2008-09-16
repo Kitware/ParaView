@@ -688,7 +688,7 @@ QString pqFileDialog::fixFileExtension(
 
   if (!ext.isEmpty())
     {
-    // Ensure that the exension the user added is indeed of one of the supported
+    // Ensure that the extension the user added is indeed of one the supported
     // types. (BUG #7634).
     QStringList wildCards;
     foreach (QString curfilter, this->Implementation->Filters)
