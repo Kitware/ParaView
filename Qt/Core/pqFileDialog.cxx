@@ -698,9 +698,21 @@ QString pqFileDialog::fixFileExtension(
     bool pass = false;
     foreach (QString wildcard, wildCards)
       {
-      QRegExp regEx = QRegExp(wildcard, Qt::CaseInsensitive, QRegExp::Wildcard);
-      if (regEx.exactMatch(filename))
+      if (wildcard.indexOf('.') != -1)
         {
+        // we only need to validate the extension, not the filename.
+        wildcard = wildcard.mid(wildcard.indexOf('.')+1);
+        QRegExp regEx = QRegExp(wildcard, Qt::CaseInsensitive, QRegExp::Wildcard);
+        if (regEx.exactMatch(ext))
+          {
+          pass = true;
+          break;
+          }
+        }
+      else
+        {
+        // we have a filter which does not specify any rule for the extension.
+        // In that case, just assume the extension matched. 
         pass = true;
         break;
         }
