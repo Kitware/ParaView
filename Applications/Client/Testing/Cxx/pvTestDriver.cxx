@@ -262,6 +262,8 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
   if(this->MPIRun.size() && type != CLIENT)
     {
     commandLine.push_back(this->MPIRun.c_str());
+    commandLine.push_back(this->MPINumProcessFlag.c_str());
+    commandLine.push_back(numProc);
     if (!this->TestTiledDisplay)
       {
       for(unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
@@ -288,8 +290,6 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
           }
         }
       }
-    commandLine.push_back(this->MPINumProcessFlag.c_str());
-    commandLine.push_back(numProc);
     }
 
   if(this->PVSSHFlags.size() && (type == SERVER || type == DATA_SERVER))
