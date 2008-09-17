@@ -97,14 +97,18 @@ protected:
   // This method gets called on satellite nodes during Initialize().
   virtual int InitializeSatellite(int argc, char** argv);
   
-  // send a stream to a node of the mpi group. 
+  // send a stream to a node of the mpi group.
+  // If remoteId==-1, then the stream is sent to all processess.
   void SendStreamToServerNodeInternal(int remoteId, 
     vtkClientServerStream& stream);
 
   // Description:
   // Internal methods to gather information.
   void GatherInformationRoot(vtkPVInformation* info, vtkClientServerID id);
-  
+
+  // Description:
+  // Collect information from children and send it to the parent.
+  void CollectInformation(vtkPVInformation* info);
 private:
   vtkMPISelfConnection(const vtkMPISelfConnection&); // Not implemented.
   void operator=(const vtkMPISelfConnection&); // Not implemented.

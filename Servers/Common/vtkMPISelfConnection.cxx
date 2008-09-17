@@ -51,7 +51,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.4");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.5");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -112,12 +112,8 @@ void vtkMPISelfConnection::Finalize()
   if (this->GetPartitionId() == 0)
     {
     // The root tells all the satellites to finish.
-    int numProcs = this->GetNumberOfPartitions();
-    for (int id=1; id < numProcs; id++)
-      {
-      this->Controller->TriggerRMI(id,
-        vtkMultiProcessController::BREAK_RMI_TAG);
-      }
+    this->Controller->TriggerRMIOnAllChildren(
+      vtkMultiProcessController::BREAK_RMI_TAG);
     }
   this->Superclass::Finalize();
 }
@@ -199,16 +195,8 @@ int vtkMPISelfConnection::SendStreamToDataServerRoot(vtkClientServerStream& stre
 //-----------------------------------------------------------------------------
 int vtkMPISelfConnection::SendStreamToDataServer(vtkClientServerStream& stream)
 {
-  // First send the command to the other server nodes, so
-  // they can get to work first
-  int numPartitions = this->GetNumberOfPartitions();
-  for(int i=1; i < numPartitions; ++i)
-    {
-    this->SendStreamToServerNodeInternal(i, stream);
-    }
-
-  // Now process the stream locally.
-  this->SendStreamToServerNodeInternal(0, stream);
+  // Send to all processess.
+  this->SendStreamToServerNodeInternal(-1, stream);
   return 0;
 }
 
@@ -224,15 +212,25 @@ void vtkMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
     return;
     }
 
-  if (remoteId == globalController->GetLocalProcessId())
+  const unsigned char* data;
+  size_t length;
+  stream.GetData(&data, &length);
+  if (remoteId == -1)
+    {
+    if (length != 0)
+      {
+      this->Controller->TriggerRMIOnAllChildren((void*)data, length,
+        vtkMPISelfConnection::ROOT_SATELLITE_RMI_TAG);
+      }
+    // Process stream locally as well.
+    this->ProcessStreamLocally(stream);
+    }
+  else if (remoteId == globalController->GetLocalProcessId())
     {
     this->ProcessStreamLocally(stream);
     }
   else
     {
-    const unsigned char* data;
-    size_t length;
-    stream.GetData(&data, &length);
     if (length != 0)
       {
       this->Controller->TriggerRMI(remoteId, (void*)data, length,
@@ -265,9 +263,6 @@ void vtkMPISelfConnection::GatherInformation(vtkTypeUInt32 serverFlags,
 void vtkMPISelfConnection::GatherInformationRoot(vtkPVInformation* info,
   vtkClientServerID id)
 {
-  int numProcs = this->GetNumberOfPartitions();
-  int cc;
-  
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Assign //dummy command.
     << info->GetClassName()
@@ -276,36 +271,11 @@ void vtkMPISelfConnection::GatherInformationRoot(vtkPVInformation* info,
   size_t slength;
   stream.GetData(&sdata, &slength);
   
-  for (cc = 1; cc < numProcs; cc++)
-    {
-    // Tell all satellites to gather information.
-    this->Controller->TriggerRMI(cc, (void*)sdata, slength,
-      vtkMPISelfConnection::ROOT_SATELLITE_GATHER_INFORMATION_RMI_TAG);
-    }
+  this->Controller->TriggerRMIOnAllChildren((void*)sdata, slength,
+    vtkMPISelfConnection::ROOT_SATELLITE_GATHER_INFORMATION_RMI_TAG);
 
   // Now, we must collect information from the satellites.
-  vtkPVInformation* tempInfo = info->NewInstance();
-
-  for (cc=1; cc < numProcs; cc++)
-    {
-    int length;
-    this->Controller->Receive(&length, 1, cc, 
-      vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
-    if (length <= 0)
-      {
-      vtkErrorMacro("Failed to Gather Information from satellite no: " << cc);
-      continue;
-      }
-    
-    unsigned char* data = new unsigned char[length];
-    this->Controller->Receive(data, length, cc,
-      vtkMPISelfConnection::ROOT_SATELLITE_INFO_TAG);
-    stream.SetData(data, length);
-    tempInfo->CopyFromStream(&stream);
-    info->AddInformation(tempInfo);
-    delete [] data; 
-    }
-  tempInfo->Delete();
+  this->CollectInformation(info);
 }
 
 
@@ -322,37 +292,88 @@ void vtkMPISelfConnection::GatherInformationSatellite(vtkClientServerStream&
   vtkPVInformation* info = vtkPVInformation::SafeDownCast(o);
   vtkObject* object = vtkObject::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetObjectFromID(id));
-  
+
   if (info && object)
     {
     info->CopyFromObject(object);
-    
-    vtkClientServerStream css;
-    info->CopyToStream(&css);
-    size_t length;
-    const unsigned char* data;
-    css.GetData(&data, &length);
-    int len = length;
-    this->Controller->Send(&len, 1, 0,
-      vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
-    this->Controller->Send(const_cast<unsigned char*>(data),
-      length, 0, vtkMPISelfConnection::ROOT_SATELLITE_INFO_TAG);
+    this->CollectInformation(info);
     }
   else
     {
     vtkErrorMacro("Could not gather information on Satellite.");
-    // let root know.
-    int len = 0; 
-    this->Controller->Send(&len, 1, 0,
-      vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
+    // let the parent know.
+    this->CollectInformation(NULL);
     }
-  
+
   if (o) 
     { 
     o->Delete(); 
     }
 }
 
+//-----------------------------------------------------------------------------
+void vtkMPISelfConnection::CollectInformation(vtkPVInformation* info)
+{
+  int myid = this->GetPartitionId();
+  int children[2] = {2*myid + 1, 2*myid + 2};
+  int parent = myid > 0? (myid-1)/2 : -1;
+  int numProcs = this->GetNumberOfPartitions();
+
+  // General rule is: receive from children and send to parent
+  for (int childno=0; childno < 2; childno++)
+    {
+    int childid = children[childno];
+    if (childid >= numProcs)
+      {
+      // Skip non-existant children.
+      continue;
+      }
+
+    int length;
+    this->Controller->Receive(&length, 1, childid, 
+      vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
+    if (length <= 0)
+      {
+      vtkErrorMacro("Failed to Gather Information from satellite no: " << childid);
+      continue;
+      }
+
+    unsigned char* data = new unsigned char[length];
+    this->Controller->Receive(data, length, childid,
+      vtkMPISelfConnection::ROOT_SATELLITE_INFO_TAG);
+    vtkClientServerStream stream;
+    stream.SetData(data, length);
+    vtkPVInformation* tempInfo = info->NewInstance();
+    tempInfo->CopyFromStream(&stream);
+    info->AddInformation(tempInfo);
+    tempInfo->FastDelete();
+    delete [] data; 
+    }
+
+  // Now send to parent, if parent is indeed valid.
+  if (parent >= 0)
+    {
+    if (info)
+      {
+      vtkClientServerStream css;
+      info->CopyToStream(&css);
+      size_t length;
+      const unsigned char* data;
+      css.GetData(&data, &length);
+      int len = length;
+      this->Controller->Send(&len, 1, parent,
+        vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
+      this->Controller->Send(const_cast<unsigned char*>(data),
+        length, parent, vtkMPISelfConnection::ROOT_SATELLITE_INFO_TAG);
+      }
+    else
+      {
+      int len = 0; 
+      this->Controller->Send(&len, 1, parent,
+        vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
+      }
+    }
+}
 
 //-----------------------------------------------------------------------------
 int vtkMPISelfConnection::LoadModule(const char* name, const char* directory)
