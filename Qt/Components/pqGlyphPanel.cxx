@@ -100,7 +100,7 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
   this->PanelLayout->addLayout(subLayout, row, column, rowSpan, columnSpan);
 
   QObject::connect(this->propertyManager(), SIGNAL(modified()),
-    this, SLOT(updateScaleFactor()));
+    this, SLOT(updateScaleFactor()), Qt::QueuedConnection);
 
   this->ScaleModeWidget = this->findChild<QComboBox*>("SetScaleMode");
 
@@ -184,7 +184,7 @@ void pqGlyphPanel::updateScaleFactor()
     break;
     }
 
-  divisor = (divisor==0)? 1 : divisor;
+  divisor = (divisor < 1.0)? 1 : divisor;
   scalefactor /= divisor;
 
   if (this->ScaleFactorWidget->property("text").toDouble() != scalefactor)
