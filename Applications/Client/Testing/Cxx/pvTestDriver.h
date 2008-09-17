@@ -79,7 +79,8 @@ private:
 
 
   // This specify the preflags and post flags that can be set using:
-  // VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
+  // VTK_MPI_PRENUMPROC_FLAGS VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
+  vtkstd::vector<vtkstd::string> MPIPreNumProcFlags;
   vtkstd::vector<vtkstd::string> MPIPreFlags;
   vtkstd::vector<vtkstd::string> MPIPostFlags;
  
