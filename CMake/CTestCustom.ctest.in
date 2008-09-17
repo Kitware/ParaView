@@ -103,3 +103,4 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "qrc_[^\\.]+.cxx"
   )
 
+  "include/mpicxx.h"
