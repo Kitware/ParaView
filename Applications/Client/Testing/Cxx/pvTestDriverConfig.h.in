@@ -14,6 +14,7 @@
 =========================================================================*/
 #define PARAVIEW_BINARY_DIR "@EXECUTABLE_OUTPUT_PATH@"
 #cmakedefine VTK_MPIRUN_EXE "@VTK_MPIRUN_EXE@"
+#cmakedefine VTK_MPI_PRENUMPROC_FLAGS "@VTK_MPI_PRENUMPROC_FLAGS@"
 #cmakedefine VTK_MPI_NUMPROC_FLAG "@VTK_MPI_NUMPROC_FLAG@"
 #cmakedefine VTK_MPI_PREFLAGS "@VTK_MPI_PREFLAGS@"
 #cmakedefine VTK_MPI_POSTFLAGS "@VTK_MPI_POSTFLAGS@"

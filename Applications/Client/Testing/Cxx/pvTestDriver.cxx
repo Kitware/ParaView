@@ -123,6 +123,9 @@ void pvTestDriver::CollectConfiguredOptions()
   cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
   return;
 # endif
+#ifdef VTK_MPI_PRENUMPROC_FLAGS
+  this->SeparateArguments(VTK_MPI_PRENUMPROC_FLAGS, this->MPIPreNumProcFlags);
+#endif
 # ifdef VTK_MPI_PREFLAGS
   this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
 # endif
@@ -262,6 +265,13 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
   if(this->MPIRun.size() && type != CLIENT)
     {
     commandLine.push_back(this->MPIRun.c_str());
+    if (!this->TestTiledDisplay)
+      {
+      for (unsigned int i = 0; i < this->MPIPreNumProcFlags.size(); ++i)
+        {
+        commandLine.push_back(this->MPIPreNumProcFlags[i].c_str());
+        }
+      }
     commandLine.push_back(this->MPINumProcessFlag.c_str());
     commandLine.push_back(numProc);
     if (!this->TestTiledDisplay)
