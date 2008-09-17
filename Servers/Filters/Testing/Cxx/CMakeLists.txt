@@ -38,7 +38,7 @@ IF (PARAVIEW_DATA_ROOT)
       ADD_EXECUTABLE(${name} ${name}.cxx)
       IF (VTK_MPIRUN_EXE AND VTK_MPI_MAX_NUMPROCS GREATER 1)
         ADD_TEST(${name}
-          ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 
+          ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
           ${CXX_TEST_PATH}/${name}
           -D ${PARAVIEW_DATA_ROOT}
           -T ${ParaView_BINARY_DIR}/Testing/Temporary)
