@@ -76,9 +76,9 @@ using vtkstd::string;
 #include <math.h>
 #include <ctime>
 // other 
-#include "vtkCTHFragmentUtils.hxx"
+#include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.80");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.81");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -3170,14 +3170,12 @@ int vtkCTHFragmentConnect::RequestData(
     this->IntegratedArrayNames.clear();
     this->NToIntegrate
       = MergeEnabledArrayNames(this->VolumeWtdAvgArraySelection,
-                               this->IntegratedArrayNames,
-                               MergedMarkers);
+                               this->IntegratedArrayNames);
     if (this->MaterialId<nMassArrays)
       {
       this->NToIntegrate
         += MergeEnabledArrayNames(this->MassWtdAvgArraySelection,
-                                  this->IntegratedArrayNames,
-                                  MergedMarkers);
+                                  this->IntegratedArrayNames);
       }
 
     // build arrays for results of attribute calculations

@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkCTHFragmentPieceLoading.h"
-#include "vtkCTHFragmentUtils.hxx"
+#include "vtkCTHFragmentUtilities.hxx"
 #include "vtkstd/vector"
 using vtkstd::vector;
 using vtksys_ios::ostream;

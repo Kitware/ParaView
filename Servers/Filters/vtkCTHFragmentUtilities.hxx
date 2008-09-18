@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkCTHFragmentUtils.hxx
+  Module:    vtkCTHFragmentUtilities.hxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -13,8 +13,8 @@
 
 =========================================================================*/
 
-#ifndef __vtkCTHFragmentUtil_h
-#define __vtkCTHFragmentUtil_h
+#ifndef __vtkCTHFragmentUtilities_h
+#define __vtkCTHFragmentUtilities_h
 
 // Vtk
 #include<vtkCommunicator.h>
@@ -251,18 +251,16 @@ void FillVector( vector<T> &V, const T &v)
     V[i]=v;
     }
 }
-/**
-Copier to copy from an array where type is not known 
-into a destination buffer.
-returns 0 if the type of the source array
-is not supported.
-*/
+// Copier to copy from an array where type is not known 
+// into a destination buffer.
+// returns 0 if the type of the source array
+// is not supported.
 template<class T>
 inline
 int CopyTuple(T *dest,          // scalar/vector
               vtkDataArray *src,//
               int nComps,       //
-              int srcCellIndex) // weight of contribution
+              int srcCellIndex) //
 {
   // convert cell index to array index
   int srcIndex=nComps*srcCellIndex;
@@ -309,9 +307,8 @@ int CopyTuple(T *dest,          // scalar/vector
     }
   return 1;
 }
-/**
-Construct a list of the selected array names
-*/
+
+// Construct a list of the selected array names
 int GetEnabledArrayNames(
         vtkDataArraySelection *das,
         vector<string> &names)
@@ -332,56 +329,52 @@ int GetEnabledArrayNames(
     }
   return nEnabled;
 }
-/**
-Merge selected array names form multiple data
-array selections who list the same arrays.
-Return the number of array that were merged.
-*/
+
+// This is inefficient but not used often.
+int IsIn(string name, vector<string> names)
+{
+  size_t n=names.size();
+  for (size_t i=0; i<n; ++i)
+    {
+    if (names[i]==name) return true;
+    }
+  return false;
+}
+
+// Merge selected array names form multiple data
+// array selections who list the same arrays.
+// Return the number of array that were merged.
+// Would like to use a std::set, but would require
+// more work than its worth.
 int MergeEnabledArrayNames(
         vtkDataArraySelection *das,
-        vector<string> &mergedNames,
-        vector<int> &mergedNamesMarker)
+        vector<string> &mergedNames)
 {
-  int nArraysTotal=das->GetNumberOfArrays();
-  // initial size in subsequent calls data array
-  // selection expected to  be the same size,
-  // order, etc...
-  if (mergedNamesMarker.size()==0)
-    {
-    mergedNamesMarker.resize(nArraysTotal,0);
-    }
-  // check each array in data array selection
+  // check each array in data array selection.
   int nMerged=0;
+  int nArraysTotal=das->GetNumberOfArrays();
   for (int i=0; i<nArraysTotal; ++i)
     {
-    // skip disabled, or previosly merged arrays
-    if (!das->GetArraySetting(i)
-        || mergedNamesMarker[i]==1)
+    string name=das->GetArrayName(i);
+    // skip disabled (all arrays should be enabled)
+    if (!das->GetArraySetting(i))
+      {
+      vtkGenericWarningMacro(
+          "Array: " << name << " is present but not enabled.");
+      continue;
+      }
+    // Skip previosly merged arrays
+    if (IsIn(name, mergedNames))
       {
       continue;
       }
     ++nMerged;
     // save names of enabled arrays, inc name count
-    mergedNames.push_back(das->GetArrayName(i));
-    // mark as being merged for future calls
-    mergedNamesMarker[i]=1;
+    mergedNames.push_back(name);
     }
   return nMerged;
 }
-/**
-Construct a list of the selected array names
-and merge them into a unique list. Return
-the number enabled.
-*/
-int GetAndMergeEnabledArrayNames(
-        vtkDataArraySelection *das,
-        vector<string> &names,
-        vector<string> &mergedNames,
-        vector<int> &mergedNamesMarker)
-{
-  MergeEnabledArrayNames(das,mergedNames,mergedNamesMarker);
-  return GetEnabledArrayNames(das,names);
-}
+
 #ifdef vtkCTHFragmentConnectDEBUG
 //
 int WritePidFile(vtkCommunicator *comm, string pidFileName)

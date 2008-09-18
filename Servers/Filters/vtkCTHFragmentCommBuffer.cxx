@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkCTHFragmentCommBuffer.h"
-#include "vtkCTHFragmentUtils.hxx"
+#include "vtkCTHFragmentUtilities.hxx"
 
 using vtkstd::vector;
 
