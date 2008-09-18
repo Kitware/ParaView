@@ -65,7 +65,7 @@ char *vtkPVTestUtilities::GetFilePath(
 {
   int baseLen=strlen(base);
   int nameLen=strlen(name);
-  int pathLen=baseLen+1+nameLen;
+  int pathLen=baseLen+1+nameLen+1;
   char *filePath=new char[pathLen];
   int i=0;
   for (; i<baseLen; ++i)
@@ -94,6 +94,7 @@ char *vtkPVTestUtilities::GetFilePath(
       filePath[i]=name[j];
     }
   }
+  filePath[i]='\0';
   return filePath;
 }
 //For each component of the arrays r_j=Sum_i(a_ji-b_ji). If the computation
@@ -158,11 +159,12 @@ bool vtkPVTestUtilities::CompareDataArrays(
     return false;
   }
   //
-  for (int q=0; q<3; ++q)
+  int n=r.size();
+  for (int q=0; q<n; ++q)
   {
     if (fabs(r[q])>tol)
     {
-      cerr << r[q] << endl;
+      cerr << daA->GetName() << ":" << r[q] << endl;
       return false;
     }
   }
