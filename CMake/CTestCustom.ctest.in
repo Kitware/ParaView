@@ -88,6 +88,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Xdmf2/libsrc"
   ".include.openmpi"
   "warning LNK4098"
+  "include/mpicxx.h"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
@@ -103,4 +104,3 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   "qrc_[^\\.]+.cxx"
   )
 
-  "include/mpicxx.h"
