@@ -22,7 +22,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkUndoStackInternal.h
       vtkSMPropertyHelper.h
       vtkInitializationHelper.h
-      vtkPVTestUtilities.h
       vtkCTHFragmentCommBuffer.h
       vtkCTHFragmentIdList.h
       vtkCTHFragmentIdListItem.h

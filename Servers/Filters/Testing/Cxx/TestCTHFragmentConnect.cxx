@@ -45,17 +45,18 @@ int main( int argc, char* argv[] )
   prototype->Delete();
 
   // Get various paths.
-  vtkPVTestUtilities tu(argc,argv);
-  char *baselinePath=tu.GetDataFilePath("Baseline/TestCTHFragmentConnect.vtm");
-  char *inputDataPath=tu.GetDataFilePath("Data/spcth_fc_0.0");
-  char *tempDataPath=tu.GetTempFilePath("TestCTHFragmentConnect.vtm");
+  vtkPVTestUtilities *tu=vtkPVTestUtilities::New();
+  tu->Initialize(argc,argv);
+  char *baselinePath=tu->GetDataFilePath("Baseline/TestCTHFragmentConnect.vtm");
+  char *inputDataPath=tu->GetDataFilePath("Data/spcth_fc_0.0");
+  char *tempDataPath=tu->GetTempFilePath("TestCTHFragmentConnect.vtm");
 
   if (myProcId==0)
-  {
+    {
     cerr << "Base: " << baselinePath << endl;
     cerr << "Input:" << inputDataPath << endl;
     cerr << "Temp: " << tempDataPath << endl;
-  }
+    }
 
   // read input
   vtkSpyPlotReader* spy=vtkSpyPlotReader::New();
@@ -108,7 +109,7 @@ int main( int argc, char* argv[] )
 
   // Process 0 checks the results.
   if (myProcId==0)
-  {
+    {
     // Save the current results in the tetsing temp folder
     vtkXMLMultiBlockDataWriter *mbdsw=vtkXMLMultiBlockDataWriter::New();
     mbdsw->SetInput(statsOut);
@@ -119,7 +120,7 @@ int main( int argc, char* argv[] )
     // Load the baseline data to compare current against
     vtkXMLMultiBlockDataReader *mbdsr=vtkXMLMultiBlockDataReader::New();
     if (!mbdsr->CanReadFile(baselinePath))
-    {
+      {
       // Oops can't read the baseline image
       delete [] baselinePath;
       delete [] tempDataPath;
@@ -130,7 +131,7 @@ int main( int argc, char* argv[] )
       controller->Delete();
       vtkAlgorithm::SetDefaultExecutivePrototype(0);
       return 1;
-    }
+      }
     mbdsr->SetFileName(baselinePath);
     vtkMultiBlockDataSet *mbdsBaseline
       = dynamic_cast<vtkMultiBlockDataSet *>(mbdsr->GetOutput());
@@ -139,24 +140,26 @@ int main( int argc, char* argv[] )
     // Loop over blocks comparing each against the baseline
     int nBlocks=statsOut->GetNumberOfBlocks();
     for (int block=0; block<nBlocks; ++block)
-    {
+      {
       vtkPolyData *pdCurrent
         = dynamic_cast<vtkPolyData *>(statsOut->GetBlock(block));
 
       vtkPolyData *pdBaseline
         = dynamic_cast<vtkPolyData *>(mbdsBaseline->GetBlock(block));
 
-      if (tu.ComparePointData(pdBaseline, pdCurrent, 1.0E-6)==false)
-      {
+      if (tu->ComparePointData(pdBaseline, pdCurrent, 1.0E-6)==false)
+        {
         cerr << "Error: Block "
              << block
              << " is not equal to baseline."
              << endl;
         testStatus=1;
+        }
       }
-    }
     mbdsr->Delete();
-  }
+    }
+
+  tu->Delete();
 
   delete [] baselinePath;
   delete [] tempDataPath;
