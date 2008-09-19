@@ -95,6 +95,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVCreateProcessModule
+  vtkPVTestUtilities.cxx
   WRAP_EXCLUDE
   )
 

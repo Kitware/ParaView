@@ -92,6 +92,7 @@ private:
   vtkPVTestUtilities(const vtkPVTestUtilities &); // Not implemented
   vtkPVTestUtilities &operator=(const vtkPVTestUtilities &); // Not implemented
 
+  //BTX
   // Description:
   // Sum the L2 Norm point wise over all tuples. Each term
   // is scaled by the magnitude of one of the inputs.
@@ -105,6 +106,8 @@ private:
           T_vtk *daB, // second vtk array
           T *pB,      // pointer to its data
           double &SumModR); // result
+  //ETX
+
   ///
   char GetPathSep();
   char *GetDataRoot();
