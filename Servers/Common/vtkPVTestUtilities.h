@@ -35,7 +35,7 @@ class vtkPVTestUtilities : public vtkObject
 public:
   // the usual vtk stuff
   vtkTypeRevisionMacro(vtkPVTestUtilities,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent){};
+  void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVTestUtilities *New();
 
   // Description:
@@ -99,13 +99,13 @@ private:
   // Return sum and the number of terms.
   //
   // Sum_i(Sqrt(Sum_j( b_ij - a_ij )**2)/Sqrt(Sum_j(a_ij**2)))
-  template <class T, class T_vtk>
+  template <class T>
   vtkIdType AccumulateScaledL2Norm(
-          T_vtk *daA, // first vtk array
-          T *pA,      // pointer to its data
-          T_vtk *daB, // second vtk array
-          T *pB,      // pointer to its data
-          double &SumModR); // result
+          T *pA,           // pointer to first data array
+          T *pB,           // pointer to second data array
+          vtkIdType nTups, // number of tuples
+          int nComps,      // number of comps
+          double &SumModR);// result
   //ETX
 
   ///

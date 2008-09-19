@@ -27,7 +27,7 @@
 using vtkstd::string;
 using vtkstd::vector;
 
-vtkCxxRevisionMacro(vtkPVTestUtilities, "1.4");
+vtkCxxRevisionMacro(vtkPVTestUtilities, "1.5");
 vtkStandardNewMacro(vtkPVTestUtilities);
 
 
@@ -114,44 +114,24 @@ char *vtkPVTestUtilities::GetFilePath(
 //-----------------------------------------------------------------------------
 // Sum the L2 Norm point wise over all tuples.
 // Return the number of terms in the sum.
-template <class T, class T_vtk>
+template <class T>
 vtkIdType vtkPVTestUtilities::AccumulateScaledL2Norm(
-        T_vtk *daA, // first vtk array
-        T *pA,      // pointer to its data
-        T_vtk *daB, // second vtk array
-        T *pB,      // pointer to its data
+        T *pA,           // pointer to first data array
+        T *pB,           // pointer to second data array
+        vtkIdType nTups, // number of tuples
+        int nComps,      // number of comps
         double &SumModR) // result
 {
-  vtkIdType nTupsA=daA->GetNumberOfTuples();
-  vtkIdType nTupsB=daB->GetNumberOfTuples();
-  int nCompsA=daA->GetNumberOfComponents();
-  int nCompsB=daB->GetNumberOfComponents();
-  //
-  if ((nTupsA!=nTupsB)
-     || (nCompsA!=nCompsB))
-    {
-    vtkGenericWarningMacro(
-              "Arrays: " << daA->GetName()
-              << " (nC=" << nCompsA 
-              << " nT= "<< nTupsA << ")"
-              << " and " << daB->GetName()
-              << " (nC=" << nCompsB 
-              << " nT= "<< nTupsB << ")"
-              << " do not have the same structure.");
-    return -1;
-    }
   //
   SumModR=0.0;
-  const T *tupA=daA->GetPointer(0);
-  const T *tupB=daB->GetPointer(0);
-  for (vtkIdType i=0; i<nTupsA; ++i)
+  for (vtkIdType i=0; i<nTups; ++i)
     {
     double modR=0.0;
     double modA=0.0;
-    for (int q=0; q<nCompsA; ++q)
+    for (int q=0; q<nComps; ++q)
       {
-      double a=tupA[q];
-      double b=tupB[q];
+      double a=pA[q];
+      double b=pB[q];
       modA+=a*a;
       double r=b-a;
       modR+=r*r;
@@ -159,10 +139,10 @@ vtkIdType vtkPVTestUtilities::AccumulateScaledL2Norm(
     modA=sqrt(modA);
     modA= modA<1.0 ? 1.0 : modA;
     SumModR+=sqrt(modR)/modA;
-    tupA+=nCompsA;
-    tupB+=nCompsA;
+    pA+=nComps;
+    pB+=nComps;
     }
-  return nTupsA;
+  return nTups;
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +160,25 @@ bool vtkPVTestUtilities::CompareDataArrays(
                     << typeB << ".");
     return false;
     }
+  //
+  vtkIdType nTupsA=daA->GetNumberOfTuples();
+  vtkIdType nTupsB=daB->GetNumberOfTuples();
+  int nCompsA=daA->GetNumberOfComponents();
+  int nCompsB=daB->GetNumberOfComponents();
+  //
+  if ((nTupsA!=nTupsB)
+     || (nCompsA!=nCompsB))
+    {
+    vtkWarningMacro(
+              "Arrays: " << daA->GetName()
+              << " (nC=" << nCompsA 
+              << " nT= "<< nTupsA << ")"
+              << " and " << daB->GetName()
+              << " (nC=" << nCompsB 
+              << " nT= "<< nTupsB << ")"
+              << " do not have the same structure.");
+    return false;
+    }
 
   double L2=0.0;
   vtkIdType N=0;
@@ -191,7 +190,7 @@ bool vtkPVTestUtilities::CompareDataArrays(
       double *pA=A->GetPointer(0);
       vtkDoubleArray *B=dynamic_cast<vtkDoubleArray *>(daB);
       double *pB=B->GetPointer(0);
-      N=this->AccumulateScaledL2Norm(A,pA,B,pB,L2);
+      N=this->AccumulateScaledL2Norm(pA,pB,nTupsA,nCompsA,L2);
       }
       break;
     case VTK_FLOAT:
@@ -200,7 +199,7 @@ bool vtkPVTestUtilities::CompareDataArrays(
       float *pA=A->GetPointer(0);
       vtkFloatArray *B=dynamic_cast<vtkFloatArray *>(daB);
       float *pB=B->GetPointer(0);
-      N=this->AccumulateScaledL2Norm(A,pA,B,pB,L2);
+      N=this->AccumulateScaledL2Norm(pA,pB,nTupsA,nCompsA,L2);
       }
       break;
     default:
@@ -273,5 +272,16 @@ bool vtkPVTestUtilities::ComparePointData(
     }
   // All tests passed.
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVTestUtilities::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "argc=" << this->Argc << endl;
+  os << indent << "argv=" << this->Argv << endl;
+  os << indent << "DataRoot=" << this->DataRoot << endl;
+  os << indent << "TempRoot=" << this->TempRoot << endl;
 }
 
