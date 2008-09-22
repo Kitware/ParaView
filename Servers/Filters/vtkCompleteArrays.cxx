@@ -39,7 +39,7 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.8");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.9");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
@@ -101,10 +101,7 @@ int vtkCompleteArrays::RequestData(
       {
       noNeed = 1;
       }
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      this->Controller->Send(&noNeed, 1, idx, 3389001);
-      }
+    this->Controller->Broadcast(&noNeed, 1, 0);
     if (noNeed)
       {
       return 1;
@@ -151,7 +148,7 @@ int vtkCompleteArrays::RequestData(
     }
   else
     { // remote processes
-    this->Controller->Receive(&noNeed, 1, 0, 3389001);
+    this->Controller->Broadcast(&noNeed, 1, 0);
     if (noNeed)
       {
       return 1;
