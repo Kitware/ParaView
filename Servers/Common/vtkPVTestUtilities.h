@@ -30,7 +30,7 @@
 class vtkPolyData;
 class vtkDataArray;
 
-class vtkPVTestUtilities : public vtkObject
+class VTK_EXPORT vtkPVTestUtilities : public vtkObject
 {
 public:
   // the usual vtk stuff
@@ -90,7 +90,7 @@ protected:
 
 private:
   vtkPVTestUtilities(const vtkPVTestUtilities &); // Not implemented
-  vtkPVTestUtilities &operator=(const vtkPVTestUtilities &); // Not implemented
+  void operator=(const vtkPVTestUtilities &); // Not implemented
 
   //BTX
   // Description:
