@@ -431,6 +431,28 @@ QVariant pqSpreadSheetViewModel::data(
         // Don't show ASCII characted for char arrays.
         str = QString::number(value.ToInt());
         }
+      else if (value.IsArray())
+        {
+        // it's possible that it's a char array, then too we need to do the
+        // number magic.
+        vtkDataArray* array = vtkDataArray::SafeDownCast(value.ToArray());
+        if (array && (
+            array->GetDataType() == VTK_CHAR ||
+            array->GetDataType() == VTK_UNSIGNED_CHAR ||
+            array->GetDataType() == VTK_SIGNED_CHAR))
+          {
+          str = QString();
+          for (vtkIdType cc=0; cc < array->GetNumberOfTuples(); cc++)
+            {
+            double *tuple = array->GetTuple(cc);
+            for (vtkIdType kk=0; kk < array->GetNumberOfComponents(); kk++)
+              {
+              str += QString::number(static_cast<int>(tuple[kk])) + " ";
+              }
+            str = str.trimmed();
+            }
+          }
+        }
       str.replace(" ", "\t");
       return str;
       }
