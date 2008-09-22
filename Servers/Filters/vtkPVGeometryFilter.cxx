@@ -55,11 +55,64 @@
 
 #include <vtkstd/map>
 #include <vtkstd/string>
+#include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.85");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.86");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
+
+class vtkPVGeometryFilter::BoundsReductionOperation : public vtkCommunicator::Operation
+{
+public:
+  // Subclasses must overload this method, which performs the actual
+  // operations.  The methods should first do a reintepret cast of the arrays
+  // to the type suggestsed by \c datatype (which will be one of the VTK type
+  // identifiers like VTK_INT, etc.).  Both arrays are considered top be
+  // length entries.  The method should perform the operation A*B (where * is
+  // a placeholder for whatever operation is actually performed) and store the
+  // result in B.  The operation is assumed to be associative.  Commutativity
+  // is specified by the Commutative method.
+  virtual void Function(const void *A, void *B, vtkIdType length,
+    int datatype)
+    {
+    assert((datatype == VTK_DOUBLE) && (length==6));
+    const double* bdsA = reinterpret_cast<const double*>(A);
+    double* bdsB = reinterpret_cast<double*>(B);
+    if (bdsA[0] < bdsB[0])
+      {
+      bdsB[0] = bdsA[0];
+      }
+    if (bdsA[1] > bdsB[1])
+      {
+      bdsB[1] = bdsA[1];
+      }
+    if (bdsA[2] < bdsB[2])
+      {
+      bdsB[2] = bdsA[2];
+      }
+    if (bdsA[3] > bdsB[3])
+      {
+      bdsB[3] = bdsA[3];
+      }
+    if (bdsA[4] < bdsB[4])
+      {
+      bdsB[4] = bdsA[4];
+      }
+    if (bdsA[5] > bdsB[5])
+      {
+      bdsB[5] = bdsA[5];
+      } 
+    }
+
+  // Description:
+  // Subclasses override this method to specify whether their operation
+  // is commutative.  It should return 1 if commutative or 0 if not.
+  virtual int Commutative()
+    {
+    return 1;
+    }
+};
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter ()
@@ -583,27 +636,16 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunic
     }
   if( this->Controller && doCommunicate )
     {
-    // An MPI gather or reduce would be easier ...
-    if (this->Controller->GetLocalProcessId() == 0)  
+    int reduced_skip = 0;
+    if (!this->Controller->AllReduce(&skip, &reduced_skip, 1,
+        vtkCommunicator::MAX_OP))
       {
-      int tmp, idx;
-      for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
-        {
-        this->Controller->Receive(&tmp, 1, idx, 89743);
-        if (tmp)
-          {
-          skip = 1;
-          }
-        }
-      for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
-        {
-        this->Controller->Send(&skip, 1, idx, 89744);
-        }
+      vtkErrorMacro("Failed to reduce correctly.");
+      skip = 1;
       }
     else
       {
-      this->Controller->Send(&skip, 1, 0, 89743);
-      this->Controller->Receive(&skip, 1, 0, 89744);
+      skip = reduced_skip;
       }
     }
   if (skip)
@@ -675,46 +717,19 @@ void vtkPVGeometryFilter::DataSetExecute(
 
   input->GetBounds(bds);
 
+  vtkPVGeometryFilter::BoundsReductionOperation operation;
   if ( procid && doCommunicate )
     {
     // Satellite node
-    this->Controller->Send(bds, 6, 0, 792390);
+    this->Controller->Reduce(bds, NULL, 6, &operation, 0);
     }
   else
     {
-    int idx;
-    double tmp[6];
-    
     if (doCommunicate)
       {
-      for (idx = 1; idx < numProcs; ++idx)
-        {
-        this->Controller->Receive(tmp, 6, idx, 792390);
-        if (tmp[0] < bds[0])
-          {
-          bds[0] = tmp[0];
-          }
-        if (tmp[1] > bds[1])
-          {
-          bds[1] = tmp[1];
-          }
-        if (tmp[2] < bds[2])
-          {
-          bds[2] = tmp[2];
-          }
-        if (tmp[3] > bds[3])
-          {
-          bds[3] = tmp[3];
-          }
-        if (tmp[4] < bds[4])
-          {
-          bds[4] = tmp[4];
-          }
-        if (tmp[5] > bds[5])
-          {
-          bds[5] = tmp[5];
-          }
-        }
+      double tmp[6];
+      this->Controller->Reduce(bds, tmp, 6, &operation, 0);
+      memcpy(bds, tmp, 6*sizeof(double));
       }
 
     if (bds[1] >= bds[0] && bds[3] >= bds[2] && bds[5] >= bds[4])
@@ -772,46 +787,19 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
 
   input->GetBounds(bds);
 
+  vtkPVGeometryFilter::BoundsReductionOperation operation;
   if ( procid && doCommunicate )
     {
     // Satellite node
-    this->Controller->Send(bds, 6, 0, 792390);
+    this->Controller->Reduce(bds, NULL, 6, &operation, 0);
     }
   else
     {
-    int idx;
-    double tmp[6];
-    
     if (doCommunicate)
       {
-      for (idx = 1; idx < numProcs; ++idx)
-        {
-        this->Controller->Receive(tmp, 6, idx, 792390);
-        if (tmp[0] < bds[0])
-          {
-          bds[0] = tmp[0];
-          }
-        if (tmp[1] > bds[1])
-          {
-          bds[1] = tmp[1];
-          }
-        if (tmp[2] < bds[2])
-          {
-          bds[2] = tmp[2];
-          }
-        if (tmp[3] > bds[3])
-          {
-          bds[3] = tmp[3];
-          }
-        if (tmp[4] < bds[4])
-          {
-          bds[4] = tmp[4];
-          }
-        if (tmp[5] > bds[5])
-          {
-          bds[5] = tmp[5];
-          }
-        }
+      double tmp[6];
+      this->Controller->Reduce(bds, tmp, 6, &operation, 0);
+      memcpy(bds, tmp, 6*sizeof(double));
       }
 
     // only output in process 0.

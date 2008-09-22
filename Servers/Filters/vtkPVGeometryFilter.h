@@ -101,7 +101,8 @@ public:
   void SetPassThroughPointIds(int);
   vtkGetMacro(PassThroughPointIds,int);
   vtkBooleanMacro(PassThroughPointIds,int);
-  
+
+//BTX
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -185,6 +186,9 @@ private:
   void AddHierarchicalIndex(vtkPolyData* pd, unsigned int level, unsigned int index);
 
   unsigned int CompositeIndex;
+
+  class BoundsReductionOperation;
+//ETX
 };
 
 #endif
