@@ -331,7 +331,7 @@ class VectorProperty(Property):
     property[1:3] = (1, 2)
     """
     def ConvertValue(self, value):
-       """Converts value to type suitable for vtSM.Property::SetElement()"""
+       """Converts value to type suitable for vtSMProperty::SetElement()"""
        if self.SMProperty.IsA("vtkSMIntVectorProperty") and \
          self.SMProperty.GetDomain("enum") and type(value) == str:
            domain = self.SMProperty.GetDomain("enum")
@@ -344,35 +344,31 @@ class VectorProperty(Property):
         """Returns the number of elements."""
         return self.SMProperty.GetNumberOfElements()
 
-    def __getitem__(self, idx):
-        """Given an index, return an element. Raises an IndexError
-        exception if the argument is out of bounds."""
-        if idx >= len(self):
-            raise exceptions.IndexError
-        return self.SMProperty.GetElement(idx)
-
     def __setitem__(self, idx, value):
-        """Given an index and a value, sets an element."""
+      """Given a list or tuple of values, sets a slice of values [min, max)"""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self))         
+        for i, j in zip(range(*indices), value):  
+          self.SMProperty.SetElement(i, self.ConvertValue(j))                
+        self._UpdateProperty()    
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      else:        
         self.SMProperty.SetElement(idx, self.ConvertValue(value))
-        self._UpdateProperty()
-
-    def __getslice__(self, min, max):
-        """Returns the range [min, max) of elements. Raises an IndexError
-        exception if an argument is out of bounds."""
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        retval = []
-        for i in range(min, max):
-            retval.append(self.SMProperty.GetElement(i))
-        return retval
-
-    def __setslice__(self, min, max, values):
-        "Given a list or tuple of values, sets a slice of values [min, max)."
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        for i in range(min, max):
-            self.SMProperty.SetElement(i, self.ConvertValue(values[i-min]))
-        self._UpdateProperty()
+        self._UpdateProperty()                
+  
+    def __getitem__(self, idx):
+      """Returns the range [min, max) of elements. Raises an IndexError
+      exception if an argument is out of bounds."""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self)) 
+        retVal = []
+        for i in range(*indices):
+          retVal.append(self.SMProperty.GetElement(i))
+        return retVal
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      return _getPyProxy(self.SMProperty.GetElement(idx))   
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -384,7 +380,7 @@ class VectorProperty(Property):
         if property.GetRepeatable() or \
            property.GetRepeatCommand() or  \
            property.GetNumberOfElements() > 1:
-            return self.__getslice__(0, len(self))
+            return self[0:len(self)]
         elif property.GetNumberOfElements() == 1:
             return property.GetElement(0)
 
@@ -416,51 +412,52 @@ class ProxyProperty(Property):
         """Returns the number of elements."""
         return self.SMProperty.GetNumberOfProxies()
 
-    def __getitem__(self, idx):
-        """Given an index, return an element. Raises an IndexError
-        exception if the argument is out of bounds."""
-        if idx >= len(self):
-            raise exceptions.IndexError
-        return _getPyProxy(self.SMProperty.GetProxy(idx))
-
     def __setitem__(self, idx, value):
-        """Given an index and a value, sets an element."""
+      """Given a list or tuple of values, sets a slice of values [min, max)"""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self))         
+        for i, j in zip(range(*indices), value):  
+          self.SMProperty.SetProxy(i, j.SMProxy)      
+          
+        self._UpdateProperty()    
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      else:        
         self.SMProperty.SetProxy(idx, value.SMProxy)
-        self._UpdateProperty()
-
-    def __delitem__(self, idx):
-        """Removes the element idx"""
-        proxy = self[idx].SMProxy
-        self.SMProperty.RemoveProxy(proxy)
-        self._UpdateProperty()
-
-    def __getslice__(self, min, max):
-        """Returns the range [min, max) of elements. Raises an IndexError
-        exception if an argument is out of bounds."""
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        retval = []
-        for i in range(min, max):
-            proxy = _getPyProxy(self.SMProperty.GetProxy(i))
-            retval.append(proxy)
-        return retval
-
-    def __setslice__(self, min, max, values):
-        "Given a list or tuple of values, sets a slice of values [min, max)."
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        for i in range(min, max):
-            self.SMProperty.SetProxy(i, values[i-min].SMProxy)
-        self._UpdateProperty()
-
-    def __delslice__(self, min, max):
-        """Removes elements [min, max)"""
-        proxies = []
-        for i in range(min, max):
-            proxies.append(self[i].SMProxy)
-        for i in proxies:
-            self.SMProperty.RemoveProxy(i)
-        self._UpdateProperty()
+        self._UpdateProperty()            
+                    
+    def __delitem__(self,idx):
+      """Removes the element idx"""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self))
+        # Collect the elements to delete to a new list first.
+        # Otherwise indices are screwed up during the actual
+        # remove loop.
+        toremove = []
+        for i in range(*indices):
+          toremove.append(self[i])
+        for i in toremove:
+          self.SMProperty.RemoveProxy(i.SMProxy)        
+        self._UpdateProperty()    
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      else:        
+        self.SMProperty.RemoveProxy(self[idx].SMProxy)
+        self._UpdateProperty()                
+  
+    def __getitem__(self, idx):
+      """Returns the range [min, max) of elements. Raises an IndexError
+      exception if an argument is out of bounds."""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self)) 
+        retVal = []
+        for i in range(*indices):
+          retVal.append(_getPyProxy(self.SMProperty.GetProxy(i)))
+        return retVal
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      return _getPyProxy(self.SMProperty.GetProxy(idx))     
+                              
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -475,7 +472,7 @@ class ProxyProperty(Property):
         "Returns all elements as either a list or a single value."
         property = self.SMProperty
         if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
-            return self.__getslice__(0, len(self))
+            return self[0:len(self)]
         else:
             if property.GetNumberOfProxies() > 0:
                 return _getPyProxy(property.GetProxy(0))
@@ -513,14 +510,6 @@ class InputProperty(ProxyProperty):
     del property[1]
     """
 
-    def __getitem__(self, idx):
-        """Given an index, return an element as an OutputPort object.
-        Raises an IndexError exception if the argument is out of bounds."""
-        if idx >= len(self):
-            raise exceptions.IndexError
-        return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)),\
-                          self.SMProperty.GetOutputPortForConnection(idx))
-
     def __getOutputPort(self, value):
         portidx = 0
         if isinstance(value, OutputPort):
@@ -533,35 +522,36 @@ class InputProperty(ProxyProperty):
         return OutputPort(value_proxy, portidx)
         
     def __setitem__(self, idx, value):
-        """Given an index and a value, sets an element. Accepts Proxy or
-        OutputPort objects."""
+      """Given a list or tuple of values, sets a slice of values [min, max)"""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self))         
+        for i, j in zip(range(*indices), value):  
+          op = self.__getOutputPort(value[i-min])
+          self.SMProperty.SetInputConnection(i, op.Proxy, op.Port)                
+        self._UpdateProperty()    
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      else:        
         op = self.__getOutputPort(value)
         self.SMProperty.SetInputConnection(idx, op.Proxy, op.Port)
-        self._UpdateProperty()
-
-    def __getslice__(self, min, max):
-        """Returns the range [min, max) of elements as a list of OutputPort
-        objects. Raises an IndexError exception if an argument is out of
-        bounds."""
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        retval = []
-        for i in range(min, max):
-            port = OutputPort(_getPyProxy(self.SMProperty.GetProxy(i)),\
+        self._UpdateProperty()    
+        
+    def __getitem__(self, idx):
+      """Returns the range [min, max) of elements. Raises an IndexError
+      exception if an argument is out of bounds."""
+      if isinstance(idx, slice):        
+        indices = idx.indices(len(self)) 
+        retVal = []
+        for i in range(*indices):
+          port = OutputPort(_getPyProxy(self.SMProperty.GetProxy(i)),\
                               self.SMProperty.GetOutputPortForConnection(i))
-            retval.append(port)
-        return retval
-
-    def __setslice__(self, min, max, values):
-        """Given a list or tuple of values, sets a slice of values [min, max).
-        Accepts Proxy or OutputPort objects."""
-        if min < 0 or min > len(self) or max < 0 or max > len(self):
-            raise exceptions.IndexError
-        for i in range(min, max):
-            op = self.__getOutputPort(value[i-min])
-            self.SMProperty.SetInputConnection(i, op.Proxy, op.Port)
-        self._UpdateProperty()
-
+          retval.append(port)
+        return retVal
+      elif idx >= len(self) or idx < 0:
+        raise exceptions.IndexError
+      return OutputPort(_getPyProxy(self.SMProperty.GetProxy(idx)),\
+                          self.SMProperty.GetOutputPortForConnection(idx))    
+                          
     def append(self, value):
         """Appends the given proxy to the property values.
         Accepts Proxy or OutputPort objects."""
@@ -574,7 +564,7 @@ class InputProperty(ProxyProperty):
         a single OutputPort object."""
         property = self.SMProperty
         if property.GetRepeatable() or property.GetNumberOfProxies() > 1:
-            return self.__getslice__(0, len(self))
+            return self[0:len(self)]
         else:
             if property.GetNumberOfProxies() > 0:
                 return OutputPort(_getPyProxy(property.GetProxy(0)),\
@@ -1821,7 +1811,7 @@ def demo3():
     probes it with a line, delivers the result to the client using Fetch
     and plots it using pylab. This demo requires numpy and pylab installed.
     It returns a tuple of (data, render view)."""
-    import paraview.numeric
+    import paraview.numpy_support
     import pylab
     
     if not ActiveConnection:
@@ -1877,7 +1867,7 @@ def demo3():
     # Now deliver it to the client. Remember, this is for small data.
     data = Fetch(probe)
     # Convert it to a numpy array
-    data = paraview.numeric.getarray(data.GetPointData().GetArray(0))
+    data = paraview.numpy_support.vtk_to_numpy(data.GetPointData().GetArray(0))
     # Plot it using matplotlib
     pylab.plot(data)
     pylab.show()
