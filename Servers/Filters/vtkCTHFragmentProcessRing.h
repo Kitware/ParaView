@@ -27,62 +27,62 @@
 
 class vtkCTHFragmentProcessRing
 {
-  public:
-    // Description:
-    vtkCTHFragmentProcessRing()
-    {
-      this->Clear();
-    }
-    // Description:
-    ~vtkCTHFragmentProcessRing()
-    {
-      this->Clear();
-    }
-    // Description:
-    // Return the object to an empty state.
-    void Clear()
-    {
+public:
+  // Description:
+  vtkCTHFragmentProcessRing()
+  {
+    this->Clear();
+  }
+  // Description:
+  ~vtkCTHFragmentProcessRing()
+  {
+    this->Clear();
+  }
+  // Description:
+  // Return the object to an empty state.
+  void Clear()
+  {
+    this->NextElement=0;
+    this->BufferSize=0;
+    this->Buffer.clear();
+  }
+  // Description:
+  // Size buffer and point to first element.
+  void Initialize(int nProcs)
+  {
+    this->NextElement=0;
+    this->BufferSize=nProcs;
+    this->Buffer.resize(nProcs);
+    for (int procId=0; procId<nProcs; ++procId)
+      {
+      this->Buffer[procId]=procId;
+      }
+  }
+  // Description:
+  // Build from a process loading from a sorted 
+  // vector of process loading items.
+  void Initialize(
+      vtkstd::vector<vtkCTHFragmentProcessLoading> &Q,
+      vtkIdType upperLoadingBound);
+  // Description:
+  // Get the next process id from the ring.
+  int GetNextId()
+  {
+    int id=this->Buffer[this->NextElement];
+    ++this->NextElement;
+    if (this->NextElement==this->BufferSize)
+      {
       this->NextElement=0;
-      this->BufferSize=0;
-      this->Buffer.clear();
-    }
-    // Description:
-    // Size buffer and point to first element.
-    void Initialize(int nProcs)
-    {
-      this->NextElement=0;
-      this->BufferSize=nProcs;
-      this->Buffer.resize(nProcs);
-      for (int procId=0; procId<nProcs; ++procId)
-        {
-        this->Buffer[procId]=procId;
-        }
-    }
-    // Description:
-    // Build from a process loading from a sorted 
-    // vector of process loading items.
-    void Initialize(
-        vtkstd::vector<vtkCTHFragmentProcessLoading> &Q,
-        vtkIdType upperLoadingBound);
-    // Description:
-    // Get the next process id from the ring.
-    int GetNextId()
-    {
-      int id=this->Buffer[this->NextElement];
-      ++this->NextElement;
-      if (this->NextElement==this->BufferSize)
-        {
-        this->NextElement=0;
-        }
-      return id;
-    }
-    // Description:
-    // Print the state of the ring.
-    void Print();
+      }
+    return id;
+  }
+  // Description:
+  // Print the state of the ring.
+  void Print();
 
-  private:
-    int NextElement;
-    int BufferSize;
-    vtkstd::vector<int> Buffer;
+private:
+  int NextElement;
+  int BufferSize;
+  vtkstd::vector<int> Buffer;
 };
 #endif
