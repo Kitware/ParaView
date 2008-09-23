@@ -108,27 +108,31 @@ struct pqReaderInfo
     // Assume that it can read the file (based on extension match)
     // if CanReadFile does not exist.
     int canRead = 1;
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    vtkSMProxy* proxy = 
-      pxm->NewProxy("sources", this->PrototypeProxy->GetXMLName());
-    proxy->SetConnectionID(cid);
-    proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
-    proxy->UpdateVTKObjects();
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << proxy->GetID() << "CanReadFile" << filename.toAscii().data()
-           << vtkClientServerStream::End;
-    pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
-    pm->GetLastResult(cid,
-      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
-           << vtkClientServerStream::End;
-    pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
-    proxy->Delete();
+    // ImageReader always returns 0 so don't test it
+    if (strcmp(this->PrototypeProxy->GetXMLName(), "ImageReader") != 0)
+      {
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+      vtkSMProxy* proxy = 
+        pxm->NewProxy("sources", this->PrototypeProxy->GetXMLName());
+      proxy->SetConnectionID(cid);
+      proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+      proxy->UpdateVTKObjects();
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << proxy->GetID() << "CanReadFile" << filename.toAscii().data()
+             << vtkClientServerStream::End;
+      pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
+      pm->GetLastResult(cid,
+        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
+             << vtkClientServerStream::End;
+      pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
+      proxy->Delete();
+      }
     return canRead;
     }
 };
