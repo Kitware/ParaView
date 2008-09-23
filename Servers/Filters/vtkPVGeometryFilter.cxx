@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.87");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.88");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -77,6 +77,8 @@ public:
     int datatype)
     {
     assert((datatype == VTK_DOUBLE) && (length==6));
+    (void)datatype;
+    (void)length;
     const double* bdsA = reinterpret_cast<const double*>(A);
     double* bdsB = reinterpret_cast<double*>(B);
     if (bdsA[0] < bdsB[0])
