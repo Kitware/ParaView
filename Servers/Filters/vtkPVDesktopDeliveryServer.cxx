@@ -22,15 +22,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkLightCollection.h"
 #include "vtkLight.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkSmartPointer.h"
 #include "vtkSquirtCompressor.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
-
-#include "vtkSmartPointer.h"
 
 #include <vtkstd/map>
 
@@ -62,7 +62,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.11");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.12");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -307,13 +307,20 @@ void vtkPVDesktopDeliveryServer::UseRendererSet(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryServer::ReceiveWindowInformation()
+bool vtkPVDesktopDeliveryServer::ProcessWindowInformation(
+  vtkMultiProcessStream& stream)
 {
+  if (!this->Superclass::ProcessWindowInformation(stream))
+    {
+    return false;
+    }
+
   vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
-  this->Controller->Receive(reinterpret_cast<int *>(&winGeoInfo),
-                            vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_SIZE,
-                            this->RootProcessId,
-                            vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_TAG);
+  if (!winGeoInfo.Restore(stream))
+    {
+    vtkErrorMacro("Failed to read WindowGeometry info.");
+    return false;
+    }
 
   // Correct window size.
   this->ClientWindowSize[0] = this->FullImageSize[0];
@@ -336,21 +343,28 @@ void vtkPVDesktopDeliveryServer::ReceiveWindowInformation()
   this->UseRendererSet(winGeoInfo.Id);
 
   vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
-  this->Controller->Receive(reinterpret_cast<int *>(&squirtOptions),
-                            vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
-                            this->RootProcessId,
-                            vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+  if (!squirtOptions.Restore(stream))
+    {
+    vtkErrorMacro("Failed to read SquirtOptions.");
+    return false;
+    }
   this->Squirt = squirtOptions.Enabled;
   this->SquirtCompressionLevel = squirtOptions.CompressLevel;
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryServer::ReceiveRendererInformation(vtkRenderer *ren)
+bool vtkPVDesktopDeliveryServer::ProcessRendererInformation(vtkRenderer *ren,
+  vtkMultiProcessStream& stream)
 {
+  if (!this->Superclass::ProcessRendererInformation(ren, stream))
+    {
+    return false;
+    }
+
   // Get the original viewport from the client.
   double viewport[4];
-  this->Controller->Receive(viewport, 4, this->RootProcessId,
-                            vtkPVDesktopDeliveryServer::RENDERER_VIEWPORT_TAG);
+  stream >> viewport[0] >> viewport[1] >> viewport[2] >> viewport[3];
 
   double scaleX = (double)this->ClientWindowSize[0]/this->ClientGUISize[0];
   double scaleY = (double)this->ClientWindowSize[1]/this->ClientGUISize[1];
@@ -372,6 +386,7 @@ void vtkPVDesktopDeliveryServer::ReceiveRendererInformation(vtkRenderer *ren)
   viewport[3] += offsetY;
 
   ren->SetViewport(viewport);
+  return true;
 }
 
 //----------------------------------------------------------------------------
@@ -760,4 +775,50 @@ static void UseRendererSet(void *localArg, void *remoteArg, int, int)
   vtkPVDesktopDeliveryServer *self
     = reinterpret_cast<vtkPVDesktopDeliveryServer *>(localArg);
   self->UseRendererSet(*reinterpret_cast<int*>(remoteArg));
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDesktopDeliveryServer::WindowGeometry::Save(vtkMultiProcessStream& stream)
+{
+  stream << vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_TAG;
+  stream << this->Position[0] << this->Position[1]
+    << this->GUISize[0] << this->GUISize[1]
+    << this->Id
+    << this->AnnotationLayer;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVDesktopDeliveryServer::WindowGeometry::Restore(vtkMultiProcessStream& stream)
+{
+  int tag;
+  stream >> tag;
+  if (tag != vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_TAG)
+    {
+    return false;
+    }
+  stream >> this->Position[0] >> this->Position[1]
+    >> this->GUISize[0] >> this->GUISize[1]
+    >> this->Id
+    >> this->AnnotationLayer;
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDesktopDeliveryServer::SquirtOptions::Save(vtkMultiProcessStream& stream)
+{
+  stream << vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG;
+  stream << this->Enabled << this->CompressLevel;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkPVDesktopDeliveryServer::SquirtOptions::Restore(vtkMultiProcessStream& stream)
+{
+  int tag;
+  stream >> tag;
+  if (tag != vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG)
+    {
+    return false;
+    }
+  stream >> this->Enabled >> this->CompressLevel;
+  return true;
 }

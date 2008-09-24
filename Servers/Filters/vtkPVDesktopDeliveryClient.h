@@ -174,8 +174,8 @@ protected:
   double RemoteImageProcessingTime;
   double TransferTime;
 
-  virtual void SendWindowInformation();
-  virtual void SendRendererInformation(vtkRenderer *);
+  virtual void CollectWindowInformation(vtkMultiProcessStream& stream);
+  virtual void CollectRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   // Squirt options (probably to be replaced later).
   int Squirt;

@@ -88,6 +88,8 @@ public:
   struct SquirtOptions {
     int Enabled;
     int CompressLevel;
+    void Save(vtkMultiProcessStream& stream);
+    bool Restore(vtkMultiProcessStream& stream);
   };
 
   struct ImageParams {
@@ -127,7 +129,9 @@ protected:
 
   virtual void ReadReducedImage();
 
-  virtual void ReceiveWindowInformation();
+  // Description:
+  // Process window information for synchronizing windows on each frame.
+  virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
 
   int Squirt;
   int SquirtCompressionLevel;

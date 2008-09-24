@@ -214,11 +214,11 @@ protected:
 
   virtual void UpdateIceTContext();
 
-  virtual void SendWindowInformation();
-  virtual void ReceiveWindowInformation();
+  virtual void CollectWindowInformation(vtkMultiProcessStream&);
+  virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
 
-  virtual void SendRendererInformation(vtkRenderer *);
-  virtual void ReceiveRendererInformation(vtkRenderer *);
+  virtual void CollectRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
+  virtual bool ProcessRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   virtual void PreRenderProcessing();
   virtual void PostRenderProcessing();

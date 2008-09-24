@@ -34,7 +34,7 @@
 #include "vtkParallelRenderManager.h"
 
 class vtkPVDesktopDeliveryServerRendererMap;
-
+class vtkMultiProcessStream;
 class vtkFloatArray;
 class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkParallelRenderManager
 {
@@ -136,11 +136,15 @@ public:
     int GUISize[2];
     int Id;
     int AnnotationLayer;
+    void Save(vtkMultiProcessStream& stream);
+    bool Restore(vtkMultiProcessStream& stream);
   };
 
   struct SquirtOptions {
     int Enabled;
     int CompressLevel;
+    void Save(vtkMultiProcessStream& stream);
+    bool Restore(vtkMultiProcessStream& stream);
   };
 
   struct ImageParams {
@@ -154,18 +158,13 @@ public:
   enum TimingMetricSize {
     TIMING_METRICS_SIZE=sizeof(struct TimingMetrics)/sizeof(double)
   };
-  enum WindowGeometrySize {
-    WINDOW_GEOMETRY_SIZE=sizeof(struct WindowGeometry)/sizeof(int)
-  };
-  enum SquirtOptionSize {
-    SQUIRT_OPTIONS_SIZE=sizeof(struct SquirtOptions)/sizeof(int)
-  };
   enum ImageParamsSize {
     IMAGE_PARAMS_SIZE=sizeof(struct ImageParams)/sizeof(int)
   };
 
 //ETX
-  
+
+//BTX
 protected:
   vtkPVDesktopDeliveryServer();
   virtual ~vtkPVDesktopDeliveryServer();
@@ -185,8 +184,8 @@ protected:
 
   virtual void ReadReducedImage();
 
-  virtual void ReceiveWindowInformation();
-  virtual void ReceiveRendererInformation(vtkRenderer *);
+  virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
+  virtual bool ProcessRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   int Squirt;
   int SquirtCompressionLevel;
@@ -216,6 +215,7 @@ protected:
 private:
   vtkPVDesktopDeliveryServer(const vtkPVDesktopDeliveryServer &); //Not implemented
   void operator=(const vtkPVDesktopDeliveryServer &);    //Not implemented
+//ETX
 };
 
 #endif

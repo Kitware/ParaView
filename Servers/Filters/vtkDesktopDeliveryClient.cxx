@@ -45,7 +45,7 @@ static void vtkDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.26");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.27");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -152,16 +152,14 @@ float vtkDesktopDeliveryClient::GetZBufferValue(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkDesktopDeliveryClient::SendWindowInformation()
+void vtkDesktopDeliveryClient::CollectWindowInformation(vtkMultiProcessStream& stream)
 {
+  this->Superclass::CollectWindowInformation(stream);
+
   vtkDesktopDeliveryServer::SquirtOptions squirt_options;
   squirt_options.Enabled = this->Squirt;
   squirt_options.CompressLevel = this->SquirtCompressionLevel;
-
-  this->Controller->Send((int *)(&squirt_options),
-             vtkDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
-             this->ServerProcessId,
-             vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+  squirt_options.Save(stream);
 }
 
 //----------------------------------------------------------------------------

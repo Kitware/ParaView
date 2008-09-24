@@ -16,18 +16,19 @@
  Copyright (c) Sandia Corporation
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
+#include "vtkIceTRenderManager.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIceTContext.h"
-#include "vtkIceTRenderManager.h"
 #include "vtkIceTRenderer.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
-#include "vtkMPI.h"
 #include "vtkMPIController.h"
+#include "vtkMPI.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPerspectiveTransform.h"
 #include "vtkPKdTree.h"
@@ -40,7 +41,7 @@
 #include <GL/ice-t.h>
 
 #include "vtkgl.h"
-
+#include "assert.h"
 #include <vtkstd/algorithm>
 
 #ifndef GL_BGRA
@@ -49,21 +50,6 @@
 
 #define MY_MAX(x, y)    ((x) < (y) ? (y) : (x))
 #define MY_MIN(x, y)    ((x) < (y) ? (x) : (y))
-
-//******************************************************************
-// Hidden structures.
-//******************************************************************
-struct IceTWindowInformation {
-  int TilesDirty;
-};
-const int ICET_WIN_INFO_SIZE = sizeof(struct IceTWindowInformation)/sizeof(int);
-
-struct IceTRendererInformation {
-  int Strategy;
-  int ComposeOperation;
-};
-const int ICET_REN_INFO_SIZE
-  = sizeof(struct IceTRendererInformation)/sizeof(int);
 
 // ******************************************************************
 // Callback commands.
@@ -94,7 +80,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.43");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.44");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -835,111 +821,114 @@ double vtkIceTRenderManager::GetCompositeTime()
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkIceTRenderManager::SendWindowInformation()
+void vtkIceTRenderManager::CollectWindowInformation(vtkMultiProcessStream& stream)
 {
   vtkDebugMacro("Sending Window Information");
 
-  this->Superclass::SendWindowInformation();
+  this->Superclass::CollectWindowInformation(stream);
 
-  struct IceTWindowInformation info;
-  info.TilesDirty = this->TilesDirty;
-
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  for (int id = 0; id < numProcs; id++)
+  // insert the tag to ensure we reading back the correct information.
+  stream << vtkProcessModule::IceTWinInfo;
+  stream << this->TilesDirty;
+  if (this->TilesDirty)
     {
-    if (id == this->RootProcessId) continue;
-
-    this->Controller->Send((int *)&info, ICET_WIN_INFO_SIZE, id,
-                           vtkProcessModule::IceTWinInfo);
-    if (this->TilesDirty)
+    stream << this->TileDimensions[0] << this->TileDimensions[1];
+    for (int x = 0; x < this->TileDimensions[0]; x++)
       {
-      this->Controller->Send(&this->TileDimensions[0], 1, id,
-                             vtkProcessModule::IceTNumTilesX);
-      this->Controller->Send(&this->TileDimensions[1], 1, id,
-                             vtkProcessModule::IceTNumTilesY);
-      for (int x = 0; x < this->TileDimensions[0]; x++)
+      for (int y=0; y < this->TileDimensions[1]; y++)
         {
-        this->Controller->Send(this->TileRanks[x], this->TileDimensions[1], id,
-                               vtkProcessModule::IceTTileRanks);
+        stream << (this->TileRanks[x])[y];
         }
       }
     }
+  stream << vtkProcessModule::IceTWinInfo;
 }
 
 //-----------------------------------------------------------------------------
 
-void vtkIceTRenderManager::ReceiveWindowInformation()
+bool vtkIceTRenderManager::ProcessWindowInformation(vtkMultiProcessStream& stream)
 {
   vtkDebugMacro("Receiving Window Information");
 
-  this->Superclass::ReceiveWindowInformation();
-
-  struct IceTWindowInformation info;
-  this->Controller->Receive((int *)&info, ICET_WIN_INFO_SIZE,
-                            this->RootProcessId,
-                            vtkProcessModule::IceTWinInfo);
-  if (info.TilesDirty)
+  if (!this->Superclass::ProcessWindowInformation(stream))
     {
-    int NewNumTilesX, NewNumTilesY;
-    this->Controller->Receive(&NewNumTilesX, 1, 0,
-                              vtkProcessModule::IceTNumTilesX);
-    this->Controller->Receive(&NewNumTilesY, 1, 0,
-                              vtkProcessModule::IceTNumTilesY);
-    this->SetTileDimensions(NewNumTilesX, NewNumTilesY);
+    return false;
+    }
+
+  int tag;
+  stream >> tag;
+  if (tag != vtkProcessModule::IceTWinInfo)
+    {
+    vtkErrorMacro("Incorrect tag received. Aborting for debugging purposes.");
+    return false;
+    }
+
+  int tilesDirty;
+  stream >> tilesDirty;
+  if (tilesDirty)
+    {
+    int newNumTilesX, newNumTilesY;
+    stream >> newNumTilesX >> newNumTilesY;
+    this->SetTileDimensions(newNumTilesX, newNumTilesY);
     for (int x = 0; x < this->TileDimensions[0]; x++)
       {
-      this->Controller->Receive(this->TileRanks[x], this->TileDimensions[1], 0,
-                                vtkProcessModule::IceTTileRanks);
+      for (int y=0; y < this->TileDimensions[1]; y++)
+        {
+        stream >> (this->TileRanks[x])[y];
+        }
       }
     }
+  stream >> tag;
+  if (tag != vtkProcessModule::IceTWinInfo)
+    {
+    vtkErrorMacro("Incorrect tag received. Aborting for debugging purposes.");
+    return false;
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkIceTRenderManager::SendRendererInformation(vtkRenderer *_ren)
+void vtkIceTRenderManager::CollectRendererInformation(vtkRenderer *_ren,
+  vtkMultiProcessStream& stream)
 {
   vtkDebugMacro("Sending renderer information for " << _ren);
 
-  this->Superclass::SendRendererInformation(_ren);
+  this->Superclass::CollectRendererInformation(_ren, stream);
 
   vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
-  if (!ren) return;
-
-  struct IceTRendererInformation info;
-  info.Strategy = ren->GetStrategy();
-  info.ComposeOperation = ren->GetComposeOperation();
-
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  for (int id = 0; id < numProcs; id++)
+  if (!ren)
     {
-    if (id == this->RootProcessId) continue;
-
-    this->Controller->Send((int *)&info, ICET_REN_INFO_SIZE, id,
-                           vtkProcessModule::IceTRenInfo);
+    return;
     }
+
+  stream << ren->GetStrategy()
+         << ren->GetComposeOperation();
 }
 
 //-----------------------------------------------------------------------------
-
-void vtkIceTRenderManager::ReceiveRendererInformation(vtkRenderer *_ren)
+bool vtkIceTRenderManager::ProcessRendererInformation(vtkRenderer *_ren,
+  vtkMultiProcessStream& stream)
 {
   vtkDebugMacro("Receiving renderer information for " << _ren);
 
-  this->Superclass::ReceiveRendererInformation(_ren);
+  if (!this->Superclass::ProcessRendererInformation(_ren, stream))
+    {
+    return false;
+    }
 
   vtkIceTRenderer *ren = vtkIceTRenderer::SafeDownCast(_ren);
-  if (!ren) return;
-
-  struct IceTRendererInformation info;
-  this->Controller->Receive((int *)&info, ICET_REN_INFO_SIZE, 0,
-                            vtkProcessModule::IceTRenInfo);
-  ren->SetStrategy(info.Strategy);
-  ren->SetComposeOperation(info.ComposeOperation);
+  if (ren) 
+    {
+    int strategy;
+    int compose_operation;
+    stream >> strategy >> compose_operation;
+    ren->SetStrategy(strategy);
+    ren->SetComposeOperation(compose_operation);
+    }
+  return true;
 }
 
 //-----------------------------------------------------------------------------
-
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");

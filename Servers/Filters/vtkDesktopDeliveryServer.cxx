@@ -13,20 +13,23 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
+#include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
 #include "vtkDesktopDeliveryServer.h"
+#include "vtkDoubleArray.h"
+#include "vtkLightCollection.h"
+#include "vtkLight.h"
+#include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkRenderWindow.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkCamera.h"
-#include "vtkLight.h"
-#include "vtkTimerLog.h"
-#include "vtkLightCollection.h"
-#include "vtkCallbackCommand.h"
-#include "vtkMultiProcessController.h"
+#include "vtkRenderWindow.h"
 #include "vtkSquirtCompressor.h"
+#include "vtkTimerLog.h"
+#include "vtkUnsignedCharArray.h"
+
+#include <assert.h>
 
 static void SatelliteStartRender(vtkObject *caller,
                                  unsigned long vtkNotUsed(event),
@@ -41,7 +44,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.21");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.22");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -227,18 +230,24 @@ void vtkDesktopDeliveryServer::SetRemoteDisplay(int flag)
     }
 }
 
-
 //----------------------------------------------------------------------------
-void vtkDesktopDeliveryServer::ReceiveWindowInformation()
+bool vtkDesktopDeliveryServer::ProcessWindowInformation(vtkMultiProcessStream& stream)
 {
-  vtkDesktopDeliveryServer::SquirtOptions squirt_options;
-  this->Controller->Receive((int *)(&squirt_options),
-                            vtkDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
-                            this->RootProcessId,
-                            vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+  if (!this->Superclass::ProcessWindowInformation(stream))
+    {
+    return false;
+    }
+
+  vtkDesktopDeliveryServer::SquirtOptions squirt_options; 
+  if (!squirt_options.Restore(stream))
+    {
+    vtkErrorMacro("Failed to read SquirtOptions.");
+    return false;
+    }
 
   this->Squirt = squirt_options.Enabled;
   this->SquirtCompressionLevel = squirt_options.CompressLevel;
+  return true;
 }  
 
 //----------------------------------------------------------------------------
@@ -500,4 +509,24 @@ static void SatelliteEndParallelRender(vtkObject *caller,
     return;
     }
   self->SatelliteEndRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkDesktopDeliveryServer::SquirtOptions::Save(vtkMultiProcessStream& stream)
+{
+  stream << vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG 
+    << this->Enabled << this->CompressLevel;
+}
+
+//----------------------------------------------------------------------------
+bool vtkDesktopDeliveryServer::SquirtOptions::Restore(vtkMultiProcessStream& stream)
+{
+  int tag;
+  stream >> tag;
+  if (!tag != vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG)
+    {
+    return false;
+    }
+  stream >> this->Enabled >> this->CompressLevel;
+  return true;
 }

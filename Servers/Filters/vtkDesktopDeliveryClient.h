@@ -146,7 +146,9 @@ protected:
   double RemoteImageProcessingTime;
   double TransferTime;
 
-  virtual void SendWindowInformation();
+  // Add to the stream information required for window synchronization on each
+  // render.
+  virtual void CollectWindowInformation(vtkMultiProcessStream&);
 
   // Squirt options (probably to be replaced later).
   int Squirt;

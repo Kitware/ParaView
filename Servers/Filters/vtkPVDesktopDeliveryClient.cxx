@@ -22,6 +22,7 @@
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
@@ -43,7 +44,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.7");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.8");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -152,8 +153,9 @@ void vtkPVDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryClient::SendWindowInformation()
+void vtkPVDesktopDeliveryClient::CollectWindowInformation(vtkMultiProcessStream& stream)
 {
+  this->Superclass::CollectWindowInformation(stream);
   vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
   if ((this->GUISize[0] == 0) || (this->GUISize[1] == 0))
     {
@@ -172,23 +174,20 @@ void vtkPVDesktopDeliveryClient::SendWindowInformation()
        - this->WindowPosition[1] - this->RenderWindow->GetActualSize()[1] );
   winGeoInfo.Id = this->Id;
   winGeoInfo.AnnotationLayer = this->AnnotationLayer;
-  this->Controller->Send(reinterpret_cast<int *>(&winGeoInfo),
-                         vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_SIZE,
-                         this->ServerProcessId,
-                         vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_TAG);
+  winGeoInfo.Save(stream);
 
   vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
   squirtOptions.Enabled = this->Squirt;
   squirtOptions.CompressLevel = this->SquirtCompressionLevel;
-  this->Controller->Send(reinterpret_cast<int *>(&squirtOptions),
-                         vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_SIZE,
-                         this->ServerProcessId,
-                         vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
+  squirtOptions.Save(stream);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryClient::SendRendererInformation(vtkRenderer *renderer)
+void vtkPVDesktopDeliveryClient::CollectRendererInformation(vtkRenderer *renderer,
+  vtkMultiProcessStream& stream)
 {
+  this->Superclass::CollectRendererInformation(renderer, stream);
+
   // The server needs to shift around the viewport and then resize it.  To do
   // this, it needs the original viewport.  Undo the "helpful" resizing of the
   // superclass.
@@ -198,9 +197,7 @@ void vtkPVDesktopDeliveryClient::SendRendererInformation(vtkRenderer *renderer)
   viewport[1] *= this->ImageReductionFactor;
   viewport[2] *= this->ImageReductionFactor;
   viewport[3] *= this->ImageReductionFactor;
-
-  this->Controller->Send(viewport, 4, this->ServerProcessId,
-                         vtkPVDesktopDeliveryServer::RENDERER_VIEWPORT_TAG);
+  stream << viewport[0] << viewport[1] << viewport[2] << viewport[3];
 }
 
 //----------------------------------------------------------------------------
