@@ -44,7 +44,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.22");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.23");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -523,7 +523,7 @@ bool vtkDesktopDeliveryServer::SquirtOptions::Restore(vtkMultiProcessStream& str
 {
   int tag;
   stream >> tag;
-  if (!tag != vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG)
+  if (tag != vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG)
     {
     return false;
     }
