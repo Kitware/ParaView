@@ -134,6 +134,7 @@ class vtkSMPropertyIterator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
 class vtkSMStateLoaderBase;
+class vtkClientServerStream;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -433,6 +434,7 @@ public:
   // Returns the client side object associated with the VTKObjectID (if any).
   vtkObjectBase* GetClientSideObject();
 
+//BTX
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -453,7 +455,13 @@ protected:
   void ExposeSubProxyProperty(const char* subproxy_name, 
     const char* property_name, const char* exposed_name);
 
-//BTX
+
+  // Description:
+  // Pushes the property. For non update-self properties, the command is
+  // collected in the stream and not pushed directly.
+  bool UpdatePropertyInternal(const char* name, bool force,
+    vtkClientServerStream& stream);
+
   // Description:
   // These classes have been declared as friends to minimize the
   // public interface exposed by vtkSMProxy. Each of these classes
@@ -476,7 +484,6 @@ protected:
   friend class vtkSMStateLoaderBase;
   // -- PVEE only
   friend class vtkWSMApplication;
-//ETX
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -702,6 +709,11 @@ protected:
   // UpdatePipelineInformation() on them. vtkSMSourceProxy overrides this method
   // (makes it public) and updates the pipeline information.
   virtual void UpdatePipelineInformation();
+
+  // Description:
+  // Internal UpdateVTKObjects() which collapses all server-side sends into the
+  // stream.
+  void UpdateVTKObjects(vtkClientServerStream& stream);
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.

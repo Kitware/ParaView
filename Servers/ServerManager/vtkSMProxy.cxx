@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.105");
+vtkCxxRevisionMacro(vtkSMProxy, "1.106");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -642,6 +642,96 @@ void vtkSMProxy::AddPropertyToSelf(
 }
 
 //---------------------------------------------------------------------------
+bool vtkSMProxy::UpdatePropertyInternal(const char* name, bool force,
+  vtkClientServerStream& stream)
+{
+  // This will ensure that the SelfID is assigned properly.
+  this->GetSelfID();
+
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.find(name);
+  if (it == this->Internals->Properties.end())
+    {
+    // Search exposed subproxy properties.
+    vtkSMProxyInternals::ExposedPropertyInfoMap::iterator eiter = 
+      this->Internals->ExposedProperties.find(name);
+    if (eiter == this->Internals->ExposedProperties.end())
+      {
+      return false;
+      }
+    const char* subproxy_name =  eiter->second.SubProxyName.c_str();
+    const char* property_name = eiter->second.PropertyName.c_str();
+    vtkSMProxy * sp = this->GetSubProxy(subproxy_name);
+    if (sp && sp->UpdatePropertyInternal(property_name, force, stream))
+      {
+      this->MarkModified(this);
+      return true;
+      }
+    return false;
+    }
+
+  if (!it->second.ModifiedFlag && !force)
+    {
+    return false;
+    }
+
+  // In case this property is a self property and causes
+  // another UpdateVTKObjects(), make sure that it does
+  // not cause recursion. If this is not set, UpdateVTKObjects()
+  // that is caused by UpdateProperty() can end up calling trying
+  // to push the same property.
+  it->second.ModifiedFlag = 0;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkSMProperty* prop = it->second.Property.GetPointer();
+  if (prop->GetUpdateSelf())
+    {
+    vtkClientServerStream str;
+    prop->AppendCommandToStream(this, &str, this->GetSelfID());
+    if (str.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, str);
+
+      // Fire event to let everyone know that a property has been updated.
+      this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)name);
+      if (!this->InUpdateVTKObjects) // if updating multiple properties
+        {                            // MarkModified() is called only once.
+        this->MarkModified(this);
+        }
+      return true;
+      }
+    }
+  else
+    {
+    if (this->VTKObjectID.IsNull())
+      {
+      // Make sure that server side objects exist before
+      // pushing values to them
+      this->CreateVTKObjects();
+      }
+    if (!this->VTKObjectID.IsNull())
+      {
+      int old_count = stream.GetNumberOfMessages();
+      prop->AppendCommandToStream(this, &stream, this->VTKObjectID);
+      if (stream.GetNumberOfMessages() > old_count)
+        {
+        //pm->SendStream(this->ConnectionID, this->Servers, str);
+
+        // Fire event to let everyone know that a property has been updated.
+        this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)name);
+        if (!this->InUpdateVTKObjects) // if updating multiple properties
+          {                            // MarkModified() is called only once.
+          this->MarkModified(this);
+          }
+        return true;  
+        }
+      }
+    }
+
+  return false;
+}
+
+//---------------------------------------------------------------------------
 bool vtkSMProxy::UpdateProperty(const char* name, int force)
 {
   // This will ensure that the SelfID is assigned properly.
@@ -913,6 +1003,21 @@ int vtkSMProxy::ArePropertiesModified(int selfOnly /*=0*/)
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
+  vtkClientServerStream stream;
+  this->UpdateVTKObjects(stream);
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    //cout << "Message Count: " << stream.GetNumberOfMessages() << endl;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID,
+      this->Servers,
+      stream);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdateVTKObjects(vtkClientServerStream& buffer)
+{
   if (this->InUpdateVTKObjects)
     {
     return;
@@ -995,10 +1100,10 @@ void vtkSMProxy::UpdateVTKObjects()
       vtkSMProperty* prop = it->second.Property.GetPointer();
       if (!prop->GetInformationOnly())
         {
-        this->UpdateProperty(it->first.c_str());
+        this->UpdatePropertyInternal(it->first.c_str(), false, buffer);
         }
       }
-    modified = true;    
+    modified = true;
     }
 
   this->InUpdateVTKObjects = 0;
@@ -1010,7 +1115,7 @@ void vtkSMProxy::UpdateVTKObjects()
   // subproxy can ever set any property on the parent proxy.
   if (this->ArePropertiesModified(1))
     {
-    this->UpdateVTKObjects();
+    this->UpdateVTKObjects(buffer);
     }
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -1018,7 +1123,14 @@ void vtkSMProxy::UpdateVTKObjects()
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
     modified = modified || it2->second.GetPointer()->ArePropertiesModified();
-    it2->second.GetPointer()->UpdateVTKObjects();
+    if (it2->second.GetPointer()->Servers == this->Servers)
+      {
+      it2->second.GetPointer()->UpdateVTKObjects(buffer);
+      }
+    else
+      {
+      it2->second.GetPointer()->UpdateVTKObjects();
+      }
     }
 
   if (modified)
