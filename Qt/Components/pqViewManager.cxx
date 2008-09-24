@@ -705,6 +705,8 @@ void pqViewManager::assignFrame(pqView* view)
   
     this->Internal->DontCreateDeleteViewsModules = true;
     QSize cur_size = oldFrame->size();
+    // Before we split, make sure that no view is currently maximized.
+    this->restoreWidget(0); // that a funny name for this un-maximize button.
     if (cur_size.width() > 1.15*cur_size.height()) 
         // give a slight preference to
         // vertical splitting.
