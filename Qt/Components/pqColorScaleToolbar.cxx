@@ -178,12 +178,12 @@ void pqColorScaleToolbar::changeColor()
         {
         // Get the color property.
         vtkSMProxy *proxy = this->Internal->Representation->getProxy();
-        vtkSMProperty *ambient = proxy->GetProperty("AmbientColor");
-        if(ambient)
+        vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
+        if(diffuse)
           {
           // Get the current color from the property.
           QList<QVariant> rgb =
-              pqSMAdaptor::getMultipleElementProperty(ambient);
+              pqSMAdaptor::getMultipleElementProperty(diffuse);
           QColor color(Qt::white);
           if(rgb.size() >= 3)
             {
@@ -200,9 +200,10 @@ void pqColorScaleToolbar::changeColor()
             rgb.append(color.redF());
             rgb.append(color.greenF());
             rgb.append(color.blueF());
-            pqSMAdaptor::setMultipleElementProperty(ambient, rgb);
+            pqSMAdaptor::setMultipleElementProperty(diffuse, rgb);
             pqSMAdaptor::setMultipleElementProperty(
-                proxy->GetProperty("DiffuseColor"), rgb);
+                proxy->GetProperty("AmbientColor"), rgb);
+            proxy->UpdateVTKObjects();
             }
           }
         }
