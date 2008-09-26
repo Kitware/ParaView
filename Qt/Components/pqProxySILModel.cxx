@@ -48,6 +48,7 @@ pqProxySILModel::pqProxySILModel(const QString& hierarchyName, QObject* _parent)
   Superclass(_parent)
 {
   this->HierarchyName = hierarchyName;
+  this->noCheckBoxes = false;
 
   QStyle::State styleOptions [3] = {
     QStyle::State_On | QStyle::State_Enabled,
@@ -157,6 +158,18 @@ void pqProxySILModel::onCheckStatusChanged()
 //-----------------------------------------------------------------------------
 QVariant pqProxySILModel::headerData (int, Qt::Orientation, int role /*= Qt::DisplayRole*/) const
 {
+  if (this->noCheckBoxes && 
+      (role == Qt::DecorationRole || role == Qt::CheckStateRole)) 
+    {
+    return QVariant();
+    }
+  else if (role == Qt::DisplayRole && this->HeaderTitle!="") 
+    {
+    return this->HeaderTitle;
+    }
+  //
+  // 
+  //
   if (role == Qt::DisplayRole)
     {
     return this->HierarchyName;
@@ -184,6 +197,18 @@ QVariant pqProxySILModel::headerData (int, Qt::Orientation, int role /*= Qt::Dis
 
   return QVariant();
 }
+//-----------------------------------------------------------------------------
+QVariant pqProxySILModel::data(const QModelIndex &proxyIndex, int role) const
+{
+  if (this->noCheckBoxes && 
+      (role == Qt::DecorationRole || role == Qt::CheckStateRole))
+    {
+    return QVariant();
+    }
+  return QAbstractProxyModel::data(proxyIndex, role);
+}
+
+//-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void pqProxySILModel::toggleRootCheckState()
@@ -197,4 +222,28 @@ void pqProxySILModel::toggleRootCheckState()
     {
     this->setData(QModelIndex(), Qt::Unchecked, Qt::CheckStateRole);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxySILModel::setNoCheckBoxes(bool val)
+{
+  this->noCheckBoxes = val;
+}
+//-----------------------------------------------------------------------------
+void pqProxySILModel::setHeaderTitle(QString &title)
+{
+  this->HeaderTitle = title;
+}
+//-----------------------------------------------------------------------------
+Qt::ItemFlags pqProxySILModel::flags(const QModelIndex &index) const
+{
+  QModelIndex srcIndex = this->mapToSource(index);
+  Qt::ItemFlags iflags = this->sourceModel()->flags(srcIndex);
+
+  if (this->noCheckBoxes) {
+    Qt::ItemFlags mask = Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+    mask = ~mask;
+    iflags = iflags & mask;
+  }
+  return iflags;
 }

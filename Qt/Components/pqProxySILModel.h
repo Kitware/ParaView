@@ -132,8 +132,21 @@ public:
   /// header.
   virtual QVariant headerData (int, Qt::Orientation, int role = Qt::DisplayRole ) const;
 
+  /// Overridden to provide a means of turning off checkboxes
+  virtual QVariant data(const QModelIndex &proxyIndex, int role = Qt::DisplayRole) const;
+
+  /// overridden to allow us to turn off checkboxes in the flags returned 
+  /// from the model
+  virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+
   /// Get the status values for the hierarchy.
   QList<QVariant> values() const;
+
+  /// Checkboxes for each item can be disabled by setting this flag
+  void setNoCheckBoxes(bool val);
+
+  /// Override the display of the title in the header with this string
+  void setHeaderTitle(QString &title);
 
 public slots:
   /// Set the status values for the hierarchy.
@@ -168,6 +181,8 @@ private:
   QTimer DelayedValuesChangedSignalTimer;
   QPixmap CheckboxPixmaps[3];
   QString HierarchyName;
+  bool    noCheckBoxes;
+  QString HeaderTitle;
 };
 
 #endif
