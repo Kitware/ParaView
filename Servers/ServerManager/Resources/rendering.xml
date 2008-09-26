@@ -508,32 +508,26 @@
       <!-- End of LabeledDataMapper -->
     </SourceProxy>
 
-    <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
-      <InputProperty name="Input" command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkPolyData"/>
-        </DataTypeDomain>
-      </InputProperty>
-      <ProxyProperty
-        name="LookupTable" command="SetLookupTable">
+    <Proxy name="MapperBase" class="not-used">
+      <Documentation>
+        Defines interface defined by vtkMapper. Don't instantiate directly.
+      </Documentation>
+
+      <ProxyProperty name="LookupTable" command="SetLookupTable">
         <ProxyGroupDomain name="groups">
           <Group name="lookup_tables"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-      <IntVectorProperty 
-        name="ScalarVisibility" 
+
+      <IntVectorProperty name="ScalarVisibility" 
         command="SetScalarVisibility"
         number_of_elements="1"
         default_values="1"
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty 
-        name="MapScalars" 
+
+      <IntVectorProperty name="MapScalars" 
         command="SetColorMode"
         number_of_elements="1"
         default_values="1"
@@ -545,14 +539,14 @@
           unsigned chars are present, they will be directly used as colors.
         </Documentation>
       </IntVectorProperty>
-      <DoubleVectorProperty
-        name="ScalarRange"
+
+      <DoubleVectorProperty name="ScalarRange"
         command="SetScalarRange"
         number_of_elements="2"
         default_values="0 1"
         animateable="0"/>
-      <IntVectorProperty 
-        name="ImmediateModeRendering" 
+
+      <IntVectorProperty name="ImmediateModeRendering" 
         command="SetImmediateModeRendering"
         number_of_elements="1"
         is_internal="1"
@@ -560,24 +554,24 @@
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="InterpolateScalarsBeforeMapping"
+
+      <IntVectorProperty name="InterpolateScalarsBeforeMapping"
         command="SetInterpolateScalarsBeforeMapping"
         number_of_elements="1"
         default_values="1"
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="UseLookupTableScalarRange"
+
+      <IntVectorProperty name="UseLookupTableScalarRange"
         command="SetUseLookupTableScalarRange"
         number_of_elements="1"
         default_values="0"
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty
-        name="ScalarMode"
+
+      <IntVectorProperty name="ScalarMode"
         command="SetScalarMode"
         default_values="0"
         number_of_elements="1"
@@ -590,8 +584,8 @@
           <Entry value="4" text="UseCellFieldData"/>
         </EnumerationDomain>
       </IntVectorProperty>
-      <StringVectorProperty 
-        name="ColorArray" 
+
+      <StringVectorProperty name="ColorArray" 
         command="SelectColorArray" 
         number_of_elements="1"
         animateable="0"> 
@@ -601,6 +595,7 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+
       <ProxyProperty name="ClippingPlanes" 
                      command="AddClippingPlane"
                      repeat_command="1"
@@ -609,17 +604,33 @@
           <Group name="implicit_functions"/>
          </ProxyGroupDomain>
       </ProxyProperty>
+
       <IntVectorProperty name="NumberOfSubPieces"
-                         command="SetNumberOfSubPieces"
-                         number_of_elements="1"
-                         default_values="1">
+        command="SetNumberOfSubPieces"
+        number_of_elements="1"
+        default_values="1">
         <IntRangeDomain name="range" min="1"/>
       </IntVectorProperty>
+
       <IntVectorProperty name="StaticMode"
-                         command="SetStatic"
-                         number_of_elements="1"
-                         default_values="0">
+        command="SetStatic"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
       </IntVectorProperty>
+    </Proxy>
+
+    <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper"
+      base_proxygroup="mappers" base_proxyname="MapperBase">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
     </SourceProxy>
 
     <SourceProxy name="ProjectedTetrahedraMapper" 
@@ -5465,21 +5476,10 @@
     <!-- End of SelectionRepresentation -->
     </SelectionRepresentationProxy>
 
-    <SurfaceRepresentationProxy name="SurfaceRepresentation">
+    <Proxy name="SurfaceRepresentationBase" class="not-used">
       <Documentation>
-        Representation to show surface.
+        API for for SurfaceRepresentation.
       </Documentation>
-      
-      <InputProperty name="Input" 
-        command="NotUsed">
-        <InputArrayDomain name="input_array_any"
-          attribute_type="any">
-        </InputArrayDomain>
-        <InputArrayDomain name="input_vectors"
-          number_of_components="3"
-          optional="1">
-        </InputArrayDomain>
-      </InputProperty>
 
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
@@ -5680,6 +5680,22 @@
           <Property name="Material" />
         </ExposedProperties>
       </SubProxy>
+      <!-- End of SurfaceRepresentationBase -->
+    </Proxy>
+
+    <SurfaceRepresentationProxy name="SurfaceRepresentation" 
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentationBase">
+      <Documentation>
+        Representation to show surface.
+      </Documentation>
+      
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
 
     <!-- End of SurfaceRepresentation -->
     </SurfaceRepresentationProxy>
