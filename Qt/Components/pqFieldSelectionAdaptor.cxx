@@ -133,16 +133,16 @@ void pqFieldSelectionAdaptor::updateGUI()
   if(combo)
     {
     int num = combo->count();
-    for(int i=0; i<num; i++)
+    for (int i=0; i<num; i++)
       {
-      if(combo->itemData(i) == this->AttributeMode &&
-         combo->itemText(i) == this->Scalar)
+      QStringList array = combo->itemData(i).toStringList();
+      if (array[0] == this->AttributeMode && array[1] == this->Scalar)
         {
-          if(combo->currentIndex() != i)
-            {
-            combo->setCurrentIndex(i);
-            }
-          break;
+        if(combo->currentIndex() != i)
+          {
+          combo->setCurrentIndex(i);
+          }
+        break;
         }
       }
     }
