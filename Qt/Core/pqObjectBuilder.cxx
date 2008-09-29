@@ -493,10 +493,10 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     findItem<pqDataRepresentation*>(reprProxy);
   if (repr)
     {
+    repr->setDefaultPropertyValues();
+
     // inherit properties from the representation for the input if applicable.
     this->initializeInheritedProperties(repr);
-
-    repr->setDefaultPropertyValues();
 
     emit this->dataRepresentationCreated(repr);
     emit this->proxyCreated(repr);
