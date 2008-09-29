@@ -89,7 +89,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.75");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.76");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -528,7 +528,6 @@ void vtkSMRenderViewProxy::BeginInteractiveRender()
   // size information.
   this->SetUseLOD(this->GetLODDecision());
 
-  this->GetRenderer()->ResetCameraClippingRange();
   this->Superclass::BeginInteractiveRender();
 }
 
@@ -545,11 +544,6 @@ void vtkSMRenderViewProxy::EndInteractiveRender()
 void vtkSMRenderViewProxy::BeginStillRender()
 {
   vtkRenderWindow *renWindow = this->GetRenderWindow(); 
-  // Still Render can get called some funky ways.
-  // Interactive renders get called through the PVInteractorStyles
-  // which cal ResetCameraClippingRange on the Renderer.
-  // We could convert them to call a method on the module directly ...
-  this->GetRenderer()->ResetCameraClippingRange();
   renWindow->SetDesiredUpdateRate(0.002);
 
   this->SetUseLOD(false);
@@ -572,6 +566,8 @@ void vtkSMRenderViewProxy::PerformRender()
     {
     this->RenderTimer->StartTimer();
     }
+
+  this->GetRenderer()->ResetCameraClippingRange();
 
   vtkRenderWindow *renWindow = this->GetRenderWindow(); 
   renWindow->Render();
@@ -773,6 +769,8 @@ vtkPVClientServerIdCollectionInformation* vtkSMRenderViewProxy
 //-----------------------------------------------------------------------------
 void vtkSMRenderViewProxy::ResetCamera()
 {
+  this->UpdateAllRepresentations();
+
   double bds[6];
   this->ComputeVisiblePropBounds(bds);
   if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
