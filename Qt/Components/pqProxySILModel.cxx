@@ -235,9 +235,9 @@ void pqProxySILModel::setHeaderTitle(QString &title)
   this->HeaderTitle = title;
 }
 //-----------------------------------------------------------------------------
-Qt::ItemFlags pqProxySILModel::flags(const QModelIndex &index) const
+Qt::ItemFlags pqProxySILModel::flags(const QModelIndex &idx) const
 {
-  QModelIndex srcIndex = this->mapToSource(index);
+  QModelIndex srcIndex = this->mapToSource(idx);
   Qt::ItemFlags iflags = this->sourceModel()->flags(srcIndex);
 
   if (this->noCheckBoxes) {
