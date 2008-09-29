@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.81");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.82");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -3401,6 +3401,152 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
   return 1;
 }
 
+// There are many possible permutations.  All we care about
+// is to conserver neighbor relations and put the reference
+// block in position 0.
+static int CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[8][8] = {
+  {0,1,2,3,4,5,6,7},
+  {1,0,3,2,5,4,7,6},
+  {2,3,0,1,6,7,4,5},
+  {3,1,2,0,7,5,6,4},
+  {4,5,6,7,0,1,2,3},
+  {5,1,7,3,4,0,6,2},
+  {6,7,2,3,4,5,0,1},
+  {7,6,5,4,3,2,1,0}
+};
+
+// Blank out voxels not connected to 0.
+// Only 127 because 0 is always on.
+static int CTH_FRAGMENT_CONNECT_CORNER_MASK[128][8] = {
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 0 0
+  {0,0,0,1,0,0,0,0}, // 1 0 0 1 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 0 0
+  {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 0 0
+  {0,0,0,0,0,1,0,0}, // 1 0 0 0 0 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 0 0
+  {0,0,0,0,0,1,0,0}, // 1 0 1 0 0 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 0 0
+  {0,0,0,1,0,1,0,0}, // 1 0 0 1 0 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 0 0
+  {0,0,0,0,0,1,0,0}, // 1 0 1 1 0 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 0 0
+  {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 0 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 0 0
+  {0,0,0,0,0,0,1,0}, // 1 0 0 0 0 0 1 0
+  {0,0,0,0,0,0,1,0}, // 1 1 0 0 0 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 1 0
+  {0,0,0,1,0,0,1,0}, // 1 0 0 1 0 0 1 0
+  {0,0,0,0,0,0,1,0}, // 1 1 0 1 0 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 1 0
+  {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 1 0
+  {0,0,0,0,0,1,1,0}, // 1 0 0 0 0 1 1 0
+  {0,0,0,0,0,0,1,0}, // 1 1 0 0 0 1 1 0
+  {0,0,0,0,0,1,0,0}, // 1 0 1 0 0 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 1 0
+  {0,0,0,1,0,1,1,0}, // 1 0 0 1 0 1 1 0
+  {0,0,0,0,0,0,1,0}, // 1 1 0 1 0 1 1 0
+  {0,0,0,0,0,1,0,0}, // 1 0 1 1 0 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 1 0
+  {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 1 0
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 1 0
+  {0,0,0,0,0,0,0,1}, // 1 0 0 0 0 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 1 0 0 0 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 0 1 0 0 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 1 1 0 0 0 0 1
+  {0,0,0,1,0,0,0,1}, // 1 0 0 1 0 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 0 0 0 1 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 1 0 0 1 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 0 1 0 1 0 0 1
+  {0,0,0,0,0,0,0,1}, // 1 1 1 0 1 0 0 1
+  {0,0,0,1,0,0,0,1}, // 1 0 0 1 1 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 0 1
+  {0,0,0,0,0,1,0,1}, // 1 0 0 0 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 0 1
+  {0,0,0,0,0,1,0,1}, // 1 0 1 0 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 0 1
+  {0,0,0,1,0,1,0,1}, // 1 0 0 1 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 0 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 0 1
+  {0,0,0,0,0,0,1,1}, // 1 0 0 0 0 0 1 1
+  {0,0,0,0,0,0,1,1}, // 1 1 0 0 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 1 1
+  {0,0,0,1,0,0,1,1}, // 1 0 0 1 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 1 1
+  {0,0,0,0,0,1,1,1}, // 1 0 0 0 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 1 1
+  {0,0,0,1,0,1,1,1}, // 1 0 0 1 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 1 1
+  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 1 1
+  {0,0,0,0,0,0,0,0}  // 1 1 1 1 1 1 1 1
+};
 
 //----------------------------------------------------------------------------
 // This method computes the displacement of the corner to place it near a 
@@ -3419,8 +3565,9 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
 // This method could probably be more efficient. General computation works
 // for all gradient directions, but components are either 1 or 0.
 void vtkCTHFragmentConnect::ComputeDisplacementFactors(
-  vtkCTHFragmentConnectIterator* pointNeighborIterators[8], 
-  double displacmentFactors[3])
+  vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
+  double displacmentFactors[3],
+  int rootNeighborIdx)
 {
   // DEBUGGING
   // This generates the raw voxel surface when uncommented.
@@ -3429,17 +3576,54 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   //displacmentFactors[2] = 0.0;
   //return;
 
-  double v000 = pointNeighborIterators[0]->VolumeFractionPointer[0];
-  double v001 = pointNeighborIterators[1]->VolumeFractionPointer[0];
-  double v010 = pointNeighborIterators[2]->VolumeFractionPointer[0];
-  double v011 = pointNeighborIterators[3]->VolumeFractionPointer[0];
-  double v100 = pointNeighborIterators[4]->VolumeFractionPointer[0];
-  double v101 = pointNeighborIterators[5]->VolumeFractionPointer[0];
-  double v110 = pointNeighborIterators[6]->VolumeFractionPointer[0];
-  double v111 = pointNeighborIterators[7]->VolumeFractionPointer[0];
+  //double v000 = pointNeighborIterators[0]->VolumeFractionPointer[0];
+  //double v001 = pointNeighborIterators[1]->VolumeFractionPointer[0];
+  //double v010 = pointNeighborIterators[2]->VolumeFractionPointer[0];
+  //double v011 = pointNeighborIterators[3]->VolumeFractionPointer[0];
+  //double v100 = pointNeighborIterators[4]->VolumeFractionPointer[0];
+  //double v101 = pointNeighborIterators[5]->VolumeFractionPointer[0];
+  //double v110 = pointNeighborIterators[6]->VolumeFractionPointer[0];
+  //double v111 = pointNeighborIterators[7]->VolumeFractionPointer[0];
+  double v[8];
+  v[0] = pointNeighborIterators[0]->VolumeFractionPointer[0];
+  v[1] = pointNeighborIterators[1]->VolumeFractionPointer[0];
+  v[2] = pointNeighborIterators[2]->VolumeFractionPointer[0];
+  v[3] = pointNeighborIterators[3]->VolumeFractionPointer[0];
+  v[4] = pointNeighborIterators[4]->VolumeFractionPointer[0];
+  v[5] = pointNeighborIterators[5]->VolumeFractionPointer[0];
+  v[6] = pointNeighborIterators[6]->VolumeFractionPointer[0];
+  v[7] = pointNeighborIterators[7]->VolumeFractionPointer[0];
+  // To eliminate non manifold surfaces, I am going to perform
+  // connectivity on the 2x2x2 volume and mask out voxels
+  // that are not face connected.  Edge connected surfaces
+  // will pull away from each other.
+  // First we need to permute the 8 values so that the inside
+  // voxel adjacent to the face is in position 0.
+  int* permutation = CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[rootNeighborIdx];
+  // Now compute the mask case index after permutation.
+  int caseIdx = 0;
+  //if (v[permutation[0]] <= this->scaledMaterialFractionThreshold) { VTK_ERROR_MACRO("0 should always be inside");}
+  if (v[permutation[1]] > this->scaledMaterialFractionThreshold) { caseIdx += 1;}
+  if (v[permutation[2]] > this->scaledMaterialFractionThreshold) { caseIdx += 2;}
+  if (v[permutation[3]] > this->scaledMaterialFractionThreshold) { caseIdx += 4;}
+  if (v[permutation[4]] > this->scaledMaterialFractionThreshold) { caseIdx += 8;}
+  if (v[permutation[5]] > this->scaledMaterialFractionThreshold) { caseIdx += 16;}
+  if (v[permutation[6]] > this->scaledMaterialFractionThreshold) { caseIdx += 32;}
+  if (v[permutation[7]] > this->scaledMaterialFractionThreshold) { caseIdx += 64;}
+  int *mask = CTH_FRAGMENT_CONNECT_CORNER_MASK[caseIdx];
+  //if (mask[0]) { v[permutation[0]] = 0.0;} // mask[0] is always 0
+  // Does setting to 0 cause degenerate triangles?
+  // 1/4 is arbitrary value less than 1/2.
+  if (mask[1]) { v[permutation[1]] *= 0.25;}
+  if (mask[2]) { v[permutation[2]] *= 0.25;}
+  if (mask[3]) { v[permutation[3]] *= 0.25;}
+  if (mask[4]) { v[permutation[4]] *= 0.25;}
+  if (mask[5]) { v[permutation[5]] *= 0.25;}
+  if (mask[6]) { v[permutation[6]] *= 0.25;}
+  if (mask[7]) { v[permutation[7]] *= 0.25;}
 
   // cell centered data interpolated to the current node
-  double centerValue = (v000+v001+v010+v011+v100+v101+v110+v111)*0.125;
+  double centerValue = (v[0]+v[1]+v[2]+v[3]+v[4]+v[5]+v[6]+v[7])*0.125;
 
   // Compute the gradient after a threshold.
   double t000 = 0.0;
@@ -3450,14 +3634,14 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   double t101 = 0.0;
   double t110 = 0.0;
   double t111 = 0.0;
-  if (v000 > this->scaledMaterialFractionThreshold) { t000 = 1.0;}
-  if (v001 > this->scaledMaterialFractionThreshold) { t001 = 1.0;}
-  if (v010 > this->scaledMaterialFractionThreshold) { t010 = 1.0;}
-  if (v011 > this->scaledMaterialFractionThreshold) { t011 = 1.0;}
-  if (v100 > this->scaledMaterialFractionThreshold) { t100 = 1.0;}
-  if (v101 > this->scaledMaterialFractionThreshold) { t101 = 1.0;}
-  if (v110 > this->scaledMaterialFractionThreshold) { t110 = 1.0;}
-  if (v111 > this->scaledMaterialFractionThreshold) { t111 = 1.0;}
+  if (v[0] > this->scaledMaterialFractionThreshold) { t000 = 1.0;}
+  if (v[1] > this->scaledMaterialFractionThreshold) { t001 = 1.0;}
+  if (v[2] > this->scaledMaterialFractionThreshold) { t010 = 1.0;}
+  if (v[3] > this->scaledMaterialFractionThreshold) { t011 = 1.0;}
+  if (v[4] > this->scaledMaterialFractionThreshold) { t100 = 1.0;}
+  if (v[5] > this->scaledMaterialFractionThreshold) { t101 = 1.0;}
+  if (v[6] > this->scaledMaterialFractionThreshold) { t110 = 1.0;}
+  if (v[7] > this->scaledMaterialFractionThreshold) { t111 = 1.0;}
 
   // We use the gradient ater threshold to choose a direction
   // to move the point.  After considering he discussion about
@@ -3470,7 +3654,7 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   g[2] = -t000-t001-t010-t011+t100+t101+t110+t111;
   g[1] = -t000-t001+t010+t011-t100-t101+t110+t111;
   g[0] = -t000+t001-t010+t011-t100+t101-t110+t111;
-  // This is unussual but it can happen with a checkerboard pattern.
+  // This is unusual but it can happen with a checkerboard pattern.
   // We should break the symetry and choose a direction ...
   if (g[0] == 0.0 && g[1] == 0.0 &&  g[2] == 0.0)
     {
@@ -3502,14 +3686,14 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   // g is on the surface of a unit cube. Compute interpolated surface value
   // with a tri-linear interpolation.
   double surfaceValue;
-  surfaceValue = v000*(0.5-g[0])*(0.5-g[1])*(0.5-g[2])
-                + v001*(0.5+g[0])*(0.5-g[1])*(0.5-g[2])
-                + v010*(0.5-g[0])*(0.5+g[1])*(0.5-g[2])
-                + v011*(0.5+g[0])*(0.5+g[1])*(0.5-g[2])
-                + v100*(0.5-g[0])*(0.5-g[1])*(0.5+g[2])
-                + v101*(0.5+g[0])*(0.5-g[1])*(0.5+g[2])
-                + v110*(0.5-g[0])*(0.5+g[1])*(0.5+g[2])
-                + v111*(0.5+g[0])*(0.5+g[1])*(0.5+g[2]);
+  surfaceValue = v[0]*(0.5-g[0])*(0.5-g[1])*(0.5-g[2])
+                + v[1]*(0.5+g[0])*(0.5-g[1])*(0.5-g[2])
+                + v[2]*(0.5-g[0])*(0.5+g[1])*(0.5-g[2])
+                + v[3]*(0.5+g[0])*(0.5+g[1])*(0.5-g[2])
+                + v[4]*(0.5-g[0])*(0.5-g[1])*(0.5+g[2])
+                + v[5]*(0.5+g[0])*(0.5-g[1])*(0.5+g[2])
+                + v[6]*(0.5-g[0])*(0.5+g[1])*(0.5+g[2])
+                + v[7]*(0.5+g[0])*(0.5+g[1])*(0.5+g[2]);
 
   // Compute how far to the surface we must travel.
   double k = (this->scaledMaterialFractionThreshold - centerValue) / (surfaceValue - centerValue);
@@ -3544,10 +3728,13 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
 // It will be modified with the sub voxel displacement.
 void vtkCTHFragmentConnect::SubVoxelPositionCorner(
   double* point, 
-  vtkCTHFragmentConnectIterator* pointNeighborIterators[8])
+  vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
+  int rootNeighborIdx)
 {
   double displacementFactors[3];
-  this->ComputeDisplacementFactors(pointNeighborIterators, displacementFactors);
+  this->ComputeDisplacementFactors(pointNeighborIterators,
+                                   displacementFactors,
+                                   rootNeighborIdx);
 
   // Find the smallest voxel to size the interpolation.  We use virtual
   // voxels which all have the same size.  Although this 
@@ -3583,6 +3770,11 @@ void vtkCTHFragmentConnect::SubVoxelPositionCorner(
         + hEdge1[ii]*displacementFactors[1] 
         + hEdge2[ii]*displacementFactors[2];
     }
+    
+  //if (fabs(point[0]-0.973579) + fabs(point[1]+0.153555) + fabs(point[2]+0.0565284) < 0.01)
+  //  {
+  //  cerr << "Break here.\n";
+  //  }
 }
 
 
@@ -3633,7 +3825,7 @@ void vtkCTHFragmentConnect::CreateFace(
   // Avoid a warning
   quadMidIds[0] = quadMidIds[1] = quadMidIds[2] = quadMidIds[3] = 0;
   
-  // Compute the corner and edge points.
+  // Compute the corner and edge points (before subpixel positioning).
   // Store the results in ivars.
   this->ComputeFacePoints(in, out,
                           axis, outMaxFlag);
@@ -3665,6 +3857,14 @@ void vtkCTHFragmentConnect::CreateFace(
   int i7 = inc0+inc1+inc2; 
 
   // Do every thing in coordinate system of face.
+  // Find the neighbors of each point to position to point off the grid.
+  // Now to avoid non-manifold surfaces, I need to avoid merging
+  // points from voxels that only share an edge (or corner)
+  // We need to determine which index (0-7) represents the
+  // voxel right inside the face we are creating.  This is 
+  // to perform connectivity on the 2x2x2 point neighbors.
+  int rootNeighborIdx;
+  
   cornerNeighbors[i0] = &(this->FaceNeighbors[0]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[1]);
   cornerNeighbors[i2] = &(this->FaceNeighbors[2]);
@@ -3673,7 +3873,9 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[9]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[10]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[11]);
-  this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors);
+  rootNeighborIdx = outMaxFlag ? i6 : i7;  // Face neighbor 10 or 11
+  this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors,
+                               rootNeighborIdx);
   quadCornerIds[0] = points->InsertNextPoint(this->FaceCornerPoints);
   cornerNeighbors[i0] = &(this->FaceNeighbors[4]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[5]);
@@ -3683,7 +3885,9 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[13]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[14]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[15]);
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors);
+  rootNeighborIdx = outMaxFlag ? i4 : i5;  // Face neighbor 12 or 13
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors,
+                               rootNeighborIdx);
   quadCornerIds[1] = points->InsertNextPoint(this->FaceCornerPoints+3);
   cornerNeighbors[i0] = &(this->FaceNeighbors[16]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[17]);
@@ -3693,7 +3897,9 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[25]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[26]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[27]);
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors);
+  rootNeighborIdx = outMaxFlag ? i2 : i3;  // Face neighbor 18 or 19
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors,
+                               rootNeighborIdx);
   quadCornerIds[2] = points->InsertNextPoint(this->FaceCornerPoints+6);
   cornerNeighbors[i0] = &(this->FaceNeighbors[20]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[21]);
@@ -3703,13 +3909,20 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[29]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[30]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[31]);
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors);
+  rootNeighborIdx = outMaxFlag ? i0 : i1;  // Face neighbor 20 or 21
+  this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors,
+                               rootNeighborIdx);
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
 
-//   if ( quadCornerIds[3] > 45502) // 74507
-//     {
-//     cerr << "Debug\n";
-//     }
+   //if ( quadCornerIds[3] > 570) // 74507
+   //  {
+   //  cerr << "Debug\n";
+   //  }
+   //if ( quadCornerIds[3] > 750) // 74507
+   //  {
+   //  cerr << "Debug\n";
+   //  }
+
 
   // Now for the mid edge point if the neighbors on that side are smaller.
   if (this->FaceEdgeFlags[0])
@@ -3722,7 +3935,10 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i5] = &(this->FaceNeighbors[11]);
     cornerNeighbors[i6] = &(this->FaceNeighbors[12]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[13]);
-    this->SubVoxelPositionCorner(this->FaceEdgePoints, cornerNeighbors);
+    // Two choices here (10, 12) because they both are the same voxel.
+    rootNeighborIdx = outMaxFlag ? i4 : i5; 
+    this->SubVoxelPositionCorner(this->FaceEdgePoints, cornerNeighbors,
+                                 rootNeighborIdx);
     quadMidIds[0] = points->InsertNextPoint(this->FaceEdgePoints);
     }
   if (this->FaceEdgeFlags[1])
@@ -3735,7 +3951,10 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i5] = &(this->FaceNeighbors[17]);
     cornerNeighbors[i6] = &(this->FaceNeighbors[18]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[19]);
-    this->SubVoxelPositionCorner(this->FaceEdgePoints+3, cornerNeighbors);
+    // Two choices here (10, 18) because they both are the same voxel.
+    rootNeighborIdx = outMaxFlag ? i2 : i3;
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+3, cornerNeighbors,
+                                 rootNeighborIdx);
     quadMidIds[1] = points->InsertNextPoint(this->FaceEdgePoints+3);
     }
   if (this->FaceEdgeFlags[2])
@@ -3748,7 +3967,10 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i5] = &(this->FaceNeighbors[21]);
     cornerNeighbors[i6] = &(this->FaceNeighbors[22]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[23]);
-    this->SubVoxelPositionCorner(this->FaceEdgePoints+6, cornerNeighbors);
+    // Two choices here (12, 20) because they both are the same voxel.
+    rootNeighborIdx = outMaxFlag ? i0 : i1;
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+6, cornerNeighbors,
+                                 rootNeighborIdx);
     quadMidIds[2] = points->InsertNextPoint(this->FaceEdgePoints+6);
     }
   if (this->FaceEdgeFlags[3])
@@ -3761,7 +3983,10 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i5] = &(this->FaceNeighbors[27]);
     cornerNeighbors[i6] = &(this->FaceNeighbors[28]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[29]);
-    this->SubVoxelPositionCorner(this->FaceEdgePoints+9, cornerNeighbors);
+    // Two choices here (18, 20) because they both are the same voxel.
+    rootNeighborIdx = outMaxFlag ? i0 : i1;
+    this->SubVoxelPositionCorner(this->FaceEdgePoints+9, cornerNeighbors,
+                                 rootNeighborIdx);
     quadMidIds[3] = points->InsertNextPoint(this->FaceEdgePoints+9);
     }
 
@@ -4226,6 +4451,9 @@ void vtkCTHFragmentConnect::ComputeFaceNeighbors(
 }
 
 
+
+
+
 //----------------------------------------------------------------------------
 // Find an iterator from an index,level and a neighbor reference iterator.
 void vtkCTHFragmentConnect::FindNeighbor(
@@ -4234,29 +4462,37 @@ void vtkCTHFragmentConnect::FindNeighbor(
   vtkCTHFragmentConnectIterator* reference)
 {
   // Convert the index to the level of the reference block.
-  int neighborIdx[3];
-  vtkCTHFragmentConnectBlock* refBlock = reference->Block;
-  const int* ext;
-  ext = refBlock->GetBaseCellExtent();
-  int refLevel = refBlock->GetLevel();
+  int refIdx[3];
+  vtkCTHFragmentConnectBlock* refBlock;
+  const int*                  refExt;
+  int                         refLevel;
+  int                         refDist;
+  vtkCTHFragmentConnectBlock* neighborBlock;
+  long                        neighborDist;
+  int                         neighborLevel;
+  const int*                  neighborExt;
+
+  refBlock =      reference->Block;
+  refExt =        refBlock->GetBaseCellExtent();
+  refLevel =      refBlock->GetLevel();
 
   if (refLevel > faceLevel)
     {
-    neighborIdx[0] = faceIdx[0] << (refLevel-faceLevel);
-    neighborIdx[1] = faceIdx[1] << (refLevel-faceLevel);
-    neighborIdx[2] = faceIdx[2] << (refLevel-faceLevel);
+    refIdx[0] = faceIdx[0] << (refLevel-faceLevel);
+    refIdx[1] = faceIdx[1] << (refLevel-faceLevel);
+    refIdx[2] = faceIdx[2] << (refLevel-faceLevel);
     }
   else
     {
-    neighborIdx[0] = faceIdx[0] >> (faceLevel-refLevel);
-    neighborIdx[1] = faceIdx[1] >> (faceLevel-refLevel);
-    neighborIdx[2] = faceIdx[2] >> (faceLevel-refLevel);
+    refIdx[0] = faceIdx[0] >> (faceLevel-refLevel);
+    refIdx[1] = faceIdx[1] >> (faceLevel-refLevel);
+    refIdx[2] = faceIdx[2] >> (faceLevel-refLevel);
     }
 
   // The index might point to the reference iterator.
-  if (neighborIdx[0] == reference->Index[0] && 
-      neighborIdx[1] == reference->Index[1] &&
-      neighborIdx[2] == reference->Index[2])
+  if (refIdx[0] == reference->Index[0] && 
+      refIdx[1] == reference->Index[1] &&
+      refIdx[2] == reference->Index[2])
     {
     *neighbor = *reference;
     return;
@@ -4264,106 +4500,176 @@ void vtkCTHFragmentConnect::FindNeighbor(
 
   // Find the block the neighbor is in.
 
-  int tmpLevel;
-  int recheck = 1;
-  while (recheck)
+  // I had trouble traversing into ghost blocks that were 
+  // not connected to the block I wanted.
+  // I am going to define a proximity measure that is independant of
+  // level.
+  refDist = this->ComputeProximity(faceIdx, faceLevel,
+                                   refExt, refLevel);
+
+  // The distance may never reach 0 because on the boundary blocks
+  // there is no neighbor.  We pad the block by returning closest
+  // block possible.
+  int changed = 1;
+
+  while (refDist > 0 && changed)
     {
-    recheck = 0;
-    // Check each axis and direction for the extent leaving the bounds.
+    changed = 0;
+    // Check each axis and direction for neighbor blocks 
+    // that are closer to the face index.
     for (int axis = 0; axis < 3; ++axis)
       {
+      int numNeighbors;
       int minIdx = 2*axis;
       int maxIdx = minIdx + 1;
       // Min direction
-      if (neighborIdx[axis] < ext[minIdx] && 
-          refBlock->GetNumberOfFaceNeighbors(minIdx) > 0)
+      numNeighbors = refBlock->GetNumberOfFaceNeighbors(minIdx);
+      if (refIdx[axis] < refExt[minIdx] && 
+          numNeighbors > 0)
         {
-        // Move in this direction.
-        refBlock = refBlock->GetFaceNeighbor(minIdx, 0);
-        ext = refBlock->GetBaseCellExtent();
-        // Save level for next comparison.
-        tmpLevel = refBlock->GetLevel();
-        if (tmpLevel > faceLevel)
+        // Look through all the neighbors move when it gets us closer to  goal.
+        for (int neighborIdx = 0; neighborIdx < numNeighbors; ++neighborIdx)
           {
-          neighborIdx[0] = faceIdx[0] << (tmpLevel-faceLevel);
-          neighborIdx[1] = faceIdx[1] << (tmpLevel-faceLevel);
-          neighborIdx[2] = faceIdx[2] << (tmpLevel-faceLevel);
+          neighborBlock = refBlock->GetFaceNeighbor(minIdx, neighborIdx);
+          neighborExt = neighborBlock->GetBaseCellExtent();
+          neighborLevel = neighborBlock->GetLevel();
+          neighborDist = this->ComputeProximity(faceIdx, faceLevel,
+                                                neighborExt, neighborLevel);
+          if (neighborDist < refDist)
+            {
+            changed = 1;
+            refBlock = neighborBlock;
+            refExt = neighborExt;
+            if (neighborLevel > faceLevel)
+              {
+              refIdx[0] = faceIdx[0] << (neighborLevel-faceLevel);
+              refIdx[1] = faceIdx[1] << (neighborLevel-faceLevel);
+              refIdx[2] = faceIdx[2] << (neighborLevel-faceLevel);
+              }
+            else
+              {
+              refIdx[0] = faceIdx[0] >> (faceLevel-neighborLevel);
+              refIdx[1] = faceIdx[1] >> (faceLevel-neighborLevel);
+              refIdx[2] = faceIdx[2] >> (faceLevel-neighborLevel);
+              }
+            refLevel = neighborLevel;
+            refDist = neighborDist;
+            }
           }
-        else
-          {
-          neighborIdx[0] = faceIdx[0] >> (faceLevel-tmpLevel);
-          neighborIdx[1] = faceIdx[1] >> (faceLevel-tmpLevel);
-          neighborIdx[2] = faceIdx[2] >> (faceLevel-tmpLevel);
-          }
-        // If we changed levels, or our extent 
-        // does not included index look some more.
-        // Note: If we move to a higher level, previous axes may go
-        // out of extent.
-        if (tmpLevel > refLevel ||
-            neighborIdx[axis] < ext[minIdx])
-          {
-          recheck = -1;
-          }
-        refLevel = tmpLevel;
         }
-
       // Max direction
-      if (neighborIdx[axis] > ext[maxIdx] && 
-          refBlock->GetNumberOfFaceNeighbors(maxIdx) > 0)
+      numNeighbors = refBlock->GetNumberOfFaceNeighbors(maxIdx);
+      if (refIdx[axis] > refExt[maxIdx] && 
+          numNeighbors > 0)
         {
-        // Move in this direction.
-        refBlock = refBlock->GetFaceNeighbor(maxIdx, 0);
-        ext = refBlock->GetBaseCellExtent();
-        // Save level for next comparison.
-        tmpLevel = refBlock->GetLevel();
-        if (tmpLevel > faceLevel)
+        // Look through all the neighbors move when it gets us closer to  goal.
+        for (int neighborIdx = 0; neighborIdx < numNeighbors; ++neighborIdx)
           {
-          neighborIdx[0] = faceIdx[0] << (tmpLevel-faceLevel);
-          neighborIdx[1] = faceIdx[1] << (tmpLevel-faceLevel);
-          neighborIdx[2] = faceIdx[2] << (tmpLevel-faceLevel);
+          neighborBlock = refBlock->GetFaceNeighbor(maxIdx, neighborIdx);
+          neighborExt = neighborBlock->GetBaseCellExtent();
+          neighborLevel = neighborBlock->GetLevel();
+          neighborDist = this->ComputeProximity(faceIdx, faceLevel,
+                                                neighborExt, neighborLevel);
+          if (neighborDist < refDist)
+            {
+            changed = 1;
+            refBlock = neighborBlock;
+            refExt = neighborExt;
+            if (neighborLevel > faceLevel)
+              {
+              refIdx[0] = faceIdx[0] << (neighborLevel-faceLevel);
+              refIdx[1] = faceIdx[1] << (neighborLevel-faceLevel);
+              refIdx[2] = faceIdx[2] << (neighborLevel-faceLevel);
+              }
+            else
+              {
+              refIdx[0] = faceIdx[0] >> (faceLevel-neighborLevel);
+              refIdx[1] = faceIdx[1] >> (faceLevel-neighborLevel);
+              refIdx[2] = faceIdx[2] >> (faceLevel-neighborLevel);
+              }
+            refLevel = neighborLevel;
+            refDist = neighborDist;
+            }
           }
-        else
-          {
-          neighborIdx[0] = faceIdx[0] >> (faceLevel-tmpLevel);
-          neighborIdx[1] = faceIdx[1] >> (faceLevel-tmpLevel);
-          neighborIdx[2] = faceIdx[2] >> (faceLevel-tmpLevel);
-          }
-        // If we changed levels, or our extent 
-        // does not included index look some more.
-        // Note: If we move to a higher level, previous axes may go
-        // out of extent.
-        if (tmpLevel > refLevel ||
-            neighborIdx[axis] < ext[minIdx])
-          {
-          recheck = -1;
-          }
-        refLevel = tmpLevel;
         }
       }
     }
 
   // We have a block
   // clamp the neighbor index to pad the volume
-  if (neighborIdx[0] < ext[0]) { neighborIdx[0] = ext[0];}
-  if (neighborIdx[0] > ext[1]) { neighborIdx[0] = ext[1];}
-  if (neighborIdx[1] < ext[2]) { neighborIdx[1] = ext[2];}
-  if (neighborIdx[1] > ext[3]) { neighborIdx[1] = ext[3];}
-  if (neighborIdx[2] < ext[4]) { neighborIdx[2] = ext[4];}
-  if (neighborIdx[2] > ext[5]) { neighborIdx[2] = ext[5];}
+  if (refIdx[0] < refExt[0]) { refIdx[0] = refExt[0];}
+  if (refIdx[0] > refExt[1]) { refIdx[0] = refExt[1];}
+  if (refIdx[1] < refExt[2]) { refIdx[1] = refExt[2];}
+  if (refIdx[1] > refExt[3]) { refIdx[1] = refExt[3];}
+  if (refIdx[2] < refExt[4]) { refIdx[2] = refExt[4];}
+  if (refIdx[2] > refExt[5]) { refIdx[2] = refExt[5];}
 
   neighbor->Block = refBlock;
-  neighbor->Index[0] = neighborIdx[0];
-  neighbor->Index[1] = neighborIdx[1];
-  neighbor->Index[2] = neighborIdx[2];
+  neighbor->Index[0] = refIdx[0];
+  neighbor->Index[1] = refIdx[1];
+  neighbor->Index[2] = refIdx[2];
   const int *incs = refBlock->GetCellIncrements();
-  int offset = (neighborIdx[0]- ext[0])*incs[0]
-             + (neighborIdx[1]- ext[2])*incs[1]
-             + (neighborIdx[2]- ext[4])*incs[2];
+  int offset = (refIdx[0]- refExt[0])*incs[0]
+             + (refIdx[1]- refExt[2])*incs[1]
+             + (refIdx[2]- refExt[4])*incs[2];
   neighbor->FragmentIdPointer = refBlock->GetBaseFragmentIdPointer() + offset;
   neighbor->VolumeFractionPointer = refBlock->GetBaseVolumeFractionPointer() + offset;
   neighbor->FlatIndex = refBlock->GetBaseFlatIndex() + offset;
 }
 
+
+
+//----------------------------------------------------------------------------
+long vtkCTHFragmentConnect::ComputeProximity(
+  const int faceIdx[3], int faceLevel,
+  const int ext[6], int refLevel)
+{
+  // We need a distance that is independant of level.
+  // All neighbors should be no more than one level away from the faces level.
+  // Lets use 2 above for a saftey margin.
+  long distance = 0;
+  long min;
+  long max;
+  long idx;
+  
+  idx = faceIdx[0] << 2;
+  min = ext[0] << (2 + faceLevel-refLevel);
+  max = ((ext[1]+1) << (2 + faceLevel-refLevel))-1;
+  if (idx < min)
+    {
+    distance += (min - idx);
+    }
+  else if (idx > max)
+    {
+    distance += (idx - max);
+    }
+
+  idx = faceIdx[1] << 2;
+  min = ext[2] << (2 + faceLevel-refLevel);
+  max = ((ext[3]+1) << (2 + faceLevel-refLevel))-1;
+  if (idx < min)
+    {
+    distance += (min - idx);
+    }
+  else if (idx > max)
+    {
+    distance += (idx - max);
+    }
+
+  idx = faceIdx[2] << 2;
+  min = ext[4] << (2 + faceLevel-refLevel);
+  max = ((ext[5]+1) << (2 + faceLevel-refLevel))-1;
+  if (idx < min)
+    {
+    distance += (min - idx);
+    }
+  else if (idx > max)
+    {
+    distance += (idx - max);
+    }
+
+  return distance;
+}
 
 
 

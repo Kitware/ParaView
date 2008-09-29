@@ -272,10 +272,12 @@ protected:
         int axis, int outMaxFlag);
   void ComputeDisplacementFactors(
         vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
-        double displacmentFactors[3]);
+        double displacmentFactors[3],
+        int rootNeighborIdx);
   void SubVoxelPositionCorner(
         double* point, 
-        vtkCTHFragmentConnectIterator* pointNeighborIterators[8]);
+        vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
+        int rootNeighborIdx);
   void FindPointNeighbors(
         vtkCTHFragmentConnectIterator* iteratorMin0, 
         vtkCTHFragmentConnectIterator* iteratorMax0,
@@ -619,10 +621,15 @@ protected:
   void ComputeFaceNeighbors(vtkCTHFragmentConnectIterator* in,
                             vtkCTHFragmentConnectIterator* out,
                             int axis, int  outMaxFlag);
+
+  long ComputeProximity(const int faceIdx[3], int faceLevel,
+                        const int ext[6], int refLevel);
+
   void FindNeighbor(
     int faceIndex[3], int faceLevel, 
     vtkCTHFragmentConnectIterator* neighbor,
     vtkCTHFragmentConnectIterator* reference);
+
 
   // PARAVIEW interface data
   vtkDataArraySelection *MaterialArraySelection;
