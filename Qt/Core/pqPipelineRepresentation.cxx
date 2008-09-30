@@ -375,6 +375,9 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
       GetRepresentedDataInformation();
     }
 
+  vtkPVArrayInformation* chosenArrayInfo = 0;
+  int chosenFieldType = 0;
+
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
@@ -383,52 +386,59 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     attrInfo = geomInfo->GetPointDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetPointDataInformation() : 0;
     pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if(arrayInfo)
+    if (arrayInfo)
       {
-      this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataRepresentationProxy::POINT_DATA);
-      return;
+      chosenFieldType = vtkSMDataRepresentationProxy::POINT_DATA;
+      chosenArrayInfo = arrayInfo;
       }
     }
     
   // Check for new cell scalars.
-  if (geomInfo)
+  if (!chosenArrayInfo && geomInfo)
     {
     attrInfo = geomInfo->GetCellDataInformation();
     inAttrInfo = inGeomInfo? inGeomInfo->GetCellDataInformation() : 0;
     pqPipelineRepresentation::getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if(arrayInfo)
+    if (arrayInfo)
       {
-      this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataRepresentationProxy::CELL_DATA);
-      return;
+      chosenFieldType = vtkSMDataRepresentationProxy::CELL_DATA;
+      chosenArrayInfo = arrayInfo;
       }
     }
    
-  if (geomInfo)
+  if (!chosenArrayInfo && geomInfo)
     {
     // Check for scalars in geometry
     attrInfo = geomInfo->GetPointDataInformation();
     this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
-    if(arrayInfo)
+    if (arrayInfo)
       {
-      this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataRepresentationProxy::POINT_DATA);
-      return;
+      chosenArrayInfo = arrayInfo;
+      chosenFieldType = vtkSMDataRepresentationProxy::POINT_DATA;
       }
     }
 
-  if (geomInfo)
+  if (!chosenArrayInfo && geomInfo)
     {
     // Check for scalars in geometry
     attrInfo = geomInfo->GetCellDataInformation();
     this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
-      this->colorByArray(arrayInfo->GetName(), 
-                         vtkSMDataRepresentationProxy::CELL_DATA);
-      return;
+      chosenArrayInfo = arrayInfo;
+      chosenFieldType = vtkSMDataRepresentationProxy::CELL_DATA;
       }
+    }
+
+  if (chosenArrayInfo)
+    {
+    if (chosenArrayInfo->GetDataType() == VTK_UNSIGNED_CHAR &&
+        chosenArrayInfo->GetNumberOfComponents() <= 4)
+        {
+        pqSMAdaptor::setElementProperty(repr->GetProperty("MapScalars"), 0);
+        }
+    this->colorByArray(chosenArrayInfo->GetName(), chosenFieldType);
+    return;
     }
   
   QList<QString> myColorFields = this->getColorFields();
