@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.82");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.83");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -4528,7 +4528,8 @@ void vtkCTHFragmentConnect::FindNeighbor(
           numNeighbors > 0)
         {
         // Look through all the neighbors move when it gets us closer to  goal.
-        for (int neighborIdx = 0; neighborIdx < numNeighbors; ++neighborIdx)
+        // Soon as the ref block changes, start over.
+        for (int neighborIdx = 0; neighborIdx < numNeighbors && !changed; ++neighborIdx)
           {
           neighborBlock = refBlock->GetFaceNeighbor(minIdx, neighborIdx);
           neighborExt = neighborBlock->GetBaseCellExtent();
@@ -4563,7 +4564,8 @@ void vtkCTHFragmentConnect::FindNeighbor(
           numNeighbors > 0)
         {
         // Look through all the neighbors move when it gets us closer to  goal.
-        for (int neighborIdx = 0; neighborIdx < numNeighbors; ++neighborIdx)
+        // Soon as the ref block changes, start over.
+        for (int neighborIdx = 0; neighborIdx < numNeighbors && !changed; ++neighborIdx)
           {
           neighborBlock = refBlock->GetFaceNeighbor(maxIdx, neighborIdx);
           neighborExt = neighborBlock->GetBaseCellExtent();
