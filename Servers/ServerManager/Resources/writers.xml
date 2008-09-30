@@ -864,8 +864,9 @@
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-        <DataTypeDomain name="input_type" composite_data_supported="0">
-          <DataType value="vtkUnstructuredGrid"/>
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkCompositeDataSet"/>
+          <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <Documentation>
           The input filter/source whose output dataset is to written to the
