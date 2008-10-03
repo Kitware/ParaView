@@ -2563,7 +2563,120 @@ The Point Data to Cell Data filter averages the values of the point attributes o
      </IntVectorProperty>
    <!-- End PointDataToCellData -->
    </SourceProxy>
+  
+   <!-- ############################################################################ -->
+  <SourceProxy 
+      name="QuadraturePointInterpolator"
+      class="vtkQuadraturePointInterpolator"
+      label="Interpolate to Quadrature Points">
+  
+    <Documentation
+        long_help="Create scalar/vector data arrays interpolated to quadrature points."
+        short_help="Create scalar/vector data arrays interpolated to quadrature points.">
+        "Create scalar/vector data arrays interpolated to quadrature points."
+    </Documentation>
+  
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+  
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+  
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkUnstructuredGrid"/>
+      </DataTypeDomain>
+    </InputProperty>
+  </SourceProxy>
+  <!-- ############################################################################ -->
+  <SourceProxy 
+      name="QuadraturePointsGenerator" 
+      class="vtkQuadraturePointsGenerator"
+      label="Generate Quadrature Points">
+  
+    <Documentation
+        long_help="Create a point set with data at quadrature points."
+        short_help="Create a point set with data at quadrature points.">
+        "Create a point set with data at quadrature points."
+    </Documentation>
+  
+    <OutputPort name="Quadrature Points" index="0" />
+  
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+  
+      <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+      </ProxyGroupDomain>
+  
+      <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid"/>
+      </DataTypeDomain>
+      <InputArrayDomain
+          name="input_array"
+          attribute_type="point"/>
+    </InputProperty>
+  
+    <!-- Source Array-->
+    <StringVectorProperty
+        name="SelectSourceArray" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"> 
+        <!--
+        name="SelectSourceArray"
+        command="SetSourceArrayName"
+        clean_command="ClearSourceArrayName"
+        repeat_command="0"
+        number_of_elements_per_command="1"
+        label="Select Source Array">
+        -->
+      <Documentation>
+        Specifies the arrays from which we generate quadrature points.
+      </Documentation>
+      <ArrayListDomain 
+          name="array_list" 
+          data_type="VTK_FLOAT VTK_DOUBLE" 
+          attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+      </ArrayListDomain>
+    </StringVectorProperty>
+  </SourceProxy>
+  <!-- ############################################################################ -->
+  <SourceProxy 
+      name="QuadratureSchemeDictionaryGenerator"
+      class="vtkQuadratureSchemeDictionaryGenerator"
+      label="Generate Quadrature Scheme Dictionary">
+  
+    <Documentation
+        long_help="Generate quadrature scheme dictionaries in data sets that do not have them."
+        short_help="Generate quadrature scheme dictionaries in data sets that do not have them.">
+        Generate quadrature scheme dictionaries in data sets that do not have them.
+    </Documentation>
+  
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+  
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+  
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkUnstructuredGrid"/>
+      </DataTypeDomain>
+    </InputProperty>
+  </SourceProxy>
 
+   
    <!-- ==================================================================== -->
    <SourceProxy name="QuadricClustering" class="vtkQuadricClustering"
     label="Quadric Clustering">
@@ -6674,34 +6787,6 @@ Tessellate a higher-order dataset.
    <!-- End CTHFragmentIntersect -->
    </SourceProxy>
 
-   <!-- ==================================================================== -->
-   <SourceProxy 
-     name="EDFIntegrationPointInterpolator" 
-     class="vtkEDFIntegrationPointInterpolator"
-     label="EDFIntegrationPointInterpolator">
-     <Documentation
-       long_help="Generate quadrature points, and interpolate fields there."
-       short_help="Generate quadrature points, and interpolate fields there.">
-     </Documentation>
-
-     <!-- Out -->
-     <OutputPort name="data set" index="0" />
-     <OutputPort name="quadrature points" index="1" />
-     <!-- In -->
-     <InputProperty
-       name="Input"
-       command="SetInputConnection">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkUnstructuredGrid"/>
-       </DataTypeDomain>
-     </InputProperty>
-   <!-- End EDFIntegrationPointInterpolator -->
-   </SourceProxy>
-   
    <!-- ==================================================================== -->
     <SourceProxy name="GeometryFilter" class="vtkPVGeometryFilter">
       <InputProperty
