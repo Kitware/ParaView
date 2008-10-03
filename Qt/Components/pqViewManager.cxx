@@ -1365,6 +1365,20 @@ vtkImageData* pqViewManager::captureImage(int _width, int _height)
 }
 
 //-----------------------------------------------------------------------------
+void pqViewManager::maximizeWidget(QWidget* wdg)
+{
+  this->Superclass::maximizeWidget(wdg);
+  this->updateViewPositions();
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::restoreWidget(QWidget* wdg)
+{
+  this->Superclass::restoreWidget(wdg);
+  this->updateViewPositions();
+}
+
+//-----------------------------------------------------------------------------
 void pqViewManager::onViewOptionsRequested()
 {
   if (this->Internal->ViewOptionsManager)

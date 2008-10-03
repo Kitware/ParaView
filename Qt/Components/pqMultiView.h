@@ -138,8 +138,8 @@ public slots:
   void showDecorations();
 
 protected slots:
-  void maximizeWidget(QWidget*);
-  void restoreWidget(QWidget*);
+  virtual void maximizeWidget(QWidget*);
+  virtual void restoreWidget(QWidget*);
 
 
 protected:

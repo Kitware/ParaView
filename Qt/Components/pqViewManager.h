@@ -203,6 +203,11 @@ protected:
   /// Event filter callback.
   bool eventFilter(QObject* caller, QEvent* e);
 
+  /// Overridden to call updateViewPositions() after a frame has been maximized
+  /// or minimized.
+  virtual void maximizeWidget(QWidget*);
+  virtual void restoreWidget(QWidget*);
+
   /// This method will either assign an empty frame
   /// to the view module or split the active view
   /// (if any, otherwise splits the first view)

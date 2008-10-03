@@ -60,6 +60,13 @@ public:
   vtkSetMacro(TileDisplayCompositeThreshold, double);
   vtkGetMacro(TileDisplayCompositeThreshold, double);
 
+  // Description:
+  // Overridden to pass the GUISize to the RenderSyncManager.
+  virtual void SetGUISize(int x, int y);
+
+  // Description:
+  // Overridden to pass the ViewPosition to the RenderSyncManager.
+  virtual void SetViewPosition(int x, int y);
 
 //BTX
 protected:
