@@ -9,6 +9,7 @@
 #include "vtkXMLMultiBlockDataWriter.h"
 #include "vtkXMLMultiBlockDataReader.h"
 #include "vtkPVTestUtilities.h"
+#include "vtkTesting.h"
 //
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -45,11 +46,12 @@ int main( int argc, char* argv[] )
   prototype->Delete();
 
   // Get various paths.
-  vtkPVTestUtilities *tu=vtkPVTestUtilities::New();
-  tu->Initialize(argc,argv);
-  char *baselinePath=tu->GetDataFilePath("Baseline/TestCTHFragmentConnect.vtm");
-  char *inputDataPath=tu->GetDataFilePath("Data/spcth_fc_0.0");
-  char *tempDataPath=tu->GetTempFilePath("TestCTHFragmentConnect.vtm");
+  vtkPVTestUtilities *pvTestHelper=vtkPVTestUtilities::New();
+  pvTestHelper->Initialize(argc,argv);
+  char *baselinePath=pvTestHelper->GetDataFilePath("Baseline/TestCTHFragmentConnect.vtm");
+  char *inputDataPath=pvTestHelper->GetDataFilePath("Data/spcth_fc_0.0");
+  char *tempDataPath=pvTestHelper->GetTempFilePath("TestCTHFragmentConnect.vtm");
+  pvTestHelper->Delete();
 
   if (myProcId==0)
     {
@@ -77,7 +79,7 @@ int main( int argc, char* argv[] )
   spy->SetCellArrayStatus("Z velocity (cm/s)",1);
   spy->SetCellArrayStatus("Pressure (dynes/cm^2^)",1);
   spy->SetCellArrayStatus("Temperature (eV)",1);
-  // Set paramter to connect filter
+  // Set parameter to connect filter
   vtkCTHFragmentConnect* frag = vtkCTHFragmentConnect::New();
   frag->SelectMaterialArray("Material volume fraction - 1");
   frag->SelectMaterialArray("Material volume fraction - 2");
@@ -110,6 +112,8 @@ int main( int argc, char* argv[] )
   // Process 0 checks the results.
   if (myProcId==0)
     {
+    vtkTesting *testHelper=vtkTesting::New();
+    testHelper->SetVerbose(1);
     // Save the current results in the tetsing temp folder
     vtkXMLMultiBlockDataWriter *mbdsw=vtkXMLMultiBlockDataWriter::New();
     mbdsw->SetInput(statsOut);
@@ -147,7 +151,7 @@ int main( int argc, char* argv[] )
       vtkPolyData *pdBaseline
         = dynamic_cast<vtkPolyData *>(mbdsBaseline->GetBlock(block));
 
-      if (tu->ComparePointData(pdBaseline, pdCurrent, 1.0E-6)==false)
+      if (!testHelper->CompareAverageOfL2Norm(pdBaseline, pdCurrent, 1.0E-6))
         {
         cerr << "Error: Block "
              << block
@@ -156,10 +160,9 @@ int main( int argc, char* argv[] )
         testStatus=1;
         }
       }
+    testHelper->Delete();
     mbdsr->Delete();
     }
-
-  tu->Delete();
 
   delete [] baselinePath;
   delete [] tempDataPath;

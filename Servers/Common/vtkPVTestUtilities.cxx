@@ -27,35 +27,61 @@
 using vtkstd::string;
 using vtkstd::vector;
 
-vtkCxxRevisionMacro(vtkPVTestUtilities, "1.5");
+vtkCxxRevisionMacro(vtkPVTestUtilities, "1.6");
 vtkStandardNewMacro(vtkPVTestUtilities);
 
-
+//-----------------------------------------------------------------------------
+void vtkPVTestUtilities::Initialize(int argc, char **argv)
+{
+  this->Argc=argc;
+  this->Argv=argv;
+  if (!((argc==0)||(argv==0)))
+  {
+    this->DataRoot=this->GetDataRoot();
+    this->TempRoot=this->GetTempRoot();
+  }
+}
 //-----------------------------------------------------------------------------
 char *vtkPVTestUtilities::GetDataRoot()
 {
   return this->GetCommandTailArgument("-D");
 }
-
 //-----------------------------------------------------------------------------
 char *vtkPVTestUtilities::GetTempRoot()
 {
   return this->GetCommandTailArgument("-T");
 }
-
 //-----------------------------------------------------------------------------
 char *vtkPVTestUtilities::GetCommandTailArgument(const char *tag)
 {
   for (int i=1; i<this->Argc; ++i)
-  {
-    if (string(this->Argv[i])==string(tag))
     {
-      return this->Argv[i+1];
-    }
+    if (string(this->Argv[i])==string(tag))
+      {
+      if ((i+1)<this->Argc)
+        {
+        return this->Argv[i+1];
+        }
+      else
+        {
+        break;
+        }
+      }
   }
   return 0;
 }
-
+//-----------------------------------------------------------------------------
+// int vtkPVTestUtilities::CheckForCommandTailArgument(const char *tag)
+// {
+//   for (int i=1; i<this->Argc; ++i)
+//     {
+//     if (string(this->Argv[i])==string(tag))
+//       {
+//       return this->Argv[i+1];
+//       }
+//     }
+//   return 0;
+// }
 //-----------------------------------------------------------------------------
 char vtkPVTestUtilities::GetPathSep()
 {
@@ -67,7 +93,6 @@ char vtkPVTestUtilities::GetPathSep()
   return '/';
   #endif
 }
-
 //-----------------------------------------------------------------------------
 // Concat the data root path to the name supplied.
 // The return is a c string that has the correct
@@ -82,198 +107,34 @@ char *vtkPVTestUtilities::GetFilePath(
   char *filePath=new char[pathLen];
   int i=0;
   for (; i<baseLen; ++i)
-  {
+    {
     if ( this->GetPathSep()=='\\'
           && base[i]=='/')
-    {
+      {
       filePath[i]='\\';
-    }
+      }
     else
-    {
+      {
       filePath[i]=base[i];
+      }
     }
-  }
   filePath[i]=this->GetPathSep();
   ++i;
   for (int j=0; j<nameLen; ++j, ++i)
-  {
+    {
     if ( this->GetPathSep()=='\\'
           && name[j]=='/')
-    {
+      {
       filePath[i]='\\';
-    }
+      }
     else
-    {
+      {
       filePath[i]=name[j];
+      }
     }
-  }
   filePath[i]='\0';
   return filePath;
 }
-
-//-----------------------------------------------------------------------------
-// Sum the L2 Norm point wise over all tuples.
-// Return the number of terms in the sum.
-template <class T>
-vtkIdType vtkPVTestUtilities::AccumulateScaledL2Norm(
-        T *pA,           // pointer to first data array
-        T *pB,           // pointer to second data array
-        vtkIdType nTups, // number of tuples
-        int nComps,      // number of comps
-        double &SumModR) // result
-{
-  //
-  SumModR=0.0;
-  for (vtkIdType i=0; i<nTups; ++i)
-    {
-    double modR=0.0;
-    double modA=0.0;
-    for (int q=0; q<nComps; ++q)
-      {
-      double a=pA[q];
-      double b=pB[q];
-      modA+=a*a;
-      double r=b-a;
-      modR+=r*r;
-      }
-    modA=sqrt(modA);
-    modA= modA<1.0 ? 1.0 : modA;
-    SumModR+=sqrt(modR)/modA;
-    pA+=nComps;
-    pB+=nComps;
-    }
-  return nTups;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkPVTestUtilities::CompareDataArrays(
-        vtkDataArray *daA,
-        vtkDataArray *daB,
-        double tol)
-{
-  int typeA=daA->GetDataType();
-  int typeB=daB->GetDataType();
-  if (typeA!=typeB)
-    {
-    vtkWarningMacro("Incompatible data types: "
-                    << typeA << ","
-                    << typeB << ".");
-    return false;
-    }
-  //
-  vtkIdType nTupsA=daA->GetNumberOfTuples();
-  vtkIdType nTupsB=daB->GetNumberOfTuples();
-  int nCompsA=daA->GetNumberOfComponents();
-  int nCompsB=daB->GetNumberOfComponents();
-  //
-  if ((nTupsA!=nTupsB)
-     || (nCompsA!=nCompsB))
-    {
-    vtkWarningMacro(
-              "Arrays: " << daA->GetName()
-              << " (nC=" << nCompsA 
-              << " nT= "<< nTupsA << ")"
-              << " and " << daB->GetName()
-              << " (nC=" << nCompsB 
-              << " nT= "<< nTupsB << ")"
-              << " do not have the same structure.");
-    return false;
-    }
-
-  double L2=0.0;
-  vtkIdType N=0;
-  switch (typeA)
-    {
-    case VTK_DOUBLE:
-      {
-      vtkDoubleArray *A=dynamic_cast<vtkDoubleArray *>(daA);
-      double *pA=A->GetPointer(0);
-      vtkDoubleArray *B=dynamic_cast<vtkDoubleArray *>(daB);
-      double *pB=B->GetPointer(0);
-      N=this->AccumulateScaledL2Norm(pA,pB,nTupsA,nCompsA,L2);
-      }
-      break;
-    case VTK_FLOAT:
-      {
-      vtkFloatArray *A=dynamic_cast<vtkFloatArray *>(daA);
-      float *pA=A->GetPointer(0);
-      vtkFloatArray *B=dynamic_cast<vtkFloatArray *>(daB);
-      float *pB=B->GetPointer(0);
-      N=this->AccumulateScaledL2Norm(pA,pB,nTupsA,nCompsA,L2);
-      }
-      break;
-    default:
-      cerr << "Skipping:" << daA->GetName() << endl;
-      return true;
-      break;
-    }
-  //
-  if (N<=0)
-  {
-    return false;
-  }
-  //
-  cerr << "Sum(L2)/N of "
-       << daA->GetName()
-       << " < " << tol 
-       << "? = " << L2
-       << "/" << N
-       << "."  << endl;
-  //
-  double avgL2=L2/N;
-  if (avgL2>tol)
-    {
-    return false;
-    }
-
-  // Test passed
-  return true;
-}
-//
-bool vtkPVTestUtilities::ComparePointData(
-        vtkPolyData *pdA,
-        vtkPolyData *pdB,
-        double tol)
-{
-  vtkDataArray *daA=0;
-  vtkDataArray *daB=0;
-  bool status=false;
-
-  // Points.
-  cerr << "Comparing points:" << endl;
-  daA=pdA->GetPoints()->GetData();
-  daB=pdB->GetPoints()->GetData();
-  //
-  status=CompareDataArrays(daA,daB,tol);
-  if (status==false)
-    {
-    return false;
-    }
-
-  // Point data arrays.
-  cerr << "Comparing data arrays:" << endl;
-  int nDaA=pdA->GetPointData()->GetNumberOfArrays();
-  int nDaB=pdB->GetPointData()->GetNumberOfArrays();
-  if (nDaA!=nDaB)
-    {
-    return false;
-    }
-  //
-  for (int arrayId=0; arrayId<nDaA; ++arrayId)
-    {
-    daA=pdA->GetPointData()->GetArray(arrayId);
-    daB=pdB->GetPointData()->GetArray(arrayId);
-    //
-    status=CompareDataArrays(daA,daB,tol);
-    if (status==false)
-      {
-      return false;
-      }
-    }
-  // All tests passed.
-  return true;
-}
-
 //-----------------------------------------------------------------------------
 void vtkPVTestUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
