@@ -18,7 +18,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMPVLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMPVLookupTableProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPVLookupTableProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMPVLookupTableProxy::vtkSMPVLookupTableProxy()
 {
@@ -31,9 +31,9 @@ vtkSMPVLookupTableProxy::~vtkSMPVLookupTableProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPVLookupTableProxy::UpdateVTKObjects()
+void vtkSMPVLookupTableProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
   this->InvokeCommand("Build");
 }
 

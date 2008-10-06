@@ -21,7 +21,7 @@
 #include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMBoxRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBoxRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMBoxRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMBoxRepresentationProxy::vtkSMBoxRepresentationProxy()
 {
@@ -55,7 +55,7 @@ void vtkSMBoxRepresentationProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
+void vtkSMBoxRepresentationProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
   if (this->InUpdateVTKObjects)
     {
@@ -64,18 +64,15 @@ void vtkSMBoxRepresentationProxy::UpdateVTKObjects()
 
   int something_changed = this->ArePropertiesModified();
 
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
 
   if (something_changed)
     {
-    vtkClientServerStream stream;
     stream  << vtkClientServerStream::Invoke
             << this->GetID()
             << "SetTransform"
             << this->GetSubProxy("Transform")->GetID()
             << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->GetConnectionID(), this->GetServers(), stream);
     }
 }
 

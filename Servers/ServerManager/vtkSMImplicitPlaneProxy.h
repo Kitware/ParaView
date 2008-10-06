@@ -43,12 +43,14 @@ public:
 
   // Description:
   // Push values to the VTK objects.
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
 
 protected:
   vtkSMImplicitPlaneProxy();
   ~vtkSMImplicitPlaneProxy();
 
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
   double Origin[3];
   double Offset;
 

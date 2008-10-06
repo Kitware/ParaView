@@ -16,12 +16,11 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneProxy, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneProxy::vtkSMImplicitPlaneProxy()
@@ -36,9 +35,9 @@ vtkSMImplicitPlaneProxy::~vtkSMImplicitPlaneProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMImplicitPlaneProxy::UpdateVTKObjects()
+void vtkSMImplicitPlaneProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
 
   double origin[3];
 
@@ -56,12 +55,10 @@ void vtkSMImplicitPlaneProxy::UpdateVTKObjects()
     origin[i] = this->Origin[i] + this->Offset*normal->GetElement(i);
     }
 
-  vtkClientServerStream str;
-  str << vtkClientServerStream::Invoke
+  stream
+      << vtkClientServerStream::Invoke
       << this->GetID() << "SetOrigin" << origin[0] << origin[1] << origin[2]
       << vtkClientServerStream::End;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->ConnectionID, this->Servers, str);
 }
  
 //----------------------------------------------------------------------------

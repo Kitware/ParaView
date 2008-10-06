@@ -55,7 +55,9 @@ public:
   void SetSourceProcessToRenderServerRoot()
     { this->SetSourceProcess(RENDER_SERVER_ROOT); }
 
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
+
 
 //BTX
 protected:
@@ -64,6 +66,7 @@ protected:
 
   void UpdateImage();
   virtual void ReviveVTKObjects();
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   char* FileName;
   int SourceProcess;

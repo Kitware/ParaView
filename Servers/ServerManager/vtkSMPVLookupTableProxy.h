@@ -31,12 +31,14 @@ public:
 
   // Description:
   // Overriden to call Build() on the vtkPVLookupTable.
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
 
 protected:
   vtkSMPVLookupTableProxy();
   ~vtkSMPVLookupTableProxy();
 
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 private:
   vtkSMPVLookupTableProxy(const vtkSMPVLookupTableProxy&); // Not implemented.
   void operator=(const vtkSMPVLookupTableProxy&); // Not implemented.

@@ -36,7 +36,8 @@ public:
   // Description:
   // push properties to VTK object.
   // Also call Build(), hence rebuilds the lookup table.
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
 
   // Description:
   // This map is used for arrays with this name 
@@ -69,6 +70,11 @@ public:
 protected:
   vtkSMLookupTableProxy();
   ~vtkSMLookupTableProxy();
+
+  // Description:
+  // push properties to VTK object.
+  // Also call Build(), hence rebuilds the lookup table.
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   // This method is overridden to change the servers.
   virtual void CreateVTKObjects();

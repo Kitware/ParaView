@@ -113,7 +113,8 @@ public:
   // Description:
   // Overloaded to ensure that the chain of subproxies is updated in correct
   // sequence. 
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
 
   // Description:
   // This method saves state information about the proxy
@@ -131,6 +132,11 @@ public:
 protected:
   vtkSMCompoundSourceProxy();
   ~vtkSMCompoundSourceProxy();
+
+  // Description:
+  // Overloaded to ensure that the chain of subproxies is updated in correct
+  // sequence. 
+  virtual void UpdateVTKObjects(vtkClientServerStream&);
 
   // Description:
   // Given a class name (by setting VTKClassName) and server ids (by

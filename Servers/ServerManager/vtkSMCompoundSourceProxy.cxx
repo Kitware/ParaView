@@ -46,7 +46,7 @@ public:
 
 
 vtkStandardNewMacro(vtkSMCompoundSourceProxy);
-vtkCxxRevisionMacro(vtkSMCompoundSourceProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCompoundSourceProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 {
@@ -173,7 +173,7 @@ void vtkSMCompoundSourceProxy::CreateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCompoundSourceProxy::UpdateVTKObjects()
+void vtkSMCompoundSourceProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
   // update subproxies that don't have inputs first.
   // This is required for Readers/Sources that need the ExtractPieces filter to
@@ -190,11 +190,11 @@ void vtkSMCompoundSourceProxy::UpdateVTKObjects()
     // GetNumberOfAlgorithmRequiredInputPorts always returns 0.
     if (!source || source->GetNumberOfAlgorithmRequiredInputPorts() == 0)
       {
-      it2->second.GetPointer()->UpdateVTKObjects();
+      it2->second.GetPointer()->UpdateVTKObjects(stream);
       }
     }
 
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
 }
 
 //----------------------------------------------------------------------------

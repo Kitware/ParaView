@@ -20,7 +20,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMNetworkImageSourceProxy);
-vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMNetworkImageSourceProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMNetworkImageSourceProxy::vtkSMNetworkImageSourceProxy()
 {
@@ -62,9 +62,9 @@ void vtkSMNetworkImageSourceProxy::SetSourceProcess(int proc)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMNetworkImageSourceProxy::UpdateVTKObjects()
+void vtkSMNetworkImageSourceProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
   if (this->UpdateNeeded && !this->ForceNoUpdates)
     {
     this->UpdateImage();

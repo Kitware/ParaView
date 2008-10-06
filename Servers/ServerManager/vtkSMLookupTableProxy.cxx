@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.18");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -57,9 +57,9 @@ void vtkSMLookupTableProxy::CreateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMLookupTableProxy::UpdateVTKObjects()
+void vtkSMLookupTableProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
   this->Build();
 }
 

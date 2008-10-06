@@ -29,7 +29,8 @@ public:
   vtkTypeRevisionMacro(vtkSMBoxRepresentationProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    {this->Superclass::UpdateVTKObjects();}
   virtual void UpdatePropertyInformation();
   virtual void UpdatePropertyInformation(vtkSMProperty* prop)
     { this->Superclass::UpdatePropertyInformation(prop); }
@@ -41,6 +42,7 @@ protected:
 
   // This method is overridden to set the transform on the vtkWidgetRepresentation.
   virtual void CreateVTKObjects();
+  virtual void UpdateVTKObjects(vtkClientServerStream&);
 
 private:
   vtkSMBoxRepresentationProxy(const vtkSMBoxRepresentationProxy&); // Not implemented

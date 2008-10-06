@@ -47,9 +47,8 @@ public:
  
   // Description:
   // Push values on to the VTK objects. 
-  // This computes the transform matrix from the Position/Scale/Rotation
-  // values and sets that on to the vtkBox
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { return this->Superclass::UpdateVTKObjects(); }
 
 protected:
   vtkSMBoxProxy();
@@ -58,6 +57,12 @@ protected:
   double Position[3];
   double Rotation[3];
   double Scale[3];
+
+  // Description:
+  // Push values on to the VTK objects. 
+  // This computes the transform matrix from the Position/Scale/Rotation
+  // values and sets that on to the vtkBox
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   // Description:
   // Computes the transform matrix from Position/Rotation/Scale

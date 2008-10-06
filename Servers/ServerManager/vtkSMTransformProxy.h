@@ -48,11 +48,14 @@ public:
   // Push values on to the VTK objects. 
   // This computes the transform matrix from the Position/Scale/Rotation
   // values and sets that on to the transform
-  virtual void UpdateVTKObjects();
+  virtual void UpdateVTKObjects()
+    { this->Superclass::UpdateVTKObjects(); }
 
 protected:
   vtkSMTransformProxy();
   ~vtkSMTransformProxy();
+
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   double Position[3];
   double Rotation[3];

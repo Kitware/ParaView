@@ -713,7 +713,7 @@ protected:
   // Description:
   // Internal UpdateVTKObjects() which collapses all server-side sends into the
   // stream.
-  void UpdateVTKObjects(vtkClientServerStream& stream);
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.

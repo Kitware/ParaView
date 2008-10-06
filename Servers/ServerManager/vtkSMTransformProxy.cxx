@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMTransformProxy);
-vtkCxxRevisionMacro(vtkSMTransformProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMTransformProxy, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -41,21 +41,18 @@ vtkSMTransformProxy::~vtkSMTransformProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMTransformProxy::UpdateVTKObjects()
+void vtkSMTransformProxy::UpdateVTKObjects(vtkClientServerStream& stream)
 {
-  this->Superclass::UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects(stream);
   
   vtkMatrix4x4* mat = vtkMatrix4x4::New();
   this->GetMatrix(mat);
    
   vtkClientServerStream str;
-  str << vtkClientServerStream::Invoke
-      << this->GetID() << "SetMatrix"
-      << vtkClientServerStream::InsertArray(
-        &(mat->Element[0][0]),16)
-      << vtkClientServerStream::End;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->ConnectionID, this->Servers, str);
+  stream  << vtkClientServerStream::Invoke
+          << this->GetID() << "SetMatrix"
+          << vtkClientServerStream::InsertArray(&(mat->Element[0][0]),16)
+          << vtkClientServerStream::End;
   mat->Delete();
 }
 
