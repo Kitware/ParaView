@@ -160,16 +160,6 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QCheckBox" name="TrackScaleChanges" >
-            <property name="toolTip" >
-             <string>When set, colour is rescaled to max/min of data limits every time the time step changes</string>
-            </property>
-            <property name="text" >
-             <string>Track Scale Changes</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="SolidColorPage" >
