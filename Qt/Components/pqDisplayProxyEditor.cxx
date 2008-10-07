@@ -378,6 +378,10 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       reprProxy, reprProxy->GetProperty("InterpolateScalarsBeforeMapping"));
     }
 
+  this->Internal->Links->addPropertyLink(this->Internal->TrackScaleChanges,
+    "checked", SIGNAL(toggled(bool)),   \
+    reprProxy, reprProxy->GetProperty("TrackColorChanges"));
+
   this->Internal->ColorBy->setRepresentation(repr);
   QObject::connect(this->Internal->ColorBy,
     SIGNAL(modified()),
@@ -386,7 +390,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->StyleRepresentation->setRepresentation(repr);
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
-    this->Internal->ColorBy, SLOT(reloadGUI()));
+    this, SLOT(reloadGUI()), Qt::QueuedConnection);
 
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
@@ -617,6 +621,13 @@ void pqDisplayProxyEditor::updateEnableState()
 
   this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
   this->Internal->ColorMapScalars->setEnabled(false);
+
+  bool track = pqSMAdaptor::getElementProperty(
+    this->Internal->Representation->getProxy()->GetProperty("TrackColorChanges")).toInt();
+  if (track) 
+  {
+    this->Internal->Representation->resetLookupTableScalarRange();
+  }
 }
 
 //-----------------------------------------------------------------------------
