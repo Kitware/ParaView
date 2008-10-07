@@ -390,7 +390,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->StyleRepresentation->setRepresentation(repr);
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
-    this, SLOT(reloadGUI()), Qt::QueuedConnection);
+     this->Internal->ColorBy, SLOT(reloadGUI()));
 
   QObject::connect(this->Internal->StyleRepresentation,
     SIGNAL(currentTextChanged(const QString&)),
