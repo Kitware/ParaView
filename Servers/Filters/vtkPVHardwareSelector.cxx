@@ -19,14 +19,14 @@
 #include "vtkProp.h"
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
-vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.2");
+vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.3");
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {
   this->NumberOfProcesses = 1;
   this->NumberOfIDs = 0;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (pm->GetNumberOfLocalPartitions() > 1)
+  if (pm && pm->GetNumberOfLocalPartitions() > 1)
     {
     this->ProcessID = pm->GetPartitionId();
     }
