@@ -19,7 +19,7 @@
 #include "vtkProp.h"
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
-vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.3");
+vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.4");
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {
@@ -49,7 +49,8 @@ bool vtkPVHardwareSelector::PassRequired(int pass)
     return (this->NumberOfIDs >= 0xffffff);
 
   case ID_HIGH16:
-    return (this->NumberOfIDs >= 0xffffffffffff);
+    int upper = (0xffffff & (this->NumberOfIDs >> 24));
+    return (upper > 0);
     }
   return true;
 }
