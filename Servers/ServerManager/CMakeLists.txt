@@ -67,6 +67,7 @@ SET(Kit_SRCS
   vtkSMFileListDomain.cxx
   vtkSMFileSeriesReaderProxy.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMHardwareSelector.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx

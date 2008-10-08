@@ -83,7 +83,7 @@
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVUpdateSuppressor.h"
-#include "vtkPVVisibleCellSelector.h"
+#include "vtkPVHardwareSelector.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkReductionFilter.h"
@@ -197,7 +197,7 @@ int main(int , char *[])
   c = vtkPVTrackballRotate::New(); c->Print(cout); c->Delete();
   c = vtkPVTrackballZoom::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
-  c = vtkPVVisibleCellSelector::New(); c->Print(cout); c->Delete();
+  c = vtkPVHardwareSelector::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
   c = vtkReductionFilter::New(); c->Print(cout); c->Delete();

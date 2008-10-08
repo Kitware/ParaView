@@ -42,7 +42,6 @@
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
-#include "vtkPVVisibleCellSelector.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -63,6 +62,8 @@
 #include "vtkSMUtilities.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkSMHardwareSelector.h"
+#include "vtkSMPropertyHelper.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/map>
@@ -89,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.76");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.77");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1266,18 +1267,7 @@ const char* vtkSMRenderViewProxy::IsSelectVisibleCellsAvailable()
 //-----------------------------------------------------------------------------
 const char* vtkSMRenderViewProxy::IsSelectVisiblePointsAvailable()
 {
-  const char* msg = this->IsSelectVisibleCellsAvailable();
-  if (msg)
-    {
-    return msg;
-    }
-
-  vtkRenderWindow *rwin = this->GetRenderWindow();
-  if (!rwin || !rwin->GetStencilCapable())
-    {
-    return "Stencil buffers are not supported.";
-    }
-  return NULL;
+  return this->IsSelectVisibleCellsAvailable();
 }
 
 //-----------------------------------------------------------------------------
@@ -1600,7 +1590,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
       {
       continue;
       }
-    vtkIdType numCells = gi->GetNumberOfCells();
+    vtkIdType numCells = ofPoints? gi->GetNumberOfPoints() : gi->GetNumberOfCells();
     if (numCells > maxNumCells)
       {
       maxNumCells = numCells;
@@ -1608,13 +1598,11 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     }
   iter->Delete();
 
-  vtkIdType needs_2_passes = (maxNumCells+1)>>24;//more than 2^24-1 cells
-  vtkIdType needs_3_passes = needs_2_passes>>24; //more than 2^48-1
-
   vtkSMProxyManager* proxyManager = vtkSMObject::GetProxyManager();  
-  vtkSMProxy *vcsProxy = proxyManager->NewProxy("PropPickers", "PVVisibleCellSelector");
+  vtkSMHardwareSelector *vcsProxy = vtkSMHardwareSelector::SafeDownCast(
+      proxyManager->NewProxy("PropPickers", "HardwareSelector"));
   vcsProxy->SetConnectionID(this->ConnectionID);
-  vcsProxy->SetServers(this->Servers);
+  vcsProxy->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   //don't let the RenderSyncManager control back/front buffer swapping so that
   //we can do it here instead.
@@ -1631,40 +1619,14 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     renderSyncManager->UpdateVTKObjects();
     }
 
-  //how we get access to the renderers
-  vtkSMProxyProperty *setRendererMethod = vtkSMProxyProperty::SafeDownCast(
-    vcsProxy->GetProperty("SetRenderer"));
-  setRendererMethod->AddProxy(this->RendererProxy);
+  // Set default property values for the selector.
+  int area[4] = {x0, y0, x1, y1};
+  vtkSMPropertyHelper(vcsProxy, "Renderer").Set(this->RendererProxy);
+  vtkSMPropertyHelper(vcsProxy, "Area").Set(area, 4);
+  vtkSMPropertyHelper(vcsProxy, "FieldAssociation").Set(ofPoints? 0 : 1);
+  vtkSMPropertyHelper(vcsProxy, "NumberOfProcesses").Set(numProcessors);
+  vtkSMPropertyHelper(vcsProxy, "NumberOfIDs").Set(maxNumCells);
   vcsProxy->UpdateVTKObjects();   
-
-  //how we put the renderers into selection mode
-  vtkSMIntVectorProperty *setModeMethod = vtkSMIntVectorProperty::SafeDownCast(
-    vcsProxy->GetProperty("SetSelectMode"));
-  vtkSMProperty *setPIdMethod = vcsProxy->GetProperty("LookupProcessorId");
-
-  //I'm using the auto created PVVisCellSelectors in the vcsProxy above just
-  //to set the SelectionMode of the remote renderers.
-  //I use this one below to convert the composited images that arrive here
-  //into a selection.
-  vtkPVVisibleCellSelector *pti = vtkPVVisibleCellSelector::New();
-  pti->SetRenderer(this->GetRenderer());
-  pti->SetArea(x0,y0,x1,y1);
-  pti->GetArea(x0,y0,x1,y1);
-
-  //Use the back buffer
-  int usefrontbuf = 0;
-  if (!usefrontbuf)
-    {
-    this->GetRenderWindow()->SwapBuffersOff();
-    }
-
-  //Set background to black to indicate misses.
-  //vtkRenderer::UpdateGeometryForSelection does this also, but in that case
-  //iceT ignores it. Thus I duplicate the same effect here.
-  double origBG[3];
-  this->GetRenderer()->GetBackground(origBG);
-  double black[3] = {0.0,0.0,0.0};
-  this->SetBackgroundColorCM(black);
 
   //don't draw the scalar bar, text annotation, orientation axes
   vtkRendererCollection *rcol = this->RenderWindow->GetRenderers();
@@ -1703,52 +1665,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     this->ForceTriStripUpdate = 0;
     }
 
-  if (ofPoints)
-    {
-    pti->SetDoVertices(1);
-    }
-
-  unsigned char *buf;  
-  for (int p = 0; p < 6; p++)
-    {
-    if ((p==0) && (numProcessors==1))
-      {
-      p++;
-      }
-    if ((p==2) && (needs_3_passes==0))
-      {
-      p++;
-      }
-    if ((p==3) && (needs_2_passes==0))
-      {
-      p++;
-      }
-    if ((p==5) && (!ofPoints))
-      {
-      break;
-      }
-    //put into a selection mode
-    setModeMethod->SetElements1(p+1);
-    if (p==0)
-      {
-      setPIdMethod->Modified();
-      }
-    vcsProxy->UpdateVTKObjects();   
-
-    //draw
-    this->StillRender();  
-
-    //get the intermediate results
-    //renderwindow allocates this buffer
-    buf = this->GetRenderWindow()->GetRGBACharPixelData(x0,y0,x1,y1,usefrontbuf); 
-    //pti will deallocate the buffer when it is deleted
-    pti->SavePixelBuffer(p, buf); 
-    }
-  
-  //restore original rendering state
-  //clear selection mode to resume normal rendering
-  setModeMethod->SetElements1(0);
-  vcsProxy->UpdateVTKObjects();   
+  vtkSelection* selection = vcsProxy->Select(); 
 
   //Turn stripping back on if we had turned it off
   if (use_strips)
@@ -1772,12 +1689,6 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     }
   delete[] renOldVis;
 
-  this->SetBackgroundColorCM(origBG);
-  if (!usefrontbuf)
-    {
-    this->GetRenderWindow()->SwapBuffersOn();
-    }
-
   if (setAllowBuffSwap != NULL)
     {
     //let the RenderSyncManager control back/front buffer swapping
@@ -1785,15 +1696,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
     renderSyncManager->UpdateVTKObjects();
     }
   
-  //convert the intermediate results into  the selection data structure 
-  pti->ComputeSelectedIds();
-  vtkSelection *selection = vtkSelection::New();
-  pti->GetSelectedIds(selection);
-
-  //cleanup
-  pti->Delete();
   vcsProxy->Delete();
-
   return selection;
 }
 

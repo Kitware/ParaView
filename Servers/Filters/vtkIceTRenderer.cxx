@@ -27,6 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPKdTree.h"
 #include "vtkRenderWindow.h"
+#include "vtkHardwareSelector.h"
 
 #include <GL/ice-t.h>
 
@@ -46,7 +47,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.27");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.28");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkCxxSetObjectMacro(vtkIceTRenderer, SortingKdTree, vtkPKdTree);
@@ -360,8 +361,13 @@ void vtkIceTRenderer::Clear()
   vtkDebugMacro("Clear Color: " << bgcolor[0] << ", " << bgcolor[1]
                 << ", " << bgcolor[2] << ", " << bgcolor[3]);
   glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);
-  glClearDepth(1.0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  GLbitfield  clear_mask = GL_COLOR_BUFFER_BIT;
+  if (!this->GetPreserveDepthBuffer())
+    {
+    glClearDepth(static_cast<GLclampf>(1.0));
+    clear_mask |= GL_DEPTH_BUFFER_BIT;
+    }
+  glClear(clear_mask);
 }
 
 //-----------------------------------------------------------------------------
@@ -425,13 +431,14 @@ int vtkIceTRenderer::UpdateGeometry()
 {
   vtkDebugMacro("In vtkIceTRenderer::UpdateGeometry()");
 
-  if (this->SelectMode != vtkRenderer::NOT_SELECTING)
+  if (this->Selector)
     {
-    //we are doing a visible polygon selection instead of a normal render
-    int ret = this->UpdateGeometryForSelection();
-    vtkDebugMacro( << "Rendered " << 
-                   this->NumberOfPropsRendered << " actors" );    
-    return ret;
+    // When selector is present, we are performing a selection,
+    // so do the selection rendering pass instead of the normal passes.
+    // Delegate the rendering of the props to the selector itself.
+    this->NumberOfPropsRendered = this->Selector->Render(this,
+      this->PropArray, this->PropArrayCount);
+    return this->NumberOfPropsRendered;
     }
 
   int i;

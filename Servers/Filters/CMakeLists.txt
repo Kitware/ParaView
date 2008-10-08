@@ -115,7 +115,7 @@ SET(Filters_SRCS
   vtkPVTrivialExtentTranslator.cxx
   vtkPVTrivialProducer.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPVVisibleCellSelector.cxx
+  vtkPVHardwareSelector.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
   vtkSequenceAnimationPlayer.cxx

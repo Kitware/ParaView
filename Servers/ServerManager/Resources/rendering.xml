@@ -423,6 +423,13 @@
       </IntVectorProperty>
 
       <IntVectorProperty
+        name="MultiSamples"
+        command="SetMultiSamples"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
          name="RenderWindowSize"
          command="SetSize"
          number_of_elements="2"
@@ -2959,31 +2966,42 @@
       </Property>
     </Proxy>
 
-    <Proxy name="PVVisibleCellSelector"
-           class="vtkPVVisibleCellSelector">
+    <HardwareSelector name="HardwareSelector" class="vtkPVHardwareSelector">
 
-      <ProxyProperty 
-        name="SetRenderer" 
+      <ProxyProperty name="Renderer" 
         command="SetRenderer">
-        <ProxyGroupDomain name="groups">
-          <Group name="renderers"/>
-        </ProxyGroupDomain>
       </ProxyProperty>
- 
-      <IntVectorProperty
-        name="SetSelectMode"
-        command="SetSelectMode"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" max="6"/>
+
+      <IntVectorProperty name="Area"
+        command="SetArea"
+        number_of_elements="4"
+        default_values="0 0 0 0">
       </IntVectorProperty>
 
-      <Property
-        name="LookupProcessorId"
-        command="LookupProcessorId">
-      </Property>
+      <IntVectorProperty name="FieldAssociation"
+        command="SetFieldAssociation"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Points" value="0" />
+          <Entry text="Cells" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IdTypeVectorProperty name="NumberOfIDs"
+        command="SetNumberOfIDs"
+        number_of_elements="1"
+        default_values="0">
+      </IdTypeVectorProperty>
+
+      <IntVectorProperty name="NumberOfProcesses"
+        command="SetNumberOfProcesses"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
+        
       
-    </Proxy>
+    </HardwareSelector>
     <!-- End of PropPickers --> 
   </ProxyGroup>
 
