@@ -19,7 +19,7 @@
 #include "vtkProp.h"
 
 vtkStandardNewMacro(vtkPVHardwareSelector);
-vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.1");
+vtkCxxRevisionMacro(vtkPVHardwareSelector, "1.2");
 //----------------------------------------------------------------------------
 vtkPVHardwareSelector::vtkPVHardwareSelector()
 {
@@ -55,7 +55,7 @@ bool vtkPVHardwareSelector::PassRequired(int pass)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVHardwareSelector::GetPropID(int idx, vtkProp* prop)
+int vtkPVHardwareSelector::GetPropID(int vtkNotUsed(idx), vtkProp* prop)
 {
   vtkClientServerID csId = 
     vtkProcessModule::GetProcessModule()->GetIDFromObject(prop);
