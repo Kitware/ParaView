@@ -7883,6 +7883,7 @@
           proxygroup="props" proxyname="BoxRepresentation">
         </Proxy>
         <ExposedProperties>
+          <Property name="PlaceFactor" />
           <Property name="PlaceWidget" />
           <Property name="Visibility" />
           <Property name="Position" />
