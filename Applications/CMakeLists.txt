@@ -45,9 +45,5 @@ ENDMACRO(paraview_build_optional_application)
 
 paraview_build_optional_application(
   Client "default ParaView Client" Client ON)
-paraview_build_optional_application(
-  CustomServer "Custom Server" CustomServer ON)
-paraview_build_optional_application(
-  DobranoViz "DobranoViz" DobranoViz ON)
 
 ENDIF(QT4_FOUND)
