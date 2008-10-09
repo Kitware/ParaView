@@ -4215,6 +4215,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="DepthPeeling" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4458,6 +4459,7 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Background" />
+          <Property name="DepthPeeling" />
         </ExposedProperties>
       </SubProxy>
 

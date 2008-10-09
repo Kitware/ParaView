@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.77");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.78");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -358,7 +358,8 @@ void vtkSMRenderViewProxy::EndCreateVTKObjects()
   SetIntVectorProperty(this->Renderer2DProxy, "Erase", 0);
   SetIntVectorProperty(this->Renderer2DProxy, "Layer", 2);
 
-  SetIntVectorProperty(this->RendererProxy, "DepthPeeling", 1);
+  // This property is now exposed, hence it's not safe to modify it.
+  //SetIntVectorProperty(this->RendererProxy, "DepthPeeling", 1);
   SetIntVectorProperty(this->RenderWindowProxy, "NumberOfLayers", 3);
    
   this->Connect(this->RendererProxy, this->RenderWindowProxy, "Renderer");

@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.17");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -129,7 +129,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   // We need to create vtkIceTRenderer on the server side and vtkRenderer on
   // the client.
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
-  this->RendererProxy->UpdateVTKObjects();
+  this->RendererProxy->GetID(); // this calls CreateVTKObjects().
 
   stream  << vtkClientServerStream::New 
           << "vtkIceTRenderer" 
@@ -138,6 +138,7 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
   this->RendererProxy->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RendererProxy->UpdateVTKObjects();
  
   return true;
 }
