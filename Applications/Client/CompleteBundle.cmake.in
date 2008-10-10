@@ -1,64 +1,84 @@
-SET(CMAKE_BACKWARDS_COMPATIBILITY "2.4")
-SET(toplevel "@EXECUTABLE_OUTPUT_PATH@/paraview.app")
-SET(finaldir "@EXECUTABLE_OUTPUT_PATH@/paraview.app/Contents/MacOS")
-SET(dylibdir "@EXECUTABLE_OUTPUT_PATH@")
-
-MAKE_DIRECTORY("${toplevel}/Contents")
-MAKE_DIRECTORY("${finaldir}")
-MAKE_DIRECTORY("${toplevel}/Contents/Resources")
-
-FIND_PROGRAM(install_name_tool NAMES install_name_tool)
-
-FILE(GLOB libraries RELATIVE "${dylibdir}" "${dylibdir}/*.dylib")
-
-MACRO(__get_qt_library var name libname)
-  SET(${var} "${name}")
-  LIST(LENGTH ${var} __get_qt_library_length)
-  IF(__get_qt_library_length GREATER 1)
-    LIST(GET ${var} 1 ${var})
-  ENDIF(__get_qt_library_length GREATER 1)
-  SET(__get_qt_library_var "${${var}}/Versions/4.0/${libname}")
-  IF(EXISTS ${__get_qt_library_var})
-    SET(${var} ${__get_qt_library_var})
-  ENDIF(EXISTS ${__get_qt_library_var})
-ENDMACRO(__get_qt_library)
-
-__get_qt_library(qtcore     "@QT_QTCORE_LIBRARY@"     QtCore)
-__get_qt_library(qtgui      "@QT_QTGUI_LIBRARY@"      QtGui)
-__get_qt_library(qtnetwork  "@QT_QTNETWORK_LIBRARY@"  QtNetwork)
-__get_qt_library(qtxml      "@QT_QTXML_LIBRARY@"      QtXml)
-__get_qt_library(qttest     "@QT_QTTEST_LIBRARY@"     QtTest)
-__get_qt_library(qtuitools  "@QT_QTUITOOLS_LIBRARY@"  QtUiTools)
-
-SET(qtlibraries ${qtcore} ${qtgui} ${qtnetwork} ${qtxml} ${qttest} ${qtuittools})
-
-MESSAGE("QT libs: ${qtlibraries}")
-
-FOREACH(modlib ${libraries})
-  # Set the library name and library name without path
-  SET(modlibname ${modlib})
-  SET(modlibnamenopath ${modlibname})
-  IF(EXISTS "${dylibdir}/${modlib}")
-    SET(modlibname "${dylibdir}/${modlib}")
-  ELSE(EXISTS "${dylibdir}/${modlib}")
-    GET_FILENAME_COMPONENT(modlibnamenopath "${modlib}" NAME)
-  ENDIF(EXISTS "${dylibdir}/${modlib}")
-
-  MESSAGE("Copy: ${modlibname} to the bundle: ${finaldir}/${modlibnamenopath}")
-
-  # Copy the library to the bundle
-  CONFIGURE_FILE("${modlibname}" "${finaldir}/${modlibnamenopath}" COPYONLY IMMEDIATE)
-
-  # Setup the install names
-  EXECUTE_PROCESS(COMMAND "${install_name_tool}"
-    "${finaldir}/paraview" -change "${modlibname}" "@executable_path/${modlibnamenopath}")
-  EXECUTE_PROCESS(COMMAND "${install_name_tool}"
-    "${finaldir}/${modlibnamenopath}" -id "@executable_path/${modlibnamenopath}")
-
-  FOREACH(inlibname ${libraries})
-    EXECUTE_PROCESS(COMMAND "${install_name_tool}"
-      "${finaldir}/${modlibnamenopath}" -change "${dylibdir}/${inlibname}" "@executable_path/${inlibname}")
-  ENDFOREACH(inlibname)
-ENDFOREACH(modlib)
+# Make sure this CMake has BundleUtilities.cmake:
+#
+if(NOT EXISTS "${CMAKE_ROOT}/Modules/BundleUtilities.cmake")
+  message(FATAL_ERROR "error: BundleUtilities.cmake not found. Use CMake 2.6.2 or later.")
+endif(NOT EXISTS "${CMAKE_ROOT}/Modules/BundleUtilities.cmake")
 
 
+# Avoid following symlinks encountered during FILE GLOB_RECURSE calls:
+#
+if(COMMAND CMAKE_POLICY)
+  cmake_policy(SET CMP0009 NEW)
+endif(COMMAND CMAKE_POLICY)
+
+
+# gp_item_default_embedded_path_override item default_embedded_path_var
+#
+# Return the path that others should refer to the item by when the item
+# is embedded inside a bundle.
+#
+# This is a project-specific override of BundleUtilities.cmake's
+# gp_item_default_embedded_path
+#
+function(gp_item_default_embedded_path_override item default_embedded_path_var)
+
+  # By default, embed items as set by gp_item_default_embedded_path:
+  #
+  set(path "${${default_embedded_path_var}}")
+
+  # But for ParaView...
+  #
+  # ...embed *.dylib in the Libraries folder:
+  #
+  if(item MATCHES "\\.dylib$")
+    set(path "@executable_path/../Libraries")
+  endif(item MATCHES "\\.dylib$")
+
+  # ...embed *Plugin.dylib in the Plugins folder:
+  #
+  if(item MATCHES "Plugin\\.dylib$")
+    set(path "@executable_path/../Plugins")
+  endif(item MATCHES "Plugin\\.dylib$")
+
+  # ...embed *.so in the Plugins folder:
+  #
+  if(item MATCHES "\\.so$")
+    set(path "@executable_path/../Plugins")
+  endif(item MATCHES "\\.so$")
+
+  # ...embed *Python.so in the Libraries folder:
+  #
+  if(item MATCHES "Python\\.so$")
+    set(path "@executable_path/../Libraries")
+  endif(item MATCHES "Python\\.so$")
+
+  set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
+endfunction(gp_item_default_embedded_path_override)
+
+
+# Copy the .app bundle from the build tree to the install tree:
+#
+execute_process(COMMAND "@OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT@")
+
+
+# Fixup the .app bundle in the install tree:
+#
+include(BundleUtilities)
+
+# Read the list of ParaView plugins from the file configured by ParaView:
+#
+file(READ "@ParaView_BINARY_DIR@/PluginList.txt" PluginList)
+
+# GLOB the list of Python.so files (treat them like plugins, too, for
+# fixup_bundle purposes since they will not be pulled in automatically
+# by dependency analysis)
+#
+file(GLOB PythonModules "@LIBRARY_OUTPUT_PATH@/*Python.so")
+
+# Fix it!
+#
+fixup_bundle(
+  "$ENV{DESTDIR}/Applications/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app"
+  "${PythonModules};${PluginList}"
+  "@LIBRARY_OUTPUT_PATH@"
+  )

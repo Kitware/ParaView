@@ -109,7 +109,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // packages in sys.path himself/herself.
     const char* inst_dirs[] = {
       "/paraview",
-      "/../Resources/paraview", // MacOS
+      "/../Python/paraview", // MacOS bundle
       "/../lib/paraview-" PARAVIEW_VERSION "/paraview",
       "/../../lib/paraview-" PARAVIEW_VERSION "/paraview",
       "/lib/python" VTK_PYTHON_VERSION "/site-packages/paraview", // UNIX --prefix
@@ -119,11 +119,17 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
       0
     };
     vtkstd::string prefix = self_dir;
-    // On OS X distributions, the libraries are in a different directory
-    // than the module. They are in the same place as the executable.
 #if defined(__APPLE__)
     vtkPythonAppInitPrependPythonPath(self_dir);
-#endif 
+    // On OS X distributions, the libraries are in a different directory
+    // than the module. They are in a place relative to the executable.
+    vtkstd::string libs_dir = vtkstd::string(self_dir) + "/../Libraries";
+    libs_dir = vtksys::SystemTools::CollapseFullPath(libs_dir.c_str());
+    if(vtksys::SystemTools::FileIsDirectory(libs_dir.c_str()))
+      {
+      vtkPythonAppInitPrependPythonPath(libs_dir.c_str());
+      }
+#endif
     for(const char** dir = inst_dirs; *dir; ++dir)
       {
       package_dir = prefix;
@@ -207,7 +213,7 @@ public:
         "Please call ReleaseControl() befor calling MakeCurrent().");
       return;
       }
-    
+
     if (this->Interpretor)
       {
       this->PreviousInterpretor = PyThreadState_Swap(this->Interpretor);
@@ -223,7 +229,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.25");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.26");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -252,7 +258,7 @@ void vtkPVPythonInterpretor::DumpError(const char* str)
     if (this->Internal->Messages.size() > 0 &&
       this->Internal->Messages.back().IsError)
       {
-      this->Internal->Messages.back().Message += str; 
+      this->Internal->Messages.back().Message += str;
       }
     else
       {
@@ -274,7 +280,7 @@ void vtkPVPythonInterpretor::DumpOutput(const char* str)
     if (this->Internal->Messages.size() > 0 &&
       !this->Internal->Messages.back().IsError)
       {
-      this->Internal->Messages.back().Message += str; 
+      this->Internal->Messages.back().Message += str;
       }
     else
       {
@@ -287,7 +293,7 @@ void vtkPVPythonInterpretor::DumpOutput(const char* str)
 //-----------------------------------------------------------------------------
 void vtkPVPythonInterpretor::FlushMessages()
 {
-  vtkstd::vector<vtkPythonMessage>::iterator iter = 
+  vtkstd::vector<vtkPythonMessage>::iterator iter =
     this->Internal->Messages.begin();
 
   for (; iter != this->Internal->Messages.end(); ++iter)
@@ -343,10 +349,10 @@ void vtkPVPythonInterpretor::InitializeInternal()
     wrapperErr->DumpToError = true;
 
     // Redirect Python's stdout and stderr
-    PySys_SetObject(const_cast<char*>("stdout"), 
+    PySys_SetObject(const_cast<char*>("stdout"),
       reinterpret_cast<PyObject*>(wrapperOut));
 
-    PySys_SetObject(const_cast<char*>("stderr"), 
+    PySys_SetObject(const_cast<char*>("stderr"),
       reinterpret_cast<PyObject*>(wrapperErr));
 
     Py_DECREF(wrapperOut);
@@ -355,7 +361,7 @@ void vtkPVPythonInterpretor::InitializeInternal()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc), 
+int vtkPVPythonInterpretor::InitializeSubInterpretor(int vtkNotUsed(argc),
   char** argv)
 {
   if (this->Internal->Interpretor)
@@ -427,7 +433,7 @@ void vtkPVPythonInterpretor::MakeCurrent()
 //-----------------------------------------------------------------------------
 void vtkPVPythonInterpretor::ReleaseControl()
 {
-  this->Internal->ReleaseControl(); 
+  this->Internal->ReleaseControl();
 }
 
 //-----------------------------------------------------------------------------
@@ -439,7 +445,7 @@ void vtkPVPythonInterpretor::RunSimpleString(const char* const script)
   // http://sourceforge.net/tracker/?group_id=5470&atid=105470&func=detail&aid=1167922
   vtkstd::string buffer = script ? script : "";
   buffer.erase(vtkstd::remove(buffer.begin(), buffer.end(), '\r'), buffer.end());
-  
+
   // The cast is necessary because PyRun_SimpleString() hasn't always been const-correct
   PyRun_SimpleString(const_cast<char*>(buffer.c_str()));
 
@@ -457,7 +463,7 @@ void vtkPVPythonInterpretor::RunSimpleFile(const char* const filename)
     vtkErrorMacro("Failed to open file " << filename);
     return;
     }
- 
+
   // The cast is necessary because PyRun_SimpleFile() hasn't always been const-correct
   PyRun_SimpleFile(fp, const_cast<char*>(filename));
 

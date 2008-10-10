@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -160,7 +160,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
       error = loader->GetError();
       }
     }
-  
+
   if(success == LOADED)
     {
     this->addExtension(server, lib);
@@ -310,13 +310,13 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
     {
     server = NULL;
     }
- 
-  // check if it is already loaded 
+
+  // check if it is already loaded
   if(this->loadedExtensions(server).contains(lib))
     {
     return ALREADYLOADED;
     }
-  
+
   // always look for SM/VTK stuff in the plugin
   success1 = pqPluginManager::loadServerExtension(server, lib, error);
 
@@ -325,8 +325,8 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
     // check if this plugin has gui stuff in it
     success2 = loadClientExtension(lib, error);
     }
- 
-  // return an error if it failed to load 
+
+  // return an error if it failed to load
   if(success1 == NOTLOADED && success2 == NOTLOADED)
     {
     if(!errorReturn)
@@ -421,8 +421,17 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
       {
       pv_plugin_path += ";";
       }
+#if defined (Q_OS_MAC)
+    //Look in the Application Package "ParaView.app/Contents/plugins
+    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
+      + "../Plugins;";
+    //Look for a folder called "plugins" at the same level as ParaView.app
+    pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
+      + "../../../Plugins;";
+#else
     pv_plugin_path += QCoreApplication::applicationDirPath() + QDir::separator()
       + "plugins";
+#endif
     }
   else
     {
@@ -454,7 +463,7 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
     helper->UpdateVTKObjects();
     vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(helper->GetConnectionID(), 
+    pm->GatherInformation(helper->GetConnectionID(),
       vtkProcessModule::DATA_SERVER, info, helper->GetID());
     settingsRoot = info->GetVariable();
     info->Delete();
@@ -494,7 +503,7 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
   pv_plugin_path = pv_plugin_path.trimmed();
   pv_plugin_path = pv_plugin_path.replace(QRegExp("(\\;|\\:)\\s+"), ";");
   pv_plugin_path = pv_plugin_path.replace(QRegExp("\\s+(\\;|\\:)"), ";");
-  
+
   // pre-parse the string replacing ':' with ';', watching out for windows drive letters
   // assumes ';' is not used as part of a directory name
   for(int index=0; index < pv_plugin_path.size(); index++)
@@ -514,7 +523,7 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
   QStringList plugin_paths = pv_plugin_path.split(';', QString::SkipEmptyParts);
   return plugin_paths;
 }
-  
+
 void pqPluginManager::addExtension(pqServer* server, const QString& lib)
 {
   if(!this->Extensions.values(server).contains(lib))

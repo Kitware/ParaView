@@ -132,18 +132,6 @@ TARGET_LINK_LIBRARIES(${PV_EXE_NAME}
   ${QT_LIBRARIES}
 )
 
-IF(Q_WS_MAC)
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CompleteBundle.cmake"
-    @ONLY IMMEDIATE)
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CreateBundle.sh"
-    @ONLY IMMEDIATE)
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundleDuringMakeInstall.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CreateBundleDuringMakeInstall.cmake"
-    @ONLY IMMEDIATE)
-ENDIF(Q_WS_MAC)
-
 IF(WIN32)
   TARGET_LINK_LIBRARIES(${PV_EXE_NAME} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
@@ -597,8 +585,16 @@ ELSE(WIN32)
   ENDIF (NOT Q_WS_MAC)
 ENDIF(WIN32)
 
-# Call this one last so that it happens after the above targets are all installed:
+# Call this last so the install script runs after the above targets are installed:
 #
 IF(Q_WS_MAC)
-  INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/CreateBundleDuringMakeInstall.cmake")
+  SET(OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT "${ParaView_BINARY_DIR}/${PV_EXE_NAME}_OSX_MakeStandAloneBundle.cmake")
+  SET(OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT "${ParaView_BINARY_DIR}/${PV_EXE_NAME}_OSX_MakeStandAloneBundle.sh")
+
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CompleteBundle.cmake.in"
+    "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}" @ONLY IMMEDIATE)
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CreateBundle.sh.in"
+    "${OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT}" @ONLY IMMEDIATE)
+
+  INSTALL(SCRIPT "${OSX_MAKE_STANDALONE_BUNDLE_CMAKE_SCRIPT}")
 ENDIF(Q_WS_MAC)

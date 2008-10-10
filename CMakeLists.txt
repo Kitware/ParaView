@@ -32,6 +32,10 @@ ELSE(COMMAND GET_PROPERTY)
 ENDIF(COMMAND GET_PROPERTY)
 
 #########################################################################
+# Clear the Plugin List
+FILE(WRITE ${ParaView_BINARY_DIR}/PluginList.txt "")
+
+#########################################################################
 # Warn about ParaQ
 SET(PARAVIEW_WARN_ABOUT_PARAQ)
 IF(EXISTS "${ParaView_SOURCE_DIR}/CVS/Root")

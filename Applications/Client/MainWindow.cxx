@@ -140,7 +140,7 @@ MainWindow::MainWindow() :
 //    QTreeView* treeView = new QTreeView();
 //    treeView->setModel(model);
 //    treeView->setRootIndex(model->hierarchies()[cc]);
-//    treeView->show(); 
+//    treeView->show();
 //    treeView->expandAll();
 //    }
 //
@@ -353,7 +353,7 @@ MainWindow::MainWindow() :
     SIGNAL(triggered()), this, SLOT(onHelpHelp()));
 
   connect(this->Implementation->UI.actionHelpEnableTooltips,
-    SIGNAL(triggered(bool)), 
+    SIGNAL(triggered(bool)),
     &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
   connect(&this->Implementation->Core, SIGNAL(enableTooltips(bool)),
     this->Implementation->UI.actionHelpEnableTooltips,
@@ -525,7 +525,7 @@ MainWindow::MainWindow() :
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core.setupProxyTabWidget(
       this->Implementation->UI.objectInspectorDock);
-  
+
   QObject::connect(
     proxyTab->getObjectInspector(),
     SIGNAL(helpRequested(QString)),
@@ -753,23 +753,23 @@ MainWindow::MainWindow() :
 
   // 3d Selection Modes
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableSurfaceSelection(bool)),
     this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableSurfacePointsSelection(bool)),
     this->Implementation->UI.actionSelectSurfacePoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableFrustumSelection(bool)),
     this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableFrustumPointSelection(bool)),
     this->Implementation->UI.actionSelectFrustumPoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableBlockSelection(bool)),
     this->Implementation->UI.actionSelect_Block, SLOT(setEnabled(bool)));
 
@@ -788,7 +788,7 @@ MainWindow::MainWindow() :
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumPointsSelection()));
   QObject::connect(
     this->Implementation->UI.actionSelect_Block, SIGNAL(triggered()),
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SLOT(beginBlockSelection()));
 
   QObject::connect(
@@ -989,24 +989,12 @@ void MainWindow::makeAssistant()
 
   if(assistantExe.isEmpty())
     {
+#if defined(Q_WS_MAC)
+    assistantExe = QCoreApplication::applicationDirPath() + "/../Support/Assistant_adp";
+#else
     assistantExe = ::Locate(assistantName);
-
-    /*
-    QString assistant = QCoreApplication::applicationDirPath();
-    assistant += QDir::separator();
-    assistant += assistantName;
-    assistantExe = assistant;
-    */
-    }
-#if defined (__APPLE__)
-  // trim upto .app in case of Mac
-  int suffixIndex = assistantExe.indexOf(QRegExp(".app/Contents/MacOS/assistant$"));
-  if (suffixIndex != -1)
-    {
-    assistantExe = assistantExe.left(suffixIndex);
-    }
 #endif
-
+    }
 
   this->Implementation->AssistantClient =
     new QAssistantClient(assistantExe, this);
@@ -1021,7 +1009,11 @@ void MainWindow::makeAssistant()
   if(profileFile.isEmpty())
     {
     // see if help is bundled up with the application
+#if defined(Q_WS_MAC)
+    QString profile = QCoreApplication::applicationDirPath() + "/../Support/pqClient.adp";
+#else
     QString profile = ::Locate("pqClient.adp");
+#endif
       /*QCoreApplication::applicationDirPath() + QDir::separator()
       + QString("pqClient.adp");*/
     if(QFile::exists(profile))
