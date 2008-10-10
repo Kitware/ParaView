@@ -2,12 +2,13 @@ INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(
   MOC_SRCS
-  ClientGraphView.h
-  ClientGraphDisplay.h
+  ClientAttributeView.h
+  ClientAttributeDisplay.h
   )
 
 SET(UI_FORMS
-  ClientGraphDisplay.ui
+  ClientAttributeDisplay.ui
+  ClientAttributeView.ui
   )
 
 QT4_WRAP_UI(
@@ -32,22 +33,22 @@ INCLUDE_DIRECTORIES(
 
 ADD_PARAVIEW_VIEW_MODULE(
   IFACES IFACE_SRCS
-  VIEW_TYPE ClientGraphView
-  VIEW_NAME "Graph View"
+  VIEW_TYPE ClientAttributeView
+  VIEW_NAME "Attribute View"
   VIEW_XML_GROUP views
-  DISPLAY_XML ClientGraphDisplay
-  DISPLAY_PANEL ClientGraphDisplay
+  DISPLAY_XML ClientAttributeDisplay
+  DISPLAY_PANEL ClientAttributeDisplay
   )
 
 ADD_PARAVIEW_PLUGIN(
-  ClientGraphViewPlugin "1.0"
+  ClientAttributeViewPlugin "1.0"
   GUI_INTERFACES ${IFACES}
-  SOURCES ClientGraphView.cxx ClientGraphDisplay.cxx ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS}
-  SERVER_MANAGER_XML ClientGraphView.xml
+  SOURCES ClientAttributeView.cxx ClientAttributeDisplay.cxx ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS}
+  SERVER_MANAGER_XML ClientAttributeView.xml
   )
 
 TARGET_LINK_LIBRARIES(
-  ClientGraphViewPlugin
+  ClientAttributeViewPlugin
   OverViewUtility
   )
 
