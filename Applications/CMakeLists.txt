@@ -4,7 +4,7 @@ SET(QT_REQUIRED TRUE)
 FIND_PACKAGE(Qt4)
 
 IF(QT4_FOUND)
-  # No warning if Qt not found.  ParaView/Qt does the warning for us
+# No warning if Qt not found.  ParaView/Qt does the warning for us
 
 # This ensures that the Qt includes dir etc are set properly.
 # We don't need to find the Qt4 package or include the use file
@@ -29,7 +29,7 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_BINARY_DIR}
   ${QtPython_SOURCE_DIR}
   ${QtPython_BINARY_DIR}
-)
+  )
 
 
 MACRO(paraview_build_optional_application name comment subdirectory default)
@@ -43,7 +43,7 @@ MACRO(paraview_build_optional_application name comment subdirectory default)
   ENDIF(PARAVIEW_BUILD_${name})
 ENDMACRO(paraview_build_optional_application)
 
-paraview_build_optional_application(
-  Client "default ParaView Client" Client ON)
+paraview_build_optional_application(Client "default ParaView Client" Client ON)
+paraview_build_optional_application(OverView "OverView informatics application" OverView OFF)
 
 ENDIF(QT4_FOUND)

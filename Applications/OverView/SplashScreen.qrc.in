@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/OverViewClient" >
+        <file>SplashScreen</file>
+    </qresource>
+</RCC>
