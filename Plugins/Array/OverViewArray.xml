@@ -1,0 +1,215 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="sources">
+
+    <SourceProxy name="DiagonalMatrixSource" class="vtkDiagonalMatrixSource" label="Diagonal Matrix">
+      <IntVectorProperty name="Extents" command="SetExtents" number_of_elements="1" default_values="3"/> 
+      <IntVectorProperty name="ArrayType" command="SetArrayType" number_of_elements="1" default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Dense Array"/>
+          <Entry value="1" text="Sparse Array"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty name="Diagonal" command="SetDiagonal" number_of_elements="1" default_values="1" label="Diagonal Value"/>
+      <DoubleVectorProperty name="SuperDiagonal" command="SetSuperDiagonal" number_of_elements="1" default_values="0" label="Super-Diagonal Value"/>
+      <DoubleVectorProperty name="SubDiagonal" command="SetSubDiagonal" number_of_elements="1" default_values="0" label="Sub-Diagonal Value"/>
+    </SourceProxy>
+    
+    <SourceProxy name="RandomArraySource" class="vtkBoostRandomSparseArraySource" label="Random Array">
+      <IntVectorProperty name="ElementProbabilitySeed" command="SetElementProbabilitySeed" number_of_elements="1" default_values="123" label="Probability Seed"/> 
+      <DoubleVectorProperty name="ElementProbability" command="SetElementProbability" number_of_elements="1" default_values="0.5" label="Probability"/>
+      <IntVectorProperty name="ElementValueSeed" command="SetElementValueSeed" number_of_elements="1" default_values="456" label="Value Seed"/> 
+      <DoubleVectorProperty name="MinValue" command="SetMinValue" number_of_elements="1" default_values="0.0" label="Minimum Value"/>
+      <DoubleVectorProperty name="MaxValue" command="SetMaxValue" number_of_elements="1" default_values="1.0" label="Maximum Value"/>
+    </SourceProxy>
+    
+  </ProxyGroup>
+
+  <ProxyGroup name="filters">
+
+    <SourceProxy name="AdjacencyMatrixToEdgeTable" class="vtkAdjacencyMatrixToEdgeTable" label="Convert Adjacency Matrix to Edge Table">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="SourceDimension" command="SetSourceDimension" number_of_elements="1" default_values="0" label="Source Dimension"/>
+      <StringVectorProperty name="ValueArrayName" command="SetValueArrayName" number_of_elements="1" default_values="value" label="Value Array Name"/>
+      <IntVectorProperty name="MinimumCount" command="SetMinimumCount" number_of_elements="1" default_values="3" label="Minimum Count"/>
+      <DoubleVectorProperty name="MinimumThreshold" command="SetMinimumThreshold" number_of_elements="1" default_values="0.5" label="Minimum Threshold"/>
+    </SourceProxy>
+ 
+    <SourceProxy name="ArrayToTable" class="vtkArrayToTable" label="Convert Array to Table">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+ 
+    <SourceProxy name="ArrayVectorNorm" class="vtkArrayVectorNorm" label="Vector Norm">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="L" command="SetL" number_of_elements="1" default_values="2"/> 
+    </SourceProxy>
+ 
+    <SourceProxy name="CosineSimilarity" class="vtkCosineSimilarity" label="Cosine Similarity">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="VectorDimension" command="SetVectorDimension" number_of_elements="1" default_values="1" label="Vector Dimension"/>
+      <DoubleVectorProperty name="MinimumThreshold" command="SetMinimumThreshold" number_of_elements="1" default_values="0.1" label="Minimum Threshold"/>
+      <IntVectorProperty name="MinimumCount" command="SetMinimumCount" number_of_elements="1" default_values="3" label="Minimum Count"/> 
+      <IntVectorProperty name="MaximumCount" command="SetMaximumCount" number_of_elements="1" default_values="100" label="Maximum Count"/> 
+    </SourceProxy>
+ 
+    <SourceProxy name="ExtractFactoredArray" class="vtkExtractFactoredArray" label="Extract Factored Array">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkFactoredArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="Index" command="SetIndex" number_of_elements="1" default_values="0"/> 
+    </SourceProxy>
+ 
+    <SourceProxy name="LogWeighting" class="vtkBoostLogWeighting" label="Log Weighting">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+ 
+    <SourceProxy name="MatricizeArray" class="vtkMatricizeArray" label="Matricize Array">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="SliceDimension" command="SetSliceDimension" number_of_elements="1" default_values="0"/> 
+    </SourceProxy>
+ 
+    <SourceProxy name="NormalizeMatrixVectors" class="vtkNormalizeMatrixVectors" label="Normalize Matrix Vectors">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="VectorDimension" command="SetVectorDimension" number_of_elements="1" default_values="1" label="Vector Dimension"/>
+    </SourceProxy>
+ 
+    <SourceProxy name="TableToSparseArray" class="vtkTableToSparseArray" label="Convert Table to Sparse Array">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <StringVectorProperty name="CoordinateColumns" command="AddCoordinateColumn" clean_command="ClearCoordinateColumns" repeat_command="1" number_of_elements_per_command="1"/>
+      <StringVectorProperty name="ValueColumn" command="SetValueColumn" number_of_elements="1" animateable="0"> 
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty> 
+    </SourceProxy>
+ 
+    <SourceProxy name="TransposeMatrix" class="vtkTransposeMatrix" label="Transpose Matrix">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+
+    <SourceProxy name="PARAFACSimilarityGraph" class="vtkPARAFACSimilarityGraph" label="Term-Term Graph">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <IntVectorProperty name="Rank" command="SetRank" number_of_elements="1" default_values="10"/> 
+      <IntVectorProperty name="MinimumCount" command="SetMinimumCount" number_of_elements="1" default_values="1" label="Minimum Term Link Count"/> 
+      <DoubleVectorProperty name="MinimumThreshold" command="SetMinimumThreshold" number_of_elements="1" default_values="1" label="Minimum Similarity Threshold"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="PARAFACConceptGraph" class="vtkPARAFACConceptGraph" label="Concept-Term Graph">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <IntVectorProperty name="Rank" command="SetRank" number_of_elements="1" default_values="10"/> 
+      <IntVectorProperty name="MinimumCount" command="SetMinimumCount" number_of_elements="1" default_values="10" label="Minimum Terms per Concept"/> 
+      <DoubleVectorProperty name="MinimumThreshold" command="SetMinimumThreshold" number_of_elements="1" default_values=".25" label="Minimum Similarity Threshold"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+ 
+  </ProxyGroup>
+   
+</ServerManagerConfiguration>
+

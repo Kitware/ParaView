@@ -11,6 +11,7 @@ MACRO(paraview_build_optional_plugin name comment subdirectory default)
   ENDIF(PARAVIEW_BUILD_PLUGIN_${name})
 ENDMACRO(paraview_build_optional_plugin)
 
-paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
+paraview_build_optional_plugin(Array "Array" Array OFF)
 paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView OFF)
+paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
 
