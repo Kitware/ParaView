@@ -1,0 +1,177 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="representations">
+   <SelectionDeliveryRepresentationProxy name="ClientGraphDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
+
+      <StringVectorProperty name="LayoutStrategy" number_of_elements="1" default_values="Fast2D">
+        <Hints>
+          <!-- This overrides the GUI's default mechanism to
+          not set the default value for this property
+          using the domain when the proxy is created -->
+          <NoDefault/>
+        </Hints>
+      </StringVectorProperty>
+
+      <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex"/>
+        <InputArrayDomain name="edge_arrays" attribute_type="edge"/>
+      </InputProperty>
+
+      <IntVectorProperty name="VertexLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="VertexLabelArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="IconVisibility" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+         
+      <ProxyProperty 
+        name="IconTexture">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty name="IconSize" number_of_elements="1" default_values="32"/>
+
+      <StringVectorProperty name="IconArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="IconFile" number_of_elements="1">
+        <FileListDomain name="icon_file_list"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="IconTypes" number_of_elements="1"/>
+
+      <IntVectorProperty name="IconIndices" number_of_elements="1" default_values="0"/>
+
+      <IntVectorProperty name="IconAlignment" number_of_elements="1" default_values="4"/>
+
+      <DoubleVectorProperty name="VertexLabelFontSize" number_of_elements="1" default_values="12"/>
+      
+      <DoubleVectorProperty name="VertexSize" number_of_elements="1" default_values="5"/>
+      
+      <DoubleVectorProperty name="VertexOpacity" number_of_elements="1" default_values="1"/>
+      
+      <DoubleVectorProperty name="VertexColor" number_of_elements="3" default_values="0.4 0.4 0.6"/>
+
+      <IntVectorProperty name="VertexColorByArray" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="VertexScalarBarVisibility" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="VertexColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
+      <IntVectorProperty name="EdgeLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="EdgeLabelArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
+      <DoubleVectorProperty name="EdgeLabelFontSize" number_of_elements="1" default_values="10"/>
+      
+      <DoubleVectorProperty name="EdgeWidth" number_of_elements="1" default_values="2"/>
+      
+      <DoubleVectorProperty name="EdgeOpacity" number_of_elements="1" default_values="0.5"/>
+      
+      <DoubleVectorProperty name="EdgeColor" number_of_elements="3" default_values="0 0 0"/>
+
+      <IntVectorProperty name="EdgeColorByArray" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EdgeScalarBarVisibility" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <IntVectorProperty name="FlipEdgeColorMap" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="EdgeColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ArcEdges" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseDomainMap" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <ProxyProperty name="DomainMap"/>
+      
+      <Hints>
+        <InheritRepresentationProperties>
+          <Property name="LayoutStrategy" />
+          <Property name="VertexLabels" />
+          <Property name="VertexLabelArray" />
+          <Property name="IconVisibility" />
+          <Property name="IconTexture" />
+          <Property name="IconSize" />
+          <Property name="IconFile" />
+          <Property name="IconTypes" />
+          <Property name="IconIndices" />
+          <Property name="IconAlignment" />
+          <Property name="VertexLabelFontSize" />
+          <Property name="VertexSize" />
+          <Property name="VertexOpacity" />
+          <Property name="VertexColor" />
+          <Property name="VertexColorByArray" />
+          <Property name="VertexScalarBarVisibility" />
+          <Property name="VertexColorArray" />
+          <Property name="EdgeLabels" />
+          <Property name="EdgeLabelArray" />
+          <Property name="EdgeLabelFontSize" />
+          <Property name="EdgeWidth" />
+          <Property name="EdgeOpacity" />
+          <Property name="EdgeColor" />
+          <Property name="EdgeColorByArray" />
+          <Property name="EdgeScalarBarVisibility" />
+          <Property name="FlipEdgeColorMap" />
+          <Property name="EdgeColorArray" />
+          <Property name="ArcEdges" />
+          <Property name="UseDomainMap" />
+          <Property name="DomainMap" />
+        </InheritRepresentationProperties>
+      </Hints>
+   </SelectionDeliveryRepresentationProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientGraphView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientGraphDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
