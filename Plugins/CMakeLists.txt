@@ -14,5 +14,7 @@ ENDMACRO(paraview_build_optional_plugin)
 paraview_build_optional_plugin(Array "Array" Array OFF)
 paraview_build_optional_plugin(ClientAttributeView "ClientAttributeView" ClientAttributeView OFF)
 paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView OFF)
+paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
+paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
 
