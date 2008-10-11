@@ -1,0 +1,150 @@
+<ui version="4.0" >
+ <class>TableToGraphPanel</class>
+ <widget class="QWidget" name="TableToGraphPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>433</width>
+    <height>362</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Link Vertices</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Vertex Type 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="vertexField1" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="vertexDomain1" />
+      </item>
+      <item row="0" column="3" >
+       <widget class="QCheckBox" name="vertexHidden1" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Vertex Type 2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="vertexField2" />
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLineEdit" name="vertexDomain2" />
+      </item>
+      <item row="1" column="3" >
+       <widget class="QCheckBox" name="vertexHidden2" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Vertex Type3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="vertexField3" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="vertexDomain3" />
+      </item>
+      <item row="2" column="3" >
+       <widget class="QCheckBox" name="vertexHidden3" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Link Edges</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Edge Type 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="edgeSource1" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="edgeTarget1" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Edge Type 2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="edgeSource2" />
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLineEdit" name="edgeTarget2" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Edge Type 3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="edgeSource3" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="edgeTarget3" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,0 +1,83 @@
+<ui version="4.0" >
+ <class>TableToSparseArrayPanel</class>
+ <widget class="QWidget" name="TableToSparseArrayPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>340</width>
+    <height>247</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_6" >
+     <property name="text" >
+      <string>Coordinate 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLineEdit" name="coordinateColumn1" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_7" >
+     <property name="text" >
+      <string>Coordinate 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLineEdit" name="coordinateColumn2" />
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_8" >
+     <property name="text" >
+      <string>Coordinate 3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLineEdit" name="coordinateColumn3" />
+   </item>
+   <item row="3" column="0" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>Coordinate 4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLineEdit" name="coordinateColumn4" />
+   </item>
+   <item row="4" column="0" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Value Column</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" >
+    <widget class="QLineEdit" name="valueColumn" />
+   </item>
+   <item row="5" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>128</width>
+       <height>31</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

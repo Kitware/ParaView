@@ -21,4 +21,7 @@ paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordV
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
 paraview_build_optional_plugin(Infovis "Infovis" Infovis OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
+paraview_build_optional_plugin(SplitTableFieldPanel "SplitTableFieldPanel" SplitTableFieldPanel OFF) 
+paraview_build_optional_plugin(TableToGraphPanel "TableToGraphPanel" TableToGraphPanel OFF) 
+paraview_build_optional_plugin(TableToSparseArrayPanel "TableToSparseArrayPanel" TableToSparseArrayPanel OFF) 
 

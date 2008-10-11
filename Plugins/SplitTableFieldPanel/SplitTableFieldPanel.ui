@@ -1,0 +1,72 @@
+<ui version="4.0" >
+ <class>SplitTableFieldPanel</class>
+ <widget class="QWidget" name="SplitTableFieldPanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>341</width>
+    <height>224</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_6" >
+     <property name="text" >
+      <string>Field 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLineEdit" name="fieldName1" />
+   </item>
+   <item row="0" column="2" >
+    <widget class="QLineEdit" name="fieldDelimiter1" />
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="label_7" >
+     <property name="text" >
+      <string>Field 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLineEdit" name="fieldName2" />
+   </item>
+   <item row="1" column="2" >
+    <widget class="QLineEdit" name="fieldDelimiter2" />
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="label_8" >
+     <property name="text" >
+      <string>Field 3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLineEdit" name="fieldName3" />
+   </item>
+   <item row="2" column="2" >
+    <widget class="QLineEdit" name="fieldDelimiter3" />
+   </item>
+   <item row="3" column="1" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
