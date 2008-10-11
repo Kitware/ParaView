@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ChartViewFrame" >
+        <file>Icons/reset_camera_16.png</file>
+    </qresource>
+</RCC>  

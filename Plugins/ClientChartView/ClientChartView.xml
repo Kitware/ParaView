@@ -1,0 +1,315 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="representations">
+   <ClientDeliveryRepresentationProxy name="ClientChartDisplay" base_proxygroup="representations" base_proxyname="ClientDeliveryRepresentationBase">
+
+      <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+         <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+
+      <IntVectorProperty name="ColumnsAsSeries" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseYArrayIndex" 
+         number_of_elements="1"
+         default_values="1">
+         <!-- When set array index is plotted on the X axis.
+         -->
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+          <StringVectorProperty name="SeriesStatus"
+             repeat_command="1"
+             number_of_elements="2"
+             number_of_elements_per_command="2"
+             element_types="2 0" 
+             information_property="SeriesInfo">
+             <ArraySelectionDomain name="array_list">
+               <RequiredProperties>
+                 <Property name="SeriesInfo" function="ArrayList"/>
+               </RequiredProperties>
+             </ArraySelectionDomain>
+          </StringVectorProperty>
+
+          <StringVectorProperty 
+             name="SeriesInfo"
+             update_self="1"
+             number_of_elements_per_command="1"
+             element_types="2"
+             information_only="1">
+
+             <CheckableArrayListInformationHelper
+               list_domain_name="array_list" />
+
+             <ArrayListDomain name="array_list" 
+               input_domain_name="row_arrays">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+
+          </StringVectorProperty>
+
+          <StringVectorProperty name="XAxisArrayName"
+             number_of_elements="1">
+             <!-- Set the array to use on X axis. This is used only if
+              UseYArrayIndex is set to 0 -->
+             <ArrayListDomain name="array_list" 
+               input_domain_name="row_arrays">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+          </StringVectorProperty>
+
+   </ClientDeliveryRepresentationProxy>
+ </ProxyGroup>
+  
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientChartView" base_proxygroup="views" base_proxyname="ViewBase" >
+
+      <!-- Add non-command properties that will help
+          keep client-only chart properties in SM such as colors etc etc -->
+
+      <StringVectorProperty
+        name="ChartTitle"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="ChartTitleFont"
+        number_of_elements="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the chart title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ChartTitleColor"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ChartTitleAlignment"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowLegend"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LegendLocation"
+        number_of_elements="1"
+        default_values="2">
+        <IntRangeDomain name="range" min="0" max="3" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LegendFlow"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxis"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisGrid"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisGridType"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisGridColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisLabels"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="AxisLabelFont"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelNotation"
+        number_of_elements="4"
+        default_values="3 3 3 3">
+        <IntRangeDomain name="range" min="0" max="3" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelPrecision"
+        number_of_elements="4"
+        default_values="2 2 2 2">
+        <IntRangeDomain name="range" min="0" max="6" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisScale"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisBehavior"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisMinimum"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisMaximum"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="LeftAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="BottomAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="RightAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="TopAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitle"
+        number_of_elements="4">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitleFont"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisTitleColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisTitleAlignment"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ZoomingBehavior"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Both"/>
+          <Entry value="1" text="Horizontal"/>
+          <Entry value="2" text="Vertical"/>
+          <Entry value="3" text="Box"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ResetAxes"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+   </ViewProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientStackedChartView" base_proxygroup="views" base_proxyname="ClientChartView" representation_name="ClientChartDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientBarChartView" base_proxygroup="views" base_proxyname="ClientChartView" representation_name="ClientChartDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientLineChartView" base_proxygroup="views" base_proxyname="ClientChartView" representation_name="ClientChartDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientStatisticalBoxChartView" base_proxygroup="views" base_proxyname="ClientChartView" representation_name="ClientChartDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+   
+</ServerManagerConfiguration>

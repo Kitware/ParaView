@@ -1,0 +1,30 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="representations">
+   <SelectionDeliveryRepresentationProxy name="ClientHierarchyDisplay" base_proxygroup="representations" base_proxyname="ClientGraphDisplay">
+      <SubProxy>
+        <Proxy name="PostProcessor" 
+          proxygroup="filters" proxyname="PassThrough">
+        </Proxy>
+      </SubProxy>
+   </SelectionDeliveryRepresentationProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientHierarchyView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientHierarchyDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="filters">
+    <SourceProxy name="PassThrough" class="vtkPassThrough">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+    </SourceProxy>
+ </ProxyGroup>
+
+</ServerManagerConfiguration>
+
+

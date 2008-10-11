@@ -1,0 +1,322 @@
+<ui version="4.0" >
+ <class>ClientHierarchyDisplay</class>
+ <widget class="QWidget" name="ClientHierarchyDisplay" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>284</width>
+    <height>852</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QCheckBox" name="useDomainMap" >
+       <property name="text" >
+        <string>Domain Map</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="pqSourceComboBox" name="domainMap" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="vertices" >
+     <property name="title" >
+      <string>Vertices</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QGroupBox" name="groupBox_2" >
+        <property name="title" >
+         <string>Labels</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QCheckBox" name="vertexLabels" >
+           <property name="text" >
+            <string>Visible</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2" >
+          <widget class="QComboBox" name="vertexLabelArray" />
+         </item>
+         <item row="1" column="0" colspan="2" >
+          <widget class="QLabel" name="label_8" >
+           <property name="text" >
+            <string>Font Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2" >
+          <widget class="QDoubleSpinBox" name="vertexLabelFontSize" />
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QGroupBox" name="groupBox" >
+        <property name="title" >
+         <string>Color</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" colspan="2" >
+          <widget class="QCheckBox" name="vertexColorByArray" >
+           <property name="text" >
+            <string>Array</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2" >
+          <widget class="QComboBox" name="vertexColorArray" />
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_10" >
+           <property name="text" >
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2" >
+          <widget class="pqColorChooserButton" name="vertexColor" >
+           <property name="text" >
+            <string>Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QLabel" name="label_3" >
+           <property name="text" >
+            <string>Opacity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2" >
+          <widget class="QDoubleSpinBox" name="vertexOpacity" >
+           <property name="maximum" >
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep" >
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2" >
+       <widget class="QGroupBox" name="groupBox_5" >
+        <property name="title" >
+         <string>Icons</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QCheckBox" name="iconVisibility" >
+           <property name="text" >
+            <string>Visible</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QPushButton" name="configureIcons" >
+           <property name="text" >
+            <string>Configure</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_5" >
+           <property name="text" >
+            <string>Alignment</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QComboBox" name="iconAlignment" >
+           <item>
+            <property name="text" >
+             <string>Top Right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Top</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Top Left</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Center</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Left</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Bottom Right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Bottom</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Bottom Left</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Size</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QDoubleSpinBox" name="vertexSize" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="edges" >
+     <property name="title" >
+      <string>Edges</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QGroupBox" name="groupBox_4" >
+        <property name="title" >
+         <string>Labels</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QCheckBox" name="edgeLabels" >
+           <property name="text" >
+            <string>Visible</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QComboBox" name="edgeLabelArray" />
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_9" >
+           <property name="text" >
+            <string>Font Size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="QDoubleSpinBox" name="edgeLabelFontSize" />
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QGroupBox" name="groupBox_3" >
+        <property name="title" >
+         <string>Color</string>
+        </property>
+        <layout class="QGridLayout" >
+         <item row="0" column="0" >
+          <widget class="QCheckBox" name="edgeColorByArray" >
+           <property name="text" >
+            <string>Array</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" >
+          <widget class="QComboBox" name="edgeColorArray" />
+         </item>
+         <item row="1" column="0" >
+          <widget class="QLabel" name="label_11" >
+           <property name="text" >
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" >
+          <widget class="pqColorChooserButton" name="edgeColor" >
+           <property name="text" >
+            <string>Color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" >
+          <widget class="QLabel" name="label_4" >
+           <property name="text" >
+            <string>Opacity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" >
+          <widget class="QDoubleSpinBox" name="edgeOpacity" >
+           <property name="maximum" >
+            <double>1.000000000000000</double>
+           </property>
+           <property name="singleStep" >
+            <double>0.100000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Width</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QDoubleSpinBox" name="edgeWidth" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqSourceComboBox</class>
+   <extends>QComboBox</extends>
+   <header>pqSourceComboBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

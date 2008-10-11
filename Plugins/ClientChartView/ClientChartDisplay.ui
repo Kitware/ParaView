@@ -1,0 +1,121 @@
+<ui version="4.0" >
+ <class>ClientChartDisplay</class>
+ <widget class="QWidget" name="ClientChartDisplay" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>254</width>
+    <height>352</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QCheckBox" name="columnsAsSeries" >
+     <property name="text" >
+      <string>Use Columns as Series</string>
+     </property>
+     <property name="checked" >
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>X Axis Data</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
+       <widget class="QRadioButton" name="UseArrayIndex" >
+        <property name="whatsThis" >
+         <string>Select this option to use the indexes of the y-axis array for the x-axis points.</string>
+        </property>
+        <property name="text" >
+         <string>Use Array Index From Y Axis Data</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QRadioButton" name="UseDataArray" >
+        <property name="whatsThis" >
+         <string>Select this option to use a data array to define the x-axis points.</string>
+        </property>
+        <property name="text" >
+         <string>Use Data Array</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="XAxisArray" >
+        <property name="whatsThis" >
+         <string>Choose the name of the x-axis data array.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqTreeWidget" name="SeriesList" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="whatsThis" >
+      <string>This displays the list of line series. You can use the list to edit the series options.</string>
+     </property>
+     <property name="editTriggers" >
+      <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::NoEditTriggers|QAbstractItemView::SelectedClicked</set>
+     </property>
+     <property name="selectionMode" >
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+     <property name="selectionBehavior" >
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
+     <column>
+      <property name="text" >
+       <string>Series Visibility</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>236</width>
+       <height>31</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>pqTreeWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>SeriesList</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../../../../../ParaView3/Qt/Components/Resources/pqComponents.qrc" />
+ </resources>
+ <connections/>
+</ui>
