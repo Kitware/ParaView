@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ToolbarActions_h
 #define _ToolbarActions_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 
 #include <QActionGroup>
 #include <QString>

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqStandardGraphLayoutStrategies_h
 #define _pqStandardGraphLayoutStrategies_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 #include <pqCoreExport.h>
 #include <pqGraphLayoutStrategyInterface.h>
 #include <vtkSmartPointer.h>

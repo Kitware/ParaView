@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkSMSourceSelectionLink_h
 #define __vtkSMSourceSelectionLink_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 
 #include <vtkObject.h>
 

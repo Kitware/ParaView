@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqFilesystem_h
 #define pqFilesystem_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 
 #include <QDir>
 

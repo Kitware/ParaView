@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef pqPropertyHelper_h
 #define pqPropertyHelper_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 #include <vtkSMPropertyHelper.h>
 
 #include <QStringList>

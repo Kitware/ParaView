@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkSMClientDeliverySource_h
 #define __vtkSMClientDeliverySource_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 
 #include <vtkDataObjectAlgorithm.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>

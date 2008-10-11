@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkSMCheckableArrayListInformationHelper_h
 #define __vtkSMCheckableArrayListInformationHelper_h
 
-#include "OverViewUtilityWin32Header.h"
+#include "OverViewUtilityExport.h"
 #include <vtkSMInformationHelper.h>
 
 class OVERVIEW_UTILITY_EXPORT vtkSMCheckableArrayListInformationHelper : public vtkSMInformationHelper
