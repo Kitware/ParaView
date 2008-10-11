@@ -1,0 +1,5 @@
+<ParaViewReaders>
+  <Reader name="XMLTreeReader" extensions="xml" file_description="XML Trees">
+  </Reader>
+</ParaViewReaders>
+

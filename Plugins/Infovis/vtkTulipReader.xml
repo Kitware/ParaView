@@ -1,0 +1,5 @@
+<ParaViewReaders>
+  <Reader name="TulipReader" extensions="tlp" file_description="Tulip graphs">
+  </Reader>
+</ParaViewReaders>
+

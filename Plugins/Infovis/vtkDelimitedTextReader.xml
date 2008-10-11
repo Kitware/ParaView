@@ -1,0 +1,5 @@
+<ParaViewReaders>
+  <Reader name="DelimitedTextReader" extensions="csv" file_description="Comma-separated-values - table">
+  </Reader>
+</ParaViewReaders>
+

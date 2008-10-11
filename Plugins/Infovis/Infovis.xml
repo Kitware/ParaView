@@ -1,0 +1,645 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="layout_strategies">
+    <Proxy name="Random" class="vtkRandomLayoutStrategy"/>
+    <Proxy name="ForceDirected" class="vtkForceDirectedLayoutStrategy"/>
+    <Proxy name="Simple2D" class="vtkSimple2DLayoutStrategy"/>
+    <Proxy name="Clustering2D" class="vtkClustering2DLayoutStrategy"/>
+    <Proxy name="Fast2D" class="vtkFast2DLayoutStrategy"/>
+    <Proxy name="Circular" class="vtkCircularLayoutStrategy"/>
+    <Proxy name="None" class="vtkPassThroughLayoutStrategy"/>
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+
+    <SourceProxy name="DelimitedTextReader" class="vtkDelimitedTextReader">
+      <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <StringVectorProperty name="FieldDelimiterCharacters" command="SetFieldDelimiterCharacters" number_of_elements="1" default_values=","/>
+      <IntVectorProperty name="UseStringDelimiter" command="SetUseStringDelimiter" number_of_elements="1" default_values="1"/>
+      <IntVectorProperty name="HaveHeaders" command="SetHaveHeaders" number_of_elements="1" default_values="1"/>
+      <IntVectorProperty name="MergeConsecutiveDelimiters" command="SetMergeConsecutiveDelimiters" number_of_elements="1" default_values="0"/>
+      <IntVectorProperty name="MaxRecords" command="SetMaxRecords" number_of_elements="1" default_values="0"/>
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="RandomGraphSource" class="vtkRandomGraphSource">
+      <IntVectorProperty name="NumberOfVertices" command="SetNumberOfVertices" number_of_elements="1" default_values="10"/>  
+      <IntVectorProperty name="NumberOfEdges" command="SetNumberOfEdges" number_of_elements="1" default_values="10"/>  
+      <DoubleVectorProperty name="EdgeProbability" command="SetEdgeProbability" number_of_elements="1" default_values="0.5"/>  
+      <IntVectorProperty name="IncludeEdgeWeights" command="SetIncludeEdgeWeights" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="Directed" command="SetDirected" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="UseEdgeProbability" command="SetUseEdgeProbability" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="StartWithTree" command="SetStartWithTree" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="AllowSelfLoops" command="SetAllowSelfLoops" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="AllowParallelEdges" command="SetAllowParallelEdges" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="Seed" command="SetSeed" number_of_elements="1" default_values="1177"/> 
+      <StringVectorProperty name="VertexPedigreeIdArrayName"
+        label="Vertex Pedigree ID Array Name"
+        command="SetVertexPedigreeIdArrayName"
+        number_of_elements="1"
+        default_values="vertex id"/> 
+      <StringVectorProperty name="EdgePedigreeIdArrayName"
+        label="Edge Pedigree ID Array Name"
+        command="SetEdgePedigreeIdArrayName"
+        number_of_elements="1"
+        default_values="edge id"/> 
+      <StringVectorProperty name="EdgeWeightArrayName"
+        label="Edge Weight Array Name"
+        command="SetEdgeWeightArrayName"
+        number_of_elements="1"
+        default_values="edge weight"/> 
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="GeoRandomGraphSource" class="vtkGeoRandomGraphSource"
+                 base_proxygroup="sources"   base_proxyname="RandomGraphSource">
+        <Hints>
+            <View type="ClientGeoView"/>
+        </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="TulipReader" class="vtkTulipReader">
+      <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="XMLTreeReader" class="vtkXMLTreeReader">
+      <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <IntVectorProperty name="MaskArrays" command="SetMaskArrays" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="ReadCharData" command="SetReadCharData" number_of_elements="1" default_values="0"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+      <IntVectorProperty name="Generate Vertex Pedigree Ids" command="SetGenerateVertexPedigreeIds" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="Vertex Pedigree Id Array Name" command="SetVertexPedigreeIdArrayName" number_of_elements="1"/>
+      <IntVectorProperty name="Generate Edge Pedigree Ids" command="SetGenerateEdgePedigreeIds" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="Edge Pedigree Id Array Name" command="SetEdgePedigreeIdArrayName" number_of_elements="1"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+   <SourceProxy name="TextSource" class="vtkPVTextSource" 
+      label="Text">
+     <Documentation
+       short_help="Display text"
+       long_help="The Text source generates a table containing text." >
+       The Text source is used to generate a 1x1 vtkTable with a single text string.
+     </Documentation>
+     <StringVectorProperty
+       name="Text"
+       command="SetText"
+       number_of_elements="1"
+       default_values="Text">
+             <Hints>
+              <Widget type="multi_line"/>
+            </Hints>
+        <Documentation>
+          This property specifies the text to display.
+        </Documentation>
+     </StringVectorProperty>
+     <Hints>
+       <View type="ClientGraphView"/>
+     </Hints>
+   </SourceProxy>
+
+  </ProxyGroup>
+  
+  <!-- FILTERS GROUP -->
+  <ProxyGroup name="filters">
+  
+    <SourceProxy name="ExtractSelectedGraph" class="vtkExtractSelectedGraph">
+      <!-- Graph Input -->
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGraph"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- Selection Input -->
+      <InputProperty name="Selection" command="SetSelectionConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="DataObjectToTable" class="vtkDataObjectToTable">
+      <InputProperty name="Input" command="SetInputConnection">
+      </InputProperty>
+      <IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Field Data"/>
+          <Entry value="1" text="Point Data"/>
+          <Entry value="2" text="Cell Data"/>
+          <Entry value="3" text="Vertex Data"/>
+          <Entry value="4" text="Edge Data"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="GroupLeafVertices" class="vtkGroupLeafVertices">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTree"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex"/>
+      </InputProperty>
+
+      <StringVectorProperty name="GroupArray" command="SetInputArrayToProcess" number_of_elements="5" element_types="0 0 0 0 2" animateable="0"> 
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty> 
+
+      <StringVectorProperty name="NameArray" command="SetInputArrayToProcess" number_of_elements="5" element_types="0 0 0 0 2" default_values="1" animateable="0"> 
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty> 
+
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="SplitTableField" class="vtkBoostSplitTableField">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty name="Fields" command="AddField" clean_command="ClearFields" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
+    </SourceProxy>
+
+    <SourceProxy name="TableToGraph" class="vtkTableToGraph">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty name="VertexTable" command="SetVertexTableConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty name="LinkVertices" command="AddLinkVertex" clean_command="ClearLinkVertices" repeat_command="1" number_of_elements_per_command="3" element_types="2 2 0"/>
+      <StringVectorProperty name="LinkEdges" command="AddLinkEdge" clean_command="ClearLinkEdges" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="TableToTree" class="vtkTableToTreeFilter">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="TreeLevels" class="vtkTreeLevelsFilter">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGraph"/>
+        </DataTypeDomain>
+      </InputProperty>
+      
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="VertexDegree" class="vtkVertexDegree">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGraph"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <StringVectorProperty name="OutputArrayName" command="SetOutputArrayName" number_of_elements="1" default_values="VertexDegree"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="StringToNumeric" class="vtkStringToNumeric">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+
+    <SourceProxy name="DescriptiveStatistics" class="vtkDescriptiveStatistics" label="Descriptive Statistics" >
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <InputProperty name="Input Statistics" command="SetInputStatisticsConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+
+     <StringVectorProperty
+        name="VariableStatus"
+        command="SetColumnStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ColumnInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="ColumnInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ColumnInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+
+        <CheckableArrayListInformationHelper list_domain_name="array_list" />
+
+        <ArrayListDomain name="array_list" 
+          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+     </StringVectorProperty>
+
+      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="SetNominalParameter" command="SetNominalParameter" label="Parameter for Nominal Value" number_of_elements="1" default_values="Mean"/>
+
+      <StringVectorProperty name="SetDeviationParameter" command="SetDeviationParameter" label="Parameter for Deviation" number_of_elements="1" default_values="Standard Deviation"/>
+
+      <IntVectorProperty name="SignedDeviations" command="SetSignedDeviations" label="Signed Deviations" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="OrderStatistics" class="vtkOrderStatistics" label="Order Statistics">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <InputProperty name="Input Statistics" command="SetInputStatisticsConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+
+     <StringVectorProperty
+        name="VariableStatus"
+        command="SetColumnStatus"
+        number_of_elements="2"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ColumnInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="ColumnInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ColumnInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+
+        <CheckableArrayListInformationHelper list_domain_name="array_list" />
+
+        <ArrayListDomain name="array_list" 
+          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+     </StringVectorProperty>
+
+      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NumberOfIntervals" command="SetNumberOfIntervals" number_of_elements="1" default_values="4"/>  
+      <IntVectorProperty name="QuantileDefinition" command="SetQuantileDefinition" number_of_elements="1" default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Inverse CDF"/>
+          <Entry value="1" text="Inverse CDF, Averaged Steps"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="CorrelativeStatistics" class="vtkCorrelativeStatistics" label="Correlative Statistics">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <InputProperty name="Input Statistics" command="SetInputStatisticsConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+
+     <StringVectorProperty
+        name="VariableStatus"
+        command="SetColumnStatus"
+        number_of_elements="4"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ColumnInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="ColumnInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ColumnInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+
+        <CheckableArrayListInformationHelper list_domain_name="array_list" />
+
+        <ArrayListDomain name="array_list" 
+          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+     </StringVectorProperty>
+
+      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="ContingencyStatistics" class="vtkContingencyStatistics" label="Contingency Statistics">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <InputProperty name="Input Statistics" command="SetInputStatisticsConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+
+     <StringVectorProperty
+        name="VariableStatus"
+        command="SetColumnStatus"
+        number_of_elements="4"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ColumnInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="ColumnInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ColumnInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+
+        <CheckableArrayListInformationHelper list_domain_name="array_list" />
+
+        <ArrayListDomain name="array_list" 
+          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+     </StringVectorProperty>
+
+      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="GraphLayoutFilter" class="vtkGraphLayout" label="Graph Layout Filter">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGraph"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+     <ProxyProperty name="LayoutStrategy" command="SetLayoutStrategy"
+        label="Layout Strategy"/>
+
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+
+    <SelectionDeliveryRepresentationProxy name="SelectionDeliveryRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ClientDeliveryRepresentationBase">
+
+      <SubProxy>
+        <Proxy name="SelectionRepresentation"
+          proxygroup="representations"
+          proxyname="ClientDeliveryRepresentation">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of SelectionDeliveryRepresentation -->
+    </SelectionDeliveryRepresentationProxy>
+
+  </ProxyGroup>
+
+</ServerManagerConfiguration>

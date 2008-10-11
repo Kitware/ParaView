@@ -1,0 +1,49 @@
+INCLUDE(${QT_USE_FILE})
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${OverViewUtility_BINARY_DIR}
+  ${OverViewUtility_SOURCE_DIR}
+  ${PARAVIEW_INCLUDE_DIRS}
+  ${VTK_INCLUDE_DIR}
+  ${pqCore_BINARY_DIR}
+  ${pqCore_SOURCE_DIR}
+  ${VTK_SOURCE_DIR}/Geovis
+  )
+
+ADD_PARAVIEW_PLUGIN(
+  InfovisPlugin "1.0"
+  SERVER_MANAGER_XML
+    Infovis.xml
+  SERVER_MANAGER_SOURCES
+    ${ParaView_SOURCE_DIR}/Servers/Filters/vtkPVTextSource.h
+    ${VTK_SOURCE_DIR}/Geovis/vtkGeoRandomGraphSource.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkGraphLayout.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkSimple2DLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkClustering2DLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkCircularLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkForceDirectedLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkPassThroughLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkRandomGraphSource.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkStringToNumeric.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTableToGraph.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTableToTreeFilter.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkThresholdTable.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTreeLevelsFilter.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTulipReader.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkXMLTreeReader.h
+  GUI_RESOURCE_FILES
+    vtkDelimitedTextReader.xml
+    vtkTulipReader.xml
+    vtkXMLTreeReader.xml
+  )
+
+TARGET_LINK_LIBRARIES(
+  InfovisPlugin
+  vtkGeovis
+  vtkInfovis
+  vtkPVFilters
+  )
+
