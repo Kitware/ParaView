@@ -233,11 +233,6 @@ IF (PARAVIEW_BUILD_QT_GUI)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################
-IF (PARAVIEW_BUILD_QT_GUI)
-  ADD_SUBDIRECTORY(Applications)
-ENDIF (PARAVIEW_BUILD_QT_GUI)
-
-#########################################################################
 OPTION(BUILD_EXAMPLES "Build ParaView examples." OFF)
 IF (BUILD_EXAMPLES)
   ADD_SUBDIRECTORY(Examples)
@@ -292,6 +287,13 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
 IF(BUILD_SHARED_LIBS)
   ADD_SUBDIRECTORY(Plugins)
 ENDIF(BUILD_SHARED_LIBS)
+
+#########################################################################
+IF (PARAVIEW_BUILD_QT_GUI)
+  # Applications MUST be configured after plugins, so they can override
+  # the plugin configuration when necessary.
+  ADD_SUBDIRECTORY(Applications)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 # Mark certain VTK variables as advanced. Users do not really have to set these.
 IF (APPLE)
