@@ -9,14 +9,62 @@ SET(OVERVIEW_VERSION_PATCH 1)
 SET(OVERVIEW_VERSION_TYPE "(alpha)")
 SET(OVERVIEW_VERSION "${OVERVIEW_VERSION_MAJOR}.${OVERVIEW_VERSION_MINOR}.${OVERVIEW_VERSION_PATCH}")
 SET(OVERVIEW_VERSION_FULL "${OVERVIEW_VERSION} ${OVERVIEW_VERSION_TYPE}")
-SET(OVERVIEW_GEO_TILE_PATH "" CACHE PATH "Tile database path")
-
-# Prompt the user for optional functionality ...
-#OPTION(OVERVIEW_INSTALLER_SUPPORT "Include support for packaging OverView into a binary installer" OFF)
 
 # Setup branding ...
+
+MACRO(configure_plugin PLUGIN)
+  IF(WIN32)
+    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"${PLUGIN}Plugin.dll\",\n")
+  ENDIF(WIN32)
+  
+  IF(UNIX AND NOT APPLE)
+    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"lib${PLUGIN}Plugin.so\",\n")
+  ENDIF(UNIX AND NOT APPLE)
+  
+  IF(APPLE)
+    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"lib${PLUGIN}Plugin.dylib\",\n")
+
+    # On the Mac only, we have to create a symlink to each configured plugin from the bundle directory,
+    # so they can be located at startup ...
+    SET(BUNDLE_PATH "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS")
+    FILE(MAKE_DIRECTORY "${BUNDLE_PATH}")
+    EXECUTE_PROCESS(COMMAND ln -sf "${EXECUTABLE_OUTPUT_PATH}/lib${PLUGIN}Plugin.dylib" "${BUNDLE_PATH}/libOverView${PLUGIN}.dylib")
+
+  ENDIF(APPLE)
+ENDMACRO(configure_plugin)
+
+MACRO(require_plugin PLUGIN)
+
+  SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} ON CACHE BOOL "Build ${PLUGIN}" FORCE)
+  configure_plugin(${PLUGIN})
+
+ENDMACRO(require_plugin)
+
+MACRO(allow_plugin PLUGIN)
+  IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
+
+    configure_plugin(${PLUGIN})
+
+  ENDIF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
+ENDMACRO(allow_plugin)
+
+# Generate a list of configured plugins that will be embedded into the application ...
+SET(CONFIGURED_PLUGINS_H "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredPlugins.h")
+FILE(WRITE ${CONFIGURED_PLUGINS_H} "")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "#ifndef __ConfiguredPlugins_h_\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "#define __ConfiguredPlugins_h_\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "// Generated file, do not edit!  See ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt for details.\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "static const char* ConfiguredPlugins[] = {\n")
+
 SET(OVERVIEW_BRANDING_CONFIGURATION "${CMAKE_CURRENT_SOURCE_DIR}/Branding/OverView/Configuration.cmake" CACHE FILEPATH "Branding configuration file")
 INCLUDE(${OVERVIEW_BRANDING_CONFIGURATION})
+
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "  NULL\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "  };\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
+FILE(APPEND ${CONFIGURED_PLUGINS_H} "#endif // !__ConfiguredPlugins_h_\n")
 
 SET(OVERVIEW_BRANDED_VERSION "${OVERVIEW_BRANDED_VERSION_MAJOR}.${OVERVIEW_BRANDED_VERSION_MINOR}.${OVERVIEW_BRANDED_VERSION_PATCH}")
 SET(OVERVIEW_BRANDED_VERSION_FULL "${OVERVIEW_BRANDED_VERSION} ${OVERVIEW_BRANDED_VERSION_TYPE}")
@@ -125,20 +173,6 @@ IF(WIN32)
   TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
 
-#INSTALL(
-# TARGETS ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-# DESTINATION bin
-# COMPONENT OverView
-# )
-
-# Install shared data
-#INSTALL(FILES
-# ${VTKSNL_DATA_DIRECTORY}/Applications/GeoView/NE2_ps_bath.png
-# ${VTKSNL_DATA_DIRECTORY}/Applications/GeoView/political.vtp
-# DESTINATION share
-# COMPONENT OverView
-# )
-
 # Reset these so they don't cause problems building our subdirectories
 SET(MOC_BUILT_SOURCES "")
 SET(UI_BUILT_SOURCES "")
@@ -146,8 +180,5 @@ SET(RCS_SOURCES "")
 
 ADD_SUBDIRECTORY(Utility)
 
-# Generate OverView installers ...
-#ADD_SUBDIRECTORY(Distribution)
-
 MARK_AS_ADVANCED(OVERVIEW_BRANDING_CONFIGURATION)
-MARK_AS_ADVANCED(OVERVIEW_GEO_TILE_PATH)
+

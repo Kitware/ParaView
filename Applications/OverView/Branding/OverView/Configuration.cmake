@@ -17,6 +17,20 @@ IF(WIN32)
   SET(OVERVIEW_BRANDED_APPLICATION_ICON "${CURRENT_LIST_DIR}/Icon.ico")
 ENDIF(WIN32)
 
-# Allow developers to pick-and-choose which plugins they want
-SET(OVERVIEW_BRANDED_A_LA_CARTE_PLUGINS TRUE)
+require_plugin(ClientGraphView)
+require_plugin(ClientTableView)
+require_plugin(Infovis)
+require_plugin(TableToGraphPanel)
+
+allow_plugin(Array)
+allow_plugin(ChartViewFrame)
+allow_plugin(ClientAttributeView)
+allow_plugin(ClientChartView)
+allow_plugin(ClientGeoView)
+allow_plugin(ClientHierarchyView)
+allow_plugin(ClientRecordView)
+allow_plugin(SplitTableFieldPanel)
+allow_plugin(TableToSparseArrayPanel)
+
+
 
