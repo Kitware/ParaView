@@ -32,8 +32,9 @@ ELSE(COMMAND GET_PROPERTY)
 ENDIF(COMMAND GET_PROPERTY)
 
 #########################################################################
-# Clear the Plugin List
-FILE(WRITE ${ParaView_BINARY_DIR}/PluginList.txt "")
+# Clear the Plugin List text file
+SET(PARAVIEW_PLUGINLIST_TXT "${ParaView_BINARY_DIR}/PluginList.txt")
+FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
 
 #########################################################################
 # Warn about ParaQ
