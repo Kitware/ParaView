@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.83");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.84");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -3401,151 +3401,87 @@ int vtkCTHFragmentConnect::ProcessBlock(int blockId)
   return 1;
 }
 
-// There are many possible permutations.  All we care about
-// is to conserver neighbor relations and put the reference
-// block in position 0.
-static int CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[8][8] = {
-  {0,1,2,3,4,5,6,7},
-  {1,0,3,2,5,4,7,6},
-  {2,3,0,1,6,7,4,5},
-  {3,1,2,0,7,5,6,4},
-  {4,5,6,7,0,1,2,3},
-  {5,1,7,3,4,0,6,2},
-  {6,7,2,3,4,5,0,1},
-  {7,6,5,4,3,2,1,0}
+// We conserver neighbor relations and put the reference (in)
+// block in position 0, and the out block in position 1.
+// The face being generated is between 0 and 1.
+static int CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[8][3][8] = {
+  {{0,1,2,3,4,5,6,7}, {0,2,1,3,4,6,5,7}, {0,4,2,6,1,5,3,7}},
+  {{1,0,3,2,5,4,7,6}, {1,3,0,2,5,7,4,6}, {1,5,3,7,0,4,2,6}},
+  {{2,3,0,1,6,7,4,5}, {2,0,3,1,6,4,7,5}, {2,6,0,4,3,7,1,5}},
+  {{3,2,1,0,7,6,5,4}, {3,1,2,0,7,5,6,4}, {3,7,2,6,1,5,0,4}},
+  {{4,5,6,7,0,1,2,3}, {4,6,5,7,0,2,1,3}, {4,0,6,2,5,1,7,3}},
+  {{5,4,7,6,1,0,3,2}, {5,7,4,6,1,3,0,2}, {5,1,7,3,4,0,6,2}},
+  {{6,7,2,3,4,5,0,1}, {6,4,2,0,7,5,3,1}, {6,2,7,3,4,0,5,1}},
+  {{7,6,5,4,3,2,1,0}, {7,5,6,4,3,1,2,0}, {7,3,5,1,6,2,4,0}}
 };
 
 // Blank out voxels not connected to 0.
 // Only 127 because 0 is always on.
-static int CTH_FRAGMENT_CONNECT_CORNER_MASK[128][8] = {
+static int CTH_FRAGMENT_CONNECT_CORNER_MASK[64][8] = {
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 0 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 0 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 0 0
   {0,0,0,1,0,0,0,0}, // 1 0 0 1 0 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 0 0
   {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 0 0
   {0,0,0,0,0,1,0,0}, // 1 0 0 0 0 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 0 0
   {0,0,0,0,0,1,0,0}, // 1 0 1 0 0 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 0 0
   {0,0,0,1,0,1,0,0}, // 1 0 0 1 0 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 0 0
   {0,0,0,0,0,1,0,0}, // 1 0 1 1 0 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 0 0
   {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 0 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 0 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 0 0
   {0,0,0,0,0,0,1,0}, // 1 0 0 0 0 0 1 0
-  {0,0,0,0,0,0,1,0}, // 1 1 0 0 0 0 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 1 0
   {0,0,0,1,0,0,1,0}, // 1 0 0 1 0 0 1 0
-  {0,0,0,0,0,0,1,0}, // 1 1 0 1 0 0 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 1 0
   {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 1 0
   {0,0,0,0,0,1,1,0}, // 1 0 0 0 0 1 1 0
-  {0,0,0,0,0,0,1,0}, // 1 1 0 0 0 1 1 0
   {0,0,0,0,0,1,0,0}, // 1 0 1 0 0 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 1 0
   {0,0,0,1,0,1,1,0}, // 1 0 0 1 0 1 1 0
-  {0,0,0,0,0,0,1,0}, // 1 1 0 1 0 1 1 0
   {0,0,0,0,0,1,0,0}, // 1 0 1 1 0 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 1 0
   {0,0,0,1,0,0,0,0}, // 1 0 0 1 1 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 1 0
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 1 0
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 1 0
   {0,0,0,0,0,0,0,1}, // 1 0 0 0 0 0 0 1
-  {0,0,0,0,0,0,0,1}, // 1 1 0 0 0 0 0 1
   {0,0,0,0,0,0,0,1}, // 1 0 1 0 0 0 0 1
-  {0,0,0,0,0,0,0,1}, // 1 1 1 0 0 0 0 1
   {0,0,0,1,0,0,0,1}, // 1 0 0 1 0 0 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 0 1
   {0,0,0,0,0,0,0,1}, // 1 0 0 0 1 0 0 1
-  {0,0,0,0,0,0,0,1}, // 1 1 0 0 1 0 0 1
   {0,0,0,0,0,0,0,1}, // 1 0 1 0 1 0 0 1
-  {0,0,0,0,0,0,0,1}, // 1 1 1 0 1 0 0 1
   {0,0,0,1,0,0,0,1}, // 1 0 0 1 1 0 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 0 1
   {0,0,0,0,0,1,0,1}, // 1 0 0 0 0 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 0 1
   {0,0,0,0,0,1,0,1}, // 1 0 1 0 0 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 0 1
   {0,0,0,1,0,1,0,1}, // 1 0 0 1 0 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 0 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 0 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 1 0 1
+  {0,0,0,0,0,0,2,0}, // 1 0 1 1 1 1 0 1 // special case 47 here.
   {0,0,0,0,0,0,1,1}, // 1 0 0 0 0 0 1 1
-  {0,0,0,0,0,0,1,1}, // 1 1 0 0 0 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 0 1 1
   {0,0,0,1,0,0,1,1}, // 1 0 0 1 0 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 0 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 0 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 1 0 1 1
   {0,0,0,0,0,1,1,1}, // 1 0 0 0 0 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 0 1 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 0 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 0 1 1 1
   {0,0,0,1,0,1,1,1}, // 1 0 0 1 0 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 0 1 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 1 0 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 1 0 1 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 0 1 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 0 1 1 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 1 0 1 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 1 0 1 1 1 1
   {0,0,0,0,0,0,0,0}, // 1 0 0 1 1 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 1 0 1 1 1 1 1
-  {0,0,0,0,0,0,0,0}, // 1 0 1 1 1 1 1 1
-  {0,0,0,0,0,0,0,0}  // 1 1 1 1 1 1 1 1
+  {0,0,0,0,0,0,0,0}  // 1 0 1 1 1 1 1 1
 };
 
 //----------------------------------------------------------------------------
@@ -3564,10 +3500,12 @@ static int CTH_FRAGMENT_CONNECT_CORNER_MASK[128][8] = {
 // voxel surface is flat, an edge, or a corner.
 // This method could probably be more efficient. General computation works
 // for all gradient directions, but components are either 1 or 0.
-void vtkCTHFragmentConnect::ComputeDisplacementFactors(
+// The return value indicates that an edge may be non manifold.
+// It returns the y or z axis index of the edge that may be non manifold.
+int vtkCTHFragmentConnect::ComputeDisplacementFactors(
   vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
   double displacmentFactors[3],
-  int rootNeighborIdx)
+  int rootNeighborIdx, int faceIdx)
 {
   // DEBUGGING
   // This generates the raw voxel surface when uncommented.
@@ -3599,28 +3537,40 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   // will pull away from each other.
   // First we need to permute the 8 values so that the inside
   // voxel adjacent to the face is in position 0.
-  int* permutation = CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[rootNeighborIdx];
+  
+  // Note: in order to fix the case (all high except two opposite corners),
+  // we permute so that the face is between 0 and 1.
+  // 0 should always be on, and 1 should always be off.
+  
+  int* permutation = CTH_FRAGMENT_CONNECT_CORNER_PERMUTATION[rootNeighborIdx][faceIdx];
   // Now compute the mask case index after permutation.
   int caseIdx = 0;
-  //if (v[permutation[0]] <= this->scaledMaterialFractionThreshold) { VTK_ERROR_MACRO("0 should always be inside");}
-  if (v[permutation[1]] > this->scaledMaterialFractionThreshold) { caseIdx += 1;}
-  if (v[permutation[2]] > this->scaledMaterialFractionThreshold) { caseIdx += 2;}
-  if (v[permutation[3]] > this->scaledMaterialFractionThreshold) { caseIdx += 4;}
-  if (v[permutation[4]] > this->scaledMaterialFractionThreshold) { caseIdx += 8;}
-  if (v[permutation[5]] > this->scaledMaterialFractionThreshold) { caseIdx += 16;}
-  if (v[permutation[6]] > this->scaledMaterialFractionThreshold) { caseIdx += 32;}
-  if (v[permutation[7]] > this->scaledMaterialFractionThreshold) { caseIdx += 64;}
+  //if (v[permutation[0]] <= this->scaledMaterialFractionThreshold) { vtkErrorMacro("0 should always be inside");}
+  // This next condition does actually occur because of padding for boundary condition.
+  // We want to pad with the same volume fraction so that the sub-voxel positioning does
+  // not move the points normal to the surface, but we still want to create the surface.
+  //if (v[permutation[1]] > this->scaledMaterialFractionThreshold) {vtkErrorMacro("1 should always be outside");}
+  if (v[permutation[2]] > this->scaledMaterialFractionThreshold) { caseIdx += 1;}
+  if (v[permutation[3]] > this->scaledMaterialFractionThreshold) { caseIdx += 2;}
+  if (v[permutation[4]] > this->scaledMaterialFractionThreshold) { caseIdx += 4;}
+  if (v[permutation[5]] > this->scaledMaterialFractionThreshold) { caseIdx += 8;}
+  if (v[permutation[6]] > this->scaledMaterialFractionThreshold) { caseIdx += 16;}
+  if (v[permutation[7]] > this->scaledMaterialFractionThreshold) { caseIdx += 32;}
   int *mask = CTH_FRAGMENT_CONNECT_CORNER_MASK[caseIdx];
+
   //if (mask[0]) { v[permutation[0]] = 0.0;} // mask[0] is always 0
   // Does setting to 0 cause degenerate triangles?
   // 1/4 is arbitrary value less than 1/2.
-  if (mask[1]) { v[permutation[1]] *= 0.25;}
-  if (mask[2]) { v[permutation[2]] *= 0.25;}
-  if (mask[3]) { v[permutation[3]] *= 0.25;}
-  if (mask[4]) { v[permutation[4]] *= 0.25;}
-  if (mask[5]) { v[permutation[5]] *= 0.25;}
-  if (mask[6]) { v[permutation[6]] *= 0.25;}
-  if (mask[7]) { v[permutation[7]] *= 0.25;}
+  if (mask[1] == 1) { v[permutation[1]] *= 0.25;}
+  if (mask[2] == 1) { v[permutation[2]] *= 0.25;}
+  if (mask[3] == 1) { v[permutation[3]] *= 0.25;}
+  if (mask[4] == 1) { v[permutation[4]] *= 0.25;}
+  if (mask[5] == 1) { v[permutation[5]] *= 0.25;}
+  if (mask[6] == 1) { v[permutation[6]] *= 0.25;}
+  if (mask[7] == 1) { v[permutation[7]] *= 0.25;}
+  // This is for the unique case with two opposite corners low and 
+  // everything else high.  Keep the two surfaces from touching.
+  if (mask[6] == 2) { v[permutation[6]] = this->scaledMaterialFractionThreshold + v[permutation[6]];}
 
   // cell centered data interpolated to the current node
   double centerValue = (v[0]+v[1]+v[2]+v[3]+v[4]+v[5]+v[6]+v[7])*0.125;
@@ -3656,10 +3606,14 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   g[0] = -t000+t001-t010+t011-t100+t101-t110+t111;
   // This is unusual but it can happen with a checkerboard pattern.
   // We should break the symetry and choose a direction ...
+  // The masking should take care of this, so this case should never occur.
+  // It does occur at boundaries when all voxels (even padded ones)
+  // are high.
   if (g[0] == 0.0 && g[1] == 0.0 &&  g[2] == 0.0)
     {
+    //vtkWarningMacro("Masking failed.");
     displacmentFactors[0] = displacmentFactors[1] = displacmentFactors[2] = 0.0;
-    return;
+    return 0;
     }
   // If the center value is above the threshold
   // then we need to go in the negative gradient direction.
@@ -3720,21 +3674,35 @@ void vtkCTHFragmentConnect::ComputeDisplacementFactors(
   displacmentFactors[0] = k * g[0];
   displacmentFactors[1] = k * g[1];
   displacmentFactors[2] = k * g[2];
+
+  if (caseIdx == 46 || caseIdx == 54 || caseIdx == 62)
+    {
+    return 2;
+    }
+  if (caseIdx == 43 || caseIdx == 57 || caseIdx == 59)
+    {
+    return 1;
+    }
+  return 0;
 }
 
 
 //----------------------------------------------------------------------------
 // Pass the non displaced corner location in the point argument.
 // It will be modified with the sub voxel displacement.
-void vtkCTHFragmentConnect::SubVoxelPositionCorner(
+// The return value indicates that an edge may be non manifold.
+// It returns the y or z axis index of the edge that may be non manifold.
+int vtkCTHFragmentConnect::SubVoxelPositionCorner(
   double* point, 
   vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
-  int rootNeighborIdx)
+  int rootNeighborIdx, int faceAxis)
 {
+  int retVal;
+  
   double displacementFactors[3];
-  this->ComputeDisplacementFactors(pointNeighborIterators,
-                                   displacementFactors,
-                                   rootNeighborIdx);
+  retVal = this->ComputeDisplacementFactors(pointNeighborIterators,
+                                            displacementFactors,
+                                            rootNeighborIdx, faceAxis);
 
   // Find the smallest voxel to size the interpolation.  We use virtual
   // voxels which all have the same size.  Although this 
@@ -3771,10 +3739,16 @@ void vtkCTHFragmentConnect::SubVoxelPositionCorner(
         + hEdge2[ii]*displacementFactors[2];
     }
     
-  //if (fabs(point[0]-0.973579) + fabs(point[1]+0.153555) + fabs(point[2]+0.0565284) < 0.01)
-  //  {
-  //  cerr << "Break here.\n";
-  //  }
+  if (fabs(point[0]-1.165164) + fabs(point[1]+0.477688) + fabs(point[2]-0.02227749) < 0.001)
+    {
+    cerr << "Break here.\n";
+    }
+  if (fabs(point[0]-1.15657675264428) + fabs(point[1]+0.479046073951029) + fabs(point[2]-0.0211548878716948) < 0.002)
+    {
+    cerr << "Break here.\n";
+    }
+
+  return retVal;
 }
 
 
@@ -3856,6 +3830,8 @@ void vtkCTHFragmentConnect::CreateFace(
   int i6 =      inc1+inc2; 
   int i7 = inc0+inc1+inc2; 
 
+  int manifoldIssue[4];
+
   // Do every thing in coordinate system of face.
   // Find the neighbors of each point to position to point off the grid.
   // Now to avoid non-manifold surfaces, I need to avoid merging
@@ -3863,7 +3839,7 @@ void vtkCTHFragmentConnect::CreateFace(
   // We need to determine which index (0-7) represents the
   // voxel right inside the face we are creating.  This is 
   // to perform connectivity on the 2x2x2 point neighbors.
-  int rootNeighborIdx;
+  int inNeighborIdx;
   
   cornerNeighbors[i0] = &(this->FaceNeighbors[0]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[1]);
@@ -3873,9 +3849,10 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[9]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[10]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[11]);
-  rootNeighborIdx = outMaxFlag ? i6 : i7;  // Face neighbor 10 or 11
-  this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors,
-                               rootNeighborIdx);
+  inNeighborIdx = outMaxFlag ? i6 : i7;  // Face neighbor 10 or 11
+  manifoldIssue[0] = this->SubVoxelPositionCorner(this->FaceCornerPoints, cornerNeighbors,
+                                                  inNeighborIdx, axis);
+  // 1 => 
   quadCornerIds[0] = points->InsertNextPoint(this->FaceCornerPoints);
   cornerNeighbors[i0] = &(this->FaceNeighbors[4]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[5]);
@@ -3885,9 +3862,9 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[13]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[14]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[15]);
-  rootNeighborIdx = outMaxFlag ? i4 : i5;  // Face neighbor 12 or 13
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors,
-                               rootNeighborIdx);
+  inNeighborIdx = outMaxFlag ? i4 : i5;  // Face neighbor 12 or 13
+  manifoldIssue[1] = this->SubVoxelPositionCorner(this->FaceCornerPoints+3, cornerNeighbors,
+                                                  inNeighborIdx, axis);
   quadCornerIds[1] = points->InsertNextPoint(this->FaceCornerPoints+3);
   cornerNeighbors[i0] = &(this->FaceNeighbors[16]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[17]);
@@ -3897,9 +3874,9 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[25]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[26]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[27]);
-  rootNeighborIdx = outMaxFlag ? i2 : i3;  // Face neighbor 18 or 19
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors,
-                               rootNeighborIdx);
+  inNeighborIdx = outMaxFlag ? i2 : i3;  // Face neighbor 18 or 19
+  manifoldIssue[2] = this->SubVoxelPositionCorner(this->FaceCornerPoints+6, cornerNeighbors,
+                                                  inNeighborIdx, axis);
   quadCornerIds[2] = points->InsertNextPoint(this->FaceCornerPoints+6);
   cornerNeighbors[i0] = &(this->FaceNeighbors[20]);
   cornerNeighbors[i1] = &(this->FaceNeighbors[21]);
@@ -3909,20 +3886,45 @@ void vtkCTHFragmentConnect::CreateFace(
   cornerNeighbors[i5] = &(this->FaceNeighbors[29]);
   cornerNeighbors[i6] = &(this->FaceNeighbors[30]);
   cornerNeighbors[i7] = &(this->FaceNeighbors[31]);
-  rootNeighborIdx = outMaxFlag ? i0 : i1;  // Face neighbor 20 or 21
-  this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors,
-                               rootNeighborIdx);
+  inNeighborIdx = outMaxFlag ? i0 : i1;  // Face neighbor 20 or 21
+  manifoldIssue[3] = this->SubVoxelPositionCorner(this->FaceCornerPoints+9, cornerNeighbors,
+                                                  inNeighborIdx, axis);
   quadCornerIds[3] = points->InsertNextPoint(this->FaceCornerPoints+9);
 
-   //if ( quadCornerIds[3] > 570) // 74507
-   //  {
-   //  cerr << "Debug\n";
-   //  }
-   //if ( quadCornerIds[3] > 750) // 74507
-   //  {
-   //  cerr << "Debug\n";
-   //  }
+  // If both corners of an edge have an issue, the we need an extra
+  // point on the edge to generate a hole.
+  // Create a permutation to convert the world coordinate system axes
+  // into the coordinate system of the 2x4x4 face neighbor array.
+  int tmp[3];
+  tmp[axis] = 0;
+  tmp[(axis+1)%3] = 1;
+  tmp[(axis+2)%3] = 2;
+  if (manifoldIssue[0] != 0 && manifoldIssue[1] != 0 && 
+      tmp[manifoldIssue[0]] == 1 && tmp[manifoldIssue[1]] == 1)
+    {
+    this->FaceEdgeFlags[0] = 1;
+    }
 
+  if (manifoldIssue[0] != 0 && manifoldIssue[2] != 0 && 
+      tmp[manifoldIssue[0]] == 2 && tmp[manifoldIssue[2]] == 2)
+    {
+    this->FaceEdgeFlags[1] = 1;
+    }
+  if (manifoldIssue[1] != 0 && manifoldIssue[3] != 0 && 
+      tmp[manifoldIssue[1]] == 2 && tmp[manifoldIssue[3]] == 2)
+    {
+    this->FaceEdgeFlags[2] = 1;
+    }
+  if (manifoldIssue[2] != 0 && manifoldIssue[3] && 
+      tmp[manifoldIssue[2]] == 1 && tmp[manifoldIssue[3]] == 1)
+    {
+    this->FaceEdgeFlags[3] = 1;
+    }
+
+   if ( quadCornerIds[3] > 3350) // 74507
+     {
+     cerr << "Debug\n";
+     }
 
   // Now for the mid edge point if the neighbors on that side are smaller.
   if (this->FaceEdgeFlags[0])
@@ -3936,9 +3938,9 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i6] = &(this->FaceNeighbors[12]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[13]);
     // Two choices here (10, 12) because they both are the same voxel.
-    rootNeighborIdx = outMaxFlag ? i4 : i5; 
+    inNeighborIdx = outMaxFlag ? i4 : i5; 
     this->SubVoxelPositionCorner(this->FaceEdgePoints, cornerNeighbors,
-                                 rootNeighborIdx);
+                                 inNeighborIdx, axis);
     quadMidIds[0] = points->InsertNextPoint(this->FaceEdgePoints);
     }
   if (this->FaceEdgeFlags[1])
@@ -3952,9 +3954,9 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i6] = &(this->FaceNeighbors[18]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[19]);
     // Two choices here (10, 18) because they both are the same voxel.
-    rootNeighborIdx = outMaxFlag ? i2 : i3;
+    inNeighborIdx = outMaxFlag ? i2 : i3;
     this->SubVoxelPositionCorner(this->FaceEdgePoints+3, cornerNeighbors,
-                                 rootNeighborIdx);
+                                 inNeighborIdx, axis);
     quadMidIds[1] = points->InsertNextPoint(this->FaceEdgePoints+3);
     }
   if (this->FaceEdgeFlags[2])
@@ -3968,9 +3970,9 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i6] = &(this->FaceNeighbors[22]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[23]);
     // Two choices here (12, 20) because they both are the same voxel.
-    rootNeighborIdx = outMaxFlag ? i0 : i1;
+    inNeighborIdx = outMaxFlag ? i0 : i1;
     this->SubVoxelPositionCorner(this->FaceEdgePoints+6, cornerNeighbors,
-                                 rootNeighborIdx);
+                                 inNeighborIdx, axis);
     quadMidIds[2] = points->InsertNextPoint(this->FaceEdgePoints+6);
     }
   if (this->FaceEdgeFlags[3])
@@ -3984,9 +3986,9 @@ void vtkCTHFragmentConnect::CreateFace(
     cornerNeighbors[i6] = &(this->FaceNeighbors[28]);
     cornerNeighbors[i7] = &(this->FaceNeighbors[29]);
     // Two choices here (18, 20) because they both are the same voxel.
-    rootNeighborIdx = outMaxFlag ? i0 : i1;
+    inNeighborIdx = outMaxFlag ? i0 : i1;
     this->SubVoxelPositionCorner(this->FaceEdgePoints+9, cornerNeighbors,
-                                 rootNeighborIdx);
+                                 inNeighborIdx, axis);
     quadMidIds[3] = points->InsertNextPoint(this->FaceEdgePoints+9);
     }
 
@@ -4340,6 +4342,13 @@ void vtkCTHFragmentConnect::ComputeFaceNeighbors(
   faceIndex[1] = faceIndex[1] << 1;
   faceIndex[2] = faceIndex[2] << 1;
 
+  // Note:  It would really nice to get rid of the outMaxFlag
+  // and have the in voxel at 10, 12, 18 and 20.
+  // To avoid breaking anything, I will leave it.
+  // however, it looks like filling the arrays would be pretty easy
+  // with the switch.  Possible the half neighbors might need to
+  // be negated.
+
   // The center four on each side of the face are always the same.
   // The face is the smallest of in and out, so there is no possibility
   // for subdivision.
@@ -4415,18 +4424,21 @@ void vtkCTHFragmentConnect::ComputeFaceNeighbors(
   faceIndex[axis2] -= 1;
   this->FindNeighbor(faceIndex, faceLevel, this->FaceNeighbors+0, this->FaceNeighbors+8);
   
+  // Split edges if neighbors are a higher level than face.
   --faceLevel;
   this->FaceEdgeFlags[0] = 0;
+  // Checking equivalences (this->FaceNeighbor[2] != this->FaceNeighbor[4])
+  // May be faster and work fine.
   if (this->FaceNeighbors[2].Block->GetLevel() > faceLevel ||
-      this->FaceNeighbors[3].Block->GetLevel() > faceLevel ||
-      this->FaceNeighbors[4].Block->GetLevel() > faceLevel ||
-      this->FaceNeighbors[5].Block->GetLevel() > faceLevel)
+      this->FaceNeighbors[3].Block->GetLevel()  > faceLevel ||
+      this->FaceNeighbors[4].Block->GetLevel()  > faceLevel ||
+      this->FaceNeighbors[5].Block->GetLevel()  > faceLevel)
     {
     this->FaceEdgeFlags[0] = 1;
     }
   this->FaceEdgeFlags[1] = 0;
-  if (this->FaceNeighbors[8].Block->GetLevel() > faceLevel ||
-      this->FaceNeighbors[9].Block->GetLevel() > faceLevel ||
+  if (this->FaceNeighbors[8].Block->GetLevel()  > faceLevel ||
+      this->FaceNeighbors[9].Block->GetLevel()  > faceLevel ||
       this->FaceNeighbors[16].Block->GetLevel() > faceLevel ||
       this->FaceNeighbors[17].Block->GetLevel() > faceLevel)
     {

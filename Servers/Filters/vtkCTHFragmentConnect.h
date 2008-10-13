@@ -270,14 +270,14 @@ protected:
         vtkCTHFragmentConnectIterator* in,
         vtkCTHFragmentConnectIterator* out,
         int axis, int outMaxFlag);
-  void ComputeDisplacementFactors(
+  int ComputeDisplacementFactors(
         vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
         double displacmentFactors[3],
-        int rootNeighborIdx);
-  void SubVoxelPositionCorner(
+        int rootNeighborIdx, int faceAxis);
+  int SubVoxelPositionCorner(
         double* point, 
         vtkCTHFragmentConnectIterator* pointNeighborIterators[8],
-        int rootNeighborIdx);
+        int rootNeighborIdx, int faceAxis);
   void FindPointNeighbors(
         vtkCTHFragmentConnectIterator* iteratorMin0, 
         vtkCTHFragmentConnectIterator* iteratorMax0,
