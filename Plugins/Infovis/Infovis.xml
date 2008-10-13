@@ -247,6 +247,32 @@
       </Hints>
     </SourceProxy>
 
+    <SourceProxy name="GenerateIndexArray" class="vtkGenerateIndexArray">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+      
+      <StringVectorProperty name="ArrayName" command="SetArrayName" number_of_elements="1" default_values="index" label="Array Name"/>
+      
+      <IntVectorProperty name="FieldType" command="SetFieldType" number_of_elements="1" default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Field Data"/>
+          <Entry value="1" text="Point Data"/>
+          <Entry value="2" text="Cell Data"/>
+          <Entry value="3" text="Vertex Data"/>
+          <Entry value="4" text="Edge Data"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ReferenceArrayName" command="SetReferenceArrayName" number_of_elements="1" default_values="" label="Reference Array Name"/>
+    </SourceProxy>
+
     <SourceProxy name="GroupLeafVertices" class="vtkGroupLeafVertices">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">

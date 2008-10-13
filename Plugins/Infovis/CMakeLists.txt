@@ -24,6 +24,7 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
     ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkForceDirectedLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkGenerateIndexArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkGraphLayout.h
     ${VTK_SOURCE_DIR}/Infovis/vtkPassThroughLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkRandomGraphSource.h
