@@ -76,6 +76,52 @@
         </Hints>
     </SourceProxy>
 
+    <SourceProxy name="SQLDatabaseGraphSource" class="vtkSQLDatabaseGraphSource">
+      <StringVectorProperty name="URL" command="SetURL" number_of_elements="1" label="Database"/> 
+      <StringVectorProperty name="Password" command="SetPassword" number_of_elements="1" label="Password" is_internal="1"/> 
+      <StringVectorProperty name="EdgeQuery" command="SetEdgeQuery" number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexQuery" command="SetVertexQuery" number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+      </StringVectorProperty>
+      <StringVectorProperty name="LinkVertices" command="AddLinkVertex" clean_command="ClearLinkVertices" repeat_command="1" number_of_elements_per_command="3" element_types="2 2 0"/>
+      <StringVectorProperty name="LinkEdges" command="AddLinkEdge" clean_command="ClearLinkEdges" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
+<!--
+      <IntVectorProperty name="Directed" command="SetDirected" number_of_elements="1" default_values="1"> 
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty> 
+-->
+      <IntVectorProperty name="GenerateEdgePedigreeIds" command="SetGenerateEdgePedigreeIds" number_of_elements="1" label="Generate Edge Pedigree IDs" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="EdgePedigreeIdArrayName" command="SetEdgePedigreeIdArrayName" number_of_elements="1" label="Edge Pedigree ID Array Name"/> 
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="SQLDatabaseTableSource" class="vtkSQLDatabaseTableSource">
+      <StringVectorProperty name="URL" command="SetURL" number_of_elements="1" label="Database"/> 
+      <StringVectorProperty name="Password" command="SetPassword" number_of_elements="1" label="Password" is_internal="1"/> 
+      <StringVectorProperty name="Query" command="SetQuery" number_of_elements="1">
+        <Hints>
+          <Widget type="multi_line"/>
+        </Hints>
+      </StringVectorProperty>
+      <IntVectorProperty name="GeneratePedigreeIds" command="SetGeneratePedigreeIds" number_of_elements="1" label="Generate Pedigree IDs" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="PedigreeIdArrayName" command="SetPedigreeIdArrayName" number_of_elements="1" label="Pedigree ID Array Name"/> 
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
     <SourceProxy name="TulipReader" class="vtkTulipReader">
       <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
         <FileListDomain name="files"/>
