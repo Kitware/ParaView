@@ -18,17 +18,18 @@ ADD_PARAVIEW_PLUGIN(
   SERVER_MANAGER_SOURCES
     ${ParaView_SOURCE_DIR}/Servers/Filters/vtkPVTextSource.h
     ${VTK_SOURCE_DIR}/Geovis/vtkGeoRandomGraphSource.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkGraphLayout.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkSimple2DLayoutStrategy.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkClustering2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkCircularLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkClustering2DLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkCollapseGraph.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkForceDirectedLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkGraphLayout.h
     ${VTK_SOURCE_DIR}/Infovis/vtkPassThroughLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkRandomGraphSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkSQLDatabaseGraphSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkSQLDatabaseTableSource.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkSimple2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkStringToNumeric.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToTreeFilter.h

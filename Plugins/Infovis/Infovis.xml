@@ -183,6 +183,27 @@
   <!-- FILTERS GROUP -->
   <ProxyGroup name="filters">
   
+    <SourceProxy name="CollapseGraph" class="vtkCollapseGraph">
+      <InputProperty name="Input" command="SetGraphConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkGraph"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty name="Selection" command="SetSelectionConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+      </InputProperty>
+    </SourceProxy>
+
     <SourceProxy name="ExtractSelectedGraph" class="vtkExtractSelectedGraph">
       <!-- Graph Input -->
       <InputProperty name="Input" command="SetInputConnection">
