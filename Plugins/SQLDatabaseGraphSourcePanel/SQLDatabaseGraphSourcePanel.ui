@@ -1,0 +1,415 @@
+<ui version="4.0" >
+ <class>SQLDatabaseGraphSourcePanel</class>
+ <widget class="QWidget" name="SQLDatabaseGraphSourcePanel" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>411</width>
+    <height>888</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <property name="leftMargin" >
+      <number>0</number>
+     </property>
+     <property name="topMargin" >
+      <number>0</number>
+     </property>
+     <property name="rightMargin" >
+      <number>0</number>
+     </property>
+     <property name="bottomMargin" >
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_10" >
+       <property name="text" >
+        <string>DataBase Type </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="databaseType" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="sqliteGroup" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" stdset="0" >
+      <string>QSQLite Options</string>
+     </property>
+     <layout class="QHBoxLayout" >
+      <property name="spacing" >
+       <number>4</number>
+      </property>
+      <property name="leftMargin" >
+       <number>4</number>
+      </property>
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="databaseFileLabel" >
+        <property name="text" >
+         <string>DataBase File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="pqFileChooserWidget" native="1" name="databaseFile" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="mysqlGroup" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" stdset="0" >
+      <string>DataBase Options</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="leftMargin" >
+       <number>4</number>
+      </property>
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>4</number>
+      </property>
+      <property name="verticalSpacing" >
+       <number>4</number>
+      </property>
+      <item row="3" column="2" >
+       <widget class="QLineEdit" name="databaseHost" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="databasePassword" >
+        <property name="echoMode" >
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLineEdit" name="databaseUser" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="databaseName" />
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>DataBase Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Port</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>Host</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_8" >
+        <property name="text" >
+         <string>Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>User</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" >
+       <widget class="QLineEdit" name="databasePort" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="groupBox_4" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>100</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" stdset="0" >
+      <string>Vertex Query</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QTextEdit" name="vertexQuery" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="groupBox_3" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>100</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" stdset="0" >
+      <string>Edge Query</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QTextEdit" name="edgeQuery" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="groupBox" >
+     <property name="title" stdset="0" >
+      <string>Link Vertices</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_14" >
+        <property name="text" >
+         <string>Vertex Type 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="vertexField1" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="vertexDomain1" />
+      </item>
+      <item row="0" column="3" >
+       <widget class="QCheckBox" name="vertexHidden1" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_15" >
+        <property name="text" >
+         <string>Vertex Type 2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="vertexField2" />
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLineEdit" name="vertexDomain2" />
+      </item>
+      <item row="1" column="3" >
+       <widget class="QCheckBox" name="vertexHidden2" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_16" >
+        <property name="text" >
+         <string>Vertex Type3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="vertexField3" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="vertexDomain3" />
+      </item>
+      <item row="2" column="3" >
+       <widget class="QCheckBox" name="vertexHidden3" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="pqCollapsedGroup" native="1" name="groupBox_2" >
+     <property name="title" stdset="0" >
+      <string>Link Edges</string>
+     </property>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_17" >
+        <property name="text" >
+         <string>Edge Type 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" >
+       <widget class="QLineEdit" name="edgeSource1" />
+      </item>
+      <item row="0" column="2" >
+       <widget class="QLineEdit" name="edgeTarget1" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_18" >
+        <property name="text" >
+         <string>Edge Type 2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="edgeSource2" />
+      </item>
+      <item row="1" column="2" >
+       <widget class="QLineEdit" name="edgeTarget2" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_19" >
+        <property name="text" >
+         <string>Edge Type 3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QLineEdit" name="edgeSource3" />
+      </item>
+      <item row="2" column="2" >
+       <widget class="QLineEdit" name="edgeTarget3" />
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QComboBox" name="generateEdgePedigreeIds" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <item>
+        <property name="text" >
+         <string>Assign Edge Pedigree IDs</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Generate Edge Pedigree IDs</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Name</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="edgePedigreeIdArrayName" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqFileChooserWidget</class>
+   <extends>QWidget</extends>
+   <header>pqFileChooserWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QWidget</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>databaseType</tabstop>
+  <tabstop>databaseName</tabstop>
+  <tabstop>databaseUser</tabstop>
+  <tabstop>databasePassword</tabstop>
+  <tabstop>databaseHost</tabstop>
+  <tabstop>databasePort</tabstop>
+  <tabstop>edgeQuery</tabstop>
+  <tabstop>vertexQuery</tabstop>
+  <tabstop>edgeSource1</tabstop>
+  <tabstop>edgeTarget1</tabstop>
+  <tabstop>edgeSource2</tabstop>
+  <tabstop>edgeTarget2</tabstop>
+  <tabstop>edgeSource3</tabstop>
+  <tabstop>edgeTarget3</tabstop>
+  <tabstop>vertexField1</tabstop>
+  <tabstop>vertexDomain1</tabstop>
+  <tabstop>vertexHidden1</tabstop>
+  <tabstop>vertexField2</tabstop>
+  <tabstop>vertexDomain2</tabstop>
+  <tabstop>vertexHidden2</tabstop>
+  <tabstop>vertexField3</tabstop>
+  <tabstop>vertexDomain3</tabstop>
+  <tabstop>vertexHidden3</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

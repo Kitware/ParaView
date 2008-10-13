@@ -1,0 +1,39 @@
+<RCC>
+    <qresource prefix="/CommonToolbar" >
+        <file>Icons/attribute_64.png</file>
+        <file>Icons/attribute_reload_64.png</file>
+        <file>Icons/internet_64.png</file>
+        <file>Icons/palette_64.png</file>
+        <file>Icons/smile_confused_help_64.png</file>
+        <file>Icons/statistic_64.png</file>
+        <file>Icons/attribute_48.png</file>
+        <file>Icons/attribute_reload_48.png</file>
+        <file>Icons/internet_48.png</file>
+        <file>Icons/palette_48.png</file>
+        <file>Icons/smile_confused_help_48.png</file>
+        <file>Icons/statistic_48.png</file>
+        <file>Icons/attribute_32.png</file>
+        <file>Icons/attribute_reload_32.png</file>
+        <file>Icons/internet_32.png</file>
+        <file>Icons/palette_32.png</file>
+        <file>Icons/smile_confused_help_32.png</file>
+        <file>Icons/statistic_32.png</file>
+        <file>Icons/pie_chart_32.png</file>
+        <file>Icons/line_chart_32.png</file>
+        <file>Icons/column_chart_32.png</file>
+        <file>Icons/area_chart_32.png</file>
+        <file>Icons/pie_chart_48.png</file>
+        <file>Icons/line_chart_48.png</file>
+        <file>Icons/column_chart_48.png</file>
+        <file>Icons/area_chart_48.png</file>
+        <file>Icons/database2table_48.png</file>
+        <file>Icons/database2graph_48.png</file>
+        <file>Icons/table_48.png</file>
+        <file>Icons/column_zoom_48.png</file>
+        <file>Icons/landscape_view_48.png</file>
+        <file>Icons/nearest_neighbor_48.png</file>
+        <file>Icons/men_working_48.png</file>
+        <file>Icons/extract_graph_48.png</file>
+        <file>Icons/row_zoom_48.png</file>
+    </qresource>
+</RCC>  
