@@ -20,6 +20,7 @@ paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView
 paraview_build_optional_plugin(ClientHierarchyView "ClientHierarchyView" ClientHierarchyView OFF)
 paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
+paraview_build_optional_plugin(GraphLayoutFilterPanel "GraphLayoutFilterPanel" GraphLayoutFilterPanel OFF)
 paraview_build_optional_plugin(Infovis "Infovis" Infovis OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
 paraview_build_optional_plugin(SplitTableFieldPanel "SplitTableFieldPanel" SplitTableFieldPanel OFF) 
