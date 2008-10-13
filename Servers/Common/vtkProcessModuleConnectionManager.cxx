@@ -33,7 +33,12 @@
 #include "vtkSmartPointer.h"
 #include "vtkSocketCollection.h"
 #include "vtkSocketController.h"
+#include "vtkTimerLog.h"
 
+#include "vtksys/SystemTools.hxx"
+
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <vtkstd/map>
 #include <vtkstd/deque>
@@ -72,7 +77,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.23");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.24");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -261,14 +266,26 @@ vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
   // Create a RemoteConnection (Server/Client)
   // Set the client socket on its controller.
   // Manage the client socket.
-  vtkClientSocket* cs = vtkClientSocket::New();
-  if (cs->ConnectToServer(hostname, port) == -1)
+  VTK_CREATE(vtkClientSocket, cs);
+  VTK_CREATE(vtkTimerLog, timer);
+  timer->StartTimer();
+  while (1)
     {
-    cs->Delete();
-    return id;
+    if (cs->ConnectToServer(hostname, port) != -1)
+      {
+      id = this->CreateConnection(cs, 0, 1);
+      break;
+      }
+    timer->StopTimer();
+    if (timer->GetElapsedTime() > 60.0)
+      {
+      vtkErrorMacro(<< "Connect timeout.");
+      break;
+      }
+    vtkWarningMacro(<< "Connect failed.  Retrying for "
+                    << (60.0 - timer->GetElapsedTime()) << " more seconds.");
+    vtksys::SystemTools::Delay(1000);
     }
-  id = this->CreateConnection(cs, 0, 1); 
-  cs->Delete();
   return id;
 }
 
