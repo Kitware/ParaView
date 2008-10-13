@@ -28,7 +28,7 @@ MACRO(configure_plugin PLUGIN)
     # so they can be located at startup ...
     SET(BUNDLE_PATH "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS")
     FILE(MAKE_DIRECTORY "${BUNDLE_PATH}")
-    EXECUTE_PROCESS(COMMAND ln -sf "${EXECUTABLE_OUTPUT_PATH}/lib${PLUGIN}Plugin.dylib" "${BUNDLE_PATH}/libOverView${PLUGIN}.dylib")
+    EXECUTE_PROCESS(COMMAND ln -sf "${EXECUTABLE_OUTPUT_PATH}/lib${PLUGIN}Plugin.dylib" "${BUNDLE_PATH}/lib${PLUGIN}Plugin.dylib")
 
   ENDIF(APPLE)
 ENDMACRO(configure_plugin)
