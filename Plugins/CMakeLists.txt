@@ -27,4 +27,5 @@ paraview_build_optional_plugin(SplitTableFieldPanel "SplitTableFieldPanel" Split
 paraview_build_optional_plugin(StatisticsToolbar "StatisticsToolbar" StatisticsToolbar OFF) 
 paraview_build_optional_plugin(TableToGraphPanel "TableToGraphPanel" TableToGraphPanel OFF) 
 paraview_build_optional_plugin(TableToSparseArrayPanel "TableToSparseArrayPanel" TableToSparseArrayPanel OFF) 
+paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
 

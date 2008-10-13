@@ -33,6 +33,5 @@ allow_plugin(GraphLayoutFilterPanel)
 allow_plugin(SplitTableFieldPanel)
 allow_plugin(StatisticsToolbar)
 allow_plugin(TableToSparseArrayPanel)
-
-
+allow_plugin(ThresholdTablePanel)
 

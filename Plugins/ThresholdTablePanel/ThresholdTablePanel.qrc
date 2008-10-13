@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/ThresholdTablePanel" >
+        <file>ThresholdTablePanel.ui</file>
+    </qresource>
+</RCC>  
