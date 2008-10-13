@@ -30,6 +30,7 @@ allow_plugin(ClientGeoView)
 allow_plugin(ClientHierarchyView)
 allow_plugin(ClientRecordView)
 allow_plugin(SplitTableFieldPanel)
+allow_plugin(StatisticsToolbar)
 allow_plugin(TableToSparseArrayPanel)
 
 

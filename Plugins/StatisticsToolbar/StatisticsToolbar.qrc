@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/StatisticsToolbar" >
+        <file>Icons/descriptive_stats_48.png</file>
+        <file>Icons/order_stats_48.png</file>
+        <file>Icons/correlative_stats_48.png</file>
+        <file>Icons/contingency_stats_48.png</file>
+        <file>Icons/statistic_32.png</file>
+        <file>Icons/statistic_48.png</file>
+        <file>Icons/statistic_64.png</file>
+    </qresource>
+</RCC>  
