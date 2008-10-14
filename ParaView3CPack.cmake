@@ -1,6 +1,16 @@
 # setup CPack
 
+# This ensures that CMake doesn't add the install rules to install the
+# system libraries. We add them to one of the components we install.
+SET (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP 1)
 INCLUDE(InstallRequiredSystemLibraries)
+IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+    DESTINATION ${PV_EXE_INSTALL_CM24}
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime)
+ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${ParaView_BINARY_DIR};ParaView;Runtime;/;${ParaView_BINARY_DIR};VTK Runtime Libs;RuntimeLibraries;/;${ParaView_BINARY_DIR};VTK Executables;RuntimeExecutables;/")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ParaView is a scientific visualization tool")
 SET(CPACK_PACKAGE_VENDOR "Kitware Inc.")
