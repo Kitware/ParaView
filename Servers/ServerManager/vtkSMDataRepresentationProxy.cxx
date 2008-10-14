@@ -53,7 +53,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.11");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -338,8 +338,9 @@ vtkPVDataInformation* vtkSMDataRepresentationProxy::GetRepresentedDataInformatio
     if (update)
       {
       // update part of pipeline to obtain correct data size information.
-      iter->GetPointer()->UpdateDataInformation();
+      iter->GetPointer()->Update();
       }
+    iter->GetPointer()->UpdateDataInformation();
     return iter->GetPointer()->GetRepresentedDataInformation();
     }
 
