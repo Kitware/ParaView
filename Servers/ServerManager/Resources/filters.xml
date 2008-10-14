@@ -5646,8 +5646,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           This property specifies which array use as colour scalars
         </Documentation>
       </StringVectorProperty>
+   </SourceProxy>
 
-      <!-- End vtkTemporalTrailsFilter -->
+   <!-- End TemporalPathLineFilter -->
 
    <!-- ==================================================================== -->
     <SourceProxy name="ParticleTracer" class="vtkTemporalStreamTracer">
