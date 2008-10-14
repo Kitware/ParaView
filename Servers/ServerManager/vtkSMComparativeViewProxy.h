@@ -115,8 +115,6 @@ public:
   // Returns a new proxy.
   // Overridden to forward the call to the internal root view proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
-    { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
   // Description:
   // Get all the internal views. The views should only be used to be layed out

@@ -65,8 +65,6 @@ public:
   // Description:
   // Forwards the call to internal view.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
-    { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
   // Description:
   // Forwards the call to internal view.

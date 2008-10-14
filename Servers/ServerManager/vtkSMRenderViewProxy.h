@@ -243,8 +243,6 @@ public:
   // Returns a new proxy.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(
     vtkSMProxy*, int opport);
-  virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy* proxy)
-    { return this->Superclass::CreateDefaultRepresentation(proxy); }
 
   // Description:
   // Generally each view type is different class of view eg. bar char view, line
