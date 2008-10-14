@@ -7006,68 +7006,7 @@ Tessellate a higher-order dataset.
     <!-- End OrderedCompositeDistributor -->
     </SourceProxy>
 
-    <UpdateSuppressorProxy name="UpdateSuppressor" class="vtkPVUpdateSuppressor"
-      executive="vtkUpdateSuppressorPipeline">
-      <InputProperty
-        name="Input"
-        command="SetInputConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <!-- Does this have any data type domain? -->
-          <Documentation>
-            Set the input to the Update Suppressor filter.
-          </Documentation>
-      </InputProperty>
-      <Property
-        name="ForceUpdate"
-        command="ForceUpdate"
-        is_internal="1">
-      </Property>
-      <Property
-        name="RemoveAllCaches"
-        command="RemoveAllCaches"
-        immediate_update="1">
-      </Property>
-      <IntVectorProperty
-        name="CacheUpdate"
-        command="CacheUpdate"
-        number_of_elements="2"
-        default_values="0 -1"
-        is_internal="1">
-        <IntRangeDomain name="range" min="0 -1" />
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="SaveCacheOnCacheUpdate"
-        command="SetSaveCacheOnCacheUpdate"
-        number_of_elements="1"
-        is_internal="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty
-        name="Enabled"
-        command="SetEnabled"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Toggle whether the update suppressor is enabled.
-        </Documentation>
-      </IntVectorProperty>
-      <DoubleVectorProperty
-        name="UpdateTime"
-        command="SetUpdateTime"
-        number_of_elements="1"
-        default_values="none"
-        immediate_update="1"
-        is_internal="1">
-        <DoubleRangeDomain name="range"/>
-      </DoubleVectorProperty>
-    <!-- End UpdateSuppressor -->
-    </UpdateSuppressorProxy>
-
+   <!-- ==================================================================== -->
     <UpdateSuppressorProxy name="UpdateSuppressor2" class="vtkPVUpdateSuppressor"
       executive="vtkUpdateSuppressorPipeline">
 
@@ -7084,17 +7023,7 @@ Tessellate a higher-order dataset.
       </InputProperty>
 
       <Property name="ForceUpdate" command="ForceUpdate" />
-      <Property name="RemoveAllCaches" command="RemoveAllCaches" />
 
-      <DoubleVectorProperty
-        name="CacheUpdate"
-        command="CacheUpdate"
-        number_of_elements="1"
-        default_values="none"
-        is_internal="1" >
-        <DoubleRangeDomain name="range" />
-      </DoubleVectorProperty>
-      
       <IntVectorProperty
         name="Enabled"
         command="SetEnabled"
@@ -7118,6 +7047,47 @@ Tessellate a higher-order dataset.
 
       <!-- End UpdateSuppressor2 -->
     </UpdateSuppressorProxy>
+
+   <!-- ==================================================================== -->
+    <SourceProxy name="CacheKeeper" class="vtkPVCacheKeeper"
+      executive="vtkPVCacheKeeperPipeline">
+      <Documentation>
+        vtkPVCacheKeeper manages data cache for flip book animations.  When
+        caching is disabled, this simply acts as a pass through filter.  When
+        caching is enabled, is the current time step has been previously cached
+        then this filter shuts the update request, otherwise propagates the
+        update and then cache the result for later use.  The current time step
+        is set using SetCacheTime().
+      </Documentation>
+
+      <InputProperty name="Input"
+        command="SetInputConnection">
+          <Documentation>
+            Set the input to the Update Suppressor filter.
+          </Documentation>
+      </InputProperty>
+
+      <Property name="RemoveAllCaches" command="RemoveAllCaches" />
+
+      <DoubleVectorProperty name="CacheTime"
+        command="SetCacheTime"
+        number_of_elements="1"
+        default_values="0.0" >
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      
+      <IntVectorProperty name="CachingEnabled"
+        command="SetCachingEnabled"
+        number_of_elements="1"
+        is_internal="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Toggle whether the caching is enabled.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of CacheKeeper -->
+    </SourceProxy>
     
    <!-- ==================================================================== -->
     <SourceProxy name="MPIMoveData" class="vtkMPIMoveData">

@@ -18,14 +18,16 @@
 #include "vtkInformation.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataSizeInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMPropertyHelper.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.19");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.20");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
   RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
@@ -58,6 +60,9 @@ vtkSMRepresentationStrategy::vtkSMRepresentationStrategy()
   vtkPVGeometryInformation* info = vtkPVGeometryInformation::New();
   this->SetRepresentedDataInformation(info);
   info->Delete();
+
+  this->CacheKeeper = 0;
+  this->SomethingCached = false;
 }
 
 //----------------------------------------------------------------------------
@@ -114,6 +119,7 @@ void vtkSMRepresentationStrategy::InvalidatePipeline()
 {
   this->DataValid = false;
   this->InformationValid = false;
+  this->CleanCacheIfObsolete();
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +127,17 @@ void vtkSMRepresentationStrategy::InvalidateLODPipeline()
 {
   this->LODDataValid = false;
   this->LODInformationValid = false;
+  this->CleanCacheIfObsolete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::CleanCacheIfObsolete()
+{
+  if (this->SomethingCached && !this->GetUseCache())
+    {
+    this->SomethingCached = false;
+    this->CacheKeeper->InvokeCommand("RemoveAllCaches");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -134,26 +151,9 @@ unsigned long vtkSMRepresentationStrategy::GetDisplayedMemorySize()
 }
 
 //----------------------------------------------------------------------------
-inline int vtkSMRepresentationStrategyGetInt(vtkSMProxy* proxy, 
-  const char* pname, int default_value)
-{
-  if (proxy && pname)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      proxy->GetProperty(pname));
-    if (ivp)
-      {
-      return ivp->GetElement(0);
-      }
-    }
-  return default_value;
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMRepresentationStrategy::GetUseLOD()
 {
   return (this->EnableLOD && this->UseLOD);
-;
 }
 
 //----------------------------------------------------------------------------
@@ -185,6 +185,17 @@ void vtkSMRepresentationStrategy::Update()
   if (this->UpdateRequired())
     {
     this->InvokeEvent(vtkCommand::StartEvent);
+
+    // Update the CacheKeeper.
+    bool cachingEnabled = this->GetUseCache();
+    vtkSMPropertyHelper(this->CacheKeeper, "CachingEnabled").Set(
+      cachingEnabled? 1 : 0);
+    vtkSMPropertyHelper(this->CacheKeeper, "CacheTime").Set(this->CacheTime);
+    this->CacheKeeper->UpdateVTKObjects();
+    if (cachingEnabled)
+      {
+      this->SomethingCached = true;
+      }
 
     if (!this->DataValid)
       {
@@ -226,6 +237,16 @@ void vtkSMRepresentationStrategy::UpdateDataInformation()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::GatherInformation(vtkPVInformation* info)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    this->CacheKeeper->GetServers(),
+    info,
+    this->CacheKeeper->GetID());
+}
+
+//----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::AddInput(unsigned int vtkNotUsed(inputPort),
                                            vtkSMSourceProxy* input,
                                            unsigned int outputPort,
@@ -242,12 +263,13 @@ void vtkSMRepresentationStrategy::AddInput(unsigned int vtkNotUsed(inputPort),
   // is going to disappear in near future.
   this->CreateVTKObjects();
 
-  this->CreatePipeline(this->Input, this->OutputPort);
+  this->Connect(this->Input, this->CacheKeeper, "Input", this->OutputPort);
+  this->CreatePipeline(this->CacheKeeper, 0);
 
   // LOD pipeline is created only if EnableLOD is true.
   if (this->EnableLOD)
     {
-    this->CreateLODPipeline(this->Input, this->OutputPort);
+    this->CreateLODPipeline(this->CacheKeeper, 0);
     }
 }
 
@@ -260,6 +282,14 @@ void vtkSMRepresentationStrategy::CreateVTKObjects()
     this->Superclass::CreateVTKObjects();
     this->EndCreateVTKObjects();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMRepresentationStrategy::BeginCreateVTKObjects()
+{
+  this->CacheKeeper = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("CacheKeeper"));
+  this->CacheKeeper->SetServers(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------

@@ -182,7 +182,7 @@ protected:
 
   // Description:
   // Called before objects are created.
-  virtual void BeginCreateVTKObjects(){};
+  virtual void BeginCreateVTKObjects();
 
   // Description:
   // Called after objects are created.
@@ -202,13 +202,15 @@ protected:
   // Gather the information of the displayed data (non-LOD).
   // Update the part of the pipeline needed to gather full information
   // and then gather that information. 
-  virtual void GatherInformation(vtkPVInformation*)= 0;
+  virtual void GatherInformation(vtkPVInformation*);
 
   // Description:
   // Gather the information of the displayed data (lod);
   // Update the part of the pipeline needed to gather full information
   // and then gather that information. 
-  virtual void GatherLODInformation(vtkPVInformation*) = 0;
+  // Default implementation simply calls GatherInformation().
+  virtual void GatherLODInformation(vtkPVInformation* info)
+    { this->GatherInformation(info); }
 
   // Description:
   // Update the LOD pipeline. Subclasses must override this method
@@ -223,17 +225,15 @@ protected:
   // Subclasses must override this method
   // to provide their own implementation and then call the superclass
   // to ensure that various flags are updated correctly.
-  // This method should respect caching, if supported. Call
-  // UseCache() to check if caching is to be employed.
   virtual void UpdatePipeline();
 
   // Description:
   // Invalidates the LOD pipeline.
-  virtual void InvalidateLODPipeline();
+  void InvalidateLODPipeline();
 
   // Description:
   // Invalidates the full resolution pipeline.
-  virtual void InvalidatePipeline();
+  void InvalidatePipeline();
 
   // Description:
   // Creates a connection between the producer and the consumer
@@ -272,10 +272,6 @@ protected:
       }
     }
 
-
-  vtkSMSourceProxy* Input;
-  int OutputPort;
-
   bool UseCache;
   bool UseLOD;
   double CacheTime;
@@ -294,10 +290,26 @@ protected:
   bool KeepLODPipelineUpdated;
 
   vtkInformation* ViewInformation;
+
+  vtkSMSourceProxy* Input;
+  int OutputPort;
+
+private:
+  // Description:
+  // Cleans cache. Called in InvalidatePipeline() and InvalidateLODPipeline().
+  // Cache is not cleaned if caching is enabled since it implies that we are
+  // building cache.
+  void CleanCacheIfObsolete();
+
+  // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
+  // server.
+  bool SomethingCached;
+
 private:
   vtkSMRepresentationStrategy(const vtkSMRepresentationStrategy&); // Not implemented
   void operator=(const vtkSMRepresentationStrategy&); // Not implemented
 
+  vtkSMSourceProxy* CacheKeeper;
   bool EnableLOD;
 
   vtkCommand* Observer;

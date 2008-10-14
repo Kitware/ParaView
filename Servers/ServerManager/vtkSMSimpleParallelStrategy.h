@@ -49,18 +49,6 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Gather the information of the displayed data (non-LOD).
-  // Update the part of the pipeline needed to gather full information
-  // and then gather that information. 
-  virtual void GatherInformation(vtkPVInformation*);
-
-  // Description:
-  // Gather the information of the displayed data (lod);
-  // Update the part of the pipeline needed to gather full information
-  // and then gather that information. 
-  virtual void GatherLODInformation(vtkPVInformation*);
-
-  // Description:
   // Update the LOD pipeline.
   // Overridden to pass correct collection decision to the Collect filter
   // based on UseCompositing flag.
@@ -92,6 +80,11 @@ protected:
 
   vtkSMSourceProxy* PreCollectUpdateSuppressorLOD;
   vtkSMSourceProxy* CollectLOD;
+  
+  // In client-server (or parallel) we want to avoid data-movement when caching,
+  // hence we use the PostCollectCacheKeeper.
+  // This is directly liked to the CacheKeeper (using property linking).
+  vtkSMSourceProxy* PostCollectCacheKeeper;
 
   bool UseCompositing;
   bool LODClientRender; // when set, indicates that data must be made available on client,
@@ -99,6 +92,7 @@ protected:
 
   bool LODClientCollect; // When set, the data delivered to client is outline of the data
                       // not the whole data.
+
 private:
   vtkSMSimpleParallelStrategy(const vtkSMSimpleParallelStrategy&); // Not implemented
   void operator=(const vtkSMSimpleParallelStrategy&); // Not implemented

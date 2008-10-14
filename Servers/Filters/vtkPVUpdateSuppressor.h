@@ -13,19 +13,17 @@
 
 =========================================================================*/
 // .NAME vtkPVUpdateSuppressor - prevents propagation of update
-// .SECTION Description  I am also going to have this object manage
-// flip books (geometry cache).
+// .SECTION Description 
 // vtkPVUpdateSuppressor now uses the vtkProcessModule singleton to set up the
 // default values for UpdateNumberOfPieces and UpdatePiece, so we no longer have
 // to set the default values (in most cases).
+// .SECTION See Also
+// vtkPVCacheKeeper vtkUpdateSuppressorPipeline
 
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
 #include "vtkDataObjectAlgorithm.h"
-
-class vtkCacheSizeKeeper;
-class vtkPVUpdateSuppressorCacheMap;
 
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataObjectAlgorithm
 {
@@ -36,21 +34,6 @@ public:
   // Description:
   // Construct with user-specified implicit function.
   static vtkPVUpdateSuppressor *New();
-
-  // Description:
-  // Methods for saving, clearing and updating flip books.
-  // This removes all saved cache.
-  void RemoveAllCaches();
-
-  // Description:
-  // Force update with caching, cacheTime is the key used to save/restore the
-  // cached data.
-  void CacheUpdate(double cacheTime);
-
-  // Description:
-  // Returns if the given \c cacheTime is available in the cache. 
-  // Does not cause any updates.
-  int IsCached(double cacheTime);
 
   // Description:
   // Force update on the input.
@@ -77,12 +60,6 @@ public:
   void SetUpdateTime(double utime);
   vtkGetMacro(UpdateTime, double);
 
-  // Description:
-  // Get/Set the cache size keeper. The update suppressor
-  // reports its cache size to this keeper, if any.
-  void SetCacheSizeKeeper(vtkCacheSizeKeeper*);
-  vtkGetObjectMacro(CacheSizeKeeper, vtkCacheSizeKeeper);
-
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
@@ -100,15 +77,12 @@ protected:
 
   int Enabled;
 
-  vtkCacheSizeKeeper* CacheSizeKeeper;
   vtkTimeStamp PipelineUpdateTime;
 
-  int SaveCacheOnCacheUpdate;
 
   // Create a default executive.
   virtual vtkExecutive* CreateDefaultExecutive();
 
-  vtkPVUpdateSuppressorCacheMap* Cache;
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.
   void operator=(const vtkPVUpdateSuppressor&);  // Not implemented.

@@ -58,12 +58,6 @@ protected:
   virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Gather the information of the displayed data (non-LOD).
-  // Update the part of the pipeline needed to gather full information
-  // and then gather that information. 
-  virtual void GatherInformation(vtkPVInformation*);
-
-  // Description:
   // Gather the information of the displayed data (lod);
   // Update the part of the pipeline needed to gather full information
   // and then gather that information. 
@@ -82,17 +76,7 @@ protected:
   // Subclasses must override this method
   // to provide their own implementation and then call the superclass
   // to ensure that various flags are updated correctly.
-  // This method should respect caching, if supported. Call
-  // GetUseCache() to check if caching is to be employed.
   virtual void UpdatePipeline();
-
-  // Description:
-  // Invalidates the full resolution pipeline, overridden to clean up cache.
-  virtual void InvalidatePipeline();
-
-  // Description:
-  // Invalidates the LOD pipeline, overridden to clean up cache.
-  virtual void InvalidateLODPipeline();
 
   // Description:
   // Called when the ViewHelperProxy is modified to set LOD resolution.
@@ -103,12 +87,6 @@ protected:
   vtkSMSourceProxy* UpdateSuppressor;
   vtkSMSourceProxy* UpdateSuppressorLOD;
   vtkSMSourceProxy* LODDecimator;
-
-  // Flag used to avoid unnecessary "RemoveAllCaches" requests being set to the
-  // server.
-  bool SomethingCached;
-  bool SomethingCachedLOD;
-
 
 private:
   vtkSMSimpleStrategy(const vtkSMSimpleStrategy&); // Not implemented

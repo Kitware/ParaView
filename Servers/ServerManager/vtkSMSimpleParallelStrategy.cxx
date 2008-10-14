@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.23");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.24");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -344,101 +344,6 @@ void vtkSMSimpleParallelStrategy::ProcessViewInformation()
     }
 
   this->Superclass::ProcessViewInformation();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::GatherInformation(vtkPVInformation* info)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (this->GetUseCache())
-    {
-    // when using cache, if the cached time is available in the update
-    // suppressor that caches, then we use the information from that update
-    // suppressor, else we follow the usual procedure.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->UpdateSuppressor->GetID()
-           << "IsCached"
-           << this->CacheTime
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
-
-    vtkClientServerStream values;
-    int is_cached=false;
-    if (pm->GetLastResult(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &values) &&
-      values.GetArgument(0, 1, &is_cached) && 
-      is_cached)
-      {
-      this->SomethingCached = true;
-      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UpdateSuppressor->GetProperty("CacheUpdate"));
-      dvp->SetElement(0, this->CacheTime);
-      this->UpdateSuppressor->UpdateProperty("CacheUpdate", 1);
-      pm->GatherInformation(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER_ROOT,
-        info,
-        this->UpdateSuppressor->GetID());
-      return;
-      }
-    }
-
-  // Update the pipeline partially until before the Collect proxy
-  this->PreCollectUpdateSuppressor->InvokeCommand("ForceUpdate");
-  // This is called for its side-effects; i.e. to force a PostUpdateData()
-  this->PreCollectUpdateSuppressor->UpdatePipeline();
-  pm->GatherInformation(this->ConnectionID,
-    vtkProcessModule::DATA_SERVER_ROOT,
-    info,
-    this->PreCollectUpdateSuppressor->GetID());
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::GatherLODInformation(vtkPVInformation* info)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  // First update the pipeline partially until before the Collect proxy
-  if (this->GetUseCache())
-    {
-    // when using cache, if the cached time is available in the update
-    // suppressor that caches, then we use the information from that update
-    // suppressor, else we follow the usual procedure.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->UpdateSuppressorLOD->GetID()
-           << "IsCached"
-           << this->CacheTime
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
-
-    vtkClientServerStream values;
-    int is_cached=false;
-    if (pm->GetLastResult(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &values) &&
-      values.GetArgument(0, 1, &is_cached) && 
-      is_cached)
-      {
-      this->SomethingCached = true;
-      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UpdateSuppressorLOD->GetProperty("CacheUpdate"));
-      dvp->SetElement(0, this->CacheTime);
-      this->UpdateSuppressorLOD->UpdateProperty("CacheUpdate", 1);
-      pm->GatherInformation(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER_ROOT,
-        info,
-        this->UpdateSuppressorLOD->GetID());
-      return;
-      }
-    }
-
-  // Update the pipeline partially until before the Collect proxy
-  this->PreCollectUpdateSuppressorLOD->InvokeCommand("ForceUpdate");
-  pm->GatherInformation(this->ConnectionID,
-    vtkProcessModule::DATA_SERVER_ROOT,
-    info,
-    this->PreCollectUpdateSuppressorLOD->GetID());
 }
 
 //----------------------------------------------------------------------------

@@ -15,7 +15,6 @@
 #include "vtkPVUpdateSuppressor.h"
 
 #include "vtkAlgorithmOutput.h"
-#include "vtkCacheSizeKeeper.h"
 #include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataPipeline.h"
@@ -41,25 +40,8 @@
 # define vtkMyDebug(x)
 #endif
 
-class vtkPVUpdateSuppressorCacheMap : 
-  public vtkstd::map<double, vtkSmartPointer<vtkDataObject> >
-{
-public:
-  unsigned long GetActualMemorySize() 
-    {
-    unsigned long actual_size = 0;
-    vtkPVUpdateSuppressorCacheMap::iterator iter;
-    for (iter = this->begin(); iter != this->end(); ++iter)
-      {
-      actual_size += iter->second.GetPointer()->GetActualMemorySize();
-      }
-    return actual_size;
-    }
-};
-
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.62");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.63");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
-vtkCxxSetObjectMacro(vtkPVUpdateSuppressor, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
@@ -69,18 +51,13 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
   this->UpdateTime = 0.0;
   this->UpdateTimeInitialized = false;
 
-  this->Cache = new vtkPVUpdateSuppressorCacheMap();
 
   this->Enabled = 1;
 
-  this->CacheSizeKeeper = 0;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   if (pm)
     {
-    this->SetCacheSizeKeeper(
-      vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
-
     this->UpdateNumberOfPieces = pm->GetNumberOfLocalPartitions();
     this->UpdatePiece = pm->GetPartitionId();
     }
@@ -89,13 +66,6 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
-  this->RemoveAllCaches();
-
-  // Unset cache keeper only after having cleared the cache.
-  this->SetCacheSizeKeeper(0);
-
-  delete this->Cache;
-  this->Cache = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -189,77 +159,6 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   this->PipelineUpdateTime.Modified();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::RemoveAllCaches()
-{
-  unsigned long freed_size = this->Cache->GetActualMemorySize();
-  this->Cache->clear();
-  if (freed_size > 0 && this->CacheSizeKeeper)
-    {
-    // Tell the cache size keeper about the newly freed memory size.
-    this->CacheSizeKeeper->FreeCacheSize(freed_size);
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVUpdateSuppressor::IsCached(double cacheTime)
-{
-  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(cacheTime);
-  return  (iter == this->Cache->end())? 0 : 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::CacheUpdate(double cacheTime)
-{
-  vtkPVUpdateSuppressorCacheMap::iterator iter = this->Cache->find(cacheTime);
-  vtkDataObject* output = this->GetOutput();
-  if (iter == this->Cache->end())
-    {
-    // No cache present, force update.
-    this->ForceUpdate();
-  
-    if (!this->CacheSizeKeeper  || !this->CacheSizeKeeper->GetCacheFull())
-      {
-      vtkSmartPointer<vtkDataObject> cache;
-      cache.TakeReference(output->NewInstance());
-      cache->ShallowCopy(output);
-
-      // FIXME: I am commenting this code as I don't know what it's doing.
-      // // Compositing seems to update the input properly.
-      // // But this update is needed when doing animation without compositing.
-      cache->Update();
-      (*this->Cache)[cacheTime] = cache;
-
-      if (this->CacheSizeKeeper)
-        {
-        // Register used cache size.
-        this->CacheSizeKeeper->AddCacheSize(cache->GetActualMemorySize());
-        }
-
-      vtkMyDebug(this->UpdatePiece << " "
-        << "Cached data: " << cacheTime 
-        << " " << vtkDataSet::SafeDownCast(cache)->GetNumberOfPoints() << endl);
-      }
-    else
-      {
-      vtkMyDebug(this->UpdatePiece << " "
-        << "Cached data: " << cacheTime 
-        << " -- not caching since cache full" << endl);
-      }
-    }
-  else
-    {
-    // Using the cached data.
-    output->ShallowCopy(iter->second.GetPointer());
-    vtkMyDebug( 
-      this->UpdatePiece << " "
-      << "Using cache: " << cacheTime 
-      << " " << vtkDataSet::SafeDownCast(output)->GetNumberOfPoints() << endl)
-    }
-  this->PipelineUpdateTime.Modified();
-  this->Modified();
-  output->Modified();
-}
 
 //----------------------------------------------------------------------------
 vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
@@ -328,6 +227,5 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
-  os << indent << "CacheSizeKeeper: " << this->CacheSizeKeeper << endl;
   os << indent << "UpdateTime: " << this->UpdateTime << endl;
 }

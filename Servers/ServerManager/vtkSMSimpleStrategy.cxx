@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.13");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.14");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -31,8 +31,6 @@ vtkSMSimpleStrategy::vtkSMSimpleStrategy()
   this->UpdateSuppressor = 0;
   this->UpdateSuppressorLOD = 0;
   this->SetEnableLOD(true);
-  this->SomethingCached = false;
-  this->SomethingCachedLOD = false;
 }
 
 //----------------------------------------------------------------------------
@@ -80,98 +78,34 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputp
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::GatherInformation(vtkPVInformation* info)
-{
-  this->UpdatePipeline(); // Update to get the geometry information;
-                          // used to get sizes etc. to make collection
-                          // decisions etc.
-
-  // For simple strategy information sub-pipline is same as the full pipeline
-  // since no data movements are involved.
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->GatherInformation(this->ConnectionID,
-    vtkProcessModule::DATA_SERVER_ROOT,
-    info,
-    this->UpdateSuppressor->GetID());
-}
-
-//----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::GatherLODInformation(vtkPVInformation* info)
 {
-  this->UpdateLODPipeline();
-
-  // For simple strategy information sub-pipline is same as the full pipeline
-  // since no data movements are involved.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->GatherInformation(this->ConnectionID,
-    vtkProcessModule::DATA_SERVER_ROOT,
+    this->LODDecimator->GetServers(),
     info,
-    this->UpdateSuppressorLOD->GetID());
+    this->LODDecimator->GetID());
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdatePipeline()
 {
-  if (this->GetUseCache())
-    {
-    this->SomethingCached = true;
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->UpdateSuppressor->GetProperty("CacheUpdate"));
-    dvp->SetElement(0, this->CacheTime);
-    this->UpdateSuppressor->UpdateProperty("CacheUpdate", 1);
-    }
-  else
-    {
-    this->UpdateSuppressor->InvokeCommand("ForceUpdate");
-    // This is called for its side-effects; i.e. to force a PostUpdateData()
-    this->UpdateSuppressor->UpdatePipeline();
-    }
+  this->UpdateSuppressor->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->UpdateSuppressor->UpdatePipeline();
+
   this->Superclass::UpdatePipeline();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdateLODPipeline()
 {
-  if (this->GetUseCache())
-    {
-    this->SomethingCachedLOD = true;
-    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->UpdateSuppressorLOD->GetProperty("CacheUpdate"));
-    dvp->SetElement(0, this->CacheTime);
-    this->UpdateSuppressorLOD->UpdateProperty("CacheUpdate", 1);
-    }
-  else
-    {
-    this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
-    }
+  this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->UpdateSuppressorLOD->UpdatePipeline();
 
   this->Superclass::UpdateLODPipeline();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::InvalidatePipeline()
-{
-  // Cache is cleaned up whenever something changes and caching is not currently
-  // enabled.
-  if (this->SomethingCached && !this->GetUseCache())
-    {
-    this->SomethingCached = false;
-    this->UpdateSuppressor->InvokeCommand("RemoveAllCaches");
-    }
-
-  this->Superclass::InvalidatePipeline();
-}
-
-//----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::InvalidateLODPipeline()
-{
-  if (this->SomethingCachedLOD && !this->GetUseCache())
-    {
-    this->SomethingCachedLOD = false;
-    this->UpdateSuppressorLOD->InvokeCommand("RemoveAllCaches");
-    }
-
-  this->Superclass::InvalidateLODPipeline();
 }
 
 //----------------------------------------------------------------------------

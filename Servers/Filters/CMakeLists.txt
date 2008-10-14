@@ -68,6 +68,8 @@ SET(Filters_SRCS
   vtkPPhastaReader.cxx
   vtkPVAnimationScene.cxx
   vtkPVArrowSource.cxx
+  vtkPVCacheKeeper.cxx
+  vtkPVCacheKeeperPipeline.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVDesktopDeliveryClient.cxx

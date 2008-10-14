@@ -3021,6 +3021,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="CacheKeeper"
+          proxygroup="filters" proxyname="CacheKeeper" />
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="QuadricClustering" />
       </SubProxy>
@@ -3031,7 +3036,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="UpdateTime" />
-          <Property name="RemoveAllCaches" />
         </ExposedProperties>
       </SubProxy>
 
@@ -3042,8 +3046,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3061,8 +3063,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3078,8 +3078,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3099,8 +3097,6 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3116,8 +3112,6 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3173,6 +3167,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="CacheKeeper"
+          proxygroup="filters" proxyname="CacheKeeper" />
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="LODDecimator" 
           proxygroup="filters" proxyname="GeometryFilter" />
       </SubProxy>
@@ -3183,7 +3182,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="UpdateTime" />
-          <Property name="RemoveAllCaches" />
         </ExposedProperties>
       </SubProxy>
 
@@ -3194,8 +3192,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3213,8 +3209,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3230,8 +3224,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3251,8 +3243,6 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3268,8 +3258,6 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3299,6 +3287,11 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="CacheKeeper"
+          proxygroup="filters" proxyname="CacheKeeper" />
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
         </Proxy>
       </SubProxy>
@@ -3309,7 +3302,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="UpdateTime" />
-          <Property name="RemoveAllCaches" />
         </ExposedProperties>
       </SubProxy>
 
@@ -3331,8 +3323,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3358,12 +3348,16 @@
       </InputProperty>
 
       <SubProxy>
+        <Proxy name="CacheKeeper"
+          proxygroup="filters" proxyname="CacheKeeper" />
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
         <ExposedProperties>
           <Property name="UpdateTime" />
-          <Property name="RemoveAllCaches" />
         </ExposedProperties>
       </SubProxy>
 
@@ -3374,8 +3368,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3397,8 +3389,6 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 
@@ -3409,8 +3399,6 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
         </ShareProperties>
       </SubProxy>
 

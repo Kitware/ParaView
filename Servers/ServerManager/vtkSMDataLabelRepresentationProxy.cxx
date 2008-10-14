@@ -430,25 +430,6 @@ void vtkSMDataLabelRepresentationProxy::Update(
     }
 
   // check if we should UseCache
-
-  if (this->ViewInformation)
-  {
-  if (this->ViewInformation->Has(vtkSMViewProxy::USE_CACHE()))
-    {
-    if(this->ViewInformation->Get(vtkSMViewProxy::USE_CACHE())>0)
-      {
-      if (this->ViewInformation->Has(vtkSMViewProxy::CACHE_TIME()))
-        {
-        vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-          this->UpdateSuppressorProxy->GetProperty("CacheUpdate"));
-        dvp->SetElement(0, this->ViewInformation->Get(vtkSMViewProxy::CACHE_TIME()));
-        this->UpdateSuppressorProxy->UpdateProperty("CacheUpdate", 1);
-        return;
-        }
-      }
-    }
-  }
-
   if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
     {
     return;
@@ -499,13 +480,13 @@ void vtkSMDataLabelRepresentationProxy::InvalidateGeometryInternal(int useCache)
   if (!useCache)
     {
     this->GeometryIsValid = 0;
-    if (this->UpdateSuppressorProxy)
-      {
-      vtkSMProperty *p = 
-        this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-      p->Modified();
-      this->UpdateSuppressorProxy->UpdateVTKObjects();
-      }
+    //if (this->UpdateSuppressorProxy)
+    //  {
+    //  vtkSMProperty *p = 
+    //    this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+    //  p->Modified();
+    //  this->UpdateSuppressorProxy->UpdateVTKObjects();
+    //  }
     }
 }
 
