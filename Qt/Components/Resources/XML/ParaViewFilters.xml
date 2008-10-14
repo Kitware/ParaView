@@ -33,6 +33,7 @@
 
   <Category name="Temporal" menu_label="&amp;Temporal">    
     <Filter name="ParticleTracer" />    
+    <Filter name="ParticlePathLines" />
     <Filter name="TemporalCache" />    
     <Filter name="TemporalInterpolator" />    
     <Filter name="TemporalSnapToTimeStep" />    
@@ -96,6 +97,7 @@
   <Filter name="OutlineCornerFilter" />
   <Filter name="OutlineFilter" />
   <Filter name="ParticleTracer" />
+  <Filter name="ParticlePathLines" />
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
   <Filter name="Probe" />

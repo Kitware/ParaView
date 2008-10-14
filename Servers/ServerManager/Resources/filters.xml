@@ -5547,6 +5547,109 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
      </SourceProxy>
 
    <!-- ==================================================================== -->
+   
+    <SourceProxy name="ParticlePathLines" 
+              class="vtkTemporalPathLineFilter"
+              label="Particle Pathlines">
+      <Documentation
+         long_help="Creates polylines representing pathlines of animating particles"
+         short_help="Particle Pathlines">
+        Creates polylines representing pathlines of animating particles
+      </Documentation>
+      
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPointSet"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array" attribute_type="point"/>
+      </InputProperty>
+
+      <InputProperty
+         name="Selection"
+         command="SetSelectionConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+          name="MaskPoints"
+          command="SetMaskPoints"
+          number_of_elements="1"
+          default_values="100" >
+      </IntVectorProperty>
+
+      <IntVectorProperty
+          name="MaxTrackLength"
+          command="SetMaxTrackLength"
+          number_of_elements="1"
+          default_values="25" >
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="MaxStepDistance"
+         command="SetMaxStepDistance"
+         number_of_elements="3"
+         animateable="1"
+         default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Prevent spurious trails from wrapping around datasets or jumping between particles by limiting the distance allowed.)
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="UsePointIndexForIds"
+         command="SetUsePointIndexForIds"
+         number_of_elements="1"
+         default_values="1" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty 
+          name="IdChannelArray" 
+          command="SetIdChannelArray"
+          number_of_elements="1"
+          animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies the name of the array to use for Ids
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty 
+          name="ScalarArray" 
+          command="SetScalarArray"
+          number_of_elements="1"
+          element_types="2"
+          animateable="0">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property specifies which array use as colour scalars
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- End vtkTemporalTrailsFilter -->
+
+   <!-- ==================================================================== -->
     <SourceProxy name="ParticleTracer" class="vtkTemporalStreamTracer">
     <Documentation
        long_help="Trace Particles through time in a vector field."
