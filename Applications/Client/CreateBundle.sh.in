@@ -163,11 +163,12 @@ for a in $(cd "${FFMPEG_LIB_DIR}" && ls libavcodec*dylib* libavformat*dylib* lib
     if [ -e "${FFMPEG_LIB_DIR}/$a" ]; then
         echo -n .
         file=$(basename "${FFMPEG_LIB_DIR}/$a")
-	old_path=`otool -L ${executable} | grep ${file} | cut -f1 -d\( | grep -v :`
         for executable in ${EXECUTABLES}; do
+            old_path=`otool -L ${executable} | grep ${file} | cut -f1 -d\( | grep -v :`
             install_name_tool "${executable}" -change ${old_path} @executable_path/${file}
         done
         for executable in ${SUB_EXECUTABLES}; do
+            old_path=`otool -L ${executable} | grep ${file} | cut -f1 -d\( | grep -v :`
             install_name_tool "${executable}" -change ${old_path} @executable_path/../../../${file}
         done
         install_name_tool paraview.app/Contents/MacOS/${file} -id @executable_path/${file}
@@ -224,58 +225,6 @@ for a in QtCore QtGui QtNetwork QtXml QtAssistant QtSql; do
     install_name_tool -change ${QTLIBSTR}$a.framework/Versions/4/$a @executable_path/../Frameworks/$a.framework/Versions/4/$a $b
   done
 done
-
-
-################################################################################
-#
-echo "Installing python libraries"
-mkdir paraview.app/Contents/Frameworks/Python.Framework
-# We are assuming that python is installed as a framework. This will fail otherwise.
-PYTHON_FRAMEWORK_ROOT=@PYTHON_INCLUDE_PATH@/..
-if [ -e ${PYTHON_FRAMEWORK_ROOT}/Python ];  then
-    python_root=${PYTHON_FRAMEWORK_ROOT}
-elif [ -e ${PYTHON_FRAMEWORK_ROOT}/../../../Python ]; then
-    python_root=${PYTHON_FRAMEWORK_ROOT}/../../..
-fi
-
-cp ${python_root}/Python paraview.app/Contents/Frameworks/Python.Framework
-chmod u+w paraview.app/Contents/Frameworks/Python.Framework/Python
-
-echo "Copying python lib folder"
-mkdir paraview.app/Contents/MacOS/lib
-PYTHON_LIB_FOLDER="${python_root}/Versions/Current/lib"
-cp -R "${PYTHON_LIB_FOLDER}" paraview.app/Contents/MacOS
-
-
-################################################################################
-#
-echo ""
-echo "Stage 4 - Fix all the Python Frameworks"
-for a in Python; do
-  lib_name=paraview.app/Contents/Frameworks/$a.framework/$a
-  if [ -e ${lib_name} ]; then
-      # Try to find the line that shows the library name. This is what we will change.
-      old_path=`otool -L ${lib_name} | grep $a | cut -f1 -d\( | grep -v :`
-      install_name_tool -id @executable_path/../Frameworks/$a.framework/$a ${lib_name}
-      for executable in ${EXECUTABLES}; do
-        install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
-      done
-      for executable in ${SUB_EXECUTABLES}; do
-        install_name_tool "${executable}" -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a
-      done
-      
-      if [ "x$DEBUG" = "x1" ]; then
-        echo "Stage 3.a.$a"
-      fi
-      for b in $(ls paraview.app/Contents/MacOS/*.dylib); do
-        install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
-      done
-      for b in $(ls paraview.app/Contents/MacOS/*.so); do
-        install_name_tool -change ${old_path}  @executable_path/../Frameworks/$a.framework/$a $b
-      done
-  fi
-done
-
 
 ################################################################################
 #
