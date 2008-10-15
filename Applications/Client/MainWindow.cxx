@@ -929,9 +929,11 @@ QString Locate(const QString& appName)
     {
     QString path = app_dir;
     path += *dir;
+#if defined (__APPLE__)
+    path += appName + ".app/Contents/MacOS/";
+#endif
     path += appName;
-    //cout << "Checking : " << path.toAscii().data() << " ... ";
-    //cout.flush();
+    //cout << "Checking : " << path.toAscii().data() << " ... " << endl;
     QFileInfo finfo (path);
     if (finfo.exists())
       {
@@ -1006,7 +1008,6 @@ void MainWindow::makeAssistant()
     assistantExe = assistantExe.left(suffixIndex);
     }
 #endif
-
 
   this->Implementation->AssistantClient =
     new QAssistantClient(assistantExe, this);
