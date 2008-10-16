@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ProcessModuleGUIHelper.h"
 #include "pqMain.h"
 #include "pqComponentsInit.h"
+#include "pqOptions.h"
 
 #ifdef Q_WS_X11
 #include <QPlastiqueStyle>
@@ -59,8 +60,30 @@ int main(int argc, char* argv[])
   dir.cd("Plugins");
   QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
   ProcessModuleGUIHelper * guiHelper = ProcessModuleGUIHelper::New();
-  int reply = pqMain::Run(app, guiHelper);
+  int appStatus = 0;
+  pqOptions * options = NULL;
+  int reply = pqMain::preRun(app, guiHelper, options);
+  if (! reply)
+    {
+    reply = pqMain::Run(options);
+    if (! reply)
+      {
+      appStatus = app.exec();
+      }
+    else
+      {
+      return reply;
+      }
+
+    reply = guiHelper->postAppExec();
+    }
+
+  pqMain::postRun();
   guiHelper->Delete();
+  if (appStatus != 0)
+    {
+    return appStatus;
+    }
   return reply;
 }
 

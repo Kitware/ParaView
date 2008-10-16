@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
-  <pqevent object="MainWindow/pqCustomFilterManager/ImportButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
-  <pqevent object="MainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevation" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/ImportButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyElevation" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

@@ -10,20 +10,20 @@ if sys.platform == 'win32':
 if sys.platform == 'darwin':
     libname = 'libGUIConePanel.dylib'
 
-object1 = 'MainWindow/menubar/menuTools'
+object1 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
-object2 = 'MainWindow/pqPluginDialog/localGroup/loadLocal'
+object2 = 'pqClientMainWindow/pqPluginDialog/localGroup/loadLocal'
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'MainWindow/pqPluginDialog/pqFileDialog'
+object3 = 'pqClientMainWindow/pqPluginDialog/pqFileDialog'
 QtTesting.playCommand(object3, 'filesSelected', libname)
-object4 = 'MainWindow/pqPluginDialog/buttonBox/1QPushButton0'
+object4 = 'pqClientMainWindow/pqPluginDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object4, 'activate', '')
-object5 = 'MainWindow/menubar/menuSources'
+object5 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object5, 'activate', 'Cone')
-object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object7 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object7, 'activate', '')
 
-object8 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel0'
+object8 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1QLabel0'
 
 text = QtTesting.getProperty(object8, 'text')
 print text

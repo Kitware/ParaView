@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.ImageData.Collection.xmf" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/commonFilters/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,63,4,/0:0/0:0" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,63,4,/0:0/0:0" />  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="vtkCompositeIndex" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.ImageData.Collection.xmf" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,63,4,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,63,4,/0:0/0:0" />  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="vtkCompositeIndex" />
 </pqevents>

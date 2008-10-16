@@ -3,46 +3,46 @@
 import QtTesting
 import QtTestingImage
 
-object2 = 'MainWindow/menubar/menuSources'
+object2 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object2, 'activate', 'HierarchicalFractal')
-object3 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/TwoDimensional'
+object3 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/TwoDimensional'
 QtTesting.playCommand(object3, 'set_boolean', 'false')
-object4 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/GhostLevels'
+object4 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/GhostLevels'
 QtTesting.playCommand(object4, 'set_boolean', 'false')
-object5 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object5 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object5, 'activate', '')
-object6 = 'MainWindow/menubar/menuFilters/Alphabetical'
+object6 = 'pqClientMainWindow/menubar/menuFilters/Alphabetical'
 
-objectA = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
+objectA = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
 QtTesting.playCommand(objectA, 'activate', '')
 QtTesting.playCommand(object6, 'activate', 'ProbeLine')
 QtTesting.playCommand(object5, 'activate', '')
 
-object1 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/WindowCaption'
+object1 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/WindowCaption'
 QtTesting.playCommand(object1, 'mousePress', '1,1,0,23,6')
 QtTesting.playCommand(object1, 'mouseRelease', '1,0,0,23,6')
 QtTesting.playCommand(object2, 'activate', 'RTAnalyticSource')
 QtTesting.playCommand(object5, 'activate', '')
 
-object2 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/WindowCaption'
+object2 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/WindowCaption'
 QtTesting.playCommand(object2, 'mousePress', '1,1,0,89,9')
 QtTesting.playCommand(object2, 'mouseRelease', '1,0,0,89,9')
 
-objectB = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
+objectB = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(objectB, 'activate', '')
 
 QtTesting.playCommand(object6, 'activate', 'ExtractHistogram')
 QtTesting.playCommand(object5, 'activate', '')
-object7 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
+object7 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(object7, 'activate', '')
-object1 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/WindowCaption'
+object1 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/WindowCaption'
 QtTesting.playCommand(object1, 'mousePress', '1,1,0,22,8')
 QtTesting.playCommand(object1, 'mouseRelease', '1,0,0,22,8')
-object9 = 'MainWindow/menubar/menuFile'
+object9 = 'pqClientMainWindow/menubar/menuFile'
 QtTesting.playCommand(object9, 'activate', 'actionFileSaveScreenshot')
-object12 = 'MainWindow/SaveSnapshotDialog/selectedViewOnly'
+object12 = 'pqClientMainWindow/SaveSnapshotDialog/selectedViewOnly'
 QtTesting.playCommand(object12, 'set_boolean', 'false')
-object10 = 'MainWindow/SaveSnapshotDialog/width'
+object10 = 'pqClientMainWindow/SaveSnapshotDialog/width'
 QtTesting.playCommand(object10, 'set_string', '1')
 QtTesting.playCommand(object10, 'set_string', '10')
 QtTesting.playCommand(object10, 'key', '16777219')
@@ -50,14 +50,14 @@ QtTesting.playCommand(object10, 'key', '16777219')
 QtTesting.playCommand(object10, 'set_string', '9')
 QtTesting.playCommand(object10, 'set_string', '90')
 QtTesting.playCommand(object10, 'set_string', '900')
-object11 = 'MainWindow/SaveSnapshotDialog/height'
+object11 = 'pqClientMainWindow/SaveSnapshotDialog/height'
 QtTesting.playCommand(object11, 'key', '16777217')
 QtTesting.playCommand(object11, 'set_string', '90')
 QtTesting.playCommand(object11, 'set_string', '90')
 QtTesting.playCommand(object11, 'set_string', '900')
-object13 = 'MainWindow/SaveSnapshotDialog/ok'
+object13 = 'pqClientMainWindow/SaveSnapshotDialog/ok'
 QtTesting.playCommand(object13, 'activate', '')
-object14 = 'MainWindow/FileSaveScreenshotDialog'
+object14 = 'pqClientMainWindow/FileSaveScreenshotDialog'
 #remove old file, if any
 QtTesting.playCommand(object14, 'remove',
   '$PARAVIEW_TEST_ROOT/savelargescreenshot.test.png')

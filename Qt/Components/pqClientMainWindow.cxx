@@ -119,10 +119,31 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////
 // pqClientMainWindow
-
+#include <QTreeView>
+#include "pqSILModel.h"
+#include "vtkGraphReader.h"
+#include "vtkExodusIIReaderParser.h"
+#include "vtkMutableDirectedGraph.h"
 pqClientMainWindow::pqClientMainWindow() :
   Implementation(new pqImplementation(this))
 {
+//  const char* filename = "/home/utkarsh/Kitware/Datasets/Exodus/DART_Examples/output/artifact.dta";
+//
+//  vtkExodusIIReaderParser* parser = vtkExodusIIReaderParser::New();
+//  parser->Go(filename);
+//  pqSILModel* model = new pqSILModel();
+//  model->update(parser->GetSIL());
+//  parser->Delete();
+//
+//  for (int cc=0; cc < 3; cc++)
+//    {
+//    QTreeView* treeView = new QTreeView();
+//    treeView->setModel(model);
+//    treeView->setRootIndex(model->hierarchies()[cc]);
+//    treeView->show();
+//    treeView->expandAll();
+//    }
+//
   this->Implementation->UI.setupUi(this);
 
   this->insertToolBarBreak(this->Implementation->UI.variableToolbar);
@@ -332,9 +353,11 @@ pqClientMainWindow::pqClientMainWindow() :
     SIGNAL(triggered()), this, SLOT(onHelpHelp()));
 
   connect(this->Implementation->UI.actionHelpEnableTooltips,
-    SIGNAL(triggered(bool)), &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
-  this->Implementation->Core.onHelpEnableTooltips(
-    this->Implementation->UI.actionHelpEnableTooltips->isChecked());
+    SIGNAL(triggered(bool)),
+    &this->Implementation->Core, SLOT(onHelpEnableTooltips(bool)));
+  connect(&this->Implementation->Core, SIGNAL(enableTooltips(bool)),
+    this->Implementation->UI.actionHelpEnableTooltips,
+    SLOT(setChecked(bool)));
 
   connect(this->Implementation->UI.actionVCRPlay, SIGNAL(triggered()),
     &this->Implementation->Core.VCRController(), SLOT(onPlay()));
@@ -502,7 +525,7 @@ pqClientMainWindow::pqClientMainWindow() :
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core.setupProxyTabWidget(
       this->Implementation->UI.objectInspectorDock);
-  
+
   QObject::connect(
     proxyTab->getObjectInspector(),
     SIGNAL(helpRequested(QString)),
@@ -730,23 +753,23 @@ pqClientMainWindow::pqClientMainWindow() :
 
   // 3d Selection Modes
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableSurfaceSelection(bool)),
     this->Implementation->UI.actionSelectionMode, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableSurfacePointsSelection(bool)),
     this->Implementation->UI.actionSelectSurfacePoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableFrustumSelection(bool)),
     this->Implementation->UI.actionSelect_Frustum, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableFrustumPointSelection(bool)),
     this->Implementation->UI.actionSelectFrustumPoints, SLOT(setEnabled(bool)));
   QObject::connect(
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SIGNAL(enableBlockSelection(bool)),
     this->Implementation->UI.actionSelect_Block, SLOT(setEnabled(bool)));
 
@@ -765,7 +788,7 @@ pqClientMainWindow::pqClientMainWindow() :
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(beginFrustumPointsSelection()));
   QObject::connect(
     this->Implementation->UI.actionSelect_Block, SIGNAL(triggered()),
-    this->Implementation->Core.renderViewSelectionHelper(), 
+    this->Implementation->Core.renderViewSelectionHelper(),
     SLOT(beginBlockSelection()));
 
   QObject::connect(
@@ -906,9 +929,11 @@ QString Locate(const QString& appName)
     {
     QString path = app_dir;
     path += *dir;
+#if defined (__APPLE__)
+    path += appName + ".app/Contents/MacOS/";
+#endif
     path += appName;
-    //cout << "Checking : " << path.toAscii().data() << " ... ";
-    //cout.flush();
+    //cout << "Checking : " << path.toAscii().data() << " ... " << endl;
     QFileInfo finfo (path);
     if (finfo.exists())
       {
@@ -962,21 +987,21 @@ void pqClientMainWindow::makeAssistant()
     QFile file(helper);
     if(file.open(QIODevice::ReadOnly))
       {
-      assistantExe = file.readLine().trimmed() + assistantProgName;
+      assistantExe = file.readLine().trimmed();
       profileFile = file.readLine().trimmed();
+      // CMake escapes spaces, we need to unescape those.
+      assistantExe.replace("\\ ", " ");
+      profileFile.replace("\\ ", " ");
       }
     }
 
   if(assistantExe.isEmpty())
     {
-    assistantExe = ::Locate(assistantProgName);
-
-    /*
-    QString assistant = QCoreApplication::applicationDirPath();
-    assistant += QDir::separator();
-    assistant += assistantName;
-    assistantExe = assistant;
-    */
+#if defined(Q_WS_MAC)
+    assistantExe = QCoreApplication::applicationDirPath() + "/../Support/Assistant_adp";
+#else
+    assistantExe = ::Locate(assistantName);
+#endif
     }
 
   this->Implementation->AssistantClient =
@@ -992,7 +1017,11 @@ void pqClientMainWindow::makeAssistant()
   if(profileFile.isEmpty())
     {
     // see if help is bundled up with the application
+#if defined(Q_WS_MAC)
+    QString profile = QCoreApplication::applicationDirPath() + "/../Support/pqClient.adp";
+#else
     QString profile = ::Locate("pqClient.adp");
+#endif
       /*QCoreApplication::applicationDirPath() + QDir::separator()
       + QString("pqClient.adp");*/
     if(QFile::exists(profile))

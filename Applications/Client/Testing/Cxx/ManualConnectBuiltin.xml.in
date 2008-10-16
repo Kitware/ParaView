@@ -1,13 +1,13 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- Start Disable LightKit -->
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,35,11,/1:0" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,35,11,/1:0" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,14,11" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,14,11" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,15,6" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,15,6" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,35,11,/1:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,35,11,/1:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,14,11" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,14,11" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,15,6" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,15,6" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
   <!-- End Disable LightKit -->
 </pqevents>

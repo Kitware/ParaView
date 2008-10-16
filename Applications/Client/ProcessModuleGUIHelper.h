@@ -29,36 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqClientProcessModudeGUIHelper_h
-#define __pqClientProcessModudeGUIHelper_h
+#ifndef __ProcessModuleGUIHelper_h
+#define __ProcessModuleGUIHelper_h
 
-#include "pqProcessModuleGUIHelper.h"
-#include <QPointer>
-#include <QSplashScreen>
+#include <pqClientProcessModuleGUIHelper.h>
 
-/*!
- * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
- * so that we can create the type of MainWindow needed for pqClient.
- *
- */
-class ProcessModuleGUIHelper : public pqProcessModuleGUIHelper
+class ProcessModuleGUIHelper : public pqClientProcessModuleGUIHelper
 {
 public:
   static ProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
+  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqClientProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
-  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+  /// Start the GUI event loop.
+  virtual int RunGUIStart(int argc, char** argv, int numServerProcs, int myId);
+
+  /// postAppExec does everything after the appExec
+  virtual int postAppExec() { return pqClientProcessModuleGUIHelper::postAppExec(); }
+
 protected:
   ProcessModuleGUIHelper();
   ~ProcessModuleGUIHelper();
-
-  /// subclasses can override this method to create their own
-  /// subclass of pqMainWindow as the Main Window.
-  virtual QWidget* CreateMainWindow();
-
-  QPointer<QSplashScreen> Splash;
 
 private:
   ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.
@@ -66,5 +57,3 @@ private:
 };
 
 #endif
-
-

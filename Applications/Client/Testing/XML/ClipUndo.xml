@@ -1,19 +1,19 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
 </pqevents>

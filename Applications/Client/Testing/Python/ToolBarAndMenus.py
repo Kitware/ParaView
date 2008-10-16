@@ -1,19 +1,19 @@
 
 import QtTesting
 
-exceptionsList = [ 'MainWindow/variableToolbar/QWidgetAction0',
-                   'MainWindow/representationToolbar/QWidgetAction0',
-                   'MainWindow/mainToolBar/QAction1',
-                   'MainWindow/mainToolBar/QAction2',
-                   'MainWindow/currentTimeToolbar/QWidgetAction0',
-                   'MainWindow/currentTimeToolbar/QWidgetAction1',
-                   'MainWindow/currentTimeToolbar/QWidgetAction2',
-                   'MainWindow/actionEditColorMap',
-                   'MainWindow/actionResetRange'
+exceptionsList = [ 'pqClientMainWindow/variableToolbar/QWidgetAction0',
+                   'pqClientMainWindow/representationToolbar/QWidgetAction0',
+                   'pqClientMainWindow/mainToolBar/QAction1',
+                   'pqClientMainWindow/mainToolBar/QAction2',
+                   'pqClientMainWindow/currentTimeToolbar/QWidgetAction0',
+                   'pqClientMainWindow/currentTimeToolbar/QWidgetAction1',
+                   'pqClientMainWindow/currentTimeToolbar/QWidgetAction2',
+                   'pqClientMainWindow/actionEditColorMap',
+                   'pqClientMainWindow/actionResetRange'
                    ]
 
 # test that all actions in the tool bars are in the menus
-missingActionsString = QtTesting.invokeMethod('MainWindow', 'findToolBarActionsNotInMenus')
+missingActionsString = QtTesting.invokeMethod('pqClientMainWindow', 'findToolBarActionsNotInMenus')
 missingActions = missingActionsString.split(',')
 numMissing = 0
 for str in missingActions:

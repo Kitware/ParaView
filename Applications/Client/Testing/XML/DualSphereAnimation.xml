@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRFirstFrame" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
-  <pqevent object="MainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="key" arguments="16777221" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRLastFrame" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRFirstFrame" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="pqClientMainWindow/menubar/menuAnimation" command="activate" arguments="actionVCRNextFrame" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="key" arguments="16777221" />
 </pqevents>

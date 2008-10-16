@@ -3,32 +3,32 @@
 import QtTesting
 import QtTestingImage
 
-object1 = 'MainWindow/menubar/menuSources'
+object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object2 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
+object3 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton'
 QtTesting.playCommand(object3, 'activate', '')
 QtTesting.playCommand(object1, 'activate', 'SphereSource')
-object4 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
+object4 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Center_0'
 QtTesting.playCommand(object4, 'set_string', '1')
 QtTesting.playCommand(object2, 'activate', '')
-object5 = 'MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
+object5 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
 QtTesting.playCommand(object5, 'currentChanged', '/0/0|0')
-object6 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar'
+object6 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar'
 QtTesting.playCommand(object6, 'set_tab', '1')
-object7 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
+object7 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object7, 'set_boolean', 'true')
-object8 = 'MainWindow/menubar/menuView'
+object8 = 'pqClientMainWindow/menubar/menuView'
 QtTesting.playCommand(object8, 'activate', 'Animation Inspector')
-object9 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
+object9 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
 QtTesting.playCommand(object9, 'set_string', 'Start Theta')
-object10 = 'MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
+object10 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
 QtTesting.playCommand(object10, 'activate', '')
-object11 = 'MainWindow/VCRToolbar/1QToolButton3'
+object11 = 'pqClientMainWindow/VCRToolbar/1QToolButton3'
 QtTesting.playCommand(object11, 'activate', '')
 QtTesting.playCommand(object11, 'activate', '')
-object12 = 'MainWindow/menubar/menuFile'
+object12 = 'pqClientMainWindow/menubar/menuFile'
 QtTesting.playCommand(object12, 'activate', '')
 QtTesting.playCommand(object12, 'activate', 'actionFileSaveAnimation')
 object13 = 'Dialog/checkBoxDisconnect'

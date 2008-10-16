@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Programmable Filter" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Script" command="set_string" arguments="pdi = self.GetPolyDataInput()&#xA;pdo = self.GetPolyDataOutput()&#xA;newPts = vtk.vtkPoints()&#xA;numPts = pdi.GetNumberOfPoints()&#xA;for i in range(0, numPts):&#xA;  coord = pdi.GetPoint(i)&#xA;  x,y,z = coord[:3]&#xA;  x = x * 2&#xA;  y = y * 0.5&#xA;  z = 1&#xA;  newPts.InsertPoint(i, x,y,z)&#xA;pdo.SetPoints(newPts)" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.159357,0.247148,2,2,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.159357,0.095057,2,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.159357,0.095057,2,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Programmable Filter" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Script" command="set_string" arguments="pdi = self.GetPolyDataInput()&#xA;pdo = self.GetPolyDataOutput()&#xA;newPts = vtk.vtkPoints()&#xA;numPts = pdi.GetNumberOfPoints()&#xA;for i in range(0, numPts):&#xA;  coord = pdi.GetPoint(i)&#xA;  x,y,z = coord[:3]&#xA;  x = x * 2&#xA;  y = y * 0.5&#xA;  z = 1&#xA;  newPts.InsertPoint(i, x,y,z)&#xA;pdo.SetPoints(newPts)" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.159357,0.247148,2,2,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.159357,0.095057,2,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.159357,0.095057,2,0,0)" />
 </pqevents>

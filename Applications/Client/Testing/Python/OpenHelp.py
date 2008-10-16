@@ -3,7 +3,7 @@
 import QtTesting
 import time
 
-object1 = 'MainWindow/menubar/menuHelp'
+object1 = 'pqClientMainWindow/menubar/menuHelp'
 QtTesting.playCommand(object1, 'activate', 'actionHelpHelp')
 
 # since this starts a new process, we'll wait for a bit

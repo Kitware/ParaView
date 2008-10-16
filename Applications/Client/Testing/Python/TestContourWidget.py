@@ -2,19 +2,19 @@
 
 import QtTesting
 
-object1 = 'MainWindow/menubar/menuSources'
+object1 = 'pqClientMainWindow/menubar/menuSources'
 QtTesting.playCommand(object1, 'activate', 'RTAnalyticSource')
-object2 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
+object2 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept'
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'MainWindow/menubar/menuFilters/Common'
+object3 = 'pqClientMainWindow/menubar/menuFilters/Common'
 QtTesting.playCommand(object3, 'activate', 'Contour')
 QtTesting.playCommand(object2, 'activate', '')
-object5 = 'MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget'
+object5 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget'
 QtTesting.setProperty(object5, 'samples', '120')
 QtTesting.playCommand(object2, 'activate', '')
 QtTesting.setProperty(object5, 'samples', '120;130;140;150')
 QtTesting.playCommand(object2, 'activate', '')
-object1 = 'MainWindow/menubar/menuEdit'
+object1 = 'pqClientMainWindow/menubar/menuEdit'
 QtTesting.playCommand(object1, 'activate', 'actionEditUndo')
 val = QtTesting.getProperty(object5, 'samples')
 

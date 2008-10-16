@@ -35,44 +35,14 @@ INCLUDE_DIRECTORIES(
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  AboutDialog.h
-  MainWindow.h
-)
-
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
-
-SET(UI_FORMS
-  AboutDialog.ui
-  MainWindow.ui
-)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  ${UI_FORMS}
-)
-
-SET(UI_RESOURCES
-  Resources.qrc
-)
-
-QT4_ADD_RESOURCES(RCS_SOURCES
-  ${UI_RESOURCES}
-)
 
 IF(WIN32)
   SET(EXE_ICON pqClient.rc)
 ENDIF(WIN32)
 
 SOURCE_GROUP("Resources" FILES
-  ${UI_RESOURCES}
-  ${UI_FORMS}
   ${EXE_ICON}
-)
-
-SOURCE_GROUP("Generated" FILES
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  ${UI_BUILT_SOURCES}
 )
 
 IF(WIN32)
@@ -109,16 +79,9 @@ ELSE(NOT Q_WS_MAC)
 ENDIF(NOT Q_WS_MAC)
 
 ADD_EXECUTABLE(${PV_EXE_NAME} WIN32 ${MAKE_BUNDLE}  
-  AboutDialog.cxx
-  AboutDialog.h
-  MainWindow.cxx
-  MainWindow.h
   main.cxx
   ProcessModuleGUIHelper.cxx
   ProcessModuleGUIHelper.h
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  ${UI_BUILT_SOURCES}
   ${EXE_ICON}
   ${apple_bundle_sources}
 )

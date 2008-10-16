@@ -1,47 +1,47 @@
 <?xml version="1.0" ?>
 <pqevents>
   <!-- Turn off orientation axis annotation -->
-  <pqevent object="MainWindow/axesToolbar/1QToolButton0" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/axesToolbar/1QToolButton0" command="set_boolean" arguments="false" />
 
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,23,4,/2:0" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,23,4,/2:0" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mousePress" arguments="1,1,0,32,7" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mouseRelease" arguments="1,0,0,32,7" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,23,4,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,23,4,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mousePress" arguments="1,1,0,32,7" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mouseRelease" arguments="1,0,0,32,7" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 
   <!-- Create a simple multiblock source -->
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="CubeSource" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/commonFilters/1QToolButton9" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CubeSource" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton9" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
 
   <!-- Add normal glyphs -->
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="NormalGlyphs" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="NormalGlyphs" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
 
   <!-- Add a second box with glyphs in non-random masking -->
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,50,8,/0:0/0:0/0:0" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,50,8,/0:0/0:0/0:0" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="2" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionY" command="set_string" arguments="2" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,10,6,/0:0/0:0/0:1" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,10,6,/0:0/0:0/0:1" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="NormalGlyphs" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Glyph Random Mode" command="set_boolean" arguments="false" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,50,8,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,50,8,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TransformFilter" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionX" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Transform/pqBoxWidget/positionY" command="set_string" arguments="2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,10,6,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,10,6,/0:0/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="NormalGlyphs" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Glyph Random Mode" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
 
   <!-- Adjust the camera to see all glyphs -->
-  <pqevent object="MainWindow/cameraToolbar/1QToolButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.567213,0.652655,1,1,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.686885,0.705752,1,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.686885,0.705752,1,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.654098,0.475664,2,2,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.654098,0.621681,2,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.654098,0.621681,2,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0" command="contextMenu" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter" command="contextMenu" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.567213,0.652655,1,1,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.686885,0.705752,1,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.686885,0.705752,1,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.654098,0.475664,2,2,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.654098,0.621681,2,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.654098,0.621681,2,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame" command="contextMenu" arguments="" />
 </pqevents>

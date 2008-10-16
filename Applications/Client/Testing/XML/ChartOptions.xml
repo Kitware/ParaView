@@ -1,40 +1,40 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="m" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my " />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="key" arguments="32" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my ch" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my ch" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my char" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my char" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my chart" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/LegendLocation" command="set_string" arguments="Bottom" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/LegendFlow" command="set_string" arguments="Left to Right" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/PageNames" command="mousePress" arguments="1,1,0,46,9,/1:0" />
-  <pqevent object="MainWindow/ActiveChartOptions/PageNames" command="mouseRelease" arguments="1,0,0,46,9,/1:0" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/LabelPrecision" command="spin" arguments="up" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/LabelNotation" command="set_string" arguments="Exponential" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisGrid" command="set_boolean" arguments="false" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/PageNames" command="mousePress" arguments="1,1,0,60,7,/2:0" />
-  <pqevent object="MainWindow/ActiveChartOptions/PageNames" command="mouseRelease" arguments="1,0,0,60,7,/2:0" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxis" command="set_boolean" arguments="false" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxis" command="set_boolean" arguments="true" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisLabels" command="set_boolean" arguments="false" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisLabels" command="set_boolean" arguments="true" />
-  <pqevent object="MainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/1QWidget0/1QScrollArea0/qt_scrollarea_viewport/EmptyView/ConvertActionsFrame/1QPushButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/DataAnalysis" command="activate" arguments="ProbeLine" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="m" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my " />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="key" arguments="32" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my ch" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my ch" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my char" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my char" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/ChartTitle" command="set_string" arguments="my chart" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/LegendLocation" command="set_string" arguments="Bottom" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/General/LegendFlow" command="set_string" arguments="Left to Right" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="mousePress" arguments="1,1,0,46,9,/1:0" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="mouseRelease" arguments="1,0,0,46,9,/1:0" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/LabelPrecision" command="spin" arguments="up" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/LabelNotation" command="set_string" arguments="Exponential" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisGrid" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="mousePress" arguments="1,1,0,60,7,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/PageNames" command="mouseRelease" arguments="1,0,0,60,7,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxis" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxis" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisLabels" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/Stack/pqChartOptionsWidget/ChartPages/Axis/ShowAxisLabels" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveChartOptions/CloseButton" command="activate" arguments="" />
 </pqevents>

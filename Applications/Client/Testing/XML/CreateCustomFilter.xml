@@ -1,62 +1,62 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Cone" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="FeatureEdges" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="0" />
-  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="MyFeatureEdges" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/RemoveOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/BackButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPorts" command="currentChanged" arguments="/0|1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/RemoveInputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyPipeline" command="currentChanged" arguments="/0|0" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Boundary Edges" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess1" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Feature Angle" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess2" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Manifold Edges" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess3" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Cone" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="FeatureEdges" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="0" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsCreateCustomFilter" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/NamePage/CustomFilterName" command="set_string" arguments="MyFeatureEdges" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPipeline" command="currentChanged" arguments="/0|0" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="MyOutput" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputPorts" command="currentChanged" arguments="/0|1" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/RemoveOutputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/OutputName" command="set_string" arguments="Output" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/OutputPage/frame_2/AddOutputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/BackButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPorts" command="currentChanged" arguments="/0|1" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputPipeline" command="currentChanged" arguments="/0|0" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input1" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/RemoveInputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/InputName" command="set_string" arguments="Input" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/InputPage/frame/AddInputButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/NextButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyPipeline" command="currentChanged" arguments="/0|0" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Boundary Edges" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess1" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Feature Angle" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess2" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyCombo" command="set_string" arguments="Manifold Edges" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/PropertyName" command="set_string" arguments="Guess3" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/AddPropertyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/PageStack/PropertyPage/frame_3/PropertyUpButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterDefinitionWizard/InputFrame/FinishButton" command="activate" arguments="" />
   <pqevent object="pqCustomFilterManager/CloseButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="actionDelete" />
-  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyFeatureEdges" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Guess3" command="set_boolean" arguments="true" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
-  <pqevent object="MainWindow/pqCustomFilterManager/RemoveButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="MyFeatureEdges" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Guess3" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageCustomFilters" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/RemoveButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
 </pqevents>

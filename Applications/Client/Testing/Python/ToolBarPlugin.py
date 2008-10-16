@@ -10,15 +10,15 @@ if sys.platform == 'win32':
 if sys.platform == 'darwin':
     libname = 'libGUIMyToolBar.dylib'
 
-object1 = 'MainWindow/menubar/menuTools'
+object1 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
-object2 = "MainWindow/pqPluginDialog/localGroup/loadLocal"
+object2 = "pqClientMainWindow/pqPluginDialog/localGroup/loadLocal"
 QtTesting.playCommand(object2, 'activate', '')
-object3 = 'MainWindow/pqPluginDialog/pqFileDialog'
+object3 = 'pqClientMainWindow/pqPluginDialog/pqFileDialog'
 QtTesting.playCommand(object3, 'filesSelected', libname)
-object4 = 'MainWindow/pqPluginDialog/buttonBox/1QPushButton0'
+object4 = 'pqClientMainWindow/pqPluginDialog/buttonBox/1QPushButton0'
 QtTesting.playCommand(object4, 'activate', '')
-object5 = 'MainWindow/MyActions/1QToolButton0'
+object5 = 'pqClientMainWindow/MyActions/1QToolButton0'
 QtTesting.playCommand(object5, 'activate', '')
 object6 = '1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0'
 QtTesting.playCommand(object6, 'activate', '')

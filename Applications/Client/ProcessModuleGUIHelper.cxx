@@ -32,9 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ProcessModuleGUIHelper.h"
 
-#include <QTimer>
-#include <QBitmap>
-#include "MainWindow.h"
+#include <pqClientMainWindow.h>
 
 #include <pqApplicationCore.h>
 #include <vtkObjectFactory.h>
@@ -42,31 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.12");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.13");
 
 //-----------------------------------------------------------------------------
-ProcessModuleGUIHelper::ProcessModuleGUIHelper()
+ProcessModuleGUIHelper::ProcessModuleGUIHelper() :
+  pqClientProcessModuleGUIHelper()  
 {
-  QPixmap pix(":/pqClient/PVSplashScreen.png");
-  this->Splash = new QSplashScreen(pix);
-  this->Splash->setMask(pix.createMaskFromColor(QColor(Qt::transparent)));
-  this->Splash->setAttribute(Qt::WA_DeleteOnClose);
-  this->Splash->show();
 }
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 {
-}
-
-//-----------------------------------------------------------------------------
-QWidget* ProcessModuleGUIHelper::CreateMainWindow()
-{
-  pqApplicationCore::instance()->setApplicationName("ParaView" PARAVIEW_VERSION);
-  pqApplicationCore::instance()->setOrganizationName("ParaView");
-  QWidget* w = new MainWindow();
-  QTimer::singleShot(10, this->Splash, SLOT(close()));
-  return w;
 }
 
 //-----------------------------------------------------------------------------
@@ -76,13 +60,10 @@ void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage,
-  double Threshold, ostream& Output, const QString& TempDirectory)
+int ProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
+  int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
 {
-  if(MainWindow* const main_window = qobject_cast<MainWindow*>(this->GetMainWindow()))
-  {
-    return main_window->compareView(ReferenceImage, Threshold, Output, TempDirectory);
-  }
-  
-  return false;
+  int status = this->Superclass::preAppExec(argc, argv, int(0), int(0));
+
+  return status;
 }

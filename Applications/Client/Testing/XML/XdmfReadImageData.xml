@@ -1,20 +1,20 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.ImageData.xmf" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Solid Color" />
-  <pqevent object="MainWindow/commonFilters/1QToolButton1" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.ImageData.xmf" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="Solid Color" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.462051,0.482993,1,0,0)" />
 
   <!-- turn on light kit -->
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,15,10" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,15,10" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,13,8" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,13,8" />
-  <pqevent object="MainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/OptionsButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mousePress" arguments="1,1,0,15,10" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/DefaultLightSwitch" command="mouseRelease" arguments="1,0,0,15,10" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mousePress" arguments="1,1,0,13,8" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Lights/UseLight" command="mouseRelease" arguments="1,0,0,13,8" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 </pqevents>

@@ -1,44 +1,44 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/singleSphereAnimation.pvd" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="2" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="3" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="4" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalCache" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalInterpolator" />
-  <pqevent object="MainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="MainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/playMode" command="set_string" arguments="Real Time" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.2" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.4" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.6" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.8" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.2" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.4" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
-  <pqevent object="MainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.5" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/singleSphereAnimation.pvd" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="1" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="2" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="3" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTimeIndex" command="set_int" arguments="4" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalCache" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalInterpolator" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
+  <pqevent object="pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/playMode" command="set_string" arguments="Real Time" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.2" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.4" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.6" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.8" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.0" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.2" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.4" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777219" />
+  <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="1.5" />
 </pqevents>
