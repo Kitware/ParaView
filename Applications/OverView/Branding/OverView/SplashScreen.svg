@@ -6,7 +6,6 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="450"
@@ -97,17 +96,7 @@
      inkscape:groupmode="layer"
      id="layer7"
      inkscape:label="SNL Logo"
-     style="display:inline">
-    <image
-       style="display:inline"
-       y="26.184212"
-       x="21.590689"
-       id="image3317"
-       height="39.066242"
-       width="255.46259"
-       sodipodi:absref="/Users/tshead/src/vtksnl/vtkSNL/Applications/OverView/Branding/OverView/snllineblk.tif.tiff"
-       xlink:href="snllineblk.tif.tiff" />
-  </g>
+     style="display:inline" />
   <g
      inkscape:groupmode="layer"
      id="layer6"
