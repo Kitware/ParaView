@@ -55,6 +55,7 @@ class pqLookmarkManagerModel;
 class pqMultiView;
 class pqObjectInspectorDriver;
 class pqObjectInspectorWidget;
+class pqOptionsContainer;
 class pqPipelineBrowser;
 class pqPipelineMenu;
 class pqPipelineSource;
@@ -155,6 +156,12 @@ public:
   
   /// Setup a progress bar, attaching it to the given status bar
   void setupProgressBar(QStatusBar* parent);
+  
+  /// Setup the application settings dialog
+  void setupApplicationSettingsDialog();
+
+  /// Add options to the application settings dialog
+  void addApplicationSettings(pqOptionsContainer *);
 
   /** Compares the contents of the window with the given reference image,
   returns true iff they "match" within some tolerance */

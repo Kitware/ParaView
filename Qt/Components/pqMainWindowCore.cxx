@@ -2387,6 +2387,28 @@ void pqMainWindowCore::onEditViewSettings()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onEditSettings()
 {
+  // Setup the applications dialog (if it hasn't been built already)
+  this->setupApplicationSettingsDialog();
+
+  // Show the dialog
+  this->Implementation->ApplicationSettings->show();
+  this->Implementation->ApplicationSettings->raise();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::addApplicationSettings(pqOptionsContainer *options)
+{
+  // Setup the applications dialog (if it hasn't been built already)
+  this->setupApplicationSettingsDialog();
+
+  // Add the options
+  this->Implementation->ApplicationSettings->addOptions(options);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::setupApplicationSettingsDialog()
+{
+  // Create the application settings dialog if it does not exist.
   if(!this->Implementation->ApplicationSettings)
     {
     this->Implementation->ApplicationSettings = 
@@ -2394,9 +2416,6 @@ void pqMainWindowCore::onEditSettings()
     this->Implementation->ApplicationSettings->setObjectName("ApplicationSettings");
     this->Implementation->ApplicationSettings->setAttribute(Qt::WA_QuitOnClose, false);
     }
-  
-  this->Implementation->ApplicationSettings->show();
-  this->Implementation->ApplicationSettings->raise();
 }
 
 //-----------------------------------------------------------------------------
@@ -3380,6 +3399,8 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
     {
     foreach(QString viewtype, viewOptions->viewTypes())
       {
+
+      // Try to create active view options
       pqActiveViewOptions* o =
         viewOptions->createActiveViewOptions(viewtype, 
           this->Implementation->ActiveViewOptions);
@@ -3388,6 +3409,16 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
         this->Implementation->ActiveViewOptions->registerOptions(
           viewtype, o);
         }
+
+        // Try to create global view options
+        pqOptionsContainer* globalOptions =
+        viewOptions->createGlobalViewOptions(viewtype, 
+          this->Implementation->ApplicationSettings);
+        if(globalOptions)
+          {
+          this->addApplicationSettings(globalOptions);
+          }
+
       }
     }
 }
