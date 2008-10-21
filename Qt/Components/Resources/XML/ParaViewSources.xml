@@ -8,6 +8,7 @@
   <Source name="ConeSource" />
   <Source name="CylinderSource" />
   <Source name="DataObjectGenerator" />
+  <Source name="DiskSource" />
   <Source name="HierarchicalFractal" />
   <Source name="LineSource" />
   <Source name="ImageMandelbrotSource" />

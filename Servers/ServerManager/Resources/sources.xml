@@ -997,6 +997,66 @@ The Sphere source can be used to add a polygonal sphere to the 3D scene. The out
    <!-- End Sphere -->
    </SourceProxy>
 
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="DiskSource" class="vtkDiskSource" label="Disk">
+      <Documentation
+         long_help="Create a 3D disk with a specified inner and outer radius." 
+         short_help="Create a 3D disk">
+The Disk source can be used to add a polygonal disk to the 3D scene. The output of the Disk source is polygonal data.
+      </Documentation>
+       
+      <DoubleVectorProperty
+         name="InnerRadius"
+         command="SetInnerRadius"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0.5" >
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Specify inner radius of hole in disc.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="OuterRadius"
+         command="SetOuterRadius"
+         number_of_elements="1"
+         animateable="1"
+         default_values="1.0" >
+        <DoubleRangeDomain name="range" min="0"/>
+        <Documentation>
+          Specify outer radius of disc. 
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="RadialResolution"
+         command="SetRadialResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          Set the number of points in radial direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="CircumferentialResolution"
+         command="SetCircumferentialResolution"
+         number_of_elements="1"
+         default_values="8" >
+        <IntRangeDomain name="range" min="3" max="1024" />
+        <Documentation>
+          Set the number of points in circumferential direction.
+        </Documentation>
+      </IntVectorProperty>
+
+   <!-- End DiscSource -->
+   </SourceProxy>
+
+
+
    <!-- ==================================================================== -->
    <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource"
                 label="Superquadric">
