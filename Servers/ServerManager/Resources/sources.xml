@@ -313,6 +313,18 @@ The Cone source can be used to add a polygonal cone to the 3D scene. The output 
          </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+         name="Direction"
+         command="SetDirection"
+         number_of_elements="3"
+         animateable="1"
+         default_values="0.0 1.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the direction the cone points.
+        </Documentation>
+      </DoubleVectorProperty>
+
      <IntVectorProperty 
         name="Capping" 
         command="SetCapping" 
