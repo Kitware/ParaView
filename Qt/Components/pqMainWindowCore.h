@@ -126,7 +126,7 @@ public:
   /// Setup a pipeline browser, attaching it to the given dock
   void setupPipelineBrowser(QDockWidget* parent);
   /// Setup a proxy tab widget, attaching it to the given dock
-  pqProxyTabWidget* setupProxyTabWidget(QDockWidget* parent);
+  virtual pqProxyTabWidget* setupProxyTabWidget(QDockWidget* parent);
   /// Setup an object inspector, attaching it to the given dock
   pqObjectInspectorWidget* setupObjectInspector(QDockWidget* parent);
   /// Setup a statistics view, attaching it to the given dock
@@ -403,7 +403,7 @@ public slots:
   void setSelectiveEnabledState(bool);
 
   void quickLaunch();
-private slots:
+protected slots:
   void onCreateSource(const QString& sourceName);
   void onCreateFilter(const QString& filtername);
 
@@ -411,7 +411,7 @@ private slots:
   void onPendingDisplayChanged(bool pendingDisplays);
 
   /// Called when the active view in the pqActiveView singleton changes.
-  void onActiveViewChanged(pqView* view);
+  virtual void onActiveViewChanged(pqView* view);
 
   void onActiveViewUndoChanged();
 
@@ -442,11 +442,11 @@ private slots:
 
   void onServerCreationFinished(pqServer *server);
   void onRemovingServer(pqServer *server);
-  void onRemovingSource(pqPipelineSource *source);
+  virtual void onRemovingSource(pqPipelineSource *source);
 
   void onServerCreation(pqServer*);
 
-  void onPostAccept();
+  virtual void onPostAccept();
 
   void addPluginInterface(QObject* iface);
   void extensionLoaded();
@@ -456,7 +456,7 @@ private slots:
   /// This method is called once after the application event loop
   /// begins. This is where we process certain command line options
   /// such as --data, --server etc.
-  void applicationInitialize();
+  virtual void applicationInitialize();
 
   /// Show the camera dialog for the active view module
   void showCameraDialog(pqView*);
