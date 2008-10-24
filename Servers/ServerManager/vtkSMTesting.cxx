@@ -14,14 +14,15 @@
 =========================================================================*/
 #include "vtkSMTesting.h"
 
+#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkTesting.h"
+#include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkImageData.h"
+#include "vtkTesting.h"
 
 vtkStandardNewMacro(vtkSMTesting);
-vtkCxxRevisionMacro(vtkSMTesting, "1.3");
+vtkCxxRevisionMacro(vtkSMTesting, "1.4");
 vtkCxxSetObjectMacro(vtkSMTesting, RenderViewProxy, vtkSMRenderViewProxy);
 //-----------------------------------------------------------------------------
 vtkSMTesting::vtkSMTesting()
@@ -47,10 +48,22 @@ void vtkSMTesting::AddArgument(const char* arg)
 int vtkSMTesting::RegressionTest(float thresh)
 {
   int res = vtkTesting::FAILED;
+
   if (this->RenderViewProxy)
     {
     vtkImageData* image = this->RenderViewProxy->CaptureWindow(1);
-    res = this->Testing->RegressionTest(image, thresh);
+
+    // We do the local partition id checks to make sure that testing works with
+    // pvsynchronousbatch. The image comparison are done only on root node.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm->GetPartitionId() == 0)
+      {
+      res = this->Testing->RegressionTest(image, thresh);
+      }
+    else
+      {
+      res = vtkTesting::PASSED;
+      }
     image->Delete();
     }
   return res;

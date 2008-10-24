@@ -51,7 +51,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.5");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.6");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -125,13 +125,19 @@ int vtkMPISelfConnection::InitializeRoot(int , char** )
 }
 
 //-----------------------------------------------------------------------------
-int vtkMPISelfConnection::InitializeSatellite(int vtkNotUsed(argc), 
-  char** vtkNotUsed(argv))
+void vtkMPISelfConnection::RegisterSatelliteRMIs()
 {
   this->Controller->AddRMI(vtkMPISelfConnectionProcessRMI, this,
     vtkMPISelfConnection::ROOT_SATELLITE_RMI_TAG);
   this->Controller->AddRMI(vtkMPISelfConnectionGatherInformationRMI, this,
     vtkMPISelfConnection::ROOT_SATELLITE_GATHER_INFORMATION_RMI_TAG);
+}
+
+//-----------------------------------------------------------------------------
+int vtkMPISelfConnection::InitializeSatellite(int vtkNotUsed(argc), 
+  char** vtkNotUsed(argv))
+{
+  this->RegisterSatelliteRMIs();
 
   // TODO: This call must not start RMI processing. 
   // We delegate that to ConnectionManager, or don't we?

@@ -55,7 +55,7 @@ public:
   // default.
   vtkSetMacro(DisableConsole, bool);
   vtkGetMacro(DisableConsole, bool);
-  
+
 protected:
   vtkPVProcessModulePythonHelper();
   virtual ~vtkPVProcessModulePythonHelper();

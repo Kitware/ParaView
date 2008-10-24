@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.78");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.79");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1074,7 +1074,8 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
         }
       }
 
-    if (invalid_image)
+    if (invalid_image && 
+      vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() == 1)
       {
       // free up current image.
       capture->Delete();

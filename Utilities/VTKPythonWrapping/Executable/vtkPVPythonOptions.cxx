@@ -13,22 +13,27 @@
 =========================================================================*/
 #include "vtkPVPythonOptions.h"
 
+#include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkParallelRenderManager.h"
+#include "vtkPMPISelfConnection.h"
+#include "vtkProcessModule.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);
-vtkCxxRevisionMacro(vtkPVPythonOptions, "1.3");
+vtkCxxRevisionMacro(vtkPVPythonOptions, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVPythonOptions::vtkPVPythonOptions()
 {
   this->PythonScriptName = 0;
   this->ServerMode = 0;
+  this->EnableSynchronousScripting = false;
 }
 
 //----------------------------------------------------------------------------
@@ -41,6 +46,10 @@ vtkPVPythonOptions::~vtkPVPythonOptions()
 void vtkPVPythonOptions::Initialize()
 {
   this->Superclass::Initialize();
+  this->AddBooleanArgument("--synchronous", "-sync",
+    &this->EnableSynchronousScripting,
+    "When specified, the python script is processed synchronously on all processes.",
+    vtkPVOptions::PVBATCH);
 }
 
 //----------------------------------------------------------------------------
@@ -54,9 +63,19 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
     this->SetErrorMessage(str.str().c_str());
     return 0;
     }
+
+  if (this->EnableSynchronousScripting)
+    {
+    // Disable render event propagation since satellites are no longer doing
+    // ProcessRMIs() since synchronous script processing is enabled.
+    vtkParallelRenderManager::SetDefaultRenderEventPropagation(false);
+    }
+  this->Synchronize();
+
   return this->Superclass::PostProcess(argc, argv);
 }
 
+//----------------------------------------------------------------------------
 int vtkPVPythonOptions::WrongArgument(const char* argument)
 {
   if ( vtksys::SystemTools::FileExists(argument) &&
@@ -72,8 +91,46 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
 }
 
 //----------------------------------------------------------------------------
+vtkSelfConnection* vtkPVPythonOptions::NewSelfConnection()
+{
+  if (this->EnableSynchronousScripting &&
+    vtkProcessModule::GetProcessModule()->GetUseMPI())
+    {
+    return vtkPMPISelfConnection::New();
+    }
+
+  return this->Superclass::NewSelfConnection();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPythonOptions::Synchronize()
+{
+  // TODO: Need to synchronize all options, for now just the script name.
+  vtkMultiProcessController* controller =
+    vtkMultiProcessController::GetGlobalController();
+
+  if (controller && controller->GetNumberOfProcesses() > 1)
+    {
+    vtkMultiProcessStream stream;
+    if (controller->GetLocalProcessId() == 0)
+      {
+      stream << this->PythonScriptName << this->EnableSynchronousScripting;
+      controller->Broadcast(stream, 0);
+      }
+    else
+      {
+      controller->Broadcast(stream, 0);
+      vtkstd::string name;
+      stream >> name >> this->EnableSynchronousScripting;
+      this->SetPythonScriptName(name.c_str());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPythonOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "EnableSynchronousScripting: " << this->EnableSynchronousScripting << endl;
 }
 

@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.16");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.17");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -49,15 +49,21 @@ void vtkPVProcessModulePythonHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
+int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv,
+  int numServerProcs, int myId)
 {
-  (void)myId;
+  vtkPVPythonOptions* boptions = vtkPVPythonOptions::SafeDownCast(
+    this->ProcessModule->GetOptions());
+  if (myId > 0 && !boptions->GetEnableSynchronousScripting())
+    {
+    return 0;
+    }
+
   (void)numServerProcs;
 
   this->SMApplication->Initialize();
   vtkSMProperty::SetCheckDomains(0);
 
-  vtkPVPythonOptions* boptions = vtkPVPythonOptions::SafeDownCast(this->ProcessModule->GetOptions());
   int res = 0; 
 
 

@@ -28,6 +28,7 @@ class vtkDummyProcessModuleHelper;
 class vtkPVMain;
 class vtkPVOptions;
 class vtkSMApplication;
+class vtkProcessModule;
 
 class VTK_EXPORT vtkInitializationHelper : public vtkObject
 {
@@ -44,6 +45,10 @@ public:
   // after calling this.
   static void Finalize();
 
+  // Description:
+  // To be used by executables. Call this method to initialize the client-server
+  // interpretor.
+  static void InitializeInterpretor(vtkProcessModule*);
 protected:
   vtkInitializationHelper() {};
   virtual ~vtkInitializationHelper() {};

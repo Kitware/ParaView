@@ -46,7 +46,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkInitializationHelper, "1.2");
+vtkCxxRevisionMacro(vtkInitializationHelper, "1.3");
 
 static void vtkInitializationHelperInit(vtkProcessModule* pm);
 
@@ -152,4 +152,10 @@ void vtkInitializationHelperInit(vtkProcessModule* pm)
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::InitializeInterpretor(vtkProcessModule* pm)
+{
+  ::vtkInitializationHelperInit(pm);
 }
