@@ -20,7 +20,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSynchronousMPISelfConnection);
-vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.1");
+vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.2");
 //----------------------------------------------------------------------------
 vtkSynchronousMPISelfConnection::vtkSynchronousMPISelfConnection()
 {
@@ -48,8 +48,8 @@ int vtkSynchronousMPISelfConnection::InitializeSatellite(
 }
 
 //----------------------------------------------------------------------------
-void vtkSynchronousMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
-  vtkClientServerStream& stream)
+void vtkSynchronousMPISelfConnection::SendStreamToServerNodeInternal(
+  int vtkNotUsed(remoteId), vtkClientServerStream& stream)
 {
   // Every processes all streams locally.
   // Logic being as follows:
