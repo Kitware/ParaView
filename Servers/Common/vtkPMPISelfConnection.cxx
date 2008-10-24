@@ -20,7 +20,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPMPISelfConnection);
-vtkCxxRevisionMacro(vtkPMPISelfConnection, "1.1");
+vtkCxxRevisionMacro(vtkPMPISelfConnection, "1.2");
 //----------------------------------------------------------------------------
 vtkPMPISelfConnection::vtkPMPISelfConnection()
 {
@@ -38,7 +38,8 @@ void vtkPMPISelfConnection::Finalize()
 }
 
 //----------------------------------------------------------------------------
-int vtkPMPISelfConnection::InitializeSatellite(int argc, char** argv)
+int vtkPMPISelfConnection::InitializeSatellite(
+  int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   this->RegisterSatelliteRMIs();
 
