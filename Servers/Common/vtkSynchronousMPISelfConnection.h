@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPMPISelfConnection.h
+  Module:    vtkSynchronousMPISelfConnection.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,26 +12,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPMPISelfConnection
+// .NAME vtkSynchronousMPISelfConnection
 // .SECTION Description
-// vtkPMPISelfConnection is a specialization of vtkMPISelfConnection to be used
-// in cases where each process has an active servermanager. Thus for a
-// python-based batch client, each process will execute the python script. For
+// vtkSynchronousMPISelfConnection is a specialization of vtkMPISelfConnection
+// to be used in cases where each process has an active servermanager. Thus for
+// a python-based batch client, each process will execute the python script. For
 // such cases, each process acts as the root node (as far as the server manager
 // is concerned) for SendStream and GatherInformation requests. There's rarely
 // any need for parallel communication (except when collecting data information)
 // since each process is expected to be executing identical python code.
 
-#ifndef __vtkPMPISelfConnection_h
-#define __vtkPMPISelfConnection_h
+#ifndef __vtkSynchronousMPISelfConnection_h
+#define __vtkSynchronousMPISelfConnection_h
 
 #include "vtkMPISelfConnection.h"
 
-class VTK_EXPORT vtkPMPISelfConnection : public vtkMPISelfConnection
+class VTK_EXPORT vtkSynchronousMPISelfConnection : public vtkMPISelfConnection
 {
 public:
-  static vtkPMPISelfConnection* New();
-  vtkTypeRevisionMacro(vtkPMPISelfConnection, vtkMPISelfConnection);
+  static vtkSynchronousMPISelfConnection* New();
+  vtkTypeRevisionMacro(vtkSynchronousMPISelfConnection, vtkMPISelfConnection);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,8 +48,8 @@ public:
 
 //BTX
 protected:
-  vtkPMPISelfConnection();
-  ~vtkPMPISelfConnection();
+  vtkSynchronousMPISelfConnection();
+  ~vtkSynchronousMPISelfConnection();
 
   // Description:
   // This method gets called on satellite nodes during Initialize().
@@ -62,8 +62,8 @@ protected:
     vtkClientServerStream& stream);
 
 private:
-  vtkPMPISelfConnection(const vtkPMPISelfConnection&); // Not implemented
-  void operator=(const vtkPMPISelfConnection&); // Not implemented
+  vtkSynchronousMPISelfConnection(const vtkSynchronousMPISelfConnection&); // Not implemented
+  void operator=(const vtkSynchronousMPISelfConnection&); // Not implemented
 //ETX
 };
 

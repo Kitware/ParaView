@@ -27,7 +27,6 @@ SET(Kit_SRCS
   vtkClientConnection.cxx
   vtkConnectionIterator.cxx
   vtkMPISelfConnection.cxx
-  vtkPMPISelfConnection.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModule.cxx
@@ -64,6 +63,7 @@ SET(Kit_SRCS
   vtkSelfConnection.cxx
   vtkServerConnection.cxx
   vtkStringList.cxx  
+  vtkSynchronousMPISelfConnection.cxx
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx

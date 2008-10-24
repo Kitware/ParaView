@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPMPISelfConnection.cxx
+  Module:    vtkSynchronousMPISelfConnection.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,33 +12,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPMPISelfConnection.h"
+#include "vtkSynchronousMPISelfConnection.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVInformation.h"
 #include "vtkClientServerStream.h"
 
-vtkStandardNewMacro(vtkPMPISelfConnection);
-vtkCxxRevisionMacro(vtkPMPISelfConnection, "1.2");
+vtkStandardNewMacro(vtkSynchronousMPISelfConnection);
+vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.1");
 //----------------------------------------------------------------------------
-vtkPMPISelfConnection::vtkPMPISelfConnection()
+vtkSynchronousMPISelfConnection::vtkSynchronousMPISelfConnection()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPMPISelfConnection::~vtkPMPISelfConnection()
+vtkSynchronousMPISelfConnection::~vtkSynchronousMPISelfConnection()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPMPISelfConnection::Finalize()
+void vtkSynchronousMPISelfConnection::Finalize()
 {
   this->vtkSelfConnection::Finalize();
 }
 
 //----------------------------------------------------------------------------
-int vtkPMPISelfConnection::InitializeSatellite(
+int vtkSynchronousMPISelfConnection::InitializeSatellite(
   int vtkNotUsed(argc), char** vtkNotUsed(argv))
 {
   this->RegisterSatelliteRMIs();
@@ -48,7 +48,7 @@ int vtkPMPISelfConnection::InitializeSatellite(
 }
 
 //----------------------------------------------------------------------------
-void vtkPMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
+void vtkSynchronousMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
   vtkClientServerStream& stream)
 {
   // Every processes all streams locally.
@@ -61,7 +61,7 @@ void vtkPMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
 }
 
 //----------------------------------------------------------------------------
-void vtkPMPISelfConnection::GatherInformation(vtkTypeUInt32 serverFlags, 
+void vtkSynchronousMPISelfConnection::GatherInformation(vtkTypeUInt32 serverFlags, 
   vtkPVInformation* info, vtkClientServerID id)
 {
   if (info->GetRootOnly() || this->GetNumberOfPartitions() == 1)
@@ -113,7 +113,7 @@ void vtkPMPISelfConnection::GatherInformation(vtkTypeUInt32 serverFlags,
 }
 
 //----------------------------------------------------------------------------
-void vtkPMPISelfConnection::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSynchronousMPISelfConnection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
