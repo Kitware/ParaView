@@ -21,7 +21,7 @@
 #include "vtkCommand.h"
 #include "vtkConnectionIterator.h"
 #include "vtkMPISelfConnection.h"
-#include "vtkPMPISelfConnection.h"
+#include "vtkMPISelfConnection.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConnection.h"
@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.26");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.27");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
