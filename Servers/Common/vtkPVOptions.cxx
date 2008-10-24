@@ -13,11 +13,9 @@
 =========================================================================*/
 #include "vtkPVOptions.h"
 
-#include "vtkMPISelfConnection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVConfig.h" //For PARAVIEW_ALWAYS_SECURE_CONNECTION option
 #include "vtkPVOptionsXMLParser.h"
-#include "vtkProcessModule.h"
 
 #include <vtksys/CommandLineArguments.hxx>
 #include <vtksys/SystemTools.hxx>
@@ -26,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.46");
+vtkCxxRevisionMacro(vtkPVOptions, "1.47");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -311,20 +309,8 @@ int vtkPVOptions::DeprecatedArgument(const char* argument)
 //----------------------------------------------------------------------------
 vtkSelfConnection* vtkPVOptions::NewSelfConnection()
 {
-  // Create and initialize the self connection. This would also initialize
-  // the MPIController, if any.
-  vtkSelfConnection* sc = 0;
-  if (this->ClientMode || !vtkProcessModule::GetProcessModule()->GetUseMPI())
-    {
-    // No MPI needed in on a pure Client.
-    sc = vtkSelfConnection::New();
-    }
-  else
-    {
-    sc = vtkMPISelfConnection::New();
-    }
-
-  return sc;
+  // Let vtkProcessModuleConnectionManager do the default thing.
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

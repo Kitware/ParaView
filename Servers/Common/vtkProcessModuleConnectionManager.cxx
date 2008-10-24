@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.25");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.26");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -126,6 +126,18 @@ int vtkProcessModuleConnectionManager::Initialize(int argc, char** argv,
   // Create and initialize the self connection. This would also initialize
   // the MPIController, if any.
   vtkSelfConnection* sc = pm->GetOptions()->NewSelfConnection();
+  if (!sc)
+    {
+    if (this->ClientMode || !vtkProcessModule::GetProcessModule()->GetUseMPI())
+      {
+      // No MPI needed in on a pure Client.
+      sc = vtkSelfConnection::New();
+      }
+    else
+      {
+      sc = vtkMPISelfConnection::New();
+      }
+    }
   this->SetConnection(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
     sc);
   sc->Delete();

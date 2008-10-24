@@ -114,8 +114,9 @@ public:
   vtkGetMacro(TellVersion, int);
 
   // Description:
-  // Called to create the primary self-connection. Default implementation
-  // handles all paraview cases. Makes it possible for new paraview-based
+  // Called to create the primary self-connection. If NULL is returned then
+  // vtkProcessModuleConnectionManager will do the default thing.
+  // Makes it possible for new paraview-based
   // applications to provide new primary connection types.
   virtual vtkSelfConnection* NewSelfConnection();
 
