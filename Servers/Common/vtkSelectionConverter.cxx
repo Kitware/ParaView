@@ -31,7 +31,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.16");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.17");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -228,7 +228,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       // for each point we find the first cell it belongs to and then lookup the
       // composite index.
       ds->GetPointCells(geomPointId, idlist);
-      vtkIdType geomCellId;
+      vtkIdType geomCellId = 0;
       if (idlist->GetNumberOfIds() > 0)
         {
         geomCellId = idlist->GetId(0);
