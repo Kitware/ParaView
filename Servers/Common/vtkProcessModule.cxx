@@ -136,7 +136,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.88");
+vtkCxxRevisionMacro(vtkProcessModule, "1.89");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -358,7 +358,8 @@ int vtkProcessModule::Start(int argc, char** argv)
   //  }
 
   // Running in server mode.
-  return this->StartServer(0);
+  // StartServer() needs to be called only on the root node.
+  return (this->GetPartitionId() == 0)? this->StartServer(0) : 0;
 }
 
 //-----------------------------------------------------------------------------
