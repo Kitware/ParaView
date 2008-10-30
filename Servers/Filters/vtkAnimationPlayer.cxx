@@ -18,7 +18,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkAnimationPlayer, "1.2");
+vtkCxxRevisionMacro(vtkAnimationPlayer, "1.3");
 vtkCxxSetObjectMacro(vtkAnimationPlayer, AnimationScene, vtkPVAnimationScene);
 //----------------------------------------------------------------------------
 vtkAnimationPlayer::vtkAnimationPlayer()
@@ -65,7 +65,7 @@ void vtkAnimationPlayer::Play()
 
   do 
     {
-    this->StartLoop(starttime, endtime);
+    this->StartLoop(starttime, endtime, this->CurrentTime);
     this->AnimationScene->Initialize();
     double deltatime = 0.0;
     while (!this->StopPlay && this->CurrentTime <= endtime)
