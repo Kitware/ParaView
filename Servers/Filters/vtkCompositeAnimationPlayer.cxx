@@ -28,7 +28,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkCompositeAnimationPlayer);
-vtkCxxRevisionMacro(vtkCompositeAnimationPlayer, "1.1");
+vtkCxxRevisionMacro(vtkCompositeAnimationPlayer, "1.2");
 //----------------------------------------------------------------------------
 vtkCompositeAnimationPlayer::vtkCompositeAnimationPlayer()
 {
@@ -82,11 +82,11 @@ void vtkCompositeAnimationPlayer::SetActive(int index)
 }
 
 //----------------------------------------------------------------------------
-void vtkCompositeAnimationPlayer::StartLoop(double starttime, double endtime)
+void vtkCompositeAnimationPlayer::StartLoop(double starttime, double endtime, double currenttime)
 {
   if (this->Internal->ActivePlayer)
     {
-    this->Internal->ActivePlayer->StartLoop(starttime, endtime);
+    this->Internal->ActivePlayer->StartLoop(starttime, endtime, currenttime);
     }
 }
 
