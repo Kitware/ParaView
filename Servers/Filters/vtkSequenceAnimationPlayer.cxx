@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSequenceAnimationPlayer);
-vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.3");
+vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.4");
 //----------------------------------------------------------------------------
 vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 {
@@ -31,16 +31,33 @@ vtkSequenceAnimationPlayer::~vtkSequenceAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime)
+void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
+                                           double currenttime)
 {
+  // the frame index is inited to 0 ONLY when an animation is not resumed from
+  // an intermediate frame
   this->FrameNo = 0;
+  
   this->StartTime = starttime;
   this->EndTime = endtime;
+  
+  // currenttime, which might be the 'scene time' (usually unequal to
+  // starttime) upon the previous pause / stop operation (if any), is used to
+  // determine the actual frame index from which to resume the animation
+  if (currenttime > starttime)
+    {
+    // let's resume from the frame NEXT to the one on which the animation WAS
+    // paused / stopped
+    this->FrameNo = static_cast<int>( (currenttime - this->StartTime) * 
+                                      (this->NumberOfFrames - 1) / 
+                                      (this->EndTime - this->StartTime) + 0.5
+                                    ) + 1;
+    }
 }
 
 //----------------------------------------------------------------------------
 double vtkSequenceAnimationPlayer::GetNextTime(double vtkNotUsed(curtime))
-{
+{ 
   this->FrameNo++;
   double time = this->StartTime + 
     ((this->EndTime - this->StartTime)*this->FrameNo)/(this->NumberOfFrames-1);
