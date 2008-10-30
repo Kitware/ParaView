@@ -1,0 +1,403 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+   <SourceProxy name="HaloFinder" class="vtkCosmoHaloFinder" label="Cosmology Halo Finder">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+     
+     <IntVectorProperty 
+        name="BatchMode" 
+        command="SetBatchMode" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Set this property to process the whole time series and write the output as a new time series.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="OutputDirectory" 
+        command="SetOutputDirectory" 
+        number_of_elements="1"
+        default_values="./halo/"> 
+        <Documentation>
+          Set the output directory for the new time series data.
+        </Documentation>
+     </StringVectorProperty>
+     
+     <IntVectorProperty 
+        name="np" 
+        command="Setnp" 
+        number_of_elements="1"
+        default_values="256" > 
+       <Documentation>
+         Number of particles seeded in each dim of the original simulation app.
+       </Documentation>
+     </IntVectorProperty>
+     <IntVectorProperty 
+        name="pmin" 
+        command="Setpmin" 
+        number_of_elements="1"
+        default_values="10" > 
+       <Documentation>
+         Minimal number of particles needed before a group is called a halo.
+       </Documentation>
+     </IntVectorProperty>
+     <DoubleVectorProperty 
+        name="bb" 
+        command="Setbb" 
+        number_of_elements="1"
+        default_values="0.20" > 
+       <Documentation>
+         Linking length measured in units of interparticle spacing, and so dimensionless.
+       </Documentation>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="rL" 
+        command="SetrL" 
+        number_of_elements="1"
+        default_values="90.140845070423" > 
+       <Documentation>
+         Physical length of the box.
+       </Documentation>
+     </DoubleVectorProperty>
+     <IntVectorProperty 
+        name="Periodic" 
+        command="SetPeriodic" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+   <!-- End HaloFinder -->
+   </SourceProxy>
+   
+   <SourceProxy name="HaloClass" class="vtkCosmoHaloClassFilter" label="Cosmology Halo Classification">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1"/>
+     </InputProperty>
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Classify By">
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property specifies the name of the scalar array from which the halos are classified.
+          </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="BoundValues"
+        command="SetBoundValue"
+        label="Classification Bounds"
+        set_number_command="SetNumberOfBounds"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1"
+        animateable="1">
+          <!--ArrayRangeDomain name="scalar_range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain-->
+          <Documentation>
+            This property specifies the bound values between halo classes.
+          </Documentation>
+     </DoubleVectorProperty>
+     <Hints>
+       <Visibility replace_input="2" />
+     </Hints>
+   <!-- End HaloClass -->
+   </SourceProxy>
+   
+   <SourceProxy name="HaloCount" class="vtkCosmoHaloCountFilter" label="Number of Halos Over Time">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+     </InputProperty>
+   <!-- End HaloCount -->
+   </SourceProxy>
+   
+   <SourceProxy name="CosmoDistiller" class="vtkCosmoDistillerSTD"
+    label="Cosmology Distill Filter">
+    <Documentation>
+    The cosmology distill filter distills the Source by masking the selected data array.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1"/>
+          <Documentation>
+            This property specifies the dataset containing the mask data array.
+          </Documentation>
+     </InputProperty>
+     <InputProperty
+        name="Source"
+        command="SetSourceConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="source_array" attribute_type="point"
+                            number_of_components="1"/>
+           <Documentation>
+             This property specifies the dataset whose point data will be distilled based on the Input.
+           </Documentation>
+      </InputProperty>
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Mask Array">
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+          input_domain_name="input_array">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property specifies the name of the scalar array which will be used as the mask.
+          </Documentation>
+     </StringVectorProperty>
+     <StringVectorProperty 
+        name="SelectSourceScalars" 
+        command="SetSourceArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Source Array">
+          <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="source_array">
+            <RequiredProperties>
+               <Property name="Source" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property specifies the name of the scalar array which will be distilled.
+          </Documentation>
+     </StringVectorProperty>
+   <!-- End CosmoDistiller -->
+   </SourceProxy>
+
+   <SourceProxy name="CosmoHaloSorter" class="vtkCosmoHaloSorter"
+    label="Cosmology Halo Sorter">
+    <Documentation>
+    The cosmology halo sorter sort the input data using the field specified by the user.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1"/>
+          <Documentation>
+            This property specifies the dataset containing the mask data array.
+          </Documentation>
+     </InputProperty>
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Sort By">
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+          input_domain_name="input_array">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property specifies the name of the scalar array which will be used as the mask.
+          </Documentation>
+     </StringVectorProperty>
+     <IntVectorProperty 
+        name="Descending" 
+        command="SetDescending" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         When set, the halos are sorted descendingly, otherwise ascendingly.
+       </Documentation>
+     </IntVectorProperty>
+  <!-- End CosmoHaloSorter -->
+  </SourceProxy>
+  
+   <SourceProxy name="CosmoNDF" class="vtkCosmoCorrelater" label="Cosmology Number of Direct Friends">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+     </InputProperty>
+     <InputProperty
+        name="Query"
+        command="SetQueryConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+     </InputProperty>     
+     <IntVectorProperty 
+        name="np" 
+        command="Setnp" 
+        number_of_elements="1"
+        default_values="256" > 
+       <Documentation>
+         Number of particles seeded in each dim of the original simulation app.
+       </Documentation>
+     </IntVectorProperty>
+     <DoubleVectorProperty 
+        name="bb" 
+        command="Setbb" 
+        number_of_elements="1"
+        default_values="0.20" > 
+       <Documentation>
+         Linking length measured in units of interparticle spacing, and so dimensionless.
+       </Documentation>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="rL" 
+        command="SetrL" 
+        number_of_elements="1"
+        default_values="90.140845070423" > 
+       <Documentation>
+         Physical length of the box.
+       </Documentation>
+     </DoubleVectorProperty>
+     <IntVectorProperty 
+        name="Periodic" 
+        command="SetPeriodic" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+       </Documentation>
+     </IntVectorProperty>
+     <StringVectorProperty 
+        name="FieldName" 
+        command="SetFieldName" 
+        number_of_elements="1"
+        default_values="NDF"> 
+        <Documentation>
+          Set the field name of NDF data.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End NDF -->
+   </SourceProxy>
+   <SourceProxy name="CosmoWrapAround" class="vtkCosmoDistillerVTU" label="Cosmology Wrap-Around Translate">
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkUnstructuredGrid"/>
+          </DataTypeDomain>
+     </InputProperty>    
+     <DoubleVectorProperty 
+        name="rL" 
+        command="SetrL" 
+        number_of_elements="1"
+        default_values="90.140845070423" > 
+       <Documentation>
+         Physical length of the box.
+       </Documentation>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="XORG" 
+        command="SetXORG" 
+        number_of_elements="1"
+        default_values="0" > 
+       <Documentation>
+         The X-coordinate of the new origin.
+       </Documentation>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="YORG" 
+        command="SetYORG" 
+        number_of_elements="1"
+        default_values="0" > 
+       <Documentation>
+         The Y-coordinate of the new origin.
+       </Documentation>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="ZORG" 
+        command="SetZORG" 
+        number_of_elements="1"
+        default_values="0" > 
+       <Documentation>
+         The Z-coordinate of the new origin.
+       </Documentation>
+     </DoubleVectorProperty>
+   <!-- End NDF -->
+   </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

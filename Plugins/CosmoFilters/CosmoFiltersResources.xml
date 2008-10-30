@@ -1,0 +1,12 @@
+<ParaViewFilters>
+  <Category name="Cosmology" menu_label="Cosmology">
+    <Filter name="HaloFinder"/>
+    <Filter name="HaloClass"/>
+    <Filter name="HaloCount"/>
+    <Filter name="CosmoDistiller"/>
+    <Filter name="CosmoHaloSorter"/>
+    <Filter name="CosmoNDF"/>
+    <Filter name="CosmoWrapAround"/>
+  </Category>
+</ParaViewFilters>
+
