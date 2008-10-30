@@ -40,7 +40,7 @@ protected:
   vtkRealtimeAnimationPlayer();
   ~vtkRealtimeAnimationPlayer();
 
-  virtual void StartLoop(double, double);
+  virtual void StartLoop(double, double, double);
   virtual void EndLoop() {}
 
   // Description:

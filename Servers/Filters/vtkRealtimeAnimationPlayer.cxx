@@ -18,7 +18,7 @@
 #include "vtkTimerLog.h"
 
 vtkStandardNewMacro(vtkRealtimeAnimationPlayer);
-vtkCxxRevisionMacro(vtkRealtimeAnimationPlayer, "1.1");
+vtkCxxRevisionMacro(vtkRealtimeAnimationPlayer, "1.2");
 //----------------------------------------------------------------------------
 vtkRealtimeAnimationPlayer::vtkRealtimeAnimationPlayer()
 {
@@ -35,7 +35,7 @@ vtkRealtimeAnimationPlayer::~vtkRealtimeAnimationPlayer()
 }
 
 //----------------------------------------------------------------------------
-void vtkRealtimeAnimationPlayer::StartLoop(double start, double end)
+void vtkRealtimeAnimationPlayer::StartLoop(double start, double end, double curtime)
 {
   this->StartTime = start;
   this->Factor = (end - start)/this->Duration;

@@ -22,7 +22,7 @@
 class vtkTimestepsAnimationPlayerSetOfDouble : public vtkstd::set<double> {};
 
 vtkStandardNewMacro(vtkTimestepsAnimationPlayer);
-vtkCxxRevisionMacro(vtkTimestepsAnimationPlayer, "1.1");
+vtkCxxRevisionMacro(vtkTimestepsAnimationPlayer, "1.2");
 //-----------------------------------------------------------------------------
 vtkTimestepsAnimationPlayer::vtkTimestepsAnimationPlayer()
 {
@@ -67,7 +67,7 @@ unsigned int vtkTimestepsAnimationPlayer::GetNumberOfTimeSteps()
 }
 
 //-----------------------------------------------------------------------------
-void vtkTimestepsAnimationPlayer::StartLoop(double , double)
+void vtkTimestepsAnimationPlayer::StartLoop(double , double, double)
 {
   this->Count = 0;
 }
