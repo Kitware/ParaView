@@ -1517,7 +1517,7 @@ def _createSetProperty(pName):
 def _findClassForProxy(xmlName):
     """Given the xmlName for a proxy, returns a Proxy class. Note
     that if there are duplicates, the first one is returned."""
-    global sources, filters
+    global sources, filters, rendering, animation, implicit_functions, writers
     if xmlName in sources.__dict__:
         return sources.__dict__[xmlName]
     elif xmlName in filters.__dict__:
@@ -1526,6 +1526,10 @@ def _findClassForProxy(xmlName):
         return rendering.__dict__[xmlName]
     elif xmlName in animation.__dict__:
         return animation.__dict__[xmlName]
+    elif xmlName in implicit_functions.__dict__:
+        return implicit_functions.__dict__[xmlName]
+    elif xmlName in writers.__dict__:
+        return writers.__dict__[xmlName]
     else:
         return None
 
