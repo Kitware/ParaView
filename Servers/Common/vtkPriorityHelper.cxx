@@ -5,7 +5,7 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPriorityHelper, "1.1");
+vtkCxxRevisionMacro(vtkPriorityHelper, "1.2");
 vtkStandardNewMacro(vtkPriorityHelper);
 
 //-----------------------------------------------------------------------------
@@ -53,8 +53,8 @@ int vtkPriorityHelper::SetSplitUpdateExtent(int port,
                                             int piece, int offset,
                                             int numPieces, 
                                             int numPasses,
-  int ghostLevel,
-  int save)
+                                            int vtkNotUsed(ghostLevel),
+                                            int save)
 {
   //set currently active piece, remember settings to reuse internally
   if (this->Input)
