@@ -363,7 +363,14 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     }
   repr->UpdateVTKObjects();
 
-  geomInfo = repr->GetRepresentedDataInformation(/*update=*/true);
+  if (!pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault())
+    {
+    geomInfo = repr->GetRepresentedDataInformation(/*update=*/true);
+    }
+  else
+    {
+    geomInfo = repr->GetRepresentedDataInformation(false);
+    }
 
   // Locate input display.
   pqPipelineRepresentation* upstreamDisplay = 
@@ -755,7 +762,15 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     ret.append(pqPipelineRepresentation::solidColor());
     }
 
-  vtkPVDataInformation* geomInfo = repr->GetRepresentedDataInformation();
+  vtkPVDataInformation* geomInfo = NULL;
+  if (!pqApplicationCore::instance()->getDisplayPolicy()->getHideByDefault())
+    {
+    geomInfo = repr->GetRepresentedDataInformation(true);
+    }
+  else
+    {
+    geomInfo = repr->GetRepresentedDataInformation(false);
+    }
   if(!geomInfo)
     {
     return ret;

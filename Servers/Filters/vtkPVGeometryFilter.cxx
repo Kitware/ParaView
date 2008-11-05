@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.88");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.89");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -144,6 +144,10 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->PassThroughPointIds = 1;
   this->ForceUseStrips = 0;
   this->StripModFirstPass = 1;
+
+  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_RANGES(), 1);
+  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_BOUNDS(), 1);  
+  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_TOPOLOGY(), 1);
 }
 
 //----------------------------------------------------------------------------

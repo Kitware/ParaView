@@ -27,6 +27,7 @@ SET(Kit_SRCS
   vtkClientConnection.cxx
   vtkConnectionIterator.cxx
   vtkMPISelfConnection.cxx
+  vtkPriorityHelper.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModule.cxx

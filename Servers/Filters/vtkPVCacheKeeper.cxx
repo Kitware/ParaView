@@ -42,14 +42,14 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVCacheKeeper);
-vtkCxxRevisionMacro(vtkPVCacheKeeper, "1.1");
+vtkCxxRevisionMacro(vtkPVCacheKeeper, "1.2");
 vtkCxxSetObjectMacro(vtkPVCacheKeeper, CacheSizeKeeper, vtkCacheSizeKeeper);
 //----------------------------------------------------------------------------
 vtkPVCacheKeeper::vtkPVCacheKeeper()
 {
   this->Cache = new vtkPVCacheKeeper::vtkCacheMap();
   this->CacheTime = 0.0;
-  this->CachingEnabled = true;
+  this->CachingEnabled = true; 
   this->CacheSizeKeeper = 0;
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -58,6 +58,7 @@ vtkPVCacheKeeper::vtkPVCacheKeeper()
     this->SetCacheSizeKeeper(
       vtkProcessModule::GetProcessModule()->GetCacheSizeKeeper());
     }
+  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
 }
 
 //----------------------------------------------------------------------------

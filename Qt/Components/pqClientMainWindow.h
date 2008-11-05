@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqGenericViewModule;
 class pqPipelineSource;
+class pqMainWindowCore;
 
 /// Provides the main window for the ParaView application
 class PQCOMPONENTS_EXPORT pqClientMainWindow :
@@ -53,19 +54,28 @@ class PQCOMPONENTS_EXPORT pqClientMainWindow :
 public:
   pqClientMainWindow();
   ~pqClientMainWindow();
+  
+  /// This constructor allows applications to use their own derived subclasses for pqMainWindowCore
+  pqClientMainWindow(pqMainWindowCore *core); 
 
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+
+  /// Applications can use this to get rid of selection menu
+  void disableSelections();
 
 public slots:
   QVariant findToolBarActionsNotInMenus();
 
+  //show a customized message on the status bar 
+  void setMessage(const QString&); 
+ 
 private slots:
   void onUndoLabel(const QString&);
   void onRedoLabel(const QString&);
 
   void onCameraUndoLabel(const QString&);
   void onCameraRedoLabel(const QString&);
-
+  
   void onPreAccept();
   void onPostAccept();
   void endWaitCursor();
@@ -92,8 +102,10 @@ private slots:
   void onSelectionModeChanged(int mode);
 
 private:
+  void constructorHelper(); 
+
   class pqImplementation;
-  pqImplementation* const Implementation;
+  pqImplementation* Implementation;
 };
 
 #endif // !_pqClientMainWindow_h

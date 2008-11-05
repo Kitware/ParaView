@@ -234,7 +234,16 @@ public:
     delete this->LookupTableManager;
   }
 
-  QWidget* const Parent;
+  void mySetParent(QWidget *parent) 
+  {
+    this->Parent = parent;
+    this->MultiViewManager.setParent(parent);
+    this->CustomFilters->setParent(parent);
+    this->LookupTableManager->setParent(parent);
+    this->QuickLaunchDialog.setParent(parent);
+  }
+
+  QWidget* Parent;
   pqViewManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
@@ -297,8 +306,24 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore
 
-pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
-  Implementation(new pqImplementation(parent_widget))
+pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget)
+{
+  this->Implementation = new pqImplementation(parent_widget);
+  this->constructorHelper(parent_widget);
+}
+
+pqMainWindowCore::pqMainWindowCore()
+{
+  this->Implementation = new pqImplementation(NULL);
+  this->constructorHelper(NULL);
+}
+
+void pqMainWindowCore::setParent(QWidget* newParent) 
+{
+  this->Implementation->mySetParent(newParent);
+}
+
+void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
 {
   this->setObjectName("MainWindowCore");
   

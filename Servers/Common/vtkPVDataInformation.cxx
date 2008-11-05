@@ -25,10 +25,12 @@
 #include "vtkDataArray.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
+#include "vtkExecutive.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGraph.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -43,11 +45,12 @@
 #include "vtkTable.h"
 #include "vtkUniformGrid.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkPriorityHelper.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.57");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -395,11 +398,22 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
 
+#if 1//DDM TODO I wrote the else section for streaming, but it makes tests fail
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
     {
     this->Bounds[idx] = bds[idx];
     }
+#else
+  if (!vtkMath::AreBoundsInitialized(this->Bounds))
+    {
+    bds = data->GetBounds();
+    for (idx = 0; idx < 6; ++idx)
+      {
+      this->Bounds[idx] = bds[idx];
+      }
+    }
+#endif
   this->MemorySize = data->GetActualMemorySize();
 
   vtkPointSet* ps = vtkPointSet::SafeDownCast(data);
@@ -535,6 +549,18 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
       dobj = algOutput->GetProducer()->GetOutputDataObject(
         algOutput->GetIndex());
       }
+    else
+      {
+      vtkPriorityHelper *helper = vtkPriorityHelper::SafeDownCast(object);
+      if (helper)
+        {
+        dobj = helper->ConditionallyGetDataObject();
+        if (!dobj)
+          {
+          return;
+          }
+        }
+      }
     }
 
   if (!dobj)
@@ -550,6 +576,31 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
+#if 1//DDM TODO I wrote the else section for streaming, but parallel tests fail
+#else
+  // Get the bounds from the reader meta-data if available
+  vtkAlgorithmOutput* pp = dobj->GetProducerPort();
+  if (pp)
+    {
+    vtkExecutive* exec = pp->GetProducer()->GetExecutive();
+    vtkInformation* outInfo = exec->GetOutputInformation(
+      pp->GetIndex());
+    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+      {
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+        this->Bounds);
+      }
+    else
+      {
+      vtkStreamingDemandDrivenPipeline *sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(exec);
+      if (sddp)
+        {
+        sddp->GetWholeBoundingBox(0, this->Bounds);
+        }
+      }
+    }
+#endif
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)
     {

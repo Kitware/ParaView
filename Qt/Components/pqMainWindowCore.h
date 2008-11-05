@@ -101,6 +101,14 @@ public:
   pqMainWindowCore(QWidget* parent);
   ~pqMainWindowCore();
 
+  //This constructor is meant to be paired with the setParent method
+  //as an alternate to the original constructor. The purpose is to 
+  //let applications use pqClientMainWindow, yet still subclass to 
+  //augment pqMainWindowCore
+  pqMainWindowCore(); 
+  void setParent(QWidget* parent);
+
+
   /// Returns a multi-view widget which can be embedded in the UI  
   pqViewManager& multiViewManager();
   /// Returns the selection manager, which handles interactive selection
@@ -485,9 +493,8 @@ private:
       int numServers, bool pendingDisplays);
   void updateViewUndoRedo(pqRenderView* renderView);
   class pqImplementation;
-  pqImplementation* const Implementation;
-
-
+  pqImplementation* Implementation;
+  void constructorHelper(QWidget *parent);
 };
 
 #endif // !_pqMainWindowCore_h

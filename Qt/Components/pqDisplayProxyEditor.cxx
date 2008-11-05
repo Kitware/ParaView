@@ -204,6 +204,13 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     this->Internal->AnnotationGroup->hide();
     }
 
+  //if ((prop = reprProxy->GetProperty("PieceBoundsVisibility")) != 0) //DDM TODO
+  //  {
+  //  this->Internal->Links->addPropertyLink(this->Internal->ShowPieceBounds,
+  //    "checked", SIGNAL(stateChanged(int)),
+  //    reprProxy, prop);
+  //  }
+
   // setup for choosing color
   if (reprProxy->GetProperty("DiffuseColor"))
     {
@@ -590,6 +597,10 @@ void pqDisplayProxyEditor::updateEnableState()
       display->GetProperty("ColorAttributeType"));
     vtkPVDataInformation* geomInfo = 
       display->GetRepresentedDataInformation(/*update=*/false);
+    if (!geomInfo)
+      {
+      return;
+      }
     vtkPVDataSetAttributesInformation* attrInfo;
     if (scalarMode == "POINT_DATA")
       {

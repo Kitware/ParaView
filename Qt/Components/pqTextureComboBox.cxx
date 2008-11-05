@@ -388,6 +388,10 @@ void pqTextureComboBox::updateEnableState()
     // Enable only if we have point texture coordinates.
     vtkPVDataInformation* dataInfo = vtkSMDataRepresentationProxy::SafeDownCast(
       this->Internal->Representation->getProxy())->GetRepresentedDataInformation(false);
+    if (!dataInfo)
+      {
+      return;
+      }
      vtkPVDataSetAttributesInformation *pdInfo = dataInfo->GetPointDataInformation();
     if (pdInfo && pdInfo->GetAttributeInformation(vtkDataSetAttributes::TCOORDS))
       {
