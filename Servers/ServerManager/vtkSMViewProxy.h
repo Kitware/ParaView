@@ -157,6 +157,33 @@ public:
     return this->GetXMLName();
     }
 
+  // Description:
+  // Views keep this false to schedule additional passes.
+  virtual int GetDisplayDone() { return 1; }
+
+  // Description:
+  // Implementation to create a representation requested strategy. DDM TODO Do I have to make this public?
+  virtual vtkSMRepresentationStrategy* NewStrategyInternal(
+    int vtkNotUsed(dataType))
+    { return 0; }
+
+  //Description:
+  // When set, strategy creation will defer to the otherView.
+  // Note this is not reference counted to avoid circular dependency
+  void SetNewStrategyHelper(vtkSMViewProxy *otherView)
+  {
+    this->NewStrategyHelper = otherView;
+  }
+  vtkGetObjectMacro(NewStrategyHelper, vtkSMViewProxy);
+
+  // Collection of representation objects added to this view.
+  vtkCollection* Representations; //DDM TODO Do I have to make this public?
+
+  // Description:
+  // Called by AddRepresentation(). Subclasses can override to add 
+  // observers etc. //DDM TODO Do I have to make this public?
+  virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
+
 //BTX
 protected:
   vtkSMViewProxy();
@@ -204,11 +231,6 @@ protected:
   virtual void EndCreateVTKObjects() {};
 
   // Description:
-  // Called by AddRepresentation(). Subclasses can override to add 
-  // observers etc.
-  virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
-
-  // Description:
   // Called by RemoveRepresentation(). Subclasses can override to remove 
   // observers etc.
   virtual void RemoveRepresentationInternal(vtkSMRepresentationProxy* rep);
@@ -227,12 +249,6 @@ protected:
   // Description:
   // Called to create the vtk objects.
   virtual void CreateVTKObjects();
-
-  // Description:
-  // Implementation to create a representation requested strategy.
-  virtual vtkSMRepresentationStrategy* NewStrategyInternal(
-    int vtkNotUsed(dataType))
-    { return 0; }
 
   // Description:
   // Equivaluent to 
@@ -270,9 +286,6 @@ protected:
   // Default implementation is empty.
   virtual void InitializeForMultiView(vtkSMViewProxy* vtkNotUsed(otherView)) {}
 
-  // Collection of representation objects added to this view.
-  vtkCollection* Representations;
-
   // Information object used to keep rendering specific information.
   // It is passed to the representations added to the view.
   vtkInformation* Information;
@@ -286,6 +299,9 @@ protected:
 
   vtkSetStringMacro(DefaultRepresentationName);
   char* DefaultRepresentationName;
+
+  vtkSMViewProxy *NewStrategyHelper;
+
 private:
   vtkSMViewProxy(const vtkSMViewProxy&); // Not implemented
   void operator=(const vtkSMViewProxy&); // Not implemented

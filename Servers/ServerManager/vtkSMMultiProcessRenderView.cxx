@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.8");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.9");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -40,6 +40,13 @@ vtkSMMultiProcessRenderView::~vtkSMMultiProcessRenderView()
 vtkSMRepresentationStrategy* vtkSMMultiProcessRenderView::NewStrategyInternal(
   int dataType)
 {
+  if (this->NewStrategyHelper)
+    {
+    return this->NewStrategyHelper->NewStrategyInternal(dataType);
+    }
+
+  
+ 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 

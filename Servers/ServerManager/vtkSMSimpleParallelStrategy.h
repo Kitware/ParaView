@@ -75,6 +75,12 @@ protected:
   void SetLODClientCollect(bool);
   void SetLODClientRender(bool);
 
+  // Since LOD and full res pipeline have exactly the same setup, we have this
+  // common method. //DDM TODO Why public?
+  void CreatePipelineInternal(vtkSMSourceProxy* input, int outputport,
+    vtkSMSourceProxy* collect,
+    vtkSMSourceProxy* updatesuppressor);
+
   vtkSMSourceProxy* PreCollectUpdateSuppressor;
   vtkSMSourceProxy* Collect;
 
@@ -97,11 +103,6 @@ private:
   vtkSMSimpleParallelStrategy(const vtkSMSimpleParallelStrategy&); // Not implemented
   void operator=(const vtkSMSimpleParallelStrategy&); // Not implemented
 
-  // Since LOD and full res pipeline have exactly the same setup, we have this
-  // common method.
-  void CreatePipelineInternal(vtkSMSourceProxy* input, int outputport,
-    vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* updatesuppressor);
 //ETX
 };
 

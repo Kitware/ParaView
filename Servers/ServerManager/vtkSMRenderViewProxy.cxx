@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.79");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.80");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -174,6 +174,11 @@ vtkSMRenderViewProxy::~vtkSMRenderViewProxy()
 vtkSMRepresentationStrategy* vtkSMRenderViewProxy::NewStrategyInternal(
   int dataType)
 {
+  if (this->NewStrategyHelper)
+    {
+    return this->NewStrategyHelper->NewStrategyInternal(dataType);
+    }
+
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
 

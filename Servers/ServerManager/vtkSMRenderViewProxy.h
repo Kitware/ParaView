@@ -182,7 +182,7 @@ public:
   // Checks if color depth is sufficient to support selection.
   // If not, will return 0 and any calls to SelectVisibleCells will 
   // quietly return an empty selection.
-  bool IsSelectionAvailable();
+  virtual bool IsSelectionAvailable();
 
   //BTX
   // Description:
@@ -257,6 +257,11 @@ public:
   // Overridden to choose the correct type of render view.
  virtual const char* GetSuggestedViewType(vtkIdType connectionID);
 
+  // Description:
+  // Called by AddRepresentation(). Subclasses can override to add 
+  // observers etc. //DDM TODO Do I have to make this public?
+  virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
@@ -269,11 +274,6 @@ protected:
   // Description:
   // Called at the end of CreateVTKObjects().
   virtual void EndCreateVTKObjects();
-
-  // Description:
-  // Called by AddRepresentation(). Subclasses can override to add 
-  // observers etc.
-  virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
 
   // Description:
   // Creates a new vtkSMRepresentationStrategy subclass based on the type
@@ -346,7 +346,8 @@ protected:
   int ForceTriStripUpdate;
   int UseImmediateMode;
   double LODThreshold;
-  
+
+public:  
   // Description:
   // Method called before/after Still Render is called.
   // Used to perform some every-still-render-setup actions.
@@ -364,13 +365,17 @@ protected:
   // render.
   virtual void PerformRender();
 
+  // Description:
+  // For internal use only. 
+  void CalculatePolygonsPerSecond(double time); //DDM TODO Do I have to make this public?
+
+protected:
   vtkTimerLog *RenderTimer;
   double LastPolygonsPerSecond;
   double MaximumPolygonsPerSecond;
   double AveragePolygonsPerSecond;
   double AveragePolygonsPerSecondAccumulated;
   vtkIdType AveragePolygonsPerSecondCount;
-  void CalculatePolygonsPerSecond(double time);
   int MeasurePolygonsPerSecond;
   int UseOffscreenRenderingForScreenshots;
   bool LightKitAdded;

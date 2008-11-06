@@ -122,7 +122,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.19");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -155,6 +155,8 @@ vtkSMViewProxy::vtkSMViewProxy()
   this->Information->Set(CACHE_TIME(), this->CacheTime);
 
   this->InRender = false;
+
+  this->NewStrategyHelper = NULL;
 }
 
 //----------------------------------------------------------------------------
