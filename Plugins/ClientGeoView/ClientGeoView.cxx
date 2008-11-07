@@ -80,43 +80,6 @@
 
 #include "ClientGeoViewConfig.h"
 
-#if 0
-// For debugging
-void PrintSelection(vtkSelection* sel)
-{
-  vtkAbstractArray* arr = sel->GetSelectionList();
-  cerr << "===selection===" << endl;
-  cerr << "top-level selection" << endl;
-  cerr << "type: " << sel->GetContentType() << endl;
-  if (arr)
-    {
-    cerr << "domain: " << (arr->GetName() ? arr->GetName() : "null") << endl;
-    for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
-      {
-      cerr << arr->GetVariantValue(i).ToString() << ",";
-      }
-    cerr << endl;
-    }
-  for (int c = 0; c < sel->GetNumberOfChildren(); ++c)
-    {
-    vtkSelection* child = sel->GetChild(c);
-    cerr << "child " << c <<  " selection" << endl;
-    cerr << "type: " << child->GetContentType() << endl;
-    vtkAbstractArray* list = child->GetSelectionList();
-    if (list)
-      {
-      cerr << "domain: " << (list->GetName() ? list->GetName() : "null") << endl;
-      for (vtkIdType i = 0; i < list->GetNumberOfTuples(); ++i)
-        {
-        cerr << list->GetVariantValue(i).ToString() << ",";
-        }
-      cerr << endl;
-      }
-    }
-  cerr << "===end selection===" << endl;
-}
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientGeoView::command
 
@@ -217,12 +180,9 @@ ClientGeoView::ClientGeoView(
   if (tileDatabase.length() == 0)
     {
     // Load default image.
-    //vtkJPEGReader* const reader = vtkJPEGReader::New();
     vtkPNGReader* const reader = vtkPNGReader::New();
     if(pqFilesystem::shareDirectory().exists("NE2_ps_bath.png"))
       reader->SetFileName(pqFilesystem::shareDirectory().filePath("NE2_ps_bath.png").toAscii().data());
-
-    cerr << "Using image file: " << (reader->GetFileName() ? reader->GetFileName() : "") << endl;
 
     this->Implementation->VTKConnect->Connect(
       reader,  vtkCommand::ProgressEvent,
@@ -231,22 +191,18 @@ ClientGeoView::ClientGeoView(
     this->Implementation->VTKConnect->Disconnect(reader);
 
     // Use the following to create a new tile database.
-    //source->LoadAnImage(reader->GetOutput(),
-    //  "/home/jeff/Work/Data/Tiles_NE2_ps_bath/");
-    source->LoadAnImage(reader->GetOutput());
+    source->SetImage(reader->GetOutput());
     reader->Delete();
     }
   else
     {
-    // Load from a tile database.
-    cerr << "Using tile database: " << tileDatabase << endl;
-    source->LoadTiles(tileDatabase.c_str());
+    vtkGenericWarningMacro(<< "Tile database currently not supported");
+    //source->LoadTiles(tileDatabase.c_str());
     }
 
   rep->SetSource(source);
-  rep->SetTerrain(terrain);
-  rep->Update(0);
 
+  this->Implementation->View->SetTerrain(terrain);
   this->Implementation->View->AddRepresentation(rep);
   terrain->Delete();
   this->Implementation->VTKConnect->Disconnect(source);
