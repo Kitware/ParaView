@@ -44,6 +44,11 @@ pqSettings::pqSettings(
 {
 }
 
+void pqSettings::alertSettingsModified()
+{
+  emit this->modified();
+}
+
 void pqSettings::saveState(const QMainWindow& window, const QString& key)
 {
   this->beginGroup(key);

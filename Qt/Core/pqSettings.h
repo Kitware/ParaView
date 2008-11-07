@@ -59,6 +59,12 @@ public:
   
   void restoreState(const QString& key, QMainWindow& window);
   void restoreState(const QString& key, QDialog& dialog);
+
+  /// Calling this method will cause the modified signal to be emited.
+  void alertSettingsModified();
+
+signals:
+  void modified();
 };
 
 #endif

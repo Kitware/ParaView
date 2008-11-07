@@ -417,15 +417,32 @@ public:
   // this method will return 1.
   int GetVersionPatch();
 
-  // Description:
   // Register a proxy manager extension. Returns true if the registration is
   // successful.
   bool RegisterExtension(vtkSMProxyManagerExtension* ext);
-
-  // Description:
   // Unregister a previously register extension.
   void UnRegisterExtension(vtkSMProxyManagerExtension* ext);
 
+  // Description:
+  // When set, all vtkSMSources and their DataRepresentations will split their
+  // work into this many Pieces and operate on each in turn to limit memory 
+  // consumption.
+  vtkGetMacro(StreamedPasses, int);
+  void SetStreamedPasses(int n);
+
+  // Description:
+  // Diagnostic modes for Streaming demo
+  vtkSetMacro(UseCulling, int);
+  vtkGetMacro(UseCulling, int);
+  vtkSetMacro(UseViewOrdering, int);
+  vtkGetMacro(UseViewOrdering, int);
+  vtkSetMacro(EnableStreamMessages, int);
+  vtkGetMacro(EnableStreamMessages, int);
+  vtkSetMacro(PieceCacheLimit, int);
+  vtkGetMacro(PieceCacheLimit, int);
+  vtkSetMacro(PieceRenderCutoff, int);
+  vtkGetMacro(PieceRenderCutoff, int);
+  //DDM TODO: The above will be moved into the plugin shortly.
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -481,6 +498,14 @@ protected:
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;
+
+  int StreamedPasses;
+  int UseCulling;
+  int UseViewOrdering;
+  int EnableStreamMessages;
+  int PieceCacheLimit;
+  int PieceRenderCutoff;
+
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

@@ -162,7 +162,8 @@ public:
   virtual int GetDisplayDone() { return 1; }
 
   // Description:
-  // Implementation to create a representation requested strategy. DDM TODO Do I have to make this public?
+  // Implementation to create a representation requested strategy. 
+  //DDM TODO Do I have to make this public?
   virtual vtkSMRepresentationStrategy* NewStrategyInternal(
     int vtkNotUsed(dataType))
     { return 0; }
