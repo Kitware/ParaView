@@ -119,6 +119,8 @@ signals:
 
   void helpRequested(const QString& proxyType);
 
+  void canAccept();
+
 protected slots:
 
   void removeProxy(pqPipelineSource* proxy);

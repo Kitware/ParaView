@@ -240,7 +240,6 @@ public:
     this->MultiViewManager.setParent(parent);
     this->CustomFilters->setParent(parent);
     this->LookupTableManager->setParent(parent);
-    this->QuickLaunchDialog.setParent(parent);
   }
 
   QWidget* Parent;

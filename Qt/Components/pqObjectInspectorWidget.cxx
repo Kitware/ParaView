@@ -651,6 +651,10 @@ void pqObjectInspectorWidget::updateAcceptState()
       }
     }
   this->canAccept(acceptable);
+  if (acceptable)
+    {
+    emit this->canAccept();
+    }
 }
 
 //-----------------------------------------------------------------------------

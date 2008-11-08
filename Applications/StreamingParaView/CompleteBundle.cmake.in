@@ -1,0 +1,64 @@
+SET(CMAKE_BACKWARDS_COMPATIBILITY "2.4")
+SET(toplevel "@EXECUTABLE_OUTPUT_PATH@/paraview.app")
+SET(finaldir "@EXECUTABLE_OUTPUT_PATH@/paraview.app/Contents/MacOS")
+SET(dylibdir "@EXECUTABLE_OUTPUT_PATH@")
+
+MAKE_DIRECTORY("${toplevel}/Contents")
+MAKE_DIRECTORY("${finaldir}")
+MAKE_DIRECTORY("${toplevel}/Contents/Resources")
+
+FIND_PROGRAM(install_name_tool NAMES install_name_tool)
+
+FILE(GLOB libraries RELATIVE "${dylibdir}" "${dylibdir}/*.dylib")
+
+MACRO(__get_qt_library var name libname)
+  SET(${var} "${name}")
+  LIST(LENGTH ${var} __get_qt_library_length)
+  IF(__get_qt_library_length GREATER 1)
+    LIST(GET ${var} 1 ${var})
+  ENDIF(__get_qt_library_length GREATER 1)
+  SET(__get_qt_library_var "${${var}}/Versions/4.0/${libname}")
+  IF(EXISTS ${__get_qt_library_var})
+    SET(${var} ${__get_qt_library_var})
+  ENDIF(EXISTS ${__get_qt_library_var})
+ENDMACRO(__get_qt_library)
+
+__get_qt_library(qtcore     "@QT_QTCORE_LIBRARY@"     QtCore)
+__get_qt_library(qtgui      "@QT_QTGUI_LIBRARY@"      QtGui)
+__get_qt_library(qtnetwork  "@QT_QTNETWORK_LIBRARY@"  QtNetwork)
+__get_qt_library(qtxml      "@QT_QTXML_LIBRARY@"      QtXml)
+__get_qt_library(qttest     "@QT_QTTEST_LIBRARY@"     QtTest)
+__get_qt_library(qtuitools  "@QT_QTUITOOLS_LIBRARY@"  QtUiTools)
+
+SET(qtlibraries ${qtcore} ${qtgui} ${qtnetwork} ${qtxml} ${qttest} ${qtuittools})
+
+MESSAGE("QT libs: ${qtlibraries}")
+
+FOREACH(modlib ${libraries})
+  # Set the library name and library name without path
+  SET(modlibname ${modlib})
+  SET(modlibnamenopath ${modlibname})
+  IF(EXISTS "${dylibdir}/${modlib}")
+    SET(modlibname "${dylibdir}/${modlib}")
+  ELSE(EXISTS "${dylibdir}/${modlib}")
+    GET_FILENAME_COMPONENT(modlibnamenopath "${modlib}" NAME)
+  ENDIF(EXISTS "${dylibdir}/${modlib}")
+
+  MESSAGE("Copy: ${modlibname} to the bundle: ${finaldir}/${modlibnamenopath}")
+
+  # Copy the library to the bundle
+  CONFIGURE_FILE("${modlibname}" "${finaldir}/${modlibnamenopath}" COPYONLY IMMEDIATE)
+
+  # Setup the install names
+  EXECUTE_PROCESS(COMMAND "${install_name_tool}"
+    "${finaldir}/paraview" -change "${modlibname}" "@executable_path/${modlibnamenopath}")
+  EXECUTE_PROCESS(COMMAND "${install_name_tool}"
+    "${finaldir}/${modlibnamenopath}" -id "@executable_path/${modlibnamenopath}")
+
+  FOREACH(inlibname ${libraries})
+    EXECUTE_PROCESS(COMMAND "${install_name_tool}"
+      "${finaldir}/${modlibnamenopath}" -change "${dylibdir}/${inlibname}" "@executable_path/${inlibname}")
+  ENDFOREACH(inlibname)
+ENDFOREACH(modlib)
+
+

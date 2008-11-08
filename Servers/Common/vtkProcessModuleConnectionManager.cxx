@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.27");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.28");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -172,7 +172,10 @@ GetConnectionFromID(vtkIdType connectionID)
   iter->Begin();
   if (iter->IsAtEnd())
     {
-    vtkErrorMacro("Invalid connection ID: " << connectionID);
+    if (connectionID != GetNullConnectionID())
+      {
+      vtkErrorMacro("Invalid connection ID: " << connectionID);
+      }
     iter->Delete();
     return NULL;
     }

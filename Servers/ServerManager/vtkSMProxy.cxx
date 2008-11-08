@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.106");
+vtkCxxRevisionMacro(vtkSMProxy, "1.107");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -893,6 +893,25 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
     }
   if (!found)
     {
+
+    // Check if the property is an exposed property
+    const char *exposed_name = this->GetPropertyName(prop);
+    if (exposed_name)
+      {
+      vtkSMProxyInternals::ExposedPropertyInfoMap::iterator eiter = 
+      this->Internals->ExposedProperties.find(exposed_name);
+      if (eiter != this->Internals->ExposedProperties.end())
+        {
+        const char* subproxy_name =  eiter->second.SubProxyName.c_str();
+        const char* property_name = eiter->second.PropertyName.c_str();
+        vtkSMProxy * sp = this->GetSubProxy(subproxy_name);
+        if (sp)
+          {
+          sp->UpdatePropertyInformation(sp->GetProperty(property_name, 0));
+          }
+        }
+      }
+
     return;
     }
 

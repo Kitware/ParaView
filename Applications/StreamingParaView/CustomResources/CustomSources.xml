@@ -1,0 +1,18 @@
+<ParaViewSources>
+  <Source name="GlyphSource2D" />
+  <Source name="VectorText" />
+  <Source name="ArrowSource" />
+  <Source name="Axes" />
+  <Source name="CubeSource" />
+  <Source name="ConeSource" />
+  <Source name="CylinderSource" />
+  <Source name="LineSource" />
+  <Source name="ImageMandelbrotSource" />
+  <Source name="OutlineSource" />
+  <Source name="PlaneSource" />
+  <Source name="PointSource" />
+  <Source name="SphereSource" />
+  <Source name="TextSource" />
+  <Source name="Ruler" />
+  <Source name="RTAnalyticSource" />
+</ParaViewSources>

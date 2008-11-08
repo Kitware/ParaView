@@ -1,0 +1,5 @@
+<RCC>
+<qresource prefix="/CustomResources">
+@QT_COMPONENTS_CUSTOM_GUI_RESOURCES_CONTENTS@
+</qresource>
+</RCC>
