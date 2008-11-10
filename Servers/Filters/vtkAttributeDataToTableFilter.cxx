@@ -29,7 +29,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
-vtkCxxRevisionMacro(vtkAttributeDataToTableFilter, "1.1");
+vtkCxxRevisionMacro(vtkAttributeDataToTableFilter, "1.2");
 //----------------------------------------------------------------------------
 vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 {
@@ -50,7 +50,7 @@ vtkExecutive* vtkAttributeDataToTableFilter::CreateDefaultExecutive()
 
 //----------------------------------------------------------------------------
 int vtkAttributeDataToTableFilter::FillInputPortInformation(
-  int port, vtkInformation* info)
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
@@ -60,7 +60,8 @@ int vtkAttributeDataToTableFilter::FillInputPortInformation(
 }
 
 //----------------------------------------------------------------------------
-int vtkAttributeDataToTableFilter::RequestData(vtkInformation* request,
+int vtkAttributeDataToTableFilter::RequestData(
+  vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {

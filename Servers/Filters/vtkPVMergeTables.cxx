@@ -25,7 +25,7 @@
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkPVMergeTables);
-vtkCxxRevisionMacro(vtkPVMergeTables, "1.2");
+vtkCxxRevisionMacro(vtkPVMergeTables, "1.3");
 //----------------------------------------------------------------------------
 vtkPVMergeTables::vtkPVMergeTables()
 {
@@ -37,7 +37,8 @@ vtkPVMergeTables::~vtkPVMergeTables()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTables::FillInputPortInformation(int port, vtkInformation* info)
+int vtkPVMergeTables::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");

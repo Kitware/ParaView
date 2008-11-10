@@ -26,7 +26,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkSelectionStreamer);
-vtkCxxRevisionMacro(vtkSelectionStreamer, "1.1");
+vtkCxxRevisionMacro(vtkSelectionStreamer, "1.2");
 //----------------------------------------------------------------------------
 vtkSelectionStreamer::vtkSelectionStreamer()
 {
@@ -150,9 +150,9 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
   else if (output_selections.size() > 1)
     {
     output->SetContentType(vtkSelection::SELECTIONS);
-    for (unsigned int cc=0; cc < output_selections.size(); cc++)
+    for (unsigned int kk=0; kk < output_selections.size(); kk++)
       {
-      output->AddChild(output_selections[cc]);
+      output->AddChild(output_selections[kk]);
       }
     }
   return 1;

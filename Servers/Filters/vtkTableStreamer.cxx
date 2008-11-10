@@ -42,7 +42,7 @@ static void vtkFillComponent(vtkUnsignedIntArray* array,
 }
  
 vtkStandardNewMacro(vtkTableStreamer);
-vtkCxxRevisionMacro(vtkTableStreamer, "1.1");
+vtkCxxRevisionMacro(vtkTableStreamer, "1.2");
 vtkCxxSetObjectMacro(vtkTableStreamer, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkTableStreamer::vtkTableStreamer()
@@ -61,7 +61,8 @@ vtkTableStreamer::~vtkTableStreamer()
 }
 
 //----------------------------------------------------------------------------
-int vtkTableStreamer::FillInputPortInformation(int port, vtkInformation* info)
+int vtkTableStreamer::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
 {
   info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
@@ -280,8 +281,8 @@ bool vtkTableStreamer::CountRows(vtkDataObject* dObj,
     iter->SkipEmptyNodesOff();
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
       {
-      vtkTable* table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
-      vtkIdType row_count =  table? table->GetNumberOfRows() : 0;
+      vtkTable* cur_table = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+      vtkIdType row_count =  cur_table? cur_table->GetNumberOfRows() : 0;
       counts.push_back(row_count);
       offsets.push_back(0);
       }

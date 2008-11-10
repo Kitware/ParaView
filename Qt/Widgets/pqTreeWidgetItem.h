@@ -67,11 +67,14 @@ public:
   class pqCallbackHandler
     {
   public:
-    virtual void checkStateChanged(pqTreeWidgetItem* item, int column) {};
-    virtual void dataChanged(pqTreeWidgetItem* item, int column, int role) {};
-    virtual bool acceptChange(pqTreeWidgetItem* item,
-      const QVariant& curValue, const QVariant& newValue,
-      int column, int role)
+    virtual ~pqCallbackHandler() {};
+    virtual void checkStateChanged(pqTreeWidgetItem* /*item*/, int /*column*/) {};
+    virtual void dataChanged(
+      pqTreeWidgetItem* /*item*/, int /*column*/, int /*role*/) {};
+    virtual bool acceptChange(
+      pqTreeWidgetItem* /*item*/,
+      const QVariant& /*curValue*/, const QVariant& /*newValue*/,
+      int /*column*/, int /*role*/)
       { return true; }
     };
 
