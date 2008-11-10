@@ -79,6 +79,7 @@
 #include <vtksys/stl/map>
 
 #include "ClientGeoViewConfig.h"
+#include "vtkPQConfig.h" // For PARAVIEW_DATA_ROOT
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientGeoView::command
@@ -169,20 +170,18 @@ ClientGeoView::ClientGeoView(
 
   emit this->beginProgress();
   vtkStdString tileDatabase(CLIENT_GEO_VIEW_TILE_PATH);
-  vtkGeoAlignedImageSource* const source = vtkGeoAlignedImageSource::New();
-  this->Implementation->VTKConnect->Connect(
-    source,  vtkCommand::ProgressEvent,
-    this, SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
-
-  vtkGeoTerrain* const terrain = vtkGeoTerrain::New();
-  vtkGeoAlignedImageRepresentation* const rep = 
-    vtkGeoAlignedImageRepresentation::New();
   if (tileDatabase.length() == 0)
     {
     // Load default image.
     vtkPNGReader* const reader = vtkPNGReader::New();
     if(pqFilesystem::shareDirectory().exists("NE2_ps_bath.png"))
+      {
       reader->SetFileName(pqFilesystem::shareDirectory().filePath("NE2_ps_bath.png").toAscii().data());
+      }
+    else
+      {
+      reader->SetFileName(PARAVIEW_DATA_ROOT "/Data/NE2_ps_bath.png");
+      }
 
     this->Implementation->VTKConnect->Connect(
       reader,  vtkCommand::ProgressEvent,
@@ -191,23 +190,14 @@ ClientGeoView::ClientGeoView(
     this->Implementation->VTKConnect->Disconnect(reader);
 
     // Use the following to create a new tile database.
-    source->SetImage(reader->GetOutput());
+    this->Implementation->View->AddDefaultImageRepresentation(
+      reader->GetOutput());
     reader->Delete();
     }
   else
     {
     vtkGenericWarningMacro(<< "Tile database currently not supported");
-    //source->LoadTiles(tileDatabase.c_str());
     }
-
-  rep->SetSource(source);
-
-  this->Implementation->View->SetTerrain(terrain);
-  this->Implementation->View->AddRepresentation(rep);
-  terrain->Delete();
-  this->Implementation->VTKConnect->Disconnect(source);
-  source->Delete();
-  rep->Delete();
 
   // Load political boundaries and write as XML
   //vtkOGRReader* const lineReader = vtkOGRReader::New();
@@ -230,7 +220,13 @@ ClientGeoView::ClientGeoView(
   vtkXMLPolyDataReader* const pbReader = vtkXMLPolyDataReader::New();
   
   if(pqFilesystem::shareDirectory().exists("political.vtp"))
+    {
     pbReader->SetFileName(pqFilesystem::shareDirectory().filePath("political.vtp").toAscii().data());
+    }
+  else
+    {
+    pbReader->SetFileName(PARAVIEW_DATA_ROOT "/Data/political.vtp");
+    }
   
   lineRep->SetInputConnection(pbReader->GetOutputPort());
   lineRep->CoordinatesInArraysOff();
