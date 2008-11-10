@@ -1,0 +1,139 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="representations">
+    <SelectionDeliveryRepresentationProxy name="ClientGeoDisplay2D"
+      base_proxygroup="representations"
+      base_proxyname="SelectionDeliveryRepresentation">
+      <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex"/>
+        <InputArrayDomain name="edge_arrays" attribute_type="edge"/>
+      </InputProperty>
+      <StringVectorProperty name="LatitudeArrayName"
+        number_of_elements="1" default_values="latitude">
+        <ArrayListDomain name="array_list"
+          input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="LongitudeArrayName"
+        number_of_elements="1" default_values="longitude">
+        <ArrayListDomain name="array_list"
+          input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexLabelArrayName"
+        number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="VertexLabelVisibility"
+        number_of_elements="1"
+        default_values="0"/>
+
+      <!-- Icon properties -->
+      <IntVectorProperty name="IconVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="IconFile" number_of_elements="1">
+        <FileListDomain name="files"/>
+      </StringVectorProperty>
+      <ProxyProperty name="IconTexture">
+        <ProxyGroupDomain name="groups">
+          <Group name="textures" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty name="IconSize"
+        number_of_elements="1"
+        default_values="32"/>
+      <StringVectorProperty name="IconArray" number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <!-- Vertex properties -->
+      <IntVectorProperty name="VertexLabelFontSize"
+        number_of_elements="1" default_values="12"/>
+      <DoubleVectorProperty name="VertexSize"
+        number_of_elements="1" default_values="5"/>
+      <DoubleVectorProperty name="VertexOpacity"
+        number_of_elements="1" default_values="1"/>
+      <DoubleVectorProperty name="VertexColor"
+        number_of_elements="3" default_values="0.4 0.4 0.6"/>
+      <IntVectorProperty name="VertexColorByArray"
+        number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="VertexColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <!-- Edge properties -->
+      <StringVectorProperty name="EdgeLabelArray"
+        number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <IntVectorProperty name="EdgeLabels"
+        number_of_elements="1"
+        default_values="0"/>
+      <IntVectorProperty name="EdgeLabelFontSize"
+        number_of_elements="1" default_values="10"/>
+      <DoubleVectorProperty name="EdgeWidth"
+        number_of_elements="1" default_values="2"/>
+      <DoubleVectorProperty name="EdgeOpacity"
+        number_of_elements="1" default_values="1.0"/>
+      <DoubleVectorProperty name="EdgeColor"
+        number_of_elements="3" default_values="0.0 0.0 0.0"/>
+      <IntVectorProperty name="EdgeColorByArray"
+        number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="EdgeColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list"
+          input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseDomainMap" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <ProxyProperty name="DomainMap"/>
+
+    </SelectionDeliveryRepresentationProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="views">
+    <ViewProxy name="ClientGeoView2D"
+      base_proxygroup="views"
+      base_proxyname="ViewBase"
+      representation_name="ClientGeoDisplay2D">
+    </ViewProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

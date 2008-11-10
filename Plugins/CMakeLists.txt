@@ -20,6 +20,7 @@ paraview_build_optional_plugin(ChartViewFrame "ChartViewFrame" ChartViewFrame OF
 paraview_build_optional_plugin(ClientAttributeView "ClientAttributeView" ClientAttributeView OFF)
 paraview_build_optional_plugin(ClientChartView "ClientChartView" ClientChartView OFF)
 paraview_build_optional_plugin(ClientGeoView "ClientGeoView" ClientGeoView OFF)
+paraview_build_optional_plugin(ClientGeoView2D "ClientGeoView2D" ClientGeoView2D OFF)
 paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView OFF)
 paraview_build_optional_plugin(ClientHierarchyView "ClientHierarchyView" ClientHierarchyView OFF)
 paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
