@@ -4,6 +4,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
 #include "vtkSMViewProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 #include "pqView.h"
 #include "pqActiveView.h"
@@ -22,6 +23,7 @@
 #include <QList>
 #include <QTimer>
 #include <QDockWidget>
+#include <QDebug>
 
 pqStreamingMainWindowCore::pqStreamingMainWindowCore() :
   pqMainWindowCore()
@@ -51,7 +53,20 @@ void pqStreamingMainWindowCore::scheduleNextPass()
     return;
     }
   
-  int doPrint = pqServer::getEnableStreamMessages();
+  int doPrint = 0;
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy * helper = vtkSMProxy::SafeDownCast(
+    pxm->GetProxy("helpers", "StreamingHelperInstance"));
+  if (helper)
+    {
+    doPrint = vtkSMPropertyHelper(helper, "EnableStreamMessages").GetAsInt();
+    }
+  else
+    {
+    qCritical() << "Could not get streaming helper proxy.";
+    }
+
+
   //for streaming schedule another render pass if required to render the next
   //piece.
   if (!vp->GetDisplayDone() && !this->StopStreaming)

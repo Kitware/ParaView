@@ -39,10 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSettings.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
-#include "pqServer.h"
 #include "pqObjectInspectorWidget.h"
 
+#include "vtkSMStreamingHelperProxy.h"
+
 #include <QDoubleValidator>
+#include <QDebug>
 
 class pqGlobalStreamingViewOptions::pqInternal 
   : public Ui::pqGlobalStreamingViewOptions
@@ -58,7 +60,6 @@ pqGlobalStreamingViewOptions::pqGlobalStreamingViewOptions(QWidget *widgetParent
   this->Internal = new pqInternal;
   this->Internal->setupUi(this);
 
-
   QIntValidator* sValidator = new QIntValidator(this->Internal->StreamedPasses);
   this->Internal->StreamedPasses->setValidator(sValidator);
 
@@ -68,7 +69,6 @@ pqGlobalStreamingViewOptions::pqGlobalStreamingViewOptions(QWidget *widgetParent
   QIntValidator* rValidator = new QIntValidator(this->Internal->PieceRenderCutoff);
   this->Internal->PieceRenderCutoff->setValidator(rValidator);
   
-
   // start fresh
   this->resetChanges();
   this->applyChanges();
@@ -143,45 +143,43 @@ void pqGlobalStreamingViewOptions::applyChanges()
   settings->beginGroup("streamingView");
 
   int intSetting;
-  bool setting;
+  bool boolSetting;
+
+  vtkSMStreamingHelperProxy* helper =
+    vtkSMStreamingHelperProxy::GetHelper();
+
+  if (!helper)
+    {
+    qCritical() << "Trying to apply changes to streaming settings but "
+                << "streaming helper proxy is null.";
+    }
 
   intSetting = this->Internal->StreamedPasses->text().toInt();
-  pqServer::setStreamedPasses(intSetting);
+  helper->SetStreamedPasses(intSetting);
   settings->setValue("StreamedPasses", intSetting);
 
-  setting = this->Internal->EnableStreamMessages->isChecked();
-  pqServer::setEnableStreamMessages(setting);
-  settings->setValue("EnableStreamMessages", setting);
+  boolSetting = this->Internal->EnableStreamMessages->isChecked();
+  helper->SetEnableStreamMessages(boolSetting);
+  settings->setValue("EnableStreamMessages", boolSetting);
 
-  setting = this->Internal->UseCulling->isChecked();
-  pqServer::setUseCulling(setting);
-  settings->setValue("UseCulling", setting);
+  boolSetting = this->Internal->UseCulling->isChecked();
+  helper->SetUseCulling(boolSetting);
+  settings->setValue("UseCulling", boolSetting);
 
-  setting = this->Internal->UseViewOrdering->isChecked();
-  pqServer::setUseViewOrdering(setting);
-  settings->setValue("UseViewOrdering", setting);
+  boolSetting = this->Internal->UseViewOrdering->isChecked();
+  helper->SetUseViewOrdering(boolSetting);
+  settings->setValue("UseViewOrdering", boolSetting);
 
   intSetting = this->Internal->PieceCacheLimit->text().toInt();
-  pqServer::setPieceCacheLimit(intSetting);
+  helper->SetPieceCacheLimit(intSetting);
   settings->setValue("PieceCacheLimit", intSetting);
 
   intSetting = this->Internal->PieceRenderCutoff->text().toInt();
-  pqServer::setPieceRenderCutoff(intSetting);
+  helper->SetPieceRenderCutoff(intSetting);
   settings->setValue("PieceRenderCutoff", intSetting);
 
   settings->endGroup();
   settings->alertSettingsModified();
-
-  // loop through render views and apply new settings
-  /*QList<pqRenderView*> views =
-    pqApplicationCore::instance()->getServerManagerModel()->
-    findItems<pqRenderView*>();
-
-  foreach(pqRenderView* view, views)
-    {
-    view->restoreSettings(true);
-    }
-  */
 }
 
 //-----------------------------------------------------------------------------
@@ -210,6 +208,5 @@ void pqGlobalStreamingViewOptions::resetChanges()
   this->Internal->PieceRenderCutoff->setText(val.toString());
 
   settings->endGroup();
-
 }
 

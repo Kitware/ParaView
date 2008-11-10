@@ -61,8 +61,6 @@ public:
   void SetPieceBoundsVisibility(int);
   vtkGetMacro(PieceBoundsVisibility, int);
 
-  void SetStreamedPasses(int);
-
 //BTX
   virtual bool UpdateRequired();
   virtual void SetViewInformation(vtkInformation*);
@@ -83,7 +81,6 @@ protected:
 
   vtkSMDataRepresentationProxy* PieceBoundsRepresentation;
   int PieceBoundsVisibility;
-  int StreamedPasses;
 
 private:
   vtkSMStreamingRepresentation(const vtkSMStreamingRepresentation&); // Not implemented

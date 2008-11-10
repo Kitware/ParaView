@@ -104,25 +104,6 @@ public:
   /// connection type. This is deprecated and will soon be removed.
   QString getRenderViewXMLName() const;
 
-  // Sets number of streaming passes for data processing
-  static void setStreamedPasses(int num);
-  static int getStreamedPasses();
-
-  static void setPieceCacheLimit(int num);
-  static int getPieceCacheLimit();
-
-  static void setPieceRenderCutoff(int num);
-  static int getPieceRenderCutoff();
-
-  static void setEnableStreamMessages(bool value);
-  static bool getEnableStreamMessages();
-
-  static void setUseViewOrdering(bool value);
-  static bool getUseViewOrdering();
-
-  static void setUseCulling(bool value);
-  static bool getUseCulling();
-  //DDM TODO: The above will being moved into the plugin in the next month.
 signals:
   /// Fired when the name of the proxy is changed.
   void nameChanged(pqServerManagerModelItem*);

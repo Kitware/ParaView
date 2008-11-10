@@ -82,26 +82,10 @@ public:
   // Overridden to choose the correct type of render view.
   virtual const char* GetSuggestedViewType(vtkIdType connectionID);
 
-  static vtkSMProxy * GetHelperProxy();
-  static vtkSMStreamingHelperProxy * GetStreamingHelper();
 
-  vtkGetMacro(StreamedPasses, int);
-  void SetStreamedPasses(int);
-
-  vtkGetMacro(EnableStreamMessages, bool);
-  vtkSetMacro(EnableStreamMessages, bool);
-
-  vtkGetMacro(UseCulling, bool);
-  vtkSetMacro(UseCulling, bool);
-
-  vtkGetMacro(UseViewOrdering, bool);
-  vtkSetMacro(UseViewOrdering, bool);
-
-  vtkGetMacro(PieceCacheLimit, int);
-  vtkSetMacro(PieceCacheLimit, int);
-
-  vtkGetMacro(PieceRenderCutoff, int);
-  vtkSetMacro(PieceRenderCutoff, int);
+  // Description:
+  // Get the streaming helper proxy.
+  static vtkSMStreamingHelperProxy* GetStreamingHelperProxy();
 
 //BTX
 protected:
@@ -149,14 +133,12 @@ protected:
 
   int Pass;
 
-  int StreamedPasses;
-  bool EnableStreamMessages;
-  bool UseCulling;
-  bool UseViewOrdering;
-  int PieceCacheLimit;
-  int PieceRenderCutoff;
+  void SetHelperProxy(vtkSMProxy* proxy);
 
 private:
+
+  vtkSMStreamingHelperProxy* helper;
+
   vtkSMStreamingViewProxy(const vtkSMStreamingViewProxy&); // Not implemented.
   void operator=(const vtkSMStreamingViewProxy&); // Not implemented.
 

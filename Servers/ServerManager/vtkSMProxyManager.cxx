@@ -94,7 +94,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.75");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.76");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -107,12 +107,6 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->AddObserver(vtkCommand::RegisterEvent, obs);
   this->AddObserver(vtkCommand::UnRegisterEvent, obs);
 #endif
-  this->StreamedPasses = 16;
-  this->EnableStreamMessages = 0;
-  this->UseCulling = 1;
-  this->UseViewOrdering = 1;
-  this->PieceCacheLimit = 16;
-  this->PieceRenderCutoff = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -1617,16 +1611,6 @@ vtkPVXMLElement* vtkSMProxyManager::GetPropertyHints(
       }
     }
   return 0;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SetStreamedPasses(int n)
-{
-  if (n > 0 && n != this->StreamedPasses)
-    {
-    this->StreamedPasses = n;
-    this->Modified();
-    }
 }
 
 //---------------------------------------------------------------------------

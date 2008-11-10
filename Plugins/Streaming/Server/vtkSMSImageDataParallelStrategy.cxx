@@ -23,12 +23,12 @@
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProxyManager.h"
 #include "vtkPVInformation.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMStreamingHelperProxy.h"
 
 vtkStandardNewMacro(vtkSMSImageDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSImageDataParallelStrategy::vtkSMSImageDataParallelStrategy()
 {
@@ -106,7 +106,8 @@ void vtkSMSImageDataParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input,
 //----------------------------------------------------------------------------
 void vtkSMSImageDataParallelStrategy::SetPassNumber(int val, int force)
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses =
+    vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -126,15 +127,15 @@ void vtkSMSImageDataParallelStrategy::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 int vtkSMSImageDataParallelStrategy::ComputePriorities()
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   int ret = nPasses;
 
   vtkSMIntVectorProperty* ivp;
 
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  int useCulling = this->GetProxyManager()->GetUseCulling();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
@@ -309,15 +310,15 @@ void vtkSMSImageDataParallelStrategy::GatherInformation(vtkPVInformation* info)
 
   vtkSMIntVectorProperty* ivp;
 
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SParStrat(" << this << ") Gather Info" << endl;
     }
 
   //put diagnostic setting transfer here because this happens early
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  //int useCulling = this->GetProxyManager()->GetUseCulling();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  //int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
@@ -335,7 +336,7 @@ void vtkSMSImageDataParallelStrategy::GatherInformation(vtkPVInformation* info)
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   ivp->SetElement(0, nPasses); 
 
   this->UpdateSuppressor->UpdateVTKObjects();
@@ -370,8 +371,8 @@ void vtkSMSImageDataParallelStrategy::GatherLODInformation(vtkPVInformation* inf
 {
   //gather information in multiple passes so as never to request
   //everything at once.
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SParStrat(" << this << ") Gather LOD Info" << endl;

@@ -15,7 +15,6 @@
 #include "vtkSMStreamingRepresentation.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSImageDataParallelStrategy.h"
@@ -25,6 +24,7 @@
 #include "vtkSMSUnstructuredGridParallelStrategy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMStreamingViewProxy.h"
+#include "vtkSMStreamingHelperProxy.h"
 #include "vtkSMIntVectorProperty.h"
 
 #include "vtkSMSourceProxy.h"
@@ -38,7 +38,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.2");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
 
 inline void vtkSMStreamingRepresentationSetInt(
@@ -58,7 +58,6 @@ vtkSMStreamingRepresentation::vtkSMStreamingRepresentation()
 {
   this->PieceBoundsRepresentation = 0;
   this->PieceBoundsVisibility = 0;
-  this->StreamedPasses = 16; // default to 16
 }
 
 //----------------------------------------------------------------------------
@@ -75,34 +74,6 @@ void vtkSMStreamingRepresentation::SetViewInformation(vtkInformation* info)
     {
     this->PieceBoundsRepresentation->SetViewInformation(info);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMStreamingRepresentation::SetStreamedPasses(int passes)
-{
-  this->StreamedPasses = passes;
-/*
-  vtkSMProxyProperty * prop = vtkSMProxyProperty::SafeDownCast(this->GetProperty("Input"));
-  if (!prop)
-    {
-    return;
-    }
-  for (unsigned int i = 0; i < prop->GetNumberOfProxies(); ++i)
-    {
-    vtkSMSourceProxy * source = vtkSMSourceProxy::SafeDownCast(prop->GetProxy(i));
-    if (!source)
-      {
-      continue;
-      }
-
-    int ports = source->GetNumberOfOutputPorts();
-    for (unsigned int k = 0; k < ports; ++k)
-      {
-      //printf("source->GetOutputPort(%d)->SetStreamedPasses(%d)\n", k, passes);
-      //source->GetOutputPort(k)->SetStreamedPasses(passes);
-      }
-    }
-*/
 }
 
 //----------------------------------------------------------------------------
@@ -222,7 +193,7 @@ void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   if (val<nPasses //should always be less than
       && 
       val>=0)
@@ -288,7 +259,7 @@ int vtkSMStreamingRepresentation::ComputePriorities()
 //----------------------------------------------------------------------------
 int vtkSMStreamingRepresentation::ComputePriorities()
 {
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SR(" << this << ") ComputePriorities" << endl;

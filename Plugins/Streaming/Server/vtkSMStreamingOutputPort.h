@@ -23,7 +23,6 @@
 #include "vtkSMOutputPort.h"
 
 class vtkPVDataInformation;
-class vtkSMStreamingHelperProxy;
 
 class VTK_EXPORT vtkSMStreamingOutputPort : public vtkSMOutputPort
 {
@@ -55,8 +54,6 @@ protected:
   // Description:
   // An internal update pipeline method that subclasses may override.
   virtual void UpdatePipelineInternal(double time, bool doTime);
-
-  vtkSMStreamingHelperProxy * Helper;
 
 private:
   vtkSMStreamingOutputPort(const vtkSMStreamingOutputPort&); // Not implemented

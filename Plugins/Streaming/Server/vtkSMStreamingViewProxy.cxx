@@ -34,6 +34,7 @@
 #include "vtkSMStreamingViewHelper.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkSMPropertyHelper.h"
 
 
 
@@ -42,7 +43,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -78,15 +79,8 @@ vtkSMStreamingViewProxy::vtkSMStreamingViewProxy()
   this->IsSerial = true;
   this->Pass = 0;
 
-  this->StreamedPasses = 16;
-  this->EnableStreamMessages = 0;
-  this->UseCulling = 1;
-  this->UseViewOrdering = 1;
-  this->PieceCacheLimit = 16;
-  this->PieceRenderCutoff = -1;
-
   // Make sure the helper proxy exists
-  this->GetHelperProxy();
+  this->GetStreamingHelperProxy();
 }
 
 //-----------------------------------------------------------------------------
@@ -99,44 +93,13 @@ vtkSMStreamingViewProxy::~vtkSMStreamingViewProxy()
     this->PixelArray->Delete();
     }
   delete this->Internals;
-
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMStreamingHelperProxy * helper = 
-    vtkSMStreamingHelperProxy::SafeDownCast(
-      pxm->GetProxy("helpers", vtkSMStreamingHelperProxy::GetInstanceName()));
-  helper->Delete();
 }
 
-
-//----------------------------------------------------------------------------
-vtkSMStreamingHelperProxy * vtkSMStreamingViewProxy::GetStreamingHelper()
+//-----------------------------------------------------------------------------
+vtkSMStreamingHelperProxy* vtkSMStreamingViewProxy::GetStreamingHelperProxy()
 {
-  return vtkSMStreamingHelperProxy::SafeDownCast(
-            vtkSMStreamingViewProxy::GetHelperProxy());
+  return vtkSMStreamingHelperProxy::GetHelper();
 }
-
-
-//----------------------------------------------------------------------------
-vtkSMProxy * vtkSMStreamingViewProxy::GetHelperProxy()
-{
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMStreamingHelperProxy * helper = 
-    vtkSMStreamingHelperProxy::SafeDownCast(
-      pxm->GetProxy("helpers", vtkSMStreamingHelperProxy::GetInstanceName()));
-  if (!helper)
-    {
-    helper = vtkSMStreamingHelperProxy::SafeDownCast(
-      pxm->NewProxy("helpers", "StreamingHelper")); 
-    if (helper)
-      {
-      helper->SetConnectionID(NULL);
-      pxm->RegisterProxy("helpers", vtkSMStreamingHelperProxy::GetInstanceName(), helper);
-      }
-    }
-  return helper;
-}
-
-
 
 //STUFF TO MAKE THIS VIEW PRETEND TO BE A RENDERVIEW
 //-----------------------------------------------------------------------------
@@ -175,19 +138,6 @@ void vtkSMStreamingViewProxy::EndCreateVTKObjects()
   iren->SetPVRenderView(this->RenderViewHelper);
 }
 
-void vtkSMStreamingViewProxy::SetStreamedPasses(int passes)
-{
-  this->StreamedPasses = passes;
-
-  /* // Not using this code anymore
-  for (unsigned int i = 0; i < this->Internals->Representations.size(); ++i)
-    {
-    vtkSMStreamingRepresentation *repr = this->Internals->Representations[i];
-    repr->SetStreamedPasses(passes);
-    }
-  */
-}
-
 //-----------------------------------------------------------------------------
 vtkSMRenderViewProxy *vtkSMStreamingViewProxy::GetRootView()
 {
@@ -213,7 +163,6 @@ void vtkSMStreamingViewProxy::AddRepresentation(vtkSMRepresentationProxy* rep)
     if (repr->AddToView(this)) 
       {
       RVP->AddRepresentationInternal(repr);
-      repr->SetStreamedPasses(this->StreamedPasses);
       }
     else
       {
@@ -293,7 +242,7 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SV(" << this << ") CreateDefaultRepresentation" << endl;
@@ -374,7 +323,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
     
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (this->IsSerial)
     {
     if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
@@ -548,11 +497,12 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
     }
 
   vtkSMRenderViewProxy *RVP = this->GetRootView();
-
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
-  //int useViewOrdering = this->GetProxyManager()->GetUseViewOrdering();
+
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  //int useViewOrdering = vtkSMStreamingHelperProxy::GetHelper()->GetUseViewOrdering();
+
   if (doPrints)
     {
     cerr << "SV::UpdateAllRepresentations" << endl;
@@ -626,7 +576,7 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
 //-----------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::PerformRender()
 {
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SV:PerformRender" << endl;
@@ -634,7 +584,7 @@ void vtkSMStreamingViewProxy::PerformRender()
   vtkSMRenderViewProxy *RVP = this->GetRootView();
 
   this->DisplayDone = 1;
-  int nPasses = this->GetProxyManager()->GetStreamedPasses(); 
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses(); 
   if (this->MaxPass == -1)
     {
     nPasses = 1;

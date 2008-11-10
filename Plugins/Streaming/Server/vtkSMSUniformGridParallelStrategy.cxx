@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkSMSUniformGridParallelStrategy.h"
-
+#include "vtkSMStreamingHelperProxy.h"
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
 #include "vtkMPIMoveData.h"
@@ -23,12 +23,11 @@
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProxyManager.h"
 #include "vtkPVInformation.h"
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSUniformGridParallelStrategy::vtkSMSUniformGridParallelStrategy()
 {
@@ -94,7 +93,7 @@ void vtkSMSUniformGridParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* inpu
 //----------------------------------------------------------------------------
 void vtkSMSUniformGridParallelStrategy::SetPassNumber(int val, int force)
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -114,15 +113,15 @@ void vtkSMSUniformGridParallelStrategy::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 int vtkSMSUniformGridParallelStrategy::ComputePriorities()
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   int ret = nPasses;
 
   vtkSMIntVectorProperty* ivp;
 
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  int useCulling = this->GetProxyManager()->GetUseCulling();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
@@ -257,15 +256,15 @@ void vtkSMSUniformGridParallelStrategy::GatherInformation(vtkPVInformation* info
 
   vtkSMIntVectorProperty* ivp;
 
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SParStrat(" << this << ") Gather Info" << endl;
     }
 
   //put diagnostic setting transfer here because this happens early
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  //int useCulling = this->GetProxyManager()->GetUseCulling();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  //int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
@@ -283,7 +282,7 @@ void vtkSMSUniformGridParallelStrategy::GatherInformation(vtkPVInformation* info
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   ivp->SetElement(0, nPasses); 
 
   this->UpdateSuppressor->UpdateVTKObjects();
@@ -318,8 +317,8 @@ void vtkSMSUniformGridParallelStrategy::GatherLODInformation(vtkPVInformation* i
 {
   //gather information in multiple passes so as never to request
   //everything at once.
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SParStrat(" << this << ") Gather LOD Info" << endl;

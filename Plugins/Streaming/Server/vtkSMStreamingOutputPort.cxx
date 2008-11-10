@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkSMStreamingOutputPort.h"
 
-#include "vtkSMProxyManager.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -33,28 +32,18 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMStreamingOutputPort);
-vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOutputPort::vtkSMStreamingOutputPort()
-{ 
-  /*
-  vtkSMProxyManager *pxm = vtkSMProxyManager::GetProxyManager();
-  this->Helper = vtkSMStreamingHelperProxy::SafeDownCast(
-    pxm->GetProxy("helpers", vtkSMStreamingHelperProxy::GetInstanceName()));
-  */
-  this->Helper = NULL;
+{
+
 }
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOutputPort::~vtkSMStreamingOutputPort()
 {
-/*
-  if (this->Helper)
-    {
-    this->Helper->Delete();
-    }
-*/
+
 }
 
 //----------------------------------------------------------------------------
@@ -85,7 +74,6 @@ void vtkSMStreamingOutputPort::InvalidateDataInformation()
 // vtkPVPart used to update before gathering this information ...
 void vtkSMStreamingOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
 {
-//cerr << "void vtkSMStreamingOutputPort(" << this << ")::GatherDataInformation(" << doUpdate <<")" << endl;
 
   if (this->GetID().IsNull())
     {
@@ -101,27 +89,19 @@ void vtkSMStreamingOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
   vtkPVDataInformation *di = vtkPVDataInformation::New();
   vtkClientServerStream stream;
 
-  int nPasses = 1;
-  int doPrints = 0;
-  if (this->Helper)
-    {
-    //nPasses = this->Helper->GetStreamedPasses();
-    //helperdoPrints = this->Helper->GetEnableStreamMessages();
-    }
+  int doPrints =  vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
 
-  // Use nPasses from proxy manager for now
-  nPasses = this->GetProxyManager()->GetStreamedPasses();
-
-//  cerr << "SMOP::" << this << " GatherData ";
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
   //commented out to make piece cache appendpolydata work
-  //if (!this->GetProxyManager()->GetUseCulling())
-//    {
-//    stream 
-//      << vtkClientServerStream::Invoke 
-//      << infoHelper << "EnableCullingOff"
-//      << vtkClientServerStream::End;
-//    }
+  //if (!useCulling)
+  //  {
+  //  stream 
+  //    << vtkClientServerStream::Invoke 
+  //    << infoHelper << "EnableCullingOff"
+  //    << vtkClientServerStream::End;
+  //  }
 
   for (int i = 0; i < 1; i++)
     {
@@ -197,18 +177,10 @@ void vtkSMStreamingOutputPort::UpdatePipelineInternal(double time, bool doTime)
          << this->GetProducerID() << "UpdateInformation"
          << vtkClientServerStream::End;
 
-  int nPasses = 1;
-  int doPrints = 0;
-  if (this->Helper)
-    {
-    //nPasses = this->Helper->GetStreamedPasses();
-    //doPrints = this->Helper->GetEnableStreamMessages();
-    }
+  int doPrints =  vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
 
-  // Use nPasses from proxy manager for now
-  nPasses = this->GetProxyManager()->GetStreamedPasses();
-
-//  cerr << "SMOP::" << this << " TUpdate ";
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
 //  stream 
 //    << vtkClientServerStream::Invoke 

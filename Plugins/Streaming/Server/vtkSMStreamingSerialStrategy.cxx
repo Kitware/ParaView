@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkSMStreamingSerialStrategy.h"
-
+#include "vtkSMStreamingHelperProxy.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -21,11 +21,10 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProperty.h"
 
 vtkStandardNewMacro(vtkSMStreamingSerialStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMStreamingSerialStrategy::vtkSMStreamingSerialStrategy()
 {
@@ -94,15 +93,15 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
   //gather information in multiple passes so as never to request the whole data  
   vtkSMIntVectorProperty* ivp;
 
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SSS(" << this << ") Gather Info" << endl;
     }
 
   //put diagnostic setting transfer here because this happens early
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  //int useCulling = this->GetProxyManager()->GetUseCulling();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  //int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
@@ -120,7 +119,7 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   ivp->SetElement(0, nPasses); 
 
   this->UpdateSuppressor->UpdateVTKObjects();
@@ -154,14 +153,14 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
 void vtkSMStreamingSerialStrategy::GatherLODInformation(vtkPVInformation* info)
 {
   //gather information in multiple passes so as never to request the whole data  
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SSS(" << this << ") Gather LOD Info" << endl;
     }
 
   vtkSMIntVectorProperty* ivp;
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   for (int i = 0; i < 1; i++)
     {
     vtkPVInformation *sinfo = 
@@ -198,9 +197,9 @@ void vtkSMStreamingSerialStrategy::InvalidatePipeline()
 //----------------------------------------------------------------------------
 void vtkSMStreamingSerialStrategy::SetPassNumber(int val, int force)
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   vtkSMIntVectorProperty* ivp;
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (doPrints)
     {
     cerr << "SSS(" << this << ") SetPassNumber(" << val << "/" << nPasses << (force?"FORCE":"LAZY") << ")" << endl;
@@ -223,15 +222,15 @@ void vtkSMStreamingSerialStrategy::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 int vtkSMStreamingSerialStrategy::ComputePriorities()
 {
-  int nPasses = this->GetProxyManager()->GetStreamedPasses();
+  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
   int ret = nPasses;
 
   vtkSMIntVectorProperty* ivp;
   
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = this->GetProxyManager()->GetEnableStreamMessages();
-  int cacheLimit = this->GetProxyManager()->GetPieceCacheLimit();
-  int useCulling = this->GetProxyManager()->GetUseCulling();
+  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
+  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
+  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
 
   if (doPrints)
     {

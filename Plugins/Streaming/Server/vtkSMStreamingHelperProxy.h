@@ -29,19 +29,14 @@ public:
   vtkTypeRevisionMacro(vtkSMStreamingHelperProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
-  //int GetStreamedPasses();
+  // Description:
+  // Get the instance name used to register the helper proxy with
+  // the proxy manager.
+  static const char* GetInstanceName();
 
   // Description:
-  // Starting from the given source proxy, the method searches
-  // up the pipeline (using vtkSMInputProperty) looking
-  // for a reader source that reports the number of passes.
-  // If more than one reader source is found, this method will
-  // return the minimum number of passes reported by the readers.
-  // If no readers are found, this method will return 0.
-  virtual int GetPassesFromSource(vtkSMSourceProxy*);
-
-  static const char* GetInstanceName();
+  // Get the streaming helper proxy.
+  static vtkSMStreamingHelperProxy* GetHelper();
 
   vtkGetMacro(StreamedPasses, int);
   vtkSetMacro(StreamedPasses, int);
@@ -73,25 +68,7 @@ protected:
   int PieceCacheLimit;
   int PieceRenderCutoff;
 
-  bool StreamedPassesNeedsUpdate;
-  int GetStreamedPasses(bool recompute);
-
   static int StreamingFactoryRegistered;
-
-//BTX
-  class vtkSMStreamingHelperObserver;
-  friend class vtkSMStreamingHelperObserver;
-//ETX
-
-  vtkSMStreamingHelperObserver* Observer;
-  // Description:
-  // Event handler.
-  virtual void ExecuteEvent(vtkObject* called, unsigned long eventid, void* data);
-  // Description:
-  // Handler for specific vtkSMProxyManager events.
-  virtual void OnRegisterProxy(const char* group, const char* name, vtkSMProxy*);
-  virtual void OnUnRegisterProxy(const char* group, const char* name, vtkSMProxy*);
-
 
 private:
   vtkSMStreamingHelperProxy(const vtkSMStreamingHelperProxy&); // Not implemented

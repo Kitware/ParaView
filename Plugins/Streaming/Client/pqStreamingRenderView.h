@@ -32,11 +32,6 @@ public:
   /// Returns proxy this one manages
   virtual vtkSMRenderViewProxy* getRenderViewProxy() const;
 
-public slots:
-
-  /// Reads streaming settings from pqSettings
-  virtual void restoreSettings();
-
 protected:
 
 private:

@@ -14,65 +14,11 @@
         the RootView subproxy.
       </Documentation>
 
-      <IntVectorProperty
-        name="StreamedPasses"
-        command="SetStreamedPasses"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="16">
-        <IntRangeDomain name="range" min="-1"/>
-        <Documentation>
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="UseCulling"
-        command="SetUseCulling"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="UseViewOrdering"
-        command="SetUseViewOrdering"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="PieceCacheLimit"
-        command="SetPieceCacheLimit"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="16">
-        <IntRangeDomain name="range" min="-1"/>
-        <Documentation>
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="PieceRenderCutoff"
-        command="SetPieceRenderCutoff"
-        update_self="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="16">
-        <IntRangeDomain name="range" min="-1"/>
-        <Documentation>
-        </Documentation>
-      </IntVectorProperty>
+      <ProxyProperty name="StreamingHelperProxy" command="SetHelperProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="helpers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
 
       <!-- End of StreamingViewBase -->
     </Proxy>
@@ -1092,10 +1038,8 @@ o        </Proxy>
 
     <StreamingHelperProxy name="StreamingHelper">
       <Documentation>
-        A helper proxy
+        The streaming helper proxy
       </Documentation>
-
-
 
       <IntVectorProperty
         name="StreamedPasses"
