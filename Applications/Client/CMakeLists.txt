@@ -140,7 +140,9 @@ IF(BUILD_TESTING)
   IF(PARAVIEW_DATA_ROOT)
     SET (TESTS_WITHOUT_BASELINES
       ${TESTS_WITHOUT_BASELINES}
-      LoadStateHistogram
+# FIXME: Enable after Plots are converted to new style and backwards
+# compatibility issues are fixed.
+#LoadStateHistogram
       )
   ENDIF(PARAVIEW_DATA_ROOT)
 
