@@ -58,8 +58,9 @@ ENDIF (PARAVIEW_DATA_ROOT)
 
 IF (VTK_USE_DISPLAY AND VTK_DATA_ROOT AND PARAVIEW_DATA_ROOT)
   SET(ServersFiltersImage_SRCS
-    TestTransferFunctionEditor
-    TestTransferFunctionEditor2
+# Enable these after the transfer function can take the vtkTable histograms.
+#TestTransferFunctionEditor
+#TestTransferFunctionEditor2
     )
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)

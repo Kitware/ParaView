@@ -24,64 +24,41 @@ readerProxy = servermanager.sources.CSVReader(FileName = temp_filename)
 readerProxy.UpdatePipeline()
 
 dataInfo = readerProxy.GetDataInformation()
-numPts = dataInfo.GetNumberOfPoints()
-if numPts != 11:
-  print "ERROR: Wrong number of points reported:", numPts
+numRows = dataInfo.GetNumberOfRows()
+if numRows != 10:
+  print "ERROR: Wrong number of rows reported:", numRows
   sys.exit(1);
 
-numCells = dataInfo.GetNumberOfCells()
-if numCells != 10:
-  print "ERROR: Wrong number of cells reported."
+rowInfo = dataInfo.GetRowDataInformation()
+numColumns = rowInfo.GetNumberOfArrays()
+if numColumns != 2:
+  print "ERROR: Wrong number of columns."
   sys.exit(1);
 
-bounds = dataInfo.GetBounds()
-correctBounds = 0
-# actual value is 37.3531
-if bounds[0] > 37.35:
-  if bounds[0] < 37.36:
-    correctBounds = 1;
+rowArrayInfo = rowInfo.GetArrayInformation(0)
+# actual value is 49.3269
+if rowArrayInfo.GetComponentRange(0)[0] < 49.32 or\
+     rowArrayInfo.GetComponentRange(0)[0] > 49.33:
+     print "ERROR: Wrong bin data value.", rowArrayInfo.GetComponentRange(0)[0]
 
-if correctBounds != 1:
-  print "ERROR: Wrong minimum bounds in X."
-  sys.exit(1);
+# actual value is 264.855
+if rowArrayInfo.GetComponentRange(0)[1] < 264.85 or\
+     rowArrayInfo.GetComponentRange(0)[1] > 264.86:
+     print "ERROR: Wrong bin data value.", rowArrayInfo.GetComponentRange(0)[1]
 
-correctBounds = 0
-# actual value is 276.829
-if bounds[1] > 276.8:
-  if bounds[1] < 276.9:
-    correctBounds = 1;
 
-if correctBounds != 1:
-  print "ERROR: Wrong maximum bounds in X."
-  sys.exit(1);
-
-extent = dataInfo.GetExtent()
-if extent[0] != 0:
-  print "ERROR: Wrong minimum extent in X."
-  sys.exit(1);
-
-if extent[1] != 10:
-  print "ERROR: Wrong maximum extent in X."
-  sys.exit(1);
-
-cellInfo = dataInfo.GetCellDataInformation()
-numCellArrays = cellInfo.GetNumberOfArrays()
-if numCellArrays != 1:
-  print "ERROR: Wrong number of cell arrays."
-  sys.exit(1);
-
-cellArrayInfo = cellInfo.GetArrayInformation(0)
-cellArrayName = cellArrayInfo.GetName()
+rowArrayInfo = rowInfo.GetArrayInformation(1)
+cellArrayName = rowArrayInfo.GetName()
 if cellArrayName != "bin_values":
   print "ERROR: Wrong cell array name."
   sys.exit(1);
 
-cellNumComp = cellArrayInfo.GetNumberOfComponents()
+cellNumComp = rowArrayInfo.GetNumberOfComponents()
 if cellNumComp != 1:
   print "ERROR: Wrong number of array components."
   sys.exit(1);
 
-cellArrayRange = cellArrayInfo.GetComponentRange(0)
+cellArrayRange = rowArrayInfo.GetComponentRange(0)
 if cellArrayRange[0] != 72:
   print "ERROR: Wrong minimum array range."
   sys.exit(1);

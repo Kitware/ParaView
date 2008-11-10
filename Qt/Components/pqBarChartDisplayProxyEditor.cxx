@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqBarChartDisplayEditor.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkSMProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 
 #include <QPointer>
@@ -43,10 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBarChartRepresentation.h"
 #include "pqColorScaleToolbar.h"
 #include "pqComboBoxDomain.h"
-#include "pqRepresentation.h"
 #include "pqPropertyLinks.h"
+#include "pqRepresentation.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"
-
 
 //-----------------------------------------------------------------------------
 class pqBarChartDisplayProxyEditor::pqInternal : public Ui::BarCharDisplayEditor
@@ -55,11 +55,13 @@ public:
   QPointer<pqRepresentation> Representation;
   QPointer<pqComboBoxDomain> XDomain;
   QPointer<pqComboBoxDomain> YDomain;
+  QPointer<pqComboBoxDomain> FieldAssociationDomain;
   vtkEventQtSlotConnect* VTKConnect;
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* XArrayNameAdaptor;
-  pqSignalAdaptorComboBox* PointComponentAdaptor;
   pqSignalAdaptorComboBox* YArrayNameAdaptor;
+  pqSignalAdaptorComboBox* FieldAssociationAdaptor;
+  pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -72,10 +74,16 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqRepresentation* rep
  
   this->Internal->XArrayNameAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->XArrayName);
-  this->Internal->PointComponentAdaptor = new pqSignalAdaptorComboBox(
-    this->Internal->PointComponent);
   this->Internal->YArrayNameAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->YArrayName);
+  this->Internal->FieldAssociationAdaptor = new pqSignalAdaptorComboBox(
+    this->Internal->FieldAssociation);
+  this->Internal->CompositeTreeAdaptor = new pqSignalAdaptorCompositeTreeWidget(
+    this->Internal->CompositeTree, 
+    vtkSMIntVectorProperty::SafeDownCast(
+      repr->getProxy()->GetProperty("CompositeDataSetIndex")), 
+    /*autoUpdateVisibility=*/true,
+    /*showSelectedElementCounts=*/true);
 
   QObject::connect(
     this->Internal->EditColorMapButton, SIGNAL(clicked()),
@@ -85,8 +93,6 @@ pqBarChartDisplayProxyEditor::pqBarChartDisplayProxyEditor(pqRepresentation* rep
     this, SLOT(rescaleToDataRange()));
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
-
-  this->Internal->UsePoints->setCheckState(Qt::Checked);
 
   this->setRepresentation(repr);
 }
@@ -133,8 +139,11 @@ void pqBarChartDisplayProxyEditor::setRepresentation(pqRepresentation* repr)
     this->Internal->XArrayName, proxy->GetProperty("XArrayName"));
   this->Internal->YDomain = new pqComboBoxDomain(
     this->Internal->YArrayName, proxy->GetProperty("YArrayName"));
+  this->Internal->FieldAssociationDomain = new pqComboBoxDomain(
+    this->Internal->FieldAssociation, proxy->GetProperty("FieldAssociation"));
   this->Internal->XDomain->forceDomainChanged();
   this->Internal->YDomain->forceDomainChanged();
+  this->Internal->FieldAssociationDomain->forceDomainChanged();
 
   // Initialize links.
   this->Internal->Links.addPropertyLink(this->Internal->ViewData,
@@ -146,23 +155,26 @@ void pqBarChartDisplayProxyEditor::setRepresentation(pqRepresentation* repr)
   this->Internal->Links.addPropertyLink(this->Internal->YArrayNameAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
     proxy, proxy->GetProperty("YArrayName"));
-  this->Internal->Links.addPropertyLink(this->Internal->PointComponentAdaptor,
+  this->Internal->Links.addPropertyLink(this->Internal->FieldAssociationAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
-    proxy, proxy->GetProperty("XAxisPointComponent"));
-  this->Internal->Links.addPropertyLink(this->Internal->UsePoints,
-    "checked", SIGNAL(stateChanged(int)),
-    proxy, proxy->GetProperty("XAxisUsePoints"));
+    proxy, proxy->GetProperty("FieldAssociation"));
+  this->Internal->Links.addPropertyLink(this->Internal->CompositeTreeAdaptor,
+    "values", SIGNAL(valuesChanged()),
+    proxy, proxy->GetProperty("CompositeDataSetIndex"));
 
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("FieldAssociation"),
+    vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
+    Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("XArrayName"),
     vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
   this->Internal->VTKConnect->Connect(proxy->GetProperty("YArrayName"),
     vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
-  this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisUsePoints"),
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("XArrayComponent"),
     vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
-  this->Internal->VTKConnect->Connect(proxy->GetProperty("XAxisPointComponent"),
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("YArrayComponent"),
     vtkCommand::ModifiedEvent, repr, SLOT(updateLookupTable()), 0, 0,
     Qt::QueuedConnection);
 

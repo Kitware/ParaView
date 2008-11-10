@@ -16,6 +16,7 @@
 
 #include "vtkAttributeDataReductionFilter.h"
 #include "vtkCellData.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -24,6 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
+#include "vtkTable.h"
 #include "vtkToolkits.h"
 
 #ifdef VTK_USE_MPI
@@ -34,7 +36,7 @@
 #include <vtksys/RegularExpression.hxx>
 
 vtkStandardNewMacro(vtkPExtractHistogram);
-vtkCxxRevisionMacro(vtkPExtractHistogram, "1.7");
+vtkCxxRevisionMacro(vtkPExtractHistogram, "1.8");
 vtkCxxSetObjectMacro(vtkPExtractHistogram, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkPExtractHistogram::vtkPExtractHistogram()
@@ -87,8 +89,8 @@ bool vtkPExtractHistogram::InitializeBinExtents(
         min, max))
     {
     data[0] = 1.0;
-    data[1] = bin_extents->GetValue(0);
-    data[2] = bin_extents->GetValue(this->BinCount);
+    data[1] = min;
+    data[2] = max;
     array_name = bin_extents->GetName();
     retVal = true;
     }
@@ -174,13 +176,7 @@ bool vtkPExtractHistogram::InitializeBinExtents(
 
   min = range[0];
   max = range[1];
-  double bin_delta = (range[1] - range[0]) / this->BinCount;
-  bin_extents->SetValue(0, range[0]);
-  for(int i = 1; i < this->BinCount; ++i)
-    {
-    bin_extents->SetValue(i, range[0] + (i * bin_delta));
-    }
-  bin_extents->SetValue(this->BinCount, range[1]);
+  this->FillBinExtents(bin_extents, min, max);
   return retVal;
 #endif
 }
@@ -212,37 +208,38 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
     // PostGatherHelper needs to be set only on the root node.
     vtkSmartPointer<vtkAttributeDataReductionFilter> rf = 
       vtkSmartPointer<vtkAttributeDataReductionFilter>::New();
-    rf->SetAttributeType(vtkAttributeDataReductionFilter::CELL_DATA|
-      vtkAttributeDataReductionFilter::FIELD_DATA);
+    rf->SetAttributeType(vtkAttributeDataReductionFilter::ROW_DATA);
     rf->SetReductionType(vtkAttributeDataReductionFilter::ADD);
     reduceFilter->SetPostGatherHelper(rf);
     }
 
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet* output = vtkDataSet::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkSmartPointer<vtkDataObject> copy;
-  copy.TakeReference(output->NewInstance());
+  vtkTable* output = vtkTable::GetData(outputVector, 0);
+  vtkSmartPointer<vtkTable> copy = vtkSmartPointer<vtkTable>::New();
   copy->ShallowCopy(output);
   reduceFilter->SetInput(copy);
   reduceFilter->Update();
   if (isRoot)
     {
+    // We save the old bin_extents and then revert to be restored later since
+    // the reduction reduces the bin_extents as well.
+    vtkSmartPointer<vtkDataArray> oldExtents = 
+      output->GetRowData()->GetArray((int)0);
     output->ShallowCopy(reduceFilter->GetOutput());
+    output->GetRowData()->GetArray((int)0)->DeepCopy(oldExtents);
     if (this->CalculateAverages)
       {
       vtkDataArray* bin_values = 
-        output->GetCellData()->GetArray("bin_values");
+        output->GetRowData()->GetArray("bin_values");
       vtksys::RegularExpression reg_ex("^(.*)_average$");
-      int numArrays = output->GetCellData()->GetNumberOfArrays();
+      int numArrays = output->GetRowData()->GetNumberOfArrays();
       for (int i=0; i<numArrays; i++)
         {
-        vtkDataArray* array = output->GetCellData()->GetArray(i);
+        vtkDataArray* array = output->GetRowData()->GetArray(i);
         if (array && reg_ex.find(array->GetName()))
           {
           int numComps = array->GetNumberOfComponents();
           vtkstd::string name = reg_ex.match(1) + "_total";
-          vtkDataArray* tarray = output->GetCellData()->GetArray(name.c_str());
+          vtkDataArray* tarray = output->GetRowData()->GetArray(name.c_str());
           for (vtkIdType idx=0; idx<this->BinCount; idx++)
             {
             for (int j=0; j<numComps; j++)
@@ -255,6 +252,11 @@ int vtkPExtractHistogram::RequestData(vtkInformation *request,
         }
       }
     }
+  else
+    {
+    output->Initialize();
+    }
+
   return 1;
 }
 

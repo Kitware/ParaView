@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt Includes.
 
 // ParaView Includes.
+#include "pqComboBoxDomain.h"
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
 #include "pqServer.h"
@@ -51,6 +52,7 @@ class pqSpreadSheetDisplayEditor::pqInternal : public Ui::SpreadSheetDisplayEdit
 public:
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
+  pqComboBoxDomain* AttributeModeDomain;
   pqSignalAdaptorSpinBox* ProcessIDAdaptor;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
 };
@@ -72,6 +74,7 @@ pqSpreadSheetDisplayEditor::pqSpreadSheetDisplayEditor(
       repr->getProxy()->GetProperty("CompositeDataSetIndex")), 
     /*autoUpdateVisibility=*/true,
     /*showSelectedElementCounts=*/true);
+  this->Internal->AttributeModeDomain = 0;
 
   this->setRepresentationInternal(repr);
 
@@ -100,16 +103,19 @@ void pqSpreadSheetDisplayEditor::setRepresentationInternal(pqRepresentation* rep
     reprProxy, reprProxy->GetProperty("Visibility"));
   this->Internal->Links.addPropertyLink(this->Internal->AttributeModeAdaptor,
     "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("FieldType"));
-  this->Internal->Links.addPropertyLink(this->Internal->ProcessIDAdaptor,
-    "value", SIGNAL(valueChanged(int)),
-    reprProxy, reprProxy->GetProperty("ProcessID"));
+    reprProxy, reprProxy->GetProperty("FieldAssociation"));
+  //this->Internal->Links.addPropertyLink(this->Internal->ProcessIDAdaptor,
+  //  "value", SIGNAL(valueChanged(int)),
+  //  reprProxy, reprProxy->GetProperty("ProcessID"));
   this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("SelectionOnly"));
   this->Internal->Links.addPropertyLink(this->Internal->CompositeTreeAdaptor,
     "values", SIGNAL(valuesChanged()),
     reprProxy, reprProxy->GetProperty("CompositeDataSetIndex"));
+  this->Internal->AttributeModeDomain = new pqComboBoxDomain(
+    this->Internal->AttributeMode,
+    reprProxy->GetProperty("FieldAssociation"), "enum");
 
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));

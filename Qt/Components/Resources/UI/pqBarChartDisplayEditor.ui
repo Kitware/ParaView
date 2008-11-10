@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>265</width>
-    <height>300</height>
+    <width>311</width>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -18,23 +18,8 @@
      <property name="title" >
       <string>View</string>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>6</number>
-      </property>
-      <property name="topMargin" >
-       <number>6</number>
-      </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <item>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" colspan="2" >
        <widget class="QCheckBox" name="ViewData" >
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
@@ -42,6 +27,47 @@
         <property name="text" >
          <string>Visible</string>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Attribute</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="FieldAssociation" >
+        <item>
+         <property name="text" >
+          <string>Points</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Cells</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Field Data</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Vertices</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Edges</string>
+         </property>
+        </item>
+        <item>
+         <property name="text" >
+          <string>Rows</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -53,53 +79,17 @@
       <string>X Axis</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="UsePoints" >
-        <property name="toolTip" >
-         <string>&lt;html>When checked the chart will use points instead of point data on the X axis.&lt;/html></string>
-        </property>
-        <property name="text" >
-         <string>Use Points</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="labelPointComponent" >
-        <property name="text" >
-         <string>Component</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="PointComponent" >
-        <item>
-         <property name="text" >
-          <string>X</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Y</string>
-         </property>
-        </item>
-        <item>
-         <property name="text" >
-          <string>Z</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="2" column="0" >
+      <item row="0" column="0" >
        <widget class="QLabel" name="labelXArrayName" >
         <property name="text" >
          <string>Array Name</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
+      <item row="0" column="1" >
        <widget class="QComboBox" name="XArrayName" />
       </item>
-      <item row="3" column="0" colspan="2" >
+      <item row="1" column="0" colspan="2" >
        <layout class="QHBoxLayout" >
         <item>
          <spacer>
@@ -171,14 +161,23 @@
     </widget>
    </item>
    <item>
+    <widget class="QTreeWidget" name="CompositeTree" >
+     <column>
+      <property name="text" >
+       <string>Structure</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>20</width>
-       <height>0</height>
+       <width>352</width>
+       <height>101</height>
       </size>
      </property>
     </spacer>
@@ -186,70 +185,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>UsePoints</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>PointComponent</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>101</x>
-     <y>111</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>143</x>
-     <y>141</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>UsePoints</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>labelPointComponent</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>101</x>
-     <y>111</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>59</x>
-     <y>141</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>UsePoints</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>labelXArrayName</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>101</x>
-     <y>111</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>59</x>
-     <y>173</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>UsePoints</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>XArrayName</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>101</x>
-     <y>111</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>143</x>
-     <y>173</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

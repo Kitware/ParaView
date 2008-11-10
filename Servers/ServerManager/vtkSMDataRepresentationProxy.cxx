@@ -53,7 +53,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.12");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -329,17 +329,17 @@ vtkPVDataInformation* vtkSMDataRepresentationProxy::GetRepresentedDataInformatio
     return 0;
     }
 
+  if (update)
+    {
+    this->Update();
+    }
+
   // We don't use active stratgies since active strategies are returned only
   // when visibile.
   vtkSMRepresentationStrategyVector::iterator iter;
   for (iter = this->RepresentationStrategies->begin(); 
     iter != this->RepresentationStrategies->end(); ++iter)
     {
-    if (update)
-      {
-      // update part of pipeline to obtain correct data size information.
-      iter->GetPointer()->Update();
-      }
     iter->GetPointer()->UpdateDataInformation();
     return iter->GetPointer()->GetRepresentedDataInformation();
     }

@@ -1837,6 +1837,217 @@
     </TransformProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="extended_filters">
+    <!-- Group for internal filters -->
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="ChartRepresentationPreprocessor"
+       class="vtkBlockDeliveryPreprocessor">
+       <Documentation>
+         vtkBlockDeliveryPreprocessor is an internal filter. This is used by
+         chart representations to preprocess the table that is delivered to the
+         client.
+       </Documentation>
+
+       <InputProperty name="Input"
+         command="SetInputConnection">
+         <Documentation>
+           This property specifies the input to the Extract Datasets filter.
+         </Documentation>
+       </InputProperty>
+
+       <IntVectorProperty name="FieldAssociation"
+         command="SetFieldAssociation"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Select the attribute data to pass.
+         </Documentation>
+         <EnumerationDomain name="enum">
+           <Entry text="Points" value="0" />
+           <Entry text="Cells" value="1" />
+           <Entry text="Field Data" value="2" />
+           <Entry text="Vertices" value="4" />
+           <Entry text="Edges" value="5" />
+           <Entry text="Rows" value="6" />
+         </EnumerationDomain>
+       </IntVectorProperty>
+
+       <IntVectorProperty name="CompositeDataSetIndex"
+         command="SetCompositeDataSetIndex"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           In case of Composite datasets, set the flat index of the dataset to 
+           pass. The flat index must point to a non-empty, non-composite dataset 
+           for anything to be passed through. If the input is not a composite 
+           dataset, then this index is ignored.
+         </Documentation>
+         <CompositeTreeDomain name="tree" mode="leaves">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+        </CompositeTreeDomain>
+       </IntVectorProperty>
+    <!-- End of ChartRepresentationPreprocessor -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="BlockDeliveryPreprocessor"
+       class="vtkBlockDeliveryPreprocessor">
+       <Documentation>
+         vtkBlockDeliveryPreprocessor is an internal filter.
+       </Documentation>
+
+       <InputProperty name="Input"
+         command="SetInputConnection">
+         <Documentation>
+           This property specifies the input to the Extract Datasets filter.
+         </Documentation>
+       </InputProperty>
+
+       <IntVectorProperty name="FieldAssociation"
+         command="SetFieldAssociation"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Select the attribute data to pass.
+         </Documentation>
+         <FieldDataDomain name="enum"
+            enable_field_data="1">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </FieldDataDomain>
+       </IntVectorProperty>
+
+       <IntVectorProperty name="CompositeDataSetIndex"
+         command="SetCompositeDataSetIndex"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           In case of Composite datasets, set the flat index of the dataset to 
+           pass. The flat index must point to a non-empty, non-composite dataset 
+           for anything to be passed through. If the input is not a composite 
+           dataset, then this index is ignored.
+         </Documentation>
+         <CompositeTreeDomain name="tree" mode="leaves">
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+        </CompositeTreeDomain>
+       </IntVectorProperty>
+    <!-- End of BlockDeliveryPreprocessor -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="TableStreamer" class="vtkTableStreamer">
+       <Documentation>
+         vtkTableStreamer is a block-based vtkTable streaming filter. 
+       </Documentation>
+
+       <InputProperty name="Input"
+         command="SetInputConnection">
+         <Documentation>
+           This property specifies the input to the Extract Datasets filter.
+         </Documentation>
+       </InputProperty>
+
+       <IdTypeVectorProperty name="BlockSize"
+         command="SetBlockSize"
+         number_of_elements="1"
+         default_values="1024">
+         <Documentation>
+           Get/Set the number of rows that fit within one block. The output of
+           this filter will have at most BlockSize rows.
+         </Documentation>
+       </IdTypeVectorProperty>
+
+       <IdTypeVectorProperty name="Block"
+         command="SetBlock"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Get/Set the block to pass.
+         </Documentation>
+       </IdTypeVectorProperty>
+
+       <IntVectorProperty name="GenerateOriginalIds"
+         command="SetGenerateOriginalIds"
+         default_values="1"
+         number_of_elements="1">
+         <Documentation>
+           When set (default) the vtkOriginalIndices array will be added to the
+           output. Can be overridden by setting this flag to 0.
+         </Documentation>
+       </IntVectorProperty>
+    <!-- End of TableStreamer --> 
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="SelectionStreamer" class="vtkSelectionStreamer">
+       <Documentation>
+         vtkSelectionStreamer is a block-based vtkSelection streaming filter.
+         This is designed to be used in conjunction with vtkTableStreamer.
+       </Documentation>
+
+       <InputProperty name="DataInput"
+         command="SetInputConnection"
+         port_index="1" >
+         <Documentation>
+           This property specifies the input to the Extract Datasets filter.
+         </Documentation>
+       </InputProperty>
+
+       <InputProperty name="Input"
+         command="SetInputConnection"
+         port_index="0" >
+         <Documentation>
+           This property specifies the input to the Extract Datasets filter.
+         </Documentation>
+       </InputProperty>
+
+       <IdTypeVectorProperty name="BlockSize"
+         command="SetBlockSize"
+         number_of_elements="1"
+         default_values="1024">
+         <Documentation>
+           Get/Set the number of rows that fit within one block. The output of
+           this filter will have at most BlockSize rows.
+         </Documentation>
+       </IdTypeVectorProperty>
+
+       <IdTypeVectorProperty name="Block"
+         command="SetBlock"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Get/Set the block to pass.
+         </Documentation>
+       </IdTypeVectorProperty>
+
+       <IntVectorProperty name="FieldAssociation"
+         command="SetFieldAssociation"
+         number_of_elements="1"
+         default_values="0">
+         <Documentation>
+           Select the attribute data to pass.
+         </Documentation>
+         <EnumerationDomain name="enum">
+           <Entry text="Points" value="0" />
+           <Entry text="Cells" value="1" />
+           <Entry text="Field Data" value="2" />
+           <Entry text="Vertices" value="3" />
+           <Entry text="Edges" value="4" />
+           <Entry text="Rows" value="5" />
+         </EnumerationDomain>
+       </IntVectorProperty>
+
+    <!-- End of SelectionStreamer --> 
+    </SourceProxy>
+
+  </ProxyGroup>
+
   <ProxyGroup name="misc">
     <Proxy name="FileInformationHelper" class="vtkPVFileInformationHelper">
 

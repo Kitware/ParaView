@@ -24,7 +24,7 @@
 #include <math.h>
 
 vtkStandardNewMacro(vtkSMCSVExporterProxy);
-vtkCxxRevisionMacro(vtkSMCSVExporterProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCSVExporterProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMCSVExporterProxy::vtkSMCSVExporterProxy()
 {
@@ -78,9 +78,7 @@ void vtkSMCSVExporterProxy::Write()
     }
 
   bool initialized = false;
-  vtkIdType numBlocks = static_cast<vtkIdType>(ceil(
-      static_cast<double>(activeRepr->GetMaximumNumberOfItems())/
-      vtkSMPropertyHelper(activeRepr, "BlockSize").GetAsIdType()));
+  vtkIdType numBlocks = activeRepr->GetNumberOfRequiredBlocks();
   for (vtkIdType blockNo=0; blockNo < numBlocks; blockNo++)
     {
     vtkTable* table = vtkTable::SafeDownCast(activeRepr->GetOutput(blockNo));

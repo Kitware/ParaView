@@ -83,11 +83,13 @@ pqPlotViewHistogram::pqPlotViewHistogram(QObject *parentObject)
   this->Internal = new pqPlotViewHistogramInternal();
 }
 
+//----------------------------------------------------------------------------
 pqPlotViewHistogram::~pqPlotViewHistogram()
 {
   delete this->Internal;
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::initialize(pqChartArea *chartArea)
 {
   if(this->Internal->Model)
@@ -108,11 +110,13 @@ void pqPlotViewHistogram::initialize(pqChartArea *chartArea)
   this->Internal->Layer->setModel(this->Internal->Model);
 }
 
+//----------------------------------------------------------------------------
 pqHistogramChart *pqPlotViewHistogram::getChartLayer() const
 {
   return this->Internal->Layer;
 }
 
+//----------------------------------------------------------------------------
 pqBarChartRepresentation *pqPlotViewHistogram::getCurrentRepresentation() const
 {
   QList<QPointer<pqBarChartRepresentation> >::ConstIterator display =
@@ -128,15 +132,21 @@ pqBarChartRepresentation *pqPlotViewHistogram::getCurrentRepresentation() const
   return 0;
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::setCurrentRepresentation(pqBarChartRepresentation *display)
 {
   vtkSMProxy* lut = 0;
   if (display)
     {
-    // Update the lookup table.
-    display->updateLookupTable();
     lut = pqSMAdaptor::getProxyProperty(
+      display->getProxy()->GetProperty("LookupTable"));
+    if (!lut)
+      {
+      // Update the lookup table.
+      display->updateLookupTable();
+      lut = pqSMAdaptor::getProxyProperty(
         display->getProxy()->GetProperty("LookupTable"));
+      }
     }
 
   this->Internal->ColorScheme.setMapIndexToColor(true);
@@ -150,6 +160,7 @@ void pqPlotViewHistogram::setCurrentRepresentation(pqBarChartRepresentation *dis
   this->Internal->MTime.Modified();
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::update(bool force)
 {
   this->setCurrentRepresentation(this->getCurrentRepresentation());
@@ -158,10 +169,14 @@ void pqPlotViewHistogram::update(bool force)
     {
     vtkDataArray *xarray = 0;
     vtkDataArray *yarray = 0;
+    int xcomp = -1;
+    int ycomp = -1;
     if(!this->Internal->LastUsedRepresentation.isNull())
       {
       xarray = this->Internal->LastUsedRepresentation->getXArray();
       yarray = this->Internal->LastUsedRepresentation->getYArray();
+      xcomp = this->Internal->LastUsedRepresentation->getXArrayComponent();
+      ycomp = this->Internal->LastUsedRepresentation->getYArrayComponent();
       if(!xarray || !yarray)
         {
         qCritical() << "Failed to locate the data to plot on either axes.";
@@ -169,10 +184,11 @@ void pqPlotViewHistogram::update(bool force)
       }
 
     this->Internal->LastUpdateTime.Modified();
-    this->Internal->Model->setDataArrays(xarray, yarray);
+    this->Internal->Model->setDataArrays(xarray, xcomp, yarray, ycomp);
     }
 }
 
+//----------------------------------------------------------------------------
 bool pqPlotViewHistogram::isUpdateNeeded()
 {
   bool force = true; //FIXME: until we fix thses conditions to include LUT.
@@ -198,6 +214,7 @@ bool pqPlotViewHistogram::isUpdateNeeded()
   return force;
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::addRepresentation(
     pqBarChartRepresentation *histogram)
 {
@@ -207,6 +224,7 @@ void pqPlotViewHistogram::addRepresentation(
     }
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::removeRepresentation(
     pqBarChartRepresentation *histogram)
 {
@@ -220,6 +238,7 @@ void pqPlotViewHistogram::removeRepresentation(
     }
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::removeAllRepresentations()
 {
   this->Internal->LastUsedRepresentation = 0;
@@ -227,6 +246,7 @@ void pqPlotViewHistogram::removeAllRepresentations()
   this->Internal->MTime.Modified();
 }
 
+//----------------------------------------------------------------------------
 void pqPlotViewHistogram::updateVisibility(pqRepresentation* display)
 {
   pqBarChartRepresentation *histogram =

@@ -8235,6 +8235,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       </Hints>
     </CompoundSourceProxy>
 
+    <!-- ==================================================================== -->
     <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
        label="Level Scalars">
       <Documentation
@@ -8264,6 +8265,7 @@ This property controls how the filter works to generate tensor cell data. You ca
     <!-- End GroupIdScalars -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
     <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup"
       label="Extract Group">
       <Documentation
@@ -8311,6 +8313,7 @@ This property controls how the filter works to generate tensor cell data. You ca
     <!-- End ExtractLevel -->
     </SourceProxy>
 
+    <!-- ==================================================================== -->
     <SourceProxy name="ExtractDataSets" 
                 class="vtkMultiGroupDataExtractDataSets"
                 label="Extract Datasets">
@@ -8352,6 +8355,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       </IntVectorProperty>
    <!-- End ExtractDataSets -->
    </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

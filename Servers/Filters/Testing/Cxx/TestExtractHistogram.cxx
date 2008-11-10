@@ -16,7 +16,7 @@
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkExtractHistogram.h"
-#include "vtkRectilinearGrid.h"
+#include "vtkTable.h"
 #include "vtkSmartPointer.h"
 #include "vtkSphereSource.h"
 #include "vtkIntArray.h"
@@ -36,9 +36,10 @@ int main(int, char*[])
   extraction->SetBinCount(bin_count);
   extraction->Update();
 
-  vtkRectilinearGrid* const histogram = extraction->GetOutput();
+  vtkTable* const histogram = extraction->GetOutput();
 
-  vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(histogram->GetXCoordinates());
+  vtkDoubleArray* const bin_extents = vtkDoubleArray::SafeDownCast(
+    histogram->GetRowData()->GetArray("Normals"));
   if(!bin_extents)
     {
     vtkGenericWarningMacro("No bin extents found.");
@@ -51,14 +52,14 @@ int main(int, char*[])
     return 1;
     }
   
-  if(bin_extents->GetNumberOfTuples() != bin_count + 1)
+  if(bin_extents->GetNumberOfTuples() != bin_count)
     {
     vtkGenericWarningMacro("Incorrect number of  bins.");
     return 1;
     }
 
   vtkIntArray* const bin_values = vtkIntArray::SafeDownCast(
-    histogram->GetCellData()->GetArray((int)0));
+    histogram->GetRowData()->GetArray((int)1));
   if(!bin_values)
     {
     vtkGenericWarningMacro("cell data missing.");

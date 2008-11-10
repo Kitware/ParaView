@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewSelectionModel.h"
 
 // Server Manager Includes.
-#include "vtkIndexBasedBlockFilter.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSelection.h"
@@ -211,13 +210,14 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
     }
 
   int field_type = this->Internal->Model->getFieldType();
-  if (field_type == vtkIndexBasedBlockFilter::FIELD)
+  if (field_type != vtkDataObject::FIELD_ASSOCIATION_POINTS &&
+    field_type != vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
     return 0;
     }
 
   // Convert field_type to selection field type.
-  field_type = (field_type == vtkIndexBasedBlockFilter::POINT)?
+  field_type = (field_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
     vtkSelection::POINT : vtkSelection::CELL;
 
   pqOutputPort* opport = repr->getOutputPortFromInput();

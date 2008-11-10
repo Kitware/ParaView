@@ -16,7 +16,7 @@
 #ifndef __vtkExtractHistogram_h
 #define __vtkExtractHistogram_h
 
-#include "vtkRectilinearGridAlgorithm.h"
+#include "vtkTableAlgorithm.h"
 
 //BTX
 class vtkDoubleArray;
@@ -34,11 +34,11 @@ struct vtkEHInternals;
 // the boundaries between each histogram bin, and a vtkUnsignedLongArray
 // named "bin_values" which will contain the value for each bin.
 
-class VTK_EXPORT vtkExtractHistogram : public vtkRectilinearGridAlgorithm
+class VTK_EXPORT vtkExtractHistogram : public vtkTableAlgorithm
 {
 public:
   static vtkExtractHistogram* New();
-  vtkTypeRevisionMacro(vtkExtractHistogram, vtkRectilinearGridAlgorithm);
+  vtkTypeRevisionMacro(vtkExtractHistogram, vtkTableAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -67,19 +67,9 @@ protected:
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
 
-  // convenience method
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
-
   virtual int RequestData(vtkInformation *request, 
                           vtkInformationVector **inputVector, 
                           vtkInformationVector *outputVector);
-
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
-
 
   // Initialize the bin_extents using the data range for the selected 
   // array.
@@ -93,6 +83,8 @@ protected:
     vtkIntArray *vals, 
     double min, double max,
     vtkFieldData* field);
+
+  void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
 
   int Component;
   int BinCount;

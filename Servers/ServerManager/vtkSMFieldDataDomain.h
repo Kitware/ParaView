@@ -59,6 +59,13 @@ protected:
   vtkSMFieldDataDomain();
   ~vtkSMFieldDataDomain();
 
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* elem);
+
+  // When true, "Field Data" option is added to the domain.
+  bool EnableFieldDataSelection;
 private:
 
   // Description:

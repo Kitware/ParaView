@@ -34,14 +34,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCellData.h"
 #include "vtkCommand.h"
 #include "vtkDataArray.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkEventQtSlotConnect.h"
-#include "vtkPointData.h"
-#include "vtkRectilinearGrid.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkTable.h"
 #include "vtkTimeStamp.h"
 
 #include <QtDebug>
@@ -50,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLookupTableManager.h"
 #include "pqPipelineSource.h"
 #include "pqScalarsToColors.h"
-#include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
 class pqBarChartRepresentation::pqInternals
@@ -86,7 +87,7 @@ void pqBarChartRepresentation::markModified()
 //-----------------------------------------------------------------------------
 vtkTimeStamp pqBarChartRepresentation::getMTime() const
 {
-  vtkRectilinearGrid* data = this->getClientSideData();
+  vtkTable* data = this->getClientSideData();
   if (data && data->GetMTime() > this->Internal->MTime)
     {
     this->Internal->MTime.Modified();
@@ -107,8 +108,7 @@ pqScalarsToColors* pqBarChartRepresentation::setLookupTable(const char* arraynam
   lut = (pqlut)? pqlut->getProxy() : 0;
 
   vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setProxyProperty(
-    proxy->GetProperty("LookupTable"), lut);
+  vtkSMPropertyHelper(proxy, "LookupTable").Set(lut);
   proxy->UpdateVTKObjects();
 
   return pqlut;
@@ -127,30 +127,29 @@ void pqBarChartRepresentation::setDefaultPropertyValues()
 
   // Set default arrays and lookup table.
   vtkSMProxy* proxy = this->getProxy();
-  
-  // By default, we use the 1st point array as the X axis. If no point data
-  // is present we use the X coordinate of the points themselves.
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    proxy->GetProperty("XArrayName"));
-  bool use_points = (svp->GetElement(0) == 0);
-  pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("XAxisUsePoints"), use_points);
-  if (this->getInput()->getProxy()->GetXMLName() == QString("ExtractHistogram"))
+ 
+  vtkPVDataInformation* input_di = this->getInputDataInformation();
+  if (input_di)
     {
-    pqSMAdaptor::setEnumerationProperty(
-      proxy->GetProperty("ReductionType"), "FIRST_NODE_ONLY");
+    int field_association = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    switch (input_di->GetDataSetType())
+      {
+    case VTK_TABLE:
+      field_association = vtkDataObject::FIELD_ASSOCIATION_ROWS;
+      break;
+     
+    case VTK_GRAPH:
+      field_association = vtkDataObject::FIELD_ASSOCIATION_VERTICES;
+      break;
+      }
+    vtkSMPropertyHelper(proxy, "FieldAssociation").Set(field_association);
     }
-  else
-    {
-    pqSMAdaptor::setEnumerationProperty(
-      proxy->GetProperty("ReductionType"), "RECTILINEAR_GRID_APPEND");
-    }
-  pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("OutputDataType"),"vtkRectilinearGrid");
   proxy->UpdateVTKObjects();
 
-  // Need to update since we would have changed the reduction type.
+  // Need to update since we would have changed the field Association changed.
   vtkSMClientDeliveryRepresentationProxy::SafeDownCast(proxy)->Update();
+  proxy->GetProperty("XArrayName")->ResetToDefault();
+  proxy->GetProperty("YArrayName")->ResetToDefault();
 
   // Now initialize the lookup table.
   this->updateLookupTable();
@@ -159,9 +158,6 @@ void pqBarChartRepresentation::setDefaultPropertyValues()
 //-----------------------------------------------------------------------------
 void pqBarChartRepresentation::updateLookupTable()
 {
-  bool use_points = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("XAxisUsePoints")).toBool();
-
   vtkDataArray* xarray  = this->getXArray();
   if (!xarray)
     {
@@ -171,7 +167,7 @@ void pqBarChartRepresentation::updateLookupTable()
 
   pqScalarsToColors* lut;
   // Now set up default lookup table.
-  if (use_points || !xarray->GetName())
+  if (!xarray->GetName())
     {
     lut = this->setLookupTable("unnamedArray"); 
     }
@@ -202,13 +198,13 @@ void pqBarChartRepresentation::resetLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
-vtkRectilinearGrid* pqBarChartRepresentation::getClientSideData() const
+vtkTable* pqBarChartRepresentation::getClientSideData() const
 {
   vtkSMClientDeliveryRepresentationProxy* proxy = 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(this->getProxy());
   if (proxy)
     {
-    return vtkRectilinearGrid::SafeDownCast(proxy->GetOutput());
+    return vtkTable::SafeDownCast(proxy->GetOutput());
     }
   return 0;
 }
@@ -217,49 +213,50 @@ vtkRectilinearGrid* pqBarChartRepresentation::getClientSideData() const
 vtkDataArray* pqBarChartRepresentation::getXArray()
 {
   vtkSMProxy* proxy = this->getProxy();
-  vtkRectilinearGrid* data = this->getClientSideData();
+  vtkTable* data = this->getClientSideData();
   if (!data || !proxy)
     {
     return 0;
     }
 
-  bool use_points = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("XAxisUsePoints")).toBool();
-  if (use_points)
-    {
-    int component = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("XAxisPointComponent")).toInt();
-    switch (component)
-      {
-    case 0:
-      return data->GetXCoordinates();
-
-    case 1:
-      return data->GetYCoordinates();
-
-    case 2:
-      return data->GetZCoordinates();
-      }
-    }
-  else
-    {
-    QString xarrayName = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("XArrayName")).toString();
-    return data->GetPointData()->GetArray(xarrayName.toAscii().data());
-    }
-  return 0;
+  return data->GetRowData()->GetArray(
+    vtkSMPropertyHelper(proxy, "XArrayName").GetAsString());
 }
 
 //----------------------------------------------------------------------------
 vtkDataArray* pqBarChartRepresentation::getYArray()
 {
   vtkSMProxy* proxy = this->getProxy();
-  vtkRectilinearGrid* data = this->getClientSideData();
+  vtkTable* data = this->getClientSideData();
   if (!data || !proxy)
     {
     return 0;
     }
-  QString yarrayName = pqSMAdaptor::getElementProperty(
-    proxy->GetProperty("YArrayName")).toString();
-  return data->GetCellData()->GetArray(yarrayName.toAscii().data());
+
+  return data->GetRowData()->GetArray(
+    vtkSMPropertyHelper(proxy, "YArrayName").GetAsString());
+}
+
+//----------------------------------------------------------------------------
+int pqBarChartRepresentation::getXArrayComponent()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  if (!proxy)
+    {
+    return 0;
+    }
+
+  return vtkSMPropertyHelper(proxy, "XArrayComponent").GetAsInt();
+}
+
+//----------------------------------------------------------------------------
+int pqBarChartRepresentation::getYArrayComponent()
+{
+  vtkSMProxy* proxy = this->getProxy();
+  if (!proxy)
+    {
+    return 0;
+    }
+
+  return vtkSMPropertyHelper(proxy, "YArrayComponent").GetAsInt();
 }

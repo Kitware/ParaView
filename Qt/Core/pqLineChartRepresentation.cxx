@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkRectilinearGrid.h"
+#include "vtkTable.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSmartPointer.h"
@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define STATUS_ROW_LENGTH 11
 
 
+//-----------------------------------------------------------------------------
 class pqLineChartDisplayItem
 {
 public:
@@ -84,13 +85,14 @@ public:
 };
 
 
+//-----------------------------------------------------------------------------
 class pqLineChartDisplayItemList
 {
 public:
   pqLineChartDisplayItemList();
   ~pqLineChartDisplayItemList() {}
 
-  void setXArray(vtkRectilinearGrid *data, bool usePoints, bool useIndex,
+  void setXArray(vtkTable *data, bool useIndex,
       const QString &arrayName, int component);
 
   QVector<pqLineChartDisplayItem> Series;
@@ -99,6 +101,7 @@ public:
 };
 
 
+//-----------------------------------------------------------------------------
 class pqLineChartRepresentation::pqInternals
 {
 public:
@@ -118,9 +121,7 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkTimeStamp LastUpdateTime;
   vtkTimeStamp ModifiedTime;
-  pqLineChartDisplayItemList PointList;
-  pqLineChartDisplayItemList CellList;
-  pqLineChartDisplayItemList *List;
+  pqLineChartDisplayItemList List;
   int ChangeCount;
   bool InMultiChange;
   unsigned int LastCompositeIndex;
@@ -141,6 +142,7 @@ pqLineChartDisplayItem::pqLineChartDisplayItem()
   this->StyleSet = false;
 }
 
+//-----------------------------------------------------------------------------
 pqLineChartDisplayItem::pqLineChartDisplayItem(
     const pqLineChartDisplayItem &other)
   : ArrayName(other.ArrayName), LegendName(other.LegendName),
@@ -156,6 +158,7 @@ pqLineChartDisplayItem::pqLineChartDisplayItem(
   this->StyleSet = other.StyleSet;
 }
 
+//-----------------------------------------------------------------------------
 pqLineChartDisplayItem &pqLineChartDisplayItem::operator=(
     const pqLineChartDisplayItem &other)
 {
@@ -181,8 +184,9 @@ pqLineChartDisplayItemList::pqLineChartDisplayItemList()
   this->XChanged = true;
 }
 
-void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
-    bool usePoints, bool useIndex, const QString &arrayName, int component)
+//-----------------------------------------------------------------------------
+void pqLineChartDisplayItemList::setXArray(vtkTable *data,
+    bool useIndex, const QString &arrayName, int component)
 {
   if(!data)
     {
@@ -192,8 +196,7 @@ void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
 
   if(useIndex)
     {
-    vtkIdType numTuples =
-        usePoints ? data->GetNumberOfPoints() : data->GetNumberOfCells();
+    vtkIdType numTuples = data->GetNumberOfRows();
     this->XArray = vtkSmartPointer<vtkDoubleArray>::New();
     this->XArray->SetNumberOfComponents(1);
     this->XArray->SetNumberOfTuples(numTuples);
@@ -204,12 +207,9 @@ void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
     }
   else
     {
-    vtkDataSetAttributes *attributes = usePoints ?
-        static_cast<vtkDataSetAttributes *>(data->GetPointData()) :
-        static_cast<vtkDataSetAttributes *>(data->GetCellData());
-    this->XArray =
-        attributes ? attributes->GetArray(arrayName.toAscii().data()) : 0;
-
+    vtkDataSetAttributes *attributes = data->GetRowData();
+    this->XArray = attributes ?
+      attributes->GetArray(arrayName.toAscii().data()) : 0;
     // Handle the component value.
     if(this->XArray && this->XArray->GetNumberOfComponents() > 1)
       {
@@ -221,16 +221,16 @@ void pqLineChartDisplayItemList::setXArray(vtkRectilinearGrid *data,
 
 //-----------------------------------------------------------------------------
 pqLineChartRepresentation::pqInternals::pqInternals()
-  : LastUpdateTime(), ModifiedTime(), PointList(), CellList()
+  : LastUpdateTime(), ModifiedTime(), List()
 {
   this->YIndexArray = vtkSmartPointer<vtkDoubleArray>::New();
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  this->List = &this->PointList;
   this->ChangeCount = 0;
   this->InMultiChange = false;
   this->LastCompositeIndex = 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::pqInternals::addLineItem(
     QList<QVariant> &values, const QString &arrayName,
     const QString &legendName, int enabled, int inLegend, double red,
@@ -250,6 +250,7 @@ void pqLineChartRepresentation::pqInternals::addLineItem(
   values.push_back(QVariant(component));
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::pqInternals::insertLineItem(
     QList<QVariant> &values, int index, const QString &arrayName,
     const QString &legendName, int enabled, int inLegend, double red,
@@ -284,30 +285,23 @@ pqLineChartRepresentation::pqLineChartRepresentation(const QString& group,
   this->Internals->VTKConnect->Connect(display,
       vtkCommand::PropertyModifiedEvent, this, SLOT(markAsModified()));
   this->Internals->VTKConnect->Connect(
-      display->GetProperty("XPointArrayName"),
-      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
+      display->GetProperty("XArrayName"),
+      vtkCommand::ModifiedEvent, this, SLOT(markListModified()));
   this->Internals->VTKConnect->Connect(
-      display->GetProperty("UseYPointArrayIndex"),
-      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
+      display->GetProperty("UseYArrayIndex"),
+      vtkCommand::ModifiedEvent, this, SLOT(markListModified()));
   this->Internals->VTKConnect->Connect(
-      display->GetProperty("XPointArrayComponent"),
-      vtkCommand::ModifiedEvent, this, SLOT(markPointModified()));
-  this->Internals->VTKConnect->Connect(
-      display->GetProperty("XCellArrayName"),
-      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
-  this->Internals->VTKConnect->Connect(
-      display->GetProperty("UseYCellArrayIndex"),
-      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
-  this->Internals->VTKConnect->Connect(
-      display->GetProperty("XCellArrayComponent"),
-      vtkCommand::ModifiedEvent, this, SLOT(markCellModified()));
+      display->GetProperty("XArrayComponent"),
+      vtkCommand::ModifiedEvent, this, SLOT(markListModified()));
 }
 
+//-----------------------------------------------------------------------------
 pqLineChartRepresentation::~pqLineChartRepresentation()
 {
   delete this->Internals;
 }
 
+//-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setDefaultPropertyValues()
 {
   this->Superclass::setDefaultPropertyValues();
@@ -319,30 +313,21 @@ void pqLineChartRepresentation::setDefaultPropertyValues()
     }
 
   vtkSMProxy* proxy = this->getProxy();
-  proxy->GetProperty("CellArrayInfo")->UpdateDependentDomains();
-  proxy->GetProperty("PointArrayInfo")->UpdateDependentDomains();
+  proxy->GetProperty("ArrayInfo")->UpdateDependentDomains();
 
   // Set the x-axis array name defaults.
   QString arrayName;
-  vtkSMProperty *cellName = proxy->GetProperty("XCellArrayName");
+  vtkSMProperty *cellName = proxy->GetProperty("XArrayName");
   if(this->getXArrayDefault(cellName, arrayName))
     {
     pqSMAdaptor::setElementProperty(cellName, arrayName);
     pqSMAdaptor::setElementProperty(
-        proxy->GetProperty("UseYCellArrayIndex"), QVariant((int)0));
+        proxy->GetProperty("UseYArrayIndex"), QVariant((int)0));
     }
-
-  vtkSMProperty *pointName = proxy->GetProperty("XPointArrayName");
-  if(this->getXArrayDefault(pointName, arrayName))
-    {
-    pqSMAdaptor::setElementProperty(pointName, arrayName);
-    pqSMAdaptor::setElementProperty(
-        proxy->GetProperty("UseYPointArrayIndex"), QVariant((int)0));
-    }
-
   proxy->UpdateVTKObjects();
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::getXArrayDefault(vtkSMProperty* prop,
     QString &arrayName)
 {
@@ -367,40 +352,19 @@ bool pqLineChartRepresentation::getXArrayDefault(vtkSMProperty* prop,
   return !arrayName.isEmpty();
 }
 
-vtkRectilinearGrid* pqLineChartRepresentation::getClientSideData() const
+//-----------------------------------------------------------------------------
+vtkTable* pqLineChartRepresentation::getClientSideData() const
 {
   vtkSMClientDeliveryRepresentationProxy* proxy = 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(this->getProxy());
   if (proxy)
     {
-    vtkDataObject* output = proxy->GetOutput();
-    if (output->IsA("vtkCompositeDataSet"))
-      {
-      vtkCompositeDataSet* cd = static_cast<vtkCompositeDataSet*>(output);
-      unsigned int composite_index = pqSMAdaptor::getElementProperty(
-        proxy->GetProperty("CompositeDataSetIndex")).toUInt();
-      
-      vtkCompositeDataIterator* iter = cd->NewIterator();
-      for (iter->InitTraversal();
-        !iter->IsDoneWithTraversal() && iter->GetCurrentFlatIndex() < composite_index;
-        iter->GoToNextItem())
-        {
-        // do nothing.
-        }
-
-      if (!iter->IsDoneWithTraversal() && 
-        iter->GetCurrentFlatIndex() == composite_index)
-        {
-        output = iter->GetCurrentDataObject();
-        }
-      iter->Delete();
-      }
-
-    return vtkRectilinearGrid::SafeDownCast(output);
+    return vtkTable::SafeDownCast(proxy->GetOutput());
     }
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isDataModified() const
 {
   if (this->getCompositeDataSetIndex() != this->Internals->LastCompositeIndex)
@@ -408,47 +372,29 @@ bool pqLineChartRepresentation::isDataModified() const
     return true;
     }
 
-  vtkRectilinearGrid *data = this->getClientSideData();
+  vtkTable *data = this->getClientSideData();
   return data && data->GetMTime() > this->Internals->LastUpdateTime;
 }
 
+//-----------------------------------------------------------------------------
 vtkDataArray* pqLineChartRepresentation::getArray(
     const QString &arrayName) const
 {
-  return this->getArray(arrayName, this->getAttributeType());
+  vtkTable *data = this->getClientSideData();
+  vtkDataSetAttributes *attributes = data? data->GetRowData() : 0;
+  return attributes? attributes->GetArray(arrayName.toAscii().data()) : 0;
 }
 
-vtkDataArray* pqLineChartRepresentation::getArray(const QString &arrayName,
-    int attributeType) const
-{
-  vtkRectilinearGrid *data = this->getClientSideData();
-  vtkDataSetAttributes *attributes = 0;
-  if(data)
-    {
-    if(attributeType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-      {
-      attributes = static_cast<vtkDataSetAttributes *>(data->GetPointData());
-      }
-    else
-      {
-      attributes = static_cast<vtkDataSetAttributes *>(data->GetCellData());
-      }
-    }
-
-  return attributes ? attributes->GetArray(arrayName.toAscii().data()) : 0;
-}
-
+//-----------------------------------------------------------------------------
 vtkDataArray* pqLineChartRepresentation::getXArray() const
 {
-  return this->Internals->List->XArray;
+  return this->Internals->List.XArray;
 }
 
+//-----------------------------------------------------------------------------
 vtkDataArray* pqLineChartRepresentation::getYArray(int index) const
 {
-  int attribute_type = this->getAttributeType();
-  vtkSMProperty *status = this->getProxy()->GetProperty(
-      attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS ?
-      "YPointArrayStatus" : "YCellArrayStatus");
+  vtkSMProperty *status = this->getProxy()->GetProperty("YArrayStatus");
   QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(status);
 
   int actual_index = index * STATUS_ROW_LENGTH;
@@ -458,19 +404,14 @@ vtkDataArray* pqLineChartRepresentation::getYArray(int index) const
     return 0;
     }
 
-  return this->getArray(values[actual_index].toString(), attribute_type);
+  return this->getArray(values[actual_index].toString());
 }
 
 //-----------------------------------------------------------------------------
 vtkDataArray* pqLineChartRepresentation::getMaskArray()
 {
-  vtkRectilinearGrid* data = this->getClientSideData();
-  if (!data)
-    {
-    return 0;
-    }
-
-  return data->GetPointData()->GetArray("vtkValidPointMask");
+  vtkTable* data = this->getClientSideData();
+  return data? data->GetRowData()->GetArray("vtkValidPointMask") : 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -481,14 +422,9 @@ bool pqLineChartRepresentation::isUpdateNeeded() const
 }
 
 //-----------------------------------------------------------------------------
-bool pqLineChartRepresentation::isArrayUpdateNeeded(int attributeType) const
+bool pqLineChartRepresentation::isArrayUpdateNeeded(int /*attributeType*/) const
 {
-  bool updateNeeded = this->Internals->CellList.XChanged;
-  if(attributeType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    updateNeeded = this->Internals->PointList.XChanged;
-    }
-
+  bool updateNeeded = this->Internals->List.XChanged;
   return updateNeeded || this->isDataModified();
 }
 
@@ -509,7 +445,7 @@ unsigned int pqLineChartRepresentation::getCompositeDataSetIndex() const
 //-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getNumberOfSeries() const
 {
-  return this->Internals->List->Series.size();
+  return this->Internals->List.Series.size();
 }
 
 //-----------------------------------------------------------------------------
@@ -517,8 +453,8 @@ int pqLineChartRepresentation::getSeriesIndex(const QString &name,
     int component) const
 {
   QVector<pqLineChartDisplayItem>::ConstIterator iter =
-      this->Internals->List->Series.begin();
-  for(int i = 0; iter != this->Internals->List->Series.end(); ++iter, ++i)
+      this->Internals->List.Series.begin();
+  for(int i = 0; iter != this->Internals->List.Series.end(); ++iter, ++i)
     {
     if(name == iter->ArrayName && component == iter->Component)
       {
@@ -532,9 +468,9 @@ int pqLineChartRepresentation::getSeriesIndex(const QString &name,
 //-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesEnabled(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].Enabled;
+    return this->Internals->List.Series[series].Enabled;
     }
 
   return false;
@@ -543,9 +479,9 @@ bool pqLineChartRepresentation::isSeriesEnabled(int series) const
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->Enabled != enabled)
       {
       item->Enabled = enabled;
@@ -579,18 +515,18 @@ void pqLineChartRepresentation::setSeriesEnabled(int series, bool enabled)
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::getSeriesName(int series, QString &name) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    name = this->Internals->List->Series[series].ArrayName;
+    name = this->Internals->List.Series[series].ArrayName;
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->ArrayName != name)
       {
       item->ArrayName = name;
@@ -606,9 +542,9 @@ void pqLineChartRepresentation::setSeriesName(int series, const QString &name)
 //-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesInLegend(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].InLegend;
+    return this->Internals->List.Series[series].InLegend;
     }
 
   return false;
@@ -617,9 +553,9 @@ bool pqLineChartRepresentation::isSeriesInLegend(int series) const
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesInLegend(int series, bool inLegend)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->InLegend != inLegend)
       {
       item->InLegend = inLegend;
@@ -637,9 +573,9 @@ void pqLineChartRepresentation::setSeriesInLegend(int series, bool inLegend)
 void pqLineChartRepresentation::getSeriesLabel(int series,
     QString &label) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    label = this->Internals->List->Series[series].LegendName;
+    label = this->Internals->List.Series[series].LegendName;
     }
 }
 
@@ -647,9 +583,9 @@ void pqLineChartRepresentation::getSeriesLabel(int series,
 void pqLineChartRepresentation::setSeriesLabel(int series,
     const QString &label)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->LegendName != label)
       {
       item->LegendName = label;
@@ -665,18 +601,18 @@ void pqLineChartRepresentation::setSeriesLabel(int series,
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::getSeriesColor(int series, QColor &color) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    color = this->Internals->List->Series[series].Color;
+    color = this->Internals->List.Series[series].Color;
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesColor(int series, const QColor &color)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(!item->ColorSet || item->Color != color)
       {
       item->ColorSet = true;
@@ -694,9 +630,9 @@ void pqLineChartRepresentation::setSeriesColor(int series, const QColor &color)
 //-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesColorSet(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].ColorSet;
+    return this->Internals->List.Series[series].ColorSet;
     }
 
   return false;
@@ -705,9 +641,9 @@ bool pqLineChartRepresentation::isSeriesColorSet(int series) const
 //-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesThickness(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].Thickness;
+    return this->Internals->List.Series[series].Thickness;
     }
 
   return 0;
@@ -716,9 +652,9 @@ int pqLineChartRepresentation::getSeriesThickness(int series) const
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->Thickness != thickness)
       {
       item->Thickness = thickness;
@@ -734,9 +670,9 @@ void pqLineChartRepresentation::setSeriesThickness(int series, int thickness)
 //-----------------------------------------------------------------------------
 Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].Style;
+    return this->Internals->List.Series[series].Style;
     }
 
   return Qt::SolidLine;
@@ -745,9 +681,9 @@ Qt::PenStyle pqLineChartRepresentation::getSeriesStyle(int series) const
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesStyle(int series, Qt::PenStyle style)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(!item->StyleSet || item->Style != style)
       {
       item->StyleSet = true;
@@ -765,9 +701,9 @@ void pqLineChartRepresentation::setSeriesStyle(int series, Qt::PenStyle style)
 //-----------------------------------------------------------------------------
 bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].StyleSet;
+    return this->Internals->List.Series[series].StyleSet;
     }
 
   return false;
@@ -776,9 +712,9 @@ bool pqLineChartRepresentation::isSeriesStyleSet(int series) const
 //-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesAxesIndex(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].AxesIndex;
+    return this->Internals->List.Series[series].AxesIndex;
     }
 
   return 0;
@@ -787,9 +723,9 @@ int pqLineChartRepresentation::getSeriesAxesIndex(int series) const
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::setSeriesAxesIndex(int series, int index)
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    pqLineChartDisplayItem *item = &this->Internals->List->Series[series];
+    pqLineChartDisplayItem *item = &this->Internals->List.Series[series];
     if(item->AxesIndex != index)
       {
       item->AxesIndex = index;
@@ -805,9 +741,9 @@ void pqLineChartRepresentation::setSeriesAxesIndex(int series, int index)
 //-----------------------------------------------------------------------------
 int pqLineChartRepresentation::getSeriesComponent(int series) const
 {
-  if(series >= 0 && series < this->Internals->List->Series.size())
+  if(series >= 0 && series < this->Internals->List.Series.size())
     {
-    return this->Internals->List->Series[series].Component;
+    return this->Internals->List.Series[series].Component;
     }
 
   return -1;
@@ -873,189 +809,174 @@ void pqLineChartRepresentation::startSeriesUpdate(bool force)
   vtkSMProxy *proxy = this->getProxy();
   proxy->GetProperty("Input")->UpdateDependentDomains();
   proxy->UpdatePropertyInformation();
-  proxy->GetProperty("CellArrayInfo")->UpdateDependentDomains();
-  proxy->GetProperty("PointArrayInfo")->UpdateDependentDomains();
+  proxy->GetProperty("ArrayInfo")->UpdateDependentDomains();
 
   bool sendSignal = false;
-  const char *status_name[] = {"YPointArrayStatus", "YCellArrayStatus"};
-  const char *xarray_name[] = {"XPointArrayName", "XCellArrayName"};
-  const char *index_name[] = {"UseYPointArrayIndex", "UseYCellArrayIndex"};
-  const char *comp_name[] = {"XPointArrayComponent", "XCellArrayComponent"};
-  pqLineChartDisplayItemList *series[] =
-      {&this->Internals->PointList, &this->Internals->CellList};
-  vtkSMStringVectorProperty *smProperty = 0;
-  vtkSMArraySelectionDomain *arrayDomain = 0;
-  for(int i = 0; i < 2; i++)
+  pqLineChartDisplayItemList *series = &this->Internals->List;
+
+  // Update the x-axis array.
+  if (force || this->isArrayUpdateNeeded(0))
     {
-    // Update the x-axis array.
-    if(force || this->isArrayUpdateNeeded(i == 0 ?
-        vtkDataObject::FIELD_ASSOCIATION_POINTS :
-        vtkDataObject::FIELD_ASSOCIATION_CELLS))
+    bool useIndex = pqSMAdaptor::getElementProperty(
+        proxy->GetProperty("UseYArrayIndex")).toInt() != 0;
+    QString xArray = pqSMAdaptor::getElementProperty(
+        proxy->GetProperty("XArrayName")).toString();
+    int component = pqSMAdaptor::getElementProperty(
+        proxy->GetProperty("XArrayComponent")).toInt();
+    series->setXArray(this->getClientSideData(), useIndex, xArray, component);
+    }
+
+  vtkSMStringVectorProperty *smProperty = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("YArrayStatus"));
+  vtkSMArraySelectionDomain *arrayDomain = vtkSMArraySelectionDomain::SafeDownCast(
+    smProperty->GetDomain("array_list"));
+
+  // Put the array names in a string list for convenience.
+  QStringList arrayNames;
+  int total = arrayDomain->GetNumberOfStrings();
+  for(int j = 0; j < total; j++)
+    {
+    arrayNames.append(arrayDomain->GetString(j));
+    }
+
+  arrayNames.removeAll("vtkValidPointMask");
+  arrayNames.removeAll("Cell's Point Ids");
+
+  // Get the current status array.
+  QList<QVariant> status =
+      pqSMAdaptor::getMultipleElementProperty(smProperty);
+
+  // Remove the array names not in the domain.
+  bool statusChanged = false;
+  QStringList statusNames;
+  QList<QVariant>::Iterator iter = status.begin();
+  while(iter != status.end())
+    {
+    QString rowName = iter->toString();
+    if(arrayNames.contains(rowName))
       {
-      bool useIndex = pqSMAdaptor::getElementProperty(
-          proxy->GetProperty(index_name[i])).toInt() != 0;
-      QString xArray = pqSMAdaptor::getElementProperty(
-          proxy->GetProperty(xarray_name[i])).toString();
-      int component = pqSMAdaptor::getElementProperty(
-          proxy->GetProperty(comp_name[i])).toInt();
-      series[i]->setXArray(this->getClientSideData(), i == 0,
-          useIndex, xArray, component);
-      }
-
-    smProperty = vtkSMStringVectorProperty::SafeDownCast(
-        proxy->GetProperty(status_name[i]));
-    arrayDomain = vtkSMArraySelectionDomain::SafeDownCast(
-        smProperty->GetDomain("array_list"));
-
-    // Put the array names in a string list for convenience.
-    QStringList arrayNames;
-    int total = arrayDomain->GetNumberOfStrings();
-    for(int j = 0; j < total; j++)
-      {
-      arrayNames.append(arrayDomain->GetString(j));
-      }
-
-    arrayNames.removeAll("vtkValidPointMask");
-    arrayNames.removeAll("Cell's Point Ids");
-
-    // Get the current status array.
-    QList<QVariant> status =
-        pqSMAdaptor::getMultipleElementProperty(smProperty);
-
-    // Remove the array names not in the domain.
-    bool statusChanged = false;
-    QStringList statusNames;
-    QList<QVariant>::Iterator iter = status.begin();
-    while(iter != status.end())
-      {
-      QString rowName = iter->toString();
-      if(arrayNames.contains(rowName))
+      // Make sure the name is unique.
+      if(!statusNames.contains(rowName))
         {
-        // Make sure the name is unique.
-        if(!statusNames.contains(rowName))
+        statusNames.append(rowName);
+        }
+
+      iter += STATUS_ROW_LENGTH;
+      }
+    else
+      {
+      statusChanged = true;
+      iter = status.erase(iter, iter + STATUS_ROW_LENGTH);
+      }
+    }
+
+  // Add status rows for the new array names. Make sure the status
+  // array order matches the domain array order.
+  QStringList::Iterator jter = arrayNames.begin();
+  for(int k = 0; jter != arrayNames.end(); ++jter)
+    {
+    // Get the number of components for the array.
+    QString current = *jter;
+    QString label = current;
+    vtkDataArray *array = this->getArray(current);
+    int numComponents = array ? array->GetNumberOfComponents() : 0;
+
+    bool inStatus = statusNames.contains(current);
+    if(inStatus)
+      {
+      current = status[k].toString();
+      }
+    else
+      {
+      statusChanged = true;
+      this->addComponentLabel(label, -1, numComponents);
+      int arrayEnabled = this->isEnabledByDefault(current);
+      this->Internals->insertLineItem(status, k, current, label,
+          arrayEnabled, 1, -1.0, -1.0, -1.0, 1, Qt::NoPen, 0, -1);
+      }
+
+    // If the array has multiple components, add an item for each.
+    k += STATUS_ROW_LENGTH;
+    if(numComponents > 1)
+      {
+      int comp = 0;
+      if(inStatus && k < status.size())
+        {
+        // See how many components are already added. More entries
+        // may be needed.
+        QString nextName = status[k].toString();
+        while(nextName == current)
           {
-          statusNames.append(rowName);
-          }
-
-        iter += STATUS_ROW_LENGTH;
-        }
-      else
-        {
-        statusChanged = true;
-        iter = status.erase(iter, iter + STATUS_ROW_LENGTH);
-        }
-      }
-
-    // Add status rows for the new array names. Make sure the status
-    // array order matches the domain array order.
-    QStringList::Iterator jter = arrayNames.begin();
-    for(int k = 0; jter != arrayNames.end(); ++jter)
-      {
-      // Get the number of components for the array.
-      QString current = *jter;
-      QString label = current;
-      vtkDataArray *array = this->getArray(current, i == 0 ?
-          vtkDataObject::FIELD_ASSOCIATION_POINTS :
-          vtkDataObject::FIELD_ASSOCIATION_CELLS);
-      int numComponents = array ? array->GetNumberOfComponents() : 0;
-
-      bool inStatus = statusNames.contains(current);
-      if(inStatus)
-        {
-        current = status[k].toString();
-        }
-      else
-        {
-        statusChanged = true;
-        this->addComponentLabel(label, -1, numComponents);
-        int arrayEnabled = this->isEnabledByDefault(current);
-        this->Internals->insertLineItem(status, k, current, label,
-            arrayEnabled, 1, -1.0, -1.0, -1.0, 1, Qt::NoPen, 0, -1);
-        }
-
-      // If the array has multiple components, add an item for each.
-      k += STATUS_ROW_LENGTH;
-      if(numComponents > 1)
-        {
-        int comp = 0;
-        if(inStatus && k < status.size())
-          {
-          // See how many components are already added. More entries
-          // may be needed.
-          QString nextName = status[k].toString();
-          while(nextName == current)
+          k += STATUS_ROW_LENGTH;
+          comp++;
+          if(k >= status.size())
             {
-            k += STATUS_ROW_LENGTH;
-            comp++;
-            if(k >= status.size())
-              {
-              break;
-              }
-
-            nextName = status[k].toString();
+            break;
             }
-          }
 
-        for( ; comp < numComponents; comp++, k += STATUS_ROW_LENGTH)
-          {
-          statusChanged = true;
-          label = current;
-          this->addComponentLabel(label, comp, numComponents);
-          this->Internals->insertLineItem(status, k, current, label,
-              0, 1, -1.0, -1.0, -1.0, 1, Qt::NoPen, 0, comp);
+          nextName = status[k].toString();
           }
+        }
+
+      for( ; comp < numComponents; comp++, k += STATUS_ROW_LENGTH)
+        {
+        statusChanged = true;
+        label = current;
+        this->addComponentLabel(label, comp, numComponents);
+        this->Internals->insertLineItem(status, k, current, label,
+            0, 1, -1.0, -1.0, -1.0, 1, Qt::NoPen, 0, comp);
         }
       }
+    }
 
-    // Save any changes to the status array.
-    if(statusChanged)
+  // Save any changes to the status array.
+  if(statusChanged)
+    {
+    smProperty->SetNumberOfElements(status.size());
+    pqSMAdaptor::setMultipleElementProperty(smProperty, status);
+    proxy->UpdateVTKObjects();
+    }
+
+  if(statusChanged || series->Series.size() != arrayNames.size())
+    {
+    if (!sendSignal && series == &this->Internals->List)
       {
-      smProperty->SetNumberOfElements(status.size());
-      pqSMAdaptor::setMultipleElementProperty(smProperty, status);
-      proxy->UpdateVTKObjects();
+      sendSignal = true;
       }
 
-    if(statusChanged || series[i]->Series.size() != arrayNames.size())
+    // Build the series list using the status list. Clear the current
+    // items and make space for the new items.
+    series->Series.clear();
+    series->Series.resize(status.size() / STATUS_ROW_LENGTH);
+
+    // Initialize the item for each of the status rows.
+    QVector<pqLineChartDisplayItem>::Iterator kter =
+        series->Series.begin();
+    for(int ii = 0; kter != series->Series.end();
+        ++kter, ii += STATUS_ROW_LENGTH)
       {
-      if(!sendSignal && series[i] == this->Internals->List)
+      kter->ArrayName = status[ii].toString();
+      kter->LegendName = status[ii + 1].toString();
+      kter->Enabled = status[ii + 2].toInt() != 0;
+      kter->InLegend = status[ii + 3].toInt() != 0;
+      double red = status[ii + 4].toDouble();
+      kter->ColorSet = red >= 0.0;
+      if(kter->ColorSet)
         {
-        sendSignal = true;
+        kter->Color.setRgbF(
+            red, status[ii + 5].toDouble(), status[ii + 6].toDouble());
         }
 
-      // Build the series list using the status list. Clear the current
-      // items and make space for the new items.
-      series[i]->Series.clear();
-      series[i]->Series.resize(status.size() / STATUS_ROW_LENGTH);
-
-      // Initialize the item for each of the status rows.
-      QVector<pqLineChartDisplayItem>::Iterator kter =
-          series[i]->Series.begin();
-      for(int ii = 0; kter != series[i]->Series.end();
-          ++kter, ii += STATUS_ROW_LENGTH)
+      kter->Thickness = status[ii + 7].toInt();
+      int style = status[ii + 8].toInt();
+      kter->StyleSet = style > Qt::NoPen && style < Qt::CustomDashLine;
+      if(kter->StyleSet)
         {
-        kter->ArrayName = status[ii].toString();
-        kter->LegendName = status[ii + 1].toString();
-        kter->Enabled = status[ii + 2].toInt() != 0;
-        kter->InLegend = status[ii + 3].toInt() != 0;
-        double red = status[ii + 4].toDouble();
-        kter->ColorSet = red >= 0.0;
-        if(kter->ColorSet)
-          {
-          kter->Color.setRgbF(
-              red, status[ii + 5].toDouble(), status[ii + 6].toDouble());
-          }
-
-        kter->Thickness = status[ii + 7].toInt();
-        int style = status[ii + 8].toInt();
-        kter->StyleSet = style > Qt::NoPen && style < Qt::CustomDashLine;
-        if(kter->StyleSet)
-          {
-          kter->Style = (Qt::PenStyle)style;
-          }
-
-        kter->AxesIndex = status[ii + 9].toInt();
-        kter->Component = status[ii + 10].toInt();
+        kter->Style = (Qt::PenStyle)style;
         }
+
+      kter->AxesIndex = status[ii + 9].toInt();
+      kter->Component = status[ii + 10].toInt();
       }
     }
 
@@ -1069,8 +990,7 @@ void pqLineChartRepresentation::startSeriesUpdate(bool force)
 void pqLineChartRepresentation::finishSeriesUpdate()
 {
   this->Internals->LastUpdateTime.Modified();
-  this->Internals->PointList.XChanged = false;
-  this->Internals->CellList.XChanged = false;
+  this->Internals->List.XChanged = false;
   this->Internals->LastCompositeIndex = this->getCompositeDataSetIndex();
 }
 
@@ -1090,28 +1010,13 @@ void pqLineChartRepresentation::markAsModified()
 //-----------------------------------------------------------------------------
 void pqLineChartRepresentation::changeSeriesList()
 {
-  int attribute_type = pqSMAdaptor::getElementProperty(
-      this->getProxy()->GetProperty("AttributeType")).toInt();
-  pqLineChartDisplayItemList *newArray =
-      attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS ?
-      &this->Internals->PointList : &this->Internals->CellList;
-  if(this->Internals->List != newArray)
-    {
-    this->Internals->List = newArray;
-    emit this->seriesListChanged();
-    }
+  emit this->seriesListChanged();
 }
 
 //-----------------------------------------------------------------------------
-void pqLineChartRepresentation::markPointModified()
+void pqLineChartRepresentation::markListModified()
 {
-  this->Internals->PointList.XChanged = true;
-}
-
-//-----------------------------------------------------------------------------
-void pqLineChartRepresentation::markCellModified()
-{
-  this->Internals->CellList.XChanged = true;
+  this->Internals->List.XChanged = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1144,14 +1049,13 @@ void pqLineChartRepresentation::saveSeriesChanges()
   this->Internals->ChangeCount = 0;
   vtkSMProxy *proxy = this->getProxy();
   vtkSMStringVectorProperty *smProperty =
-      vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty(
-      this->Internals->List == &this->Internals->PointList ?
-      "YPointArrayStatus" : "YCellArrayStatus"));
+    vtkSMStringVectorProperty::SafeDownCast(
+      proxy->GetProperty("YArrayStatus"));
 
   QList<QVariant> status;
   QVector<pqLineChartDisplayItem>::Iterator iter =
-      this->Internals->List->Series.begin();
-  for( ; iter != this->Internals->List->Series.end(); ++iter)
+      this->Internals->List.Series.begin();
+  for( ; iter != this->Internals->List.Series.end(); ++iter)
     {
     double red = -1.0;
     double green = -1.0;

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class QTreeWidget;
-class pqTreeWidgetItemObject;
+class QTreeWidgetItem;
 
 /// pqSignalAdaptorTreeWidget can be used to connect any property with 
 /// repeat_command to a tree widget that displays the property value.
@@ -66,17 +66,17 @@ public:
   /// Append an item to the tree.
   /// The size of values == this->TreeWidget->columnCount().
   /// Returns the newly created item, or 0 on failure.
-  pqTreeWidgetItemObject* appendValue(const QList<QVariant>& values);
-  pqTreeWidgetItemObject* appendValue(const QStringList& values);
+  QTreeWidgetItem* appendValue(const QList<QVariant>& values);
+  QTreeWidgetItem* appendValue(const QStringList& values);
 
-  /// This adaptor create pqTreeWidgetItemObject instances by default when new
+  /// This adaptor create QTreeWidgetItem instances by default when new
   /// entries are to be shown in the widget. To change the type of
-  /// pqTreeWidgetItemObject subclass created, simply set a function pointer to
+  /// QTreeWidgetItem subclass created, simply set a function pointer to
   /// a callback which will be called every time a new item is needed.
   /// The signature for the callback is:
-  /// pqTreeWidgetItemObject* callback(QTreeWidget* parent, const QStringList& val)
+  /// QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
   void setItemCreatorFunction(
-    pqTreeWidgetItemObject* (fptr)(QTreeWidget*, const QStringList&))
+    QTreeWidgetItem* (fptr)(QTreeWidget*, const QStringList&))
     {
     this->ItemCreatorFunctionPtr = fptr;
     }
@@ -86,7 +86,7 @@ signals:
 
   /// Fired when the table is automatically grown due to the user navigating
   /// past the end. This only supported for editable pqTreeWidget instances.
-  void tableGrown(pqTreeWidgetItemObject* item);
+  void tableGrown(QTreeWidgetItem* item);
 
 public slots:
   /// Set the values in the widget.
@@ -104,14 +104,17 @@ private:
   void operator=(const pqSignalAdaptorTreeWidget&); // Not implemented.
 
   /// Append an item to the tree.
-  void appendItem(pqTreeWidgetItemObject* item);
+  void appendItem(QTreeWidgetItem* item);
+
+  /// Create a new QTreeWidgetItem instance.
+  QTreeWidgetItem* newItem(const QStringList& columnValues);
 
   void updateSortingLinks();
 
   QTreeWidget* TreeWidget;
   bool Editable;
   bool Sortable;
-  pqTreeWidgetItemObject* (*ItemCreatorFunctionPtr)(QTreeWidget*, const QStringList&);
+  QTreeWidgetItem* (*ItemCreatorFunctionPtr)(QTreeWidget*, const QStringList&);
 };
 
 #endif

@@ -114,6 +114,14 @@ public:
   vtkGetObjectMacro(FieldDataInformation,vtkPVDataSetAttributesInformation);
 
   // Description:
+  // Method to access vtkPVDataSetAttributesInformation using field association
+  // type.
+  // \c fieldAssociation can be vtkDataObject::FIELD_ASSOCIATION_POINTS,
+  // vtkDataObject::FIELD_ASSOCIATION_CELLS etc.
+  // (use vtkDataObject::FIELD_ASSOCIATION_NONE for field data).
+  vtkPVDataSetAttributesInformation* GetAttributeInformation(int fieldAssociation);
+
+  // Description:
   // If data is composite, this provides information specific to
   // composite datasets.
   vtkGetObjectMacro(CompositeDataInformation,vtkPVCompositeDataInformation);

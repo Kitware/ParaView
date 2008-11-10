@@ -14,15 +14,18 @@
 =========================================================================*/
 #include "vtkPVMergeTables.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkTable.h"
+#include "vtkCompositeDataIterator.h"
+#include "vtkCompositeDataPipeline.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkVariant.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
+#include "vtkTable.h"
+#include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkPVMergeTables);
-vtkCxxRevisionMacro(vtkPVMergeTables, "1.1");
+vtkCxxRevisionMacro(vtkPVMergeTables, "1.2");
 //----------------------------------------------------------------------------
 vtkPVMergeTables::vtkPVMergeTables()
 {
@@ -37,27 +40,28 @@ vtkPVMergeTables::~vtkPVMergeTables()
 int vtkPVMergeTables::FillInputPortInformation(int port, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
-  return this->Superclass::FillInputPortInformation(port, info);
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkTable");
+  info->Append(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkCompositeDataSet");
+  return 1;
 }
 
+//----------------------------------------------------------------------------
+vtkExecutive* vtkPVMergeTables::CreateDefaultExecutive()
+{
+  return vtkCompositeDataPipeline::New();
+}
 
 //----------------------------------------------------------------------------
-int vtkPVMergeTables::RequestData(
-  vtkInformation*, 
-  vtkInformationVector** inputVector, 
-  vtkInformationVector* outputVector)
+static void vtkPVMergeTablesMerge(vtkTable* output, vtkTable* inputs[], int num_inputs)
 {
-  // Get output table
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkTable* output = vtkTable::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  int num_connections = this->GetNumberOfInputConnections(0);
-  for (int idx = 0; idx < num_connections; ++idx)
+  for (int idx = 0; idx < num_inputs; ++idx)
     {
-    vtkInformation* info = inputVector[0]->GetInformationObject(idx);
-    vtkTable* curTable= vtkTable::SafeDownCast(
-      info->Get(vtkDataObject::DATA_OBJECT()));
+    vtkTable* curTable = inputs[idx];
+    if (!curTable || curTable->GetNumberOfRows() == 0 ||
+      curTable->GetNumberOfColumns() == 0)
+      {
+      continue;
+      }
 
     if (output->GetNumberOfRows() == 0)
       {
@@ -77,8 +81,50 @@ int vtkPVMergeTables::RequestData(
         }
       }
     }
-  cout << "Num rows: " << output->GetNumberOfRows() << endl;
+}
 
+//----------------------------------------------------------------------------
+int vtkPVMergeTables::RequestData(
+  vtkInformation*, 
+  vtkInformationVector** inputVector, 
+  vtkInformationVector* outputVector)
+{
+  int num_connections = this->GetNumberOfInputConnections(0);
+
+  // Get output table
+  vtkTable* outputTable = vtkTable::GetData(outputVector, 0);
+
+  if (vtkTable::GetData(inputVector[0], 0))
+    {
+    vtkTable** inputs = new vtkTable*[num_connections];
+    for (int idx = 0; idx < num_connections; ++idx)
+      {
+      inputs[idx] = vtkTable::GetData(inputVector[0], idx);
+      }
+    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
+    delete [] inputs;
+    return 1;
+    }
+
+  vtkCompositeDataSet* input0 = vtkCompositeDataSet::GetData(inputVector[0], 0);
+  vtkCompositeDataIterator* iter = input0->NewIterator();
+  iter->SkipEmptyNodesOff();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkTable** inputs = new vtkTable*[num_connections];
+    for (int idx = 0; idx < num_connections; ++idx)
+      {
+      vtkCompositeDataSet* inputCD = vtkCompositeDataSet::GetData(inputVector[0], idx);
+      if (!inputCD)
+        {
+        continue;
+        }
+      inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+      }
+    ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
+    delete [] inputs;
+    }
+  iter->Delete();
   return 1;
 }
 

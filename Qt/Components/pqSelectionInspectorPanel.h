@@ -43,7 +43,6 @@ class pqProxy;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
-class pqTreeWidgetItemObject;
 class pqView;
 class QTreeWidgetItem;
 class vtkSMClientDeliveryRepresentationProxy;
@@ -113,7 +112,7 @@ protected slots:
 
   /// Called when user navigates beyond the end in the indices table widget. We
   /// add a new row to simplify editing.
-  void onTableGrown(pqTreeWidgetItemObject* item);
+  void onTableGrown(QTreeWidgetItem* item);
 
   /// Called when the current item in the "Indices" table changes. If composite
   /// tree is visible, we update the composite tree selection to match the

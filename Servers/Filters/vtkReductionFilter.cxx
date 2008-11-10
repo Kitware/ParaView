@@ -39,15 +39,11 @@
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 
-#ifdef VTK_USE_MPI
-#include "vtkMPICommunicator.h"
-#endif
-
 #include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.18");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.19");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -56,7 +52,6 @@ vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
 vtkReductionFilter::vtkReductionFilter()
 {
   this->Controller= 0;
-  this->RawData = 0;
   this->PreGatherHelper = 0;
   this->PostGatherHelper = 0;
   this->PassThrough = -1;
@@ -69,7 +64,6 @@ vtkReductionFilter::~vtkReductionFilter()
   this->SetPreGatherHelper(0);
   this->SetPostGatherHelper(0);
   this->SetController(0);
-  delete []this->RawData;
 }
 
 //-----------------------------------------------------------------------------
@@ -82,12 +76,12 @@ int vtkReductionFilter::FillInputPortInformation(int idx, vtkInformation *info)
 //-----------------------------------------------------------------------------
 int vtkReductionFilter::RequestDataObject(
   vtkInformation* reqInfo,
-  vtkInformationVector** inputVector, 
+  vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
   if (this->PostGatherHelper != NULL)
     {
-    vtkInformation* helpersInfo = 
+    vtkInformation* helpersInfo =
       this->PostGatherHelper->GetOutputPortInformation(0);
 
     const char *hOT = helpersInfo->Get(vtkDataObject::DATA_TYPE_NAME());
@@ -99,11 +93,11 @@ int vtkReductionFilter::RequestDataObject(
       vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
       helpersOutType = input? input->GetClassName() : "vtkUnstructuredGrid";
       }
-    
+
     vtkInformation* info = outputVector->GetInformationObject(0);
     vtkDataObject *output = reqInfo->Get(vtkDataObject::DATA_OBJECT());
-      
-    if (!output || !output->IsA(helpersOutType)) 
+
+    if (!output || !output->IsA(helpersOutType))
       {
       vtkObject* anObj = vtkDataObjectTypes::NewDataObject(helpersOutType);
       if (!anObj || !anObj->IsA(helpersOutType))
@@ -123,7 +117,7 @@ int vtkReductionFilter::RequestDataObject(
     {
     vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
     vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  
+
     if (input)
       {
       // for each output
@@ -131,8 +125,8 @@ int vtkReductionFilter::RequestDataObject(
         {
         vtkInformation* info = outputVector->GetInformationObject(i);
         vtkDataObject *output =  info->Get(vtkDataObject::DATA_OBJECT());
-    
-        if (!output || !output->IsA(input->GetClassName())) 
+
+        if (!output || !output->IsA(input->GetClassName()))
           {
           vtkDataObject* newOutput = input->NewInstance();
           newOutput->SetPipelineInformation(info);
@@ -161,14 +155,14 @@ int vtkReductionFilter::RequestData(vtkInformation*,
     input = inputVector[0]->GetInformationObject(0)->Get(
         vtkDataObject::DATA_OBJECT());
     }
-  
+
   this->Reduce(input, output);
 
-  output->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(), 
+  output->GetInformation()->Set(vtkDataObject::DATA_PIECE_NUMBER(),
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 
+  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(),
     outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 
+  output->GetInformation()->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(),
     outInfo->Get(
       vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
 
@@ -176,19 +170,21 @@ int vtkReductionFilter::RequestData(vtkInformation*,
 }
 
 //-----------------------------------------------------------------------------
-void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
+vtkDataObject* vtkReductionFilter::PreProcess(vtkDataObject* input)
 {
-  //run the PreReduction filter on our input
-  //result goes into preOutput
-  vtkDataObject *preOutput = NULL;
+  if (!input)
+    {
+    return 0;
+    }
+
+  vtkSmartPointer<vtkDataObject> result;
   if (this->PreGatherHelper == NULL)
     {
     //allow a passthrough
-    preOutput = input->NewInstance();
-    preOutput->ShallowCopy(input);
+    result = input;
     }
   else
-    {        
+    {
     //don't just use the input directly, in that case the pipeline info gets
     //messed up and PreGatherHelper won't have piece or time info.
     this->PreGatherHelper->RemoveAllInputs();
@@ -196,42 +192,94 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     incopy->ShallowCopy(input);
     this->PreGatherHelper->AddInputConnection(0, incopy->GetProducerPort());
     this->PreGatherHelper->Update();
-    vtkDataObject* reduced_output = 
-      this->PreGatherHelper->GetOutputDataObject(0);
+    result = this->PreGatherHelper->GetOutputDataObject(0);
     incopy->Delete();
 
+    // If a PostGatherHelper is present, we need to ensure that the result produced
+    // by this pre-processing stage is acceptable to the PostGatherHelper.
     if (this->PostGatherHelper != NULL)
       {
       vtkInformation* info = this->PostGatherHelper->GetInputPortInformation(0);
-      if (info) 
+      if (info)
         {
         const char* expectedType =
           info->Get(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
-        if (reduced_output->IsA(expectedType))
+        if (!result->IsA(expectedType))
           {
-          preOutput = reduced_output->NewInstance();
-          preOutput->ShallowCopy(reduced_output);
-          }
-        else 
-          {
-          vtkWarningMacro("PreGatherHelper's output type is not compatible with the PostGatherHelper's input type.");
-          preOutput = input->NewInstance();
-          preOutput->ShallowCopy(input);
+          vtkWarningMacro("PreGatherHelper's output type is not compatible with "
+            "the PostGatherHelper's input type.");
+          result = input;
           }
         }
       }
+    }
+
+  vtkDataObject* clone = result->NewInstance();
+  clone->ShallowCopy(result);
+  return clone;
+}
+
+//-----------------------------------------------------------------------------
+void vtkReductionFilter::PostProcess(vtkDataObject* output,
+  vtkSmartPointer<vtkDataObject> inputs[], unsigned int num_inputs)
+{
+  if (num_inputs == 0)
+    {
+    return;
+    }
+
+  if (!this->PostGatherHelper)
+    {
+    //allow a passthrough
+    //in this case just send the data from one node
+    output->ShallowCopy(inputs[0]);
+    }
+  else
+    {
+    this->PostGatherHelper->RemoveAllInputs();
+    //connect all (or just the selected) datasets to the reduction
+    //algorithm
+    for (unsigned int cc = 0; cc < num_inputs; ++cc)
+      {
+      this->PostGatherHelper->AddInputConnection(
+        inputs[cc]->GetProducerPort());
+      }
+    this->PostGatherHelper->Update();
+    this->PostGatherHelper->RemoveAllInputs();
+
+    vtkDataObject* reduced_output =
+      this->PostGatherHelper->GetOutputDataObject(0);
+
+    if (output->IsA(reduced_output->GetClassName()))
+      {
+      output->ShallowCopy(reduced_output);
+      }
     else
       {
-      preOutput = reduced_output->NewInstance();
-      preOutput->ShallowCopy(reduced_output);
+      vtkErrorMacro("POST OUT = " << reduced_output->GetClassName() << "\n"
+        << "REDX OUT = " << output->GetClassName() << "\n"
+        << "PostGatherHelper's output type is not same as the "
+        "ReductionFilters's output type.");
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
+{
+  //run the PreReduction filter on our input
+  //result goes into preOutput
+  vtkSmartPointer<vtkDataObject> preOutput;
+  preOutput.TakeReference(this->PreProcess(input));
 
   vtkMultiProcessController* controller = this->Controller;
   if (!controller || controller->GetNumberOfProcesses() <= 1)
     {
-    output->ShallowCopy(preOutput);
-    preOutput->Delete();
+    if (preOutput)
+      {
+      vtkSmartPointer<vtkDataObject> inputs[1] = { preOutput };
+      this->PostProcess(output, inputs, 1);
+      }
     return;
     }
 
@@ -251,7 +299,7 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
       dsPreOutput->GetPointData()->AddArray(originalProcessIds);
       originalProcessIds->Delete();
       }
-      
+
     if (dsPreOutput->GetNumberOfCells() > 0)
       {
       originalProcessIds = vtkIdTypeArray::New();
@@ -281,15 +329,6 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
       }
     }
 
-
-#ifdef VTK_USE_MPI
-  vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
-    controller->GetCommunicator());
-  if (!com)
-    {
-    vtkErrorMacro("vtkMPICommunicator needed to perform reduction.");
-    return;
-    }
   int myId = controller->GetLocalProcessId();
   int numProcs = controller->GetNumberOfProcesses();
   if (this->PassThrough > numProcs)
@@ -297,92 +336,50 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     this->PassThrough = -1;
     }
 
+  vtkstd::vector<vtkSmartPointer<vtkDataObject> > data_sets;
   if (myId == 0)
     {
     int cc = 0;
     // Form vtkDataObjects from collected data.
     // Meanwhile if the user wants to see only one node's data
     // then pass only that through
-    vtkstd::vector<vtkSmartPointer<vtkDataObject> > data_sets;
     for (cc=0; cc < numProcs; ++cc)
       {
-      vtkDataObject* ds = NULL;
-      if (cc == 0)
+      vtkSmartPointer<vtkDataObject> ds = NULL;
+      if (cc == 0 && preOutput)
         {
-        ds = preOutput->NewInstance();
+        ds.TakeReference(preOutput->NewInstance());
         ds->ShallowCopy(preOutput);
         }
       else
         {
-        ds = this->Receive(cc, output->GetDataObjectType());
+        ds.TakeReference(this->Receive(cc, output->GetDataObjectType()));
         }
-      if (this->PassThrough<0 || this->PassThrough==cc)
-        {        
+      if (ds && (this->PassThrough<0 || this->PassThrough==cc))
+        {
         data_sets.push_back(ds);
         }
-      ds->Delete();
-      }
-
-    // Now run the PostGatherHelper on the collected results from each node
-    if (!this->PostGatherHelper)
-      {
-      //allow a passthrough
-      //in this case just send the data from one node
-      output->ShallowCopy(data_sets[0]);
-      }
-    else
-      {
-      this->PostGatherHelper->RemoveAllInputs();
-      //connect all (or just the selected) datasets to the reduction
-      //algorithm
-      if (this->PassThrough == -1)
-        {
-        for (cc=0; cc<numProcs; ++cc)
-          {
-          this->PostGatherHelper->AddInputConnection(
-            data_sets[cc]->GetProducerPort());
-          }
-        } 
-      else
-        {
-        this->PostGatherHelper->AddInputConnection(
-          data_sets[0]->GetProducerPort());
-        }
-       
-      this->PostGatherHelper->Update();
-      vtkDataObject* reduced_output = 
-        this->PostGatherHelper->GetOutputDataObject(0);
-
-      if (output->IsA(reduced_output->GetClassName()))
-        {
-        output->ShallowCopy(reduced_output);
-        }
-      else
-        {
-        cerr << "POST OUT = " << reduced_output->GetClassName() << endl;
-        cerr << "REDX OUT = " << output->GetClassName() << endl;
-        vtkErrorMacro("PostGatherHelper's output type is not same as the ReductionFilters's output type.");
-        }
-      }
+      } 
     }
   else
     {
     this->Send(0, preOutput);
-    
-    output->ShallowCopy(preOutput);
+    if (preOutput)
+      {
+      data_sets.push_back(preOutput);
+      }
     }
 
-  preOutput->Delete();
-  delete []this->RawData;
-  this->RawData = 0;
-  this->DataLength = 0;
-#endif
+  // Now run the PostGatherHelper.
+  // If myId==0, data_sets has datasets collected from all satellites otherwise
+  // it contains the current process's result.
+  this->PostProcess(output, &data_sets[0], data_sets.size());
 }
 
 //-----------------------------------------------------------------------------
 void vtkReductionFilter::Send(int receiver, vtkDataObject* data)
 {
-  if (data->IsA("vtkSelection"))
+  if (data && data->IsA("vtkSelection"))
     {
     // Convert to XML.
     vtkSelection* sel = vtkSelection::SafeDownCast(data);
@@ -391,10 +388,10 @@ void vtkReductionFilter::Send(int receiver, vtkDataObject* data)
     res << ends;
     // Send the size of the string.
     int size = res.str().size();
-    this->Controller->Send(&size, 1, receiver, 
+    this->Controller->Send(&size, 1, receiver,
       vtkReductionFilter::TRANSMIT_DATA_OBJECT);
     // Send the XML string.
-    this->Controller->Send(res.str().c_str(), size, receiver, 
+    this->Controller->Send(res.str().c_str(), size, receiver,
       vtkReductionFilter::TRANSMIT_DATA_OBJECT);
     }
   else
@@ -422,7 +419,7 @@ vtkDataObject* vtkReductionFilter::Receive(int sender, int dataType)
     delete[] xml;
     return sel;
     }
-  return this->Controller->ReceiveDataObject(sender, 
+  return this->Controller->ReceiveDataObject(sender,
     vtkReductionFilter::TRANSMIT_DATA_OBJECT);
 }
 

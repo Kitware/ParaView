@@ -92,6 +92,11 @@ public:
   // Update self based on the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty* property);
+
+  // Description:
+  // Overridden to ensure that the property's default value is valid for the
+  // enumeration, if not it will be set to the first enumeration value. 
+  virtual int SetDefaultValues(vtkSMProperty*);
 protected:
   vtkSMEnumerationDomain();
   ~vtkSMEnumerationDomain();

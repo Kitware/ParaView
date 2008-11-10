@@ -49,20 +49,89 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView Includes.
-#include "pqTreeWidgetItemObject.h"
+#include "pqTreeWidgetItem.h"
 #include "pqSMAdaptor.h"
 
-// This TreeItem specialization needs some explaination.
+//-----------------------------------------------------------------------------
+class pqSignalAdaptorCompositeTreeWidget::pqInternal
+{
+public:
+  QPointer<QTreeWidget> TreeWidget;
+  vtkSmartPointer<vtkSMIntVectorProperty> Property;
+  vtkSmartPointer<vtkSMOutputPort> OutputPort;
+  vtkSmartPointer<vtkSMCompositeTreeDomain> Domain;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnectSelection;
+
+  QList<pqTreeWidgetItem*> Items;
+  int DomainMode;
+};
+
+//-----------------------------------------------------------------------------
+class pqSignalAdaptorCompositeTreeWidget::pqCallbackAdaptor :
+  public pqTreeWidgetItem::pqCallbackHandler
+{
+  bool BlockCallbacks;
+  pqSignalAdaptorCompositeTreeWidget* Adaptor;
+public:
+  pqCallbackAdaptor(pqSignalAdaptorCompositeTreeWidget* adaptor)
+    {
+    this->Adaptor = adaptor;
+    this->BlockCallbacks = false;
+    }
+  bool blockCallbacks(bool val)
+    {
+    bool old = this->BlockCallbacks;
+    this->BlockCallbacks = val;
+    return old;
+    }
+  virtual void checkStateChanged(pqTreeWidgetItem* item, int column)
+    {
+    if (this->BlockCallbacks == false)
+      {
+      this->Adaptor->updateCheckState(item, column);
+      }
+    }
+
+  virtual bool acceptChange(pqTreeWidgetItem* item,
+    const QVariant& curValue, const QVariant& newValue, int column, int role)
+    {
+    if (this->BlockCallbacks == false)
+      {
+      // * In SINGLE_ITEM, it's an error to not have any item checked. Hence if
+      // the user is un-checking an item, we ensure that atleast one other item
+      // is checked.
+      if (this->Adaptor->CheckMode == pqSignalAdaptorCompositeTreeWidget::SINGLE_ITEM &&
+        role == Qt::CheckStateRole && curValue.toInt() == Qt::Checked &&
+        newValue.toInt() == Qt::Unchecked && 
+        (item->flags() & Qt::ItemIsTristate) == 0)
+        {
+        // ensure that at least one item is always checked.
+        foreach (pqTreeWidgetItem* curitem, this->Adaptor->Internal->Items)
+          {
+          if (item != curitem && curitem->checkState(column) == Qt::Checked)
+            {
+            return true;
+            }
+          }
+        return false;
+        }
+      }
+    return true;
+    }
+};
+
+// This TreeItem specialization needs some explanation.
 // Default Qt behaviour for tristate items:
 //   - If all immediate children are checked or partially checked
 //     then the item becomes fully checked.
-// This is not approriate for this widget. A parent item should never be fully
+// This is not appropriate for this widget. A parent item should never be fully
 // checked unless the user explicitly checked it, since otherwise, the behaviour
 // of the filter is to pass the entire subtree through. 
 // This class fixes that issue.
-class pqCompositeTreeWidgetItem : public pqTreeWidgetItemObject
+class pqCompositeTreeWidgetItem : public pqTreeWidgetItem
 {
-  typedef pqTreeWidgetItemObject Superclass;
+  typedef pqTreeWidgetItem Superclass;
   int triStateCheckState;
 public:
   pqCompositeTreeWidgetItem(QTreeWidget* tree, QStringList _values):
@@ -129,21 +198,6 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-class pqSignalAdaptorCompositeTreeWidget::pqInternal
-{
-public:
-  QPointer<QTreeWidget> TreeWidget;
-  vtkSmartPointer<vtkSMIntVectorProperty> Property;
-  vtkSmartPointer<vtkSMOutputPort> OutputPort;
-  vtkSmartPointer<vtkSMCompositeTreeDomain> Domain;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnectSelection;
-
-  QList<pqTreeWidgetItemObject*> Items;
-  int DomainMode;
-};
-
-//-----------------------------------------------------------------------------
 void pqSignalAdaptorCompositeTreeWidget::constructor(
   QTreeWidget* tree, bool autoUpdateVisibility)
 {
@@ -160,6 +214,8 @@ void pqSignalAdaptorCompositeTreeWidget::constructor(
   this->ShowIndex = false;
   this->ShowDatasetsInMultiPiece = false;
   this->ShowSelectedElementCounts = false;
+
+  this->CallbackAdaptor = new pqCallbackAdaptor(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -265,6 +321,8 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
 pqSignalAdaptorCompositeTreeWidget::~pqSignalAdaptorCompositeTreeWidget()
 {
   delete this->Internal;
+  delete this->CallbackAdaptor;
+  this->CallbackAdaptor = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -275,8 +333,8 @@ void pqSignalAdaptorCompositeTreeWidget::select(unsigned int flatIndex)
     {
     item->setSelected(false);
     }
-  QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
-  foreach (pqTreeWidgetItemObject* item, treeitems)
+  QList<pqTreeWidgetItem*> treeitems = this->Internal->Items; 
+  foreach (pqTreeWidgetItem* item, treeitems)
     {
     QVariant metadata = item->data(0, FLAT_INDEX);
     if (metadata.isValid() && metadata.toUInt() == flatIndex)
@@ -312,8 +370,8 @@ QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
 {
   QList<QVariant> reply;
 
-  QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
-  foreach (pqTreeWidgetItemObject* item, treeitems)
+  QList<pqTreeWidgetItem*> treeitems = this->Internal->Items; 
+  foreach (pqTreeWidgetItem* item, treeitems)
     {
     QVariant nodeType = item->data(0, NODE_TYPE);
     if (!nodeType.isValid())
@@ -375,12 +433,12 @@ inline bool pqItemIsCheckable(QTreeWidgetItem* item)
 void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_values)
 {
   bool prev = this->Internal->TreeWidget->blockSignals(true);
-  QList<pqTreeWidgetItemObject*> treeitems = this->Internal->Items; 
+  QList<pqTreeWidgetItem*> treeitems = this->Internal->Items; 
   bool changed = false;
 
   if (this->IndexMode == INDEX_MODE_FLAT)
     {
-    foreach (pqTreeWidgetItemObject* item, treeitems)
+    foreach (pqTreeWidgetItem* item, treeitems)
       {
       QVariant metadata = item->data(0, FLAT_INDEX);
       Qt::CheckState cstate = 
@@ -395,7 +453,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
     }
   else if (this->IndexMode == INDEX_MODE_LEVEL)
     {
-    foreach (pqTreeWidgetItemObject* item, treeitems)
+    foreach (pqTreeWidgetItem* item, treeitems)
       {
       QVariant metadata = item->data(0, LEVEL_NUMBER);
       Qt::CheckState cstate = 
@@ -418,7 +476,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
       pairs.insert(QPair<unsigned int, unsigned int>(level, index));
       }
 
-    foreach (pqTreeWidgetItemObject* item, treeitems)
+    foreach (pqTreeWidgetItem* item, treeitems)
       {
       QVariant metadata0 = item->data(0, LEVEL_NUMBER);
       QVariant metadata1 = item->data(0, DATASET_INDEX);
@@ -453,8 +511,9 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
   this->FlatIndex = 0;
   this->LevelNo = 0;
   
-  pqTreeWidgetItemObject* root = new pqCompositeTreeWidgetItem(
+  pqTreeWidgetItem* root = new pqCompositeTreeWidgetItem(
     this->Internal->TreeWidget, QStringList("Root"));
+  root->setCallbackHandler(this->CallbackAdaptor);
   root->setData(0, ORIGINAL_LABEL, "Root");
   root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
@@ -497,8 +556,9 @@ void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
   this->FlatIndex = 0;
   this->LevelNo = 0;
 
-  pqTreeWidgetItemObject* root = new pqCompositeTreeWidgetItem(
+  pqTreeWidgetItem* root = new pqCompositeTreeWidgetItem(
     this->Internal->TreeWidget, QStringList("Root"));
+  root->setCallbackHandler(this->CallbackAdaptor);
   root->setData(0, ORIGINAL_LABEL, "Root");
   root->setToolTip(0, root->text(0));
   this->buildTree(root, dInfo);
@@ -529,7 +589,7 @@ void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
     return;
     }
 
-  foreach (pqTreeWidgetItemObject* item, this->Internal->Items)
+  foreach (pqTreeWidgetItem* item, this->Internal->Items)
     {
     QVariant vNodeType = item->data(0, NODE_TYPE);
     if (!vNodeType.isValid() || !vNodeType.canConvert<int>())
@@ -537,14 +597,12 @@ void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
       continue;
       }
 
-    bool can_check=false;
     int nodeType = vNodeType.toInt();
     if (nodeType == LEAF)
       {
       // leaves are always checkable.
       item->setFlags(item->flags()|Qt::ItemIsUserCheckable);
       item->setCheckState(0, Qt::Unchecked);
-      can_check = true;
       }
     else if (nodeType == NON_LEAF)
       {
@@ -555,16 +613,7 @@ void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
         {
         item->setFlags(item->flags()|Qt::ItemIsUserCheckable|Qt::ItemIsTristate);
         item->setCheckState(0, Qt::Unchecked);
-        can_check = true;
         }
-      }
-
-    if (can_check)
-      {
-      QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-        this, SIGNAL(valuesChanged()), Qt::QueuedConnection);
-      QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-        this, SLOT(updateCheckState(bool)));
       }
     }
 }
@@ -572,24 +621,29 @@ void pqSignalAdaptorCompositeTreeWidget::updateItemFlags()
 //-----------------------------------------------------------------------------
 /// Called when an item check state is toggled. This is used only when
 /// this->CheckMode == SINGLE_ITEM. We uncheck all other items.
-void pqSignalAdaptorCompositeTreeWidget::updateCheckState(bool checked)
+void pqSignalAdaptorCompositeTreeWidget::updateCheckState(pqTreeWidgetItem* item,
+  int column)
 {
-  pqTreeWidgetItemObject* item = qobject_cast<pqTreeWidgetItemObject*>(this->sender());
+  this->CallbackAdaptor->blockCallbacks(true);
+  bool checked = item->checkState(column) == Qt::Checked;
   if (item && checked && this->CheckMode == SINGLE_ITEM)
     {
-    foreach (pqTreeWidgetItemObject* curitem, this->Internal->Items)
+    foreach (pqTreeWidgetItem* curitem, this->Internal->Items)
       {
       if (curitem != item && (curitem->flags() & Qt::ItemIsUserCheckable) && 
-        curitem->checkState(0) != Qt::Unchecked)
+        (curitem->checkState(0) != Qt::Unchecked) &&
+        (curitem->flags() & Qt::ItemIsTristate) == 0)
         {
         curitem->setCheckState(0, Qt::Unchecked);
         }
       }
     }
+  this->CallbackAdaptor->blockCallbacks(false);
+  emit this->valuesChanged();
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
+void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItem* item,
   vtkPVDataInformation* info)
 {
   this->Internal->Items.push_back(item);
@@ -628,8 +682,9 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
           childLabel = QString("DataSet (%1)").arg(this->FlatIndex);
           }
 
-        pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
+        pqTreeWidgetItem* child = new pqCompositeTreeWidgetItem(item,
           QStringList(childLabel));
+        child->setCallbackHandler(this->CallbackAdaptor);
         child->setToolTip(0, child->text(0));
         child->setData(0, ORIGINAL_LABEL, childLabel);
         this->buildTree(child, NULL);
@@ -680,8 +735,9 @@ void pqSignalAdaptorCompositeTreeWidget::buildTree(pqTreeWidgetItemObject* item,
 
     if (this->Internal->DomainMode != vtkSMCompositeTreeDomain::NON_LEAVES || !is_leaf)
       {
-      pqTreeWidgetItemObject* child = new pqCompositeTreeWidgetItem(item,
+      pqTreeWidgetItem* child = new pqCompositeTreeWidgetItem(item,
         QStringList(childLabel));
+      child->setCallbackHandler(this->CallbackAdaptor);
       child->setData(0, ORIGINAL_LABEL, childLabel);
       child->setToolTip(0, child->text(0));
       this->buildTree(child, cinfo->GetDataInformation(cc));
@@ -719,7 +775,7 @@ void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
   vtkPVDataInformation* info = sourceProxy->GetSelectionOutput(
     this->Internal->Domain->GetSourcePort())->GetDataInformation();
 
-  foreach (pqTreeWidgetItemObject* item, this->Internal->Items)
+  foreach (pqTreeWidgetItem* item, this->Internal->Items)
     {
     if (item->data(0, NODE_TYPE).toInt() != LEAF)
       {

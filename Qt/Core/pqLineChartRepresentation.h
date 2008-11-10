@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMProperty;
 class vtkDataArray;
-class vtkRectilinearGrid;
+class vtkTable;
 class QColor;
 
 /// pqLineChartRepresentation is a pqRepresentation for "XYPlotRepresentation" proxy.
@@ -63,12 +63,10 @@ public:
 
   /// Returns the client-side rectilinear grid. 
   /// Note that this method does not update the pipeline.
-  vtkRectilinearGrid* getClientSideData() const;
+  vtkTable* getClientSideData() const;
   bool isDataModified() const;
 
   vtkDataArray* getArray(const QString &arrayName) const;
-
-  vtkDataArray* getArray(const QString &arrayName, int attributeType) const;
 
   /// Returns the array used for x-axis.
   vtkDataArray* getXArray() const;
@@ -162,8 +160,7 @@ protected:
 
 private slots:
   void changeSeriesList();
-  void markPointModified();
-  void markCellModified();
+  void markListModified();
 
 private:
   pqLineChartRepresentation(const pqLineChartRepresentation&); // Not implemented.

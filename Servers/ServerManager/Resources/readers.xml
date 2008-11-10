@@ -4591,7 +4591,11 @@
       <Documentation
         short_help="Read a comma-separated values file."
         long_help="Read a comma-separated values file into a 1D rectilinear grid.">
-        The CSV reader reads a comma-separated values file into a 1D rectilinear grid. If the file was saved using the CSVWriter, then the rectilinear grid's points and point data can be restored as well as the cell data. Otherwise all the data in the CSV file is treated as cell data. The default file extension is .csv.
+        The CSV reader reads a comma-separated values file into a 1D rectilinear
+        grid. If the file was saved using the CSVWriter, then the rectilinear
+        grid's points and point data can be restored as well as the cell data.
+        Otherwise all the data in the CSV file is treated as cell data. The
+        default file extension is .csv.
       </Documentation>
       <StringVectorProperty name="FileName"
         command="SetFileName"
@@ -4634,6 +4638,11 @@
           string does not matter.
         </Documentation>
       </StringVectorProperty>
+
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="SpreadSheetView" />
+     </Hints>
       <!-- End of CSVReader -->
    </SourceProxy>
 

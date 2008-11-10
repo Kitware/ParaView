@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QTreeWidget;
 class vtkSMProperty;
-class pqTreeWidgetItemObject;
+class QTreeWidgetItem;
 
 /// pqSignalAdaptorSelectionTreeWidget has two roles.
 /// \li It is used to connect a selection property with a
@@ -72,14 +72,14 @@ public:
   /// selected by the user are returned.
   QList<QList<QVariant> > values() const;
 
-  /// This adaptor create pqTreeWidgetItemObject instances by default when new
+  /// This adaptor create QTreeWidgetItem instances by default when new
   /// entries are to be shown in the widget. To change the type of
-  /// pqTreeWidgetItemObject subclass created, simply set a function pointer to
+  /// QTreeWidgetItem subclass created, simply set a function pointer to
   /// a callback which will be called every time a new item is needed.
   /// The signature for the callback is:
-  /// pqTreeWidgetItemObject* callback(QTreeWidget* parent, const QStringList& val)
+  /// QTreeWidgetItem* callback(QTreeWidget* parent, const QStringList& val)
   void setItemCreatorFunction(
-    pqTreeWidgetItemObject* (fptr)(QTreeWidget*, const QStringList&))
+    QTreeWidgetItem* (fptr)(QTreeWidget*, const QStringList&))
     {
     this->ItemCreatorFunctionPtr = fptr;
     }
@@ -107,7 +107,7 @@ private:
   class pqInternal;
   pqInternal* Internal;
 
-  pqTreeWidgetItemObject* (*ItemCreatorFunctionPtr)(QTreeWidget*, const QStringList&);
+  QTreeWidgetItem* (*ItemCreatorFunctionPtr)(QTreeWidget*, const QStringList&);
 };
 
 #endif

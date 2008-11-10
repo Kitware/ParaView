@@ -273,14 +273,20 @@ void pqProxyInformationWidget::fillDataInformation(
       QString("Current data time step: <b>%1</b>").arg(dataInformation->GetTime()));
     }
 
-  vtkPVDataSetAttributesInformation* info[2];
+  vtkPVDataSetAttributesInformation* info[5];
   info[0] = dataInformation->GetPointDataInformation();
   info[1] = dataInformation->GetCellDataInformation();
+  info[2] = dataInformation->GetVertexDataInformation();
+  info[3] = dataInformation->GetEdgeDataInformation();
+  info[4] = dataInformation->GetRowDataInformation();
 
-  QPixmap pixmaps[2] = 
+  QPixmap pixmaps[5] = 
     {
     QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqCellData16.png")
+    QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
+    QPixmap(":/pqWidgets/Icons/pqPointData16.png")
     };
 
   if (dataInformation->IsDataStructured())
@@ -310,7 +316,7 @@ void pqProxyInformationWidget::fillDataInformation(
       }
     }
 
-  for(int k=0; k<2; k++)
+  for(int k=0; k<5; k++)
     {
     if(info[k])
       {

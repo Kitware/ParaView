@@ -16,14 +16,15 @@
 // .SECTION Description:
 // vtkParallelSerialWriter is a meta-writer that enables serial writers
 // to work in parallel. It gathers data to the 1st node and invokes the
-// internal writer. Currently, only polydata is supported.
+// internal writer. The reduction is controlled defined by the PreGatherHelper
+// and PostGatherHelper.
+// This also makes it possible to write time-series for temporal datasets using
+// simple non-time-aware writers.
 
 #ifndef __vtkParallelSerialWriter_h
 #define __vtkParallelSerialWriter_h
 
 #include "vtkDataObjectAlgorithm.h"
-
-class vtkPolyData;
 
 class VTK_EXPORT vtkParallelSerialWriter : public vtkDataObjectAlgorithm
 {
@@ -72,10 +73,34 @@ public:
   vtkGetMacro(GhostLevel, int);
   vtkSetMacro(GhostLevel, int);
 
+  // Description:
+  // Get/Set the pre-reduction helper. Pre-Reduction helper is an algorithm 
+  // that runs on each node's data before it is sent to the root.
+  void SetPreGatherHelper(vtkAlgorithm*);
+  vtkGetObjectMacro(PreGatherHelper, vtkAlgorithm);
+
+  // Description:
+  // Get/Set the reduction helper. Reduction helper is an algorithm with
+  // multiple input connections, that produces a single output as
+  // the reduced output. This is run on the root node to produce a result
+  // from the gathered results of each node.
+  void SetPostGatherHelper(vtkAlgorithm*);
+  vtkGetObjectMacro(PostGatherHelper, vtkAlgorithm);
+
+  // Description:
+  // Must be set to true to write all timesteps, otherwise only the current
+  // timestep will be written out. Off by default.
+  vtkGetMacro(WriteAllTimeSteps, int);
+  vtkSetMacro(WriteAllTimeSteps, int);
+  vtkBooleanMacro(WriteAllTimeSteps, int);
+
 protected:
   vtkParallelSerialWriter();
   ~vtkParallelSerialWriter();
 
+  int RequestInformation(vtkInformation* request,
+                         vtkInformationVector** inputVector,
+                         vtkInformationVector* outputVector);
   int RequestUpdateExtent(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
@@ -87,16 +112,24 @@ private:
   vtkParallelSerialWriter(const vtkParallelSerialWriter&); // Not implemented.
   void operator=(const vtkParallelSerialWriter&); // Not implemented.
   
-  void WriteAFile(const char* fname, vtkPolyData* input);
+  void WriteATimestep(vtkDataObject* input);
+  void WriteAFile(const char* fname, vtkDataObject* input);
 
   void SetWriterFileName(const char* fname);
   void WriteInternal();
+
+  vtkAlgorithm* PreGatherHelper;
+  vtkAlgorithm* PostGatherHelper;
 
   vtkAlgorithm* Writer;
   char* FileNameMethod;
   int Piece;
   int NumberOfPieces;
   int GhostLevel;
+
+  int WriteAllTimeSteps;
+  int NumberOfTimeSteps;
+  int CurrentTimeIndex;
 
   // The name of the output file.
   char* FileName;

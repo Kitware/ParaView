@@ -18,13 +18,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkMPIMoveData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
 #include "vtkProcessModule.h"
+#include "vtkReductionFilter.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
@@ -34,10 +34,10 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.5");
-
-vtkCxxSetObjectMacro(vtkParallelSerialWriter,Writer,vtkAlgorithm);
-
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.6");
+vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
+vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::vtkParallelSerialWriter()
 {
@@ -51,17 +51,23 @@ vtkParallelSerialWriter::vtkParallelSerialWriter()
   this->Piece = 0;
   this->NumberOfPieces = 1;
   this->GhostLevel = 0;
+
+  this->PreGatherHelper = 0;
+  this->PostGatherHelper = 0;
+
+  this->WriteAllTimeSteps = 0;
+  this->NumberOfTimeSteps = 0;
+  this->CurrentTimeIndex = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkParallelSerialWriter::~vtkParallelSerialWriter()
 {
-  if (this->Writer)
-    {
-    this->Writer->Delete();
-    }
+  this->SetWriter(0);
   this->SetFileNameMethod(0);
   this->SetFileName(0);
+  this->SetPreGatherHelper(0);
+  this->SetPostGatherHelper(0);
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +88,25 @@ int vtkParallelSerialWriter::Write()
 }
 
 //----------------------------------------------------------------------------
+int vtkParallelSerialWriter::RequestInformation(
+  vtkInformation* vtkNotUsed(request),
+  vtkInformationVector** inputVector,
+  vtkInformationVector* vtkNotUsed(outputVector))
+{
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  if ( inInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS()) )
+    {
+    this->NumberOfTimeSteps = 
+      inInfo->Length( vtkStreamingDemandDrivenPipeline::TIME_STEPS() );
+    }
+  else
+    {
+    this->NumberOfTimeSteps = 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkParallelSerialWriter::RequestUpdateExtent(
   vtkInformation* vtkNotUsed(request),
   vtkInformationVector** inputVector,
@@ -97,34 +122,68 @@ int vtkParallelSerialWriter::RequestUpdateExtent(
   inInfo->Set(
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 
     this->GhostLevel);
+
+  double *inTimes = inputVector[0]->GetInformationObject(0)->Get(
+      vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  if (inTimes && this->WriteAllTimeSteps)
+    {
+    double timeReq = inTimes[this->CurrentTimeIndex];
+    inputVector[0]->GetInformationObject(0)->Set( 
+        vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(), 
+        &timeReq, 1);
+    }
   return 1;  
 }
 
 //----------------------------------------------------------------------------
 int vtkParallelSerialWriter::RequestData(
-  vtkInformation* vtkNotUsed(request),
+  vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* vtkNotUsed(outputVector))
 {
-if (!this->Writer)
-  {
-  vtkErrorMacro("No internal writer specified. Cannot write.");
-  return 0;
-  }
+  if (!this->Writer)
+    {
+    vtkErrorMacro("No internal writer specified. Cannot write.");
+    return 0;
+    }
 
+  if (this->WriteAllTimeSteps)
+    {
+    if (this->CurrentTimeIndex == 0)
+      {
+      // Tell the pipeline to start looping.
+      request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
+      }
+    }
+  else
+    {
+    request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
+    this->CurrentTimeIndex = 0;
+    }
+  
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
-  vtkPolyData* pdInput = vtkPolyData::SafeDownCast(input);
-  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input);
-  if (pdInput)
+  this->WriteATimestep(input);
+
+  if (this->WriteAllTimeSteps)
     {
-    vtkSmartPointer<vtkPolyData> inputCopy;
-    inputCopy.TakeReference(pdInput->NewInstance());
-    inputCopy->ShallowCopy(pdInput);
-  
-    this->WriteAFile(this->FileName, inputCopy);
+    this->CurrentTimeIndex++;
+    if (this->CurrentTimeIndex == this->NumberOfTimeSteps)
+      {
+      // Tell the pipeline to stop looping.
+      request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
+      this->CurrentTimeIndex = 0;
+      }
     }
-  else if (cds)
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkParallelSerialWriter::WriteATimestep(vtkDataObject* input)
+{
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(input); 
+  if (cds)
     {
     vtkSmartPointer<vtkCompositeDataIterator> iter;
     iter.TakeReference(cds->NewIterator());
@@ -135,20 +194,6 @@ if (!this->Writer)
         iter->GoToNextItem(), idx++)
       {
       vtkDataObject* curObj = iter->GetCurrentDataObject();
-      vtkSmartPointer<vtkPolyData> pd;
-      if (curObj)
-        {
-        pd = vtkPolyData::SafeDownCast(curObj);
-        if (!pd.GetPointer())
-          {
-          vtkErrorMacro("Cannot write data object of type: "
-              << curObj->GetClassName());
-          }
-        }
-      if (!pd.GetPointer())
-        {
-        pd.TakeReference(vtkPolyData::New());
-        }
       vtkstd::string path = 
         vtksys::SystemTools::GetFilenamePath(this->FileName);
       vtkstd::string fnamenoext =
@@ -157,26 +202,33 @@ if (!this->Writer)
         vtksys::SystemTools::GetFilenameLastExtension(this->FileName);
       vtksys_ios::ostringstream fname;
       fname << path << "/" << fnamenoext << idx << ext;
-      
-      this->WriteAFile(fname.str().c_str(), pd);
+      this->WriteAFile(fname.str().c_str(), curObj);
       }
     }
+  else if (input)
+    {
+    vtkSmartPointer<vtkDataObject> inputCopy;
+    inputCopy.TakeReference(input->NewInstance());
+    inputCopy->ShallowCopy(input);
+    this->WriteAFile(this->FileName, inputCopy);
+    }
   
-  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkParallelSerialWriter::WriteAFile(const char* fname,
-    vtkPolyData* input)
+void vtkParallelSerialWriter::WriteAFile(const char* filename, vtkDataObject* input)
 {
   vtkMultiProcessController* controller = 
     vtkProcessModule::GetProcessModule()->GetController();
   
-  vtkSmartPointer<vtkMPIMoveData> md = vtkSmartPointer<vtkMPIMoveData>::New();
-  md->SetOutputDataType(VTK_POLY_DATA);
+  vtkSmartPointer<vtkReductionFilter> md = vtkSmartPointer<vtkReductionFilter>::New();
   md->SetController(controller);
-  md->SetMoveModeToCollect();
-  md->SetInputConnection(0, input->GetProducerPort());
+  md->SetPreGatherHelper(this->PreGatherHelper);
+  md->SetPostGatherHelper(this->PostGatherHelper);
+  if (input)
+    {
+    md->SetInputConnection(0, input->GetProducerPort());
+    }
   md->UpdateInformation();
   vtkInformation* outInfo = md->GetExecutive()->GetOutputInformation(0);
   outInfo->Set(
@@ -189,19 +241,37 @@ void vtkParallelSerialWriter::WriteAFile(const char* fname,
     vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
     this->GhostLevel);
   md->Update();
-  
-  vtkDataObject* output = md->GetOutputDataObject(0);
-  vtkSmartPointer<vtkPolyData> outputCopy;
-  outputCopy.TakeReference(vtkPolyData::SafeDownCast(output->NewInstance()));
-  outputCopy->ShallowCopy(output);
-  
-  if (controller->GetLocalProcessId() == 0 && 
-      outputCopy->GetNumberOfCells() > 0)
+    
+  if (controller->GetLocalProcessId() == 0)
     {
-    this->Writer->SetInputConnection(outputCopy->GetProducerPort());
-    this->SetWriterFileName(fname);
-    this->WriteInternal();
-    this->Writer->SetInputConnection(0);
+    vtkDataObject* output = md->GetOutputDataObject(0);
+    if (vtkDataSet::SafeDownCast(output) == 0 || 
+      vtkDataSet::SafeDownCast(output)->GetNumberOfCells() != 0)
+      {
+      vtkSmartPointer<vtkDataObject> outputCopy;
+      outputCopy.TakeReference(output->NewInstance());
+      outputCopy->ShallowCopy(output);
+
+      vtksys_ios::ostringstream fname;
+      if (this->WriteAllTimeSteps)
+        {
+        vtkstd::string path = 
+          vtksys::SystemTools::GetFilenamePath(filename);
+        vtkstd::string fnamenoext =
+          vtksys::SystemTools::GetFilenameWithoutLastExtension(filename);
+        vtkstd::string ext =
+          vtksys::SystemTools::GetFilenameLastExtension(filename);
+        fname << path << "/" << fnamenoext << "." << this->CurrentTimeIndex << ext;
+        }
+      else
+        {
+        fname << filename;
+        }
+      this->Writer->SetInputConnection(outputCopy->GetProducerPort());
+      this->SetWriterFileName(fname.str().c_str());
+      this->WriteInternal();
+      this->Writer->SetInputConnection(0);
+      }
     }
 }
 

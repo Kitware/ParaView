@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTreeWidget>
 #include <QPointer>
 
-#include "pqTreeWidgetItemObject.h"
 #include "pqSMAdaptor.h"
 
 //-----------------------------------------------------------------------------
@@ -91,6 +90,19 @@ pqSignalAdaptorSelectionTreeWidget::pqSignalAdaptorSelectionTreeWidget(
 
     this->domainChanged();
     }
+
+  QObject::connect(this->Internal->TreeWidget->model(),
+    SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)),
+    this, SIGNAL(valuesChanged()));
+  QObject::connect(this->Internal->TreeWidget->model(),
+    SIGNAL(modelReset()),
+    this, SIGNAL(valuesChanged()));
+  QObject::connect(this->Internal->TreeWidget->model(),
+    SIGNAL(rowsInserted(const QModelIndex&, int, int)),
+    this, SIGNAL(valuesChanged()));
+  QObject::connect(this->Internal->TreeWidget->model(),
+    SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
+    this, SIGNAL(valuesChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -126,16 +138,19 @@ void pqSignalAdaptorSelectionTreeWidget::setValues(
     qDebug("inconsistent count in selection list\n");
     }
 
+  bool old_bs = this->blockSignals(true);
   int max = this->Internal->TreeWidget->topLevelItemCount();
-  if(new_values.size() < max)
+  if (new_values.size() < max)
+    {
     max = new_values.size();
+    }
 
   bool changed = false;
   for (int cc=0; cc < max; cc++)
     {
     QList<QVariant> nval = new_values[cc];
     QTreeWidgetItem* item = this->Internal->TreeWidget->topLevelItem(cc);
-    if(item->text(0) != nval[0])
+    if (item->text(0) != nval[0])
       {
       item->setText(0, nval[0].toString());
       changed = true;
@@ -148,8 +163,9 @@ void pqSignalAdaptorSelectionTreeWidget::setValues(
       changed = true;
       }
     }
+  this->blockSignals(old_bs);
   
-  if(changed)
+  if (changed)
     {
     emit this->valuesChanged();
     }
@@ -197,21 +213,18 @@ void pqSignalAdaptorSelectionTreeWidget::domainChanged()
 
   foreach (QList<QVariant> newValue, newValues)
     {
-    pqTreeWidgetItemObject* item = NULL;
+    QTreeWidgetItem* item = NULL;
     if (this->ItemCreatorFunctionPtr)
       {
       item = (*this->ItemCreatorFunctionPtr)(this->Internal->TreeWidget, 
         QStringList(newValue[0].toString()));
       }
-
     if (!item)
       {
-      item  = new pqTreeWidgetItemObject(this->Internal->TreeWidget,
+      item  = new QTreeWidgetItem(this->Internal->TreeWidget,
         QStringList(newValue[0].toString()));
       }
     item->setCheckState(0, newValue[1].toInt() ? Qt::Checked : Qt::Unchecked);
-    QObject::connect(item, SIGNAL(checkedStateChanged(bool)),
-      this, SIGNAL(valuesChanged()), Qt::QueuedConnection);
     }
 }
 

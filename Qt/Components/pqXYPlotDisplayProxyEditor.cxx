@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetItemObject.h"
 #include "pqView.h"
 
 //-----------------------------------------------------------------------------
@@ -1108,26 +1107,12 @@ void pqXYPlotDisplayProxyEditor::switchXAxisProperties()
   vtkSMProperty *newName = 0;
   vtkSMProperty *oldComponent = 0;
   vtkSMProperty *newComponent = 0;
-  int attribute_type = pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("AttributeType")).toInt();
-  if(attribute_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    oldIndex = proxy->GetProperty("UseYCellArrayIndex");
-    newIndex = proxy->GetProperty("UseYPointArrayIndex");
-    oldName = proxy->GetProperty("XCellArrayName");
-    newName = proxy->GetProperty("XPointArrayName");
-    oldComponent = proxy->GetProperty("XCellArrayComponent");
-    newComponent = proxy->GetProperty("XPointArrayComponent");
-    }
-  else
-    {
-    oldIndex = proxy->GetProperty("UseYPointArrayIndex");
-    newIndex = proxy->GetProperty("UseYCellArrayIndex");
-    oldName = proxy->GetProperty("XPointArrayName");
-    newName = proxy->GetProperty("XCellArrayName");
-    oldComponent = proxy->GetProperty("XPointArrayComponent");
-    newComponent = proxy->GetProperty("XCellArrayComponent");
-    }
+  oldIndex = proxy->GetProperty("UseYArrayIndex");
+  newIndex = proxy->GetProperty("UseYArrayIndex");
+  oldName = proxy->GetProperty("XArrayName");
+  newName = proxy->GetProperty("XArrayName");
+  oldComponent = proxy->GetProperty("XArrayComponent");
+  newComponent = proxy->GetProperty("XArrayComponent");
 
   // Disconnect from the previous porperties.
   this->Internal->Links.removePropertyLink(this->Internal->UseArrayIndex,

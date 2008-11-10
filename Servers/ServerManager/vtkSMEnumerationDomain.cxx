@@ -24,7 +24,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.12");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -241,6 +241,22 @@ void vtkSMEnumerationDomain::Update(vtkSMProperty* prop)
       }
     this->InvokeModified();
     }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMEnumerationDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
+  if (ivp && this->GetNumberOfEntries() > 0)
+    {
+    unsigned int idx=0;
+    if (!this->IsInDomain(ivp->GetDefaultValue(0), idx))
+      {
+      ivp->SetElement(0, this->GetEntryValue(0));
+      return 1;
+      }
+    }
+  return this->Superclass::SetDefaultValues(prop);
 }
 
 //---------------------------------------------------------------------------

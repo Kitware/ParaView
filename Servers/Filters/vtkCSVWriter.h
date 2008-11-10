@@ -12,15 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCSVWriter - writer for 1D vtkRectilinearGrid.
-// Writes a vtkRectilinearGrid as a delimited text file (such as CSV). 
+// .NAME vtkCSVWriter - CSV writer for vtkTable
+// Writes a vtkTable as a delimited text file (such as CSV). 
 #ifndef __vtkCSVWriter_h
 #define __vtkCSVWriter_h
 
 #include "vtkWriter.h"
 
 class vtkStdString;
-class vtkRectilinearGrid;
+class vtkTable;
 
 class VTK_EXPORT vtkCSVWriter : public vtkWriter
 {
@@ -63,10 +63,10 @@ protected:
   bool OpenFile();
 
   virtual void WriteData();
-  virtual void WriteRectilinearGridData(vtkRectilinearGrid* rectilinearGrid);
+  virtual void WriteTable(vtkTable* rectilinearGrid);
 
   // see algorithm for more info.
-  // This writer takes in vtkRectilinearGrids.
+  // This writer takes in vtkTable.
   virtual int FillInputPortInformation(int port, vtkInformation* info);
 
   char* FileName;

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 
-class pqTreeWidgetItemObject;
+class pqTreeWidgetItem;
 class QTreeWidget;
 class vtkPVDataInformation;
 class vtkSMIntVectorProperty;
@@ -47,6 +47,8 @@ class vtkSMSourceProxy;
 /// pqSignalAdaptorCompositeTreeWidget is used to connect a property with
 /// vtkSMCompositeTreeDomain as its domain to a Tree widget. It updates the tree
 /// to show composite data tree.
+/// Caveats: This widget does not handle SINGLE_ITEM selection where non-leaves
+/// are acceptable.
 class PQCOMPONENTS_EXPORT pqSignalAdaptorCompositeTreeWidget : public QObject
 {
   Q_OBJECT
@@ -114,7 +116,7 @@ public:
   void select(unsigned int flatIndex);
 
   /// Returns the flat index for the current item.
-  unsigned int getCurrentFlatIndex(bool* valid=NULL);
+  unsigned int getCurrentFlatIndex(bool* valid=NULL); 
 
 public slots:
   /// Set the values.
@@ -132,10 +134,7 @@ signals:
   void valuesChanged();
 
 private slots:
-  /// Called when an item check state is toggled. This is used only when
-  /// this->CheckMode == SINGLE_ITEM. We uncheck all other items.
-  void updateCheckState(bool checked);
-
+  
   /// Called to update the labels to show the current selected elements
   /// information.
   void updateSelectionCounts();
@@ -148,7 +147,7 @@ private:
   /// update the selected cells/points counts.
   void setupSelectionUpdatedCallback(vtkSMSourceProxy* source, unsigned int port);
 
-  void buildTree(pqTreeWidgetItemObject* item, 
+  void buildTree(pqTreeWidgetItem* item, 
     vtkPVDataInformation* info);
 
   /// updates the check flags for all the items.
@@ -199,6 +198,14 @@ private:
 
   /// Code common to both variants of the constructor.
   void constructor(QTreeWidget* tree, bool autoUpdateVisibility);
+
+  /// Called when an item check state is toggled. This is used only when
+  /// this->CheckMode == SINGLE_ITEM. We uncheck all other items.
+  void updateCheckState(pqTreeWidgetItem* item, int column);
+
+  friend class pqCallbackAdaptor;
+  class pqCallbackAdaptor;
+  pqCallbackAdaptor* CallbackAdaptor;
 };
 
 #endif

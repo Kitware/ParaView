@@ -74,6 +74,8 @@ SET(QtWidgets_SRCS
   pqTreeWidget.h
   pqTreeWidgetCheckHelper.cxx
   pqTreeWidgetCheckHelper.h
+  pqTreeWidgetItem.cxx
+  pqTreeWidgetItem.h
   pqTreeWidgetItemObject.cxx
   pqTreeWidgetItemObject.h
   pqTreeWidgetSelectionHelper.cxx

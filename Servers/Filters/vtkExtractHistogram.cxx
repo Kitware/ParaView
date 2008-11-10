@@ -17,6 +17,7 @@
 #include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkGraph.h"
 #include "vtkInformation.h"
@@ -27,7 +28,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkOnePieceExtentTranslator.h"
 #include "vtkPointData.h"
-#include "vtkRectilinearGrid.h"
 #include "vtkSmartPointer.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTable.h"
@@ -51,7 +51,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.22");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.23");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -89,66 +89,6 @@ int vtkExtractHistogram::FillInputPortInformation (int port,
   this->Superclass::FillInputPortInformation(port, info);
   
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkExtractHistogram::RequestInformation(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** vtkNotUsed(inputVector),
-  vtkInformationVector* outputVector)
-{
-  // get the info objects
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-
-  // Extents are {0, no. of bins, 0, 0, 0, 0};
-  int extent[6] = {0,0,0,0,0,0};
-  extent[1] = this->BinCount;
-  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
-
-  // Setup ExtentTranslator so that all downstream piece requests are
-  // converted to whole extent update requests, as need by the histogram filter.
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  if (strcmp(
-      sddp->GetExtentTranslator(outInfo)->GetClassName(), 
-      "vtkOnePieceExtentTranslator") != 0)
-    {
-    vtkExtentTranslator* et = vtkOnePieceExtentTranslator::New();
-    sddp->SetExtentTranslator(outInfo, et);
-    et->Delete();
-    }
-
-  return 1;
-}
-
-//-----------------------------------------------------------------------------
-int vtkExtractHistogram::RequestUpdateExtent(
-  vtkInformation* vtkNotUsed(request),
-  vtkInformationVector** inputVector, vtkInformationVector* outputVector)
-{
-  // This filter changes the ExtentTranslator on the output
-  // to always update whole extent on this filter, irrespective of 
-  // what piece the downstream filter is requesting. Hence, we need to
-  // propagate the actual extents upstream. If upstream is structured
-  // data we need to use the ExtentTranslator of the input, otherwise
-  // we just set the piece information. All this is taken care of
-  // by SetUpdateExtent().
-
-  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
-  vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkStreamingDemandDrivenPipeline* sddp = 
-    vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
-  if (outInfo->Has(sddp->UPDATE_NUMBER_OF_PIECES()) && 
-    outInfo->Has(sddp->UPDATE_PIECE_NUMBER()) &&
-    outInfo->Has(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS()))
-    {
-    int piece = outInfo->Get(sddp->UPDATE_PIECE_NUMBER());
-    int numPieces = outInfo->Get(sddp->UPDATE_NUMBER_OF_PIECES());
-    int ghostLevel = outInfo->Get(sddp->UPDATE_NUMBER_OF_GHOST_LEVELS());
-
-    sddp->SetUpdateExtent(inInfo, piece, numPieces, ghostLevel);
-    }
   return 1;
 }
 
@@ -281,18 +221,34 @@ bool vtkExtractHistogram::InitializeBinExtents(
     {
     // Give it some width.
     range[1] = range[0]+1;
-    }    
+    }
 
   min = range[0];
   max = range[1];
-  double bin_delta = (range[1] - range[0]) / this->BinCount;
-  bin_extents->SetValue(0, range[0]);
-  for(int i = 1; i < this->BinCount; ++i)
-    {
-    bin_extents->SetValue(i, range[0] + (i * bin_delta));
-    }
-  bin_extents->SetValue(this->BinCount, range[1]);
+  this->FillBinExtents(bin_extents, min, max);
   return true;
+}
+
+//-----------------------------------------------------------------------------
+void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* bin_extents,
+  double min, double max)
+{
+  // Calculate the extents of each bin, based on the range of values in the
+  // input ...  
+  if (min == max)
+    {
+    // Give it some width.
+    max = min + 1;
+    }
+
+  bin_extents->SetNumberOfComponents(1);
+  bin_extents->SetNumberOfTuples(this->BinCount);
+  double bin_delta = (max - min) / this->BinCount;
+  double half_delta = bin_delta/2.0;
+  for(int i = 0; i < this->BinCount; ++i)
+    {
+    bin_extents->SetValue(i, min + (i * bin_delta) + half_delta);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -359,45 +315,35 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
 {  
   // Build an empty output grid in advance, so we can bail-out if we
   // encounter any problems
-  vtkInformation* const output_info = outputVector->GetInformationObject(0);
-  vtkRectilinearGrid* const output_data = vtkRectilinearGrid::SafeDownCast(
-    output_info->Get(vtkDataObject::DATA_OBJECT()));
+  vtkTable* const output_data = vtkTable::GetData(outputVector, 0);
   output_data->Initialize();
-  output_data->SetDimensions(this->BinCount+1, 1, 1);
 
-  vtkDoubleArray* const bin_extents = vtkDoubleArray::New();
+  // These are the mid-points for each of the bins
+  vtkSmartPointer<vtkDoubleArray> bin_extents =
+    vtkSmartPointer<vtkDoubleArray>::New();
   bin_extents->SetNumberOfComponents(1);
-  bin_extents->SetNumberOfTuples(this->BinCount + 1);
+  bin_extents->SetNumberOfTuples(this->BinCount);
   bin_extents->SetName("bin_extents");
   bin_extents->FillComponent(0, 0.0);
-  output_data->SetXCoordinates(bin_extents);
 
   // Insert values into bins ...
-  vtkIntArray* const bin_values = vtkIntArray::New();
+  vtkSmartPointer<vtkIntArray> bin_values = 
+    vtkSmartPointer<vtkIntArray>::New();
   bin_values->SetNumberOfComponents(1);
   bin_values->SetNumberOfTuples(this->BinCount);
   bin_values->SetName("bin_values");
   bin_values->FillComponent(0, 0.0);
 
-  vtkDoubleArray* const otherCoords = vtkDoubleArray::New();
-  otherCoords->SetNumberOfComponents(1);
-  otherCoords->SetNumberOfTuples(1);
-  otherCoords->SetTuple1(0, 0.0);
-  output_data->SetYCoordinates(otherCoords);
-  output_data->SetZCoordinates(otherCoords);
-  otherCoords->Delete();
-
   // Initializes the bin_extents array.
   double min, max;
   if (!this->InitializeBinExtents(inputVector, bin_extents, min, max))
     {
-    bin_values->Delete();
-    bin_extents->Delete();
     this->Internal->ArrayValues.clear();
     return 1;
     }
-  output_data->GetPointData()->AddArray(bin_extents);
-  output_data->GetCellData()->AddArray(bin_values);
+
+  output_data->GetRowData()->AddArray(bin_extents);
+  output_data->GetRowData()->AddArray(bin_values);
 
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataObject *input = inInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -467,15 +413,12 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
             }
           }
         }
-      output_data->GetCellData()->AddArray(da);
-      output_data->GetCellData()->AddArray(aa);
+      output_data->GetRowData()->AddArray(da);
+      output_data->GetRowData()->AddArray(aa);
       }
 
     this->Internal->ArrayValues.clear();
     }
 
-  bin_values->Delete();
-  bin_extents->Delete();
-    
   return 1;
 }

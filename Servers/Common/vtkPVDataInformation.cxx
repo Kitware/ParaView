@@ -50,7 +50,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.58");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.59");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -153,6 +153,34 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeSpan: "
      << this->TimeSpan[0] << ", " << this->TimeSpan[1]
      << endl;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataSetAttributesInformation*
+vtkPVDataInformation::GetAttributeInformation(int fieldAssociation)
+{
+  switch (fieldAssociation)
+    {
+  case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+    return this->PointDataInformation;
+
+  case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+    return this->CellDataInformation;
+
+  case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+    return this->VertexDataInformation;
+
+  case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+    return this->EdgeDataInformation;
+
+  case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+    return this->RowDataInformation;
+
+  case vtkDataObject::FIELD_ASSOCIATION_NONE:
+    return this->FieldDataInformation;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

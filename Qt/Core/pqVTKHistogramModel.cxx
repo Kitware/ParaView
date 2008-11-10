@@ -40,23 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqVTKHistogramModelInternal
 {
 public:
-  pqVTKHistogramModelInternal();
-  ~pqVTKHistogramModelInternal() {}
+  pqVTKHistogramModelInternal():
+    Minimum(), Maximum(), XArrayComponent(-1), YArrayComponent(-1), XDelta(0) {}
 
   pqChartCoordinate Minimum;
   pqChartCoordinate Maximum;
   vtkSmartPointer<vtkDataArray> XArray;
   vtkSmartPointer<vtkDataArray> YArray;
+  int XArrayComponent;
+  int YArrayComponent;
+  double XDelta;
 };
-
-//----------------------------------------------------------------------------
-pqVTKHistogramModelInternal::pqVTKHistogramModelInternal()
-  : Minimum(), Maximum()
-{
-  this->XArray = 0;
-  this->YArray = 0;
-}
-
 
 //----------------------------------------------------------------------------
 pqVTKHistogramModel::pqVTKHistogramModel(QObject *parentObject)
@@ -74,10 +68,9 @@ pqVTKHistogramModel::~pqVTKHistogramModel()
 //----------------------------------------------------------------------------
 int pqVTKHistogramModel::getNumberOfBins() const
 {
-  if(this->Internal->YArray &&
-      this->Internal->YArray->GetNumberOfComponents() == 1)
+  if (this->Internal->XArray)
     {
-    return this->Internal->YArray->GetNumberOfTuples();
+    return this->Internal->XArray->GetNumberOfTuples();
     }
 
   return 0;
@@ -86,9 +79,10 @@ int pqVTKHistogramModel::getNumberOfBins() const
 //----------------------------------------------------------------------------
 void pqVTKHistogramModel::getBinValue(int index, pqChartValue &bin) const
 {
-  if(index >= 0 && index < this->getNumberOfBins())
+  if (index >= 0 && index < this->getNumberOfBins())
     {
-    bin = this->Internal->YArray->GetTuple1(index);
+    bin = this->Internal->YArray->GetComponent(index,
+      this->Internal->YArrayComponent);
     }
 }
 
@@ -96,11 +90,13 @@ void pqVTKHistogramModel::getBinValue(int index, pqChartValue &bin) const
 void pqVTKHistogramModel::getBinRange(int index, pqChartValue &min,
     pqChartValue &max) const
 {
-  if(this->Internal->XArray && index >= 0 &&
-      index + 1 < this->Internal->XArray->GetNumberOfTuples())
+  if (this->Internal->XArray &&
+    index >= 0 && index < this->getNumberOfBins())
     {
-    min = this->Internal->XArray->GetTuple1(index);
-    max = this->Internal->XArray->GetTuple1(index + 1);
+    double bin_mid_point = this->Internal->XArray->GetComponent(index,
+      this->Internal->XArrayComponent);
+    min = bin_mid_point - this->Internal->XDelta; 
+    max = bin_mid_point + this->Internal->XDelta; 
     }
 }
 
@@ -118,27 +114,44 @@ void pqVTKHistogramModel::getRangeY(pqChartValue &min, pqChartValue &max) const
   max = this->Internal->Maximum.Y;
 }
 
+#define PQ_MAX(x, y) ((x)>(y))?(x):(y)
+
 //----------------------------------------------------------------------------
-void pqVTKHistogramModel::setDataArrays(vtkDataArray *xarray,
-    vtkDataArray *yarray)
+void pqVTKHistogramModel::setDataArrays(vtkDataArray *xarray, int xcomp,
+  vtkDataArray *yarray, int ycomp)
 {
   if(xarray && yarray)
     {
     this->Internal->XArray = xarray;
     this->Internal->YArray = yarray;
-    if(this->Internal->XArray->GetNumberOfTuples() < 2)
+    if (xcomp >= xarray->GetNumberOfComponents())
       {
-      qWarning("The histogram range must have at least two values.");
+      qWarning() << "Requested x-component " << xcomp << " is invalid.";
+      xcomp = -1;
       }
+    if (ycomp >= yarray->GetNumberOfComponents())
+      {
+      qWarning() << "Requested y-component " << ycomp << " is invalid.";
+      ycomp = -1;
+      }
+
+    this->Internal->XArrayComponent = xcomp;
+    this->Internal->YArrayComponent = ycomp;
 
     // Get the overall range for the histogram. The bin ranges are
     // stored in the x coordinate array.
-    double range[2];
-    this->Internal->XArray->GetRange(range);
-    this->Internal->Minimum.X = range[0];
-    this->Internal->Maximum.X = range[1];
+    double range[2] = {0.0, 0.0};
+    this->Internal->XArray->GetRange(range, xcomp);
 
-    this->Internal->YArray->GetRange(range);
+    vtkIdType numTuples = PQ_MAX(2, this->Internal->XArray->GetNumberOfTuples());
+    double delta = (range[1] - range[0])/(numTuples - 1);
+    delta /= 2.0;
+
+    this->Internal->Minimum.X = range[0]-delta;
+    this->Internal->Maximum.X = range[1]+delta;
+    this->Internal->XDelta = delta;
+
+    this->Internal->YArray->GetRange(range, ycomp);
     this->Internal->Minimum.Y = range[0];
     this->Internal->Maximum.Y = range[1];
     }
@@ -146,6 +159,9 @@ void pqVTKHistogramModel::setDataArrays(vtkDataArray *xarray,
     {
     this->Internal->XArray = 0;
     this->Internal->YArray = 0;
+    this->Internal->XDelta = 0;
+    this->Internal->XArrayComponent = -1;
+    this->Internal->YArrayComponent = -1;
 
     // No data, just show empty chart.
     this->Internal->Minimum.Y = 0;

@@ -42,17 +42,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
+#include "pqComboBoxDomain.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
+#include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqSpreadSheetView.h"
-#include "pqPropertyLinks.h"
 
 class pqSpreadSheetViewDecorator::pqInternal : public Ui::pqSpreadSheetViewDecorator
 {
 public:
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* AttributeAdaptor;
+  pqComboBoxDomain* AttributeDomain;
 };
 
 //-----------------------------------------------------------------------------
@@ -72,6 +74,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
   this->Internal->Source->fillExistingPorts();
   this->Internal->AttributeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Attribute);
+  this->Internal->AttributeDomain = 0;
 
   QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
     this->Spreadsheet, SLOT(render()));
@@ -88,6 +91,7 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
 {
+  delete this->Internal->AttributeDomain;
   delete this->Internal;
   this->Internal = 0;
 }
@@ -96,13 +100,19 @@ pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
 void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
 {
   this->Internal->Links.removeAllPropertyLinks();
+  delete this->Internal->AttributeDomain;
+  this->Internal->AttributeDomain = 0;
   if (repr)
     {
-    this->Internal->Source->setCurrentPort(repr->getOutputPortFromInput());
     vtkSMProxy* reprProxy = repr->getProxy();
+
+    this->Internal->AttributeDomain = new pqComboBoxDomain(
+      this->Internal->Attribute,
+      reprProxy->GetProperty("FieldAssociation"), "enum");
+    this->Internal->Source->setCurrentPort(repr->getOutputPortFromInput());
     this->Internal->Links.addPropertyLink(this->Internal->AttributeAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
-      reprProxy, reprProxy->GetProperty("FieldType"));
+      reprProxy, reprProxy->GetProperty("FieldAssociation"));
     }
   else
     {

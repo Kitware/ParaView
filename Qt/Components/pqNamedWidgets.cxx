@@ -89,7 +89,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
 #include "pqTreeWidget.h"
-#include "pqTreeWidgetItemObject.h"
 #include "pqTreeWidgetSelectionHelper.h"
 
 //-----------------------------------------------------------------------------

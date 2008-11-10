@@ -31,7 +31,7 @@
 #define __vtkReductionFilter_h
 
 #include "vtkDataObjectAlgorithm.h"
-
+#include "vtkSmartPointer.h" // needed for vtkSmartPointer.
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkReductionFilter : public vtkDataObjectAlgorithm
@@ -75,11 +75,10 @@ public:
   vtkSetMacro(GenerateProcessIds, int);
   vtkGetMacro(GenerateProcessIds, int);
 
-  //BTX
+//BTX
   enum Tags {
     TRANSMIT_DATA_OBJECT = 23484
   };
-  //ETX
 
 protected:
   vtkReductionFilter();
@@ -97,13 +96,14 @@ protected:
                           vtkInformationVector* outputVector);
 
   void Reduce(vtkDataObject* input, vtkDataObject* output);
+  vtkDataObject* PreProcess(vtkDataObject* input);
+  void PostProcess(vtkDataObject* output,
+    vtkSmartPointer<vtkDataObject> inputs[],
+    unsigned int num_inputs);
 
   void Send(int receiver, vtkDataObject*);
   vtkDataObject* Receive(int receiver, int dataobjectType);
 
-  char* RawData;
-  vtkIdType DataLength;
-  int Extent[6];
   vtkAlgorithm* PreGatherHelper;
   vtkAlgorithm* PostGatherHelper;
   vtkMultiProcessController* Controller;
@@ -113,6 +113,7 @@ protected:
 private:
   vtkReductionFilter(const vtkReductionFilter&); // Not implemented.
   void operator=(const vtkReductionFilter&); // Not implemented.
+//ETX
 };
 
 #endif

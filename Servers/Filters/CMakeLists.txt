@@ -13,6 +13,8 @@ SET(Filters_SRCS
   vtkAnimationPlayer.cxx
   vtkAppendRectilinearGrid.cxx
   vtkAttributeDataReductionFilter.cxx
+  vtkAttributeDataToTableFilter.cxx
+  vtkBlockDeliveryPreprocessor.cxx
   vtkCTHFragmentCommBuffer.cxx
   vtkCTHFragmentConnect.cxx
   vtkCTHFragmentIdList.cxx
@@ -44,8 +46,6 @@ SET(Filters_SRCS
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
-  vtkIndexBasedBlockFilter.cxx
-  vtkIndexBasedBlockSelectionFilter.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
   vtkInteractorStyleTransferFunctionEditor.cxx
@@ -59,7 +59,6 @@ SET(Filters_SRCS
   vtkNetworkImageSource.cxx
   vtkOrderedCompositeDistributor.cxx
   vtkPConvertSelection.cxx
-  vtkPCSVWriter.cxx
   vtkPExtractHistogram.cxx
   vtkParallelSerialWriter.cxx
   vtkPhastaReader.cxx
@@ -120,6 +119,7 @@ SET(Filters_SRCS
   vtkPVHardwareSelector.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
+  vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx
   vtkSpyPlotBlockIterator.cxx
@@ -129,12 +129,12 @@ SET(Filters_SRCS
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkSurfaceVectors.cxx
+  vtkTableStreamer.cxx
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx
 #  vtkTemporalProbeFilter.cxx
   vtkTexturePainter.cxx
   vtkTimestepsAnimationPlayer.cxx
-  vtkTimeSeriesWriter.cxx
   vtkTimeToTextConvertor.cxx
   vtkTrackballPan.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx

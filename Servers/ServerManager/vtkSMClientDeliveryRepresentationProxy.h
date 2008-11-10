@@ -111,6 +111,7 @@ protected:
   // Create the data pipeline.
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
+  vtkSMSourceProxy* PreProcessorProxy;
   vtkSMClientDeliveryStrategyProxy* StrategyProxy;
   vtkSMSourceProxy* PostProcessorProxy;
   vtkSMProxy* PreGatherHelper;

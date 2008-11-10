@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkSMSpreadSheetRepresentationProxy.h"
 
-#include "vtkIndexBasedBlockFilter.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -29,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSpreadSheetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSpreadSheetRepresentationProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSpreadSheetRepresentationProxy::vtkSMSpreadSheetRepresentationProxy()
 {
@@ -115,7 +114,7 @@ bool vtkSMSpreadSheetRepresentationProxy::CreatePipeline(
 
   // esProxy port:1 is a index based vtkSelection. That's the one we are
   // interested in.
-  this->Connect(input, this->SelectionRepresentation, "DataInput", 0);
+  this->Connect(this->PreProcessor, this->SelectionRepresentation, "DataInput", 0);
   this->Connect(esProxy, this->SelectionRepresentation, "Input", 1);
   return true;
 }
@@ -127,9 +126,9 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
   // properties has to be managed a bit more gracefully.
 
   // Pass essential properties to the selection representation
-  // such as "BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex".
+  // such as "BlockSize", "CacheSize", "FieldAssociation"
   const char* pnames[] =
-    {"BlockSize", "CacheSize", "FieldType", "CompositeDataSetIndex", 0};
+    {"BlockSize", "CacheSize", "FieldAssociation", 0};
   for (int cc=0; pnames[cc]; cc++)
     {
     vtkSMProperty* src = this->GetProperty(pnames[cc]);
@@ -143,7 +142,6 @@ void vtkSMSpreadSheetRepresentationProxy::PassEssentialAttributes()
       this->SelectionRepresentation->UpdateProperty(pnames[cc]);
       }
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -153,23 +151,23 @@ void vtkSMSpreadSheetRepresentationProxy::Update(vtkSMViewProxy* view)
     {
     this->MarkModified(0);
     // change the pipeline to deliver correct data.
-    // Note this is a bit unconvetional, changing the pipeline in Update()
+    // Note this is a bit unconventional, changing the pipeline in Update()
     // so we must be careful.
-
+  
     if (this->SelectionOnly)
       {
       this->Connect(
         this->GetInputProxy()->GetSelectionOutput(this->OutputPort),
-        this->UpdateStrategy);
-      vtkSMPropertyHelper(this->BlockFilter, "GenerateOriginalIds").Set(0);
+        this->PreProcessor);
+      vtkSMPropertyHelper(this->Streamer, "GenerateOriginalIds").Set(0);
       }
     else
       {
       this->Connect(this->GetInputProxy(),
-        this->UpdateStrategy, "Input", this->OutputPort);
-      vtkSMPropertyHelper(this->BlockFilter, "GenerateOriginalIds").Set(1);
+        this->PreProcessor, "Input", this->OutputPort);
+      vtkSMPropertyHelper(this->Streamer, "GenerateOriginalIds").Set(1);
       }
-    this->BlockFilter->UpdateVTKObjects();
+    this->Streamer->UpdateVTKObjects();
 
     this->PreviousSelectionOnly = this->SelectionOnly;
     }
@@ -192,66 +190,6 @@ vtkSelection* vtkSMSpreadSheetRepresentationProxy::GetSelectionOutput(vtkIdType 
 bool vtkSMSpreadSheetRepresentationProxy::IsSelectionAvailable(vtkIdType blockid)
 {
   return this->SelectionRepresentation->IsAvailable(blockid);
-}
-
-//----------------------------------------------------------------------------
-vtkIdType vtkSMSpreadSheetRepresentationProxy::GetMaximumNumberOfItems()
-{
-  vtkPVDataInformation* info =
-    this->SelectionOnly?
-    this->GetInputProxy()->GetSelectionOutput(this->OutputPort)->GetDataInformation(0):
-    this->GetInputProxy()->GetDataInformation(this->OutputPort);
-
-  if (!info)
-    {
-    vtkErrorMacro("Failed to get any data information.");
-    return 0;
-    }
-
-  if (info->GetCompositeDataInformation()->GetDataIsComposite())
-    {
-    // use CompositeDataSetIndex to locate the vtkPVDataInformation.
-    info = info->GetDataInformationForCompositeIndex(this->CompositeDataSetIndex);
-    }
-
-  if (!info)
-    {
-    /*
-     * Don't raise an error here since when the spreadsheet view is in selection
-     * only mode and nothing is selected, we would indeed get empty data
-     * information.
-
-     vtkErrorMacro("Failed to locate composite information for "
-      << this->CompositeDataSetIndex);
-    */
-    return 0;
-    }
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("FieldType"));
-  int field_type = ivp->GetElement(0);
-
-  switch (field_type)
-    {
-  case vtkIndexBasedBlockFilter::FIELD:
-    if (info->GetFieldDataInformation() && !this->SelectionOnly)
-      {
-      // Since arrays in the field data can be variables lengths, find the
-      // length of the longest one:
-      return info->GetFieldDataInformation()->GetMaximumNumberOfTuples();
-      }
-    // if SelectionOnly is true, no field data can ever be delivered.
-    break;
-
-  case vtkIndexBasedBlockFilter::POINT:
-    return info->GetNumberOfPoints();
-
-  case vtkIndexBasedBlockFilter::CELL:
-  default:
-    return info->GetNumberOfCells();
-    }
-
-  return 0;
 }
 
 //----------------------------------------------------------------------------

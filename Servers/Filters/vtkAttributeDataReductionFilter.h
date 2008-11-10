@@ -25,13 +25,13 @@
 #ifndef __vtkAttributeDataReductionFilter_h
 #define __vtkAttributeDataReductionFilter_h
 
-#include "vtkDataSetAlgorithm.h"
+#include "vtkDataObjectAlgorithm.h"
 
-class VTK_EXPORT vtkAttributeDataReductionFilter : public vtkDataSetAlgorithm
+class VTK_EXPORT vtkAttributeDataReductionFilter : public vtkDataObjectAlgorithm
 {
 public:
   static vtkAttributeDataReductionFilter* New();
-  vtkTypeRevisionMacro(vtkAttributeDataReductionFilter, vtkDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkAttributeDataReductionFilter, vtkDataObjectAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
   enum ReductionTypes
@@ -45,7 +45,8 @@ public:
     {
     POINT_DATA = 0x01,
     CELL_DATA  = 0x02,
-    FIELD_DATA = 0x04 // FIXME: Field data not supported yet.
+    FIELD_DATA = 0x04, // FIXME: Field data not supported yet.
+    ROW_DATA = 0x08
     };
 //ETX
 
@@ -87,6 +88,13 @@ protected:
   virtual int RequestData(vtkInformation* request,
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
+
+  // Description:
+  // This is called by the superclass.
+  // This is the method you should override.
+  virtual int RequestDataObject(vtkInformation*,
+                                vtkInformationVector**,
+                                vtkInformationVector*);
   
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   int ReductionType;

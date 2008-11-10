@@ -72,19 +72,37 @@
    </item>
    <item row="2" column="2" >
     <widget class="QComboBox" name="AttributeMode" >
+     <property name="sizeAdjustPolicy" >
+      <enum>QComboBox::AdjustToContents</enum>
+     </property>
      <item>
       <property name="text" >
-       <string>Cell Data</string>
+       <string>Points</string>
       </property>
      </item>
      <item>
       <property name="text" >
-       <string>Point Data</string>
+       <string>Cells</string>
       </property>
      </item>
      <item>
       <property name="text" >
        <string>Field Data</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Vertices</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Edges</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Rows</string>
       </property>
      </item>
     </widget>

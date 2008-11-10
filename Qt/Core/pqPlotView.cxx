@@ -630,46 +630,36 @@ bool pqPlotView::canDisplay(pqOutputPort* opPort) const
   if(this->getViewType() == this->barChartType())
     {
     vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
-    if (dataInfo)
-      {
-      int extent[6];
-      dataInfo->GetExtent(extent);
-      int non_zero_dims = 0;
-      for (int cc=0; cc < 3; cc++)
-        {
-        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-        }
-
-      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
-        (non_zero_dims == 1);
-      }
+    return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
     }
   else if(this->getViewType() == this->XYPlotType())
     {
     vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
-    if (dataInfo)
-      {
-      if (dataInfo->GetNumberOfPoints() <= 1)
-        {
-        // can be XY-plotted  only when number of points > 1.
-        return false;
-        }
+    return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
+    //vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
+    //if (dataInfo)
+    //  {
+    //  if (dataInfo->GetNumberOfPoints() <= 1)
+    //    {
+    //    // can be XY-plotted  only when number of points > 1.
+    //    return false;
+    //    }
 
-      if (srcProxyName == "ProbeLine" )
-        {
-        return true;
-        }
+    //  if (srcProxyName == "ProbeLine" )
+    //    {
+    //    return true;
+    //    }
 
-      int extent[6];
-      dataInfo->GetExtent(extent);
-      int non_zero_dims = 0;
-      for (int cc=0; cc < 3; cc++)
-        {
-        non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
-        }
-      return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
-        (non_zero_dims == 1);
-      }
+    //  int extent[6];
+    //  dataInfo->GetExtent(extent);
+    //  int non_zero_dims = 0;
+    //  for (int cc=0; cc < 3; cc++)
+    //    {
+    //    non_zero_dims += (extent[2*cc+1]-extent[2*cc]>0)? 1: 0;
+    //    }
+    //  return (dataInfo->GetDataClassName() == QString("vtkRectilinearGrid")) &&
+    //    (non_zero_dims == 1);
+    //  }
     }
   return false;
 }

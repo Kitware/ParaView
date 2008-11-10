@@ -18,12 +18,13 @@
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryStrategyProxy.h"
 #include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMIntVectorProperty.h"
 
 #include <vtkstd/map>
 
@@ -72,11 +73,12 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
-  this->BlockFilter = 0;
+  this->PreProcessor = 0;
+  this->Streamer = 0;
   this->CacheDirty = false;
   this->UpdateStrategy = 0;
   this->DeliveryStrategy = 0;
@@ -100,60 +102,6 @@ vtkSMBlockDeliveryRepresentationProxy::~vtkSMBlockDeliveryRepresentationProxy()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBlockDeliveryRepresentationProxy::SetFieldType(int ft)
-{
-  if (this->BlockFilter)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->BlockFilter->GetProperty("FieldType"));
-    if (ivp)
-      {
-      ivp->SetElement(0, ft);
-      this->BlockFilter->UpdateProperty("FieldType");
-      this->CacheDirty = true;
-      }
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkSMBlockDeliveryRepresentationProxy::SetProcessID(int id)
-{
-  if (this->BlockFilter)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->BlockFilter->GetProperty("ProcessID"));
-    if (ivp)
-      {
-      ivp->SetElement(0, id);
-      this->BlockFilter->UpdateProperty("ProcessID");
-      this->CacheDirty = true;
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMBlockDeliveryRepresentationProxy::SetCompositeDataSetIndex(int id)
-{
-  if (id < 0)
-    {
-    id = 0;
-    }
-  if (this->BlockFilter)
-    {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->BlockFilter->GetProperty("CompositeDataSetIndex"));
-    if (ivp)
-      {
-      ivp->SetElement(0, id);
-      this->BlockFilter->UpdateProperty("CompositeDataSetIndex");
-      this->CacheDirty = true;
-      }
-    }
-  this->CompositeDataSetIndex = static_cast<unsigned int>(id);
-}
-
-//----------------------------------------------------------------------------
 bool vtkSMBlockDeliveryRepresentationProxy::IsAvailable(vtkIdType blockid)
 {
   return this->Internal->CachedBlocks.find(blockid) != 
@@ -168,10 +116,17 @@ bool vtkSMBlockDeliveryRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  this->PreProcessor = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("PreProcessor"));
+  if (this->PreProcessor)
+    {
+    this->PreProcessor->SetServers(vtkProcessModule::DATA_SERVER);
+    }
+
   // Block filter is used to deliver only 1 block of data to the client.
-  this->BlockFilter = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("BlockFilter"));
-  this->BlockFilter->SetServers(vtkProcessModule::DATA_SERVER);
+  this->Streamer = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("Streamer"));
+  this->Streamer->SetServers(vtkProcessModule::DATA_SERVER);
 
   this->Reduction = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("Reduction"));
@@ -218,7 +173,15 @@ bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
   this->UpdateStrategy->Delete();
 
   this->UpdateStrategy->SetEnableLOD(false);
-  this->Connect(input, this->UpdateStrategy, "Input", outputport);
+  if (this->PreProcessor)
+    {
+    this->Connect(input, this->PreProcessor, "Input", outputport);
+    this->Connect(this->PreProcessor, this->UpdateStrategy);
+    }
+  else
+    {
+    this->Connect(input, this->UpdateStrategy, "Input", outputport);
+    }
   this->UpdateStrategy->UpdateVTKObjects();
 
   // Now create another strategy to deliver the data to the client.
@@ -234,15 +197,13 @@ bool vtkSMBlockDeliveryRepresentationProxy::CreatePipeline(vtkSMSourceProxy* inp
   this->DeliveryStrategy->SetConnectionID(this->ConnectionID);
   this->DeliveryStrategy->SetEnableLOD(false);
 
-  this->Connect(this->UpdateStrategy->GetOutput(), this->BlockFilter);
-  this->Connect(this->BlockFilter, this->DeliveryStrategy);
+  this->Connect(this->UpdateStrategy->GetOutput(), this->Streamer);
+  this->Connect(this->Streamer, this->DeliveryStrategy);
 
   // Set default strategy values.
   this->DeliveryStrategy->SetPreGatherHelper((vtkSMProxy*)0);
   this->DeliveryStrategy->SetPostGatherHelper(this->Reduction);
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->DeliveryStrategy->GetProperty("GenerateProcessIds"));
-  ivp->SetElement(0, 1);
+  vtkSMPropertyHelper(this->DeliveryStrategy, "GenerateProcessIds").Set(1);
   this->DeliveryStrategy->UpdateVTKObjects();;
   return true;
 }
@@ -258,6 +219,12 @@ void vtkSMBlockDeliveryRepresentationProxy::Update(vtkSMViewProxy* view)
     }
 
   this->Superclass::Update(view);
+  // HACK: Please fix the domains soon so I won't need to do this stupidity.
+  if (this->PreProcessor &&
+    this->PreProcessor->GetProperty("Input"))
+    {
+    this->PreProcessor->GetProperty("Input")->UpdateDependentDomains();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -269,13 +236,13 @@ void vtkSMBlockDeliveryRepresentationProxy::Fetch(vtkIdType block)
   if (iter == this->Internal->CachedBlocks.end())
     {
     // cout << this << " Fetching Block #" << block << endl;
-    // Pass the block number to the BlockFilter.
+    // Pass the block number to the Streamer.
     vtkSMIdTypeVectorProperty* ivp = vtkSMIdTypeVectorProperty::SafeDownCast(
-      this->BlockFilter->GetProperty("Block"));
+      this->Streamer->GetProperty("Block"));
     if (ivp)
       {
       ivp->SetElement(0, block);
-      this->BlockFilter->UpdateProperty("Block");
+      this->Streamer->UpdateProperty("Block");
       }
     this->DeliveryStrategy->Update();
 
@@ -289,7 +256,6 @@ void vtkSMBlockDeliveryRepresentationProxy::Fetch(vtkIdType block)
 
     vtkDataObject* clone = output->NewInstance();
     clone->ShallowCopy(output);
-
     this->Internal->AddToCache(block, clone, this->CacheSize);
     this->IsAvailable(block);
     clone->Delete();
@@ -317,6 +283,15 @@ vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput(vtkIdType block)
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkSMBlockDeliveryRepresentationProxy::GetNumberOfRequiredBlocks()
+{
+  vtkPVDataInformation* dInfo = this->GetRepresentedDataInformation(false);
+  return static_cast<vtkIdType>(ceil(
+      static_cast<double>(dInfo->GetNumberOfRows())/
+      vtkSMPropertyHelper(this, "BlockSize").GetAsIdType()));
 }
 
 //----------------------------------------------------------------------------

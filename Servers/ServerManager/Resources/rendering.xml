@@ -6999,301 +6999,305 @@
       <!-- End of ClientDeliveryRepresentation -->
     </ClientDeliveryRepresentationProxy>
 
-    <ClientDeliveryRepresentationProxy name="BarChartRepresentation"
-      base_proxygroup="representations"
-      base_proxyname="ClientDeliveryRepresentationBase">
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy name="BarChartRepresentation">
       <Documentation>
         Representation used in BarChartView.
       </Documentation>
-      <!-- All properties here are non-command properties, since
-        we don't have any special proxy for BarChartDisplay. 
-        We have properties which aid the GUI is "drawing" this display.
-      -->
-       <InputProperty
-        name="Input"
-        command="SetInput-not-used"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-        <InputArrayDomain 
-          name="input_array_cell" 
-          attribute_type="cell"
-          number_of_components="1"/>
-        <InputArrayDomain 
-          name="input_array_point" 
-          attribute_type="point"
-          number_of_components="1"/>
+
+      <InputProperty name="Input" command="not-used">
         <DataTypeDomain name="input_type">
-          <DataType value="vtkRectilinearGrid"/>
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
       </InputProperty>
-      <ProxyProperty
-        name="LookupTable">
-        <!--
-        The lookup table proxy used to color the bar chart.
-        -->
+
+      <IntVectorProperty name="Visibility"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
+      <ProxyProperty name="LookupTable">
+        <Documentation>
+          The lookup table proxy used to color the bar chart.
+        </Documentation>
         <ProxyGroupDomain name="groups">
           <Group name="lookup_tables"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-      
-      <StringVectorProperty name="XArrayName"
-         number_of_elements="1">
-         <!-- Set the array to use on X axis. This is used only if
-          XAxisUsePoints is 0. -->
-          <ArrayListDomain name="array_list" 
-            attribute_type="Scalars"
-            input_domain_name="input_array_point">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-            </RequiredProperties>
-          </ArrayListDomain>
-      </StringVectorProperty>
 
-      <StringVectorProperty name="YArrayName"
-         number_of_elements="1">
-         <!-- Set the array to use on X axis. -->
-          <ArrayListDomain name="array_list" 
-            attribute_type="Scalars"
-            input_domain_name="input_array_cell">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-            </RequiredProperties>
-          </ArrayListDomain>
-      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="PreProcessor"
+          proxygroup="extended_filters"
+          proxyname="ChartRepresentationPreprocessor">
+        </Proxy>
+        <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
+        a single leaf in the composite dataset alone -->
+        <ExposedProperties>
+          <Property name="FieldAssociation" />
+          <Property name="CompositeDataSetIndex" />
+        </ExposedProperties>
+      </SubProxy>
 
-      <IntVectorProperty name="XAxisPointComponent"
-        number_of_elements="1"
-        default_values="0">
-        <!-- Choose the point component for X axis.
-        Used only when XAxisUsePoints is 1 -->
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="X" />
-          <Entry value="1" text="Y" />
-          <Entry value="2" text="Z" />
-        </EnumerationDomain>
-      </IntVectorProperty>
+      <SubProxy>
+        <!--
+          Dummy consumer is used so that domains work correctly for XArrayName,
+          YArrayName etc.
+        -->
+        <Proxy name="DummyConsumer">
+          <ProxyProperty name="Input">
+            <DataTypeDomain>
+              <DataType value="vtkTable"/>
+            </DataTypeDomain>
+            <InputArrayDomain name="input_array" />
+          </ProxyProperty>
 
-      <IntVectorProperty name="XAxisUsePoints"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
+          <StringVectorProperty name="XArrayName"
+            number_of_elements="1">
+            <Documentation>
+              Set the array to use on X axis. 
+            </Documentation>
+            <ArrayListDomain name="array_list">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+          </StringVectorProperty>
+          
+          <IntVectorProperty name="XArrayComponent"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              Choose the array component for X-axis.
+            </Documentation>
+            <NumberOfComponentsDomain name="comps">
+              <RequiredProperties>
+                <Property name="Input" function="Input" />
+                <Property name="XArrayName" function="ArraySelection"/>
+              </RequiredProperties>
+            </NumberOfComponentsDomain>
+          </IntVectorProperty>
+
+          <StringVectorProperty name="YArrayName"
+            number_of_elements="1"
+            default_values="bin_values" >
+            <Documentation>
+              Set the array to use on Y axis. 
+            </Documentation>
+            <ArrayListDomain name="array_list">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
+          </StringVectorProperty>
+          
+          <IntVectorProperty name="YArrayComponent"
+            number_of_elements="1"
+            default_values="0">
+            <Documentation>
+              Choose the array component for Y-axis.
+            </Documentation>
+            <NumberOfComponentsDomain name="comps">
+              <RequiredProperties>
+                <Property name="Input" function="Input" />
+                <Property name="YArrayName" function="ArraySelection"/>
+              </RequiredProperties>
+            </NumberOfComponentsDomain>
+          </IntVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="XArrayName" />
+          <Property name="XArrayComponent" />
+          <Property name="YArrayName" />
+          <Property name="YArrayComponent" />
+        </ExposedProperties>
+      </SubProxy>
+
       <!-- End of BarChartRepresentation -->
-    </ClientDeliveryRepresentationProxy>
+    </ChartRepresentationProxy>
 
-    <XYPlotRepresentationProxy name="XYPlotRepresentation"
-      base_proxygroup="representations" 
-      base_proxyname="ClientDeliveryRepresentationBase">
+    <!-- =================================================================== -->
+    <ChartRepresentationProxy name="XYPlotRepresentation">
       <Documentation>
         Representation used by XYPlotView.
       </Documentation>
 
-       <InputProperty name="Input"
-        command="SetInput-not-used"
-        update_self="1">
-
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-          <Group name="glyph_sources" />
-        </ProxyGroupDomain>
-
+      <InputProperty name="Input"
+        command="SetInput-not-used" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkRectilinearGrid"/>
-          <DataType value="vtkPolyData"/>
+          <DataType value="vtkDataObject"/>
         </DataTypeDomain>
       </InputProperty>
 
-      <IntVectorProperty name="CompositeDataSetIndex"
+      <IntVectorProperty name="Visibility"
         number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          In case of Composite datasets, set the flat index of the dataset to 
-          pass. The flat index must point to a non-empty, non-composite dataset 
-          for anything to be passed through. If the input is not a composite 
-          dataset, then this index is ignored.
-        </Documentation>
-        <CompositeTreeDomain name="tree" mode="leaves">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-       </CompositeTreeDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="AttributeType"
-        number_of_elements="1"
-        default_values="0">
-        <!-- 
-          Indicates if we are plotting point data or cell data 
-          Although both YCellArrayStatus and YPointArrayStatus 
-          properties are present, only one will be active at a time
-          base on the value of this property.
-        -->
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Point Data" />
-          <Entry value="1" text="Cell Data" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="UseYCellArrayIndex" 
-         number_of_elements="1"
-         default_values="1">
-         <!-- When set array index is plotted on the X axis.
-         -->
+        default_values="1" >
         <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="UseYPointArrayIndex" 
-         number_of_elements="1"
-         default_values="1">
-         <!-- When set array index is plotted on the X axis.
-         -->
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseYArrayIndex" 
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          When set array index is plotted on the X axis.
+        </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
       <SubProxy>
-        <Proxy name="PostProcessor" 
-          proxygroup="filters" proxyname="PolyLineToRectilinearGrid">
+        <Proxy name="PreProcessor"
+          proxygroup="extended_filters"
+          proxyname="ChartRepresentationPreprocessor">
         </Proxy>
+        <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
+        a single leaf in the composite dataset alone -->
+        <ExposedProperties>
+          <Property name="FieldAssociation" exposed_name="AttributeType" />
+          <Property name="CompositeDataSetIndex" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
+        <!--
+          Dummy consumer is used so that domains work correctly for array names
+          etc.
+        -->
         <Proxy name="DummyConsumer">
           <ProxyProperty name="Input">
-            <InputArrayDomain name="input_array_cell"
-              attribute_type="cell"
-              number_of_components="0">
-            </InputArrayDomain>
-
-            <InputArrayDomain name="input_array_point"
-              attribute_type="point"
-              number_of_components="0">
-            </InputArrayDomain>
+            <DataTypeDomain>
+              <DataType value="vtkTable"/>
+            </DataTypeDomain>
+            <InputArrayDomain name="input_array" 
+              attribute_type="row" />
           </ProxyProperty>
 
-          <StringVectorProperty name="YCellArrayStatus"
-             repeat_command="1"
-             number_of_elements_per_command="11"
-             element_types="2 2 0 0 1 1 1 0 0 0 0" >
-               <Documentation>
-                 Set the cell array to use on Y axis (arrayname, legendname, 
-                 enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
-                component)
-               </Documentation>
-              <ArraySelectionDomain name="array_list">
-                <RequiredProperties>
-                  <Property name="CellArrayInfo" function="ArrayList" />
-                </RequiredProperties>
-              </ArraySelectionDomain>
-          </StringVectorProperty>
-
-          <StringVectorProperty name="YPointArrayStatus"
-             repeat_command="1"
-             number_of_elements_per_command="11"
-             element_types="2 2 0 0 1 1 1 0 0 0 0" >
+          <StringVectorProperty name="YArrayStatus"
+            repeat_command="1"
+            number_of_elements_per_command="11"
+            element_types="2 2 0 0 1 1 1 0 0 0 0" >
               <Documentation>
-                Set the cell array to use on Y axis (arrayname, legendname, 
+                Set the array to use on Y axis (arrayname, legendname, 
                 enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
-                component)
+               component)
               </Documentation>
-              <ArraySelectionDomain name="array_list">
-                <RequiredProperties>
-                  <Property name="PointArrayInfo" function="ArrayList" />
-                </RequiredProperties>
-              </ArraySelectionDomain>
-          </StringVectorProperty>
-
-          <StringVectorProperty 
-             name="CellArrayInfo"
-             number_of_elements_per_command="1"
-             element_types="2"
-             update_self="1"
-             information_only="1">
-
-             <ArrayListInformationHelper 
-               list_domain_name="array_list" />
-
-             <ArrayListDomain name="array_list" 
-               attribute_type="Scalars"
-               input_domain_name="input_array_cell">
+             <ArraySelectionDomain name="array_list">
                <RequiredProperties>
-                  <Property name="Input" function="Input"/>
+                 <Property name="ArrayInfo" function="ArrayList" />
                </RequiredProperties>
-             </ArrayListDomain>
+             </ArraySelectionDomain>
           </StringVectorProperty>
 
-          <StringVectorProperty 
-             name="PointArrayInfo"
-             update_self="1"
-             number_of_elements_per_command="1"
-             element_types="2"
-             information_only="1">
+          <StringVectorProperty name="ArrayInfo"
+            number_of_elements_per_command="1"
+            element_types="2"
+            update_self="1"
+            information_only="1">
+            <Documentation>
+              Internal property used to provide list of available arrays
+              for the ArraySelectionDomain on the YArrayStatus property.
+            </Documentation>
 
-             <ArrayListInformationHelper 
-               list_domain_name="array_list" />
+            <ArrayListInformationHelper 
+              list_domain_name="array_list" />
 
-             <ArrayListDomain name="array_list" 
-               attribute_type="Scalars"
-               input_domain_name="input_array_point">
-               <RequiredProperties>
-                  <Property name="Input" function="Input"/>
-               </RequiredProperties>
-             </ArrayListDomain>
+            <ArrayListDomain name="array_list" 
+              input_domain_name="input_array">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
           </StringVectorProperty>
 
-          <StringVectorProperty name="XCellArrayName"
-             number_of_elements="1">
-             <!-- Set the array to use on X axis. This is used only if
-              UseYCellArrayIndex is set to 0 -->
-             <ArrayListDomain name="array_list" 
-               attribute_type="Scalars"
-               input_domain_name="input_array_cell">
-               <RequiredProperties>
-                  <Property name="Input" function="Input"/>
-               </RequiredProperties>
-             </ArrayListDomain>
+          <StringVectorProperty name="XArrayName"
+            number_of_elements="1">
+            <Documentation>
+              Set the array to use on X axis. This is used only if
+              UseYCellArrayIndex is set to 0 
+            </Documentation>
+            <ArrayListDomain name="array_list" 
+              input_domain_name="input_array">
+              <RequiredProperties>
+                 <Property name="Input" function="Input"/>
+              </RequiredProperties>
+            </ArrayListDomain>
           </StringVectorProperty>
 
-          <StringVectorProperty name="XPointArrayName"
-             number_of_elements="1">
-             <!-- Set the array to use on X axis. This is used only if
-              UseYPointArrayIndex is set to 0 -->
-             <ArrayListDomain name="array_list" 
-               attribute_type="Scalars"
-               input_domain_name="input_array_point">
-               <RequiredProperties>
-                  <Property name="Input" function="Input"/>
-               </RequiredProperties>
-             </ArrayListDomain>
-          </StringVectorProperty>
-
-          <IntVectorProperty name="XCellArrayComponent"
-            number_of_elements="1"
-            default_values="-2">
-          </IntVectorProperty>
-
-          <IntVectorProperty name="XPointArrayComponent"
+          <IntVectorProperty name="XArrayComponent"
             number_of_elements="1"
             default_values="-2">
           </IntVectorProperty>
         </Proxy>
         <ExposedProperties>
-          <Property name="YCellArrayStatus" />
-          <Property name="YPointArrayStatus" />
-          <Property name="CellArrayInfo" />
-          <Property name="PointArrayInfo" />
-          <Property name="XCellArrayName" />
-          <Property name="XPointArrayName" />
-          <Property name="XCellArrayComponent" />
-          <Property name="XPointArrayComponent" />
+          <Property name="YArrayStatus" />
+          <Property name="ArrayInfo" />
+          <Property name="XArrayName" />
+          <Property name="XArrayComponent" />
         </ExposedProperties>
       </SubProxy>
       <!-- End of XYPlotRepresentation -->
-    </XYPlotRepresentationProxy>
+    </ChartRepresentationProxy>
 
     <BlockDeliveryRepresentationProxy name="BlockDeliveryRepresentation">
       <Documentation>
@@ -7309,47 +7313,6 @@
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool" />
-      </IntVectorProperty>
-
-      <IntVectorProperty name="FieldType"
-        command="SetFieldType"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Cell Data" />
-          <Entry value="1" text="Point Data" />
-          <Entry value="2" text="Field Data" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="ProcessID"
-         command="SetProcessID"
-         update_self="1"
-         number_of_elements="1"
-         default_values="0">
-         <Documentation>
-          Select the process to obtain the field data from. Only used when
-          FieldType is "Field Data" (2).
-         </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="CompositeDataSetIndex"
-        command="SetCompositeDataSetIndex"
-        update_self="1"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          In case of Composite datasets, set the flat index of the dataset to 
-          pass. The flat index must point to a non-empty, non-composite dataset 
-          for anything to be passed through. If the input is not a composite 
-          dataset, then this index is ignored.
-        </Documentation>
-        <CompositeTreeDomain name="tree" mode="leaves">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-       </CompositeTreeDomain>
       </IntVectorProperty>
 
       <IdTypeVectorProperty name="CacheSize"
@@ -7388,60 +7351,20 @@
       </IntVectorProperty>
 
       <SubProxy>
-        <SourceProxy name="BlockFilter" class="vtkIndexBasedBlockFilter">
-          <InputProperty name="Input" 
-            command="SetInputConnection">
-          </InputProperty>
+        <Proxy name="PreProcessor"
+          proxygroup="extended_filters" proxyname="BlockDeliveryPreprocessor">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FieldAssociation" />
+          <Property name="CompositeDataSetIndex" />
+        </ExposedProperties>
+      </SubProxy>
 
-          <IdTypeVectorProperty name="BlockSize"
-            command="SetBlockSize"
-            number_of_elements="1"
-            default_values="1024" >
-          </IdTypeVectorProperty>
-
-          <IdTypeVectorProperty name="Block"
-            command="SetBlock"
-            number_of_elements="1"
-            default_values="0">
-          </IdTypeVectorProperty>
-
-          <IntVectorProperty name="FieldType"
-            command="SetFieldType"
-            number_of_elements="1"
-            default_values="1">
-            <EnumerationDomain name="enum">
-              <Entry value="0" text="Cell Data" />
-              <Entry value="1" text="Point Data" />
-              <Entry value="2" text="Field Data" />
-            </EnumerationDomain>
-          </IntVectorProperty>
-
-          <IntVectorProperty name="ProcessID"
-            command="SetProcessID"
-            number_of_elements="1"
-            default_values="0">
-          </IntVectorProperty>
-
-          <IntVectorProperty name="CompositeDataSetIndex"
-            command="SetCompositeDataSetIndex"
-            number_of_elements="1"
-            default_values="0">
-            <Documentation>
-              In case of Composite datasets, set the flat index of the dataset to 
-              pass. The flat index must point to a non-empty, non-composite dataset 
-              for anything to be passed through. If the input is not a composite 
-              dataset, then this index is ignored.
-            </Documentation>
-          </IntVectorProperty>
-
-          <IntVectorProperty name="GenerateOriginalIds"
-            command="SetGenerateOriginalIds"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool" />
-          </IntVectorProperty>
-
-        </SourceProxy>
+      <SubProxy>
+        <!-- Streaming sub-proxy -->
+        <Proxy name="Streamer" 
+          proxygroup="extended_filters" proxyname="TableStreamer">
+        </Proxy>
         <ExposedProperties>
           <Property name="BlockSize" />
         </ExposedProperties>
@@ -7475,36 +7398,6 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
-      <IntVectorProperty name="FieldType"
-        command="SetFieldType"
-        number_of_elements="1"
-        update_self="1"
-        default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Cell Data" />
-          <Entry value="1" text="Point Data" />
-          <Entry value="2" text="Field Data" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="CompositeDataSetIndex"
-        command="SetCompositeDataSetIndex"
-        update_self="1"
-        number_of_elements="1"
-        default_values="0">
-        <Documentation>
-          In case of Composite datasets, set the flat index of the dataset to 
-          pass. The flat index must point to a non-empty, non-composite dataset 
-          for anything to be passed through. If the input is not a composite 
-          dataset, then this index is ignored.
-        </Documentation>
-        <CompositeTreeDomain name="tree" mode="leaves">
-          <RequiredProperties>
-             <Property name="Input" function="Input"/>
-          </RequiredProperties>
-       </CompositeTreeDomain>
-      </IntVectorProperty>
-
       <IdTypeVectorProperty name="CacheSize"
         command="SetCacheSize"
         update_self="1"
@@ -7541,62 +7434,13 @@
       </IntVectorProperty>
 
       <SubProxy>
-        <SourceProxy name="BlockFilter" class="vtkIndexBasedBlockSelectionFilter">
-          <InputProperty name="Input" 
-            command="SetInputConnection"
-            port_index="0">
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkSelection"/>
-            </DataTypeDomain>
-          </InputProperty>
-
-          <InputProperty name="DataInput" 
-            command="SetInputConnection"
-            port_index="1">
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkDataObject"/>
-            </DataTypeDomain>
-          </InputProperty>
-
-          <IdTypeVectorProperty name="BlockSize"
-            command="SetBlockSize"
-            number_of_elements="1"
-            default_values="1024" >
-          </IdTypeVectorProperty>
-
-          <IdTypeVectorProperty name="Block"
-            command="SetBlock"
-            number_of_elements="1"
-            default_values="0">
-          </IdTypeVectorProperty>
-
-          <IntVectorProperty name="FieldType"
-            command="SetFieldType"
-            number_of_elements="1"
-            default_values="1">
-            <EnumerationDomain name="enum">
-              <Entry value="0" text="Cell Data" />
-              <Entry value="1" text="Point Data" />
-              <Entry value="2" text="Field Data" />
-            </EnumerationDomain>
-          </IntVectorProperty>
-
-          <IntVectorProperty name="CompositeDataSetIndex"
-            command="SetCompositeDataSetIndex"
-            number_of_elements="1"
-            default_values="0">
-            <Documentation>
-              In case of Composite datasets, set the flat index of the dataset to 
-              pass. The flat index must point to a non-empty, non-composite dataset 
-              for anything to be passed through. If the input is not a composite 
-              dataset, then this index is ignored.
-            </Documentation>
-          </IntVectorProperty>
-
+        <SourceProxy name="Streamer"
+          proxygroup="extended_filters" proxyname="SelectionStreamer">
         </SourceProxy>
         <ExposedProperties>
           <Property name="BlockSize" />
           <Property name="DataInput" />
+          <Property name="FieldAssociation" />
         </ExposedProperties>
       </SubProxy>
 

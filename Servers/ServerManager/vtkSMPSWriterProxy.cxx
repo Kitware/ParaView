@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPSWriterProxy);
-vtkCxxRevisionMacro(vtkSMPSWriterProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPSWriterProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMPSWriterProxy::vtkSMPSWriterProxy()
 {
@@ -70,6 +70,24 @@ void vtkSMPSWriterProxy::CreateVTKObjects()
            << this->GetID() 
            << "SetFileNameMethod" 
            << this->GetFileNameMethod()
+           << vtkClientServerStream::End;
+    }
+
+  if (this->GetSubProxy("PreGatherHelper"))
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->GetID()
+           << "SetPreGatherHelper"
+           << this->GetSubProxy("PreGatherHelper")->GetID()
+           << vtkClientServerStream::End;
+    }
+
+  if (this->GetSubProxy("PostGatherHelper"))
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->GetID()
+           << "SetPostGatherHelper"
+           << this->GetSubProxy("PostGatherHelper")->GetID()
            << vtkClientServerStream::End;
     }
   pm->SendStream(this->ConnectionID, this->Servers, stream);

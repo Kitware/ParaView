@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkIdList.h"
 #include "vtkIdTypeArray.h"
-#include "vtkIndexBasedBlockFilter.h"
 #include "vtkInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVCompositeDataInformation.h"
@@ -121,7 +120,32 @@ public:
   int getFieldType()
     {
     return pqSMAdaptor::getElementProperty(
-      this->Representation->GetProperty("FieldType")).toInt();
+      this->Representation->GetProperty("FieldAssociation")).toInt();
+    }
+
+  int getNumberOfRows()
+    {
+    if (this->Representation)
+      {
+      vtkPVDataInformation* info =
+        this->Representation->GetRepresentedDataInformation(false);
+      return info->GetNumberOfRows();
+      }
+    return 0;
+    }
+  
+  int getNumberOfColumns()
+    {
+    if (this->Representation)
+      {
+      vtkTable* table = vtkTable::SafeDownCast(
+        this->Representation->GetOutput(this->ActiveBlockNumber));
+      if (table)
+        {
+        return table->GetNumberOfColumns();
+        }
+      }
+    return 0;
     }
 
   QTimer Timer;
@@ -247,17 +271,15 @@ void pqSpreadSheetViewModel::forceUpdate()
   vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
   if (repr)
     {
-    vtkTable* table = vtkTable::SafeDownCast(
-      repr->GetOutput(this->Internal->ActiveBlockNumber));
-    this->Internal->NumberOfRows = repr->GetMaximumNumberOfItems();
-    this->Internal->NumberOfColumns = table? table->GetNumberOfColumns()  :0;
-    if (this->Internal->NumberOfColumns == 0 && this->Internal->ActiveBlockNumber != 0)
+    if (this->Internal->ActiveBlockNumber >= repr->GetNumberOfRequiredBlocks() &&
+      this->Internal->ActiveBlockNumber != 0)
       {
-      // it is possible that the current index is invalid (data size may have
-      // shrunk), update the view once again.
+      // Ensure that the active block number if within range.
       this->Internal->ActiveBlockNumber = 0;
-      this->forceUpdate();
       }
+
+    this->Internal->NumberOfRows = this->Internal->getNumberOfRows();
+    this->Internal->NumberOfColumns = this->Internal->getNumberOfColumns();
     
     // When SelectionOnly is true, the delivered data has an extra
     // "vtkOriginalIndices" column that needs to be hidden since it does not
@@ -291,7 +313,8 @@ void pqSpreadSheetViewModel::updateSelectionForBlock(vtkIdType blockNumber)
 {
   vtkSMSpreadSheetRepresentationProxy* repr = this->Internal->Representation;
   if (repr && 
-    this->Internal->getFieldType() != vtkIndexBasedBlockFilter::FIELD)
+    (this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_CELLS ||
+    this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_POINTS))
     {
     // If we are showing only the selected items, then there's not point in
     // highlighting the selected items, since all items are selected. So we
@@ -407,7 +430,7 @@ QVariant pqSpreadSheetViewModel::data(
 
     // If displaying field data, check to make sure that the data is valid
     // since its arrays can be of different lengths
-    if(this->Internal->getFieldType() == vtkIndexBasedBlockFilter::FIELD)
+    if(this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_NONE)
       {
       if(!this->isDataValid(idx))
         {
@@ -494,8 +517,28 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
         }
       else if (title == "vtkOriginalIndices")
         {
-        title = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
-          "Point ID" : "Cell ID";
+        switch (this->Internal->getFieldType())
+          {
+        case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+          title  = "Point ID";
+          break;
+
+        case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+          title = "Cell ID";
+          break;
+
+        case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+          title = "Vertex ID";
+          break;
+
+        case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+          title = "Edge ID";
+          break;
+
+        case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+          title = "Row ID";
+          break;
+          }
         }
       else if (title == "vtkOriginalCellIds" && repr->GetSelectionOnly())
         {
@@ -536,7 +579,7 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
   const char* column_name = "vtkOriginalIndices";
   if (repr->GetSelectionOnly())
     {
-    column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+    column_name = (this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
       "vtkOriginalPointIds" : "vtkOriginalCellIds";
     }
   vtkIdTypeArray* indexcolumn = vtkIdTypeArray::SafeDownCast(
@@ -642,7 +685,7 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
 //-----------------------------------------------------------------------------
 QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtkselection)
 {
-  if (!vtkselection)
+  if (!vtkselection || vtkselection->GetContentType() == -1)
     {
     return QItemSelection();
     }
@@ -728,7 +771,7 @@ QSet<pqSpreadSheetViewModel::vtkIndex> pqSpreadSheetViewModel::getVTKIndices(
       const char* column_name = "vtkOriginalIndices";
       if (repr->GetSelectionOnly())
         {
-        column_name = (this->Internal->getFieldType() == vtkIndexBasedBlockFilter::POINT)?
+        column_name = (this->Internal->getFieldType() == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
           "vtkOriginalPointIds" : "vtkOriginalCellIds";
         }
 
@@ -789,28 +832,15 @@ bool pqSpreadSheetViewModel::isDataValid( const QModelIndex &idx) const
       inputProxy->GetDataInformation(port) : 0;
 
     // Get the appropriate attribute information object
-    vtkPVDataSetAttributesInformation *attrInfo = NULL;
-    if (info)
-      {
-      if (field_type == vtkIndexBasedBlockFilter::FIELD)
-        {
-        attrInfo = info->GetFieldDataInformation();
-        }
-      else if (field_type == vtkIndexBasedBlockFilter::POINT)
-        {
-        attrInfo = info->GetPointDataInformation();
-        }
-      else if (field_type == vtkIndexBasedBlockFilter::CELL)
-        {
-        attrInfo = info->GetCellDataInformation();
-        }
-      }
+    vtkPVDataSetAttributesInformation *attrInfo = info?
+      info->GetAttributeInformation(field_type) : 0;
  
     if(attrInfo)
       {
       // Ensure that the row of this index is less than the length of the 
       // data array associated with its column
-      vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(table->GetColumnName(idx.column()));
+      vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(
+        table->GetColumnName(idx.column()));
       if(arrayInfo && idx.row() < arrayInfo->GetNumberOfTuples())
         {
         return true;

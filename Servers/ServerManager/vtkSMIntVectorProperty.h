@@ -122,6 +122,10 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  // Description:
+  // Returns the default value, if any, specified in the XML.
+  int GetDefaultValue(int idx);
+
 protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();

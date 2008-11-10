@@ -76,15 +76,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptors.h"
 #include "pqSignalAdaptorTreeWidget.h"
 #include "pqSMAdaptor.h"
-#include "pqTreeWidgetItemObject.h"
 #include "pqTreeWidgetSelectionHelper.h"
 
 //////////////////////////////////////////////////////////////////////////////
-class pqSelectionInspectorTreeItem : public pqTreeWidgetItemObject
+class pqSelectionInspectorTreeItem : public QTreeWidgetItem 
 {
 public:
   pqSelectionInspectorTreeItem(QTreeWidget* _parent, const QStringList& l)
-    : pqTreeWidgetItemObject(_parent, l, QTreeWidgetItem::UserType+10)
+    : QTreeWidgetItem(_parent, l, QTreeWidgetItem::UserType+10)
     {
     }
 
@@ -116,7 +115,7 @@ public:
 };
 
 
-pqTreeWidgetItemObject* pqSelectionInspectorPanelNewItem (QTreeWidget* tree, const QStringList& list)
+QTreeWidgetItem* pqSelectionInspectorPanelNewItem (QTreeWidget* tree, const QStringList& list)
 {
  return new pqSelectionInspectorTreeItem(tree, list);
 }
@@ -1100,9 +1099,8 @@ void pqSelectionInspectorPanel::setupIDSelectionGUI()
   // Update the newly added items composite index to the index of the current
   // selected node, if applicable.
   QObject::connect(this->Implementation->IndicesAdaptor, 
-    SIGNAL(tableGrown(pqTreeWidgetItemObject*)),
-    this,
-    SLOT(onTableGrown(pqTreeWidgetItemObject*)));
+    SIGNAL(tableGrown(QTreeWidgetItem*)),
+    this, SLOT(onTableGrown(QTreeWidgetItem*)));
 
   // Link surface selection properties
   QObject::connect(this->Implementation->Delete, SIGNAL(clicked()),
@@ -1323,7 +1321,7 @@ void pqSelectionInspectorPanel::onActiveViewChanged(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionInspectorPanel::onTableGrown(pqTreeWidgetItemObject* item)
+void pqSelectionInspectorPanel::onTableGrown(QTreeWidgetItem* item)
 {
   if (this->Implementation->CompositeTreeAdaptor)
     {

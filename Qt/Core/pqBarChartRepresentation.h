@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqScalarsToColors;
 class vtkDataArray;
-class vtkRectilinearGrid;
+class vtkTable;
 class vtkTimeStamp;
 
 /// pqBarChartRepresentation is a pqRepresentation for "BarChartDisplay" proxy.
@@ -75,9 +75,17 @@ public:
   /// Note that this method does not update the pipeline.
   vtkDataArray* getYArray();
 
-  /// Returns the client-side rectilinear grid. 
+  /// Returns the component from XArray to plot.
+  /// -1 indicates magnitude.
+  int getXArrayComponent();
+
+  /// Returns the component from YArray to plot.
+  /// -1 indicates magnitude.
+  int getYArrayComponent();
+
+  /// Returns the client-side vtkTable.
   /// Note that this method does not update the pipeline.
-  vtkRectilinearGrid* getClientSideData() const;
+  vtkTable* getClientSideData() const;
 
   /// Returns the time when the underlying proxy changed
   /// or the client side data (if any) changed.

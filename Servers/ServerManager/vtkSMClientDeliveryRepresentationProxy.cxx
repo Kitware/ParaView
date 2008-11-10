@@ -28,10 +28,11 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMClientDeliveryRepresentationProxy, "1.21");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryRepresentationProxy::vtkSMClientDeliveryRepresentationProxy()
 {
+  this->PreProcessorProxy = 0;
   this->StrategyProxy = 0;
   this->PostProcessorProxy = 0;
 
@@ -49,6 +50,7 @@ vtkSMClientDeliveryRepresentationProxy::~vtkSMClientDeliveryRepresentationProxy(
     this->StrategyProxy->Delete();
     }
   this->StrategyProxy = 0;
+  this->PreProcessorProxy = 0;
   this->PostProcessorProxy = 0;
   if (this->PreGatherHelper)
     {
@@ -99,6 +101,14 @@ bool vtkSMClientDeliveryRepresentationProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  this->PreProcessorProxy = vtkSMSourceProxy::SafeDownCast(
+    this->GetSubProxy("PreProcessor"));
+  if (this->PreProcessorProxy)
+    {
+    this->PreProcessorProxy->SetServers(
+      vtkProcessModule::DATA_SERVER);
+    }
+
   this->PostProcessorProxy = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("PostProcessor"));
   if (this->PostProcessorProxy)
@@ -114,8 +124,14 @@ bool vtkSMClientDeliveryRepresentationProxy::EndCreateVTKObjects()
 {
   // Setup selection pipeline connections.
   vtkSMSourceProxy* input = this->GetInputProxy();
-  this->CreatePipeline(input, this->OutputPort);
-
+  int port = this->OutputPort;
+  if (this->PreProcessorProxy)
+    {
+    this->Connect(input, this->PreProcessorProxy, "Input", port);
+    input = this->PreProcessorProxy;
+    port = 0;
+    }
+  this->CreatePipeline(input, port);
   return this->Superclass::EndCreateVTKObjects();
 }
 

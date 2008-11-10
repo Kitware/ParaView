@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
   vtkTransferFunctionViewer *viewer = vtkTransferFunctionViewer::New();
   viewer->SetTransferFunctionEditorTypeToSimple1D();
   viewer->SetModificationTypeToColorAndOpacity();
-  viewer->SetHistogram(histogram->GetOutput());
-  viewer->SetHistogramVisibility(1);
+  //viewer->SetHistogram(histogram->GetOutput());
+  //viewer->SetHistogramVisibility(1);
   viewer->SetShowColorFunctionInHistogram(1);
   viewer->SetShowColorFunctionOnLines(0);
   viewer->SetColorElementsByColorFunction(0);

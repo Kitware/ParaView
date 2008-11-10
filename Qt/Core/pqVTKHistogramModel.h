@@ -71,8 +71,11 @@ public:
   /// array.
   ///
   /// \param xarray The x-axis data array.
+  /// \param xcomp  The component 
   /// \param yarray The y-axis data array.
-  void setDataArrays(vtkDataArray *xarray, vtkDataArray *yarray);
+  /// \param ycomp  The component
+  void setDataArrays(vtkDataArray *xarray, int xcomp,
+    vtkDataArray *yarray, int ycomp);
 
 private:
   pqVTKHistogramModelInternal *Internal; ///< Stores the histogram data.
