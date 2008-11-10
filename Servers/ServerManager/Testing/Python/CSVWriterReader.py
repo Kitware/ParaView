@@ -67,4 +67,7 @@ if cellArrayRange[1] != 1938:
   print "ERROR: Wrong maximum array range."
   sys.exit(1);
 
-os.remove(temp_filename)
+try:
+  os.remove(temp_filename)
+except:
+  pass
