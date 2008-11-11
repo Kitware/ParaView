@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -86,6 +86,13 @@ void vtkSMSUnstructuredDataParallelStrategy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, int outputport)
 {
+  //turn off caching for animation it will interfere with streaming
+  vtkSMSourceProxy *cacher =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CacheKeeper"));
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    cacher->GetProperty("CachingEnabled"));
+  ivp->SetElement(0, 0);
+
   this->Connect(input, this->ViewSorter);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, outputport);

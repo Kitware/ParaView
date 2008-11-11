@@ -28,7 +28,7 @@
 #include "vtkSMStreamingHelperProxy.h"
 
 vtkStandardNewMacro(vtkSMSImageDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSImageDataParallelStrategy::vtkSMSImageDataParallelStrategy()
 {
@@ -78,6 +78,13 @@ void vtkSMSImageDataParallelStrategy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMSImageDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, int outputport)
 {
+  //turn off caching for animation it will interfere with streaming
+  vtkSMSourceProxy *cacher =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CacheKeeper"));
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    cacher->GetProperty("CachingEnabled"));
+  ivp->SetElement(0, 0);
+
   this->Connect(input, this->ViewSorter);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, outputport);
