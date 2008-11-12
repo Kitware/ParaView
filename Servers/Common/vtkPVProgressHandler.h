@@ -70,6 +70,7 @@ public:
   // messages received from satellites while waiting on some receive.
   vtkMPICommunicatorOpaqueRequest* GetAsyncRequest();
   void RefreshProgress();
+  void MarkAsyncRequestReceived();
 //BTX
 protected:
   vtkPVProgressHandler();

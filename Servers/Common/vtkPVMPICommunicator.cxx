@@ -22,7 +22,7 @@
 #include "vtkMPI.h"
 
 vtkStandardNewMacro(vtkPVMPICommunicator);
-vtkCxxRevisionMacro(vtkPVMPICommunicator, "1.1");
+vtkCxxRevisionMacro(vtkPVMPICommunicator, "1.2");
 //----------------------------------------------------------------------------
 vtkPVMPICommunicator::vtkPVMPICommunicator()
 {
@@ -82,8 +82,13 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
       }
     if (index == 1)
       {
+      // MPI_Waitany destroys the successful request object. Now the
+      // progressHandler cannot re-test the request. Hence we force it to
+      // pretend that the request has indeed been received without actually
+      // testing it.
       // Received the progress request, handle it.
       // This will also set up a new request for the progress.
+      progressHandler->MarkAsyncRequestReceived();
       progressHandler->RefreshProgress();
       }
     } while (index != 0);

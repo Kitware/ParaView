@@ -214,12 +214,14 @@ public:
   bool AsyncRequestValid;
   char AsyncRequestData[ASYNCREQUESTDATA_MAX_SIZE];
   bool EnableProgress;
+  bool ForceAsyncRequestReceived;
 
   vtkTimerLog* ProgressTimer;
   vtkInternals()
     {
     this->AsyncRequestValid = false;
     this->EnableProgress = false;
+    this->ForceAsyncRequestReceived = false;
     this->ProgressTimer = vtkTimerLog::New();
     this->ProgressTimer->StartTimer();
     }
@@ -241,7 +243,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.13");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.14");
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
@@ -392,7 +394,11 @@ void vtkPVProgressHandler::CleanupSatellites()
     if (this->Internals->AsyncRequestValid)
       {
       this->Internals->AsyncRequestValid = false;
-      this->Internals->AsyncRequest.Cancel();
+      if (!this->Internals->ForceAsyncRequestReceived)
+        {
+        this->Internals->AsyncRequest.Cancel();
+        }
+      this->Internals->ForceAsyncRequestReceived = false;
       }
     }
 #endif
@@ -558,12 +564,19 @@ int vtkPVProgressHandler::GatherProgress()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVProgressHandler::MarkAsyncRequestReceived()
+{
+  this->Internals->ForceAsyncRequestReceived = true;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVProgressHandler::ReceiveProgressFromSatellites()
 {
   int req_count = 0;
 #ifdef VTK_USE_MPI
   if (this->Internals->AsyncRequestValid &&
-    this->Internals->AsyncRequest.Test())
+    (this->Internals->ForceAsyncRequestReceived || 
+     this->Internals->AsyncRequest.Test()))
     {
     int pid, oid, progress;
 
@@ -584,6 +597,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
       pid, oid, text, progress/100.0); 
     req_count++;
     this->Internals->AsyncRequestValid = false;
+    this->Internals->ForceAsyncRequestReceived =false;
     }
 
   vtkMPIController* controller = vtkMPIController::SafeDownCast(
