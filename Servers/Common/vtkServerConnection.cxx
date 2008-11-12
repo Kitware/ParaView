@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.15");
+vtkCxxRevisionMacro(vtkServerConnection, "1.16");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -365,9 +365,9 @@ void vtkServerConnection::GatherInformationFromController(vtkSocketController* c
 }
 
 //-----------------------------------------------------------------------------
-int vtkServerConnection::Initialize(int vtkNotUsed(argc), 
-  char** vtkNotUsed(argv), int *vtkNotUsed(partitionId))
+int vtkServerConnection::Initialize(int argc, char** argv, int *partitionId)
 {
+  this->Superclass::Initialize(argc, argv, partitionId);
   // returns 0 on success, 1 on error.
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

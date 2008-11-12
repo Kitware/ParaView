@@ -33,6 +33,7 @@ class vtkCommand;
 class vtkMultiProcessController;
 class vtkProcessModuleConnectionObserver;
 class vtkPVInformation;
+class vtkPVProgressHandler;
 class vtkPVXMLElement;
 
 class VTK_EXPORT vtkProcessModuleConnection : public vtkObject
@@ -53,7 +54,9 @@ public:
   // Description:
   // Initializes the connection. This is essential to
   // intialize the controller associated with the connection etc etc.
-  virtual int Initialize(int argc, char** argv, int *partitionId) = 0;
+  // Subclasses must call this method to do some standard initialization if they
+  // override this method.
+  virtual int Initialize(int argc, char** argv, int *partitionId);
 
   // Description:
   // Finalizes the connection.
@@ -131,6 +134,10 @@ public:
   // \returns NULL on failure, otherwise the XML element is returned.
   virtual vtkPVXMLElement* NewNextRedo()=0;
 
+  // Description:
+  // Get the progress handler for this connection.
+  vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
+
 protected:
   vtkProcessModuleConnection();
   ~vtkProcessModuleConnection();
@@ -171,6 +178,7 @@ protected:
   // Every connection is assigned a vtkClientServerID.
   vtkClientServerID SelfID;
 
+  vtkPVProgressHandler* ProgressHandler;
 private:
   vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implemented.
   void operator=(const vtkProcessModuleConnection&); // Not implemented.

@@ -38,7 +38,9 @@
 void vtkClientConnectionLastResultRMI(void* localArg, void* , int, int)
 {
   vtkClientConnection* self = (vtkClientConnection*)localArg;
+  self->Activate();
   self->SendLastResult();
+  self->Deactivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -110,12 +112,12 @@ void vtkClientConnectionRootRMI(void *localArg, void *remoteArg,
 void vtkClientConnectionGatherInformationRMI(void *localArg, 
   void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
+  vtkClientServerStream stream;
+  stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
+  vtkClientConnection* self = (vtkClientConnection*)localArg;
+  self->Activate();
   try
     {
-    vtkClientServerStream stream;
-    stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
-
-    vtkClientConnection* self = (vtkClientConnection*)localArg;
     self->SendInformation(stream);
     }
   catch (vtkstd::bad_alloc)
@@ -128,6 +130,7 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
     vtkProcessModule::GetProcessModule()->ExceptionEvent(
       vtkProcessModule::EXCEPTION_UNKNOWN);
     }
+  self->Deactivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -220,11 +223,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.9");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.10");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.9");
+vtkCxxRevisionMacro(vtkClientConnection, "1.10");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -238,8 +241,10 @@ vtkClientConnection::~vtkClientConnection()
 }
 
 //-----------------------------------------------------------------------------
-int vtkClientConnection::Initialize(int vtkNotUsed(argc), char** vtkNotUsed(argv), int *vtkNotUsed(partitionId))
+int vtkClientConnection::Initialize(int argc, char** argv, int *partitionId)
 {
+  this->Superclass::Initialize(argc, argv, partitionId);
+
   // Ensure that we are indeed the root node.
   if (vtkMultiProcessController::GetGlobalController()->
     GetLocalProcessId() != 0)

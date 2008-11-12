@@ -75,7 +75,14 @@ SET(Kit_SRCS
     vtkMPIMToNSocketConnectionPortInformation.cxx
     vtkPVServerSocket.cxx )
 
-
+IF (VTK_USE_MPI)
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+  SET (Kit_SRCS ${Kit_SRCS}
+    vtkPVMPICommunicator.cxx)
+  SET_SOURCE_FILES_PROPERTIES(
+    vtkPVMPICommunicator.cxx
+    WRAP_EXCLUDE)
+ENDIF (VTK_USE_MPI)
 
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
@@ -91,7 +98,6 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkCommandOptionsXMLParser.cxx
   vtkConnectionIterator.cxx
-  vtkPVProgressHandler.cxx
   vtkStringList.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVServerOptions.cxx

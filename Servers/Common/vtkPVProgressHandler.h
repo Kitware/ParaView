@@ -12,25 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVProgressHandler - Object to represent the output of a PVSource.
+// .NAME vtkPVProgressHandler - progress handler.
 // .SECTION Description
-// This object combines methods for accessing parallel VTK data, and also an 
-// interface for changing the view of the data.  The interface used to be in a 
-// superclass called vtkPVActorComposite.  I want to separate the interface 
-// from this object, but a superclass is not the way to do it.
+// vtkPVProgressHandler handles the progress messages. It handles progress in
+// all configurations single process, client-server, mpi-batch. One progress
+// handler is created per connection.
+// .SECTION See Also
+// vtkPVMPICommunicator
 
 #ifndef __vtkPVProgressHandler_h
 #define __vtkPVProgressHandler_h
 
-
 #include "vtkObject.h"
-
-class vtkProcessModule;
-class vtkPVWindow;
-class vtkTimerLog;
-class vtkMPIController;
-class vtkPVProgressHandlerInternal;
-
+class vtkProcessModuleConnection;
+class vtkMPICommunicatorOpaqueRequest;
 class VTK_EXPORT vtkPVProgressHandler : public vtkObject
 {
 public:
@@ -38,94 +33,108 @@ public:
   vtkTypeRevisionMacro(vtkPVProgressHandler, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
   // Description:
-  // Set the process module that will drive progress
-  virtual void SetProcessModule(vtkProcessModule *pvApp)
+  // Get/Set the connection. This is not reference-counted to avoid cycles.
+  void SetConnection(vtkProcessModuleConnection* conn)
     {
-    this->ProcessModule = pvApp;
+    if (this->Connection != conn)
+      {
+      this->Connection = conn;
+      this->DetermineProcessType();
+      this->Modified();
+      }
     }
+  vtkGetObjectMacro(Connection, vtkProcessModuleConnection);
 
   // Description:
-  // Invoke the progress event.
-  virtual void InvokeProgressEvent(
-    vtkProcessModule* pvApp,
-    vtkObject* object,
-    int val,
-    const char* str);
-
-  // Description:
-  // This method should be called before removing the object.
-  virtual void Cleanup() {}
-
+  // Listen to progress events from the object.
+  void RegisterProgressEvent(vtkObject* object, int id);
 
   // Description:
   // This method resets all the progress counters and prepares progress
   // reporting. All progress events before this call are ignored.
-  virtual void PrepareProgress(vtkProcessModule* app);
+  void PrepareProgress();
 
   // Description:
   // This method collects all outstanding progress messages. All progress
   // events after this call are ignored.
-  virtual void CleanupPendingProgress(vtkProcessModule* app);
+  void CleanupPendingProgress();
 
   // Description:
-  // This method register object to be observed.
-  virtual void RegisterProgressEvent(vtkObject* po, int id);
+  // Called when the client connection (vtkClientConnection) receives progress
+  // from the server.
+  void HandleServerProgress(int progress, const char* text);
 
   // Description:
-  // Set client and server mode
-  vtkSetMacro(ClientMode, int);
-  vtkSetMacro(ServerMode, int);
-  
+  // These methods are used by vtkPVMPICommunicator to handle the progress
+  // messages received from satellites while waiting on some receive.
+  vtkMPICommunicatorOpaqueRequest* GetAsyncRequest();
+  void RefreshProgress();
+//BTX
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();
 
-  vtkProcessModule* ProcessModule;
-
-  int ReceivingProgressReports;
-
-  //BTX
-  int ProgressPending;
-  int Progress[4];
+  enum eProcessTypes
+    {
+    INVALID=0,
+    ALL_IN_ONE,
+    CLIENTSERVER_CLIENT,
+    CLIENTSERVER_SERVER_ROOT,
+    SATELLITE
+    };
+  enum eTAGS
+    {
+    CLEANUP_TAG = 188969,
+    PROGRESS_EVENT_TAG = 188970
+    };
 
   // Description:
-  // Types of progress handling.
-  enum {
-    NotSet = 0,
-    SingleProcess,
-    SingleProcessMPI,
-    SatelliteMPI,
-    ClientServerClient,
-    ClientServerServer,
-    ClientServerServerMPI
-  };
-  //ETX
-  
-  void DetermineProgressType(vtkProcessModule* app);
-  int ProgressType;
+  // Determines the process type using the Connection
+  void DetermineProcessType();
 
-  int ClientMode;
-  int ServerMode;
-  int LocalProcessID;
-  int NumberOfProcesses;
+  // Description:
+  // Called on MPI processes to pass around the CLEANUP_TAG marking the end of
+  // the progress messages.
+  void CleanupSatellites();
 
-  void InvokeSatelliteProgressEvent(vtkProcessModule*, vtkObject*, int val);
-  void InvokeRootNodeProgressEvent(vtkProcessModule*, vtkObject*, int val);
-  void InvokeRootNodeServerProgressEvent(vtkProcessModule*, vtkObject*, int val);
-  int ReceiveProgressFromSatellite(int* id, int* progress);
-  void LocalDisplayProgress(vtkProcessModule* app, const char* filter, int progress);
-  void HandleProgress(int processid, int filterid, int progress);
+  // Description:
+  // Returns if current process is the root node.
+  bool GetIsRoot();
 
-  double MinimumProgressInterval;
-  vtkTimerLog* ProgressTimer;
+  // Description:
+  // Called on a MPI group to gather progress.
+  int GatherProgress();
 
-  vtkMPIController* MPIController;
-  vtkPVProgressHandlerInternal* Internals;
+  // Description:
+  // Returns if the progress should be reported.
+  bool ReportProgress(double progress);
 
+
+  void SetLocalProgress(int progress, const char* text);
+
+  void SendProgressToClient();
+  void SendProgressToRoot();
+  int ReceiveProgressFromSatellites();
+  void ReceiveProgressFromServer();
+
+  vtkProcessModuleConnection* Connection;
+  eProcessTypes ProcessType;
+private:
   vtkPVProgressHandler(const vtkPVProgressHandler&); // Not implemented
   void operator=(const vtkPVProgressHandler&); // Not implemented
+
+  // Description:
+  // Callback called when vtkCommand::ProgressEvent is received.
+  void OnProgressEvent(vtkObject* obj, double progress);
+
+  class vtkInternals;
+  vtkInternals* Internals;
+
+  class vtkObserver;
+  vtkObserver* Observer;
+  friend class vtkObserver;
+//ETX
 };
 
 #endif

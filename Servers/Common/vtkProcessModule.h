@@ -288,10 +288,6 @@ public:
   void RegisterProgressEvent(vtkObject* po, int id);
  
   // Description:
-  // Internal method--called when a progress event is received.
-  void ProgressEvent(vtkObject *o, int val, const char* filter);
-
-  // Description:
   // Internal method- called when an exception Tag is received 
   // from the server.
   void ExceptionEvent(const char* message);
@@ -305,15 +301,12 @@ public:
   virtual void SendPrepareProgress(vtkIdType connectionID,
     vtkTypeUInt32 servers=CLIENT|DATA_SERVER);
   virtual void SendCleanupPendingProgress(vtkIdType connectionID);
+  vtkPVProgressHandler* GetActiveProgressHandler();
   //ETX
 
   // Description:
-  // This method is called before progress reports start comming.
+  // Internal methods. Do not call directly.
   void PrepareProgress();
-
-  // Description:
-  // This method is called after force update to clenaup all the pending
-  // progresses.
   void CleanupPendingProgress();
 
   // Description:
@@ -322,7 +315,6 @@ public:
   void SetLocalProgress(const char* filter, int progress);
   vtkGetMacro(ProgressRequests, int);
   vtkSetMacro(ProgressRequests, int);
-  vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 
   // Description:
   // Set and get the application options
@@ -714,7 +706,6 @@ protected:
   vtkProcessModuleObserver* Observer;
   vtkProcessModuleConnectionManager* ConnectionManager;
 
-  vtkPVProgressHandler* ProgressHandler;
   int ProgressRequests;
 
   vtkPVOptions* Options;

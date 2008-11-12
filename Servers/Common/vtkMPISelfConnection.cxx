@@ -26,6 +26,7 @@
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
+#include "vtkPVMPICommunicator.h"
 #endif
 
 //----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.6");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.7");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -77,8 +78,17 @@ vtkMPISelfConnection::~vtkMPISelfConnection()
 //-----------------------------------------------------------------------------
 int vtkMPISelfConnection::Initialize(int argc, char** argv, int *partitionId)
 {
-  this->Controller->Initialize(&argc, &argv, 1);
-  
+  this->Superclass::Initialize(argc, argv, partitionId);
+
+#ifdef VTK_USE_MPI
+  // Replace the communicator with vtkPVMPICommunicator which handles progress
+  // events better than the conventional vtkMPICommunicator.
+  vtkPVMPICommunicator* comm = vtkPVMPICommunicator::New();
+  comm->CopyFrom(vtkMPICommunicator::GetWorldCommunicator());
+  vtkMPIController::SafeDownCast(this->Controller)->SetCommunicator(comm);
+  comm->Delete();
+#endif
+
   if (this->Controller->GetNumberOfProcesses() > 1)
     {// !!!!! For unix, this was done when MPI was defined (even for 1
       // process). !!!!!

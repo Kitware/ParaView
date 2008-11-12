@@ -15,42 +15,28 @@
 #include "vtkPVProgressHandler.h"
 
 #include "vtkAlgorithm.h"
-#include "vtkClientServerInterpreter.h"
+#include "vtkByteSwap.h"
+#include "vtkCommand.h"
+
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkRemoteConnection.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
+#include "vtkToolkits.h" // For VTK_USE_MPI
 
 #ifdef VTK_USE_MPI
+#include "vtkMPICommunicator.h"
 #include "vtkMPIController.h"
-#include "vtkMPICommunicator.h" // Needed for vtkMPICommunicator::Request
-#endif 
-
-#include <vtkstd/map>
-#include <vtkstd/vector>
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.11");
-
-//----------------------------------------------------------------------------
-//****************************************************************************
-class vtkPVProgressHandlerInternal
-{
-public:
-  typedef vtkstd::vector<int> VectorOfInts;
-  typedef vtkstd::map<int, VectorOfInts> MapOfVectorsOfInts;
-  typedef vtkstd::map<vtkObject*, int> MapOfObjectIds;
-
-  MapOfVectorsOfInts ProgressMap;
-  MapOfObjectIds ObjectIdsMap;
-
-#ifdef VTK_USE_MPI
-  vtkMPICommunicator::Request ProgressRequest;
 #endif
-};
+
+#include <vtkstd/vector>
+#include <vtkstd/deque>
+#include <vtkstd/string>
+#include <vtkstd/map>
+
+#define MIN_PROGRESS_INTERVAL_IN_SECS 0.3
 
 inline const char* vtkGetProgressText(vtkObjectBase* o)
 {
@@ -63,444 +49,622 @@ inline const char* vtkGetProgressText(vtkObjectBase* o)
   return o->GetClassName();
 }
 
-//****************************************************************************
+// When in parallel, we want to collect progress reported by all processess and
+// then report the lowest progress. That's managed by this class.
+class vtkProgressStore
+{
+  class vtkRow
+    {
+  public:
+    int ObjectID;
+    vtkstd::vector<double> Progress;
+    vtkstd::vector<vtkstd::string> Text;
+
+    // Returns true if there's some progress to report for this row.
+    // NOTE: This is a non-idempotent method.
+    bool Report(vtkstd::string& txt, double& progress)
+      {
+      progress = VTK_DOUBLE_MAX;
+      for (unsigned int cc=0; cc < this->Progress.size(); cc++)
+        {
+        if (this->Progress[cc] >= 0.0 && this->Progress[cc] < progress)
+          {
+          progress = this->Progress[cc];
+          txt = this->Text[cc];
+          if (this->Progress[cc] >= 1.0)
+            {
+            // Report 100% only once.
+            this->Progress[cc] = -1;
+            }
+          }
+        }
+      return (progress < VTK_DOUBLE_MAX);
+      }
+
+    // Returns if this row has any valid progress.
+    bool ReadyToClean()
+      {
+      for (unsigned int cc=0; cc < this->Progress.size(); cc++)
+        {
+        if (this->Progress[cc] != -1)
+          {
+          return false;
+          }
+        }
+      return true;
+      }
+    };
+  typedef vtkstd::deque<vtkRow> ListOfRows;
+  ListOfRows Rows;
+
+  vtkRow& Find(int objectId)
+    {
+    ListOfRows::iterator iter;
+    for (iter = this->Rows.begin(); iter != this->Rows.end(); ++iter)
+      {
+      if (iter->ObjectID == objectId)
+        {
+        return (*iter);
+        }
+      }
+    int numProcs = this->GetNumberOfProcesses();
+    vtkRow row;
+    row.ObjectID = objectId; 
+    this->Rows.push_back(row);
+    this->Rows.back().Progress.resize(numProcs, -1);
+    this->Rows.back().Text.resize(numProcs);
+    return this->Rows.back();
+    }
+
+  int GetNumberOfProcesses()
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm->GetPartitionId()==0 && pm->GetNumberOfLocalPartitions() > 1)
+      {
+      return pm->GetNumberOfLocalPartitions();
+      }
+    return 2;
+    }
+
+public:
+  void AddLocalProgress(int objectId, const vtkstd::string& txt,
+    double progress)
+    {
+    vtkRow& row = this->Find(objectId);
+    row.Text[0] = txt;
+    row.Progress[0] = progress;
+    }
+
+  void AddRemoteProgress(int remoteId, int objectId,
+    const vtkstd::string& txt, double progress)
+    {
+    vtkRow& row = this->Find(objectId);
+    row.Text[remoteId] = txt;
+    row.Progress[remoteId] = progress;
+    }
+
+  // Returns the progress to report. This is a non-idempotent method (esp. when
+  // any of the filters is reporting 100%).
+  bool GetProgress(int &objectId, vtkstd::string& txt, double& progress)
+    {
+    ListOfRows::iterator iter;
+    for (iter = this->Rows.begin(); iter != this->Rows.end(); ++iter)
+      {
+      if (iter->Report(txt, progress))
+        {
+        objectId = iter->ObjectID;
+        if (iter->ReadyToClean())
+          {
+          this->Rows.erase(iter);
+          }
+        return true;
+        }
+      }
+    return false;
+    }
+
+  void Clear()
+    {
+    this->Rows.clear();
+    }
+};
+
+
+class vtkPVProgressHandler::vtkObserver : public vtkCommand
+{
+public:
+  static vtkObserver* New() { return new vtkObserver(); }
+  void SetTarget(vtkPVProgressHandler* target)
+    {
+    this->Target = target;
+    }
+  
+  virtual void Execute(vtkObject* wdg, unsigned long event, void* calldata)
+    {
+    if (this->Target && event == vtkCommand::ProgressEvent)
+      {
+      this->Target->OnProgressEvent(wdg, *reinterpret_cast<double*>(calldata));
+      }
+    }
+protected:
+  vtkObserver() { this->Target = 0; }
+  vtkPVProgressHandler* Target;
+};
+
+#define ASYNCREQUESTDATA_MAX_SIZE (129+sizeof(int)*3)
+
 //----------------------------------------------------------------------------
+class vtkPVProgressHandler::vtkInternals
+{
+public:
+  typedef vtkstd::map<vtkObject*, int> MapOfObjectToInt;
+  MapOfObjectToInt RegisteredObjects;
+
+  vtkProgressStore ProgressStore;
+#ifdef VTK_USE_MPI
+  vtkMPICommunicator::Request AsyncRequest;
+#endif
+  bool AsyncRequestValid;
+  char AsyncRequestData[ASYNCREQUESTDATA_MAX_SIZE];
+  bool EnableProgress;
+
+  vtkTimerLog* ProgressTimer;
+  vtkInternals()
+    {
+    this->AsyncRequestValid = false;
+    this->EnableProgress = false;
+    this->ProgressTimer = vtkTimerLog::New();
+    this->ProgressTimer->StartTimer();
+    }
+
+  ~vtkInternals()
+    {
+    this->ProgressTimer->Delete();
+    this->ProgressTimer = 0;
+    }
+
+  int GetIDFromObject(vtkObject* obj)
+    {
+    if (this->RegisteredObjects.find(obj) != this->RegisteredObjects.end())
+      {
+      return this->RegisteredObjects[obj];
+      }
+    return 0;
+    }
+};
+
+vtkStandardNewMacro(vtkPVProgressHandler);
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.12");
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
-  this->Internals = new vtkPVProgressHandlerInternal;
-  this->ProcessModule = 0;
-  this->ProgressType = vtkPVProgressHandler::NotSet;
-  this->ProgressPending = 0;
-  this->MinimumProgressInterval = 0.5;
-
-  this->ProgressTimer = vtkTimerLog::New();
-  this->ProgressTimer->StartTimer();
-
-  this->MPIController = 0;
-
-  this->ReceivingProgressReports = 0;
-
-  this->ClientMode = 0;
-  this->ServerMode = 0;
-  this->LocalProcessID = -1;
-  this->NumberOfProcesses = -1;
+  this->Connection = 0;
+  this->Internals = new vtkInternals();
+  this->Observer = vtkPVProgressHandler::vtkObserver::New();
+  this->Observer->SetTarget(this);
+  this->ProcessType = INVALID; 
 }
 
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
-#ifdef VTK_USE_MPI
-  if (this->ProgressPending)
-    {
-    this->Internals->ProgressRequest.Cancel();
-    }
-#endif
-  this->ProgressTimer->Delete();
+  this->SetConnection(0);
   delete this->Internals;
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
+  this->Observer = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* po, int id)
+void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* object, int id)
 {
-  this->Internals->ObjectIdsMap[po] = id;
+  if (object && (object->IsA("vtkAlgorithm") || object->IsA("vtkKdTree")))
+    {
+    this->Internals->RegisteredObjects[object] = id;
+    object->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::DetermineProgressType(vtkProcessModule* app)
+void vtkPVProgressHandler::DetermineProcessType()
 {
-  if ( this->ProgressType != vtkPVProgressHandler::NotSet )
-    {
-    return;
-    }
-  vtkDebugMacro("Determine progress type");
-
-  int client = this->ClientMode;
-  int server = this->ServerMode;
-  int local_process = app->GetPartitionId();
-  int num_processes = app->GetNumberOfLocalPartitions();
-
-  if ( client )
-    {
-    this->ProgressType = vtkPVProgressHandler::ClientServerClient;
-    }
-  else
-    {
-    if ( server )
-      {
-      if ( local_process > 0 )
-        {
-        this->ProgressType = vtkPVProgressHandler::SatelliteMPI;
-        }
-      else
-        {
-        if ( num_processes > 1 )
-          {
-          this->ProgressType = vtkPVProgressHandler::ClientServerServerMPI;
-          }
-        else
-          {
-          this->ProgressType = vtkPVProgressHandler::ClientServerServer;
-          }
-        }
-      }
-    else
-      {
-      if ( local_process > 0 )
-        {
-        this->ProgressType = vtkPVProgressHandler::SatelliteMPI;
-        }
-      else
-        {
-        if ( num_processes > 1 )
-          {
-          this->ProgressType = vtkPVProgressHandler::SingleProcessMPI;
-          }
-        else
-          {
-          this->ProgressType = vtkPVProgressHandler::SingleProcess;
-          }
-        }
-      }
-    }
-  if ( this->ProgressType == vtkPVProgressHandler::NotSet )
-    {
-    vtkErrorMacro("Non-critical internal ParaView error: "
-                  "Progress is not set.");
-    //abort();
-    }
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::InvokeProgressEvent(vtkProcessModule* app,
-  vtkObject *o, int val, const char* filter)
-{
-  this->DetermineProgressType(app);
-
-  if ( !this->ReceivingProgressReports && 
-    this->ProgressType != vtkPVProgressHandler::SingleProcess && 
-    this->ProgressType != vtkPVProgressHandler::ClientServerClient )
+  this->ProcessType = INVALID;
+  if (!this->Connection)
     {
     return;
     }
 
-  switch( this->ProgressType )
+  if (this->Connection->IsA("vtkServerConnection"))
     {
-    case vtkPVProgressHandler::SingleProcess:
-      vtkDebugMacro("This is the gui and I got the progress: " << val);
-      this->LocalDisplayProgress(app, ::vtkGetProgressText(o), val);
-      break;
-    case vtkPVProgressHandler::SingleProcessMPI:
-      vtkDebugMacro("This is the gui and I got progress. I need to handle "
-                    "children. " << val);
-      this->InvokeRootNodeProgressEvent(app, o, val);
-      break;
-    case vtkPVProgressHandler::SatelliteMPI:
-      vtkDebugMacro("I am satellite and I need to send progress to the "
-                    "node 0: " << val);
-      this->InvokeSatelliteProgressEvent(app, o, val);
-      break;
-    case vtkPVProgressHandler::ClientServerClient:
-      // No need to receive since the event handling will take care of that
-      vtkDebugMacro("This is gui and I got the progress from the server: " 
-                    << val);
-      if ( !filter )
-        {
-        filter = ::vtkGetProgressText(o);
-        }
-      this->LocalDisplayProgress(app, filter, val);
-      break;
-    case vtkPVProgressHandler::ClientServerServer:
-      vtkDebugMacro("This is non-mpi server and I need to send progress "
-                    "to client: " << val);
-      this->InvokeRootNodeServerProgressEvent(app, o, val);
-      break;
-    case vtkPVProgressHandler::ClientServerServerMPI:
-      vtkDebugMacro("This is mpi server and I need to send progress "
-                    "to client: " << val);
-      this->InvokeRootNodeServerProgressEvent(app, o, val);
-      break;
-    default:
-      vtkErrorMacro("Non-critical internal ParaView error: "
-                    "Progress type is set to some unknown value");
-      //abort();
+    this->ProcessType = CLIENTSERVER_CLIENT;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::LocalDisplayProgress(
-  vtkProcessModule* app, const char* filter, int progress)
-{
-  app->SetLocalProgress(filter, progress);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
-  vtkProcessModule* app, vtkObject* o, int myprogress)
-{
-  int id = -1;
-  int progress = -1;
-  vtkPVProgressHandlerInternal::MapOfObjectIds::iterator it 
-    = this->Internals->ObjectIdsMap.find(o);
-  if ( it != this->Internals->ObjectIdsMap.end() )
+  else if (this->Connection->IsA("vtkClientConnection"))
     {
-    this->HandleProgress(0, it->second, myprogress);
+    this->ProcessType = CLIENTSERVER_SERVER_ROOT;
     }
-  while ( this->ReceiveProgressFromSatellite(&id, &progress) ) 
+  else 
     {
-    // EMPTY
-    }
-  if (id >= 0)
-    {
-    vtkClientServerID nid;
-    nid.ID = id;
-    vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
-    if ( base )
+    // Not running in client-server. The this is either a parallel batch or
+    // simple all-in-one client.
+    this->ProcessType = ALL_IN_ONE;
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (pm->GetPartitionId() > 0)
       {
-      this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
-      }
-    else
-      {
-      //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-      //vtkPVApplication::Abort();
+      this->ProcessType = SATELLITE;
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
-  vtkProcessModule* , vtkObject* o, int myprogress)
+void vtkPVProgressHandler::PrepareProgress()
 {
-  int id = -1;
-  int progress = -1;
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  
-  vtkPVProgressHandlerInternal::MapOfObjectIds::iterator it 
-    = this->Internals->ObjectIdsMap.find(o);
-  if ( it != this->Internals->ObjectIdsMap.end() )
-    {
-    this->HandleProgress(0, it->second, myprogress);
-    }
-  while ( this->ReceiveProgressFromSatellite(&id, &progress) )
-    {
-    // EMPTY
-    }
-  vtkClientServerID nid;
-  nid.ID = id;
-  vtkObjectBase* base = pm->GetInterpreter()->GetObjectFromID(nid, 1);
-  vtkSocketController* controller = pm->GetActiveSocketController();
-  if (base && controller)
-    {
-    char buffer[1024];
-    buffer[0] = progress;
-    sprintf(buffer+1, "%s", ::vtkGetProgressText(base));
-    int len = strlen(buffer+1) + 2;
-    controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
-    }
-  else
-    {
-    //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-    //vtkPVApplication::Abort();
-    }
+  this->Internals->EnableProgress = true;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
-  vtkProcessModule*, vtkObject* o, int progress)
+void vtkPVProgressHandler::CleanupPendingProgress()
 {
-#ifdef VTK_USE_MPI
-  if (this->ProgressPending && this->Internals->ProgressRequest.Test())
-    {
-    this->ProgressPending=0;
-    }
-#endif
-
-  this->ProgressTimer->StopTimer();
-  double delT = this->ProgressTimer->GetElapsedTime();
-
-  if (delT > this->MinimumProgressInterval && progress)
-    {
-    this->ProgressTimer->StartTimer();
-    if (!this->ProgressPending)
-      {
-      vtkPVProgressHandlerInternal::MapOfObjectIds::iterator it 
-        = this->Internals->ObjectIdsMap.find(o);
-      if ( it != this->Internals->ObjectIdsMap.end() )
-        {
-#ifdef VTK_USE_MPI
-        this->Progress[0] = app->GetPartitionId();
-        this->Progress[1] = it->second;
-        this->Progress[2] = progress;
-
-        this->MPIController->NoBlockSend(
-          this->Progress, 
-          3, 0, vtkProcessModule::PROGRESS_EVENT_TAG, 
-          this->Internals->ProgressRequest);
-#endif
-        this->ProgressPending=1;
-        }
-      else
-        {
-        vtkErrorMacro("Non-critical internal ParaView error: "
-                      "Got progresss from something not observed.");
-        //abort();
-        }
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProgressHandler::ReceiveProgressFromSatellite(int *id, int* progress)
-{
-  int rec = 0;
-#ifdef VTK_USE_MPI
-  if ( this->MPIController )
-    {
-    if (!this->ProgressPending)
-      {
-      this->MPIController->NoBlockReceive(this->Progress, 3, 
-        vtkMultiProcessController::ANY_SOURCE,
-        vtkProcessModule::PROGRESS_EVENT_TAG, 
-        this->Internals->ProgressRequest);
-      }
-    if (this->Internals->ProgressRequest.Test() )
-      {
-      this->HandleProgress(this->Progress[0],
-        this->Progress[1],
-        this->Progress[2]);
-      rec ++;
-      this->MPIController->NoBlockReceive(this->Progress, 3, 
-        vtkMultiProcessController::ANY_SOURCE, 
-        vtkProcessModule::PROGRESS_EVENT_TAG, 
-        this->Internals->ProgressRequest);
-      }
-    this->ProgressPending=1;
-    }
-#endif
-  int minprog = 101;
-  int filter = -1;
-  vtkPVProgressHandlerInternal::MapOfVectorsOfInts::iterator it;
-  vtkPVProgressHandlerInternal::VectorOfInts::iterator vit;
-  for ( it = this->Internals->ProgressMap.begin();
-    it != this->Internals->ProgressMap.end();
-    it ++ )
-    {
-    for ( vit = it->second.begin(); 
-      vit != it->second.end();
-      vit ++ )
-      {
-      if ( *vit < minprog )
-        {
-        minprog = *vit;
-        filter = it->first;
-        }
-      }
-    }
-  *progress = minprog;
-  *id = filter;
-
-  // Remove the filter from the progress map once 100% is reported.
-  // Otherwise, it may be reported accidentally when another filter
-  // hits 100%
-  if (*progress == 100)
-    {
-    this->Internals->ProgressMap.erase(
-      this->Internals->ProgressMap.find(*id));
-    }
-  return rec;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::HandleProgress(int processid, int filterid, int progress)
-{
-  vtkPVProgressHandlerInternal::VectorOfInts* vect 
-    = &this->Internals->ProgressMap[filterid];
-#ifdef VTK_USE_MPI
-  vect->resize(this->ProcessModule->GetNumberOfLocalPartitions());
-#else
-  vect->resize(processid < (int)vect->size()?vect->size():processid+1);
-#endif
-  (*vect)[processid] = progress;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::PrepareProgress(vtkProcessModule* app)
-{
-  vtkDebugMacro("Prepare progress receiving");
-  this->DetermineProgressType(app);
-  vtkPVProgressHandlerInternal::MapOfVectorsOfInts::iterator it;
-  vtkPVProgressHandlerInternal::VectorOfInts::iterator vit;
-  for ( it = this->Internals->ProgressMap.begin();
-    it != this->Internals->ProgressMap.end();
-    it ++ )
-    {
-    for ( vit = it->second.begin(); 
-      vit != it->second.end();
-      vit ++ )
-      {
-      *vit = 200;
-      }
-    }
-
-  this->ReceivingProgressReports = 1;
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
-{
-  if ( !this->ReceivingProgressReports )
+  if (!this->Internals->EnableProgress)
     {
     vtkErrorMacro("Non-critical internal ParaView Error: "
-                  "Got request for cleanup pending progress "
-                  "after being cleaned up");
-    //abort();
+      "Got request for cleanup pending progress after being cleaned up");
+    return;
     }
-  vtkDebugMacro("Cleanup all pending progress events");
-  int id = -1;
-  int progress = -1;
-  switch ( this->ProgressType )
+
+  // The role of this method to  consume all progress messages that may have
+  // been put in the message queue by other processes.
+
+  // Receive progress from all children and then send the "Cleaned" signal
+  // to the parent (if any).
+
+  if (this->ProcessType == ALL_IN_ONE)
     {
-    case vtkPVProgressHandler::SingleProcessMPI:
-    case vtkPVProgressHandler::ClientServerServerMPI:
-      while ( this->ReceiveProgressFromSatellite(&id, &progress) ) 
-        {
-        vtkClientServerID nid;
-        nid.ID = id;
-        vtkObjectBase* base = 
-          app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid, 1);
-        if ( base )
-          {
-          if ( this->ProgressType == vtkPVProgressHandler::SingleProcessMPI )
-            {
-            this->LocalDisplayProgress(app, ::vtkGetProgressText(base), progress);
-            }
-          else
-            {
-            vtkSocketController* controller = 
-              vtkProcessModule::GetProcessModule()->GetActiveSocketController();
-            if (controller)
-              {
-              char buffer[1024];
-              buffer[0] = progress;
-              sprintf(buffer+1, "%s", ::vtkGetProgressText(base));
-              int len = strlen(buffer+1) + 2;
-              controller->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
-              }
-            }
-          }
-        }
+    // Receive progress from satellites, if any.
+    this->CleanupSatellites(); 
     }
-  this->ReceivingProgressReports = 0;
-  // WARNING
-  // should really synchronize and cleanup all progresses.
+
+  if (this->ProcessType == SATELLITE)
+    {
+    this->CleanupSatellites();
+    }
+
+  if (this->ProcessType == CLIENTSERVER_SERVER_ROOT)
+    {
+    // Receive progress from satellites, if any.
+    this->CleanupSatellites(); 
+
+    // Send reply to client.
+    vtkRemoteConnection* rconn =
+      vtkRemoteConnection::SafeDownCast(this->Connection);
+    int temp=0;
+    rconn->GetSocketController()->Send(&temp, 1, 1, CLEANUP_TAG);
+    }
+
+  if (this->ProcessType == CLIENTSERVER_CLIENT)
+    {
+    // Receive CLEANUP_TAG from Server. While we wait on this receive, we will
+    // consume any progress messages sent by the server.
+    vtkRemoteConnection* rconn =
+      vtkRemoteConnection::SafeDownCast(this->Connection);
+    int temp=0;
+    rconn->GetSocketController()->Receive(&temp, 1, 1, CLEANUP_TAG);
+    }
+
+  this->Internals->ProgressStore.Clear();
+  this->Internals->EnableProgress = false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::CleanupSatellites()
+{
+#ifdef VTK_USE_MPI
+  vtkMPIController* controller = vtkMPIController::SafeDownCast(
+    vtkMultiProcessController::GetGlobalController());
+  if (controller && controller->GetNumberOfProcesses() > 1)
+    {
+    int myId = controller->GetLocalProcessId();
+    int numProcs = controller->GetNumberOfProcesses();
+
+    // As we wait on these receives, we will consume any progress messages sent
+    // by the satellites
+    if (myId == 0)
+      {
+      for (int cc=1; cc < numProcs; cc++)
+        {
+        int temp = 0;
+        controller->Receive(&temp, 1,
+          vtkMultiProcessController::ANY_SOURCE,
+          vtkPVProgressHandler::CLEANUP_TAG);
+        }
+      }
+    else
+      {
+      // Send the CLEANUP_TAG to the root node.
+      controller->Send(&myId, 1, 0, vtkPVProgressHandler::CLEANUP_TAG);
+      }
+    if (this->Internals->AsyncRequestValid)
+      {
+      this->Internals->AsyncRequestValid = false;
+      this->Internals->AsyncRequest.Cancel();
+      }
+    }
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::OnProgressEvent(vtkObject* obj,
+  double progress)
+{
+  if (!this->Internals->EnableProgress)
+    {
+    return;
+    }
+  vtkstd::string text = ::vtkGetProgressText(obj);
+  if (text.size() > 128)
+    {
+    vtkWarningMacro("Progress text is tuncated to 128 characters.");
+    text = text.substr(0, 128);
+    }
+  int id = this->Internals->GetIDFromObject(obj);
+  this->Internals->ProgressStore.AddLocalProgress(id, text, progress);
+  this->RefreshProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::RefreshProgress()
+{
+  int id;
+  double progress;
+  vtkstd::string text;
+
+  // NOTE: All the sends/receives have to be non-blocking.
+  if (this->ProcessType == ALL_IN_ONE)
+    {
+    // Collect progress from all satellites.
+    this->GatherProgress();
+
+    // Display progress locally.
+    if (this->Internals->ProgressStore.GetProgress(id, text, progress))
+      {
+      this->SetLocalProgress(static_cast<int>(progress*100.0), text.c_str());
+      }
+    }
+  else if (this->ProcessType == CLIENTSERVER_SERVER_ROOT)
+    {
+    // Collect progress from all satellites.
+    this->GatherProgress();
+
+    if (this->GetIsRoot())
+      {
+      // Send to client.
+      this->SendProgressToClient();
+      }
+    }
+  else if (this->ProcessType == SATELLITE)
+    {
+    this->GatherProgress();
+    }
+  else if (this->ProcessType == CLIENTSERVER_CLIENT)
+    {
+    this->ReceiveProgressFromServer();
+
+    // Display progress locally.
+    if (this->Internals->ProgressStore.GetProgress(id, text, progress))
+      {
+      this->SetLocalProgress(static_cast<int>(progress*100.0), text.c_str());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVProgressHandler::GetIsRoot()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return (pm->GetPartitionId() == 0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkPVProgressHandler::ReportProgress(double progress)
+{
+  this->Internals->ProgressTimer->StopTimer();
+  if (progress <= 0.0 ||
+    progress >= 1.0 ||
+    this->Internals->ProgressTimer->GetElapsedTime() > MIN_PROGRESS_INTERVAL_IN_SECS)
+    {
+    this->Internals->ProgressTimer->StartTimer();
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SendProgressToClient()
+{
+  vtkRemoteConnection* rc =
+    vtkRemoteConnection::SafeDownCast(this->Connection);
+
+  // Called on Root node of the server process to send the progress to the
+  // client.
+  int id;
+  vtkstd::string text;
+  double progress;
+  if (this->Internals->ProgressStore.GetProgress(id, text, progress))
+    {
+    if (this->ReportProgress(progress))
+      {
+      char buffer[1026];
+      buffer[0] = static_cast<int>(progress*100.0);
+      snprintf(buffer+1, 1024, "%s", text.c_str());
+      int len = strlen(buffer+1) + 2;
+      rc->GetSocketController()->Send(buffer, len, 1,
+        vtkProcessModule::PROGRESS_EVENT_TAG);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::ReceiveProgressFromServer()
+{
+  // Nothing to do here. We cannot do non-block receive on SocketController.
+  // All progress events from the server will be received as a consequence of
+  // vtkCommand::WrongTag event in which case HandleServerProgress() gets
+  // called.
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::HandleServerProgress(int progress, const char* text)
+{
+  vtkProcessModule::GetProcessModule()->SetLocalProgress(text, progress);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SetLocalProgress(int progress, const char* text)
+{
+  this->Internals->ProgressTimer->StopTimer();
+  //if (this->Internals->ProgressTimer->GetElapsedTime() > MIN_PROGRESS_INTERVAL_IN_SECS)
+    {
+    this->Internals->ProgressTimer->StartTimer();
+    vtkProcessModule::GetProcessModule()->SetLocalProgress(text, progress);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProgressHandler::GatherProgress()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm->GetNumberOfLocalPartitions() == 1)
+    {
+    return 0;
+    }
+
+  if (pm->GetPartitionId() == 0)
+    {
+    // Get any progress events from satellites.
+    return this->ReceiveProgressFromSatellites();
+    }
+  else
+    {
+    // Send local progress to the root node. 
+    this->SendProgressToRoot();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProgressHandler::ReceiveProgressFromSatellites()
+{
+  int req_count = 0;
+#ifdef VTK_USE_MPI
+  if (this->Internals->AsyncRequestValid &&
+    this->Internals->AsyncRequest.Test())
+    {
+    int pid, oid, progress;
+
+    memcpy(&pid, this->Internals->AsyncRequestData, sizeof(int));
+    vtkByteSwap::SwapLE(&pid);
+
+    memcpy(&oid, this->Internals->AsyncRequestData + sizeof(int), sizeof(int));
+    vtkByteSwap::SwapLE(&oid);
+
+    memcpy(&progress, this->Internals->AsyncRequestData + sizeof(int)*2, sizeof(int));
+    vtkByteSwap::SwapLE(&progress);
+
+    vtkstd::string text = reinterpret_cast<const char*>(
+      this->Internals->AsyncRequestData + sizeof(int)*3);
+    //cout << "----Received: " << text.c_str() << ": " << progress << endl;
+
+    this->Internals->ProgressStore.AddRemoteProgress(
+      pid, oid, text, progress/100.0); 
+    req_count++;
+    this->Internals->AsyncRequestValid = false;
+    }
+
+  vtkMPIController* controller = vtkMPIController::SafeDownCast(
+    vtkMultiProcessController::GetGlobalController());
+  if (this->Internals->AsyncRequestValid == false)
+    {
+    controller->NoBlockReceive(this->Internals->AsyncRequestData,
+      ASYNCREQUESTDATA_MAX_SIZE,
+      vtkMultiProcessController::ANY_SOURCE,
+      vtkPVProgressHandler::PROGRESS_EVENT_TAG,
+      this->Internals->AsyncRequest);
+    this->Internals->AsyncRequestValid = true;
+    return req_count + this->ReceiveProgressFromSatellites();
+    }
+#endif
+  return req_count;
+}
+
+//----------------------------------------------------------------------------
+vtkMPICommunicatorOpaqueRequest* vtkPVProgressHandler::GetAsyncRequest()
+{
+#ifdef VTK_USE_MPI
+  return this->Internals->AsyncRequest.Req;
+#else
+  return 0;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProgressHandler::SendProgressToRoot()
+{
+#ifdef VTK_USE_MPI
+  if (this->Internals->AsyncRequestValid &&
+    this->Internals->AsyncRequest.Test())
+    {
+    // The previous Send() has been consumed by the root, so we no longer have
+    // a pending send.
+    this->Internals->AsyncRequestValid =false;
+    }
+
+  if (this->Internals->AsyncRequestValid == false)
+    {
+    double progress;
+    int id;
+    vtkstd::string text;
+    if (this->Internals->ProgressStore.GetProgress(id, text, progress))
+      {
+      if (this->ReportProgress(progress))
+        {
+        vtkByteSwap::SwapLE(&id);
+
+        int i_progress = static_cast<int>(progress*100.0);
+        vtkByteSwap::SwapLE(&i_progress);
+
+        int myId = vtkProcessModule::GetProcessModule()->GetPartitionId();
+        vtkByteSwap::SwapLE(&myId);
+
+        char buf[20];
+        sprintf(buf, "(%d)", myId);
+        text += buf;
+
+
+        memcpy(this->Internals->AsyncRequestData, &myId, sizeof(int));
+        memcpy(this->Internals->AsyncRequestData + sizeof(int), &id, sizeof(int));
+        memcpy(this->Internals->AsyncRequestData + sizeof(int)*2, &i_progress,
+          sizeof(int));
+        memcpy(this->Internals->AsyncRequestData + sizeof(int)*3, text.c_str(),
+          text.size()+1);
+
+        vtkIdType messageSize = sizeof(int)*3 + text.size() + 1;
+        vtkMPIController* controller = vtkMPIController::SafeDownCast(
+          vtkMultiProcessController::GetGlobalController());
+        controller->NoBlockSend(this->Internals->AsyncRequestData,
+          messageSize, 0,
+          vtkPVProgressHandler::PROGRESS_EVENT_TAG,
+          this->Internals->AsyncRequest);
+        //cout << "Sent To Root: " << text.c_str() << ": " << i_progress<< endl;
+        this->Internals->AsyncRequestValid = true;
+        }
+      }
+    }
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "ClientMode: " << this->ClientMode << endl;
-  os << indent << "ServerMode: " << this->ServerMode << endl;
+  this->Superclass::PrintSelf(os, indent);
 }
+
+

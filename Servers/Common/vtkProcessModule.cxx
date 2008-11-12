@@ -136,7 +136,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.89");
+vtkCxxRevisionMacro(vtkProcessModule, "1.90");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -157,7 +157,6 @@ vtkProcessModule::vtkProcessModule()
 
   this->UniqueID.ID = 3;
 
-  this->ProgressHandler = vtkPVProgressHandler::New();
   this->ProgressRequests = 0;
 
   this->Options = 0;
@@ -215,7 +214,6 @@ vtkProcessModule::~vtkProcessModule()
     this->InterpreterObserver = 0;
     }
 
-  this->ProgressHandler->Delete();
   this->SetOptions(0);
   this->SetGUIHelper(0);
 
@@ -238,17 +236,6 @@ vtkProcessModule::~vtkProcessModule()
 void vtkProcessModule::SetOptions(vtkPVOptions* op)
 {
   this->Options = op;
-  if (this->Options)
-    {
-    if (this->Options->GetServerMode())
-      {
-      this->ProgressHandler->SetServerMode(1);
-      }
-    if (this->Options->GetClientMode())
-      {
-      this->ProgressHandler->SetClientMode(1);
-      }
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1169,10 +1156,21 @@ void vtkProcessModule::RegisterProgressEvent(vtkObject* po, int id)
 {
   // We do this check to avoid registering progress events for
   // objects that don't report any progress at all.
-  if (po->IsA("vtkAlgorithm") || po->IsA("vtkKdTree"))
+  //if (po->IsA("vtkAlgorithm") || po->IsA("vtkKdTree"))
+  //  {
+  //  //po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+  //  //this->ProgressHandler->RegisterProgressEvent(po, id);
+  //  }
+  if (this->ActiveRemoteConnection)
     {
-    po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
-    this->ProgressHandler->RegisterProgressEvent(po, id);
+    this->ActiveRemoteConnection->GetProgressHandler()->
+      RegisterProgressEvent(po, id);
+    }
+  else
+    {
+    this->ConnectionManager->GetConnectionFromID(
+      vtkProcessModuleConnectionManager::GetSelfConnectionID())->
+      GetProgressHandler()->RegisterProgressEvent(po, id);
     }
 }
 
@@ -1203,7 +1201,8 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke 
-           << this->GetProcessModuleID() << "PrepareProgress" 
+           << this->GetProcessModuleID()
+           << "PrepareProgress" 
            << vtkClientServerStream::End;
     this->SendStream(connectionId, servers, stream);
     }
@@ -1231,9 +1230,10 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
     return;
     }
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke 
-         << this->GetProcessModuleID() << "CleanupPendingProgress" 
-         << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->GetProcessModuleID()
+           << "CleanupPendingProgress" 
+           << vtkClientServerStream::End;
   this->SendStream(connectionId, this->Internals->ProgressServersFlag, stream);
   this->Internals->ProgressServersFlag = 0;
   
@@ -1248,16 +1248,45 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkProcessModule::PrepareProgress()
+//-----------------------------------------------------------------------------
+vtkPVProgressHandler* vtkProcessModule::GetActiveProgressHandler()
 {
-  this->ProgressHandler->PrepareProgress(this);
+  if (this->ActiveRemoteConnection)
+    {
+    return this->ActiveRemoteConnection->GetProgressHandler();
+    }
+  return this->ConnectionManager->GetConnectionFromID(
+    vtkProcessModuleConnectionManager::GetSelfConnectionID())->GetProgressHandler();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+void vtkProcessModule::PrepareProgress()
+{
+  if (this->ActiveRemoteConnection)
+    {
+    this->ActiveRemoteConnection->GetProgressHandler()->PrepareProgress();
+    }
+  else
+    {
+    this->ConnectionManager->GetConnectionFromID(
+      vtkProcessModuleConnectionManager::GetSelfConnectionID())->
+      GetProgressHandler()->PrepareProgress();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkProcessModule::CleanupPendingProgress()
 {
-  this->ProgressHandler->CleanupPendingProgress(this);
+  if (this->ActiveRemoteConnection)
+    {
+    this->ActiveRemoteConnection->GetProgressHandler()->CleanupPendingProgress();
+    }
+  else
+    {
+    this->ConnectionManager->GetConnectionFromID(
+      vtkProcessModuleConnectionManager::GetSelfConnectionID())->
+      GetProgressHandler()->CleanupPendingProgress();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1291,25 +1320,11 @@ void vtkProcessModule::ExceptionEvent(int type)
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModule::ProgressEvent(vtkObject *o, int val, const char* str)
-{
-  this->ProgressHandler->InvokeProgressEvent(this, o, val, str);
-}
-
-//-----------------------------------------------------------------------------
 void vtkProcessModule::ExecuteEvent(
   vtkObject* o, unsigned long event, void* calldata)
 {
   switch (event)
     {
-  case vtkCommand::ProgressEvent:
-      {
-      int progress = static_cast<int>(*reinterpret_cast<double*>(calldata) *
-        100.0);
-      this->ProgressEvent(o, progress, 0);
-      }
-    break;
-
   case vtkCommand::AbortCheckEvent:
     this->InvokeEvent(vtkCommand::AbortCheckEvent);
     break;
@@ -1914,16 +1929,6 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   if (this->Interpreter)
     {
     this->Interpreter->PrintSelf(os, indent.GetNextIndent());
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-
-  os << indent << "ProgressHandler: " ;
-  if (this->ProgressHandler)
-    {
-    this->ProgressHandler->PrintSelf(os, indent.GetNextIndent());
     }
   else
     {

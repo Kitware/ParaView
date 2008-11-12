@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
+#include "vtkPVProgressHandler.h"
 #include "vtkSocket.h"
 
 class vtkProcessModuleConnectionObserver : public vtkCommand
@@ -57,7 +58,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.12");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.13");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -67,11 +68,15 @@ vtkProcessModuleConnection::vtkProcessModuleConnection()
 
   this->Observer = vtkProcessModuleConnectionObserver::New();
   this->Observer->SetTarget(this);
+
+  this->ProgressHandler = vtkPVProgressHandler::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::~vtkProcessModuleConnection()
 {
+  this->ProgressHandler->Delete();
+  this->ProgressHandler = 0;
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
@@ -178,13 +183,21 @@ void vtkProcessModuleConnection::OnWrongTagEvent(vtkObject* caller,
       vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
       return;
       }
-    vtkProcessModule::GetProcessModule()->ProgressEvent(caller, val, ptr);
+    this->ProgressHandler->HandleServerProgress(val, ptr);
     }
   else if (tag == vtkProcessModule::EXCEPTION_EVENT_TAG)
     {
     vtkProcessModule::GetProcessModule()->ExceptionEvent(ptr);
     this->OnSocketError();
     }
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModuleConnection::Initialize(int argc, char** argv, int *partitionId)
+{
+  this->ProgressHandler->SetConnection(this);
+  // returns 0 on success, 1 on error.
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
