@@ -58,7 +58,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.13");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.14");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -150,8 +150,8 @@ void vtkProcessModuleConnection::OnSocketError()
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModuleConnection::OnWrongTagEvent(vtkObject* caller, 
-  void* calldata)
+void vtkProcessModuleConnection::OnWrongTagEvent(
+  vtkObject* vtkNotUsed(caller), void* calldata)
 {
   int tag = -1;
   int len = -1;
@@ -193,7 +193,8 @@ void vtkProcessModuleConnection::OnWrongTagEvent(vtkObject* caller,
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModuleConnection::Initialize(int argc, char** argv, int *partitionId)
+int vtkProcessModuleConnection::Initialize(
+  int vtkNotUsed(argc), char** vtkNotUsed(argv), int *vtkNotUsed(partitionId))
 {
   this->ProgressHandler->SetConnection(this);
   // returns 0 on success, 1 on error.
