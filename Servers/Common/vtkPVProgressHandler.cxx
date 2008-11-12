@@ -36,6 +36,13 @@
 #include <vtkstd/string>
 #include <vtkstd/map>
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+# define SNPRINTF _snprintf
+#else
+# define SNPRINTF snprintf
+#endif
+
+
 #define MIN_PROGRESS_INTERVAL_IN_SECS 0.3
 
 inline const char* vtkGetProgressText(vtkObjectBase* o)
@@ -234,7 +241,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.12");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.13");
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
@@ -494,7 +501,7 @@ void vtkPVProgressHandler::SendProgressToClient()
       {
       char buffer[1026];
       buffer[0] = static_cast<int>(progress*100.0);
-      snprintf(buffer+1, 1024, "%s", text.c_str());
+      SNPRINTF(buffer+1, 1024, "%s", text.c_str());
       int len = strlen(buffer+1) + 2;
       rc->GetSocketController()->Send(buffer, len, 1,
         vtkProcessModule::PROGRESS_EVENT_TAG);
