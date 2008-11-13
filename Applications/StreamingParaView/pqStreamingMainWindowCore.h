@@ -33,14 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqStreamingMainWindowCore_h
 #define _pqStreamingMainWindowCore_h
 
-#include "pqMainWindowCore.h"
 #include <QObject>
+#include "pqCoreExport.h" // Needed for PQCORE_EXPORT macro
+#include "pqMainWindowCore.h"
 
 /** \brief Provides a standardized main window for ParaView applications -
 application authors can derive from pqMainWindowCore and call its member functions
 to use as-much or as-little of the standardized functionality as desired */
 
-class PQCOMPONENTS_EXPORT pqStreamingMainWindowCore :
+class PQCORE_EXPORT pqStreamingMainWindowCore :
   public pqMainWindowCore
 {
   Q_OBJECT

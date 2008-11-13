@@ -86,7 +86,7 @@ ENDIF(Q_WS_MAC)
 
 # Add main server executables.
 IF(NOT Q_WS_MAC)
-  SET(PV_EXE_LIST paraview)
+  SET(PV_EXE_LIST StreamingParaView)
 ENDIF(NOT Q_WS_MAC)
 # Add Qt assistant to the list of shared lib. forwarded executables.
 # If this is enabled, the build system will create an executable

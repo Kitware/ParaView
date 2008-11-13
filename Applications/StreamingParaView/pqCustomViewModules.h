@@ -33,8 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCustomViewModules_h
 #define _pqCustomViewModules_h
 
-#include "pqStandardViewModules.h"
 #include <QObject>
+#include "pqCoreExport.h" // Needed for PQCORE_EXPORT macro
+#include "pqStandardViewModules.h"
 
 /// interface class for plugins that create view modules
 class PQCORE_EXPORT pqCustomViewModules : public pqStandardViewModules
