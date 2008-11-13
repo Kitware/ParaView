@@ -65,13 +65,13 @@ public:
   // from the server.
   void HandleServerProgress(int progress, const char* text);
 
+//BTX
   // Description:
   // These methods are used by vtkPVMPICommunicator to handle the progress
   // messages received from satellites while waiting on some receive.
   vtkMPICommunicatorOpaqueRequest* GetAsyncRequest();
   void RefreshProgress();
   void MarkAsyncRequestReceived();
-//BTX
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();

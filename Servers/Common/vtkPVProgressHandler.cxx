@@ -243,7 +243,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.14");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.15");
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
@@ -620,10 +620,13 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellites()
 vtkMPICommunicatorOpaqueRequest* vtkPVProgressHandler::GetAsyncRequest()
 {
 #ifdef VTK_USE_MPI
-  return this->Internals->AsyncRequest.Req;
-#else
-  return 0;
+  if (this->Internals->AsyncRequestValid &&
+    !this->Internals->ForceAsyncRequestReceived)
+    {
+    return this->Internals->AsyncRequest.Req;
+    }
 #endif
+  return 0;
 }
 
 //----------------------------------------------------------------------------

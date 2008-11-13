@@ -22,7 +22,7 @@
 #include "vtkMPI.h"
 
 vtkStandardNewMacro(vtkPVMPICommunicator);
-vtkCxxRevisionMacro(vtkPVMPICommunicator, "1.2");
+vtkCxxRevisionMacro(vtkPVMPICommunicator, "1.3");
 //----------------------------------------------------------------------------
 vtkPVMPICommunicator::vtkPVMPICommunicator()
 {
@@ -74,8 +74,16 @@ int vtkPVMPICommunicator::ReceiveDataInternal(
     {
     MPI_Request requests[2];
     requests[0] = receiveReq.Req->Handle;
-    requests[1] = progressHandler->GetAsyncRequest()->Handle;
-    if (!CheckForMPIError(MPI_Waitany(2, requests, &index, &(info->Status))))
+    int num_requests = 1;
+    vtkMPICommunicatorOpaqueRequest* asyncReq =
+      progressHandler->GetAsyncRequest();
+    if (asyncReq)
+      {
+      requests[1] = asyncReq->Handle;
+      num_requests = 2;
+      }
+    retVal = MPI_Waitany(num_requests, requests, &index, &(info->Status));
+    if (!CheckForMPIError(retVal))
       {
       receiveReq.Cancel();
       return 0;
