@@ -2564,6 +2564,32 @@ The Point Data to Cell Data filter averages the values of the point attributes o
    <!-- End PointDataToCellData -->
    </SourceProxy>
   
+  <!-- ############################################################################ -->
+  <SourceProxy 
+      name="QuadraturePointStatistics"
+      class="vtkQuadraturePointStatistics"
+      label="Quadrature Point Statistics">
+  
+    <Documentation
+        long_help="Compute basics statistics over data fields interpolated to quadrature points."
+        short_help="Compute basics statistics over data fields interpolated to quadrature points.">
+        "Compute basics statistics over data fields interpolated to quadrature points."
+    </Documentation>
+  
+    <InputProperty
+        name="Input"
+        command="SetInputConnection">
+  
+      <ProxyGroupDomain name="groups">
+        <Group name="sources"/>
+        <Group name="filters"/>
+      </ProxyGroupDomain>
+  
+      <DataTypeDomain name="input_type">
+        <DataType value="vtkUnstructuredGrid"/>
+      </DataTypeDomain>
+    </InputProperty>
+  </SourceProxy>
    <!-- ############################################################################ -->
   <SourceProxy 
       name="QuadraturePointInterpolator"

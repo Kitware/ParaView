@@ -108,6 +108,7 @@
   <Filter name="PVConnectivityFilter" />
   <Filter name="QuadraturePointInterpolator" />
   <Filter name="QuadraturePointsGenerator" />
+  <Filter name="QuadraturePointStatistics" />
   <Filter name="QuadratureSchemeDictionaryGenerator" />
   <Filter name="QuadricClustering" />
   <Filter name="ReflectionFilter" />
