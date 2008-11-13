@@ -2,8 +2,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkPiece.h"
 #include "vtkstd/vector"
+#include "vtkstd/algorithm"
 
-vtkCxxRevisionMacro(vtkPieceList, "1.1");
+vtkCxxRevisionMacro(vtkPieceList, "1.2");
 vtkStandardNewMacro(vtkPieceList);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -117,7 +118,7 @@ int vtkPieceList::GetNumberNonZeroPriority()
 //------------------------------------------------------------------------------
 void vtkPieceList::SortPriorities()
 {
-  sort(this->Internals->Pieces.begin(),
+  vtkstd::sort(this->Internals->Pieces.begin(),
        this->Internals->Pieces.end(),
        vtkPieceListByPriority());
 }

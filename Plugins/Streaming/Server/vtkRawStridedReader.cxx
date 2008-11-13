@@ -25,14 +25,14 @@
 #include "vtkByteSwap.h"
 #include "vtkExtentTranslator.h"
 
-#include <iostream.h>
+#include <iostream>
 #include <fstream>
 #include <time.h>
 #include <sstream>
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader, "1.1");
+vtkCxxRevisionMacro(vtkRawStridedReader, "1.2");
 vtkStandardNewMacro(vtkRawStridedReader);
 
 #define DEBUGPRINT_STRIDED_READER_DETAILS(arg)\

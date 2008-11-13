@@ -38,7 +38,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.2");
+vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.3");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
 
 inline void vtkSMStreamingRepresentationSetInt(
@@ -92,7 +92,7 @@ bool vtkSMStreamingRepresentation::EndCreateVTKObjects()
   vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "MakeOutlineOfInput", 1);
   vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "UseOutline", 1);
   
-  this->Superclass::EndCreateVTKObjects();
+  return this->Superclass::EndCreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

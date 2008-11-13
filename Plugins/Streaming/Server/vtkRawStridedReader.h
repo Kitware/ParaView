@@ -28,7 +28,7 @@
 class vtkRawStridedReaderPiece;
 class vtkRangeKeeper2;
 
-class VTK_IO_EXPORT vtkRawStridedReader : public vtkImageAlgorithm
+class VTK_EXPORT vtkRawStridedReader : public vtkImageAlgorithm
 {
 public:
   static vtkRawStridedReader *New();
