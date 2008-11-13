@@ -8,6 +8,7 @@ SET(STREAMING_SS_SOURCES
   vtkPieceList.cxx
   vtkPieceCacheFilter.cxx
   vtkPieceCacheExecutive.cxx
+  vtkPVSGeometryInformation.cxx
   vtkRawStridedReader.cxx
   vtkSMSImageDataParallelStrategy.cxx
   vtkSMStreamingHelperProxy.cxx

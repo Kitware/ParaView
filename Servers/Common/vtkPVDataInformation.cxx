@@ -50,7 +50,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.59");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -426,22 +426,11 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
 
-#if 1//DDM TODO I wrote the else section for streaming, but it makes tests fail
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
     {
     this->Bounds[idx] = bds[idx];
     }
-#else
-  if (!vtkMath::AreBoundsInitialized(this->Bounds))
-    {
-    bds = data->GetBounds();
-    for (idx = 0; idx < 6; ++idx)
-      {
-      this->Bounds[idx] = bds[idx];
-      }
-    }
-#endif
   this->MemorySize = data->GetActualMemorySize();
 
   vtkPointSet* ps = vtkPointSet::SafeDownCast(data);
@@ -604,31 +593,6 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
-#if 1//DDM TODO I wrote the else section for streaming, but parallel tests fail
-#else
-  // Get the bounds from the reader meta-data if available
-  vtkAlgorithmOutput* pp = dobj->GetProducerPort();
-  if (pp)
-    {
-    vtkExecutive* exec = pp->GetProducer()->GetExecutive();
-    vtkInformation* outInfo = exec->GetOutputInformation(
-      pp->GetIndex());
-    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
-      {
-      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
-        this->Bounds);
-      }
-    else
-      {
-      vtkStreamingDemandDrivenPipeline *sddp =
-        vtkStreamingDemandDrivenPipeline::SafeDownCast(exec);
-      if (sddp)
-        {
-        sddp->GetWholeBoundingBox(0, this->Bounds);
-        }
-      }
-    }
-#endif
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)
     {

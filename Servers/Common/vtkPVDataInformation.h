@@ -166,7 +166,7 @@ protected:
 
   void AddFromMultiPieceDataSet(vtkCompositeDataSet* data);
   void CopyFromCompositeDataSet(vtkCompositeDataSet* data);
-  void CopyFromDataSet(vtkDataSet* data);
+  virtual void CopyFromDataSet(vtkDataSet* data);
   void CopyFromGenericDataSet(vtkGenericDataSet *data);
   void CopyFromGraph(vtkGraph* graph);
   void CopyFromTable(vtkTable* table);

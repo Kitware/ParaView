@@ -15,6 +15,7 @@
 
 #include "vtkStreamingFactory.h"
 #include "vtkSMStreamingOutputPort.h"
+#include "vtkPVSGeometryInformation.h"
 #include "vtkVersion.h"
 
 //----------------------------------------------------------------------------
@@ -26,11 +27,14 @@
 //VTK_FACTORY_INTERFACE_IMPLEMENT(vtkStreamingFactory)
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkStreamingFactory, "1.1");
+vtkCxxRevisionMacro(vtkStreamingFactory, "1.2");
 vtkStandardNewMacro(vtkStreamingFactory);
 
 //----------------------------------------------------------------------------
 VTK_CREATE_CREATE_FUNCTION(vtkSMStreamingOutputPort);
+
+//----------------------------------------------------------------------------
+VTK_CREATE_CREATE_FUNCTION(vtkPVSGeometryInformation);
 
 //----------------------------------------------------------------------------
 vtkStreamingFactory::vtkStreamingFactory()
@@ -40,6 +44,11 @@ vtkStreamingFactory::vtkStreamingFactory()
                          "Streaming",
                          1,
                          vtkObjectFactoryCreatevtkSMStreamingOutputPort);
+  this->RegisterOverride("vtkPVGeometryInformation",
+                         "vtkPVSGeometryInformation",
+                         "Streaming",
+                         1,
+                         vtkObjectFactoryCreatevtkPVSGeometryInformation);
 }
 
 //----------------------------------------------------------------------------

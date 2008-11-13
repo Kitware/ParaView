@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVGeometryInformation.h
+  Module:    vtkPVSGeometryInformation.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,36 +12,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGeometryInformation - Info about geometry output.
+// .NAME vtkPVSGeometryInformation - Info about geometry output.
 // .SECTION Description
 // This object collects information about the geometry filter's
 // output.  It is almost the same as the superclass vtkPVDatainformation
-// but the geometry filter (or update suppressor) 
-// is passed in instead of the data object.
+// but it uses meta information when available to get the whole picture.
 
-#ifndef __vtkPVGeometryInformation_h
-#define __vtkPVGeometryInformation_h
+#ifndef __vtkPVSGeometryInformation_h
+#define __vtkPVSGeometryInformation_h
 
-#include "vtkPVDataInformation.h"
+#include "vtkPVGeometryInformation.h"
 
-class VTK_EXPORT vtkPVGeometryInformation : public vtkPVDataInformation
+class VTK_EXPORT vtkPVSGeometryInformation : public vtkPVGeometryInformation
 {
 public:
-  static vtkPVGeometryInformation* New();
-  vtkTypeRevisionMacro(vtkPVGeometryInformation, vtkPVDataInformation);
+  static vtkPVSGeometryInformation* New();
+  vtkTypeRevisionMacro(vtkPVSGeometryInformation, vtkPVGeometryInformation);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Transfer information about a single object into this object.
-  virtual void CopyFromObject(vtkObject*);
+  virtual void CopyFromDataSet(vtkDataSet*);
 
 protected:
-  vtkPVGeometryInformation();
-  ~vtkPVGeometryInformation();
+  vtkPVSGeometryInformation();
+  ~vtkPVSGeometryInformation();
 
 private:
-  vtkPVGeometryInformation(const vtkPVGeometryInformation&); // Not implemented
-  void operator=(const vtkPVGeometryInformation&); // Not implemented
+  vtkPVSGeometryInformation(const vtkPVSGeometryInformation&);// Not implemented
+  void operator=(const vtkPVSGeometryInformation&); // Not implemented
 };
 
 #endif
