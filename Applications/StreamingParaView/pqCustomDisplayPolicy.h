@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqCustomDisplayPolicy_h
 
 #include <QObject>
-#include "pqCoreExport.h" // Needed for PQCORE_EXPORT macro
 #include <pqDisplayPolicy.h>
 
 class pqDataRepresentation;
@@ -50,7 +49,7 @@ class vtkSMProxy;
 /// an instance of the policy used by the application. Custom applications
 /// should set their own policy instance on the global application core 
 /// instance.
-class PQCORE_EXPORT pqCustomDisplayPolicy : public pqDisplayPolicy
+class pqCustomDisplayPolicy : public pqDisplayPolicy
 {
   Q_OBJECT
 public:

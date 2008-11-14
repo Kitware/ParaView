@@ -33,11 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqGlobalStreamingViewOptions_h
 #define _pqGlobalStreamingViewOptions_h
 
-#include "pqComponentsExport.h"
 #include "pqOptionsContainer.h"
 
 /// options container for pages of render view options
-class PQCOMPONENTS_EXPORT pqGlobalStreamingViewOptions : public pqOptionsContainer
+class pqGlobalStreamingViewOptions : public pqOptionsContainer
 {
   Q_OBJECT
 
