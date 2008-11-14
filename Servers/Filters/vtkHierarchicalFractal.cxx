@@ -36,7 +36,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.12");
+vtkCxxRevisionMacro(vtkHierarchicalFractal, "1.13");
 vtkStandardNewMacro(vtkHierarchicalFractal);
 
 //----------------------------------------------------------------------------
@@ -1462,7 +1462,8 @@ unsigned int vtkHierarchicalFractal::AppedDataSetToLevel(
   else if (hbDS)
     {
     int dim=this->TwoDimensional? 2:3;
-    vtkAMRBox box(dim,extents);
+    vtkIdType ext[6]={extents[0],extents[1],extents[2],extents[3],extents[4],extents[5]};
+    vtkAMRBox box(dim,ext);
     index = hbDS->GetNumberOfDataSets(level);
     hbDS->SetDataSet(level, index, box, vtkUniformGrid::SafeDownCast(dataset));
     }
