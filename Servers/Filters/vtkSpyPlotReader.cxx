@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.68");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.69");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1817,15 +1817,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                            << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
   cerr << "}\n"*/;
 
-  int loCorner[3], hiCorner[3];
-  loCorner[0] = realExtents[0];
-  hiCorner[0] = realExtents[1];
-  loCorner[1] = realExtents[2];
-  hiCorner[1] = realExtents[3];
-  loCorner[2] = realExtents[4];
-  hiCorner[2] = realExtents[5];
-
-  vtkAMRBox box(3,loCorner,hiCorner);
+  vtkAMRBox box(realExtents);
 
   vtkUniformGrid* ug = vtkUniformGrid::New();
   hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
