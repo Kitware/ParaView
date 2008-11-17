@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.84");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.85");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -4141,7 +4141,6 @@ void vtkCTHFragmentConnect::CreateFace(
       {
       // Compute length of diagonals (squared)
       // This will help us decide which way to split up the quad into triangles.
-      double tmp;
       double d0011 = 0.0;
       double d0110 = 0.0;
       double *pt00 = this->FaceCornerPoints;
@@ -4150,10 +4149,10 @@ void vtkCTHFragmentConnect::CreateFace(
       double *pt11 = this->FaceCornerPoints+9;
       for (int ii = 0; ii < 3; ++ii)
         {
-        tmp = pt00[ii]-pt11[ii];
-        d0011 += tmp*tmp;
-        tmp = pt01[ii]-pt10[ii];
-        d0110 += tmp*tmp;
+        double tmp2 = pt00[ii]-pt11[ii];
+        d0011 += tmp2*tmp2;
+        tmp2 = pt01[ii]-pt10[ii];
+        d0110 += tmp2*tmp2;
         }
       if (d0011 < d0110)
         {   
