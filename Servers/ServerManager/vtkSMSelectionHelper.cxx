@@ -43,7 +43,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.18");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.19");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -152,7 +152,7 @@ vtkSMProxy* vtkSMSelectionHelper::NewSelectionSourceFromSelectionInternal(
   vtkSelection* selection,
   vtkSMProxy* selSource /*=NULL*/)
 {
-  if (!selection)
+  if (!selection || !selection->GetSelectionList())
     {
     return selSource;
     }
