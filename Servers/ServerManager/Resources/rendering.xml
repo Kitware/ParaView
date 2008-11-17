@@ -7975,12 +7975,11 @@
       <Documentation>
         Representation proxy used to show text.
       </Documentation>
-      <InputProperty name="Input" 
-                     command="NotUsed"
-                     />
 
-      <DoubleVectorProperty
-        name="UpdateTime"
+      <InputProperty name="Input" 
+        command="NotUsed" />
+
+      <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
         update_self="1"
         is_internal="1"
@@ -7993,11 +7992,17 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <SubProxy>
-        <Proxy name="UpdateSuppressor"
-          proxygroup="filters" proxyname="UpdateSuppressor2">
-        </Proxy>
-      </SubProxy>
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
+      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="TextWidgetRepresentation"
@@ -8028,11 +8033,6 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="Collect"
-        proxygroup="filters" proxyname="ClientServerMoveData">
-        </Proxy>
-      </SubProxy>
       <!-- End of TextSourceRepresentation -->
     </TextSourceRepresentationProxy>
     
