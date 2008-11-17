@@ -90,7 +90,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.80");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.81");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -572,7 +572,7 @@ void vtkSMRenderViewProxy::PerformRender()
   if ( this->MeasurePolygonsPerSecond )
     {
     this->RenderTimer->StartTimer();
-    }
+    } 
 
   this->GetRenderer()->ResetCameraClippingRange();
 

@@ -122,7 +122,7 @@ void vtkSMViewProxy::CleanMultiViewInitializer()
 }
 
 vtkStandardNewMacro(vtkSMViewProxy);
-vtkCxxRevisionMacro(vtkSMViewProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMViewProxy, "1.21");
 
 vtkInformationKeyMacro(vtkSMViewProxy, USE_CACHE, Integer);
 vtkInformationKeyMacro(vtkSMViewProxy, CACHE_TIME, Double);
@@ -275,14 +275,6 @@ void vtkSMViewProxy::AddRepresentationInternal(vtkSMRepresentationProxy* repr)
 
   this->Representations->AddItem(repr);
 
-  // If representation is modified, we invalidate the data information.
-  repr->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
-
-  // If representation pipeline is updated, we invalidate the data info.
-  repr->AddObserver(vtkCommand::EndEvent, this->Observer);
-
-  // repr->AddObserver(vtkCommand::SelectionChanged, this->Observer);
-
   // Pass the view update time to the representation.
   if (this->ViewUpdateTimeInitialized)
     {
@@ -306,8 +298,6 @@ void vtkSMViewProxy::RemoveRepresentationInternal(vtkSMRepresentationProxy* repr
   this->InvalidateDataSizes();
 
   repr->SetViewInformation(0);
-
-  repr->RemoveObserver(this->Observer);
   this->Representations->RemoveItem(repr);
   // Don't access repr after removing, it may be already deleted.
 }
@@ -371,6 +361,8 @@ void vtkSMViewProxy::StillRender()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
 
+  this->InvalidateDataSizes();
+
   this->BeginStillRender();
 
   // Now update all representation pipelines.
@@ -393,6 +385,8 @@ void vtkSMViewProxy::InteractiveRender()
   this->InRender = true;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress(this->ConnectionID);
+
+  this->InvalidateDataSizes();
 
   this->BeginInteractiveRender();
 
@@ -435,13 +429,6 @@ void vtkSMViewProxy::ProcessEvents(vtkObject* caller, unsigned long eventId,
   (void)caller;
   (void)eventId;
   (void)callData;
-
-  if (vtkSMRepresentationProxy::SafeDownCast(caller) && 
-    ( eventId == vtkCommand::ModifiedEvent  ||
-      eventId == vtkCommand::EndEvent))
-    {
-    this->InvalidateDataSizes();
-    }
 }
 
 //-----------------------------------------------------------------------------

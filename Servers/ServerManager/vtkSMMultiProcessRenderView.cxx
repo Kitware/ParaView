@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.9");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.10");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -129,7 +129,7 @@ void vtkSMMultiProcessRenderView::BeginInteractiveRender()
   // partially) if required to obtain correct data sizes.
 
   this->LastCompositingDecision = 
-    this->GetCompositingDecision(this->GetVisibleDisplayedDataSize(), 0);
+    this->GetCompositingDecision(this->GetVisibileFullResDataSize(), 0);
 
   this->SetUseCompositing(this->LastCompositingDecision);
 }

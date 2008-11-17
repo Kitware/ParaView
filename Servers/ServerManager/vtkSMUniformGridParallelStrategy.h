@@ -29,13 +29,13 @@
 #ifndef __vtkSMUniformGridParallelStrategy_h
 #define __vtkSMUniformGridParallelStrategy_h
 
-#include "vtkSMSimpleStrategy.h"
+#include "vtkSMSimpleParallelStrategy.h"
 
-class VTK_EXPORT vtkSMUniformGridParallelStrategy : public vtkSMSimpleStrategy
+class VTK_EXPORT vtkSMUniformGridParallelStrategy : public vtkSMSimpleParallelStrategy
 {
 public:
   static vtkSMUniformGridParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMUniformGridParallelStrategy, vtkSMSimpleStrategy);
+  vtkTypeRevisionMacro(vtkSMUniformGridParallelStrategy, vtkSMSimpleParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -53,22 +53,19 @@ protected:
   ~vtkSMUniformGridParallelStrategy();
 
   // Description:
-  // Overridden to set the servers correctly on all subproxies.
-  virtual void BeginCreateVTKObjects();
+  // Overridden to fix the Collect filter output data type etc.
   virtual void EndCreateVTKObjects();
-
-  // Description:
-  // Create and initialize the data pipeline.
-  virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
   // Overridden to avoid unnecessary LOD information collection.
   virtual void GatherLODInformation(vtkPVInformation*) {}
 
-  void InitializeCollectProxy(vtkSMProxy* collect);
-  vtkSMSourceProxy* Collect;
-  vtkSMSourceProxy* CollectLOD;
+  // Description:
+  // Determine where the data is to be delivered for rendering the current
+  // frame.
+  virtual int GetMoveMode();
+  virtual int GetLODMoveMode();
+
 private:
   vtkSMUniformGridParallelStrategy(const vtkSMUniformGridParallelStrategy&); // Not implemented
   void operator=(const vtkSMUniformGridParallelStrategy&); // Not implemented

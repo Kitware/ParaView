@@ -21,24 +21,27 @@
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.24");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.25");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
-  this->PreCollectUpdateSuppressor = 0;
+  this->PostCollectUpdateSuppressor = 0;
   this->Collect = 0;
 
-  this->PreCollectUpdateSuppressorLOD = 0;
+  this->PostCollectUpdateSuppressorLOD = 0;
   this->CollectLOD = 0;
 
   this->UseCompositing = false;
 
   this->LODClientRender = false;
   this->LODClientCollect = true;
+
+  this->CollectedDataValid = false;
+  this->CollectedLODDataValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -50,24 +53,29 @@ vtkSMSimpleParallelStrategy::~vtkSMSimpleParallelStrategy()
 void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 {
   this->Superclass::BeginCreateVTKObjects();
+  this->UpdateSuppressor->SetServers(vtkProcessModule::DATA_SERVER);
+  if (this->UpdateSuppressorLOD)
+    {
+    this->UpdateSuppressorLOD->SetServers(vtkProcessModule::DATA_SERVER);
+    }
 
-  this->PreCollectUpdateSuppressor =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressor"));
   this->Collect = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Collect"));
+  this->PostCollectUpdateSuppressor =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PostCollectUpdateSuppressor")); 
 
-  this->PreCollectUpdateSuppressorLOD =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreCollectUpdateSuppressorLOD"));
   this->CollectLOD = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CollectLOD"));
+  this->PostCollectUpdateSuppressorLOD =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PostCollectUpdateSuppressorLOD"));
 
-  this->PreCollectUpdateSuppressor->SetServers(vtkProcessModule::DATA_SERVER);
   this->Collect->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->PostCollectUpdateSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
 
   if (this->CollectLOD)
     {
-    this->PreCollectUpdateSuppressorLOD->SetServers(vtkProcessModule::DATA_SERVER);
     this->CollectLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    this->PostCollectUpdateSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else
     {
@@ -79,29 +87,27 @@ void vtkSMSimpleParallelStrategy::BeginCreateVTKObjects()
 void vtkSMSimpleParallelStrategy::CreatePipeline(vtkSMSourceProxy* input,
   int outputport)
 {
-  // We set up the pipeline as such
-  //    INPUT --> Collect --> UpdateSuppressor
-  this->CreatePipelineInternal(input, outputport,
-                               this->Collect, 
-                               this->UpdateSuppressor);
+  this->Superclass::CreatePipeline(input, outputport);
 
-  // Connect the PreCollectUpdateSuppressor to the input.
-  this->Connect(input, this->PreCollectUpdateSuppressor, "Input", outputport);
+  // Extend the superclass's pipeline as follows
+  //    SUPERCLASS --> Collect --> PostCollectUpdateSuppressor 
+  this->CreatePipelineInternal(this->Superclass::GetOutput(), 0,
+                               this->Collect, 
+                               this->PostCollectUpdateSuppressor);
+
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input, 
   int outputport)
 {
-  // We set up the pipeline as such
-  //    INPUT --> LODDecimator --> Collect --> UpdateSuppressor
-  this->Connect(input, this->LODDecimator, "Input", outputport);
-  this->CreatePipelineInternal(this->LODDecimator, 0,
-                               this->CollectLOD, 
-                               this->UpdateSuppressorLOD);
+  this->Superclass::CreateLODPipeline(input, outputport);
 
-  // Connect the PreCollectUpdateSuppressorLOD to the decimator.
-  this->Connect(this->LODDecimator, this->PreCollectUpdateSuppressorLOD, "Input", 0);
+  // Extend the superclass's pipeline as follows
+  //    SUPERCLASS --> CollectLOD --> PostCollectUpdateSuppressorLOD 
+  this->CreatePipelineInternal(this->Superclass::GetLODOutput(), 0,
+                               this->CollectLOD, 
+                               this->PostCollectUpdateSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
@@ -164,16 +170,12 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
 
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::UpdatePipeline()
+int vtkSMSimpleParallelStrategy::GetMoveMode()
 {
   // Based on the compositing decision made by the render view,
   // decide where the data should be delivered for rendering.
-
   bool usecompositing = this->GetUseCompositing();
   // cout << "usecompositing: " << usecompositing << endl;
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Collect->GetProperty("MoveMode"));
 
   int move_mode = 0;
   if (usecompositing)
@@ -195,32 +197,16 @@ void vtkSMSimpleParallelStrategy::UpdatePipeline()
       // cout << "COLLECT" << endl;
       }
     }
-  
-  ivp->SetElement(0, move_mode);
-  this->Collect->UpdateProperty("MoveMode");
-
-  // It is essential to mark the Collect filter explicitly modified.
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << this->Collect->GetID()
-          << "Modified"
-          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, this->Collect->GetServers(), stream);
-
-  this->Superclass::UpdatePipeline();
+  return move_mode;
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
+int vtkSMSimpleParallelStrategy::GetLODMoveMode()
 {
   // Based on the compositing decision made by the render view,
   // decide where the data should be delivered for rendering.
 
   bool usecompositing = this->GetUseCompositing();
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->CollectLOD->GetProperty("MoveMode"));
 
   int move_mode = 0;
   if (usecompositing)
@@ -251,8 +237,48 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
       // cout << "LOD COLLECT" << endl;
       }
     }
+  return move_mode;
+}
 
-  ivp->SetElement(0, move_mode);
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::UpdatePipeline()
+{
+  if (this->vtkSMSimpleParallelStrategy::GetDataValid())
+    {
+    return;
+    }
+
+  this->Superclass::UpdatePipeline();
+
+  vtkSMPropertyHelper(this->Collect, "MoveMode").Set(this->GetMoveMode()); 
+  this->Collect->UpdateProperty("MoveMode");
+
+  // It is essential to mark the Collect filter explicitly modified.
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->Collect->GetID()
+          << "Modified"
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, this->Collect->GetServers(), stream);
+
+  this->PostCollectUpdateSuppressor->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->PostCollectUpdateSuppressor->UpdatePipeline();
+  this->CollectedDataValid = true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
+{
+  if (this->vtkSMSimpleParallelStrategy::GetLODDataValid())
+    {
+    return;
+    }
+
+  this->Superclass::UpdateLODPipeline();
+
+  vtkSMPropertyHelper(this->CollectLOD, "MoveMode").Set(this->GetLODMoveMode());
   this->CollectLOD->UpdateProperty("MoveMode");
 
   // It is essential to mark the Collect filter explicitly modified.
@@ -272,9 +298,11 @@ void vtkSMSimpleParallelStrategy::UpdateLODPipeline()
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, this->CollectLOD->GetServers(), stream);
 
-  this->Superclass::UpdateLODPipeline();
+  this->PostCollectUpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->PostCollectUpdateSuppressorLOD->UpdatePipeline();
+  this->CollectedLODDataValid = true;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleParallelStrategy::SetUseCompositing(bool compositing)

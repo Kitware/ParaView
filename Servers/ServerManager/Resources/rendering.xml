@@ -3057,7 +3057,7 @@
       base_proxyname="PolyDataStrategy">
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressor" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -3072,7 +3072,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreDistributorSuppressor" proxygroup="filters"
+        <Proxy name="PostDistributorSuppressor" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -3091,7 +3091,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressorLOD" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -3106,7 +3106,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreDistributorSuppressorLOD" proxygroup="filters"
+        <Proxy name="PostDistributorSuppressorLOD" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -3147,6 +3147,17 @@
           <Property name="GenerateProcessIds" />
         </ExposedProperties>
       </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PostCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+        </ShareProperties>
+      </SubProxy>
+
 
       <!-- End of ClientDeliveryStrategy -->
     </ClientDeliveryStrategyProxy>
@@ -3203,7 +3214,7 @@
       base_proxyname="UnstructuredGridStrategy">
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressor" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -3218,7 +3229,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreDistributorSuppressor" proxygroup="filters"
+        <Proxy name="PostDistributorSuppressor" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -3237,7 +3248,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressorLOD" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -3252,7 +3263,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreDistributorSuppressorLOD" proxygroup="filters"
+        <Proxy name="PostDistributorSuppressorLOD" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -3292,11 +3303,6 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
-        </Proxy>
-      </SubProxy>
-
-      <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
@@ -3312,11 +3318,6 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
-        </Proxy>
-      </SubProxy>
-
-      <SubProxy>
         <Proxy name="UpdateSuppressorLOD"
           proxygroup="filters" proxyname="UpdateSuppressor2">
         </Proxy>
@@ -3324,6 +3325,36 @@
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
         </ShareProperties>
+      </SubProxy>
+
+     <SubProxy>
+        <Proxy name="PostCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PostCollectUpdateSuppressorLOD" proxygroup="filters"
+          proxyname="UpdateSuppressor2">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="CollectLOD" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
       </SubProxy>
 
       <!-- End of UniformGridParallelStrategy -->
@@ -3362,7 +3393,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressor" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressor" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -3393,7 +3424,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="PreCollectUpdateSuppressorLOD" proxygroup="filters"
+        <Proxy name="PostCollectUpdateSuppressorLOD" proxygroup="filters"
           proxyname="UpdateSuppressor2">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >

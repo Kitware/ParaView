@@ -2383,7 +2383,7 @@
       <ProxyProperty
         name="Producers"
         command="AddProducer"
-        clean_command="RemoveAllProducers" >
+        remove_command="RemoveProducer" >
         <Documentation>
           Producers/algorithms producing data that needs to be distributed.
         </Documentation>

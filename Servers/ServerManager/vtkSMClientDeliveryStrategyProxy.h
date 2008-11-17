@@ -32,6 +32,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Get the output from the strategy.
+  virtual vtkSMSourceProxy* GetOutput()
+    { return this->PostCollectUpdateSuppressor; }
+  
+  // Description:
   // The reduction filter collects data from all processes on the root node and
   // then combines them together using the post gather reduction helper.
   // This method is used to specify the class name for the algorithm to use for
@@ -58,9 +63,24 @@ protected:
   // based on UseCompositing() flag.
   virtual void UpdatePipeline();
 
+  // Description:
+  // Invalidates the full resolution pipeline.
+  virtual void InvalidatePipeline()
+    {
+    this->Superclass::InvalidatePipeline();
+    this->CollectedDataValid = false;
+    }
+
+  // Description:
+  // Returns true is data is valid.
+  virtual bool GetDataValid()
+    {
+    return this->Superclass::GetDataValid() && this->CollectedDataValid;
+    }
   vtkSMSourceProxy* ReductionProxy;
   vtkSMSourceProxy* CollectProxy;
-
+  vtkSMSourceProxy* PostCollectUpdateSuppressor;
+  bool CollectedDataValid;
 private:
   vtkSMClientDeliveryStrategyProxy(const vtkSMClientDeliveryStrategyProxy&); // Not implemented
   void operator=(const vtkSMClientDeliveryStrategyProxy&); // Not implemented

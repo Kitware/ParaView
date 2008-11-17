@@ -18,20 +18,23 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkSMIceTCompositeViewProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {
-  this->PreDistributorSuppressor = 0;
   this->Distributor = 0;
+  this->PostDistributorSuppressor = 0;
 
-  this->PreDistributorSuppressorLOD = 0;
   this->DistributorLOD = 0;
+  this->PostDistributorSuppressorLOD = 0;
+
+  this->DistributedDataValid = false;
+  this->DistributedLODDataValid = false;
 
   this->KdTree = 0;
   this->UseOrderedCompositing = false;
@@ -79,8 +82,8 @@ void vtkSMUnstructuredDataParallelStrategy::SetUseOrderedCompositing(bool use)
     this->UseOrderedCompositing = use;
 
     // invalidate data, since distribution changed.
-    this->InvalidatePipeline();
-    this->InvalidateLODPipeline();
+    this->DistributedDataValid = false;
+    this->DistributedLODDataValid = false;
     }
 }
 
@@ -89,22 +92,22 @@ void vtkSMUnstructuredDataParallelStrategy::BeginCreateVTKObjects()
 {
   this->Superclass::BeginCreateVTKObjects();
 
-  this->PreDistributorSuppressor =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreDistributorSuppressor"));
+  this->PostDistributorSuppressor =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PostDistributorSuppressor"));
   this->Distributor =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Distributor"));
 
-  this->PreDistributorSuppressorLOD =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PreDistributorSuppressorLOD"));
+  this->PostDistributorSuppressorLOD =
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PostDistributorSuppressorLOD"));
   this->DistributorLOD =
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("DistributorLOD"));
 
-  this->PreDistributorSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->PostDistributorSuppressor->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
   this->Distributor->SetServers(vtkProcessModule::RENDER_SERVER);
 
-  if (this->PreDistributorSuppressorLOD && this->DistributorLOD)
+  if (this->PostDistributorSuppressorLOD && this->DistributorLOD)
     {
-    this->PreDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
+    this->PostDistributorSuppressorLOD->SetServers(vtkProcessModule::CLIENT_AND_SERVERS);
     this->DistributorLOD->SetServers(vtkProcessModule::RENDER_SERVER);
     }
   else
@@ -123,14 +126,14 @@ void vtkSMUnstructuredDataParallelStrategy::EndCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredDataParallelStrategy::UpdateDistributedData()
 {
-  if (!this->DataValid)
-    {
-    // TODO: How to handle this when using cache?
-    // We need to call this only if cache won't be used.
-    this->PreDistributorSuppressor->InvokeCommand("ForceUpdate");
-    // This is called for its side-effects; i.e. to force a PostUpdateData()
-    this->PreDistributorSuppressor->UpdatePipeline();
-    }
+  this->Superclass::UpdatePipeline();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMUnstructuredDataParallelStrategy::InvalidateDistributedData()
+{
+  this->DistributedDataValid = false;
+  this->DistributedLODDataValid = false;
 }
 
 //----------------------------------------------------------------------------
@@ -138,17 +141,12 @@ void vtkSMUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* inp
   int outputport)
 {
   this->Superclass::CreatePipeline(input, outputport);
-  this->Connect(0, this->UpdateSuppressor);
 
-  // Superclass will create such a pipeline
-  //    INPUT --> Collect --> UpdateSuppressor
-  // We want to insert the distrubutor between the collect and the update
-  // suppressor.
-
-  this->CreatePipelineInternal(this->Collect, 
-                               this->PreDistributorSuppressor,
+  // Extend the superclass's pipeline as follows
+  // SUPERCLASS --> Distributor (only of Render Server) --> PostDistributorSuppressor
+  this->CreatePipelineInternal(this->Superclass::GetOutput(),
                                this->Distributor,
-                               this->UpdateSuppressor);
+                               this->PostDistributorSuppressor);
 }
 
 //----------------------------------------------------------------------------
@@ -156,38 +154,33 @@ void vtkSMUnstructuredDataParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* 
   int outputport)
 {
   this->Superclass::CreateLODPipeline(input, outputport);
-  this->Connect(0, this->UpdateSuppressorLOD);
-  // Superclass will create such a pipline
-  //    INPUT --> LODDecimator --> Collect --> UpdateSuppressor
-  // We want to insert the distrubutor between the collect and the update
-  // suppressor.
-  this->CreatePipelineInternal(this->CollectLOD, 
-                               this->PreDistributorSuppressorLOD,
+
+  // Extend the superclass's pipeline as follows
+  // SUPERCLASS --> DistributorLOD (only of Render Server) -->
+  //                                            PostDistributorSuppressorLOD
+  this->CreatePipelineInternal(this->Superclass::GetLODOutput(),
                                this->DistributorLOD,
-                               this->UpdateSuppressorLOD);
+                               this->PostDistributorSuppressorLOD);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredDataParallelStrategy::CreatePipelineInternal(
-  vtkSMSourceProxy* collect,
-  vtkSMSourceProxy* predistributorsuppressor,
+  vtkSMSourceProxy* input,
   vtkSMSourceProxy* distributor,
   vtkSMSourceProxy* updatesuppressor)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
 
-  this->Connect(collect, predistributorsuppressor);
-
   // This sets the connection on the render server (since Distributor::Servers =
   // vtkProcessModule::RENDER_SERVER).
-  this->Connect(predistributorsuppressor, distributor);
+  this->Connect(input, distributor);
 
   // On Render Server, the Distributor is connected to the input of the
   // UpdateSuppressor. Since there are no distributors on the client
-  // (or data server), we directly connect the PreDistributorSuppressor to the
+  // (or data server), we directly connect the PostDistributorSuppressor to the
   // UpdateSuppressor on the client and data server.
-  this->Connect(predistributorsuppressor, updatesuppressor);
+  this->Connect(input, updatesuppressor);
   updatesuppressor->UpdateVTKObjects();
 
   // Now send to the render server.
@@ -221,17 +214,8 @@ void vtkSMUnstructuredDataParallelStrategy::CreatePipelineInternal(
   // since the data type must be set only for type conversion and don't really
   // need any type conversion.
   
-  // The PreDistributorSuppressor should not supress any updates, 
-  // it's purpose is to force updates, not suppress any.
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    predistributorsuppressor->GetProperty("Enabled"));
-  ivp->SetElement(0, 0);
-  predistributorsuppressor->UpdateVTKObjects();
-
   // The distributor does not do any distribution by default.
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    distributor->GetProperty("PassThrough"));
-  ivp->SetElement(0, 1);
+  vtkSMPropertyHelper(distributor, "PassThrough").Set(1);
   distributor->UpdateVTKObjects();
 }
 
@@ -249,40 +233,59 @@ void vtkSMUnstructuredDataParallelStrategy::SetKdTree(vtkSMProxy* proxy)
     {
     this->Connect(proxy, this->DistributorLOD, "PKdTree");
     }
+
+  //this->DistributedDataValid = false;
+  //this->DistributedLODDataValid = false;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredDataParallelStrategy::UpdatePipeline()
 {
+  if (this->vtkSMUnstructuredDataParallelStrategy::GetDataValid())
+    {
+    return;
+    }
+
+  this->Superclass::UpdatePipeline();
+
   bool usecompositing = this->GetUseCompositing();
   // cout << "usecompositing: " << usecompositing << endl;
 
   // cout << "use ordered compositing: " << (usecompositing && this->UseOrderedCompositing)
   //  << endl;
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->Distributor->GetProperty("PassThrough"));
-  ivp->SetElement(0,
+  vtkSMPropertyHelper(this->Distributor, "PassThrough").Set(
     (usecompositing && this->UseOrderedCompositing)? 0 : 1);
   this->Distributor->UpdateProperty("PassThrough");
 
-  this->Superclass::UpdatePipeline();
+  this->PostDistributorSuppressor->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->PostDistributorSuppressor->UpdatePipeline();
+  this->DistributedDataValid = true;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMUnstructuredDataParallelStrategy::UpdateLODPipeline()
 {
+  if (this->vtkSMUnstructuredDataParallelStrategy::GetLODDataValid())
+    {
+    return;
+    }
+
+  this->Superclass::UpdateLODPipeline();
+
   // Based on the compositing decision made by the render view,
   // decide where the data should be delivered for rendering.
 
   bool usecompositing = this->GetUseCompositing();
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->DistributorLOD->GetProperty("PassThrough"));
-  ivp->SetElement(0,
+  vtkSMPropertyHelper(this->DistributorLOD, "PassThrough").Set(
     (usecompositing && this->UseOrderedCompositing)? 0 : 1);
   this->DistributorLOD->UpdateProperty("PassThrough");
 
-  this->Superclass::UpdateLODPipeline();
+  this->PostDistributorSuppressorLOD->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->PostDistributorSuppressorLOD->UpdatePipeline();
+  this->DistributedLODDataValid = true;
 }
 
 //----------------------------------------------------------------------------

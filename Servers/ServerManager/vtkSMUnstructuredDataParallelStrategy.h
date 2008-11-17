@@ -32,13 +32,28 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Get the output from the strategy.
+  virtual vtkSMSourceProxy* GetOutput()
+    { return this->PostDistributorSuppressor; }
+
+  // Description:
+  // Get low resolution output.
+  virtual vtkSMSourceProxy* GetLODOutput()
+    { return this->PostDistributorSuppressorLOD; }
+
+  // Description:
   // Returns the data generator that goes into the distributor.
   virtual vtkSMSourceProxy* GetDistributedSource()
-    { return this->PreDistributorSuppressor; }
+    { return this->Superclass::GetOutput(); }
 
   // Description:
   // Update the data the gets distributed.
   virtual void UpdateDistributedData();
+
+  // Description:
+  // This is called to mark the distributed data invalid. This must be called
+  // whenever the KdTree is rebuilt.
+  void InvalidateDistributedData();
 
 //BTX
 protected:
@@ -88,23 +103,49 @@ protected:
   // Called to set the KdTree proxy on the distributor.
   void SetKdTree(vtkSMProxy*);
 
+  virtual bool GetDataValid()
+    { return this->DistributedDataValid && this->Superclass::GetDataValid(); }
+
+  virtual bool GetLODDataValid()
+    { 
+    return this->DistributedLODDataValid &&
+      this->Superclass::GetLODDataValid(); 
+    }
+
+  // Description:
+  // Invalidates the LOD pipeline.
+  virtual void InvalidateLODPipeline()
+    { 
+    this->Superclass::InvalidateLODPipeline();
+    this->DistributedLODDataValid = false;
+    }
+
+  // Description:
+  // Invalidates the full resolution pipeline.
+  virtual void InvalidatePipeline()
+    {
+    this->Superclass::InvalidatePipeline();
+    this->DistributedDataValid = false;
+    }
+
+  bool DistributedDataValid;
+  bool DistributedLODDataValid;
+
   bool UseOrderedCompositing;
   vtkSMProxy* KdTree;
 
-  vtkSMSourceProxy* PreDistributorSuppressor;
+  vtkSMSourceProxy* PostDistributorSuppressor;
   vtkSMSourceProxy* Distributor;
 
-  vtkSMSourceProxy* PreDistributorSuppressorLOD;
+  vtkSMSourceProxy* PostDistributorSuppressorLOD;
   vtkSMSourceProxy* DistributorLOD;
 
 private:
   vtkSMUnstructuredDataParallelStrategy(const vtkSMUnstructuredDataParallelStrategy&); // Not implemented
   void operator=(const vtkSMUnstructuredDataParallelStrategy&); // Not implemented
 
-  void CreatePipelineInternal(vtkSMSourceProxy* collect,
-    vtkSMSourceProxy* predistributorsuppressor,
-    vtkSMSourceProxy* distributor,
-    vtkSMSourceProxy* updatesuppressor);
+  void CreatePipelineInternal(vtkSMSourceProxy* input,
+    vtkSMSourceProxy* distributor, vtkSMSourceProxy* updatesuppressor);
 
 //ETX
 };

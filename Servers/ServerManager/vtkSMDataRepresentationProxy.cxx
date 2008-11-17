@@ -53,7 +53,7 @@ protected:
 };
 
 
-vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMDataRepresentationProxy, "1.13");
 vtkCxxSetObjectMacro(vtkSMDataRepresentationProxy, InputProxy, vtkSMSourceProxy);
 //----------------------------------------------------------------------------
 vtkSMDataRepresentationProxy::vtkSMDataRepresentationProxy()
@@ -329,10 +329,12 @@ vtkPVDataInformation* vtkSMDataRepresentationProxy::GetRepresentedDataInformatio
     return 0;
     }
 
-  if (update)
-    {
-    this->Update();
-    }
+  // Don't call update, UpdateDataInformation() will update the sub-pipeline
+  // until the place from which the data information is obtained if needed.
+  //if (update)
+  //  {
+  //  this->Update();
+  //  }
 
   // We don't use active stratgies since active strategies are returned only
   // when visibile.
@@ -340,7 +342,10 @@ vtkPVDataInformation* vtkSMDataRepresentationProxy::GetRepresentedDataInformatio
   for (iter = this->RepresentationStrategies->begin(); 
     iter != this->RepresentationStrategies->end(); ++iter)
     {
-    iter->GetPointer()->UpdateDataInformation();
+    if (update)
+      {
+      iter->GetPointer()->UpdateDataInformation();
+      }
     return iter->GetPointer()->GetRepresentedDataInformation();
     }
 

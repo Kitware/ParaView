@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSMUpdateSuppressorProxy);
-vtkCxxRevisionMacro(vtkSMUpdateSuppressorProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMUpdateSuppressorProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMUpdateSuppressorProxy::vtkSMUpdateSuppressorProxy()
@@ -28,6 +28,32 @@ vtkSMUpdateSuppressorProxy::vtkSMUpdateSuppressorProxy()
 //---------------------------------------------------------------------------
 vtkSMUpdateSuppressorProxy::~vtkSMUpdateSuppressorProxy()
 {
+}
+
+////---------------------------------------------------------------------------
+//void vtkSMUpdateSuppressorProxy::UpdatePipeline(double vtkNotUsed(time))
+//{
+//  // UpdatePipeline doesn't update anything in case of UpdateSuppressor. Hence
+//  // we just shunt update pipeline calls. One should use ForceUpdate().
+//  vtkWarningMacro("Try using ForceUpdate() to update pipeline.");
+//}
+//
+////---------------------------------------------------------------------------
+//void vtkSMUpdateSuppressorProxy::UpdatePipeline()
+//{
+//  // UpdatePipeline doesn't update anything in case of UpdateSuppressor. Hence
+//  // we just shunt update pipeline calls. One should use ForceUpdate().
+//  vtkWarningMacro("Try using ForceUpdate() to update pipeline.");
+//}
+
+//---------------------------------------------------------------------------
+void vtkSMUpdateSuppressorProxy::ForceUpdate()
+{
+  if (this->NeedsUpdate)
+    {
+    this->InvokeCommand("ForceUpdate");
+    this->Superclass::UpdatePipeline();
+    }
 }
 
 //---------------------------------------------------------------------------

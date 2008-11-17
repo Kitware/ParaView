@@ -140,7 +140,7 @@ public:
   // information about data sizes etc from the server without actually
   // undertaking any expensive data transfers.
   // Similar to Update(), the LOD subpipline is updated only if LOD is used.
-  void UpdateDataInformation();
+  virtual void UpdateDataInformation();
 
   // Description:
   // Returns the current data information for the represented data.
@@ -202,7 +202,7 @@ protected:
   // Gather the information of the displayed data (non-LOD).
   // Update the part of the pipeline needed to gather full information
   // and then gather that information. 
-  virtual void GatherInformation(vtkPVInformation*);
+  virtual void GatherInformation(vtkPVInformation*) = 0;
 
   // Description:
   // Gather the information of the displayed data (lod);
@@ -229,11 +229,11 @@ protected:
 
   // Description:
   // Invalidates the LOD pipeline.
-  void InvalidateLODPipeline();
+  virtual void InvalidateLODPipeline();
 
   // Description:
   // Invalidates the full resolution pipeline.
-  void InvalidatePipeline();
+  virtual void InvalidatePipeline();
 
   // Description:
   // Creates a connection between the producer and the consumer
@@ -271,6 +271,16 @@ protected:
       this->InvalidateLODPipeline();
       }
     }
+
+  // Description:
+  // Returns true is data is valid.
+  virtual bool GetDataValid()
+    { return this->DataValid; }
+
+  // Description:
+  // Returns true is LOD data is valid.
+  virtual bool GetLODDataValid()
+    { return this->LODDataValid; }
 
   bool UseCache;
   bool UseLOD;

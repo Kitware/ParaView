@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSimpleStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.14");
+vtkCxxRevisionMacro(vtkSMSimpleStrategy, "1.15");
 //----------------------------------------------------------------------------
 vtkSMSimpleStrategy::vtkSMSimpleStrategy()
 {
@@ -78,34 +78,67 @@ void vtkSMSimpleStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputp
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSimpleStrategy::GatherLODInformation(vtkPVInformation* info)
+void vtkSMSimpleStrategy::GatherInformation(vtkPVInformation* info)
 {
+  // It's essential that we don't call UpdatePipeline() on our subclasses since
+  // they may still be in a state that's not fully determined eg. status of
+  // compositing etc.
+  this->vtkSMSimpleStrategy::UpdatePipeline();
+
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->GatherInformation(this->ConnectionID,
-    this->LODDecimator->GetServers(),
+    this->UpdateSuppressor->GetServers(),
     info,
-    this->LODDecimator->GetID());
+    this->UpdateSuppressor->GetID());
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSimpleStrategy::GatherLODInformation(vtkPVInformation* info)
+{
+  // It's essential that we don't call UpdatePipeline() on our subclasses since
+  // they may still be in a state that's not fully determined eg. status of
+  // compositing etc.
+  this->vtkSMSimpleStrategy::UpdateLODPipeline();
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->ConnectionID,
+    this->UpdateSuppressorLOD->GetServers(),
+    info,
+    this->UpdateSuppressorLOD->GetID());
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdatePipeline()
 {
+  // We check to see if the part of the pipeline that will up updated by this
+  // class needs any update. Then alone do we call update.
+  if (this->vtkSMSimpleStrategy::GetDataValid())
+    {
+    return;
+    }
+
+  // It's essential to call UpdatePipeline() on the superclass first since
+  // that's the one that sets up CacheKeeper state correctly.
+  this->Superclass::UpdatePipeline();
+  
   this->UpdateSuppressor->InvokeCommand("ForceUpdate");
   // This is called for its side-effects; i.e. to force a PostUpdateData()
   this->UpdateSuppressor->UpdatePipeline();
-
-  this->Superclass::UpdatePipeline();
 }
 
 //----------------------------------------------------------------------------
 void vtkSMSimpleStrategy::UpdateLODPipeline()
 {
-  this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
-
-  // This is called for its side-effects; i.e. to force a PostUpdateData()
-  this->UpdateSuppressorLOD->UpdatePipeline();
+  if (this->vtkSMSimpleStrategy::GetLODDataValid())
+    {
+    return;
+    }
 
   this->Superclass::UpdateLODPipeline();
+
+  this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+  // This is called for its side-effects; i.e. to force a PostUpdateData()
+  this->UpdateSuppressorLOD->UpdatePipeline();
 }
 
 //----------------------------------------------------------------------------

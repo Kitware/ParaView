@@ -32,11 +32,11 @@
 #include "vtkSMUnstructuredDataParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-
+#include "vtkSMUniformGridParallelStrategy.h"
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.24");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -556,9 +556,13 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
     if (strcmp(strategyIter->GetPointer()->GetXMLName(), 
         "UniformGridParallelStrategy") == 0)
       {
+      vtkSMUniformGridParallelStrategy* ugps =
+        vtkSMUniformGridParallelStrategy::SafeDownCast(strategyIter->GetPointer());
       ppStructuredProducer->RemoveAllProxies();
-      ppStructuredProducer->AddProxy(strategyIter->GetPointer()->GetOutput());
+      ppStructuredProducer->AddProxy(
+        ugps->vtkSMSimpleStrategy::GetOutput());
       
+      // cout << strategyIter->GetPointer()->UpdateRequired() << endl; 
       // Essential to update the representation, so that the
       // KdTree generator gets the updated data to use when generating the
       // KdTree.
@@ -575,6 +579,16 @@ void vtkSMIceTCompositeViewProxy::UpdateOrderedCompositingPipeline()
         {
         ppProducers->AddProxy(pstrategy->GetDistributedSource());
         pstrategy->UpdateDistributedData();
+        // We mark the distributed data invalid since we'd be rebuilding the
+        // KdTree, and the distributor must be re-executed after the KdTree has
+        // changed. This method is smart enough to only mark the distributed
+        // data invalid, not the entire pipeline which saves ton of pipeline
+        // rexecutions.
+        // Although we are making the distributed data invalid on every render.
+        // The OrderedCompositingDistrubitor is smart enough to re-distribute
+        // data only if something changed, hence distribution does not actually
+        // take place on every render unless something changed.
+        pstrategy->InvalidateDistributedData();
         }
       }
     }

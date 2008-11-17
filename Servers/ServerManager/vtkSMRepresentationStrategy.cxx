@@ -27,7 +27,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMPropertyHelper.h"
 
-vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.20");
+vtkCxxRevisionMacro(vtkSMRepresentationStrategy, "1.21");
 vtkCxxSetObjectMacro(vtkSMRepresentationStrategy, 
   RepresentedDataInformation, vtkPVDataInformation);
 //----------------------------------------------------------------------------
@@ -169,11 +169,11 @@ bool vtkSMRepresentationStrategy::UpdateRequired()
   // up-to-date, we need an Update. Additionally, is LOD is enabled and LOD
   // pipeline is not up-to-date, then too, we need an update.
 
-  bool update_required = !this->DataValid;
+  bool update_required = !this->GetDataValid();
 
   if (this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated))
     {
-    update_required |= !this->LODDataValid;
+    update_required |= !this->GetLODDataValid();
     }
 
   return update_required;
@@ -185,31 +185,22 @@ void vtkSMRepresentationStrategy::Update()
   if (this->UpdateRequired())
     {
     this->InvokeEvent(vtkCommand::StartEvent);
-
-    // Update the CacheKeeper.
-    bool cachingEnabled = this->GetUseCache();
-    vtkSMPropertyHelper(this->CacheKeeper, "CachingEnabled").Set(
-      cachingEnabled? 1 : 0);
-    vtkSMPropertyHelper(this->CacheKeeper, "CacheTime").Set(this->CacheTime);
-    this->CacheKeeper->UpdateVTKObjects();
-    if (cachingEnabled)
-      {
-      this->SomethingCached = true;
-      }
-
-    if (!this->DataValid)
+ 
+    if (!this->GetDataValid())
       {
       this->UpdatePipeline();
       }
 
-    if ( (this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated)) 
-      && !this->LODDataValid)
+    if ((this->GetUseLOD() || (this->EnableLOD && this->KeepLODPipelineUpdated)) 
+      && !this->GetLODDataValid())
       {
       this->UpdateLODPipeline();
       }
 
     this->InvokeEvent(vtkCommand::EndEvent);
     }
+
+  this->PostUpdateData();
 }
 
 //----------------------------------------------------------------------------
@@ -234,16 +225,6 @@ void vtkSMRepresentationStrategy::UpdateDataInformation()
     this->LODInformationValid = true;
     info->Delete();
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMRepresentationStrategy::GatherInformation(vtkPVInformation* info)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->GatherInformation(this->ConnectionID,
-    this->CacheKeeper->GetServers(),
-    info,
-    this->CacheKeeper->GetID());
 }
 
 //----------------------------------------------------------------------------
@@ -295,10 +276,20 @@ void vtkSMRepresentationStrategy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMRepresentationStrategy::UpdatePipeline()
 {
+  // Update the CacheKeeper.
+  bool cachingEnabled = this->GetUseCache();
+  vtkSMPropertyHelper(this->CacheKeeper, "CachingEnabled").Set(
+    cachingEnabled? 1 : 0);
+  vtkSMPropertyHelper(this->CacheKeeper, "CacheTime").Set(this->CacheTime);
+  this->CacheKeeper->UpdateVTKObjects();
+  if (cachingEnabled)
+    {
+    this->SomethingCached = true;
+    }
+
+
   this->DataValid = true;
-  this->InformationValid = false;
-  
-  this->PostUpdateData();
+  this->InformationValid = false; 
 }
 
 //----------------------------------------------------------------------------

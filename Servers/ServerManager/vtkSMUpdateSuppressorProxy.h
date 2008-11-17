@@ -29,6 +29,19 @@ public:
   vtkTypeRevisionMacro(vtkSMUpdateSuppressorProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //// Description:
+  //// Calls Update() on all sources. It also creates output ports if
+  //// they are not already created.
+  //virtual void UpdatePipeline();
+
+  //// Description:
+  //// Calls Update() on all sources with the given time request. 
+  //// It also creates output ports if they are not already created.
+  //virtual void UpdatePipeline(double time);
+
+  // Description:
+  // Results in calling ForceUpdate() if the pipeline is dirty. 
+  void ForceUpdate();
 
 protected:
   vtkSMUpdateSuppressorProxy();

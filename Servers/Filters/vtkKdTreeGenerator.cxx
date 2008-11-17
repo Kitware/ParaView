@@ -31,7 +31,7 @@
 class vtkKdTreeGeneratorVector : public vtkstd::vector<int> {};
 
 vtkStandardNewMacro(vtkKdTreeGenerator);
-vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.4");
+vtkCxxRevisionMacro(vtkKdTreeGenerator, "1.5");
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, ExtentTranslator, vtkExtentTranslator);
 vtkCxxSetObjectMacro(vtkKdTreeGenerator, KdTree, vtkPKdTree);
 //-----------------------------------------------------------------------------
@@ -120,6 +120,17 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
     return 0;
     }
 
+  // Now to determine assigments (not much different from inorder traversal printing 
+  // the leaf nodes alone).
+  int *assignments = new int[this->NumberOfPieces];
+  int *ptr = assignments;
+  //assignments[0] = 0;
+  //assignments[1] = 1;
+  //assignments[2] = 2;
+  //assignments[3] = 3;
+  vtkKdTreeGeneratorOrder(ptr, root);
+  this->KdTree->AssignRegions(assignments, this->NumberOfPieces);
+
   vtkSmartPointer<vtkBSPCuts> cuts = vtkSmartPointer<vtkBSPCuts>::New();
   cuts->CreateCuts(root);
   if (!this->KdTree)
@@ -129,15 +140,8 @@ int vtkKdTreeGenerator::BuildTree(vtkDataObject* data)
     tree->Delete();
     }
   this->KdTree->SetCuts(cuts);
-  // cout  << endl << "Tree: " << endl;
-  // cuts->PrintTree();
-
-  // Now to determine assigments (not much different from inorder traversal printing 
-  // the leaf nodes alone).
-  int *assignments = new int[this->NumberOfPieces];
-  int *ptr = assignments;
-  vtkKdTreeGeneratorOrder(ptr, root);
-  this->KdTree->AssignRegions(assignments, this->NumberOfPieces);
+  //cout  << endl << "Tree: " << endl;
+  //cuts->PrintTree();
 
   this->SetExtentTranslator(0);
   delete []assignments;
@@ -284,14 +288,27 @@ void vtkKdTreeGenerator::FormRegions()
   this->ExtentTranslator->SetWholeExtent(this->WholeExtent);
   this->ExtentTranslator->SetNumberOfPieces(this->NumberOfPieces);
   this->ExtentTranslator->SetGhostLevel(0);
+  // cout << "************************" << endl;
+  // cout << "ExtentTranslator: " << this->ExtentTranslator << ":"
+  //   << this->ExtentTranslator->GetClassName() << endl;
   for (int cc=0; cc < this->NumberOfPieces; cc++)
     {
     this->ExtentTranslator->SetPiece(cc);
     this->ExtentTranslator->PieceToExtent();
     this->ExtentTranslator->GetExtent(&this->Regions[cc*6]);
+    //int extent[6];
+    //this->ExtentTranslator->GetExtent(extent);
+    //cout << cc << ": " 
+    //  << extent[0] << ", "
+    //  << extent[1] << ", "
+    //  << extent[2] << ", "
+    //  << extent[3] << ", "
+    //  << extent[4] << ", "
+    //  << extent[5] << endl;
     }
 }
 
+//-----------------------------------------------------------------------------
 static bool vtkConvertToBoundsInternal(
   vtkKdNode* node, double origin[3], double spacing[3])
 {
