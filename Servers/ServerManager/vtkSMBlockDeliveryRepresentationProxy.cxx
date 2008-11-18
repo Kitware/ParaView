@@ -73,7 +73,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMBlockDeliveryRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMBlockDeliveryRepresentationProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMBlockDeliveryRepresentationProxy::vtkSMBlockDeliveryRepresentationProxy()
 {
@@ -288,7 +288,7 @@ vtkDataObject* vtkSMBlockDeliveryRepresentationProxy::GetOutput(vtkIdType block)
 //----------------------------------------------------------------------------
 vtkIdType vtkSMBlockDeliveryRepresentationProxy::GetNumberOfRequiredBlocks()
 {
-  vtkPVDataInformation* dInfo = this->GetRepresentedDataInformation(false);
+  vtkPVDataInformation* dInfo = this->GetRepresentedDataInformation(true);
   return static_cast<vtkIdType>(ceil(
       static_cast<double>(dInfo->GetNumberOfRows())/
       vtkSMPropertyHelper(this, "BlockSize").GetAsIdType()));

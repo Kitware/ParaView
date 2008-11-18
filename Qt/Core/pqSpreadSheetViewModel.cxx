@@ -128,7 +128,7 @@ public:
     if (this->Representation)
       {
       vtkPVDataInformation* info =
-        this->Representation->GetRepresentedDataInformation(false);
+        this->Representation->GetRepresentedDataInformation(true);
       return info->GetNumberOfRows();
       }
     return 0;
