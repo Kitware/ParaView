@@ -572,6 +572,14 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty name="ProcessEvents"
+                         command="SetProcessEvents"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain/>
+      </IntVectorProperty>
+
+
       <!-- End of TextWidget -->
     </Proxy>
 

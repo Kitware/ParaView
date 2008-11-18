@@ -32,6 +32,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set the visibility for the representation.
+  void SetVisibility(int);
+
+  // Description:
   // Called to update the Display. Default implementation does nothing.
   // Argument is the view requesting the update. Can be null in the
   // case when something other than a view is requesting the update.

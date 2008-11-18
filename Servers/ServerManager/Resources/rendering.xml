@@ -7962,7 +7962,7 @@
           proxygroup="3d_widgets" proxyname="TextWidget">
         </Proxy>
         <ExposedProperties>
-          <Property name="Enabled"/>
+          <Property name="ProcessEvents"/>
           <Property name="Selectable"/>
           <Property name="Resizable"/>
         </ExposedProperties>
@@ -8004,13 +8004,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="TextWidgetRepresentation"
           proxygroup="representations" proxyname="TextWidgetRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="Enabled" />
-          <Property name="Visibility" />
+          <Property name="ProcessEvents" exposed_name="Interactivity"/>
           <Property name="Position" />
           <Property name="Position2" />
           <Property name="PositionInfo" />

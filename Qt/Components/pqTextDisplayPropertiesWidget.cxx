@@ -131,12 +131,9 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
     this->Internal->Visibility, "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Visibility"));
 
-  QObject::connect(this->Internal->Visibility, SIGNAL(stateChanged(int)),
-    this, SLOT(onVisibilityChanged(int)));
-
   this->Internal->Links.addPropertyLink(
     this->Internal->Interactivity, "checked", SIGNAL(stateChanged(int)),
-    proxy, proxy->GetProperty("Enabled"));
+    proxy, proxy->GetProperty("Interactivity"));
   this->Internal->Links.addPropertyLink(
     this->Internal->Position1X, "value", SIGNAL(editingFinished()),
     proxy, proxy->GetProperty("Position"), 0);
@@ -192,10 +189,10 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
 //-----------------------------------------------------------------------------
 void pqTextDisplayPropertiesWidget::onVisibilityChanged(int state)
 {
-  if (state == Qt::Unchecked)
-    {
-    this->Internal->Interactivity->setCheckState(Qt::Unchecked);
-    }
+  //if (state == Qt::Unchecked)
+  //  {
+  //  this->Internal->Interactivity->setCheckState(Qt::Unchecked);
+  //  }
 }
 
 //-----------------------------------------------------------------------------
