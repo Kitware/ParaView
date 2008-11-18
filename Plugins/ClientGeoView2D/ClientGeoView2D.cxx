@@ -38,6 +38,7 @@
 #include <vtkGeoImageNode.h>
 #include <vtkGeoAlignedImageRepresentation.h>
 #include <vtkGeoAlignedImageSource.h>
+#include <vtkGeoFileImageSource.h>
 #include <vtkGeoLineRepresentation.h>
 #include <vtkGeometryFilter.h>
 #include <vtkGeoProjection.h>
@@ -174,26 +175,40 @@ ClientGeoView2D::ClientGeoView2D(
   this->Implementation->View->ApplyViewTheme(theme);
   theme->Delete();
 
-  // Set default projection and image
-  vtkStdString filename;
-  if (pqFilesystem::shareDirectory().exists("NE2_ps_bath.png"))
+  vtkStdString tileDatabase(CLIENT_GEO_VIEW_TILE_PATH);
+  if (tileDatabase.length() == 0)
     {
-    filename = pqFilesystem::shareDirectory().filePath("NE2_ps_bath.png").toAscii().data();
+    // Set default projection and image
+    vtkStdString filename;
+    if (pqFilesystem::shareDirectory().exists("NE2_ps_bath.png"))
+      {
+      filename = pqFilesystem::shareDirectory().filePath("NE2_ps_bath.png").toAscii().data();
+      }
+    else
+      {
+      filename = PARAVIEW_DATA_ROOT "/Data/NE2_ps_bath.png";
+      }
+
+    // Create image representation.
+    vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
+    reader->SetFileName(filename.c_str());
+    reader->Update();
+    this->Implementation->ImageSource->SetImage(reader->GetOutput());
+    vtkSmartPointer<vtkGeoAlignedImageRepresentation> rep =
+      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
+    rep->SetSource(this->Implementation->ImageSource);
+    this->Implementation->View->AddRepresentation(rep);
     }
   else
     {
-    filename = PARAVIEW_DATA_ROOT "/Data/NE2_ps_bath.png";
+    vtkSmartPointer<vtkGeoFileImageSource> imageSource =
+      vtkSmartPointer<vtkGeoFileImageSource>::New();
+    imageSource->SetPath(tileDatabase.c_str());
+    vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
+      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
+    imageRep->SetSource(imageSource);
+    this->Implementation->View->AddRepresentation(imageRep);
     }
-
-  // Create image representation.
-  vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
-  reader->SetFileName(filename.c_str());
-  reader->Update();
-  this->Implementation->ImageSource->SetImage(reader->GetOutput());
-  vtkSmartPointer<vtkGeoAlignedImageRepresentation> rep =
-    vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
-  rep->SetSource(this->Implementation->ImageSource);
-  this->Implementation->View->AddRepresentation(rep);
 
   // Create surface.
   this->Implementation->ProjectionSource->SetProjection(

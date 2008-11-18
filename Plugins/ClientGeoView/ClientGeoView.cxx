@@ -35,6 +35,8 @@
 #include <vtkGeoAlignedImageRepresentation.h>
 #include <vtkGeoAlignedImageSource.h>
 #include <vtkGeoCamera.h>
+#include <vtkGeoFileImageSource.h>
+#include <vtkGeoGlobeSource.h>
 #include <vtkGeoGraphRepresentation.h>
 #include <vtkGeoInteractorStyle.h>
 #include <vtkGeoLineRepresentation.h>
@@ -196,7 +198,20 @@ ClientGeoView::ClientGeoView(
     }
   else
     {
-    vtkGenericWarningMacro(<< "Tile database currently not supported");
+    vtkSmartPointer<vtkGeoGlobeSource> globeSource =
+      vtkSmartPointer<vtkGeoGlobeSource>::New();
+    vtkSmartPointer<vtkGeoTerrain> terrain =
+      vtkSmartPointer<vtkGeoTerrain>::New();
+    terrain->SetSource(globeSource);
+    this->Implementation->View->SetTerrain(terrain);
+
+    vtkSmartPointer<vtkGeoFileImageSource> imageSource =
+      vtkSmartPointer<vtkGeoFileImageSource>::New();
+    imageSource->SetPath(tileDatabase.c_str());
+    vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
+      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
+    imageRep->SetSource(imageSource);
+    this->Implementation->View->AddRepresentation(imageRep);
     }
 
   // Load political boundaries and write as XML
