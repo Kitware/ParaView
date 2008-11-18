@@ -50,7 +50,6 @@ public:
   // MPIMToNSocketConnection==0 => Client-DataServer.
   // MPIMToNSocketConnection==1 => Client-DataServer-RenderServer.
   void SetController(vtkMultiProcessController* controller);
-  void SetClientDataServerSocketController(vtkSocketController* sdc);
   void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection* sc);
   
   // Description:
@@ -81,12 +80,6 @@ public:
   vtkGetMacro(OutputDataType, int);
 
   // Description:
-  // Legacy API for ParaView 1.4
-  void SetPassThrough(int v) 
-    {if(v){this->SetMoveModeToPassThrough();} else {this->SetMoveModeToClone();}}
-  void SetSocketController(vtkSocketController* c) {this->SetClientDataServerSocketController(c);}
-
-  // Description:
   // Sometimes, the data may be too huge to deliver to the client. In that case,
   // the client can request that only the outline for the data may be delivered
   // to the client. This is supported only for vtkPolyData.
@@ -105,6 +98,12 @@ public:
 protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
+
+  // Description:
+  // This method is called on each RequestData(). It Initializes the
+  // ClientDataServerSocketController with the socket communicator for the
+  // active connection.
+  void DetermineClientDataServerController();
 
   virtual int RequestDataObject(vtkInformation* request, 
                            vtkInformationVector** inputVector, 

@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.16");
+vtkCxxRevisionMacro(vtkServerConnection, "1.17");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -370,18 +370,7 @@ int vtkServerConnection::Initialize(int argc, char** argv, int *partitionId)
   this->Superclass::Initialize(argc, argv, partitionId);
   // returns 0 on success, 1 on error.
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   
-  // A remote connnection is assigned a unique vtkClientServerID so that
-  // the connection can be located by the interpreter.
-  this->SelfID = pm->GetUniqueID();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Assign
-    << this->SelfID << this
-    << vtkClientServerStream::End;
-  this->SendStreamToClient(stream);  
-
-
   // Authenticate with DataServer.
   if (!this->AuthenticateWithServer(this->GetSocketController()))
     {
@@ -403,6 +392,7 @@ int vtkServerConnection::Initialize(int argc, char** argv, int *partitionId)
     }
 
   // Collect and keep the server information.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVServerInformation* temp = vtkPVServerInformation::New();
   this->GatherInformation(
     vtkProcessModule::RENDER_SERVER,
@@ -441,13 +431,6 @@ int vtkServerConnection::AuthenticateWithServer(vtkSocketController* controller)
     return 1;
     }
 
-  if (!this->SelfID.ID)
-    {
-    // Sanity check.
-    vtkErrorMacro("SelfID not set.");
-    return 0;
-    }
-  
   // If any send or receive fails we simply give up.
   // Send connect ID to the server.
   int cid = options->GetConnectID();
@@ -502,29 +485,13 @@ int vtkServerConnection::AuthenticateWithServer(vtkSocketController* controller)
   // Receive the number of server processes as an handshake.
   int numServerProcs =  0;
   if (!controller->Receive(&numServerProcs, 1, 1,
-      vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG))
+      vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG) || 
+    (numServerProcs == 0))
     {
     vtkErrorMacro("Failed to receive handshake message.");
     return 0;
     }
 
-  // Now, since the authentication has succeeded, tell the server
-  // to assign the same vtkClientServerID to this connection as the Client is.
-  int id = static_cast<int>(this->SelfID.ID);
-  if (!controller->Send(&id, 1, 1,
-      vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG))
-    {
-    return 0;
-    }
-  match=0;
-  controller->Receive(&match, 1, 1, 
-    vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
-  if (match == 0)
-    {
-    vtkErrorMacro("Failed to assign ID to this connection.");
-    return 0;
-    }
-  
   // Since no of Data Server Processes >= no. of Render Server Processes,
   // this check ensures we only maintain the Data Server processes count.
   this->NumberOfServerProcesses = 

@@ -223,11 +223,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.10");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.11");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.10");
+vtkCxxRevisionMacro(vtkClientConnection, "1.11");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -328,48 +328,6 @@ int vtkClientConnection::AuthenticateWithClient()
   // send the number of server processes as a handshake. 
   this->Controller->Send(&numProcs, 1, 1, 
     vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
-
-  // Now get the vtkClientServerID to assign to this connection.
-  // The client tells the ID to assign.
-  int id = 0;
-  this->Controller->Receive(&id, 1, 1,
-    vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
-  if (id == 0)
-    {
-    vtkErrorMacro("Failed to get correct ID to assign to this connection.");
-    }
-  else
-    {
-    this->SelfID.ID = static_cast<vtkTypeUInt32>(id);
-    // We will assign the SelfID to this connection on the local interpreter.
-
-    // Now, on satellites, we want this ID to be assigned to a null object,
-    // since, this connection has no representation on the satellites.
-    // So we first assign the ID as null object on every node and then 
-    // reassign the id to this connection on the root node.
-    
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Assign
-      << this->SelfID << 0 //NULL.
-      << vtkClientServerStream::End;
-
-    pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
-      vtkProcessModule::DATA_SERVER, stream, 1);
-
-    // Reassign the ID on the root.
-    stream << vtkClientServerStream::Delete
-      << this->SelfID << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Assign
-      << this->SelfID << this
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
-    }
-
-  // Let the client know the ID we assigned.
-  this->Controller->Send(&id, 1, 1,
-    vtkRemoteConnection::CLIENT_SERVER_COMMUNICATION_TAG);
-
   return 1; //SUCCESS.
 }
 

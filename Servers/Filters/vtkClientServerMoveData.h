@@ -36,7 +36,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Set the connection on which we are moving the data.
-  // Thus must not be set on the render server only nodes at all.
+  // If not set, the active remote connection will be used.
   void SetProcessModuleConnection(vtkProcessModuleConnection*);
 
   // Description:

@@ -103,17 +103,6 @@ public:
   vtkGetMacro(AbortConnection, int);
 
   // Description:
-  // Overridden to break the reference loop caused by the fact that 
-  // vtkRemoteConnections store their own ClientServerIds.
-  virtual void UnRegister(vtkObjectBase* obj);
-
-//BTX
-  // Description:
-  // Get the SelfID.
-  vtkGetMacro(SelfID, vtkClientServerID);
-//ETX
-
-  // Description:
   // Push the vtkUndoSet xml state on the undo stack for this connection.
   // Subclasses override this method to do the appropriate action.
   // On SelfConnection, the undo set is stored locally, while on
@@ -175,9 +164,6 @@ protected:
   // flag is set when SocketError occurs.
   int AbortConnection;
  
-  // Every connection is assigned a vtkClientServerID.
-  vtkClientServerID SelfID;
-
   vtkPVProgressHandler* ProgressHandler;
 private:
   vtkProcessModuleConnection(const vtkProcessModuleConnection&); // Not implemented.

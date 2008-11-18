@@ -22,7 +22,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.3");
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderSyncManagerHelper::vtkSMClientServerRenderSyncManagerHelper()
 {
@@ -145,8 +145,7 @@ void vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
   // communicate. So, set that up.
   stream  << vtkClientServerStream::Invoke 
           << pm->GetProcessModuleID()
-          << "GetRenderServerSocketController"
-          << pm->GetConnectionClientServerID(cid)
+          << "GetActiveRenderServerSocketController"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke 
           << rsmProxy->GetID()

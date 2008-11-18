@@ -385,17 +385,6 @@ public:
   // Get the ID used for MPIMToNSocketConnection for the given connection.
   vtkClientServerID GetMPIMToNSocketConnectionID(vtkIdType id);
   
-  // Description:
-  // Given a connection ID, this call returns the ClientServer ID
-  // assigned to that connection. For now, only vtkRemoteConnections are
-  // assigned valid ClientServer IDs. If needed, we can add these IDs 
-  // to SelfConnection also.
-  vtkClientServerID GetConnectionClientServerID(vtkIdType);
-
-  // Description:
-  // Given a ClientServer ID for a connection, it returns the connection ID
-  // assigned to it on this process.
-  vtkIdType GetConnectionID(vtkClientServerID id);
 //ETX
 
 
@@ -411,23 +400,16 @@ public:
 
   // Description:
   // Get the socket controller associated with the ActiveRemoteConnection;
-  // The notion of active conntion
-  // is here only for the sake of ProgressHandler.
+  // ActiveRemoteConnection is the connection which is processing the current
+  // stream.
   vtkSocketController* GetActiveSocketController();
 
   // Description:
   // Get the render-server socket controlled for the ActiveRemoteConnection,
-  // if any. The notion of active conntion
-  // is here only for the sake of ProgressHandler.
+  // if any. 
+  // ActiveRemoteConnection is the connection which is processing the current
+  // stream.
   vtkSocketController* GetActiveRenderServerSocketController();
-
-  // Description:
-  // This is the way to get the socket controllers on all
-  // partitions/server/client etc.  using the client server stream. This
-  // works because each connection (for now, each Remote connection) is
-  // assigned a ClientServerId.
-  vtkSocketController* GetSocketController(vtkProcessModuleConnection* conn);
-  vtkSocketController* GetRenderServerSocketController(vtkProcessModuleConnection* conn);
 
   // Description:
   // For the given connection, returns 1 if the connection is

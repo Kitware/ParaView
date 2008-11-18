@@ -248,11 +248,6 @@ public:
   vtkProcessModuleConnection* GetConnectionFromID(vtkIdType id);
 
   // Description:
-  // Given a connection id, this call returns the ClientServer ID
-  // assigned to that connection.
-  vtkClientServerID GetConnectionClientServerID(vtkIdType);
-
-  // Description:
   // Given a vtkProcessModuleConnection, this method returns the connection
   // ID for it.
   vtkIdType GetConnectionID(vtkProcessModuleConnection* connection);

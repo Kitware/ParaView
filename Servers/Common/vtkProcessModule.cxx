@@ -136,7 +136,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.90");
+vtkCxxRevisionMacro(vtkProcessModule, "1.91");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -831,30 +831,11 @@ void vtkProcessModule::DeleteStreamObject(
          <<  vtkClientServerStream::End;
 }
 
-
 //-----------------------------------------------------------------------------
 const vtkClientServerStream& vtkProcessModule::GetLastResult(
   vtkIdType connectionID, vtkTypeUInt32 server)
 {
   return this->ConnectionManager->GetLastResult(connectionID, server);
-}
-//-----------------------------------------------------------------------------
-vtkClientServerID vtkProcessModule::GetConnectionClientServerID(
-  vtkIdType id)
-{
-  return this->ConnectionManager->GetConnectionClientServerID(id);
-}
-
-//-----------------------------------------------------------------------------
-vtkIdType vtkProcessModule::GetConnectionID(vtkClientServerID id)
-{
-  vtkProcessModuleConnection* conn = vtkProcessModuleConnection::SafeDownCast(
-    this->GetObjectFromID(id));
-  if (conn)
-    {
-    return this->ConnectionManager->GetConnectionID(conn);
-    }
-  return vtkProcessModuleConnectionManager::GetNullConnectionID();
 }
 
 //-----------------------------------------------------------------------------
@@ -1796,34 +1777,6 @@ void vtkProcessModule::SetProcessEnvironmentVariable(int processId,
     char* envstr = vtksys::SystemTools::DuplicateString(var);
     putenv(envstr);
     }
-}
-
-//-----------------------------------------------------------------------------
-vtkSocketController* vtkProcessModule::GetSocketController(
-  vtkProcessModuleConnection* conn)
-{
-  vtkRemoteConnection* rconn = vtkRemoteConnection::SafeDownCast(conn);
-  if (rconn)
-    {
-    return rconn->GetSocketController();
-    }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-vtkSocketController* vtkProcessModule::GetRenderServerSocketController(
-  vtkProcessModuleConnection* conn)
-{
-  vtkServerConnection* sconn = vtkServerConnection::SafeDownCast(conn);
-  if (sconn)
-    {
-    vtkSocketController* sc = sconn->GetRenderServerSocketController();
-    if (sc)
-      {
-      return sc;
-      }
-    }
-  return this->GetSocketController(conn);
 }
 
 //-----------------------------------------------------------------------------

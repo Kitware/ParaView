@@ -25,7 +25,7 @@
 #include "vtkSMPropertyHelper.h"
 
 vtkStandardNewMacro(vtkSMSimpleParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.25");
+vtkCxxRevisionMacro(vtkSMSimpleParallelStrategy, "1.26");
 //----------------------------------------------------------------------------
 vtkSMSimpleParallelStrategy::vtkSMSimpleParallelStrategy()
 {
@@ -123,22 +123,7 @@ void vtkSMSimpleParallelStrategy::CreatePipelineInternal(
   this->Connect(collect, updatesuppressor);
 
   // Now we need to set up some default parameters on these filters.
-
-  // Collect filter needs the socket controller use to communicate between
-  // data-server root and the client.
-  stream  << vtkClientServerStream::Invoke
-          << pm->GetProcessModuleID() 
-          << "GetSocketController"
-          << pm->GetConnectionClientServerID(this->ConnectionID)
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << collect->GetID()
-          << "SetSocketController"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, 
-    vtkProcessModule::CLIENT_AND_SERVERS, stream);
-
+  
   // Collect filter needs the MPIMToNSocketConnection to communicate between
   // render server and data server nodes.
   stream  << vtkClientServerStream::Invoke

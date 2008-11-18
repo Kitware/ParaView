@@ -48,7 +48,7 @@ public:
   // Called to update the Display. Default implementation does nothing.
   // Argument is the view requesting the update. Can be null in the
   // case when something other than a view is requesting the update.
-  virtual void Update() { this->Update(0); };
+  virtual void Update() { this->Superclass::Update(); };
   virtual void Update(vtkSMViewProxy* view);
 
   //BTX

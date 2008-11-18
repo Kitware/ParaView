@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMClientDeliveryStrategyProxy);
-vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMClientDeliveryStrategyProxy, "1.16");
 //----------------------------------------------------------------------------
 vtkSMClientDeliveryStrategyProxy::vtkSMClientDeliveryStrategyProxy()
 {
@@ -138,14 +138,7 @@ void vtkSMClientDeliveryStrategyProxy::CreatePipeline(vtkSMSourceProxy* input,
   this->Connect(this->ReductionProxy, this->CollectProxy);
   this->Connect(this->CollectProxy, this->PostCollectUpdateSuppressor);
 
-  // Now we need to set up some default parameters on these filters.
-  stream << vtkClientServerStream::Invoke
-         << this->CollectProxy->GetID() 
-         << "SetProcessModuleConnection"
-         << pm->GetConnectionClientServerID(this->GetConnectionID())
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, this->CollectProxy->GetServers(), stream);
-
+  // Now set the MPI controller.
   stream  << vtkClientServerStream::Invoke
           << pm->GetProcessModuleID() << "GetController"
           << vtkClientServerStream::End;

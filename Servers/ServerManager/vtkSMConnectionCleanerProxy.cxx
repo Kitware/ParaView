@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMConnectionCleanerProxy);
-vtkCxxRevisionMacro(vtkSMConnectionCleanerProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMConnectionCleanerProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMConnectionCleanerProxy::vtkSMConnectionCleanerProxy()
 {
@@ -48,9 +48,13 @@ void vtkSMConnectionCleanerProxy::CreateVTKObjects()
   vtkClientServerStream stream;
 
   stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID()
+         << "GetActiveRemoteConnection"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
     << pm->GetProcessModuleID()
     << "GetConnectionID" 
-    << pm->GetConnectionClientServerID(this->GetConnectionID())
+    << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
 
   stream << vtkClientServerStream::Invoke

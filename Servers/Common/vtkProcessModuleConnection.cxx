@@ -58,11 +58,10 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.14");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.15");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
-  this->SelfID.ID = 0;
   this->Controller = NULL;
   this->AbortConnection = 0;
 
@@ -85,31 +84,6 @@ vtkProcessModuleConnection::~vtkProcessModuleConnection()
     this->Controller->Delete();
     this->Controller = NULL;
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModuleConnection::UnRegister(vtkObjectBase* obj)
-{
-  if (this->SelfID.ID != 0)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    if (pm && obj != pm->GetInterpreter())
-      {
-      // If the object is not being deleted by the interpreter and it
-      // has a reference count of 2, unassign the clientserver id.
-      if (this->ReferenceCount == 2)
-        {
-        vtkClientServerID selfid = this->SelfID;
-        this->SelfID.ID = 0;
-        vtkClientServerStream deleteStream;
-        deleteStream << vtkClientServerStream::Delete
-          << selfid << vtkClientServerStream::End;
-        pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(), 
-          vtkProcessModule::CLIENT, deleteStream);
-        }
-      }
-    }
-  this->Superclass::UnRegister(obj);
 }
 
 //-----------------------------------------------------------------------------
@@ -333,7 +307,6 @@ void vtkProcessModuleConnection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AbortConnection: " << this->AbortConnection << endl;
-  os << indent << "SelfID: " << this->SelfID << endl;
   os << indent << "Controller: ";
   if (this->Controller)
     {
@@ -343,5 +316,4 @@ void vtkProcessModuleConnection::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << indent << "SelfID: " << SelfID << endl;
 }

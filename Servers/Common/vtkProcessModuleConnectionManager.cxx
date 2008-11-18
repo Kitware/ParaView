@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.28");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.29");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -501,19 +501,6 @@ int vtkProcessModuleConnectionManager::IsServerConnection(
     return 0;
     }
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-vtkClientServerID vtkProcessModuleConnectionManager::
-GetConnectionClientServerID(vtkIdType id)
-{
-  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
-  if (!conn)
-    {
-    vtkClientServerID nullid;
-    return nullid;
-    }
-  return conn->GetSelfID();
 }
 
 //-----------------------------------------------------------------------------

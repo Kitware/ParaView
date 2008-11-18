@@ -22,19 +22,21 @@
 #include "vtkGenericDataObjectWriter.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkSelection.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkServerConnection.h"
 #include "vtkSocketController.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkMultiBlockDataSet.h"
-#include "vtksys/ios/sstream"
+
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.13");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.14");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -133,10 +135,14 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
 
   vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
     this->ProcessModuleConnection);
+  if (!rc)
+    {
+    rc = vtkProcessModule::GetProcessModule()->GetActiveRemoteConnection();
+    }
   if (rc)
     {
     vtkSocketController* controller = rc->GetSocketController();
-    if (this->ProcessModuleConnection->IsA("vtkClientConnection"))
+    if (rc->IsA("vtkClientConnection"))
       {
       vtkDebugMacro("Server Root: Send input data to client.");
       // This is a server root node.
@@ -163,7 +169,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
                                 vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
         }
       }
-    else if (this->ProcessModuleConnection->IsA("vtkServerConnection"))
+    else if (rc->IsA("vtkServerConnection"))
       {
       vtkDebugMacro("Client: Get data from server and put it on the output.");
       // This is a client node.

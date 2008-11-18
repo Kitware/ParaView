@@ -30,6 +30,7 @@
 #include "vtkOutlineFilter.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
@@ -46,13 +47,11 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.20");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.21");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
-vtkCxxSetObjectMacro(vtkMPIMoveData,ClientDataServerSocketController, vtkSocketController);
 vtkCxxSetObjectMacro(vtkMPIMoveData,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
-
 //-----------------------------------------------------------------------------
 vtkMPIMoveData::vtkMPIMoveData()
 {
@@ -88,7 +87,7 @@ vtkMPIMoveData::vtkMPIMoveData()
 vtkMPIMoveData::~vtkMPIMoveData()
 {
   this->SetController(0);
-  this->SetClientDataServerSocketController(0);
+  this->ClientDataServerSocketController = 0;
   this->SetMPIMToNSocketConnection(0);
   this->ClearBuffer();
 }
@@ -167,6 +166,18 @@ int vtkMPIMoveData::RequestInformation(vtkInformation*,
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+void vtkMPIMoveData::DetermineClientDataServerController()
+{
+  this->ClientDataServerSocketController = 0;
+  if (this->Server != vtkMPIMoveData::RENDER_SERVER)
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    this->ClientDataServerSocketController = pm->GetActiveSocketController();
+    }
+}
+
+//-----------------------------------------------------------------------------
 // This filter  is going to replace the many variations of collection fitlers.
 // It handles collection and duplication.
 // It handles poly data and unstructured grid.
@@ -200,6 +211,8 @@ int vtkMPIMoveData::RequestData(vtkInformation*,
                                 vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector)
 {
+  this->DetermineClientDataServerController();
+
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   vtkDataSet* input = 0;
