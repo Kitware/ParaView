@@ -42,6 +42,12 @@ public:
   virtual void Update() { this->Update(0); };
   virtual void Update(vtkSMViewProxy* view);
 
+  // Description:
+  // Get the bounds for the representation.
+  // Overridden to now return any bounds since Text has no bounds.
+  virtual bool GetBounds(double bounds[6])
+    { return false; }
+
 // BTX
 protected:
   vtkSMTextSourceRepresentationProxy();
