@@ -630,11 +630,15 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
   // can be used by the display panels.
   core->registerManager("COLOR_SCALE_EDITOR",
       this->getColorScaleEditorManager());
+  
+  // the most recently used file extensions
+  this->restoreSettings();
 }
 
 //-----------------------------------------------------------------------------
 pqMainWindowCore::~pqMainWindowCore()
 {
+  this->saveSettings();
   delete Implementation;
 }
 
@@ -1522,6 +1526,41 @@ bool pqMainWindowCore::makeServerConnection()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::restoreSettings()
+{
+  // Load the most recently used file extensions from QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  
+  if ( settings->contains("extensions/ScreenshotExtension") )
+    {
+    this->ScreenshotExtension =
+       settings->value("extensions/ScreenshotExtension").toString();
+    }
+  else
+    {
+    this->ScreenshotExtension = QString();
+    }
+  
+  if ( settings->contains("extensions/DataExtension") )
+    {
+    this->DataExtension = settings->value("extensions/DataExtension").toString();
+    }
+  else
+    {
+    this->DataExtension = QString();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::saveSettings()
+{ 
+  // Save the most recently used file extensions to QSettings.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("extensions/ScreenshotExtension", this->ScreenshotExtension);
+  settings->setValue("extensions/DataExtension",       this->DataExtension);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::makeDefaultConnectionIfNoneExists()
 {
   if (this->getActiveServer())
@@ -1731,11 +1770,18 @@ void pqMainWindowCore::onFileSaveData()
 
   pqFileDialog file_dialog(port->getServer(),
     this->Implementation->Parent, tr("Save File:"), QString(), filters);
+  file_dialog.setRecentlyUsedExtension(this->DataExtension);
   file_dialog.setObjectName("FileSaveDialog");
   file_dialog.setFileMode(pqFileDialog::AnyFile);
   QObject::connect(&file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileSaveData(const QStringList&)));
-  file_dialog.exec();
+  
+  if ( file_dialog.exec() == QDialog::Accepted )
+    {
+    QString selectedFile = file_dialog.getSelectedFiles()[0];
+    QFileInfo fileInfo  = QFileInfo( selectedFile );
+    this->DataExtension = QString("*.") + fileInfo.suffix();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1851,12 +1897,16 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;PDF file (*.pdf)";
   pqFileDialog* const file_dialog = new pqFileDialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
+  file_dialog->setRecentlyUsedExtension(this->ScreenshotExtension);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   if (file_dialog->exec() == QDialog::Accepted)
     {
     vtkSmartPointer<vtkImageData> img;
     QString file = file_dialog->getSelectedFiles()[0];
+    QFileInfo fileInfo = QFileInfo( file );
+    this->ScreenshotExtension = QString("*.") + fileInfo.suffix();
+    
     if (ssDialog.saveAllViews())
       {
       img.TakeReference(this->multiViewManager().captureImage( 
