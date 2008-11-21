@@ -109,6 +109,9 @@ public:
   /// set the file mode
   void setFileMode(FileMode);
 
+  /// set the most recently used file extension
+  void setRecentlyUsedExtension(const QString& fileExtension);
+
   /// Returns the set of files
   QStringList getSelectedFiles();
 

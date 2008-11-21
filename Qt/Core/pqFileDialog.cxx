@@ -437,7 +437,6 @@ void pqFileDialog::onContextMenuRequested(const QPoint &menuPos)
   menu.exec(this->Implementation->Ui.Files->mapToGlobal(menuPos));
 }
 
-
 //-----------------------------------------------------------------------------
 void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
 {
@@ -467,6 +466,27 @@ void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
           QAbstractItemView::ExtendedSelection);
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension)
+{
+  if ( fileExtension == QString() )
+    {
+    // upon the initial use of any kind (e.g., data or screenshot) of dialog
+    // 'fileExtension' is equal /set to an empty string.
+    // In this case, no any user preferences are considered
+    this->Implementation->Ui.FileType->setCurrentIndex(0);
+    }
+  else
+    {
+    int index = this->Implementation->Ui.FileType->findText(fileExtension,
+                                                            Qt::MatchContains);
+    // just in case the provided extension is not in the combobox list
+    index = (index == -1) ? 0 : index;
+    
+    this->Implementation->Ui.FileType->setCurrentIndex(index);
+  }
 }
 
 //-----------------------------------------------------------------------------
