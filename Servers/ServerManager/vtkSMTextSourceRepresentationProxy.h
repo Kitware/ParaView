@@ -45,7 +45,7 @@ public:
   // Description:
   // Get the bounds for the representation.
   // Overridden to now return any bounds since Text has no bounds.
-  virtual bool GetBounds(double bounds[6])
+  virtual bool GetBounds(double*)
     { return false; }
 
 // BTX
