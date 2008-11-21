@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.17");
+vtkCxxRevisionMacro(vtkServerConnection, "1.18");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -92,8 +92,7 @@ void vtkServerConnection::Finalize()
 }
 
 //-----------------------------------------------------------------------------
-int vtkServerConnection::SetRenderServerSocket(vtkClientSocket* soc, 
-    int connecting_side_handshake)
+int vtkServerConnection::SetRenderServerSocket(vtkClientSocket* soc)
 {
   if (!this->RenderServerSocketController)
     {
@@ -109,12 +108,7 @@ int vtkServerConnection::SetRenderServerSocket(vtkClientSocket* soc,
   comm->SetSocket(soc);
   soc->AddObserver(vtkCommand::ErrorEvent, this->GetObserver());
   comm->AddObserver(vtkCommand::ErrorEvent, this->GetObserver());
-  // TODO: I would like to hide this handshake. May be, vtkSocket must manage it.
-  if (connecting_side_handshake)
-    {
-    return comm->ClientSideHandshake();
-    }
-  return comm->ServerSideHandshake();
+  return comm->Handshake();
 }
 
 //-----------------------------------------------------------------------------

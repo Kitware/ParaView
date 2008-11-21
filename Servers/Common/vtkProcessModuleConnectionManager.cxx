@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.29");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.30");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -281,7 +281,7 @@ vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
     {
     if (cs->ConnectToServer(hostname, port) != -1)
       {
-      id = this->CreateConnection(cs, 0, 1);
+      id = this->CreateConnection(cs, 0);
       break;
       }
     timer->StopTimer();
@@ -326,7 +326,7 @@ vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
     vtkErrorMacro("Render Server connection failed.");
     return id;
     }
-  id = this->CreateConnection(dcs, rcs, 1);
+  id = this->CreateConnection(dcs, rcs);
   dcs->Delete();
   rcs->Delete();
   return id;
@@ -374,7 +374,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
           {
           ds = this->Internals->DataServerConnections.front();
           rs = cc;
-          id = this->CreateConnection(ds, rs, 0);
+          id = this->CreateConnection(ds, rs);
           this->Internals->DataServerConnections.pop_front();
           }
         else
@@ -388,7 +388,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
           {
           ds = cc;
           rs = this->Internals->RenderServerConnections.front();
-          id = this->CreateConnection(ds, rs, 0);
+          id = this->CreateConnection(ds, rs);
           this->Internals->RenderServerConnections.pop_front();
           }
         else
@@ -398,7 +398,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
         break;
         
       case RENDER_AND_DATA_SERVER:
-        id = this->CreateConnection(cc, 0, 0);
+        id = this->CreateConnection(cc, 0);
         break;
         }
 
@@ -677,15 +677,14 @@ vtkIdType vtkProcessModuleConnectionManager::GetUniqueConnectionID()
 
 //-----------------------------------------------------------------------------
 vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
-  vtkClientSocket* cs, vtkClientSocket* renderserver_socket, 
-  int connecting_side_handshake)
+  vtkClientSocket* cs, vtkClientSocket* renderserver_socket)
 {
   vtkIdType id = vtkProcessModuleConnectionManager::NullConnectionID;
 
   vtkRemoteConnection* rc = this->NewRemoteConnection();
   if (rc)
     {
-    if (rc->SetSocket(cs, connecting_side_handshake) == 0)
+    if (rc->SetSocket(cs) == 0)
       {
       rc->Delete();
       vtkErrorMacro("Handshake failed. You are probably using mismatching "
@@ -696,8 +695,7 @@ vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
     if (renderserver_socket && vtkServerConnection::SafeDownCast(rc))
       {
       vtkServerConnection* sc = vtkServerConnection::SafeDownCast(rc);
-      if (sc->SetRenderServerSocket(renderserver_socket, 
-          connecting_side_handshake) == 0)
+      if (sc->SetRenderServerSocket(renderserver_socket) == 0)
         {
         rc->Delete();
         vtkErrorMacro("RenderServer Handshake failed.");

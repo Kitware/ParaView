@@ -56,11 +56,8 @@ public:
   // Set the "live" socket to use for this connection. This must be
   // set before Initialize() is called. The SocketController will 
   // use this socket for all the communication.
-  // connecting_side_handshake is used to determing which handshake side
-  // are we on. Set to 1 when this soc has connected to a remote host,
-  // set to 0 when the soc is a connection received from a remote machine.
   // Returns 1 on success, 0 on failure.
-  virtual int SetSocket(vtkClientSocket* soc, int connecting_side_handshake);
+  virtual int SetSocket(vtkClientSocket* soc);
 
   // Description:
   // Called to process some incoming data.

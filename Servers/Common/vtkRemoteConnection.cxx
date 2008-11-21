@@ -22,7 +22,7 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 
-vtkCxxRevisionMacro(vtkRemoteConnection, "1.2");
+vtkCxxRevisionMacro(vtkRemoteConnection, "1.3");
 //-----------------------------------------------------------------------------
 vtkRemoteConnection::vtkRemoteConnection()
 {
@@ -42,8 +42,7 @@ vtkSocketController* vtkRemoteConnection::GetSocketController()
 }
 
 //-----------------------------------------------------------------------------
-int vtkRemoteConnection::SetSocket(vtkClientSocket* soc, 
-  int connecting_side_handshake)
+int vtkRemoteConnection::SetSocket(vtkClientSocket* soc)
 {
   vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
     this->GetSocketController()->GetCommunicator());
@@ -55,12 +54,7 @@ int vtkRemoteConnection::SetSocket(vtkClientSocket* soc,
   comm->SetSocket(soc);
   soc->AddObserver(vtkCommand::ErrorEvent, this->GetObserver());
   comm->AddObserver(vtkCommand::ErrorEvent, this->GetObserver());
-  
-  if (connecting_side_handshake)
-    {
-    return comm->ClientSideHandshake();
-    }
-  return comm->ServerSideHandshake();
+  return comm->Handshake();
 }
 
 //-----------------------------------------------------------------------------

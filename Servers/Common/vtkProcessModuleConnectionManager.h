@@ -351,8 +351,8 @@ protected:
   // Description:
   // Internal method to create a connection from a client socket
   // and start managing it.
-  vtkIdType CreateConnection(vtkClientSocket* cs, 
-    vtkClientSocket* renderserver_socket, int connecting_side_handshake);
+  vtkIdType CreateConnection(vtkClientSocket* cs,
+    vtkClientSocket* renderserver_socket);
   
   // Description:
   // Returns a unique connection ID.
