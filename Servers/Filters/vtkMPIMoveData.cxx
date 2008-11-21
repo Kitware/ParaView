@@ -47,7 +47,7 @@
 #include "vtkAllToNRedistributePolyData.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.21");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.22");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -173,7 +173,8 @@ void vtkMPIMoveData::DetermineClientDataServerController()
   if (this->Server != vtkMPIMoveData::RENDER_SERVER)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    this->ClientDataServerSocketController = pm->GetActiveSocketController();
+    this->ClientDataServerSocketController =
+      pm? pm->GetActiveSocketController() : 0;
     }
 }
 
