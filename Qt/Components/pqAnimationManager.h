@@ -85,6 +85,12 @@ public:
   // Saves the animation geometry from the active scene
   // as visible in the given view.
   bool saveGeometry(const QString& filename, pqView* view);
+  
+  /// Save the settings of "save animation" with QSettings.
+  void saveSettings();
+
+  /// Apply the settings from QSettings to "save animation".
+  void restoreSettings();
 
 signals:
   /// emitted when the active scene changes (\c scene may be NULL).
@@ -127,6 +133,9 @@ private:
 
   class pqInternals;
   pqInternals* Internals;
+  
+  // the most recently used file extension
+  QString AnimationExtension;
 };
 
 

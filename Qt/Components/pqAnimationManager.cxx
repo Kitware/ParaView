@@ -64,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 #include "pqViewManager.h"
+#include "pqSettings.h"
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -99,11 +100,14 @@ pqAnimationManager::pqAnimationManager(QObject* _parent/*=0*/)
     this, SLOT(updateViewModules()));
   QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
     this, SLOT(updateViewModules()));
+  
+  this->restoreSettings();
 }
 
 //-----------------------------------------------------------------------------
 pqAnimationManager::~pqAnimationManager()
 {
+  this->saveSettings();
   delete this->Internals;
 }
 
@@ -444,6 +448,7 @@ bool pqAnimationManager::saveAnimation()
     disconnect_and_save?  scene->getServer() : 0,
     parent_window,
     tr("Save Animation"), QString(), filters);
+  file_dialog->setRecentlyUsedExtension(this->AnimationExtension);
   file_dialog->setObjectName("FileSaveAnimationDialog");
   file_dialog->setFileMode(pqFileDialog::AnyFile);
   if (file_dialog->exec() != QDialog::Accepted)
@@ -452,7 +457,10 @@ bool pqAnimationManager::saveAnimation()
     return false;
     }
 
-  QStringList files = file_dialog->getSelectedFiles();
+  QStringList files  = file_dialog->getSelectedFiles();
+  QFileInfo fileInfo = QFileInfo( files[0] );
+  this->AnimationExtension = QString("*.") + fileInfo.suffix();
+  
   // essential to destroy file dialog, before we disconnect from the server, if
   // at all.
   delete file_dialog;
@@ -613,6 +621,30 @@ bool pqAnimationManager::saveGeometry(const QString& filename,
   bool status = writer->Save();
   writer->Delete();
   return status;
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::restoreSettings()
+{
+  // Load the most recently used file extension from QSettings, if available.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+
+  if ( settings->contains("extensions/AnimationExtension") )
+    {
+    this->AnimationExtension = settings->value("extensions/AnimationExtension").toString();
+    }
+  else
+    {
+    this->AnimationExtension = QString();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::saveSettings()
+{ 
+  // Save the most recently used file extension to QSettings.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("extensions/AnimationExtension", this->AnimationExtension);
 }
 
 //-----------------------------------------------------------------------------
