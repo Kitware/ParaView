@@ -43,8 +43,8 @@ MACRO(paraview_build_optional_application name comment subdirectory default)
   ENDIF(PARAVIEW_BUILD_${name})
 ENDMACRO(paraview_build_optional_application)
 
-paraview_build_optional_application(Client "default ParaView Client" Client ON)
-paraview_build_optional_application(OverView "OverView informatics application" OverView OFF)
-paraview_build_optional_application(StreamingParaView "Streaming ParaView" StreamingParaView OFF)
+paraview_build_optional_application(Client "Standard ParaView Client" Client ON)
+paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
+paraview_build_optional_application(StreamingParaView "Streaming ParaView Client" StreamingParaView OFF)
 
 ENDIF(QT4_FOUND)
