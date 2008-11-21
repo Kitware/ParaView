@@ -263,6 +263,12 @@ public:
 
   /// Provides access to the menu manager used for the sources menu.
   pqProxyMenuManager* sourcesMenuManager() const;
+  
+  /// Save the settings of "save data" and "save screenshot" with QSettings.
+  void saveSettings();
+
+  /// Apply the settings from QSettings to "save data" and "save screenshot".
+  void restoreSettings();
 
 signals:
   void enableFileLoadServerState(bool);
@@ -495,6 +501,9 @@ private:
   class pqImplementation;
   pqImplementation* Implementation;
   void constructorHelper(QWidget *parent);
+
+  QString  ScreenshotExtension;
+  QString  DataExtension;
 };
 
 #endif // !_pqMainWindowCore_h
