@@ -187,15 +187,6 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqTextDisplayPropertiesWidget::onVisibilityChanged(int state)
-{
-  //if (state == Qt::Unchecked)
-  //  {
-  //  this->Internal->Interactivity->setCheckState(Qt::Unchecked);
-  //  }
-}
-
-//-----------------------------------------------------------------------------
 void pqTextDisplayPropertiesWidget::onTextLocationChanged(bool checked)
 {
   int winLocation = vtkTextRepresentation::AnyLocation;

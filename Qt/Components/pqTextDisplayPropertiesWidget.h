@@ -44,7 +44,6 @@ public:
   virtual ~pqTextDisplayPropertiesWidget();
 
 protected slots:
-  void onVisibilityChanged(int);
   void onTextLocationChanged(bool);
 
 private:
