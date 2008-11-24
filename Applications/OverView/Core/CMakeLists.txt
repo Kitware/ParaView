@@ -83,3 +83,5 @@ TARGET_LINK_LIBRARIES(
   vtkPVServerManager
   )
  
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/OverViewConfig.cmake.in" "${ParaView_BINARY_DIR}/OverViewConfig.cmake" @ONLY)
+

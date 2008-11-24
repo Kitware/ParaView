@@ -1,10 +1,9 @@
 # This section builds the OverView core library and is specific to the ParaView/OverView build process ...
-PROJECT(OverView)
 ADD_SUBDIRECTORY(Core)
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/OverViewConfig.cmake.in" "${ParaView_BINARY_DIR}/OverViewConfig.cmake" @ONLY)
 
 # This section builds an "OverView-branded" OverView client, and is an example of how to create a custom
 # OverView branding ...
+PROJECT(OverView)
 INCLUDE("${ParaView_BINARY_DIR}/OverViewConfig.cmake")
 
 SET(OVERVIEW_BRANDED_APPLICATION_TITLE "OverView") 

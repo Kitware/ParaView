@@ -55,22 +55,43 @@ MACRO(build_overview)
   FILE(APPEND ${MAIN_CXX} "    );\n")
   FILE(APPEND ${MAIN_CXX} "}\n")
 
+  CONFIGURE_FILE(@OverViewCore_SOURCE_DIR@/SplashScreen.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc @ONLY)
+  CONFIGURE_FILE(${OVERVIEW_BRANDED_SPLASH_IMAGE} ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen COPYONLY)
+  SET(UI_RESOURCES
+    ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc
+    )
+
+  QT4_ADD_RESOURCES(RCS_SOURCES
+    ${UI_RESOURCES}
+    )
+
+  IF(WIN32)
+    CONFIGURE_FILE(@OverViewCore_SOURCE_DIR@/Icon.rc.in ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc @ONLY)
+    SET(EXE_ICON ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
+  ENDIF(WIN32)
+
   INCLUDE_DIRECTORIES(
     ${OverViewCore_SOURCE_DIR}
     )
 
+  SOURCE_GROUP("Resources" FILES
+    ${UI_RESOURCES}
+    ${EXE_ICON}
+    )
+
+  SOURCE_GROUP("Generated" FILES
+    ${RCS_SOURCES}
+    )
+
   ADD_EXECUTABLE(${OVERVIEW_BRANDED_APPLICATION_TITLE} WIN32 MACOSX_BUNDLE
     ${MAIN_CXX}
-    ${MOC_BUILT_SOURCES}
     ${RCS_SOURCES}
-    ${UI_BUILT_SOURCES}
     ${EXE_ICON}
     )
    
   TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE}
     OverViewCore
     )
-
 
   # On the Mac only, we have to create a symlink to each configured plugin from the bundle directory,
   # so they can be located at startup ...
@@ -99,34 +120,7 @@ ENDMACRO(build_overview)
 #    MESSAGE(SEND_ERROR "PARAVIEW_BUILD_OverView requires BUILD_SHARED_LIBS")
 #  ENDIF(NOT BUILD_SHARED_LIBS)
 
-#  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Icon.rc.in ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
-#  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/SplashScreen.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc)
-#  CONFIGURE_FILE(${OVERVIEW_BRANDED_SPLASH_IMAGE} ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen COPYONLY)
 #
-
-#  SET(UI_RESOURCES
-#    ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc
-#  )
-
-#  QT4_ADD_RESOURCES(RCS_SOURCES
-#    ${UI_RESOURCES}
-#  )
-
-#  IF(WIN32)
-#    SET(EXE_ICON ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
-#  ENDIF(WIN32)
-
-#  SOURCE_GROUP("Resources" FILES
-#    ${UI_RESOURCES}
-#    ${UI_FORMS}
-#    ${EXE_ICON}
-#  )
-
-#  SOURCE_GROUP("Generated" FILES
-#    ${MOC_BUILT_SOURCES}
-#    ${RCS_SOURCES}
-#    ${UI_BUILT_SOURCES}
-#  )
 
 #  IF(WIN32)
 #    LINK_DIRECTORIES(${QT_LIBRARY_DIR})
