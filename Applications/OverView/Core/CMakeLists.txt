@@ -88,4 +88,5 @@ TARGET_LINK_LIBRARIES(
   )
  
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/OverViewConfig.cmake.in" "${ParaView_BINARY_DIR}/OverViewConfig.cmake" @ONLY)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/OverViewWin32Distribution.cmake.in" "${ParaView_BINARY_DIR}/OverViewWin32Distribution.cmake" @ONLY)
 

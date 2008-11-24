@@ -110,5 +110,9 @@ MACRO(build_overview)
     ENDFOREACH()
   ENDIF(APPLE)
 
+  IF(WIN32)
+    INCLUDE("@ParaView_BINARY_DIR@/OverViewWin32Distribution.cmake")
+  ENDIF(WIN32)
+
 ENDMACRO(build_overview)
 
