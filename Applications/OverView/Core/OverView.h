@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef OVERVIEW_H
 #define OVERVIEW_H
 
+#include "OverViewCoreExport.h"
 #include <QStringList>
 
-class OverView
+class OVERVIEW_CORE_EXPORT OverView
 {
 public:
   static int main(int argc, char* argv[],

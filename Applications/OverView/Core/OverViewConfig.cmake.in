@@ -55,10 +55,10 @@ MACRO(build_overview)
   FILE(APPEND ${MAIN_CXX} "    );\n")
   FILE(APPEND ${MAIN_CXX} "}\n")
 
-  CONFIGURE_FILE(@OverViewCore_SOURCE_DIR@/SplashScreen.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc @ONLY)
-  CONFIGURE_FILE(${OVERVIEW_BRANDED_SPLASH_IMAGE} ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen COPYONLY)
+  CONFIGURE_FILE("@OverViewCore_SOURCE_DIR@/SplashScreen.qrc.in" "${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc" @ONLY)
+  CONFIGURE_FILE("${OVERVIEW_BRANDED_SPLASH_IMAGE}" "${CMAKE_CURRENT_BINARY_DIR}/SplashScreen" COPYONLY)
   SET(UI_RESOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc
+    "${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc"
     )
 
   QT4_ADD_RESOURCES(RCS_SOURCES
@@ -66,12 +66,13 @@ MACRO(build_overview)
     )
 
   IF(WIN32)
-    CONFIGURE_FILE(@OverViewCore_SOURCE_DIR@/Icon.rc.in ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc @ONLY)
-    SET(EXE_ICON ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
+    CONFIGURE_FILE("@OverViewCore_SOURCE_DIR@/Icon.rc.in" "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc" @ONLY)
+    SET(EXE_ICON "${CMAKE_CURRENT_BINARY_DIR}/Icon.rc")
   ENDIF(WIN32)
 
   INCLUDE_DIRECTORIES(
-    ${OverViewCore_SOURCE_DIR}
+    "@OverViewCore_SOURCE_DIR@"
+    "@OverViewCore_BINARY_DIR@"
     )
 
   SOURCE_GROUP("Resources" FILES
@@ -93,6 +94,12 @@ MACRO(build_overview)
     OverViewCore
     )
 
+  IF(WIN32)
+    FIND_PACKAGE(Qt4)
+    INCLUDE(${QT_USE_FILE})
+    TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
+  ENDIF(WIN32)
+
   # On the Mac only, we have to create a symlink to each configured plugin from the bundle directory,
   # so they can be located at startup ...
   IF(APPLE)
@@ -104,30 +111,4 @@ MACRO(build_overview)
   ENDIF(APPLE)
 
 ENDMACRO(build_overview)
-
-#MACRO(FOO)
-#  IF(WIN32)
-#    CONFIGURE_FILE(${OVERVIEW_BRANDED_APPLICATION_ICON} ${CMAKE_CURRENT_BINARY_DIR}/Icon.ico COPYONLY)
-#  ENDIF(WIN32)
-
-#  SET(QT_USE_QTASSISTANT TRUE)
-#  SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
-#  SET(QT_USE_QTSQL TRUE)
-#  SET(QT_USE_QTUITOOLS TRUE)
-#  INCLUDE(${QT_USE_FILE})
-
-#  IF(NOT BUILD_SHARED_LIBS)
-#    MESSAGE(SEND_ERROR "PARAVIEW_BUILD_OverView requires BUILD_SHARED_LIBS")
-#  ENDIF(NOT BUILD_SHARED_LIBS)
-
-#
-
-#  IF(WIN32)
-#    LINK_DIRECTORIES(${QT_LIBRARY_DIR})
-#  ENDIF(WIN32)
-
-#  IF(WIN32)
-#    TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
-#  ENDIF(WIN32)
-#ENDMACRO(FOO)
 
