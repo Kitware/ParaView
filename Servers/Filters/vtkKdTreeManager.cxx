@@ -36,7 +36,7 @@ class vtkKdTreeManager::vtkAlgorithmSet :
   public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxRevisionMacro(vtkKdTreeManager, "1.6");
+vtkCxxRevisionMacro(vtkKdTreeManager, "1.7");
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkKdTreeManager, KdTree, vtkPKdTree);
 //----------------------------------------------------------------------------
@@ -131,12 +131,17 @@ void vtkKdTreeManager::Update()
     return;
     }
 
-  for (int cc=0; cc < 1; cc++)
-    {
   this->KdTree->RemoveAllDataSets();
   for (dsIter = outputs.begin(); dsIter != outputs.end(); ++dsIter)
     {
     this->AddDataSetToKdTree(*dsIter);
+    }
+
+  static bool initialized = false;
+  if (!initialized)
+    {
+    this->KdTree->BuildLocator();
+    initialized = true;
     }
 
   if (this->StructuredProducer)
@@ -158,8 +163,6 @@ void vtkKdTreeManager::Update()
     }
 
   this->KdTree->BuildLocator();
-   }
-  // this->KdTree->PrintTree();
   this->UpdateTime.Modified();
 }
 
