@@ -50,13 +50,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkSMClientDeliverySource_h
 #define __vtkSMClientDeliverySource_h
 
-#include "OverViewUtilityExport.h"
+#include "OverViewCoreExport.h"
 
 #include <vtkDataObjectAlgorithm.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>
 
 /// "Adapts" vtkSMClientDeliveryRepresentationProxy so it can be used as a pipeline source
-class OVERVIEW_UTILITY_EXPORT vtkSMClientDeliverySource :
+class OVERVIEW_CORE_EXPORT vtkSMClientDeliverySource :
   public vtkDataObjectAlgorithm
 {
 public:

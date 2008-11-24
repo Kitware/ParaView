@@ -1,0 +1,21 @@
+#ifndef _OverViewCoreExport_h
+#define _OverViewCoreExport_h
+
+#ifndef PARAVIEW_BUILD_SHARED_LIBS
+#cmakedefine PARAVIEW_BUILD_SHARED_LIBS
+#endif
+
+#if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
+
+  #if defined(OverViewCore_EXPORTS)
+    #define OVERVIEW_CORE_EXPORT __declspec( dllexport ) 
+  #else
+    #define OVERVIEW_CORE_EXPORT __declspec( dllimport ) 
+  #endif
+
+#else
+  #define OVERVIEW_CORE_EXPORT
+#endif
+
+#endif // !_OverViewCoreExport_h
+

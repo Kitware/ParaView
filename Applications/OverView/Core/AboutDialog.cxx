@@ -32,20 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AboutDialog.h"
 #include "Config.h"
+#include "OverView.h"
 #include "ui_AboutDialog.h"
 
-#include "pqApplicationCore.h"
-#include "pqOptions.h"
-#include "pqServer.h"
-#include "pqServerManagerModel.h"
-#include "pqServerResource.h"
-#include "QtTestingConfigure.h"
-#include "vtkProcessModule.h"
-#include "vtkPVConfig.h"
-#include "vtkPVServerInformation.h"
+#include <pqApplicationCore.h>
+#include <pqOptions.h>
+#include <pqServer.h>
+#include <pqServerManagerModel.h>
+#include <pqServerResource.h>
+#include <QtTestingConfigure.h>
+#include <vtkProcessModule.h>
+#include <vtkPVConfig.h>
+#include <vtkPVServerInformation.h>
 
 #include <QHeaderView>
-#include "vtksys/ios/sstream"
+#include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
 AboutDialog::AboutDialog(QWidget* Parent) :
@@ -54,7 +55,7 @@ AboutDialog::AboutDialog(QWidget* Parent) :
 {
   this->Ui->setupUi(this);
 
-  this->setWindowTitle(QString("About %1").arg(OVERVIEW_BRANDED_APPLICATION_TITLE));
+  this->setWindowTitle(QString("About %1").arg(OverView::GetBrandedApplicationTitle()));
   
   this->setObjectName("AboutDialog");
 
@@ -71,7 +72,7 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   info = info.remove(0, idx);
 
   this->Ui->VersionLabel->setText(
-    QString("<html><b>Version: <i>%1</i></b></html>").arg(OVERVIEW_BRANDED_VERSION_FULL));
+    QString("<html><b>Version: <i>%1</i></b></html>").arg(OverView::GetBrandedFullVersion()));
 
   this->AddClientInformation();
   this->AddServerInformation();
@@ -113,7 +114,7 @@ void AboutDialog::AddClientInformation()
 
   QTreeWidget* tree = this->Ui->ClientInformation;
 
-  ::addItem(tree, OVERVIEW_BRANDED_APPLICATION_TITLE " Version", OVERVIEW_BRANDED_VERSION_FULL);
+  ::addItem(tree, OverView::GetBrandedApplicationTitle() + " Version", OverView::GetBrandedFullVersion());
   ::addItem(tree, "OverView Version", OVERVIEW_VERSION_FULL);
 #if defined(PARAVIEW_ENABLE_PYTHON)
   ::addItem(tree, "Embeded Python", "On");

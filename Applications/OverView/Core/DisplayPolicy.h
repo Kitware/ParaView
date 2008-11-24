@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __DisplayPolicy_h
 #define __DisplayPolicy_h
 
+#include "OverViewCoreExport.h"
+
 #include "pqDisplayPolicy.h"
 
 class pqDataRepresentation;
@@ -48,7 +50,7 @@ class vtkSMProxy;
 /// an instance of the policy used by the application. Custom applications
 /// should set their own policy instance on the global application core 
 /// instance.
-class DisplayPolicy : public pqDisplayPolicy
+class OVERVIEW_CORE_EXPORT DisplayPolicy : public pqDisplayPolicy
 {
   Q_OBJECT
   //typedef pqDisplayPolicy Superclass;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    IconDialog.h
+   Module:    ApplicationOptionsDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,39 +29,23 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __IconDialog_h
-#define __IconDialog_h
 
-#include "OverViewUtilityExport.h"
+#ifndef _ApplicationOptionsDialog_h
+#define _ApplicationOptionsDialog_h
 
-#include <pqDialog.h>
-#include <pqRepresentation.h>
+#include "OverViewCoreExport.h"
 
-class OVERVIEW_UTILITY_EXPORT IconDialog : public pqDialog
+#include "pqOptionsDialog.h"
+
+/// dialog class that allows editing of application wide settings
+class OVERVIEW_CORE_EXPORT ApplicationOptionsDialog : public pqOptionsDialog
 {
   Q_OBJECT
-  
+
 public:
-  IconDialog(pqRepresentation *rep, QWidget* parent = 0);
-  ~IconDialog();
+  ApplicationOptionsDialog(QWidget *parent=0);
+  ~ApplicationOptionsDialog();
 
-public slots:
-
-  void onIconSizeChanged();
-  void onApplyIconSize();
-  void updateDisplay();
-  void readIconSheetFromFile(const QString &file);
-
-protected:
-
-  virtual void acceptInternal();
-  
-  void initializeDisplay();
-
-private:
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
 };
 
 #endif

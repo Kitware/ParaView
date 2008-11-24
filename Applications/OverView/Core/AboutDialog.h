@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqGraphLayoutStrategyInterface.h
+   Module:    AboutDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,29 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqGraphLayoutStrategyInterface_h
-#define _pqGraphLayoutStrategyInterface_h
+#ifndef _AboutDialog_h
+#define _AboutDialog_h
 
-#include <QtPlugin>
-#include <QStringList>
+#include "OverViewCoreExport.h"
 
-class vtkGraphLayoutStrategy;
+#include <QDialog>
 
-/// interface class for plugins that create view modules
-class pqGraphLayoutStrategyInterface
+namespace Ui { class AboutDialog; }
+
+class pqServer;
+class QTreeWidget;
+/// Provides an about dialog
+class OVERVIEW_CORE_EXPORT AboutDialog :
+  public QDialog
 {
+  Q_OBJECT
+
 public:
-  /// destructor
-  virtual ~pqGraphLayoutStrategyInterface() {}
+  AboutDialog(QWidget* Parent);
+
+private:
+  ~AboutDialog();
+  AboutDialog(const AboutDialog&);
+  AboutDialog& operator=(const AboutDialog&);
+
+  void AddClientInformation();
+  void AddServerInformation();
+  void AddServerInformation(pqServer* server, QTreeWidget* tree);
   
-  /// Return a list of layout strategies supported by this interface
-  virtual QStringList graphLayoutStrategies() const = 0;
-
-  virtual vtkGraphLayoutStrategy* getGraphLayoutStrategy(const QString& layoutStrategy) = 0;
-
+  Ui::AboutDialog* const Ui;
 };
 
-Q_DECLARE_INTERFACE(pqGraphLayoutStrategyInterface, "com.kitware/paraview/graphLayoutStrategy")
-
-#endif
+#endif // !_AboutDialog_h
 

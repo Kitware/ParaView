@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSingleInputView_h
 #define _pqSingleInputView_h
 
-#include "OverViewUtilityExport.h"
+#include "OverViewCoreExport.h"
 
 #include "pqView.h"
 
 /// Convenience view class that enforces "single input" behavior
-class OVERVIEW_UTILITY_EXPORT pqSingleInputView : public pqView
+class OVERVIEW_CORE_EXPORT pqSingleInputView : public pqView
 {
   Q_OBJECT
 

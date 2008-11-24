@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPropertyHelper.h
+   Module:    vtkSMSourceSelectionLink.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,29 +29,51 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkSMSourceSelectionLink - Links vtkSMSourceProxy selections
+// .SECTION Description
 
-#ifndef pqPropertyHelper_h
-#define pqPropertyHelper_h
+#ifndef __vtkSMSourceSelectionLink_h
+#define __vtkSMSourceSelectionLink_h
 
-#include "OverViewUtilityExport.h"
-#include <vtkSMPropertyHelper.h>
+#include "OverViewCoreExport.h"
 
-#include <QStringList>
+#include <vtkObject.h>
 
-/// Helper object to simplify working with properties
-class OVERVIEW_UTILITY_EXPORT pqPropertyHelper :
-  public vtkSMPropertyHelper
+class vtkSMSourceProxy;
+class vtkSMSourceSelectionLinkCommand;
+class vtkSMSourceSelectionLinkInternals;
+class pqViewManager;
+
+class OVERVIEW_CORE_EXPORT vtkSMSourceSelectionLink : public vtkObject
 {
 public:
-  pqPropertyHelper(vtkSMProxy* proxy, const char* name);
+  static vtkSMSourceSelectionLink *New();
+  vtkTypeRevisionMacro(vtkSMSourceSelectionLink, vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Set(const QString& value);
-  void Set(unsigned int index, const QString& value);
-  void Set(const QStringList& value);
+  void AddSource(vtkSMSourceProxy* source);
+  void RemoveSource(vtkSMSourceProxy* source);
 
-  const QString GetAsString(unsigned int index = 0);
-  const QStringList GetAsStringList();
+  void SetViewManager(pqViewManager* manager)
+    { this->ViewManager = manager; }
+
+protected:
+  vtkSMSourceSelectionLink();
+  ~vtkSMSourceSelectionLink();
+
+  void SelectionChanged(vtkSMSourceProxy* source);
+
+private:
+  vtkSMSourceSelectionLink(const vtkSMSourceSelectionLink&);  // Not implemented.
+  void operator=(const vtkSMSourceSelectionLink&);  // Not implemented.
+
+  pqViewManager* ViewManager;
+  bool InSelectionChanged;
+
+  friend class vtkSMSourceSelectionLinkCommand;
+  vtkSMSourceSelectionLinkCommand* Command;
+  vtkSMSourceSelectionLinkInternals* Internals;
 };
 
-#endif // !pqPropertyHelper_h
+#endif
 

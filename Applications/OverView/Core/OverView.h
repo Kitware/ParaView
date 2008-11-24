@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    AboutDialog.h
+   Module:    OverView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,36 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef OVERVIEW_H
+#define OVERVIEW_H
 
-#ifndef _AboutDialog_h
-#define _AboutDialog_h
+#include <QStringList>
 
-#include <QDialog>
-
-namespace Ui { class AboutDialog; }
-
-class pqServer;
-class QTreeWidget;
-/// Provides an about dialog
-class AboutDialog :
-  public QDialog
+class OverView
 {
-  Q_OBJECT
-
 public:
-  AboutDialog(QWidget* Parent);
+  static int main(int argc, char* argv[],
+    const QStringList& ConfiguredPlugins,
+    const QString& BrandedApplicationTitle,
+    const QString& BrandedSplashTextColor,
+    const QString& BrandedVersion,
+    const QString& BrandedFullVersion,
+    const QString& GeoTilePath,
+    const bool InstallerSupport
+    );
 
-private:
-  ~AboutDialog();
-  AboutDialog(const AboutDialog&);
-  AboutDialog& operator=(const AboutDialog&);
-
-  void AddClientInformation();
-  void AddServerInformation();
-  void AddServerInformation(pqServer* server, QTreeWidget* tree);
-  
-  Ui::AboutDialog* const Ui;
+  static const QString GetBrandedApplicationTitle();
+  static const QString GetBrandedSplashTextColor();
+  static const QString GetBrandedVersion();
+  static const QString GetBrandedFullVersion();
+  static const QString GetGeoTilePath();
+  static const bool GetInstallerSupport();
 };
 
-#endif // !_AboutDialog_h
+#endif // !OVERVIEW_H
 

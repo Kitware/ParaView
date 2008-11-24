@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqMultiInputView_h
 #define _pqMultiInputView_h
 
-#include "OverViewUtilityExport.h"
+#include "OverViewCoreExport.h"
 
 #include "pqView.h"
 
 /// Convenience view class that enforces "single input" behavior
-class OVERVIEW_UTILITY_EXPORT pqMultiInputView : public pqView
+class OVERVIEW_CORE_EXPORT pqMultiInputView : public pqView
 {
   Q_OBJECT
 

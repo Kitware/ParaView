@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _ToolbarActions_h
 #define _ToolbarActions_h
 
-#include "OverViewUtilityExport.h"
+#include "OverViewCoreExport.h"
 
 #include <QActionGroup>
 #include <QString>
 
 class pqPipelineSource;
 
-class OVERVIEW_UTILITY_EXPORT ToolbarActions : public QActionGroup
+class OVERVIEW_CORE_EXPORT ToolbarActions : public QActionGroup
 {
   Q_OBJECT
 public:

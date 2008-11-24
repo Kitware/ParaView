@@ -1,193 +1,50 @@
+# This section builds the OverView core library and is specific to the ParaView/OverView build process ...
 PROJECT(OverView)
+ADD_SUBDIRECTORY(Core)
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/OverViewConfig.cmake.in" "${ParaView_BINARY_DIR}/OverViewConfig.cmake" @ONLY)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6 FATAL_ERROR)
+# This section builds an "OverView-branded" OverView client, and is an example of how to create a custom
+# OverView branding ...
+INCLUDE("${ParaView_BINARY_DIR}/OverViewConfig.cmake")
 
-# Set global configuration options ...
-SET(OVERVIEW_VERSION_MAJOR 0)
-SET(OVERVIEW_VERSION_MINOR 5)
-SET(OVERVIEW_VERSION_PATCH 0)
-SET(OVERVIEW_VERSION_TYPE "")
-SET(OVERVIEW_VERSION "${OVERVIEW_VERSION_MAJOR}.${OVERVIEW_VERSION_MINOR}.${OVERVIEW_VERSION_PATCH}")
-SET(OVERVIEW_VERSION_FULL "${OVERVIEW_VERSION} ${OVERVIEW_VERSION_TYPE}")
+SET(OVERVIEW_BRANDED_APPLICATION_TITLE "OverView") 
+SET(OVERVIEW_BRANDED_SPLASH_IMAGE "${CMAKE_CURRENT_SOURCE_DIR}/SplashScreen.png")
+SET(OVERVIEW_BRANDED_SPLASH_TEXT_COLOR "black")
+SET(OVERVIEW_BRANDED_VERSION_MAJOR "0")
+SET(OVERVIEW_BRANDED_VERSION_MINOR "5")
+SET(OVERVIEW_BRANDED_VERSION_PATCH "0")
+SET(OVERVIEW_BRANDED_VERSION_TYPE "alpha")
 
-# Setup branding ...
-
-SET(OVERVIEW_CONFIGURED_PLUGINS )
-
-MACRO(configure_plugin PLUGIN)
-  LIST(APPEND OVERVIEW_CONFIGURED_PLUGINS ${PLUGIN})
-
-  IF(WIN32)
-    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"${PLUGIN}Plugin.dll\",\n")
-  ENDIF(WIN32)
-  
-  IF(UNIX AND NOT APPLE)
-    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"lib${PLUGIN}Plugin.so\",\n")
-  ENDIF(UNIX AND NOT APPLE)
-  
-  IF(APPLE)
-    FILE(APPEND ${CONFIGURED_PLUGINS_H} "  \"lib${PLUGIN}Plugin.dylib\",\n")
-
-    # On the Mac only, we have to create a symlink to each configured plugin from the bundle directory,
-    # so they can be located at startup ...
-    SET(BUNDLE_PATH "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS")
-    FILE(MAKE_DIRECTORY "${BUNDLE_PATH}")
-    EXECUTE_PROCESS(COMMAND ln -sf "${EXECUTABLE_OUTPUT_PATH}/lib${PLUGIN}Plugin.dylib" "${BUNDLE_PATH}/lib${PLUGIN}Plugin.dylib")
-
-  ENDIF(APPLE)
-ENDMACRO(configure_plugin)
-
-MACRO(require_plugin PLUGIN)
-
-  SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} ON CACHE BOOL "Build ${PLUGIN}" FORCE)
-  configure_plugin(${PLUGIN})
-
-ENDMACRO(require_plugin)
-
-MACRO(allow_plugin PLUGIN)
-  IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-
-    configure_plugin(${PLUGIN})
-
-  ENDIF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-ENDMACRO(allow_plugin)
-
-# Generate a list of configured plugins that will be embedded into the application ...
-SET(CONFIGURED_PLUGINS_H "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredPlugins.h")
-FILE(WRITE ${CONFIGURED_PLUGINS_H} "")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "#ifndef __ConfiguredPlugins_h_\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "#define __ConfiguredPlugins_h_\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "// Generated file, do not edit!  See ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt for details.\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "static const char* ConfiguredPlugins[] = {\n")
-
-SET(OVERVIEW_BRANDING_CONFIGURATION "${CMAKE_CURRENT_SOURCE_DIR}/Branding/OverView/Configuration.cmake" CACHE FILEPATH "Branding configuration file")
-INCLUDE(${OVERVIEW_BRANDING_CONFIGURATION})
-
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "  NULL\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "  };\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "\n")
-FILE(APPEND ${CONFIGURED_PLUGINS_H} "#endif // !__ConfiguredPlugins_h_\n")
-
-SET(OVERVIEW_BRANDED_VERSION "${OVERVIEW_BRANDED_VERSION_MAJOR}.${OVERVIEW_BRANDED_VERSION_MINOR}.${OVERVIEW_BRANDED_VERSION_PATCH}")
-SET(OVERVIEW_BRANDED_VERSION_FULL "${OVERVIEW_BRANDED_VERSION} ${OVERVIEW_BRANDED_VERSION_TYPE}")
+IF(APPLE)
+  SET(OVERVIEW_BRANDED_BUNDLE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/overview.icns") 
+#  SET(OVERVIEW_BRANDED_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/volume.png") 
+ENDIF(APPLE)
 
 IF(WIN32)
-  CONFIGURE_FILE(${OVERVIEW_BRANDED_APPLICATION_ICON} ${CMAKE_CURRENT_BINARY_DIR}/Icon.ico COPYONLY)
+  SET(OVERVIEW_BRANDED_APPLICATION_ICON "${CMAKE_CURRENT_SOURCE_DIR}/Icon.ico")
 ENDIF(WIN32)
 
-# Do sanity-checking on the current configuration ...
-SET(QT_USE_QTASSISTANT TRUE)
-SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
-SET(QT_USE_QTSQL TRUE)
-SET(QT_USE_QTUITOOLS TRUE)
-INCLUDE(${QT_USE_FILE})
+require_plugin(ClientGraphView)
+require_plugin(ClientTableView)
+require_plugin(Infovis)
+require_plugin(TableToGraphPanel)
 
-IF(NOT BUILD_SHARED_LIBS)
-  MESSAGE(SEND_ERROR "PARAVIEW_BUILD_OverView requires BUILD_SHARED_LIBS")
-ENDIF(NOT BUILD_SHARED_LIBS)
+allow_plugin(Array)
+allow_plugin(ChartViewFrame)
+allow_plugin(ClientAttributeView)
+allow_plugin(ClientChartView)
+allow_plugin(ClientGeoView)
+allow_plugin(ClientGeoView2D)
+allow_plugin(ClientHierarchyView)
+allow_plugin(ClientRecordView)
+allow_plugin(CommonToolbar)
+allow_plugin(GraphLayoutFilterPanel)
+allow_plugin(SQLDatabaseGraphSourcePanel)
+allow_plugin(SQLDatabaseTableSourcePanel)
+allow_plugin(SplitTableFieldPanel)
+allow_plugin(StatisticsToolbar)
+allow_plugin(TableToSparseArrayPanel)
+allow_plugin(ThresholdTablePanel)
 
-# Build the OverView client ...
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_BINARY_DIR}/Config.h)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Icon.rc.in ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/SplashScreen.qrc.in ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc)
-CONFIGURE_FILE(${OVERVIEW_BRANDED_SPLASH_IMAGE} ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen COPYONLY)
-
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  AboutDialog.h
-  ApplicationOptionsDialog.h
-  DisplayPolicy.h
-  GlobalGraphViewOptions.h
-  MainWindow.h
-)
-
-SET(UI_FORMS
-  AboutDialog.ui
-  GlobalGraphViewOptions.ui
-  MainWindow.ui
-)
-
-QT4_WRAP_UI(UI_BUILT_SOURCES
-  ${UI_FORMS}
-)
-
-SET(UI_RESOURCES
-  ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.qrc
-)
-
-QT4_ADD_RESOURCES(RCS_SOURCES
-  ${UI_RESOURCES}
-)
-
-IF(WIN32)
-  SET(EXE_ICON ${CMAKE_CURRENT_BINARY_DIR}/Icon.rc)
-ENDIF(WIN32)
-
-SOURCE_GROUP("Resources" FILES
-  ${UI_RESOURCES}
-  ${UI_FORMS}
-  ${EXE_ICON}
-)
-
-SOURCE_GROUP("Generated" FILES
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  ${UI_BUILT_SOURCES}
-)
-
-IF(WIN32)
-  LINK_DIRECTORIES(${QT_LIBRARY_DIR})
-ENDIF(WIN32)
-
-INCLUDE_DIRECTORIES(
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${OverViewUtility_BINARY_DIR}
-  ${OverViewUtility_SOURCE_DIR}
-  )
-
-ADD_EXECUTABLE(${OVERVIEW_BRANDED_APPLICATION_TITLE} WIN32 MACOSX_BUNDLE
-  AboutDialog.cxx
-  AboutDialog.h
-  ApplicationOptionsDialog.cxx
-  ApplicationOptionsDialog.h
-  DisplayPolicy.cxx
-  DisplayPolicy.h
-  GlobalGraphViewOptions.cxx
-  GlobalGraphViewOptions.h
-  MainWindow.cxx
-  MainWindow.h
-  main.cxx
-  ProcessModuleGUIHelper.cxx
-  ProcessModuleGUIHelper.h
-  ${MOC_BUILT_SOURCES}
-  ${RCS_SOURCES}
-  ${UI_BUILT_SOURCES}
-  ${EXE_ICON}
-)
-
-TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE}
-  pqComponents
-  pqCore
-  pqWidgets
-  QtChart
-  QtTesting
-  ${QT_LIBRARIES}
-  OverViewUtility
-)
-
-IF(WIN32)
-  TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
-ENDIF(WIN32)
-
-# Reset these so they don't cause problems building our subdirectories
-SET(MOC_BUILT_SOURCES "")
-SET(UI_BUILT_SOURCES "")
-SET(RCS_SOURCES "")
-
-ADD_SUBDIRECTORY(Distribution)
-ADD_SUBDIRECTORY(Utility)
-
-MARK_AS_ADVANCED(OVERVIEW_BRANDING_CONFIGURATION)
+build_overview()
 

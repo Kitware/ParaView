@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Config.h"
 #include "ProcessModuleGUIHelper.h"
-#include "ConfiguredPlugins.h"
+#include "OverView.h"
 
 #include <QApplication>
 #include <QTimer>
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -58,9 +58,9 @@ ProcessModuleGUIHelper::ProcessModuleGUIHelper()
   this->Splash->setWindowFlags(Qt::WindowStaysOnTopHint);
   this->Splash->setFont(QFont("Helvetica", 12, QFont::Bold));
   this->Splash->showMessage(
-    QString("%1 %2").arg(OVERVIEW_BRANDED_APPLICATION_TITLE).arg(OVERVIEW_BRANDED_VERSION_FULL),
+    QString("%1 %2").arg(OverView::GetBrandedApplicationTitle()).arg(OverView::GetBrandedFullVersion()),
     Qt::AlignBottom | Qt::AlignRight,
-    QColor(OVERVIEW_BRANDED_SPLASH_TEXT_COLOR));
+    QColor(OverView::GetBrandedSplashTextColor()));
   this->Splash->show();
 }
 
@@ -69,18 +69,23 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 {
 }
 
+void ProcessModuleGUIHelper::SetConfiguredPlugins(const QStringList& configured_plugins)
+{
+  this->ConfiguredPlugins = configured_plugins;
+}
+
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
-  pqApplicationCore::instance()->setApplicationName(OVERVIEW_BRANDED_APPLICATION_TITLE OVERVIEW_BRANDED_VERSION);
+  pqApplicationCore::instance()->setApplicationName(OverView::GetBrandedApplicationTitle() + " " + OverView::GetBrandedVersion());
   pqApplicationCore::instance()->setOrganizationName("Sandia National Laboratories");
   QWidget* w = new MainWindow();
   QTimer::singleShot(3500, this->Splash, SLOT(close()));
 
-  for(vtkIdType i = 0; ConfiguredPlugins[i]; ++i)
+  for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
     {
-    cerr << "Loading Configured Plugin: " << QApplication::applicationDirPath().toAscii().data() << "/" << ConfiguredPlugins[i] << endl;
-    pqApplicationCore::instance()->getPluginManager()->loadExtension(0, QApplication::applicationDirPath() + "/" + ConfiguredPlugins[i]); 
+    cerr << "Loading Configured Plugin: " << QApplication::applicationDirPath().toAscii().data() << "/" << this->ConfiguredPlugins[i].toAscii().data() << endl;
+    pqApplicationCore::instance()->getPluginManager()->loadExtension(0, QApplication::applicationDirPath() + "/" + this->ConfiguredPlugins[i]); 
     }
 
   return w;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    GlobalGraphViewOptions.h
+   Module:    IconDialog.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,54 +29,39 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __IconDialog_h
+#define __IconDialog_h
 
-#ifndef _GlobalGraphViewOptions_h
-#define _GlobalGraphViewOptions_h
+#include "OverViewCoreExport.h"
 
-#include "pqOptionsContainer.h"
+#include <pqDialog.h>
+#include <pqRepresentation.h>
 
-/// options container for pages of render view options
-class GlobalGraphViewOptions : public pqOptionsContainer
+class OVERVIEW_CORE_EXPORT IconDialog : public pqDialog
 {
   Q_OBJECT
-
+  
 public:
-  GlobalGraphViewOptions(QWidget *parent=0);
-  virtual ~GlobalGraphViewOptions();
+  IconDialog(pqRepresentation *rep, QWidget* parent = 0);
+  ~IconDialog();
 
-  // set the current page
-  virtual void setPage(const QString &page);
-  // return a list of strings for pages we have
-  virtual QStringList getPageList();
+public slots:
 
-  // apply the changes
-  virtual void applyChanges();
-  // reset the changes
-  virtual void resetChanges();
-
-  // tell pqOptionsDialog that we want an apply button
-  virtual bool isApplyUsed() const { return true; }
-
-
-  struct ManipulatorType
-    {
-    int Mouse;
-    int Shift;
-    int Control;
-    QByteArray Name;
-    };
+  void onIconSizeChanged();
+  void onApplyIconSize();
+  void updateDisplay();
+  void readIconSheetFromFile(const QString &file);
 
 protected:
-  void init();
 
-private slots:
-  void resetDefaultCameraManipulators();
+  virtual void acceptInternal();
+  
+  void initializeDisplay();
 
 private:
-  class pqInternal;
-  pqInternal* Internal;
 
-  static ManipulatorType DefaultManipulatorTypes[9];
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif

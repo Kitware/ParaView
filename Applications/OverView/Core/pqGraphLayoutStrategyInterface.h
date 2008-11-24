@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ProcessModuleGUIHelper.h
+   Module:    pqGraphLayoutStrategyInterface.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,42 +29,32 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqClientProcessModudeGUIHelper_h
-#define __pqClientProcessModudeGUIHelper_h
 
-#include "pqProcessModuleGUIHelper.h"
-#include <QPointer>
-#include <QSplashScreen>
+#ifndef _pqGraphLayoutStrategyInterface_h
+#define _pqGraphLayoutStrategyInterface_h
 
-/*!
- * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
- * so that we can create the type of MainWindow needed for pqClient.
- *
- */
-class ProcessModuleGUIHelper : public pqProcessModuleGUIHelper
+#include "OverViewCoreExport.h"
+
+#include <QtPlugin>
+#include <QStringList>
+
+class vtkGraphLayoutStrategy;
+
+/// interface class for plugins that create view modules
+class OVERVIEW_CORE_EXPORT pqGraphLayoutStrategyInterface
 {
 public:
-  static ProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  /// destructor
+  virtual ~pqGraphLayoutStrategyInterface() {}
+  
+  /// Return a list of layout strategies supported by this interface
+  virtual QStringList graphLayoutStrategies() const = 0;
 
-  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
-  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
-protected:
-  ProcessModuleGUIHelper();
-  ~ProcessModuleGUIHelper();
+  virtual vtkGraphLayoutStrategy* getGraphLayoutStrategy(const QString& layoutStrategy) = 0;
 
-  /// subclasses can override this method to create their own
-  /// subclass of pqMainWindow as the Main Window.
-  virtual QWidget* CreateMainWindow();
-
-  QPointer<QSplashScreen> Splash;
-
-private:
-  ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.
-  void operator=(const ProcessModuleGUIHelper&); // Not implemented.
 };
 
-#endif
+Q_DECLARE_INTERFACE(pqGraphLayoutStrategyInterface, "com.kitware/paraview/graphLayoutStrategy")
 
+#endif
 

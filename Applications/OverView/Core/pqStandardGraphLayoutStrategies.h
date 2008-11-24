@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqStandardGraphLayoutStrategies_h
 #define _pqStandardGraphLayoutStrategies_h
 
-#include "OverViewUtilityExport.h"
+#include "OverViewCoreExport.h"
 #include <pqCoreExport.h>
 #include <pqGraphLayoutStrategyInterface.h>
 #include <vtkSmartPointer.h>
@@ -50,8 +50,9 @@ class vtkSimple2DLayoutStrategy;
 class vtkPassThroughLayoutStrategy;
 
 /// interface class for plugins that create graph layout strategies
-class OVERVIEW_UTILITY_EXPORT pqStandardGraphLayoutStrategies : public QObject, 
-                                                 public pqGraphLayoutStrategyInterface
+class OVERVIEW_CORE_EXPORT pqStandardGraphLayoutStrategies :
+  public QObject, 
+  public pqGraphLayoutStrategyInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqGraphLayoutStrategyInterface)

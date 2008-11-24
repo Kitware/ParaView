@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkSMSourceSelectionLink.h
+   Module:    ProcessModuleGUIHelper.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,47 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkSMSourceSelectionLink - Links vtkSMSourceProxy selections
-// .SECTION Description
+#ifndef __pqClientProcessModudeGUIHelper_h
+#define __pqClientProcessModudeGUIHelper_h
 
-#ifndef __vtkSMSourceSelectionLink_h
-#define __vtkSMSourceSelectionLink_h
+#include "OverViewCoreExport.h"
 
-#include "OverViewUtilityExport.h"
+#include "pqProcessModuleGUIHelper.h"
+#include <QPointer>
+#include <QSplashScreen>
 
-#include <vtkObject.h>
-
-class vtkSMSourceProxy;
-class vtkSMSourceSelectionLinkCommand;
-class vtkSMSourceSelectionLinkInternals;
-class pqViewManager;
-
-class OVERVIEW_UTILITY_EXPORT vtkSMSourceSelectionLink : public vtkObject
+/*!
+ * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
+ * so that we can create the type of MainWindow needed for pqClient.
+ *
+ */
+class OVERVIEW_CORE_EXPORT ProcessModuleGUIHelper : public pqProcessModuleGUIHelper
 {
 public:
-  static vtkSMSourceSelectionLink *New();
-  vtkTypeRevisionMacro(vtkSMSourceSelectionLink, vtkObject);
+  static ProcessModuleGUIHelper* New();
+  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void AddSource(vtkSMSourceProxy* source);
-  void RemoveSource(vtkSMSourceProxy* source);
+  void SetConfiguredPlugins(const QStringList& configured_plugins);
 
-  void SetViewManager(pqViewManager* manager)
-    { this->ViewManager = manager; }
-
+  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
+  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 protected:
-  vtkSMSourceSelectionLink();
-  ~vtkSMSourceSelectionLink();
+  ProcessModuleGUIHelper();
+  ~ProcessModuleGUIHelper();
 
-  void SelectionChanged(vtkSMSourceProxy* source);
+  /// subclasses can override this method to create their own
+  /// subclass of pqMainWindow as the Main Window.
+  virtual QWidget* CreateMainWindow();
+
+  QPointer<QSplashScreen> Splash;
+  QStringList ConfiguredPlugins;
 
 private:
-  vtkSMSourceSelectionLink(const vtkSMSourceSelectionLink&);  // Not implemented.
-  void operator=(const vtkSMSourceSelectionLink&);  // Not implemented.
-
-  pqViewManager* ViewManager;
-  bool InSelectionChanged;
-
-  friend class vtkSMSourceSelectionLinkCommand;
-  vtkSMSourceSelectionLinkCommand* Command;
-  vtkSMSourceSelectionLinkInternals* Internals;
+  ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.
+  void operator=(const ProcessModuleGUIHelper&); // Not implemented.
 };
 
 #endif
+
 

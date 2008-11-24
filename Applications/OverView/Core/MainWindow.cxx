@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Config.h"
 #include "DisplayPolicy.h"
 #include "MainWindow.h"
+#include "OverView.h"
 
 #include "ui_MainWindow.h"
 
@@ -160,7 +161,7 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setToolbarMenu(this->Implementation->ToolbarsMenu);
 
   this->setWindowTitle(
-    QString("%1 %2").arg(OVERVIEW_BRANDED_APPLICATION_TITLE).arg(OVERVIEW_BRANDED_VERSION_FULL));
+    QString("%1 %2").arg(OverView::GetBrandedApplicationTitle()).arg(OverView::GetBrandedFullVersion()));
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileOpen,
@@ -753,7 +754,7 @@ MainWindow::MainWindow() :
     new pqStandardGraphLayoutStrategies(pqApplicationCore::instance()->getPluginManager()));
 
   // Simplify main window for the TLP:
-  if(strcmp(OVERVIEW_BRANDED_APPLICATION_TITLE, "NetViewPrototype") == 0)
+  if(OverView::GetBrandedApplicationTitle() == "NetViewPrototype")
     {
     this->menuBar()->removeAction(this->Implementation->UI.menuEdit->menuAction());
     this->menuBar()->removeAction(this->Implementation->UI.menuTools->menuAction());

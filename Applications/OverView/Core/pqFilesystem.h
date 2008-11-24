@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    Config.h.in
+   Module:    pqFilesystem.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,20 +29,26 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef OVERVIEW_CONFIG_H
-#define OVERVIEW_CONFIG_H
 
-#define OVERVIEW_VERSION "@OVERVIEW_VERSION@"
-#define OVERVIEW_VERSION_FULL "@OVERVIEW_VERSION_FULL@"
 
-#define OVERVIEW_BRANDED_APPLICATION_TITLE "@OVERVIEW_BRANDED_APPLICATION_TITLE@"
-#define OVERVIEW_BRANDED_SPLASH_TEXT_COLOR "@OVERVIEW_BRANDED_SPLASH_TEXT_COLOR@"
-#define OVERVIEW_BRANDED_VERSION "@OVERVIEW_BRANDED_VERSION@"
-#define OVERVIEW_BRANDED_VERSION_FULL "@OVERVIEW_BRANDED_VERSION_FULL@"
+#ifndef pqFilesystem_h
+#define pqFilesystem_h
 
-#define OVERVIEW_GEO_TILE_PATH "@OVERVIEW_GEO_TILE_PATH@"
+#include "OverViewCoreExport.h"
 
-#cmakedefine OVERVIEW_INSTALLER_SUPPORT
+#include <QDir>
 
-#endif // !OVERVIEW_CONFIG_H
+/// Provides convenient access to common filesystem locations
+class OVERVIEW_CORE_EXPORT pqFilesystem
+{
+public:
+  /// Returns the top-level install directory
+  static const QDir installDirectory();
+  /// Returns the bin directory (where the binary is located)
+  static const QDir binDirectory();
+  /// Returns the share directory
+  static const QDir shareDirectory();
+};
+
+#endif // !pqFilesystem_h
 

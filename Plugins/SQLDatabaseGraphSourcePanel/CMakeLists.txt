@@ -17,8 +17,8 @@ QT4_WRAP_UI(
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
-  ${OverViewUtility_BINARY_DIR}
-  ${OverViewUtility_SOURCE_DIR}
+  ${OverViewCore_BINARY_DIR}
+  ${OverViewCore_SOURCE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
@@ -46,6 +46,6 @@ ADD_PARAVIEW_PLUGIN(
 
 TARGET_LINK_LIBRARIES(
   SQLDatabaseGraphSourcePanelPlugin
-  OverViewUtility
+  OverViewCore
   )
 

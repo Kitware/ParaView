@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MainWindow_h
 #define _MainWindow_h
 
+#include "OverViewCoreExport.h"
+
 #include <QMainWindow>
 #include <QVariant>
 #include <vtkIOStream.h>
@@ -43,7 +45,7 @@ class pqRepresentation;
 class pqView;
 
 /// Provides the main window for the ParaView application
-class MainWindow :
+class OVERVIEW_CORE_EXPORT MainWindow :
   public QMainWindow
 {
   Q_OBJECT

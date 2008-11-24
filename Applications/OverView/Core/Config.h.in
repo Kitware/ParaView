@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqFilesystem.h
+   Module:    Config.h.in
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,26 +29,11 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef OVERVIEW_CONFIG_H
+#define OVERVIEW_CONFIG_H
 
+#define OVERVIEW_VERSION "@OVERVIEW_VERSION@"
+#define OVERVIEW_VERSION_FULL "@OVERVIEW_VERSION_FULL@"
 
-#ifndef pqFilesystem_h
-#define pqFilesystem_h
-
-#include "OverViewUtilityExport.h"
-
-#include <QDir>
-
-/// Provides convenient access to common filesystem locations
-class OVERVIEW_UTILITY_EXPORT pqFilesystem
-{
-public:
-  /// Returns the top-level install directory
-  static const QDir installDirectory();
-  /// Returns the bin directory (where the binary is located)
-  static const QDir binDirectory();
-  /// Returns the share directory
-  static const QDir shareDirectory();
-};
-
-#endif // !pqFilesystem_h
+#endif // !OVERVIEW_CONFIG_H
 

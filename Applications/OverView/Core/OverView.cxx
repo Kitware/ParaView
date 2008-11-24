@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    main.cxx
+   Module:    OverView.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,29 +30,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include <QApplication>
-#include <QDir>
-#include "Config.h"
+#include "OverView.h"
+#include "ProcessModuleGUIHelper.h"
 #include "pqComponentsInit.h"
 #include "pqMain.h"
-#include "ProcessModuleGUIHelper.h"
 #include "vtkSmartPointer.h"
+#include <QApplication>
+#include <QDir>
 
 #ifdef Q_WS_X11
 #include <QPlastiqueStyle>
 #endif
 
-int main(int argc, char* argv[])
+static QString g_BrandedApplicationTitle;
+static QString g_BrandedSplashTextColor;
+static QString g_BrandedVersion;
+static QString g_BrandedFullVersion;
+static QString g_GeoTilePath;
+static bool g_InstallerSupport = false;
+
+int OverView::main(int argc, char* argv[],
+  const QStringList& ConfiguredPlugins,
+  const QString& BrandedApplicationTitle,
+  const QString& BrandedSplashTextColor,
+  const QString& BrandedVersion,
+  const QString& BrandedFullVersion,
+  const QString& GeoTilePath,
+  const bool InstallerSupport
+  )
 {
+  g_BrandedApplicationTitle = BrandedApplicationTitle;
+  g_BrandedSplashTextColor = BrandedSplashTextColor;
+  g_BrandedVersion = BrandedVersion;
+  g_BrandedFullVersion = BrandedFullVersion;
+  g_GeoTilePath = GeoTilePath;
+  g_InstallerSupport = InstallerSupport;
+
   QApplication app(argc, argv);
 
 #ifdef Q_WS_X11
-
   // Using motif style gives us test failures (and its ugly).
   // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
   // let's just use plastique for now
   QApplication::setStyle(new QPlastiqueStyle);
-
 #endif
 
   pqComponentsInit();
@@ -65,6 +85,39 @@ int main(int argc, char* argv[])
   QApplication::setLibraryPaths(QStringList(plugin_directory.absolutePath()));
 #endif
 
-  return pqMain::Run(app, vtkSmartPointer<ProcessModuleGUIHelper>::New());
+  vtkSmartPointer<ProcessModuleGUIHelper> helper = vtkSmartPointer<ProcessModuleGUIHelper>::New();
+  helper->SetConfiguredPlugins(ConfiguredPlugins);
+
+  return pqMain::Run(app, helper);
+}
+
+const QString OverView::GetBrandedApplicationTitle()
+{
+  return g_BrandedApplicationTitle;
+}
+
+const QString OverView::GetBrandedSplashTextColor()
+{
+  return g_BrandedSplashTextColor;
+}
+
+const QString OverView::GetBrandedVersion()
+{
+  return g_BrandedVersion;
+}
+
+const QString OverView::GetBrandedFullVersion()
+{
+  return g_BrandedFullVersion;
+}
+
+const QString OverView::GetGeoTilePath()
+{
+  return g_GeoTilePath;
+}
+
+const bool OverView::GetInstallerSupport()
+{
+  return g_InstallerSupport;
 }
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    ApplicationOptionsDialog.h
+   Module:    GlobalGraphViewOptions.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,20 +30,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _ApplicationOptionsDialog_h
-#define _ApplicationOptionsDialog_h
+#ifndef _GlobalGraphViewOptions_h
+#define _GlobalGraphViewOptions_h
 
-#include "pqOptionsDialog.h"
+#include "OverViewCoreExport.h"
 
-/// dialog class that allows editing of application wide settings
-class ApplicationOptionsDialog : public pqOptionsDialog
+#include "pqOptionsContainer.h"
+
+/// options container for pages of render view options
+class OVERVIEW_CORE_EXPORT GlobalGraphViewOptions : public pqOptionsContainer
 {
   Q_OBJECT
 
 public:
-  ApplicationOptionsDialog(QWidget *parent=0);
-  ~ApplicationOptionsDialog();
+  GlobalGraphViewOptions(QWidget *parent=0);
+  virtual ~GlobalGraphViewOptions();
 
+  // set the current page
+  virtual void setPage(const QString &page);
+  // return a list of strings for pages we have
+  virtual QStringList getPageList();
+
+  // apply the changes
+  virtual void applyChanges();
+  // reset the changes
+  virtual void resetChanges();
+
+  // tell pqOptionsDialog that we want an apply button
+  virtual bool isApplyUsed() const { return true; }
+
+
+  struct ManipulatorType
+    {
+    int Mouse;
+    int Shift;
+    int Control;
+    QByteArray Name;
+    };
+
+protected:
+  void init();
+
+private slots:
+  void resetDefaultCameraManipulators();
+
+private:
+  class pqInternal;
+  pqInternal* Internal;
+
+  static ManipulatorType DefaultManipulatorTypes[9];
 };
 
 #endif
