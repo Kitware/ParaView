@@ -13,14 +13,11 @@
 
 =========================================================================*/
 
-/*
- * Copyright 2008 Sandia Corporation.
- * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
- * license for use of this work by or on behalf of the
- * U.S. Government. Redistribution and use in source and binary forms, with
- * or without modification, are permitted provided that this Notice and any
- * statement of authorship are reproduced on all copies.
- */
+/*-------------------------------------------------------------------------
+  Copyright 2008 Sandia Corporation.
+  Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
+  the U.S. Government retains certain rights in this software.
+-------------------------------------------------------------------------*/
 
 // .NAME vtkPVScalarBarActor - A scalar bar with labels of fixed font.
 //
@@ -38,12 +35,20 @@
 
 #include "vtkScalarBarActor.h"
 
+#include "vtkSmartPointer.h" // For ivars
+#include <vtkstd/vector>     // For ivars
+
 class VTK_EXPORT vtkPVScalarBarActor : public vtkScalarBarActor
 {
 public:
   vtkTypeRevisionMacro(vtkPVScalarBarActor, vtkScalarBarActor);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
   static vtkPVScalarBarActor *New();
+
+  // Description:
+  // Draw the scalar bar and annotation text to the screen.
+  virtual int RenderOpaqueGeometry(vtkViewport* viewport);
+  virtual int RenderOverlay(vtkViewport* viewport);
 
   // Description:
   // The bar aspect ratio (length/width).  Defaults to 20.  Note that this
@@ -58,6 +63,12 @@ public:
   vtkGetMacro(AutomaticLabelFormat, int);
   vtkSetMacro(AutomaticLabelFormat, int);
   vtkBooleanMacro(AutomaticLabelFormat, int);
+  
+  // Description:
+  // Release any graphics resources that are being consumed by this actor.
+  // The parameter window could be used to determine which graphic
+  // resources to release.
+  virtual void ReleaseGraphicsResources(vtkWindow *);
 
 protected:
   vtkPVScalarBarActor();
@@ -67,10 +78,74 @@ protected:
 
   int AutomaticLabelFormat;
 
-  virtual void AllocateAndSizeLabels(int *labelSize, int *propSize,
-                                     vtkViewport *viewport, double *range);
+//BTX
+  // Description:
+  // These replace the TextMappers and TextActors fields because they are a
+  // lot easier to work with.
+  vtkstd::vector<vtkSmartPointer<vtkTextMapper> > LabelMappers;
+  vtkstd::vector<vtkSmartPointer<vtkActor2D> >    LabelActors;
+//ETX
 
-  virtual void SizeTitle(int *titleSize, int *propSize, vtkViewport *viewport);
+  // Description:
+  // Allocate and position all the labels (stored in LabelMappers and
+  // LabelActors).
+  virtual void AllocateAndPositionLabels(int *propSize, vtkViewport *viewport);
+
+  // Description:
+  // Determines the size and position of the title and sets the mapper and
+  // actor to place it there.
+  virtual void PositionTitle(const int propSize[2], vtkViewport *viewport);
+
+  // Description:
+  // Set up the ScalarBar, ScalarBarMapper, and ScalarBarActor based on the
+  // current position and orientation of this actor.
+  virtual void PositionScalarBar(const int propSize[2], vtkViewport *viewport);
+
+  // Description:
+  // Set up the texture used to render the scalar bar.
+  virtual void BuildScalarBarTexture();
+
+  // Description:
+  // A convenience function for creating one of the labels.  A text mapper
+  // and associated actor are added to LabelMappers and LabelActors
+  // respectively.  The index to the newly created entries is returned.
+  virtual int CreateLabel(double value, int targetWidth, int targetHeight,
+                          vtkViewport *viewport);
+
+//BTX
+  // Description:
+  // Given a data range, finds locations for tick marks that will have
+  // "friendly" labels (that is, can be represented with less units of
+  // precision).
+  virtual vtkstd::vector<double> LinearTickMarks(const double range[2],
+                                                 int maxTicks,
+                                                 bool intOnly=false);
+  virtual vtkstd::vector<double> LogTickMarks(const double range[2],
+                                              int maxTicks);
+//ETX
+
+  vtkTexture *ScalarBarTexture;
+
+  vtkPolyData           *TickMarks;
+  vtkPolyDataMapper2D   *TickMarksMapper;
+  vtkActor2D            *TickMarksActor;
+
+  // Description:
+  // Space, in pixels, between the title and the rest of the bar.  Currently
+  // set in PositionTitle.
+  int TitleSpace;
+  // Description:
+  // The width and height of the bar in pixels.  Currently set in
+  // AllocateAndPositionLabels.
+  int BarWidth;
+  int BarHeight;
+  // Description:
+  // Space, in pixels, between the labels and the bar itself.  Currently set in
+  // PositionTitle.
+  int LabelSpace;
+  // Description:
+  // The space in pixels given to the hieght of the labels.
+  int LabelHeight;
 
 private:
   vtkPVScalarBarActor(const vtkPVScalarBarActor &);     // Not implemented.
