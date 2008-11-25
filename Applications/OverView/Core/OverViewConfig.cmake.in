@@ -1,25 +1,40 @@
-SET(OVERVIEW_CONFIGURED_PLUGINS )
+SET(OVERVIEW_STARTUP_PLUGIN_FILES )
+SET(OVERVIEW_STARTUP_PLUGIN_DIRECTORIES )
 
-# configure_plugin
-MACRO(configure_plugin PLUGIN)
-  LIST(APPEND OVERVIEW_CONFIGURED_PLUGINS ${PLUGIN})
-ENDMACRO(configure_plugin)
+# overview_startup_plugin
+MACRO(overview_startup_plugin PLUGIN_NAME)
+  IF(ARGV1)
+    SET(PLUGIN_DIRECTORY ${ARGV1})
+  ELSE()
+    SET(PLUGIN_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
+  ENDIF()
 
-# require_plugin
-MACRO(require_plugin PLUGIN)
+  IF(WIN32)
+    LIST(APPEND OVERVIEW_STARTUP_PLUGIN_FILES "${PLUGIN_NAME}Plugin.dll")
+  ELSEIF(UNIX AND NOT APPLE)
+    LIST(APPEND OVERVIEW_STARTUP_PLUGIN_FILES "lib${PLUGIN_NAME}Plugin.so")
+  ELSEIF(APPLE)
+    LIST(APPEND OVERVIEW_STARTUP_PLUGIN_FILES "lib${PLUGIN_NAME}Plugin.dylib")
+  ENDIF()
+
+  LIST(APPEND OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN_DIRECTORY})
+ENDMACRO(overview_startup_plugin)
+
+# paraview_require_plugin
+MACRO(paraview_require_plugin PLUGIN)
   SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} ON CACHE BOOL "Build ${PLUGIN}" FORCE)
-  configure_plugin(${PLUGIN})
-ENDMACRO(require_plugin)
+  overview_startup_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
+ENDMACRO(paraview_require_plugin)
 
-# allow_plugin
-MACRO(allow_plugin PLUGIN)
+# paraview_allow_plugin
+MACRO(paraview_allow_plugin PLUGIN)
   IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-    configure_plugin(${PLUGIN})
+    overview_startup_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
   ENDIF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-ENDMACRO(allow_plugin)
+ENDMACRO(paraview_allow_plugin)
 
-# build_overview
-MACRO(build_overview)
+# overview_build_client
+MACRO(overview_build_client)
   SET(OVERVIEW_BRANDED_VERSION "${OVERVIEW_BRANDED_VERSION_MAJOR}.${OVERVIEW_BRANDED_VERSION_MINOR}.${OVERVIEW_BRANDED_VERSION_PATCH}")
   SET(OVERVIEW_BRANDED_VERSION_FULL "${OVERVIEW_BRANDED_VERSION} ${OVERVIEW_BRANDED_VERSION_TYPE}")
 
@@ -30,19 +45,9 @@ MACRO(build_overview)
   FILE(APPEND ${MAIN_CXX} "int main(int argc, char* argv[])\n")
   FILE(APPEND ${MAIN_CXX} "{\n")
   FILE(APPEND ${MAIN_CXX} "  QStringList configured_plugins;\n")
-  FOREACH(PLUGIN ${OVERVIEW_CONFIGURED_PLUGINS})
-    IF(WIN32)
-      FILE(APPEND ${MAIN_CXX} "  configured_plugins << \"${PLUGIN}Plugin.dll\";\n")
-    ENDIF(WIN32)
-   
-    IF(UNIX AND NOT APPLE)
-      FILE(APPEND ${MAIN_CXX} "  configured_plugins << \"lib${PLUGIN}Plugin.so\";\n")
-    ENDIF(UNIX AND NOT APPLE)
-   
-    IF(APPLE)
-      FILE(APPEND ${MAIN_CXX} "  configured_plugins << \"lib${PLUGIN}Plugin.dylib\";\n")
-    ENDIF(APPLE)
-  ENDFOREACH(PLUGIN)
+  FOREACH(PLUGIN_FILE ${OVERVIEW_STARTUP_PLUGIN_FILES})
+    FILE(APPEND ${MAIN_CXX} "  configured_plugins << \"${PLUGIN_FILE}\";\n")
+  ENDFOREACH()
   FILE(APPEND ${MAIN_CXX} "\n")
   FILE(APPEND ${MAIN_CXX} "  return OverView::main(argc, argv,\n")
   FILE(APPEND ${MAIN_CXX} "    configured_plugins,\n")
@@ -105,14 +110,25 @@ MACRO(build_overview)
   IF(APPLE)
     SET(BUNDLE_PATH "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS")
     FILE(MAKE_DIRECTORY "${BUNDLE_PATH}")
-    FOREACH(PLUGIN ${OVERVIEW_CONFIGURED_PLUGINS})
-      EXECUTE_PROCESS(COMMAND ln -sf "${EXECUTABLE_OUTPUT_PATH}/lib${PLUGIN}Plugin.dylib" "${BUNDLE_PATH}/lib${PLUGIN}Plugin.dylib")
-    ENDFOREACH()
+
+    LIST(LENGTH OVERVIEW_STARTUP_PLUGIN_FILES PLUGIN_COUNT)
+    #MESSAGE(STATUS "PLUGIN_COUNT: ${PLUGIN_COUNT}")
+
+    SET(PLUGIN 0)
+    WHILE(PLUGIN LESS ${PLUGIN_COUNT})
+      LIST(GET OVERVIEW_STARTUP_PLUGIN_FILES ${PLUGIN} PLUGIN_FILE)
+      LIST(GET OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN} PLUGIN_DIRECTORY)
+      
+      #MESSAGE(STATUS "${PLUGIN} ${PLUGIN_DIRECTORY} ${PLUGIN_NAME}")
+      EXECUTE_PROCESS(COMMAND ln -sf "${PLUGIN_DIRECTORY}/${PLUGIN_FILE}" "${BUNDLE_PATH}/${PLUGIN_FILE}")
+
+      MATH(EXPR PLUGIN "${PLUGIN} + 1")
+    ENDWHILE()
   ENDIF(APPLE)
 
   IF(WIN32)
     INCLUDE("@ParaView_BINARY_DIR@/OverViewWin32Distribution.cmake")
   ENDIF(WIN32)
 
-ENDMACRO(build_overview)
+ENDMACRO(overview_build_client)
 
