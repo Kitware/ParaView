@@ -1517,7 +1517,7 @@ def _createSetProperty(pName):
 def _findClassForProxy(xmlName):
     """Given the xmlName for a proxy, returns a Proxy class. Note
     that if there are duplicates, the first one is returned."""
-    global sources, filters, rendering, animation, implicit_functions, writers
+    global sources, filters, rendering, animation, implicit_functions, writers, extended_sources
     if xmlName in sources.__dict__:
         return sources.__dict__[xmlName]
     elif xmlName in filters.__dict__:
@@ -1530,6 +1530,8 @@ def _findClassForProxy(xmlName):
         return implicit_functions.__dict__[xmlName]
     elif xmlName in writers.__dict__:
         return writers.__dict__[xmlName]
+    elif xmlName in extended_sources.__dict__:
+        return extended_sources.__dict__[xmlName]
     else:
         return None
 
@@ -1564,7 +1566,7 @@ def _printProgress(caller, event):
 def updateModules():
     """Called when a plugin is loaded, this method updates
     the proxy class object in all known modules."""
-    global sources, filters, writers, rendering, animation, implicit_functions
+    global sources, filters, writers, rendering, animation, implicit_functions, extended_sources
 
     createModule("sources", sources)
     createModule("filters", filters)
@@ -1576,11 +1578,12 @@ def updateModules():
     createModule("animation", animation)
     createModule('animation_keyframes', animation)
     createModule('implicit_functions', implicit_functions)
+    createModule("extended_sources", extended_sources)
     
 def _createModules():
     """Called when the module is loaded, this creates sub-
     modules for all know proxy groups."""
-    global sources, filters, writers, rendering, animation, implicit_functions
+    global sources, filters, writers, rendering, animation, implicit_functions, extended_sources
 
     sources = createModule('sources')
     filters = createModule('filters')
@@ -1592,6 +1595,7 @@ def _createModules():
     animation = createModule('animation')
     createModule('animation_keyframes', animation)
     implicit_functions = createModule('implicit_functions')
+    extended_sources = createModule("extended_sources", extended_sources)
     
 def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
