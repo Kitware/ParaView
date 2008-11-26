@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -84,8 +84,18 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 
   for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
     {
-    cerr << "Loading Configured Plugin: " << QApplication::applicationDirPath().toAscii().data() << "/" << this->ConfiguredPlugins[i].toAscii().data() << endl;
-    pqApplicationCore::instance()->getPluginManager()->loadExtension(0, QApplication::applicationDirPath() + "/" + this->ConfiguredPlugins[i]); 
+    const QString plugin = QApplication::applicationDirPath() + "/" + this->ConfiguredPlugins[i];
+
+    cerr << "Loading startup plugin: " << plugin.toAscii().data() << " ... ";
+    QString error_message;
+    if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin, &error_message))
+      {
+      cerr << "failed: " << error_message.toAscii().data() << endl;
+      }
+    else
+      {
+      cerr << "succeeded" << endl;
+      }
     }
 
   return w;
