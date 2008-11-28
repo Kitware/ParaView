@@ -4752,7 +4752,7 @@ The Plot Over Line filter samples the data set attributes of the current data se
 
    <!-- ==================================================================== -->
    <SourceProxy name="Probe" class="vtkPProbeFilter"
-    label="Resample with dataset">
+    label="Resample With Dataset">
     <Documentation
        long_help="Sample data attributes at the points of a dataset."
        short_help="Sample data values at the points of a dataset.">

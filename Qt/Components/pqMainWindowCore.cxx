@@ -2397,11 +2397,12 @@ void pqMainWindowCore::initPythonInterpretor()
       "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
       "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n"
       "servermanager.ToggleProgressPrinting()\n"
-      "servermanager.fromGUI = True\n")
+      "servermanager.fromGUI = True\n"
+      "from paraview.simple import *")
       .arg(cid)
       .arg(activeServer->getResource().toURI());
     this->Implementation->PythonDialog->print(
-      "from paraview import servermanager");
+      "from paraview.simple import *");
     this->Implementation->PythonDialog->runString(initStr);
     }
 

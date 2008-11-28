@@ -909,12 +909,12 @@
         </Documentation>
       </IntVectorProperty>
 
-      <Property name="Play" command="Play" />
-      <Property name="Stop" command="Stop" />
-      <Property name="GoToNext" command="GoToNext" />
-      <Property name="GoToPrevious" command="GoToPrevious" />
-      <Property name="GoToFirst" command="GoToFirst" />
-      <Property name="GoToLast" command="GoToLast" />
+      <Property name="Play" command="Play" is_internal="0"/>
+      <Property name="Stop" command="Stop" is_internal="0"/>
+      <Property name="GoToNext" command="GoToNext" is_internal="0"/>
+      <Property name="GoToPrevious" command="GoToPrevious" is_internal="0"/>
+      <Property name="GoToFirst" command="GoToFirst" is_internal="0"/>
+      <Property name="GoToLast" command="GoToLast" is_internal="0"/>
 
       <!-- End of AnimationPlayerBase -->
     </Proxy>

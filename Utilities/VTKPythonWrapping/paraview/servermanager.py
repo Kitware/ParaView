@@ -7,7 +7,7 @@
 #  All rights reserved.
 #  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 #
-#     This software is distributed WITHOUT ANY WARRANTY; without even
+#     This software is distributed WITHOUT ANY WARRANTY without even
 #     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #     PURPOSE.  See the above copyright notice for more information.
 #
@@ -40,7 +40,12 @@ A simple example:
 
   renModule.StillRender()
 """
-import re, os, new, exceptions, sys, vtk
+import paraview, re, os, new, exceptions, sys, vtk
+
+if not paraview.compatibility.minor:
+    paraview.compatibility.major = 3
+if not paraview.compatibility.major:
+    paraview.compatibility.minor = 4
 
 if os.name == "posix":
     from libvtkPVServerCommonPython import *
@@ -49,9 +54,66 @@ else:
     from vtkPVServerCommonPython import *
     from vtkPVServerManagerPython import *
 
-class Proxy(object):
+def _wrap_property(proxy, smproperty):
+    """ Internal function.
+    Given a server manager property and its domains, returns the 
+    appropriate python object.
     """
-    Proxy wrapper. Makes it easier to set/get properties on a proxy.
+    property = None
+    if smproperty.IsA("vtkSMStringVectorProperty"):
+        al = smproperty.GetDomain("array_list")
+        if  al and al.IsA("vtkSMArraySelectionDomain") and \
+            smproperty.GetRepeatCommand():
+            property = ArrayListProperty(proxy, smproperty)
+        elif al and al.IsA("vtkSMArrayListDomain"):
+            property = ArraySelectionProperty(proxy, smproperty)
+        else:
+            iter = smproperty.NewDomainIterator()
+            isFileName = False
+            while not iter.IsAtEnd():
+                if iter.GetDomain().IsA("vtkSMFileListDomain"):
+                    isFileName = True
+                    break
+                iter.Next()
+            if isFileName:
+                property = FileNameProperty(proxy, smproperty)
+            else:
+                property = VectorProperty(proxy, smproperty)            
+    elif smproperty.IsA("vtkSMVectorProperty"):
+        property = VectorProperty(proxy, smproperty)
+    elif smproperty.IsA("vtkSMInputProperty"):
+        property = InputProperty(proxy, smproperty)
+    elif smproperty.IsA("vtkSMProxyProperty"):
+        property = ProxyProperty(proxy, smproperty)
+    else:
+        property = Property(proxy, smproperty)
+    return property
+    
+class Proxy(object):
+    """Proxy for a server side object. A proxy manages the lifetime of
+    one or more server manager objects. It also provides an interface
+    to set and get the properties of the server side objects. These
+    properties are presented as Python properties. For example,
+    you can set a property Foo using the following:
+     proxy.Foo = (1,2)
+    or
+     proxy.Foo.SetData((1,2))
+    or
+     proxy.Foo[0:2] = (1,2)
+    For more information, see the documentation of the property which
+    you can obtain with
+    help(proxy.Foo).
+
+    This class also provides an iterator which can be used to iterate
+    over all properties.
+    eg:
+      proxy = Proxy(proxy=smproxy)
+      for property in proxy:
+          print property
+
+    For advanced users:
+    This is a python class that wraps a vtkSMProxy.. Makes it easier to 
+    set/get properties.
     Instead of:
      proxy.GetProperty("Foo").SetElement(0, 1)
      proxy.GetProperty("Foo").SetElement(0, 2)
@@ -62,7 +124,7 @@ class Proxy(object):
     or
      proxy.Foo[0:2] = (1,2)
     Instead of:
-      proxy.GetPropery("Foo").GetElement(0)
+      proxy.GetProperty("Foo").GetElement(0)
     you can do:
       proxy.Foo.GetData()[0]
     or
@@ -74,19 +136,13 @@ class Proxy(object):
     Properties support most of the list API. See VectorProperty and
     ProxyProperty documentation for details.
 
-    This class also provides an iterator which can be used to iterate
-    over all properties.
-    eg:
-      proxy = Proxy(proxy=smproxy)
-      for property in proxy:
-          print property
-
     Please note that some of the methods accessible through the Proxy
     class are not listed by help() because the Proxy objects forward
     unresolved attributes to the underlying object. To get the full list,
     see also dir(proxy.SMProxy). See also the doxygen based documentation
     of the vtkSMProxy C++ class.
     """
+
     def __init__(self, **args):
         """ Default constructor. It can be used to initialize properties
         by passing keyword arguments where the key is the name of the
@@ -168,15 +224,7 @@ class Proxy(object):
             return self.__Properties[name]()
         smproperty = self.SMProxy.GetProperty(name)
         if smproperty:
-            property = None
-            if smproperty.IsA("vtkSMVectorProperty"):
-                property = VectorProperty(self, smproperty)
-            elif smproperty.IsA("vtkSMInputProperty"):
-                property = InputProperty(self, smproperty)
-            elif smproperty.IsA("vtkSMProxyProperty"):
-                property = ProxyProperty(self, smproperty)
-            else:
-                property = Property(self, smproperty)
+            property = _wrap_property(self, smproperty)
             if property is not None:
                 import weakref
                 self.__Properties[name] = weakref.ref(property)
@@ -192,28 +240,24 @@ class Proxy(object):
         return property_list
 
     def __ConvertArgumentsAndCall(self, *args):
-      newArgs = []
-      for arg in args:
-          if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
-              newArgs.append(arg.SMProxy)
-          else:
-              newArgs.append(arg)
-      func = getattr(self.SMProxy, self.__LastAttrName)
-      retVal = func(*newArgs)
-      if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
-          return _getPyProxy(retVal)
-      elif type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProperty"):
-          property = retVal
-          if property.IsA("vtkSMVectorProperty"):
-              return VectorProperty(self, property)
-          elif property.IsA("vtkSMInputProperty"):
-              return InputProperty(self, property)
-          elif property.IsA("vtkSMProxyProperty"):
-              return ProxyProperty(self, property)
-          else:
-              return None
-      else:
-          return retVal
+        """ Internal function.
+        Used to call a function on SMProxy. Converts input and
+        output values as appropriate.
+        """
+        newArgs = []
+        for arg in args:
+            if issubclass(type(arg), Proxy) or isinstance(arg, Proxy):
+                newArgs.append(arg.SMProxy)
+            else:
+                newArgs.append(arg)
+        func = getattr(self.SMProxy, self.__LastAttrName)
+        retVal = func(*newArgs)
+        if type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProxy"):
+            return _getPyProxy(retVal)
+        elif type(retVal) is type(self.SMProxy) and retVal.IsA("vtkSMProperty"):
+            return _wrap_property(self, retVal)
+        else:
+            return retVal
 
     def __GetActiveCamera(self):
         """ This method handles GetActiveCamera specially. It adds
@@ -231,7 +275,8 @@ class Proxy(object):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
         if not self.SMProxy:
-            return getattr(self, name)
+            raise AttributeError("class has no attribute %s" % name)
+            return None
         # Handle GetActiveCamera specially.
         if name == "GetActiveCamera" and \
            hasattr(self.SMProxy, "GetActiveCamera"):
@@ -248,16 +293,35 @@ class Proxy(object):
         return getattr(self.SMProxy, name)
 
 class SourceProxy(Proxy):
-    """Source proxy wrapper. This class adds a few methods to Proxy
-    that are specific to source proxies."""
-    
-    def UpdatePipeline(self):
+    """Proxy for a source object. This class adds a few methods to Proxy
+    that are specific to sources. It also provides access to the output
+    ports. Output ports can be accessed by name or index:
+    > op = source[0]
+    or
+    > op = source['some name'].
+    See the OutputPort documentation on instructions for accessing the
+    meta-data about the output objects.
+    """
+
+    def __init__(self, **args):
+        Proxy.__init__(self, **args)
+        
+    def UpdatePipeline(self, time=None):
         """This method updates the server-side VTK pipeline and the associated
-        data information."""
-        self.SMProxy.UpdatePipeline()
+        data information. Make sure to update a source to validate the output
+        meta-data."""
+        if time:
+            self.SMProxy.UpdatePipeline(time)
+        else:
+            self.SMProxy.UpdatePipeline()
         # Fetch the new information. This is also here to cause a receive
         # on the client side so that progress works properly.
         self.SMProxy.GetDataInformation()
+        
+    def UpdatePipelineInformation(self):
+        """This method updates the meta-data of the server-side VTK pipeline and
+        the associated information properties"""
+        self.SMProxy.UpdatePipelineInformation()
 
     def GetDataInformation(self, idx=0):
         """This method returns a DataInformation wrapper around a
@@ -267,8 +331,34 @@ class SourceProxy(Proxy):
                 self.SMProxy.GetDataInformation(idx), \
                 self.SMProxy, idx)
                 
+    def __getitem__(self, idx):
+        """Given a slice, int or string, returns the corresponding
+        output port"""
+        if isinstance(idx, slice):
+            indices = idx.indices(self.SMProxy.GetNumberOfOutputPorts())
+            retVal = []
+            for i in range(*indices):
+                retVal.append(OutputPort(self, i))
+            return retVal
+        elif isinstance(idx, int):
+            if idx >= self.SMProxy.GetNumberOfOutputPorts() or idx < 0:
+                raise exceptions.IndexError            
+            return OutputPort(self, idx)
+        else:
+            return OutputPort(self, self.SMProxy.GetOutputPortIndex(idx))                
+
 class Property(object):
-    """Python wrapper around a vtkSMProperty with a simple interface.
+    """Generic property object that provides access to one of the properties of
+    a server object. This class does not allow setting/getting any values but
+    provides an interface to update a property using __call__. This can be used
+    for command properties that correspond to function calls without arguments.
+    For example,
+    > proxy.Foo()
+    would push a Foo property which may cause the proxy to call a Foo method
+    on the actual VTK object.
+    
+    For advanced users:
+    Python wrapper around a vtkSMProperty with a simple interface.
     In addition to all method provided by vtkSMProperty (obtained by
     forwarding unknown attributes requests to the underlying SMProxy),
     Property and sub-class provide a list API.
@@ -303,6 +393,7 @@ class Property(object):
         return repr
 
     def __call__(self):
+        """Forces a property update using InvokeCommand."""
         if type(self) is Property:
             self.Proxy.SMProxy.InvokeCommand(self._FindPropertyName())
         else:
@@ -316,7 +407,7 @@ class Property(object):
         "Pushes the value of this property to the server."
         # For now, we are updating all properties. This is due to an
         # issue with the representations. Their VTK objects are not
-        # created until Input is set; therefore, updating a property
+        # created until Input is set therefore, updating a property
         # has no effect. Updating all properties everytime one is
         # updated has the effect of pushing values set before Input
         # when Input is updated.
@@ -324,11 +415,15 @@ class Property(object):
         self.Proxy.SMProxy.UpdateVTKObjects()
 
 class VectorProperty(Property):
-    """Python wrapper for vtkSMVectorProperty and sub-classes.
-    In addition to vtkSMVectorProperty methods, this class provides
-    a list interface, allowing things like:
-    val = property[2]
-    property[1:3] = (1, 2)
+    """A VectorProperty provides access to one or more values. You can use
+    a slice to get one or more property values:
+    > val = property[2]
+    or
+    > vals = property[0:5:2]
+    You can use a slice to set one or more property values:
+    > property[2] = val
+    or
+    > property[1:3] = (1,2)
     """
     def ConvertValue(self, value):
        """Converts value to type suitable for vtSMProperty::SetElement()"""
@@ -338,7 +433,6 @@ class VectorProperty(Property):
            if domain.HasEntryText(value):
               return domain.GetEntryValueForText(value)
        return value
-
     
     def __len__(self):
         """Returns the number of elements."""
@@ -368,7 +462,7 @@ class VectorProperty(Property):
         return retVal
       elif idx >= len(self) or idx < 0:
         raise exceptions.IndexError
-      return _getPyProxy(self.SMProperty.GetElement(idx))   
+      return self.SMProperty.GetElement(idx)
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -390,8 +484,13 @@ class VectorProperty(Property):
         if not isinstance(values, tuple) and \
            not isinstance(values, list):
             values = (values,)
+        iup = self.SMProperty.GetImmediateUpdate()
+        self.SMProperty.SetImmediateUpdate(False)
+        # Clean up first
+        self.SMProperty.SetNumberOfElements(0)
         for i in range(len(values)):
             self.SMProperty.SetElement(i, self.ConvertValue(values[i]))
+        self.SMProperty.SetImmediateUpdate(iup)
         self._UpdateProperty()
 
     def Clear(self):
@@ -399,14 +498,207 @@ class VectorProperty(Property):
         self.SMProperty().SetNumberOfElements(0)
         self._UpdateProperty()
 
+class FileNameProperty(VectorProperty):
+    """Property to set/get one or more file names.
+    This property updates the pipeline information everytime its value changes.
+    This is used to keep the array lists up to date."""
+
+    def _UpdateProperty(self):
+        "Pushes the value of this property to the server."
+        VectorProperty._UpdateProperty(self)
+        self.Proxy.UpdatePipelineInformation()
+
+class ArraySelectionProperty(VectorProperty):
+    "Property to select an array to be processed by a filter."
+
+    def GetAssociation(self):
+        ass = int(self.SMProperty.GetElement(3))
+        if ass == 0:
+            return FIELD_ASSOCIATION_POINTS
+        elif ass == 1:
+            return FIELD_ASSOCIATION_CELLS
+        elif ass == 4:
+            return FIELD_ASSOCIATION_VERTICES
+        elif ass == 5:
+            return FIELD_ASSOCIATION_EDGES
+        elif ass == 6:
+            return FIELD_ASSOCIATION_ROWS
+
+        return None
+        
+    def GetArrayName(self):
+        return self.SMProperty.GetElement(4)
+        
+    def __len__(self):
+        """Returns the number of elements."""
+        return 2
+
+    def __setitem__(self, idx, value):
+        raise RuntimeError, "This property cannot be accessed using __setitem__"
+  
+    def __getitem__(self, idx):
+        """Returns attribute type for index 0, array name for index 1"""
+        if isinstance(idx, slice):        
+            indices = idx.indices(len(self)) 
+            retVal = []
+            for i in range(*indices):
+                if i >= 2 or i < 0:
+                    raise exceptions.IndexError
+                if i == 0:
+                    retVal.append(self.GetAssociation())
+                else:
+                    retVal.append(self.GetArrayName())
+            return retVal
+        elif idx >= 2 or idx < 0:
+            raise exceptions.IndexError
+            
+        if i == 0:
+            return self.GetAssociation()
+        else:
+            return self.GetArrayName()
+
+    def SetData(self, values):
+        """Allows setting of all values at once. Requires a single value,
+        a tuple or list."""
+        if not isinstance(values, tuple) and \
+           not isinstance(values, list):
+            values = (values,)
+        if len(values) == 1:
+            self.SMProperty.SetElement(4, values[0])
+        elif len(values) == 2:
+            val = str(values[0])
+            if isinstance(values[0], str):
+                val = str(ASSOCIATIONS[values[0]])
+            self.SMProperty.SetElement(3,  val)
+            self.SMProperty.SetElement(4, values[1])
+        else:
+            raise RuntimeError, "Expected 1 or 2 values."
+        self._UpdateProperty()
+
+    def UpdateDefault(self):
+        "Helper method to set default values."
+        if self.SMProperty.GetNumberOfElements() != 5:
+            return
+        if self.SMProperty.GetElement(4) != '' or \
+            self.SMProperty.GetElement(3) != '':
+            return
+            
+        for i in range(0,3):
+            if self.SMProperty.GetElement(i) == '':
+                self.SMProperty.SetElement(i, '0')
+        al = self.SMProperty.GetDomain("array_list")
+        al.Update(self.SMProperty)
+        al.SetDefaultValues(self.SMProperty)
+
+class ArrayListProperty(VectorProperty):
+    """This property provides a simpler interface for selecting arrays.
+    Simply assign a list of arrays that should be loaded by the reader.
+    Use the Available property to get a list of available arrays."""
+
+    def __init__(self, proxy, smproperty):
+        VectorProperty.__init__(self, proxy, smproperty)
+        self.__arrays = []
+
+    def GetAvailable(self):
+        "Returns the list of available arrays"
+        dm = self.GetDomain("array_list")
+        retVal = []
+        for i in range(dm.GetNumberOfStrings()):
+            retVal.append(dm.GetString(i))
+        return retVal
+
+    Available = property(GetAvailable, None, None, \
+        "This read-only property contains the list of items that can be read by a reader.")
+        
+    def __len__(self):
+        """Returns the number of elements."""
+        return len(self.GetData())
+
+    def __setitem__(self, idx, value):
+      """Given a list or tuple of values, sets a slice of values [min, max)"""
+      self.GetData()
+      if isinstance(idx, slice):        
+          indices = idx.indices(len(self))         
+          for i, j in zip(range(*indices), value):  
+              self.__arrays[i] = j
+          self.SetData(self.__arrays)
+      elif idx >= len(self) or idx < 0:
+          raise exceptions.IndexError
+      else:
+          self.__arrays[idx] = self.ConvertValue(value)
+          self.SetData(self.__arrays)
+  
+    def __getitem__(self, idx):
+      """Returns the range [min, max) of elements. Raises an IndexError
+      exception if an argument is out of bounds."""
+      self.GetData()
+      if isinstance(idx, slice):        
+          indices = idx.indices(len(self)) 
+          retVal = []
+          for i in range(*indices):
+              retVal.append(self.__arrays[i])
+          return retVal
+      elif idx >= len(self) or idx < 0:
+          raise exceptions.IndexError
+      return self.__arrays[idx]
+      
+    def SetData(self, values):
+        """Allows setting of all values at once. Requires a single value,
+        a tuple or list."""
+        # Clean up first
+        iup = self.SMProperty.GetImmediateUpdate()
+        self.SMProperty.SetImmediateUpdate(False)
+        # Clean up first
+        self.SMProperty.SetNumberOfElements(0)
+        if not isinstance(values, tuple) and \
+           not isinstance(values, list):
+            values = (values,)
+        fullvalues = []
+        for i in range(len(values)):
+            val = self.ConvertValue(values[i])
+            fullvalues.append(val)
+            fullvalues.append('1')
+        for array in self.Available:
+            if not values.__contains__(array):
+                fullvalues.append(array)
+                fullvalues.append('0')
+        i = 0
+        for value in fullvalues:
+            self.SMProperty.SetElement(i, value)
+            i += 1
+
+        self._UpdateProperty()
+        self.SMProperty.SetImmediateUpdate(iup)
+
+    def GetData(self):
+        "Returns all elements as a list."
+        property = self.SMProperty
+        nElems = property.GetNumberOfElements()
+        self.__arrays = []
+        for i in range(0, nElems, 2):
+            if property.GetElement(i+1) != '0':
+                self.__arrays.append(property.GetElement(i))
+        return list(self.__arrays)
+        
 class ProxyProperty(Property):
-    """Python wrapper for vtkSMProxyProperty.
-    In addition to vtkSMProxyProperty methods, this class provides
-    a list interface, allowing things like:
-    proxy = property[2]
-    property[1:3] = (px1, px2)
-    property.append(proxy)
-    del property[1]
+    """A ProxyProperty provides access to one or more proxies. You can use
+    a slice to get one or more property values:
+    > proxy = property[2]
+    or
+    > proxies = property[0:5:2]
+    You can use a slice to set one or more property values:
+    > property[2] = proxy
+    or
+    > property[1:3] = (proxy1, proxy2)
+    You can also append and delete:
+    > property.append(proxy)
+    and
+    > del property[1:2]
+    
+    You can also remove all elements with Clear().
+    
+    Note that some properties expect only 1 proxy and will complain if
+    you set the number of values to be something else.
     """
     def __len__(self):
         """Returns the number of elements."""
@@ -456,8 +748,7 @@ class ProxyProperty(Property):
         return retVal
       elif idx >= len(self) or idx < 0:
         raise exceptions.IndexError
-      return _getPyProxy(self.SMProperty.GetProxy(idx))     
-                              
+      return _getPyProxy(self.SMProperty.GetProxy(idx))                                   
 
     def __getattr__(self, name):
         "Unknown attribute requests get forwarded to SMProperty."
@@ -499,18 +790,22 @@ class ProxyProperty(Property):
         self._UpdateProperty()
 
 class InputProperty(ProxyProperty):
-    """Python wrapper for vtkSMInputProperty.
-    In addition to vtkSMInputProperty methods, this class provides
-    a list interface, allowing things like:
-    outputport = property[2]
-    property[0] = proxy
-     or
-    property[0] = OuputPort(proxy, 1)
-    property.append(OutputPort(proxy, 0))
-    del property[1]
+    """An InputProperty allows making pipeline connections. You can set either
+    a source proxy or an OutputProperty to an input property:
+
+    > property[0] = proxy
+    or
+    > property[0] = OuputPort(proxy, 1)
+    
+    > property.append(proxy)
+    or
+    > property.append(OutputPort(proxy, 0))
     """
 
     def __getOutputPort(self, value):
+        """Internal method that returns an output port given
+        a proxy or an OutputPort. The OutputPort will contain
+        a vtkSMSourceProxy."""
         portidx = 0
         if isinstance(value, OutputPort):
             portidx = value.Port
@@ -583,10 +878,22 @@ class InputProperty(ProxyProperty):
             self.SMProperty.AddInputConnection(op.Proxy, op.Port)
         self._UpdateProperty()
         
+    def _UpdateProperty(self):
+        "Pushes the value of this property to the server."
+        ProxyProperty._UpdateProperty(self)
+        iter = PropertyIterator(self.Proxy)
+        for prop in iter:
+            if isinstance(prop, ArraySelectionProperty):
+                prop.UpdateDefault()
+    
+        
 class DataInformation(object):
-    """Python wrapper around a vtkPVDataInformation. In addition to
-    proving all methods of a vtkPVDataInformation, it provides a
-    few convenience methods.
+    """DataInformation is a contained for meta-data associated with an
+    output data.
+    
+    DataInformation is a python wrapper around a vtkPVDataInformation. 
+    In addition to proving all methods of a vtkPVDataInformation, it provides 
+    a few convenience methods.
 
     Please note that some of the methods accessible through the DataInformation
     class are not listed by help() because the DataInformation objects forward
@@ -630,37 +937,160 @@ class DataInformation(object):
         """Forwards unknown attribute requests to the underlying
         vtkPVInformation."""
         if not self.DataInformation:
-            return getattr(self, name)
+            raise AttributeError("class has no attribute %s" % name)
+            return None
         self.Update()
         return getattr(self.DataInformation, name)
+
+class ArrayInformation(object):
+    """Meta-information associated with an array. Use the Name
+    attribute to get the array name.
+
+    Please note that some of the methods accessible through the ArrayInformation
+    class are not listed by help() because the ArrayInformation objects forward
+    unresolved attributes to the underlying object. 
+    See the doxygen based documentation of the vtkPVArrayInformation C++
+    class for a full list.
+    """
+    def __init__(self, proxy, field, name):
+        self.Proxy = proxy
+        self.FieldData = field
+        self.Name = name
+
+    def __getattr__(self, name):
+        """Forward unknown methods to vtkPVArrayInformation"""
+        array = self.FieldData.GetFieldData().GetArrayInformation(self.Name)
+        if not array: return None
+        return getattr(array, name)
+        
+    def __repr__(self):
+        """Returns a user-friendly representation string."""
+        return "Array: " + self.Name
+        
+    def Range(self, component=0):
+        """Given a component, returns its value range as a tuple of 2 values."""
+        array = self.FieldData.GetFieldData().GetArrayInformation(self.Name)
+        range = array.GetComponentRange(component)
+        return (range[0], range[1])
+
+class FieldDataInformation(object):
+    """Meta-data for a field of an output object (point data, cell data etc...).
+    Provides easy access to the arrays using the slice interface:
+    > narrays = len(field_info)
+    > for i in range(narrays):
+    >   array_info = field_info[i]
+    
+    Full slice interface is supported:
+    > arrays = field_info[0:5:3]
+    where arrays is a list.
+    
+    Array access by name is also possible:
+    > array_info = field_info['Temperature']
+    
+    The number of arrays can also be accessed using the NumberOfArrays
+    property.
+    """
+    def __init__(self, proxy, idx, field):
+        self.Proxy = proxy
+        self.OutputPort = idx
+        self.FieldData = field
+
+    def GetFieldData(self):
+        """Convenience method to get the underlying
+        vtkPVDataSetAttributesInformation"""
+        return getattr(self.Proxy.GetDataInformation(self.OutputPort), "Get%sInformation" % self.FieldData)()
+
+    def GetNumberOfArrays(self):
+        """Returns the number of arrays."""
+        self.Proxy.UpdatePipeline()
+        return self.GetFieldData().GetNumberOfArrays()
+
+    def GetArray(self, idx):
+        """Given an index or a string, returns an array information.
+        Raises IndexError if the index is out of bounds."""
+        self.Proxy.UpdatePipeline()
+        if not self.GetFieldData().GetArrayInformation(idx):
+            return None
+        if isinstance(idx, str):
+            return ArrayInformation(self.Proxy, self, idx)
+        elif idx >= len(self) or idx < 0:
+            raise exceptions.IndexError
+        return ArrayInformation(self.Proxy, self, self.GetFieldData().GetArrayInformation(idx).GetName())
+
+    def __len__(self):
+        """Returns the number of arrays."""
+        return self.GetNumberOfArrays()
+        
+    def __getitem__(self, idx):
+        """Implements the [] operator. Accepts a slice, index or name."""
+        if isinstance(idx, slice):
+            indices = idx.indices(self.GetNumberOfArrays())
+            retVal = []
+            for i in range(*indices):
+                retVal.append(self.GetArray(i))
+            return retVal
+        
+        return self.GetArray(idx)
+
+    def __getattr__(self, name):
+        """Forwards unknown attributes to the underlying
+        vtkPVDataSetAttributesInformation"""
+        array = self.GetArray(name)
+        if array: return array
+        raise AttributeError("class has no attribute %s" % name)
+        return None
+
+    NumberOfArrays = property(GetNumberOfArrays, None, None, "Returns the number of arrays.")
     
 class OutputPort(object):
     """Helper class to store a reference to an output port. Used to
     set pipeline connections."""
-    
+
     def __init__(self, proxy, outputPort=0):
         """Default constructor. It takes a Proxy and an optional port
         index."""
         self.Proxy = proxy
         self.Port = outputPort
+        if proxy:
+            self.Name = proxy.GetOutputPortName(outputPort)
+        else:
+            self.Name = None
 
     def __repr__(self):
         """Returns a user-friendly representation string."""
         import exceptions
         try:
-            return self.Proxy.__repr__() + ":%d" % self.Port
+            return self.Proxy.__repr__() + ":%d (%s)" % (self.Port, self.Name)
         except exceptions.AttributeError:
             return object.__repr__(self)
-        
-class ProxyManager(object):
-    """Python wrapper for vtkSMProxyManager. Note that the underlying
-    vtkSMProxyManager is a singleton. All instances of this class will
-    refer to the same object. In addition to all methods provided by
-    vtkSMProxyManager (all unknown attribute requests are forwarded
-    to the vtkSMProxyManager), this class provides several convenience
-    methods.
 
-    When running scripts from the python shell in the ParaView application,
+    def __getattr__(self, name):
+        """Forwards unknown attribute requests to the underlying
+        proxy."""
+        if not self.Proxy:
+            raise AttributeError("class has no attribute %s" % name)
+            return None
+        return getattr(self.Proxy, name)
+
+    def GetDataInformation(self):
+        """Returns the associated data information."""
+        return self.Proxy.GetDataInformation(self.Port)
+
+    def GetPointDataInformation(self):
+        """Returns the associated point data information."""
+        self.Proxy.UpdatePipeline()
+        return FieldDataInformation(self.Proxy, self.Port, "PointData")
+
+    def GetCellDataInformation(self):
+        """Returns the associated cell data information."""
+        self.Proxy.UpdatePipeline()
+        return FieldDataInformation(self.Proxy, self.Port, "CellData")
+
+    PointData = property(GetPointDataInformation, None, None, "Returns point data information")
+    CellData = property(GetCellDataInformation, None, None, "Returns cell data information")
+
+class ProxyManager(object):
+    """When running scripts from the python shell in the ParaView application,
     registering proxies with the proxy manager is the ony mechanism to
     notify the graphical user interface (GUI) that a proxy
     exists. Therefore, unless a proxy is registered, it will not show up in
@@ -671,6 +1101,13 @@ class ProxyManager(object):
     you can use proxyManager.GetProxy(group, name). The name is the same
     as the name shown in the pipeline browser.
 
+    This class is a python wrapper for vtkSMProxyManager. Note that the 
+    underlying vtkSMProxyManager is a singleton. All instances of this 
+    class wil refer to the same object. In addition to all methods provided by
+    vtkSMProxyManager (all unknown attribute requests are forwarded
+    to the vtkSMProxyManager), this class provides several convenience
+    methods.
+    
     Please note that some of the methods accessible through the ProxyManager
     class are not listed by help() because the ProxyManager objects forwards
     unresolved attributes to the underlying object. To get the full list,
@@ -733,7 +1170,7 @@ class ProxyManager(object):
             if not proxy_groups.has_key(iter.GetGroup()):
                 proxy_groups[iter.GetGroup()] = {}
             group = proxy_groups[iter.GetGroup()]
-            group[iter.GetKey()] = proxy;
+            group[iter.GetKey()] = proxy
         return proxy_groups
 
     def GetProxiesInGroup(self, groupname, connection=None):
@@ -745,7 +1182,7 @@ class ProxyManager(object):
         proxies = {}
         iter = self.NewGroupIterator(groupname) 
         for aProxy in iter:
-            proxies[iter.GetKey()] = aProxy;
+            proxies[iter.GetKey()] = aProxy
         return proxies
 
     def UnRegisterProxy(self, groupname, proxyname, aProxy):
@@ -1039,7 +1476,7 @@ class Connection(object):
         """Returns the number of partitions on the data server for this
            connection"""
         pm = vtkProcessModule.GetProcessModule()
-        return pm.GetNumberOfPartitions(self.ID);
+        return pm.GetNumberOfPartitions(self.ID)
 
 
 ## These are methods to create a new connection.
@@ -1177,8 +1614,9 @@ def Disconnect(connection=None):
     if not connection or connection == ActiveConnection:
         connection = ActiveConnection
         ActiveConnection = None
-    pm =  vtkProcessModule.GetProcessModule()
-    pm.Disconnect(connection.ID)
+    if connection:
+        pm =  vtkProcessModule.GetProcessModule()
+        pm.Disconnect(connection.ID)
     return
 
 def CreateProxy(xml_group, xml_name, connection=None):
@@ -1249,6 +1687,12 @@ def CreateRenderView(connection=None, **extraArgs):
     proxy = rendering.__dict__[ren_module.GetXMLName()](**extraArgs)
     return proxy
 
+def GetRepresentation(aProxy, view):
+    for rep in view.Representations:
+        if rep.Input[0].Proxy == aProxy:
+            return rep
+    return None
+        
 def CreateRepresentation(aProxy, view, **extraArgs):
     """Creates a representation for the proxy and adds it to the render
     module.
@@ -1396,36 +1840,37 @@ def AnimateReader(reader, view, filename=None):
     filename is provided, a movie is created (type depends on the
     extension of the filename."""
     # Create an animation scene
-    scene = animation.AnimationScene();
+    scene = animation.AnimationScene()
     # with 1 view
-    scene.ViewModules = [view];
+    scene.ViewModules = [view]
     # Update the reader to get the time information
     reader.UpdatePipelineInformation()
     scene.TimeSteps = reader.TimestepValues.GetData()
     # Animate from 1st time step to last
     scene.StartTime = reader.TimestepValues.GetData()[0]
-    scene.EndTime = reader.TimestepValues.GetData()[-1];
+    scene.EndTime = reader.TimestepValues.GetData()[-1]
 
     # Each frame will correspond to a time step
-    scene.PlayMode = 2; #Snap To Timesteps
+    scene.PlayMode = 2 #Snap To Timesteps
 
     # Create a special animation cue for time.
-    cue = animation.TimeAnimationCue();
-    cue.AnimatedProxy = view;
-    cue.AnimatedPropertyName = "ViewTime";
-    scene.Cues = [cue];
+    cue = animation.TimeAnimationCue()
+    cue.AnimatedProxy = view
+    cue.AnimatedPropertyName = "ViewTime"
+    scene.Cues = [cue]
 
     if filename:
-        writer = vtkSMAnimationSceneImageWriter();
-        writer.SetFileName(filename);
-        writer.SetFrameRate(1);
-        writer.SetAnimationScene(scene.SMProxy);
+        writer = vtkSMAnimationSceneImageWriter()
+        writer.SetFileName(filename)
+        writer.SetFrameRate(1)
+        writer.SetAnimationScene(scene.SMProxy)
         
         # Now save the animation.
         if not writer.Save():
             raise exceptions.RuntimeError, "Saving of animation failed!"
     else:
         scene.Play()
+    return scene
 
 def ToggleProgressPrinting():
     """Turn on/off printing of progress (by default, it is on). You can
@@ -1597,9 +2042,20 @@ def _createModules():
     implicit_functions = createModule('implicit_functions')
     extended_sources = createModule("extended_sources", extended_sources)
     
+class PVModule(object):
+    pass
+
+def _make_name_valid(name):
+    name = name.replace(' ','')
+    name = name.replace('-','')
+    if not name[0].isalpha():
+        name = 'a' + name
+    return name
+    
 def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
     If mdl is not specified, it also creates the module"""
+    
     pxm = vtkSMObject.GetProxyManager()
     # Use prototypes to find all proxy types.
     pxm.InstantiateGroupPrototypes(groupName)
@@ -1607,7 +2063,7 @@ def createModule(groupName, mdl=None):
     debug = False
     if not mdl:
         debug = True
-        mdl = new.module(groupName)
+        mdl = PVModule()
     numProxies = pxm.GetNumberOfXMLProxies(groupName)
     for i in range(numProxies):
         pname = pxm.GetXMLProxyName(groupName, i)
@@ -1621,13 +2077,23 @@ def createModule(groupName, mdl=None):
         # Add all properties as python properties.
         for prop in iter:
             propName = iter.GetKey()
+            if (prop.GetInformationOnly() and propName != "TimestepValues" ) \
+                or prop.GetIsInternal() :
+                continue
+            names = [propName]
+            if paraview.compatibility.major >= 3 and \
+               paraview.compatibility.minor >= 5:
+                if prop.GetXMLLabel() and not proto.GetProperty(prop.GetXMLLabel()):
+                    names = [prop.GetXMLLabel()]
             propDoc = None
             if prop.GetDocumentation():
                 propDoc = prop.GetDocumentation().GetDescription()
-            cdict[propName] = property(_createGetProperty(propName),
+            for name in names:
+                name = _make_name_valid(name)
+                cdict[name] = property(_createGetProperty(propName),
                                        _createSetProperty(propName),
                                        None,
-                                       propDoc)
+                                       propDoc)                
         # Add the documentation as the class __doc__
         if proto.GetDocumentation() and \
            proto.GetDocumentation().GetDescription():
@@ -1641,7 +2107,13 @@ def createModule(groupName, mdl=None):
         else:
             cobj = type(pname, (Proxy,), cdict)            
         # Add it to the modules dictionary
-        mdl.__dict__[pname] = cobj
+        names = [pname]
+        if paraview.compatibility.major >= 3 and \
+           paraview.compatibility.minor >= 5:
+            if proto.GetXMLLabel():
+                names = [proto.GetXMLLabel()]
+        for name in names:
+            mdl.__dict__[_make_name_valid(name)] = cobj
     return mdl
 
 
@@ -1660,16 +2132,24 @@ def __determineGroup(proxy):
     elif xmlgroup == "representations":
         if xmlname == "ScalarBarWidgetRepresentation":
             return "scalar_bars"
-        return "representations";
+        return "representations"
     elif xmlgroup == "lookup_tables":
         return "lookup_tables"
+    elif xmlgroup == "implicit_functions":
+        return "implicit_functions"
     return None
 
-__nameCounter = 0
+__nameCounter = {}
 def __determineName(proxy, group):
     global __nameCounter
-    __nameCounter += 1
-    return "%s%d" % (proxy.GetXMLName(), __nameCounter)
+    name = proxy.GetXMLName()
+    if not __nameCounter.has_key(name):
+        __nameCounter[name] = 0
+        val = 0
+    else:
+        val = __nameCounter[name]
+        __nameCounter[name] += 1
+    return "%s%d" % (proxy.GetXMLName(), val)
 
 def __getName(proxy, group):
     pxm = ProxyManager()
@@ -1696,8 +2176,8 @@ def Register(proxy, **extraArgs):
         pxm = ProxyManager()
         pxm.RegisterProxy(registrationGroup, registrationName, proxy)
     else:
-        raise exceptions.RuntimeError, "Registeration error."
-    return (registrationGroup, registrationName);
+        raise exceptions.RuntimeError, "Registration error %s %s." % (registrationGroup, registrationName)
+    return (registrationGroup, registrationName)
 
 def UnRegister(proxy, **extraArgs):
     """UnRegisters proxies registered using Register()."""
@@ -1715,8 +2195,8 @@ def UnRegister(proxy, **extraArgs):
         pxm = ProxyManager()
         pxm.UnRegisterProxy(registrationGroup, registrationName, proxy)
     else:
-        raise exceptions.RuntimeError, "UnRegisteration error."
-    return (registrationGroup, registrationName);
+        raise exceptions.RuntimeError, "UnRegistration error."
+    return (registrationGroup, registrationName)
 
 def demo1():
     """This simple demonstration creates a sphere, renders it and delivers
@@ -1724,16 +2204,21 @@ def demo1():
     view)"""
     if not ActiveConnection:
         Connect()
-    ss = sources.SphereSource(Radius=2, ThetaResolution=32)
-    shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
-    cs = sources.ConeSource()
-    app = filters.Append()
+    if paraview.compatibility.GetVersion() <= 3.4:
+        ss = sources.SphereSource(Radius=2, ThetaResolution=32)
+        shr = filters.ShrinkFilter(Input=OutputPort(ss,0))
+        cs = sources.ConeSource()
+        app = filters.Append()
+    else:
+        ss = sources.Sphere(Radius=2, ThetaResolution=32)
+        shr = filters.Shrink(Input=OutputPort(ss,0))
+        cs = sources.Cone()
+        app = filters.AppendDatasets()
     app.Input = [shr, cs]
     rv = CreateRenderView()
     rep = CreateRepresentation(app, rv)
     rv.ResetCamera()
     rv.StillRender()
-    cf = filters.Contour()
     data = Fetch(ss)
 
     return (data, rv)
@@ -1748,22 +2233,15 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
         Connect()
     # Create the exodus reader and specify a file name
     reader = sources.ExodusIIReader(FileName=fname)
-    # Update information to force the reader to read the meta-data
-    # including the list of variables available
-    reader.UpdatePipelineInformation()
-    # Get the list of point arrays. This is a list of pairs; each pair
-    # contains the name of the array and whether that array is to be
-    # loaded
-    arrayList = reader.PointResultArrayInfo
-    print arrayList.GetData()
-    # Assign the list to the property that determines which arrays are read.
-    # See the documentation for the exodus reader for details.
-    reader.PointResultArrayStatus = arrayList.GetData()
-    arraystatus = reader.PointResultArrayStatus
-    # Flip the read flag of all arrays
-    for idx in range(1, len(arraystatus), 2):
-        arraystatus[idx] = "1"
-    print arraystatus.GetData()
+    # Get the list of point arrays.
+    if paraview.compatibility.GetVersion() <= 3.4:
+        arraySelection = reader.PointResultArrayStatus
+    else:
+        arraySelection = reader.PointVariables
+    print arraySelection.Available
+    # Select all arrays
+    arraySelection.SetData(arraySelection.Available)
+    
     # Next create a default render view appropriate for the connection type.
     rv = CreateRenderView()
     # Create the matching representation
@@ -1782,19 +2260,18 @@ def demo2(fname="/Users/berk/Work/ParaViewData/Data/disk_out_ref.ex2"):
     rv.StillRender()
     # Now that the reader execute, let's get some information about it's
     # output.
-    di = reader.GetDataInformation()
-    pdi = di.GetPointDataInformation()
+    pdi = reader[0].PointData
     # This prints a list of all read point data arrays as well as their
     # value ranges.
-    print 'Number of point arrays:', pdi.GetNumberOfArrays()
-    for i in range(pdi.GetNumberOfArrays()):
-        ai = pdi.GetArrayInformation(i)
+    print 'Number of point arrays:', len(pdi)
+    for i in range(len(pdi)):
+        ai = pdi[i]
         print "----------------"
-        print "Array:", i, ai.GetName(), ":"
+        print "Array:", i, ai.Name, ":"
         numComps = ai.GetNumberOfComponents()
         print "Number of components:", numComps
         for j in range(numComps):
-            print "Range:", ai.GetComponentRange(j)
+            print "Range:", ai.Range(j)
     # White is boring. Let's color the geometry using a variable.
     # First create a lookup table. This object controls how scalar
     # values are mapped to colors. See VTK documentation for
@@ -1825,7 +2302,10 @@ def demo3():
     if not ActiveConnection:
         Connect()
     # Create a synthetic data source
-    source = sources.RTAnalyticSource()
+    if paraview.compatibility.GetVersion() <= 3.4:
+        source = sources.RTAnalyticSource()
+    else:
+        source = sources.Wavelet()
     # Let's get some information about the data. First, for the
     # source to execute
     source.UpdatePipeline()
@@ -1834,7 +2314,7 @@ def demo3():
     print "Data type:", di.GetPrettyDataTypeString()
     print "Extent:", di.GetExtent()
     print "Array name:", \
-          di.GetPointDataInformation().GetArrayInformation(0).GetName()
+          source[0].PointData[0].Name
 
     rv = CreateRenderView()
 
@@ -1843,10 +2323,9 @@ def demo3():
 
     # Let's apply a contour filter
     cf = filters.Contour(Input=source, ContourValues=[200])
-    # This is probably one of the most difficult properties to set.
-    # Look at the documentation of vtkAlgorithm::SetInputArrayToProcess()
-    # for details.
-    cf.SelectInputScalars = ['0', '0', '0', '0', 'RTData']
+    
+    # Select the array to contour by
+    #cf.SelectInputScalars = 'RTData'
 
     rep2 = CreateRepresentation(cf, rv)
     
@@ -1857,9 +2336,14 @@ def demo3():
     rv.StillRender()
 
     # Now, let's probe the data
-    probe = filters.Probe(Input=source)
-    # with a line
-    line = sources.LineSource(Resolution=60)
+    if paraview.compatibility.GetVersion() <= 3.4:
+        probe = filters.Probe(Input=source)
+        # with a line
+        line = sources.LineSource(Resolution=60)
+    else:
+        probe = filters.ResampleWithDataset(Input=source)
+        # with a line
+        line = sources.Line(Resolution=60)
     # that spans the dataset
     bounds = di.GetBounds()
     print "Bounds: ", bounds
@@ -1890,55 +2374,60 @@ def demo4(fname="/Users/berk/Work/ParaViewData/Data/can.ex2"):
     reader = sources.ExodusIIReader(FileName=fname)
     view = CreateRenderView()
     repr = CreateRepresentation(reader, view)
-    view.StillRender();
-    view.ResetCamera();
-    view.StillRender();
+    view.StillRender()
+    view.ResetCamera()
+    view.StillRender()
     c = view.GetActiveCamera()
     c.Elevation(95)
-    AnimateReader(reader, view)
+    return AnimateReader(reader, view)
 
 
 def demo5():
     """ Simple sphere animation"""
     if not ActiveConnection:
         Connect()
-    sphere = sources.SphereSource();
-    view = CreateRenderView();
-    repr = CreateRepresentation(sphere, view);
+    if paraview.compatibility.GetVersion() <= 3.4:
+        sphere = sources.SphereSource()
+    else:
+        sphere = sources.Sphere()
+    view = CreateRenderView()
+    repr = CreateRepresentation(sphere, view)
 
-    view.StillRender();
-    view.ResetCamera();
-    view.StillRender();
+    view.StillRender()
+    view.ResetCamera()
+    view.StillRender()
 
     # Create an animation scene
-    scene = animation.AnimationScene();
+    scene = animation.AnimationScene()
     # Add 1 view
-    scene.ViewModules = [view];
+    scene.ViewModules = [view]
 
     # Create a cue to animate the StartTheta property
-    cue = animation.KeyFrameAnimationCue();
-    cue.AnimatedProxy = sphere;
-    cue.AnimatedPropertyName = "StartTheta";
+    cue = animation.KeyFrameAnimationCue()
+    cue.AnimatedProxy = sphere
+    cue.AnimatedPropertyName = "StartTheta"
     # Add it to the scene's cues
-    scene.Cues = [cue];
+    scene.Cues = [cue]
 
     # Create 2 keyframes for the StartTheta track
-    keyf0 = animation.CompositeKeyFrame();
-    keyf0.Type = 2 ;# Set keyframe interpolation type to Ramp.
+    keyf0 = animation.CompositeKeyFrame()
+    keyf0.Type = 2 # Set keyframe interpolation type to Ramp.
     # At time = 0, value = 0
-    keyf0.KeyTime = 0;
-    keyf0.KeyValues= [0];
+    keyf0.KeyTime = 0
+    keyf0.KeyValues= [0]
 
-    keyf1 = animation.CompositeKeyFrame();
+    keyf1 = animation.CompositeKeyFrame()
     # At time = 1.0, value = 200
-    keyf1.KeyTime = 1.0;
-    keyf1.KeyValues= [200];
+    keyf1.KeyTime = 1.0
+    keyf1.KeyValues= [200]
 
     # Add keyframes.
-    cue.KeyFrames = [keyf0, keyf1];
+    cue.KeyFrames = [keyf0, keyf1]
 
     scene.Play()
-    return scene;
+    return scene
+
+ASSOCIATIONS = { 'POINTS' : 0, 'CELLS' : 1, 'VERTICES' : 4, 'EDGES' : 5, 'ROWS' : 6}
 
 # Users can set the active connection which will be used by API
 # to create proxies etc when no connection argument is passed.

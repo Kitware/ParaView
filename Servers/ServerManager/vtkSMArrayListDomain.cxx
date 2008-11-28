@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkSMArrayListDomain.h"
 
+#include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVArrayInformation.h"
@@ -33,7 +34,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.18");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.19");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -46,6 +47,7 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
 {
   this->AttributeType = vtkDataSetAttributes::SCALARS;
   this->DefaultElement = 0;
+  this->Association = 0;
   this->InputDomainName = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
 }
@@ -68,7 +70,8 @@ int vtkSMArrayListDomain::IsArrayPartial(unsigned int idx)
 void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
                                      int outputport,
                                      vtkPVDataSetAttributesInformation* info, 
-                                     vtkSMInputArrayDomain* iad)
+                                     vtkSMInputArrayDomain* iad,
+                                     int association)
 {
   this->DefaultElement = 0;
 
@@ -108,6 +111,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
   if (attrIdx >= 0)
     {
     this->SetDefaultElement(attrIdx);
+    this->Association = association;
     }
 }
 
@@ -127,31 +131,46 @@ void vtkSMArrayListDomain::Update(vtkSMSourceProxy* sp,
 
   if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ANY )
     {
-    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad);
-    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad);
-    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad);
-    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad);
-    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_VERTICES);
+    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_EDGES);
+    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_ROWS);
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::POINT )
     {
-    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetPointDataInformation(), iad,
+      vtkDataObject:: FIELD_ASSOCIATION_POINTS);
+    this->Association = vtkDataObject:: FIELD_ASSOCIATION_POINTS;
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::CELL )
     {
-    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetCellDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_CELLS);
+    this->Association = vtkDataObject:: FIELD_ASSOCIATION_CELLS;
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::VERTEX)
     {
-    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetVertexDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_VERTICES);
+    this->Association = vtkDataObject:: FIELD_ASSOCIATION_VERTICES;
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::EDGE)
     {
-    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetEdgeDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_EDGES);
+    this->Association = vtkDataObject:: FIELD_ASSOCIATION_EDGES;    
     }
   else if ( iad->GetAttributeType() == vtkSMInputArrayDomain::ROW)
     {
-    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad);
+    this->AddArrays(sp, outputport, info->GetRowDataInformation(), iad,
+      vtkDataObject::FIELD_ASSOCIATION_ROWS);
+    this->Association = vtkDataObject:: FIELD_ASSOCIATION_ROWS;
     }
 
   this->InvokeModified();
@@ -393,6 +412,9 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
 
     if (svp->GetNumberOfElements() == 5)
       {
+      vtksys_ios::ostringstream ass;
+      ass << this->Association;
+      svp->SetElement(3, ass.str().c_str());
       svp->SetElement(4, array);
       return 1;
       }

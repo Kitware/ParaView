@@ -80,6 +80,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     numeric
     util
     benchmark
+    simple
     )
 
   # Now copy these files if necessary.

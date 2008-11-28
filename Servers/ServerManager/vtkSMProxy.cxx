@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.107");
+vtkCxxRevisionMacro(vtkSMProxy, "1.108");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1718,9 +1718,6 @@ void vtkSMProxy::PostUpdateData()
   unsigned int numProducers = this->GetNumberOfProducers();
   for (unsigned int i=0; i<numProducers; i++)
     {
-    if (this->GetVTKClassName() && this->GetProducerProxy(i)->GetVTKClassName())
-      {
-      }
     if (this->GetProducerProxy(i)->NeedsUpdate)
       {
       this->GetProducerProxy(i)->PostUpdateData();

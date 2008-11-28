@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.65");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.66");
 
 // This struct will keep all information associated with the output port.
 struct vtkSMSourceProxyOutputPort
@@ -272,11 +272,14 @@ int vtkSMSourceProxy::ReadXMLAttributes(vtkSMProxyManager* pm,
 // TODO this should update information properties.
 void vtkSMSourceProxy::UpdatePipeline()
 {
-  int i;
+  if (!this->NeedsUpdate)
+    {
+    return;
+    }
 
   this->CreateOutputPorts(); 
   int num = this->GetNumberOfOutputPorts();
-  for (i=0; i < num; ++i)
+  for (int i=0; i < num; ++i)
     {
     this->GetOutputPort(i)->UpdatePipeline();
     }

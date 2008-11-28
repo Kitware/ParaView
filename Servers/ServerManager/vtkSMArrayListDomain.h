@@ -112,7 +112,8 @@ protected:
   void AddArrays(vtkSMSourceProxy* sp, 
                  int outputport,
                  vtkPVDataSetAttributesInformation* info, 
-                 vtkSMInputArrayDomain* iad);
+                 vtkSMInputArrayDomain* iad,
+                 int association);
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad, int outputport);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp, int outputport);
   void Update(vtkSMProxyProperty* pp);
@@ -125,10 +126,14 @@ protected:
 
   int AttributeType;
   int Attribute;
+  int Association;
   unsigned int DefaultElement;
 
-  vtkSetStringMacro(InputDomainName);
+  // Description:
+  // InputDomainName refers to a input property domain that describes
+  // the type of array is needed by this property.
   vtkGetStringMacro(InputDomainName);
+  vtkSetStringMacro(InputDomainName);
 
   char* InputDomainName;
 

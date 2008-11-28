@@ -19,5 +19,16 @@ it provides:
   vtk
   numeric
   util
+  simple
 """
 
+class compatibility:
+    minor = None 
+    major = None
+    
+    @classmethod
+    def GetVersion(cls):
+        if compatibility.minor and compatibility.major:
+            return compatibility.major + float(compatibility.minor)/10
+        return None
+    

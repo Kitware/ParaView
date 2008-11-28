@@ -3320,6 +3320,7 @@
      
      <StringVectorProperty
         name="EdgeBlockArrayStatus"
+                                label="Edge Blocks"
         command="SetEdgeBlockArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3341,6 +3342,7 @@
      
      <StringVectorProperty
         name="FaceBlockArrayStatus"
+                                label="Face Blocks"
         command="SetFaceBlockArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3366,6 +3368,7 @@
      
      <StringVectorProperty
         name="ElementBlockArrayStatus"
+                                label="Element Blocks"
         command="SetElementBlockArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3381,6 +3384,7 @@
 
      <StringVectorProperty
         name="GlobalResultArrayStatus"
+                                label="Global Variables"
         command="SetGlobalResultArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3402,6 +3406,7 @@
 
      <StringVectorProperty
         name="PointResultArrayStatus"
+                                label="Point Variables"
         command="SetPointResultArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3423,6 +3428,7 @@
 
      <StringVectorProperty
         name="EdgeResultArrayStatus"
+                                label="Edge Variables"
         command="SetEdgeResultArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3444,6 +3450,7 @@
 
      <StringVectorProperty
         name="FaceResultArrayStatus"
+                                label="Face Variables"
         command="SetFaceResultArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
@@ -3465,6 +3472,7 @@
 
      <StringVectorProperty
         name="ElementResultArrayStatus"
+                                label="Element Variables"
         command="SetElementResultArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
