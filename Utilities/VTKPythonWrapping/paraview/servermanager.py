@@ -2040,7 +2040,7 @@ def _createModules():
     animation = createModule('animation')
     createModule('animation_keyframes', animation)
     implicit_functions = createModule('implicit_functions')
-    extended_sources = createModule("extended_sources", extended_sources)
+    extended_sources = createModule("extended_sources")
     
 class PVModule(object):
     pass
