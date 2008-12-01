@@ -75,6 +75,7 @@ def _wrap_property(proxy, smproperty):
                     isFileName = True
                     break
                 iter.Next()
+            iter.UnRegister(None)
             if isFileName:
                 property = FileNameProperty(proxy, smproperty)
             else:
