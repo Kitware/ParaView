@@ -1,8 +1,8 @@
 SET(OVERVIEW_STARTUP_PLUGIN_FILES )
 SET(OVERVIEW_STARTUP_PLUGIN_DIRECTORIES )
 
-# overview_startup_plugin
-MACRO(overview_startup_plugin PLUGIN_NAME)
+# add_brand_specific_plugin
+MACRO(add_brand_specific_plugin PLUGIN_NAME)
   IF(${ARGC} EQUAL 2)
     SET(PLUGIN_DIRECTORY ${ARGV1})
   ELSE()
@@ -18,20 +18,20 @@ MACRO(overview_startup_plugin PLUGIN_NAME)
   ENDIF()
 
   LIST(APPEND OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN_DIRECTORY})
-ENDMACRO(overview_startup_plugin)
+ENDMACRO(add_brand_specific_plugin)
 
-# paraview_require_plugin
-MACRO(paraview_require_plugin PLUGIN)
+# require_paraview_plugin
+MACRO(require_paraview_plugin PLUGIN)
   SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} ON CACHE BOOL "Build ${PLUGIN}" FORCE)
-  overview_startup_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
-ENDMACRO(paraview_require_plugin)
+  add_brand_specific_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
+ENDMACRO(require_paraview_plugin)
 
-# paraview_allow_plugin
-MACRO(paraview_allow_plugin PLUGIN)
+# allow_paraview_plugin
+MACRO(allow_paraview_plugin PLUGIN)
   IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-    overview_startup_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
+    add_brand_specific_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
   ENDIF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-ENDMACRO(paraview_allow_plugin)
+ENDMACRO(allow_paraview_plugin)
 
 # overview_build_client
 MACRO(overview_build_client)
