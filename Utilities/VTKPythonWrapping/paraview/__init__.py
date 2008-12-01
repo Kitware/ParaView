@@ -26,9 +26,10 @@ class compatibility:
     minor = None 
     major = None
     
-    @classmethod
+#    @classmethod
     def GetVersion(cls):
         if compatibility.minor and compatibility.major:
             return compatibility.major + float(compatibility.minor)/10
         return None
-    
+    GetVersion = classmethod(GetVersion)    
+        
