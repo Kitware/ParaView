@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMSUniformGridParallelStrategy::vtkSMSUniformGridParallelStrategy()
 {
@@ -143,7 +143,7 @@ int vtkSMSUniformGridParallelStrategy::ComputePriorities()
     this->UpdateSuppressor->GetProperty("UseCulling"));
   ivp->SetElement(0, useCulling);
 
-  //Note: Parallel Strategy has to use the PreCollectUS, because that
+  //Note: Parallel Strategy has to use the PostCollectUS, because that
   //is has access to the data server's pipeline, which can compute the
   //priority.
 

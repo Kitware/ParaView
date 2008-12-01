@@ -517,7 +517,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressor" proxygroup="filters"
+        <Proxy name="StreamingPostCollectUpdateSuppressor" proxygroup="filters"
           proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -531,7 +531,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreDistributorSuppressor" proxygroup="filters"
+        <Proxy name="StreamingPostDistributorSuppressor" proxygroup="filters"
           proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressor" >
@@ -545,7 +545,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressorLOD" proxygroup="filters"
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD" proxygroup="filters"
           proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -559,7 +559,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreDistributorSuppressorLOD" proxygroup="filters"
+        <Proxy name="StreamingPostDistributorSuppressorLOD" proxygroup="filters"
           proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="UpdateSuppressorLOD" >
@@ -612,7 +612,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressor"
+        <Proxy name="StreamingPostCollectUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
@@ -626,7 +626,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreDistributorSuppressor"
+        <Proxy name="StreamingPostDistributorSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
@@ -640,7 +640,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressorLOD"
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
@@ -654,7 +654,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreDistributorSuppressorLOD"
+        <Proxy name="StreamingPostDistributorSuppressorLOD"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
@@ -746,7 +746,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressor"
+        <Proxy name="StreamingPostCollectUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
@@ -758,7 +758,7 @@ o        </Proxy>
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="StreamingPreCollectUpdateSuppressorLOD"
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
