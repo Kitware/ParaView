@@ -703,9 +703,9 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
       // qt selection.
       vtkIdTypeArray *indices = vtkIdTypeArray::SafeDownCast(
         node->GetSelectionList());
-      for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
+      for (vtkIdType i=0; indices && i < indices->GetNumberOfTuples(); i++)
         {
-        vtkIdType idx = indices->GetValue(cc);
+        vtkIdType idx = indices->GetValue(i);
         QModelIndex qtIndex = this->indexFor(node, idx);
         if (qtIndex.isValid())
           {
@@ -731,6 +731,7 @@ QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtksel
 
     qSel.merge(qSelCur, QItemSelectionModel::Select);
     }
+  return qSel;
 }
 
 //-----------------------------------------------------------------------------

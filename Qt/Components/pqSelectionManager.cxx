@@ -232,10 +232,10 @@ static void getGlobalIDs(vtkSelection* sel, QList<vtkIdType>& gids)
       {
       vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
         node->GetSelectionList());
-      for (vtkIdType cc=0; selList && 
-        cc < selList->GetNumberOfTuples()* selList->GetNumberOfComponents(); cc++)
+      for (vtkIdType i=0; selList && 
+        i < selList->GetNumberOfTuples()* selList->GetNumberOfComponents(); i++)
         {
-        gids << selList->GetValue(cc);
+        gids << selList->GetValue(i);
         }
       }
     }
@@ -253,11 +253,11 @@ static void getIndices(vtkSelection* sel, QList<QPair<int, vtkIdType> >& indices
         node->GetSelectionList());
       int pid = node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID())?
         node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID()): -1;
-      for (vtkIdType cc=0; selList && 
-        cc < (selList->GetNumberOfTuples()* selList->GetNumberOfComponents());
-        cc++)
+      for (vtkIdType i=0; selList && 
+        i < (selList->GetNumberOfTuples()* selList->GetNumberOfComponents());
+        i++)
         {
-        indices.push_back(QPair<int, vtkIdType>(pid, selList->GetValue(cc)));
+        indices.push_back(QPair<int, vtkIdType>(pid, selList->GetValue(i)));
         }
       }
     }
