@@ -26,17 +26,18 @@
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
 
-class vtkPVExtractSelection::vtkSelectionVector : 
-  public vtkstd::vector<vtkSmartPointer<vtkSelection> >
+class vtkPVExtractSelection::vtkSelectionNodeVector : 
+  public vtkstd::vector<vtkSmartPointer<vtkSelectionNode> >
 {
 };
 
 
-vtkCxxRevisionMacro(vtkPVExtractSelection, "1.11");
+vtkCxxRevisionMacro(vtkPVExtractSelection, "1.12");
 vtkStandardNewMacro(vtkPVExtractSelection);
 
 //----------------------------------------------------------------------------
@@ -128,7 +129,7 @@ int vtkPVExtractSelection::RequestData(
   vtkSelection *output = vtkSelection::SafeDownCast(
     outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
 
-  output->Clear();
+  output->Initialize();
 
   if (!sel)
     {
@@ -140,19 +141,19 @@ int vtkPVExtractSelection::RequestData(
     outputVector->GetInformationObject(2)->Get(vtkDataObject::DATA_OBJECT()));
   passThroughSelection->ShallowCopy(sel);
 
-  // If input selection content type is vtkSelection::BLOCKS, then we simply
+  // If input selection content type is vtkSelectionNode::BLOCKS, then we simply
   // need to shallow copy the input as the output.
-  if (this->GetContentType(sel) == vtkSelection::BLOCKS)
+  if (this->GetContentType(sel) == vtkSelectionNode::BLOCKS)
     {
     output->ShallowCopy(sel);
     return 1;
     }
 
-  vtkSelectionVector oVector;
+  vtkSelectionNodeVector oVector;
   if (cdOutput)
     {
     // For composite datasets, the output of this filter is
-    // vtkSelection::SELECTIONS instance with vtkSelection instances for some
+    // vtkSelectionNode::SELECTIONS instance with vtkSelection instances for some
     // nodes in the composite dataset. COMPOSITE_INDEX() or
     // HIERARCHICAL_LEVEL(), HIERARCHICAL_INDEX() keys are set on each of the
     // vtkSelection instances correctly to help identify the block they came
@@ -163,7 +164,7 @@ int vtkPVExtractSelection::RequestData(
     for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
       iter->GoToNextItem())
       {
-      vtkSelection* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(),
+      vtkSelectionNode* curSel = this->LocateSelection(iter->GetCurrentFlatIndex(),
         sel);
       if (!curSel && hbIter)
         {
@@ -174,8 +175,8 @@ int vtkPVExtractSelection::RequestData(
       geomOutput = vtkDataSet::SafeDownCast(cdOutput->GetDataSet(iter));
       if (curSel && geomOutput)
         {
-        vtkSelectionVector curOVector;
-        vtkSelectionVector::iterator viter;
+        vtkSelectionNodeVector curOVector;
+        vtkSelectionNodeVector::iterator viter;
 
         this->RequestDataInternal(curOVector, geomOutput, curSel);
 
@@ -183,7 +184,7 @@ int vtkPVExtractSelection::RequestData(
           {
           // RequestDataInternal() will not set COMPOSITE_INDEX() for
           // hierarchical datasets.
-          viter->GetPointer()->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
+          viter->GetPointer()->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(),
             iter->GetCurrentFlatIndex());
           oVector.push_back(viter->GetPointer());
           }
@@ -193,111 +194,84 @@ int vtkPVExtractSelection::RequestData(
     }
   else if (geomOutput)
     {
-    this->RequestDataInternal(oVector, geomOutput, sel);
-    }
-
-
-  if (oVector.size() == 1)
-    {
-    output->ShallowCopy(oVector[0]);
-    }
-  else if (oVector.size() > 1)
-    {
-    output->SetContentType(vtkSelection::SELECTIONS);
-    vtkSelectionVector::iterator iter;
-    for (iter = oVector.begin(); iter != oVector.end(); ++iter)
+    unsigned int numNodes = sel->GetNumberOfNodes();
+    for (unsigned int i = 0; i < numNodes; i++)
       {
-      output->AddChild(iter->GetPointer());
+      this->RequestDataInternal(oVector, geomOutput, sel->GetNode(i));
       }
+    }
+
+  vtkSelectionNodeVector::iterator iter;
+  for (iter = oVector.begin(); iter != oVector.end(); ++iter)
+    {
+    output->AddNode(iter->GetPointer());
     }
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVExtractSelection::LocateSelection(unsigned int level,
+vtkSelectionNode* vtkPVExtractSelection::LocateSelection(unsigned int level,
   unsigned int index, vtkSelection* sel)
 {
-  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+    if (node)
       {
-      vtkSelection* child = sel->GetChild(cc);
-      if (child)
+      if (node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+          node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
+          static_cast<unsigned int>(node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_LEVEL())) == 
+          level &&
+          static_cast<unsigned int>(node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_INDEX())) == 
+          index)
         {
-        vtkSelection* outputChild = this->LocateSelection(level, index, child);
-        if (outputChild)
-          {
-          return outputChild;
-          }
+        return node;
         }
       }
-    return NULL;
     }
-
-  if (sel->GetProperties()->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
-    sel->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
-    static_cast<unsigned int>(sel->GetProperties()->Get(vtkSelection::HIERARCHICAL_LEVEL())) == 
-    level &&
-    static_cast<unsigned int>(sel->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX())) == 
-    index)
-    {
-    return sel;
-    }
-
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkPVExtractSelection::LocateSelection(unsigned int composite_index,
+vtkSelectionNode* vtkPVExtractSelection::LocateSelection(unsigned int composite_index,
   vtkSelection* sel)
 {
-  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+    if (node)
       {
-      vtkSelection* child = sel->GetChild(cc);
-      if (child)
+      if (node->GetProperties()->Has(vtkSelectionNode::COMPOSITE_INDEX()) &&
+          node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX()) == 
+          static_cast<int>(composite_index))
         {
-        vtkSelection* outputChild = this->LocateSelection(composite_index, child);
-        if (outputChild)
-          {
-          return outputChild;
-          }
+        return node;
         }
       }
-    return NULL;
     }
-
-  if (sel->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) &&
-    sel->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()) == 
-    static_cast<int>(composite_index))
-    {
-    return sel;
-    }
-
   return NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractSelection::RequestDataInternal(vtkSelectionVector& outputs,
-  vtkDataSet* geomOutput, vtkSelection* sel)
+void vtkPVExtractSelection::RequestDataInternal(vtkSelectionNodeVector& outputs,
+  vtkDataSet* geomOutput, vtkSelectionNode* sel)
 {
   // DON'T CLEAR THE outputs.
 
-  int ft = vtkSelection::CELL;
-  if (sel && sel->GetProperties()->Has(vtkSelection::FIELD_TYPE()))
+  int ft = vtkSelectionNode::CELL;
+  if (sel && sel->GetProperties()->Has(vtkSelectionNode::FIELD_TYPE()))
     {
-    ft = sel->GetProperties()->Get(vtkSelection::FIELD_TYPE());
+    ft = sel->GetProperties()->Get(vtkSelectionNode::FIELD_TYPE());
     }
 
-  if (geomOutput && ft == vtkSelection::CELL)
+  if (geomOutput && ft == vtkSelectionNode::CELL)
     {
-    vtkSelection* output = vtkSelection::New();
+    vtkSelectionNode* output = vtkSelectionNode::New();
     output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
-    output->SetContentType(vtkSelection::INDICES);
+    output->SetContentType(vtkSelectionNode::INDICES);
     vtkIdTypeArray *oids = vtkIdTypeArray::SafeDownCast(
       geomOutput->GetCellData()->GetArray("vtkOriginalCellIds"));
     if (oids)
@@ -311,10 +285,10 @@ void vtkPVExtractSelection::RequestDataInternal(vtkSelectionVector& outputs,
   // no else, since original point indices are always passed.
   if (geomOutput)
     {
-    vtkSelection* output = vtkSelection::New();
+    vtkSelectionNode* output = vtkSelectionNode::New();
     output->GetProperties()->Copy(sel->GetProperties(), /*deep=*/1);
-    output->SetFieldType(vtkSelection::POINT);
-    output->SetContentType(vtkSelection::INDICES);
+    output->SetFieldType(vtkSelectionNode::POINT);
+    output->SetContentType(vtkSelectionNode::INDICES);
     vtkIdTypeArray* oids = vtkIdTypeArray::SafeDownCast(
       geomOutput->GetPointData()->GetArray("vtkOriginalPointIds"));
     if (oids)
@@ -330,26 +304,19 @@ void vtkPVExtractSelection::RequestDataInternal(vtkSelectionVector& outputs,
 int vtkPVExtractSelection::GetContentType(vtkSelection* sel)
 {
   int ctype = -1;
-  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+    int nodeCType = node->GetContentType();
+    if (ctype == -1)
       {
-      vtkSelection* child = sel->GetChild(cc);
-      int childCType = this->GetContentType(child);
-      if (ctype == -1)
-        {
-        ctype = childCType;
-        }
-      else if (childCType != ctype)
-        {
-        return 0;
-        }
+      ctype = nodeCType;
       }
-    }
-  else
-    {
-    ctype = sel->GetContentType();
+    else if (nodeCType != ctype)
+      {
+      return 0;
+      }
     }
   return ctype;
 }

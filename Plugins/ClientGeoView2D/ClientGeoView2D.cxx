@@ -57,6 +57,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
 #include <vtkSelectionLink.h>
+#include <vtkSelectionNode.h>
 #include <vtkSMIdTypeVectorProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
@@ -252,7 +253,7 @@ ClientGeoView2D::ClientGeoView2D(
   // Listen for the selection changed event
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelection::PEDIGREEIDS);
+  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
   emit this->endProgress();
 }
 

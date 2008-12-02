@@ -46,6 +46,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -90,7 +91,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.81");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.82");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1282,19 +1283,18 @@ vtkSelection* vtkSMRenderViewProxy::NewSelectionForProp(
   vtkSelection* selection, vtkClientServerID propId)
 {
   vtkSelection* newSelection = vtkSelection::New();
-  newSelection->GetProperties()->Copy(selection->GetProperties(), 0);
-  unsigned int numChildren = selection->GetNumberOfChildren();
-  for(unsigned int i=0; i<numChildren; i++)
+  unsigned int numNodes = selection->GetNumberOfNodes();
+  for(unsigned int i=0; i<numNodes; i++)
     {
-    vtkSelection* child = selection->GetChild(i);
-    vtkInformation* properties = child->GetProperties();
-    if (properties->Has(vtkSelection::PROP_ID()) &&
-      properties->Get(vtkSelection::PROP_ID()) == (int)propId.ID)
+    vtkSelectionNode* node = selection->GetNode(i);
+    vtkInformation* properties = node->GetProperties();
+    if (properties->Has(vtkSelectionNode::PROP_ID()) &&
+      properties->Get(vtkSelectionNode::PROP_ID()) == (int)propId.ID)
       {
-      vtkSelection* newChildSelection = vtkSelection::New();
-      newChildSelection->ShallowCopy(child);
-      newSelection->AddChild(newChildSelection);
-      newChildSelection->Delete();
+      vtkSelectionNode* newNode = vtkSelectionNode::New();
+      newNode->ShallowCopy(node);
+      newSelection->AddNode(newNode);
+      newNode->Delete();
       }
     }
 
@@ -1306,20 +1306,20 @@ static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
 {
   vtkstd::map<int, int> propToPixelCount;
   
-  unsigned int numChildren = sel->GetNumberOfChildren();
+  unsigned int numNodes = sel->GetNumberOfNodes();
   unsigned int cc;
 
   int choosenPropId = -1;
   int maxPixels = -1;
-  for (cc=0; cc < numChildren; cc++)
+  for (cc=0; cc < numNodes; cc++)
     {
-    vtkSelection* child = sel->GetChild(cc);
-    vtkInformation* properties = child->GetProperties();
-    if (properties->Has(vtkSelection::PIXEL_COUNT()) && 
-      properties->Has(vtkSelection::PROP_ID()))
+    vtkSelectionNode* node = sel->GetNode(cc);
+    vtkInformation* properties = node->GetProperties();
+    if (properties->Has(vtkSelectionNode::PIXEL_COUNT()) && 
+      properties->Has(vtkSelectionNode::PROP_ID()))
       {
-      int numPixels = properties->Get(vtkSelection::PIXEL_COUNT());
-      int prop_id = properties->Get(vtkSelection::PROP_ID());
+      int numPixels = properties->Get(vtkSelectionNode::PIXEL_COUNT());
+      int prop_id = properties->Get(vtkSelectionNode::PROP_ID());
       if (propToPixelCount.find(prop_id) != propToPixelCount.end())
         {
         numPixels += propToPixelCount[prop_id];
@@ -1334,24 +1334,24 @@ static void vtkSMRenderViewProxyShrinkSelection(vtkSelection* sel)
       }
     }
 
-  vtkstd::vector<vtkSmartPointer<vtkSelection> > choosenChildren;
+  vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > choosenNodes;
   if (choosenPropId != -1)
     {
-    for (cc=0; cc < numChildren; cc++)
+    for (cc=0; cc < numNodes; cc++)
       {
-      vtkSelection* child = sel->GetChild(cc);
-      vtkInformation* properties = child->GetProperties();
-      if (properties->Has(vtkSelection::PROP_ID()) && 
-        properties->Get(vtkSelection::PROP_ID()) == choosenPropId)
+      vtkSelectionNode* node = sel->GetNode(cc);
+      vtkInformation* properties = node->GetProperties();
+      if (properties->Has(vtkSelectionNode::PROP_ID()) && 
+        properties->Get(vtkSelectionNode::PROP_ID()) == choosenPropId)
         {
-        choosenChildren.push_back(child);
+        choosenNodes.push_back(node);
         }
       }
     }
-  sel->RemoveAllChildren();
-  for (cc=0; cc <choosenChildren.size(); cc++)
+  sel->RemoveAllNodes();
+  for (cc=0; cc <choosenNodes.size(); cc++)
     {
-    sel->AddChild(choosenChildren[cc]);
+    sel->AddNode(choosenNodes[cc]);
     }
 }
 
@@ -1484,14 +1484,16 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
     worldP[index*4+2], worldP[index*4+3]);
 
   vtkSelection* frustumSel = vtkSelection::New();
-  frustumSel->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::FRUSTUM);
+  vtkSelectionNode* frustumNode = vtkSelectionNode::New();
+  frustumSel->AddNode(frustumNode);
+  frustumNode->GetProperties()->Set(
+    vtkSelectionNode::CONTENT_TYPE(), vtkSelectionNode::FRUSTUM);
   if (ofPoints)
     {
-    frustumSel->GetProperties()->Set(
-      vtkSelection::FIELD_TYPE(), vtkSelection::POINT);
+    frustumNode->GetProperties()->Set(
+      vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::POINT);
     }
-  frustumSel->SetSelectionList(frustcorners);
+  frustumNode->SetSelectionList(frustcorners);
   frustcorners->Delete();
 
   // 2) Figure out which representation is "selected".
@@ -1501,8 +1503,6 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
   double bounds[6];
 
   vtkSelection* frustumParent = vtkSelection::New();
-  frustumParent->GetProperties()->Set(
-    vtkSelection::CONTENT_TYPE(), vtkSelection::SELECTIONS);
 
   // Now we just use the first selected representation,
   // until we have other mechanisms to select one.
@@ -1527,7 +1527,7 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
 
     if(FrustumExtractor->OverallBoundsTest(bounds))
       {
-      frustumParent->AddChild(frustumSel);
+      frustumParent->AddNode(frustumNode);
 
       vtkSMProxy* selectionSource = repr->ConvertSelection(frustumParent);
       if (!selectionSource)
@@ -1551,6 +1551,7 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
     }
 
   frustumSel->Delete();
+  frustumNode->Delete();
   frustumParent->Delete();
   FrustumExtractor->Delete();
   return true;
@@ -1563,7 +1564,7 @@ vtkSelection* vtkSMRenderViewProxy::SelectVisibleCells(unsigned int x0,
   if (!this->IsSelectionAvailable())
     {
     vtkSelection *selection = vtkSelection::New();
-    selection->Clear();
+    selection->Initialize();
     return selection;
     }
 

@@ -20,11 +20,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
+#include "vtkSmartPointer.h"
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkPVSelectionInformation);
-vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVSelectionInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionInformation::vtkPVSelectionInformation()
@@ -53,7 +55,7 @@ void vtkPVSelectionInformation::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVSelectionInformation::Initialize()
 {
-  this->Selection->Clear();
+  this->Selection->Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -94,7 +96,14 @@ void vtkPVSelectionInformation::AddInformation(vtkPVInformation* info)
     return;
     }
 
-  this->Selection->CopyChildren(sInfo->Selection);
+  for (unsigned int i = 0; i < sInfo->Selection->GetNumberOfNodes(); ++i)
+    {
+    vtkSelectionNode* node = sInfo->Selection->GetNode(i);
+    vtkSmartPointer<vtkSelectionNode> newNode =
+      vtkSmartPointer<vtkSelectionNode>::New();
+    newNode->ShallowCopy(node);
+    this->Selection->AddNode(node);
+    }
 }
 
 //----------------------------------------------------------------------------

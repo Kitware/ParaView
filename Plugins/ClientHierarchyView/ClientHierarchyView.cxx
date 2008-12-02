@@ -50,6 +50,7 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelectionLink.h>
+#include <vtkSelectionNode.h>
 #include <vtkSelectionSource.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>
@@ -183,9 +184,9 @@ ClientHierarchyView::ClientHierarchyView(
     vtkCommand::SelectionChangedEvent, this->Command);
 
   this->Implementation->TreeView->SetSelectionType(
-    vtkSelection::PEDIGREEIDS);
+    vtkSelectionNode::PEDIGREEIDS);
   this->Implementation->HierarchicalGraphView->SetSelectionType(
-    vtkSelection::PEDIGREEIDS);
+    vtkSelectionNode::PEDIGREEIDS);
 
   this->showTree(false);
 

@@ -24,14 +24,16 @@
 #include "vtkPointData.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
+#include "vtkSmartPointer.h"
 #include "vtkUnsignedIntArray.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSelectionConverter);
-vtkCxxRevisionMacro(vtkSelectionConverter, "1.17");
+vtkCxxRevisionMacro(vtkSelectionConverter, "1.18");
 
 //----------------------------------------------------------------------------
 vtkSelectionConverter::vtkSelectionConverter()
@@ -85,35 +87,52 @@ public:
 void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   int global_ids)
 {
-  output->Clear();
+  output->Initialize();
+  for (unsigned int i = 0; i < input->GetNumberOfNodes(); ++i)
+    {
+    vtkInformation *nodeProps = input->GetNode(i)->GetProperties();
+    if (!nodeProps->Has(vtkSelectionNode::PROCESS_ID()) ||
+        ( nodeProps->Get(vtkSelectionNode::PROCESS_ID()) ==
+          vtkProcessModule::GetProcessModule()->GetPartitionId() )
+      )
+      {
+      this->Convert(input->GetNode(i), output, global_ids);
+      }
+    }
+}
 
+//----------------------------------------------------------------------------
+void vtkSelectionConverter::Convert(vtkSelectionNode* input, vtkSelection* outputSel,
+  int global_ids)
+{
+  vtkSmartPointer<vtkSelectionNode> output = vtkSmartPointer<vtkSelectionNode>::New();
   vtkInformation* inputProperties =  input->GetProperties();
   vtkInformation* outputProperties = output->GetProperties();
 
   if (global_ids)
     {
     outputProperties->Set(
-      vtkSelection::CONTENT_TYPE(),
-      vtkSelection::GLOBALIDS);
+      vtkSelectionNode::CONTENT_TYPE(),
+      vtkSelectionNode::GLOBALIDS);
     }
   else
     {
     outputProperties->Set(
-      vtkSelection::CONTENT_TYPE(),
-      inputProperties->Get(vtkSelection::CONTENT_TYPE()));
+      vtkSelectionNode::CONTENT_TYPE(),
+      inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()));
     }
 
-
+#if 0
   unsigned int numChildren = input->GetNumberOfChildren();
   for (unsigned int i=0; i<numChildren; i++)
     {
     vtkInformation *childProps = input->GetChild(i)->GetProperties();
-    if (!childProps->Has(vtkSelection::PROCESS_ID()) ||
-        ( childProps->Get(vtkSelection::PROCESS_ID()) ==
+    if (!childProps->Has(vtkSelectionNode::PROCESS_ID()) ||
+        ( childProps->Get(vtkSelectionNode::PROCESS_ID()) ==
           vtkProcessModule::GetProcessModule()->GetPartitionId() )
       )
       {
-      vtkSelection* newOutput = vtkSelection::New();
+      vtkSelection* newOutput = vtkSelectionNode::New();
       this->Convert(input->GetChild(i), newOutput, global_ids);
       if (newOutput->GetNumberOfChildren() > 0)
         {
@@ -129,22 +148,23 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       newOutput->Delete();
       }
     }
+#endif
 
-  if (inputProperties->Get(vtkSelection::CONTENT_TYPE()) !=
-    vtkSelection::INDICES ||
-    !inputProperties->Has(vtkSelection::FIELD_TYPE()))
+  if (inputProperties->Get(vtkSelectionNode::CONTENT_TYPE()) !=
+    vtkSelectionNode::INDICES ||
+    !inputProperties->Has(vtkSelectionNode::FIELD_TYPE()))
     {
     return;
     }
 
-  if (inputProperties->Get(vtkSelection::FIELD_TYPE()) != vtkSelection::CELL &&
-    inputProperties->Get(vtkSelection::FIELD_TYPE()) != vtkSelection::POINT)
+  if (inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) != vtkSelectionNode::CELL &&
+    inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) != vtkSelectionNode::POINT)
     {
     // We can only handle point or cell selections.
     return;
     }
 
-  if (!inputProperties->Has(vtkSelection::SOURCE_ID()) ||
+  if (!inputProperties->Has(vtkSelectionNode::SOURCE_ID()) ||
       !inputProperties->Has(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()))
     {
     return;
@@ -160,7 +180,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerID id;
-  id.ID = inputProperties->Get(vtkSelection::SOURCE_ID());
+  id.ID = inputProperties->Get(vtkSelectionNode::SOURCE_ID());
   vtkAlgorithm* geomAlg = vtkAlgorithm::SafeDownCast(
     pm->GetObjectFromID(id));
   if (!geomAlg)
@@ -200,7 +220,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
   vtkIdType numHits = inputList->GetNumberOfTuples() *
     inputList->GetNumberOfComponents();
 
-  if (inputProperties->Get(vtkSelection::FIELD_TYPE()) == vtkSelection::POINT)
+  if (inputProperties->Get(vtkSelectionNode::FIELD_TYPE()) == vtkSelectionNode::POINT)
     {
     vtkIdTypeArray* pointMapArray = vtkIdTypeArray::SafeDownCast(
       ds->GetPointData()->GetArray("vtkOriginalPointIds"));
@@ -209,7 +229,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       return;
       }
 
-    outputProperties->Set(vtkSelection::FIELD_TYPE(), vtkSelection::POINT);
+    outputProperties->Set(vtkSelectionNode::FIELD_TYPE(), vtkSelectionNode::POINT);
 
     vtkIdList *idlist = vtkIdList::New();
 
@@ -286,13 +306,13 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     }
 
   outputProperties->Set(
-    vtkSelection::SOURCE_ID(),
+    vtkSelectionNode::SOURCE_ID(),
     inputProperties->Get(vtkSelectionSerializer::ORIGINAL_SOURCE_ID()));
 
-  if (inputProperties->Has(vtkSelection::PROCESS_ID()))
+  if (inputProperties->Has(vtkSelectionNode::PROCESS_ID()))
     {
-    outputProperties->Set(vtkSelection::PROCESS_ID(),
-                          inputProperties->Get(vtkSelection::PROCESS_ID()));
+    outputProperties->Set(vtkSelectionNode::PROCESS_ID(),
+                          inputProperties->Get(vtkSelectionNode::PROCESS_ID()));
     }
 
   if (indices.size() > 1)
@@ -300,18 +320,18 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
     indicesType::iterator mit;
     for (mit=indices.begin(); mit != indices.end(); ++mit)
       {
-      vtkSelection* child = vtkSelection::New();
+      vtkSelectionNode* child = vtkSelectionNode::New();
       child->GetProperties()->Copy(outputProperties, /*deep=*/0);
       if (amrLevelArray && amrIndexArray)
         {
-        child->GetProperties()->Set(vtkSelection::HIERARCHICAL_LEVEL(),
+        child->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
           mit->first.HierarchicalIndex[0]);
-        child->GetProperties()->Set(vtkSelection::HIERARCHICAL_INDEX(),
+        child->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
           mit->first.HierarchicalIndex[1]);
         }
       else if (compositeIndexArray)
         {
-        child->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(),
+        child->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(),
           mit->first.CompositeIndex);
         }
 
@@ -327,7 +347,7 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       child->SetSelectionList(outputArray);
       outputArray->Delete();
 
-      output->AddChild(child);
+      outputSel->AddNode(child);
       child->Delete();
       }
     }
@@ -344,18 +364,19 @@ void vtkSelectionConverter::Convert(vtkSelection* input, vtkSelection* output,
       }
     if (amrLevelArray && amrIndexArray)
       {
-      outputProperties->Set(vtkSelection::HIERARCHICAL_LEVEL(),
+      outputProperties->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(),
         indices.begin()->first.HierarchicalIndex[0]);
-      outputProperties->Set(vtkSelection::HIERARCHICAL_INDEX(),
+      outputProperties->Set(vtkSelectionNode::HIERARCHICAL_INDEX(),
         indices.begin()->first.HierarchicalIndex[1]);
       }
     else if (compositeIndexArray)
       {
-      outputProperties->Set(vtkSelection::COMPOSITE_INDEX(),
+      outputProperties->Set(vtkSelectionNode::COMPOSITE_INDEX(),
         indices.begin()->first.CompositeIndex);
       }
     output->SetSelectionList(outputArray);
     outputArray->Delete();
+    outputSel->AddNode(output);
     }
 }
 

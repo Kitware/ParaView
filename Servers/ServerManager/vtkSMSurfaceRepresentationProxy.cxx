@@ -25,6 +25,7 @@
 #include "vtkTransform.h"
 #include "vtkProperty.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSelectionSerializer.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -40,7 +41,7 @@
 #include "vtkBoundingBox.h"
 
 vtkStandardNewMacro(vtkSMSurfaceRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMSurfaceRepresentationProxy, "1.31");
 //----------------------------------------------------------------------------
 vtkSMSurfaceRepresentationProxy::vtkSMSurfaceRepresentationProxy()
 {
@@ -277,23 +278,21 @@ static void vtkSMSurfaceRepresentationProxyAddSourceIDs(
   vtkSelection* sel, vtkClientServerID propId, vtkClientServerID sourceId,
   vtkClientServerID originalSourceId)
 {
-  unsigned int numChildren = sel->GetNumberOfChildren();
-  for (unsigned int cc=0; cc < numChildren; cc++)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    vtkSMSurfaceRepresentationProxyAddSourceIDs(sel->GetChild(cc),
-      propId, sourceId, originalSourceId);
+    vtkSelectionNode* node = sel->GetNode(cc);
+    vtkInformation* properties = node->GetProperties();
+    if (!properties->Has(vtkSelectionNode::PROP_ID()) || 
+      propId.ID != static_cast<vtkTypeUInt32>(
+        properties->Get(vtkSelectionNode::PROP_ID())))
+      {
+      return;
+      }
+    properties->Set(vtkSelectionNode::SOURCE_ID(), sourceId.ID);
+    properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
+      originalSourceId.ID);
     }
-
-  vtkInformation* properties = sel->GetProperties();
-  if (!properties->Has(vtkSelection::PROP_ID()) || 
-    propId.ID != static_cast<vtkTypeUInt32>(
-      properties->Get(vtkSelection::PROP_ID())))
-    {
-    return;
-    }
-  properties->Set(vtkSelection::SOURCE_ID(), sourceId.ID);
-  properties->Set(vtkSelectionSerializer::ORIGINAL_SOURCE_ID(), 
-    originalSourceId.ID);
 }
 
 //----------------------------------------------------------------------------
@@ -327,33 +326,31 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
 
   vtkSmartPointer<vtkSelection> mySelection = 
     vtkSmartPointer<vtkSelection>::New();
-  mySelection->GetProperties()->Copy(surfaceSel->GetProperties(), 0);
-
-  unsigned int numChildren = surfaceSel->GetNumberOfChildren();
-  for (unsigned int cc=0; cc < numChildren; cc++)
+  unsigned int numNodes = surfaceSel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    vtkSelection* child = surfaceSel->GetChild(cc);
-    vtkInformation* properties = child->GetProperties();
+    vtkSelectionNode* node = surfaceSel->GetNode(cc);
+    vtkInformation* properties = node->GetProperties();
     // If there is no PROP_ID or PROP key set, we assume the selection
     // is valid on all representations
     bool hasProp = true;
-    if (properties->Has(vtkSelection::PROP_ID()))
+    if (properties->Has(vtkSelectionNode::PROP_ID()))
       {
       hasProp = false;
       vtkClientServerID propId;
 
       propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
-        vtkSelection::PROP_ID()));
+        vtkSelectionNode::PROP_ID()));
       if (propId == this->Prop3D->GetID())
         {
         hasProp = true;
         }
       }
-    else if(properties->Has(vtkSelection::PROP()))
+    else if(properties->Has(vtkSelectionNode::PROP()))
       {
       hasProp = false;
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      if (properties->Get(vtkSelection::PROP()) == 
+      if (properties->Get(vtkSelectionNode::PROP()) == 
         pm->GetObjectFromID(this->Prop3D->GetID()))
         {
         hasProp = true;
@@ -361,20 +358,20 @@ vtkSMProxy* vtkSMSurfaceRepresentationProxy::ConvertSelection(
       }
     if(hasProp)
       {
-      vtkSelection* myChild = vtkSelection::New();
-      myChild->ShallowCopy(child);
-      mySelection->AddChild(myChild);
-      myChild->Delete();
+      vtkSelectionNode* myNode = vtkSelectionNode::New();
+      myNode->ShallowCopy(node);
+      mySelection->AddNode(myNode);
+      myNode->Delete();
       }
     }
 
-  if (mySelection->GetNumberOfChildren() == 0)
+  if (mySelection->GetNumberOfNodes() == 0)
     {
     return 0;
     }
 
   vtkSMProxy* selectionSource = NULL;
-  if(mySelection->GetChild(0)->GetContentType() == vtkSelection::FRUSTUM)
+  if(mySelection->GetNode(0)->GetContentType() == vtkSelectionNode::FRUSTUM)
     {
     // Create a selection source for the selection.
     selectionSource = 

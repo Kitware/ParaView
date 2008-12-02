@@ -25,6 +25,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkTable.h"
 #include "vtkUnsignedIntArray.h"
@@ -42,7 +43,7 @@ static void vtkFillComponent(vtkUnsignedIntArray* array,
 }
  
 vtkStandardNewMacro(vtkTableStreamer);
-vtkCxxRevisionMacro(vtkTableStreamer, "1.2");
+vtkCxxRevisionMacro(vtkTableStreamer, "1.3");
 vtkCxxSetObjectMacro(vtkTableStreamer, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkTableStreamer::vtkTableStreamer()
@@ -200,27 +201,27 @@ int vtkTableStreamer::RequestData(vtkInformation*,
       }
 
     vtkSmartPointer<vtkUnsignedIntArray> compositeIndex;
-    if (iter->GetCurrentMetaData()->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
-      iter->GetCurrentMetaData()->Has(vtkSelection::HIERARCHICAL_INDEX()))
+    if (iter->GetCurrentMetaData()->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+      iter->GetCurrentMetaData()->Has(vtkSelectionNode::HIERARCHICAL_INDEX()))
       {
       compositeIndex = vtkSmartPointer<vtkUnsignedIntArray>::New();
       compositeIndex->SetName("vtkCompositeIndexArray");
       compositeIndex->SetNumberOfComponents(2);
       compositeIndex->SetNumberOfTuples(curCount);
       ::vtkFillComponent(compositeIndex, 0, static_cast<unsigned int>(
-          iter->GetCurrentMetaData()->Get(vtkSelection::HIERARCHICAL_LEVEL())));
+          iter->GetCurrentMetaData()->Get(vtkSelectionNode::HIERARCHICAL_LEVEL())));
       ::vtkFillComponent(compositeIndex, 1, static_cast<unsigned int>(
-          iter->GetCurrentMetaData()->Get(vtkSelection::HIERARCHICAL_INDEX())));
+          iter->GetCurrentMetaData()->Get(vtkSelectionNode::HIERARCHICAL_INDEX())));
 
       }
-    else if (iter->GetCurrentMetaData()->Has(vtkSelection::COMPOSITE_INDEX()))
+    else if (iter->GetCurrentMetaData()->Has(vtkSelectionNode::COMPOSITE_INDEX()))
       {
       compositeIndex = vtkSmartPointer<vtkUnsignedIntArray>::New();
       compositeIndex->SetName("vtkCompositeIndexArray");
       compositeIndex->SetNumberOfComponents(1);
       compositeIndex->SetNumberOfTuples(curCount);
       ::vtkFillComponent(compositeIndex, 0, static_cast<unsigned int>(
-          iter->GetCurrentMetaData()->Get(vtkSelection::COMPOSITE_INDEX())));
+          iter->GetCurrentMetaData()->Get(vtkSelectionNode::COMPOSITE_INDEX())));
       }
 
     // TODO: add Hierarchical index information.

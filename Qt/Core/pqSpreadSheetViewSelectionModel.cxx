@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMVectorProperty.h"
@@ -218,7 +219,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
 
   // Convert field_type to selection field type.
   field_type = (field_type == vtkDataObject::FIELD_ASSOCIATION_POINTS)?
-    vtkSelection::POINT : vtkSelection::CELL;
+    vtkSelectionNode::POINT : vtkSelectionNode::CELL;
 
   pqOutputPort* opport = repr->getOutputPortFromInput();
   vtkSMSourceProxy* selsource = opport->getSelectionInput(); 

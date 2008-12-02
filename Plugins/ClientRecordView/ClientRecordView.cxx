@@ -40,6 +40,7 @@
 #include <vtkPVDataInformation.h>
 #include <vtkQtTableModelAdapter.h>
 #include <vtkSelection.h>
+#include <vtkSelectionNode.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMSourceProxy.h>
@@ -274,13 +275,13 @@ void ClientRecordView::updateSelection(vtkSelection *origSelection)
   switch (this->Implementation->CurrentAttributeType)
     {
     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      selType = vtkSelection::VERTEX;
+      selType = vtkSelectionNode::VERTEX;
       break;
     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      selType = vtkSelection::EDGE;
+      selType = vtkSelectionNode::EDGE;
       break;
     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      selType = vtkSelection::ROW;
+      selType = vtkSelectionNode::ROW;
       break;
     }
   
@@ -288,37 +289,29 @@ void ClientRecordView::updateSelection(vtkSelection *origSelection)
     return;
 
   // Does the selection have a compatible field type?
-  vtkSelection* selection = 0;
-  if (origSelection && origSelection->GetContentType() == vtkSelection::SELECTIONS)
+  vtkSelectionNode* selection = 0;
+  if (origSelection)
     {
-    vtkSelection* child = NULL;
-    for (unsigned int i = 0; i < origSelection->GetNumberOfChildren(); i++)
+    vtkSelectionNode* node = NULL;
+    for (unsigned int i = 0; i < origSelection->GetNumberOfNodes(); i++)
       {
-      child = origSelection->GetChild(i);
-      if (child && selType == child->GetFieldType()) 
+      node = origSelection->GetNode(i);
+      if (node && selType == node->GetFieldType()) 
         {
-        selection = vtkSelection::New();
-        selection->ShallowCopy(child);
+        selection = vtkSelectionNode::New();
+        selection->ShallowCopy(node);
         break;
         }
       }
-    if(!selection && child)
+    if(!selection && node)
       {
-      /// Use the last valid child selection
-      selection = vtkSelection::New();
-      selection->ShallowCopy(child);
-      }
-    }
-  else
-    {
-    if (selType == origSelection->GetFieldType())
-      {
-      selection = vtkSelection::New();
-      selection->ShallowCopy(origSelection);
+      /// Use the last valid selection node
+      selection = vtkSelectionNode::New();
+      selection->ShallowCopy(node);
       }
     }
   
-  if(!selection || selection->GetContentType() != vtkSelection::PEDIGREEIDS)
+  if(!selection || selection->GetContentType() != vtkSelectionNode::PEDIGREEIDS)
     {
     // Did not find a selection with the same field type
     return;
@@ -334,7 +327,7 @@ void ClientRecordView::updateSelection(vtkSelection *origSelection)
   this->Implementation->RowIndex = pedigreeIdArray->LookupValue(v);
 
 /*
-  selection->SetFieldType(vtkSelection::ROW);
+  selection->SetFieldType(vtkSelectionNode::ROW);
   vtkSelection *indexSelection = 
       vtkConvertSelection::ToIndexSelection(selection, this->Implementation->Table);
   vtkIdTypeArray *idxList = 

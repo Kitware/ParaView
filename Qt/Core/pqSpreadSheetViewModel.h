@@ -46,6 +46,7 @@ class vtkSMSpreadSheetRepresentationProxy;
 class QItemSelectionModel;
 class QItemSelection;
 class vtkSelection;
+class vtkSelectionNode;
 class pqDataRepresentation;
 
 class PQCORE_EXPORT pqSpreadSheetViewModel : public QAbstractTableModel
@@ -160,7 +161,7 @@ private:
   pqSpreadSheetViewModel(const pqSpreadSheetViewModel&); // Not implemented.
   void operator=(const pqSpreadSheetViewModel&); // Not implemented.
 
-  QModelIndex indexFor(vtkSelection* vtkselection, vtkIdType index);
+  QModelIndex indexFor(vtkSelectionNode* node, vtkIdType index);
 
   class pqInternal;
   pqInternal* Internal;

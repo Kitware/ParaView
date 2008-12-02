@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballRotate.h"
 #include "vtkPVTrackballZoom.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInteractionUndoStackBuilder.h"
 #include "vtkSMIntVectorProperty.h"
@@ -842,9 +843,9 @@ void pqRenderView::collectSelectionPorts(
       vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
         opPort->getSource()->getProxy());
 
-      // convert the index based selection to vtkSelection::BLOCKS selection.
+      // convert the index based selection to vtkSelectionNode::BLOCKS selection.
       vtkSMSourceProxy* newSelSource = vtkSMSourceProxy::SafeDownCast(
-        vtkSMSelectionHelper::ConvertSelection(vtkSelection::BLOCKS,
+        vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::BLOCKS,
           selectionSource,
           selectedSource, opPort->getPortNumber()));
       selectionSource.TakeReference(newSelSource);

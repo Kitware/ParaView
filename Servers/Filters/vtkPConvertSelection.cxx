@@ -21,10 +21,11 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 
 vtkStandardNewMacro(vtkPConvertSelection);
-vtkCxxRevisionMacro(vtkPConvertSelection, "1.2");
+vtkCxxRevisionMacro(vtkPConvertSelection, "1.3");
 vtkCxxSetObjectMacro(vtkPConvertSelection, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkPConvertSelection::vtkPConvertSelection()
@@ -41,34 +42,22 @@ vtkPConvertSelection::~vtkPConvertSelection()
 
 //----------------------------------------------------------------------------
 // returns if the input has PROCESS_ID == processId
-static bool vtkTrimTree(vtkSelection* input, int processId)
+static void vtkTrimTree(vtkSelection* input, int processId)
 {
   if (input)
     {
-    if (input->GetContentType() == vtkSelection::SELECTIONS)
+    unsigned int numNodes = input->GetNumberOfNodes();
+    for (unsigned int cc = 0; cc < numNodes; cc++)
       {
-      // trim children.
-      int numChildren = static_cast<int>(input->GetNumberOfChildren());
-      for (int cc=numChildren-1; cc >= 0; --cc)
+      vtkSelectionNode* node = input->GetNode(cc);
+      int propId = (node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID()))?
+        node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID()): -1;
+      if (propId != -1 && processId != -1 && propId != processId) 
         {
-        bool match = ::vtkTrimTree(input->GetChild(cc), processId);
-        if (!match)
-          {
-          input->RemoveChild(cc);
-          }
+        input->RemoveNode(node);
         }
       }
-
-    int propId = (input->GetProperties()->Has(vtkSelection::PROCESS_ID()))?
-      input->GetProperties()->Get(vtkSelection::PROCESS_ID()): -1;
-      
-    if (propId == -1 || processId == -1 || propId == processId) 
-      {
-      return true;
-      }
     }
-
-  return false;
 }
 
 //----------------------------------------------------------------------------
@@ -77,18 +66,10 @@ static void vtkAddProcessID(vtkSelection* input, int myId)
 {
   if (input)
     {
-    if (input->GetContentType() == vtkSelection::SELECTIONS)
+    unsigned int numNodes = input->GetNumberOfNodes();
+    for (unsigned int cc = 0; cc < numNodes; cc++)
       {
-      // trim children.
-      unsigned int numChildren = input->GetNumberOfChildren();
-      for (unsigned int cc=0; cc < numChildren; cc++)
-        {
-        ::vtkAddProcessID(input->GetChild(cc), myId);
-        }
-      }
-    else
-      {
-      input->GetProperties()->Set(vtkSelection::PROCESS_ID(), myId);
+      input->GetNode(cc)->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
       }
     }
 }
@@ -119,11 +100,7 @@ int vtkPConvertSelection::RequestData(vtkInformation* request,
     vtkSmartPointer<vtkSelection>::New();
   newInput->ShallowCopy(input);
 
-  if (!::vtkTrimTree(newInput, myId))
-    {
-    // empty output?
-    return 1;
-    }
+  ::vtkTrimTree(newInput, myId);
 
   vtkDataSet* ds = vtkDataSet::SafeDownCast(data);
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(data);

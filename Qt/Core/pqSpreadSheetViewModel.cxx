@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -567,7 +568,7 @@ QVariant pqSpreadSheetViewModel::headerData (int section, Qt::Orientation orient
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdType vtkindex)
+QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelectionNode* node, vtkIdType vtkindex)
 {
   vtkSMSpreadSheetRepresentationProxy* repr = 
     this->Internal->Representation;
@@ -600,9 +601,9 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
   vtkIdList* ids = vtkIdList::New();
   indexcolumn->LookupValue(vtkindex, ids);
  
-  if (vtkselection->GetProperties()->Has(vtkSelection::PROCESS_ID()) && pidcolumn)
+  if (node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID()) && pidcolumn)
     {
-    int pid = vtkselection->GetProperties()->Get(vtkSelection::PROCESS_ID());
+    int pid = node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID());
     if (pid != -1)
       {
       // remove those ids from the "ids" list that don't have the same process ID
@@ -622,14 +623,14 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
       }
     }
 
-  if (vtkselection->GetProperties()->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
-      vtkselection->GetProperties()->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
+  if (node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+      node->GetProperties()->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
       compositeIndexColumn && compositeIndexColumn->GetNumberOfComponents() == 2)
     {
     unsigned int hid = static_cast<unsigned int>(
-      vtkselection->GetProperties()->Get(vtkSelection::HIERARCHICAL_INDEX()));
+      node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_INDEX()));
     unsigned int hlevel = static_cast<unsigned int>(
-      vtkselection->GetProperties()->Get(vtkSelection::HIERARCHICAL_LEVEL()));
+      node->GetProperties()->Get(vtkSelectionNode::HIERARCHICAL_LEVEL()));
     // remove those ids from the "ids" list that don't have the same process ID
     // as the selection.
     for (vtkIdType cc=0; cc < ids->GetNumberOfIds();)
@@ -647,11 +648,11 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
         }
       }
     }
-  else if (vtkselection->GetProperties()->Has(vtkSelection::COMPOSITE_INDEX()) && 
+  else if (node->GetProperties()->Has(vtkSelectionNode::COMPOSITE_INDEX()) && 
     compositeIndexColumn)
     {
     unsigned int cid = static_cast<unsigned int>(
-      vtkselection->GetProperties()->Get(vtkSelection::COMPOSITE_INDEX()));
+      node->GetProperties()->Get(vtkSelectionNode::COMPOSITE_INDEX()));
     // remove those ids from the "ids" list that don't have the same process ID
     // as the selection.
     for (vtkIdType cc=0; cc < ids->GetNumberOfIds();)
@@ -685,56 +686,51 @@ QModelIndex pqSpreadSheetViewModel::indexFor(vtkSelection* vtkselection, vtkIdTy
 //-----------------------------------------------------------------------------
 QItemSelection pqSpreadSheetViewModel::convertToQtSelection(vtkSelection* vtkselection)
 {
-  if (!vtkselection || vtkselection->GetContentType() == -1)
+  if (!vtkselection)
     {
     return QItemSelection();
     }
 
-  if (vtkselection->GetContentType() == vtkSelection::SELECTIONS)
+  QItemSelection qSel;
+  for (unsigned int cc=0; cc < vtkselection->GetNumberOfNodes(); cc++)
     {
-    QItemSelection qSel;
-    for (unsigned int cc=0; cc < vtkselection->GetNumberOfChildren(); cc++)
+    vtkSelectionNode* node = vtkselection->GetNode(cc);
+    QItemSelection qSelCur;
+    if (node->GetContentType() == vtkSelectionNode::INDICES)
       {
-      vtkSelection* sel = vtkselection->GetChild(cc);
-      qSel.merge(this->convertToQtSelection(sel), QItemSelectionModel::Select);
-      }
-    return qSel;
-    }
-  else if (vtkselection->GetContentType() == vtkSelection::INDICES)
-    {
-    QItemSelection qSel;
-    // Iterate over all indices in the vtk selection, 
-    // Determine the qt model index for each and then add that to the
-    // qt selection.
-    vtkIdTypeArray *indices = vtkIdTypeArray::SafeDownCast(
-      vtkselection->GetSelectionList());
-    for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
-      {
-      vtkIdType idx = indices->GetValue(cc);
-      QModelIndex qtIndex = this->indexFor(vtkselection, idx);
-      if (qtIndex.isValid())
+      // Iterate over all indices in the vtk selection, 
+      // Determine the qt model index for each and then add that to the
+      // qt selection.
+      vtkIdTypeArray *indices = vtkIdTypeArray::SafeDownCast(
+        node->GetSelectionList());
+      for (vtkIdType cc=0; indices && cc < indices->GetNumberOfTuples(); cc++)
         {
-        // cout << "Selecting: " << qtIndex.row() << endl;
-        qSel.select(qtIndex, qtIndex);
+        vtkIdType idx = indices->GetValue(cc);
+        QModelIndex qtIndex = this->indexFor(node, idx);
+        if (qtIndex.isValid())
+          {
+          // cout << "Selecting: " << qtIndex.row() << endl;
+          qSelCur.select(qtIndex, qtIndex);
+          }
         }
       }
-    return qSel;
-    }
-  else if (vtkselection->GetContentType() == vtkSelection::BLOCKS)
-    {
-    QItemSelection qSel;
-    vtkUnsignedIntArray* blocks = vtkUnsignedIntArray::SafeDownCast(
-      vtkselection->GetSelectionList());
-    if (blocks && blocks->GetNumberOfTuples() > 0)
+    else if (node->GetContentType() == vtkSelectionNode::BLOCKS)
       {
-      qSel.select(this->createIndex(0, 0),
-        this->createIndex(this->rowCount()-1, 0));
+      vtkUnsignedIntArray* blocks = vtkUnsignedIntArray::SafeDownCast(
+        node->GetSelectionList());
+      if (blocks && blocks->GetNumberOfTuples() > 0)
+        {
+        qSelCur.select(this->createIndex(0, 0),
+          this->createIndex(this->rowCount()-1, 0));
+        }
       }
-    return qSel;
-    }
-  qCritical() << "Unknown selection object.";
-  return QItemSelection();
+    else
+      {
+      qCritical() << "Unknown selection object.";
+      }
 
+    qSel.merge(qSelCur, QItemSelectionModel::Select);
+    }
 }
 
 //-----------------------------------------------------------------------------

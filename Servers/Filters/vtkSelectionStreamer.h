@@ -25,6 +25,7 @@
 #include "vtkTableStreamer.h"
 
 class vtkSelection;
+class vtkSelectionNode;
 class vtkCompositeDataIterator;
 
 class VTK_EXPORT vtkSelectionStreamer : public vtkTableStreamer
@@ -70,13 +71,14 @@ protected:
                           vtkInformationVector**,
                           vtkInformationVector*);
 
-  vtkSelection* LocateSelection(
+  vtkSelectionNode* LocateSelection(
     vtkCompositeDataIterator* inputIter, vtkSelection* sel);
 
-  vtkSelection* LocateSelection(vtkSelection* sel);
+  vtkSelectionNode* LocateSelection(vtkSelection* sel);
 
+  bool LocateSelection(vtkSelectionNode* node);
 
-  bool PassBlock(vtkSelection* output, vtkSelection* input,
+  bool PassBlock(vtkSelectionNode* output, vtkSelectionNode* input,
     vtkIdType offset, vtkIdType count);
 
   int FieldAssociation;

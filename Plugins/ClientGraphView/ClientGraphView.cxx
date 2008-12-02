@@ -43,6 +43,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
 #include <vtkSelectionLink.h>
+#include <vtkSelectionNode.h>
 #include <vtkTable.h>
 #include <vtkTexture.h>
 #include <vtkViewTheme.h>
@@ -74,42 +75,6 @@
 
 #include <QVBoxLayout>
 #include <QtDebug>
-
-#if 0
-// For debugging
-void PrintSelection(vtkSelection* sel)
-{
-  vtkAbstractArray* arr = sel->GetSelectionList();
-  cerr << "top-level selection " << sel << endl;
-  cerr << "type: " << sel->GetContentType() << endl;
-  if (arr)
-    {
-    cerr << "domain: " << (arr->GetName() ? arr->GetName() : "null") << endl;
-    for (vtkIdType i = 0; i < arr->GetNumberOfTuples(); ++i)
-      {
-      cerr << arr->GetVariantValue(i).ToString() << ",";
-      }
-    cerr << endl;
-    }
-  for (int c = 0; c < sel->GetNumberOfChildren(); ++c)
-    {
-    vtkSelection* child = sel->GetChild(c);
-    cerr << "child " << c <<  " selection" << endl;
-    cerr << "type: " << child->GetContentType() << endl;
-    vtkAbstractArray* list = child->GetSelectionList();
-    if (list)
-      {
-      cerr << "domain: " << (list->GetName() ? list->GetName() : "null") << endl;
-      for (vtkIdType i = 0; i < list->GetNumberOfTuples(); ++i)
-        {
-        cerr << list->GetVariantValue(i).ToString() << ",";
-        }
-      cerr << endl;
-      }
-    }
-  cerr << "===end selection===" << endl;
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientGraphView::command
@@ -182,7 +147,7 @@ ClientGraphView::ClientGraphView(
 {
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelection::PEDIGREEIDS);
+  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
   // Listen to all views that may fire progress events during updating.
   this->Implementation->VTKConnect->Connect(

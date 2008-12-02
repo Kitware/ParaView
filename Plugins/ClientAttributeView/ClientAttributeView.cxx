@@ -39,6 +39,7 @@
 #include <vtkIdTypeArray.h>
 #include <vtkPVDataInformation.h>
 #include <vtkQtTableModelAdapter.h>
+#include <vtkSelectionNode.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMSourceProxy.h>
@@ -468,8 +469,6 @@ void ClientAttributeView::onSelectionChanged(const QItemSelection&, const QItemS
 
   // Make a selection of values
   vtkSelection* selection = vtkSelection::New();
-  selection->SetContentType(vtkSelection::SELECTIONS);
-  selection->SetFieldType(vtkSelection::ROW);
   
   const QModelIndexList selectedIndices = this->Implementation->Widgets.tableView->selectionModel()->selectedRows();
   vtkAbstractArray *domainArray = this->Implementation->Table->GetColumnByName("domain");
@@ -496,28 +495,28 @@ void ClientAttributeView::onSelectionChanged(const QItemSelection&, const QItemS
         domain = pedigreeIdArray->GetName();
         }
 
-      vtkSelection *childSelection = NULL;
-      for(unsigned int j=0; j<selection->GetNumberOfChildren(); ++j)
+      vtkSelectionNode *node = NULL;
+      for(unsigned int j=0; j<selection->GetNumberOfNodes(); ++j)
         {
-        vtkSelection *sel = selection->GetChild(j);
-        if(domain == sel->GetSelectionList()->GetName())
+        vtkSelectionNode *curNode = selection->GetNode(j);
+        if(domain == curNode->GetSelectionList()->GetName())
           {
-          childSelection = sel;
+          node = curNode;
           break;
           }
         }
 
-      if(!childSelection)
+      if(!node)
         {
-        childSelection = vtkSelection::New();
-        childSelection->SetContentType(vtkSelection::PEDIGREEIDS);
-        childSelection->SetFieldType(vtkSelection::ROW);
-        vtkVariantArray* childSelectionList = vtkVariantArray::New();
-        childSelectionList->SetName(domain.toAscii().data());
-        childSelection->SetSelectionList(childSelectionList);
-        childSelectionList->Delete();
-        selection->AddChild(childSelection);
-        childSelection->Delete();
+        node = vtkSelectionNode::New();
+        node->SetContentType(vtkSelectionNode::PEDIGREEIDS);
+        node->SetFieldType(vtkSelectionNode::ROW);
+        vtkVariantArray* nodeList = vtkVariantArray::New();
+        nodeList->SetName(domain.toAscii().data());
+        node->SetSelectionList(nodeList);
+        nodeList->Delete();
+        selection->AddNode(node);
+        node->Delete();
         }
 
       vtkVariant id;
@@ -525,7 +524,7 @@ void ClientAttributeView::onSelectionChanged(const QItemSelection&, const QItemS
         {
         vtkExtraExtendedTemplateMacro(id = *static_cast<VTK_TT*>(pedigreeIdArray->GetVoidPointer(it->second)));
         }
-      vtkVariantArray::SafeDownCast(childSelection->GetSelectionList())->InsertNextValue(id);
+      vtkVariantArray::SafeDownCast(node->GetSelectionList())->InsertNextValue(id);
       }
     }
 
@@ -573,13 +572,13 @@ void ClientAttributeView::updateSelection(vtkSelection *origSelection)
   switch (this->Implementation->CurrentAttributeType)
     {
     case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      selType = vtkSelection::VERTEX;
+      selType = vtkSelectionNode::VERTEX;
       break;
     case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      selType = vtkSelection::EDGE;
+      selType = vtkSelectionNode::EDGE;
       break;
     case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      selType = vtkSelection::ROW;
+      selType = vtkSelectionNode::ROW;
       break;
     }
 
@@ -587,46 +586,43 @@ void ClientAttributeView::updateSelection(vtkSelection *origSelection)
     return;
   
   // Does the selection have a compatible field type?
-  vtkSelection* selection = 0;
-  if (origSelection && origSelection->GetContentType() == vtkSelection::SELECTIONS)
+  vtkSelectionNode* selection = 0;
+  if (origSelection)
     {
-    vtkSelection* child = NULL;
-    for (unsigned int i = 0; i < origSelection->GetNumberOfChildren(); i++)
+    vtkSelectionNode* node = NULL;
+    for (unsigned int i = 0; i < origSelection->GetNumberOfNodes(); i++)
       {
-      child = origSelection->GetChild(i);
-      if (child && selType != vtkSelection::SELECTIONS) 
+      node = origSelection->GetNode(i);
+      if (node) 
         {
-        selection = vtkSelection::New();
-        selection->ShallowCopy(child);
+        selection = vtkSelectionNode::New();
+        selection->ShallowCopy(node);
         break;
         }
       }
-    if(!selection && child)
+    if(!selection && node)
       {
       /// Use the last valid child selection
-      selection = vtkSelection::New();
-      selection->ShallowCopy(child);
+      selection = vtkSelectionNode::New();
+      selection->ShallowCopy(node);
       }
     }
-  else
-    {
-    selection = vtkSelection::New();
-    selection->ShallowCopy(origSelection);
-    }
   
-  if(!selection || selection->GetContentType() != vtkSelection::PEDIGREEIDS)
+  if(!selection || selection->GetContentType() != vtkSelectionNode::PEDIGREEIDS)
     {
     // Did not find a selection with the same field type
     return;
     }
 
   // We need to convert this to a field selection since we are extracting from a table.
-  selection->SetFieldType(vtkSelection::ROW);
+  selection->SetFieldType(vtkSelectionNode::ROW);
+  vtkSmartPointer<vtkSelection> tempSel = vtkSmartPointer<vtkSelection>::New();
+  tempSel->AddNode(selection);
   vtkSelection* valuesSel = vtkConvertSelection::ToValueSelection(
-      selection, 
+      tempSel, 
       this->Implementation->Table, 
       this->Implementation->CurrentAttributeName.toAscii().data());
-  vtkAbstractArray* arr = valuesSel->GetSelectionList();
+  vtkAbstractArray* arr = valuesSel->GetNode(0)->GetSelectionList();
   
   // Clear the selection column
   int rows = this->Implementation->TableModel.rowCount();

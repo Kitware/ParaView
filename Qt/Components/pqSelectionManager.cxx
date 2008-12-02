@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMClientDeliveryStrategyProxy.h"
@@ -224,21 +225,18 @@ void pqSelectionManager::select(pqOutputPort* selectedPort)
 //-----------------------------------------------------------------------------
 static void getGlobalIDs(vtkSelection* sel, QList<vtkIdType>& gids)
 {
-  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+  for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
     {
-    for (unsigned int cc=0; cc < sel->GetNumberOfChildren(); cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+    if (node && node->GetContentType() == vtkSelectionNode::GLOBALIDS)
       {
-      ::getGlobalIDs(sel->GetChild(cc), gids);
-      }
-    }
-  else if (sel && sel->GetContentType() == vtkSelection::GLOBALIDS)
-    {
-    vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
-      sel->GetSelectionList());
-    for (vtkIdType cc=0; selList && 
-      cc < selList->GetNumberOfTuples()* selList->GetNumberOfComponents(); cc++)
-      {
-      gids << selList->GetValue(cc);
+      vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
+        node->GetSelectionList());
+      for (vtkIdType cc=0; selList && 
+        cc < selList->GetNumberOfTuples()* selList->GetNumberOfComponents(); cc++)
+        {
+        gids << selList->GetValue(cc);
+        }
       }
     }
 }
@@ -246,24 +244,21 @@ static void getGlobalIDs(vtkSelection* sel, QList<vtkIdType>& gids)
 //-----------------------------------------------------------------------------
 static void getIndices(vtkSelection* sel, QList<QPair<int, vtkIdType> >& indices)
 {
-  if (sel && sel->GetContentType() == vtkSelection::SELECTIONS)
+  for (unsigned int cc=0; cc < sel->GetNumberOfNodes(); cc++)
     {
-    for (unsigned int cc=0; cc < sel->GetNumberOfChildren(); cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+    if (node && node->GetContentType() == vtkSelectionNode::INDICES)
       {
-      ::getIndices(sel->GetChild(cc), indices);
-      }
-    }
-  else if (sel && sel->GetContentType() == vtkSelection::INDICES)
-    {
-    vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
-      sel->GetSelectionList());
-    int pid = sel->GetProperties()->Has(vtkSelection::PROCESS_ID())?
-      sel->GetProperties()->Get(vtkSelection::PROCESS_ID()): -1;
-    for (vtkIdType cc=0; selList && 
-      cc < (selList->GetNumberOfTuples()* selList->GetNumberOfComponents());
-      cc++)
-      {
-      indices.push_back(QPair<int, vtkIdType>(pid, selList->GetValue(cc)));
+      vtkIdTypeArray* selList = vtkIdTypeArray::SafeDownCast(
+        node->GetSelectionList());
+      int pid = node->GetProperties()->Has(vtkSelectionNode::PROCESS_ID())?
+        node->GetProperties()->Get(vtkSelectionNode::PROCESS_ID()): -1;
+      for (vtkIdType cc=0; selList && 
+        cc < (selList->GetNumberOfTuples()* selList->GetNumberOfComponents());
+        cc++)
+        {
+        indices.push_back(QPair<int, vtkIdType>(pid, selList->GetValue(cc)));
+        }
       }
     }
 }
@@ -288,7 +283,7 @@ QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pq
   // we dont need to do any conversion.
   if (pqSMAdaptor::getElementProperty(
       selectionSource->GetProperty("ContentType")).toInt() 
-    == vtkSelection::GLOBALIDS)
+    == vtkSelectionNode::GLOBALIDS)
     {
     QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(
       selectionSource->GetProperty("IDs"));
@@ -311,7 +306,7 @@ QList<vtkIdType> pqSelectionManager::getGlobalIDs(vtkSMProxy* selectionSource,pq
   pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
     dataSource, dataPort);
   pqSMAdaptor::setElementProperty(convertor->GetProperty("OutputType"),
-    vtkSelection::GLOBALIDS);
+    vtkSelectionNode::GLOBALIDS);
   convertor->UpdateVTKObjects();
   convertor->UpdatePipeline(timeKeeper->getTime());
 
@@ -360,7 +355,7 @@ QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(vtkSMProxy* selecti
   // we dont need to do any conversion.
   if (pqSMAdaptor::getElementProperty(
       selectionSource->GetProperty("ContentType")).toInt() 
-    == vtkSelection::INDICES)
+    == vtkSelectionNode::INDICES)
     {
     QList<QVariant> ids = pqSMAdaptor::getMultipleElementProperty(
       selectionSource->GetProperty("IDs"));
@@ -384,7 +379,7 @@ QList<QPair<int, vtkIdType> > pqSelectionManager::getIndices(vtkSMProxy* selecti
   pqSMAdaptor::setInputProperty(convertor->GetProperty("DataInput"),
     dataSource, dataPort);
   pqSMAdaptor::setElementProperty(convertor->GetProperty("OutputType"),
-    vtkSelection::INDICES);
+    vtkSelectionNode::INDICES);
   convertor->UpdateVTKObjects();
   convertor->UpdatePipeline(timeKeeper->getTime());
 
@@ -418,14 +413,6 @@ vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, v
   selectionSource->SetConnectionID(connId);
 
   // Fill the selection source with the selection
-  vtkSmartPointer<vtkSelection> dummyParent =
-    vtkSmartPointer<vtkSelection>::New();
-  if (sel->GetContentType() != vtkSelection::SELECTIONS)
-    {
-    dummyParent->SetContentType(vtkSelection::SELECTIONS);
-    dummyParent->AddChild(sel);
-    sel = dummyParent;
-    }
   vtkSMStringVectorProperty* p = vtkSMStringVectorProperty::SafeDownCast(
     selectionSource->GetProperty("IDs"));
   p->SetNumberOfElements(0);
@@ -434,10 +421,10 @@ vtkSMSourceProxy* pqSelectionManager::createSelectionSource(vtkSelection* sel, v
   sp->SetNumberOfElements(0);
   unsigned int curId = 0;
   unsigned int curStringId = 0;
-  for (unsigned int c = 0; c < sel->GetNumberOfChildren(); ++c)
+  for (unsigned int c = 0; c < sel->GetNumberOfNodes(); ++c)
     {
-    vtkSelection* curSel = sel->GetChild(c);
-    vtkAbstractArray* ids = curSel->GetSelectionList();
+    vtkSelectionNode* node = sel->GetNode(c);
+    vtkAbstractArray* ids = node->GetSelectionList();
     if (ids)
       {
       // Set the ids from the selection

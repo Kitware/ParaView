@@ -25,6 +25,7 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDataTypeDomain.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
@@ -37,7 +38,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredGridVolumeRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMUnstructuredGridVolumeRepresentationProxy, "1.17");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredGridVolumeRepresentationProxy::vtkSMUnstructuredGridVolumeRepresentationProxy()
 {
@@ -580,33 +581,32 @@ vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
 
   vtkSmartPointer<vtkSelection> mySelection = 
     vtkSmartPointer<vtkSelection>::New();
-  mySelection->GetProperties()->Copy(userSel->GetProperties(), 0);
 
-  unsigned int numChildren = userSel->GetNumberOfChildren();
-  for (unsigned int cc=0; cc < numChildren; cc++)
+  unsigned int numNodes = userSel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    vtkSelection* child = userSel->GetChild(cc);
-    vtkInformation* properties = child->GetProperties();
+    vtkSelectionNode* node = userSel->GetNode(cc);
+    vtkInformation* properties = node->GetProperties();
     // If there is no PROP_ID or PROP key set, we assume the selection
     // is valid on all representations
     bool hasProp = true;
-    if (properties->Has(vtkSelection::PROP_ID()))
+    if (properties->Has(vtkSelectionNode::PROP_ID()))
       {
       hasProp = false;
       vtkClientServerID propId;
 
       propId.ID = static_cast<vtkTypeUInt32>(properties->Get(
-        vtkSelection::PROP_ID()));
+        vtkSelectionNode::PROP_ID()));
       if (propId == this->VolumeActor->GetID())
         {
         hasProp = true;
         }
       }
-    else if(properties->Has(vtkSelection::PROP()))
+    else if(properties->Has(vtkSelectionNode::PROP()))
       {
       hasProp = false;
       vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-      if (properties->Get(vtkSelection::PROP()) == 
+      if (properties->Get(vtkSelectionNode::PROP()) == 
         pm->GetObjectFromID(this->VolumeActor->GetID()))
         {
         hasProp = true;
@@ -614,14 +614,14 @@ vtkSMProxy* vtkSMUnstructuredGridVolumeRepresentationProxy::ConvertSelection(
       }
     if(hasProp)
       {
-      vtkSelection* myChild = vtkSelection::New();
-      myChild->ShallowCopy(child);
-      mySelection->AddChild(myChild);
-      myChild->Delete();
+      vtkSelectionNode* myNode = vtkSelectionNode::New();
+      myNode->ShallowCopy(node);
+      mySelection->AddNode(myNode);
+      myNode->Delete();
       }
     }
 
-  if (mySelection->GetNumberOfChildren() == 0)
+  if (mySelection->GetNumberOfNodes() == 0)
     {
     return 0;
     }

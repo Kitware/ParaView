@@ -15,7 +15,7 @@
 #include "vtkSelectionSerializer.h"
 
 #include "vtkDataArray.h"
-#include "vtkFieldData.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkInformation.h"
 #include "vtkInformationIterator.h"
 #include "vtkInformationIntegerKey.h"
@@ -29,10 +29,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkStringArray.h"
 
 vtkStandardNewMacro(vtkSelectionSerializer);
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.18");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.19");
 
 vtkInformationKeyMacro(vtkSelectionSerializer,ORIGINAL_SOURCE_ID,Integer);
 
@@ -58,57 +59,58 @@ void vtkSelectionSerializer::PrintXML(
   ostream& os, vtkIndent indent, int printData, vtkSelection* selection)
 {
   os << indent << "<Selection>" << endl;
-
-  vtkIndent ni = indent.GetNextIndent();
-
-  // Write out all properties.
-  // For now, only keys of type vtkInformationIntegerKey are supported.
-  vtkInformationIterator* iter = vtkInformationIterator::New();
-  vtkInformation* properties = selection->GetProperties();
-  iter->SetInformation(properties);
-  for(iter->GoToFirstItem();
-      !iter->IsDoneWithTraversal();
-      iter->GoToNextItem())
+  vtkIndent nodeIndent = indent.GetNextIndent();
+  unsigned int numNodes = selection->GetNumberOfNodes();
+  for (unsigned int i = 0; i < numNodes; i++)
     {
-    vtkInformationKey* key = iter->GetCurrentKey();
-    os << ni
-       << "<Property key=\"" << key->GetName()
-       << "\" value=\"";
-    if (key->IsA("vtkInformationIntegerKey"))
+    os << nodeIndent << "<Selection>" << endl;
+    vtkSelectionNode* node = selection->GetNode(i);
+
+    vtkIndent ni = nodeIndent.GetNextIndent();
+
+    // Write out all properties.
+    // For now, only keys of type vtkInformationIntegerKey are supported.
+    vtkInformationIterator* iter = vtkInformationIterator::New();
+    vtkInformation* properties = node->GetProperties();
+    iter->SetInformation(properties);
+    for(iter->GoToFirstItem();
+        !iter->IsDoneWithTraversal();
+        iter->GoToNextItem())
       {
-      vtkInformationIntegerKey* iKey =
-        static_cast<vtkInformationIntegerKey*>(key);
-      os << properties->Get(iKey);
+      vtkInformationKey* key = iter->GetCurrentKey();
+      os << ni
+        << "<Property key=\"" << key->GetName()
+        << "\" value=\"";
+      if (key->IsA("vtkInformationIntegerKey"))
+        {
+        vtkInformationIntegerKey* iKey =
+          static_cast<vtkInformationIntegerKey*>(key);
+        os << properties->Get(iKey);
+        }
+      else if (key->IsA("vtkInformationDoubleKey"))
+        {
+        vtkInformationDoubleKey* dKey =
+          static_cast<vtkInformationDoubleKey*>(key);
+        os << properties->Get(dKey);
+        }
+      else if (key->IsA("vtkInformationStringKey"))
+        {
+        vtkInformationStringKey* sKey =
+          static_cast<vtkInformationStringKey*>(key);
+        os << properties->Get(sKey);
+        }
+
+      os << "\"/>" << endl;
       }
-    else if (key->IsA("vtkInformationDoubleKey"))
+    iter->Delete();
+
+    // Write the selection list
+    if (printData)
       {
-      vtkInformationDoubleKey* dKey =
-        static_cast<vtkInformationDoubleKey*>(key);
-      os << properties->Get(dKey);
-      }
-    else if (key->IsA("vtkInformationStringKey"))
-      {
-      vtkInformationStringKey* sKey =
-        static_cast<vtkInformationStringKey*>(key);
-      os << properties->Get(sKey);
+      vtkSelectionSerializer::WriteSelectionData(os, ni, node);
       }
 
-    os << "\"/>" << endl;
-    }
-  iter->Delete();
-
-  // Serialize all children
-  unsigned int numChildren = selection->GetNumberOfChildren();
-  for (unsigned int i=0; i<numChildren; i++)
-    {
-    vtkSelectionSerializer::PrintXML(
-      os, ni, printData, selection->GetChild(i));
-    }
-
-  // Write the selection list
-  if (printData)
-    {
-    vtkSelectionSerializer::WriteSelectionData(os, indent, selection);
+    os << nodeIndent << "</Selection>" << endl;
     }
 
   os << indent << "</Selection>" << endl;
@@ -130,9 +132,9 @@ void vtkSelectionSerializerWriteSelectionList(ostream& os, vtkIndent indent,
 //----------------------------------------------------------------------------
 // Serializes the selection list data array
 void vtkSelectionSerializer::WriteSelectionData(
-  ostream& os, vtkIndent indent, vtkSelection* selection)
+  ostream& os, vtkIndent indent, vtkSelectionNode* selection)
 {
-  vtkFieldData* data = selection->GetSelectionData();
+  vtkDataSetAttributes* data = selection->GetSelectionData();
   for (int i = 0; i < data->GetNumberOfArrays(); i++)
     {
     if (vtkDataArray::SafeDownCast(data->GetAbstractArray(i)))
@@ -197,20 +199,37 @@ void vtkSelectionSerializer::WriteSelectionData(
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::Parse(const char* xml, vtkSelection* root)
 {
-  root->Clear();
+  root->Initialize();
 
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->Parse(xml);
-  if (parser->GetRootElement())
+  vtkPVXMLElement* rootElem = parser->GetRootElement();
+  if (rootElem)
     {
-    vtkSelectionSerializer::ParseNode(parser->GetRootElement(), root);
+    unsigned int numNested = rootElem->GetNumberOfNestedElements();
+    for (unsigned int i=0; i<numNested; i++)
+      {
+      vtkPVXMLElement* elem = rootElem->GetNestedElement(i);
+      const char* name = elem->GetName();
+      if (!name)
+        {
+        continue;
+        }
+      if (strcmp("Selection", name) == 0 )
+        {
+        vtkSelectionNode* newNode = vtkSelectionNode::New();
+        root->AddNode(newNode);
+        vtkSelectionSerializer::ParseNode(elem, newNode);
+        newNode->Delete();
+        }
+      }
     }
   parser->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
-                                       vtkSelection* node)
+                                       vtkSelectionNode* node)
 {
   if (!nodeXML || !node)
     {
@@ -227,13 +246,6 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
       continue;
       }
 
-    if (strcmp("Selection", name) == 0 )
-      {
-      vtkSelection* newNode = vtkSelection::New();
-      node->AddChild(newNode);
-      vtkSelectionSerializer::ParseNode(elem, newNode);
-      newNode->Delete();
-      }
     // Only a selected list of keys are supported
     else if (strcmp("Property", name) == 0)
       {
@@ -245,7 +257,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::CONTENT_TYPE(), val);
+            node->GetProperties()->Set(vtkSelectionNode::CONTENT_TYPE(), val);
             }
           }
         else if (strcmp("FIELD_TYPE", key) == 0)
@@ -253,7 +265,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::FIELD_TYPE(), val);
+            node->GetProperties()->Set(vtkSelectionNode::FIELD_TYPE(), val);
             }
           }
         else if (strcmp("SOURCE_ID", key) == 0)
@@ -261,7 +273,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::SOURCE_ID(), val);
+            node->GetProperties()->Set(vtkSelectionNode::SOURCE_ID(), val);
             }
           }
         else if (strcmp("ORIGINAL_SOURCE_ID", key) == 0)
@@ -277,7 +289,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::PROP_ID(), val);
+            node->GetProperties()->Set(vtkSelectionNode::PROP_ID(), val);
             }
           }
         else if (strcmp("PROCESS_ID", key) == 0)
@@ -285,7 +297,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::PROCESS_ID(), val);
+            node->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), val);
             }
           }
         else if (strcmp("EPSILON", key) == 0)
@@ -293,7 +305,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           double val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::EPSILON(), val);
+            node->GetProperties()->Set(vtkSelectionNode::EPSILON(), val);
             }
           }
         else if (strcmp("CONTAINING_CELLS", key) == 0)
@@ -301,7 +313,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::CONTAINING_CELLS(), val);
+            node->GetProperties()->Set(vtkSelectionNode::CONTAINING_CELLS(), val);
             }
           }
         else if (strcmp("INVERSE", key) == 0)
@@ -309,7 +321,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::INVERSE(), val);
+            node->GetProperties()->Set(vtkSelectionNode::INVERSE(), val);
             }
           }
         else if (strcmp("PIXEL_COUNT", key) == 0)
@@ -317,7 +329,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::PIXEL_COUNT(), val);
+            node->GetProperties()->Set(vtkSelectionNode::PIXEL_COUNT(), val);
             }
           }
         else if (strcmp("INDEXED_VERTICES", key) == 0)
@@ -325,7 +337,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::INDEXED_VERTICES(), val);
+            node->GetProperties()->Set(vtkSelectionNode::INDEXED_VERTICES(), val);
             }
           }
         else if (strcmp("COMPOSITE_INDEX", key) == 0)
@@ -333,7 +345,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::COMPOSITE_INDEX(), val);
+            node->GetProperties()->Set(vtkSelectionNode::COMPOSITE_INDEX(), val);
             }
           }
         else if (strcmp("HIERARCHICAL_LEVEL", key) == 0)
@@ -341,7 +353,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::HIERARCHICAL_LEVEL(), val);
+            node->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_LEVEL(), val);
             }
           }
         else if (strcmp("HIERARCHICAL_INDEX", key) == 0)
@@ -349,7 +361,7 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           int val;
           if (elem->GetScalarAttribute("value", &val))
             {
-            node->GetProperties()->Set(vtkSelection::HIERARCHICAL_INDEX(), val);
+            node->GetProperties()->Set(vtkSelectionNode::HIERARCHICAL_INDEX(), val);
             }
           }
         }

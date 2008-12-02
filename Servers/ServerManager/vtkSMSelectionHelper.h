@@ -23,6 +23,7 @@
 #include "vtkSMObject.h"
 
 class vtkSelection;
+class vtkSelectionNode;
 class vtkSMProxy;
 class vtkSMSourceProxy;
 
@@ -95,7 +96,7 @@ private:
   void operator=(const vtkSMSelectionHelper&); // Not implemented.
 
   static vtkSMProxy* NewSelectionSourceFromSelectionInternal(
-    vtkIdType connectionId, vtkSelection* selection, vtkSMProxy* selSource=0);
+    vtkIdType connectionId, vtkSelectionNode* selection, vtkSMProxy* selSource=0);
 
   static vtkSMProxy* ConvertInternal(
     vtkSMSourceProxy* inSource, vtkSMSourceProxy* dataSource,

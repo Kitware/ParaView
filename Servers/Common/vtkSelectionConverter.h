@@ -33,6 +33,7 @@
 #include "vtkObject.h"
 
 class vtkSelection;
+class vtkSelectionNode;
 
 class VTK_EXPORT vtkSelectionConverter : public vtkObject
 {
@@ -53,6 +54,8 @@ public:
 protected:
   vtkSelectionConverter();
   ~vtkSelectionConverter();
+
+  void Convert(vtkSelectionNode* input, vtkSelection* output, int global_ids);
 
 private:
   vtkSelectionConverter(const vtkSelectionConverter&);  // Not implemented.

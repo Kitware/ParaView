@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
@@ -1379,28 +1380,28 @@ int pqSelectionInspectorPanel::getContentType() const
   switch (this->Implementation->itemsStackedWidget->currentIndex())
     {
   case pqImplementation::IDS: // IDs
-    return vtkSelection::INDICES; 
+    return vtkSelectionNode::INDICES; 
 
   case pqImplementation::GLOBALIDS: // GlobalsIDs
-    return vtkSelection::GLOBALIDS;
+    return vtkSelectionNode::GLOBALIDS;
 
   case pqImplementation::FRUSTUM: // Frustum
-    return vtkSelection::FRUSTUM;
+    return vtkSelectionNode::FRUSTUM;
 
   case pqImplementation::THRESHOLDS: // Threshold
-    return vtkSelection::THRESHOLDS;
+    return vtkSelectionNode::THRESHOLDS;
 
   case pqImplementation::LOCATIONS:
-    return vtkSelection::LOCATIONS;
+    return vtkSelectionNode::LOCATIONS;
 
   case pqImplementation::BLOCKS:
-    return vtkSelection::BLOCKS;
+    return vtkSelectionNode::BLOCKS;
 
   default:
     qDebug() << "Case not handled.";
     }
 
-  return vtkSelection::INDICES;
+  return vtkSelectionNode::INDICES;
 }
 
 //-----------------------------------------------------------------------------
@@ -1418,7 +1419,7 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
 
   if (curSelSource && 
     port->getServer()->isRemote() &&
-    (outputType == vtkSelection::INDICES || outputType == vtkSelection::GLOBALIDS))
+    (outputType == vtkSelectionNode::INDICES || outputType == vtkSelectionNode::GLOBALIDS))
     {
     // BUG: 6783. Warn user when converting a Frustum|Threshold selection to
     // an id based selection.
@@ -1432,9 +1433,9 @@ void pqSelectionInspectorPanel::createNewSelectionSourceIfNeeded()
         port->getPortNumber())->GetDataInformation();
       int fdType = pqSMAdaptor::getElementProperty(
         curSelSource->GetProperty("FieldType")).toInt();
-      if ((fdType == vtkSelection::POINT && 
+      if ((fdType == vtkSelectionNode::POINT && 
           selectedInformation->GetNumberOfPoints() > 10000) ||
-        (fdType == vtkSelection::CELL && 
+        (fdType == vtkSelectionNode::CELL && 
          selectedInformation->GetNumberOfCells() > 10000))
         {
         if (QMessageBox::warning(this, tr("Convert Selection"),
@@ -1569,7 +1570,7 @@ void pqSelectionInspectorPanel::updateLocationWidgets()
 {
   bool show_widgets = 
     (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
-  if (!show_widgets || this->getContentType() != vtkSelection::LOCATIONS ||
+  if (!show_widgets || this->getContentType() != vtkSelectionNode::LOCATIONS ||
     !this->Implementation->getSelectionSource())
     {
     this->removeWidgetsFromView();
@@ -1604,7 +1605,7 @@ void pqSelectionInspectorPanel::updateLocationFromWidgets()
 {
   bool show_widgets = 
     (this->Implementation->showLocationWidgets->checkState() == Qt::Checked);
-  if (!show_widgets || this->getContentType() != vtkSelection::LOCATIONS ||
+  if (!show_widgets || this->getContentType() != vtkSelectionNode::LOCATIONS ||
     !this->Implementation->getSelectionSource())
     {
     return;

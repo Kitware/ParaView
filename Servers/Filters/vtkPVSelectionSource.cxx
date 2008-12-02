@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkSelectionSource.h"
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
@@ -158,7 +159,7 @@ public:
 
 
 vtkStandardNewMacro(vtkPVSelectionSource);
-vtkCxxRevisionMacro(vtkPVSelectionSource, "1.9");
+vtkCxxRevisionMacro(vtkPVSelectionSource, "1.10");
 //----------------------------------------------------------------------------
 vtkPVSelectionSource::vtkPVSelectionSource()
 {
@@ -174,7 +175,7 @@ vtkPVSelectionSource::vtkPVSelectionSource()
     {
     this->Frustum[cc] = 0;
     }
-  this->FieldType = vtkSelection::CELL;
+  this->FieldType = vtkSelectionNode::CELL;
 }
 
 //----------------------------------------------------------------------------
@@ -389,7 +390,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   vtkInformationVector* outputVector)
 {
   vtkSelection* output = vtkSelection::GetData(outputVector);
-  output->Clear();
+  output->Initialize();
 
   int piece = 0;
   int npieces = -1;
@@ -425,7 +426,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   switch (this->Mode)
     {
   case FRUSTUM:
-    source->SetContentType(vtkSelection::FRUSTUM);
+    source->SetContentType(vtkSelectionNode::FRUSTUM);
     source->SetFrustum(this->Frustum);
     source->Update();
     output->ShallowCopy(source->GetOutput());
@@ -433,7 +434,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case GLOBALIDS:
       {
-      source->SetContentType(vtkSelection::GLOBALIDS);
+      source->SetContentType(vtkSelectionNode::GLOBALIDS);
       source->RemoveAllIDs();
       vtkInternal::SetOfIDs::iterator iter;
       for (iter = this->Internal->GlobalIDs.begin();
@@ -448,8 +449,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case PEDIGREEIDS:
       {
-      output->SetContentType(vtkSelection::SELECTIONS);
-      source->SetContentType(vtkSelection::INDICES);
+      source->SetContentType(vtkSelectionNode::INDICES);
 
       // Add integer IDs
       source->RemoveAllIDs();
@@ -463,10 +463,10 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           if (iter != this->Internal->PedigreeIDs.begin())
             {
             source->Update();
-            vtkSelection* clone = vtkSelection::New();
-            clone->ShallowCopy(source->GetOutput());
-            clone->SetContentType(vtkSelection::PEDIGREEIDS);
-            output->AddChild(clone);
+            vtkSelectionNode* clone = vtkSelectionNode::New();
+            clone->ShallowCopy(source->GetOutput()->GetNode(0));
+            clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
+            output->AddNode(clone);
             clone->Delete();
             }
 
@@ -478,10 +478,10 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       if (this->Internal->PedigreeIDs.size() > 0)
         {
         source->Update();
-        vtkSelection* clone = vtkSelection::New();
-        clone->ShallowCopy(source->GetOutput());
-        clone->SetContentType(vtkSelection::PEDIGREEIDS);
-        output->AddChild(clone);
+        vtkSelectionNode* clone = vtkSelectionNode::New();
+        clone->ShallowCopy(source->GetOutput()->GetNode(0));
+        clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
+        output->AddNode(clone);
         clone->Delete();
         }
 
@@ -498,10 +498,10 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           if (siter != this->Internal->PedigreeStringIDs.begin())
             {
             source->Update();
-            vtkSelection* clone = vtkSelection::New();
-            clone->ShallowCopy(source->GetOutput());
-            clone->SetContentType(vtkSelection::PEDIGREEIDS);
-            output->AddChild(clone);
+            vtkSelectionNode* clone = vtkSelectionNode::New();
+            clone->ShallowCopy(source->GetOutput()->GetNode(0));
+            clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
+            output->AddNode(clone);
             clone->Delete();
             }
 
@@ -513,10 +513,10 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       if (this->Internal->PedigreeStringIDs.size() > 0)
         {
         source->Update();
-        vtkSelection* clone = vtkSelection::New();
-        clone->ShallowCopy(source->GetOutput());
-        clone->SetContentType(vtkSelection::PEDIGREEIDS);
-        output->AddChild(clone);
+        vtkSelectionNode* clone = vtkSelectionNode::New();
+        clone->ShallowCopy(source->GetOutput()->GetNode(0));
+        clone->SetContentType(vtkSelectionNode::PEDIGREEIDS);
+        output->AddNode(clone);
         clone->Delete();
         }
       }
@@ -524,8 +524,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case COMPOSITEID:
       {
-      output->SetContentType(vtkSelection::SELECTIONS);
-      source->SetContentType(vtkSelection::INDICES);
+      source->SetContentType(vtkSelectionNode::INDICES);
       vtkInternal::SetOfCompositeIDType::iterator iter;
       for (iter = this->Internal->CompositeIDs.begin();
         iter != this->Internal->CompositeIDs.end(); ++iter)
@@ -536,9 +535,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           if (iter != this->Internal->CompositeIDs.begin())
             {
             source->Update();
-            vtkSelection* clone = vtkSelection::New();
-            clone->ShallowCopy(source->GetOutput());
-            output->AddChild(clone);
+            vtkSelectionNode* clone = vtkSelectionNode::New();
+            clone->ShallowCopy(source->GetOutput()->GetNode(0));
+            output->AddNode(clone);
             clone->Delete();
             }
 
@@ -551,9 +550,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       if (this->Internal->CompositeIDs.size() > 0)
         {
         source->Update();
-        vtkSelection* clone = vtkSelection::New();
-        clone->ShallowCopy(source->GetOutput());
-        output->AddChild(clone);
+        vtkSelectionNode* clone = vtkSelectionNode::New();
+        clone->ShallowCopy(source->GetOutput()->GetNode(0));
+        output->AddNode(clone);
         clone->Delete();
         }
       }
@@ -561,8 +560,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case HIERARCHICALID:
       {
-      output->SetContentType(vtkSelection::SELECTIONS);
-      source->SetContentType(vtkSelection::INDICES);
+      source->SetContentType(vtkSelectionNode::INDICES);
       vtkInternal::SetOfHierarchicalIDType::iterator iter;
       for (iter = this->Internal->HierarchicalIDs.begin();
         iter != this->Internal->HierarchicalIDs.end(); ++iter)
@@ -573,9 +571,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
           if (iter != this->Internal->HierarchicalIDs.begin())
             {
             source->Update();
-            vtkSelection* clone = vtkSelection::New();
-            clone->ShallowCopy(source->GetOutput());
-            output->AddChild(clone);
+            vtkSelectionNode* clone = vtkSelectionNode::New();
+            clone->ShallowCopy(source->GetOutput()->GetNode(0));
+            output->AddNode(clone);
             clone->Delete();
             }
 
@@ -588,9 +586,9 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
       if (this->Internal->HierarchicalIDs.size() > 0)
         {
         source->Update();
-        vtkSelection* clone = vtkSelection::New();
-        clone->ShallowCopy(source->GetOutput());
-        output->AddChild(clone);
+        vtkSelectionNode* clone = vtkSelectionNode::New();
+        clone->ShallowCopy(source->GetOutput()->GetNode(0));
+        output->AddNode(clone);
         clone->Delete();
         }
       }
@@ -598,7 +596,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case THRESHOLDS:
       {
-      source->SetContentType(vtkSelection::THRESHOLDS); 
+      source->SetContentType(vtkSelectionNode::THRESHOLDS); 
       source->SetArrayName(this->ArrayName);
       vtkInternal::VectorOfDoubles::iterator iter;
       for (iter = this->Internal->Thresholds.begin();
@@ -617,7 +615,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case LOCATIONS:
       {
-      source->SetContentType(vtkSelection::LOCATIONS);
+      source->SetContentType(vtkSelectionNode::LOCATIONS);
       vtkInternal::VectorOfDoubles::iterator iter;
       for (iter = this->Internal->Locations.begin();
         iter != this->Internal->Locations.end(); )
@@ -637,7 +635,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
 
   case BLOCKS:
       {
-      source->SetContentType(vtkSelection::BLOCKS);
+      source->SetContentType(vtkSelectionNode::BLOCKS);
       vtkInternal::SetOfIDs::iterator iter;
       for (iter = this->Internal->Blocks.begin();
         iter != this->Internal->Blocks.end(); ++iter)
@@ -652,7 +650,7 @@ int vtkPVSelectionSource::RequestData(vtkInformation* vtkNotUsed(request),
   case ID:
   default:
       {
-      source->SetContentType(vtkSelection::INDICES);
+      source->SetContentType(vtkSelectionNode::INDICES);
       source->RemoveAllIDs();
       vtkInternal::SetOfIDType::iterator iter;
       for (iter = this->Internal->IDs.begin();

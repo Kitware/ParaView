@@ -37,6 +37,8 @@
 
 #include "vtkExtractSelection.h"
 
+class vtkSelectionNode;
+
 class VTK_EXPORT vtkPVExtractSelection : public vtkExtractSelection
 {
 public:
@@ -69,17 +71,17 @@ protected:
 
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
 
-  vtkSelection* LocateSelection(unsigned int level,
+  vtkSelectionNode* LocateSelection(unsigned int level,
     unsigned int index, vtkSelection* sel);
-  vtkSelection* LocateSelection(unsigned int composite_index, vtkSelection* sel);
+  vtkSelectionNode* LocateSelection(unsigned int composite_index, vtkSelection* sel);
 
 private:
   vtkPVExtractSelection(const vtkPVExtractSelection&);  // Not implemented.
   void operator=(const vtkPVExtractSelection&);  // Not implemented.
 
-  class vtkSelectionVector;
-  void RequestDataInternal(vtkSelectionVector& outputs,
-    vtkDataSet* geomOutput, vtkSelection* sel);
+  class vtkSelectionNodeVector;
+  void RequestDataInternal(vtkSelectionNodeVector& outputs,
+    vtkDataSet* geomOutput, vtkSelectionNode* sel);
 
   // Returns the combined content type for the selection.
   int GetContentType(vtkSelection* sel);

@@ -29,7 +29,7 @@
 class vtkInformationIntegerKey;
 class vtkPVXMLElement;
 class vtkSelection;
-class vtkSelection;
+class vtkSelectionNode;
 
 class VTK_EXPORT vtkSelectionSerializer : public vtkObject
 {
@@ -69,9 +69,9 @@ private:
 
   static void WriteSelectionData(ostream& os, 
                                  vtkIndent indent, 
-                                 vtkSelection* selection);
+                                 vtkSelectionNode* selection);
   static void ParseNode(
-    vtkPVXMLElement* nodeXML, vtkSelection* node);
+    vtkPVXMLElement* nodeXML, vtkSelectionNode* node);
 };
 
 #endif

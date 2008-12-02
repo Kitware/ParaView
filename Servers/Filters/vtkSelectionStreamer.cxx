@@ -19,6 +19,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkSelection.h"
+#include "vtkSelectionNode.h"
 #include "vtkInformation.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkUnsignedIntArray.h"
@@ -26,7 +27,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkSelectionStreamer);
-vtkCxxRevisionMacro(vtkSelectionStreamer, "1.2");
+vtkCxxRevisionMacro(vtkSelectionStreamer, "1.3");
 //----------------------------------------------------------------------------
 vtkSelectionStreamer::vtkSelectionStreamer()
 {
@@ -81,21 +82,23 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
 
   if (!inputDO->IsA("vtkCompositeDataSet"))
     {
-    vtkSelection* inSel = this->LocateSelection(inputSel);
+    vtkSelectionNode* inSel = this->LocateSelection(inputSel);
     if (inSel)
       {
-      this->PassBlock(output, inSel,
+      vtkSmartPointer<vtkSelectionNode> outputNode =
+        vtkSmartPointer<vtkSelectionNode>::New();
+      this->PassBlock(outputNode, inSel,
         indices[0].first, indices[0].second);
+      output->AddNode(outputNode);
       }
     return 1;
     }
 
   int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
-  output->GetProperties()->Set(vtkSelection::PROCESS_ID(), myId);
 
   vtkSmartPointer<vtkCompositeDataSet> input =
     vtkCompositeDataSet::SafeDownCast(inputDO);
-  vtkstd::vector<vtkSmartPointer<vtkSelection> > output_selections;
+  vtkstd::vector<vtkSmartPointer<vtkSelectionNode> > output_nodes;
 
   vtkCompositeDataIterator* iter = input->NewIterator();
   iter->SkipEmptyNodesOff();
@@ -107,16 +110,16 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
     vtkIdType curCount = indices[cc].second;
     if (curCount > 0)
       {
-      vtkSelection* curSel = this->LocateSelection(iter, inputSel);
+      vtkSelectionNode* curSel = this->LocateSelection(iter, inputSel);
       if (!curSel)
         {
         continue;
         }
-      vtkSelection* curOutputSel = vtkSelection::New();
+      vtkSelectionNode* curOutputSel = vtkSelectionNode::New();
       curOutputSel->GetProperties()->Copy(curSel->GetProperties());
-      curOutputSel->GetProperties()->Set(vtkSelection::PROCESS_ID(), myId);
+      curOutputSel->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
       bool hit = false;
-      if (curSel->GetContentType() == vtkSelection::BLOCKS)
+      if (curSel->GetContentType() == vtkSelectionNode::BLOCKS)
         {
         // BLOCK selection, pass if the current block is selected.
         if (curSel->GetSelectionList()->LookupValue(
@@ -136,30 +139,22 @@ int vtkSelectionStreamer::RequestData(vtkInformation*,
         }
       if (hit)
         {
-        output_selections.push_back(curOutputSel);
+        output_nodes.push_back(curOutputSel);
         }
       curOutputSel->Delete();
       }
     }
   iter->Delete();
 
-  if (output_selections.size() == 1)
+  for (unsigned int kk=0; kk < output_nodes.size(); kk++)
     {
-    output->ShallowCopy(output_selections[0]);
-    }
-  else if (output_selections.size() > 1)
-    {
-    output->SetContentType(vtkSelection::SELECTIONS);
-    for (unsigned int kk=0; kk < output_selections.size(); kk++)
-      {
-      output->AddChild(output_selections[kk]);
-      }
+    output->AddNode(output_nodes[kk]);
     }
   return 1;
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkSelectionStreamer::LocateSelection(
+vtkSelectionNode* vtkSelectionStreamer::LocateSelection(
   vtkCompositeDataIterator* inputIter, vtkSelection* sel)
 {
   if (!sel || !inputIter || !inputIter->HasCurrentMetaData())
@@ -173,133 +168,116 @@ vtkSelection* vtkSelectionStreamer::LocateSelection(
   // original input before converting to tables was a
   // vtkHierarchicalBoxDataSet). 
  
-  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc = 0; cc < numNodes; cc++)
     {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
+    vtkSelectionNode* node = sel->GetNode(cc);
+
+    // vtkAttributeDataToTableFilter puts in this meta-data to which aids in
+    // determining original composite index.
+
+    vtkInformation* metaData = inputIter->GetCurrentMetaData();
+
+    vtkInformation* properties = node->GetProperties();
+    if (properties->Has(vtkSelectionNode::COMPOSITE_INDEX()) &&
+      metaData->Has(vtkSelectionNode::COMPOSITE_INDEX()) &&
+      (properties->Get(vtkSelectionNode::COMPOSITE_INDEX()) ==
+       metaData->Get(vtkSelectionNode::COMPOSITE_INDEX())))
       {
-      vtkSelection* located = this->LocateSelection(inputIter, sel->GetChild(cc));
-      if (located)
-        {
-        return located;
-        }
+      return (this->LocateSelection(node) ? node : 0);
       }
-    return 0;
+
+    if (properties->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+      properties->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
+      metaData->Has(vtkSelectionNode::HIERARCHICAL_LEVEL()) &&
+      metaData->Has(vtkSelectionNode::HIERARCHICAL_INDEX()) &&
+      (metaData->Get(vtkSelectionNode::HIERARCHICAL_LEVEL()) ==
+       properties->Get(vtkSelectionNode::HIERARCHICAL_LEVEL())) &&
+      (metaData->Get(vtkSelectionNode::HIERARCHICAL_INDEX()) ==
+       properties->Get(vtkSelectionNode::HIERARCHICAL_INDEX())))
+      {
+      return (this->LocateSelection(node) ? node : 0);
+      }
     }
-
-  // vtkAttributeDataToTableFilter puts in this meta-data to which aids in
-  // determining original composite index.
-
-  vtkInformation* metaData = inputIter->GetCurrentMetaData();
-
-  vtkInformation* properties = sel->GetProperties();
-  if (properties->Has(vtkSelection::COMPOSITE_INDEX()) &&
-    metaData->Has(vtkSelection::COMPOSITE_INDEX()) &&
-    (properties->Get(vtkSelection::COMPOSITE_INDEX()) ==
-     metaData->Get(vtkSelection::COMPOSITE_INDEX())))
-    {
-    return this->LocateSelection(sel);
-    }
-
-  if (properties->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
-    properties->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
-    metaData->Has(vtkSelection::HIERARCHICAL_LEVEL()) &&
-    metaData->Has(vtkSelection::HIERARCHICAL_INDEX()) &&
-    (metaData->Get(vtkSelection::HIERARCHICAL_LEVEL()) ==
-     properties->Get(vtkSelection::HIERARCHICAL_LEVEL())) &&
-    (metaData->Get(vtkSelection::HIERARCHICAL_INDEX()) ==
-     properties->Get(vtkSelection::HIERARCHICAL_INDEX())))
-    {
-    return this->LocateSelection(sel);
-    }
-
   return 0;
 }
 
 //----------------------------------------------------------------------------
-vtkSelection* vtkSelectionStreamer::LocateSelection(vtkSelection* sel)
+vtkSelectionNode* vtkSelectionStreamer::LocateSelection(vtkSelection* sel)
 {
   if (!sel)
     {
     return 0;
     }
-
-  if (sel->GetContentType() == vtkSelection::SELECTIONS)
+  unsigned int numNodes = sel->GetNumberOfNodes();
+  for (unsigned int cc=0; cc < numNodes; cc++)
     {
-    unsigned int numChildren = sel->GetNumberOfChildren();
-    for (unsigned int cc=0; cc < numChildren; cc++)
+    if (this->LocateSelection(sel->GetNode(cc)))
       {
-      vtkSelection* located = this->LocateSelection(sel->GetChild(cc)); 
-      if (located)
-        {
-        return located;
-        }
+      return sel->GetNode(cc);
       }
-    return 0;
     }
-
-  vtkInformation* properties = sel->GetProperties();
-  int myId = this->Controller? this->Controller->GetLocalProcessId() : 0;
-  if (properties->Has(vtkSelection::PROCESS_ID()) &&
-      properties->Get(vtkSelection::PROCESS_ID()) != -1 &&
-      properties->Get(vtkSelection::PROCESS_ID()) != myId)
-    {
-    // input selection process id is not same as this process's id, which means
-    // that the input selection is not applicable to this process. Nothing to do
-    // in that case.
-    return 0;
-    }
-
-  if (sel->GetContentType() != vtkSelection::BLOCKS &&
-    sel->GetContentType() != vtkSelection::INDICES)
-    {
-    // only BLOCKS or INDICES based selections are supported.
-    return 0;
-    }
-
-  int selFieldType = sel->GetFieldType();
-  if (selFieldType == vtkSelection::POINT &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    return sel;
-    }
-
-  if (selFieldType == vtkSelection::CELL &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    return sel;
-    }
-
-  if (selFieldType == vtkSelection::VERTEX &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
-    {
-    return sel;
-    }
-
-  if (selFieldType == vtkSelection::EDGE &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_EDGES)
-    {
-    return sel;
-    }
-
-  if (selFieldType == vtkSelection::ROW &&
-    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_ROWS)
-    {
-    return sel;
-    }
-
   return 0;
 }
 
 //----------------------------------------------------------------------------
-bool vtkSelectionStreamer::PassBlock(vtkSelection* output, vtkSelection* input,
+bool vtkSelectionStreamer::LocateSelection(vtkSelectionNode* node)
+{
+  vtkInformation* properties = node->GetProperties();
+  int myId = this->Controller? this->Controller->GetLocalProcessId() : 0;
+  if (properties->Has(vtkSelectionNode::PROCESS_ID()) &&
+      properties->Get(vtkSelectionNode::PROCESS_ID()) != -1 &&
+      properties->Get(vtkSelectionNode::PROCESS_ID()) != myId)
+    {
+    // input selection process id is not same as this process's id, which means
+    // that the input selection is not applicable to this process. Nothing to do
+    // in that case.
+    return false;
+    }
+  if (node->GetContentType() != vtkSelectionNode::BLOCKS &&
+    node->GetContentType() != vtkSelectionNode::INDICES)
+    {
+    // only BLOCKS or INDICES based selections are supported.
+    return false;
+    }
+  int selFieldType = node->GetFieldType();
+  if (selFieldType == vtkSelectionNode::POINT &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
+    {
+    return true;
+    }
+  if (selFieldType == vtkSelectionNode::CELL &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_CELLS)
+    {
+    return true;
+    }
+  if (selFieldType == vtkSelectionNode::VERTEX &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
+    {
+    return true;
+    }
+  if (selFieldType == vtkSelectionNode::EDGE &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_EDGES)
+    {
+    return true;
+    }
+  if (selFieldType == vtkSelectionNode::ROW &&
+    this->FieldAssociation == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+    return true;
+    }
+  return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSelectionStreamer::PassBlock(vtkSelectionNode* output, vtkSelectionNode* input,
   vtkIdType offset, vtkIdType count)
 {
   bool hit = false;
   output->GetProperties()->Copy(input->GetProperties());
   int myId = this->Controller? this->Controller->GetLocalProcessId()  :0;
-  output->GetProperties()->Set(vtkSelection::PROCESS_ID(), myId);
-  if (input->GetContentType() == vtkSelection::INDICES)
+  output->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), myId);
+  if (input->GetContentType() == vtkSelectionNode::INDICES)
     {
     vtkIdTypeArray* outIds = vtkIdTypeArray::New();
     outIds->SetNumberOfComponents(1);
