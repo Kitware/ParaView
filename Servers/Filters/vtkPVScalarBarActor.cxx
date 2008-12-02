@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.6");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.7");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -468,7 +468,7 @@ vtkstd::vector<double> vtkPVScalarBarActor::LogTickMarks(const double range[2],
 
   for (size_t i = 0; i < ticks.size(); i++)
     {
-    ticks[i] = pow(10, ticks[i]);
+    ticks[i] = pow(10.0, ticks[i]);
     }
 
   return ticks;
