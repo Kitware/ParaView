@@ -313,6 +313,7 @@ public slots:
 
   void onFileSaveServerState();
   void onFileSaveServerState(const QStringList& Files);
+  void onFileSaveRecoveryState();
 
   void onFileSaveData();
   void onFileSaveData(const QStringList& files);

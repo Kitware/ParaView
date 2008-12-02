@@ -187,7 +187,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-#include "assert.h"
+#include <cassert>
+#include <ctime>
+
+//#define pqMainWindowCoreDEBUG
+
+const char CrashRecoveryStateFile[]=".PV3CrashRecoveryState.pvsm";
 
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore::pqImplementation
@@ -621,7 +626,7 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
     SIGNAL(serverManagerExtensionLoaded()),
     &this->Implementation->ViewExporterManager,
     SLOT(refresh()));
-  
+
   QObject::connect(&pqActiveView::instance(), SIGNAL(changed(pqView*)),
       &this->Implementation->PendingDisplayManager,
       SLOT(setActiveView(pqView*)));
@@ -630,7 +635,7 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
   // can be used by the display panels.
   core->registerManager("COLOR_SCALE_EDITOR",
       this->getColorScaleEditorManager());
-  
+
   // the most recently used file extensions
   this->restoreSettings();
 }
@@ -638,6 +643,13 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
 //-----------------------------------------------------------------------------
 pqMainWindowCore::~pqMainWindowCore()
 {
+  // Paraview is closing all is well, remove the crash
+  // recovery file.
+  if (QFile::exists(CrashRecoveryStateFile))
+    {
+    QFile::remove(CrashRecoveryStateFile);
+    }
+
   this->saveSettings();
   delete Implementation;
 }
@@ -818,6 +830,10 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
   QObject::connect(object_inspector, SIGNAL(accepted()), 
                    &this->Implementation->PendingDisplayManager,
                    SLOT(createPendingDisplays()));
+
+  // Save crash recovery state on Apply
+  QObject::connect(object_inspector, SIGNAL(accepted()),
+                   this, SLOT(onFileSaveRecoveryState()));
 
   // Use the server manager selection model to determine which page
   // should be shown.
@@ -1744,6 +1760,27 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 
   root->Delete();
 }
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onFileSaveRecoveryState()
+{
+  #ifdef pqMainWindowCoreDEBUG
+  vtkstd::clock_t startTime=vtkstd::clock();
+  #endif
+
+  QStringList stateFileName;
+  stateFileName << CrashRecoveryStateFile;
+  this->onFileSaveServerState(stateFileName);
+
+  #ifdef pqMainWindowCoreDEBUG
+  vtkstd::clock_t endTime=vtkstd::clock();
+  cerr << "[" << __LINE__ << "] "
+       << " clock time ellapsed during save recovery state "
+       << (double)(endTime-startTime)/(double)CLOCKS_PER_SEC
+       << " sec." << endl;
+  #endif
+}
+
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveData()
@@ -3685,6 +3722,27 @@ void pqMainWindowCore::applicationInitialize()
   else
     {
     this->onHelpEnableTooltips(true);
+    }
+
+  // Look for a crash recovery state file, nag user and
+  // load if desired. TODO add "Do not ask again" check box.
+  if (QFile::exists(CrashRecoveryStateFile))
+    {
+    int recover
+      = QMessageBox::question(
+                0,
+                "ParaView3",
+                "A crash recovery state file has been found.\n"
+                "Would you like to restore ParaView to its pre-crash state?",
+                QMessageBox::Yes | QMessageBox::No,
+                QMessageBox::No);
+    if (recover==QMessageBox::Yes)
+      {
+      QStringList fileName;
+      fileName << CrashRecoveryStateFile;
+      this->onFileLoadServerState(fileName);
+      }
+    QFile::remove(CrashRecoveryStateFile);
     }
 }
 
