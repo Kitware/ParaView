@@ -7,6 +7,8 @@
     <Proxy name="Clustering2D" class="vtkClustering2DLayoutStrategy"/>
     <Proxy name="Fast2D" class="vtkFast2DLayoutStrategy"/>
     <Proxy name="Circular" class="vtkCircularLayoutStrategy"/>
+    <Proxy name="Tree" class="vtkTreeLayoutStrategy"/>
+    <Proxy name="TreeOrbit" class="vtkTreeOrbitLayoutStrategy"/>
     <Proxy name="None" class="vtkPassThroughLayoutStrategy"/>
   </ProxyGroup>
 

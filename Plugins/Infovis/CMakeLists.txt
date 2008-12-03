@@ -35,6 +35,8 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToTreeFilter.h
     ${VTK_SOURCE_DIR}/Infovis/vtkThresholdTable.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTreeLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTreeOrbitLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTreeLevelsFilter.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTulipReader.h
     ${VTK_SOURCE_DIR}/Infovis/vtkXMLTreeReader.h
