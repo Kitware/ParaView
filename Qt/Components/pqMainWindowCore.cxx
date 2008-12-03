@@ -190,8 +190,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cassert>
 #include <ctime>
 
-//#define pqMainWindowCoreDEBUG
-
+// If CrashRecovery is set under Edit->Settings, then before each 
+// "Apply" a state file is saved to this file.
 const char CrashRecoveryStateFile[]=".PV3CrashRecoveryState.pvsm";
 
 ///////////////////////////////////////////////////////////////////////////
@@ -831,9 +831,15 @@ pqProxyTabWidget* pqMainWindowCore::setupProxyTabWidget(QDockWidget* dock_widget
                    &this->Implementation->PendingDisplayManager,
                    SLOT(createPendingDisplays()));
 
-  // Save crash recovery state on Apply
-  QObject::connect(object_inspector, SIGNAL(accepted()),
-                   this, SLOT(onFileSaveRecoveryState()));
+  // Save crash recovery state on "Apply" before changes
+  // are made, this grabs the last known good state.
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  bool useCrashRecovery=settings->value("crashRecovery",false).toBool();
+  if (useCrashRecovery)
+    {
+    QObject::connect(object_inspector, SIGNAL(preaccept()),
+                     this, SLOT(onFileSaveRecoveryState()));
+    }
 
   // Use the server manager selection model to determine which page
   // should be shown.
@@ -1569,7 +1575,7 @@ void pqMainWindowCore::restoreSettings()
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::saveSettings()
-{ 
+{
   // Save the most recently used file extensions to QSettings.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("extensions/ScreenshotExtension", this->ScreenshotExtension);
@@ -1735,6 +1741,8 @@ void pqMainWindowCore::onFileSaveServerState()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 {
+  // NOTE: Of the two operations , building the XML tree
+  // and writing it to disk, building is the more expensive.
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("ParaView");
   pqApplicationCore::instance()->saveState(root);
@@ -1747,7 +1755,7 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
     {
     ofstream os(files[i].toAscii().data(), ios::out);
     root->PrintXML(os, vtkIndent());
-    
+
     // Add this to the list of recent server resources ...
     pqServerResource resource;
     resource.setScheme("session");
@@ -1764,23 +1772,10 @@ void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveRecoveryState()
 {
-  #ifdef pqMainWindowCoreDEBUG
-  vtkstd::clock_t startTime=vtkstd::clock();
-  #endif
-
   QStringList stateFileName;
   stateFileName << CrashRecoveryStateFile;
   this->onFileSaveServerState(stateFileName);
-
-  #ifdef pqMainWindowCoreDEBUG
-  vtkstd::clock_t endTime=vtkstd::clock();
-  cerr << "[" << __LINE__ << "] "
-       << " clock time ellapsed during save recovery state "
-       << (double)(endTime-startTime)/(double)CLOCKS_PER_SEC
-       << " sec." << endl;
-  #endif
 }
-
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onFileSaveData()
@@ -3725,8 +3720,10 @@ void pqMainWindowCore::applicationInitialize()
     }
 
   // Look for a crash recovery state file, nag user and
-  // load if desired. TODO add "Do not ask again" check box.
-  if (QFile::exists(CrashRecoveryStateFile))
+  // load if desired.
+  bool recoveryEnabled=settings->value("crashRecovery",false).toBool();
+  if (recoveryEnabled
+      && QFile::exists(CrashRecoveryStateFile))
     {
     int recover
       = QMessageBox::question(

@@ -99,6 +99,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->AutoAccept,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->CrashRecovery,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
 }
 
 //-----------------------------------------------------------------------------
@@ -147,6 +150,9 @@ void pqApplicationOptions::applyChanges()
   bool autoAccept = this->Internal->AutoAccept->isChecked();
   settings->setValue("autoAccept", autoAccept);
   pqObjectInspectorWidget::setAutoAccept(autoAccept);
+
+  bool crashRecovery = this->Internal->CrashRecovery->isChecked();
+  settings->setValue("crashRecovery",crashRecovery);
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +160,7 @@ void pqApplicationOptions::resetChanges()
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
 
-  QString curView = settings->value("defaultViewType", 
+  QString curView = settings->value("defaultViewType",
       pqRenderView::renderViewType()).toString();
   int index = this->Internal->DefaultViewType->findData(curView);
   index = (index==-1)? 0 : index;
@@ -162,8 +168,11 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->HeartBeatTimeout->setText(
     QString("%1").arg(pqServer::getHeartBeatTimeoutSetting()/(60.0*1000), 0, 'f', 2));
-  
+
   this->Internal->AutoAccept->setChecked(
     settings->value("autoAccept", false).toBool());
+
+  this->Internal->CrashRecovery->setChecked(
+    settings->value("crashRecovery", false).toBool());
 }
 

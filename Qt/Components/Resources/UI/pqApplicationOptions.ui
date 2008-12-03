@@ -13,11 +13,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
@@ -26,37 +35,6 @@
      </property>
      <widget class="QWidget" name="General" >
       <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
-       <item row="1" column="2" >
-        <widget class="QLabel" name="label_2" >
-         <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>0</hsizetype>
-           <vsizetype>0</vsizetype>
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text" >
-          <string>mins</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label" >
-         <property name="text" >
-          <string>Heart-Beat Interval</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" colspan="2" >
-        <widget class="QComboBox" name="DefaultViewType" />
-       </item>
        <item row="0" column="0" >
         <widget class="QLabel" name="label_4" >
          <property name="text" >
@@ -64,30 +42,13 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="3" >
-        <spacer>
-         <property name="orientation" >
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" >
-          <size>
-           <width>441</width>
-           <height>127</height>
-          </size>
-         </property>
-        </spacer>
+       <item row="0" column="1" colspan="2" >
+        <widget class="QComboBox" name="DefaultViewType" />
        </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_3" >
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label" >
          <property name="text" >
-          <string>Auto Accept</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QCheckBox" name="AutoAccept" >
-         <property name="text" >
-          <string/>
+          <string>Heart-Beat Interval</string>
          </property>
         </widget>
        </item>
@@ -104,12 +65,84 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="2" >
+        <widget class="QLabel" name="label_2" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Fixed" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>mins</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_3" >
+         <property name="text" >
+          <string>Auto Accept</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QCheckBox" name="AutoAccept" >
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="label_5" >
+         <property name="text" >
+          <string>Crash recovery</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QCheckBox" name="CrashRecovery" >
+         <property name="text" >
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>364</width>
+           <height>157</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <includes/>
  <resources/>
  <connections/>
+ <designerdata>
+  <property name="gridDeltaX" >
+   <number>2</number>
+  </property>
+  <property name="gridDeltaY" >
+   <number>2</number>
+  </property>
+  <property name="gridSnapX" >
+   <bool>true</bool>
+  </property>
+  <property name="gridSnapY" >
+   <bool>true</bool>
+  </property>
+  <property name="gridVisible" >
+   <bool>true</bool>
+  </property>
+ </designerdata>
 </ui>
