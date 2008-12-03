@@ -386,6 +386,9 @@ void pqSpreadSheetViewModel::delayedSelectionUpdate()
       this->Internal->ActiveBlockNumber = blockNumber;
       this->updateSelectionForBlock(blockNumber);
       }
+    
+    // whether or not to allow further selections
+    emit this->selectionOnly( repr->GetSelectionOnly() );
     }
 }
 

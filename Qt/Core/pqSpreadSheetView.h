@@ -97,6 +97,10 @@ protected slots:
 
   /// Called when user double clicks on a column header.
   void onSectionDoubleClicked(int logicalindex);
+  
+  /// Called when checkbox "Show Only Selected Elements" is updated
+  void onSelectionOnly(int selOnly);
+  
 private:
   pqSpreadSheetView(const pqSpreadSheetView&); // Not implemented.
   void operator=(const pqSpreadSheetView&); // Not implemented.

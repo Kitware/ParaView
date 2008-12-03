@@ -128,7 +128,11 @@ public:
 
 signals:
   void requestDelayedUpdate() const;
-
+  
+  /// to inform the associated pqSpreadSheetView of the status of
+  /// checkbox "Show Only Selected Elements" in object inspector
+  void selectionOnly(int selOnly);
+  
   /// Fired whenever the server side selection changes.
   void selectionChanged(const QItemSelection& selection);
 

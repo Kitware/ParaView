@@ -275,6 +275,9 @@ pqSpreadSheetView::pqSpreadSheetView(
     this->Internal->Table->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)),
     this, SLOT(onSectionDoubleClicked(int)), Qt::QueuedConnection);
   
+  QObject::connect( &(this->Internal->Model), SIGNAL( selectionOnly(int) ),
+    this, SLOT( onSelectionOnly(int) ) );
+  
   foreach(pqRepresentation* rep, this->getRepresentations())
     {
     this->onAddRepresentation(rep);
@@ -436,5 +439,22 @@ void pqSpreadSheetView::onSectionDoubleClicked(int logicalindex)
   if (!this->Internal->SingleColumnMode)
     {
     this->Internal->Table->resizeColumnsToContents();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetView::onSelectionOnly(int selOnly)
+{
+  if (selOnly)
+    {
+    // The user is disallowed to make further (embedded / recursive) selection
+    // once checkbox "Show Only Selected Elements" is checked.
+    this->Internal->Table->setSelectionMode(QAbstractItemView::NoSelection); 
+    }
+  else
+    {
+    // Once the checkbox is un-checked, the user to allowed to make selections.
+    this->Internal->Table->setSelectionMode(
+      QAbstractItemView::ExtendedSelection);
     }
 }
