@@ -26,6 +26,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
@@ -43,7 +44,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.3");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 //-----------------------------------------------------------------------------
@@ -395,6 +396,14 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
                       << dataType);
       }
     }  
+
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    strategy->GetProperty("SetNumberOfPasses"));
+  if (ivp)
+    {
+    int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+    ivp->SetElement(0,nPasses);
+    }
 
   return strategy;
 }

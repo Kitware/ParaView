@@ -420,6 +420,9 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -459,6 +462,9 @@ o        </Proxy>
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -498,6 +504,9 @@ o        </Proxy>
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -593,6 +602,9 @@ o        </Proxy>
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -688,6 +700,9 @@ o        </Proxy>
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -727,6 +742,9 @@ o        </Proxy>
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="SetNumberOfPasses" />
+        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
