@@ -31,25 +31,18 @@
 #ifndef __vtkPVDesktopDeliveryServer_h
 #define __vtkPVDesktopDeliveryServer_h
 
-#include "vtkParallelRenderManager.h"
+#include "vtkPVClientServerRenderManager.h"
 
 class vtkPVDesktopDeliveryServerRendererMap;
 class vtkMultiProcessStream;
 class vtkFloatArray;
-class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkParallelRenderManager
+class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkPVClientServerRenderManager
 {
 public:
-  vtkTypeRevisionMacro(vtkPVDesktopDeliveryServer, vtkParallelRenderManager);
+  vtkTypeRevisionMacro(vtkPVDesktopDeliveryServer, vtkPVClientServerRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   static vtkPVDesktopDeliveryServer *New();
-
-  // Description:
-  // Set/Get the controller that is attached to a vtkDesktopDeliveryClient.
-  // This object will assume that the controller has two processors, and
-  // that the controller on the opposite side of the controller has been
-  // given to the server object.
-  virtual void SetController(vtkMultiProcessController *controller);
 
   // Description:
   // Set/Get a parallel render manager that is used for parallel rendering.

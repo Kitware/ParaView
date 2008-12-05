@@ -68,13 +68,13 @@ public:
   // Get the socket controller used by this class.
   vtkSocketController* GetSocketController();
 
+//BTX
   // Description:
   // These methods should be called before and after 
   // the subclass has sent some stream for processing on 
   // the SelfConnection.
   void Activate();
   void Deactivate();
-
 protected:
   vtkRemoteConnection();
   ~vtkRemoteConnection(); 
@@ -82,6 +82,10 @@ protected:
 private:
   vtkRemoteConnection(const vtkRemoteConnection&); // Not implemented.
   void operator=(const vtkRemoteConnection&); // Not implemented.
+  
+  class vtkInternal;
+  vtkInternal* Internal;
+//ETX
 };
 
 #endif

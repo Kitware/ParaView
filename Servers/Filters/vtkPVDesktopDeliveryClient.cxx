@@ -44,7 +44,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.8");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.9");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -68,6 +68,10 @@ vtkPVDesktopDeliveryClient::vtkPVDesktopDeliveryClient()
   cbc->SetClientData(this);
   cbc->SetCallback(vtkPVDesktopDeliveryClientReceiveImageCallback);
   this->ReceiveImageCallback = cbc;
+
+  // I am the root, the other process is the satellite.
+  this->RootProcessId = 0;
+  this->ServerProcessId = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -85,27 +89,6 @@ void vtkPVDesktopDeliveryClient::SetUseCompositing(int v)
   if (this->RemoteDisplay)
     {
     this->SetParallelRendering(v);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryClient::SetController(
-                                          vtkMultiProcessController *controller)
-{
-  vtkDebugMacro("SetController");
-
-  if (controller && (controller->GetNumberOfProcesses() != 2))
-    {
-    vtkErrorMacro("vtkDesktopDelivery needs controller with 2 processes");
-    return;
-    }
-
-  this->Superclass::SetController(controller);
-
-  if (this->Controller)
-    {
-    this->RootProcessId = this->Controller->GetLocalProcessId();
-    this->ServerProcessId = 1 - this->RootProcessId;
     }
 }
 

@@ -69,6 +69,7 @@ SET(Filters_SRCS
   vtkPVArrowSource.cxx
   vtkPVCacheKeeper.cxx
   vtkPVCacheKeeperPipeline.cxx
+  vtkPVClientServerRenderManager.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVDesktopDeliveryClient.cxx
@@ -182,12 +183,13 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkAnimationPlayer.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkImageCompressor.cxx
-  vtkPVRenderViewProxy.cxx
+  vtkPVClientServerRenderManager.cxx
   vtkPVJoystickFly.cxx
-  vtkTransferFunctionEditorRepresentation.cxx
+  vtkPVRenderViewProxy.cxx
   vtkTransferFunctionEditorRepresentation1D.cxx
-  vtkTransferFunctionEditorWidget.cxx
+  vtkTransferFunctionEditorRepresentation.cxx
   vtkTransferFunctionEditorWidget1D.cxx
+  vtkTransferFunctionEditorWidget.cxx
   ABSTRACT)
 
 IF(PARAVIEW_ENABLE_PYTHON)

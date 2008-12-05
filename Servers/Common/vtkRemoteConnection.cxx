@@ -22,10 +22,19 @@
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 
-vtkCxxRevisionMacro(vtkRemoteConnection, "1.3");
+#include <vtkstd/vector>
+
+class vtkRemoteConnection::vtkInternal : public
+                                         vtkstd::vector<vtkRemoteConnection*>
+{
+};
+
+
+vtkCxxRevisionMacro(vtkRemoteConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkRemoteConnection::vtkRemoteConnection()
 {
+  this->Internal = new vtkInternal();
   this->Controller = vtkSocketController::New();
 }
 
@@ -33,6 +42,7 @@ vtkRemoteConnection::vtkRemoteConnection()
 vtkRemoteConnection::~vtkRemoteConnection()
 {
   this->Finalize();
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
@@ -61,7 +71,10 @@ int vtkRemoteConnection::SetSocket(vtkClientSocket* soc)
 int vtkRemoteConnection::ProcessCommunication()
 {
   // Just process one RMI message.
+  this->Activate(); 
   int ret = this->Controller->ProcessRMIs(0, 1);
+  this->Deactivate();
+
   if (ret != vtkMultiProcessController::RMI_NO_ERROR)
     {
     // Processing error or connection closed.
@@ -74,13 +87,17 @@ int vtkRemoteConnection::ProcessCommunication()
 //-----------------------------------------------------------------------------
 void vtkRemoteConnection::Activate()
 {
+  this->Internal->push_back(
+    vtkProcessModule::GetProcessModule()->GetActiveRemoteConnection());
   vtkProcessModule::GetProcessModule()->SetActiveRemoteConnection(this);
 }
 
 //-----------------------------------------------------------------------------
 void vtkRemoteConnection::Deactivate()
 {
-  vtkProcessModule::GetProcessModule()->SetActiveRemoteConnection(0);
+  vtkProcessModule::GetProcessModule()->SetActiveRemoteConnection(
+    this->Internal->back());
+  this->Internal->pop_back();
 }
 
 //-----------------------------------------------------------------------------

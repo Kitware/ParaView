@@ -35,13 +35,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include <vtkstd/map>
 
 //-----------------------------------------------------------------------------
-
-static void SatelliteStartRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event),
-                                 void *clientData, void *);
-static void SatelliteEndRender(vtkObject *caller,
-                               unsigned long vtkNotUsed(event),
-                               void *clientData, void *);
 static void SatelliteStartParallelRender(vtkObject *caller,
                                          unsigned long vtkNotUsed(event),
                                          void *clientData, void *);
@@ -62,7 +55,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.12");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.13");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -82,6 +75,9 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
   this->WindowIdRMIId = 0;
   this->ReducedZBuffer = 0;
   this->AnnotationLayerVisible = 1;
+
+  // The other process is the root process.
+  this->RootProcessId = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -109,26 +105,6 @@ vtkPVDesktopDeliveryServer::~vtkPVDesktopDeliveryServer()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryServer::SetController(
-                                          vtkMultiProcessController *controller)
-{
-  vtkDebugMacro("SetController");
-
-  if (controller && (controller->GetNumberOfProcesses() != 2))
-    {
-    vtkErrorMacro("vtkDesktopDelivery needs controller with 2 processes");
-    return;
-    }
-
-  this->Superclass::SetController(controller);
-
-  if (this->Controller)
-    {
-    this->RootProcessId = 1 - this->Controller->GetLocalProcessId();
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
                                                   vtkParallelRenderManager *prm)
 {
@@ -136,7 +112,6 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
     {
     return;
     }
-  this->Modified();
 
   if (this->ParallelRenderManager)
     {
@@ -145,18 +120,12 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
     this->ParallelRenderManager->RemoveObserver(this->EndParallelRenderTag);
     this->StartParallelRenderTag = 0;
     this->EndParallelRenderTag = 0;
-
-    // Delete the reference.
-    this->ParallelRenderManager->UnRegister(this);
-    this->ParallelRenderManager = NULL;
     }
 
-  this->ParallelRenderManager = prm;
+  vtkSetObjectBodyMacro(ParallelRenderManager, vtkParallelRenderManager, prm);
+
   if (this->ParallelRenderManager)
     {
-    // Create a reference.
-    this->ParallelRenderManager->Register(this);
-
     if (this->RemoteDisplay)
       {
       // No need to write the image back on the render server.
@@ -189,37 +158,13 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
     cbc->Delete();
 
     // Remove observers to RenderWindow.  We use the prm instead.
-    if (this->ObservingRenderWindow)
-      {
-      this->RenderWindow->RemoveObserver(this->StartRenderTag);
-      this->RenderWindow->RemoveObserver(this->EndRenderTag);
-      this->ObservingRenderWindow = 0;
-      this->StartRenderTag = 0;
-      this->EndRenderTag = 0;
-      }
+    this->RemoveRenderWindowEventHandlers();
     }
   else
     {
     // Apparently we added and then removed a ParallelRenderManager.
     // Restore RenderWindow observers.
-    if (this->RenderWindow)
-      {
-      vtkCallbackCommand *cbc;
-      
-      cbc = vtkCallbackCommand::New();
-      cbc->SetCallback(::SatelliteStartRender);
-      cbc->SetClientData(this);
-      this->StartRenderTag
-        = this->RenderWindow->AddObserver(vtkCommand::StartEvent,cbc);
-      cbc->Delete();
-
-      cbc = vtkCallbackCommand::New();
-      cbc->SetCallback(::SatelliteEndRender);
-      cbc->SetClientData(this);
-      this->EndRenderTag
-        = this->RenderWindow->AddObserver(vtkCommand::EndEvent,cbc);
-      cbc->Delete();
-      }
+    this->AddRenderWindowEventHandlers();
     }
 }
 
@@ -227,14 +172,11 @@ void vtkPVDesktopDeliveryServer::SetParallelRenderManager(
 void vtkPVDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 {
   this->Superclass::SetRenderWindow(renWin);
-
-  if (this->ObservingRenderWindow && this->ParallelRenderManager)
+  if (this->ParallelRenderManager)
     {
-    this->RenderWindow->RemoveObserver(this->StartRenderTag);
-    this->RenderWindow->RemoveObserver(this->EndRenderTag);
-    this->ObservingRenderWindow = 0;
-    this->StartRenderTag = 0;
-    this->EndRenderTag = 0;
+    // If ParallelRenderManager is present, we don't want to be listening to
+    // render events from the render window.
+    this->RemoveRenderWindowEventHandlers(); 
     }
 }
 
@@ -706,37 +648,6 @@ void vtkPVDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
      << (this->RemoteDisplay ? "on" : "off") << endl;
   os << indent << "AnnotationLayerVisible: " 
     << this->AnnotationLayerVisible << endl;
-}
-
-
-//----------------------------------------------------------------------------
-static void SatelliteStartRender(vtkObject *caller,
-                                 unsigned long vtkNotUsed(event),
-                                 void *clientData, void *)
-{
-  vtkPVDesktopDeliveryServer *self
-    = reinterpret_cast<vtkPVDesktopDeliveryServer *>(clientData);
-  if (caller != self->GetRenderWindow())
-    {
-    vtkGenericWarningMacro("vtkPVDesktopDeliveryServer caller mismatch");
-    return;
-    }
-  self->SatelliteStartRender();
-}
-
-//----------------------------------------------------------------------------
-static void SatelliteEndRender(vtkObject *caller,
-                               unsigned long vtkNotUsed(event),
-                               void *clientData, void *)
-{
-  vtkPVDesktopDeliveryServer *self
-    = reinterpret_cast<vtkPVDesktopDeliveryServer *>(clientData);
-  if (caller != self->GetRenderWindow())
-    {
-    vtkGenericWarningMacro("vtkPVDesktopDeliveryServer caller mismatch");
-    return;
-    }
-  self->SatelliteEndRender();
 }
 
 //----------------------------------------------------------------------------

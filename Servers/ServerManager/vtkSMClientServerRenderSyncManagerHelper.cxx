@@ -22,7 +22,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.3");
+vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.4");
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderSyncManagerHelper::vtkSMClientServerRenderSyncManagerHelper()
 {
@@ -145,11 +145,11 @@ void vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
   // communicate. So, set that up.
   stream  << vtkClientServerStream::Invoke 
           << pm->GetProcessModuleID()
-          << "GetActiveRenderServerSocketController"
+          << "GetActiveRemoteConnection"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke 
           << rsmProxy->GetID()
-          << "SetController" 
+          << "Initialize" 
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
   pm->SendStream(cid, rsmProxy->GetServers(), stream);
@@ -170,7 +170,7 @@ void vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
 
   // Setup RMI callbacks. 
   // FIXME: Make InitializeRMIs idempotent.
-  rsmProxy->InvokeCommand("InitializeRMIs");
+  // rsmProxy->InvokeCommand("InitializeRMIs");
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rsmProxy->GetProperty("RenderWindow"));

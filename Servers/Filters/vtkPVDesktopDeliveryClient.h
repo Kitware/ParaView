@@ -39,14 +39,14 @@
 #ifndef __vtkPVDesktopDeliveryClient_h
 #define __vtkPVDesktopDeliveryClient_h
 
-#include "vtkParallelRenderManager.h"
+#include "vtkPVClientServerRenderManager.h"
 
 class vtkCommand;
 
-class VTK_EXPORT vtkPVDesktopDeliveryClient : public vtkParallelRenderManager
+class VTK_EXPORT vtkPVDesktopDeliveryClient : public vtkPVClientServerRenderManager
 {
 public:
-  vtkTypeRevisionMacro(vtkPVDesktopDeliveryClient, vtkParallelRenderManager);
+  vtkTypeRevisionMacro(vtkPVDesktopDeliveryClient, vtkPVClientServerRenderManager);
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   static vtkPVDesktopDeliveryClient *New();
@@ -59,13 +59,6 @@ public:
   // then ParallelRendering is also turned off altogether.  Likewise,
   // ParallelRendering is turned back on when UseCompositing is turned on.
   virtual void SetUseCompositing(int v);
-
-  // Description:
-  // Set/Get the controller that is attached to a vtkDesktopDeliveryServer.
-  // This object will assume that the controller has two processors, and
-  // that the controller on the opposite side of the controller has been
-  // given to the server object.
-  virtual void SetController(vtkMultiProcessController *controller);
 
   virtual void ComputeVisiblePropBounds(vtkRenderer *ren, double bounds[6]);
 

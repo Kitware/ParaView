@@ -38,9 +38,7 @@
 void vtkClientConnectionLastResultRMI(void* localArg, void* , int, int)
 {
   vtkClientConnection* self = (vtkClientConnection*)localArg;
-  self->Activate();
   self->SendLastResult();
-  self->Deactivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -53,15 +51,11 @@ void vtkClientConnectionRMI(void *localArg, void *remoteArg,
     vtkClientServerStream stream;
     stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
 
-    vtkClientConnection* self = (vtkClientConnection*)localArg;
-    self->Activate();
-
     // Tell process module to send it to SelfConnection.
     vtkProcessModule::GetProcessModule()->SendStream(
       vtkProcessModuleConnectionManager::GetSelfConnectionID(),
       vtkProcessModule::DATA_SERVER, stream);
 
-    self->Deactivate();
     }
   catch (vtkstd::bad_alloc)
     {
@@ -85,15 +79,10 @@ void vtkClientConnectionRootRMI(void *localArg, void *remoteArg,
     vtkClientServerStream stream;
     stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
 
-    vtkClientConnection* self = (vtkClientConnection*)localArg;
-    self->Activate();
-
     // Tell process module to send it to SelfConnection Root.
     vtkProcessModule::GetProcessModule()->SendStream(
       vtkProcessModuleConnectionManager::GetSelfConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT, stream);
-
-    self->Deactivate();
     }
   catch (vtkstd::bad_alloc)
     {
@@ -115,7 +104,6 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
   vtkClientServerStream stream;
   stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
   vtkClientConnection* self = (vtkClientConnection*)localArg;
-  self->Activate();
   try
     {
     self->SendInformation(stream);
@@ -130,7 +118,6 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
     vtkProcessModule::GetProcessModule()->ExceptionEvent(
       vtkProcessModule::EXCEPTION_UNKNOWN);
     }
-  self->Deactivate();
 }
 
 //-----------------------------------------------------------------------------
@@ -223,11 +210,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.11");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.12");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.11");
+vtkCxxRevisionMacro(vtkClientConnection, "1.12");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
