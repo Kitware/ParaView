@@ -79,9 +79,9 @@ def LoadServerManagerState(filename):
   if not parser.Parse(data):
     return Error("Failed to parse")
   loader = servermanager.vtkSMStateLoader()
-  loader.SetConnectionID(servermanager.ActiveConnection.ID)
+  loader.GetProxyLocator().SetConnectionID(servermanager.ActiveConnection.ID)
   root = parser.GetRootElement()
-  if loader.LoadState(root,0):
+  if loader.LoadState(root):
     pxm = servermanager.vtkSMObject.GetProxyManager()
     pxm.UpdateRegisteredProxiesInOrder(0);
     pxm.UpdateRegisteredProxies(0)
