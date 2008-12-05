@@ -43,7 +43,7 @@ void vtkClientConnectionLastResultRMI(void* localArg, void* , int, int)
 
 //-----------------------------------------------------------------------------
 // Called when requesting to process the stream on Server (root and satellites).
-void vtkClientConnectionRMI(void *localArg, void *remoteArg,
+void vtkClientConnectionRMI(void *vtkNotUsed(localArg), void *remoteArg,
   int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
   try
@@ -71,7 +71,7 @@ void vtkClientConnectionRMI(void *localArg, void *remoteArg,
 
 //-----------------------------------------------------------------------------
 // Called when requesting to process the stream on Root Node only.
-void vtkClientConnectionRootRMI(void *localArg, void *remoteArg,
+void vtkClientConnectionRootRMI(void *vtkNotUsed(localArg), void *remoteArg,
   int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
   try
@@ -210,11 +210,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.12");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.13");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.12");
+vtkCxxRevisionMacro(vtkClientConnection, "1.13");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
