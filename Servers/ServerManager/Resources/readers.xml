@@ -4185,231 +4185,66 @@
      <!-- End SESAMEReader -->
    </SourceProxy>
 
-    <!-- Beginning of OpenFOAM Reader -->
-    <SourceProxy name="OpenFOAMReader" class="vtkPOpenFOAMReader">
-      <StringVectorProperty
-         name="FileName"
-         command="SetFileName"
-         number_of_elements="1"
-         animateable="0">
+    <!-- Beginning of FOAM Reader -->
+    <SourceProxy name="OpenFOAMReader" 
+                    class="vtkOpenFOAMReader">
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
         <FileListDomain name="files"/>
+        <Documentation>
+          Set the file name for the OpenFOAM reader.
+        </Documentation>
       </StringVectorProperty>
-
-      <Property
-         name="Refresh"
-         command="SetRefresh"
-         is_internal="1"
-         animateable="0">
-        <Documentation>
-          Refresh time information and selection list metadata. Useful when watching a running simulation.
-        </Documentation>
-      </Property>
-
-      <IntVectorProperty 
-         name="CaseType" 
-         command="SetCaseType"
-         number_of_elements="1"
-         default_values="1"
-         animateable="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Decomposed Case"/>
-          <Entry value="1" text="Reconstructed Case"/>
-        </EnumerationDomain>
-        <Documentation>
-          The property indicates whether decomposed mesh or reconstructed mesh should be read
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="CreateCellToPoint"
-         command="SetCreateCellToPoint"
-         number_of_elements="1"
-         default_values="1"
-         label="Create cell-to-point filtered data"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Create point data from cell data. Beware: the filter does not do inverse distance weighting.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="AddDimensionsToArrayNames"
-         command="SetAddDimensionsToArrayNames"
-         number_of_elements="1"
-         default_values="0"
-         label="Add dimensional units to array names"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Read dimensional units from field data and add them to array names as human-readable string.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty
-         name="TimestepValues"
-         repeatable="1"
-         information_only="1">
-        <TimeStepsInformationHelper/>
-      </DoubleVectorProperty>
-
-      <StringVectorProperty
-         name="PatchArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Patch"/>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="MeshRegions"
-         command="SetPatchArrayStatus"
-         number_of_elements="0"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="PatchArrayInfo"
-         animateable="0">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property name="PatchArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="CellArrayInfo"
-         information_only="1">
+      <StringVectorProperty name="CellArrayInfo"
+                            information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
       </StringVectorProperty>
-      <StringVectorProperty
-         name="CellArrays"
-         command="SetCellArrayStatus"
-         number_of_elements="0"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="CellArrayInfo"
-         animateable="0">
+      <StringVectorProperty name="CellArrayStatus"
+                            command="SetCellArrayStatus"
+                            number_of_elements="0" 
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0" 
+                            information_property="CellArrayInfo"
+                            label="Cell Arrays">
         <ArraySelectionDomain name="array_list">
           <RequiredProperties>
             <Property name="CellArrayInfo" function="ArrayList"/>
           </RequiredProperties>
         </ArraySelectionDomain>
+        <Documentation>
+          Select which cell-centered arrays to read.
+        </Documentation>
       </StringVectorProperty>
-
-      <StringVectorProperty
-         name="PointArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-      </StringVectorProperty>
-      <StringVectorProperty
-         name="PointArrays"
-         command="SetPointArrayStatus"
-         number_of_elements="0"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="PointArrayInfo"
-         animateable="0">
-        <ArraySelectionDomain name="array_list">
+      <IntVectorProperty name="TimeStepRangeInfo"
+                         command="GetTimeStepRange"
+                         information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+      <IntVectorProperty name="TimeStep"
+                           command="SetTimeStep"
+                           number_of_elements="1"
+                           animateable="1"
+                           default_values="0">
+        <IntRangeDomain name="range">
           <RequiredProperties>
-            <Property name="PointArrayInfo" function="ArrayList"/>
+            <Property name="TimeStepRangeInfo" function="Range"/>
           </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-
-      <StringVectorProperty
-         name="LagrangianArrayInfo"
-         information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Lagrangian"/>
-      </StringVectorProperty>
-      <StringVectorProperty
-         name="LagrangianArrays"
-         command="SetLagrangianArrayStatus"
-         number_of_elements="0"
-         repeat_command="1"
-         number_of_elements_per_command="2"
-         element_types="2 0"
-         information_property="LagrangianArrayInfo"
-         animateable="0">
-        <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-            <Property name="LagrangianArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-        </ArraySelectionDomain>
-      </StringVectorProperty>
-
-      <IntVectorProperty
-         name="CacheMesh"
-         command="SetCacheMesh"
-         number_of_elements="1"
-         default_values="1"
-         label="Cache mesh"
-         animateable="0">
-        <BooleanDomain name="bool"/>
+        </IntRangeDomain>
         <Documentation>
-          Cache the OpenFOAM mesh between GUI selection changes.
+          Set the current timestep.
         </Documentation>
       </IntVectorProperty>
-
-      <IntVectorProperty
-         name="DecomposePolyhedra"
-         command="SetDecomposePolyhedra"
-         number_of_elements="1"
-         default_values="1"
-         label="Decompose polyhedra"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Decompose polyhedra into tetrahedra and pyramids.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="ListTimeStepsByControlDict"
-         command="SetListTimeStepsByControlDict"
-         number_of_elements="1"
-         default_values="0"
-         label="List timesteps according to controlDict"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          List time directories listed according to the settings in controlDict.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="PositionsIsIn13Format"
-         command="SetPositionsIsIn13Format"
-         number_of_elements="1"
-         default_values="0"
-         label="Lagrangian positions are in OF 1.3 binary format"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Set if Lagrangian positions files are in OpenFOAM 1.3 binary format.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-         name="ReadZones"
-         command="SetReadZones"
-         number_of_elements="1"
-         default_values="0"
-         label="Read zones"
-         animateable="0">
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Read point/face/cell-Zones?
-        </Documentation>
-      </IntVectorProperty>
-
-      <Hints>
-        <Property name="FileName" show="1"/>
-        <Property name="Refresh" show="0"/>
-      </Hints>
-
+      <DoubleVectorProperty 
+          name="TimestepValues"
+          repeatable="1"
+          information_only="1">
+        <TimeStepsInformationHelper/>
+      </DoubleVectorProperty>
     </SourceProxy>
-    <!-- End of OpenFOAM Reader -->
+    <!-- End of foam Reader -->
 
     <!-- Beginning of MFIX Reader -->
     <SourceProxy name="MFIXReader" class="vtkMFIXReader">
