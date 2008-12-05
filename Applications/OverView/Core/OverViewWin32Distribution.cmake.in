@@ -109,6 +109,19 @@ INSTALL(PROGRAMS
 
 # Install Qt libraries required by OverView ...
 INSTALL(PROGRAMS
+  @QT_LIBRARY_DIR@/../bin/QtAssistantClientD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtCoreD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtGuiD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtNetworkD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtSqlD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtSVGD4.dll
+  @QT_LIBRARY_DIR@/../bin/QtXmlD4.dll
+  DESTINATION bin
+  COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+  CONFIGURATIONS Debug
+  )
+
+INSTALL(PROGRAMS
   @QT_LIBRARY_DIR@/../bin/QtAssistantClient4.dll
   @QT_LIBRARY_DIR@/../bin/QtCore4.dll
   @QT_LIBRARY_DIR@/../bin/QtGui4.dll
@@ -118,6 +131,7 @@ INSTALL(PROGRAMS
   @QT_LIBRARY_DIR@/../bin/QtXml4.dll
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+  CONFIGURATIONS Release
   )
 
 #Install Qt plugins required by OverView ...
