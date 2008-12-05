@@ -46,14 +46,14 @@ ENDIF(OVERVIEW_INSTALL_ORACLE)
 IF(OVERVIEW_INSTALL_QT_MYSQL)
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqlmysqld4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqlmysqld4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqlmysql4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqlmysql4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -65,14 +65,14 @@ ENDIF(OVERVIEW_INSTALL_QT_MYSQL)
 IF(OVERVIEW_INSTALL_QT_ORACLE)
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqlocid4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqlocid4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqloci4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqloci4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -84,14 +84,14 @@ ENDIF(OVERVIEW_INSTALL_QT_ORACLE)
 IF(OVERVIEW_INSTALL_QT_POSTGRESQL)
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqlpsqld4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqlpsqld4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    @QT_PLUGINS_DIR@/sqldrivers/qsqlpsql4.dll
+    "@QT_PLUGINS_DIR@/sqldrivers/qsqlpsql4.dll"
     DESTINATION bin/qtplugins/sqldrivers
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -100,35 +100,43 @@ IF(OVERVIEW_INSTALL_QT_POSTGRESQL)
 ENDIF(OVERVIEW_INSTALL_QT_POSTGRESQL)
 
 # Install MSVC runtimes required by OverView ...
-INSTALL(PROGRAMS
-  c:/windows/system32/msvcp71.dll
-  c:/windows/system32/msvcr71.dll
-  DESTINATION bin
-  COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-  )
+IF(MSVC80)
+  INSTALL(PROGRAMS
+    "c:/program files/microsoft visual studio 8/vc/redist/x86/microsoft.vc80.crt/msvcr80.dll"
+    DESTINATION bin
+    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+    )
+ELSE()
+  INSTALL(PROGRAMS
+    "c:/windows/system32/msvcp71.dll"
+    "c:/windows/system32/msvcr71.dll"
+    DESTINATION bin
+    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+    )
+ENDIF()
 
 # Install Qt libraries required by OverView ...
 INSTALL(PROGRAMS
-  @QT_LIBRARY_DIR@/../bin/QtAssistantClientD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtCoreD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtGuiD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtNetworkD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtSqlD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtSVGD4.dll
-  @QT_LIBRARY_DIR@/../bin/QtXmlD4.dll
+  "@QT_LIBRARY_DIR@/../bin/QtAssistantClientD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtCoreD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtGuiD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtNetworkD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtSqlD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtSVGD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtXmlD4.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
-  @QT_LIBRARY_DIR@/../bin/QtAssistantClient4.dll
-  @QT_LIBRARY_DIR@/../bin/QtCore4.dll
-  @QT_LIBRARY_DIR@/../bin/QtGui4.dll
-  @QT_LIBRARY_DIR@/../bin/QtNetwork4.dll
-  @QT_LIBRARY_DIR@/../bin/QtSql4.dll
-  @QT_LIBRARY_DIR@/../bin/QtSVG4.dll
-  @QT_LIBRARY_DIR@/../bin/QtXml4.dll
+  "@QT_LIBRARY_DIR@/../bin/QtAssistantClient4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtCore4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtGui4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtNetwork4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtSql4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtSVG4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtXml4.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
@@ -136,18 +144,18 @@ INSTALL(PROGRAMS
 
 #Install Qt plugins required by OverView ...
 INSTALL(PROGRAMS
-  @QT_PLUGINS_DIR@/imageformats/qjpegd4.dll
-  @QT_PLUGINS_DIR@/imageformats/qmngd4.dll
-  @QT_PLUGINS_DIR@/imageformats/qsvgd4.dll
+  "@QT_PLUGINS_DIR@/imageformats/qjpegd4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qmngd4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qsvgd4.dll"
   DESTINATION bin/qtplugins/imageformats
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
-  @QT_PLUGINS_DIR@/imageformats/qjpeg4.dll
-  @QT_PLUGINS_DIR@/imageformats/qmng4.dll
-  @QT_PLUGINS_DIR@/imageformats/qsvg4.dll
+  "@QT_PLUGINS_DIR@/imageformats/qjpeg4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qmng4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qsvg4.dll"
   DESTINATION bin/qtplugins/imageformats
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
@@ -155,136 +163,138 @@ INSTALL(PROGRAMS
 
 # Install VTK/ParaView libraries required by OverView ...
 INSTALL(PROGRAMS
-  @ParaView_BINARY_DIR@/bin/debug/KWCommon.dll
-  @ParaView_BINARY_DIR@/bin/debug/OverViewCore.dll
-  @ParaView_BINARY_DIR@/bin/debug/pqComponents.dll
-  @ParaView_BINARY_DIR@/bin/debug/pqCore.dll
-  @ParaView_BINARY_DIR@/bin/debug/pqWidgets.dll
-  @ParaView_BINARY_DIR@/bin/debug/QtChart.dll
-  @ParaView_BINARY_DIR@/bin/debug/QtTesting.dll
-  @ParaView_BINARY_DIR@/bin/debug/QVTK.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkClientServer.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkCommon.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkCommonCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkDICOMParser.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkexoIIc.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkexpat.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkFiltering.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkFilteringCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkfreetype.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkftgl.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkGenericFiltering.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkGenericFilteringCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkGeovis.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkGraphics.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkGraphicsCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkhdf5.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkHybrid.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkHybridCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkImaging.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkImagingCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkInfovis.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkInfovisCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkIO.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkIOCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkjpeg.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtklibxml2.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkmetaio.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkNetCDF.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkParallel.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkParallelCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkpng.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkproj4.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVCommandOptions.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVFilters.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVFiltersCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommon.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommonCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkPVServerManager.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkQtChart.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkRendering.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkRenderingCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtksys.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtktiff.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkverdict.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkViews.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkViewsCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkVolumeRendering.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkVolumeRenderingCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkWidgets.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkWidgetsCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkXdmf.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkXdmfCS.dll
-  @ParaView_BINARY_DIR@/bin/debug/vtkzlib.dll
-  @ParaView_BINARY_DIR@/bin/debug/Xdmf.dll
+  "@ParaView_BINARY_DIR@/bin/debug/KWCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/OverViewCore.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/QVTK.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/QtChart.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/QtTesting.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/Xdmf.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/pqComponents.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/pqCore.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/pqWidgets.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkClientServer.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkCommonCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkDICOMParser.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkFiltering.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkFilteringCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkGenericFiltering.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkGenericFilteringCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkGeovis.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkGraphics.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkGraphicsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkHybrid.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkHybridCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkIO.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkIOCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkImaging.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkImagingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkInfovis.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkInfovisCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkNetCDF.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVCommandOptions.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVFilters.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVFiltersCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommonCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkPVServerManager.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkParallel.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkParallelCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkQtChart.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkRendering.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkRenderingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkViews.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkViewsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkVolumeRendering.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkVolumeRenderingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkWidgets.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkWidgetsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkXdmf.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkXdmfCS.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkalglib.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkexoIIc.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkexpat.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkfreetype.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkftgl.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkhdf5.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkjpeg.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtklibxml2.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkmetaio.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkpng.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkproj4.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtksys.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtktiff.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkverdict.dll"
+  "@ParaView_BINARY_DIR@/bin/debug/vtkzlib.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
-  @ParaView_BINARY_DIR@/bin/release/KWCommon.dll
-  @ParaView_BINARY_DIR@/bin/release/OverViewCore.dll
-  @ParaView_BINARY_DIR@/bin/release/pqComponents.dll
-  @ParaView_BINARY_DIR@/bin/release/pqCore.dll
-  @ParaView_BINARY_DIR@/bin/release/pqWidgets.dll
-  @ParaView_BINARY_DIR@/bin/release/QtChart.dll
-  @ParaView_BINARY_DIR@/bin/release/QtTesting.dll
-  @ParaView_BINARY_DIR@/bin/release/QVTK.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkClientServer.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkCommon.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkCommonCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkDICOMParser.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkexoIIc.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkexpat.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkFiltering.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkFilteringCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkfreetype.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkftgl.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkGenericFiltering.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkGenericFilteringCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkGeovis.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkGraphics.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkGraphicsCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkhdf5.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkHybrid.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkHybridCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkImaging.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkImagingCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkInfovis.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkInfovisCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkIO.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkIOCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkjpeg.dll
-  @ParaView_BINARY_DIR@/bin/release/vtklibxml2.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkmetaio.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkNetCDF.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkParallel.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkParallelCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkpng.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkproj4.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVCommandOptions.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVFilters.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVFiltersCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVServerCommon.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVServerCommonCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkPVServerManager.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkQtChart.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkRendering.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkRenderingCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtksys.dll
-  @ParaView_BINARY_DIR@/bin/release/vtktiff.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkverdict.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkViews.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkViewsCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkVolumeRendering.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkVolumeRenderingCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkWidgets.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkWidgetsCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkXdmf.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkXdmfCS.dll
-  @ParaView_BINARY_DIR@/bin/release/vtkzlib.dll
-  @ParaView_BINARY_DIR@/bin/release/Xdmf.dll
+  "@ParaView_BINARY_DIR@/bin/release/KWCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/release/OverViewCore.dll"
+  "@ParaView_BINARY_DIR@/bin/release/QVTK.dll"
+  "@ParaView_BINARY_DIR@/bin/release/QtChart.dll"
+  "@ParaView_BINARY_DIR@/bin/release/QtTesting.dll"
+  "@ParaView_BINARY_DIR@/bin/release/Xdmf.dll"
+  "@ParaView_BINARY_DIR@/bin/release/pqComponents.dll"
+  "@ParaView_BINARY_DIR@/bin/release/pqCore.dll"
+  "@ParaView_BINARY_DIR@/bin/release/pqWidgets.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkClientServer.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkCommonCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkDICOMParser.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkFiltering.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkFilteringCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkGenericFiltering.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkGenericFilteringCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkGeovis.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkGraphics.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkGraphicsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkHybrid.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkHybridCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkIO.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkIOCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkImaging.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkImagingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkInfovis.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkInfovisCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkNetCDF.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVCommandOptions.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVFilters.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVFiltersCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVServerCommon.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVServerCommonCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkPVServerManager.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkParallel.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkParallelCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkQtChart.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkRendering.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkRenderingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkViews.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkViewsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkVolumeRendering.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkVolumeRenderingCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkWidgets.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkWidgetsCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkXdmf.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkXdmfCS.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkalglib.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkexoIIc.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkexpat.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkfreetype.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkftgl.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkhdf5.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkjpeg.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtklibxml2.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkmetaio.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkpng.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkproj4.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtksys.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtktiff.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkverdict.dll"
+  "@ParaView_BINARY_DIR@/bin/release/vtkzlib.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
@@ -294,18 +304,18 @@ INSTALL(PROGRAMS
 IF(PARAVIEW_USE_ICE_T)
 
   INSTALL(PROGRAMS
-    @ParaView_BINARY_DIR@/bin/debug/icet.dll
-    @ParaView_BINARY_DIR@/bin/debug/icet_mpi.dll
-    @ParaView_BINARY_DIR@/bin/debug/icet_strategies.dll
+    "@ParaView_BINARY_DIR@/bin/debug/icet.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/icet_mpi.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/icet_strategies.dll"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    @ParaView_BINARY_DIR@/bin/release/icet.dll
-    @ParaView_BINARY_DIR@/bin/release/icet_mpi.dll
-    @ParaView_BINARY_DIR@/bin/release/icet_strategies.dll
+    "@ParaView_BINARY_DIR@/bin/release/icet.dll"
+    "@ParaView_BINARY_DIR@/bin/release/icet_mpi.dll"
+    "@ParaView_BINARY_DIR@/bin/release/icet_strategies.dll"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -317,7 +327,7 @@ ENDIF(PARAVIEW_USE_ICE_T)
 IF(PARAVIEW_ENABLE_PYTHON)
 
   FIND_FILE(OVERVIEW_PYTHON_DLL python25.dll
-    c:/windows/system32
+    "c:/windows/system32"
     DOC "Enter the full path to python25.dll - this file will be included in the OverView installer."
     )
 
@@ -328,44 +338,44 @@ IF(PARAVIEW_ENABLE_PYTHON)
     )
 
   INSTALL(PROGRAMS
-    @ParaView_BINARY_DIR@/bin/debug/QtPython.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkFilteringPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkGenericFilteringPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkGeovisPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkGraphicsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkHybridPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkImagingPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkIOPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkParallelPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkPVPythonInterpretor.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommonPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkPVServerManagerPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkViewsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkVolumeRenderingPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkWidgetsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/debug/vtkXdmfPython.dll
+    "@ParaView_BINARY_DIR@/bin/debug/QtPython.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkFilteringPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkGenericFilteringPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkGeovisPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkGraphicsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkHybridPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkImagingPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkIOPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkParallelPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkPVPythonInterpretor.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkPVServerCommonPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkPVServerManagerPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkViewsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkVolumeRenderingPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkWidgetsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/debug/vtkXdmfPython.dll"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    @ParaView_BINARY_DIR@/bin/release/QtPython.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkFilteringPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkGenericFilteringPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkGeovisPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkGraphicsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkHybridPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkImagingPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkIOPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkParallelPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkPVPythonInterpretor.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkPVServerCommonPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkPVServerManagerPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkViewsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkVolumeRenderingPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkWidgetsPythonD.dll
-    @ParaView_BINARY_DIR@/bin/release/vtkXdmfPython.dll
+    "@ParaView_BINARY_DIR@/bin/release/QtPython.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkFilteringPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkGenericFilteringPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkGeovisPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkGraphicsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkHybridPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkImagingPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkIOPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkParallelPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkPVPythonInterpretor.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkPVServerCommonPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkPVServerManagerPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkViewsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkVolumeRenderingPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkWidgetsPythonD.dll"
+    "@ParaView_BINARY_DIR@/bin/release/vtkXdmfPython.dll"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -383,14 +393,14 @@ WHILE(PLUGIN LESS ${PLUGIN_COUNT})
   LIST(GET OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN} PLUGIN_DIRECTORY)
 
   INSTALL(PROGRAMS
-    ${PLUGIN_DIRECTORY}/debug/${PLUGIN_FILE}
+    "${PLUGIN_DIRECTORY}/debug/${PLUGIN_FILE}"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Debug
     )
 
   INSTALL(PROGRAMS
-    ${PLUGIN_DIRECTORY}/release/${PLUGIN_FILE}
+    "${PLUGIN_DIRECTORY}/release/${PLUGIN_FILE}"
     DESTINATION bin
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     CONFIGURATIONS Release
@@ -402,14 +412,14 @@ ENDWHILE()
 
 # Install OverView binaries ...
 INSTALL(PROGRAMS
-  ${EXECUTABLE_OUTPUT_PATH}/debug/${OVERVIEW_BRANDED_APPLICATION_TITLE}.exe
+  "${EXECUTABLE_OUTPUT_PATH}/debug/${OVERVIEW_BRANDED_APPLICATION_TITLE}.exe"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
-  ${EXECUTABLE_OUTPUT_PATH}/release/${OVERVIEW_BRANDED_APPLICATION_TITLE}.exe
+  "${EXECUTABLE_OUTPUT_PATH}/release/${OVERVIEW_BRANDED_APPLICATION_TITLE}.exe"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
