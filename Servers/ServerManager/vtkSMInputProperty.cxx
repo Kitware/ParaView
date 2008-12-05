@@ -20,12 +20,12 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.23");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.24");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -347,9 +347,15 @@ unsigned int vtkSMInputProperty::GetUncheckedOutputPortForConnection(
 
 //---------------------------------------------------------------------------
 int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
-                                  vtkSMStateLoaderBase* loader, 
+                                  vtkSMProxyLocator* loader, 
                                   int loadLastPushedValues/*=0*/)
 {
+  if (!loader)
+    {
+    // If no loader, leave state unchanged.
+    return 1;
+    }
+
   // NOTE: This method by-passes LoadState() of vtkSMProxyProperty and
   // re-implements a lot of it's functionality to add output ports. 
   // Therefore, care must be taken to keep the two in sync.
@@ -396,11 +402,10 @@ int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
         currentElement->GetScalarAttribute("output_port", &outputPort);
         if (id)
           {
-          vtkSMProxy* proxy = loader->NewProxy(id);
+          vtkSMProxy* proxy = loader->LocateProxy(id);
           if (proxy)
             {
             this->AddInputConnection(proxy, outputPort, 0);
-            proxy->Delete();
             }
           else
             {

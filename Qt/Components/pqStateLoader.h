@@ -35,22 +35,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqComponentsExport.h"
-#include "vtkSMPQStateLoader.h"
+#include "vtkSMStateLoader.h"
 
 class pqMainWindowCore;
 class pqStateLoaderInternal;
 
 /// State loader which makes it possible to load
 /// additional GUI related state (including multiview layout).
-class PQCOMPONENTS_EXPORT pqStateLoader : public vtkSMPQStateLoader
+/// This also ensures that the time-keeper and animation scene proxies are not
+/// recreated (but existing ones are used).
+class PQCOMPONENTS_EXPORT pqStateLoader : public vtkSMStateLoader
 {
 public:
   static pqStateLoader* New();
-  vtkTypeRevisionMacro(pqStateLoader, vtkSMPQStateLoader);
+  vtkTypeRevisionMacro(pqStateLoader, vtkSMStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  /// Loads the GUI as well as the ServerManager state.
-  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
   /// Set the main window core. The core is GUI side manager.
   void SetMainWindowCore(pqMainWindowCore* core);
@@ -58,18 +57,23 @@ protected:
   pqStateLoader();
   ~pqStateLoader();
 
+  /// Load the state.
+  virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
+
+  /// Description:
+  /// Locate the XML for the proxy with the given id. Overridden to filter the
+  /// XML for certain proxies.
+  virtual vtkPVXMLElement* LocateProxyElement(int id);
+
   /// Overridden so that animation scene proxy is not recreated types.
-  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, vtkIdType cid);
 
   /// Overridden to avoid registering the reused animation scene twice.
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
 
-  /// This method is called to load a proxy state. Overloaded to make sure that 
-  /// when states are loaded for existsing render modules, the displays already present
-  /// in those render modules are not affected.
-  virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
-
+  /// Overridden to process pq_helper_proxies groups.
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 
   /// Finds helper proxies for any pqProxies and assigns them accordingly.

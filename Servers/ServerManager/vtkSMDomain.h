@@ -30,7 +30,7 @@
 #include "vtkClientServerID.h" // needed for saving animation in batch script
 
 class vtkSMProperty;
-class vtkSMStateLoaderBase;
+class vtkSMProxyLocator;
 class vtkPVXMLElement;
 //BTX
 struct vtkSMDomainInternals;
@@ -94,7 +94,7 @@ protected:
 
   // Load the state of the domain from the XML.
   virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement), 
-    vtkSMStateLoaderBase* vtkNotUsed(loader)) { return 1;  }
+    vtkSMProxyLocator* vtkNotUsed(loader)) { return 1;  }
 
 //BTX
   friend class vtkSMProperty;

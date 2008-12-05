@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMStateLoaderBase.h"
 
 #include <QList>
 #include <QMap>
@@ -119,26 +118,6 @@ public:
     return Key();
     }
 };
-
-class pqSimpleStateLoader : public vtkSMStateLoaderBase
-{
-public:
-  static pqSimpleStateLoader* New();
-  vtkTypeRevisionMacro(pqSimpleStateLoader, vtkSMStateLoaderBase);
-
-  int LoadState(vtkPVXMLElement* xml, vtkSMProxy* proxy)
-    {
-    return this->LoadProxyState(xml, proxy);
-    }
-
-protected:
-  virtual void CreatedNewProxy(int, vtkSMProxy* )
-    {
-    qCritical() << "Invalid XML when loading default lookup table state.";
-    }
-};
-vtkStandardNewMacro(pqSimpleStateLoader);
-vtkCxxRevisionMacro(pqSimpleStateLoader, "1.14");
 
 //-----------------------------------------------------------------------------
 pqPQLookupTableManager::pqPQLookupTableManager(QObject* _p)
@@ -264,9 +243,7 @@ void pqPQLookupTableManager::setDefaultState(vtkSMProxy* lutProxy)
 
   if (this->Internal->DefaultLUTElement)
     {
-    pqSimpleStateLoader* loader = pqSimpleStateLoader::New();
-    loader->LoadState(this->Internal->DefaultLUTElement, lutProxy);
-    loader->Delete();
+    lutProxy->LoadState(this->Internal->DefaultLUTElement, NULL);
     }
 
   lutProxy->UpdateVTKObjects();

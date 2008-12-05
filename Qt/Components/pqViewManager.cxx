@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMUtilities.h"
 
 // Qt includes.
@@ -1049,7 +1049,7 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
 
 //-----------------------------------------------------------------------------
 bool pqViewManager::loadState(vtkPVXMLElement* rwRoot, 
-  vtkSMStateLoaderBase* loader)
+  vtkSMProxyLocator* locator)
 {
   if (!rwRoot || !rwRoot->GetName() || strcmp(rwRoot->GetName(), "ViewManager"))
     {
@@ -1096,7 +1096,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
       int id = 0;
       elem->GetScalarAttribute("view_module", &id);
       vtkSmartPointer<vtkSMProxy> viewModule;
-      viewModule.TakeReference(loader->NewProxy(id));
+      viewModule = locator->LocateProxy(id);
       if (!viewModule.GetPointer())
         {
         qCritical() << "Failed to locate view module mentioned in state!";

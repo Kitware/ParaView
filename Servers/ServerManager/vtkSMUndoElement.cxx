@@ -17,25 +17,25 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 
-vtkCxxRevisionMacro(vtkSMUndoElement, "1.4");
+vtkCxxRevisionMacro(vtkSMUndoElement, "1.5");
 vtkCxxSetObjectMacro(vtkSMUndoElement, XMLElement, vtkPVXMLElement);
-vtkCxxSetObjectMacro(vtkSMUndoElement, StateLoader, vtkSMStateLoaderBase);
+vtkCxxSetObjectMacro(vtkSMUndoElement, ProxyLocator, vtkSMProxyLocator);
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::vtkSMUndoElement()
 {
   this->ConnectionID  = 
     vtkProcessModuleConnectionManager::GetNullConnectionID();
   this->XMLElement = 0;
-  this->StateLoader = 0;
+  this->ProxyLocator = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMUndoElement::~vtkSMUndoElement()
 {
   this->SetXMLElement(0);
-  this->SetStateLoader(0);
+  this->SetProxyLocator(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -59,6 +59,6 @@ void vtkSMUndoElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ConnectionID: " << this->ConnectionID << endl;
-  os << indent << "StateLoader: " << this->StateLoader << endl;
+  os << indent << "ProxyLocator: " << this->ProxyLocator << endl;
 }
 

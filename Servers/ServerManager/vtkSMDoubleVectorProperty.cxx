@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.44");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.45");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -397,7 +397,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMStateLoaderBase* loader, int loadLastPushedValues/*=0*/)
+  vtkSMProxyLocator* loader, int loadLastPushedValues/*=0*/)
 {
   int prevImUpdate = this->ImmediateUpdate;
 

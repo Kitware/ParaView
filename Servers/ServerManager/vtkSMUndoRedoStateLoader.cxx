@@ -18,6 +18,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyModificationUndoElement.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyRegisterUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMUpdateInformationUndoElement.h"
@@ -32,14 +33,14 @@ class vtkSMUndoRedoStateLoaderVector :
 
 
 vtkStandardNewMacro(vtkSMUndoRedoStateLoader);
-vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.3");
+vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.4");
 vtkCxxSetObjectMacro(vtkSMUndoRedoStateLoader, RootElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
 {
   this->RegisteredElements = new vtkSMUndoRedoStateLoaderVector;
   this->RootElement = 0;
-  this->UseExistingProxies = true;
+  this->ProxyLocator = 0;
 
   vtkSMUndoElement* elem = vtkSMProxyRegisterUndoElement::New();
   this->RegisterElement(elem);
@@ -114,14 +115,14 @@ unsigned int vtkSMUndoRedoStateLoader::GetNumberOfRegisteredElements()
 
 //-----------------------------------------------------------------------------
 vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
-  vtkPVXMLElement* rootElement)
+  vtkPVXMLElement* rootElement,
+  vtkSMProxyLocator* locator)
 {
   if (!rootElement)
     {
     vtkErrorMacro("Cannot load state from (null) root element.");
     return 0;
     }
-
 
   if (!rootElement->GetName() || strcmp(rootElement->GetName(), "UndoSet") != 0)
     {
@@ -130,6 +131,7 @@ vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
     }
 
   this->SetRootElement(rootElement);
+  this->ProxyLocator = locator;
 
   vtkUndoSet* undoSet = vtkUndoSet::New();
   unsigned int numElems = rootElement->GetNumberOfNestedElements();
@@ -148,7 +150,7 @@ vtkUndoSet* vtkSMUndoRedoStateLoader::LoadUndoRedoSet(
       elem->Delete();
       }
     }
-
+  this->ProxyLocator = 0;
   return undoSet;
 }
 
@@ -199,14 +201,21 @@ vtkUndoElement* vtkSMUndoRedoStateLoader::HandleTag(vtkPVXMLElement* root)
     if ((*iter)->CanLoadState(root))
       {
       vtkSMUndoElement* elem = (*iter)->NewInstance();
-      elem->SetConnectionID(this->ConnectionID);
-      elem->SetStateLoader(this);
+      elem->SetProxyLocator(this->ProxyLocator);
       elem->LoadState(root);
       return elem;
       }
     }
   vtkWarningMacro("Cannot handle element : " << root->GetName());
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoRedoStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
+{
+  vtkClientServerID csid;
+  csid.ID = static_cast<vtkTypeUInt32>(id);
+  proxy->SetSelfID(csid);
 }
 
 //-----------------------------------------------------------------------------

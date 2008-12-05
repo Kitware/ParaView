@@ -17,10 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundSourceProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCompoundProxyDefinitionLoader);
-vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.4");
+vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
@@ -39,14 +40,20 @@ vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::HandleDefinition(
   vtkPVXMLElement* rootElement)
 {
   vtkSMCompoundSourceProxy* result = vtkSMCompoundSourceProxy::New();
+
   this->RootElement = rootElement;
-  if (result->LoadDefinition(rootElement, this))
+  vtkSMProxyLocator* locator = vtkSMProxyLocator::New();
+  locator->SetDeserializer(this);
+  int retVal = result->LoadDefinition(rootElement, locator);
+  locator->SetDeserializer(0);
+  locator->Delete();
+  this->RootElement = 0;
+
+  if (retVal)
     {
-    this->RootElement = 0;
     return result;
     }
   result->Delete();
-  this->RootElement = 0;
   return 0;
 }
 
@@ -102,15 +109,11 @@ vtkSMCompoundSourceProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
     return result;
     }
 
-  this->ClearCreatedProxies();
-
   if (rootElement->GetName() &&
       strcmp(rootElement->GetName(), "CompoundSourceProxy") == 0)
     {
     result = this->HandleDefinition(rootElement);
     }
-
-  this->ClearCreatedProxies();
 
   return result;
 }

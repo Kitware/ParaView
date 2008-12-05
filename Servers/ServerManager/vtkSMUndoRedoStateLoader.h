@@ -35,26 +35,28 @@
 #ifndef __vtkSMUndoRedoStateLoader_h
 #define __vtkSMUndoRedoStateLoader_h
 
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMDeserializer.h"
 
 class vtkPVXMLElement;
+class vtkSMProxyLocator;
 class vtkSMUndoElement;
 class vtkSMUndoRedoStateLoaderVector;
 class vtkUndoElement;
 class vtkUndoSet;
 
-class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMStateLoaderBase
+class VTK_EXPORT vtkSMUndoRedoStateLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMUndoRedoStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMUndoRedoStateLoader, vtkSMStateLoaderBase);
+  vtkTypeRevisionMacro(vtkSMUndoRedoStateLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Loads an Undo/Redo set state returns a new instance of vtkUndoSet.
   // This method allocates a new vtkUndoSet and it is the responsibility 
   // of the caller to \c Delete it.
-  vtkUndoSet* LoadUndoRedoSet(vtkPVXMLElement* rootElement);
+  vtkUndoSet* LoadUndoRedoSet(vtkPVXMLElement* rootElement,
+    vtkSMProxyLocator* locator);
 
   // Description:
   // The loader creates a vtkSMUndoElement subclass for every XML entry
@@ -83,27 +85,26 @@ protected:
   vtkSMUndoRedoStateLoader();
   ~vtkSMUndoRedoStateLoader();
 
-  virtual vtkUndoElement* HandleTag(vtkPVXMLElement* root);
-
   // Description:
-  // Return the xml element for the state of the proxy with the given id.
-  // This is used by NewProxy() when the proxy with the given id
-  // is not located in the internal CreatedProxies map.
+  // Locate the XML for the proxy with the given id.
   virtual vtkPVXMLElement* LocateProxyElement(int id);
 
   // Description:
-  // Called after a new proxy is created.
-  // Nothing to do here.
-  virtual void CreatedNewProxy(int vtkNotUsed(id), vtkSMProxy* vtkNotUsed(proxy))
-    { }
+  // Called after a new proxy has been created.
+  // Overridden to set the SelfID for the new proxy to match the id. This
+  // ensures that the reference to this proxy is future undo-elements still
+  // remains valid.
+  virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
 
-  vtkPVXMLElement* RootElement;
+  vtkUndoElement* HandleTag(vtkPVXMLElement* root);
+
   void SetRootElement(vtkPVXMLElement*);
+  vtkPVXMLElement* RootElement;
 
+  vtkSMProxyLocator* ProxyLocator;
 private:
   vtkSMUndoRedoStateLoader(const vtkSMUndoRedoStateLoader&); // Not implemented.
   void operator=(const vtkSMUndoRedoStateLoader&); // Not implemented.
-
   vtkSMUndoRedoStateLoaderVector* RegisteredElements;
 };
 

@@ -31,6 +31,7 @@
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
@@ -94,7 +95,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.76");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.77");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1116,7 +1117,7 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
     {
     spLoader = loader;
     }
-  spLoader->SetConnectionID(id);
+  spLoader->GetProxyLocator()->SetConnectionID(id);
   spLoader->LoadState(rootElement);
 }
 

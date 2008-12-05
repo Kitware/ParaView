@@ -98,7 +98,7 @@ protected:
 
   // Description:
   // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator);
 private:
   vtkSMProxyLinkInternals* Internals;
 

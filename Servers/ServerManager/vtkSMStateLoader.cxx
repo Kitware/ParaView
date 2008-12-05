@@ -15,24 +15,26 @@
 #include "vtkSMStateLoader.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMCameraLink.h"
 #include "vtkSMPropertyLink.h"
-#include "vtkSMSelectionLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
-#include "vtkSMCameraLink.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMSelectionLink.h"
 #include "vtkSMStateVersionController.h"
+#include "vtkSMViewProxy.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.29");
-vtkCxxSetObjectMacro(vtkSMStateLoader, RootElement, vtkPVXMLElement);
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.30");
+vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
 {
@@ -51,23 +53,59 @@ struct vtkSMStateLoaderInternals
 vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
-  this->RootElement = 0;
-  this->ConnectionID = 
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID();
-  this->ReviveProxies = 0;
+  this->ServerManagerStateElement = 0;
+  this->ProxyLocator = vtkSMProxyLocator::New();
 }
 
 //---------------------------------------------------------------------------
 vtkSMStateLoader::~vtkSMStateLoader()
 {
+  this->SetProxyLocator(0);
+  this->ServerManagerStateElement = 0;
+  this->ProxyLocator = 0;
   delete this->Internal;
-  this->SetRootElement(0);
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMStateLoader::GetViewXMLName (int connectionID,
+  const char *xml_name)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
+    pxm->GetPrototypeProxy("views", xml_name));
+  if (prototype)
+    {
+    // Generally each view type is different class of view eg. bar char view, line
+    // plot view etc. However in some cases a different view types are indeed the
+    // same class of view the only different being that each one of them works in
+    // a different configuration eg. "RenderView" in builin mode, 
+    // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+    // determine what type of view needs to be created for the given class. 
+    return prototype->GetSuggestedViewType(connectionID);
+    }
+
+  return xml_name;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::CreateProxy(
+  const char* xml_group, const char* xml_name, vtkIdType cid)
+{
+  // Check if the proxy requested is a view module.
+  if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
+    {
+    return this->Superclass::CreateProxy(xml_group,
+      this->GetViewXMLName(cid, xml_name), cid);
+    }
+
+  // If all else fails, let the superclass handle it:
+  return this->Superclass::CreateProxy(xml_group, xml_name, cid);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
 {
-  if (!this->ReviveProxies)
+  if (!this->ProxyLocator->GetReviveProxies())
     {
     // Ensure that the proxy is created before it is registered, unless we are
     // reviving the server-side server manager, which needs special handling.
@@ -106,7 +144,7 @@ void vtkSMStateLoader::RegisterProxyInternal(const char* group,
 vtkPVXMLElement* vtkSMStateLoader::LocateProxyElement(int id)
 {
   return this->LocateProxyElementInternal(
-    this->RootElement, id);
+    this->ServerManagerStateElement, id);
 }
 
 //---------------------------------------------------------------------------
@@ -162,7 +200,7 @@ int vtkSMStateLoader::BuildProxyCollectionInformation(
   const char* groupName = collectionElement->GetAttribute("name");
   if (!groupName)
     {
-    vtkErrorMacro("Requied attribute name is missing.");
+    vtkErrorMacro("Required attribute name is missing.");
     return 0;
     }
   unsigned int numElems = collectionElement->GetNumberOfNestedElements();
@@ -218,7 +256,7 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
         continue;
         }
 
-      vtkSMProxy* proxy = this->NewProxy(id);
+      vtkSMProxy* proxy = this->ProxyLocator->LocateProxy(id);
       if (!proxy)
         {
         continue;
@@ -233,7 +271,6 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
         }
       // No need to register
       //pm->RegisterProxy(groupName, name, proxy);
-      proxy->Delete();
       }
     }
 
@@ -304,7 +341,7 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
         }
       if (link)
         {
-        if (!link->LoadState(currentElement, this))
+        if (!link->LoadState(currentElement, this->ProxyLocator))
           {
           return 0;
           }
@@ -329,21 +366,35 @@ bool vtkSMStateLoader::VerifyXMLVersion(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
+int vtkSMStateLoader::LoadState(vtkPVXMLElement* elem)
 {
-  if (!rootElement)
+  if (!elem)
     {
     vtkErrorMacro("Cannot load state from (null) root element.");
     return 0;
     }
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
-  if (!pm)
+  if (!this->GetProxyManager())
     {
     vtkErrorMacro("Cannot load state without a proxy manager.");
     return 0;
     }
 
+  if (!this->ProxyLocator)
+    {
+    vtkErrorMacro("Please set the locator correctly.");
+    return 0;
+    }
+
+  this->ProxyLocator->SetDeserializer(this);
+  int ret = this->LoadStateInternal(elem);
+  this->ProxyLocator->SetDeserializer(0);
+  return ret;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
+{
   if (rootElement->GetName() && 
     strcmp(rootElement->GetName(),"ServerManagerState") != 0)
     {
@@ -364,16 +415,12 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
     }
   convertor->Delete();
 
-
-  this->SetRootElement(rootElement);
-
   if (!this->VerifyXMLVersion(rootElement))
     {
     return 0;
     }
 
-  this->ClearCreatedProxies();
-  this->Internal->RegistrationInformation.clear();
+  this->ServerManagerStateElement = rootElement;
 
   unsigned int numElems = rootElement->GetNumberOfNestedElements();
   unsigned int i;
@@ -427,13 +474,9 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
       }
     }
 
-  if (!keep_proxies)
-    {
-    this->ClearCreatedProxies();
-    }
-
-  this->SetRootElement(0);
-
+  // Clear internal data structures.
+  this->Internal->RegistrationInformation.clear();
+  this->ServerManagerStateElement = 0; 
   return 1;
 }
 
@@ -441,6 +484,4 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
 void vtkSMStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "ConnectionID: " << this->ConnectionID << endl;
-  os << indent << "ReviveProxies: " << this->ReviveProxies << endl;
 }

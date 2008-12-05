@@ -20,6 +20,7 @@
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMProxyInternals.h"
+#include "vtkSMProxyLocator.h"
 
 #include <vtkstd/list>
 #include <vtkstd/vector>
@@ -46,7 +47,7 @@ public:
 
 
 vtkStandardNewMacro(vtkSMCompoundSourceProxy);
-vtkCxxRevisionMacro(vtkSMCompoundSourceProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCompoundSourceProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMCompoundSourceProxy::vtkSMCompoundSourceProxy()
 {
@@ -261,10 +262,9 @@ vtkPVXMLElement* vtkSMCompoundSourceProxy::SaveRevivalState(vtkPVXMLElement* roo
 }
 
 //----------------------------------------------------------------------------
-int vtkSMCompoundSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
-  vtkSMStateLoaderBase* loader)
+int vtkSMCompoundSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
 {
-  if (!this->Superclass::LoadRevivalState(revivalElem, loader))
+  if (!this->Superclass::LoadRevivalState(revivalElem))
     {
     return 0;
     }
@@ -276,7 +276,7 @@ int vtkSMCompoundSourceProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
 
 //----------------------------------------------------------------------------
 int vtkSMCompoundSourceProxy::LoadDefinition(vtkPVXMLElement* proxyElement,
-  vtkSMStateLoaderBase* loader)
+  vtkSMProxyLocator* locator)
 {
   this->ReadCoreXMLAttributes(proxyElement);
 
@@ -298,13 +298,11 @@ int vtkSMCompoundSourceProxy::LoadDefinition(vtkPVXMLElement* proxyElement,
           {
           continue;
           }
-        vtkSMProxy* subProxy = loader->NewProxyFromElement(
-          currentElement, currentId);
+        vtkSMProxy* subProxy = locator->LocateProxy(currentId);
         if (subProxy)
           {
           subProxy->SetConnectionID(this->ConnectionID);
           this->AddProxy(compoundName, subProxy);
-          subProxy->Delete();
           }
         }
       }

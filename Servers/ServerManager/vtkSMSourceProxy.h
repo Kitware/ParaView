@@ -154,8 +154,7 @@ public:
   // object IDs.
   // Overridden to save information pertinant to reviving the output ports.
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
-  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
-    vtkSMStateLoaderBase* loader);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
 
   // Description:
   // Creates extract selection proxies for each output port if not already

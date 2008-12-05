@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 
 #include <QList>
 #include <QString>
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqHelperProxyRegisterUndoElement);
-vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.4");
+vtkCxxRevisionMacro(pqHelperProxyRegisterUndoElement, "1.5");
 //-----------------------------------------------------------------------------
 pqHelperProxyRegisterUndoElement::pqHelperProxyRegisterUndoElement()
 {
@@ -102,14 +102,13 @@ int pqHelperProxyRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSmartPointer<vtkSMStateLoaderBase> loader = 
-   this->GetStateLoader(); 
+  vtkSmartPointer<vtkSMProxyLocator> locator = 
+   this->GetProxyLocator(); 
 
-  loader->SetConnectionID(this->GetConnectionID());
-  vtkSmartPointer<vtkSMProxy> proxy;
-  proxy.TakeReference(loader->NewProxy(id));
+  locator->SetConnectionID(this->GetConnectionID());
+  vtkSMProxy* proxy = locator->LocateProxy(id);
 
-  if (!proxy.GetPointer())
+  if (!proxy)
     {
     vtkErrorMacro("Failed to locate the proxy.");
     return 0;
@@ -141,9 +140,8 @@ int pqHelperProxyRegisterUndoElement::Redo()
       continue;
       }
 
-    vtkSmartPointer<vtkSMProxy> helper;
-    helper.TakeReference(loader->NewProxy(id));
-    if (!helper.GetPointer())
+    vtkSMProxy* helper = locator->LocateProxy(id);
+    if (!helper)
       {
       vtkErrorMacro("Failed to locate the helper.");
       continue;

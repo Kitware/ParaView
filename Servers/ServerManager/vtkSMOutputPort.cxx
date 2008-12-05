@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.8");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -107,10 +107,9 @@ vtkPVXMLElement* vtkSMOutputPort::SaveRevivalState(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMOutputPort::LoadRevivalState(vtkPVXMLElement* revivalElem, 
-  vtkSMStateLoaderBase* loader)
+int vtkSMOutputPort::LoadRevivalState(vtkPVXMLElement* revivalElem)
 {
-  if (!this->Superclass::LoadRevivalState(revivalElem, loader))
+  if (!this->Superclass::LoadRevivalState(revivalElem))
     {
     return 0;
     }

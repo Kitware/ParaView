@@ -27,8 +27,8 @@
 #include "vtkSMDocumentation.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMStateLoaderBase.h"
 
 #include "vtkSMProxyInternals.h"
 
@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.108");
+vtkCxxRevisionMacro(vtkSMProxy, "1.109");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -2130,8 +2130,8 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement, 
-                          vtkSMStateLoaderBase* loader)
+int vtkSMProxy::LoadState(
+  vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
   int servers =0;
@@ -2162,18 +2162,19 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
         vtkDebugMacro("Property " << prop_name<< " does not exist.");
         continue;
         }
-      if (!property->LoadState(currentElement, loader))
+      if (!property->LoadState(currentElement, locator))
         {
         return 0;
         }
       }
     else if (strcmp(name, "SubProxy") == 0)
       {
-      this->LoadSubProxyState(currentElement, loader);
+      this->LoadSubProxyState(currentElement, locator);
       }
-    else if (strcmp(name, "RevivalState") == 0 && loader->GetReviveProxies())
+    else if (strcmp(name, "RevivalState") == 0 &&
+      locator && locator->GetReviveProxies())
       {
-      if (!this->LoadRevivalState(currentElement, loader))
+      if (!this->LoadRevivalState(currentElement))
         {
         return 0;
         }
@@ -2183,8 +2184,7 @@ int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
-  vtkSMStateLoaderBase* loader)
+int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem)
 {
   if (this->ObjectsCreated)
     {
@@ -2246,8 +2246,7 @@ int vtkSMProxy::LoadRevivalState(vtkPVXMLElement* revivalElem,
                       << ". Cannot revive the subproxy.");
         return 0;
         }
-      if (!subProxy->LoadRevivalState(
-            currentElement->GetNestedElement(0), loader))
+      if (!subProxy->LoadRevivalState(currentElement->GetNestedElement(0)))
         {
         return 0;
         }
@@ -2347,7 +2346,7 @@ void vtkSMProxy::SaveSubProxyState(vtkPVXMLElement* root)
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
-  vtkSMStateLoaderBase* loader)
+  vtkSMProxyLocator* locator)
 {
   const char* name = subproxyElement->GetAttribute("name");
   if (name)
@@ -2363,7 +2362,7 @@ void vtkSMProxy::LoadSubProxyState(vtkPVXMLElement* subproxyElement,
         vtkPVXMLElement* nested = subproxyElement->GetNestedElement(cc);
         if (nested->GetName() && strcmp(nested->GetName(), "SubProxy")==0)
           {
-          proxy->LoadSubProxyState(nested, loader);
+          proxy->LoadSubProxyState(nested, locator);
           }
         }
       }

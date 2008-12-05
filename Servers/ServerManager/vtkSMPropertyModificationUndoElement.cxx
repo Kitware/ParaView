@@ -18,10 +18,10 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
-vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.5");
+vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMPropertyModificationUndoElement::vtkSMPropertyModificationUndoElement()
 {
@@ -46,21 +46,20 @@ int vtkSMPropertyModificationUndoElement::Undo()
   this->XMLElement->GetScalarAttribute("id", &proxy_id);
   const char* property_name = this->XMLElement->GetAttribute("name");
 
-  vtkSMStateLoaderBase* loader = this->GetStateLoader();
-  if (!loader)
+  vtkSMProxyLocator* locator = this->GetProxyLocator();
+  if (!locator)
     {
-    vtkErrorMacro("No loader set. Cannot Undo.");
+    vtkErrorMacro("No locator set. Cannot Undo.");
     return 0;
     }
-  vtkSMProxy* proxy = loader->NewProxy(proxy_id);
+  vtkSMProxy* proxy = locator->LocateProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
   int ret = 0;
   if (property)
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
-      loader, 1);
+      locator, 1);
     }
-  proxy->Delete();
   return ret;
 }
 
@@ -76,25 +75,22 @@ int vtkSMPropertyModificationUndoElement::Redo()
   this->XMLElement->GetScalarAttribute("id", &proxy_id);
   const char* property_name = this->XMLElement->GetAttribute("name");
 
-  vtkSMStateLoaderBase* loader = this->GetStateLoader();
-  if (!loader)
+  vtkSMProxyLocator* locator = this->GetProxyLocator();
+  if (!locator)
     {
-    vtkErrorMacro("No loader set. Cannot Redo.");
+    vtkErrorMacro("No locator set. Cannot Redo.");
     return 0;
     }
-
-  vtkSMProxy* proxy = loader->NewProxy(proxy_id);
+  vtkSMProxy* proxy = locator->LocateProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
   int ret = 0;
   if (property)
     {
     ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
-      loader, 0);
+      locator, 0);
     }
-  proxy->Delete();
   return ret;
 }
-
 
 //-----------------------------------------------------------------------------
 bool vtkSMPropertyModificationUndoElement::CanLoadState(vtkPVXMLElement* elem)

@@ -125,8 +125,7 @@ public:
   // Overridden to avoid saving information about output ports, since the output
   // ports of a compound proxy don't really belong to the compound proxy itself.
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
-  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
-    vtkSMStateLoaderBase* loader);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
 
 //BTX
 protected:
@@ -148,8 +147,7 @@ protected:
 
   // Description:
   // Load the compound proxy definition.
-  int LoadDefinition(vtkPVXMLElement* proxyElement,
-    vtkSMStateLoaderBase* loader);
+  int LoadDefinition(vtkPVXMLElement* proxyElement, vtkSMProxyLocator* locator);
 
 private:
   vtkSMCompoundSourceProxy(const vtkSMCompoundSourceProxy&); // Not implemented

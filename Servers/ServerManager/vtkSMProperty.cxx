@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.59");
+vtkCxxRevisionMacro(vtkSMProperty, "1.60");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -467,7 +467,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, 
-  vtkSMStateLoaderBase* loader, int vtkNotUsed(loadLastPushedValues))
+  vtkSMProxyLocator* loader, int vtkNotUsed(loadLastPushedValues))
 {
   // Process the domains.
   unsigned int numElems = propertyElement->GetNumberOfNestedElements();

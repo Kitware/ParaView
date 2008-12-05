@@ -103,7 +103,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqLookmarkStateLoader);
-vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.23");
+vtkCxxRevisionMacro(pqLookmarkStateLoader, "1.24");
 //-----------------------------------------------------------------------------
 pqLookmarkStateLoader::pqLookmarkStateLoader()
 {
@@ -194,7 +194,7 @@ void pqLookmarkStateLoader::AddChildItems(vtkPVXMLElement *elem, QStandardItem *
 
 
 //---------------------------------------------------------------------------
-int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
+int pqLookmarkStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
 {
   pqServerManagerModel *model = pqApplicationCore::instance()->getServerManagerModel();
 
@@ -216,18 +216,8 @@ int pqLookmarkStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_prox
     return 0;
     }
 
-  // We do this because our superclass expects the "ServerManagerState" XML
-  // element to be a child of the root element, not the root element itself.
-  vtkPVXMLElement *newRootElement = vtkPVXMLElement::New();
-  newRootElement->AddNestedElement(rootElement);
-
-  int returnValue = this->Superclass::LoadState(newRootElement,keep_proxies);
-
-  newRootElement->Delete();
-
-  return returnValue;
+  return this->Superclass::LoadStateInternal(rootElement);
 }
-
 
 //---------------------------------------------------------------------------
 int pqLookmarkStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
@@ -283,22 +273,22 @@ int pqLookmarkStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElem
 
 
 //---------------------------------------------------------------------------
-vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
-  vtkPVXMLElement* proxyElement, int id)
+vtkSMProxy* pqLookmarkStateLoader::NewProxy(int id, vtkSMProxyLocator* locator)
 {
-  if(!proxyElement)
+  vtkPVXMLElement* proxyElement = this->LocateProxyElement(id);
+  if (!proxyElement)
     {
     return 0;
     }
 
-  vtkSMProxy* proxy = 0;
-
-  if( (proxy = this->GetCreatedProxy(id)) )
+  const char* group = proxyElement->GetAttribute("group");
+  const char* type = proxyElement->GetAttribute("type");
+  if (!type || !group)
     {
-    proxy->Register(this);
-    return proxy;
+    vtkErrorMacro("Could not create proxy from element, missing 'type'.");
+    return 0;
     }
-
+  
   if (strcmp(proxyElement->GetName(), "Proxy") == 0)
     {
     const char* group = proxyElement->GetAttribute("group");
@@ -357,12 +347,12 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyFromElement(
       }
     }
 
-  return this->Superclass::NewProxyFromElement(proxyElement, id);
+  return this->Superclass::NewProxy(id, locator);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
-  const char* xml_group, const char* xml_name)
+vtkSMProxy* pqLookmarkStateLoader::CreateProxy(
+  const char* xml_group, const char* xml_name, vtkIdType cid)
 {
   if(xml_group && xml_name && (strcmp(xml_group, "sources")==0) )
     {
@@ -431,7 +421,7 @@ vtkSMProxy* pqLookmarkStateLoader::NewProxyInternal(
       }
     }
 
-  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+  return this->Superclass::CreateProxy(xml_group, xml_name, cid);
 }
 
 
@@ -458,7 +448,7 @@ void pqLookmarkStateLoader::HandleCompoundProxyDefinitions(
 
 //-----------------------------------------------------------------------------
 int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
-  vtkSMProxy* proxy)
+  vtkSMProxy* proxy, vtkSMProxyLocator* locator)
 {
   // Remove all elements of a source/reader's XML unless its a 
   // PointArrayStatus or CellArrayStatus property. But these 
@@ -635,7 +625,7 @@ int pqLookmarkStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement,
       }
     }
 
-  return this->Superclass::LoadProxyState(proxyElement, proxy);
+  return this->Superclass::LoadProxyState(proxyElement, proxy, locator);
 }
 
 //-----------------------------------------------------------------------------

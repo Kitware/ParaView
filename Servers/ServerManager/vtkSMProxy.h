@@ -133,8 +133,8 @@ class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
-class vtkSMStateLoaderBase;
 class vtkClientServerStream;
+class vtkSMProxyLocator;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -426,6 +426,14 @@ public:
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
   // Description:
+  // Loads the proxy state from the XML element. Returns 0 on failure.
+  // \c locator is used to locate other proxies that may be referred to in the
+  // state XML (which happens in case of properties of type vtkSMProxyProperty
+  // or subclasses). If locator is NULL, then such properties are left
+  // unchanged.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
+  // Description:
   // Dirty means this algorithm will execute during next update.
   // This all marks all consumers as dirty.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -481,7 +489,7 @@ protected:
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
   friend class vtkSMSourceProxy;
-  friend class vtkSMStateLoaderBase;
+  friend class vtkSMUndoRedoStateLoader;
   // -- PVEE only
   friend class vtkWSMApplication;
 
@@ -508,8 +516,7 @@ protected:
   // It is possible to set the SelfID for a proxy. However then the setter
   // has the responsiblity to ensure that the ID is going to be unique 
   // for the lifetime of the proxy. Also the SelfID can be set, only before
-  // an ID was assigned to the proxy. This is used by vtkSMStateLoaderBase
-  // and subclasses.
+  // an ID was assigned to the proxy. 
   void SetSelfID(vtkClientServerID id);
 
   // Description:
@@ -639,7 +646,7 @@ protected:
   // Description:
   // Load the subproxy state.
   void LoadSubProxyState(vtkPVXMLElement* subproxyElement, 
-    vtkSMStateLoaderBase* loader);
+    vtkSMProxyLocator* locator);
 
   // Description:
   // Called by a proxy property, this adds the property,proxy
@@ -716,16 +723,12 @@ protected:
   virtual void UpdateVTKObjects(vtkClientServerStream& stream);
 
   // Description:
-  // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoaderBase* loader);
-
   // Loads the revival state for the proxy.
   // RevivalState includes the entire state saved by calling 
   // SaveState() as well additional information such as server side
   // object ID. This makes it possible to restore the servermanager state
   // while reusing server side object id.
-  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement, 
-    vtkSMStateLoaderBase* loader);
+  virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
  
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);

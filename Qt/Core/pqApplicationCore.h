@@ -157,12 +157,8 @@ public:
 
   /// Loads the ServerManager state. Emits the signal
   /// stateLoaded() on loading state successfully.
-  /// If reuse_views is true, an attempt will be made to reuse the existing
-  /// views, otherwise, all current views will be destroyed prior to loading the
-  /// state.
   void loadState(vtkPVXMLElement* root, pqServer* server, 
-    vtkSMStateLoader* loader=NULL,
-    bool reuse_views=false);
+    vtkSMStateLoader* loader=NULL);
 
   /// Returns the set of available server resources
   pqServerResources& serverResources();

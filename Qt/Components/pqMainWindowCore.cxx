@@ -1376,12 +1376,6 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
       }
     }
 
-  // HACK: disconnect clear undo stack when state is loaded,
-  // since lookmark uses state loading as well and we want that to remain
-  // undoable.
-  QObject::disconnect(core, SIGNAL(stateLoaded()),
-    this->Implementation->UndoStack, SLOT(clear()));
-
   this->Implementation->UndoStack->beginUndoSet(
     QString("Load Lookmark %1").arg(this->Implementation->CurrentToolbarLookmark));
 
@@ -1396,10 +1390,6 @@ void pqMainWindowCore::onLoadLookmark(const QString &name)
     view, &sources, name);
 
   this->Implementation->UndoStack->endUndoSet();
-
-  // clear undo stack when state is loaded.
-  QObject::connect(core, SIGNAL(stateLoaded()),
-    this->Implementation->UndoStack, SLOT(clear()));
 }
 
 //-----------------------------------------------------------------------------

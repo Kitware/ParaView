@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMCompoundProxyDefinitionLoader - Creates a compound proxy from an XML definition
+// .NAME vtkSMCompoundProxyDefinitionLoader - Creates a compound proxy from an
+// XML definition.
 // .SECTION Description
 // vtkSMCompoundProxyDefinitionLoader can load a compound proxy definition
 // from a given vtkPVXMLElement. This element can be populated by a 
@@ -23,16 +24,15 @@
 #ifndef __vtkSMCompoundProxyDefinitionLoader_h
 #define __vtkSMCompoundProxyDefinitionLoader_h
 
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMDeserializer.h"
 
 class vtkSMCompoundSourceProxy;
 
-class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMStateLoaderBase
+class VTK_EXPORT vtkSMCompoundProxyDefinitionLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMCompoundProxyDefinitionLoader* New();
-  vtkTypeRevisionMacro(vtkSMCompoundProxyDefinitionLoader, 
-    vtkSMStateLoaderBase);
+  vtkTypeRevisionMacro(vtkSMCompoundProxyDefinitionLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -44,17 +44,10 @@ protected:
   vtkSMCompoundProxyDefinitionLoader();
   ~vtkSMCompoundProxyDefinitionLoader();
 
-  // Description:
-  // Called after a new proxy is created.
-  virtual void CreatedNewProxy(int vtkNotUsed(id), vtkSMProxy* vtkNotUsed(proxy))
-    { }
-
   vtkSMCompoundSourceProxy* HandleDefinition(vtkPVXMLElement* rootElement);
 
   // Description:
-  // Return the xml element for the state of the proxy with the given id.
-  // This is used by NewProxy() when the proxy with the given id
-  // is not located in the internal CreatedProxies map.
+  // Locate the XML for the proxy with the given id.
   virtual vtkPVXMLElement* LocateProxyElement(int id);
 
   vtkPVXMLElement* RootElement;

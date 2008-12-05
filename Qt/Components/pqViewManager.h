@@ -41,7 +41,7 @@ class pqUndoStack;
 class pqView;
 class vtkImageData;
 class vtkPVXMLElement;
-class vtkSMStateLoaderBase;
+class vtkSMProxyLocator;
 class vtkUndoElement;
 
 /// This class manages all view windows. View windows occupy the central
@@ -65,7 +65,7 @@ public:
   void saveState(vtkPVXMLElement* root);
 
   /// Loads the state for the view window manager.
-  bool loadState(vtkPVXMLElement* rwRoot, vtkSMStateLoaderBase* loader);
+  bool loadState(vtkPVXMLElement* rwRoot, vtkSMProxyLocator* loader);
 
   /// This option is used for testing. When size.isEmpty() is true,
   /// it resets the maximum bounds on the view windows.

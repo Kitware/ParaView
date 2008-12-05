@@ -20,13 +20,13 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.19");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.20");
 //-----------------------------------------------------------------------------
 class vtkSMPropertyLinkObserver : public vtkCommand
 {
@@ -560,7 +560,7 @@ void vtkSMPropertyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
 
 //-----------------------------------------------------------------------------
 int vtkSMPropertyLink::LoadState(vtkPVXMLElement* linkElement, 
-  vtkSMStateLoader* loader)
+  vtkSMProxyLocator* locator)
 {
   unsigned int numElems = linkElement->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -597,7 +597,7 @@ int vtkSMPropertyLink::LoadState(vtkPVXMLElement* linkElement,
       vtkErrorMacro("State missing required attribute id.");
       return 0;
       }
-    vtkSMProxy* proxy = loader->NewProxy(id); 
+    vtkSMProxy* proxy = locator->LocateProxy(id); 
     if (!proxy)
       {
       vtkErrorMacro("Failed to locate proxy with ID: " << id);
@@ -611,7 +611,6 @@ int vtkSMPropertyLink::LoadState(vtkPVXMLElement* linkElement,
       return 0;
       }
     this->AddLinkedProperty(proxy, pname, idirection);
-    proxy->Delete(); 
     }
   return 1;
 }

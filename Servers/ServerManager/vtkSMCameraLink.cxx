@@ -21,12 +21,11 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkSMStateLoader.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMCameraLink);
-vtkCxxRevisionMacro(vtkSMCameraLink, "1.18");
+vtkCxxRevisionMacro(vtkSMCameraLink, "1.19");
 
 //---------------------------------------------------------------------------
 class vtkSMCameraLink::vtkInternals
@@ -337,12 +336,6 @@ void vtkSMCameraLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
     parent->AddNestedElement(child);
     }
   root->Delete();
-}
-
-//---------------------------------------------------------------------------
-int vtkSMCameraLink::LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader)
-{
-  return this->Superclass::LoadState(linkElement, loader);
 }
 
 //---------------------------------------------------------------------------

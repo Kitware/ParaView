@@ -24,7 +24,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.29");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.30");
 
 struct vtkSMPQStateLoaderInternals
 {
@@ -45,8 +45,8 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
-  const char* xml_group, const char* xml_name)
+vtkSMProxy* vtkSMPQStateLoader::CreateProxy(
+  const char* xml_group, const char* xml_name, vtkIdType cid)
 {
   // Check if the proxy requested is a view module.
   if (xml_group && xml_name && strcmp(xml_group, "views") == 0)
@@ -56,43 +56,30 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
     if (prototype && prototype->IsA("vtkSMViewProxy"))
       {
       // Retrieve the view type that should be used/created
-      const char* preferred_xml_name = 
-        this->GetPreferredViewType(this->GetConnectionID(), xml_name);
+      const char* preferred_xml_name = this->GetViewXMLName(cid, xml_name);
 
       // Look for a view of this type among our preferred views, return the
       // first one found
-      if (!this->PQInternal->PreferredViews.empty())
+      // Return a preferred render view if one exists of this type.
+      vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator iter = 
+        this->PQInternal->PreferredViews.begin();
+      while(iter != this->PQInternal->PreferredViews.end())
         {
-        // Return a preferred render view if one exists of this type.
-        vtkstd::list<vtkSmartPointer<vtkSMViewProxy> >::iterator iter = 
-          this->PQInternal->PreferredViews.begin();
-        while(iter != this->PQInternal->PreferredViews.end())
+        vtkSMViewProxy *viewProxy = *iter;
+        if(viewProxy->GetConnectionID() == cid &&
+          strcmp(viewProxy->GetXMLName(), preferred_xml_name) == 0)
           {
-          vtkSMViewProxy *viewProxy = *iter;
-          if(strcmp(viewProxy->GetXMLName(), preferred_xml_name)==0)
-            {
-            viewProxy->Register(this);
-            this->PQInternal->PreferredViews.erase(iter);
-            return viewProxy;
-            }
-          iter++;
+          viewProxy->Register(this);
+          this->PQInternal->PreferredViews.erase(iter);
+          return viewProxy;
           }
-        }
-
-      // Can't use existing module (none present, none of the correct type, 
-      // or all present are have already been used, hence we allocate a new one
-      // of the preferred type.
-      vtkSMProxy* preferred_prototype = 
-        pxm->GetPrototypeProxy(xml_group, preferred_xml_name);
-      if (preferred_prototype)
-        {
-        return this->Superclass::NewProxyInternal(xml_group, preferred_xml_name);
+        iter++;
         }
       }
     }
 
   // If all else fails, let the superclass handle it:
-  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+  return this->Superclass::CreateProxy(xml_group, xml_name, cid);
 }
 
 //---------------------------------------------------------------------------
@@ -141,27 +128,6 @@ void vtkSMPQStateLoader::RegisterProxyInternal(const char* group,
       }
     }
   this->Superclass::RegisterProxyInternal(group, name, proxy);
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkSMPQStateLoader::GetPreferredViewType (int connectionID,
-  const char *xml_name)
-{
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMViewProxy* prototype = vtkSMViewProxy::SafeDownCast(
-    pxm->GetPrototypeProxy("views", xml_name));
-  if (prototype)
-    {
-    // Generally each view type is different class of view eg. bar char view, line
-    // plot view etc. However in some cases a different view types are indeed the
-    // same class of view the only different being that each one of them works in
-    // a different configuration eg. "RenderView" in builin mode, 
-    // "IceTDesktopRenderView" in remote render mode etc. This method is used to
-    // determine what type of view needs to be created for the given class. 
-    return prototype->GetSuggestedViewType(connectionID);
-    }
-
-  return xml_name;
 }
 
 //-----------------------------------------------------------------------------

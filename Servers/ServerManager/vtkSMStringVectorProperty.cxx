@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.44");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.45");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -414,7 +414,7 @@ const char* vtkSMStringVectorProperty::GetDefaultValue(int idx)
 
 //---------------------------------------------------------------------------
 int vtkSMStringVectorProperty::LoadState(vtkPVXMLElement* element,
-  vtkSMStateLoaderBase* loader, int loadLastPushedValues/*=0*/)
+  vtkSMProxyLocator* loader, int loadLastPushedValues/*=0*/)
 {
   int prevImUpdate = this->ImmediateUpdate;
 

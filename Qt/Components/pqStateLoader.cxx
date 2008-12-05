@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 
 #include <QPointer>
@@ -60,7 +61,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(pqStateLoader);
-vtkCxxRevisionMacro(pqStateLoader, "1.17");
+vtkCxxRevisionMacro(pqStateLoader, "1.18");
 //-----------------------------------------------------------------------------
 pqStateLoader::pqStateLoader()
 {
@@ -80,62 +81,37 @@ void pqStateLoader::SetMainWindowCore(pqMainWindowCore* core)
 }
 
 //-----------------------------------------------------------------------------
-int pqStateLoader::LoadState(vtkPVXMLElement* root, int keep_proxies/*=0*/)
+int pqStateLoader::LoadStateInternal(vtkPVXMLElement* root)
 {
   this->Internal->HelperProxyCollectionElements.clear();
 
-  const char* name = root->GetName();
-  if (name && strcmp(name, "ServerManagerState") == 0)
+  // Load the <ServerManagerState /> element first.
+  if (!this->Superclass::LoadStateInternal(root))
     {
-    if (!this->Superclass::LoadState(root, 1))
+    return 0;
+    }
+
+  vtkPVXMLElement *viewManagerXML =
+    root->FindNestedElementByName("ViewManager");
+  if (viewManagerXML)
+    {
+    if (!this->Internal->MainWindowCore->multiViewManager().loadState(
+        viewManagerXML, this->ProxyLocator)) 
       {
       return 0;
-      }
-    }
-  else
-    {
-    unsigned int numElems = root->GetNumberOfNestedElements();
-    for (unsigned int cc=0; cc < numElems; ++cc)
-      {
-      vtkPVXMLElement* curElement = root->GetNestedElement(cc);
-      name = curElement->GetName();
-      if (!name)
-        {
-        continue;
-        }
-      if (strcmp(name, "ServerManagerState") == 0)
-        {
-        if (!this->Superclass::LoadState(curElement, 1))
-          {
-          return 0;
-          }
-        }
-      else if (strcmp(name, "ViewManager") == 0)
-        {
-      if (!this->Internal->MainWindowCore->multiViewManager().loadState(
-            curElement, this))
-        {
-        return 0;
-        }
-        }
       }
     }
 
   // After having loaded all state,
   // try to discover helper proxies for all pqProxies.
   this->DiscoverHelperProxies();
-
-  if (!keep_proxies)
-    {
-    this->ClearCreatedProxies();
-    }
   this->Internal->HelperProxyCollectionElements.clear();
   return 1;
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pqStateLoader::NewProxyInternal(
-  const char* xml_group, const char* xml_name)
+vtkSMProxy* pqStateLoader::CreateProxy(
+  const char* xml_group, const char* xml_name, vtkIdType cid)
 {
   if (xml_group && xml_name && strcmp(xml_group, "animation")==0
     && strcmp(xml_name, "AnimationScene")==0)
@@ -164,91 +140,83 @@ vtkSMProxy* pqStateLoader::NewProxyInternal(
       }
     }
 
-  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+  return this->Superclass::CreateProxy(xml_group, xml_name, cid);
 }
 
 //---------------------------------------------------------------------------
 void pqStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
-  if (proxy->GetXMLGroup() 
-    && strcmp(proxy->GetXMLGroup(), "animation")==0
-    && proxy->IsA("vtkSMAnimationScene"))
+  // Don't re-register a proxy in the same group.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if (pxm->GetProxyName(group, proxy))
     {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    if (pxm->GetProxyName(group, proxy))
-      {
-      // scene is registered, don't re-register it.
-      return;
-      }
+    // scene is registered, don't re-register it.
+    return;
     }
 
   this->Superclass::RegisterProxyInternal(group, name, proxy);
 }
 
 //-----------------------------------------------------------------------------
-int pqStateLoader::LoadProxyState(vtkPVXMLElement* proxyElement, 
-  vtkSMProxy* proxy)
+vtkPVXMLElement* pqStateLoader::LocateProxyElement(int id)
 {
-  if (proxy->GetXMLGroup())
+  vtkPVXMLElement* proxyElement = this->Superclass::LocateProxyElement(id);
+  if (!proxyElement || !proxyElement->GetAttribute("group") ||
+    !proxyElement->GetAttribute("type"))
     {
-    if (strcmp(proxy->GetXMLGroup(), "views")==0)
+    return proxyElement;
+    }
+
+  const char* xml_group = proxyElement->GetAttribute("group");
+  const char* xml_name = proxyElement->GetAttribute("type");
+  if (strcmp(xml_group, "views") == 0)
+    {
+    unsigned int max = proxyElement->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < max; ++cc)
       {
-      unsigned int max = proxyElement->GetNumberOfNestedElements();
-      vtkPVXMLElement* toRemove = 0;
-      for (unsigned int cc=0; cc < max; ++cc)
+      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+      if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("ViewSize"))
         {
-        vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
-        if (element->GetName() == QString("Property") &&
-          element->GetAttribute("name") == QString("Representations"))
-          {
-          element->SetAttribute("clear", "0");
-          // This will ensure that when the state for Displays property is loaded
-          // all already present displays won't be cleared.
-          }
-        else if (element->GetName() == QString("Property") &&
-          element->GetAttribute("name") == QString("ViewSize"))
-          {
-          toRemove = element;
-          }
-        }
-      if (toRemove)
-        {
-        proxyElement->RemoveNestedElement(toRemove);
+        proxyElement->RemoveNestedElement(element);
+        break;
         }
       }
-    else if (strcmp(proxy->GetXMLGroup(), "misc")==0 && 
-      strcmp(proxy->GetXMLName(), "TimeKeeper") == 0)
+    }
+  else if (strcmp(xml_group, "misc")==0 && strcmp(xml_name, "TimeKeeper") == 0)
+    {
+    // FIXME: This needs to be fixed by making the vtkSMTimeKeeper internally
+    // manage the views and timestep values so that on never manually has to set
+    // it up.
+    unsigned int max = proxyElement->GetNumberOfNestedElements();
+    for (unsigned int cc=0; cc < max; ++cc)
       {
-      unsigned int max = proxyElement->GetNumberOfNestedElements();
-      for (unsigned int cc=0; cc < max; ++cc)
+      // Views are not loaded from state, since the pqTimeKeeper 
+      // automatically updates the property appropriately.
+      vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
+      if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("Views"))
         {
-        // Views are not loaded from state, since the pqTimeKeeper 
-        // automatically updates the property appropriately.
-        vtkPVXMLElement* element = proxyElement->GetNestedElement(cc);
-        if (element->GetName() == QString("Property") &&
-          element->GetAttribute("name") == QString("Views"))
-          {
-          proxyElement->RemoveNestedElement(element);
-          cc--;
-          max--;
-          continue;
-          }
-        // We don't want to upload the values from "TimestepValues" property
-        // either since that's populated by the GUI. 
-        if (element->GetName() == QString("Property") &&
-          element->GetAttribute("name") == QString("TimestepValues"))
-          {
-          proxyElement->RemoveNestedElement(element);
-          cc--;
-          max--;
-          continue;
-          }
+        proxyElement->RemoveNestedElement(element);
+        cc--;
+        max--;
+        continue;
+        }
+      // We don't want to upload the values from "TimestepValues" property
+      // either since that's populated by the GUI. 
+      if (element->GetName() == QString("Property") &&
+        element->GetAttribute("name") == QString("TimestepValues"))
+        {
+        proxyElement->RemoveNestedElement(element);
+        cc--;
+        max--;
+        continue;
         }
       }
     }
 
-  return this->Superclass::LoadProxyState(proxyElement, proxy);
+  return proxyElement;
 }
 
 //-----------------------------------------------------------------------------
@@ -258,7 +226,7 @@ int pqStateLoader::BuildProxyCollectionInformation(
   const char* groupName = collectionElement->GetAttribute("name");
   if (!groupName)
     {
-    vtkErrorMacro("Requied attribute name is missing.");
+    vtkErrorMacro("Required attribute name is missing.");
     return 0;
     }
 
@@ -293,8 +261,7 @@ void pqStateLoader::DiscoverHelperProxies()
       continue;
       }
     int proxyid = helper_group_rx.cap(1).toInt();
-    vtkSmartPointer<vtkSMProxy> proxy;
-    proxy.TakeReference(this->NewProxy(proxyid));
+    vtkSMProxy* proxy = this->ProxyLocator->LocateProxy(proxyid);
     pqProxy *pq_proxy = smmodel->findItem<pqProxy*>(proxy);
     if (!pq_proxy)
       {
@@ -314,11 +281,10 @@ void pqStateLoader::DiscoverHelperProxies()
         {
         continue;
         }
-      vtkSMProxy* helper = this->NewProxy(helperid);
+      vtkSMProxy* helper = this->ProxyLocator->LocateProxy(helperid);
       if (helper)
         {
         pq_proxy->addHelperProxy(name, helper);
-        helper->Delete();
         }
       }
     }

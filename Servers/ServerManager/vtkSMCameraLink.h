@@ -82,10 +82,6 @@ protected:
   virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
 
   // Description:
-  // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
-
-  // Description:
   // Internal method to copy vtkSMproperty values from caller to all linked
   // proxies.
   void CopyProperties(vtkSMProxy* caller);

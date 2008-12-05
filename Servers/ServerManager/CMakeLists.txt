@@ -52,6 +52,7 @@ SET(Kit_SRCS
   vtkSMDataLabelRepresentationProxy.cxx
   vtkSMDataRepresentationProxy.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDeserializer.cxx
   vtkSMDimensionsDomain.cxx
   vtkSMDistanceRepresentation2DProxy.cxx
   vtkSMDocumentation.cxx
@@ -72,6 +73,7 @@ SET(Kit_SRCS
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx
   vtkSMIceTMultiDisplayRenderViewProxy.cxx
+  vtkSMIdBasedProxyLocator.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImageDataParallelStrategy.cxx
   vtkSMImageSliceRepresentationProxy.cxx
@@ -118,6 +120,7 @@ SET(Kit_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
+  vtkSMProxyLocator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyManagerExtension.cxx
   vtkSMProxyManagerReviver.cxx
@@ -153,7 +156,6 @@ SET(Kit_SRCS
   vtkSMSinusoidKeyFrameProxy.cxx
   vtkSMSourceProxy.cxx
   vtkSMSpreadSheetRepresentationProxy.cxx
-  vtkSMStateLoaderBase.cxx
   vtkSMStateLoader.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionController.cxx
@@ -223,7 +225,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMProxyManagerReviver.cxx
   vtkSMRepresentationProxy.cxx
   vtkSMRepresentationStrategy.cxx
-  vtkSMStateLoaderBase.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMStateVersionControllerBase.cxx
   vtkSMUndoElement.cxx

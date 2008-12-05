@@ -19,7 +19,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMSelectionLink);
-vtkCxxRevisionMacro(vtkSMSelectionLink, "1.2");
+vtkCxxRevisionMacro(vtkSMSelectionLink, "1.3");
 //----------------------------------------------------------------------------
 vtkSMSelectionLink::vtkSMSelectionLink()
 {
@@ -67,9 +67,9 @@ void vtkSMSelectionLink::SaveState(const char* linkname, vtkPVXMLElement* parent
 
 //----------------------------------------------------------------------------
 int vtkSMSelectionLink::LoadState(vtkPVXMLElement* linkElement,
-  vtkSMStateLoader* loader)
+  vtkSMProxyLocator* locator)
 {
-  return this->PropertyLink->LoadState(linkElement, loader);
+  return this->PropertyLink->LoadState(linkElement, locator);
 }
 
 //----------------------------------------------------------------------------

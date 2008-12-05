@@ -103,7 +103,7 @@ protected:
   
   // Load the state of the domain from the XML.
   virtual int LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMStateLoaderBase* loader);
+    vtkSMProxyLocator* loader);
 
   vtkSMStringListDomainInternals* SLInternals;
 

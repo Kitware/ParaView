@@ -26,7 +26,7 @@
 class vtkCommand;
 class vtkPVXMLElement;
 class vtkSMProxy;
-class vtkSMStateLoader;
+class vtkSMProxyLocator;
 //ETX
 
 class VTK_EXPORT vtkSMLink : public vtkSMObject
@@ -91,7 +91,7 @@ protected:
 
   // Description:
   // Load the link state.
-  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader) = 0;
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator) = 0;
 
 //BTX
   friend class vtkSMLinkObserver;

@@ -20,14 +20,14 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoader.h"
+#include "vtkSMProxyLocator.h"
 
 #include <vtkstd/list>
 #include <vtkstd/set>
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.12");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.13");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -283,7 +283,8 @@ void vtkSMProxyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProxyLink::LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader)
+int vtkSMProxyLink::LoadState(
+  vtkPVXMLElement* linkElement, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = linkElement->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < numElems; cc++)
@@ -320,14 +321,13 @@ int vtkSMProxyLink::LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* lo
       vtkErrorMacro("State missing required attribute id.");
       return 0;
       }
-    vtkSMProxy* proxy = loader->NewProxy(id); 
+    vtkSMProxy* proxy = locator->LocateProxy(id); 
     if (!proxy)
       {
       vtkErrorMacro("Failed to locate proxy with ID: " << id);
       return 0;
       }
     this->AddLinkedProxy(proxy, idirection);
-    proxy->Delete();
     }
   return 1;
 }

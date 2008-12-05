@@ -25,6 +25,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyLocator.h"
 
 #include "vtkPVConfig.h" // for PARAVIEW_USE_ICE_T
 #include "vtkToolkits.h" // for VTK_USE_MPI
@@ -33,7 +34,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.17");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.18");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -134,9 +135,9 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
 
   vtkSMPQStateLoader* loader = vtkSMPQStateLoader::New();
   // The state is loaded on the self connection.
-  loader->SetConnectionID(
+  loader->GetProxyLocator()->SetConnectionID(
     vtkProcessModuleConnectionManager::GetSelfConnectionID());
-  loader->SetReviveProxies(1);
+  loader->GetProxyLocator()->SetReviveProxies(1);
 
   // The process module on the client side keeps track of the unique IDs.
   // We need to synchornize the IDs on the client side, so that when new IDs

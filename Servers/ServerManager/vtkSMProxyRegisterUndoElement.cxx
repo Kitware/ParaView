@@ -18,12 +18,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMStateLoaderBase.h"
-
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.7");
+vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMProxyRegisterUndoElement::vtkSMProxyRegisterUndoElement()
 {
@@ -83,15 +82,14 @@ int vtkSMProxyRegisterUndoElement::Undo()
     return 0;
     }
 
-  vtkSMStateLoaderBase* loader = this->GetStateLoader();
-  if (!loader)
+  vtkSMProxyLocator* locator = this->GetProxyLocator();
+  if (!locator)
     {
-    vtkErrorMacro("No loader set. Cannot Undo.");
+    vtkErrorMacro("No locator set. Cannot Undo.");
     return 0;
     }
 
-  vtkSMProxy* proxy = loader->NewProxyFromElement(
-    this->XMLElement->GetNestedElement(0), id);
+  vtkSMProxy* proxy = locator->LocateProxy(id);
   if (!proxy)
     {
     vtkErrorMacro("Failed to locate the proxy to register.");
@@ -100,7 +98,6 @@ int vtkSMProxyRegisterUndoElement::Undo()
   
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->UnRegisterProxy(group_name, proxy_name, proxy);
-  proxy->Delete();
 
   // Unregistering may trigger deletion of the proxy.
   return 1;
@@ -132,15 +129,14 @@ int vtkSMProxyRegisterUndoElement::Redo()
     return 0;
     }
 
-  vtkSMStateLoaderBase* loader = this->GetStateLoader();
-  if (!loader)
+  vtkSMProxyLocator* locator = this->GetProxyLocator();
+  if (!locator)
     {
-    vtkErrorMacro("No loader set. Cannot Redo.");
+    vtkErrorMacro("No locator set. Cannot Redo.");
     return 0;
     }
 
-  vtkSMProxy* proxy = loader->NewProxyFromElement(
-    this->XMLElement->GetNestedElement(0), id);
+  vtkSMProxy* proxy = locator->LocateProxy(id);
 
   if (!proxy)
     {
@@ -154,7 +150,6 @@ int vtkSMProxyRegisterUndoElement::Redo()
   // this proxy is not going to be updated. Hence we explicitly mark it 
   // for update. 
   proxy->InvokeEvent(vtkCommand::PropertyModifiedEvent, 0);
-  proxy->Delete();
   return 1;
 }
 

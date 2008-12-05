@@ -25,7 +25,7 @@
 #include "vtkUndoElement.h"
 
 class vtkPVXMLElement;
-class vtkSMStateLoaderBase;
+class vtkSMProxyLocator;
 
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
@@ -39,13 +39,12 @@ public:
   vtkSetMacro(ConnectionID, vtkIdType);
 
   // Description:
-  // Get/Set the state loader.
+  // Get/Set the proxy locator used to locate proxies referred to in the
+  // undo/redo states.
   // This must be set before the undo/redo actions are called.
-  // The element may use the state loader to access
-  // proxies. 
   // This is only valid within Undo()/Redo() calls.
-  vtkGetObjectMacro(StateLoader, vtkSMStateLoaderBase);
-  void SetStateLoader(vtkSMStateLoaderBase* loader);
+  void SetProxyLocator(vtkSMProxyLocator*);
+  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
@@ -58,7 +57,7 @@ protected:
   vtkPVXMLElement* XMLElement;
   void SetXMLElement(vtkPVXMLElement*);
 
-  vtkSMStateLoaderBase* StateLoader;
+  vtkSMProxyLocator* ProxyLocator;
 
   // Description:
   // Overridden to save state specific to the class.

@@ -22,46 +22,60 @@
 #ifndef __vtkSMStateLoader_h
 #define __vtkSMStateLoader_h
 
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMDeserializer.h"
 
 class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyLocator;
 
 //BTX
 struct vtkSMStateLoaderInternals;
 //ETX
 
-class VTK_EXPORT vtkSMStateLoader : public vtkSMStateLoaderBase
+class VTK_EXPORT vtkSMStateLoader : public vtkSMDeserializer
 {
 public:
   static vtkSMStateLoader* New();
-  vtkTypeRevisionMacro(vtkSMStateLoader, vtkSMStateLoaderBase);
+  vtkTypeRevisionMacro(vtkSMStateLoader, vtkSMDeserializer);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Load the state from the given root element. This root
-  // element must have Proxy and ProxyCollection sub-elements
-  // Returns 1 on success, 0 on failure.
-  // If keep_proxies is set, then the internal map
-  // of proxy ids to proxies is not cleared on loading of the state.
-  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
+  // Load the state from the given root element.
+  int LoadState(vtkPVXMLElement* rootElement);
+
+  // Description:
+  // Get/Set the proxy locator to use. Default is 
+  // vtkSMProxyLocator will be used.
+  void SetProxyLocator(vtkSMProxyLocator* loc);
+  vtkGetObjectMacro(ProxyLocator, vtkSMProxyLocator);
 
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
 
-  vtkPVXMLElement* RootElement;
-  void SetRootElement(vtkPVXMLElement*);
-
-  virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
-  virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
-  int HandleLinks(vtkPVXMLElement* linksElement);
-  virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
+  // Description:
+  // The rootElement must be the <ServerManagerState /> xml element.
+  // If rootElement is not a <ServerManagerState /> element, then we try to
+  // locate the first <ServerManagerState /> nested element and load that.
+  // Load the state from the given root element.
+  virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
 
   // Description:
   // Called after a new proxy is created.
   // We register all created proxies.
   virtual void CreatedNewProxy(int id, vtkSMProxy* proxy);
+
+  // Description:
+  // Overridden so that when new views are to be created, we create views
+  // suitable for the connection. 
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, vtkIdType cid);
+
+
+  virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
+  virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
+  int HandleLinks(vtkPVXMLElement* linksElement);
+  virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
 
   // Description:
   // This method scans through the internal data structure built 
@@ -88,6 +102,19 @@ protected:
   // Checks the root element for version. If failed, return false.
   virtual bool VerifyXMLVersion(vtkPVXMLElement* rootElement);
 
+  // Description:
+  // Given the xml name for a view, this returns the xmlname for the view if the
+  // view is to be created on the given connection.
+  // Generally each view type is different class of view eg. bar char view, line
+  // plot view etc. However in some cases a different view types are indeed the
+  // same class of view the only different being that each one of them works in
+  // a different configuration eg. "RenderView" in builin mode, 
+  // "IceTDesktopRenderView" in remote render mode etc. This method is used to
+  // determine what type of view needs to be created for the given class. 
+  const char* GetViewXMLName(int connectionID, const char *xml_name);
+
+  vtkPVXMLElement* ServerManagerStateElement;
+  vtkSMProxyLocator* ProxyLocator;
 private:
   vtkSMStateLoader(const vtkSMStateLoader&); // Not implemented
   void operator=(const vtkSMStateLoader&); // Not implemented

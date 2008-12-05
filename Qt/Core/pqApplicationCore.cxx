@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderViewProxy.h"
@@ -330,8 +331,7 @@ void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::loadState(vtkPVXMLElement* rootElement, 
-  pqServer* server, vtkSMStateLoader* arg_loader/*=NULL*/,
-  bool reuse_views/*=false*/)
+  pqServer* server, vtkSMStateLoader* arg_loader/*=NULL*/)
 {
   if (!server || !rootElement)
     {
@@ -355,22 +355,11 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
       "ServerManagerState");
     }
 
-  vtkSMPQStateLoader* pqLoader = vtkSMPQStateLoader::SafeDownCast(loader);
-
-  // Preferred view stuff needs to be deprecated BIG TIME! For now, I am letting
-  // it be since the lookmark stuff uses it.
   QList<pqView*> current_views = 
     this->Internal->ServerManagerModel->findItems<pqView*>(server);
   foreach (pqView* view, current_views)
     {
-    if (pqLoader && reuse_views && qobject_cast<pqRenderView*>(view))
-      {
-      pqLoader->AddPreferredView(view->getViewProxy());
-      }
-    else
-      {
-      this->Internal->ObjectBuilder->destroy(view);
-      }
+    this->Internal->ObjectBuilder->destroy(view);
     }
 
   this->LoadingState = true;
@@ -379,18 +368,10 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
     pxm->LoadState(rootElement, server->GetConnectionID(), loader);
+    loader->GetProxyLocator()->Clear();
     }
-
-
-  if (pqLoader)
-    {
-    // delete any unused rendermodules from state loader
-    pqLoader->ClearPreferredViews();
-    }
-
   pqEventDispatcher::processEventsAndWait(1);
   this->render();
-
   this->LoadingState = false;
   emit this->stateLoaded();
 }

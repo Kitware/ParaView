@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMProxy.h"
-#include "vtkSMStateLoaderBase.h"
+#include "vtkSMProxyLocator.h"
 
 #include "pqPipelineSource.h"
 #include "pqApplicationCore.h"
@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.8");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.9");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
@@ -88,9 +88,9 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     return 0;
     }
 
-  vtkSMStateLoaderBase* loader = this->GetStateLoader();
-  loader->SetConnectionID(this->GetConnectionID());
-  vtkSMProxy* proxy = loader->NewProxy(id);
+  vtkSMProxyLocator* locator = this->GetProxyLocator();
+  locator->SetConnectionID(this->GetConnectionID());
+  vtkSMProxy* proxy = locator->LocateProxy(id);
 
   if (!proxy)
     {
@@ -122,7 +122,6 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     pxy->setModifiedState(pqProxy::UNINITIALIZED);
     pdmanager->internalAddPendingDisplayForSource(pxy);
     }
-  proxy->Delete();
   return 1;
 }
 

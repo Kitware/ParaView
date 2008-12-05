@@ -19,6 +19,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMIdBasedProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMUndoRedoStateLoader.h"
 #include "vtkUndoSet.h"
@@ -148,11 +149,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.14");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.15");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.14");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.15");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -256,8 +257,11 @@ int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
     this->SetStateLoader(sl);
     sl->Delete();
     }
-  this->StateLoader->SetConnectionID(id); 
-  vtkUndoSet* undo = this->StateLoader->LoadUndoRedoSet(root);
+
+  vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
+  locator->SetConnectionID(id);
+  locator->SetDeserializer(this->StateLoader);
+  vtkUndoSet* undo = this->StateLoader->LoadUndoRedoSet(root, locator);
   int status = 0;
   if (undo)
     {
@@ -266,10 +270,7 @@ int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
     // Update modified proxies.
     // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
     }
-
-  // This is essential otherwise we have un-intentional references to proxies
-  // in the state loader.
-  this->StateLoader->ClearCreatedProxies();
+  locator->Delete();
   return status;
 }
 
@@ -282,8 +283,11 @@ int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
     this->SetStateLoader(sl);
     sl->Delete();
     }
-  this->StateLoader->SetConnectionID(id); 
-  vtkUndoSet* redo = this->StateLoader->LoadUndoRedoSet(root);
+
+  vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
+  locator->SetConnectionID(id);
+  locator->SetDeserializer(this->StateLoader);
+  vtkUndoSet* redo = this->StateLoader->LoadUndoRedoSet(root, locator);
   int status = 0;
   if (redo)
     {
@@ -292,13 +296,9 @@ int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
     // Update modified proxies.
     // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
     }
-
-  // This is essential otherwise we have un-intentional references to proxies
-  // in the state loader.
-  this->StateLoader->ClearCreatedProxies();
+  locator->Delete();
   return status;
 }
-
 
 //-----------------------------------------------------------------------------
 int vtkSMUndoStack::Undo()

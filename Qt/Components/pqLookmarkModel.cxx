@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPQStateLoader.h"
+#include "vtkSMProxyLocator.h"
 #include "vtkSMStateLoader.h"
 #include "vtksys/ios/sstream"
 
@@ -279,8 +280,8 @@ void pqLookmarkModel::load(
     return;
     }
 
-  pqApplicationCore::instance()->loadState(stateElement,server,loader, 
-    /* reuse_views=*/true);
+  pqLoader->GetProxyLocator()->SetConnectionID(server->GetConnectionID());
+  pqLoader->LoadState(stateElement);
 
   // If this is a render module with no previous visible representations
   // and RestoreCamera is turned off, reset the camera.

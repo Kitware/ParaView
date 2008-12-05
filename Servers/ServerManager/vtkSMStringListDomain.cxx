@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.22");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.23");
 
 struct vtkSMStringListDomainInternals
 {
@@ -208,7 +208,7 @@ void vtkSMStringListDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 
 //---------------------------------------------------------------------------
 int vtkSMStringListDomain::LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMStateLoaderBase* loader)
+    vtkSMProxyLocator* loader)
 {
   this->Superclass::LoadState(domainElement, loader);
   

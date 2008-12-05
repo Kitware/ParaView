@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.13");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -216,7 +216,7 @@ void vtkSMNewWidgetRepresentationProxy::UpdateEnabled()
 
 //-----------------------------------------------------------------------------
 int vtkSMNewWidgetRepresentationProxy::LoadState(vtkPVXMLElement* proxyElement, 
-                          vtkSMStateLoaderBase* loader)
+                          vtkSMProxyLocator* loader)
 {
   this->StateLoaded = true;
   return this->Superclass::LoadState(proxyElement, loader);

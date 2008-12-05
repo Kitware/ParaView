@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 //#include "vtkSMPQStateLoader.h"
-#include "pqStateLoader.h"
+#include "vtkSMPQStateLoader.h"
 #include <QList>
 
 class pqLookmarkStateLoaderInternal;
@@ -50,29 +50,12 @@ class pqView;
 // State loader for the lookmark state.
 //
 
-class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public pqStateLoader
+class PQCOMPONENTS_EXPORT pqLookmarkStateLoader : public vtkSMPQStateLoader
 {
 public:
   static pqLookmarkStateLoader* New();
-  vtkTypeRevisionMacro(pqLookmarkStateLoader, pqStateLoader);
+  vtkTypeRevisionMacro(pqLookmarkStateLoader, vtkSMPQStateLoader);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Load the state from the given root element. This root
-  // element must have Proxy and ProxyCollection sub-elements
-  // Returns 1 on success, 0 on failure.
-  // If keep_proxies is set, then the internal map
-  // of proxy ids to proxies is not cleared on loading of the state.
-  //
-  // Overloaded to check whether there are enough existing sources to support 
-  // this lookmark.
-  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
-
-  // Description:
-  // Overloaded to check whether the proxyElement is a source and if so, 
-  // look for a display proxy element in the state that has it for an input.
-  // Store the id of this display for later so that we know not to load its state.
-  virtual vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 
   // Can be given a list of sources to use before any others. 
   // Right now these are the sources that are selected in the pipeline browser.
@@ -97,6 +80,15 @@ protected:
   pqLookmarkStateLoader();
   ~pqLookmarkStateLoader();
 
+  /// Load the state.
+  virtual int LoadStateInternal(vtkPVXMLElement* rootElement);
+
+  // Description:
+  // Overloaded to check whether the proxyElement is a source and if so, 
+  // look for a display proxy element in the state that has it for an input.
+  // Store the id of this display for later so that we know not to load its state.
+  virtual vtkSMProxy* NewProxy(int id, vtkSMProxyLocator*);
+
   // Description:
   // Make sure the "sources" proxy collection gets loaded before any other.
   // When the source collection element does get passed, reorder child elements
@@ -104,9 +96,12 @@ protected:
   // pipeline. This is required for the pqLookmarkSourceDialog to work correctly
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
 
-  // Description:
+   // Description:
+  // Create a new proxy of the given group and name. Default implementation
+  // simply asks the proxy manager to create a new proxy of the requested type.
   // When a source proxy is about to be created, provide it with an existing one instead.
-  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, vtkIdType connectionId);
 
   // Make sure we do not re-register proxies that are being reused or ignored
   virtual void RegisterProxy(int id, vtkSMProxy* proxy);
@@ -118,7 +113,8 @@ protected:
   // Description:
   // This method is called to load a proxy state. 
   // It handles different proxy types different ways. 
-  virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy);
+  virtual int LoadProxyState(vtkPVXMLElement* proxyElement, vtkSMProxy* proxy,
+    vtkSMProxyLocator*);
 
   // Helper function for constructing a QAbstractItemModel from the lookmark's 
   // pipeline hierarchy

@@ -72,7 +72,7 @@ class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
 class vtkSMProxy;
-class vtkSMStateLoaderBase;
+class vtkSMProxyLocator;
 class vtkSMXMLParser;
 //BTX
 struct vtkSMPropertyInternals;
@@ -330,7 +330,7 @@ protected:
   // If \c loadLastPushedValues is set, then last pushed values
   // are loaded from the xml if present. If not present, the value 
   // of the property remains unchanged.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoaderBase* loader,
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* loader,
     int loadLastPushedValues=0);
 
   // Description:

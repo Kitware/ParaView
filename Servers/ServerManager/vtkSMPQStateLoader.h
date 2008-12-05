@@ -12,17 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPQStateLoader - State loader for ParaView client.
+// .NAME vtkSMPQStateLoader - state loader with added functionality to reuse
+// views. The views to be reused can be set by using AddPreferredView().
 // .SECTION Description
-// SMState file has render module states in it. Typically one can simply load 
-// back the SMState and create new rendermodules from that SMState, just like 
-// other proxies. However, when using MultiViewFactory, if a 
-// MultiViewFactory exists, it must be used to obtain the 
-// rendermodules, otherwise they will not work correctly. Hence, we provide 
-// this loader. Set the MultiViewFactory on this loader before 
-// loading the state. Then, when a render module is encountered in the state 
-// the MultiViewFactory is requested to return
-// a render module and the state is loaded on that render module.
+// vtkSMPQStateLoader is a state loader with added functionality to reuse
+// views. The views to be reused can be set by using AddPreferredView().
 
 #ifndef __vtkSMPQStateLoader_h
 #define __vtkSMPQStateLoader_h
@@ -53,18 +47,13 @@ protected:
   ~vtkSMPQStateLoader();
 
   // Description:
-  // Overridden so that render modules and displays can be created of appropriate
-  // types.
-  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
+  // Overridden so that 'preferred views' are used if possible.
+  virtual vtkSMProxy* CreateProxy(
+    const char* xmlgroup, const char* xmlname, vtkIdType cid);
 
   // Overridden to avoid registering the reused rendermodules twice.
   virtual void RegisterProxyInternal(const char* group, 
     const char* name, vtkSMProxy* proxy);
-
-  // A default callback that returns the type of view the state loader should 
-  // create when it encounters a view with the given xml name in the state.
-  // This function can be overridden by the UI.
-  const char* GetPreferredViewType(int connectionID, const char *xml_name);
 
   vtkSMPQStateLoaderInternals *PQInternal;
 private:
