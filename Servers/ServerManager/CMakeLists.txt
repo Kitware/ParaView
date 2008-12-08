@@ -238,6 +238,7 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
   vtkSMPropertyHelper.cxx
+  vtkSMProxyManagerExtension.cxx
   WRAP_EXCLUDE)
 
 
