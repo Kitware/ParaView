@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>433</width>
-    <height>362</height>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -62,7 +62,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_8" >
         <property name="text" >
-         <string>Vertex Type3</string>
+         <string>Vertex Type 3</string>
         </property>
        </widget>
       </item>
@@ -78,6 +78,46 @@
          <string>Hidden</string>
         </property>
        </widget>
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Vertex Type 4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="vertexField4" />
+      </item>
+      <item row="3" column="2" >
+       <widget class="QLineEdit" name="vertexDomain4" />
+      </item>
+      <item row="3" column="3" >
+       <widget class="QCheckBox" name="vertexHidden4" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Vertex Type 5</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3" >
+       <widget class="QCheckBox" name="vertexHidden5" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="vertexField5" />
+      </item>
+      <item row="4" column="2" >
+       <widget class="QLineEdit" name="vertexDomain5" />
       </item>
      </layout>
     </widget>
@@ -126,6 +166,32 @@
       </item>
       <item row="2" column="2" >
        <widget class="QLineEdit" name="edgeTarget3" />
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>Edge Type 4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_10" >
+        <property name="text" >
+         <string>Edge Type 5</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="edgeSource4" />
+      </item>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="edgeSource5" />
+      </item>
+      <item row="3" column="2" >
+       <widget class="QLineEdit" name="edgeTarget4" />
+      </item>
+      <item row="4" column="2" >
+       <widget class="QLineEdit" name="edgeTarget5" />
       </item>
      </layout>
     </widget>
