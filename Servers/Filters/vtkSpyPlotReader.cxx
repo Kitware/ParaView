@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.71");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.72");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -103,6 +103,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
+  this->IsAMR = 1;
 
   this->TimeRequestedFromPipeline = false;
 }
@@ -133,7 +134,8 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *vtkNotUsed(req),
   vtkInformation *outInfo = outV->GetInformationObject(0);
   vtkCompositeDataSet* outData = NULL;
 
-  // IsAMR is updated during the RequestInformation pass.
+  // IsAMR is first set during the RequestInformation pass. This will
+  // make the wrong decision if RequestDataObject runs first.
   if (this->IsAMR)
     {
     outData = vtkHierarchicalBoxDataSet::New();
@@ -153,8 +155,8 @@ int vtkSpyPlotReader::RequestDataObject(vtkInformation *vtkNotUsed(req),
 //-----------------------------------------------------------------------------
 // Read the case file and the first binary file do get meta
 // informations (number of files, number of fields, number of timestep).
-int vtkSpyPlotReader::RequestInformation(vtkInformation *request, 
-                                         vtkInformationVector **inputVector, 
+int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
+                                         vtkInformationVector **inputVector,
                                          vtkInformationVector *outputVector)
 {
   if(this->GlobalController==0)
@@ -166,7 +168,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     {
     return 0;
     }
-  
+
   vtkInformation *info=outputVector->GetInformationObject(0);
   info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
 
@@ -520,7 +522,13 @@ enum
 };
 
 template<class DataType>
-int vtkSpyPlotRemoveBadGhostCells(DataType* dataType, vtkDataArray* dataArray, int realExtents[6], int realDims[3], int ptDims[3], int realPtDims[3])
+int vtkSpyPlotRemoveBadGhostCells(
+        DataType* dataType,
+        vtkDataArray* dataArray,
+        int realExtents[6],
+        int realDims[3],
+        int ptDims[3],
+        int realPtDims[3])
 {
   /*
     vtkDebugMacro( "//////////////////////////////////////////////////////////////////////////////////" );
@@ -791,9 +799,13 @@ int vtkSpyPlotReader::RequestData(
   int rightHasBounds = 0;
   int leftHasBounds = 0;
 
-  // TODO collect the functions that gather meta data 
-  // in one place and collect the data in a single pass
-  // TODO move the MakeCurrent outside of meta data gather funcs
+  vtkHierarchicalBoxDataSet *hbds 
+        = vtkHierarchicalBoxDataSet::SafeDownCast(cds);
+
+  // TODO The following three calls compute meta data
+  // this could be done in a single pass, and the meta data
+  // should be vtkInformationKeys defined in vtkHierarchicalBoxDataSet
+  // rather than placed in the field data as it is here.
 
   // Note that in the process of getting the bounds 
   // all of the readers will get updated appropriately
@@ -807,8 +819,6 @@ int vtkSpyPlotReader::RequestData(
   this->SetGlobalMinLevelAndSpacing( blockIterator );
   // export global bounds, minimum level, spacing, and box size
   // in field data arrays for use by downstream filters
-  vtkHierarchicalBoxDataSet *hbds 
-        = vtkHierarchicalBoxDataSet::SafeDownCast(cds);
   if ( hbds )
     {
     this->AddAttributes(hbds);
@@ -817,8 +827,8 @@ int vtkSpyPlotReader::RequestData(
   // read in the data
   if (nBlocks!=0)
     {
-    // TODO This filter can use the arrays
-    // in field data instead.
+    // TODO This seems wrong, shouldn't the bounds key be defined in
+    // the hierarchical dataset?
     double b[6];
     this->Bounds->GetBounds(b);
     info->Set(vtkExtractCTHPart::BOUNDS(), b, 6);
@@ -1800,25 +1810,24 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
                                          level, spacing,
                                          origin, extents,
                                          realExtents,
-                                         realDims); 
+                                         realDims);
 
-/*  double bds[6];
-  this->Bounds->GetBounds(bds);
-  cerr << "{\n";
-  cerr << "level:       [" << *level << "]\n";
-  cerr << "Origin:      [" << origin[0] << "," << origin[1] << "," << origin[2] << "]\n";
-  cerr << "Spacing:     [" << spacing[0] << "," << spacing[1] << "," << spacing[2] << "]\n";
-  cerr << "extents:     [" << extents[0] << "," << extents[1] << "," << extents[2] << "|"
-                           << extents[3] << "," << extents[4] << "," << extents[5] << "]\n";
-  cerr << "realExtents: [" << realExtents[0] << "," << realExtents[1] << "," << realExtents[2] << ","
-                           << realExtents[3] << "," << realExtents[4] << "," << realExtents[5] << "]\n";
-  cerr << "realDims:    [" << realDims[0] << "," << realDims[1] << "," << realDims[2] << "]\n";
-  cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
-                           << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
-  cerr << "}\n"*/;
+//   double bds[6];
+//   this->Bounds->GetBounds(bds);
+//   cerr << "{\n";
+//   cerr << "level:       [" << *level << "]\n";
+//   cerr << "Origin:      [" << origin[0] << "," << origin[1] << "," << origin[2] << "]\n";
+//   cerr << "Spacing:     [" << spacing[0] << "," << spacing[1] << "," << spacing[2] << "]\n";
+//   cerr << "extents:     [" << extents[0] << "," << extents[1] << "," << extents[2] << "|"
+//                            << extents[3] << "," << extents[4] << "," << extents[5] << "]\n";
+//   cerr << "realExtents: [" << realExtents[0] << "," << realExtents[1] << "," << realExtents[2] << ","
+//                            << realExtents[3] << "," << realExtents[4] << "," << realExtents[5] << "]\n";
+//   cerr << "realDims:    [" << realDims[0] << "," << realDims[1] << "," << realDims[2] << "]\n";
+//   cerr << "bounds:      [" << bds[0] << "," << bds[1] << "," << bds[2] << ","
+//                            << bds[3] << "," << bds[4] << "," << bds[5] << "]\n";
+//   cerr << "}\n";
 
   vtkAMRBox box(realExtents);
-
   vtkUniformGrid* ug = vtkUniformGrid::New();
   hb->SetDataSet(*level, hb->GetNumberOfDataSets(*level), box, ug);
   ug->SetSpacing(spacing);
@@ -1826,6 +1835,7 @@ int vtkSpyPlotReader::PrepareAMRData(vtkHierarchicalBoxDataSet *hb,
   ug->SetOrigin(origin);
   *cd = ug->GetCellData();
   ug->Delete();
+
   return needsFixing;
 }
 
@@ -2003,7 +2013,6 @@ void vtkSpyPlotReader::UpdateBadGhostFieldData(int numFields, int dims[3],
       //vtkDebugMacro( << __LINE__ << " Read data block: " << blockID 
       // << " " << field << "  [" << array->GetName() << "]" );
       cd->AddArray(array);
-      //array->Print(cout);
 
       if ( !fixed )
         {

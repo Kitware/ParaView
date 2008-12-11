@@ -8,6 +8,8 @@
 #define MinBlockBound(i) this->XYZArrays[i]->GetTuple1(0)
 #define MaxBlockBound(i)  \
 this->XYZArrays[i]->GetTuple1(this->XYZArrays[i]->GetNumberOfTuples()-1)
+
+
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " \
 << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
@@ -16,15 +18,21 @@ this->XYZArrays[i]->GetTuple1(this->XYZArrays[i]->GetNumberOfTuples()-1)
 vtkSpyPlotBlock::vtkSpyPlotBlock() :
   Level(0)
 {
+  this->Level = 0;
+  this->XYZArrays[0]=this->XYZArrays[1]=this->XYZArrays[2]=NULL;
+  this->Dimensions[0]=this->Dimensions[1]=this->Dimensions[2]=0;
+  this->SavedExtents[0]=this->SavedExtents[2]=this->SavedExtents[4]=1;
+  this->SavedExtents[1]=this->SavedExtents[3]=this->SavedExtents[5]=0;
+  this->SavedRealExtents[0]=this->SavedRealExtents[2]=this->SavedRealExtents[4]=1;
+  this->SavedRealExtents[1]=this->SavedRealExtents[3]=this->SavedRealExtents[5]=0;
+  this->SavedRealDims[0]=this->SavedRealDims[2]=this->SavedRealDims[4]=1;
+  this->SavedRealDims[1]=this->SavedRealDims[3]=this->SavedRealDims[5]=0;
+  //
   this->Status.Active = 0;
   this->Status.Allocated = 0;
   this->Status.Fixed = 0;
   this->Status.Debug = 0;
   this->Status.AMR = 0;
-  this->XYZArrays[0] = 0;
-  this->XYZArrays[1] = 0;
-  this->XYZArrays[2] = 0;
-  
 }
 
 //-----------------------------------------------------------------------------
@@ -62,7 +70,7 @@ unsigned char vtkSpyPlotBlock::GetDebug() const
 //-----------------------------------------------------------------------------
 const char *vtkSpyPlotBlock::GetClassName() const
 {
-  return "vtkSpyPlotBlock";;
+  return "vtkSpyPlotBlock";
 }
 
 //-----------------------------------------------------------------------------
@@ -115,7 +123,7 @@ void vtkSpyPlotBlock::GetRealBounds(double rbounds[6]) const
     if (this->Dimensions[i] > 1)
       {
       rbounds[j++] = this->XYZArrays[i]->GetTuple1(fixOffset);
-      rbounds[j++] = 
+      rbounds[j++] =
         this->XYZArrays[i]->GetTuple1(this->Dimensions[i]+fixOffset-2);
       continue;
       }
@@ -167,12 +175,14 @@ int vtkSpyPlotBlock::GetAMRInformation(const vtkBoundingBox  &globalBounds,
     {
     minV = MinBlockBound(i);
     maxV = MaxBlockBound(i);
+
     spacing[i] = (maxV  - minV) / this->Dimensions[i];
-    
+
     if (this->Dimensions[i] == 1)
       {
+      origin[i]=0.0;
       realExtents[j++] = 0;
-      realExtents[j++] = 1;
+      realExtents[j++] = 1; //!
       realDims[i] = 1;
       continue;
       }
@@ -195,7 +205,7 @@ int vtkSpyPlotBlock::GetAMRInformation(const vtkBoundingBox  &globalBounds,
     ++j;
     if (maxV > maxP[i])
       {
-      realExtents[j] = this->Dimensions[i] - 1;      
+      realExtents[j] = this->Dimensions[i] - 1;
       hasBadCells = 1;
       if (!this->IsFixed())
         {
@@ -205,7 +215,6 @@ int vtkSpyPlotBlock::GetAMRInformation(const vtkBoundingBox  &globalBounds,
     else
       {
       realExtents[j] = this->Dimensions[i];
-      
       }
     realDims[i] = realExtents[j] - realExtents[j-1];
     }
@@ -253,7 +262,7 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
         {
           ca[i] = 0;
           continue;
-        }      
+        }
       ca[i] = this->XYZArrays[i];
       }
     return 1;
@@ -306,7 +315,7 @@ int vtkSpyPlotBlock::FixInformation(const vtkBoundingBox &globalBounds,
     
     if (maxV > maxP[i])
       {
-      realExtents[j] = this->Dimensions[i] - 1;      
+      realExtents[j] = this->Dimensions[i] - 1;
       --extents[j];
       hasBadGhostCells=1;
       if (!this->IsFixed())
@@ -363,6 +372,7 @@ int vtkSpyPlotBlock::Read(int isAMR, int fileVersion, vtkSpyPlotIStream *stream)
     vtkErrorMacro("Could not read in block's dimensions");
     return 0;
     }
+
   // Read in the allocation state of the block
   if (!stream->ReadInt32s(&temp, 1))
     {
