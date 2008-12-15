@@ -1575,20 +1575,6 @@
         </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="ByteOrder" 
-        command="SetByteOrder" 
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="BigEndian"/>
-         <Entry value="1" text="LittleEndian"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property indicates the byte order of the binary file(s).
-       </Documentation>
-     </IntVectorProperty>
-
      <StringVectorProperty 
         name="CellArrayInfo"
         information_only="1">
