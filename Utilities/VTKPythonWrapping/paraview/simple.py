@@ -200,6 +200,9 @@ def GetActiveView():
 def GetActiveSource():
     return active_objects.source
     
+def GetActiveCamera():
+    return GetActiveView().GetActiveCamera()
+    
 class active_objects:
     view = None
     source = None
@@ -218,5 +221,58 @@ FIELD_ASSOCIATION_ROWS = 6
 if not servermanager.ActiveConnection:
     Connect()
 
+def demo1():
+    ss = Sphere(Radius=2, ThetaResolution=32)
+    shr = Shrink(Input=ss)
+    cs = Cone()
+    app = AppendDatasets()
+    app.Input = [shr, cs]
+    Show(app)
+    Render()
 
+def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
+    # Create the exodus reader and specify a file name
+    reader = ExodusIIReader(FileName=fname)
+    # Get the list of point arrays.
+    arraySelection = reader.PointVariables
+    print arraySelection.Available
+    # Select all arrays
+    arraySelection = arraySelection.Available
+
+    # Turn on the visibility of the reader
+    Show(reader)
+    # Set representation to wireframe
+    SetDisplayProperties(Representation = "Wireframe")
+    # Black background is not pretty
+    SetViewProperties(Background = [0.4, 0.4, 0.6])
+    Render()
+    # Change the elevation of the camera. See VTK documentation of vtkCamera
+    # for camera parameters.
+    # NOTE: THIS WILL BE SIMPLER
+    GetActiveCamera().Elevation(45)
+    Render()
+    # Now that the reader executed, let's get some information about it's
+    # output.
+    pdi = reader[0].PointData
+    # This prints a list of all read point data arrays as well as their
+    # value ranges.
+    print 'Number of point arrays:', len(pdi)
+    for i in range(len(pdi)):
+        ai = pdi[i]
+        print "----------------"
+        print "Array:", i, ai.Name, ":"
+        numComps = ai.GetNumberOfComponents()
+        print "Number of components:", numComps
+        for j in range(numComps):
+            print "Range:", ai.Range(j)
+    # White is boring. Let's color the geometry using a variable.
+    # First create a lookup table. This object controls how scalar
+    # values are mapped to colors. See VTK documentation for
+    # details.
+    # Map min (0.00678) to blue, max (0.0288) to red
+    SetDisplayProperties(LookupTable = MakeBlueToRedLT(0.00678, 0.0288))
+    # Color by point array called Pres
+    SetDisplayProperties(ColorAttributeType = "POINT_DATA")
+    SetDisplayProperties(ColorArrayName = "Pres")
+    Render()
 
