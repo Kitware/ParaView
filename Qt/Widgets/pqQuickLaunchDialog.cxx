@@ -158,9 +158,17 @@ void pqQuickLaunchDialog::updateSearch()
     return;
     }
 
-  QStringList search = this->Internal->Items.keys();
-  search = search.filter(this->Internal->SearchString, Qt::CaseInsensitive);
-  foreach (QString key, search)
+  QStringList searchComponents = this->Internal->SearchString.split(" ",
+    QString::SkipEmptyParts);
+
+  QStringList searchSpace = this->Internal->Items.keys();
+
+  foreach (QString component, searchComponents)
+    {
+    searchSpace = searchSpace.filter(component, Qt::CaseInsensitive);
+    }
+
+  foreach (QString key, searchSpace)
     {
     QListWidgetItem *item = new QListWidgetItem(this->Internal->Items[key]);
     QString actionName = item->data(Qt::UserRole).toString();
