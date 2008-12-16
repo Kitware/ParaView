@@ -96,7 +96,8 @@ bool pqQuickLaunchDialog::eventFilter (QObject *watched, QEvent *evt)
       return true;
       }
     else if ( (key >= Qt::Key_0 && key <= Qt::Key_9) ||
-      (key >= Qt::Key_A && key <= Qt::Key_Z))
+      (key >= Qt::Key_A && key <= Qt::Key_Z) ||
+      key == Qt::Key_Space)
       {
       this->Internal->SearchString += keyEvent->text();
       this->updateSearch();
