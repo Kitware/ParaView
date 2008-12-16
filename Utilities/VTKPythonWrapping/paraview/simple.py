@@ -122,12 +122,16 @@ def UpdatePipeline(time=None, proxy=None):
         proxy = active_objects.source
     proxy.UpdatePipeline(time)
 
+# TODO: Change this to take the array name and number of components. Register 
+# the lt under the name ncomp.array_name
 def MakeBlueToRedLT(min, max):
     lt = servermanager.rendering.PVLookupTable()
+    servermanager.Register(lt)
     # Add to RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values. 
     lt.RGBPoints = [min, 0, 0, 1, max, 1, 0, 0]
-    lt.ColorSpace = 1 # HSV
+    lt.ColorSpace = "HSV"
+    return lt
     
 def _find_writer(filename):
     extension = None
@@ -234,10 +238,10 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     # Create the exodus reader and specify a file name
     reader = ExodusIIReader(FileName=fname)
     # Get the list of point arrays.
-    arraySelection = reader.PointVariables
-    print arraySelection.Available
+    avail = reader.PointVariables.Available
+    print avail
     # Select all arrays
-    arraySelection = arraySelection.Available
+    reader.PointVariables = avail
 
     # Turn on the visibility of the reader
     Show(reader)
@@ -260,7 +264,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     for i in range(len(pdi)):
         ai = pdi[i]
         print "----------------"
-        print "Array:", i, ai.Name, ":"
+        print "Array:", i, " ", ai.Name, ":"
         numComps = ai.GetNumberOfComponents()
         print "Number of components:", numComps
         for j in range(numComps):
