@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>411</width>
-    <height>888</height>
+    <height>944</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -254,7 +254,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="label_16" >
         <property name="text" >
-         <string>Vertex Type3</string>
+         <string>Vertex Type 3</string>
         </property>
        </widget>
       </item>
@@ -271,6 +271,26 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="1" >
+       <widget class="QLineEdit" name="vertexField4" />
+      </item>
+      <item row="3" column="2" >
+       <widget class="QLineEdit" name="vertexDomain4" />
+      </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_4" >
+        <property name="text" >
+         <string>Vertex Type 4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3" >
+       <widget class="QCheckBox" name="vertexHidden4" >
+        <property name="text" >
+         <string>Hidden</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -280,44 +300,74 @@
       <string>Link Edges</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="0" column="0" >
+      <item row="1" column="0" >
        <widget class="QLabel" name="label_17" >
         <property name="text" >
          <string>Edge Type 1</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
+      <item row="1" column="1" >
        <widget class="QLineEdit" name="edgeSource1" />
       </item>
-      <item row="0" column="2" >
+      <item row="1" column="2" >
        <widget class="QLineEdit" name="edgeTarget1" />
       </item>
-      <item row="1" column="0" >
+      <item row="2" column="0" >
        <widget class="QLabel" name="label_18" >
         <property name="text" >
          <string>Edge Type 2</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
+      <item row="2" column="1" >
        <widget class="QLineEdit" name="edgeSource2" />
       </item>
-      <item row="1" column="2" >
+      <item row="2" column="2" >
        <widget class="QLineEdit" name="edgeTarget2" />
       </item>
-      <item row="2" column="0" >
+      <item row="3" column="0" >
        <widget class="QLabel" name="label_19" >
         <property name="text" >
          <string>Edge Type 3</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
+      <item row="3" column="1" >
        <widget class="QLineEdit" name="edgeSource3" />
       </item>
-      <item row="2" column="2" >
+      <item row="3" column="2" >
        <widget class="QLineEdit" name="edgeTarget3" />
+      </item>
+      <item row="4" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Edge Type 4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="edgeSource4" />
+      </item>
+      <item row="4" column="2" >
+       <widget class="QLineEdit" name="edgeTarget4" />
+      </item>
+      <item row="0" column="0" colspan="2" >
+       <widget class="QLabel" name="label_2" >
+        <property name="text" >
+         <string>Generate Directed Graph</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <widget class="QCheckBox" name="Directed" >
+        <property name="text" >
+         <string/>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -392,14 +442,8 @@
   <tabstop>databasePassword</tabstop>
   <tabstop>databaseHost</tabstop>
   <tabstop>databasePort</tabstop>
-  <tabstop>edgeQuery</tabstop>
   <tabstop>vertexQuery</tabstop>
-  <tabstop>edgeSource1</tabstop>
-  <tabstop>edgeTarget1</tabstop>
-  <tabstop>edgeSource2</tabstop>
-  <tabstop>edgeTarget2</tabstop>
-  <tabstop>edgeSource3</tabstop>
-  <tabstop>edgeTarget3</tabstop>
+  <tabstop>edgeQuery</tabstop>
   <tabstop>vertexField1</tabstop>
   <tabstop>vertexDomain1</tabstop>
   <tabstop>vertexHidden1</tabstop>
@@ -409,6 +453,20 @@
   <tabstop>vertexField3</tabstop>
   <tabstop>vertexDomain3</tabstop>
   <tabstop>vertexHidden3</tabstop>
+  <tabstop>vertexField4</tabstop>
+  <tabstop>vertexDomain4</tabstop>
+  <tabstop>vertexHidden4</tabstop>
+  <tabstop>Directed</tabstop>
+  <tabstop>edgeSource1</tabstop>
+  <tabstop>edgeTarget1</tabstop>
+  <tabstop>edgeSource2</tabstop>
+  <tabstop>edgeTarget2</tabstop>
+  <tabstop>edgeSource3</tabstop>
+  <tabstop>edgeTarget3</tabstop>
+  <tabstop>edgeSource4</tabstop>
+  <tabstop>edgeTarget4</tabstop>
+  <tabstop>generateEdgePedigreeIds</tabstop>
+  <tabstop>edgePedigreeIdArrayName</tabstop>
  </tabstops>
  <resources/>
  <connections/>
