@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _@ARG_STRATEGY_TYPE@Implementation_h
 
 #include <QObject>
-#include "pqGraphLayoutStrategyInterface.h"
-#include "vtkSmartPointer.h"
+#include <pqGraphLayoutStrategyInterface.h>
+#include <vtkSmartPointer.h>
 
 class vtk@ARG_STRATEGY_TYPE@;
 

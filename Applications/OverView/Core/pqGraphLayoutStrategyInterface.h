@@ -33,15 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqGraphLayoutStrategyInterface_h
 #define _pqGraphLayoutStrategyInterface_h
 
-#include "OverViewCoreExport.h"
-
 #include <QtPlugin>
 #include <QStringList>
 
 class vtkGraphLayoutStrategy;
 
 /// interface class for plugins that create view modules
-class OVERVIEW_CORE_EXPORT pqGraphLayoutStrategyInterface
+class pqGraphLayoutStrategyInterface
 {
 public:
   /// destructor
