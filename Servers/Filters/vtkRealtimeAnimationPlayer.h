@@ -52,6 +52,8 @@ protected:
 
   unsigned long Duration;
   double StartTime;
+  double EndTime;
+  double ShiftTime;
   double Factor;
   vtkTimerLog* Timer;
 private:
