@@ -152,6 +152,13 @@ ClientChartDisplay::ClientChartDisplay(pqRepresentation* representation, QWidget
     proxy,
     proxy->GetProperty("SeriesStatus"));
 
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.SeriesFilterText,
+    "text",
+    SIGNAL(textChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("SeriesFilterText"));
+
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
 }

@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>254</width>
-    <height>352</height>
+    <height>396</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" >
@@ -90,6 +90,20 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" >
+     <item>
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Search</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="SeriesFilterText" />
+     </item>
+    </layout>
+   </item>
+   <item>
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -115,7 +129,7 @@
   <tabstop>SeriesList</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../../../../ParaView3/Qt/Components/Resources/pqComponents.qrc" />
+  <include location="../../Qt/Components/Resources/pqComponents.qrc" />
  </resources>
  <connections/>
 </ui>

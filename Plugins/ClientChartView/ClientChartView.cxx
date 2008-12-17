@@ -369,11 +369,12 @@ void ClientChartView::renderInternal()
           vtkSMPropertyHelper(repProxy, "XAxisArrayName").GetAsString());
         }
 
+      QString seriesText = vtkSMPropertyHelper(repProxy, "SeriesFilterText").GetAsString();
       vtkSMPropertyHelper seriesHelper(repProxy, "SeriesStatus");
       for(unsigned int i=0; i<seriesHelper.GetNumberOfElements(); i+=2)
         {
         QString series = seriesHelper.GetAsString(i);
-        bool status = QVariant(seriesHelper.GetAsString(i+1)).toBool();
+        bool status = QVariant(seriesHelper.GetAsString(i+1)).toBool() && series.startsWith(seriesText);
 
         for(int j=0; j<this->Implementation->ChartLayer->getModel()->getNumberOfSeries(); ++j)
           {
