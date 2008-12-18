@@ -175,7 +175,7 @@ class Proxy(object):
 
     def __del__(self):
         """Destructor. Cleans up all observers as well as remove
-        the proxy for the _pyproxies dictionary"""
+        the proxy from the _pyproxies dictionary"""
         # Make sure that we remove observers we added
         if self.Observed:
             observed = self.Observed
@@ -974,6 +974,29 @@ class ArrayInformation(object):
         range = array.GetComponentRange(component)
         return (range[0], range[1])
 
+class FieldDataInformationIterator(object):
+    """Iterator for FieldDataInformation"""
+    
+    def __init__(self, info, items=False):
+        self.FieldDataInformation = info
+        self.index = 0
+        self.items = items
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.index >= self.FieldDataInformation.GetNumberOfArrays():
+            raise StopIteration
+
+        self.index += 1
+        ai = self.FieldDataInformation[self.index-1]
+        if self.items:
+            return (ai.GetName(), ai)
+        else:
+            return ai
+
+
 class FieldDataInformation(object):
     """Meta-data for a field of an output object (point data, cell data etc...).
     Provides easy access to the arrays using the slice interface:
@@ -1023,16 +1046,48 @@ class FieldDataInformation(object):
         return self.GetNumberOfArrays()
         
     def __getitem__(self, idx):
-        """Implements the [] operator. Accepts a slice, index or name."""
-        if isinstance(idx, slice):
-            indices = idx.indices(self.GetNumberOfArrays())
-            retVal = []
-            for i in range(*indices):
-                retVal.append(self.GetArray(i))
-            return retVal
-        
+        """Implements the [] operator. Accepts an array name."""
         return self.GetArray(idx)
 
+    def keys(self):
+        """Implementation of the dictionary API"""
+        kys = []
+        narrays = self.GetNumberOfArrays()
+        for i in range(narrays):
+            kys.append(ai.GetName())
+        return kys
+        
+    def values(self):
+        """Implementation of the dictionary API"""
+        vals = []
+        narrays = self.GetNumberOfArrays()
+        for i in range(narrays):
+            vals.append(self.GetArray(i))
+        return vals
+
+    def iteritems(self):
+        """Implementation of the dictionary API"""
+        return FieldDataInformationIterator(self, True)
+        
+    def items(self):
+        """Implementation of the dictionary API"""
+        itms = []
+        narrays = self.GetNumberOfArrays()
+        for i in range(narrays):
+            ai = self.GetArray(i)
+            itms.append((ai.GetName(), ai))
+        return itms
+        
+    def has_key(self, key):
+        """Implementation of the dictionary API"""
+        if self.GetArray(key):
+            return True
+        return False
+        
+    def __iter__(self):
+        """Implementation of the dictionary API"""
+        return FieldDataInformationIterator(self)
+        
     def __getattr__(self, name):
         """Forwards unknown attributes to the underlying
         vtkPVDataSetAttributesInformation"""
@@ -1309,7 +1364,7 @@ class PropertyIterator(object):
     
     def __init__(self, aProxy):
         self.SMIterator = aProxy.NewPropertyIterator()
-	if self.SMIterator:
+        if self.SMIterator:
             self.SMIterator.UnRegister(None)
             self.SMIterator.Begin()
         self.Key = None
@@ -1319,7 +1374,7 @@ class PropertyIterator(object):
         return self
 
     def next(self):
-	if not self.SMIterator:
+        if not self.SMIterator:
             raise StopIteration
 
         if self.SMIterator.IsAtEnd():
