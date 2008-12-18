@@ -1,6 +1,6 @@
 # Requires ParaView_SOURCE_DIR and ParaView_BINARY_DIR to be set.
 
-INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
+INCLUDE("${VTK_MAKE_INSTANTIATOR}/vtkMakeInstantiator.cmake")
 
 # helper PV_PLUGIN_LIST_CONTAINS macro
 MACRO(PV_PLUGIN_LIST_CONTAINS var value)
@@ -11,7 +11,6 @@ MACRO(PV_PLUGIN_LIST_CONTAINS var value)
     ENDIF (${value} STREQUAL ${value2})
   ENDFOREACH (value2)
 ENDMACRO(PV_PLUGIN_LIST_CONTAINS)
-
 
 # helper PV_PLUGIN_PARSE_ARGUMENTS macro
 MACRO(PV_PLUGIN_PARSE_ARGUMENTS prefix arg_names option_names)
@@ -42,7 +41,6 @@ MACRO(PV_PLUGIN_PARSE_ARGUMENTS prefix arg_names option_names)
   ENDFOREACH(arg)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PV_PLUGIN_PARSE_ARGUMENTS)
-
 
 # Macro to generate a header xml given an XML.
 MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)

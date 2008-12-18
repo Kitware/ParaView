@@ -1,4 +1,14 @@
 PROJECT(ServerManager)
+
+# needed by vtkExportKit.cmake
+SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
+#SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
+
+# Any build configured headers should be added to this 
+# variable so that they also get installed.
+SET (dynamicHeaders)
+
+
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(KIT PVServerManager)
@@ -314,11 +324,12 @@ IF (PARAVIEW_ENABLE_PYTHON)
   IF(VTKPythonWrapping_INSTALL_BIN_DIR)
     SET(VTK_INSTALL_NO_LIBRARIES)
   ENDIF(VTKPythonWrapping_INSTALL_BIN_DIR)
-  SET(VTK_INSTALL_LIB_DIR "${VTKPythonWrapping_INSTALL_LIB_DIR}")
-  SET(VTK_INSTALL_BIN_DIR "${VTKPythonWrapping_INSTALL_BIN_DIR}")
-  STRING(REGEX REPLACE "^/" "" VTK_INSTALL_LIB_DIR_CM24 "${VTK_INSTALL_LIB_DIR}")
-  STRING(REGEX REPLACE "^/" "" VTK_INSTALL_BIN_DIR_CM24 "${VTK_INSTALL_BIN_DIR}")
 
+#   SET(VTK_INSTALL_LIB_DIR      "${VTKPythonWrapping_INSTALL_LIB_DIR}")
+#   SET(VTK_INSTALL_BIN_DIR      "${VTKPythonWrapping_INSTALL_BIN_DIR}")
+  SET(VTK_INSTALL_LIB_DIR_CM24 "${VTKPythonWrapping_INSTALL_LIB_DIR}")
+  SET(VTK_INSTALL_BIN_DIR_CM24 "${VTKPythonWrapping_INSTALL_BIN_DIR}")
+  
   # include python wrapping from VTK
   INCLUDE(KitCommonPythonWrapBlock)
 ENDIF (PARAVIEW_ENABLE_PYTHON)
@@ -379,7 +390,7 @@ IF(NOT CMAKE_CROSSCOMPILING)
       @ONLY IMMEDIATE)
     ADD_EXECUTABLE(${edexe} ${CMAKE_CURRENT_BINARY_DIR}/${edexe}-forward.c)
     ADD_DEPENDENCIES(${edexe} ${edexe}${PV_EXE_SUFFIX})
-    INSTALL(TARGETS ${edexe} DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime)
+    INSTALL(TARGETS ${edexe} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime)
   ENDIF(PV_NEED_SHARED_FORWARD)
 
   TARGET_LINK_LIBRARIES(vtkSMExtractDocumentation${PV_EXE_SUFFIX} vtkPVServerManager)
@@ -420,41 +431,52 @@ FOREACH(rf ${resourceFiles})
   SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION
     "${PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION}\n${oneModule}")
 ENDFOREACH(rf)
+
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/vtkParaViewIncludeModulesToSMApplication.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h"
   @ONLY IMMEDIATE)
+SET (dynamicHeaders 
+    "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/vtkParaViewIncludeModulesToSMApplication.h")
+
 
 SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
+# Install
+#----------------------------------------------------------------------------------------------------
+# Libraries
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET (targets_to_install)
-  
+
   IF(PARAVIEW_ENABLE_PYTHON)
     SET (targets_to_install ${targets_to_install} 
       vtk${KIT}Python)
   ENDIF(PARAVIEW_ENABLE_PYTHON)
-    
-  IF(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL(TARGETS vtk${KIT} ${targets_to_install}
-      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-  ELSE(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL_TARGETS(${PV_INSTALL_LIB_DIR}
-      vtk${KIT}
-      ${targets_to_install}
-      )
-  ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
+  INSTALL(TARGETS vtk${KIT} ${targets_to_install}
+      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
+#
+# Resource files
 IF(NOT PV_INSTALL_NO_RUNTIME)
-  INSTALL_FILES(${PV_INSTALL_LIB_DIR}/ServerManager/Resources FILES
-    ${resourceFiles}
-    )
+  INSTALL(
+    FILES ${resourceFiles}
+    DESTINATION ${PV_INSTALL_LIB_DIR}/ServerManager/Resources)
 ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+#
+# Development
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  PV3InstallHeaders(${CMAKE_CURRENT_SOURCE_DIR} ${PV_INSTALL_INCLUDE_DIR})
+  INSTALL(FILES ${dynamicHeaders} DESTINATION ${PV_INSTALL_INCLUDE_DIR} COMPONENT Development)
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
+# Testing
+#----------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
+
+

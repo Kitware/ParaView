@@ -2,7 +2,8 @@ PROJECT(VTKCS)
 
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 
-INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServer.cmake)
+
 IF(NOT PARAVIEW_BINARY_DIR)
   SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/VTK/Utilities")
 ENDIF(NOT PARAVIEW_BINARY_DIR)
@@ -10,14 +11,14 @@ ENDIF(NOT PARAVIEW_BINARY_DIR)
 # Configure the vtkClientServer library.
 SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
-  ${VTKCS_SOURCE_DIR}/vtkClientServerConfigure.h.in
-  ${VTKCS_BINARY_DIR}/vtkClientServerConfigure.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerConfigure.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkClientServerConfigure.h
   @ONLY IMMEDIATE
   )
 
 INCLUDE_DIRECTORIES(
-  ${VTKCS_SOURCE_DIR}
-  ${VTKCS_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${VTK_INCLUDE_DIR}
   )
 
@@ -78,12 +79,30 @@ ADD_LIBRARY(vtkClientServer
 TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
 
 IF(NOT PV_INSTALL_NO_DEVELOPMENT)
-  INSTALL_FILES(${PV_INSTALL_INCLUDE_DIR} FILES
-    ${VTKCS_BINARY_DIR}/vtkClientServerConfigure.h
-    ${VTKCS_SOURCE_DIR}/vtkClientServerID.h
-    ${VTKCS_SOURCE_DIR}/vtkClientServerInterpreter.h
-    ${VTKCS_SOURCE_DIR}/vtkClientServerStream.h
-    )
+  # Headers etc...
+  SET(sourceFiles
+     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerID.h"
+     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerInterpreter.h"
+     "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerStream.h"
+     "${CMAKE_CURRENT_BINARY_DIR}/vtkClientServerConfigure.h")
+  INSTALL(
+      FILES ${sourceFiles}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+  # CMake files
+  SET(configFiles
+      "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServer.cmake"
+      "${CMAKE_CURRENT_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake"
+      "${CMAKE_CURRENT_SOURCE_DIR}/CMake/vtkWrapClientServer.cxx.in")
+  INSTALL(
+      FILES ${configFiles}
+      DESTINATION ${PV_INSTALL_LIB_DIR}
+      COMPONENT Development)
+  # Wrapper exec
+  INSTALL(
+      FILES "${ParaView_BINARY_DIR}/bin/vtkWrapClientServer${PV_EXE_SUFFIX}"
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
 # Build vtkClientServer wrappers for VTK kits.
@@ -115,14 +134,10 @@ IF(VTK_USE_VIEWS)
 ENDIF(VTK_USE_VIEWS)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
-  IF(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL(TARGETS vtkClientServer
-      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-  ELSE(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} vtkClientServer)
-  ENDIF(PV_INSTALL_HAS_CMAKE_24)
+  INSTALL(TARGETS vtkClientServer
+    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
 
 IF(BUILD_TESTING)

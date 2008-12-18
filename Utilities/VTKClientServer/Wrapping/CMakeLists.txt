@@ -1,5 +1,5 @@
 IF(NOT CMAKE_CROSSCOMPILING)
-
+ 
   SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
   # vtkParse.tab.c has #line markers that break #include with double quotes.
   INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/VTK/Wrapping)
@@ -11,7 +11,9 @@ IF(NOT CMAKE_CROSSCOMPILING)
   ENDIF(COMPILE_TOOLS_TARGET)
 
   IF(NOT PV_INSTALL_NO_DEVELOPMENT)
-    INSTALL_TARGETS(/lib/paraview-${PARAVIEW_VERSION} vtkWrapClientServer)
+    INSTALL(
+        TARGETS vtkWrapClientServer
+        DESTINATION ${PV_INSTALL_BIN_DIR})
   ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)
 
 ENDIF(NOT CMAKE_CROSSCOMPILING)

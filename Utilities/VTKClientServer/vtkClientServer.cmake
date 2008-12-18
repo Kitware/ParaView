@@ -1,11 +1,16 @@
-INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
+#
+#
+#
+INCLUDE (${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cmake)
 
+#------------------------------------------------------------------------------
 MACRO(CS_INITIALIZE_WRAP)
   SET(LIBRARY_OUTPUT_PATH    ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
   SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
   SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 ENDMACRO(CS_INITIALIZE_WRAP)
 
+#------------------------------------------------------------------------------
 MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
   SET(vtk${kit}CS_HEADERS)
   INCLUDE("${VTK_KITS_DIR}/vtk${kit}Kit.cmake")
@@ -24,7 +29,8 @@ MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
   ENDFOREACH(class)
   VTK_WRAP_ClientServer("${libname}" "vtk${kit}CS_SRCS" "${vtk${kit}CS_HEADERS}")
 ENDMACRO(PV_PRE_WRAP_VTK_CS kit ukit deps)
-
+ 
+#------------------------------------------------------------------------------
 # Macro to create ClientServer wrappers classes in a single VTK kit.
 MACRO(PV_WRAP_VTK_CS kit ukit deps)
   SET(KIT_CS_DEPS)
@@ -38,15 +44,10 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
   IF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)
     IF(BUILD_SHARED_LIBS)
       IF(NOT PV_INSTALL_NO_LIBRARIES)
-        IF(PV_INSTALL_HAS_CMAKE_24)
-          INSTALL(TARGETS vtk${kit}CS
-            RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-            LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-            ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-        ELSE(PV_INSTALL_HAS_CMAKE_24)
-          INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} vtk${kit}CS)
-        ENDIF(PV_INSTALL_HAS_CMAKE_24)
-
+        INSTALL(TARGETS vtk${kit}CS
+          RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+          LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+          ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
       ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
     ENDIF(BUILD_SHARED_LIBS)
   ENDIF(PARAVIEW_SOURCE_DIR OR ParaView_SOURCE_DIR)

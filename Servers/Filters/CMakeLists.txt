@@ -1,4 +1,13 @@
 PROJECT(PVFilters)
+
+# needed by vtkExportKit.cmake
+SET(VTK_INSTALL_PACKAGE_DIR_CM24 ${PV_INSTALL_LIB_DIR})
+SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
+
+# Any build configured headers should be added to this 
+# variable so that they also get installed.
+SET (dynamicHeaders)
+
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 IF(PARAVIEW_ENABLE_PYTHON)
@@ -7,7 +16,6 @@ IF(PARAVIEW_ENABLE_PYTHON)
     ${VTKPythonWrapping_SOURCE_DIR}/Executable
   )
 ENDIF(PARAVIEW_ENABLE_PYTHON)
-
 
 SET(Filters_SRCS
   vtkAnimationPlayer.cxx
@@ -287,7 +295,7 @@ IF(PARAVIEW_BUILD_WITH_ADAPTOR)
 ENDIF(PARAVIEW_BUILD_WITH_ADAPTOR)
 
 #########################################################################
-
+SET (dynamicHeaders "${dynamicHeaders};${PVFilters_BINARY_DIR}/vtkPVFiltersConfig.h")
 CONFIGURE_FILE(${PVFilters_SOURCE_DIR}/vtkPVFiltersConfig.h.in
   ${PVFilters_BINARY_DIR}/vtkPVFiltersConfig.h
   ESCAPE_QUOTES)
@@ -350,17 +358,23 @@ SET(KIT_WRAP_DEPS Parallel Hybrid Rendering VolumeRendering Widgets)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Filters/Utilities")
 PV_WRAP_VTK_CS(PVFilters PVFILTERS "${KIT_WRAP_DEPS}")
 
+#Install
+#-------------------------------------------------------------------------------------------------
+# Libraries
 IF(NOT PV_INSTALL_NO_LIBRARIES)
-  IF(PV_INSTALL_HAS_CMAKE_24)
     INSTALL(TARGETS vtkPVFiltersCS vtkPVFilters
-      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-  ELSE(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} vtkPVFiltersCS vtkPVFilters)
-  ENDIF(PV_INSTALL_HAS_CMAKE_24)
+      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
+# Development
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  PV3InstallHeaders(${CMAKE_CURRENT_SOURCE_DIR} ${PV_INSTALL_INCLUDE_DIR})
+  INSTALL(FILES ${dynamicHeaders} DESTINATION ${PV_INSTALL_INCLUDE_DIR} COMPONENT Development)
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
+# Tests
+#-------------------------------------------------------------------------------------------------
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)

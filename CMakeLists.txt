@@ -1,5 +1,7 @@
 PROJECT(ParaView)
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4.5)
+
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
@@ -122,6 +124,12 @@ ENDIF (PARAVIEW_BUILD_QT_GUI)
 SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake FindPythonLibs bug")
 MARK_AS_ADVANCED(PYTHON_DEBUG_LIBRARY)
 
+# Mark certain VTK variables as advanced. Users do not really have to set these.
+IF (APPLE)
+  MARK_AS_ADVANCED(CMAKE_OSX_ARCHITECTURES CMAKE_OSX_SYSROOT VTK_USE_CARBON VTK_USE_COCOA VTK_APPLE_RESOURCE)
+ENDIF(APPLE)
+MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC)
+
 #########################################################################
 # Define a PARAVIEW_USE_MPI that is not advanced
 SET(PARAVIEW_USE_MPI OFF CACHE BOOL "Build ParaView with MPI support")
@@ -206,10 +214,16 @@ FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping NO_CMAKE_FIND
 MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 
 #########################################################################
+# Any build configured headers should be added to this 
+# variable so that they also get installed.
+SET (dynamicHeaders)
+
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPQConfig.h
   ESCAPE_QUOTES)
 
+SET(dynamicHeaders 
+    "${dynamicHeaders};${ParaView_BINARY_DIR}/vtkPQConfig.h")
 
 #########################################################################
 #
@@ -220,7 +234,12 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
 #########################################################################
 # Include the file that most of the environment setup (except GUI)
 # It also adds the VTK directories
+SET(PARAVIEW_PLUGINS_CMAKE_FILE "${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake")
+SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
+SET(VTKCS_SOURCE_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer")
+SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
 INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
+
 
 #########################################################################
 IF(BUILD_DOCUMENTATION)
@@ -246,7 +265,6 @@ INCLUDE(ParaView3CPack.cmake)
 
 #########################################################################
 # Additional definitions for ParaViewConfig.cmake
-
 SET(PARAVIEW_USE_FILE "${ParaView_SOURCE_DIR}/ParaViewUse.cmake")
 SET(PARAVIEW_VTK_DIR "${ParaView_BINARY_DIR}/VTK")
 
@@ -265,23 +283,12 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
                               ${ParaView_SOURCE_DIR}/Qt/Components
                               ${ParaView_BINARY_DIR}/Qt/Components )
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
-
 GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview${PV_EXE_SUFFIX} LOCATION)
 GET_TARGET_PROPERTY(PARAVIEW_BATCH_EXECUTABLE pvbatch${PV_EXE_SUFFIX} LOCATION)
 GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY 
   "${ParaView_SOURCE_DIR}/Servers/ServerManager/Resources")
-SET(VTKCS_SOURCE_DIR 
-  "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer")
 
-# The ParaView library dependencies.
-SET(PARAVIEW_LIBRARY_DEPENDS_FILE
-  "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
-EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
-
-# Perform configuration.
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
-  ${ParaView_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
 
 
 #########################################################################
@@ -296,8 +303,100 @@ IF (PARAVIEW_BUILD_QT_GUI)
   ADD_SUBDIRECTORY(Applications)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
-# Mark certain VTK variables as advanced. Users do not really have to set these.
-IF (APPLE)
-  MARK_AS_ADVANCED(CMAKE_OSX_ARCHITECTURES CMAKE_OSX_SYSROOT VTK_USE_CARBON VTK_USE_COCOA VTK_APPLE_RESOURCE)
-ENDIF(APPLE)
-MARK_AS_ADVANCED(VTK_USE_MPEG2_ENCODER QT_PLUGINS_DIR QT_MKSPECS_DIR VTK_USE_MFC)
+# The ParaView library dependencies.
+SET(PARAVIEW_LIBRARY_DEPENDS_FILE
+  "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
+EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
+# Perform build tree configuration. Install configuration is
+# handled below.
+CONFIGURE_FILE(
+    ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
+    ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
+    @ONLY IMMEDIATE)
+
+#######################################################################
+# INSTALL
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  MESSAGE(STATUS "Configuring development install...")
+
+  INSTALL(
+      FILES ${dynamicHeaders} 
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+  SET(pluginQtComponentConfig
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqObjectPanelImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewOptionsImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewOptionsImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqActionGroupImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqActionGroupImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqViewFrameActionGroupImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqExtraResources.qrc.in)
+  INSTALL(
+      FILES ${pluginQtComponentConfig}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Components
+      COMPONENT Development)
+  SET(pluginQtCoreConfig
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqViewModuleImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqAutoStartImplementation.cxx.in
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqPluginImplementation.h.in
+      ${ParaView_SOURCE_DIR}/Qt/Core/pqPluginImplementation.cxx.in)
+  INSTALL(
+      FILES ${pluginQtCoreConfig}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Core)
+  SET(pluginServerManagerConfig
+      ${ParaView_SOURCE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in)
+  INSTALL(
+      FILES ${pluginServerManagerConfig}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Servers/Common/vtkPVPluginInit.cxx.in
+      COMPONENT Development)
+  SET(cmakeDevFiles
+      ${ParaView_SOURCE_DIR}/ParaViewUse.cmake
+      ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake
+      ${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake)
+  INSTALL(
+      FILES ${cmakeDevFiles} 
+      DESTINATION ${PV_INSTALL_LIB_DIR}
+      COMPONENT Development)
+
+  # Re-configure for the install.
+  SET(SOURCE_TREE                                  ${ParaView_SOURCE_DIR})
+  SET(ParaView_SOURCE_DIR                         "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_USE_FILE                           "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewUse.cmake")
+  SET(PARAVIEW_VTK_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+  SET(PARAVIEW_CMAKE_EXTENSIONS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+  SET(PARAVIEW_CMAKE_CLIENT_SERVER_EXTENSION      "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/vtkWrapClientServer.cmake")
+  SET(VTK_WRAP_ClientServer_EXE_CONFIG            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/vtkWrapClientServer")
+  SET(PARAVIEW_INCLUDE_DIRS                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_GUI_INCLUDE_DIRS                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_KWSYS_INCLUDE_DIRS                 "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_INCLUDE_DIR}")
+  SET(PARAVIEW_LIBRARY_DIRS                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+  SET(PARAVIEW_GUI_CLIENT_EXECUTABLE              "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/paraview${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_BATCH_EXECUTABLE                   "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvbatch${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_PROCESS_XML_EXECUTABLE             "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/kwProcessXML${PV_EXE_SUFFIX}")
+  SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/Servers/ServerManager/Resources")
+  SET(VTKCS_CONFIG_DIR                            "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+  SET(PARAVIEW_LIBRARY_DEPENDS_FILE               "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewLibraryDepends.cmake")
+  SET(PARAVIEW_PLUGINS_CMAKE_FILE                 "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/ParaViewPlugins.cmake")
+  SET(VTK_MAKE_INSTANTIATOR                       "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/CMake/")
+
+  CONFIGURE_FILE(
+      "${SOURCE_TREE}/ParaViewConfig.cmake.in"
+      "${ParaView_BINARY_DIR}/CMake/tmp/ParaViewConfig.cmake"
+      @ONLY IMMEDIATE)
+
+  INSTALL(
+      FILES "${ParaView_BINARY_DIR}/CMake/tmp/ParaViewConfig.cmake"
+      DESTINATION ${PV_INSTALL_LIB_DIR}
+      COMPONENT Development)
+
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)

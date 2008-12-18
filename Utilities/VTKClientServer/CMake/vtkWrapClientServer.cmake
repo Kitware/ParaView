@@ -104,7 +104,7 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   SET (CS_TARGET ${TARGET})
 
   CONFIGURE_FILE(
-    ${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cxx.in  
+    ${VTKCS_CONFIG_DIR}/vtkWrapClientServer.cxx.in  
     ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
     COPY_ONLY
     IMMEDIATE

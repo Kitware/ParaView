@@ -1,5 +1,9 @@
 PROJECT(QtPython)
 
+# Any build configured headers should be added to this 
+# variable so that they also get installed.
+SET (dynamicHeaders)
+
 INCLUDE_DIRECTORIES(
   ${pqCore_SOURCE_DIR}
   ${pqCore_BINARY_DIR}
@@ -49,26 +53,26 @@ TARGET_LINK_LIBRARIES(QtPython
 
 CONFIGURE_FILE(
   ${QtPython_SOURCE_DIR}/QtPythonConfig.h.in
-  ${QtPython_BINARY_DIR}/QtPythonConfig.h
-)
+  ${QtPython_BINARY_DIR}/QtPythonConfig.h)
+SET(dynamicHeaders 
+    "${dynamicHeaders};${QtPython_BINARY_DIR}/QtPythonConfig.h")
 
 SOURCE_GROUP("Generated Files" FILES
   ${QtPython_MOC_BUILT_SOURCES}
-  ${QtPython_UI_BUILT_SOURCES}
-)
+  ${QtPython_UI_BUILT_SOURCES})
 
+# Install
+#--------------------------------------------------------------------------------------------------
+# Libraries
 IF(NOT PV_INSTALL_NO_LIBRARIES)
   SET (targets_to_install QtPython)
-    
-  IF(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL(TARGETS ${targets_to_install}
-      RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
-      LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
-      ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
-  ELSE(PV_INSTALL_HAS_CMAKE_24)
-    INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} ${targets_to_install})
-  ENDIF(PV_INSTALL_HAS_CMAKE_24)
-
+  INSTALL(TARGETS ${targets_to_install}
+    RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+    LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
-
-
+# Development
+IF (NOT PV_INSTALL_NO_DEVELOPMENT)
+  PV3InstallHeaders(${CMAKE_CURRENT_SOURCE_DIR} ${PV_INSTALL_INCLUDE_DIR})
+  INSTALL(FILES ${dynamicHeaders} DESTINATION ${PV_INSTALL_INCLUDE_DIR} COMPONENT Development)
+ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)

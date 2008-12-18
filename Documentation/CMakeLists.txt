@@ -147,9 +147,9 @@ configure_file(
 
 set(dir "${ParaView_BINARY_DIR}/Documentation/")
 install(DIRECTORY ${ParaView_BINARY_DIR}/Documentation/ 
-        DESTINATION ${PV_EXE_INSTALL_CM24}/Documentation 
+        DESTINATION ${PV_EXE_INSTALL}/Documentation 
         COMPONENT Runtime
         REGEX ".html")
 
 install(FILES ${ParaView_BINARY_DIR}/pqClient.adp 
-  DESTINATION ${PV_EXE_INSTALL_CM24} COMPONENT Runtime )
+  DESTINATION ${PV_EXE_INSTALL} COMPONENT Runtime )

@@ -9,10 +9,10 @@ IF(QT4_FOUND)
 # To make support of ParaView tractable, we only support a single version
 # of Qt at one time.  If you really want to use a newer version of Qt, you
 # can delete this check, but you are on your own.
-#STRING(REGEX MATCH "^4\\.2\\.[0-9]+" qt_version_tmp "${QTVERSION}")
-#IF (NOT qt_version_tmp)
+# STRING(REGEX MATCH "^4\\.2\\.[0-9]+" qt_version_tmp "${QTVERSION}")
+# IF (NOT qt_version_tmp)
 #  MESSAGE(SEND_ERROR "Qt ${QTVERSION} not supported.  Please use Qt 4.2.")
-#ENDIF (NOT qt_version_tmp)
+# ENDIF (NOT qt_version_tmp)
 
 # help CMake find QtUiTools on Mac (binary install)
 IF(Q_WS_MAC AND QT4_FOUND AND QT_QTCORE_FOUND AND NOT QT_QTUITOOLS_FOUND)
