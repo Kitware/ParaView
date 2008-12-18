@@ -830,10 +830,11 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
 
   for(int i=0; i<attrInfo->GetNumberOfArrays(); i++)
     {
-    if(attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
+    vtkPVArrayInformation* info = attrInfo->GetArrayInformation(i);
+    if (info->GetNumberOfComponents() == 1)
       {
       this->Implementation->ThresholdScalarArray->addItem(
-        attrInfo->GetArrayInformation(i)->GetName());
+        info->GetName());
       }
     }
 }
