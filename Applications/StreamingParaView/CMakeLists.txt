@@ -95,7 +95,7 @@ ENDIF(NOT Q_WS_MAC)
 # to install assistant-real
 SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
-SET(MACOSX_BUNDLE_BUNDLE_NAME "StreamingParaView")
+SET(MACOSX_BUNDLE_BUNDLE_NAME "StreamingParaview")
 IF(NOT Q_WS_MAC)
   SET(PV_EXE_NAME StreamingParaview${PV_EXE_SUFFIX})
 ELSE(NOT Q_WS_MAC)

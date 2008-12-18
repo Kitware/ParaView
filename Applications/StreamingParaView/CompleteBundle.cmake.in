@@ -1,6 +1,6 @@
 SET(CMAKE_BACKWARDS_COMPATIBILITY "2.4")
-SET(toplevel "@EXECUTABLE_OUTPUT_PATH@/paraview.app")
-SET(finaldir "@EXECUTABLE_OUTPUT_PATH@/paraview.app/Contents/MacOS")
+SET(toplevel "@EXECUTABLE_OUTPUT_PATH@/@MACOSX_BUNDLE_BUNDLE_NAME@.app")
+SET(finaldir "@EXECUTABLE_OUTPUT_PATH@/@MACOSX_BUNDLE_BUNDLE_NAME@.app/Contents/MacOS")
 SET(dylibdir "@EXECUTABLE_OUTPUT_PATH@")
 
 MAKE_DIRECTORY("${toplevel}/Contents")
@@ -51,7 +51,7 @@ FOREACH(modlib ${libraries})
 
   # Setup the install names
   EXECUTE_PROCESS(COMMAND "${install_name_tool}"
-    "${finaldir}/paraview" -change "${modlibname}" "@executable_path/${modlibnamenopath}")
+    "${finaldir}/@MACOSX_BUNDLE_BUNDLE_NAME@" -change "${modlibname}" "@executable_path/${modlibnamenopath}")
   EXECUTE_PROCESS(COMMAND "${install_name_tool}"
     "${finaldir}/${modlibnamenopath}" -id "@executable_path/${modlibnamenopath}")
 
