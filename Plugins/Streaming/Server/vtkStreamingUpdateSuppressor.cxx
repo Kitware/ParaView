@@ -22,6 +22,8 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkUpdateSuppressorPipeline.h"
+#include "vtkPieceCacheFilter.h"
+#include "vtkStreamingOptions.h"
 
 #include "vtkPiece.h"
 #include "vtkPieceList.h"
@@ -30,7 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.1");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.2");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -43,7 +45,6 @@ vtkStreamingUpdateSuppressor::vtkStreamingUpdateSuppressor()
   this->SerializedPriorities = NULL;
   this->UseCulling = 1;
 
-  this->EnableStreamMessages = 0;
   this->MPIMoveData = NULL;
 }
 
@@ -60,7 +61,6 @@ vtkStreamingUpdateSuppressor::~vtkStreamingUpdateSuppressor()
     }
 }
 
-//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::ForceUpdate()
 {    
@@ -320,7 +320,7 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
       vtkPiece *piece = vtkPiece::New();    
       int gPiece = this->UpdatePiece*this->NumberOfPasses + i;
       int gPieces = this->UpdateNumberOfPieces*this->NumberOfPasses;
-      if (this->UseCulling)
+      if (vtkStreamingOptions::GetUsePrioritization())
         {
         if (this->EnableStreamMessages)
           {

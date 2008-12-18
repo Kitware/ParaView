@@ -143,7 +143,6 @@ private:
   //For debugging, helps to identify which US is spewing out messages
   void PrintPipe(vtkAlgorithm *);
 //ETX
-
 };
 
 #endif

@@ -14,9 +14,8 @@
 =========================================================================*/
 
 #include "vtkSMStreamingViewProxy.h"
-
-#include "vtkSMStreamingHelperProxy.h"
-
+#include "vtkSMStreamingOptionsProxy.h"
+#include "vtkStreamingOptions.h"
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
@@ -37,15 +36,19 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkSMPropertyHelper.h"
 
-
-
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.4");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
+
+#define DEBUGPRINT_VIEW(arg)\
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
 
 //-----------------------------------------------------------------------------
 class vtkSMStreamingViewProxy::vtkInternals
@@ -74,6 +77,7 @@ vtkSMStreamingViewProxy::vtkSMStreamingViewProxy()
   this->DisplayDone = 1;
   this->MaxPass = -1;
   this->PixelArray = NULL;
+
   this->RenderViewHelper = vtkSMStreamingViewHelper::New();
   this->RenderViewHelper->SetStreamingView(this); //not reference counted.
 
@@ -81,7 +85,7 @@ vtkSMStreamingViewProxy::vtkSMStreamingViewProxy()
   this->Pass = 0;
 
   // Make sure the helper proxy exists
-  this->GetStreamingHelperProxy();
+  this->GetStreamingOptionsProxy();
 }
 
 //-----------------------------------------------------------------------------
@@ -97,9 +101,9 @@ vtkSMStreamingViewProxy::~vtkSMStreamingViewProxy()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMStreamingHelperProxy* vtkSMStreamingViewProxy::GetStreamingHelperProxy()
+vtkSMStreamingOptionsProxy* vtkSMStreamingViewProxy::GetStreamingOptionsProxy()
 {
-  return vtkSMStreamingHelperProxy::GetHelper();
+  return vtkSMStreamingOptionsProxy::GetProxy();
 }
 
 //STUFF TO MAKE THIS VIEW PRETEND TO BE A RENDERVIEW
@@ -233,7 +237,7 @@ void vtkSMStreamingViewProxy::InteractiveRender()
   in_interactive_render = false;
 }
 
-//STUFF TO MAKE A PLUGIN VIEW WITH SPECIALIZE STREAMING REPS and STRATS
+//STUFF TO MAKE A PLUGIN VIEW WITH SPECIALIZED STREAMING REPS and STRATS
 //-----------------------------------------------------------------------------
 vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
   vtkSMProxy* source, int opport)
@@ -243,11 +247,9 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
     return 0;
     }
 
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
+  DEBUGPRINT_VIEW(
     cerr << "SV(" << this << ") CreateDefaultRepresentation" << endl;
-    }
+    );
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
@@ -270,10 +272,9 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
   pp->RemoveAllUncheckedProxies();
   if (usg)
     {
-    if (doPrints)
-      {
+    DEBUGPRINT_VIEW(
       cerr << "SV(" << this << ") Created StreamingUnstructuredGridRepresentation" << endl;
-      }
+      );
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "StreamingUnstructuredGridRepresentation"));
     }
@@ -288,10 +289,9 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
   pp->RemoveAllUncheckedProxies();
   if (sg)
     {
-    if (doPrints)
-      {
+    DEBUGPRINT_VIEW(
       cerr << "SV(" << this << ") Created StreamingUniformGridRepresentation" << endl;
-      }
+      );
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "StreamingUniformGridRepresentation"));
     }
@@ -306,10 +306,9 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
   pp->RemoveAllUncheckedProxies();
   if (g)
     {
-    if (doPrints)
-      {
+    DEBUGPRINT_VIEW(
       cerr << "SV(" << this << ") Created StreamingGeometryRepresentation" << endl;
-      }
+      );
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "StreamingGeometryRepresentation"));
     }
@@ -324,25 +323,22 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   vtkSMRepresentationStrategy* strategy = 0;
     
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
   if (this->IsSerial)
     {
     if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
         dataType == VTK_IMAGE_DATA)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingPolyDataStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingPolyDataStrategy"));
       }
     else if (dataType == VTK_UNSTRUCTURED_GRID)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingUnstructuredGridStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingUnstructuredGridStrategy"));
       }
@@ -356,37 +352,33 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
     {
     if (dataType == VTK_POLY_DATA)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingPolyDataParallelStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
          pxm->NewProxy("strategies", "StreamingPolyDataParallelStrategy"));
       }
     else if (dataType == VTK_UNIFORM_GRID)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingUniformGridParallelStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingUniformGridParallelStrategy"));
       }
     else if (dataType == VTK_UNSTRUCTURED_GRID)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingUnstructuredGridParallelStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingUnstructuredGridParallelStrategy"));
       }
     else if (dataType == VTK_IMAGE_DATA)
       {
-      if (doPrints)
-        {    
+      DEBUGPRINT_VIEW(
         cerr << "SV(" << this << ") Creating StreamingImageDataParallelStrategy" << endl;
-        }
+        );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingImageDataParallelStrategy"));
       }
@@ -401,7 +393,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
     strategy->GetProperty("SetNumberOfPasses"));
   if (ivp)
     {
-    int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+    int nPasses = vtkStreamingOptions::GetStreamedPasses();
     ivp->SetElement(0,nPasses);
     }
 
@@ -447,7 +439,7 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
           srep->SetViewState(this->Internals->CamState, this->Internals->Frustum);
           }
         }
-      }    
+      }
     }
 }
 
@@ -470,6 +462,10 @@ void vtkSMStreamingViewProxy::FinalizeRenderPass()
     //take all that we've drawn into back buffer and show it
     this->CopyBackBufferToFrontBuffer();
     }
+
+//  cerr << "---------------------<any key>----------------------" << endl;
+//  s t d::string s;
+//  cin >> s;
 }
 
 //-----------------------------------------------------------------------------
@@ -508,15 +504,11 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
   vtkSMRenderViewProxy *RVP = this->GetRootView();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  //int useViewOrdering = vtkSMStreamingHelperProxy::GetHelper()->GetUseViewOrdering();
-
-  if (doPrints)
-    {
+  DEBUGPRINT_VIEW(
     cerr << "SV::UpdateAllRepresentations" << endl;
-    }
+    );
 
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   //Update pipeline for each representation.
   //For representations that allow streaming, compute a piece priority order
   vtkSmartPointer<vtkCollectionIterator> iter;
@@ -550,17 +542,15 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
       {
       if (this->Pass == 0)
         {
-        if (doPrints)
-          {
+        DEBUGPRINT_VIEW(
           cerr << "SV(" << this << ") Compute priorities on DREP " << drepr << endl;
-          }
+                        );
         int maxpass = drepr->ComputePriorities();
         if (maxpass > this->MaxPass)
           {
-          if (doPrints)
-            {
+          DEBUGPRINT_VIEW(
             cerr << "SV(" << this << ") MaxPass is now " << maxpass << endl;
-            }
+                          );
           this->MaxPass = maxpass;
           }
         }
@@ -585,15 +575,14 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
 //-----------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::PerformRender()
 {
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SV:PerformRender" << endl;
-    }
+  DEBUGPRINT_VIEW(
+    cerr << "SV::PerformRender" << endl;
+    );
+
   vtkSMRenderViewProxy *RVP = this->GetRootView();
 
   this->DisplayDone = 1;
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses(); 
+  int nPasses = vtkStreamingOptions::GetStreamedPasses(); 
   if (this->MaxPass == -1)
     {
     nPasses = 1;
@@ -623,10 +612,9 @@ void vtkSMStreamingViewProxy::PerformRender()
       //if representation supports pieces, choose most important one to render in this pass      
       if (this->Pass < nPasses)
         {
-        if (doPrints)
-          {
+        DEBUGPRINT_VIEW(
           cerr << "SV(" << this << ") Update Pass " << this->Pass << endl;
-          }
+                        );
         drepr->SetPassNumber(this->Pass, 1);
         //update pipeline to get the geometry for that piece
         drepr->Update(this); //get geometry for next stripe
@@ -636,18 +624,16 @@ void vtkSMStreamingViewProxy::PerformRender()
 
   if (this->Pass+1 < nPasses)
     {
-    if (doPrints)
-      {
+    DEBUGPRINT_VIEW(
       cerr << "SV(" << this << ") Need more passes " << endl;
-      }    
+                    );
     this->DisplayDone = 0;
     }
   else
     {
-    if (doPrints)
-      {
+    DEBUGPRINT_VIEW(
       cerr << "SV(" << this << ") All passes finished " << endl;
-      }    
+                    );
     }
   
   if ( RVP->GetMeasurePolygonsPerSecond() )
@@ -685,7 +671,6 @@ void vtkSMStreamingViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
-
 
 //-----------------------------------------------------------------------------
 bool vtkSMStreamingViewProxy::CameraChanged()

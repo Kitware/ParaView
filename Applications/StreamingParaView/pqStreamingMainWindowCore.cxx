@@ -56,7 +56,7 @@ void pqStreamingMainWindowCore::scheduleNextPass()
   int doPrint = 0;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy * helper = vtkSMProxy::SafeDownCast(
-    pxm->GetProxy("helpers", "StreamingHelperInstance"));
+    pxm->GetProxy("helpers", "StreamingOptionsInstance"));
   if (helper)
     {
     doPrint = vtkSMPropertyHelper(helper, "EnableStreamMessages").GetAsInt();

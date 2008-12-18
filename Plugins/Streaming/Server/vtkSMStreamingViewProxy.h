@@ -27,7 +27,7 @@ class vtkUnsignedCharArray;
 class vtkSMRenderViewProxy;
 class vtkTimerLog;
 class vtkSMStreamingViewHelper;
-class vtkSMStreamingHelperProxy;
+class vtkSMStreamingOptionsProxy;
 
 class VTK_EXPORT vtkSMStreamingViewProxy : public vtkSMViewProxy
 {
@@ -85,7 +85,7 @@ public:
 
   // Description:
   // Get the streaming helper proxy.
-  static vtkSMStreamingHelperProxy* GetStreamingHelperProxy();
+  static vtkSMStreamingOptionsProxy* GetStreamingOptionsProxy();
 
 //BTX
 protected:
@@ -133,11 +133,9 @@ protected:
 
   int Pass;
 
-  void SetHelperProxy(vtkSMProxy* proxy);
-
 private:
 
-  vtkSMStreamingHelperProxy* helper;
+  vtkSMStreamingOptionsProxy* options;
 
   vtkSMStreamingViewProxy(const vtkSMStreamingViewProxy&); // Not implemented.
   void operator=(const vtkSMStreamingViewProxy&); // Not implemented.

@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkRawStridedReader.h"
 
+#include "vtkStreamingOptions.h"
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
@@ -32,15 +33,33 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader, "1.2");
+vtkCxxRevisionMacro(vtkRawStridedReader, "1.3");
 vtkStandardNewMacro(vtkRawStridedReader);
 
 #define DEBUGPRINT_STRIDED_READER_DETAILS(arg)\
-  ;
+  if (false && vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
+
 #define DEBUGPRINT_STRIDED_READER(arg)\
-  ;
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
+
+#define DEBUGPRINT_RESOLUTION(arg)\
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
+
 #define DEBUGPRINT_METAINFORMATION(arg)\
-  ;
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
+
 
 //============================================================================
 struct vtkRangeRecord2
@@ -120,6 +139,7 @@ public:
   }
 
   vtkstd::vector<vtkRangeRecord2 *> ranges;
+
 };
 
 //==============================================================================
@@ -465,9 +485,7 @@ int vtkRawStridedReaderPiece::read(ifstream& file,
     cerr << "buffer size must be a multiple of " << sizeof(float) << endl;
     return 0;
     }
-  DEBUGPRINT_STRIDED_READER_DETAILS(unsigned int num_floats =)
-    alloc_data();
-  DEBUGPRINT_STRIDED_READER_DETAILS(cerr << "We have room for " << num_floats << " floats." << endl;);
+  alloc_data();
 
   unsigned int insert_index = 0;
   
@@ -768,11 +786,8 @@ int vtkRawStridedReader::ProcessRequest(vtkInformation *request,
                    vtkInformationVector **inputVector,
                    vtkInformationVector *outputVector)
 {
+  DEBUGPRINT_STRIDED_READER(cerr << "RSR(" << this << ") PR" << endl;);
 
-//cerr << "RSR--------------------------------------------------------------" << endl;
-//vtkPrintit(request);
-//vtkPrintit(outputVector->GetInformationObject(0));
-//cerr << "-------------------------------------------------------------------" << endl;
   if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
     {
     DEBUGPRINT_STRIDED_READER(cerr << "RSR(" << this << ") RDO =====================================" << endl;);

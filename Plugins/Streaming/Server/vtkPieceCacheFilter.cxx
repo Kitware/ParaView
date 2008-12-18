@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPieceCacheFilter.h"
 
+#include "vtkStreamingOptions.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -24,8 +25,14 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPieceCacheFilter, "1.1");
+vtkCxxRevisionMacro(vtkPieceCacheFilter, "1.2");
 vtkStandardNewMacro(vtkPieceCacheFilter);
+
+#define DEBUGPRINT_CACHING(arg) \
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
 
 //----------------------------------------------------------------------------
 vtkPieceCacheFilter::vtkPieceCacheFilter()
@@ -35,6 +42,7 @@ vtkPieceCacheFilter::vtkPieceCacheFilter()
   this->AppendFilter = NULL;
   this->AppendSlot = -1;
   this->EnableStreamMessages = 0;
+  this->GetInformation()->Set(vtkAlgorithm::PRESERVES_DATASET(), 1);
 }
 
 //----------------------------------------------------------------------------
@@ -67,29 +75,19 @@ void vtkPieceCacheFilter::SetCacheSize(int size)
     {
     return;
     }
-  if (this->EnableStreamMessages)
-    {      
-    cerr << "PCF(" << this << ") SetCacheSize " << size << endl;
-    }
   this->EmptyCache();
 }
 
 //----------------------------------------------------------------------------
 void vtkPieceCacheFilter::EmptyCache()
 {
-  if (this->EnableStreamMessages)
-    {      
-    cerr << "PCF(" << this << ") Empty cache" << endl;
-    }
+  DEBUGPRINT_CACHING(
+  cerr << "PCF(" << this << ") Empty cache" << endl;
+                     );
 
   CacheType::iterator pos;
   for (pos = this->Cache.begin(); pos != this->Cache.end(); )
     {
-    if (this->EnableStreamMessages)
-      {
-      cerr << "PCF(" << this << ") Cache Remove " 
-           << pos->second.second << endl;
-      }
     pos->second.second->Delete();
     this->Cache.erase(pos++);
     }
@@ -112,10 +110,11 @@ vtkDataSet * vtkPieceCacheFilter::GetPiece(int pieceNum )
 //----------------------------------------------------------------------------
 void vtkPieceCacheFilter::DeletePiece(int pieceNum )
 {
-  if (this->EnableStreamMessages)
-    {      
-    cerr << "PCF(" << this << ") Delete piece " << pieceNum << endl;
-    }
+  DEBUGPRINT_CACHING(
+  cerr << "PCF(" << this << ") Delete piece " 
+  << this->ComputePiece(pieceNum) << "/" 
+  << this->ComputeNumberOfPieces(pieceNum) << endl;
+                     );
 
   CacheType::iterator pos = this->Cache.find(pieceNum);
   if (pos != this->Cache.end())
@@ -223,14 +222,17 @@ int vtkPieceCacheFilter::RequestData(
   CacheType::iterator pos = this->Cache.find(pieceNum);
   if (pos != this->Cache.end())
     {
-    if (this->EnableStreamMessages)
-      {
-      cerr << "PCF(" << this << ") Cache hit for piece " << pieceNum << endl;
-      }
+    DEBUGPRINT_CACHING(
+    cerr << "PCF(" << this << ") Cache hit for piece " << pieceNum << endl;
+                       );
+
     // update the m time in the cache
     pos->second.first = outData->GetUpdateTime();
 
     //pass the cached data onward
+    DEBUGPRINT_CACHING( 
+    cerr << "PCF(" << this << ") returning cached result" << endl;
+                      );
     outData->ShallowCopy(pos->second.second);
     return 1;
     }
@@ -331,10 +333,9 @@ int vtkPieceCacheFilter::RequestData(
     }
   else
     {
-    if (this->EnableStreamMessages)
-      {      
-      cerr << "PCF(" << this << ") Cache full for piece " << pieceNum << endl;
-      }
+    DEBUGPRINT_CACHING(
+    cerr << "PCF(" << this << ") Cache full for piece " << pieceNum << endl;
+                       );
     }
   
   outData->ShallowCopy(inData);
@@ -408,11 +409,11 @@ int vtkPieceCacheFilter::ProcessRequest(vtkInformation* request,
         }
       }
 
-    if (this->EnableStreamMessages)
-      {
-      cerr << "PCF(" << this << ") Not cached returning input filter's answer" 
-           << endl;
-      }
+    DEBUGPRINT_CACHING(
+    cerr << "PCF(" << this 
+    << ") Not cached returning input filter's answer for " 
+    << pieceNum << endl;
+                       );
 
     double inPrior = 1;
     if (inInfo->Has(vtkStreamingDemandDrivenPipeline::PRIORITY()))

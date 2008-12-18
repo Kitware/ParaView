@@ -14,9 +14,10 @@
 =========================================================================*/
 // .NAME vtkPriorityHelper - updates input conditionally
 // .SECTION Description
-// During info gathering, Streaming paraview adds this to the end of the pipeline so
-// that it can check each piece's priority before updating the piece. If a 
-// piece has a priority of 0, it is skipped and the rest tested in sequence.
+// During info gathering, Streaming paraview adds this to the end of the 
+// pipeline so that it can check each piece's priority before updating the 
+// piece. If a piece has a priority of 0, it is skipped and the rest tested 
+// in sequence.
 
 #ifndef __vtkPriorityHelper_h
 #define __vtkPriorityHelper_h

@@ -15,6 +15,7 @@
 
 #include "vtkVisibilityPrioritizer.h"
 
+#include "vtkStreamingOptions.h"
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -25,11 +26,14 @@
 #include "vtkBoundingBox.h"
 #include "vtkExtractSelectedFrustum.h"
 
-vtkCxxRevisionMacro(vtkVisibilityPrioritizer, "1.1");
+vtkCxxRevisionMacro(vtkVisibilityPrioritizer, "1.2");
 vtkStandardNewMacro(vtkVisibilityPrioritizer);
 
 #define DEBUGPRINT_PRIORITY(arg)\
-  ;
+  if (vtkStreamingOptions::GetEnableStreamMessages())\
+    { \
+      arg;\
+    }
 
 //----------------------------------------------------------------------------
 vtkVisibilityPrioritizer::vtkVisibilityPrioritizer()
@@ -73,8 +77,17 @@ int vtkVisibilityPrioritizer::ProcessRequest(vtkInformation* request,
 {  
   if(request->Has(vtkStreamingDemandDrivenPipeline::
                   REQUEST_UPDATE_EXTENT_INFORMATION()))
-    {
-    return this->RequestUpdateExtentInformation(request, inputVector, outputVector);
+    {    
+    if (vtkStreamingOptions::GetUseViewOrdering())
+      {
+      return this->RequestUpdateExtentInformation(request, inputVector, outputVector);
+      }
+    else
+      {
+      DEBUGPRINT_PRIORITY(
+                          cerr << "VS(" << this << ") Vis Priority Ignored" << endl;
+                          );
+      }
     }
   return this->Superclass::ProcessRequest(request, inputVector,
                                           outputVector);
@@ -153,7 +166,6 @@ int vtkVisibilityPrioritizer::RequestUpdateExtentInformation(
         }
       else
         {
-
         //for those that are not rejected, compute a priority from the bounds such that pieces
         //nearest to camera eye have highest priority 1 and those furthest away have lowest 0. 
         //Must do this using only information about current piece.

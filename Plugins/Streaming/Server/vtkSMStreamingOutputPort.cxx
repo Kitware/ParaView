@@ -28,11 +28,11 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMStreamingHelperProxy.h"
+#include "vtkStreamingOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMStreamingOutputPort);
-vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.2");
+vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOutputPort::vtkSMStreamingOutputPort()
@@ -89,13 +89,13 @@ void vtkSMStreamingOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
   vtkPVDataInformation *di = vtkPVDataInformation::New();
   vtkClientServerStream stream;
 
-  int doPrints =  vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
-  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
+  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
+  int doPrints =  vtkStreamingOptions::GetEnableStreamMessages();
 
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
   //commented out to make piece cache appendpolydata work
-  //if (!useCulling)
+  //if (!usePrioritization)
   //  {
   //  stream 
   //    << vtkClientServerStream::Invoke 
@@ -165,8 +165,6 @@ void vtkSMStreamingOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
   pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkSMStreamingOutputPort::UpdatePipelineInternal(double time, bool doTime)
 {
@@ -177,9 +175,9 @@ void vtkSMStreamingOutputPort::UpdatePipelineInternal(double time, bool doTime)
          << this->GetProducerID() << "UpdateInformation"
          << vtkClientServerStream::End;
 
-  int doPrints =  vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
-  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
+  int doPrints =  vtkStreamingOptions::GetEnableStreamMessages();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
+  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
 
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
 //  stream 

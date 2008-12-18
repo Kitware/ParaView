@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkvtkPieceCacheFilter - cache pieces for fast reuse
+// .NAME vtkPieceCacheFilter - cache pieces for fast reuse
 // .SECTION Description
 // vtkPieceCacheFilter caches the pieces given to it in its input and then
 // passes the data through to its output. Later requests will then
@@ -30,8 +30,8 @@
 // .SEE ALSO
 // vtkPieceCacheExecutive
 
-#ifndef __vtkvtkPieceCacheFilter_h
-#define __vtkvtkPieceCacheFilter_h
+#ifndef __vtkPieceCacheFilter_h
+#define __vtkPieceCacheFilter_h
 
 #include "vtkDataSetAlgorithm.h"
 
@@ -65,16 +65,26 @@ public:
   // if necessary.
   void DeletePiece(int i);
 
-  // Description:
-  // Controls whether the filter will attempt to use polydata aggregation. 
-  // Defaults is on.
-  vtkSetMacro(TryAppend, int);
-  vtkGetMacro(TryAppend, int);
+  //Description:
+  //Convert piece and number of pieces into a unique cache slot index
+  int ComputeIndex(int piece, int numPieces) const
+  {
+    return (((piece&0x0000FFFF)<<16) | (numPieces&0x0000FFFF));
+  }
 
-  // Description:
-  // Turn on or off diagnostic console messages.
-  vtkSetMacro(EnableStreamMessages, int);
-  vtkGetMacro(EnableStreamMessages, int);
+  //Description:
+  //Retrieve the piece number from a unique cache slot index
+  int ComputePiece(int index) const
+  {
+    return index>>16;
+  }
+
+  //Description:
+  //Retrieve the number of pieces from a unique cache slot index
+  int ComputeNumberOfPieces(int index) const
+  {
+    return index&0x0000FFFF;
+  }
 
 protected:
   vtkPieceCacheFilter();

@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCustomDisplayPolicy.h"
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -82,7 +82,7 @@ int ProcessModuleGUIHelper::preAppExec(int argc, char** argv,
   if (pxm)
     {
     vtkSMProxy* prototype =
-      pxm->GetPrototypeProxy("helpers", "StreamingHelper");
+      pxm->GetPrototypeProxy("helpers", "StreamingOptions");
     if (!prototype)
       {
       vtkErrorMacro("Tried and failed to create a streaming module. "

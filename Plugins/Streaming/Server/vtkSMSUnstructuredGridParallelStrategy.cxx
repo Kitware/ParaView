@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkSMSUnstructuredGridParallelStrategy.h"
-#include "vtkSMStreamingHelperProxy.h"
+#include "vtkStreamingOptions.h"
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
 #include "vtkMPIMoveData.h"
@@ -27,7 +27,7 @@
 #include "vtkPVInformation.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredGridParallelStrategy, "1.4");
+vtkCxxRevisionMacro(vtkSMSUnstructuredGridParallelStrategy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredGridParallelStrategy::vtkSMSUnstructuredGridParallelStrategy()
 {
@@ -115,7 +115,7 @@ void vtkSMSUnstructuredGridParallelStrategy::CreateLODPipeline(vtkSMSourceProxy*
 //----------------------------------------------------------------------------
 void vtkSMSUnstructuredGridParallelStrategy::SetPassNumber(int val, int force)
 {
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -135,27 +135,20 @@ void vtkSMSUnstructuredGridParallelStrategy::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 int vtkSMSUnstructuredGridParallelStrategy::ComputePriorities()
 {
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   int ret = nPasses;
 
   vtkSMIntVectorProperty* ivp;
 
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
-  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
+  int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
+  int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UseCulling"));
+    this->UpdateSuppressor->GetProperty("UsePrioritization"));
   ivp->SetElement(0, useCulling);
 
   //Note: Parallel Strategy has to use the PostCollectUS, because that
@@ -321,34 +314,22 @@ void vtkSMSUnstructuredGridParallelStrategy::GatherInformation(vtkPVInformation*
   //everything at once.
 
   vtkSMIntVectorProperty* ivp;
-
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather Info" << endl;
-    }
-
+  
   //put diagnostic setting transfer here because this happens early
-  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
-  //int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
+  int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
+  //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UseCulling"));
+    this->UpdateSuppressor->GetProperty("UsePrioritization"));
   ivp->SetElement(0, 0);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   ivp->SetElement(0, nPasses); 
 
   this->UpdateSuppressor->UpdateVTKObjects();
@@ -383,12 +364,7 @@ void vtkSMSUnstructuredGridParallelStrategy::GatherLODInformation(vtkPVInformati
 {
   //gather information in multiple passes so as never to request
   //everything at once.
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather LOD Info" << endl;
-    }
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
 
   for (int i = 0; i < 1; i++)
     {

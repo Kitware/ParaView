@@ -207,6 +207,12 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     return;
     }
 
+  if (name=="StreamingOptionsInstance")
+    {
+    // Ignore this particular proxy
+    return;
+    }
+
   if (!proxy)
     {
     qCritical() << "Null proxy cannot be registered.";

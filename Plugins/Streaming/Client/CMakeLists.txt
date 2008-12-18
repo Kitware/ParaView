@@ -26,16 +26,19 @@ INCLUDE_DIRECTORIES(
 # moc the Qt based .h files
 QT4_WRAP_CPP(MOC_SRCS
   pqStreamingRenderView.h
-  pqGlobalStreamingViewOptions.h)
-
+  pqGlobalStreamingViewOptions.h
+  pqStreamingDisplayDecorator.h
+)
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
   pqGlobalStreamingViewOptions.ui
+  pqStreamingDisplayDecorator.ui
 )
 
 SET(STREAMING_CS_SOURCES
   pqStreamingRenderView.cxx
   pqGlobalStreamingViewOptions.cxx
+  pqStreamingDisplayDecorator.cxx
 )
 
 # invoke macro to create sources for streaming view.
@@ -58,12 +61,22 @@ ADD_PARAVIEW_VIEW_OPTIONS(
                          GLOBAL_VIEW_OPTIONS pqGlobalStreamingViewOptions
                          )
 
+# invoke macro that adds the show piece bounds checkbox to the display tab
+ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
+  PANEL_IFACE PANEL_IFACE_SRCS 
+  CLASS_NAME pqStreamingDisplayDecorator
+  PANEL_TYPES pqDisplayProxyEditor)
+
 # finally create the plugin that puts the above together into a lib that 
 # paraview can load
 ADD_PARAVIEW_PLUGIN(StreamingCSPlugin "1.0" 
-                    GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
-                    GUI_SOURCES ${STREAMING_CS_SOURCES}
-                    ${MOC_SRCS} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${UI_BUILT_SOURCES})
+                    GUI_INTERFACES 
+                    ${IFACES} ${OPTIONS_IFACE} ${PANEL_IFACE}
+                    GUI_SOURCES 
+                    ${STREAMING_CS_SOURCES}
+                    ${MOC_SRCS} 
+                    ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS} ${PANEL_IFACE_SRCS}
+                    ${UI_BUILT_SOURCES})
 
 
 TARGET_LINK_LIBRARIES(StreamingCSPlugin StreamingSSPlugin)

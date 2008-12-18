@@ -18,6 +18,7 @@
 #include "vtkInformationIntegerVectorKey.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkStreamingOptions.h"
 #include "vtkAlgorithm.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkImageData.h"
@@ -26,8 +27,14 @@
 #include "vtkPointData.h"
 #include "vtkPieceCacheFilter.h"
 
-vtkCxxRevisionMacro(vtkPieceCacheExecutive, "1.1");
+vtkCxxRevisionMacro(vtkPieceCacheExecutive, "1.2");
 vtkStandardNewMacro(vtkPieceCacheExecutive);
+
+#define DEBUGPRINT_CACHING(arg) \
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
 
 //----------------------------------------------------------------------------
 vtkPieceCacheExecutive
@@ -49,8 +56,6 @@ int vtkPieceCacheExecutive
 {
   vtkPieceCacheFilter *myPCF = 
     vtkPieceCacheFilter::SafeDownCast(this->GetAlgorithm());
-
-  int doPrint = myPCF->GetEnableStreamMessages();
 
   // If no port is specified, check all ports.  This behavior is
   // implemented by the superclass.
@@ -111,46 +116,42 @@ int vtkPieceCacheExecutive
           // we have a match
           // Give the cached result to the requester
           dso->ShallowCopy(ds);
-          if (doPrint)
-            {
-            cerr << "PCE(" << this << ") UD cache hit piece " 
-                 << updatePiece << "\\"
-                 << updateNumberOfPieces << " "
-                 << dso->GetNumberOfPoints() << endl;
-            }
+          DEBUGPRINT_CACHING(
+          cerr << "PCE(" << this << ") cache hit piece " 
+               << updatePiece << "/"
+               << updateNumberOfPieces << " "
+               << dso->GetNumberOfPoints() << endl;
+          );
           //pipeline request can terminate now, yeah!
           return 0;
           }     
-        if (doPrint)
-          {         
-          cerr << "PCE(" << this 
-               << ") miss, cached is not a data set" << endl;
-          }
         }
       else
         {
-        if (doPrint)
-          {         
+        DEBUGPRINT_CACHING(
           cerr << "PCE(" << this << ") miss, cached has wrong extent" << endl;
           cerr << dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) << "!="
                <<  VTK_PIECES_EXTENT << "||"
                << dataPiece << "/" << dataNumberOfPieces << "!="
                << updatePiece << "/" << updateNumberOfPieces << "||"
                << dataGhostLevel << "!=" << updateGhostLevel << endl;
-          }
+                           );
           myPCF->DeletePiece(updatePiece);
         }
       }
     else
       {
-      if (doPrint)
-        {
-        cerr << "PCE(" << this << ") miss, nothing cached" << endl;
-        }
+      DEBUGPRINT_CACHING(
+      cerr << "PCE(" << this << ") miss, nothing cached for "
+           << updatePiece << "/"
+           << updateNumberOfPieces << endl;
+                         );
       }
     }
   else if (dataInfo->Get(vtkDataObject::DATA_EXTENT_TYPE()) == VTK_3D_EXTENT)
     {
+    //WARNING: THIS CODE HASN'T BEEN TESTED RECENTLY
+
     // Check the structured extent.  If the update extent is outside
     // of the extent and not empty, we need to execute.
     int dataExtent[6];
@@ -180,10 +181,9 @@ int vtkPieceCacheExecutive
           // we have a match
           // Give the cached result to the requester
           dso->ShallowCopy(ds);
-          if (doPrint)
-            {
+          DEBUGPRINT_CACHING(
             cerr << "PCE(" << this << ") SD cache hit " << updatePiece << endl;
-            }
+            );
           //pipeline request can terminate now, yeah!
           return 0;
           }
@@ -192,10 +192,9 @@ int vtkPieceCacheExecutive
     }
 
   // We do need to execute
-  if (doPrint)
-    {
-    cerr << "PCE(" << this << ") cache miss " << updatePiece << endl;
-    }  
+  DEBUGPRINT_CACHING(
+  cerr << "PCE(" << this << ") cache miss " << updatePiece << endl;
+                     );
   return 1;
 }
 

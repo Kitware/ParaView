@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkSMStreamingSerialStrategy.h"
-#include "vtkSMStreamingHelperProxy.h"
+#include "vtkStreamingOptions.h"
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -22,9 +22,16 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyProperty.h"
+
+#define DEBUGPRINT_STRATEGY(arg)\
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
 
 vtkStandardNewMacro(vtkSMStreamingSerialStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.2");
+vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMStreamingSerialStrategy::vtkSMStreamingSerialStrategy()
 {
@@ -90,28 +97,18 @@ void vtkSMStreamingSerialStrategy::CreateLODPipeline(vtkSMSourceProxy* input, in
 //----------------------------------------------------------------------------
 void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
 {
-  //gather information in multiple passes so as never to request the whole data  
+  //gather information without requesting the whole data  
   vtkSMIntVectorProperty* ivp;
-
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
+  DEBUGPRINT_STRATEGY(
     cerr << "SSS(" << this << ") Gather Info" << endl;
-    }
+    );
 
-  //put diagnostic setting transfer here because this happens early
-  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
-  //int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
+  int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
+  //int useCulling = vtkStreamingOptions::GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("UseCulling"));
   ivp->SetElement(0, 1);//useCulling);
@@ -119,7 +116,7 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   ivp->SetElement(0, nPasses); 
 
   this->UpdateSuppressor->UpdateVTKObjects();
@@ -153,14 +150,12 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
 void vtkSMStreamingSerialStrategy::GatherLODInformation(vtkPVInformation* info)
 {
   //gather information in multiple passes so as never to request the whole data  
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
+  DEBUGPRINT_STRATEGY(
     cerr << "SSS(" << this << ") Gather LOD Info" << endl;
-    }
+    );
 
   vtkSMIntVectorProperty* ivp;
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   for (int i = 0; i < 1; i++)
     {
     vtkPVInformation *sinfo = 
@@ -197,13 +192,11 @@ void vtkSMStreamingSerialStrategy::InvalidatePipeline()
 //----------------------------------------------------------------------------
 void vtkSMStreamingSerialStrategy::SetPassNumber(int val, int force)
 {
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   vtkSMIntVectorProperty* ivp;
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
+  DEBUGPRINT_STRATEGY(
     cerr << "SSS(" << this << ") SetPassNumber(" << val << "/" << nPasses << (force?"FORCE":"LAZY") << ")" << endl;
-    }
+                      );
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("PassNumber"));
@@ -222,35 +215,26 @@ void vtkSMStreamingSerialStrategy::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 int vtkSMStreamingSerialStrategy::ComputePriorities()
 {
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   int ret = nPasses;
 
   vtkSMIntVectorProperty* ivp;
   
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  int cacheLimit = vtkSMStreamingHelperProxy::GetHelper()->GetPieceCacheLimit();
-  int useCulling = vtkSMStreamingHelperProxy::GetHelper()->GetUseCulling();
+  int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
+  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
 
-  if (doPrints)
-    {
+  DEBUGPRINT_STRATEGY(
     cerr << "SSS(" << this << ") ComputePriorities" << endl;
-    }
-  
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
+                      )  
   ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UseCulling"));
-  ivp->SetElement(0, useCulling);
+    this->UpdateSuppressor->GetProperty("UsePrioritization"));
+  ivp->SetElement(0, usePrioritization);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(

@@ -15,31 +15,35 @@
 #include "vtkSMStreamingRepresentation.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMRepresentationStrategyVector.h"
 #include "vtkSMSImageDataParallelStrategy.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStreamingSerialStrategy.h"
+#include "vtkSMStreamingViewProxy.h"
 #include "vtkSMSUniformGridParallelStrategy.h"
 #include "vtkSMSUnstructuredDataParallelStrategy.h"
 #include "vtkSMSUnstructuredGridParallelStrategy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMStreamingViewProxy.h"
-#include "vtkSMStreamingHelperProxy.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkStreamingOptions.h"
 
-#include "vtkSMSourceProxy.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMOutputPort.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVCompositeDataInformation.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMPropertyIterator.h"
-
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.3");
+vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.4");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
+
+#define DEBUGPRINT_REPRESENTATION(arg)\
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
 
 inline void vtkSMStreamingRepresentationSetInt(
   vtkSMProxy* proxy, const char* pname, int val)
@@ -88,9 +92,12 @@ bool vtkSMStreamingRepresentation::EndCreateVTKObjects()
   this->Connect(inputProxy, this->PieceBoundsRepresentation,
                 "Input", this->OutputPort);
 
-  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "Visibility", 0);
-  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "MakeOutlineOfInput", 1);
-  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "UseOutline", 1);
+  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, 
+                                     "Visibility", 0);
+  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, 
+                                     "MakeOutlineOfInput", 1);
+  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, 
+                                     "UseOutline", 1);
   
   return this->Superclass::EndCreateVTKObjects();
 }
@@ -110,8 +117,9 @@ void vtkSMStreamingRepresentation::SetVisibility(int visible)
     this->ClearStreamCache();
     }
 
-  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "Visibility",
-    visible && this->PieceBoundsVisibility);
+  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, 
+                                     "Visibility",
+                                     visible && this->PieceBoundsVisibility);
   this->PieceBoundsRepresentation->UpdateVTKObjects();
      
   this->Superclass::SetVisibility(visible);
@@ -121,8 +129,9 @@ void vtkSMStreamingRepresentation::SetVisibility(int visible)
 void vtkSMStreamingRepresentation::SetPieceBoundsVisibility(int visible)
 {
   this->PieceBoundsVisibility = visible;
-  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, "Visibility",
-    visible && this->GetVisibility());
+  vtkSMStreamingRepresentationSetInt(this->PieceBoundsRepresentation, 
+                                     "Visibility",
+                                     visible && this->GetVisibility());
   this->PieceBoundsRepresentation->UpdateVTKObjects();
 }
 
@@ -193,7 +202,7 @@ void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
 //----------------------------------------------------------------------------
 void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
 {
-  int nPasses = vtkSMStreamingHelperProxy::GetHelper()->GetStreamedPasses();
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
   if (val<nPasses //should always be less than
       && 
       val>=0)
@@ -247,10 +256,6 @@ int vtkSMStreamingRepresentation::ComputePriorities()
     int maxpass = ptr->ComputePriorities();\
     if (maxpass > maxPass)\
       {\
-      if (doPrints)\
-        {\
-        cerr << "SR(" << this << ") MaxPass=" << maxpass << endl;\
-        }\
       maxPass = maxpass;\
       }\
     }\
@@ -259,11 +264,9 @@ int vtkSMStreamingRepresentation::ComputePriorities()
 //----------------------------------------------------------------------------
 int vtkSMStreamingRepresentation::ComputePriorities()
 {
-  int doPrints = vtkSMStreamingHelperProxy::GetHelper()->GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SR(" << this << ") ComputePriorities" << endl;
-    }
+  DEBUGPRINT_REPRESENTATION(
+  cerr << "SR(" << this << ") ComputePriorities" << endl;
+                            );
   int maxPass = -1;
   vtkSMRepresentationStrategyVector strats;
   this->GetActiveStrategies(strats);
@@ -315,16 +318,6 @@ void vtkSMStreamingRepresentation::ClearStreamCache()
     }
 }
 
-/*
-//----------------------------------------------------------------------------
-bool vtkSMStreamingRepresentation::AddToView(vtkSMViewProxy* view)
-{
-  this->PieceBoundsRepresentation->AddToView(view);
-
-  return this->Superclass::AddToView(view);
-}
-*/
-
 //----------------------------------------------------------------------------
 bool vtkSMStreamingRepresentation::AddToView(vtkSMViewProxy* view)
 {
@@ -334,6 +327,8 @@ bool vtkSMStreamingRepresentation::AddToView(vtkSMViewProxy* view)
     vtkErrorMacro("View must be a vtkSMStreamingView.");
     return false;
     }
+
+  this->PieceBoundsRepresentation->AddToView(streamView->GetRootView());
 
   //this tells renderview to let view create strategy
   vtkSMRenderViewProxy* renderView = streamView->GetRootView();

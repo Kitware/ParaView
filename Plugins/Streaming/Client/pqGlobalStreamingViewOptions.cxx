@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqObjectInspectorWidget.h"
 
-#include "vtkSMStreamingHelperProxy.h"
+#include "vtkSMStreamingOptionsProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include <QDoubleValidator>
 #include <QDebug>
@@ -80,7 +81,7 @@ pqGlobalStreamingViewOptions::pqGlobalStreamingViewOptions(QWidget *widgetParent
   QObject::connect(this->Internal->EnableStreamMessages,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
-  QObject::connect(this->Internal->UseCulling,
+  QObject::connect(this->Internal->UsePrioritization,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->UseViewOrdering,
@@ -136,6 +137,11 @@ QStringList pqGlobalStreamingViewOptions::getPageList()
 
 }
   
+#define QUICKSETVAL(name, val)\
+  p = vtkSMIntVectorProperty::SafeDownCast(\
+    helper->GetProperty(name));\
+  p->SetElement(0, val);
+
 //-----------------------------------------------------------------------------
 void pqGlobalStreamingViewOptions::applyChanges()
 {
@@ -145,37 +151,38 @@ void pqGlobalStreamingViewOptions::applyChanges()
   int intSetting;
   bool boolSetting;
 
-  vtkSMStreamingHelperProxy* helper =
-    vtkSMStreamingHelperProxy::GetHelper();
-
+  vtkSMStreamingOptionsProxy* helper =
+    vtkSMStreamingOptionsProxy::GetProxy();
   if (!helper)
     {
     qCritical() << "Trying to apply changes to streaming settings but "
                 << "streaming helper proxy is null.";
     }
 
+  vtkSMIntVectorProperty *p;
+
   intSetting = this->Internal->StreamedPasses->text().toInt();
-  helper->SetStreamedPasses(intSetting);
+  QUICKSETVAL("StreamedPasses", intSetting);
   settings->setValue("StreamedPasses", intSetting);
 
   boolSetting = this->Internal->EnableStreamMessages->isChecked();
-  helper->SetEnableStreamMessages(boolSetting);
+  QUICKSETVAL("EnableStreamMessages", (boolSetting?1:0));
   settings->setValue("EnableStreamMessages", boolSetting);
 
-  boolSetting = this->Internal->UseCulling->isChecked();
-  helper->SetUseCulling(boolSetting);
-  settings->setValue("UseCulling", boolSetting);
+  boolSetting = this->Internal->UsePrioritization->isChecked();
+  QUICKSETVAL("UsePrioritization", (boolSetting?1:0));
+  settings->setValue("UsePrioritization", boolSetting);
 
   boolSetting = this->Internal->UseViewOrdering->isChecked();
-  helper->SetUseViewOrdering(boolSetting);
+  QUICKSETVAL("UseViewOrdering", (boolSetting?1:0));
   settings->setValue("UseViewOrdering", boolSetting);
 
   intSetting = this->Internal->PieceCacheLimit->text().toInt();
-  helper->SetPieceCacheLimit(intSetting);
+  QUICKSETVAL("PieceCacheLimit", intSetting);
   settings->setValue("PieceCacheLimit", intSetting);
 
   intSetting = this->Internal->PieceRenderCutoff->text().toInt();
-  helper->SetPieceRenderCutoff(intSetting);
+  QUICKSETVAL("PieceRenderCutoff", intSetting);
   settings->setValue("PieceRenderCutoff", intSetting);
 
   settings->endGroup();
@@ -195,8 +202,8 @@ void pqGlobalStreamingViewOptions::resetChanges()
   val = settings->value("EnableStreamMessages", false);
   this->Internal->EnableStreamMessages->setChecked(val.toBool());
 
-  val = settings->value("UseCulling", true);
-  this->Internal->UseCulling->setChecked(val.toBool());
+  val = settings->value("UsePrioritization", true);
+  this->Internal->UsePrioritization->setChecked(val.toBool());
 
   val = settings->value("UseViewOrdering", true);
   this->Internal->UseViewOrdering->setChecked(val.toBool());

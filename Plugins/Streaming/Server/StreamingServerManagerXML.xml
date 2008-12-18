@@ -14,7 +14,7 @@
         the RootView subproxy.
       </Documentation>
 
-      <ProxyProperty name="StreamingHelperProxy" command="SetHelperProxy">
+      <ProxyProperty name="StreamingOptionsProxy" command="SetOptionsProxy">
         <ProxyGroupDomain name="groups">
           <Group name="helpers"/>
         </ProxyGroupDomain>
@@ -430,7 +430,7 @@
       <SubProxy>
         <Proxy name="StreamingUpdateSuppressorLOD"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
-o        </Proxy>
+        </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
@@ -514,7 +514,7 @@ o        </Proxy>
       <SubProxy>
         <Proxy name="StreamingUpdateSuppressorLOD"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
-o        </Proxy>
+        </Proxy>
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
@@ -794,6 +794,7 @@ o        </Proxy>
   </ProxyGroup>
 
   <!-- ================================================================= -->
+
   <ProxyGroup name="sources">
 
    <SourceProxy name="StridedReader" 
@@ -932,27 +933,6 @@ o        </Proxy>
         <DoubleArrayInformationHelper/>
       </DoubleVectorProperty>
 
-      <IntVectorProperty
-        name="EnableStreamMessages"
-        command="SetEnableStreamMessages"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" max="1"/>
-        <Documentation>
-          Enable or disable console progress log messages.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
-        name="UseCulling"
-        command="SetUseCulling"
-        number_of_elements="1"
-        default_values="1">
-        <IntRangeDomain name="range" min="0" max="1"/>
-        <Documentation>
-          Enable or disable console priority culling.
-        </Documentation>
-      </IntVectorProperty>
 
       <ProxyProperty name="SetMPIMoveData" command="SetMPIMoveData">
         <ProxyGroupDomain name="groups">
@@ -1030,18 +1010,6 @@ o        </Proxy>
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="EnableStreamMessages"
-        command="SetEnableStreamMessages"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" max="1"/>
-        <BooleanDomain name="bool"/>
-        <Documentation>
-          Enable or disable console progress log messages.
-        </Documentation>
-      </IntVectorProperty>
-
       <Property name="EmptyCache" command="EmptyCache" />
 
       <!-- End of PieceCacheFilter -->
@@ -1054,9 +1022,9 @@ o        </Proxy>
 
   <ProxyGroup name="helpers">
 
-    <StreamingHelperProxy name="StreamingHelper">
+    <StreamingOptionsProxy name="StreamingOptions" class="vtkStreamingOptions">
       <Documentation>
-        The streaming helper proxy
+        Helper for setting global options that control the way streaming runs.
       </Documentation>
 
       <IntVectorProperty
@@ -1074,7 +1042,6 @@ o        </Proxy>
       <IntVectorProperty
         name="EnableStreamMessages"
         command="SetEnableStreamMessages"
-        update_self="1"
         immediate_update="1"
         number_of_elements="1"
         information_property="EnableStreamMessagesInfo" 
@@ -1086,26 +1053,26 @@ o        </Proxy>
       </IntVectorProperty>
 
       <IntVectorProperty
-        name="UseCulling"
-        command="SetUseCulling"
-        update_self="1"
+        name="UsePrioritization"
+        command="SetUsePrioritization"
         immediate_update="1"
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
         <Documentation>
+         Enables/Disables prioritization and culling.
         </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
         name="UseViewOrdering"
         command="SetUseViewOrdering"
-        update_self="1"
         immediate_update="1"
         number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
         <Documentation>
+          Enables/Disables view dependent ordering and frustum culling.
         </Documentation>
       </IntVectorProperty>
 
@@ -1118,24 +1085,24 @@ o        </Proxy>
         default_values="16">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
+          This is the number of pieces that the data is broken up into.
         </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
         name="PieceRenderCutoff"
         command="SetPieceRenderCutoff"
-        update_self="1"
         immediate_update="1"
         number_of_elements="1"
         default_values="16">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
+          This number of pieces will be cached after they are first generated. Subsequent renders will reuse them and be faster.
         </Documentation>
       </IntVectorProperty>
 
-
-      <!-- End of StreamingHelper -->
-    </StreamingHelperProxy>
+      <!-- End of StreamingOptions -->
+    </StreamingOptionsProxy>
 
     <!-- End helpers -->
   </ProxyGroup> 
