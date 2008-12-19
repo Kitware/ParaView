@@ -601,15 +601,13 @@ bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
     return false;
     }
   vtkPVDataInformation* dinfo = opPort->getDataInformation(false);
-  if (dinfo->GetDataSetType() == -1)
+  if (dinfo->GetDataSetType() == -1 || 
+    dinfo->GetDataSetType() == VTK_TABLE)
     {
     return false;
     }
 
-  if (!dinfo->DataSetTypeIsA("vtkDataSet"))
-    {
-    return false;
-    }
+
   return true;
 }
 
