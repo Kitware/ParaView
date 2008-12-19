@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
+#include "pqSpreadSheetView.h"
 #include "pqView.h"
 
 #include <QFont>
@@ -78,6 +79,7 @@ public:
     GEOMETRY,
     BARCHART,
     LINECHART,
+    TABLE,
     INDETERMINATE,
     LAST
     };
@@ -567,6 +569,10 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
       {
       return LINECHART;
       }
+    if (type == pqSpreadSheetView::spreadsheetViewType())
+      {
+      return TABLE;
+      }
     }
   
   return GEOMETRY;
@@ -680,6 +686,10 @@ pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
     if (type == pqPlotView::XYPlotType())
       {
       return LINECHART;
+      }
+    if (type == pqSpreadSheetView::spreadsheetViewType())
+      {
+      return TABLE;
       }
     }
   
@@ -2033,6 +2043,8 @@ void pqPipelineModel::initializePixmaps()
         ":/pqWidgets/Icons/pqHistogram16.png");
     this->PixmapList[pqPipelineModelItem::LINECHART].load(
        ":/pqWidgets/Icons/pqLineChart16.png");
+    this->PixmapList[pqPipelineModelItem::TABLE].load(
+       ":/pqWidgets/Icons/pqSpreadsheet16.png");
     this->PixmapList[pqPipelineModelItem::INDETERMINATE].load(
       ":/pqWidgets/Icons/pq3DView16.png");
     this->PixmapList[pqPipelineModelInternal::EYEBALL].load(
