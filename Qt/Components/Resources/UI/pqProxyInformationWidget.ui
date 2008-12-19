@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>276</width>
-    <height>900</height>
+    <height>956</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -90,42 +90,10 @@
       <string>Statistics</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>4</number>
-      </property>
-      <property name="topMargin" >
-       <number>4</number>
-      </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>4</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>4</number>
-      </property>
-      <item row="3" column="1" >
-       <widget class="QLabel" name="memory" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>Memory:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" >
-       <widget class="QLabel" name="numberOfPoints" >
-        <property name="text" >
-         <string>Number of Points:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="numberOfCells" >
-        <property name="text" >
-         <string>Number of Cells:</string>
+         <string>Type:</string>
         </property>
        </widget>
       </item>
@@ -136,31 +104,112 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
+      <item row="1" column="0" colspan="2" >
+       <widget class="QStackedWidget" name="dataTypeProperties" >
+        <property name="currentIndex" >
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="DataSet" >
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Number of Cells:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="numberOfCells" >
+            <property name="text" >
+             <string>Number of Cells:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_3" >
+            <property name="text" >
+             <string>Number of Points:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLabel" name="numberOfPoints" >
+            <property name="text" >
+             <string>Number of Points:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="Table" >
+         <layout class="QGridLayout" >
+          <property name="leftMargin" >
+           <number>0</number>
+          </property>
+          <property name="topMargin" >
+           <number>0</number>
+          </property>
+          <property name="rightMargin" >
+           <number>0</number>
+          </property>
+          <property name="bottomMargin" >
+           <number>0</number>
+          </property>
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_11" >
+            <property name="text" >
+             <string>Number of Rows:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QLabel" name="numberOfRows" >
+            <property name="text" >
+             <string>Number Of Rows:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="label_12" >
+            <property name="text" >
+             <string>Number of Columns</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QLabel" name="numberOfColumns" >
+            <property name="text" >
+             <string>Number of Columns</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item row="2" column="0" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
          <string>Memory:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_3" >
+      <item row="2" column="1" >
+       <widget class="QLabel" name="memory" >
         <property name="text" >
-         <string>Number of Points:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>Number of Cells:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Type:</string>
+         <string>Memory:</string>
         </property>
        </widget>
       </item>

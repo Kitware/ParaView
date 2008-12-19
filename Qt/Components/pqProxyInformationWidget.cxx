@@ -236,6 +236,8 @@ void pqProxyInformationWidget::fillDataInformation(
   this->Ui->type->setText(tr("NA"));
   this->Ui->numberOfCells->setText(tr("NA"));
   this->Ui->numberOfPoints->setText(tr("NA"));
+  this->Ui->numberOfRows->setText(tr("NA"));
+  this->Ui->numberOfColumns->setText(tr("NA"));
   this->Ui->memory->setText(tr("NA"));
   
   this->Ui->dataArrays->clear();
@@ -261,6 +263,24 @@ void pqProxyInformationWidget::fillDataInformation(
   
   QString numPoints = QString("%1").arg(dataInformation->GetNumberOfPoints());
   this->Ui->numberOfPoints->setText(numPoints);
+
+  QString numRows = QString("%1").arg(dataInformation->GetNumberOfRows());
+  this->Ui->numberOfRows->setText(numRows);
+
+  QString numColumns =
+    QString("%1").arg(dataInformation->GetRowDataInformation()->GetNumberOfArrays());
+  this->Ui->numberOfColumns->setText(numColumns);
+
+  if (dataInformation->GetDataSetType() == VTK_TABLE)
+    {
+    this->Ui->dataTypeProperties->setCurrentWidget(
+      this->Ui->Table);
+    }
+  else
+    {
+    this->Ui->dataTypeProperties->setCurrentWidget(
+      this->Ui->DataSet);
+    }
   
   QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
                                      0, 'e', 2);
@@ -286,7 +306,7 @@ void pqProxyInformationWidget::fillDataInformation(
     QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
     QPixmap(":/pqWidgets/Icons/pqPointData16.png"),
     QPixmap(":/pqWidgets/Icons/pqCellData16.png"),
-    QPixmap(":/pqWidgets/Icons/pqPointData16.png")
+    QPixmap(":/pqWidgets/Icons/pqSpreadsheet16.png")
     };
 
   if (dataInformation->IsDataStructured())
