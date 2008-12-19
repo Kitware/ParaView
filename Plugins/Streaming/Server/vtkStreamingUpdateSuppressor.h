@@ -80,16 +80,6 @@ public:
   void UnSerializePriorities(double *);
 
   //Description:
-  //Diagnostic mode to turn on off prioritization
-  void SetUseCulling(int);
-  vtkGetMacro(UseCulling, int);
-
-  //Description:
-  //Diagnostic mode to turn on off detailed debugging information printouts
-  void SetEnableStreamMessages(int);
-  vtkGetMacro(EnableStreamMessages, int);
-
-  //Description:
   //Set in parallel runs to ensure communication when pieces are reused.
   void SetMPIMoveData(vtkMPIMoveData *mp)
   {
@@ -124,10 +114,6 @@ protected:
   //A copy of the piece list which server sends to client to stay in synch.
   vtkDoubleArray *SerializedPriorities;
   
-  //These are for diagnostic modes.
-  int EnableStreamMessages;
-  int UseCulling;
-
   vtkMPIMoveData *MPIMoveData;
 
 private:

@@ -41,7 +41,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.5");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -582,15 +582,25 @@ void vtkSMStreamingViewProxy::PerformRender()
   vtkSMRenderViewProxy *RVP = this->GetRootView();
 
   this->DisplayDone = 1;
-  int nPasses = vtkStreamingOptions::GetStreamedPasses(); 
-  if (this->MaxPass == -1)
+  //data is split into this many pieces so render at most that
+  int nPasses = vtkStreamingOptions::GetStreamedPasses();
+
+  //user may want to terminate before all have rendered
+  int lastPass = vtkStreamingOptions::GetPieceRenderCutoff();
+  if (lastPass > -1 && lastPass < nPasses)
+    {
+    nPasses = lastPass;
+    }
+
+  //because of culling (and caching) we may need to render fewer passes
+  if (this->MaxPass == -1) //meaning everything cached
     {
     nPasses = 1;
     }
   if (this->MaxPass > -1 && this->MaxPass < nPasses)
     {
     nPasses = this->MaxPass;
-    }  
+    } 
 
   vtkSmartPointer<vtkCollectionIterator> iter;
   iter.TakeReference(RVP->Representations->NewIterator());

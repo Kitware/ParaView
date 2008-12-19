@@ -31,7 +31,7 @@
     }
 
 vtkStandardNewMacro(vtkSMStreamingSerialStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMStreamingSerialStrategy::vtkSMStreamingSerialStrategy()
 {
@@ -104,14 +104,10 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
     );
 
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  //int useCulling = vtkStreamingOptions::GetUseCulling();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UseCulling"));
-  ivp->SetElement(0, 1);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -222,7 +218,6 @@ int vtkSMStreamingSerialStrategy::ComputePriorities()
   
   //put diagnostic settings transfer here in case info not gathered yet
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
 
   DEBUGPRINT_STRATEGY(
     cerr << "SSS(" << this << ") ComputePriorities" << endl;
@@ -231,10 +226,6 @@ int vtkSMStreamingSerialStrategy::ComputePriorities()
       this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, usePrioritization);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(

@@ -36,7 +36,7 @@
 #include "vtkSMSUnstructuredGridParallelStrategy.h"
 #include "vtkStreamingOptions.h"
 
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.4");
+vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.5");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
 
 #define DEBUGPRINT_REPRESENTATION(arg)\
@@ -328,7 +328,7 @@ bool vtkSMStreamingRepresentation::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  this->PieceBoundsRepresentation->AddToView(streamView->GetRootView());
+  //this->PieceBoundsRepresentation->AddToView(streamView->GetRootView());
 
   //this tells renderview to let view create strategy
   vtkSMRenderViewProxy* renderView = streamView->GetRootView();

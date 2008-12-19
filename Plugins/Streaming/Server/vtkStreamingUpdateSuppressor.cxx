@@ -32,9 +32,15 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.2");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.3");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
+#define DEBUGPRINT_EXECUTION(arg)\
+  if (vtkStreamingOptions::GetEnableStreamMessages()) \
+    { \
+      arg;\
+    }
+  
 //----------------------------------------------------------------------------
 vtkStreamingUpdateSuppressor::vtkStreamingUpdateSuppressor()
 {
@@ -43,8 +49,6 @@ vtkStreamingUpdateSuppressor::vtkStreamingUpdateSuppressor()
   this->PieceList = NULL;
   this->MaxPass = 0;
   this->SerializedPriorities = NULL;
-  this->UseCulling = 1;
-
   this->MPIMoveData = NULL;
 }
 
@@ -122,10 +126,9 @@ void vtkStreamingUpdateSuppressor::ForceUpdate()
     info->Set(vtkCompositeDataPipeline::UPDATE_TIME_STEPS(), &this->UpdateTime, 1);
     }
 
-  if (this->EnableStreamMessages)
-    {
-    cerr << "US(" << this << ") Update " << this->Pass << "->" << gPiece << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") Update " << this->Pass << "->" << gPiece << endl;
+  );
   
   input->Update();
   output->ShallowCopy(input);
@@ -186,10 +189,9 @@ void vtkStreamingUpdateSuppressor::SetPassNumber(int pass, int NPasses)
 //-----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::SetPieceList(vtkPieceList *other)
 {
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") SET PIECE LIST" << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") SET PIECE LIST" << endl;
+  );
   if (this->PieceList)
     {
     this->PieceList->Delete();
@@ -209,15 +211,13 @@ void vtkStreamingUpdateSuppressor::SetPieceList(vtkPieceList *other)
 //-----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::SerializePriorities()
 {
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") SERIALIZE PRIORITIES" << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") SERIALIZE PRIORITIES" << endl;
+  );
   this->PieceList->Serialize();
-  if (this->EnableStreamMessages)
-    {        
-    this->PieceList->Print();
-    }
+  DEBUGPRINT_EXECUTION(
+  this->PieceList->Print();
+  );
 }
 
 //-----------------------------------------------------------------------------
@@ -248,27 +248,25 @@ vtkDoubleArray *vtkStreamingUpdateSuppressor::GetSerializedPriorities()
 //-----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::UnSerializePriorities(double *buffer)
 {
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") UNSERIALIZE PRIORITIES" << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") UNSERIALIZE PRIORITIES" << endl;
+  );
   if (!this->PieceList)
     {
     this->PieceList = vtkPieceList::New();
     }
   this->PieceList->UnSerialize(buffer);
-  if (this->EnableStreamMessages)
-    {        
-    /*
-      int len = (int)*buffer * 6 + 1;
-      for (int i = 0; i < len; i++)
-      {
-      cerr << buffer[i] << " ";
-      }
-      cerr << endl;
-    */
-    this->PieceList->Print();
-    }
+  DEBUGPRINT_EXECUTION(
+/*
+  int len = (int)*buffer * 6 + 1;
+  for (int i = 0; i < len; i++)
+  {
+    cerr << buffer[i] << " ";
+  };
+  cerr << endl;
+*/
+  this->PieceList->Print();
+  );
 }
 
 //-----------------------------------------------------------------------------
@@ -289,22 +287,14 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
     {
     return;
     }
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") COMPUTE PRIORITIES ";
-    this->PrintPipe(this);
-    cerr << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") COMPUTE PRIORITIES ";
+  this->PrintPipe(this);
+  cerr << endl;
+  );
   if (this->PieceList)
     {
     this->PieceList->Delete();
-    //can not longer reuse saved priority list, because caching makes it change on every frame
-    if (this->EnableStreamMessages)
-      {        
-      //cerr << "US(" << this << ") Would Reuse Cached Priorities" << endl;
-      //this->PieceList->Print();
-      }
-    //return;
     }
   this->PieceList = vtkPieceList::New();
   this->PieceList->Clear();
@@ -322,10 +312,9 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
       int gPieces = this->UpdateNumberOfPieces*this->NumberOfPasses;
       if (vtkStreamingOptions::GetUsePrioritization())
         {
-        if (this->EnableStreamMessages)
-          {
-          cerr << "US(" << this << ") COMPUTE PRIORITY ON " << gPiece << endl;
-          }
+        DEBUGPRINT_EXECUTION(
+        cerr << "US(" << this << ") COMPUTE PRIORITY ON " << gPiece << endl;
+        );
         sddp->SetUpdateExtent(info, gPiece, gPieces, 0); 
         priority = sddp->ComputePriority();
         }
@@ -336,11 +325,10 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
       piece->Delete();
       }
     }
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") PRESORT:" << endl;
-    this->PieceList->Print();
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") PRESORT:" << endl;
+  this->PieceList->Print();
+  );
 
   //sorts pieces from priority 1.0 down to 0.0
   this->PieceList->SortPriorities();    
@@ -351,10 +339,9 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
 
   //The client can use this to know when it can stop.
   this->MaxPass = this->PieceList->GetNumberNonZeroPriority();
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") " << this->MaxPass << " pieces that matter" << endl;
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") " << this->MaxPass << " pieces that matter" << endl;
+  );
 }
 
 //----------------------------------------------------------------------------
@@ -407,11 +394,10 @@ void vtkStreamingUpdateSuppressor::MergePriorities()
     {
     procid = controller->GetLocalProcessId();
     numProcs = controller->GetNumberOfProcesses();
-    if (this->EnableStreamMessages)
-      {        
-      cerr << "US(" << this << ") PREGATHER:" << endl;
-      this->PieceList->Print();
-      }
+    DEBUGPRINT_EXECUTION(
+    cerr << "US(" << this << ") PREGATHER:" << endl;
+    this->PieceList->Print();
+    );
     }
   if (procid)
     {
@@ -448,34 +434,12 @@ void vtkStreamingUpdateSuppressor::MergePriorities()
       this->PieceList->GetPiece(i)->SetPriority(mine[i]);
       }
     }
-  if (this->EnableStreamMessages)
-    {        
-    cerr << "US(" << this << ") POSTGATHER" << endl;;
-    this->PieceList->Print();
-    }
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") POSTGATHER" << endl;;
+  this->PieceList->Print();
+  );
 
   delete[] mine;
-}
-
-//----------------------------------------------------------------------------
-void vtkStreamingUpdateSuppressor::SetUseCulling(int val)
-{
-  if (val != this->UseCulling)
-    {
-    this->UseCulling = val;
-    this->ClearPriorities();
-    this->Modified();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkStreamingUpdateSuppressor::SetEnableStreamMessages(int val)
-{
-  if (val != this->EnableStreamMessages)
-    {
-    this->EnableStreamMessages = val;
-    this->Modified();
-    }
 }
 
 //----------------------------------------------------------------------------

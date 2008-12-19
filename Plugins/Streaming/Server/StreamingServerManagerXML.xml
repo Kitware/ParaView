@@ -933,7 +933,6 @@
         <DoubleArrayInformationHelper/>
       </DoubleVectorProperty>
 
-
       <ProxyProperty name="SetMPIMoveData" command="SetMPIMoveData">
         <ProxyGroupDomain name="groups">
           <Group name="filters"/>
@@ -1030,12 +1029,12 @@
       <IntVectorProperty
         name="StreamedPasses"
         command="SetStreamedPasses"
-        update_self="1"
         immediate_update="1"
         number_of_elements="1"
         default_values="16">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
+          The number of pieces that the data will be broken up into.
         </Documentation>
       </IntVectorProperty>
 
@@ -1079,13 +1078,12 @@
       <IntVectorProperty
         name="PieceCacheLimit"
         command="SetPieceCacheLimit"
-        update_self="1"
         immediate_update="1"
         number_of_elements="1"
         default_values="16">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
-          This is the number of pieces that the data is broken up into.
+          This number of pieces will be cached after they are first drawn. Subsequent renders will be faster because a full pipeline update can be avoided.
         </Documentation>
       </IntVectorProperty>
 
@@ -1097,7 +1095,7 @@
         default_values="16">
         <IntRangeDomain name="range" min="-1"/>
         <Documentation>
-          This number of pieces will be cached after they are first generated. Subsequent renders will reuse them and be faster.
+          The maximum number of pieces that will be drawn.
         </Documentation>
       </IntVectorProperty>
 
