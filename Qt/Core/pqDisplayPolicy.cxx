@@ -290,6 +290,12 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
         createDataRepresentation(opPort, view);
       }
     }
+  if (!repr)
+    {
+    qDebug() << "Cannot show the data in the current view although"
+      "the view reported that it can show the data.";
+    return 0;
+    }
 
   repr->setVisible(visible);
 

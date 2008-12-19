@@ -49,14 +49,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkTable.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMArraySelectionDomain.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkTable.h"
 
 #define STATUS_ROW_LENGTH 11
 
@@ -313,6 +314,28 @@ void pqLineChartRepresentation::setDefaultPropertyValues()
     }
 
   vtkSMProxy* proxy = this->getProxy();
+  vtkPVDataInformation* input_di = this->getInputDataInformation();
+  if (input_di)
+    {
+    int field_association = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    switch (input_di->GetDataSetType())
+      {
+    case VTK_TABLE:
+      field_association = vtkDataObject::FIELD_ASSOCIATION_ROWS;
+      break;
+     
+    case VTK_GRAPH:
+      field_association = vtkDataObject::FIELD_ASSOCIATION_VERTICES;
+      break;
+      }
+    vtkSMPropertyHelper(proxy, "AttributeType").Set(field_association);
+    }
+  proxy->UpdateVTKObjects();
+
+  // Need to update since we would have changed the field Association changed.
+  vtkSMClientDeliveryRepresentationProxy::SafeDownCast(proxy)->Update();
+
+  proxy->GetProperty("XArrayName")->ResetToDefault();
   proxy->GetProperty("ArrayInfo")->UpdateDependentDomains();
 
   // Set the x-axis array name defaults.

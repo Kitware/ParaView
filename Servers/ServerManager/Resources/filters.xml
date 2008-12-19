@@ -49,7 +49,11 @@
         <NoGUI />
        </Hints>
      </InputProperty>
-      
+     
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
      <!-- End of ExtractSelectionOverTime -->
    </SourceProxy>
    
@@ -77,6 +81,11 @@ TimeData (if Time exists in the input)).
          The input from which the selection is extracted.
        </Documentation>
      </InputProperty>
+
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="XYPlotView" />
+     </Hints>
 
      <!-- End ExtractFieldDatasOverTime -->
    </SourceProxy>
