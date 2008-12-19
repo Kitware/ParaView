@@ -16,13 +16,11 @@ CMAKE_EXPORT_BUILD_SETTINGS(
   ${KWCommon_BINARY_DIR}/KWCommonBuildSettings.cmake)
 
 IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-  SET(devFiles 
-       ${CMAKE_CURRENT_SOURCE_DIR}/UseKWCommon.cmake
-       ${KWCommon_BINARY_DIR}/KWCommonLibraryDepends.cmake
-       ${KWCommon_BINARY_DIR}/KWCommonBuildSettings.cmake)
-  INSTALL(
-      FILES ${devFiles}
-      DESTINATION ${KWCommon_INSTALL_LIB_DIR})
+  INSTALL_FILES(${KWCommon_INSTALL_PACKAGE_DIR} FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/UseKWCommon.cmake
+    ${KWCommon_BINARY_DIR}/KWCommonLibraryDepends.cmake
+    ${KWCommon_BINARY_DIR}/KWCommonBuildSettings.cmake
+    )
 ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
 
 #-----------------------------------------------------------------------------
@@ -136,12 +134,10 @@ SET(KWCommon_CONFIGURATION_TYPES_CONFIG)
 # calls to compute the installation prefix from KWCommon_DIR.
 STRING(REGEX REPLACE "/" ";" KWCommon_INSTALL_PACKAGE_DIR_COUNT
   "${KWCommon_INSTALL_PACKAGE_DIR}")
-
 SET(KWCommon_CONFIG_INSTALL_ONLY "
 # Compute the installation prefix from KWCommon_DIR.
 SET(KWCommon_INSTALL_PREFIX \"${DOLLAR}{KWCommon_DIR}\")
 ")
-
 FOREACH(p ${KWCommon_INSTALL_PACKAGE_DIR_COUNT})
   SET(KWCommon_CONFIG_INSTALL_ONLY
     "${KWCommon_CONFIG_INSTALL_ONLY}GET_FILENAME_COMPONENT(KWCommon_INSTALL_PREFIX \"${DOLLAR}{KWCommon_INSTALL_PREFIX}\" PATH)\n"
@@ -163,9 +159,8 @@ IF(CMAKE_CONFIGURATION_TYPES)
   # specified when building the install target.  The BUILD_TYPE variable
   # will be set while CMake is processing the install files.
   IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-    INSTALL(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/${DOLLAR}{BUILD_TYPE}/KWCommonConfig.cmake"
-        DESTINATION ${KWCommon_INSTALL_PACKAGE_DIR})
+    INSTALL_FILES(${KWCommon_INSTALL_PACKAGE_DIR} FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/${DOLLAR}{BUILD_TYPE}/KWCommonConfig.cmake)
   ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
 ELSE(CMAKE_CONFIGURATION_TYPES)
   # There is only one build configuration. Configure one KWCommonConfig.cmake.
@@ -176,8 +171,7 @@ ELSE(CMAKE_CONFIGURATION_TYPES)
 
   # Setup an install rule for the config file.
   IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-    INSTALL(
-        FILES "${CMAKE_CURRENT_BINARY_DIR}/KWCommonConfig.cmake"
-        DESTINATION ${KWCommon_INSTALL_PACKAGE_DIR})
+    INSTALL_FILES(${KWCommon_INSTALL_PACKAGE_DIR} FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/KWCommonConfig.cmake)
   ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
 ENDIF(CMAKE_CONFIGURATION_TYPES)
