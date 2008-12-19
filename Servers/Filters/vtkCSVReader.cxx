@@ -17,16 +17,19 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkDelimitedTextReader.h"
 #include "vtkDoubleArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 #include "vtkTable.h"
-#include "vtkSmartPointer.h"
 #include "vtkVariant.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkCSVReader);
-vtkCxxRevisionMacro(vtkCSVReader, "1.4");
+vtkCxxRevisionMacro(vtkCSVReader, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkCSVReader::vtkCSVReader()
@@ -43,6 +46,16 @@ int vtkCSVReader::RequestData(vtkInformation* request,
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
+  // Check piece request. If requested anything but the 0-th piece, nothing to
+  // read.
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) &&
+    outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) > 0)
+    {
+    return 1;
+    }
+
+
   if (!this->Superclass::RequestData(request, inputVector, outputVector))
     {
     return 0;

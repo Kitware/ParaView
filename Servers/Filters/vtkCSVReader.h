@@ -12,12 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCSVReader - reads CSV files into a one-dimensional 
-// vtkRectilinearGrid.
+// .NAME vtkCSVReader - reads CSV files into a vtkTable.
 // .SECTION Description:
 // This extends vtkDelimitedTextReader to convert numerical columns to double
 // values. This makes it easy for ParaView to deal with numerical data
-// correctly.
+// correctly. 
+// It also adds logic to ensure that the CSV file is read only on the root node.
+// All other nodes simply have empty vtkTables in their output.
 // .SECTION See Also
 // vtkDelimitedTextReader
 
