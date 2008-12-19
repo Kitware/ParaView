@@ -47,7 +47,6 @@ if (len(streamingPlugin) == 0):
 ##########################################################################
 
 
-
 ## Start servermanager
 servermanager.Connect()
 
@@ -55,15 +54,19 @@ servermanager.Connect()
 servermanager.LoadPlugin(streamingPlugin)
 
 ## Create streaming view
+view = servermanager.rendering.RenderView()
+view.StillRender()
 view = servermanager.rendering.StreamingRenderView()
-'''
+
 ## Set streaming parameters
 pxm = servermanager.ProxyManager()
-helper = pxm.GetProxy("helpers", "StreamingHelperInstance")
-helper.GetProperty("StreamedPasses").SetElement(0, numberOfPasses)
-helper.GetProperty("EnableStreamMessages").SetElement(0, streamMessages)
-helper.GetProperty("PieceCacheLimit").SetElement(0, cacheSize)
-'''
+helper = pxm.GetProxy("helpers", "StreamingOptionsInstance")
+helper.GetProperty("StreamedPasses").SetElement(0, 16)
+helper.GetProperty("EnableStreamMessages").SetElement(0, 1)
+helper.GetProperty("PieceCacheLimit").SetElement(0, 16)
+helper.GetProperty("UsePrioritization").SetElement(0, 1)
+helper.GetProperty("UseViewOrdering").SetElement(0, 1)
+helper.GetProperty("PieceRenderCutoff").SetElement(0, -1)
 
 ## Disable progress printing if requested
 if (printProgress == 0):
