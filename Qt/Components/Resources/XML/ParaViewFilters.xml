@@ -140,5 +140,6 @@
   <Filter name="WarpScalar" />
   <Filter name="WarpVector" />
   <Filter name="NormalGlyphs" />
+  <Filter name="TableToPolyData" />
 
 </ParaViewFilters>

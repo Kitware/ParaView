@@ -8379,8 +8379,64 @@ This property controls how the filter works to generate tensor cell data. You ca
            This property provides a list of datasets to extract.
          </Documentation>
       </IntVectorProperty>
-   <!-- End ExtractDataSets -->
-   </SourceProxy>
+    <!-- End ExtractDataSets -->
+    </SourceProxy>
+
+    <!-- ==================================================================== -->
+    <SourceProxy name="TableToPolyData" 
+                class="vtkTableToPolyData"
+                label="Table To Points" >
+      <Documentation>
+        The TableToPolyData filter converts a vtkTable to a set of points in a
+        vtkPolyData. One must specifies the columns in the input table to use as
+        the X, Y and Z coordinates for the points in the output.
+      </Documentation>
+      <InputProperty name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <InputArrayDomain name="input_array" 
+              attribute_type="row"
+              number_of_components="1" />
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkTable"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input..
+            </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="XColumn"
+        command="SetXColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="YColumn"
+        command="SetYColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="ZColumn"
+        command="SetZColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+    </SourceProxy>
 
   </ProxyGroup>
 
