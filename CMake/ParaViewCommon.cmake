@@ -1,25 +1,37 @@
 # Requires ParaView_SOURCE_DIR and ParaView_BINARY_DIR to be set.
 #########################################################################
 
-# MACRO to scrape headers from "src" and and schedule them to 
-# be installed in "dest".
-MACRO (PV3InstallHeaders src dest) 
-  FILE(GLOB hToInstall RELATIVE ${src} *.h)
-  FILE(GLOB txxToInstall RELATIVE ${src} *.txx)
-  FILE(GLOB hxxToInstall RELATIVE ${src} *.hxx)
-  SET (headers "${hToInstall};${txxToInstall};${hxxToInstall}")
-  INSTALL(FILES ${headers}
-          DESTINATION ${dest} 
-          COMPONENT Development)
-  # MESSAGE("PV3InstallHeaders ${src}")
-ENDMACRO (PV3InstallHeaders src dest)
+
+# GLOB_INSTALL_DEVELOPMENT: 
+#     Scrape directory for glob pattern 
+#     install the found files to Development
+#     component.
+#                   
+# from:    directory to scrape.
+# to:      destination
+# exts:    list of glob patterns
+MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
+  #message(${from}\n${to})
+  SET(filesToInstall)
+  FOREACH(ext ${exts})
+    #message(${ext})
+    SET(files)
+    FILE(GLOB files RELATIVE ${from} ${ext})
+    IF(files)
+      SET(filesToInstall "${filesToInstall};${files}")
+    ENDIF(files)
+  ENDFOREACH(ext)
+  IF(filesToInstall)
+    #message("${filesToInstall}\n\n")
+    INSTALL(
+        FILES ${filesToInstall}
+        DESTINATION ${to}
+        COMPONENT Develeopment) 
+  ENDIF(filesToInstall)
+ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 
 # Common settings
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
-
-IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
-  SET(PV_INSTALL_HAS_CMAKE_24 1)
-ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
 
 # Configure VTK library versions to be paraview-specific.
 SET(VTK_NO_LIBRARY_VERSION 1)
@@ -118,11 +130,6 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
   ENDIF(NOT WIN32)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
 
-SET(KWCommon_INSTALL_LIB_DIR         "${PV_INSTALL_LIB_DIR}")
-SET(KWCommon_INSTALL_BIN_DIR         "${PV_INSTALL_BIN_DIR}")
-SET(KWCommon_INSTALL_INCLUDE_DIR     "${PV_INSTALL_INCLUDE_DIR}")
-SET(KWCommon_VTK_INSTALL_PACKAGE_DIR "${PV_INSTALL_LIB_DIR}")
-                       
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true. 
 OPTION(PARAVIEW_INSTALL_DEVELOPMENT "Install ParaView plugin development files." OFF)
@@ -132,7 +139,6 @@ OPTION(PARAVIEW_INSTALL_DEVELOPMENT "Install ParaView plugin development files."
   ELSE (NOT PARAVIEW_INSTALL_DEVELOPMENT)
     SET (PV_INSTALL_NO_DEVELOPMENT 0)
   ENDIF(NOT PARAVIEW_INSTALL_DEVELOPMENT)
-
 
 SET(PV_INSTALL_NO_LIBRARIES)
 IF(BUILD_SHARED_LIBS)
@@ -145,6 +151,8 @@ ELSE(BUILD_SHARED_LIBS)
   ENDIF(PV_INSTALL_NO_DEVELOPMENT)
 ENDIF(BUILD_SHARED_LIBS)
 
+#PV requires minimum 2.4
+SET(VTK_INSTALL_HAS_CMAKE_24 1)
 # Send VTK executables to the ParaView LIBRARY directory (not a mistake).
 # Send VTK include files to the ParaView include directory
 # Send VTK libraries to the ParaView library directory.
@@ -152,13 +160,10 @@ SET(VTK_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(VTK_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(VTK_INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
 SET(VTK_INSTALL_PACKAGE_DIR "/${PV_INSTALL_LIB_DIR}")
-SET(VTK_INSTALL_HAS_CMAKE_24 ${PV_INSTALL_HAS_CMAKE_24})
-
 # VTK and KWCommon should install only the components paraview does.
 SET(VTK_INSTALL_NO_DOCUMENTATION 1)
 SET(VTK_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-
-# This will disable installing of vtkpython executable and the vtk python 
+# This will disable installing of vtkpython executable and the vtk python
 # module. This is essential since we don't want to conflict with kosher VTK
 # installations.
 SET (VTK_INSTALL_NO_PYTHON 1)
@@ -167,16 +172,22 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 # with the other python extension modules ParaView creates.
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 
-SET(KWCommon_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-SET(KWCommon_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-SET(KWCommon_INSTALL_DATA_DIR ${PV_INSTALL_DATA_DIR})
-SET(KWCommon_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
-SET(KWCommon_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
+
+#TODO move this stuff into KWCommon top level cmake file.
+SET(PV_INSTALL_HAS_CMAKE_24 1)
+SET(PV_INSTALL_BIN_DIR_CM24 ${PV_INSTALL_BIN_DIR})
+SET(PV_INSTALL_LIB_DIR_CM24 ${PV_INSTALL_LIB_DIR})
+SET(PV_INSTALL_INCLUDE_DIR_CM24 ${PV_INSTALL_INCLUDE_DIR})
+SET(KWCommon_INSTALL_BIN_DIR "/${PV_INSTALL_BIN_DIR}")
+SET(KWCommon_INSTALL_LIB_DIR "/${PV_INSTALL_LIB_DIR}")
+SET(KWCommon_INSTALL_DATA_DIR "/${PV_INSTALL_DATA_DIR}")
+SET(KWCommon_INSTALL_INCLUDE_DIR "/${PV_INSTALL_INCLUDE_DIR}")
+SET(KWCommon_INSTALL_PACKAGE_DIR "/${PV_INSTALL_LIB_DIR}")
 SET(KWCommon_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(KWCommon_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
 SET(KWCommon_INSTALL_NO_DOCUMENTATION 1)
 SET(KWCommon_INSTALL_NO_RUNTIME 1)
-
+# ??
 SET(KWCommonPro_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(KWCommonPro_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(KWCommonPro_INSTALL_DATA_DIR ${PV_INSTALL_DATA_DIR})

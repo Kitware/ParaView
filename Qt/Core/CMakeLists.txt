@@ -383,10 +383,27 @@ INSTALL(TARGETS pqCore
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  PV3InstallHeaders(${CMAKE_CURRENT_SOURCE_DIR} ${PV_INSTALL_INCLUDE_DIR})
-  INSTALL(FILES ${dynamicHeaders} DESTINATION ${PV_INSTALL_INCLUDE_DIR} COMPONENT Development)
+  # Headers
+  GLOB_INSTALL_DEVELOPMENT(
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${PV_INSTALL_INCLUDE_DIR} 
+      "*.h;*.hxx;*.txx")
+  INSTALL(
+      FILES ${dynamicHeaders}
+      DESTINATION ${PV_INSTALL_INCLUDE_DIR}
+      COMPONENT Development)
+  # QT resources
+  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
+  GLOB_INSTALL_DEVELOPMENT( 
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/UI"
+    "${resPath}/*.ui")
+  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
+  GLOB_INSTALL_DEVELOPMENT( 
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${PV_INSTALL_INCLUDE_DIR}/Qt/Core/Resources/Icons"
+    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
-
 
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)

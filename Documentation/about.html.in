@@ -1,0 +1,19 @@
+ParaView @PARAVIEW_VERSION_FULL@
+<p>
+ParaView is an open-source, multi-platform data analysis and visualization application. ParaView users can quickly build visualizations to analyze their data using qualitative and quantitative techniques. The data exploration can be done interactively in 3D or programmatically using ParaView's batch processing capabilities.
+<p>
+ParaView was developed to analyze extremely large datasets using distributed memory computing resources. It can be run on supercomputers to analyze datasets of terascale as well as on laptops for smaller data.
+<br>
+<a:href="http://www.paraview.org">ParaView Web Site</a>
+<br><br>
+<a:href="http://www.paraview.org/doc/nightly/html/classes.html">ParaView Doxygen</a>
+<p>
+<pre>
+  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  This software is distributed WITHOUT ANY WARRANTY; without even
+  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.  See the above copyright notice for more information.
+</pre>

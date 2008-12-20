@@ -7,7 +7,7 @@
   <property name="applicationicon">images/handbook.png</property>
   <property name="startpage">Documentation/index.html</property>
   <property name="aboutmenutext">About ParaView</property>
-  <property name="abouturl">about.txt</property>
+  <property name="abouturl">about.html</property>
   <property name="assistantdocs">doc</property>
 </profile>
 

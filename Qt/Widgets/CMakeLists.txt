@@ -183,7 +183,7 @@ TARGET_LINK_LIBRARIES(pqWidgets
 SET(QTWIDGETS_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/QtWidgetsExport.h.in"
                "${CMAKE_CURRENT_BINARY_DIR}/QtWidgetsExport.h")
-SET(dynamicHeaders 
+SET(dynamicHeaders
     "${dynamicHeaders};${CMAKE_CURRENT_BINARY_DIR}/QtWidgetsExport.h")
 
 INSTALL(TARGETS pqWidgets
@@ -192,11 +192,31 @@ INSTALL(TARGETS pqWidgets
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
 
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  PV3InstallHeaders(${CMAKE_CURRENT_SOURCE_DIR} ${PV_INSTALL_INCLUDE_DIR})
+  # Headers
+  GLOB_INSTALL_DEVELOPMENT(
+      ${CMAKE_CURRENT_SOURCE_DIR}
+      ${PV_INSTALL_INCLUDE_DIR} 
+      "*.h;*.hxx;*.txx")
   INSTALL(
       FILES ${dynamicHeaders}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}
       COMPONENT Development)
+  # QT resources
+  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/UI")
+  GLOB_INSTALL_DEVELOPMENT(
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/UI"
+    "${resPath}/*.ui")
+  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources/Icons")
+  GLOB_INSTALL_DEVELOPMENT(
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources/Icons"
+    "${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc")
+  SET(resPath "${CMAKE_CURRENT_SOURCE_DIR}/Resources")
+  GLOB_INSTALL_DEVELOPMENT(
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${PV_INSTALL_INCLUDE_DIR}/Qt/Widgets/Resources"
+    "${resPath}/*.ui;${resPath}/*.ico;${resPath}/*.png;${resPath}/*.svg;${resPath}/*.xpm;${resPath}/*.rc;${resPath}/*.qrc")
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)
 
 IF(BUILD_TESTING)

@@ -140,16 +140,30 @@ foreach(filename ${PARAVIEW_HTML_DOCUMENTATION})
     COPYONLY)
 endforeach(filename)
 
+set(dir "${ParaView_BINARY_DIR}/Documentation/")
+install(
+    DIRECTORY ${ParaView_BINARY_DIR}/Documentation/ 
+    DESTINATION ${PV_EXE_INSTALL}/Documentation 
+    COMPONENT Runtime
+    REGEX ".html")
+
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/about.html.in"
+    "${ParaView_BINARY_DIR}/about.html"
+    @ONLY
+    IMMEDIATE)
+
+install(
+    FILES "${ParaView_BINARY_DIR}/about.html"
+    DESTINATION ${PV_INSTALL_LIB_DIR}
+    COMPONENT Runtime)
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/pqClient.adp"
   "${ParaView_BINARY_DIR}/pqClient.adp"
   COPYONLY)
 
-set(dir "${ParaView_BINARY_DIR}/Documentation/")
-install(DIRECTORY ${ParaView_BINARY_DIR}/Documentation/ 
-        DESTINATION ${PV_EXE_INSTALL}/Documentation 
-        COMPONENT Runtime
-        REGEX ".html")
-
-install(FILES ${ParaView_BINARY_DIR}/pqClient.adp 
-  DESTINATION ${PV_EXE_INSTALL} COMPONENT Runtime )
+install(
+  FILES ${ParaView_BINARY_DIR}/pqClient.adp 
+  DESTINATION ${PV_EXE_INSTALL} 
+  COMPONENT Runtime)
