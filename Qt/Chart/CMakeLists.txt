@@ -191,5 +191,5 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
   GLOB_INSTALL_DEVELOPMENT( 
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${PV_INSTALL_INCLUDE_DIR}/Qt/Chart/Resources"
-    "*.ui;*.qrc;*.ico;*.png;*.svg;*.rc;*.xpm") 
+    "*.ui;*.qrc;*.ico;*.png;*.svg;*.rc;*.xpm")
 ENDIF (NOT PV_INSTALL_NO_DEVELOPMENT)

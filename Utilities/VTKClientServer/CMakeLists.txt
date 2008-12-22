@@ -100,7 +100,7 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
       COMPONENT Development)
   # Wrapper exec
   INSTALL(
-      FILES "${ParaView_BINARY_DIR}/bin/vtkWrapClientServer${PV_EXE_SUFFIX}"
+      FILES "${ParaView_BINARY_DIR}/bin/vtkWrapClientServer"
       DESTINATION ${PV_INSTALL_BIN_DIR}
       COMPONENT Development)
 ENDIF(NOT PV_INSTALL_NO_DEVELOPMENT)

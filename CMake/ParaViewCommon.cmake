@@ -10,6 +10,9 @@
 # from:    directory to scrape.
 # to:      destination
 # exts:    list of glob patterns
+# 
+# NOTE: To search in directory other than the current
+#       put the search dir in "exts".
 MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
   #message(${from}\n${to})
   SET(filesToInstall)
@@ -26,7 +29,7 @@ MACRO(GLOB_INSTALL_DEVELOPMENT from to exts)
     INSTALL(
         FILES ${filesToInstall}
         DESTINATION ${to}
-        COMPONENT Develeopment) 
+        COMPONENT Develeopment)
   ENDIF(filesToInstall)
 ENDMACRO(GLOB_INSTALL_DEVELOPMENT)
 
@@ -120,7 +123,7 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     SET(PV_EXE_SUFFIX -real)
     SET(PV_EXE_INSTALL ${PV_INSTALL_LIB_DIR})
     SET(PV_FORWARD_DIR_BUILD "${EXECUTABLE_OUTPUT_PATH}")
-    SET(PV_FORWARD_DIR_INSTALL "..${PV_EXE_INSTALL}")
+    SET(PV_FORWARD_DIR_INSTALL "../${PV_EXE_INSTALL}")
     SET(PV_FORWARD_PATH_BUILD "\"${PV_FORWARD_DIR_BUILD}\"")
     SET(PV_FORWARD_PATH_INSTALL "\"${PV_FORWARD_DIR_INSTALL}\"")
     FOREACH(ldir ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
@@ -156,9 +159,9 @@ SET(VTK_INSTALL_HAS_CMAKE_24 1)
 # Send VTK executables to the ParaView LIBRARY directory (not a mistake).
 # Send VTK include files to the ParaView include directory
 # Send VTK libraries to the ParaView library directory.
-SET(VTK_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-SET(VTK_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
-SET(VTK_INSTALL_LIB_DIR "${PV_INSTALL_LIB_DIR}")
+SET(VTK_INSTALL_BIN_DIR "/${PV_INSTALL_BIN_DIR}")
+SET(VTK_INSTALL_INCLUDE_DIR "/${PV_INSTALL_INCLUDE_DIR}")
+SET(VTK_INSTALL_LIB_DIR "/${PV_INSTALL_LIB_DIR}")
 SET(VTK_INSTALL_PACKAGE_DIR "/${PV_INSTALL_LIB_DIR}")
 # VTK and KWCommon should install only the components paraview does.
 SET(VTK_INSTALL_NO_DOCUMENTATION 1)
@@ -172,13 +175,13 @@ SET (VTK_INSTALL_NO_VTKPYTHON 1)
 # with the other python extension modules ParaView creates.
 SET (VTK_INSTALL_PYTHON_USING_CMAKE 1)
 
-
-#TODO move this stuff into KWCommon top level cmake file.
+# KWCommon config
+#TODO move this stuff into /ParaView3/Common/CMakeLists.txt 
 SET(PV_INSTALL_HAS_CMAKE_24 1)
 SET(PV_INSTALL_BIN_DIR_CM24 ${PV_INSTALL_BIN_DIR})
 SET(PV_INSTALL_LIB_DIR_CM24 ${PV_INSTALL_LIB_DIR})
 SET(PV_INSTALL_INCLUDE_DIR_CM24 ${PV_INSTALL_INCLUDE_DIR})
-SET(KWCommon_INSTALL_BIN_DIR "/${PV_INSTALL_BIN_DIR}")
+SET(KWCommon_INSTALL_BIN_DIR "/${PV_INSTALL_BIN_DIR}") #NOTE the  "/" is required by INSTALL_TARGETS
 SET(KWCommon_INSTALL_LIB_DIR "/${PV_INSTALL_LIB_DIR}")
 SET(KWCommon_INSTALL_DATA_DIR "/${PV_INSTALL_DATA_DIR}")
 SET(KWCommon_INSTALL_INCLUDE_DIR "/${PV_INSTALL_INCLUDE_DIR}")
@@ -197,6 +200,13 @@ SET(KWCommonPro_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(KWCommonPro_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
 SET(KWCommonPro_INSTALL_NO_DOCUMENTATION 1)
 SET(KWCommonPro_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
+
+# XDMF config
+SET(XDMF_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+SET(XDMF_INSTALL_INCLUDE_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
+SET(XDMF_INSTALL_INCLUDE_VTK_DIR "${PV_INSTALL_INCLUDE_DIR}/Xdmf")
+
+
 
 #########################################################################
 # The client server wrapper macro needs this name for

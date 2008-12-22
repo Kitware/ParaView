@@ -155,7 +155,7 @@ configure_file(
 
 install(
     FILES "${ParaView_BINARY_DIR}/about.html"
-    DESTINATION ${PV_INSTALL_LIB_DIR}
+    DESTINATION ${PV_INSTALL_BIN_DIR}
     COMPONENT Runtime)
 
 configure_file(

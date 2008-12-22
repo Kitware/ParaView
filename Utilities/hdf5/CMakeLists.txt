@@ -564,14 +564,17 @@ CONFIGURE_FILE(
 
 # Development files install
 IF (NOT PV_INSTALL_NO_DEVELOPMENT)
-  GLOB_INSTALL_DEVELOPMENT(
-      ${CMAKE_CURRENT_SOURCE_DIR}
-      ${PV_INSTALL_INCLUDE_DIR}/hdf5
-      "*.h;*.hxx;*.txx")
+  FILE(GLOB hToInstall
+      RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+      "*.h")
   INSTALL(
-        FILES ${hinToInstall} 
-        DESTINATION ${PV_INSTALL_INCLUDE_DIR}/hdf5 
-        COMPONENT Development)
+      FILES ${hToInstall}
+      DESTINATION "${PV_INSTALL_INCLUDE_DIR}/hdf5"
+      COMPONENT Development)
+  INSTALL(
+      FILES ${hinToInstall}
+      DESTINATION "${PV_INSTALL_INCLUDE_DIR}/hdf5"
+      COMPONENT Development)
   INSTALL(
       FILES ${cmakeinToInstall} 
       DESTINATION ${PV_INSTALL_LIB_DIR}
