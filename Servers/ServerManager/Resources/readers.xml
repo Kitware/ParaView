@@ -4600,6 +4600,17 @@
         </Documentation>
       </StringVectorProperty>
 
+      <IntVectorProperty name="DetectNumericColumns"
+        command="SetDetectNumericColumns"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, the reader will detect numeric columns and create
+          vtkDoubleArray or vtkIntArray for those instead of vtkStringArray.
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="UseStringDelimiter"
         command="SetUseStringDelimiter"
         number_of_elements="1"
