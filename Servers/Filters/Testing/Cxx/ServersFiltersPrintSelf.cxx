@@ -21,7 +21,6 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkClientServerMoveData.h"
 #include "vtkCompleteArrays.h"
-#include "vtkCSVReader.h"
 #include "vtkCSVWriter.h"
 #include "vtkExtractHistogram.h"
 #include "vtkExtractScatterPlot.h"
@@ -136,7 +135,6 @@ int main(int , char *[])
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkClientServerMoveData::New(); c->Print(cout); c->Delete();
   c = vtkCompleteArrays::New(); c->Print(cout); c->Delete();
-  c = vtkCSVReader::New(); c->Print(cout); c->Delete();
   c = vtkCSVWriter::New(); c->Print(cout); c->Delete();
   c = vtkExtractHistogram::New(); c->Print(cout); c->Delete();
   c = vtkExtractScatterPlot::New(); c->Print(cout); c->Delete();

@@ -4581,7 +4581,7 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-   <SourceProxy name="CSVReader" class="vtkCSVReader" label="CSV reader">
+   <SourceProxy name="CSVReader" class="vtkDelimitedTextReader" label="CSV reader">
       <Documentation
         short_help="Read a comma-separated values file."
         long_help="Read a comma-separated values file into a 1D rectilinear grid.">
