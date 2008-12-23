@@ -8447,6 +8447,80 @@ This property controls how the filter works to generate tensor cell data. You ca
 
     </SourceProxy>
 
+    <!-- ==================================================================== -->
+    <SourceProxy name="TableToStructuredGrid" 
+                class="vtkPTableToStructuredGrid"
+                label="Table To Structured Grid" >
+      <Documentation>
+        The TableToStructuredGrid filter converts a vtkTable to a
+        vtkStructuredGrid.  One must specifies the columns in the input table to
+        use as the X, Y and Z coordinates for the points in the output, and the
+        whole extent.
+      </Documentation>
+      <InputProperty name="Input"
+         command="SetInputConnection">
+            <ProxyGroupDomain name="groups">
+              <Group name="sources"/>
+              <Group name="filters"/>
+            </ProxyGroupDomain>
+            <InputArrayDomain name="input_array" 
+              attribute_type="row"
+              number_of_components="1" />
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkTable"/>
+            </DataTypeDomain>
+            <Documentation>
+              This property specifies the input..
+            </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="WholeExtent" 
+         command="SetWholeExtent" 
+         number_of_elements="6"
+         default_values="0 0 0 0 0 0"> 
+         <!--
+        <ExtentDomain name="extent">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ExtentDomain>
+        <Documentation>
+          This property gives the minimum and maximum point index (extent) in
+          each dimension for the output dataset.
+        </Documentation>
+        -->
+      </IntVectorProperty>
+
+      <StringVectorProperty name="XColumn"
+        command="SetXColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="YColumn"
+        command="SetYColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="ZColumn"
+        command="SetZColumn"
+        number_of_elements="1">
+          <ArrayListDomain name="array_list" >
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+      </StringVectorProperty>
+
+    </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>
