@@ -141,5 +141,6 @@
   <Filter name="WarpVector" />
   <Filter name="NormalGlyphs" />
   <Filter name="TableToPolyData" />
+  <Filter name="TableToStructuredGrid" />
 
 </ParaViewFilters>
