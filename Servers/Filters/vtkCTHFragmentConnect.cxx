@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.86");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.87");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -4756,16 +4756,7 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
   int axis0, int maxFlag0,
   int axis1, int maxFlag1,
   int axis2, int maxFlag2)
-{
-  if (iterator->Index[0] == 37 && iterator->Index[1] == 911)
-    {
-    cerr << "debug this.\n";
-    }
-  if (iterator->Index[0] == 74 && iterator->Index[1] == 1824)
-    {
-    cerr << "debug this.\n";
-    }
-    
+{   
   if (iterator->Block == 0)
     { // No input, no output.  This should not happen.
     vtkWarningMacro("Can not find neighbor for NULL block.");
@@ -4982,12 +4973,6 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
     // Lets integrate when we remove the iterator from the queue.
     // We could also do it when we add the iterator to the queue, but
     // the adds occur in so many places.
-
- if (iterator.Index[0] == 37 && iterator.Index[1] == 911 && iterator.Block->GetLevel() == 4)
-  {
-  cerr << "Debug this.\n";
-  }
-
     if (iterator.Block->GetGhostFlag() == 0)
       {
       // accumlate fragment volume
