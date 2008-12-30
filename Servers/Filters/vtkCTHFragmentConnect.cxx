@@ -78,7 +78,7 @@ using vtkstd::string;
 // other 
 #include "vtkCTHFragmentUtilities.hxx"
 
-vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.85");
+vtkCxxRevisionMacro(vtkCTHFragmentConnect, "1.86");
 vtkStandardNewMacro(vtkCTHFragmentConnect);
 
 // NOTE:
@@ -763,6 +763,12 @@ void vtkCTHFragmentConnectBlock::Initialize(
   this->BaseCellExtent[3] = this->CellExtent[3];
   this->BaseCellExtent[4] = this->CellExtent[4];
   this->BaseCellExtent[5] = this->CellExtent[5];
+  
+  // Handle the case of 2D input blocks.
+  if (this->BaseCellExtent[4] > this->BaseCellExtent[5])
+    {
+    this->BaseCellExtent[4] = this->BaseCellExtent[5] = 0;
+    }
 
   this->CellIncrements[0] = 1;
   // Point extent -> cell increments.  Do not add 1.
@@ -775,8 +781,10 @@ void vtkCTHFragmentConnectBlock::Initialize(
   #endif
   assert( "Spacing does not look correct for CTH AMR structure."
           && (int)(rootSpacing[0] / this->Spacing[0] + 0.5) == (1<<(this->Level))
-          && (int)(rootSpacing[1] / this->Spacing[1] + 0.5) == (1<<(this->Level))
-          && (int)(rootSpacing[2] / this->Spacing[2] + 0.5) == (1<<(this->Level)) );
+          && (int)(rootSpacing[1] / this->Spacing[1] + 0.5) == (1<<(this->Level)) );
+
+  //  2D grids do not follow the same pattern for the z axis.
+  //  && (int)(rootSpacing[2] / this->Spacing[2] + 0.5) == (1<<(this->Level)) );
 
   // This will have to change, but I will leave it for now.
   this->HalfEdges[1][0] = this->Spacing[0]*0.5;
@@ -2203,6 +2211,11 @@ void vtkCTHFragmentConnect::ComputeOriginAndRootSpacing(
     {
     this->StandardBlockDimensions[q]=pi[q]-2;
     }
+  // For 2d case
+  if (this->StandardBlockDimensions[2] < 1)
+    {
+    this->StandardBlockDimensions[2] = 1;
+    }
   // min level in use
   int minLevel = minLevelIa->GetValue(0);
   // min level spacing
@@ -2433,6 +2446,11 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacingOld(
     this->StandardBlockDimensions[0] = largestDims[0]-2;
     this->StandardBlockDimensions[1] = largestDims[1]-2;
     this->StandardBlockDimensions[2] = largestDims[2]-2;
+    // For 2d case
+    if (this->StandardBlockDimensions[2] < 1)
+      {
+      this->StandardBlockDimensions[2] = 1;
+      }        
     this->RootSpacing[0] = lowestSpacing[0] * (1 << (lowestLevel));
     this->RootSpacing[1] = lowestSpacing[1] * (1 << (lowestLevel));
     this->RootSpacing[2] = lowestSpacing[2] * (1 << (lowestLevel));
@@ -2490,7 +2508,7 @@ int vtkCTHFragmentConnect::ComputeOriginAndRootSpacingOld(
       this->GlobalOrigin[ii] = dMsg[ii];
       this->RootSpacing[ii] = dMsg[ii+3];
       this->StandardBlockDimensions[ii] = (int)(dMsg[ii+6]);
-      }
+      }      
     }
 
   return totalNumberOfBlocksInThisProcess;
@@ -4739,6 +4757,15 @@ void vtkCTHFragmentConnect::GetNeighborIterator(
   int axis1, int maxFlag1,
   int axis2, int maxFlag2)
 {
+  if (iterator->Index[0] == 37 && iterator->Index[1] == 911)
+    {
+    cerr << "debug this.\n";
+    }
+  if (iterator->Index[0] == 74 && iterator->Index[1] == 1824)
+    {
+    cerr << "debug this.\n";
+    }
+    
   if (iterator->Block == 0)
     { // No input, no output.  This should not happen.
     vtkWarningMacro("Can not find neighbor for NULL block.");
@@ -4955,6 +4982,12 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
     // Lets integrate when we remove the iterator from the queue.
     // We could also do it when we add the iterator to the queue, but
     // the adds occur in so many places.
+
+ if (iterator.Index[0] == 37 && iterator.Index[1] == 911 && iterator.Block->GetLevel() == 4)
+  {
+  cerr << "Debug this.\n";
+  }
+
     if (iterator.Block->GetGhostFlag() == 0)
       {
       // accumlate fragment volume
@@ -5068,44 +5101,51 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
       if (next.Block && next.Block->GetLevel() > iterator.Block->GetLevel())
         {
         vtkCTHFragmentConnectIterator next2;
+        bool threeDimFlag = next.Block->GetBaseCellExtent()[4] < next.Block->GetBaseCellExtent()[5];
         // Take the first neighbor found and move +Y
-        this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next2.VolumeFractionPointer == 0 || 
-            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
-          {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, &next2, ii, 0);
-          }    
-        else if (next2.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-         *(next2.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next2);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+        if (ii != 1 || threeDimFlag)
+          { // stupid after the fact way of dealing with 2d AMR input.
+          this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+          if (next2.VolumeFractionPointer == 0 || 
+              next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, &next2, ii, 0);
+            }    
+          else if (next2.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+           *(next2.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next2);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         // Take the fist iterator found and move +Z
-        this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-        if (next2.VolumeFractionPointer == 0 || 
-            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
-          {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, &next2, ii, 0);
-          }    
-        else if (next2.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-          *(next2.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next2);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+        if (ii != 0 || threeDimFlag)
+          { // stupid after the fact way of dealing with 2d AMR input.
+          this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
+          if (next2.VolumeFractionPointer == 0 || 
+              next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, &next2, ii, 0);
+            }    
+          else if (next2.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+            *(next2.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next2);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-        if (next2.Block)
+        if (next2.Block && threeDimFlag)
           {
           this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
           if (next.VolumeFractionPointer == 0 || 
@@ -5149,44 +5189,51 @@ void vtkCTHFragmentConnect::ConnectFragment(vtkCTHFragmentConnectRingBuffer *que
       if (next.Block && next.Block->GetLevel() > iterator.Block->GetLevel())
         {
         vtkCTHFragmentConnectIterator next2;
+        bool threeDimFlag = next.Block->GetBaseCellExtent()[4] < next.Block->GetBaseCellExtent()[5];
         // Take the first neighbor found and move +Y
-        this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
-        if (next2.VolumeFractionPointer == 0 || 
-            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
-          {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, &next2, ii, 1);
-          }    
-        else if (next2.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-          *(next2.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next2);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+        if (ii != 1 || threeDimFlag)
+          { // stupid after the fact way of dealing with 2d AMR input.
+          this->GetNeighborIterator(&next2, &next, (ii+1)%3,1, (ii+2)%3,0, ii,0);
+          if (next2.VolumeFractionPointer == 0 || 
+              next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, &next2, ii, 1);
+            }    
+          else if (next2.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+            *(next2.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next2);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         // Take the fist iterator found and move +Z
-        this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
-        if (next2.VolumeFractionPointer == 0 || 
-            next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
-          {
-          // Neighbor is outside of fragment.  Make a face.
-          this->CreateFace(&iterator, &next2, ii, 1);
-          }    
-        else if (next2.FragmentIdPointer[0] == -1)
-          { // We have not visited this neighbor yet. Mark the voxel and recurse.
-          *(next2.FragmentIdPointer) = this->FragmentId;
-          queue->Push(&next2);
-          }
-        else
-          { // The last case is that we have already visited this voxel and it
-          // is in the same fragment.
-          this->AddEquivalence(&next2, &next);
+        if (ii != 0 || threeDimFlag)
+          { // stupid after the fact way of dealing with 2d AMR input.
+          this->GetNeighborIterator(&next2, &next, (ii+2)%3,1, ii,0, (ii+1)%3,0);
+          if (next2.VolumeFractionPointer == 0 || 
+              next2.VolumeFractionPointer[0] < this->scaledMaterialFractionThreshold)
+            {
+            // Neighbor is outside of fragment.  Make a face.
+            this->CreateFace(&iterator, &next2, ii, 1);
+            }    
+          else if (next2.FragmentIdPointer[0] == -1)
+            { // We have not visited this neighbor yet. Mark the voxel and recurse.
+            *(next2.FragmentIdPointer) = this->FragmentId;
+            queue->Push(&next2);
+            }
+          else
+            { // The last case is that we have already visited this voxel and it
+            // is in the same fragment.
+            this->AddEquivalence(&next2, &next);
+            }
           }
         // To get the +Y+Z start with the +Z iterator and move +Y put results in "next"
-        if (next2.Block)
+        if (next2.Block && threeDimFlag)
           {
           this->GetNeighborIterator(&next, &next2, (ii+1)%3,1, (ii+2)%3,0, ii,0);
           if (next.VolumeFractionPointer == 0 || 
