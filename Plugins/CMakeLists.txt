@@ -13,6 +13,8 @@ ENDMACRO(paraview_build_optional_plugin)
 
 if (PARAVIEW_BUILD_StreamingParaView)
   add_subdirectory(Streaming)
+else (PARAVIEW_BUILD_StreamingParaView)
+  paraview_build_optional_plugin(Streaming "Streaming Plugin" Streaming OFF)
 endif (PARAVIEW_BUILD_StreamingParaView)
 
 paraview_build_optional_plugin(Array "Array" Array OFF)

@@ -45,6 +45,6 @@ ENDMACRO(paraview_build_optional_application)
 
 paraview_build_optional_application(Client "Standard ParaView Client" Client ON)
 paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
-paraview_build_optional_application(StreamingParaView "Streaming ParaView Client" StreamingParaView OFF)
+paraview_build_optional_application(StreamingParaView "Streaming ParaView Application" StreamingParaView OFF)
 
 ENDIF(QT4_FOUND)
