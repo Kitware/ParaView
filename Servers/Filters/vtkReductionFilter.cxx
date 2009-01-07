@@ -43,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.19");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.20");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -346,10 +346,13 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
     for (cc=0; cc < numProcs; ++cc)
       {
       vtkSmartPointer<vtkDataObject> ds = NULL;
-      if (cc == 0 && preOutput)
+      if (cc == 0)
         {
-        ds.TakeReference(preOutput->NewInstance());
-        ds->ShallowCopy(preOutput);
+        if (preOutput)
+          {
+          ds.TakeReference(preOutput->NewInstance());
+          ds->ShallowCopy(preOutput);
+          }
         }
       else
         {
