@@ -42,6 +42,7 @@
 #include "vtkPVOpenGLExtensionsInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -50,8 +51,10 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMHardwareSelector.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
@@ -63,8 +66,6 @@
 #include "vtkSMUtilities.h"
 #include "vtkTimerLog.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkSMHardwareSelector.h"
-#include "vtkSMPropertyHelper.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/map>
@@ -91,7 +92,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.83");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.84");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1778,6 +1779,33 @@ vtkSMRepresentationProxy* vtkSMRenderViewProxy::CreateDefaultRepresentation(
     {
     return vtkSMRepresentationProxy::SafeDownCast(
       pxm->NewProxy("representations", "GeometryRepresentation"));
+    }
+
+  vtkPVXMLElement* hints = source->GetHints();
+  if (hints)
+    {
+    // If the source has an hint as follows, then it's a text producer and must
+    // be is display-able.
+    //  <Hints>
+    //    <OutputPort name="..." index="..." type="text" />
+    //  </Hints>
+
+    unsigned int numElems = hints->GetNumberOfNestedElements(); 
+    for (unsigned int cc=0; cc < numElems; cc++)
+      {
+      int index;
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child->GetName() &&
+        strcmp(child->GetName(), "OutputPort") == 0 &&
+        child->GetScalarAttribute("index", &index) &&
+        index == opport &&
+        child->GetAttribute("type") &&
+        strcmp(child->GetAttribute("type"), "text") == 0)
+        {
+        return vtkSMRepresentationProxy::SafeDownCast(
+          pxm->NewProxy("representations", "TextSourceRepresentation"));
+        }
+      }
     }
 
   return 0;

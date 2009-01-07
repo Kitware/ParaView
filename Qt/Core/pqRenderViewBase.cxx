@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -601,13 +602,30 @@ bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
     return false;
     }
 
-  // HACK to allow text.
-  QString srcProxyName = sourceProxy->GetXMLName();
-  if (srcProxyName == "TextSource" || 
-    srcProxyName == "TimeToTextConvertor" ||
-    srcProxyName == "TimeToTextConvertorSource")
+  vtkPVXMLElement* hints = sourceProxy->GetHints();
+  if (hints)
     {
-    return true;
+    // If the source has an hint as follows, then it's a text producer and must
+    // be is display-able.
+    //  <Hints>
+    //    <OutputPort name="..." index="..." type="text" />
+    //  </Hints>
+
+    unsigned int numElems = hints->GetNumberOfNestedElements(); 
+    for (unsigned int cc=0; cc < numElems; cc++)
+      {
+      int index;
+      vtkPVXMLElement* child = hints->GetNestedElement(cc);
+      if (child->GetName() &&
+        strcmp(child->GetName(), "OutputPort") == 0 &&
+        child->GetScalarAttribute("index", &index) &&
+        index == opPort->getPortNumber() &&
+        child->GetAttribute("type") &&
+        strcmp(child->GetAttribute("type"), "text") == 0)
+        {
+        return true;
+        }
+      }
     }
   
   vtkPVDataInformation* dinfo = opPort->getDataInformation(false);

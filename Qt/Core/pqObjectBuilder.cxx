@@ -440,14 +440,6 @@ pqDataRepresentation* pqObjectBuilder::createDataRepresentation(
     reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
       "representations", representationType.toAscii().data());
     }
-  else if ( (srcProxyName == "TextSource" || 
-             srcProxyName == "TimeToTextConvertor"
-             || srcProxyName == "TimeToTextConvertorSource") && 
-    qobject_cast<pqRenderView*>(view))
-    {
-    reprProxy = vtkSMObject::GetProxyManager()->NewProxy(
-      "representations", "TextSourceRepresentation");
-    }
   else
     {
     reprProxy = view->getViewProxy()->CreateDefaultRepresentation(

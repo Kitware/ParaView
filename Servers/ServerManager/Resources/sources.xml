@@ -1354,6 +1354,10 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
           This property specifies the text to display.
         </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+       <OutputPort name="Output-0" index="0" type="text" />
+     </Hints>
    <!-- End of TextSource -->
    </SourceProxy>
 
@@ -1686,6 +1690,10 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
          This property specifies the format used to display the input time (using printf style).
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+       <OutputPort name="Output-0" index="0" type="text" />
+     </Hints>
      <!-- End of TimeToTextConvertorSource -->
    </SourceProxy>
 

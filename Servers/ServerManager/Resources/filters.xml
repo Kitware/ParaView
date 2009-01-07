@@ -7769,6 +7769,7 @@ This filter extracts a list of datasets from hierarchical datasets.
      
      <Hints>
        <Visibility replace_input="0" />
+       <OutputPort name="Output-0" index="0" type="text" />
      </Hints>
 
    <!-- End of TimeToTextConvertor -->
