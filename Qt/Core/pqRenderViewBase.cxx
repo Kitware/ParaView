@@ -600,6 +600,16 @@ bool pqRenderViewBase::canDisplay(pqOutputPort* opPort) const
     {
     return false;
     }
+
+  // HACK to allow text.
+  QString srcProxyName = sourceProxy->GetXMLName();
+  if (srcProxyName == "TextSource" || 
+    srcProxyName == "TimeToTextConvertor" ||
+    srcProxyName == "TimeToTextConvertorSource")
+    {
+    return true;
+    }
+  
   vtkPVDataInformation* dinfo = opPort->getDataInformation(false);
   if (dinfo->GetDataSetType() == -1 || 
     dinfo->GetDataSetType() == VTK_TABLE)
