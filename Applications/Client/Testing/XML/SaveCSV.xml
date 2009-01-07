@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileSaveData" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SaveCSV0.csv" />
+  <pqevent object="pqClientMainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveCSV.csv" />
+  <pqevent object="pqWriterDialog/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveCSV0.csv" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TableToPolyData" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/XColumn" command="set_string" arguments="Points:0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/YColumn" command="set_string" arguments="Points:1" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ZColumn" command="set_string" arguments="Points:2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,9,13,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,9,13,/0:0/0:1" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Points" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton0" command="activate" arguments="" />
+</pqevents>

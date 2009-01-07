@@ -303,6 +303,7 @@ IF(BUILD_TESTING)
     RepresentationSelector
     SaveAnimationGeometry
     SaveColorMap
+    SaveCSV
     SelectReader
     SimpleInteraction
     Slice
