@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/disk_out_ref.ex2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton6" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton5" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,117,44," />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,117,44," />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,95,12,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,95,12,/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Probe" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/InputFrame/qt_scrollarea_viewport/InputContainer/Source" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/Sources" command="mousePress" arguments="1,1,0,62,10,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/Sources" command="mouseRelease" arguments="1,0,0,62,10,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/SelectInputDialog/OkButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="V" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton0" command="activate" arguments="" />
+</pqevents>

@@ -274,6 +274,7 @@ IF(BUILD_TESTING)
     CreateCustomFilter
     CreateSource
     CustomFilter
+    CustomSourceProbe
     Cut
     CutMulti
     D3SmallCells

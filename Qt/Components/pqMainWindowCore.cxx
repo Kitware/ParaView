@@ -730,7 +730,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     fmm->setElementTagName("Filter");
     fmm->setRecentlyUsedMenuSize(10);
     QObject::connect(fmm, SIGNAL(selected(const QString&)),
-      this, SLOT(onCreateFilter(const QString&)));
+      this, SLOT(onCreateFilter(const QString&)),
+      Qt::QueuedConnection);
     QObject::connect(this, SIGNAL(refreshFiltersMenu()),
       fmm, SLOT(update()));
     QObject::connect(this, SIGNAL(enableFilterCreate(bool)),
