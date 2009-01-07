@@ -513,17 +513,12 @@ class ArraySelectionProperty(VectorProperty):
     "Property to select an array to be processed by a filter."
 
     def GetAssociation(self):
-        ass = int(self.SMProperty.GetElement(3))
-        if ass == 0:
-            return FIELD_ASSOCIATION_POINTS
-        elif ass == 1:
-            return FIELD_ASSOCIATION_CELLS
-        elif ass == 4:
-            return FIELD_ASSOCIATION_VERTICES
-        elif ass == 5:
-            return FIELD_ASSOCIATION_EDGES
-        elif ass == 6:
-            return FIELD_ASSOCIATION_ROWS
+        val = self.SMProperty.GetElement(3)
+        if val == "":
+            return None
+        for key, value in ASSOCIATIONS.iteritems():
+            if value == int(val):
+                return key
 
         return None
         

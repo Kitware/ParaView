@@ -34,7 +34,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.19");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.20");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -400,30 +400,34 @@ int vtkSMArrayListDomain::SetDefaultValues(vtkSMProperty* prop)
     return 0;
     }
 
+  const char* array = 0;
   if (this->GetNumberOfStrings() > 0)
     {
-    const char* array = this->GetString(this->DefaultElement);
+    array = this->GetString(this->DefaultElement);
     const char* defaultValue = svp->GetDefaultValue(0);
     unsigned int temp;
     if (defaultValue && this->IsInDomain(defaultValue, temp))
       {
       array = defaultValue;
       }
+    }
 
     if (svp->GetNumberOfElements() == 5)
       {
       vtksys_ios::ostringstream ass;
       ass << this->Association;
       svp->SetElement(3, ass.str().c_str());
-      svp->SetElement(4, array);
-      return 1;
+      if (array)
+        {
+        svp->SetElement(4, array);
+        return 1;
+        }
       }
-    else if (svp->GetNumberOfElements() == 1)
+    else if (svp->GetNumberOfElements() == 1 && array)
       {
       svp->SetElement(0, array);
       return 1;
       }
-    }
 
   return this->Superclass::SetDefaultValues(prop);
 }
