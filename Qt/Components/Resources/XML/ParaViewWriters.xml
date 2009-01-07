@@ -71,7 +71,7 @@
   <Writer name="CSVWriter"
           extensions="csv"
           file_description="CSV File"/>
-  <Writer name="PCSVWriter"
+  <Writer name="DataSetCSVWriter"
           extensions="csv"
           file_description="CSV File"/>
 </ParaViewWriters>

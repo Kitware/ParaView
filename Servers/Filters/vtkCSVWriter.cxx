@@ -29,9 +29,10 @@
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkCSVWriter);
-vtkCxxRevisionMacro(vtkCSVWriter, "1.9");
+vtkCxxRevisionMacro(vtkCSVWriter, "1.10");
 //-----------------------------------------------------------------------------
 vtkCSVWriter::vtkCSVWriter()
 {
@@ -199,7 +200,14 @@ void vtkCSVWriter::WriteTable(vtkTable* table)
         (*this->Stream) << this->FieldDelimiter;
         }
       first = false;
-      (*this->Stream) << this->GetString(vtkStdString(array->GetName()));
+
+      vtksys_ios::ostringstream array_name;
+      array_name << array->GetName();
+      if (array->GetNumberOfComponents() > 1)
+        {
+        array_name << ":" << comp;
+        }
+      (*this->Stream) << this->GetString(array_name.str());
       }
     vtkArrayIterator* iter = array->NewIterator();
     columnsIters.push_back(iter);

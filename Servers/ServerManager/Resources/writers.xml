@@ -1063,6 +1063,8 @@
       file_name_method="SetFileName">
       <Documentation short_help="Writer to write CSV files">
         Writer to write CSV files from table.
+        In parallel, it delivers the table to the root node and then saves the
+        CSV. For composite datasets, it saves multiple csv files.
       </Documentation>
       <SubProxy>
         <Proxy name="Writer"
@@ -1111,6 +1113,103 @@
       </Hints>
       <!-- End of CSVWriter -->
     </PSWriterProxy>
+
+    <PSWriterProxy name="DataSetCSVWriter" class="vtkParallelSerialWriter"
+      file_name_method="SetFileName">
+      <Documentation short_help="Writer to write CSV files">
+        Writer to write CSV files from any dataset. Set FieldAssociation to
+        choose whether cell data/point data needs to be saved.
+        In parallel, it delivers the table to the root node and then saves the
+        CSV. For composite datasets, it saves multiple csv files.
+      </Documentation>
+      <SubProxy>
+        <Proxy name="Writer"
+          proxygroup="internal_writers" proxyname="CSVWriter">
+        </Proxy>
+      </SubProxy>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+       <Documentation>
+        The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" /> 
+        <Documentation>
+        When WriteAllTimeSteps is turned ON, the writer is executed 
+        once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PreGatherHelper" class="vtkAttributeDataToTableFilter">
+           <IntVectorProperty name="FieldAssociation"
+             command="SetFieldAssociation"
+             number_of_elements="1"
+             default_values="0">
+             <Documentation>
+               Select the attribute data to pass.
+             </Documentation>
+             <EnumerationDomain name="enum">
+               <Entry text="Points" value="0" />
+               <Entry text="Cells" value="1" />
+               <Entry text="Field Data" value="2" />
+               <!-- These values are not applicable for vtkDataSet.
+               <Entry text="Vertices" value="4" />
+               <Entry text="Edges" value="5" />
+               <Entry text="Rows" value="6" />
+               -->
+             </EnumerationDomain>
+           </IntVectorProperty>
+           <IntVectorProperty name="AddMetaData"
+             command="SetAddMetaData"
+             number_of_elements="1"
+             default_values="1">
+             <Documentation>
+               It is possible for this filter to add additional meta-data to the
+               field data such as point coordinates (when point attributes are
+               selected and input is pointset) or structured coordinates etc.
+               To enable this addition of extra information, turn this flag on.
+             </Documentation>
+             <BooleanDomain name="bool" />
+           </IntVectorProperty>
+        </Proxy>
+        <ExposedProperties>
+          <Property name="FieldAssociation" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PostGatherHelper" class="vtkPVMergeTables" />
+      </SubProxy>
+
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of CSVWriter -->
+    </PSWriterProxy>
+
 
   </ProxyGroup>
 </ServerManagerConfiguration>
