@@ -73,7 +73,7 @@ public:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMComparativeViewProxy);
-vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMComparativeViewProxy, "1.28");
 
 //----------------------------------------------------------------------------
 vtkSMComparativeViewProxy::vtkSMComparativeViewProxy()
@@ -837,6 +837,7 @@ void vtkSMComparativeViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Mode: " << this->Mode << endl;
   os << indent << "TimeRange: " 
     << this->TimeRange[0] <<", " << this->TimeRange[1] << endl;
-  os << indent << "Spacing: " << this->Spacing << endl;
+  os << indent << "Spacing: " << this->Spacing[0] << ", "
+    << this->Spacing[1] << endl;
 }
 
