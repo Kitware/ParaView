@@ -62,9 +62,12 @@ void vtkSMWriterProxy::UpdatePipeline()
       << this->GetID()
       << "GetErrorCode"
       << vtkClientServerStream::End;
+
+  pm->SendPrepareProgress(this->ConnectionID);
   pm->SendStream(this->ConnectionID, this->Servers, str);
   pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
     0, 0, &this->ErrorCode);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,9 +85,12 @@ void vtkSMWriterProxy::UpdatePipeline(double time)
       << this->GetID()
       << "GetErrorCode"
       << vtkClientServerStream::End;
+  
+  pm->SendPrepareProgress(this->ConnectionID);
   pm->SendStream(this->ConnectionID, this->Servers, str);
   pm->GetLastResult(this->GetConnectionID(), this->GetServers()).GetArgument(
     0, 0, &this->ErrorCode);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
