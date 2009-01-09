@@ -27,6 +27,7 @@
 class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkCollection;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMOutputPort : public vtkSMProxy
 {
@@ -105,7 +106,6 @@ public:
     }
 //ETX
 
-
   // Description:
   // This method saves state information about the proxy
   // which can be used to revive the proxy using server side objects
@@ -116,9 +116,17 @@ public:
   virtual vtkPVXMLElement* SaveRevivalState(vtkPVXMLElement* root);
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
 
+  // Description:
+  // Provides access to the source proxy to which the output port belongs.
+  vtkSMSourceProxy* GetSourceProxy()
+    { return this->SourceProxy; }
+
 protected:
   vtkSMOutputPort();
   ~vtkSMOutputPort();
+
+  void SetSourceProxy(vtkSMSourceProxy* src)
+    { this->SourceProxy = src; }
 
   // Description:
   // An internal update pipeline method that subclasses may override.
@@ -131,6 +139,8 @@ protected:
   // The index of the port the output is obtained from.
   vtkSetMacro(PortIndex, int);
   int PortIndex;
+
+  vtkSMSourceProxy* SourceProxy;
 
   vtkPVClassNameInformation* ClassNameInformation;
   int ClassNameInformationValid;

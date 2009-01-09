@@ -43,13 +43,20 @@ class pqServerManagerModel;
 class pqServerManagerModelItem;
 class pqServerManagerSelection;
 class pqServerManagerSelectionModelInternal;
+class vtkSMProxy;
 
 /// This is a QItemSelectionModel-like selection model for the
 /// pqServerManagerModel. pqServerManagerSelectionModel is part
 /// of the "Synchronized Selection" mechanism, which makes it 
 /// possible for different Qt views based on different Qt models, all
-/// of which are based on thq pqServerManagerModel to coordintae selection
+/// of which are based on the pqServerManagerModel to coordinate selection
 /// state.
+/// .SECTION Update
+/// This has been updated to internally use vtkSMProxySelectionModel register
+/// with the proxy manager under the name "ActiveSources" to keep track for the
+/// selection/current proxy. This makes it possible to synchronize proxy
+/// selections with python shell.
+
 class PQCORE_EXPORT pqServerManagerSelectionModel : public QObject
 {
   Q_OBJECT
@@ -78,7 +85,7 @@ public:
   /// if the current item should be selected/deselected, or
   /// all selection cleared.
   void setCurrentItem(pqServerManagerModelItem* item, 
-    pqServerManagerSelectionModel::SelectionFlags command);
+    const pqServerManagerSelectionModel::SelectionFlags& command);
 
   /// Returns true if the item is selected.
   bool isSelected(pqServerManagerModelItem* item) const;
@@ -91,19 +98,28 @@ public:
 
 public slots:
   void select(pqServerManagerModelItem* item, 
-    pqServerManagerSelectionModel::SelectionFlags command);
+    const pqServerManagerSelectionModel::SelectionFlags& command);
   void select(const pqServerManagerSelection& items,
-    pqServerManagerSelectionModel::SelectionFlags command);
+    const pqServerManagerSelectionModel::SelectionFlags& command);
+
+protected:
+  /// convert SelectionFlags to vtkSMProxySelectionModel::ProxySelectionFlag
+  int getCommand(const SelectionFlags& command);
+
+  /// get vtkSMProxy for the item.
+  vtkSMProxy* getProxy(pqServerManagerModelItem* item);
 
 signals:
   void currentChanged(pqServerManagerModelItem* item);
   void selectionChanged(const pqServerManagerSelection& selected,
     const pqServerManagerSelection& deselected);
 
+private slots:
+  void smSelectionChanged();
+  void smCurrentChanged();
+
 private:
   pqServerManagerSelectionModelInternal* Internal;
-  /// Cleans up QPointers pointing to null objects in the selection.
-  void purge();
 };
 
 inline bool operator==(const QPointer<pqServerManagerModelItem>& lhs, 

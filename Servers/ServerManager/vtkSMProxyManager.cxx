@@ -95,7 +95,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.77");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.78");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1649,6 +1649,56 @@ void vtkSMProxyManager::UnRegisterExtension(vtkSMProxyManagerExtension* ext)
       break;
       }
     }
+}
+
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RegisterSelectionModel(
+  const char* name, vtkSMProxySelectionModel* model)
+{
+  if (!model)
+    {
+    vtkErrorMacro("Cannot register a null model.");
+    return;
+    }
+  if (!name)
+    {
+    vtkErrorMacro("Cannot register model with no name.");
+    return;
+    }
+
+  vtkSMProxySelectionModel* curmodel = this->GetSelectionModel(name);
+  if (curmodel && curmodel == model)
+    {
+    // already registered.
+    return;
+    }
+
+  if (curmodel)
+    {
+    vtkWarningMacro("Replacing existing selection model: " << name);
+    }
+  this->Internals->SelectionModels[name] = model;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterSelectionModel( const char* name)
+{
+  this->Internals->SelectionModels.erase(name);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
+  const char* name)
+{
+  vtkSMProxyManagerInternals::SelectionModelsType::iterator iter =
+    this->Internals->SelectionModels.find(name);
+  if (iter == this->Internals->SelectionModels.end())
+    {
+    return 0;
+    }
+
+  return iter->second;
 }
 
 //---------------------------------------------------------------------------

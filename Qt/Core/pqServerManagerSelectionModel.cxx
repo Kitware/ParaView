@@ -31,11 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqServerManagerSelectionModel.h"
 
+#include "vtkCollection.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkSMOutputPort.h"
+
 #include <QPointer>
 #include <QGlobalStatic>
 
-#include "pqServerManagerModelItem.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerModelItem.h"
+#include "pqProxy.h"
+#include "pqOutputPort.h"
 
 // register meta type for pqSMProxy
 static const int pqServerManagerSelectionId = 
@@ -46,8 +55,14 @@ class pqServerManagerSelectionModelInternal
 {
 public:
   QPointer<pqServerManagerModel> Model;
+
+  // Both the \c Selection and \c Current are kept synchronized with those
+  // maintained by vtkSMProxySelectionModel.
   pqServerManagerSelection Selection;
   QPointer<pqServerManagerModelItem> Current;
+
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkSmartPointer<vtkSMProxySelectionModel> ActiveSources;
 };
 
 //-----------------------------------------------------------------------------
@@ -56,6 +71,24 @@ pqServerManagerSelectionModel::pqServerManagerSelectionModel(
 {
   this->Internal = new pqServerManagerSelectionModelInternal;
   this->Internal->Model = _model;
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxySelectionModel* selmodel = pxm->GetSelectionModel("ActiveSources");
+  if (!selmodel)
+    {
+    selmodel = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveSources", selmodel);
+    selmodel->Delete();
+    }
+
+  this->Internal->ActiveSources = selmodel;
+  
+  this->Internal->VTKConnect =
+    vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->VTKConnect->Connect(selmodel, vtkCommand::CurrentChangedEvent,
+    this, SLOT(smCurrentChanged()));
+  this->Internal->VTKConnect->Connect(selmodel,
+    vtkCommand::SelectionChangedEvent, this, SLOT(smSelectionChanged()));
 }
 
 //-----------------------------------------------------------------------------
@@ -71,16 +104,65 @@ pqServerManagerModelItem* pqServerManagerSelectionModel::currentItem() const
 }
 
 //-----------------------------------------------------------------------------
+void pqServerManagerSelectionModel::smCurrentChanged()
+{
+  pqServerManagerModelItem* item =
+    this->Internal->Model->findItem<pqServerManagerModelItem*>(
+      this->Internal->ActiveSources->GetCurrentProxy());
+  if (item != this->Internal->Current)
+    {
+    this->Internal->Current = item;
+    emit this->currentChanged(item);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerSelectionModel::smSelectionChanged()
+{
+  pqServerManagerSelection selected;
+  pqServerManagerSelection deselected;
+
+  vtkCollection* collection =
+    this->Internal->ActiveSources->GetNewlyDeselected();
+  for (int cc=0; cc < collection->GetNumberOfItems(); cc++)
+    {
+    pqServerManagerModelItem* item =
+      this->Internal->Model->findItem<pqServerManagerModelItem*>(
+        vtkSMProxy::SafeDownCast(collection->GetItemAsObject(cc)));
+    if (item)
+      {
+      this->Internal->Selection.removeAll(item);
+      deselected.push_back(item);
+      }
+    }
+
+  collection = this->Internal->ActiveSources->GetNewlySelected();
+  for (int cc=0; cc < collection->GetNumberOfItems(); cc++)
+    {
+    pqServerManagerModelItem* item =
+      this->Internal->Model->findItem<pqServerManagerModelItem*>(
+        vtkSMProxy::SafeDownCast(collection->GetItemAsObject(cc)));
+    if (item)
+      {
+      this->Internal->Selection.push_back(item);
+      selected.push_back(item);
+      }
+    }
+
+  emit this->selectionChanged(selected, deselected);
+}
+
+//-----------------------------------------------------------------------------
 void pqServerManagerSelectionModel::setCurrentItem(
   pqServerManagerModelItem* item,
-  pqServerManagerSelectionModel::SelectionFlags command)
+  const pqServerManagerSelectionModel::SelectionFlags &command)
 {
-  this->purge();
   if (this->Internal->Current != item)
     {
     this->Internal->Current = item;
-    this->select(item, command);
-
+    vtkSMProxy* proxy = this->getProxy(item);
+    this->Internal->ActiveSources->SetCurrentProxy(proxy,
+      this->getCommand(command));
     emit this->currentChanged(item);
     }
 }
@@ -107,7 +189,7 @@ pqServerManagerSelectionModel::selectedItems() const
 
 //-----------------------------------------------------------------------------
 void pqServerManagerSelectionModel::select(pqServerManagerModelItem* item,
-  pqServerManagerSelectionModel::SelectionFlags command)
+  const pqServerManagerSelectionModel::SelectionFlags& command)
 {
   pqServerManagerSelection sel;
   sel.push_back(item);
@@ -117,60 +199,65 @@ void pqServerManagerSelectionModel::select(pqServerManagerModelItem* item,
 //-----------------------------------------------------------------------------
 void pqServerManagerSelectionModel::select(
   const pqServerManagerSelection& items,
-  pqServerManagerSelectionModel::SelectionFlags command)
+  const pqServerManagerSelectionModel::SelectionFlags& command)
 {
-  this->purge();
-
   if (command == NoUpdate)
     {
     return;
     }
 
-  bool changed = false;
-  
-  pqServerManagerSelection selected;
-  pqServerManagerSelection deselected;
-
-  if (command & Clear)
-    {
-    deselected = this->Internal->Selection;
-    this->Internal->Selection.clear();
-    changed = true;
-    }
-
+  vtkCollection* proxies = vtkCollection::New();
   foreach(pqServerManagerModelItem* item, items)
     {
-    if (command & Select && !this->Internal->Selection.contains(item))
+    vtkSMProxy* proxy = this->getProxy(item);
+    if (proxy)
       {
-      this->Internal->Selection.push_back(item);
-      if (!selected.contains(item))
-        {
-        selected.push_back(item);
-        changed = true;
-        }
-      }
-
-    if (command & Deselect && this->Internal->Selection.contains(item)) 
-      {
-      this->Internal->Selection.removeAll(item);
-      if (!deselected.contains(item))
-        {
-        deselected.push_back(item);
-        changed = true;
-        }
+      proxies->AddItem(proxy);
       }
     }
-
-  if (changed)
-    {
-    emit this->selectionChanged(selected, deselected);
-    }
+  this->Internal->ActiveSources->Select(proxies, this->getCommand(command));
+  proxies->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerSelectionModel::purge()
+int pqServerManagerSelectionModel::getCommand(
+  const pqServerManagerSelectionModel::SelectionFlags &command)
 {
-  this->Internal->Selection.removeAll(0);
+  int smcommand =0;
+  if (command & NoUpdate)
+    {
+    smcommand |= vtkSMProxySelectionModel::NO_UPDATE;
+    }
+  if (command & Clear)
+    {
+    smcommand |= vtkSMProxySelectionModel::CLEAR;
+    }
+  if (command & Select)
+    {
+    smcommand |= vtkSMProxySelectionModel::SELECT;
+    }
+  if (command & Deselect)
+    {
+    smcommand |= vtkSMProxySelectionModel::DESELECT;
+    }
+
+  return smcommand;
 }
 
+//-----------------------------------------------------------------------------
+vtkSMProxy*
+pqServerManagerSelectionModel::getProxy(pqServerManagerModelItem* item)
+{
+  pqOutputPort* opport = qobject_cast<pqOutputPort*>(item);
+  if (opport)
+    {
+    return opport->getOutputPortProxy();
+    }
 
+  pqProxy* source = qobject_cast<pqProxy*>(item);
+  if (source)
+    {
+    return source->getProxy();
+    }
+  return 0;
+}

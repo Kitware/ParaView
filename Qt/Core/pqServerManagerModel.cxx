@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 // Server Manager Includes.
-#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
+#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxy.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
 // Qt Includes.
@@ -55,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqView.h"
 #include "pqRepresentation.h"
+#include "pqOutputPort.h"
 
 //-----------------------------------------------------------------------------
 class pqServerManagerModel::pqInternal
@@ -65,6 +67,9 @@ public:
 
   typedef QMap<vtkSMProxy*, QPointer<pqProxy> > ProxyMap;
   ProxyMap Proxies;
+
+  typedef QMap<vtkSMOutputPort*, QPointer<pqOutputPort> > OutputPortMap;
+  OutputPortMap OutputPorts;
 
   QList<QPointer<pqServerManagerModelItem> > ItemList;
 };
@@ -121,7 +126,7 @@ pqServer* pqServerManagerModel::findServer(const pqServerResource& resource) con
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pqServerManagerModel::findItemHelper(
+pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& vtkNotUsed(mo), 
   vtkSMProxy* proxy)
 {
@@ -131,11 +136,29 @@ pqProxy* pqServerManagerModel::findItemHelper(
     return iter.value();
     }
 
+  vtkSMOutputPort* port = vtkSMOutputPort::SafeDownCast(proxy);
+  if (port)
+    {
+    pqPipelineSource* src =
+      model->findItem<pqPipelineSource*>(port->GetSourceProxy());
+    if (src)
+      {
+      for (int cc=0; cc < src->getNumberOfOutputPorts(); cc++)
+        {
+        pqOutputPort* pqport = src->getOutputPort(cc);
+        if (pqport && pqport->getOutputPortProxy() == port)
+          {
+          return pqport;
+          }
+        }
+      }
+    }
+
   return 0;
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pqServerManagerModel::findItemHelper(
+pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& mo, 
   vtkClientServerID id)
 {
@@ -152,7 +175,7 @@ pqProxy* pqServerManagerModel::findItemHelper(
 }
 
 //-----------------------------------------------------------------------------
-pqProxy* pqServerManagerModel::findItemHelper(
+pqServerManagerModelItem* pqServerManagerModel::findItemHelper(
   const pqServerManagerModel* const model, const QMetaObject& mo, 
   const QString& name)
 {
@@ -457,4 +480,5 @@ void pqServerManagerModel::endRemoveServer()
 {
   emit this->finishedRemovingServer();
 }
+
 

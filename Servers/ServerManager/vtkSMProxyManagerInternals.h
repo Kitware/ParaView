@@ -21,6 +21,7 @@
 #include "vtkSMLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManagerExtension.h"
+#include "vtkSMProxySelectionModel.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -206,6 +207,11 @@ struct vtkSMProxyManagerInternals
   // Data structure for proxy manager extensions.
   typedef vtkstd::vector<vtkSmartPointer<vtkSMProxyManagerExtension> > ExtensionsType;
   ExtensionsType Extensions;
+
+  // Data structure for selection models.
+  typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
+    SelectionModelsType;
+  SelectionModelsType SelectionModels;
 
   // Helper method to retrieve the proxy element.
   vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName)

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMOutputPort);
-vtkCxxRevisionMacro(vtkSMOutputPort, "1.9");
+vtkCxxRevisionMacro(vtkSMOutputPort, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -39,13 +39,14 @@ vtkSMOutputPort::vtkSMOutputPort()
   this->ClassNameInformationValid = 0;
   this->DataInformationValid = false;
   this->PortIndex = 0;
-
+  this->SourceProxy = 0;
   this->DataObjectProxy = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMOutputPort::~vtkSMOutputPort()
 {
+  this->SetSourceProxy(0);
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
   if (this->DataObjectProxy)
@@ -626,8 +627,8 @@ void vtkSMOutputPort::UpdatePipelineInternal(double time,
 void vtkSMOutputPort::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
   os << indent << "PortIndex: " << this->PortIndex << endl;
+  os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }
 
 

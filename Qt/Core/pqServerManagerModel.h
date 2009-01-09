@@ -158,15 +158,15 @@ public:
     const QMetaObject &mo, QList<void *> *list, pqServer* server=0);
 
   /// Internal method.
-  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+  static pqServerManagerModelItem* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, vtkSMProxy* proxy);
 
   /// Internal method.
-  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+  static pqServerManagerModelItem* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, vtkClientServerID id);
 
   /// Internal method.
-  static pqProxy* findItemHelper(const pqServerManagerModel* const model, 
+  static pqServerManagerModelItem* findItemHelper(const pqServerManagerModel* const model, 
     const QMetaObject& mo, const QString& name);
 
 signals:

@@ -136,6 +136,7 @@ SET(Kit_SRCS
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
+  vtkSMProxySelectionModel.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPVLookupTableProxy.cxx

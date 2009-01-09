@@ -42,6 +42,7 @@ class vtkSMProxy;
 class vtkSMProxyManagerExtension;
 class vtkSMProxyManagerObserver;
 class vtkSMProxyManagerProxySet;
+class vtkSMProxySelectionModel;
 class vtkSMStateLoader;
 class vtkStringList;
 
@@ -417,11 +418,25 @@ public:
   // this method will return 1.
   int GetVersionPatch();
 
+  // Description:
   // Register a proxy manager extension. Returns true if the registration is
   // successful.
   bool RegisterExtension(vtkSMProxyManagerExtension* ext);
+  
+  // Description:
   // Unregister a previously register extension.
   void UnRegisterExtension(vtkSMProxyManagerExtension* ext);
+
+  // Description:
+  // Register/UnRegister a selection model. A selection model can be typically
+  // used by applications to keep track of active sources, filters, views etc.
+  void RegisterSelectionModel(const char* name, vtkSMProxySelectionModel*);
+  void UnRegisterSelectionModel(const char* name);
+
+  // Description:
+  // Get a registered selection model. Will return null if no such model is
+  // registered.
+  vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
 protected:
   vtkSMProxyManager();
