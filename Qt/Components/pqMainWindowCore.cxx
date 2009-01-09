@@ -352,6 +352,9 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
   QObject::connect(&this->Implementation->MultiViewManager,
     SIGNAL(activeViewChanged(pqView*)),
     &pqActiveView::instance(), SLOT(setCurrent(pqView*)));
+  QObject::connect(
+    &pqActiveView::instance(), SIGNAL(changed(pqView*)),
+    &this->Implementation->MultiViewManager, SLOT(setActiveView(pqView*)));
 
   // Connect the view manager's camera button.
   QObject::connect(&this->Implementation->MultiViewManager,

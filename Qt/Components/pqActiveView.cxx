@@ -31,31 +31,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqActiveView.h"
 
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxySelectionModel.h"
+#include "vtkEventQtSlotConnect.h"
+
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
+#include "pqView.h"
+
+//-----------------------------------------------------------------------------
 pqActiveView& pqActiveView::instance()
 {
   static pqActiveView the_instance;
   return the_instance;
 }
 
-pqActiveView::pqActiveView() :
-  ActiveView(0)
+//-----------------------------------------------------------------------------
+pqActiveView::pqActiveView() : ActiveView(0)
 {
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  this->SMActiveView = pxm->GetSelectionModel("ActiveView");
+  if (!this->SMActiveView)
+    {
+    this->SMActiveView = vtkSMProxySelectionModel::New();
+    pxm->RegisterSelectionModel("ActiveView", this->SMActiveView);
+    this->SMActiveView->Delete();
+    }
+
+  this->VTKConnect = vtkEventQtSlotConnect::New();
+  this->VTKConnect->Connect(this->SMActiveView, vtkCommand::CurrentChangedEvent,
+    this, SLOT(smCurrentChanged()));
 }
 
+//-----------------------------------------------------------------------------
 pqActiveView::~pqActiveView()
 {
+  this->VTKConnect->Delete();
 }
 
+//-----------------------------------------------------------------------------
 pqView* pqActiveView::current()
 {
   return this->ActiveView;
 }
 
-void pqActiveView::setCurrent(pqView* view)
+//-----------------------------------------------------------------------------
+void pqActiveView::smCurrentChanged()
 {
-  if(this->ActiveView != view)
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqView* view = smmodel->findItem<pqView*>(this->SMActiveView->GetCurrentProxy());
+  if (this->ActiveView != view)
     {
     this->ActiveView = view;
     emit this->changed(view);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveView::setCurrent(pqView* view)
+{
+  vtkSMProxy* viewProxy = view? view->getProxy() : 0;
+  this->SMActiveView->SetCurrentProxy(viewProxy,
+    vtkSMProxySelectionModel::NO_UPDATE);
 }

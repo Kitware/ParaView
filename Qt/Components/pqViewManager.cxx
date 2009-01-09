@@ -756,7 +756,8 @@ void pqViewManager::assignFrame(pqView* view)
 //-----------------------------------------------------------------------------
 pqMultiViewFrame* pqViewManager::getFrame(pqView* view) const
 {
-  return qobject_cast<pqMultiViewFrame*>(view->getWidget()->parentWidget());
+  return view? 
+    qobject_cast<pqMultiViewFrame*>(view->getWidget()->parentWidget()) : NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -1384,5 +1385,26 @@ void pqViewManager::onViewOptionsRequested()
   if (this->Internal->ViewOptionsManager)
     {
     this->Internal->ViewOptionsManager->showOptions();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::setActiveView(pqView* view)
+{
+  if (this->Internal->ActiveView == view)
+    {
+    return;
+    }
+
+  // Locate the frame for the view and activate it.
+  pqMultiViewFrame* frame = this->getFrame(view);
+  if (frame)
+    {
+    frame->setActive(true);
+    }
+  else if (this->Internal->ActiveView)
+    {
+    frame = this->getFrame(this->Internal->ActiveView);
+    frame->setActive(false);
     }
 }

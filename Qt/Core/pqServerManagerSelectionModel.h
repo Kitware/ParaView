@@ -115,7 +115,10 @@ signals:
     const pqServerManagerSelection& deselected);
 
 private slots:
+  /// called when vtkSMProxySelectionModel's selection changes.
   void smSelectionChanged();
+
+  /// called when vtkSMProxySelectionModel's current changes.
   void smCurrentChanged();
 
 private:

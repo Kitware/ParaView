@@ -39,10 +39,10 @@ public:
 //BTX
   // vtkSMProxy selection flags
   enum ProxySelectionFlag {
-    NO_UPDATE        = 1,
-    CLEAR            = 2,
-    SELECT           = 4,
-    DESELECT         = 8,
+    NO_UPDATE        = 0,
+    CLEAR            = 1,
+    SELECT           = 2,
+    DESELECT         = 4,
     CLEAR_AND_SELECT = CLEAR | SELECT
   };
 //ETX

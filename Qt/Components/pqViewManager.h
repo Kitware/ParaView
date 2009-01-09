@@ -199,6 +199,11 @@ public slots:
   /// when a frame a split.
   void setActiveServer(pqServer* server);
 
+  /// Called to change the active view. If view==null and then if the view
+  /// manager is currently focused on an empty frame, then it does not change
+  /// that. Otherwise the frame containing the view is activated.
+  void setActiveView(pqView* view);
+
 protected:
   /// Event filter callback.
   bool eventFilter(QObject* caller, QEvent* e);

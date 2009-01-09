@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqView;
+class vtkSMProxySelectionModel;
+class vtkEventQtSlotConnect;
 
 /// Provides a central location for managing an "active" view
 /// (note that a "view" could be a 3D render view, a plot, or
@@ -43,8 +45,11 @@ class pqView;
 ///
 /// A slot is provided to set the currently-active view, and
 /// a signal notifies observers when the active view changes
-class PQCOMPONENTS_EXPORT pqActiveView :
-  public QObject
+/// 
+/// To make it possible to synchronize the active view with the python shell,
+/// this class now internal uses vtkSMProxySelectionModel (registered as
+/// "ActiveView" with the proxy manager.
+class PQCOMPONENTS_EXPORT pqActiveView : public QObject
 {
   Q_OBJECT
   
@@ -62,13 +67,19 @@ public slots:
   /// Called to set the currently-active view
   void setCurrent(pqView* view);
 
+private slots:
+  /// called when vtkSMProxySelectionModel's current changes.
+  void smCurrentChanged();
+
 private:
   pqActiveView();
   pqActiveView(const pqActiveView&); // Not implemented.
   void operator=(const pqActiveView&); // Not implemented.
   ~pqActiveView();
-  
+
+  vtkEventQtSlotConnect* VTKConnect;
   pqView* ActiveView;
+  vtkSMProxySelectionModel* SMActiveView;
 };
 
 #endif
