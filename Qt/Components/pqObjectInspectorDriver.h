@@ -39,8 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QObject>
-#include <QPointer>
-#include "pqOutputPort.h"
+
 class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
@@ -151,7 +150,7 @@ private:
   pqView *View;  ///< Stores the active view.
   bool ShowCurrent;           ///< True if the current is shown for multiple.
 
-  QPointer<pqOutputPort> OutputPort;
+  pqOutputPort* OutputPort;
 };
 
 #endif

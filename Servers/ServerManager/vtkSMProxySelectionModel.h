@@ -73,6 +73,11 @@ public:
   vtkSMProxy* GetSelectedProxy(unsigned int  index);
 
   // Description:
+  // Get the collection of proxies that are currently selected.
+  // WARNING: Do not modify the returned collection.
+  vtkGetObjectMacro(Selection, vtkCollection);
+
+  // Description:
   // Update the selected set of proxies. \c command affects how the selection is
   // updated.
   // \li NO_UPDATE: don't affect the selected set of proxies.
@@ -112,6 +117,7 @@ protected:
   
   vtkCollection* NewlySelected;
   vtkCollection* NewlyDeselected;
+  vtkCollection* Selection;
 
 private:
   vtkSMProxySelectionModel(const  vtkSMProxySelectionModel&); // Not implemented

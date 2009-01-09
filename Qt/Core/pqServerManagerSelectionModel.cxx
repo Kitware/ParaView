@@ -122,32 +122,30 @@ void pqServerManagerSelectionModel::smSelectionChanged()
   pqServerManagerSelection selected;
   pqServerManagerSelection deselected;
 
-  vtkCollection* collection =
-    this->Internal->ActiveSources->GetNewlyDeselected();
-  for (int cc=0; cc < collection->GetNumberOfItems(); cc++)
+  pqServerManagerSelection curselection;
+  vtkCollection* curSMselection = this->Internal->ActiveSources->GetSelection();
+  curSMselection->InitTraversal();
+  while (vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
+      curSMselection->GetNextItemAsObject()))
     {
     pqServerManagerModelItem* item =
-      this->Internal->Model->findItem<pqServerManagerModelItem*>(
-        vtkSMProxy::SafeDownCast(collection->GetItemAsObject(cc)));
+      this->Internal->Model->findItem<pqServerManagerModelItem*>(proxy);
     if (item)
       {
-      this->Internal->Selection.removeAll(item);
-      deselected.push_back(item);
+      curselection.push_back(item);
+      if (this->Internal->Selection.removeAll(item) == 0)
+        {
+        // item was not present in old selection, so must be newly selected.
+        selected.push_back(item);
+        }
       }
     }
 
-  collection = this->Internal->ActiveSources->GetNewlySelected();
-  for (int cc=0; cc < collection->GetNumberOfItems(); cc++)
-    {
-    pqServerManagerModelItem* item =
-      this->Internal->Model->findItem<pqServerManagerModelItem*>(
-        vtkSMProxy::SafeDownCast(collection->GetItemAsObject(cc)));
-    if (item)
-      {
-      this->Internal->Selection.push_back(item);
-      selected.push_back(item);
-      }
-    }
+  // whatever has remained in this->Internal->Selection are not present in
+  // curselection, hence they have been deselected.
+  deselected = this->Internal->Selection;
+
+  this->Internal->Selection = curselection;
 
   emit this->selectionChanged(selected, deselected);
 }
