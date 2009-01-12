@@ -61,6 +61,11 @@ pqActiveView::pqActiveView() : ActiveView(0)
   this->VTKConnect = vtkEventQtSlotConnect::New();
   this->VTKConnect->Connect(this->SMActiveView, vtkCommand::CurrentChangedEvent,
     this, SLOT(smCurrentChanged()));
+
+  pqServerManagerModel* smmodel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QObject::connect(smmodel, SIGNAL(viewRemoved(pqView*)),
+    this, SLOT(onViewRemoved(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -94,4 +99,13 @@ void pqActiveView::setCurrent(pqView* view)
   vtkSMProxy* viewProxy = view? view->getProxy() : 0;
   this->SMActiveView->SetCurrentProxy(viewProxy,
     vtkSMProxySelectionModel::NO_UPDATE);
+}
+
+//-----------------------------------------------------------------------------
+void pqActiveView::onViewRemoved(pqView* view)
+{
+  if (this->ActiveView == view)
+    {
+    this->setCurrent(0);
+    }
 }

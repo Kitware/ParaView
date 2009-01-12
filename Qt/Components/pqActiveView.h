@@ -71,6 +71,10 @@ private slots:
   /// called when vtkSMProxySelectionModel's current changes.
   void smCurrentChanged();
 
+  /// called when a view is destroyed. We ensure that it's not same as the
+  //active view. If so, we set the active view to 0.
+  void onViewRemoved(pqView*);
+
 private:
   pqActiveView();
   pqActiveView(const pqActiveView&); // Not implemented.
