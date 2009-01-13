@@ -3521,6 +3521,14 @@
       <!-- End of SpreadSheetView -->
     </ViewProxy>
 
+    <ViewProxy name="BarChartView2" 
+      base_proxygroup="views" 
+      base_proxyname="ViewBase"
+      representation_name="BarChartRepresentation">
+
+      <!-- End of BarChartView2 -->
+    </ViewProxy>
+
 
     <ViewProxy name="BarChartView" 
       base_proxygroup="views" base_proxyname="ViewBase"

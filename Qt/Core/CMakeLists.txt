@@ -9,6 +9,8 @@ INCLUDE_DIRECTORIES(
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
   ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QtChart_SOURCE_DIR}
@@ -43,6 +45,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
+  pqBarChartView.h
   pqBarChartRepresentation.h
   pqCommandServerStartup.h
   pqComparativeRenderView.h
@@ -161,6 +164,8 @@ ADD_LIBRARY(pqCore
   pqApplicationCore.h
   pqBarChartRepresentation.cxx
   pqBarChartRepresentation.h
+  pqBarChartView.cxx
+  pqBarChartView.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqComparativeRenderView.cxx
@@ -357,6 +362,7 @@ TARGET_LINK_LIBRARIES(pqCore
   QtTesting
   pqWidgets
   QVTK
+  vtkQtChart
   vtkPVServerManager
 )
 

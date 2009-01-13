@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComparativeRenderView.h"
 #include "pqComparativePlotView.h"
 #include "pqLineChartRepresentation.h"
+#include "pqBarChartView.h"
 #include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
@@ -61,6 +62,7 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() << 
     pqRenderView::renderViewType() << 
     pqTwoDRenderView::twoDRenderViewType() <<
+    //pqBarChartView::barChartViewType() << 
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
@@ -83,6 +85,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   if (type == pqRenderView::renderViewType())
     {
     return pqRenderView::renderViewTypeName();
+    }
+  else if(type == pqBarChartView::barChartViewType())
+    {
+    return pqBarChartView::barChartViewTypeName();
     }
   else if(type == pqPlotView::barChartType())
     {
@@ -150,6 +156,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "2DRenderView";
     }
+  else if(viewtype == pqBarChartView::barChartViewType())
+    {
+    root_xmlname = "BarChartView2";
+    }
   else if(viewtype == pqPlotView::barChartType())
     {
     root_xmlname = "BarChartView";
@@ -198,6 +208,10 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqPlotView(pqPlotView::XYPlotType(),
                               group, viewname, viewmodule, server, p);
+    }
+  else if(viewtype == pqBarChartView::barChartViewType())
+    {
+    return new pqBarChartView(group, viewname, viewmodule, server, p);
     }
   else if(viewtype == "TableView")
     {
