@@ -803,6 +803,73 @@
    <!-- End stlreader -->
    </SourceProxy>
 
+   <SourceProxy name="CSVReaderCore" class="vtkDelimitedTextReader" label="CSV reader">
+      <Documentation
+        short_help="Read a comma-separated values file."
+        long_help="Read a comma-separated values file into a 1D rectilinear grid.">
+        The CSV reader reads a comma-separated values file into a 1D rectilinear
+        grid. If the file was saved using the CSVWriter, then the rectilinear
+        grid's points and point data can be restored as well as the cell data.
+        Otherwise all the data in the CSV file is treated as cell data. The
+        default file extension is .csv.
+      </Documentation>
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        animateable="0" >
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the CSV (Command Separated Values) reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="DetectNumericColumns"
+        command="SetDetectNumericColumns"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set to true, the reader will detect numeric columns and create
+          vtkDoubleArray or vtkIntArray for those instead of vtkStringArray.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="UseStringDelimiter"
+        command="SetUseStringDelimiter"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This property indicates whether to use the string delimiter.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HaveHeaders"
+        command="SetHaveHeaders"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If the value of this property is 1, treat the first line of the file as headers.
+        </Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="FieldDelimiterCharacters"
+        command="SetFieldDelimiterCharacters"
+        number_of_elements="1"
+        default_values=",">
+        <Documentation>
+          This property lists the characters that may be used to separate fields.  For
+          example, a value of "," indicates a comma-separated value file.  A
+          value of ".:;" indicates that columns may be separated by a
+          period, colon or semicolon.  The order of the characters in the text
+          string does not matter.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- End of CSVReaderCore -->
+   </SourceProxy>
+
+
   </ProxyGroup>
 
   <ProxyGroup name="sources">
@@ -4581,7 +4648,10 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
-   <SourceProxy name="CSVReader" class="vtkDelimitedTextReader" label="CSV reader">
+   <FileSeriesReaderProxy name="CSVReader"
+                          class="vtkFileSeriesReader"
+                          label="CSV reader"
+                          file_name_method="SetFileName">
       <Documentation
         short_help="Read a comma-separated values file."
         long_help="Read a comma-separated values file into a 1D rectilinear grid.">
@@ -4590,66 +4660,52 @@
         grid's points and point data can be restored as well as the cell data.
         Otherwise all the data in the CSV file is treated as cell data. The
         default file extension is .csv.
+        This can read file series as well.
       </Documentation>
+
       <StringVectorProperty name="FileName"
-        command="SetFileName"
-        animateable="0" >
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            animateable="0"
+                            number_of_elements="0" 
+                            repeat_command="1">
         <FileListDomain name="files"/>
         <Documentation>
-          This property specifies the file name for the CSV (Command Separated Values) reader.
+          The list of files to be read by the reader. Each file is expected to be
+          a csv file. If more than 1 file is specified, the reader will switch to
+          file series mode in which it will pretend that it can support time and
+          provide 1 file per time step.
         </Documentation>
       </StringVectorProperty>
-
-      <IntVectorProperty name="DetectNumericColumns"
-        command="SetDetectNumericColumns"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
+ 
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper/>
         <Documentation>
-          When set to true, the reader will detect numeric columns and create
-          vtkDoubleArray or vtkIntArray for those instead of vtkStringArray.
+          Available timestep values.
         </Documentation>
-      </IntVectorProperty>
+      </DoubleVectorProperty>
 
-      <IntVectorProperty name="UseStringDelimiter"
-        command="SetUseStringDelimiter"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          This property indicates whether to use the string delimiter.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="HaveHeaders"
-        command="SetHaveHeaders"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          If the value of this property is 1, treat the first line of the file as headers.
-        </Documentation>
-      </IntVectorProperty>
-
-      <StringVectorProperty name="FieldDelimiterCharacters"
-        command="SetFieldDelimiterCharacters"
-        number_of_elements="1"
-        default_values=",">
-        <Documentation>
-          This property lists the characters that may be used to separate fields.  For
-          example, a value of "," indicates a comma-separated value file.  A
-          value of ".:;" indicates that columns may be separated by a
-          period, colon or semicolon.  The order of the characters in the text
-          string does not matter.
-        </Documentation>
-      </StringVectorProperty>
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="CSVReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="DetectNumericColumns" />
+          <Property name="UseStringDelimiter" />
+          <Property name="HaveHeaders" />
+          <Property name="FieldDelimiterCharacters" />
+        </ExposedProperties>
+      </SubProxy>
 
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
      </Hints>
       <!-- End of CSVReader -->
-   </SourceProxy>
+   </FileSeriesReaderProxy>
 
   </ProxyGroup>
 </ServerManagerConfiguration>
