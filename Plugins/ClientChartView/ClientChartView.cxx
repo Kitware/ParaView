@@ -103,9 +103,8 @@ public:
     this->Widgets.setupUi(&this->Widget);
 
     // Set up the chart legend.
-    this->LegendModel = new vtkQtChartLegendModel();
     this->Legend = new vtkQtChartLegend();
-    this->Legend->setModel(this->LegendModel);
+    this->LegendModel = this->Legend->getModel();
 
     // Set up the chart titles. The axis titles should be in the same
     // order as the properties: left, bottom, right, top.
