@@ -63,6 +63,7 @@ public:
   enum EventStates
     {
     FlushEvents,
+    FlushEventsAgain,
     DoEvent,
     Done
     };
@@ -134,10 +135,14 @@ void pqEventDispatcher::checkPlayNextEvent()
     }
   else if(this->Implementation->EventState == pqImplementation::FlushEvents)
     {
-    if(!QAbstractEventDispatcher::instance()->hasPendingEvents())
-      {
-      this->Implementation->EventState = pqImplementation::DoEvent;
-      }
+    // ask for another flush assuming the chain of queued events isn't too long
+    // for the last play command to complete
+    this->Implementation->EventState = pqImplementation::FlushEventsAgain;
+    this->Implementation->Timer.start();
+    }
+  else
+    {
+    this->Implementation->EventState = pqImplementation::DoEvent;
     this->Implementation->Timer.start();
     }
 }
