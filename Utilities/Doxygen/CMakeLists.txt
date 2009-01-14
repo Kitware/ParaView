@@ -38,7 +38,8 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
         \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/OverView\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/OverView/Core\" \\
         \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Common\" \\
         \"${ParaView_SOURCE_DIR}/Servers/Filters\" \\
