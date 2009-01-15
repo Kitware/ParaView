@@ -47,6 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QAbstractItemView>
 
+#include <vtkstd/string>
+#include <vtksys/SystemTools.hxx>
+
 class pqFileComboBox : public QComboBox
 {
 public:
@@ -891,13 +894,30 @@ void pqFileDialog::fileSelectionChanged()
 
   this->Implementation->Ui.FileName->setText(fileString);
 }
-  
+
 bool pqFileDialog::selectFile(const QString& f)
 {
+  // We don't use QFileInfo here since it messes the paths up if the client and
+  // the server are heterogeneous systems.
+  vtkstd::string unix_path = f.toAscii().data();
+  vtksys::SystemTools::ConvertToUnixSlashes(unix_path);
+
+  vtkstd::string filename, dirname;
+  vtkstd::string::size_type slashPos = unix_path.rfind("/");
+  if (slashPos != vtkstd::string::npos)
+    {
+    filename = unix_path.substr(slashPos+1);
+    dirname = unix_path.substr(0, slashPos);
+    }
+  else
+    {
+    filename = unix_path;
+    dirname = "";
+    }
+
   QPointer<QDialog> diag = this;
-  QFileInfo info(f);
-  this->Implementation->Model->setCurrentPath(info.absolutePath());
-  this->Implementation->Ui.FileName->setText(info.fileName());
+  this->Implementation->Model->setCurrentPath(dirname.c_str());
+  this->Implementation->Ui.FileName->setText(filename.c_str());
   this->Implementation->SupressOverwriteWarning = true;
   this->accept();
   if(diag && diag->result() != QDialog::Accepted)
