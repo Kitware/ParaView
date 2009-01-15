@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.7");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.8");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -658,7 +658,7 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
 
       // Do not create the label if it is already represented in the min or max
       // label.
-      if ((val != range[0]) && (val != range[1]))
+      if ((val > range[0]) && (val < range[1]))
         {
         labelIdx = this->CreateLabel(val, targetWidth, targetHeight, viewport);
         textMapper = this->LabelMappers[labelIdx];
