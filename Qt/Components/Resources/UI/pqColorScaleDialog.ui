@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
-    <height>440</height>
+    <width>475</width>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -933,7 +933,7 @@
           </sizepolicy>
          </property>
          <property name="text" >
-          <string>Number of Labels</string>
+          <string>Max Number of Labels</string>
          </property>
         </widget>
        </item>
