@@ -93,6 +93,7 @@ SET(Kit_SRCS
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
+  vtkSMIdTypeArrayInformationHelper.cxx
   vtkSMIntArrayInformationHelper.cxx
   vtkSMInteractionUndoStackBuilder.cxx
   vtkSMIntRangeDomain.cxx
@@ -160,6 +161,7 @@ SET(Kit_SRCS
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
+  vtkSMSimpleIdTypeInformationHelper.cxx
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSimpleParallelStrategy.cxx
   vtkSMSimpleStrategy.cxx
