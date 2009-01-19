@@ -52,7 +52,8 @@ public:
   pqImplementation() :
     Source(0),
     Player(0),
-    EventState(FlushEvents)
+    EventState(FlushEvents),
+    FlushCount(0)
   {
     this->Timer.setSingleShot(true);
   }
@@ -63,15 +64,16 @@ public:
   enum EventStates
     {
     FlushEvents,
-    FlushEventsAgain,
     DoEvent,
     Done
     };
   int EventState;
+  int FlushCount;
 
   static int WaitTime;
 };
 
+static int MaxFlushCount = 2;
 int pqEventDispatcher::pqImplementation::WaitTime = 0;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -119,15 +121,18 @@ void pqEventDispatcher::checkPlayNextEvent()
     }
     
   this->Implementation->Timer.setInterval(1);
+  QApplication::syncX();
 
   // do an event every other time through here to be sure events are processed
   if(this->Implementation->WaitTime)
     {
+    this->Implementation->FlushCount = 0;
     this->Implementation->Timer.setInterval(this->Implementation->WaitTime);
     this->Implementation->Timer.start();
     }
   else if(this->Implementation->EventState == pqImplementation::DoEvent)
     {
+    this->Implementation->FlushCount = 0;
     this->Implementation->EventState = pqImplementation::FlushEvents;
     pqEventDispatcher::processEventsAndWait(1);
     this->Implementation->Timer.start();
@@ -135,15 +140,17 @@ void pqEventDispatcher::checkPlayNextEvent()
     }
   else if(this->Implementation->EventState == pqImplementation::FlushEvents)
     {
-    // ask for another flush assuming the chain of queued events isn't too long
-    // for the last play command to complete
-    this->Implementation->EventState = pqImplementation::FlushEventsAgain;
-    this->Implementation->Timer.start();
-    }
-  else
-    {
-    this->Implementation->EventState = pqImplementation::DoEvent;
-    this->Implementation->Timer.start();
+    if(this->Implementation->FlushCount < MaxFlushCount && 
+      QAbstractEventDispatcher::instance()->hasPendingEvents())
+      {
+      this->Implementation->FlushCount++;
+      this->Implementation->Timer.start();
+      }
+    else
+      {
+      this->Implementation->EventState = pqImplementation::DoEvent;
+      this->Implementation->Timer.start();
+      }
     }
 }
 
