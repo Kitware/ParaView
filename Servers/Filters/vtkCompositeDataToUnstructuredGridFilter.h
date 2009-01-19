@@ -18,7 +18,7 @@
 // .SECTION Description
 // vtkCompositeDataToUnstructuredGridFilter appends all vtkUnstructuredGrid
 // leaves of the input composite dataset to a single unstructure grid. The
-// subtree to be combined can be choosen using the SubTreeCompositeIndex. If 
+// subtree to be combined can be chosen using the SubTreeCompositeIndex. If 
 // the SubTreeCompositeIndex is a leaf node, then no appending is required.
 
 #ifndef __vtkCompositeDataToUnstructuredGridFilter_h
@@ -38,8 +38,12 @@ public:
     vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Get/Set the composite index of the subtree to be merged. By default set to
+  // 0 i.e. root, hence entire input composite dataset is merged.
   vtkSetMacro(SubTreeCompositeIndex, unsigned int);
   vtkGetMacro(SubTreeCompositeIndex, unsigned int);
+
 //BTX
 protected:
   vtkCompositeDataToUnstructuredGridFilter();
@@ -53,6 +57,10 @@ protected:
                           vtkInformationVector* outputVector);
 
   virtual int FillInputPortInformation(int port, vtkInformation* info);
+
+  // Description:
+  // Remove point/cell arrays not present on all processes.
+  void RemovePartialArrays(vtkUnstructuredGrid* data);
 
   void AddDataSet(vtkDataSet* ds, vtkAppendFilter* appender);
 
