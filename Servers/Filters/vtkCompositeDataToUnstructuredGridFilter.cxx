@@ -14,17 +14,25 @@
 =========================================================================*/
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkAppendFilter.h"
+#include "vtkCellData.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
-#include "vtkObjectFactory.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessControllerHelper.h"
+#include "vtkMultiProcessStream.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkUnstructuredGrid.h"
+
+#include <vtkstd/algorithm>
+#include <vtkstd/set>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
-vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.3");
+vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.4");
 //----------------------------------------------------------------------------
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
@@ -146,14 +154,7 @@ int vtkCompositeDataToUnstructuredGridFilter::FillInputPortInformation(
   return 1;
 }
 
-#include <vtkstd/algorithm>
-#include <vtkstd/set>
-#include <vtkstd/string>
-#include "vtkPointData.h"
-#include "vtkCellData.h"
-#include "vtkAbstractArray.h"
-#include "vtkMultiProcessStream.h"
-
+//****************************************************************************
 class vtkCDUGFMetaData
 {
 public:
@@ -176,6 +177,7 @@ public:
 
 typedef vtkstd::set<vtkCDUGFMetaData> ArraySet;
 
+//----------------------------------------------------------------------------
 static void CreateSet(ArraySet& arrays, vtkFieldData* dsa)
 {
   int numArrays = dsa->GetNumberOfArrays();
@@ -191,6 +193,7 @@ static void CreateSet(ArraySet& arrays, vtkFieldData* dsa)
     }
 }
 
+//----------------------------------------------------------------------------
 static void UpdateFromSet(vtkFieldData* dsa,
   ArraySet& arrays)
 {
@@ -210,6 +213,7 @@ static void UpdateFromSet(vtkFieldData* dsa,
     }
 }
 
+//----------------------------------------------------------------------------
 static void SaveSet(vtkMultiProcessStream& stream,
   ArraySet& arrays)
 {
@@ -224,6 +228,7 @@ static void SaveSet(vtkMultiProcessStream& stream,
     }
 }
 
+//----------------------------------------------------------------------------
 static void LoadSet(vtkMultiProcessStream& stream,
   ArraySet& arrays)
 {
@@ -240,6 +245,7 @@ static void LoadSet(vtkMultiProcessStream& stream,
     }
 }
 
+//----------------------------------------------------------------------------
 static void IntersectStreams(
   vtkMultiProcessStream& A, vtkMultiProcessStream& B)
 {
@@ -256,6 +262,7 @@ static void IntersectStreams(
   B.Reset();
   ::SaveSet(B, setC);
 }
+//****************************************************************************
 
 //----------------------------------------------------------------------------
 void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
