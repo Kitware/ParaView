@@ -1,0 +1,116 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <SourceProxy name="FluxVectors" class="vtkFluxVectors" label="Flux Vectors">
+      <Documentation short_help="Create flux or circulation vectors."
+                     long_help="Convert scalars to flux or circulation vectors.">
+        Often times a simulation that computes circulation or flux in a
+        mesh will simply write out the scalar that represents the amount of
+        movement and the direction is implied by the normal of the surface
+        cell (for flux) or the direction of the line cell (for
+        circulation).  This filter converts the scalar representation to
+        the vector representation.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          attribute_type="cell"
+                          number_of_components="1">
+          <RequiredProperties>
+            <Property name="SelectInputScalars" function="FieldDataSelection"/>
+          </RequiredProperties>
+        </InputArrayDomain>
+        <Documentation>
+          The input to the filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="SelectInputScalars"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Flux/Circulation Array">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          The name of the scalar array that represents flux through a 2D
+          element or circulation through a 1D element.  This array will be
+          converted to a vector pointing in the direction the flow or
+          circulation is moving.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+
+    <SourceProxy name="CirculationFeatures" class="vtkCirculationFeatures"
+                 label="Circulation Features">
+      <Documentation short_help="Find features in circulation fields."
+                     long_help="Find sources, sinks, and saddles in circulation fields.">
+        Given a set of line elements with a circulation scalar or vector
+        field on the cells, compute the "feature" points.  Features are
+        sources, sinks, or saddles in the circulation.  Any one of these is
+        identified by vectors facing the opposite direction.  Since the
+        input can be unstructured and deformed, the features are estimated
+        by finding the average circulation vector on each point and seeing
+        if any attached circulation vector points more than 90 degrees in a
+        different direction.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <InputArrayDomain name="input_array"
+                          attribute_type="cell">
+          <RequiredProperties>
+            <Property name="SelectInputScalars" function="FieldDataSelection"/>
+          </RequiredProperties>
+        </InputArrayDomain>
+        <Documentation>
+          The input to the filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty name="SelectInputScalars"
+                            command="SetInputArrayToProcess"
+                            number_of_elements="5"
+                            element_types="0 0 0 0 2"
+                            label="Circulation Array">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+        <FieldDataDomain name="field_list">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </FieldDataDomain>
+        <Documentation>
+          The name of the array that represents circulation through a 1D
+          element.  This array can be either a scalar (in which case it
+          points in the direction of the line element) or a vector.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

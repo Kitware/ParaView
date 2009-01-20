@@ -29,6 +29,7 @@ paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordV
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
 paraview_build_optional_plugin(CommonToolbar "CommonToolbar" CommonToolbar OFF)
 paraview_build_optional_plugin(CosmoFilters "Comsmology Filters" CosmoFilters OFF)
+paraview_build_optional_plugin(Flux, "Filters for Flux and Circulation Fields" Flux ON)
 paraview_build_optional_plugin(GraphLayoutFilterPanel "GraphLayoutFilterPanel" GraphLayoutFilterPanel OFF)
 paraview_build_optional_plugin(Infovis "Infovis" Infovis OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON) 
