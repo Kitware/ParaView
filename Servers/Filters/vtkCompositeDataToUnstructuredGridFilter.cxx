@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
-vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.4");
+vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.5");
 //----------------------------------------------------------------------------
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
@@ -91,7 +91,7 @@ int vtkCompositeDataToUnstructuredGridFilter::RequestData(
           output->ShallowCopy(curUG);
           // NOTE: Not using the appender at all.
           }
-        else if (curDS)
+        else if (curDS && curCD->GetNumberOfPoints() > 0)
           {
           this->AddDataSet(curDS, appender);
           }
@@ -161,108 +161,154 @@ public:
   vtkstd::string Name;
   int NumberOfComponents;
   int Type;
+  vtkCDUGFMetaData() 
+    {
+    this->NumberOfComponents = 0;
+    this->Type = 0;
+    }
+  vtkCDUGFMetaData(const vtkCDUGFMetaData& other)
+    {
+    this->Name = other.Name;
+    this->NumberOfComponents = other.NumberOfComponents;
+    this->Type = other.Type;
+    }
+
   bool operator < (const vtkCDUGFMetaData& b) const
     {
-    return (this->Name < b.Name ||
-     this->NumberOfComponents < b.NumberOfComponents ||
-     this->Type < b.Type);
+    if (this->Name != b.Name)
+      {
+      return this->Name < b.Name;
+      }
+    if (this->NumberOfComponents != b.NumberOfComponents)
+      {
+      return this->NumberOfComponents < b.NumberOfComponents;
+      }
+    return this->Type < b.Type;
     }
+
   void Set(vtkAbstractArray* array)
     {
     this->Name = array->GetName();
     this->NumberOfComponents = array->GetNumberOfComponents();
     this->Type = array->GetDataType();
     }
+
 };
 
-typedef vtkstd::set<vtkCDUGFMetaData> ArraySet;
-
-//----------------------------------------------------------------------------
-static void CreateSet(ArraySet& arrays, vtkFieldData* dsa)
+class vtkCGUGArraySet : public vtkstd::set<vtkCDUGFMetaData>
 {
-  int numArrays = dsa->GetNumberOfArrays();
-  for (int cc=0; cc < numArrays; cc++)
+public:
+  // Fill up \c this with arrays from \c dsa
+  void Initialize(vtkFieldData* dsa)
     {
-    vtkAbstractArray* array = dsa->GetAbstractArray(cc);
-    if (array && array->GetName())
+    int numArrays = dsa->GetNumberOfArrays();
+    if (dsa->GetNumberOfTuples() == 0)
       {
-      vtkCDUGFMetaData mda;
-      mda.Set(array);
-      arrays.insert(mda);
+      numArrays = 0;
       }
-    }
-}
-
-//----------------------------------------------------------------------------
-static void UpdateFromSet(vtkFieldData* dsa,
-  ArraySet& arrays)
-{
-  int numArrays = dsa->GetNumberOfArrays();
-  for (int cc=numArrays-1; cc >= 0; cc--)
-    {
-    vtkAbstractArray* array = dsa->GetAbstractArray(cc);
-    if (array && array->GetName())
+    for (int cc=0; cc < numArrays; cc++)
       {
-      vtkCDUGFMetaData mda;
-      mda.Set(array);
-      if (arrays.find(mda) == arrays.end())
+      vtkAbstractArray* array = dsa->GetAbstractArray(cc);
+      if (array && array->GetName())
         {
-        dsa->RemoveArray(array->GetName());
+        vtkCDUGFMetaData mda;
+        mda.Set(array);
+        this->insert(mda);
         }
       }
     }
-}
 
-//----------------------------------------------------------------------------
-static void SaveSet(vtkMultiProcessStream& stream,
-  ArraySet& arrays)
-{
-  stream.Reset();
-  stream << static_cast<unsigned int>(arrays.size());
-  ArraySet::iterator iter;
-  for (iter = arrays.begin(); iter != arrays.end(); ++iter)
+  // Remove arrays from \c dsa not present in \c this.
+  void UpdateFieldData(vtkFieldData* dsa)
     {
-    stream << iter->Name
-           << iter->NumberOfComponents
-           << iter->Type;
+    if (this->size() == 0)
+      {
+      return;
+      }
+    int numArrays = dsa->GetNumberOfArrays();
+    for (int cc=numArrays-1; cc >= 0; cc--)
+      {
+      vtkAbstractArray* array = dsa->GetAbstractArray(cc);
+      if (array && array->GetName())
+        {
+        vtkCDUGFMetaData mda;
+        mda.Set(array);
+        if (this->find(mda) == this->end())
+          {
+          //cout << "Removing: " << array->GetName() << endl;
+          dsa->RemoveArray(array->GetName());
+          }
+        }
+      }
     }
-}
 
-//----------------------------------------------------------------------------
-static void LoadSet(vtkMultiProcessStream& stream,
-  ArraySet& arrays)
-{
-  arrays.clear();
-  unsigned int numvalues;
-  stream >> numvalues;
-  for (unsigned int cc=0; cc < numvalues; cc++)
+  void Save(vtkMultiProcessStream& stream)
     {
-    vtkCDUGFMetaData mda;
-    stream >> mda.Name
-           >> mda.NumberOfComponents
-           >> mda.Type;
-    arrays.insert(mda);
+    stream.Reset();
+    stream << static_cast<unsigned int>(this->size());
+    vtkCGUGArraySet::iterator iter;
+    for (iter = this->begin(); iter != this->end(); ++iter)
+      {
+      stream << iter->Name
+        << iter->NumberOfComponents
+        << iter->Type;
+      }
     }
-}
+
+  void Load(vtkMultiProcessStream& stream)
+    {
+    this->clear();
+    unsigned int numvalues;
+    stream >> numvalues;
+    for (unsigned int cc=0; cc < numvalues; cc++)
+      {
+      vtkCDUGFMetaData mda;
+      stream >> mda.Name
+        >> mda.NumberOfComponents
+        >> mda.Type;
+      this->insert(mda);
+      }
+    }
+  void Print()
+    {
+    vtkCGUGArraySet::iterator iter;
+    for (iter = this->begin(); iter != this->end(); ++iter)
+      {
+      cout << iter->Name << ", "
+        << iter->NumberOfComponents << ", "
+        << iter->Type << endl;
+      }
+    cout << "-----------------------------------" << endl << endl;
+    }
+};
+
 
 //----------------------------------------------------------------------------
 static void IntersectStreams(
   vtkMultiProcessStream& A, vtkMultiProcessStream& B)
 {
-  ArraySet setA;
-  ArraySet setB;
-  ArraySet setC;
+  vtkCGUGArraySet setA;
+  vtkCGUGArraySet setB;
+  vtkCGUGArraySet setC;
 
-  ::LoadSet(A, setA);
-  ::LoadSet(B, setB);
-  vtkstd::set_intersection(setA.begin(), setA.end(),
-    setB.begin(), setB.end(),
-    vtkstd::inserter(setC, setC.begin()));
+  setA.Load(A);
+  setB.Load(B);
+  if (setA.size() > 0 && setB.size() > 0)
+    {
+    vtkstd::set_intersection(setA.begin(), setA.end(),
+      setB.begin(), setB.end(),
+      vtkstd::inserter(setC, setC.begin()));
+    }
+  else
+    {
+    vtkstd::set_union(setA.begin(), setA.end(),
+      setB.begin(), setB.end(),
+      vtkstd::inserter(setC, setC.begin()));
+    }
 
   B.Reset();
-  ::SaveSet(B, setC);
+  setC.Save(B);
 }
-//****************************************************************************
 
 //----------------------------------------------------------------------------
 void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
@@ -275,16 +321,15 @@ void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
     return;
     }
 
-  ArraySet pdSet;
-  ArraySet cdSet;
-
-  ::CreateSet(pdSet, data->GetPointData());
-  ::CreateSet(cdSet, data->GetCellData());
+  vtkCGUGArraySet pdSet;
+  vtkCGUGArraySet cdSet;
+  pdSet.Initialize(data->GetPointData());
+  cdSet.Initialize(data->GetCellData());
 
   vtkMultiProcessStream pdStream;
   vtkMultiProcessStream cdStream;
-  ::SaveSet(pdStream, pdSet);
-  ::SaveSet(cdStream, cdSet);
+  pdSet.Save(pdStream);
+  cdSet.Save(cdStream);
 
   vtkMultiProcessControllerHelper::ReduceToAll(
     controller,
@@ -296,14 +341,11 @@ void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
     cdStream,
     ::IntersectStreams,
     1278393);
-  ::LoadSet(pdStream, pdSet);
-  ::LoadSet(cdStream, cdSet);
+  pdSet.Load(pdStream);
+  cdSet.Load(cdStream);
 
-  ::UpdateFromSet(data->GetPointData(), pdSet);
-  ::UpdateFromSet(data->GetCellData(), cdSet);
-
-  //cout << controller->GetLocalProcessId() << "NumPts : " << pdSet.size() << endl;
-  //cout << controller->GetLocalProcessId() << "NumCells : " << cdSet.size() << endl;
+  cdSet.UpdateFieldData(data->GetCellData());
+  pdSet.UpdateFieldData(data->GetPointData());
 }
 
 //----------------------------------------------------------------------------
