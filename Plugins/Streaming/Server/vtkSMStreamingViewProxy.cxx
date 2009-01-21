@@ -17,6 +17,7 @@
 #include "vtkSMStreamingOptionsProxy.h"
 #include "vtkStreamingOptions.h"
 #include "vtkCamera.h"
+#include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -41,7 +42,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.6");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -120,10 +121,12 @@ bool vtkSMStreamingViewProxy::BeginCreateVTKObjects()
 
   if (!strcmp("StreamingRenderView", this->GetXMLName()))
     {
+    DEBUGPRINT_VIEW(cerr << "SV(" << this << ") Created serial view" << endl;);
     this->IsSerial = true;
     }
   else
     {
+    DEBUGPRINT_VIEW(cerr << "SV(" << this << ") Created parallel view type " << this->GetXMLName() << endl;);
     this->IsSerial = false;
     }
 
@@ -404,6 +407,7 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
 //----------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::PrepareRenderPass()
 {
+  static bool firstpass=true;
   vtkRenderWindow *renWin = this->GetRootView()->GetRenderWindow(); 
   vtkRenderer *ren = this->GetRootView()->GetRenderer();
 
@@ -416,7 +420,14 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
   if (this->Pass == 0)
     {
     //cls
-    ren->Clear(); 
+    if (firstpass) //workaround a crash that shows up on some mac's
+      {
+      firstpass = false;
+      }
+    else
+      {
+      ren->Clear(); 
+      }    
     //don't cls on following render passes
     renWin->EraseOff();
     ren->EraseOff();
@@ -505,7 +516,7 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   DEBUGPRINT_VIEW(
-    cerr << "SV::UpdateAllRepresentations" << endl;
+    cerr << "SV(" << this << ")::UpdateAllRepresentations" << endl;
     );
 
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
@@ -576,7 +587,7 @@ void vtkSMStreamingViewProxy::UpdateAllRepresentations()
 void vtkSMStreamingViewProxy::PerformRender()
 {
   DEBUGPRINT_VIEW(
-    cerr << "SV::PerformRender" << endl;
+    cerr << "SV(" << this << ")::PerformRender" << endl;
     );
 
   vtkSMRenderViewProxy *RVP = this->GetRootView();
@@ -651,8 +662,20 @@ void vtkSMStreamingViewProxy::PerformRender()
     this->RenderTimer->StartTimer();
     }
 
-  vtkRenderWindow *renWin = RVP->GetRenderWindow(); 
-  renWin->Render();
+  //vtkRenderWindow *renWin = RVP->GetRenderWindow(); 
+  //RVP->RenderMe();
+
+  vtkSMProxy *RWProxy = RVP->GetRenderWindowProxy();
+  DEBUGPRINT_VIEW(cerr << "SV(" << this << ") CallRender " << endl;);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << RWProxy->GetID()
+         << "Render"
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT,
+    stream);
 
   if (this->DisplayDone)
     {

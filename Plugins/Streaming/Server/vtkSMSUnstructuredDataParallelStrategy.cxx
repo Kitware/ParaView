@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -75,12 +75,6 @@ void vtkSMSUnstructuredDataParallelStrategy::BeginCreateVTKObjects()
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ViewSorter"));
   this->ViewSorter->SetServers(vtkProcessModule::DATA_SERVER);
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
-  if (pp)
-    {
-    pp->AddProxy(this->Collect);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -93,12 +87,19 @@ void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
     cacher->GetProperty("CachingEnabled"));
   ivp->SetElement(0, 0);
 
-  this->Connect(input, this->ViewSorter);
+  this->Connect(input, this->ViewSorter);//, "Input", outputport);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, outputport);
-  //input->VS->PC->Collect->PostDistUS->Distr
-  //             |                   \>US
-  //             \>PostCollectUS
+  //input->VS->PC->Collect->PostCollectUS->Distr
+  //             |                       \>PostDistrUS
+  //             \>US
+
+  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
+    this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
+  if (pp)
+    {
+    //pp->AddProxy(this->Collect);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -107,9 +108,9 @@ void vtkSMSUnstructuredDataParallelStrategy::CreateLODPipeline(vtkSMSourceProxy*
   this->Connect(input, this->ViewSorter);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreateLODPipeline(this->PieceCache, outputport);
-  //input->VS->PC->LODDec->CollectLOD->PostDistUSLOD->DistrLOD
-  //             |                         \>USLOD
-  //             \>PostCollectUSLOD
+  //input->VS->PC->LODDec->CollectLOD->PostCollectUSLOD->DistrLOD
+  //                     |                              \>USLOD
+  //                     \>USLOD
 }
 
 //----------------------------------------------------------------------------
@@ -119,16 +120,16 @@ void vtkSMSUnstructuredDataParallelStrategy::SetPassNumber(int val, int force)
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("PassNumber"));
+    this->PostDistributorSuppressor->GetProperty("PassNumber"));
   ivp->SetElement(0, val);
   ivp->SetElement(1, nPasses);
   if (force)
     {
     ivp->Modified();
-    this->UpdateSuppressor->UpdateVTKObjects(); 
-    vtkSMProperty *p = this->UpdateSuppressor->GetProperty("ForceUpdate");
+    this->PostDistributorSuppressor->UpdateVTKObjects(); 
+    vtkSMProperty *p = this->PostDistributorSuppressor->GetProperty("ForceUpdate");
     p->Modified();
-    this->UpdateSuppressor->UpdateVTKObjects();
+    this->PostDistributorSuppressor->UpdateVTKObjects();
     }
 }
 
@@ -145,56 +146,43 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, useCulling);
-
-  //Note: Parallel Strategy has to use the PostCollectUS, because that
-  //is has access to the data server's pipeline, which can compute the
-  //priority.
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PostCollectUpdateSuppressor->GetProperty("SetNumberOfPasses"));
+    this->PostDistributorSuppressor->GetProperty("SetNumberOfPasses"));
   ivp->SetElement(0, nPasses); 
 
-  this->PostCollectUpdateSuppressor->UpdateVTKObjects();
+  this->PostDistributorSuppressor->UpdateVTKObjects();
 
   //ask it to compute the priorities
   vtkSMProperty* cp = 
-    this->PostCollectUpdateSuppressor->GetProperty("ComputePriorities");
+    this->UpdateSuppressor->GetProperty("ComputePriorities");
   vtkSMIntVectorProperty* rp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PostCollectUpdateSuppressor->GetProperty("GetMaxPass"));
+    this->UpdateSuppressor->GetProperty("GetMaxPass"));
   cp->Modified();
-  this->PostCollectUpdateSuppressor->UpdateVTKObjects();      
+  this->UpdateSuppressor->UpdateVTKObjects();      
   //get the result
-  this->PostCollectUpdateSuppressor->UpdatePropertyInformation(rp);
+  this->UpdateSuppressor->UpdatePropertyInformation(rp);
   ret = rp->GetElement(0);
 
   //now that we've computed the priority and piece ordering, share that
   //with the other UpdateSuppressors to keep them all in synch.
   vtkSMSourceProxy *pdUS = this->PostDistributorSuppressor;
-  vtkSMSourceProxy *uS = this->UpdateSuppressor;
+  vtkSMSourceProxy *pcUS = this->PostCollectUpdateSuppressor;
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerStream stream;
-  this->CopyPieceList(&stream, this->PostCollectUpdateSuppressor, pdUS);
-  this->CopyPieceList(&stream, this->PostCollectUpdateSuppressor, uS);
+  this->CopyPieceList(&stream, this->UpdateSuppressor, pdUS);
+  this->CopyPieceList(&stream, this->UpdateSuppressor, pcUS);
 
   //now gather list from server to client
   vtkClientServerStream s2c;
   s2c << vtkClientServerStream::Invoke
-      << this->PostCollectUpdateSuppressor->GetID()
+      << this->UpdateSuppressor->GetID()
       << "SerializePriorities" 
       << vtkClientServerStream::End;
   pm->SendStream(this->GetConnectionID(),
@@ -203,13 +191,21 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
   //TODO: Find another way to get this. As I recall the info helper has
   //limited length.
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->PostCollectUpdateSuppressor->GetProperty("SerializedList"));
-  this->PostCollectUpdateSuppressor->UpdatePropertyInformation(dvp);
+    this->UpdateSuppressor->GetProperty("SerializedList"));
+  this->UpdateSuppressor->UpdatePropertyInformation(dvp);
   int np = dvp->GetNumberOfElements();
   double *elems = dvp->GetElements();
+/*
+  cerr << "UDPS(" << this << ") Obtained list " << np << ":";
+  for (int i = 0; i < np; i++)
+    {
+    cerr << elems[i] << " ";
+    }
+  cerr << endl;
+*/
   vtkClientServerStream s3c;
   s3c << vtkClientServerStream::Invoke
-      << this->UpdateSuppressor->GetID()
+      << this->PostDistributorSuppressor->GetID()
       << "UnSerializePriorities"
       << vtkClientServerStream::InsertArray(elems, np)
       << vtkClientServerStream::End;
@@ -224,7 +220,7 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
   //False means don't do a shallow copy. 
   //Relic from when cached dataobjects were in the piecelist. Might be 
   //removable now.
-  this->CopyPieceList(&stream, this->PostCollectUpdateSuppressor, pcUSLOD);
+  this->CopyPieceList(&stream, this->UpdateSuppressor, pcUSLOD);
   this->CopyPieceList(&stream, pcUSLOD, pdUSLOD);
   this->CopyPieceList(&stream, pcUSLOD, uSLOD);
 
@@ -272,11 +268,11 @@ void vtkSMSUnstructuredDataParallelStrategy::SharePieceList(
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
 
-  vtkSMSourceProxy *US1 = this->UpdateSuppressor;
+  vtkSMSourceProxy *US1 = this->PostDistributorSuppressor;
 
   vtkSMSourceProxy *US2 =
     vtkSMSourceProxy::SafeDownCast(
-      dest->GetSubProxy("UpdateSuppressor"));
+      dest->GetSubProxy("PostDistributorSuppressor"));
 
   vtkClientServerStream s2c;
   s2c << vtkClientServerStream::Invoke
@@ -331,18 +327,9 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherInformation(vtkPVInformation*
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, 0);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -360,12 +347,12 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherInformation(vtkPVInformation*
     vtkPVInformation *sinfo = 
       vtkPVInformation::SafeDownCast(info->NewInstance());
     ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->PostCollectUpdateSuppressor->GetProperty("PassNumber"));
+      this->UpdateSuppressor->GetProperty("PassNumber"));
     ivp->SetElement(0, i);
     ivp->SetElement(1, nPasses);
 
-    this->PostCollectUpdateSuppressor->UpdateVTKObjects();
-    this->PostCollectUpdateSuppressor->InvokeCommand("ForceUpdate");
+    this->UpdateSuppressor->UpdateVTKObjects();
+    this->UpdateSuppressor->InvokeCommand("ForceUpdate");
 
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->GatherInformation(this->ConnectionID,
@@ -394,18 +381,18 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherLODInformation(vtkPVInformati
     vtkPVInformation *sinfo = 
       vtkPVInformation::SafeDownCast(info->NewInstance());
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->PostCollectUpdateSuppressorLOD->GetProperty("PieceNumber"));
+      this->UpdateSuppressorLOD->GetProperty("PieceNumber"));
     ivp->SetElement(0, i);
     ivp->SetElement(1, nPasses);
 
-    this->PostCollectUpdateSuppressorLOD->UpdateVTKObjects();
-    this->PostCollectUpdateSuppressorLOD->InvokeCommand("ForceUpdate");
+    this->UpdateSuppressorLOD->UpdateVTKObjects();
+    this->UpdateSuppressorLOD->InvokeCommand("ForceUpdate");
 
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->GatherInformation(this->ConnectionID,
                           vtkProcessModule::DATA_SERVER_ROOT,
                           sinfo,
-                          this->PostCollectUpdateSuppressorLOD->GetID());
+                          this->UpdateSuppressorLOD->GetID());
     info->AddInformation(sinfo);
     sinfo->Delete();
     }

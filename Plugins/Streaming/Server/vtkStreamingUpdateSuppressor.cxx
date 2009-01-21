@@ -32,7 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.3");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.4");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 #define DEBUGPRINT_EXECUTION(arg)\
@@ -234,14 +234,14 @@ vtkDoubleArray *vtkStreamingUpdateSuppressor::GetSerializedPriorities()
   this->SerializedPriorities->SetNumberOfComponents(1);
   this->SerializedPriorities->SetNumberOfTuples(len);
   this->SerializedPriorities->SetArray(buffer, len, 1);
-/*
-  cerr << "US(" << this << ") Get list " << len << "SP:";
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") My list was " << len << ":";
   for (int i = 0; i < len; i++)
     {
     cerr << this->SerializedPriorities->GetValue(i) << " ";
     }
   cerr << endl;
-*/
+  );
   return this->SerializedPriorities;
 }
 
@@ -272,6 +272,10 @@ void vtkStreamingUpdateSuppressor::UnSerializePriorities(double *buffer)
 //-----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::ClearPriorities()
 {
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") CLEAR PRIORITIES" << endl;
+  );
+
   if (this->PieceList)
     {
     this->PieceList->Delete();

@@ -74,9 +74,11 @@ public:
   vtkGetObjectMacro(Renderer2D, vtkRenderer);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
   vtkGetObjectMacro(Interactor, vtkPVGenericRenderWindowInteractor);
+  vtkGetObjectMacro(ActiveCamera, vtkCamera);
+
   vtkGetObjectMacro(RendererProxy, vtkSMProxy);
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
-  vtkGetObjectMacro(ActiveCamera, vtkCamera);
+  vtkGetObjectMacro(RenderWindowProxy, vtkSMProxy);
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
   
   // Description:

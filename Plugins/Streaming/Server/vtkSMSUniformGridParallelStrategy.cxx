@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSUniformGridParallelStrategy::vtkSMSUniformGridParallelStrategy()
 {
@@ -65,6 +65,12 @@ void vtkSMSUniformGridParallelStrategy::BeginCreateVTKObjects()
   this->PieceCache = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("PieceCache"));
   this->PieceCache->SetServers(vtkProcessModule::DATA_SERVER);
+
+  //Get hold of the filter that does view dependent prioritization
+  this->ViewSorter = 
+    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ViewSorter"));
+  this->ViewSorter->SetServers(vtkProcessModule::DATA_SERVER);
+
 }
 
 //----------------------------------------------------------------------------
@@ -77,15 +83,16 @@ void vtkSMSUniformGridParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, 
     cacher->GetProperty("CachingEnabled"));
   ivp->SetElement(0, 0);
 
-  this->Connect(input, this->PieceCache);
+  this->Connect(input, this->ViewSorter);//, "Input", outputport);
+  this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, outputport);
-  //input->PieceCache->Collect->US
+  //input->ViewSorter->PieceCache->Collect->US
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
   if (pp)
     {
-    pp->AddProxy(this->Collect);
+    //pp->AddProxy(this->Collect);
     }
 }
 
@@ -130,18 +137,12 @@ int vtkSMSUniformGridParallelStrategy::ComputePriorities()
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
   ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, useCulling);
 
   //Note: Parallel Strategy has to use the PostCollectUS, because that
   //is has access to the data server's pipeline, which can compute the
@@ -273,18 +274,9 @@ void vtkSMSUniformGridParallelStrategy::GatherInformation(vtkPVInformation* info
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, 0);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(

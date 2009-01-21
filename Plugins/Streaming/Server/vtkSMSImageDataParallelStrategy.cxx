@@ -28,7 +28,7 @@
 #include "vtkStreamingOptions.h"
 
 vtkStandardNewMacro(vtkSMSImageDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.5");
+vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMSImageDataParallelStrategy::vtkSMSImageDataParallelStrategy()
 {
@@ -73,6 +73,7 @@ void vtkSMSImageDataParallelStrategy::BeginCreateVTKObjects()
   this->ViewSorter = 
     vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("ViewSorter"));
   this->ViewSorter->SetServers(vtkProcessModule::DATA_SERVER);
+
 }
 
 //----------------------------------------------------------------------------
@@ -85,7 +86,7 @@ void vtkSMSImageDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, in
     cacher->GetProperty("CachingEnabled"));
   ivp->SetElement(0, 0);
 
-  this->Connect(input, this->ViewSorter);
+  this->Connect(input, this->ViewSorter);//, "Input", outputport);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, outputport);
   //input->VS->PCache->Collect->US
@@ -95,9 +96,8 @@ void vtkSMSImageDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, in
     this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
   if (pp)
     {
-    pp->AddProxy(this->Collect);
+    //pp->AddProxy(this->Collect);
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -143,18 +143,9 @@ int vtkSMSImageDataParallelStrategy::ComputePriorities()
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, useCulling);
 
   //Note: Parallel Strategy has to use the PostCollectUS, because that
   //is has access to the data server's pipeline, which can compute the
@@ -326,18 +317,9 @@ void vtkSMSImageDataParallelStrategy::GatherInformation(vtkPVInformation* info)
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PieceCache->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("EnableStreamMessages"));
-  ivp->SetElement(0, doPrints);
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, 0);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
