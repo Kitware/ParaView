@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.6");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -94,12 +94,30 @@ void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
   //             |                       \>PostDistrUS
   //             \>US
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
-  if (pp)
-    {
-    //pp->AddProxy(this->Collect);
-    }
+  //use streams instead of a proxy property here 
+  //so that proxyproperty dependencies are not invoked 
+  //otherwise they end up with an artificial loop
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->PostDistributorSuppressor->GetID()
+         << "SetMPIMoveData" 
+         << this->Collect->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::CLIENT_AND_SERVERS,
+                 stream);
+
+  // Do not supress any updates in the intermediate US's between
+  // data and display. We need them to get piece selection back.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->PostCollectUpdateSuppressor->GetProperty("Enabled"));
+  ivp->SetElement(0, 0);
+  this->PostCollectUpdateSuppressor->UpdateVTKObjects();
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->UpdateSuppressor->GetProperty("Enabled"));
+  ivp->SetElement(0, 0);
+  this->UpdateSuppressor->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -152,10 +170,9 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PostDistributorSuppressor->GetProperty("SetNumberOfPasses"));
+    this->UpdateSuppressor->GetProperty("SetNumberOfPasses"));
   ivp->SetElement(0, nPasses); 
-
-  this->PostDistributorSuppressor->UpdateVTKObjects();
+  this->UpdateSuppressor->UpdateVTKObjects();
 
   //ask it to compute the priorities
   vtkSMProperty* cp = 
@@ -188,8 +205,6 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
   pm->SendStream(this->GetConnectionID(),
                  vtkProcessModule::DATA_SERVER_ROOT,
                  s2c);
-  //TODO: Find another way to get this. As I recall the info helper has
-  //limited length.
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->UpdateSuppressor->GetProperty("SerializedList"));
   this->UpdateSuppressor->UpdatePropertyInformation(dvp);
@@ -317,12 +332,6 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherInformation(vtkPVInformation*
   //everything at once.
   vtkSMIntVectorProperty* ivp;
 
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather Info" << endl;
-    }
-
   //put diagnostic setting transfer here because this happens early
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
   //int useCulling = vtkStreamingOptions::GetUsePrioritization();
@@ -370,11 +379,6 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherLODInformation(vtkPVInformati
   //gather information in multiple passes so as never to request
   //everything at once.
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather LOD Info" << endl;
-    }
 
   for (int i = 0; i < 1; i++)
     {
@@ -403,9 +407,9 @@ void vtkSMSUnstructuredDataParallelStrategy::InvalidatePipeline()
 {
   // Cache is cleaned up whenever something changes and caching is not currently
   // enabled.
-  if (this->UpdateSuppressor)
+  if (this->PostDistributorSuppressor)
     {
-    this->UpdateSuppressor->InvokeCommand("ClearPriorities");
+    this->PostDistributorSuppressor->InvokeCommand("ClearPriorities");
     }
   this->Superclass::InvalidatePipeline();
 }

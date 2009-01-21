@@ -27,7 +27,7 @@
 #include "vtkPVInformation.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredGridParallelStrategy, "1.6");
+vtkCxxRevisionMacro(vtkSMSUnstructuredGridParallelStrategy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredGridParallelStrategy::vtkSMSUnstructuredGridParallelStrategy()
 {
@@ -94,12 +94,30 @@ void vtkSMSUnstructuredGridParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
   //                             |                          \>US
   //                             \>PostCollectUS
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
-  if (pp)
-    {
-    //pp->AddProxy(this->Collect);
-    }
+  //use streams instead of a proxy property here 
+  //so that proxyproperty dependencies are not invoked 
+  //otherwise they end up with an artificial loop
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->PostDistributorSuppressor->GetID()
+         << "SetMPIMoveData" 
+         << this->Collect->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::CLIENT_AND_SERVERS,
+                 stream);
+
+  // Do not supress any updates in the intermediate US's between
+  // data and display. We need them to get piece selection back.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->PostCollectUpdateSuppressor->GetProperty("Enabled"));
+  ivp->SetElement(0, 0);
+  this->PostCollectUpdateSuppressor->UpdateVTKObjects();
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->UpdateSuppressor->GetProperty("Enabled"));
+  ivp->SetElement(0, 0);
+  this->UpdateSuppressor->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -320,9 +338,6 @@ void vtkSMSUnstructuredGridParallelStrategy::GatherInformation(vtkPVInformation*
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
   this->PieceCache->UpdateVTKObjects();
-  ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("UsePrioritization"));
-  ivp->SetElement(0, 0);//useCulling);
 
   //let US know NumberOfPasses for CP
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -391,9 +406,9 @@ void vtkSMSUnstructuredGridParallelStrategy::InvalidatePipeline()
 {
   // Cache is cleaned up whenever something changes and caching is not currently
   // enabled.
-  if (this->UpdateSuppressor)
+  if (this->PostDistributorSuppressor)
     {
-    this->UpdateSuppressor->InvokeCommand("ClearPriorities");
+    this->PostDistributorSuppressor->InvokeCommand("ClearPriorities");
     }
   this->Superclass::InvalidatePipeline();
 }

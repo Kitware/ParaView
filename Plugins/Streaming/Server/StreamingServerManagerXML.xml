@@ -933,12 +933,6 @@
         <DoubleArrayInformationHelper/>
       </DoubleVectorProperty>
 
-      <ProxyProperty name="SetMPIMoveData" command="SetMPIMoveData">
-        <ProxyGroupDomain name="groups">
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-      </ProxyProperty>
-
       <!-- End StreamingUpdateSuppressor -->
     </UpdateSuppressorProxy>
 

@@ -32,7 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.4");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.5");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 #define DEBUGPRINT_EXECUTION(arg)\
@@ -172,7 +172,9 @@ int vtkStreamingUpdateSuppressor::GetPiece(int p)
 //----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::SetPassNumber(int pass, int NPasses)
 {
-//  cerr << "US(" << this << ") SetPassNumber " << Pass << "/" << NPasses << endl;
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") SetPassNumber " << Pass << "/" << NPasses << endl;
+                       );
   this->SetPass(pass);
   this->SetNumberOfPasses(NPasses);
   if (this->MPIMoveData)
@@ -251,20 +253,20 @@ void vtkStreamingUpdateSuppressor::UnSerializePriorities(double *buffer)
   DEBUGPRINT_EXECUTION(
   cerr << "US(" << this << ") UNSERIALIZE PRIORITIES" << endl;
   );
+
   if (!this->PieceList)
     {
     this->PieceList = vtkPieceList::New();
     }
   this->PieceList->UnSerialize(buffer);
+
   DEBUGPRINT_EXECUTION(
-/*
   int len = (int)*buffer * 6 + 1;
   for (int i = 0; i < len; i++)
-  {
+    {
     cerr << buffer[i] << " ";
-  };
+    };
   cerr << endl;
-*/
   this->PieceList->Print();
   );
 }
@@ -439,7 +441,7 @@ void vtkStreamingUpdateSuppressor::MergePriorities()
       }
     }
   DEBUGPRINT_EXECUTION(
-  cerr << "US(" << this << ") POSTGATHER" << endl;;
+  cerr << "US(" << this << ") POSTGATHER" << endl;
   this->PieceList->Print();
   );
 

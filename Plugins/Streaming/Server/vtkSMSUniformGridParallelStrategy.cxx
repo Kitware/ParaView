@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUniformGridParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.6");
+vtkCxxRevisionMacro(vtkSMSUniformGridParallelStrategy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMSUniformGridParallelStrategy::vtkSMSUniformGridParallelStrategy()
 {
@@ -88,12 +88,6 @@ void vtkSMSUniformGridParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, 
   this->Superclass::CreatePipeline(this->PieceCache, outputport);
   //input->ViewSorter->PieceCache->Collect->US
 
-  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-    this->UpdateSuppressor->GetProperty("SetMPIMoveData"));
-  if (pp)
-    {
-    //pp->AddProxy(this->Collect);
-    }
 }
 
 //----------------------------------------------------------------------------
