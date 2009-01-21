@@ -61,18 +61,18 @@ public:
 
   /** Add a resource to the collection / 
   move the resource to the beginning of the list */
-  void add(const pqServerResource& resource);
+  virtual void add(const pqServerResource& resource);
   /** Returns the contents of the collection, ordered from
   most-recently-used to least-recently-used */
   const ListT list() const;
 
   /// Load the collection (from local user preferences)
-  void load(pqSettings&);
+  virtual void load(pqSettings&);
   /// Save the collection (to local user preferences)
-  void save(pqSettings&);
+  virtual void save(pqSettings&);
 
   /// Open a resource on the given server
-  void open(pqServer* server, const pqServerResource& resource);
+  virtual void open(pqServer* server, const pqServerResource& resource);
 
 signals:
   /// Signal emitted whenever the collection is changed

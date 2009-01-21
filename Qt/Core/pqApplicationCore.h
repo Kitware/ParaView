@@ -162,6 +162,9 @@ public:
 
   /// Returns the set of available server resources
   pqServerResources& serverResources();
+  /// Set server resources
+  void setServerResources(pqServerResources* serverResources);
+  
   /// Returns an object that can start remote servers
   pqServerStartups& serverStartups();
 

@@ -389,6 +389,17 @@ pqServerResources& pqApplicationCore::serverResources()
 }
 
 //-----------------------------------------------------------------------------
+void pqApplicationCore::setServerResources(
+  pqServerResources* serverResources)
+{
+  this->Internal->ServerResources = serverResources;
+  if(this->Internal->ServerResources)
+    {
+    this->Internal->ServerResources->load(*this->settings());
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqServerStartups& pqApplicationCore::serverStartups()
 {
   if(!this->Internal->ServerStartups)
