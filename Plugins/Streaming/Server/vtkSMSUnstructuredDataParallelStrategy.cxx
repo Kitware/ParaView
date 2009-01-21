@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.7");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -135,6 +135,8 @@ void vtkSMSUnstructuredDataParallelStrategy::CreateLODPipeline(vtkSMSourceProxy*
 void vtkSMSUnstructuredDataParallelStrategy::SetPassNumber(int val, int force)
 {
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
+  //cerr << "SUDPS(" << this << ") SetPassNumber " << val << "/" << nPasses << " " << (force?"FORCE":"LAZY") << endl;
+
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(

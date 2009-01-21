@@ -420,9 +420,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -434,10 +431,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -462,9 +456,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -476,10 +467,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -504,9 +492,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -518,10 +503,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -532,10 +514,7 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -546,10 +525,7 @@
         <ShareProperties subproxy="UpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -560,10 +536,7 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -574,10 +547,7 @@
         <ShareProperties subproxy="UpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -602,9 +572,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -616,10 +583,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -630,10 +594,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -644,10 +605,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -658,10 +616,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -672,10 +627,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -700,9 +652,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -714,10 +663,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -742,9 +688,6 @@
         <Proxy name="StreamingUpdateSuppressor"
           proxygroup="filters" proxyname="StreamingUpdateSuppressor">
         </Proxy>
-        <ExposedProperties>
-          <Property name="SetNumberOfPasses" />
-        </ExposedProperties>
         <ShareProperties subproxy="UpdateSuppressor" >
         </ShareProperties>
       </SubProxy>
@@ -756,10 +699,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
           <Exception name="ComputePriorities" />
-          <Exception name="SerializedList" />
         </ShareProperties>
       </SubProxy>
 
@@ -770,8 +710,7 @@
         <ShareProperties subproxy="StreamingUpdateSuppressor" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
+          <Exception name="ComputePriorities" />
         </ShareProperties>
       </SubProxy>
 
@@ -782,12 +721,11 @@
         <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
           <Exception name="Input" />
           <Exception name="ForceUpdate" />
-          <Exception name="CacheUpdate" />
-          <Exception name="RemoveAllCaches" />
+          <Exception name="ComputePriorities" />
         </ShareProperties>
       </SubProxy>
 
-      <!-- End of StreamingImageDataParalllelStrategy -->
+      <!-- End of StreamingImageDataParallelStrategy -->
     </SImageDataParallelStrategy>
 
     <!-- End of Strategies -->
@@ -898,7 +836,7 @@
         name="PassNumber"
         command="SetPassNumber"
         number_of_elements="2"
-        default_values="0 1">
+        default_values="0 16">
         <IntRangeDomain name="range" min="0"/>
         <Documentation>
           Choose a particular stream piece to render.
@@ -909,7 +847,7 @@
         name="SetNumberOfPasses"
         command="SetNumberOfPasses"
         number_of_elements="1"
-        default_values="1">
+        default_values="16">
         <IntRangeDomain name="range" min="1"/>
         <Documentation>
           Let it know total number of passes.
