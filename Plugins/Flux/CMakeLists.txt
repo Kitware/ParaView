@@ -18,6 +18,7 @@ SET(SM_XML
 
 SET(SM_SRC
   vtkCirculationFeatures.cxx
+  vtkFluxGlyphs.cxx
   vtkFluxVectors.cxx
   )
 
