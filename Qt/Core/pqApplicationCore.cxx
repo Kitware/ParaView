@@ -390,9 +390,9 @@ pqServerResources& pqApplicationCore::serverResources()
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setServerResources(
-  pqServerResources* serverResources)
+  pqServerResources* aserverResources)
 {
-  this->Internal->ServerResources = serverResources;
+  this->Internal->ServerResources = aserverResources;
   if(this->Internal->ServerResources)
     {
     this->Internal->ServerResources->load(*this->settings());

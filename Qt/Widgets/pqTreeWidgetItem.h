@@ -43,22 +43,22 @@ class QTWIDGETS_EXPORT pqTreeWidgetItem : public QTreeWidgetItem
 {
   typedef QTreeWidgetItem Superclass;
 public:
-  pqTreeWidgetItem(int type=UserType):
-    Superclass(type), CallbackHandler(0) { }
-  pqTreeWidgetItem(const QStringList& strings, int type=UserType):
-    Superclass(strings, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *parent, int type=UserType):
-    Superclass(parent, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *parent, const QStringList &strings, int type=UserType):
-    Superclass(parent, strings, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidget *parent, QTreeWidgetItem *preceding, int type=UserType):
-    Superclass(parent, preceding, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *parent, int type=UserType):
-    Superclass(parent, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *parent, const QStringList& strings, int type=UserType):
-    Superclass(parent, strings, type), CallbackHandler(0) { }
-  pqTreeWidgetItem(QTreeWidgetItem *parent, QTreeWidgetItem* preceding, int type=UserType):
-    Superclass(parent, preceding, type), CallbackHandler(0) { }
+  pqTreeWidgetItem(int atype=UserType):
+    Superclass(atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(const QStringList& strings, int atype=UserType):
+    Superclass(strings, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidget *aparent, int atype=UserType):
+    Superclass(aparent, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidget *aparent, const QStringList &strings, int atype=UserType):
+    Superclass(aparent, strings, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidget *aparent, QTreeWidgetItem *preceding, int atype=UserType):
+    Superclass(aparent, preceding, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidgetItem *aparent, int atype=UserType):
+    Superclass(aparent, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidgetItem *aparent, const QStringList& strings, int atype=UserType):
+    Superclass(aparent, strings, atype), CallbackHandler(0) { }
+  pqTreeWidgetItem(QTreeWidgetItem *aparent, QTreeWidgetItem* preceding, int atype=UserType):
+    Superclass(aparent, preceding, atype), CallbackHandler(0) { }
 
   /// overload setData() to call callbacks if set.
   virtual void setData(int column, int role, const QVariant& v);
