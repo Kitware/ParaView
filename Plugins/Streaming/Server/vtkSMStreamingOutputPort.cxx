@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMStreamingOutputPort);
-vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.3");
+vtkCxxRevisionMacro(vtkSMStreamingOutputPort, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingOutputPort::vtkSMStreamingOutputPort()
@@ -90,18 +90,9 @@ void vtkSMStreamingOutputPort::GatherDataInformation(int vtkNotUsed(doUpdate))
   vtkClientServerStream stream;
 
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
   int doPrints =  vtkStreamingOptions::GetEnableStreamMessages();
 
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
-  //commented out to make piece cache appendpolydata work
-  //if (!usePrioritization)
-  //  {
-  //  stream 
-  //    << vtkClientServerStream::Invoke 
-  //    << infoHelper << "EnableCullingOff"
-  //    << vtkClientServerStream::End;
-  //  }
 
   for (int i = 0; i < 1; i++)
     {
@@ -177,7 +168,6 @@ void vtkSMStreamingOutputPort::UpdatePipelineInternal(double time, bool doTime)
 
   int doPrints =  vtkStreamingOptions::GetEnableStreamMessages();
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  int usePrioritization = vtkStreamingOptions::GetUsePrioritization();
 
   vtkClientServerID infoHelper = pm->NewStreamObject("vtkPriorityHelper", stream);
 //  stream 

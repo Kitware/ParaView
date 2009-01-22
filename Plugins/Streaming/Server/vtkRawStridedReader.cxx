@@ -33,7 +33,7 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader, "1.3");
+vtkCxxRevisionMacro(vtkRawStridedReader, "1.4");
 vtkStandardNewMacro(vtkRawStridedReader);
 
 #define DEBUGPRINT_STRIDED_READER_DETAILS(arg)\
@@ -720,8 +720,6 @@ int vtkRawStridedReader::RequestData(
     return 0;
     }
   outData->Initialize();
-
-  vtkInformation *dInfo = outData->GetInformation();
 
   //prepping to produce real data and thus allocate real amounts of space
   int *uext = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());

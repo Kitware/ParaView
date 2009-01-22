@@ -28,7 +28,7 @@
 #include "vtkStreamingOptions.h"
 
 vtkStandardNewMacro(vtkSMSImageDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.7");
+vtkCxxRevisionMacro(vtkSMSImageDataParallelStrategy, "1.8");
 //----------------------------------------------------------------------------
 vtkSMSImageDataParallelStrategy::vtkSMSImageDataParallelStrategy()
 {
@@ -153,9 +153,7 @@ int vtkSMSImageDataParallelStrategy::ComputePriorities()
   vtkSMIntVectorProperty* ivp;
 
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
@@ -321,15 +319,8 @@ void vtkSMSImageDataParallelStrategy::GatherInformation(vtkPVInformation* info)
 
   vtkSMIntVectorProperty* ivp;
 
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather Info" << endl;
-    }
-
   //put diagnostic setting transfer here because this happens early
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
@@ -374,11 +365,6 @@ void vtkSMSImageDataParallelStrategy::GatherLODInformation(vtkPVInformation* inf
   //gather information in multiple passes so as never to request
   //everything at once.
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
-  if (doPrints)
-    {
-    cerr << "SParStrat(" << this << ") Gather LOD Info" << endl;
-    }
 
   for (int i = 0; i < 1; i++)
     {

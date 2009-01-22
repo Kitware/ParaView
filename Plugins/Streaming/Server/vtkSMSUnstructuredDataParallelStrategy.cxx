@@ -27,7 +27,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.8");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -162,9 +162,7 @@ int vtkSMSUnstructuredDataParallelStrategy::ComputePriorities()
   vtkSMIntVectorProperty* ivp;
 
   //put diagnostic settings transfer here in case info not gathered yet
-  int doPrints = vtkStreamingOptions::GetEnableStreamMessages();
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
@@ -336,7 +334,6 @@ void vtkSMSUnstructuredDataParallelStrategy::GatherInformation(vtkPVInformation*
 
   //put diagnostic setting transfer here because this happens early
   int cacheLimit = vtkStreamingOptions::GetPieceCacheLimit();
-  //int useCulling = vtkStreamingOptions::GetUsePrioritization();
   ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->PieceCache->GetProperty("SetCacheSize"));
   ivp->SetElement(0, cacheLimit);
