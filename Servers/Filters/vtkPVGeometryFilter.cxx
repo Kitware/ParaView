@@ -58,7 +58,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.90");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.91");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -522,13 +522,15 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     {
     if (numInputs > 0)
       {
-      // Remove any partial arrays.
-      vtkCleanArrays* cleaner = vtkCleanArrays::New();
-      cleaner->SetInputConnection(append->GetOutputPort());
-      cleaner->Update();
-      output->ShallowCopy(cleaner->GetOutput());
-      cleaner->Delete();
+      append->Update();
+      //// Remove any partial arrays.
+      //vtkCleanArrays* cleaner = vtkCleanArrays::New();
+      //cleaner->SetInputConnection(append->GetOutputPort());
+      //cleaner->Update();
+      //output->ShallowCopy(cleaner->GetOutput());
+      //cleaner->Delete();
       }
+    output->ShallowCopy(append->GetOutput());
     retVal = 1;
     }
   append->Delete();
