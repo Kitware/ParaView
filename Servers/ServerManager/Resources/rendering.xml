@@ -4343,16 +4343,6 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="ViewSize"
-        number_of_elements="2"
-        default_values="400 400">
-        <IntRangeDomain name="range" min="1 1" />
-        <Documentation>
-          Set the view size for this view module.
-        </Documentation>
-      </IntVectorProperty>
-
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
@@ -4366,10 +4356,8 @@
         <Proxy name="RenderWindow" proxyname="RenderWindow" proxygroup="renderwindow">
         </Proxy>
         <ExposedProperties>
-          <!--
           <Property name="RenderWindowSizeInfo" />
           <Property name="RenderWindowSize" exposed_name="ViewSize" />
-          -->
         </ExposedProperties>
       </SubProxy>
 
