@@ -24,7 +24,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMProxySelectionModel);
-vtkCxxRevisionMacro(vtkSMProxySelectionModel, "1.2");
+vtkCxxRevisionMacro(vtkSMProxySelectionModel, "1.3");
 
 //-----------------------------------------------------------------------------
 class vtkSMProxySelectionModel::vtkInternal
@@ -83,7 +83,7 @@ void vtkSMProxySelectionModel::SetCurrentProxy(vtkSMProxy*  proxy,  int  command
 //-----------------------------------------------------------------------------
 bool vtkSMProxySelectionModel::IsSelected(vtkSMProxy*  proxy)
 {
-  return this->Selection->IsItemPresent(proxy);
+  return this->Selection->IsItemPresent(proxy) != 0;
 }
 
 //-----------------------------------------------------------------------------
