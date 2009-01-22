@@ -18,9 +18,11 @@
 #include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
 #include "vtkCellData.h"
+#include "vtkCleanArrays.h"
 #include "vtkCommand.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkFloatArray.h"
@@ -34,7 +36,6 @@
 #include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkCompositeDataSet.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
@@ -50,14 +51,14 @@
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkUnsignedIntArray.h"
+#include "vtkUnstructuredGrid.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.89");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.90");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -521,13 +522,16 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     {
     if (numInputs > 0)
       {
-      append->Update();
+      // Remove any partial arrays.
+      vtkCleanArrays* cleaner = vtkCleanArrays::New();
+      cleaner->SetInputConnection(append->GetOutputPort());
+      cleaner->Update();
+      output->ShallowCopy(cleaner->GetOutput());
+      cleaner->Delete();
       }
-    output->ShallowCopy(append->GetOutput());
-    append->Delete();
     retVal = 1;
     }
-
+  append->Delete();
   return retVal;
 }
 

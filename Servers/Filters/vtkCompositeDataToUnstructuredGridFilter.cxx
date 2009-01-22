@@ -14,25 +14,16 @@
 =========================================================================*/
 #include "vtkCompositeDataToUnstructuredGridFilter.h"
 
-#include "vtkAbstractArray.h"
 #include "vtkAppendFilter.h"
-#include "vtkCellData.h"
+#include "vtkCleanArrays.h"
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkInformation.h"
-#include "vtkMultiProcessController.h"
-#include "vtkMultiProcessControllerHelper.h"
-#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-#include <vtkstd/algorithm>
-#include <vtkstd/set>
-#include <vtkstd/string>
-
 vtkStandardNewMacro(vtkCompositeDataToUnstructuredGridFilter);
-vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.5");
+vtkCxxRevisionMacro(vtkCompositeDataToUnstructuredGridFilter, "1.6");
 //----------------------------------------------------------------------------
 vtkCompositeDataToUnstructuredGridFilter::vtkCompositeDataToUnstructuredGridFilter()
 {
@@ -154,198 +145,18 @@ int vtkCompositeDataToUnstructuredGridFilter::FillInputPortInformation(
   return 1;
 }
 
-//****************************************************************************
-class vtkCDUGFMetaData
-{
-public:
-  vtkstd::string Name;
-  int NumberOfComponents;
-  int Type;
-  vtkCDUGFMetaData() 
-    {
-    this->NumberOfComponents = 0;
-    this->Type = 0;
-    }
-  vtkCDUGFMetaData(const vtkCDUGFMetaData& other)
-    {
-    this->Name = other.Name;
-    this->NumberOfComponents = other.NumberOfComponents;
-    this->Type = other.Type;
-    }
-
-  bool operator < (const vtkCDUGFMetaData& b) const
-    {
-    if (this->Name != b.Name)
-      {
-      return this->Name < b.Name;
-      }
-    if (this->NumberOfComponents != b.NumberOfComponents)
-      {
-      return this->NumberOfComponents < b.NumberOfComponents;
-      }
-    return this->Type < b.Type;
-    }
-
-  void Set(vtkAbstractArray* array)
-    {
-    this->Name = array->GetName();
-    this->NumberOfComponents = array->GetNumberOfComponents();
-    this->Type = array->GetDataType();
-    }
-
-};
-
-class vtkCGUGArraySet : public vtkstd::set<vtkCDUGFMetaData>
-{
-public:
-  // Fill up \c this with arrays from \c dsa
-  void Initialize(vtkFieldData* dsa)
-    {
-    int numArrays = dsa->GetNumberOfArrays();
-    if (dsa->GetNumberOfTuples() == 0)
-      {
-      numArrays = 0;
-      }
-    for (int cc=0; cc < numArrays; cc++)
-      {
-      vtkAbstractArray* array = dsa->GetAbstractArray(cc);
-      if (array && array->GetName())
-        {
-        vtkCDUGFMetaData mda;
-        mda.Set(array);
-        this->insert(mda);
-        }
-      }
-    }
-
-  // Remove arrays from \c dsa not present in \c this.
-  void UpdateFieldData(vtkFieldData* dsa)
-    {
-    if (this->size() == 0)
-      {
-      return;
-      }
-    int numArrays = dsa->GetNumberOfArrays();
-    for (int cc=numArrays-1; cc >= 0; cc--)
-      {
-      vtkAbstractArray* array = dsa->GetAbstractArray(cc);
-      if (array && array->GetName())
-        {
-        vtkCDUGFMetaData mda;
-        mda.Set(array);
-        if (this->find(mda) == this->end())
-          {
-          //cout << "Removing: " << array->GetName() << endl;
-          dsa->RemoveArray(array->GetName());
-          }
-        }
-      }
-    }
-
-  void Save(vtkMultiProcessStream& stream)
-    {
-    stream.Reset();
-    stream << static_cast<unsigned int>(this->size());
-    vtkCGUGArraySet::iterator iter;
-    for (iter = this->begin(); iter != this->end(); ++iter)
-      {
-      stream << iter->Name
-        << iter->NumberOfComponents
-        << iter->Type;
-      }
-    }
-
-  void Load(vtkMultiProcessStream& stream)
-    {
-    this->clear();
-    unsigned int numvalues;
-    stream >> numvalues;
-    for (unsigned int cc=0; cc < numvalues; cc++)
-      {
-      vtkCDUGFMetaData mda;
-      stream >> mda.Name
-        >> mda.NumberOfComponents
-        >> mda.Type;
-      this->insert(mda);
-      }
-    }
-  void Print()
-    {
-    vtkCGUGArraySet::iterator iter;
-    for (iter = this->begin(); iter != this->end(); ++iter)
-      {
-      cout << iter->Name << ", "
-        << iter->NumberOfComponents << ", "
-        << iter->Type << endl;
-      }
-    cout << "-----------------------------------" << endl << endl;
-    }
-};
-
-
-//----------------------------------------------------------------------------
-static void IntersectStreams(
-  vtkMultiProcessStream& A, vtkMultiProcessStream& B)
-{
-  vtkCGUGArraySet setA;
-  vtkCGUGArraySet setB;
-  vtkCGUGArraySet setC;
-
-  setA.Load(A);
-  setB.Load(B);
-  if (setA.size() > 0 && setB.size() > 0)
-    {
-    vtkstd::set_intersection(setA.begin(), setA.end(),
-      setB.begin(), setB.end(),
-      vtkstd::inserter(setC, setC.begin()));
-    }
-  else
-    {
-    vtkstd::set_union(setA.begin(), setA.end(),
-      setB.begin(), setB.end(),
-      vtkstd::inserter(setC, setC.begin()));
-    }
-
-  B.Reset();
-  setC.Save(B);
-}
-
 //----------------------------------------------------------------------------
 void vtkCompositeDataToUnstructuredGridFilter::RemovePartialArrays(
   vtkUnstructuredGrid* data)
 {
-  vtkMultiProcessController* controller =
-    vtkMultiProcessController::GetGlobalController();
-  if (!controller || controller->GetNumberOfProcesses() <= 1)
-    {
-    return;
-    }
-
-  vtkCGUGArraySet pdSet;
-  vtkCGUGArraySet cdSet;
-  pdSet.Initialize(data->GetPointData());
-  cdSet.Initialize(data->GetCellData());
-
-  vtkMultiProcessStream pdStream;
-  vtkMultiProcessStream cdStream;
-  pdSet.Save(pdStream);
-  cdSet.Save(cdStream);
-
-  vtkMultiProcessControllerHelper::ReduceToAll(
-    controller,
-    pdStream,
-    ::IntersectStreams,
-    1278392);
-  vtkMultiProcessControllerHelper::ReduceToAll(
-    controller,
-    cdStream,
-    ::IntersectStreams,
-    1278393);
-  pdSet.Load(pdStream);
-  cdSet.Load(cdStream);
-
-  cdSet.UpdateFieldData(data->GetCellData());
-  pdSet.UpdateFieldData(data->GetPointData());
+  vtkUnstructuredGrid* clone = vtkUnstructuredGrid::New();
+  clone->ShallowCopy(data);
+  vtkCleanArrays* cleaner = vtkCleanArrays::New();
+  cleaner->SetInput(clone);
+  cleaner->Update();
+  data->ShallowCopy(cleaner->GetOutput());
+  cleaner->Delete();
+  clone->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -36,6 +36,7 @@ SET(Filters_SRCS
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx
+  vtkCleanArrays.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientServerMoveData.cxx
   vtkCompleteArrays.cxx
