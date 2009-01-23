@@ -202,6 +202,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF(PARAVIEW_ENABLE_PYTHON)
   SET(Filters_SRCS ${Filters_SRCS}
+    vtkPythonCalculator.cxx
     vtkPythonProgrammableFilter.cxx
     )
 ENDIF(PARAVIEW_ENABLE_PYTHON)

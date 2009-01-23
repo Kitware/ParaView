@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.32");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.33");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   fscript += funcname;
 
   // Set the parameters defined by user.
-  fscript += "(self):\n";
+  fscript += "(self, inputs = None, output = None):\n";
   for(ParametersT::const_iterator parameter = 
         this->Implementation->Parameters.begin();
       parameter != this->Implementation->Parameters.end();
@@ -299,7 +299,19 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   this->Implementation->Interpretor->RunSimpleString(fscript.c_str());
 
   vtkstd::string runscript;
-  runscript = "from paraview import vtk\n";
+
+  runscript += "from paraview import vtk\n";
+  runscript += "from paraview import servermanager\n";
+  runscript += "if servermanager.progressObserverTag:\n";
+  runscript += "  servermanager.ToggleProgressPrinting()\n";
+  runscript += "hasnumpy = True\n";
+  runscript += "try:\n";
+  runscript += "  from numpy import *\n";
+  runscript += "except ImportError:\n";
+  runscript += "  hasnumpy = False\n";
+  runscript += "if hasnumpy:\n";
+  runscript += "  from paraview.vtk import dataset_adapter\n";
+  runscript += "  from paraview.vtk.algorithms import *\n";
 
   // Set self to point to this
   char addrofthis[1024];
@@ -310,13 +322,35 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
     {
     aplus += 2; //skip over "0x"
     }
+
+  // Call the function
+  runscript += "myarg = ";
+  runscript += "vtk.vtkProgrammableFilter('";
+  runscript += aplus;
+  runscript += "')\n";
+  runscript += "if hasnumpy:\n";
+  runscript += "  inputs = []\n";
+  runscript += "  index = 0\n";
+  int numinps = this->GetNumberOfInputConnections(0);
+  for (int i=0; i<numinps; i++)
+    {
+    runscript += 
+      "  inputs.append(dataset_adapter.DataSet(myarg.GetInputDataObject(0, index)))\n";
+    runscript += "  index += 1\n";
+    }
+  runscript += "  output = dataset_adapter.DataSet(myarg.GetOutputDataObject(0))\n";
+  runscript += "else:\n";
+  runscript += "  inputs = None\n";
+  runscript += "  output = None\n";
   
   // Call the function
   runscript += funcname;
-  runscript += "(vtk.vtkProgrammableFilter('";
-  runscript += aplus;
-  runscript += "'))\n";
+  runscript += "(myarg, inputs, output)\n";
+  runscript += "del inputs\n";
+  runscript += "del output\n";
+  runscript += "del myarg\n";
 
+  cout << runscript << endl;
   this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
 
   this->Implementation->Interpretor->FlushMessages();

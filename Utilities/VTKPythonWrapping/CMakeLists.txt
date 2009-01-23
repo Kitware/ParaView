@@ -74,7 +74,19 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # List all python source files.
   # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
-    vtk
+    vtk/__init__
+    vtk/genericfiltering
+    vtk/geovis
+    vtk/hybrid
+    vtk/imaging
+    vtk/infovis
+    vtk/io
+    vtk/parallel
+    vtk/views
+    vtk/volumerendering
+    vtk/widgets
+    vtk/algorithms
+    vtk/dataset_adapter
     servermanager
     __init__
     numeric

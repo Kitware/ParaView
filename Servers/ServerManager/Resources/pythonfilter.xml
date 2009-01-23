@@ -1,16 +1,25 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-    <SourceProxy name="ProgrammableFilter" 
-                 class="vtkPythonProgrammableFilter"
-                 label="Programmable Filter">
+    <SourceProxy name="PythonCalculator" 
+                 class="vtkPythonCalculator"
+                 label="Python Calculator">
       <Documentation
-         long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
-         short_help="Executes a python script to produce data.">
-This filter will execute a python script to produce an output dataset.
-The filter keeps a copy of the python script in Script, and creates 
-Interpretor, a python interpretor to run the script upon the first 
- execution.
+         long_help="This filter evaluates a Python expression"
+         short_help="Evaluates a Python expression">
+        This filter uses Python to calculate an expression.
+        It depends heavily on the numpy and paraview.vtk modules.
+        To use the parallel functions, mpi4py is also necessary. The expression
+        is evaluated and the resulting scalar value or numpy array is added
+        to the output as an array. See numpy and paraview.vtk documentation
+        for the list of available functions.
+
+        This filter tries to make it easy for the user to write expressions
+        by defining certain variables. The filter tries to assign each array
+        to a variable of the same name. If the name of the array is not a 
+        valid Python variable, it has to be accessed through a dictionary called
+        arrays (i.e. arrays['array_name']). The points can be accessed using the
+        points variable.        
       </Documentation>
       <InputProperty
          name="Input"
@@ -25,87 +34,178 @@ Interpretor, a python interpretor to run the script upon the first
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>       
            <Documentation>
-            This property specifies the input(s) to the programmable filter.
+        Set the input of the filter.
            </Documentation>
       </InputProperty>
 
-     <IntVectorProperty 
-        name="OutputDataSetType" 
-        command="SetOutputDataSetType" 
-        number_of_elements="1"
-        default_values="8"> 
-       <EnumerationDomain name="enum">
-         <!-- Values come from vtkType.h-->
-         <Entry value="8" text="Same as Input"/> <!-- text="vtkDataSet" -->
-         <Entry value="0" text="vtkPolyData"/>
-         <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
-         <Entry value="2" text="vtkStructuredGrid"/>
-         <Entry value="3" text="vtkRectilinearGrid"/>
-         <Entry value="4" text="vtkUnstructuredGrid"/>
-         <!-- <Entry value="5" text="vtkPiecewiseFunction"/> -->
-         <Entry value="6" text="vtkImageData"/>
-         <!-- <Entry value="7" text="vtkDataObject"/> -->
-         <!-- <Entry value="9" text="vtkPointSet"/> -->
-         <!-- <Entry value="10" text="vtkUniformGrid"/> -->
-         <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
-         <!-- <Entry value="13" text="vtkMultiblockDataSet"/> -->
-         <!-- <Entry value="15" text="vtkHierarchical_BoxDataSet"/> -->
-         <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
-         <!-- <Entry value="17" text="vtkHyperOctree"/> -->
-         <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
-         <!-- <Entry value="19" text="vtkTable"/> -->
-         <!-- <Entry value="20" text="vtkGraph"/> -->
-         <!-- <Entry value="21" text="vtkTree"/> -->
-       </EnumerationDomain>
-       <Documentation>
-         The value of this property determines the dataset type for the output of the programmable filter.
-       </Documentation>
-     </IntVectorProperty>
+      <StringVectorProperty 
+         name="Expression" 
+         command="SetExpression"
+         number_of_elements="1">
+        <Documentation>
+        The Python expression evaluated during execution.
+        </Documentation>
+      </StringVectorProperty>
 
-     <StringVectorProperty 
-        name="Script" 
-        command="SetScript"
-        number_of_elements="1">
-       <Hints>
-         <Widget type="multi_line"/>
-       </Hints>
-       <Documentation>
-         This property contains the text of a python program that the programmable filter runs.
-       </Documentation>
-     </StringVectorProperty>
+      <IntVectorProperty 
+         name="ArrayAssociation" 
+         command="SetArrayAssociation" 
+         number_of_elements="0"
+         default_values="0"> 
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Point Data"/>
+          <Entry value="1" text="Cell Data"/>
+        </EnumerationDomain>
+        <Documentation>
+        This property controls the association of the output array as well as
+        which arrays are defined as variables.
+        </Documentation>
+      </IntVectorProperty>
 
-     <StringVectorProperty 
-        name="InformationScript" 
-        command="SetInformationScript"
-        label="Script (RequestInformation)"
-        number_of_elements="1">
-       <Hints>
-         <Widget type="multi_line"/>
-       </Hints>
-       <Documentation>
-         This property is a python script that is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
-       </Documentation>
-     </StringVectorProperty>
+      <StringVectorProperty 
+         name="ArrayName" 
+         command="SetArrayName"
+         number_of_elements="1"
+         default_values="result">
+        <Documentation>
+        The name of the output array.
+        </Documentation>
+      </StringVectorProperty>
 
-     <StringVectorProperty
-       name="Parameters"
-       command="SetParameter"
-       is_internal="1"
-       repeat_command="1"
-       number_of_elements_per_command="2"
-       clean_command="ClearParameters"
-       animateable="0">
-     </StringVectorProperty>
+      <IntVectorProperty 
+         name="CopyArrays" 
+         command="SetCopyArrays" 
+         number_of_elements="1"
+         default_values="1" 
+         animateable="0"> 
+        <BooleanDomain name="bool"/>
+        <Documentation>
+        If this property is set to true, all the cell and point arrays from
+        first input are copied to the output.
+        </Documentation>
+      </IntVectorProperty>
 
-     <StringVectorProperty
-       name="PythonPath"
-       command="SetPythonPath"
-       number_of_elements="1">
-       <Documentation>
-         A semi-colon (;) separated list of directories to add to the python library
-         search path.
-       </Documentation>
-     </StringVectorProperty>
+    <!-- End PythonCalculator -->    
+    </SourceProxy>
+
+    <SourceProxy name="ProgrammableFilter" 
+                 class="vtkPythonProgrammableFilter"
+                 label="Programmable Filter">
+          <Documentation
+             long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
+             short_help="Executes a python script to produce data.">
+    This filter will execute a python script to produce an output dataset.
+    The filter keeps a copy of the python script in Script, and creates 
+    Interpretor, a python interpretor to run the script upon the first 
+     execution.
+          </Documentation>
+          <InputProperty
+             name="Input"
+             command="AddInputConnection"
+             clean_command="RemoveAllInputs"
+             multiple_input="1">
+               <ProxyGroupDomain name="groups">
+                 <Group name="sources"/>
+                 <Group name="filters"/>
+               </ProxyGroupDomain>
+               <DataTypeDomain name="input_type">
+                 <DataType value="vtkDataSet"/>
+               </DataTypeDomain>       
+               <Documentation>
+                This property specifies the input(s) to the programmable filter.
+               </Documentation>
+          </InputProperty>
+
+         <IntVectorProperty 
+            name="OutputDataSetType" 
+            command="SetOutputDataSetType" 
+            number_of_elements="1"
+            default_values="8"> 
+           <EnumerationDomain name="enum">
+             <!-- Values come from vtkType.h-->
+             <Entry value="8" text="Same as Input"/> <!-- text="vtkDataSet" -->
+             <Entry value="0" text="vtkPolyData"/>
+             <!-- <Entry value="1" text="vtkStructuredPoints"/> -->
+             <Entry value="2" text="vtkStructuredGrid"/>
+             <Entry value="3" text="vtkRectilinearGrid"/>
+             <Entry value="4" text="vtkUnstructuredGrid"/>
+             <!-- <Entry value="5" text="vtkPiecewiseFunction"/> -->
+             <Entry value="6" text="vtkImageData"/>
+             <!-- <Entry value="7" text="vtkDataObject"/> -->
+             <!-- <Entry value="9" text="vtkPointSet"/> -->
+             <!-- <Entry value="10" text="vtkUniformGrid"/> -->
+             <!-- <Entry value="11" text="vtkCompositeDataSet"/> -->
+             <!-- <Entry value="13" text="vtkMultiblockDataSet"/> -->
+             <!-- <Entry value="15" text="vtkHierarchical_BoxDataSet"/> -->
+             <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
+             <!-- <Entry value="17" text="vtkHyperOctree"/> -->
+             <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
+             <!-- <Entry value="19" text="vtkTable"/> -->
+             <!-- <Entry value="20" text="vtkGraph"/> -->
+             <!-- <Entry value="21" text="vtkTree"/> -->
+           </EnumerationDomain>
+           <Documentation>
+             The value of this property determines the dataset type for the output of the programmable filter.
+           </Documentation>
+         </IntVectorProperty>
+
+         <StringVectorProperty 
+            name="Script" 
+            command="SetScript"
+            number_of_elements="1">
+           <Hints>
+             <Widget type="multi_line"/>
+           </Hints>
+           <Documentation>
+             This property contains the text of a python program that the programmable filter runs.
+           </Documentation>
+         </StringVectorProperty>
+
+         <StringVectorProperty 
+            name="InformationScript" 
+            command="SetInformationScript"
+            label="Script (RequestInformation)"
+            number_of_elements="1">
+           <Hints>
+             <Widget type="multi_line"/>
+           </Hints>
+           <Documentation>
+             This property is a python script that is executed during the RequestInformation pipeline pass. Use this to provide information such as WHOLE_EXTENT to the pipeline downstream.
+           </Documentation>
+         </StringVectorProperty>
+         
+         <IntVectorProperty 
+            name="CopyArrays" 
+            command="SetCopyArrays" 
+            number_of_elements="1"
+            default_values="0"
+            animateable="0"> 
+           <BooleanDomain name="bool"/>
+           <Documentation>
+           If this property is set to true, all the cell and point arrays from
+           first input are copied to the output.
+           </Documentation>
+         </IntVectorProperty>
+
+         <StringVectorProperty
+           name="Parameters"
+           command="SetParameter"
+           is_internal="1"
+           repeat_command="1"
+           number_of_elements_per_command="2"
+           clean_command="ClearParameters"
+           animateable="0">
+         </StringVectorProperty>
+
+         <StringVectorProperty
+           name="PythonPath"
+           command="SetPythonPath"
+           number_of_elements="1">
+           <Documentation>
+             A semi-colon (;) separated list of directories to add to the python library
+             search path.
+           </Documentation>
+         </StringVectorProperty>
 
     <!-- End ProgrammableFilter -->
     </SourceProxy>
