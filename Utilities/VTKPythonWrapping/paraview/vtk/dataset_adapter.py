@@ -173,6 +173,14 @@ class DataSet(VTKObjectWrapper):
         "Returns the field data as a DataSetAttributes instance."
         return DataSetAttributes(self.VTKObject.GetFieldData(), self)
         
+    PointData = property(GetPointData, None, None, "This property returns \
+        the point data of the dataset.")
+    CellData = property(GetCellData, None, None, "This property returns \
+        the cell data of a dataset.")
+    FieldData = property(GetFieldData, None, None, "This property returns \
+        the field data of a dataset.")
+
+class PointSet(DataSet):
     def GetPoints(self):
         """Returns the points as a VTKArray instance. Returns None if the
         dataset has implicit points."""
@@ -181,18 +189,27 @@ class DataSet(VTKObjectWrapper):
         return vtkDataArrayToVTKArray(
             self.VTKObject.GetPoints().GetData(), self)
 
-    PointData = property(GetPointData, None, None, "This property returns \
-        the point data of the dataset.")
-    CellData = property(GetCellData, None, None, "This property returns \
-        the cell data of a dataset.")
-    FieldData = property(GetFieldData, None, None, "This property returns \
-        the field data of a dataset.")
     Points = property(GetPoints, None, None, "This property returns the \
-        point coordinates of dataset. It returns None if the points are \
-        implicit (i.e. image data and rectiliear grid).")
+        point coordinates of dataset.")
+        
+class PolyData(PointSet):
+    def GetPolygons(self):
+        """Returns the points as a VTKArray instance. Returns None if the
+        dataset has implicit points."""
+        if not self.VTKObject.GetPolys():
+            return None
+        return vtkDataArrayToVTKArray(
+            self.VTKObject.GetPolys().GetData(), self)
 
+    Polygons = property(GetPolygons, None, None, "This property returns the \
+        connectivity of polygons.")
+        
 def WrapDataObject(ds):
-    if ds.IsA("vtkDataSet"):
+    if ds.IsA("vtkPolyData"):
+        return PolyData(ds)
+    elif ds.IsA("vtkPointSet"):
+        return PointSet(ds)
+    elif ds.IsA("vtkDataSet"):
         return DataSet(ds)
     elif ds.IsA("vtkCompositeDataSet"):
         return CompositeDataSet(ds)
