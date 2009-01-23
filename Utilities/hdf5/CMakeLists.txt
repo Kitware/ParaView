@@ -446,7 +446,7 @@ H5FD.c        H5Gnode.c       H5Osdspace.c  H5T.c          H5Zdeflate.c
 H5FDcore.c    H5Gstab.c       H5Oshared.c   H5TS.c         H5Zfletcher32.c
 H5FDfamily.c  H5HG.c          H5Ostab.c     H5Tarray.c     H5Zshuffle.c
 H5FDgass.c    H5HGdbg.c       H5P.c         H5Tbit.c       H5Zszip.c
-H5FDlog.c     H5HL.c          H5Pdcpl.c     H5Tcommit.c    H5detect.c
+H5FDlog.c     H5HL.c          H5Pdcpl.c     H5Tcommit.c
 H5FDmpi.c     H5HLdbg.c       H5Pdxpl.c     H5Tcompound.c
   )
 
