@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.33");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.34");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -335,10 +335,10 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   for (int i=0; i<numinps; i++)
     {
     runscript += 
-      "  inputs.append(dataset_adapter.DataSet(myarg.GetInputDataObject(0, index)))\n";
+      "  inputs.append(dataset_adapter.WrapDataObject(myarg.GetInputDataObject(0, index)))\n";
     runscript += "  index += 1\n";
     }
-  runscript += "  output = dataset_adapter.DataSet(myarg.GetOutputDataObject(0))\n";
+  runscript += "  output = dataset_adapter.WrapDataObject(myarg.GetOutputDataObject(0))\n";
   runscript += "else:\n";
   runscript += "  inputs = None\n";
   runscript += "  output = None\n";

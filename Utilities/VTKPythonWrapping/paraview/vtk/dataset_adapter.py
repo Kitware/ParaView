@@ -7,6 +7,18 @@ sure that it is installed properly.")
 from paraview import servermanager
 from paraview import numpy_support
 
+class VTKObjectWrapper(object):
+    "Superclass for classes that wrap VTK objects with Python objects."
+    def __init__(self, vtkobject):
+        self.VTKObject = vtkobject
+
+    def __getattr__(self, name):
+        "Forwards unknown attribute requests to VTK object."
+        if not self.VTKObject:
+            raise AttributeError("class has no attribute %s" % name)
+            return None
+        return getattr(self.VTKObject, name)
+
 def MakeObserver(numpy_array):
     "Internal function used to attach a numpy array to a vtk array"
     def Closure(caller, event):
@@ -65,7 +77,7 @@ class VTKArray(numpy.ndarray):
         return getattr(self.VTKObject, name)
 
 
-class DataSetAttributes(object):
+class DataSetAttributes(VTKObjectWrapper):
     """This is a python friendly wrapper of vtkDataSetAttributes. It
     returns VTKArrays. It also provides the dictionary interface."""
     
@@ -110,22 +122,45 @@ class DataSetAttributes(object):
             narray = narray.copy()
         arr = numpyTovtkDataArray(narray, name)
         self.VTKObject.AddArray(arr)
-        
-    def __getattr__(self, name):
-        "Forwards unknown attribute requests to VTK object."
-        if not self.VTKObject:
-            raise AttributeError("class has no attribute %s" % name)
-            return None
-        return getattr(self.VTKObject, name)
-        
 
-class DataSet(object):
+class CompositeDataIterator(object):
+    """Wrapper for a vtkCompositeDataIterator class to satisfy
+       the python iterator protocol.
+       """
+    
+    def __init__(self, cds):
+        self.Iterator = cds.NewIterator()
+        if self.Iterator:
+            self.Iterator.UnRegister(None)
+            self.Iterator.GoToFirstItem()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if not self.Iterator:
+            raise StopIteration
+
+        if self.Iterator.IsDoneWithTraversal():
+            raise StopIteration
+        retVal = self.Iterator.GetCurrentDataObject()
+        self.Iterator.GoToNextItem()
+        return WrapDataObject(retVal)
+
+    def __getattr__(self, name):
+        """Returns attributes from the vtkCompositeDataIterator."""
+        return getattr(self.Iterator, name)
+
+class CompositeDataSet(VTKObjectWrapper):
+
+    def __iter__(self):
+        "Creates an iterator for the contained datasets."
+        return CompositeDataIterator(self)
+    
+class DataSet(VTKObjectWrapper):
     """This is a python friendly wrapper of a vtkDataSet that defines
     a few useful properties."""
     
-    def __init__(self, vtkobject):
-        self.VTKObject = vtkobject
-
     def GetPointData(self):
         "Returns the point data as a DataSetAttributes instance."
         return DataSetAttributes(self.VTKObject.GetPointData(), self)
@@ -156,10 +191,9 @@ class DataSet(object):
         point coordinates of dataset. It returns None if the points are \
         implicit (i.e. image data and rectiliear grid).")
 
-    def __getattr__(self, name):
-        "Forwards unknown attribute requests to the underlying dataset."
-        if not self.VTKObject:
-            raise AttributeError("class has no attribute %s" % name)
-            return None
-        return getattr(self.VTKObject, name)
-
+def WrapDataObject(ds):
+    if ds.IsA("vtkDataSet"):
+        return DataSet(ds)
+    elif ds.IsA("vtkCompositeDataSet"):
+        return CompositeDataSet(ds)
+        
