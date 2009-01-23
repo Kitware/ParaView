@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartAxisModel.h"
 #include "pqChartAxisOptions.h"
 #include "pqChartContentsSpace.h"
+#include "pqChartValueFormatter.h"
 
 #include <QFont>
 #include <QFontMetrics>
@@ -139,6 +140,7 @@ pqChartAxis::pqChartAxis(pqChartAxis::AxisLocation location,
   this->AtMax = 0;
   this->Across = 0;
   this->Zoom = 0;
+  this->Formatter = 0;
   this->Location = location;
 
   // Set up the options object.
@@ -492,8 +494,7 @@ void pqChartAxis::layoutAxis(const QRect &area)
         {
         // If the item has no width assigned, use the font metrics to
         // calculate the necessary width.
-        QString label = value.getString(this->Options->getPrecision(),
-            this->Options->getNotation());
+        QString label = this->getLabel(value);
         (*iter)->Width = fm.width(label);
         if((*iter)->Width > this->Internal->MaxLabelWidth)
           {
@@ -980,8 +981,7 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(QPointF(tick, y), QPointF(x, y));
         this->Model->getLabel(i, value);
-        label = value.getString(this->Options->getPrecision(),
-            this->Options->getNotation());
+        label = this->getLabel(value);
         painter.setPen(this->Options->getLabelColor());
         y += halfAscent;
         if(this->Location == pqChartAxis::Left)
@@ -1029,8 +1029,7 @@ void pqChartAxis::drawAxis(QPainter &painter, const QRect &area) const
         painter.setPen(this->Options->getAxisColor());
         painter.drawLine(QPointF(x, tick), QPointF(x, y));
         this->Model->getLabel(i, value);
-        label = value.getString(this->Options->getPrecision(),
-            this->Options->getNotation());
+        label = this->getLabel(value);
         painter.setPen(this->Options->getLabelColor());
         x -= (*iter)->Width / 2;
         if(this->Location == pqChartAxis::Top)
@@ -1227,19 +1226,15 @@ int pqChartAxis::getLabelWidthGuess() const
     {
     pqChartValue value = this->Internal->Maximum;
     value.convertTo(pqChartValue::FloatValue);
-    length1 = value.getString(this->Options->getPrecision(),
-        this->Options->getNotation()).length();
+    length1 = this->getLabel(value).length();
     value = this->Internal->Minimum;
     value.convertTo(pqChartValue::FloatValue);
-    length2 = value.getString(this->Options->getPrecision(),
-        this->Options->getNotation()).length();
+    length2 = this->getLabel(value).length();
     }
   else
     {
-    length1 = this->Internal->Maximum.getString(this->Options->getPrecision(),
-        this->Options->getNotation()).length();
-    length2 = this->Internal->Minimum.getString(this->Options->getPrecision(),
-        this->Options->getNotation()).length();
+    length1 = this->getLabel(this->Internal->Maximum).length();
+    length2 = this->getLabel(this->Internal->Minimum).length();
     }
 
   if(length2 > length1)
@@ -1675,4 +1670,15 @@ void pqChartAxis::generateLogLabels(const QRect &contents)
   this->Model->finishModifyingData();
 }
 
+QString pqChartAxis::getLabel(const pqChartValue& value) const
+{
+  if (this->Formatter)
+    {
+    return this->Formatter->format(value,
+      this->Options->getPrecision(),
+      this->Options->getNotation());
+    }
 
+  return value.getString(this->Options->getPrecision(),
+    this->Options->getNotation());
+}

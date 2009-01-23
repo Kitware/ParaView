@@ -41,10 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "pqChartPixelScale.h" // Needed for enum
 
+class pqChartAxisInternal;
 class pqChartAxisModel;
 class pqChartAxisOptions;
-class pqChartAxisInternal;
 class pqChartContentsSpace;
+class pqChartValueFormatter;
 class QPainter;
 class QRect;
 
@@ -325,6 +326,9 @@ public:
   float getLabelLocation(int index) const;
   //@}
 
+  /// Set the optional value formatter. If present, it will be used to format
+  /// the values shown on the axis.
+  void setFormatter(pqChartValueFormatter*);
 signals:
   /// Emitted when the axis needs to be layed out again.
   void layoutNeeded();
@@ -339,7 +343,7 @@ signals:
   /// method. Charts using this signal should never emit
   /// \c layoutNeeded when responding to this signal. Instead, set a
   /// flag to use when the chart layout method is called.
-  void pixelScaleChanged();
+  void pixelScaleChanged(); 
 
 public slots:
   /// Resets the chart axis view.
@@ -388,11 +392,15 @@ private:
   /// \param contents The axis contents area.
   void generateLogLabels(const QRect &contents);
 
+  /// Return the label to be rendered for the given chart value.
+  QString getLabel(const pqChartValue& value) const;
+
 private:
   pqChartAxisInternal *Internal;    ///< Stores the view data.
   pqChartAxisOptions *Options;      ///< Stores the drawing options.
   pqChartAxisModel *Model;          ///< Stores the list of labels.
   pqChartPixelScale *Scale;         ///< Stores the pixel-value scale.
+  pqChartValueFormatter* Formatter; ///< Used to format labels.
   const pqChartAxis *AtMin;         ///< Stores the axis at the min.
   const pqChartAxis *AtMax;         ///< Stores the axis at the max.
   const pqChartAxis *Across;        ///< Stores the parallel axis.

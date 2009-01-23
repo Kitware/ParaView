@@ -56,6 +56,8 @@ SET(QtChart_SRCS
   pqChartTitle.h
   pqChartValue.cxx
   pqChartValue.h
+  pqChartValueFormatter.cxx
+  pqChartValueFormatter.h
   pqChartWidget.cxx
   pqChartWidget.h
   pqChartWidgetPlugin.h
@@ -117,6 +119,7 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartMouseSelection.h
   pqChartPlugin.h
   pqChartTitle.h
+  pqChartValueFormatter.h
   pqChartWidget.h
   pqChartWidgetPlugin.h
   pqColorMapColorChanger.h
