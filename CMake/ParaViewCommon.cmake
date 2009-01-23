@@ -687,6 +687,7 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_SOURCE_DIR}/Servers/Common
+  ${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable
 #
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer

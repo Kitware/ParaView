@@ -28,15 +28,15 @@ ADD_LIBRARY(vtkPVPythonInterpretor
   vtkPVPythonInterpretor.cxx
   vtkPVPythonInteractiveInterpretor.cxx)
 
-ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
-  pvpython.cxx
+ADD_LIBRARY(vtkPVPython
   vtkPVPythonOptions.cxx
   vtkPVProcessModulePythonHelper.cxx)
 
+ADD_EXECUTABLE(pvpython${PV_EXE_SUFFIX}
+  pvpython.cxx)
+
 ADD_EXECUTABLE(pvbatch${PV_EXE_SUFFIX}
-  pvbatch.cxx
-  vtkPVPythonOptions.cxx
-  vtkPVProcessModulePythonHelper.cxx)
+  pvbatch.cxx)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "AIX")
   GET_FILENAME_COMPONENT(CMAKE_PYTHON_LIB_PREFIX "${PYTHON_LIBRARY}" PATH)
@@ -125,8 +125,9 @@ IF(VTK_WRAP_TCL)
   SET(_PVPYTHON_LINK_LIBS ${_PVPYTHON_LINK_LIBS}  ${VTK_TK_LIBRARIES})
 ENDIF(VTK_WRAP_TCL)
 
-TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} ${_PVPYTHON_LINK_LIBS})
-TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} ${_PVPYTHON_LINK_LIBS})
+TARGET_LINK_LIBRARIES(vtkPVPython ${_PVPYTHON_LINK_LIBS})
+TARGET_LINK_LIBRARIES(pvpython${PV_EXE_SUFFIX} vtkPVPython)
+TARGET_LINK_LIBRARIES(pvbatch${PV_EXE_SUFFIX} vtkPVPython)
 
 IF(BORLAND)
   SET(KITS Common PVServerCommon PVServerManager)
