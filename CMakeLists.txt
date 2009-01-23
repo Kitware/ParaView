@@ -278,6 +278,8 @@ SET(PARAVIEW_LIBRARY_DIRS
 
 SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
                               ${ParaView_BINARY_DIR}/Qt/Widgets
+                              ${ParaView_SOURCE_DIR}/Qt/Chart
+                              ${ParaView_BINARY_DIR}/Qt/Chart
                               ${ParaView_SOURCE_DIR}/Qt/Core
                               ${ParaView_BINARY_DIR}/Qt/Core
                               ${ParaView_SOURCE_DIR}/Qt/Components
