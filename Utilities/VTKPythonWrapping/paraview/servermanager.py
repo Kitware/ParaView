@@ -170,7 +170,7 @@ class Proxy(object):
             pxm = ProxyManager()
             pxm.RegisterProxy(registrationGroup, registrationName, self.SMProxy)
         for key in args.keys():
-            self.SetPropertyWithName(key, args[key])
+            setattr(self, key, args[key])
         self.UpdateVTKObjects()
 
     def __del__(self):
@@ -292,7 +292,7 @@ class Proxy(object):
         except:
             pass
         return getattr(self.SMProxy, name)
-
+        
 class SourceProxy(Proxy):
     """Proxy for a source object. This class adds a few methods to Proxy
     that are specific to sources. It also provides access to the output
@@ -1961,7 +1961,7 @@ def _getPyProxy(smproxy):
         if retVal:
             return retVal
     
-    classForProxy = _findClassForProxy(smproxy.GetXMLName())
+    classForProxy = _findClassForProxy(smproxy.GetXMLName(), smproxy.GetXMLGroup())
     if classForProxy:
         retVal = classForProxy(proxy=smproxy)
     else:
@@ -2010,24 +2010,24 @@ def _createSetProperty(pName):
         return self.SetPropertyWithName(propName, value)
     return setProperty
 
-def _findClassForProxy(xmlName):
+def _findClassForProxy(xmlName, xmlGroup):
     """Given the xmlName for a proxy, returns a Proxy class. Note
     that if there are duplicates, the first one is returned."""
     global sources, filters, rendering, animation, implicit_functions, writers, extended_sources
-    if xmlName in sources.__dict__:
+    if xmlGroup == "sources":
         return sources.__dict__[xmlName]
-    elif xmlName in filters.__dict__:
+    elif xmlGroup == "filters":
         return filters.__dict__[xmlName]
+    elif xmlGroup == "implicit_functions":
+        return implicit_functions.__dict__[xmlName]
+    elif xmlGroup == "writers":
+        return writers.__dict__[xmlName]
+    elif xmlGroup == "extended_sources":
+        return extended_sources.__dict__[xmlName]
     elif xmlName in rendering.__dict__:
         return rendering.__dict__[xmlName]
     elif xmlName in animation.__dict__:
         return animation.__dict__[xmlName]
-    elif xmlName in implicit_functions.__dict__:
-        return implicit_functions.__dict__[xmlName]
-    elif xmlName in writers.__dict__:
-        return writers.__dict__[xmlName]
-    elif xmlName in extended_sources.__dict__:
-        return extended_sources.__dict__[xmlName]
     else:
         return None
 
