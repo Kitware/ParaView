@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.8");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.9");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -146,7 +146,7 @@ int vtkPVScalarBarActor::RenderOpaqueGeometry(vtkViewport *viewport)
   
   if (!this->LookupTable)
     {
-    vtkWarningMacro(<<"Need a mapper to render a scalar bar");
+    vtkWarningMacro(<<"Need a lookup table to render a scalar bar");
     return 0;
     }
 
