@@ -58,7 +58,6 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
         \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Qt/Core\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
