@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveChartOptions.h"
 
 #include "pqApplicationCore.h"
+#include "pqBarChartView.h"
 #include "pqChartOptionsEditor.h"
 #include "pqOptionsDialog.h"
-#include "pqSMAdaptor.h"
 #include "pqPlotView.h"
+#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
 #include <QEvent>
@@ -94,13 +95,14 @@ public:
 
   void setOptions(pqChartOptionsEditor *options);
   void setChart(pqPlotView *chart);
+  void setBarChart(pqBarChartView *chart);
   void initializeOptions();
   void setModified(ModifiedFlag flag);
 
 public:
   unsigned int ModifiedData;
   pqChartOptionsEditor *Options;
-  pqPlotView *Chart;
+  pqView *Chart;
 };
 
 
@@ -497,6 +499,12 @@ void pqActiveChartOptionsInternal::setChart(pqPlotView *chart)
   this->initializeOptions();
 }
 
+void pqActiveChartOptionsInternal::setBarChart(pqBarChartView *chart)
+{
+  this->Chart = chart;
+  this->initializeOptions();
+}
+
 void pqActiveChartOptionsInternal::initializeOptions()
 {
   if(!this->Chart || !this->Options)
@@ -836,10 +844,23 @@ void pqActiveChartOptions::showOptions(pqView *view, const QString &page,
         this, SLOT(setAxisTitleAlignmentModified()));
     }
 
-  // See if the view is a plot view.
-  pqPlotView *chart = qobject_cast<pqPlotView *>(view);
-  this->Internal->setChart(chart);
-  if(chart)
+  // See if the view is a type of chart view.
+  pqPlotView *plotView = qobject_cast<pqPlotView *>(view);
+  pqBarChartView *barChart = qobject_cast<pqBarChartView *>(view);
+  if(plotView)
+    {
+    this->Internal->setChart(plotView);
+    }
+  else if(barChart)
+    {
+    this->Internal->setBarChart(barChart);
+    }
+  else
+    {
+    this->Internal->setChart(0);
+    }
+
+  if(this->Internal->Chart)
     {
     if(page.isEmpty())
       {
@@ -859,7 +880,20 @@ void pqActiveChartOptions::changeView(pqView *view)
 {
   if(this->Dialog)
     {
-    this->Internal->setChart(qobject_cast<pqPlotView *>(view));
+    pqPlotView *plotView = qobject_cast<pqPlotView *>(view);
+    pqBarChartView *barChart = qobject_cast<pqBarChartView *>(view);
+    if(plotView)
+      {
+      this->Internal->setChart(plotView);
+      }
+    else if(barChart)
+      {
+      this->Internal->setBarChart(barChart);
+      }
+    else
+      {
+      this->Internal->setChart(0);
+      }
     }
 }
 

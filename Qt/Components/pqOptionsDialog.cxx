@@ -396,7 +396,7 @@ void pqOptionsDialog::addOptions(pqOptionsContainer *options)
     }
 
   // Get the list of pages from the container.
-  QStringList pathList = options->getPageList();;
+  QStringList pathList = options->getPageList();
 
   // See if the container uses the apply button.
   if(options->isApplyUsed())

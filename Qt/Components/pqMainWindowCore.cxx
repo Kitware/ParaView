@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationCore.h"
 #include "pqApplicationOptionsDialog.h"
+#include "pqBarChartView.h"
 #include "pqCameraDialog.h"
 #include "pqColorScaleToolbar.h"
 #include "pqCloseViewUndoElement.h"
@@ -1108,6 +1109,8 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
       pqPlotView::barChartType(), chartOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
       pqPlotView::XYPlotType(), chartOptions);
+    this->Implementation->ActiveViewOptions->registerOptions(
+      pqBarChartView::barChartViewType(), chartOptions);
 
     pqActiveTwoDRenderViewOptions* twoDOptions = new pqActiveTwoDRenderViewOptions(
       this->Implementation->ActiveViewOptions);

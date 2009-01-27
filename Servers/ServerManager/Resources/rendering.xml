@@ -3526,6 +3526,210 @@
       base_proxyname="ViewBase"
       representation_name="BarChartRepresentation">
 
+      <!-- Add non-command properties that will help
+          keep client-only BarChart properties in SM such as colors etc etc -->
+
+      <StringVectorProperty
+        name="ChartTitle"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="ChartTitleFont"
+        number_of_elements="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the chart title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ChartTitleColor"
+        number_of_elements="3"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ChartTitleAlignment"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowLegend"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LegendLocation"
+        number_of_elements="1"
+        default_values="2">
+        <IntRangeDomain name="range" min="0" max="3" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="LegendFlow"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxis"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisGrid"
+        number_of_elements="4"
+        default_values="1 1 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisGridType"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisGridColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="ShowAxisLabels"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="AxisLabelFont"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisLabelColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelNotation"
+        number_of_elements="4"
+        default_values="3 3 3 3">
+        <IntRangeDomain name="range" min="0" max="3" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisLabelPrecision"
+        number_of_elements="4"
+        default_values="2 2 2 2">
+        <IntRangeDomain name="range" min="0" max="6" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisScale"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="AxisBehavior"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisMinimum"
+        number_of_elements="4"
+        default_values="0 0 0 0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisMaximum"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="LeftAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="BottomAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="RightAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="TopAxisLabels"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </DoubleVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitle"
+        number_of_elements="4">
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="AxisTitleFont"
+        repeat_command="1"
+        number_of_elements_per_command="4"
+        element_types="2 0 0 0" >
+        <Documentation>
+          Set the axis title font (familyname, size, bold, italics).
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="AxisTitleColor"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="AxisTitleAlignment"
+        number_of_elements="4"
+        default_values="1 1 1 1">
+        <IntRangeDomain name="range" min="0" max="2" />
+      </IntVectorProperty>
+
       <!-- End of BarChartView2 -->
     </ViewProxy>
 
