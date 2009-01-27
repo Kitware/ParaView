@@ -212,24 +212,21 @@ public:
       }
     else if(mode == "Snap To TimeSteps")
       {
-      num = 
-        pqSMAdaptor::getMultipleElementProperty(
-          pxy->GetProperty("TimeSteps")).size();
+      num = this->Scene->getTimeSteps().size(); 
       }
     return num;
     }
 
-  QList<QVariant> ticks()
+  QList<double> ticks()
     {
     vtkSMProxy* pxy = this->Scene->getProxy();
     QString mode =
       pqSMAdaptor::getEnumerationProperty(pxy->GetProperty("PlayMode")).toString();
     if(mode == "Snap To TimeSteps")
       {
-      return pqSMAdaptor::getMultipleElementProperty(
-        pxy->GetProperty("TimeSteps"));
+      return this->Scene->getTimeSteps(); 
       }
-    return QList<QVariant>();
+    return QList<double>();
     }
 };
 
@@ -668,11 +665,11 @@ void pqAnimationViewWidget::updateTicks()
     this->Internal->AnimationWidget->animationModel();
   if (animModel->mode() == pqAnimationModel::Custom)
     {
-    QList<QVariant> ticks = this->Internal->ticks();
+    QList<double> ticks = this->Internal->ticks();
     double *dticks = new double[ticks.size()+1];
     for (int cc=0; cc < ticks.size(); cc++)
       {
-      dticks[cc] = ticks[cc].toDouble();
+      dticks[cc] = ticks[cc];
       }
     animModel->setTickMarks(ticks.size(), dticks);
     delete [] dticks;

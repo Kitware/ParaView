@@ -28,6 +28,8 @@
 
 class vtkAnimationScene;
 class vtkSMViewProxy;
+class vtkSMTimeKeeperProxy;
+class vtkCommand;
 
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMAnimationCueProxy
 {
@@ -76,15 +78,48 @@ public:
   void AddCueProxy(vtkSMAnimationCueProxy*);
   void RemoveCueProxy(vtkSMAnimationCueProxy*);
 
+  // Description:
+  // Set the time keeper. Time keeper is used to obtain the information about
+  // timesteps. This is required to play animation in "Snap To Timesteps" mode.
+  void SetTimeKeeper(vtkSMTimeKeeperProxy*);
+  vtkGetObjectMacro(TimeKeeper, vtkSMTimeKeeperProxy);
+
+  // Description:
+  // Get/Set user specified start and end times. These times are used if
+  // TimeKeeper is NULL or UseCustomEndTimes is set to true. If
+  // UseCustomEndTimes is false and TimeKeeper is set, then the animation end
+  // times are obtained from the time range provided by the TimeKeeper. Look at
+  // vtkSMTimeKeeperProxy for details on what a time keeper is and how it can be
+  // used to manager time in ServerManager.
+  vtkSetMacro(CustomStartTime, double);
+  vtkGetMacro(CustomStartTime, double);
+  vtkSetMacro(CustomEndTime, double);
+  vtkGetMacro(CustomEndTime, double);
+
+  // Description:
+  // When set the CustomStartTime and CustomEndTime are used as the animation
+  // start and end times. Otherwise the time range is obtained from the
+  // TimeKeeper, if set. If no time keeper is present, then CustomStartTime and
+  // CustomEndTime will be used irrespective of the status of this flag.
+  vtkSetMacro(UseCustomEndTimes, bool);
+  vtkGetMacro(UseCustomEndTimes, bool);
+  vtkBooleanMacro(UseCustomEndTimes, bool);
+
+  // Description:
+  // Overridden to ensure that correct end-times are set on the scene based on
+  // the status of UseCustomEndTimes.
+  virtual void UpdateVTKObjects();
 //BTX
 protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
 
-
   // Description:
   // Create VTK Objects.
   virtual void CreateVTKObjects();
+
+  virtual void UpdateVTKObjects(vtkClientServerStream& stream)
+    { this->Superclass::UpdateVTKObjects(stream); }
 
   // Description:
   // Callbacks for corresponding Cue events. The argument must be 
@@ -93,6 +128,10 @@ protected:
   virtual void TickInternal(void* info);
   virtual void EndCueInternal(void* info);
   void CacheUpdate(void* info);
+
+  // Description:
+  // Called when the timekeeper's time range changes.
+  void TimeKeeperTimeRangeChanged();
 
   // Description:
   // Check if the current cache size on all processes is within limits.
@@ -107,12 +146,20 @@ protected:
   int CacheLimit; // in KiloBytes.
 
   vtkSMProxy* AnimationPlayer;
+  vtkSMTimeKeeperProxy* TimeKeeper;
+
+  bool UseCustomEndTimes;
+  double CustomStartTime;
+  double CustomEndTime;
+
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.
   void operator=(const vtkSMAnimationSceneProxy&); // Not implemented.
 
   class vtkInternals;
   vtkInternals* Internals;
+
+  vtkCommand* TimeKeeperObserver;
 
   class vtkPlayerObserver;
   friend class vtkPlayerObserver;

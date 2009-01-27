@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
@@ -46,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
-#include "pqSMAdaptor.h"
 #include "pqView.h"
 
 #include <vtkstd/vector>
@@ -54,44 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqTimeKeeper::pqInternals
 {
 public:
-  typedef QMap<double, QList<QPointer<pqPipelineSource> > > TimeMapType;
-  typedef TimeMapType::iterator TimeMapIteratorType;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-
-  TimeMapType Timesteps;
-  TimeMapType Timeranges;
-
-  static void clearValues(TimeMapType &map, pqPipelineSource *value)
-  {
-    TimeMapIteratorType iter = map.begin();
-    while (iter != map.end())
-      {
-      if (iter.value().contains(value))
-        {
-        iter.value().removeAll(value);
-        if (iter.value().size() == 0)
-          {
-          iter = map.erase(iter);
-          continue;
-          }
-        }
-      ++iter;
-      }
-  }
-  static void insertValue(TimeMapType &map, double key, pqPipelineSource *value)
-  {
-    TimeMapIteratorType iter = map.find(key);
-    if (iter != map.end())
-      {
-      iter.value().push_back(value);
-      }
-    else
-      {
-      QList<QPointer<pqPipelineSource> > valueList;
-      valueList.push_back(value);
-      map.insert(key, valueList);
-      }
-  }
 };
 
 //-----------------------------------------------------------------------------
@@ -103,6 +66,10 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   this->Internals->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("Time"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeChanged()));
+  this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
+    vtkCommand::ModifiedEvent, this, SIGNAL(timeStepsChanged()));
+  this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
+    vtkCommand::ModifiedEvent, this, SIGNAL(timeRangeChanged()));
 
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -139,6 +106,7 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
   if (sources.size() > 0)
     {
     emit this->timeStepsChanged();
+    emit this->timeRangeChanged();
     }
 
   emit this->timeChanged();
@@ -151,192 +119,97 @@ pqTimeKeeper::~pqTimeKeeper()
 }
 
 //-----------------------------------------------------------------------------
+QList<double> pqTimeKeeper::getTimeSteps() const
+{
+  vtkSMPropertyHelper helper(this->getProxy(), "TimestepValues");
+  QList<double> list;
+  for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
+    {
+    list.push_back(helper.GetAsDouble(cc));
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 int pqTimeKeeper::getNumberOfTimeStepValues() const
 {
-  return this->Internals->Timesteps.size();
+  return vtkSMPropertyHelper(this->getProxy(),
+    "TimestepValues").GetNumberOfElements();
 }
 
 //-----------------------------------------------------------------------------
 double pqTimeKeeper::getTimeStepValue(int index) const
 {
-  if (index < this->Internals->Timesteps.size())
+  if (index < this->getNumberOfTimeStepValues())
     {
-    QList<double> keys = this->Internals->Timesteps.keys();
-    return keys[index];
+    return vtkSMPropertyHelper(this->getProxy(),
+      "TimestepValues").GetAsDouble(index);
     }
-  return 0;
+
+  return 0.0;
 }
 
 //-----------------------------------------------------------------------------
 int pqTimeKeeper::getTimeStepValueIndex(double time) const
 {
-  QList<double> keys = this->Internals->Timesteps.keys();
+  int num_values = this->getNumberOfTimeStepValues();
+  double *values = new double[num_values+1];
+  vtkSMPropertyHelper(this->getProxy(), "TimestepValues").Get(values,
+    num_values);
+
   int cc=1;
-  for (cc=1; cc < keys.size(); cc++)
+  for (cc=1; cc < num_values; cc++)
     {
-    if (keys[cc] > time)
+    if (values[cc] > time)
       {
+      delete[] values;
       return (cc-1);
       }
     }
+  delete[] values;
   return (cc-1); 
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::updateTimeKeeperProxy()
-{
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->getProxy()->GetProperty("TimestepValues"));
-
-
-  QVector<double> keys = this->Internals->Timesteps.keys().toVector();
-  vtkstd::vector<double> std_keys = keys.toStdVector();
-
-  dvp->SetNumberOfElements(this->Internals->Timesteps.size());
-  if (this->Internals->Timesteps.size() != 0)
-    {
-    dvp->SetElements(&std_keys[0]);
-    }
-  this->getProxy()->UpdateVTKObjects();
-
-  // if the current time is not in the range of the timesteps currently
-  // available, we change the time.
-  QPair<double, double> range = this->getTimeRange();
-  double curtime = this->getTime();
-  if (range.first < range.second && 
-    (curtime < range.first || curtime > range.second))
-    {
-    this->setTime(range.first);
-    }
-
-  emit this->timeStepsChanged();
 }
 
 //-----------------------------------------------------------------------------
 QPair<double, double> pqTimeKeeper::getTimeRange() const
 {
-  if (this->Internals->Timeranges.size() == 0)
-    {
-    return QPair<double, double>(0.0, 0.0);
-    }
-
-  return QPair<double, double>(this->Internals->Timeranges.begin().key(),
-    (this->Internals->Timeranges.end()-1).key());
+  vtkSMPropertyHelper helper(this->getProxy(), "TimeRange");
+  return QPair<double, double>(helper.GetAsDouble(0),
+    helper.GetAsDouble(1));
 }
 
 //-----------------------------------------------------------------------------
 double pqTimeKeeper::getTime() const
 {
-  return pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("Time")).toDouble();  
+  return vtkSMPropertyHelper(this->getProxy(), "Time").GetAsDouble(0);
 }
 
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::setTime(double time) 
 {
-  pqSMAdaptor::setElementProperty(
-    this->getProxy()->GetProperty("Time"), time);
+  vtkSMPropertyHelper(this->getProxy(), "Time").Set(time);
   this->getProxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceAdded(pqPipelineSource* source)
 {
-  vtkSMProxy* proxy = source->getProxy();
-  if (proxy->GetProperty("TimestepValues") || proxy->GetProperty("TimeRange"))
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("TimeSources"));
+  if (!pp->IsProxyAdded(source->getProxy()))
     {
-    this->Internals->VTKConnect->Connect(proxy, vtkCommand::PropertyModifiedEvent,
-      this, SLOT(propertyModified(vtkObject*, unsigned long, void*, void*)));
-
-    this->propertyModified(source);
+    pp->AddProxy(source->getProxy());
+    this->getProxy()->UpdateVTKObjects();
     }
-
-}
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::propertyModified(vtkObject* obj, unsigned long, void*, void* callData)
-{
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
-  const char* name = reinterpret_cast<const char*>(callData);
-  if (   !proxy || !name
-      || (   (strcmp(name, "TimestepValues") != 0)
-          && (strcmp(name, "TimeRange") != 0) ) )
-    {
-    return;
-    }
-
-  pqServerManagerModel* smmodel = 
-    pqApplicationCore::instance()->getServerManagerModel();
-  pqPipelineSource* source = smmodel->findItem<pqPipelineSource*>(proxy);
-  if (source)
-    {
-    this->propertyModified(source);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::propertyModified(pqPipelineSource* source)
-{
-  // The important thing to note here is that pqTimeKeeper never itself calls
-  // UpdatePipelineInformation() or UpdatePropertyInformation(). It merely
-  // updates the timekeeper whenever any reader reports it have timesteps
-  // available or they are changed. This is crucial since this method may
-  // get called during undo/redo, loading state etc when the proxy may not
-  // have necessary properties intialized to do a UpdatePropertyInformation().
-
-  vtkSMProxy* proxy = source->getProxy();
-  this->cleanupTimes(source);
-
-  if (proxy->GetProperty("TimestepValues"))
-    {
-    QList<QVariant> timestepValues = pqSMAdaptor::getMultipleElementProperty(
-                                          proxy->GetProperty("TimestepValues"));
-    if (timestepValues.size() > 0)
-      {
-      foreach (QVariant vtime, timestepValues)
-        {
-        pqInternals::insertValue(this->Internals->Timesteps,
-                                 vtime.toDouble(), source);
-        }
-      // The following may result in multiple entries in the Timeranges map for
-      // sources with both TimestepValues and TimeRanges properties, but that is
-      // OK.
-      pqInternals::insertValue(this->Internals->Timeranges,
-                               timestepValues.first().toDouble(), source);
-      pqInternals::insertValue(this->Internals->Timeranges,
-                               timestepValues.last().toDouble(), source);
-    }
-    }
-
-  if (proxy->GetProperty("TimeRange"))
-    {
-    QList<QVariant> timeRange = pqSMAdaptor::getMultipleElementProperty(
-                                               proxy->GetProperty("TimeRange"));
-    if (timeRange.size() == 2)
-      {
-      pqInternals::insertValue(this->Internals->Timeranges,
-                               timeRange[0].toDouble(), source);
-      pqInternals::insertValue(this->Internals->Timeranges,
-                               timeRange[1].toDouble(), source);
-      }
-    }
-
-  this->updateTimeKeeperProxy();
 }
 
 //-----------------------------------------------------------------------------
 void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 {
-  this->Internals->VTKConnect->Disconnect(source->getProxy());
-  this->cleanupTimes(source);
-  this->updateTimeKeeperProxy();
-}
-
-//-----------------------------------------------------------------------------
-void pqTimeKeeper::cleanupTimes(pqPipelineSource* source)
-{
-  // Remove times reported by this source.
-  pqInternals::clearValues(this->Internals->Timesteps, source);
-  pqInternals::clearValues(this->Internals->Timeranges, source);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("TimeSources"));
+  pp->RemoveProxy(source->getProxy());
+  this->getProxy()->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

@@ -20,11 +20,11 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
 #include "vtkSMPropertyLink.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSelectionLink.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 #include "vtkSMViewProxy.h"
 
@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.30");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.31");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -110,6 +110,10 @@ void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
     // Ensure that the proxy is created before it is registered, unless we are
     // reviving the server-side server manager, which needs special handling.
     proxy->UpdateVTKObjects();
+    if (proxy->IsA("vtkSMSourceProxy"))
+      {
+      vtkSMSourceProxy::SafeDownCast(proxy)->UpdatePipelineInformation();
+      }
     }
   this->RegisterProxy(id, proxy);
 }

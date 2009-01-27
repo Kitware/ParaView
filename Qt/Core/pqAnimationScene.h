@@ -92,6 +92,9 @@ public:
   /// Returns the current animation time.
   double getAnimationTime() const;
 
+  /// Returns the timesteps from the timekeeper for the animation scene.
+  QList<double> getTimeSteps() const;
+
 signals:
   /// Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);
@@ -154,9 +157,9 @@ private slots:
   /// state of the scene.
   void onCuesChanged();
 
-  /// Called when timekeeper's timesteps change,
-  /// we synchronize the ClockTimeRange on the scene proxy.
-  void updateTimeRanges();  
+  /// Called when timekeeper's timesteps are changed. We determine the play mode
+  /// based on the availability of timesteps.
+  void updateTimeSteps();  
 
   /// Called on animation tick.
   void onTick(vtkObject* caller, unsigned long, void*, void* info);

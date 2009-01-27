@@ -57,6 +57,7 @@ public:
   // or one or more of the values is not in all domains.
   // Returns 1 otherwise.
   int SetElements(const double* values);
+  int SetElements(const double* values, unsigned int numValues);
   double *GetElements();
 
   // Description:
@@ -124,6 +125,15 @@ public:
   vtkGetMacro(ArgumentIsArray, int);
   vtkSetMacro(ArgumentIsArray, int);
 
+
+  // Description:
+  // Get/Set the precision to use while saving the state for this property. If
+  // 0 (or negative), then default ostream precision will be used. Precision can
+  // be defined in ServerManager configuration XML using the attribute
+  // "precision".
+  vtkSetMacro(Precision, int);
+  vtkGetMacro(Precision, int);
+
   // Description: 
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
@@ -155,6 +165,7 @@ protected:
 
   vtkSMDoubleVectorPropertyInternals* Internals;
 
+  int Precision;
   int ArgumentIsArray;
 
   // Description:

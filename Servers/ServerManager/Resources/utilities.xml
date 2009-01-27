@@ -791,50 +791,71 @@
         </Documentation>
       </ProxyProperty>
       
-      <DoubleVectorProperty
-        name="AnimationTime"
+      <DoubleVectorProperty name="AnimationTime"
         command="SetAnimationTime"
         update_self="1"
         number_of_elements="1"
+        precision="16"
         default_values="none">
         <Documentation>
           Set the current animation time.
         </Documentation>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="StartTime"
-        command="SetStartTime"
+      <DoubleVectorProperty name="StartTime"
+        label="Start Time"
+        command="SetCustomStartTime"
         number_of_elements="1"
-        default_values="0">
+        update_self="1"
+        information_property="StartTimeInfo"
+        precision="16"
+        default_values="0.0">
         <Documentation>
           Set the start time for the animation scene.
         </Documentation>
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="EndTime"
-        command="SetEndTime"
+      <DoubleVectorProperty name="EndTime"
+        label="End Time"
+        command="SetCustomEndTime"
         number_of_elements="1"
-        default_values="1">
+        update_self="1"
+        information_property="EndTimeInfo"
+        precision="16"
+        default_values="1.0">
         <Documentation>
           Set the end time for the animation scene.
         </Documentation>
       </DoubleVectorProperty>
 
-      <IntVectorProperty
-        name="ClockTimeRangeLocks"
-        label="Lock Animation Start/End Time"
-        number_of_elements="2"
-        default_values="0 0">
+      <DoubleVectorProperty name="StartTimeInfo"
+        command="GetStartTime"
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EndTimeInfo"
+        command="GetEndTime"
+        information_only="1" >
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseCustomEndTimes"
+        command="SetUseCustomEndTimes"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
         <Documentation>
-          This is a "no-command" property, has not effect 
-          on the proxy, but used by the GUI to keep the range lock state.
+          When set the StartTime and EndTime are used as the
+          animation start and end times. Otherwise the time range is obtained
+          from the TimeKeeper, if set. If no time keeper is present, then
+          StartTime and EndTime will be used irrespective of the
+          status of this flag. 
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="Caching"
+      <IntVectorProperty name="Caching"
         command="SetCaching"
         number_of_elements="1"
         default_values="0"
@@ -845,8 +866,7 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty
-        name="CacheLimit"
+      <IntVectorProperty name="CacheLimit"
         command="SetCacheLimit"
         number_of_elements="1"
         update_self="1"
@@ -856,6 +876,16 @@
           Cache limit used to limit cache size. 
         </Documentation>
       </IntVectorProperty>
+
+      <ProxyProperty name="TimeKeeper"
+        command="SetTimeKeeper"
+        update_self="1">
+        <Documentation>
+          Set the time keeper. Time keeper is used to obtain the information
+          about timesteps. This is required to play animation in "Snap To
+          Timesteps" mode.
+        </Documentation>
+      </ProxyProperty>
 
       <SubProxy>
         <Proxy name="AnimationPlayer"
@@ -872,7 +902,6 @@
           <Property name="PlayMode" />
           <Property name="NumberOfFrames" />
           <Property name="Duration" />
-          <Property name="TimeSteps" />
           <Property name="FramesPerTimestep" />
         </ExposedProperties>
       </SubProxy>
@@ -2116,13 +2145,32 @@
         update_self="1"
         immediate_update="1" 
         number_of_elements="1"
+        precision="16"
         default_values="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
         name="TimestepValues"
-        immediate_update="1" >
+        information_only="1" >
+        <Documentation>
+          The timesteps currently available. This property does not have any
+          information helper since vtkSMTimeKeeperProxy keeps this updated
+          without any need to call UpdatePropertyInformation().
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="TimeRange"
+        number_of_elements="2"
+        default_values="0.0 0.0"
+        precision="16"
+        information_only="1" >
+        <Documentation>
+          This is the time range. It's possible that there are no TimestepValues
+          but there is a valid TimeRange since some sources may provide
+          continuous time.
+        </Documentation>
       </DoubleVectorProperty>
 
       <ProxyProperty
@@ -2132,6 +2180,18 @@
         update_self="1">
         <Documentation>
           Views with their view time linked with this time keeper.
+        </Documentation>
+      </ProxyProperty>
+
+      <ProxyProperty
+        name="TimeSources"
+        command="AddTimeSource"
+        remove_command="RemoveTimeSource"
+        update_self="1">
+        <Documentation>
+          List of proxies that provide time. TimestepValues property has
+          a set of timesteps provided by all the sources added to this property
+          alone.
         </Documentation>
       </ProxyProperty>
 

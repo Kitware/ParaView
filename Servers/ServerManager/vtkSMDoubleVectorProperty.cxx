@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.45");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.46");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -59,6 +59,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
   this->ArgumentIsArray = 0;
   this->SetNumberCommand = 0;
   this->Initialized = false;
+  this->Precision = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -294,6 +295,47 @@ int vtkSMDoubleVectorProperty::SetElements4(
 }
 
 //---------------------------------------------------------------------------
+int vtkSMDoubleVectorProperty::SetElements(const double* values,
+  unsigned int numValues)
+{
+  unsigned int numArgs = this->GetNumberOfElements();
+
+  int modified = (numArgs != numValues);
+  for (unsigned int i=0; modified == 0 && i<numArgs; i++)
+    {
+    if (this->Internals->Values[i] != values[i])
+      {
+      modified = 1;
+      break;
+      }
+    }
+  if(!modified && this->Initialized)
+    {
+    return 1;
+    }
+
+  if ( vtkSMProperty::GetCheckDomains() )
+    {
+    memcpy(&this->Internals->UncheckedValues[0], 
+           values, 
+           numValues*sizeof(double));
+    if (!this->IsInDomains())
+      {
+      return 0;
+      }
+    }
+
+  this->Internals->Values.resize(numValues, 0);
+  if (numValues > 0)
+    {
+    memcpy(&this->Internals->Values[0], values, numValues*sizeof(double));
+    }
+  this->Initialized = true;
+  this->Modified();
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::SetElements(const double* values)
 {
   unsigned int numArgs = this->GetNumberOfElements();
@@ -352,6 +394,12 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (numCommand)
     {
     this->SetSetNumberCommand(numCommand);
+    }
+
+  int precision=0;
+  if (element->GetScalarAttribute("precision", &precision))
+    {
+    this->SetPrecision(precision);
     }
 
   int numElems = this->GetNumberOfElements();
@@ -474,7 +522,8 @@ void vtkSMDoubleVectorProperty::ChildSaveState(
     vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
     elementElement->SetName("Element");
     elementElement->AddAttribute("index", i);
-    elementElement->AddAttribute("value", this->GetElement(i));
+    elementElement->AddAttribute("value", this->GetElement(i),
+      this->Precision);
     propertyElement->AddNestedElement(elementElement);
     elementElement->Delete();
     }
@@ -492,7 +541,8 @@ void vtkSMDoubleVectorProperty::ChildSaveState(
       elementElement->SetName("Element");
       elementElement->AddAttribute("index", cc);
       elementElement->AddAttribute("value", 
-        this->Internals->LastPushedValues[cc]);
+        this->Internals->LastPushedValues[cc],
+        this->Precision);
       element->AddNestedElement(elementElement);
       elementElement->Delete();
       }
@@ -549,6 +599,7 @@ void vtkSMDoubleVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "ArgumentIsArray: " << this->ArgumentIsArray << endl;
+  os << indent << "Precision: " << this->Precision << endl;
 
   os << indent << "Values: ";
   for (unsigned int i=0; i<this->GetNumberOfElements(); i++)

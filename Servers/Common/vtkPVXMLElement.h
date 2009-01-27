@@ -125,6 +125,7 @@ public:
   void AddAttribute(const char* attrName, const char* attrValue);
   void AddAttribute(const char* attrName, unsigned int attrValue);
   void AddAttribute(const char* attrName, double attrValue);
+  void AddAttribute(const char* attrName, double attrValue, int precision);
   void AddAttribute(const char* attrName, int attrValue);
 #if defined(VTK_USE_64BIT_IDS)
   void AddAttribute(const char* attrName, vtkIdType attrValue);

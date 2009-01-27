@@ -64,6 +64,9 @@ public:
   /// for the given time for which timestep value[index] <= time.
   int getTimeStepValueIndex(double time) const;
 
+  /// Returns the available timesteps.
+  QList<double> getTimeSteps() const;
+
   /// Returns the time range. 
   /// Return (0,0) is getNumberOfTimeStepValues() == 0.
   QPair<double, double> getTimeRange() const;
@@ -74,6 +77,12 @@ public:
   /// Update the current time.
   void setTime(double time);
 
+  /// Add/remove a source that provides time.
+  /// Every registered source is added to this list by
+  /// pqPipelineSource::initialize().
+  void addTimeSource(pqPipelineSource*);
+  void removeTimeSource(pqPipelineSource*);
+
 signals:
   /// Fired when the keeper updates the times.
   void timeStepsChanged();
@@ -81,10 +90,10 @@ signals:
   /// Fired when the current time changes.
   void timeChanged();
 
+  /// Fired when the time range changes.
+  void timeRangeChanged();
 
 protected slots:
-  void propertyModified(vtkObject*, unsigned long, void*, void* callData);
-  
   /// Called when a source is added.
   void sourceAdded(pqPipelineSource*);
 
@@ -97,10 +106,6 @@ protected slots:
   /// Called when a view is removed.
   void viewRemoved(pqView*);
 
-protected:
-  void updateTimeKeeperProxy();
-
-  void cleanupTimes(pqPipelineSource*);
 private:
   pqTimeKeeper(const pqTimeKeeper&); // Not implemented.
   void operator=(const pqTimeKeeper&); // Not implemented.

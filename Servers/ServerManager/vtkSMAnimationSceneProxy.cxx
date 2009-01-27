@@ -14,16 +14,21 @@
 =========================================================================*/
 #include "vtkSMAnimationSceneProxy.h"
 
-#include "vtkPVAnimationScene.h"
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
 #include "vtkCommand.h"
+#include "vtkMemberFunctionCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVAnimationScene.h"
 #include "vtkPVCacheSizeInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMRenderViewProxy.h"
-#include "vtkCollection.h"
+#include "vtkSMTimeKeeperProxy.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/vector>
@@ -36,14 +41,18 @@ public:
     VectorOfViews;
   VectorOfViews ViewModules;
   vtkCollection* AnimationCues;
+  vtkSMPropertyLink* TimeStepsLink;
 
   vtkInternals()
     {
     this->AnimationCues = vtkCollection::New();
+    this->TimeStepsLink = vtkSMPropertyLink::New();
     }
 
   ~vtkInternals()
     {
+    this->TimeStepsLink->Delete();
+    this->TimeStepsLink = 0;
     this->AnimationCues->Delete();
     this->AnimationCues = 0;
     }
@@ -143,8 +152,8 @@ private:
 };
 
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.54");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.55");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -156,18 +165,90 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->PlayerObserver = vtkPlayerObserver::New();
   this->PlayerObserver->SetTarget(this);
   this->InTick = false;
+  this->TimeKeeper = 0;
+  this->CustomStartTime = 0.0;
+  this->CustomEndTime = 1.0;
+  this->UseCustomEndTimes = false;
+  this->TimeKeeperObserver = vtkMakeMemberFunctionCommand(
+    *this, &vtkSMAnimationSceneProxy::TimeKeeperTimeRangeChanged);
 }
 
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
+  this->SetTimeKeeper(0);
   if (this->AnimationPlayer)
     {
     this->AnimationPlayer->RemoveObserver(this->PlayerObserver);
     }
   this->PlayerObserver->SetTarget(0);
   this->PlayerObserver->Delete();
+  this->TimeKeeperObserver->Delete();
+  this->TimeKeeperObserver = 0;
   delete this->Internals;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::UpdateVTKObjects()
+{
+  this->Superclass::UpdateVTKObjects();
+ 
+  vtkPVAnimationScene* scene = vtkPVAnimationScene::SafeDownCast(
+    this->AnimationCue);
+  if (this->UseCustomEndTimes || !this->TimeKeeper)
+    {
+    scene->SetStartTime(this->CustomStartTime);
+    scene->SetEndTime(this->CustomEndTime);
+    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
+    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
+    }
+  else
+    {
+    // ensure timekeeper's time range is pushed.
+    this->TimeKeeperTimeRangeChanged();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::SetTimeKeeper(vtkSMTimeKeeperProxy* tkp)
+{
+  if (this->TimeKeeper == tkp)
+    {
+    return;
+    }
+
+  this->Internals->TimeStepsLink->RemoveAllLinks();
+  if (this->TimeKeeper)
+    {
+    this->TimeKeeper->GetProperty("TimeRange")->RemoveObserver(
+      this->TimeKeeperObserver);
+    }
+  vtkSetObjectBodyMacro(TimeKeeper, vtkSMTimeKeeperProxy, tkp);
+  if (this->TimeKeeper)
+    {
+    this->Internals->TimeStepsLink->AddLinkedProperty(
+      this->TimeKeeper, "TimestepValues", vtkSMLink::INPUT);
+    this->Internals->TimeStepsLink->AddLinkedProperty(
+      this->AnimationPlayer, "TimeSteps", vtkSMLink::OUTPUT);
+    this->TimeKeeper->GetProperty("TimeRange")->AddObserver(
+      vtkCommand::ModifiedEvent, this->TimeKeeperObserver);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::TimeKeeperTimeRangeChanged()
+{
+  if (!this->UseCustomEndTimes)
+    {
+    vtkPVAnimationScene* scene = vtkPVAnimationScene::SafeDownCast(
+      this->AnimationCue);
+    scene->SetStartTime(vtkSMPropertyHelper(
+        this->TimeKeeper,"TimeRange").GetAsDouble(0));
+    scene->SetEndTime(vtkSMPropertyHelper(
+        this->TimeKeeper,"TimeRange").GetAsDouble(1));
+    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
+    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -429,4 +510,7 @@ void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OverrideStillRender: " << this->OverrideStillRender << endl;
   os << indent << "CacheLimit: " << this->CacheLimit << endl;
   os << indent << "Caching: " << this->Caching << endl;
+  os << indent << "CustomStartTime: " << this->CustomStartTime << endl;
+  os << indent << "CustomEndTime: " << this->CustomEndTime << endl;
+  os << indent << "UseCustomEndTimes: " << this->UseCustomEndTimes << endl;
 }

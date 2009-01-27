@@ -298,11 +298,11 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
     this->Internal->endTime, "text", SIGNAL(textChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("EndTime"));
   this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->startTimeLock, "checked", SIGNAL(toggled(bool)),
-    sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 0);
-  this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->endTimeLock, "checked", SIGNAL(toggled(bool)),
-    sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 1);
+    this->Internal->UseCustomEndTimes, "checked", SIGNAL(toggled(bool)),
+    sceneProxy, sceneProxy->GetProperty("UseCustomEndTimes"));
+  //this->Internal->SceneLinks.addPropertyLink(
+  //  this->Internal->endTimeLock, "checked", SIGNAL(toggled(bool)),
+  //  sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 1);
 
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->PlayModeAdaptor, "currentText", 
@@ -331,8 +331,7 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
 
   // Whenever timesteps change, we want to update the ranges for the spin boxes
   // which show the timestep index.
-  pqTimeKeeper* timekeeper = scene->getServer()->getTimeKeeper();
-  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
+  QObject::connect(scene, SIGNAL(timeStepsChanged()),
     this, SLOT(onTimeStepsChanged()));
 }
 

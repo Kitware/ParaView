@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>319</width>
+    <width>323</width>
     <height>770</height>
    </rect>
   </property>
@@ -13,10 +13,22 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>9</number>
    </property>
-   <property name="spacing" >
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <property name="horizontalSpacing" >
+    <number>6</number>
+   </property>
+   <property name="verticalSpacing" >
     <number>6</number>
    </property>
    <item row="2" column="0" >
@@ -25,10 +37,22 @@
       <string>Key Frame Editor</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="0" colspan="2" >
@@ -40,18 +64,28 @@
          <enum>QFrame::Plain</enum>
         </property>
         <layout class="QGridLayout" >
-         <property name="margin" >
+         <property name="leftMargin" >
           <number>0</number>
          </property>
-         <property name="spacing" >
+         <property name="topMargin" >
+          <number>0</number>
+         </property>
+         <property name="rightMargin" >
+          <number>0</number>
+         </property>
+         <property name="bottomMargin" >
+          <number>0</number>
+         </property>
+         <property name="horizontalSpacing" >
+          <number>6</number>
+         </property>
+         <property name="verticalSpacing" >
           <number>6</number>
          </property>
          <item row="3" column="0" colspan="2" >
           <widget class="QFrame" name="valueFrameLarge" >
            <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>3</hsizetype>
-             <vsizetype>3</vsizetype>
+            <sizepolicy vsizetype="MinimumExpanding" hsizetype="MinimumExpanding" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -77,9 +111,7 @@
          <item row="0" column="1" >
           <widget class="QSpinBox" name="keyFrameIndex" >
            <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>1</hsizetype>
-             <vsizetype>0</vsizetype>
+            <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -112,9 +144,7 @@
          <item row="1" column="1" >
           <widget class="QLineEdit" name="keyFrameTime" >
            <property name="sizePolicy" >
-            <sizepolicy>
-             <hsizetype>7</hsizetype>
-             <vsizetype>0</vsizetype>
+            <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -147,10 +177,22 @@
             <enum>QFrame::Raised</enum>
            </property>
            <layout class="QGridLayout" >
-            <property name="margin" >
+            <property name="leftMargin" >
              <number>9</number>
             </property>
-            <property name="spacing" >
+            <property name="topMargin" >
+             <number>9</number>
+            </property>
+            <property name="rightMargin" >
+             <number>9</number>
+            </property>
+            <property name="bottomMargin" >
+             <number>9</number>
+            </property>
+            <property name="horizontalSpacing" >
+             <number>6</number>
+            </property>
+            <property name="verticalSpacing" >
              <number>6</number>
             </property>
             <item row="0" column="0" >
@@ -199,10 +241,22 @@
       <string>Track Selection</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>2</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>2</number>
       </property>
       <item row="0" column="0" >
@@ -228,9 +282,7 @@
       <item row="1" column="1" >
        <widget class="pqAnimatablePropertiesComboBox" name="propertyName" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -240,9 +292,7 @@
       <item row="0" column="1" >
        <widget class="pqAnimatableProxyComboBox" name="sourceName" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -261,33 +311,52 @@
       <string>Playback</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
        <number>2</number>
       </property>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_8" >
+      <property name="verticalSpacing" >
+       <number>2</number>
+      </property>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="startTimeLabel" >
         <property name="text" >
          <string>Start Time:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
+      <item row="2" column="1" >
        <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
         <property name="spacing" >
          <number>2</number>
+        </property>
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
         </property>
         <item>
          <widget class="QLineEdit" name="startTime" >
           <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>0</vsizetype>
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
             <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -301,19 +370,9 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QCheckBox" name="startTimeLock" >
-          <property name="toolTip" >
-           <string>&lt;html>When ever a new file is read, the start time is adjusted to match the timesteps provided by the file. To avoid this behavior, turn the lock on.&lt;/html></string>
-          </property>
-          <property name="text" >
-           <string>lock</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
-      <item row="4" column="0" >
+      <item row="5" column="0" >
        <widget class="QLabel" name="labelNumberOfFrames" >
         <property name="text" >
          <string>No. Of Frames:</string>
@@ -323,7 +382,7 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
+      <item row="6" column="0" >
        <widget class="QLabel" name="labelDuration" >
         <property name="text" >
          <string>Duration (secs):</string>
@@ -333,12 +392,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
+      <item row="4" column="1" >
        <widget class="QComboBox" name="playMode" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>5</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -360,55 +417,60 @@
         </item>
        </widget>
       </item>
-      <item row="5" column="1" >
+      <item row="6" column="1" >
        <widget class="QSpinBox" name="duration" >
         <property name="sizePolicy" >
-         <sizepolicy>
-          <hsizetype>1</hsizetype>
-          <vsizetype>0</vsizetype>
+         <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="maximum" >
-         <number>2147483647</number>
-        </property>
         <property name="minimum" >
          <number>1</number>
         </property>
+        <property name="maximum" >
+         <number>2147483647</number>
+        </property>
        </widget>
       </item>
-      <item row="3" column="0" >
+      <item row="4" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
          <string>Play Mode:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
+      <item row="5" column="1" >
        <widget class="QSpinBox" name="numberOfFrames" >
-        <property name="maximum" >
-         <number>2147483647</number>
-        </property>
         <property name="minimum" >
          <number>1</number>
         </property>
+        <property name="maximum" >
+         <number>2147483647</number>
+        </property>
        </widget>
       </item>
-      <item row="2" column="1" >
+      <item row="3" column="1" >
        <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
         <property name="spacing" >
          <number>2</number>
+        </property>
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
         </property>
         <item>
          <widget class="QLineEdit" name="endTime" >
           <property name="sizePolicy" >
-           <sizepolicy>
-            <hsizetype>7</hsizetype>
-            <vsizetype>0</vsizetype>
+           <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
             <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -422,16 +484,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QCheckBox" name="endTimeLock" >
-          <property name="toolTip" >
-           <string>&lt;html>When ever a new file is read, the end time is adjusted to match the timesteps provided by the file. To avoid this behavior, turn the lock on.&lt;/html></string>
-          </property>
-          <property name="text" >
-           <string>lock</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item row="0" column="0" >
@@ -441,8 +493,8 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QLabel" name="label_9" >
+      <item row="3" column="0" >
+       <widget class="QLabel" name="endTimeLabel" >
         <property name="text" >
          <string>End Time:</string>
         </property>
@@ -450,11 +502,20 @@
       </item>
       <item row="0" column="1" >
        <layout class="QHBoxLayout" >
-        <property name="margin" >
-         <number>0</number>
-        </property>
         <property name="spacing" >
          <number>2</number>
+        </property>
+        <property name="leftMargin" >
+         <number>0</number>
+        </property>
+        <property name="topMargin" >
+         <number>0</number>
+        </property>
+        <property name="rightMargin" >
+         <number>0</number>
+        </property>
+        <property name="bottomMargin" >
+         <number>0</number>
         </property>
         <item>
          <widget class="QLineEdit" name="currentTime" />
@@ -467,6 +528,17 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="UseCustomEndTimes" >
+        <property name="text" >
+         <string>Use custom end times for the animation. 
+Otherwise times provided by sources will be used.</string>
+        </property>
+        <property name="checked" >
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -490,10 +562,22 @@
       <string>Animation Settings</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>4</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>4</number>
+      </property>
+      <property name="rightMargin" >
+       <number>4</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>4</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>2</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>2</number>
       </property>
       <item row="1" column="0" >
@@ -508,11 +592,11 @@
         <property name="toolTip" >
          <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
         </property>
-        <property name="maximum" >
-         <number>999999999</number>
-        </property>
         <property name="minimum" >
          <number>10</number>
+        </property>
+        <property name="maximum" >
+         <number>999999999</number>
         </property>
         <property name="singleStep" >
          <number>100</number>
@@ -560,6 +644,7 @@
    <class>pqKeyFrameTypeWidget</class>
    <extends>QFrame</extends>
    <header>pqKeyFrameTypeWidget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>pqAnimatablePropertiesComboBox</class>
@@ -578,5 +663,102 @@
  <resources>
   <include location="../pqComponents.qrc" />
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>startTime</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>155</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>startTimeIndex</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>234</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>startTimeLabel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>57</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>endTime</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>155</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>endTimeIndex</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>234</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>UseCustomEndTimes</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>endTimeLabel</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>161</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>57</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

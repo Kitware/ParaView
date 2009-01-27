@@ -65,12 +65,10 @@ static uint qHash(QPointer<T> p)
 class pqAnimationScene::pqInternals
 {
 public:
-  vtkSmartPointer<vtkSMPropertyLink> TimestepValuesLink;
   QSet<QPointer<pqAnimationCue> > Cues;
   QPointer<pqAnimationCue> GlobalTimeCue;
   pqInternals()
     {
-    this->TimestepValuesLink = vtkSmartPointer<vtkSMPropertyLink>::New();
     }
 };
 
@@ -101,15 +99,12 @@ pqAnimationScene::pqAnimationScene(const QString& group, const QString& name,
   connector->Connect(
     proxy->GetProperty("NumberOfFrames"), vtkCommand::ModifiedEvent,
     this, SIGNAL(frameCountChanged()));
-  connector->Connect(
-    proxy->GetProperty("TimeSteps"), vtkCommand::ModifiedEvent,
-    this, SIGNAL(timeStepsChanged()));
 
   connector->Connect(
-    proxy->GetProperty("StartTime"), vtkCommand::ModifiedEvent,
+    proxy->GetProperty("StartTimeInfo"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
   connector->Connect(
-    proxy->GetProperty("EndTime"), vtkCommand::ModifiedEvent,
+    proxy->GetProperty("EndTimeInfo"), vtkCommand::ModifiedEvent,
     this, SIGNAL(clockTimeRangesChanged()));
   connector->Connect(
     proxy->GetProperty("AnimationTime"), vtkCommand::ModifiedEvent,
@@ -150,28 +145,22 @@ void pqAnimationScene::setupTimeTrack()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
 
-  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
-    this, SLOT(updateTimeRanges()));
-
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("TimeKeeper"));
-  if (pp && pp->GetNumberOfProxies() == 0)
+  if (pp)
     {
+    pp->RemoveAllProxies();
     pp->AddProxy(timekeeper->getProxy());
     this->getProxy()->UpdateVTKObjects();
     }
 
-  // Link timekeeper properties.
-  this->Internals->TimestepValuesLink->AddLinkedProperty(
-    timekeeper->getProxy(), "TimestepValues", vtkSMLink::INPUT);
-  this->Internals->TimestepValuesLink->AddLinkedProperty(
-    this->getProxy(), "TimeSteps", vtkSMLink::OUTPUT);
-  timekeeper->getProxy()->GetProperty("TimestepValues")->Modified();
-  this->updateTimeRanges();
+  QObject::connect(timekeeper, SIGNAL(timeRangeChanged()),
+    this, SLOT(updateTimeSteps()));
+  this->updateTimeSteps();
 }
 
 //-----------------------------------------------------------------------------
-void pqAnimationScene::updateTimeRanges()
+void pqAnimationScene::updateTimeSteps()
 {
   pqTimeKeeper* timekeeper = this->getServer()->getTimeKeeper();
   if (pqApplicationCore::instance()->isLoadingState())
@@ -181,24 +170,19 @@ void pqAnimationScene::updateTimeRanges()
     return;
     }
 
-  QPair<double, double> range = timekeeper->getTimeRange();
   vtkSMProxy* sceneProxy = this->getProxy();
 
-  // Only adjust the time range if the one in the timekeeper looks valid.
-  if (range.first < range.second)
+  // Update the StartTime and EndTime properties so that GUI shows it correctly
+  // every where, unless the user has UseCustomEndTimes set, in which case
+  // he's going to manage that on his own.
+  if (pqSMAdaptor::getElementProperty(
+      sceneProxy->GetProperty("UseCustomEndTimes")).toBool() == false)
     {
-    QList<QVariant> locks = pqSMAdaptor::getMultipleElementProperty(
-                                sceneProxy->GetProperty("ClockTimeRangeLocks"));
-    if (!locks[0].toBool())
-      {
-      pqSMAdaptor::setElementProperty(
-                     sceneProxy->GetProperty("StartTime"), range.first);
-      }
-    if (!locks[1].toBool())
-      {
-      pqSMAdaptor::setElementProperty(
-                    sceneProxy->GetProperty("EndTime"), range.second);
-      }
+    QPair<double, double> range = timekeeper->getTimeRange();
+    pqSMAdaptor::setElementProperty(
+      sceneProxy->GetProperty("StartTime"), range.first);
+    pqSMAdaptor::setElementProperty(
+      sceneProxy->GetProperty("EndTime"), range.second);
     }
 
   // Adjust the play mode based on whether or not we have time steps.
@@ -206,7 +190,7 @@ void pqAnimationScene::updateTimeRanges()
   if (timekeeper->getNumberOfTimeStepValues() == 0)
     {
     if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
-        == "Snap To TimeSteps" )
+      == "Snap To TimeSteps" )
       {
       pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
       }
@@ -217,27 +201,34 @@ void pqAnimationScene::updateTimeRanges()
     }
   sceneProxy->UpdateVTKObjects();
 
-  // If the animation time is not in the scene time range, set it to the min
-  // value.
+  /// If the animation time is not in the scene time range, set it to the min
+  /// value.
   double min = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("StartTime")).toDouble();
+    sceneProxy->GetProperty("StartTimeInfo")).toDouble();
   double max = pqSMAdaptor::getElementProperty(
-    sceneProxy->GetProperty("EndTime")).toDouble();
+    sceneProxy->GetProperty("EndTimeInfo")).toDouble();
   double cur = pqSMAdaptor::getElementProperty(
     sceneProxy->GetProperty("AnimationTime")).toDouble();
   if (cur < min || cur > max)
     {
     this->setAnimationTime(min);
     }
+  emit this->timeStepsChanged();
+}
+
+//-----------------------------------------------------------------------------
+QList<double> pqAnimationScene::getTimeSteps() const
+{
+  return this->getServer()->getTimeKeeper()->getTimeSteps();;
 }
 
 //-----------------------------------------------------------------------------
 QPair<double, double> pqAnimationScene::getClockTimeRange() const
 {
   double start = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("StartTime")).toDouble();
+    this->getProxy()->GetProperty("StartTimeInfo")).toDouble();
   double end = pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("EndTime")).toDouble();
+    this->getProxy()->GetProperty("EndTimeInfo")).toDouble();
   return QPair<double,double>(start, end);
 }
 

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.22");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.23");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -108,6 +108,22 @@ void vtkPVXMLElement::AddAttribute(const char* attrName, double attrValue)
   vtksys_ios::ostringstream valueStr;
   valueStr << attrValue << ends;
   this->AddAttribute(attrName, valueStr.str().c_str());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::AddAttribute(const char* attrName, double attrValue,
+  int precision)
+{
+  if (precision <= 0)
+    {
+    this->AddAttribute(attrName, attrValue);
+    }
+  else
+    {
+    vtksys_ios::ostringstream valueStr;
+    valueStr << setprecision(precision) << attrValue << ends;
+    this->AddAttribute(attrName, valueStr.str().c_str());
+    }
 }
 
 //----------------------------------------------------------------------------
