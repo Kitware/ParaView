@@ -97,6 +97,29 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "include/mpicxx.h"
   )
 
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  # Some VTK dashboards include building bits of Qt which produce lots of
+  # the following warnings when built with the MS compilers. Qt guys should
+  # fix their code. Until they do, keep the Qt chatter off the VTK dashboard
+  # results:
+  "include.[Qq]t([Cc]ore|[Gg]ui).*warning C4127: conditional expression is constant"
+  "[Qq]t.*h.*warning.*declaration of .* shadows a member of .this"
+  "[Qq]t.*h.*warning.*(copy constructor|assignment operator) could not be generated"
+  )
+
+IF(APPLE)
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "warning -.: directory name .* does not exist"
+  "OpenTransport.*warning.*is deprecated"
+
+  # Somebody will have to get rid of these calls eventually (bug 4001) to
+  # eliminate these warnings. For now, mask them out of dashboard results:
+  "vtkCarbonRenderWindow.cxx.*warning: .(New|Diff|Equal|Dispose)Rgn. is deprecated"
+  )
+ENDIF(APPLE)
+
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
   ${CTEST_CUSTOM_COVERAGE_EXCLUDE}
   "vtk.*CSInit.cxx"
