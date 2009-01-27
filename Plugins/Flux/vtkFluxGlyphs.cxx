@@ -29,9 +29,12 @@
 #include "vtkGenericCell.h"
 #include "vtkGlyph3D.h"
 #include "vtkInformation.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkTransformFilter.h"
+#include "vtkUnsignedCharArray.h"
 
 #include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) \
@@ -40,7 +43,45 @@
 #include <math.h>
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkFluxGlyphs, "1.1");
+// Computes the length of a 1D cell (only accurate for 1 segment cells).
+inline double vtkFluxGlyphsCellLength(vtkCell *cell)
+{
+  vtkPoints *points = cell->GetPoints();
+  double p0[3], p1[3];
+  points->GetPoint(0, p0);
+  points->GetPoint(cell->GetNumberOfPoints()-1, p1);
+  return sqrt(vtkMath::Distance2BetweenPoints(p0, p1));
+}
+
+// Computes the area of a 2D cell.
+inline double vtkFluxGlyphsCellArea(vtkCell *cell)
+{
+  VTK_CREATE(vtkIdList, triangleIds);
+  VTK_CREATE(vtkPoints, points);
+  cell->Triangulate(0, triangleIds, points);
+  int numTris = points->GetNumberOfPoints()/3;
+
+  double totalArea = 0.0;
+  for (int i = 0; i < numTris; i++)
+    {
+    double p0[3], p1[3], p2[3], v0[3], v1[3], vec[3];
+    int j;
+    points->GetPoint(i*3+0, p0);
+    points->GetPoint(i*3+1, p1);
+    points->GetPoint(i*3+2, p2);
+    for (j = 0; j < 3; j++) v0[j] = p0[j] - p1[j];
+    for (j = 0; j < 3; j++) v1[j] = p2[j] - p1[j];
+    // The magnitude of the cross product is the area of the parallelogram of
+    // the two vectors.  Half that is the area of the triangle.
+    vtkMath::Cross(v1, v0, vec);
+    totalArea += 0.5*vtkMath::Norm(vec);
+    }
+
+  return totalArea;
+}
+
+//=============================================================================
+vtkCxxRevisionMacro(vtkFluxGlyphs, "1.2");
 vtkStandardNewMacro(vtkFluxGlyphs);
 
 //-----------------------------------------------------------------------------
@@ -106,13 +147,18 @@ int vtkFluxGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
     vtkDebugMacro("No input scalars.");
     return 1;
     }
+
+  // Find the scale factors and add them to the input.
+  vtkSmartPointer<vtkDataArray> scaleFactors
+    = this->MakeGlyphScaleFactors(workingInput);
+
   if (inputArray->GetNumberOfComponents() == 1)
     {
     workingInput = this->MakeFluxVectors(workingInput);
     }
 
   vtkSmartPointer<vtkPolyData> glyphs;
-  glyphs = this->MakeGlyphs(workingInput);
+  glyphs = this->MakeGlyphs(workingInput, scaleFactors);
 
   output->ShallowCopy(glyphs);
 
@@ -148,27 +194,80 @@ vtkSmartPointer<vtkDataArray>
 vtkFluxGlyphs::MakeGlyphScaleFactors(vtkDataSet *input)
 {
   vtkIdType numCells = input->GetNumberOfCells();
+  vtkIdType cellId;
 
   VTK_CREATE(vtkDoubleArray, scaleFactors);
   scaleFactors->SetNumberOfComponents(1);
   scaleFactors->SetNumberOfTuples(numCells);
 
+  vtkDataArray *inputArray = this->GetInputArrayToProcess(0, input);
+  int numComponents = inputArray->GetNumberOfComponents();
+
+  double maxFluxMag = 0.0;
+
+  VTK_CREATE(vtkUnsignedCharArray, cellDims);
+  cellDims->SetNumberOfComponents(1);
+  cellDims->SetNumberOfTuples(numCells);
+  double maxCellArea = 0.0;
+
   VTK_CREATE(vtkGenericCell, cell);
-  for (vtkIdType cellId = 0; cellId < numCells; cellId++)
+  for (cellId = 0; cellId < numCells; cellId++)
     {
+    double fluxMag2 = 0.0;
+    for (int c = 0; c < numComponents; c++)
+      {
+      double fluxComp = inputArray->GetComponent(cellId, c);
+      fluxMag2 = fluxComp*fluxComp;
+      }
+    double fluxMag = sqrt(fluxMag2);
+    if (fluxMag > maxFluxMag) maxFluxMag = fluxMag;
+
     input->GetCell(cellId, cell);
-    scaleFactors->SetValue(cellId, sqrt(cell->GetLength2()));
+    int cDim = cell->GetCellDimension();
+    cellDims->SetValue(cellId, cDim);
+    double cellArea;
+    switch (cDim)
+      {
+      case 1:
+        cellArea = vtkFluxGlyphsCellLength(cell);
+        break;
+      case 2:
+        cellArea = vtkFluxGlyphsCellArea(cell);
+        if (maxCellArea < cellArea) maxCellArea = cellArea;
+        break;
+      default:
+        // Should we warn?
+        cellArea = 0.0;
+        break;
+      }
+
+    scaleFactors->SetValue(cellId, fluxMag*cellArea);
+    }
+
+  // Normalize by flux magnitude and cell area.  The max length of the cell
+  // should be roughly equal to the max length of a cell.  Use sqrt(maxCellArea)
+  // to estimate that.
+  if (maxFluxMag > 0.0)
+    {
+    double maxCellAreaSqrt = sqrt(maxCellArea);
+    for (cellId = 0; cellId < numCells; cellId++)
+      {
+      double sf = scaleFactors->GetValue(cellId);
+      sf /= maxFluxMag;
+      if (cellDims->GetValue(cellId) == 2) sf /= maxCellAreaSqrt;
+      scaleFactors->SetValue(cellId, sf);
+      }
     }
 
   return scaleFactors;
 }
 
 //-----------------------------------------------------------------------------
-vtkSmartPointer<vtkPolyData> vtkFluxGlyphs::MakeGlyphs(vtkDataSet *input)
+vtkSmartPointer<vtkPolyData> vtkFluxGlyphs::MakeGlyphs(
+                                                     vtkDataSet *input,
+                                                     vtkDataArray *scaleFactors)
 {
-  // Find the scale factors and add them to the input.
-  vtkSmartPointer<vtkDataArray> scaleFactors
-    = this->MakeGlyphScaleFactors(input);
+  // Add the scale factors to the input.
   scaleFactors->SetName("ScaleFactors");
   vtkSmartPointer<vtkDataSet> inputCopy;
   inputCopy.TakeReference(input->NewInstance());
@@ -220,6 +319,10 @@ vtkSmartPointer<vtkPolyData> vtkFluxGlyphs::MakeGlyphs(vtkDataSet *input)
   glyph->Update();
 
   vtkSmartPointer<vtkPolyData> result = glyph->GetOutput();
+  // Modifying the output of a filter is not a great idea, but all we are
+  // going to do is a shallow copy.
+  result->GetPointData()->RemoveArray("ScaleFactors");
+  result->GetPointData()->RemoveArray("GlyphVector");
   return result;
 }
 

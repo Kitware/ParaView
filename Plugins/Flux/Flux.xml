@@ -75,9 +75,9 @@
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           attribute_type="cell">
-          <RequiredProperties>
+<!--          <RequiredProperties>
             <Property name="SelectInputScalars" function="FieldDataSelection"/>
-          </RequiredProperties>
+          </RequiredProperties> -->
         </InputArrayDomain>
         <Documentation>
           The input to the filter.

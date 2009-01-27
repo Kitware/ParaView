@@ -63,7 +63,8 @@ protected:
 //BTX
   virtual vtkSmartPointer<vtkDataSet> MakeFluxVectors(vtkDataSet *input);
   virtual vtkSmartPointer<vtkDataArray> MakeGlyphScaleFactors(vtkDataSet*input);
-  virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet *input);
+  virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet *input,
+                                                  vtkDataArray *scaleFactors);
 //ETX
 
 private:
