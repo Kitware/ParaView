@@ -26,7 +26,6 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
-#include "vtkSMPropertyLink.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMTimeKeeperProxy.h"
 
@@ -41,18 +40,14 @@ public:
     VectorOfViews;
   VectorOfViews ViewModules;
   vtkCollection* AnimationCues;
-  vtkSMPropertyLink* TimeStepsLink;
 
   vtkInternals()
     {
     this->AnimationCues = vtkCollection::New();
-    this->TimeStepsLink = vtkSMPropertyLink::New();
     }
 
   ~vtkInternals()
     {
-    this->TimeStepsLink->Delete();
-    this->TimeStepsLink = 0;
     this->AnimationCues->Delete();
     this->AnimationCues = 0;
     }
@@ -153,7 +148,7 @@ private:
 
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.55");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.56");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -169,8 +164,10 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->CustomStartTime = 0.0;
   this->CustomEndTime = 1.0;
   this->UseCustomEndTimes = false;
-  this->TimeKeeperObserver = vtkMakeMemberFunctionCommand(
+  this->TimeRangeObserver = vtkMakeMemberFunctionCommand(
     *this, &vtkSMAnimationSceneProxy::TimeKeeperTimeRangeChanged);
+  this->TimestepValuesObserver = vtkMakeMemberFunctionCommand(
+    *this, &vtkSMAnimationSceneProxy::TimeKeeperTimestepsChanged);
 }
 
 //----------------------------------------------------------------------------
@@ -183,8 +180,10 @@ vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
     }
   this->PlayerObserver->SetTarget(0);
   this->PlayerObserver->Delete();
-  this->TimeKeeperObserver->Delete();
-  this->TimeKeeperObserver = 0;
+  this->TimeRangeObserver->Delete();
+  this->TimeRangeObserver = 0;
+  this->TimestepValuesObserver->Delete();
+  this->TimestepValuesObserver = 0;
   delete this->Internals;
 }
 
@@ -217,22 +216,32 @@ void vtkSMAnimationSceneProxy::SetTimeKeeper(vtkSMTimeKeeperProxy* tkp)
     return;
     }
 
-  this->Internals->TimeStepsLink->RemoveAllLinks();
   if (this->TimeKeeper)
     {
     this->TimeKeeper->GetProperty("TimeRange")->RemoveObserver(
-      this->TimeKeeperObserver);
+      this->TimeRangeObserver);
+    this->TimeKeeper->GetProperty("TimestepValues")->RemoveObserver(
+      this->TimestepValuesObserver);
     }
   vtkSetObjectBodyMacro(TimeKeeper, vtkSMTimeKeeperProxy, tkp);
   if (this->TimeKeeper)
     {
-    this->Internals->TimeStepsLink->AddLinkedProperty(
-      this->TimeKeeper, "TimestepValues", vtkSMLink::INPUT);
-    this->Internals->TimeStepsLink->AddLinkedProperty(
-      this->AnimationPlayer, "TimeSteps", vtkSMLink::OUTPUT);
     this->TimeKeeper->GetProperty("TimeRange")->AddObserver(
-      vtkCommand::ModifiedEvent, this->TimeKeeperObserver);
+      vtkCommand::ModifiedEvent, this->TimeRangeObserver);
+    this->TimeKeeper->GetProperty("TimestepValues")->AddObserver(
+      vtkCommand::ModifiedEvent, this->TimestepValuesObserver);
+
+    this->TimeKeeperTimestepsChanged();
+    this->TimeKeeperTimeRangeChanged();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::TimeKeeperTimestepsChanged()
+{
+  this->AnimationPlayer->GetProperty("TimeSteps")->Copy(
+    this->TimeKeeper->GetProperty("TimestepValues"));
+  this->AnimationPlayer->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

@@ -172,6 +172,25 @@ void pqAnimationScene::updateTimeSteps()
 
   vtkSMProxy* sceneProxy = this->getProxy();
 
+  // Adjust the play mode based on whether or not we have time steps.
+  vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
+  if (timekeeper->getNumberOfTimeStepValues() == 0)
+    {
+    if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
+      == "Snap To TimeSteps" )
+      {
+      pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
+      pqSMAdaptor::setElementProperty(
+        sceneProxy->GetProperty("UseCustomEndTimes"), 1);
+      }
+    }
+  else
+    {
+    pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
+    pqSMAdaptor::setElementProperty(
+      sceneProxy->GetProperty("UseCustomEndTimes"), 0);
+    }
+
   // Update the StartTime and EndTime properties so that GUI shows it correctly
   // every where, unless the user has UseCustomEndTimes set, in which case
   // he's going to manage that on his own.
@@ -185,20 +204,6 @@ void pqAnimationScene::updateTimeSteps()
       sceneProxy->GetProperty("EndTime"), range.second);
     }
 
-  // Adjust the play mode based on whether or not we have time steps.
-  vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
-  if (timekeeper->getNumberOfTimeStepValues() == 0)
-    {
-    if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
-      == "Snap To TimeSteps" )
-      {
-      pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
-      }
-    }
-  else
-    {
-    pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
-    }
   sceneProxy->UpdateVTKObjects();
 
   /// If the animation time is not in the scene time range, set it to the min

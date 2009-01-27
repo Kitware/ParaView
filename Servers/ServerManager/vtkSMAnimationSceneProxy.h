@@ -132,6 +132,7 @@ protected:
   // Description:
   // Called when the timekeeper's time range changes.
   void TimeKeeperTimeRangeChanged();
+  void TimeKeeperTimestepsChanged();
 
   // Description:
   // Check if the current cache size on all processes is within limits.
@@ -159,7 +160,8 @@ private:
   class vtkInternals;
   vtkInternals* Internals;
 
-  vtkCommand* TimeKeeperObserver;
+  vtkCommand* TimeRangeObserver;
+  vtkCommand* TimestepValuesObserver;
 
   class vtkPlayerObserver;
   friend class vtkPlayerObserver;
