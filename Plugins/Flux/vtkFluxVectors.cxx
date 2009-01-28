@@ -45,6 +45,7 @@ inline void vtkFluxVectorsCellDirection(vtkCell *cell, double vec[3])
   points->GetPoint(0, p0);
   points->GetPoint(cell->GetNumberOfPoints()-1, p1);
   for (int j = 0; j < 3; j++) vec[j] = p1[j] - p0[j];
+  vtkMath::Normalize(vec);
 }
 
 // Computes the normal of a 2D cell.
@@ -101,7 +102,7 @@ inline double vtkFluxVectorsCellArea(vtkCell *cell)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkFluxVectors, "1.2");
+vtkCxxRevisionMacro(vtkFluxVectors, "1.3");
 vtkStandardNewMacro(vtkFluxVectors);
 
 //-----------------------------------------------------------------------------
