@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.9");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.10");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -658,7 +658,8 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
 
       // Do not create the label if it is already represented in the min or max
       // label.
-      if ((val > range[0]) && (val < range[1]))
+      if (   (val - 1e-6*MY_ABS(val+range[0]) > range[0])
+          && (val + 1e-6*MY_ABS(val+range[1]) < range[1]))
         {
         labelIdx = this->CreateLabel(val, targetWidth, targetHeight, viewport);
         textMapper = this->LabelMappers[labelIdx];
@@ -815,17 +816,18 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
 
     // "Mute" the color of the tick marks.
     double color[3];
-    this->TickMarksActor->GetProperty()->GetColor(color);
-    vtkMath::RGBToLab(color, color);
-    if (color[0] > 50.0)
+    //this->TickMarksActor->GetProperty()->GetColor(color);
+    this->LabelTextProperty->GetColor(color);
+    vtkMath::RGBToHSV(color, color);
+    if (color[2] > 0.5)
       {
-      color[0] -= 15.0;
+      color[2] -= 0.33;
       }
     else
       {
-      color[0] += 15.0;
+      color[2] += 0.33;
       }
-    vtkMath::LabToRGB(color, color);
+    vtkMath::HSVToRGB(color, color);
     this->TickMarksActor->GetProperty()->SetColor(color);
     }
 }
