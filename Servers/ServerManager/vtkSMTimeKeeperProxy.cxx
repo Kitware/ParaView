@@ -36,7 +36,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMTimeKeeperProxy);
-vtkCxxRevisionMacro(vtkSMTimeKeeperProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMTimeKeeperProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMTimeKeeperProxy::vtkSMTimeKeeperProxy()
 {
@@ -191,7 +191,8 @@ void vtkSMTimeKeeperProxy::UpdateTimeSteps()
 
   if (timerange[0] == VTK_DOUBLE_MAX && timerange[1] == VTK_DOUBLE_MIN)
     {
-    timerange[0] = timerange[1] = 0.0;
+    timerange[0] = 0.0;
+    timerange[1] = 1.0;
     }
 
   vtkSMDoubleVectorProperty::SafeDownCast(

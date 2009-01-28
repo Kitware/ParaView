@@ -154,6 +154,8 @@ void pqAnimationScene::setupTimeTrack()
     this->getProxy()->UpdateVTKObjects();
     }
 
+  QObject::connect(timekeeper, SIGNAL(timeStepsChanged()),
+    this, SLOT(updateTimeSteps()));
   QObject::connect(timekeeper, SIGNAL(timeRangeChanged()),
     this, SLOT(updateTimeSteps()));
   this->updateTimeSteps();

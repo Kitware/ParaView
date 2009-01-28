@@ -371,6 +371,17 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     loader->GetProxyLocator()->Clear();
     }
   pqEventDispatcher::processEventsAndWait(1);
+
+  // This is essential since it's possible that the AnimationTime property on
+  // the scenes gets pushed before StartTime and EndTime and as a consequence
+  // the scene may not even result in the animation time being set as expected.
+  QList<pqAnimationScene*> scenes = 
+    this->getServerManagerModel()->findItems<pqAnimationScene*>();
+  foreach (pqAnimationScene* scene, scenes)
+    {
+    scene->getProxy()->UpdateProperty("AnimationTime", 1);
+    }
+
   this->render();
   this->LoadingState = false;
   emit this->stateLoaded();
