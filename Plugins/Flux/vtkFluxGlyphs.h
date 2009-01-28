@@ -47,12 +47,31 @@ public:
   // to set the array used as the input flux or circulation.  The
   // fieldAttributeType comes from the vtkDataSetAttributes::AttributeTypes
   // enum.
-  virtual void SetInputArray(const char *name);
-  virtual void SetInputArray(int fieldAttributeType);
+  virtual void SetInputFlux(const char *name);
+  virtual void SetInputFlux(int fieldAttributeType);
+
+  // Description:
+  // If off (the default), then the input array is taken to be the total flux
+  // or circulation through each element.  If on, then the input array is taken
+  // to be the density of the flux or circulation.
+  vtkGetMacro(InputFluxIsDensity, int);
+  vtkSetMacro(InputFluxIsDensity, int);
+  vtkBooleanMacro(InputFluxIsDensity, int);
+
+  // Description:
+  // If off (the default), then the glyphs are scaled by the total flux or
+  // circulation through each element.  If on, then the glyphs are scaled by the
+  // flux or circulation density.
+  vtkGetMacro(ScaleByDensity, int);
+  vtkSetMacro(ScaleByDensity, int);
+  vtkBooleanMacro(ScaleByDensity, int);
 
 protected:
   vtkFluxGlyphs();
   ~vtkFluxGlyphs();
+
+  int InputFluxIsDensity;
+  int ScaleByDensity;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
 
@@ -61,10 +80,13 @@ protected:
                           vtkInformationVector *outputVector);
 
 //BTX
-  virtual vtkSmartPointer<vtkDataSet> MakeFluxVectors(vtkDataSet *input);
-  virtual vtkSmartPointer<vtkDataArray> MakeGlyphScaleFactors(vtkDataSet*input);
+  virtual void MakeFluxVectors(vtkSmartPointer<vtkDataSet> &input,
+                               vtkSmartPointer<vtkDataArray> &inputArray);
+  virtual vtkSmartPointer<vtkDataArray> MakeGlyphScaleFactors(
+                                                      vtkDataSet *input,
+                                                      vtkDataArray *inputArray);
   virtual vtkSmartPointer<vtkPolyData> MakeGlyphs(vtkDataSet *input,
-                                                  vtkDataArray *scaleFactors);
+                                                  vtkDataArray *inputArray);
 //ETX
 
 private:

@@ -45,12 +45,47 @@ public:
   // These are basically a convenience method that calls SetInputArrayToProcess
   // to set the array used as the input scalars.  The fieldAttributeType comes
   // from the vtkDataSetAttributes::AttributeTypes enum.
-  virtual void SetInputArray(const char *name);
-  virtual void SetInputArray(int fieldAttributeType);
+  virtual void SetInputFlux(const char *name);
+  virtual void SetInputFlux(int fieldAttributeType);
+
+  // Description:
+  // If off (the default), then the input array is taken to be the total flux
+  // or circulation through each element.  If on, then the input array is taken
+  // to be the density of the flux or circulation.
+  vtkGetMacro(InputFluxIsDensity, int);
+  vtkSetMacro(InputFluxIsDensity, int);
+  vtkBooleanMacro(InputFluxIsDensity, int);
+
+  // Description:
+  // Set the name assigned to the total or density of flux output array.  If
+  // the string is NULL or empty, then the output names are taken from the
+  // input flux array.
+  vtkSetStringMacro(OutputFluxTotalName);
+  vtkSetStringMacro(OutputFluxDensityName);
+
+  // Description:
+  // Given the current (or specified) input and current state of this filter,
+  // returns the name actually assigned to the total or density of flux output
+  // array.  The returned string is not guaranteed to be equal to array names
+  // created from the last call to Update, but will be the same if neither the
+  // input or state of this filter changes.  This method is NOT thread safe.
+  const char *GetOutputFluxTotalName() {
+    return this->GetOutputFluxTotalName(this->GetInput());
+  }
+  const char *GetOutputFluxDensityName() {
+    return this->GetOutputFluxDensityName(this->GetInput());
+  }
+  virtual const char *GetOutputFluxTotalName(vtkDataObject *input);
+  virtual const char *GetOutputFluxDensityName(vtkDataObject *input);
 
 protected:
   vtkFluxVectors();
   ~vtkFluxVectors();
+
+  int InputFluxIsDensity;
+
+  char *OutputFluxTotalName;
+  char *OutputFluxDensityName;
 
   virtual int RequestData(vtkInformation *request,
                           vtkInformationVector **inputVector,

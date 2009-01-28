@@ -51,8 +51,8 @@ public:
   // These are basically a convenience method that calls SetInputArrayToProcess
   // to set the array used as the input scalars.  The fieldAttributeType comes
   // from the vtkDataSetAttributes::AttributeTypes enum.
-  virtual void SetInputArray(const char *name);
-  virtual void SetInputArray(int fieldAttributeType);
+  virtual void SetInputCirculation(const char *name);
+  virtual void SetInputCirculation(int fieldAttributeType);
 
 protected:
   vtkCirculationFeatures();

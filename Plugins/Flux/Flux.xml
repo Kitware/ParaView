@@ -23,9 +23,6 @@
         <InputArrayDomain name="input_array"
                           attribute_type="cell"
                           number_of_components="1">
-          <RequiredProperties>
-            <Property name="SelectInputScalars" function="FieldDataSelection"/>
-          </RequiredProperties>
         </InputArrayDomain>
         <Documentation>
           The input to the filter.
@@ -54,6 +51,19 @@
           circulation is moving.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="InputFluxIsDensity"
+                         command="SetInputFluxIsDensity"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Input Flux Is Density">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If off, then the input array is taken to be the total flux or
+          circulation through each element.  If on, then the input array is
+          taken to be the density of the flux or circulation.
+        </Documentation>
+      </IntVectorProperty>
     </SourceProxy> <!-- Flux Vectors -->
 
     <SourceProxy name="FluxGlyphs" class="vtkFluxGlyphs" label="Flux Glyphs">
@@ -75,9 +85,6 @@
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           attribute_type="cell">
-<!--          <RequiredProperties>
-            <Property name="SelectInputScalars" function="FieldDataSelection"/>
-          </RequiredProperties> -->
         </InputArrayDomain>
         <Documentation>
           The input to the filter.
@@ -106,6 +113,32 @@
           the direction the flow or circulation is moving.
         </Documentation>
       </StringVectorProperty>
+
+      <IntVectorProperty name="InputFluxIsDensity"
+                         command="SetInputFluxIsDensity"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Input Flux Is Density">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If off, then the input array is taken to be the total flux or
+          circulation through each element.  If on, then the input array is
+          taken to be the density of the flux or circulation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScaleByDenisty"
+                         command="SetScaleByDensity"
+                         number_of_elements="1"
+                         default_values="0"
+                         label="Scale By Density">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If off, then the glyphs are scaled by the total flux or
+          circulation through each element.  If on, then the glyphs are
+          scaled by the flux or circulation density.
+        </Documentation>
+      </IntVectorProperty>
     </SourceProxy> <!-- Flux Glyphs -->
 
     <SourceProxy name="CirculationFeatures" class="vtkCirculationFeatures"
@@ -132,9 +165,6 @@
         </DataTypeDomain>
         <InputArrayDomain name="input_array"
                           attribute_type="cell">
-          <RequiredProperties>
-            <Property name="SelectInputScalars" function="FieldDataSelection"/>
-          </RequiredProperties>
         </InputArrayDomain>
         <Documentation>
           The input to the filter.
