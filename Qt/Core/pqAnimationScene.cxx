@@ -191,11 +191,11 @@ void pqAnimationScene::updateTimeSteps()
       sceneProxy->GetProperty("UseCustomEndTimes"), 0);
     }
 
-  // Update the StartTime and EndTime properties so that GUI shows it correctly
-  // every where, unless the user has UseCustomEndTimes set, in which case
-  // he's going to manage that on his own.
-  if (pqSMAdaptor::getElementProperty(
-      sceneProxy->GetProperty("UseCustomEndTimes")).toBool() == false)
+  bool disable_automatic =
+    pqSMAdaptor::getElementProperty(
+      sceneProxy->GetProperty("DisableAutomaticTimeAdjustment")).toBool();
+
+  if (!disable_automatic)
     {
     QPair<double, double> range = timekeeper->getTimeRange();
     pqSMAdaptor::setElementProperty(

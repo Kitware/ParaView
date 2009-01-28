@@ -855,6 +855,20 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty name="DisableAutomaticTimeAdjustment"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          This is a no-op property. It is set by the GUI with the user manually
+          changes the UseCustomEndTimes, StartTime and EndTime properties.
+          If that's done, then the GUI will no longer adjust start time/end
+          time when data sets are loaded or new timesteps are available etc.
+          (Look at pqAnimationScene for details on how this property affects the
+          GUI)
+        </Documentation>
+      </IntVectorProperty>
+
       <IntVectorProperty name="Caching"
         command="SetCaching"
         number_of_elements="1"
