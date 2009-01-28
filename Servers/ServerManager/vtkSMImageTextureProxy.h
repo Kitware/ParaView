@@ -23,12 +23,18 @@
 
 #include "vtkSMSourceProxy.h"
 
+class vtkImageData;
+
 class VTK_EXPORT vtkSMImageTextureProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMImageTextureProxy* New();
   vtkTypeRevisionMacro(vtkSMImageTextureProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Returns the client side image if one has been loaded successfully.
+  vtkImageData* GetLoadedImage();
 
 //BTX
 protected:

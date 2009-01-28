@@ -14,11 +14,15 @@
 =========================================================================*/
 #include "vtkSMImageTextureProxy.h"
 
+#include "vtkAlgorithm.h"
+#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
-#include "vtkClientServerStream.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkImageData.h"
+
 vtkStandardNewMacro(vtkSMImageTextureProxy);
-vtkCxxRevisionMacro(vtkSMImageTextureProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMImageTextureProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMImageTextureProxy::vtkSMImageTextureProxy()
 {
@@ -53,6 +57,15 @@ void vtkSMImageTextureProxy::CreateVTKObjects()
           << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
     this->Servers, stream);
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkSMImageTextureProxy::GetLoadedImage()
+{
+  vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Source"))->UpdatePipeline();
+  vtkAlgorithm* source = vtkAlgorithm::SafeDownCast(
+    this->GetSubProxy("Source")->GetClientSideObject());
+  return source? vtkImageData::SafeDownCast(source->GetOutputDataObject(0)): 0;
 }
 
 //----------------------------------------------------------------------------
