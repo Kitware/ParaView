@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartAxis.h"
 #include "vtkQtChartAxisLayer.h"
 #include "vtkQtChartAxisModel.h"
+#include "vtkQtChartContentsSpace.h"
+#include "vtkQtChartInteractorSetup.h"
 #include "vtkQtChartWidget.h"
 #include "vtkQtChartSeriesModelCollection.h"
 #include "vtkQtChartTableRepresentation.h"
@@ -98,6 +100,19 @@ pqBarChartView::pqBarChartView(
   QObject::connect(
     this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
     this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
+
+  // Set up the paraview style interactor.
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartMouseSelection* selector =
+    vtkQtChartInteractorSetup::createSplitZoom(area);
+  this->Internal->BarChartView->AddChartSelectionHandlers(selector);
+
+  // Set up the view undo/redo.
+  vtkQtChartContentsSpace *contents = area->getContentsSpace();
+  this->connect(contents, SIGNAL(historyPreviousAvailabilityChanged(bool)),
+    this, SIGNAL(canUndoChanged(bool)));
+  this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
+    this, SIGNAL(canRedoChanged(bool)));
 
   // Listen for title property changes.
   this->Internal->VTKConnect->Connect(
@@ -377,6 +392,34 @@ void pqBarChartView::updateRepresentationVisibility(
     }
 
   this->Internal->BarChartView->Update();
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartView::undo()
+{
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  area->getContentsSpace()->historyPrevious();
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartView::redo()
+{
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  area->getContentsSpace()->historyNext();
+}
+
+//-----------------------------------------------------------------------------
+bool pqBarChartView::canUndo() const
+{
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  return area->getContentsSpace()->isHistoryPreviousAvailable();
+}
+
+//-----------------------------------------------------------------------------
+bool pqBarChartView::canRedo() const
+{
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  return area->getContentsSpace()->isHistoryNextAvailable();
 }
 
 //-----------------------------------------------------------------------------

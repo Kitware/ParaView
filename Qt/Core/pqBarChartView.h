@@ -71,7 +71,21 @@ public:
     { return 0; }
   virtual vtkImageData* captureImage(const QSize& asize)
     { return this->Superclass::captureImage(asize); } 
-  
+
+  virtual bool supportsUndo() const {return true;}
+
+  /// Called to undo interaction.
+  virtual void undo();
+
+  /// Called to redo interaction.
+  virtual void redo();
+
+  /// Returns true if undo can be done.
+  virtual bool canUndo() const;
+
+  /// Returns true if redo can be done.
+  virtual bool canRedo() const;
+
   /// 
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
