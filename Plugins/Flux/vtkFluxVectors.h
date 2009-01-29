@@ -50,8 +50,8 @@ public:
 
   // Description:
   // If off (the default), then the input array is taken to be the total flux
-  // or circulation through each element.  If on, then the input array is taken
-  // to be the density of the flux or circulation.
+  // through or or circulation along each element.  If on, then the input array
+  // is taken to be the density of the flux or circulation.
   vtkGetMacro(InputFluxIsDensity, int);
   vtkSetMacro(InputFluxIsDensity, int);
   vtkBooleanMacro(InputFluxIsDensity, int);

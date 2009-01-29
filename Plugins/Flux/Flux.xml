@@ -46,7 +46,7 @@
         </FieldDataDomain>
         <Documentation>
           The name of the scalar array that represents flux through a 2D
-          element or circulation through a 1D element.  This array will be
+          element or circulation along a 1D element.  This array will be
           converted to a vector pointing in the direction the flow or
           circulation is moving.
         </Documentation>
@@ -59,9 +59,9 @@
                          label="Input Flux Is Density">
         <BooleanDomain name="bool" />
         <Documentation>
-          If off, then the input array is taken to be the total flux or
-          circulation through each element.  If on, then the input array is
-          taken to be the density of the flux or circulation.
+          If off, then the input array is taken to be the total flux
+          through or circulation along each element.  If on, then the input
+          array is taken to be the density of the flux or circulation.
         </Documentation>
       </IntVectorProperty>
     </SourceProxy> <!-- Flux Vectors -->
@@ -108,7 +108,7 @@
         </FieldDataDomain>
         <Documentation>
           The name of the scalar or vector array that represents flux
-          through a 2D element or circulation through a 1D element.  If
+          through a 2D element or circulation along a 1D element.  If
           necessary, this array will be converted to a vector pointing in
           the direction the flow or circulation is moving.
         </Documentation>
@@ -121,9 +121,9 @@
                          label="Input Flux Is Density">
         <BooleanDomain name="bool" />
         <Documentation>
-          If off, then the input array is taken to be the total flux or
-          circulation through each element.  If on, then the input array is
-          taken to be the density of the flux or circulation.
+          If off, then the input array is taken to be the total flux
+          through or circulation along each element.  If on, then the input
+          array is taken to be the density of the flux or circulation.
         </Documentation>
       </IntVectorProperty>
 
@@ -134,8 +134,8 @@
                          label="Scale By Density">
         <BooleanDomain name="bool" />
         <Documentation>
-          If off, then the glyphs are scaled by the total flux or
-          circulation through each element.  If on, then the glyphs are
+          If off, then the glyphs are scaled by the total flux through or
+          circulation along each element.  If on, then the glyphs are
           scaled by the flux or circulation density.
         </Documentation>
       </IntVectorProperty>
@@ -187,7 +187,7 @@
           </RequiredProperties>
         </FieldDataDomain>
         <Documentation>
-          The name of the array that represents circulation through a 1D
+          The name of the array that represents circulation along a 1D
           element.  This array can be either a scalar (in which case it
           points in the direction of the line element) or a vector.
         </Documentation>

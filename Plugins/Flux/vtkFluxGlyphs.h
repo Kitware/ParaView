@@ -52,16 +52,16 @@ public:
 
   // Description:
   // If off (the default), then the input array is taken to be the total flux
-  // or circulation through each element.  If on, then the input array is taken
-  // to be the density of the flux or circulation.
+  // through or circulation along each element.  If on, then the input array is
+  // taken to be the density of the flux or circulation.
   vtkGetMacro(InputFluxIsDensity, int);
   vtkSetMacro(InputFluxIsDensity, int);
   vtkBooleanMacro(InputFluxIsDensity, int);
 
   // Description:
-  // If off (the default), then the glyphs are scaled by the total flux or
-  // circulation through each element.  If on, then the glyphs are scaled by the
-  // flux or circulation density.
+  // If off (the default), then the glyphs are scaled by the total flux through
+  // or circulation along each element.  If on, then the glyphs are scaled by
+  // the flux or circulation density.
   vtkGetMacro(ScaleByDensity, int);
   vtkSetMacro(ScaleByDensity, int);
   vtkBooleanMacro(ScaleByDensity, int);
