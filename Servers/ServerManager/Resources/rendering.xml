@@ -1060,6 +1060,14 @@
           <Property name="SourceProcess" />
         </ExposedProperties>
       </SubProxy>
+      <IntVectorProperty
+        name="RestrictPowerOf2ImageSmaller"
+        command="SetRestrictPowerOf2ImageSmaller"
+        number_of_elements="1"
+        default_values="0"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </ImageTextureProxy>
   </ProxyGroup>
 

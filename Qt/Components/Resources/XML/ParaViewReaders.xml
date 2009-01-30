@@ -153,6 +153,11 @@
           file_description="PNG Image Files">
   </Reader>
 
+  <Reader name="TIFFReader"
+          extensions="tif"
+          file_description="TIFF Image Files">
+  </Reader>
+
   <Reader name="PhastaReader"
           extensions="pht"
           file_description="Phasta Files">
