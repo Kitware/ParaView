@@ -211,6 +211,20 @@ pqBarChartView::pqBarChartView(
       viewModule->GetProperty("TopAxisLabels"), vtkCommand::ModifiedEvent,
       this, SLOT(updateTopAxisLabels()));
 
+  // Listen for bar chart property changes.
+  this->Internal->VTKConnect->Connect(
+      viewModule->GetProperty("HelpFormat"), vtkCommand::ModifiedEvent,
+      this, SLOT(updateHelpFormat()));
+  this->Internal->VTKConnect->Connect(
+      viewModule->GetProperty("OutlineStyle"), vtkCommand::ModifiedEvent,
+      this, SLOT(updateOutlineStyle()));
+  this->Internal->VTKConnect->Connect(
+      viewModule->GetProperty("GroupFraction"), vtkCommand::ModifiedEvent,
+      this, SLOT(updateGroupFraction()));
+  this->Internal->VTKConnect->Connect(
+      viewModule->GetProperty("WidthFraction"), vtkCommand::ModifiedEvent,
+      this, SLOT(updateWidthFraction()));
+
   // Add the current Representations to the chart.
   QList<pqRepresentation*> currentRepresentations = this->getRepresentations();
   foreach(pqRepresentation* rep, currentRepresentations)
@@ -302,6 +316,9 @@ void pqBarChartView::setDefaultPropertyValues()
       proxy->GetProperty("AxisLabelFont"), values);
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisTitleFont"), values);
+
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"),
+      QVariant("%s: %1, %2"));
 }
 
 //-----------------------------------------------------------------------------
@@ -772,5 +789,32 @@ void pqBarChartView::updateTopAxisLabels()
 
     model->finishModifyingData();
     }
+}
+
+void pqBarChartView::updateHelpFormat()
+{
+  this->Internal->BarChartView->SetHelpFormat(pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("HelpFormat")).toString().toAscii().data());
+}
+
+void pqBarChartView::updateOutlineStyle()
+{
+  this->Internal->BarChartView->SetOutlineStyle(
+    pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("OutlineStyle")).toInt());
+}
+
+void pqBarChartView::updateGroupFraction()
+{
+  this->Internal->BarChartView->SetBarGroupFraction(
+    (float)pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("GroupFraction")).toDouble());
+}
+
+void pqBarChartView::updateWidthFraction()
+{
+  this->Internal->BarChartView->SetBarWidthFraction(
+    (float)pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("WidthFraction")).toDouble());
 }
 

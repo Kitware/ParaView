@@ -3738,6 +3738,32 @@
         <IntRangeDomain name="range" min="0" max="2" />
       </IntVectorProperty>
 
+      <StringVectorProperty
+        name="HelpFormat"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty
+        name="OutlineStyle"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" max="1" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="GroupFraction"
+        number_of_elements="1"
+        default_values="0.7">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="WidthFraction"
+        number_of_elements="1"
+        default_values="0.8">
+        <DoubleRangeDomain name="range" min="0" max="1" />
+      </DoubleVectorProperty>
+
       <!-- End of BarChartView2 -->
     </ViewProxy>
 

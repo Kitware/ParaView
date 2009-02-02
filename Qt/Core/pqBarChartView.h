@@ -131,6 +131,11 @@ protected slots:
   void updateBottomAxisLabels();
   void updateRightAxisLabels();
   void updateTopAxisLabels();
+
+  void updateHelpFormat();
+  void updateOutlineStyle();
+  void updateGroupFraction();
+  void updateWidthFraction();
   
 private:
   pqBarChartView(const pqBarChartView&); // Not implemented.
