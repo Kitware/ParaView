@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOptionsContainer.h
+   Module:    pqBarChartOptionsEditor.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,61 +30,53 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqOptionsContainer.h
-/// \date 7/20/2007
-
-#ifndef _pqOptionsContainer_h
-#define _pqOptionsContainer_h
-
+#ifndef _pqBarChartOptionsEditor_h
+#define _pqBarChartOptionsEditor_h
 
 #include "pqComponentsExport.h"
 #include "pqOptionsPage.h"
+#include "vtkQtBarChartOptions.h" // needed for enum
+
+class pqBarChartOptionsEditorForm;
+class QString;
 
 
-/// \class pqOptionsContainer
-/// \brief
-///   The pqOptionsContainer class is used to add multiple pages of
-///   options to the pqOptionsDialog.
-///
-/// Grouping the options pages into container objects can make is
-/// easier to maintain a set of options. The container makes it
-/// possible to reuse a UI form. If several objects have the same
-/// properties, the same page can be used for each of the objects.
-class PQCOMPONENTS_EXPORT pqOptionsContainer : public pqOptionsPage
+class PQCOMPONENTS_EXPORT pqBarChartOptionsEditor : public pqOptionsPage
 {
   Q_OBJECT
 
 public:
   /// \brief
-  ///   Constructs an options container.
+  ///   Constructs a bar chart options page.
   /// \param parent The parent widget.
-  pqOptionsContainer(QWidget *parent=0);
-  virtual ~pqOptionsContainer();
+  pqBarChartOptionsEditor(QWidget *parent=0);
+  virtual ~pqBarChartOptionsEditor();
 
-  /// \brief
-  ///   Gets the page path prefix.
-  /// \return
-  ///   The page path prefix.
-  const QString &getPagePrefix() const;
+  void getHelpFormat(QString &format) const;
+  void setHelpFormat(const QString &format);
 
-  /// \brief
-  ///   Sets the page path prefix.
-  /// \param prefix The new page path prefix.
-  void setPagePrefix(const QString &prefix);
+  vtkQtBarChartOptions::OutlineStyle getOutlineStyle() const;
+  void setOutlineStyle(vtkQtBarChartOptions::OutlineStyle outline);
 
-  /// \brief
-  ///   Sets the currently displayed page.
-  /// \param page The page hierarchy name.
-  virtual void setPage(const QString &page) = 0;
-  
-  /// \brief
-  ///   Gets the list of available pages in the container.
-  /// \param pages Used to return the list of available pages.
-  virtual QStringList getPageList() = 0;
+  float getBarGroupFraction() const;
+  void setBarGroupFraction(float fraction);
+
+  float getBarWidthFraction() const;
+  void setBarWidthFraction(float fraction);
+
+signals:
+  void helpFormatChanged(const QString &format);
+  void outlineStyleChanged(vtkQtBarChartOptions::OutlineStyle outline);
+  void barGroupFractionChanged(float fraction);
+  void barWidthFractionChanged(float fraction);
+
+private slots:
+  void convertOutlineStyle(int index);
+  void convertGroupFraction(double fraction);
+  void convertWidthFraction(double fraction);
 
 private:
-  QString *Prefix; ///< Stores the page prefix.
+  pqBarChartOptionsEditorForm *Form; ///< Stores the UI data.
 };
 
 #endif
-

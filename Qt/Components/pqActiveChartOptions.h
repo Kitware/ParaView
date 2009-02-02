@@ -40,7 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqActiveViewOptions.h"
 
-class pqActiveChartOptionsInternal;
+class pqBarChartOptionsHandler;
+class pqChartOptionsHandler;
 class pqOptionsDialog;
 
 
@@ -83,6 +84,9 @@ private slots:
   /// Cleans up the options dialog data in case it is deleted.
   void cleanupDialog();
 
+  void openUndoSet();
+  void closeUndoSet();
+
   void setTitleModified();
   void setTitleFontModified();
   void setTitleColorModified();
@@ -110,9 +114,15 @@ private slots:
   void setAxisTitleColorModified();
   void setAxisTitleAlignmentModified();
 
+  void setBarHelpFormatModified();
+  void setBarOutlineStyleModified();
+  void setBarGroupFractionModified();
+  void setBarWidthFractionModified();
+
 private:
-  pqActiveChartOptionsInternal *Internal; ///< Handles the modified data.
-  pqOptionsDialog *Dialog;                ///< Stores the dialog.
+  pqChartOptionsHandler *Chart;       ///< Handles the base chart options.
+  pqBarChartOptionsHandler *BarChart; ///< Handles the bar chart options.
+  pqOptionsDialog *Dialog;            ///< Stores the dialog.
 };
 
 #endif

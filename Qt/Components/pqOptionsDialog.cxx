@@ -388,17 +388,21 @@ void pqOptionsDialog::setApplyNeeded(bool applyNeeded)
     }
 }
 
-void pqOptionsDialog::addOptions(pqOptionsContainer *options)
+void pqOptionsDialog::addOptions(const QString &path, pqOptionsPage *options)
 {
   if(!options)
     {
     return;
     }
 
-  // Get the list of pages from the container.
-  QStringList pathList = options->getPageList();
+  // See if the page is a container.
+  pqOptionsContainer *container = qobject_cast<pqOptionsContainer *>(options);
+  if(!container && path.isEmpty())
+    {
+    return;
+    }
 
-  // See if the container uses the apply button.
+  // See if the page/container uses the apply button.
   if(options->isApplyUsed())
     {
     this->Form->ApplyUseCount++;
@@ -416,14 +420,38 @@ void pqOptionsDialog::addOptions(pqOptionsContainer *options)
   // Add the widget to the stack.
   this->Form->Stack->addWidget(options);
 
-  QStringList names;
-  QStringList::Iterator iter = pathList.begin();
-  for( ; iter != pathList.end(); ++iter)
+  // Add the page(s) to the map and the model.
+  if(container)
     {
-    // Add the path to the map and the model.
-    this->Form->Pages.insert(*iter, options);
-    this->Form->Model->addPath(*iter);
+    // If the path is not empty, use it as the page prefix.
+    QString prefix;
+    if(!path.isEmpty())
+      {
+      prefix = path;
+      prefix.append(".");
+      }
+
+    container->setPagePrefix(prefix);
+
+    // Get the list of pages from the container.
+    QStringList pathList = container->getPageList();
+    QStringList::Iterator iter = pathList.begin();
+    for( ; iter != pathList.end(); ++iter)
+      {
+      this->Form->Pages.insert(prefix + *iter, options);
+      this->Form->Model->addPath(prefix + *iter);
+      }
     }
+  else
+    {
+    this->Form->Pages.insert(path, options);
+    this->Form->Model->addPath(path);
+    }
+}
+
+void pqOptionsDialog::addOptions(pqOptionsContainer *options)
+{
+  this->addOptions(QString(), options);
 }
 
 void pqOptionsDialog::removeOptions(pqOptionsPage *options)
@@ -503,6 +531,7 @@ void pqOptionsDialog::applyChanges()
 {
   if(this->Form->ApplyNeeded)
     {
+    emit this->aboutToApplyChanges();
     QMap<QString, pqOptionsPage *>::Iterator iter = this->Form->Pages.begin();
     for( ; iter != this->Form->Pages.end(); ++iter)
       {
@@ -510,6 +539,7 @@ void pqOptionsDialog::applyChanges()
       }
 
     this->setApplyNeeded(false);
+    emit this->appliedChanges();
     }
 }
 
@@ -546,6 +576,14 @@ void pqOptionsDialog::changeCurrentPage()
     pqOptionsContainer *container = qobject_cast<pqOptionsContainer *>(*iter);
     if(container)
       {
+      // Get the path prefix from the container.
+      QString prefix = container->getPagePrefix();
+      if(!prefix.isEmpty())
+        {
+        // Remove the prefix from the path.
+        path.remove(0, prefix.length());
+        }
+
       // Set the page on the container object.
       container->setPage(path);
       }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqOptionsContainer.cxx
+   Module:    pqBarChartOptionsHandler.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqOptionsContainer.cxx
-/// \date 7/20/2007
+#ifndef _pqBarChartOptionsHandler_h
+#define _pqBarChartOptionsHandler_h
 
-#include "pqOptionsContainer.h"
+#include "pqComponentsExport.h"
+#include "pqOptionsPage.h"
+
+class pqBarChartOptionsEditor;
+class pqView;
 
 
-pqOptionsContainer::pqOptionsContainer(QWidget *widgetParent)
-  : pqOptionsPage(widgetParent)
+class PQCOMPONENTS_EXPORT pqBarChartOptionsHandler :
+  public pqOptionsPageApplyHandler
 {
-  this->Prefix = new QString();
-}
+public:
+  enum ModifiedFlag
+    {
+    HelpFormatModified = 0x00000001,
+    OutlineStyleModified = 0x00000002,
+    GroupFractionModified = 0x00000004,
+    WidthFractionModified = 0x00000008
+    };
 
-pqOptionsContainer::~pqOptionsContainer()
-{
-  delete this->Prefix;
-}
+public:
+  pqBarChartOptionsHandler();
+  virtual ~pqBarChartOptionsHandler() {}
 
-const QString &pqOptionsContainer::getPagePrefix() const
-{
-  return *this->Prefix;
-}
+  pqBarChartOptionsEditor *getOptions() const {return this->Options;}
+  void setOptions(pqBarChartOptionsEditor *options);
 
-void pqOptionsContainer::setPagePrefix(const QString &prefix)
-{
-  *this->Prefix = prefix;
-}
+  pqView *getView() const {return this->View;}
+  void setView(pqView *chart);
 
+  void setModified(ModifiedFlag flag);
 
+  virtual void applyChanges();
+  virtual void resetChanges();
+
+private:
+  void initializeOptions();
+
+private:
+  unsigned int ModifiedData;
+  pqBarChartOptionsEditor *Options;
+  pqView *View;
+};
+
+#endif

@@ -72,7 +72,15 @@ public:
   /// \param applyNeeded True if there are changes to apply.
   void setApplyNeeded(bool applyNeeded);
 
-  //void addOptions(const QString &path, pqOptionsPage *options);
+  /// \brief
+  ///   Adds a page to the options dialog.
+  ///
+  /// When the options object is a page container, the path parameter
+  /// becomes the path prefix for the container pages.
+  ///
+  /// \param path The name hierarchy for the options page.
+  /// \param options The options page.
+  void addOptions(const QString &path, pqOptionsPage *options);
 
   /// \brief
   ///   Adds a container to the options dialog.
@@ -103,6 +111,13 @@ public slots:
 
   /// Calls each page to reset any changes.
   void resetChanges();
+
+signals:
+  /// Emitted before the option changes are applied.
+  void aboutToApplyChanges();
+
+  /// Emitted after the option changes have been applied.
+  void appliedChanges();
 
 private slots:
   /// Changes the current page to match the user selection.
