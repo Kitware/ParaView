@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkFluxGlyphs.h
+  Module:    vtkMomentGlyphs.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -18,7 +18,7 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-// .NAME vtkFluxGlyphs - Create arrow glyphs representing flux or circulation.
+// .NAME vtkMomentGlyphs - Create arrow glyphs representing flux or circulation.
 //
 // .SECTION Description
 //
@@ -28,18 +28,18 @@
 // the flow.
 //
 
-#ifndef __vtkFluxGlyphs_h
-#define __vtkFluxGlyphs_h
+#ifndef __vtkMomentGlyphs_h
+#define __vtkMomentGlyphs_h
 
 #include "vtkPolyDataAlgorithm.h"
 
 #include "vtkSmartPointer.h"    // For internal methods.
 
-class vtkFluxGlyphs : public vtkPolyDataAlgorithm
+class vtkMomentGlyphs : public vtkPolyDataAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkFluxGlyphs, vtkPolyDataAlgorithm);
-  static vtkFluxGlyphs *New();
+  vtkTypeRevisionMacro(vtkMomentGlyphs, vtkPolyDataAlgorithm);
+  static vtkMomentGlyphs *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -47,16 +47,16 @@ public:
   // to set the array used as the input flux or circulation.  The
   // fieldAttributeType comes from the vtkDataSetAttributes::AttributeTypes
   // enum.
-  virtual void SetInputFlux(const char *name);
-  virtual void SetInputFlux(int fieldAttributeType);
+  virtual void SetInputMoment(const char *name);
+  virtual void SetInputMoment(int fieldAttributeType);
 
   // Description:
   // If off (the default), then the input array is taken to be the total flux
   // through or circulation along each element.  If on, then the input array is
   // taken to be the density of the flux or circulation.
-  vtkGetMacro(InputFluxIsDensity, int);
-  vtkSetMacro(InputFluxIsDensity, int);
-  vtkBooleanMacro(InputFluxIsDensity, int);
+  vtkGetMacro(InputMomentIsDensity, int);
+  vtkSetMacro(InputMomentIsDensity, int);
+  vtkBooleanMacro(InputMomentIsDensity, int);
 
   // Description:
   // If off (the default), then the glyphs are scaled by the total flux through
@@ -67,10 +67,10 @@ public:
   vtkBooleanMacro(ScaleByDensity, int);
 
 protected:
-  vtkFluxGlyphs();
-  ~vtkFluxGlyphs();
+  vtkMomentGlyphs();
+  ~vtkMomentGlyphs();
 
-  int InputFluxIsDensity;
+  int InputMomentIsDensity;
   int ScaleByDensity;
 
   virtual int FillInputPortInformation(int port, vtkInformation *info);
@@ -80,8 +80,8 @@ protected:
                           vtkInformationVector *outputVector);
 
 //BTX
-  virtual void MakeFluxVectors(vtkSmartPointer<vtkDataSet> &input,
-                               vtkSmartPointer<vtkDataArray> &inputArray);
+  virtual void MakeMomentVectors(vtkSmartPointer<vtkDataSet> &input,
+                                 vtkSmartPointer<vtkDataArray> &inputArray);
   virtual vtkSmartPointer<vtkDataArray> MakeGlyphScaleFactors(
                                                       vtkDataSet *input,
                                                       vtkDataArray *inputArray);
@@ -90,8 +90,8 @@ protected:
 //ETX
 
 private:
-  vtkFluxGlyphs(const vtkFluxGlyphs &);         // Not implemented
-  void operator=(const vtkFluxGlyphs &);        // Not implemented
+  vtkMomentGlyphs(const vtkMomentGlyphs &);         // Not implemented
+  void operator=(const vtkMomentGlyphs &);          // Not implemented
 };
 
-#endif //__vtkFluxGlyphs_h
+#endif //__vtkMomentGlyphs_h

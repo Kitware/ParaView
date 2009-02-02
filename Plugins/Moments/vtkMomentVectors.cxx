@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkFluxVectors.cxx
+  Module:    vtkMomentVectors.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -18,7 +18,7 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-#include "vtkFluxVectors.h"
+#include "vtkMomentVectors.h"
 
 #include "vtkCellData.h"
 #include "vtkDataSet.h"
@@ -38,7 +38,7 @@
 
 //=============================================================================
 // Computes the direction of a 1D cell.
-inline void vtkFluxVectorsCellDirection(vtkCell *cell, double vec[3])
+inline void vtkMomentVectorsCellDirection(vtkCell *cell, double vec[3])
 {
   double p0[3], p1[3];
   vtkPoints *points = cell->GetPoints();
@@ -49,7 +49,7 @@ inline void vtkFluxVectorsCellDirection(vtkCell *cell, double vec[3])
 }
 
 // Computes the normal of a 2D cell.
-inline void vtkFluxVectorsCellNormal(vtkCell *cell, double vec[3])
+inline void vtkMomentVectorsCellNormal(vtkCell *cell, double vec[3])
 {
   double p0[3], p1[3], p2[3], v0[3], v1[3];
   vtkPoints *points = cell->GetPoints();
@@ -65,7 +65,7 @@ inline void vtkFluxVectorsCellNormal(vtkCell *cell, double vec[3])
 
 //-----------------------------------------------------------------------------
 // Computes the length of a 1D cell (only accurate for 1 segment cells).
-inline double vtkFluxVectorsCellLength(vtkCell *cell)
+inline double vtkMomentVectorsCellLength(vtkCell *cell)
 {
   vtkPoints *points = cell->GetPoints();
   double p0[3], p1[3];
@@ -75,7 +75,7 @@ inline double vtkFluxVectorsCellLength(vtkCell *cell)
 }
 
 // Computes the area of a 2D cell.
-inline double vtkFluxVectorsCellArea(vtkCell *cell)
+inline double vtkMomentVectorsCellArea(vtkCell *cell)
 {
   VTK_CREATE(vtkIdList, triangleIds);
   VTK_CREATE(vtkPoints, points);
@@ -102,52 +102,53 @@ inline double vtkFluxVectorsCellArea(vtkCell *cell)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkFluxVectors, "1.3");
-vtkStandardNewMacro(vtkFluxVectors);
+vtkCxxRevisionMacro(vtkMomentVectors, "1.1");
+vtkStandardNewMacro(vtkMomentVectors);
 
 //-----------------------------------------------------------------------------
-vtkFluxVectors::vtkFluxVectors()
+vtkMomentVectors::vtkMomentVectors()
 {
-  this->SetInputFlux(vtkDataSetAttributes::SCALARS);
-  this->InputFluxIsDensity = 0;
-  this->OutputFluxTotalName = NULL;
-  this->OutputFluxDensityName = NULL;
+  this->SetInputMoment(vtkDataSetAttributes::SCALARS);
+  this->InputMomentIsDensity = 0;
+  this->OutputMomentTotalName = NULL;
+  this->OutputMomentDensityName = NULL;
 }
 
-vtkFluxVectors::~vtkFluxVectors()
+vtkMomentVectors::~vtkMomentVectors()
 {
 }
 
-void vtkFluxVectors::PrintSelf(ostream &os, vtkIndent indent)
+void vtkMomentVectors::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "InputFluxIsDensity: " << this->InputFluxIsDensity << endl;
-  os << indent << "OutputFluxTotalName: "
-     << this->GetOutputFluxTotalName() << endl;
-  os << indent << "OutputFluxDensityName: "
-     << this->GetOutputFluxDensityName() << endl;
+  os << indent << "InputMomentIsDensity: "
+     << this->InputMomentIsDensity << endl;
+  os << indent << "OutputMomentTotalName: "
+     << this->GetOutputMomentTotalName() << endl;
+  os << indent << "OutputMomentDensityName: "
+     << this->GetOutputMomentDensityName() << endl;
 }
 
 //-----------------------------------------------------------------------------
-void vtkFluxVectors::SetInputFlux(const char *name)
+void vtkMomentVectors::SetInputMoment(const char *name)
 {
   this->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
                                name);
 }
 
-void vtkFluxVectors::SetInputFlux(int fieldAttributeType)
+void vtkMomentVectors::SetInputMoment(int fieldAttributeType)
 {
   this->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
                                fieldAttributeType);
 }
 
 //-----------------------------------------------------------------------------
-const char *vtkFluxVectors::GetOutputFluxTotalName(vtkDataObject *input)
+const char *vtkMomentVectors::GetOutputMomentTotalName(vtkDataObject *input)
 {
-  if (this->OutputFluxTotalName && (this->OutputFluxTotalName[0] != '\0'))
+  if (this->OutputMomentTotalName && (this->OutputMomentTotalName[0] != '\0'))
     {
-    return this->OutputFluxTotalName;
+    return this->OutputMomentTotalName;
     }
 
   if (!input) return "???";
@@ -155,7 +156,7 @@ const char *vtkFluxVectors::GetOutputFluxTotalName(vtkDataObject *input)
   vtkDataArray *inputArray = this->GetInputArrayToProcess(0, input);
   if (!inputArray) return "???";
 
-  if (this->InputFluxIsDensity)
+  if (this->InputMomentIsDensity)
     {
     static vtkStdString result;
     result = inputArray->GetName();
@@ -169,11 +170,11 @@ const char *vtkFluxVectors::GetOutputFluxTotalName(vtkDataObject *input)
 }
 
 //-----------------------------------------------------------------------------
-const char *vtkFluxVectors::GetOutputFluxDensityName(vtkDataObject *input)
+const char *vtkMomentVectors::GetOutputMomentDensityName(vtkDataObject *input)
 {
-  if (this->OutputFluxDensityName && (this->OutputFluxDensityName[0] != '\0'))
+  if (this->OutputMomentDensityName && (this->OutputMomentDensityName[0] != '\0'))
     {
-    return this->OutputFluxDensityName;
+    return this->OutputMomentDensityName;
     }
 
   if (!input) return "???";
@@ -181,7 +182,7 @@ const char *vtkFluxVectors::GetOutputFluxDensityName(vtkDataObject *input)
   vtkDataArray *inputArray = this->GetInputArrayToProcess(0, input);
   if (!inputArray) return "???";
 
-  if (this->InputFluxIsDensity)
+  if (this->InputMomentIsDensity)
     {
     return inputArray->GetName();
     }
@@ -195,9 +196,9 @@ const char *vtkFluxVectors::GetOutputFluxDensityName(vtkDataObject *input)
 }
 
 //-----------------------------------------------------------------------------
-int vtkFluxVectors::RequestData(vtkInformation *vtkNotUsed(request),
-                                vtkInformationVector **inputVector,
-                                vtkInformationVector *outputVector)
+int vtkMomentVectors::RequestData(vtkInformation *vtkNotUsed(request),
+                                  vtkInformationVector **inputVector,
+                                  vtkInformationVector *outputVector)
 {
   vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
   vtkDataSet *output = vtkDataSet::GetData(outputVector);
@@ -236,12 +237,12 @@ int vtkFluxVectors::RequestData(vtkInformation *vtkNotUsed(request),
   VTK_CREATE(vtkGenericCell, cell);
 
   VTK_CREATE(vtkDoubleArray, fluxTotalOut);
-  fluxTotalOut->SetName(this->GetOutputFluxTotalName(input));
+  fluxTotalOut->SetName(this->GetOutputMomentTotalName(input));
   fluxTotalOut->SetNumberOfComponents(3);
   fluxTotalOut->SetNumberOfTuples(numCells);
 
   VTK_CREATE(vtkDoubleArray, fluxDensityOut);
-  fluxDensityOut->SetName(this->GetOutputFluxDensityName(input));
+  fluxDensityOut->SetName(this->GetOutputMomentDensityName(input));
   fluxDensityOut->SetNumberOfComponents(3);
   fluxDensityOut->SetNumberOfTuples(numCells);
 
@@ -258,12 +259,12 @@ int vtkFluxVectors::RequestData(vtkInformation *vtkNotUsed(request),
     switch (cell->GetCellDimension())
       {
       case 1:
-        vtkFluxVectorsCellDirection(cell, vec);
-        size = vtkFluxVectorsCellLength(cell);
+        vtkMomentVectorsCellDirection(cell, vec);
+        size = vtkMomentVectorsCellLength(cell);
         break;
       case 2:
-        vtkFluxVectorsCellNormal(cell, vec);
-        size = vtkFluxVectorsCellArea(cell);
+        vtkMomentVectorsCellNormal(cell, vec);
+        size = vtkMomentVectorsCellArea(cell);
         break;
       default:
         // Invalid cell type.  Should we warn?
@@ -273,7 +274,7 @@ int vtkFluxVectors::RequestData(vtkInformation *vtkNotUsed(request),
       }
 
     for (j = 0; j < 3; j++) vec[j] *= s;
-    if (this->InputFluxIsDensity)
+    if (this->InputMomentIsDensity)
       {
       fluxDensityOut->SetTuple(cellId, vec);
       for (j = 0; j < 3; j++) vec[j] *= size;
@@ -291,7 +292,7 @@ int vtkFluxVectors::RequestData(vtkInformation *vtkNotUsed(request),
   output->GetCellData()->AddArray(fluxDensityOut);
   if (input->GetCellData()->GetScalars() == scalars)
     {
-    if (this->InputFluxIsDensity)
+    if (this->InputMomentIsDensity)
       {
       output->GetCellData()->SetVectors(fluxDensityOut);
       }

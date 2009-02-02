@@ -3,7 +3,7 @@
 # flows through the area of the cell.  Circulation fields are defined on 1D
 # cells and describes flows in the direction of the cell.
 
-SET(PLUGIN_NAME Flux)
+SET(PLUGIN_NAME Moments)
 SET(PLUGIN_VERSION "0.0")
 
 INCLUDE_DIRECTORIES(
@@ -13,12 +13,12 @@ INCLUDE_DIRECTORIES(
   )
 
 SET(SM_XML
-  Flux.xml
+  Moments.xml
   )
 
 SET(SM_SRC
-  vtkFluxGlyphs.cxx
-  vtkFluxVectors.cxx
+  vtkMomentGlyphs.cxx
+  vtkMomentVectors.cxx
   )
 
 ADD_PARAVIEW_PLUGIN(${PLUGIN_NAME} ${PLUGIN_VERSION}

@@ -2,7 +2,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkFluxGlyphs.cxx
+  Module:    vtkMomentGlyphs.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -18,13 +18,13 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
-#include "vtkFluxGlyphs.h"
+#include "vtkMomentGlyphs.h"
 
 #include "vtkArrowSource.h"
 #include "vtkCellCenters.h"
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
-#include "vtkFluxVectors.h"
+#include "vtkMomentVectors.h"
 #include "vtkGeneralTransform.h"
 #include "vtkGenericCell.h"
 #include "vtkGlyph3D.h"
@@ -43,44 +43,45 @@
 #include <math.h>
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkFluxGlyphs, "1.3");
-vtkStandardNewMacro(vtkFluxGlyphs);
+vtkCxxRevisionMacro(vtkMomentGlyphs, "1.1");
+vtkStandardNewMacro(vtkMomentGlyphs);
 
 //-----------------------------------------------------------------------------
-vtkFluxGlyphs::vtkFluxGlyphs()
+vtkMomentGlyphs::vtkMomentGlyphs()
 {
-  this->SetInputFlux(vtkDataSetAttributes::SCALARS);
-  this->InputFluxIsDensity = 0;
+  this->SetInputMoment(vtkDataSetAttributes::SCALARS);
+  this->InputMomentIsDensity = 0;
   this->ScaleByDensity = 0;
 }
 
-vtkFluxGlyphs::~vtkFluxGlyphs()
+vtkMomentGlyphs::~vtkMomentGlyphs()
 {
 }
 
-void vtkFluxGlyphs::PrintSelf(ostream &os, vtkIndent indent)
+void vtkMomentGlyphs::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "InputFluxIsDensity: " << this->InputFluxIsDensity << endl;
+  os << indent << "InputMomentIsDensity: "
+     << this->InputMomentIsDensity << endl;
   os << indent << "ScaleByDensity: " << this->ScaleByDensity << endl;
 }
 
 //-----------------------------------------------------------------------------
-void vtkFluxGlyphs::SetInputFlux(const char *name)
+void vtkMomentGlyphs::SetInputMoment(const char *name)
 {
   this->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
                                name);
 }
 
-void vtkFluxGlyphs::SetInputFlux(int fieldAttributeType)
+void vtkMomentGlyphs::SetInputMoment(int fieldAttributeType)
 {
   this->SetInputArrayToProcess(0, 0, 0, vtkDataObject::FIELD_ASSOCIATION_CELLS,
                                fieldAttributeType);
 }
 
 //-----------------------------------------------------------------------------
-int vtkFluxGlyphs::FillInputPortInformation(int port, vtkInformation *info)
+int vtkMomentGlyphs::FillInputPortInformation(int port, vtkInformation *info)
 {
   if (port == 0)
     {
@@ -91,9 +92,9 @@ int vtkFluxGlyphs::FillInputPortInformation(int port, vtkInformation *info)
 }
 
 //-----------------------------------------------------------------------------
-int vtkFluxGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
-                               vtkInformationVector **inputVector,
-                               vtkInformationVector *outputVector)
+int vtkMomentGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
+                                 vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector)
 {
   vtkDataSet *input = vtkDataSet::GetData(inputVector[0]);
   vtkPolyData *output = vtkPolyData::GetData(outputVector);
@@ -123,7 +124,7 @@ int vtkFluxGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
 
   if (inputArray->GetNumberOfComponents() == 1)
     {
-    this->MakeFluxVectors(workingInput, inputArray);
+    this->MakeMomentVectors(workingInput, inputArray);
     }
 
   vtkSmartPointer<vtkPolyData> glyphs;
@@ -135,14 +136,15 @@ int vtkFluxGlyphs::RequestData(vtkInformation *vtkNotUsed(request),
 }
 
 //-----------------------------------------------------------------------------
-void vtkFluxGlyphs::MakeFluxVectors(vtkSmartPointer<vtkDataSet> &input,
-                                    vtkSmartPointer<vtkDataArray> &inputArray)
+void vtkMomentGlyphs::MakeMomentVectors(vtkSmartPointer<vtkDataSet> &input,
+                                      vtkSmartPointer<vtkDataArray> &inputArray)
 {
-  // Use a vtkFluxVectors filter to convert flux/circulation scalars to vectors.
-  VTK_CREATE(vtkFluxVectors, makeVectors);
+  // Use a vtkMomentVectors filter to convert flux/circulation scalars to
+  // vectors.
+  VTK_CREATE(vtkMomentVectors, makeVectors);
   makeVectors->SetInput(input);
-  makeVectors->SetInputFlux(inputArray->GetName());
-  makeVectors->SetInputFluxIsDensity(this->InputFluxIsDensity);
+  makeVectors->SetInputMoment(inputArray->GetName());
+  makeVectors->SetInputMomentIsDensity(this->InputMomentIsDensity);
 
   makeVectors->Update();
 
@@ -150,19 +152,19 @@ void vtkFluxGlyphs::MakeFluxVectors(vtkSmartPointer<vtkDataSet> &input,
   const char *inputArrayName;
   if (this->ScaleByDensity)
     {
-    inputArrayName = makeVectors->GetOutputFluxDensityName();
+    inputArrayName = makeVectors->GetOutputMomentDensityName();
     }
   else
     {
-    inputArrayName = makeVectors->GetOutputFluxTotalName();
+    inputArrayName = makeVectors->GetOutputMomentTotalName();
     }
   inputArray = input->GetCellData()->GetArray(inputArrayName);
 }
 
 //-----------------------------------------------------------------------------
 vtkSmartPointer<vtkDataArray>
-vtkFluxGlyphs::MakeGlyphScaleFactors(vtkDataSet *input,
-                                     vtkDataArray *inputArray)
+vtkMomentGlyphs::MakeGlyphScaleFactors(vtkDataSet *input,
+                                       vtkDataArray *inputArray)
 {
   vtkIdType numCells = input->GetNumberOfCells();
   vtkIdType cellId;
@@ -215,7 +217,7 @@ vtkFluxGlyphs::MakeGlyphScaleFactors(vtkDataSet *input,
 }
 
 //-----------------------------------------------------------------------------
-vtkSmartPointer<vtkPolyData> vtkFluxGlyphs::MakeGlyphs(
+vtkSmartPointer<vtkPolyData> vtkMomentGlyphs::MakeGlyphs(
                                                      vtkDataSet *input,
                                                      vtkDataArray *inputArray)
 {

@@ -1,7 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-    <SourceProxy name="FluxVectors" class="vtkFluxVectors" label="Flux Vectors">
+    <SourceProxy name="MomentVectors" class="vtkMomentVectors"
+                 label="Moment Vectors">
       <Documentation short_help="Create flux or circulation vectors."
                      long_help="Convert scalars to flux or circulation vectors.">
         Often times a simulation that computes circulation or flux in a
@@ -52,11 +53,11 @@
         </Documentation>
       </StringVectorProperty>
 
-      <IntVectorProperty name="InputFluxIsDensity"
-                         command="SetInputFluxIsDensity"
+      <IntVectorProperty name="InputMomentIsDensity"
+                         command="SetInputMomentIsDensity"
                          number_of_elements="1"
                          default_values="0"
-                         label="Input Flux Is Density">
+                         label="Input Moment Is Density">
         <BooleanDomain name="bool" />
         <Documentation>
           If off, then the input array is taken to be the total flux
@@ -64,9 +65,10 @@
           array is taken to be the density of the flux or circulation.
         </Documentation>
       </IntVectorProperty>
-    </SourceProxy> <!-- Flux Vectors -->
+    </SourceProxy> <!-- Moment Vectors -->
 
-    <SourceProxy name="FluxGlyphs" class="vtkFluxGlyphs" label="Flux Glyphs">
+    <SourceProxy name="MomentGlyphs" class="vtkMomentGlyphs"
+                 label="Moment Glyphs">
       <Documentation short_help="Create flux or circulation glyphs."
                      long_help="Create glyphs pointing in the direction of flux or circulation.">
         Circulation is a vector field on 1D cells that represents flow
@@ -114,11 +116,11 @@
         </Documentation>
       </StringVectorProperty>
 
-      <IntVectorProperty name="InputFluxIsDensity"
-                         command="SetInputFluxIsDensity"
+      <IntVectorProperty name="InputMomentIsDensity"
+                         command="SetInputMomentIsDensity"
                          number_of_elements="1"
                          default_values="0"
-                         label="Input Flux Is Density">
+                         label="Input Moment Is Density">
         <BooleanDomain name="bool" />
         <Documentation>
           If off, then the input array is taken to be the total flux
@@ -139,7 +141,7 @@
           scaled by the flux or circulation density.
         </Documentation>
       </IntVectorProperty>
-    </SourceProxy> <!-- Flux Glyphs -->
+    </SourceProxy> <!-- Moment Glyphs -->
 
   </ProxyGroup>
 </ServerManagerConfiguration>
