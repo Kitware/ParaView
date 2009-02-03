@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonCalculator, "1.1");
+vtkCxxRevisionMacro(vtkPythonCalculator, "1.2");
 vtkStandardNewMacro(vtkPythonCalculator);
 
 //----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void vtkPythonCalculator::Exec(const char* expression,
       }
     }
     
-  size_t pos = orgscript.rfind("\n");
+  //size_t pos = orgscript.rfind("\n");
     
   // Construct a script that defines a function
   vtkstd::string fscript;
