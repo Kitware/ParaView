@@ -34,7 +34,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNewWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMNewWidgetRepresentationProxy, "1.14");
 
 class vtkSMNewWidgetRepresentationObserver : public vtkCommand
 {
@@ -245,15 +245,17 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
     vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
 
   this->WidgetProxy = this->GetSubProxy("Widget");
-  if (!this->WidgetProxy)
+  if (this->WidgetProxy)
     {
-    vtkErrorMacro("A widget proxy must be defined as a Widget sub-proxy");
-    return;
+    this->WidgetProxy->SetServers(vtkProcessModule::CLIENT);
     }
-  this->WidgetProxy->SetServers(vtkProcessModule::CLIENT);
 
   this->Superclass::CreateVTKObjects();
 
+  if (!this->WidgetProxy)
+    {
+    return;
+    }
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Representation"));
   if (pp)
@@ -305,6 +307,7 @@ void vtkSMNewWidgetRepresentationProxy::CreateVTKObjects()
       }
     }
   piter->Delete();
+
 }
 
 //-----------------------------------------------------------------------------
