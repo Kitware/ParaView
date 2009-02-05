@@ -39,10 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBarChartOptionsEditor.h"
 #include "pqBarChartOptionsHandler.h"
 #include "pqBarChartView.h"
+#include "pqBoxChartOptionsEditor.h"
+#include "pqBoxChartOptionsHandler.h"
 #include "pqChartOptionsEditor.h"
 #include "pqChartOptionsHandler.h"
+#include "pqLineChartOptionsEditor.h"
+#include "pqLineChartOptionsHandler.h"
 #include "pqOptionsDialog.h"
 #include "pqPlotView.h"
+#include "pqStackedChartOptionsEditor.h"
+#include "pqStackedChartOptionsHandler.h"
 #include "pqUndoStack.h"
 
 #include <QString>
@@ -56,15 +62,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqActiveChartOptions::pqActiveChartOptions(QObject *parentObject)
   : pqActiveViewOptions(parentObject)
 {
+  this->Dialog = 0;
   this->Chart = new pqChartOptionsHandler();
   this->BarChart = new pqBarChartOptionsHandler();
-  this->Dialog = 0;
+  this->LineChart = new pqLineChartOptionsHandler();
+  this->StackedChart = new pqStackedChartOptionsHandler();
+  this->BoxChart = new pqBoxChartOptionsHandler();
 }
 
 pqActiveChartOptions::~pqActiveChartOptions()
 {
   delete this->Chart;
   delete this->BarChart;
+  delete this->LineChart;
+  delete this->StackedChart;
+  delete this->BoxChart;
 }
 
 void pqActiveChartOptions::showOptions(pqView *view, const QString &page,
@@ -186,7 +198,10 @@ void pqActiveChartOptions::changeView(pqView *view)
     {
     pqPlotView *plotView = qobject_cast<pqPlotView *>(view);
     pqBarChartView *barChart = qobject_cast<pqBarChartView *>(view);
-    if(plotView || barChart)
+    //pqLineChartView *lineChart = qobject_cast<pqBarChartView *>(view);
+    //pqStackedChartView *stackedChart = qobject_cast<pqBarChartView *>(view);
+    //pqBoxChartView *boxChart = qobject_cast<pqBoxChartView *>(view);
+    if(plotView || barChart /*|| lineChart || stackedChart || boxChart*/)
       {
       this->Chart->setView(view);
       }
@@ -201,36 +216,140 @@ void pqActiveChartOptions::changeView(pqView *view)
       this->Dialog->setWindowTitle("Chart Options");
       }
 
+    pqBarChartOptionsEditor *barOptions = this->BarChart->getOptions();
     if(barChart)
       {
       // Set the dialog title.
       this->Dialog->setWindowTitle("Bar Chart Options");
 
-      // Set up the dialog for the extra bar chart options.
-      pqBarChartOptionsEditor *barOptions = new pqBarChartOptionsEditor();
-      this->BarChart->setOptions(barOptions);
-      this->Dialog->addOptions("Bar Chart", barOptions);
-      this->BarChart->setView(barChart);
+      // Make sure the bar chart options are added.
+      if(!barOptions)
+        {
+        // Set up the dialog for the extra bar chart options.
+        barOptions = new pqBarChartOptionsEditor();
+        this->BarChart->setOptions(barOptions);
+        this->Dialog->addOptions("Bar Chart", barOptions);
+        this->BarChart->setView(barChart);
 
-      // Listen for bar chart option changes.
-      this->connect(barOptions, SIGNAL(helpFormatChanged(const QString &)),
-          this, SLOT(setBarHelpFormatModified()));
-      this->connect(barOptions,
-          SIGNAL(outlineStyleChanged(vtkQtBarChartOptions::OutlineStyle)),
-          this, SLOT(setBarOutlineStyleModified()));
-      this->connect(barOptions, SIGNAL(barGroupFractionChanged(float)),
-          this, SLOT(setBarGroupFractionModified()));
-      this->connect(barOptions, SIGNAL(barWidthFractionChanged(float)),
-          this, SLOT(setBarWidthFractionModified()));
+        // Listen for bar chart option changes.
+        this->connect(barOptions, SIGNAL(helpFormatChanged(const QString &)),
+            this, SLOT(setBarHelpFormatModified()));
+        this->connect(barOptions,
+            SIGNAL(outlineStyleChanged(vtkQtBarChartOptions::OutlineStyle)),
+            this, SLOT(setBarOutlineStyleModified()));
+        this->connect(barOptions, SIGNAL(barGroupFractionChanged(float)),
+            this, SLOT(setBarGroupFractionModified()));
+        this->connect(barOptions, SIGNAL(barWidthFractionChanged(float)),
+            this, SLOT(setBarWidthFractionModified()));
+        }
       }
-    else if(this->BarChart->getOptions())
+    else if(barOptions)
       {
       // Remove the bar chart options from the dialog.
-      pqBarChartOptionsEditor *barOptions = this->BarChart->getOptions();
       this->Dialog->removeOptions(barOptions);
       this->BarChart->setOptions(0);
       this->BarChart->setView(0);
       delete barOptions;
+      }
+
+    pqLineChartOptionsEditor *lineOptions = this->LineChart->getOptions();
+    /*if(lineChart)
+      {
+      // Set the dialog title.
+      this->Dialog->setWindowTitle("Line Chart Options");
+
+      // Make sure the line chart options are added.
+      if(!lineOptions)
+        {
+        // Set up the dialog for the extra line chart options.
+        lineOptions = new pqLineChartOptionsEditor();
+        this->LineChart->setOptions(lineOptions);
+        this->Dialog->addOptions("Line Chart", lineOptions);
+        this->LineChart->setView(lineChart);
+
+        // Listen for line chart option changes.
+        this->connect(lineOptions, SIGNAL(helpFormatChanged(const QString &)),
+            this, SLOT(setLineHelpFormatModified()));
+        }
+      }
+    else*/ if(lineOptions)
+      {
+      // Remove the line chart options from the dialog.
+      this->Dialog->removeOptions(lineOptions);
+      this->LineChart->setOptions(0);
+      this->LineChart->setView(0);
+      delete lineOptions;
+      }
+
+    pqStackedChartOptionsEditor *stackedOptions =
+        this->StackedChart->getOptions();
+    /*if(stackedChart)
+      {
+      // Set the dialog title.
+      this->Dialog->setWindowTitle("Stacked Chart Options");
+
+      // Make sure the stacked chart options are added.
+      if(!stackedOptions)
+        {
+        // Set up the dialog for the extra stacked chart options.
+        stackedOptions = new pqStackedChartOptionsEditor();
+        this->StackedChart->setOptions(stackedOptions);
+        this->Dialog->addOptions("Stacked Chart", stackedOptions);
+        this->StackedChart->setView(stackedChart);
+
+        // Listen for stacked chart option changes.
+        this->connect(stackedOptions,
+            SIGNAL(helpFormatChanged(const QString &)),
+            this, SLOT(setStackedHelpFormatModified()));
+        this->connect(stackedOptions, SIGNAL(normalizationChanged(bool)),
+            this, SLOT(setStackedNormalizationModified()));
+        this->connect(stackedOptions, SIGNAL(gradientChanged(bool)),
+            this, SLOT(setStackedGradientModified()));
+        }
+      }
+    else*/ if(stackedOptions)
+      {
+      // Remove the stacked chart options from the dialog.
+      this->Dialog->removeOptions(stackedOptions);
+      this->StackedChart->setOptions(0);
+      this->StackedChart->setView(0);
+      delete stackedOptions;
+      }
+
+    pqBoxChartOptionsEditor *boxOptions = this->BoxChart->getOptions();
+    /*if(boxChart)
+      {
+      // Set the dialog title.
+      this->Dialog->setWindowTitle("Statistical Box Chart Options");
+
+      // Make sure the box chart options are added.
+      if(!boxOptions)
+        {
+        // Set up the dialog for the extra box chart options.
+        boxOptions = new pqBoxChartOptionsEditor();
+        this->BoxChart->setOptions(boxOptions);
+        this->Dialog->addOptions("Statistical Box Chart", boxOptions);
+        this->BoxChart->setView(boxChart);
+
+        // Listen for box chart option changes.
+        this->connect(boxOptions, SIGNAL(helpFormatChanged(const QString &)),
+            this, SLOT(setBoxHelpFormatModified()));
+        this->connect(boxOptions, SIGNAL(outlierFormatChanged(const QString &)),
+            this, SLOT(setBoxOutlierFormatModified()));
+        this->connect(boxOptions,
+            SIGNAL(outlineStyleChanged(vtkQtStatisticalBoxChartOptions::OutlineStyle)),
+            this, SLOT(setBoxOutlineStyleModified()));
+        this->connect(boxOptions, SIGNAL(boxWidthFractionChanged(float)),
+            this, SLOT(setBoxWidthFractionModified()));
+        }
+      }
+    else*/ if(boxOptions)
+      {
+      // Remove the bar chart options from the dialog.
+      this->Dialog->removeOptions(boxOptions);
+      this->BoxChart->setOptions(0);
+      this->BoxChart->setView(0);
+      delete boxOptions;
       }
     }
 }
@@ -242,6 +361,9 @@ void pqActiveChartOptions::closeOptions()
     this->Dialog->accept();
     this->Chart->setView(0);
     this->BarChart->setView(0);
+    this->LineChart->setView(0);
+    this->StackedChart->setView(0);
+    this->BoxChart->setView(0);
     }
 }
 
@@ -264,6 +386,12 @@ void pqActiveChartOptions::cleanupDialog()
   this->Chart->setView(0);
   this->BarChart->setOptions(0);
   this->BarChart->setView(0);
+  this->LineChart->setOptions(0);
+  this->LineChart->setView(0);
+  this->StackedChart->setOptions(0);
+  this->StackedChart->setView(0);
+  this->BoxChart->setOptions(0);
+  this->BoxChart->setView(0);
 }
 
 void pqActiveChartOptions::openUndoSet()
@@ -439,6 +567,49 @@ void pqActiveChartOptions::setBarGroupFractionModified()
 void pqActiveChartOptions::setBarWidthFractionModified()
 {
   this->BarChart->setModified(pqBarChartOptionsHandler::WidthFractionModified);
+}
+
+void pqActiveChartOptions::setLineHelpFormatModified()
+{
+  this->LineChart->setModified(pqLineChartOptionsHandler::HelpFormatModified);
+}
+
+void pqActiveChartOptions::setStackedHelpFormatModified()
+{
+  this->StackedChart->setModified(
+    pqStackedChartOptionsHandler::HelpFormatModified);
+}
+
+void pqActiveChartOptions::setStackedNormalizationModified()
+{
+  this->StackedChart->setModified(
+    pqStackedChartOptionsHandler::NormalizationModified);
+}
+
+void pqActiveChartOptions::setStackedGradientModified()
+{
+  this->StackedChart->setModified(
+    pqStackedChartOptionsHandler::GradientModified);
+}
+
+void pqActiveChartOptions::setBoxHelpFormatModified()
+{
+  this->BoxChart->setModified(pqBoxChartOptionsHandler::HelpFormatModified);
+}
+
+void pqActiveChartOptions::setBoxOutlierFormatModified()
+{
+  this->BoxChart->setModified(pqBoxChartOptionsHandler::OutlierFormatModified);
+}
+
+void pqActiveChartOptions::setBoxOutlineStyleModified()
+{
+  this->BoxChart->setModified(pqBoxChartOptionsHandler::OutlineStyleModified);
+}
+
+void pqActiveChartOptions::setBoxWidthFractionModified()
+{
+  this->BoxChart->setModified(pqBoxChartOptionsHandler::WidthFractionModified);
 }
 
 

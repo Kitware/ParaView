@@ -41,8 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveViewOptions.h"
 
 class pqBarChartOptionsHandler;
+class pqBoxChartOptionsHandler;
 class pqChartOptionsHandler;
+class pqLineChartOptionsHandler;
 class pqOptionsDialog;
+class pqStackedChartOptionsHandler;
 
 
 /// \class pqActiveChartOptions
@@ -119,10 +122,26 @@ private slots:
   void setBarGroupFractionModified();
   void setBarWidthFractionModified();
 
+  void setLineHelpFormatModified();
+
+  void setStackedHelpFormatModified();
+  void setStackedNormalizationModified();
+  void setStackedGradientModified();
+
+  void setBoxHelpFormatModified();
+  void setBoxOutlierFormatModified();
+  void setBoxOutlineStyleModified();
+  void setBoxWidthFractionModified();
+
 private:
-  pqChartOptionsHandler *Chart;       ///< Handles the base chart options.
-  pqBarChartOptionsHandler *BarChart; ///< Handles the bar chart options.
-  pqOptionsDialog *Dialog;            ///< Stores the dialog.
+  pqOptionsDialog *Dialog;              ///< Stores the dialog.
+  pqChartOptionsHandler *Chart;         ///< Handles the base chart options.
+  pqBarChartOptionsHandler *BarChart;   ///< Handles the bar chart options.
+  pqLineChartOptionsHandler *LineChart; ///< Handles the line chart options.
+
+  /// Handles the stacked chart options.
+  pqStackedChartOptionsHandler *StackedChart;
+  pqBoxChartOptionsHandler *BoxChart;   ///< Handles the box chart options.
 };
 
 #endif

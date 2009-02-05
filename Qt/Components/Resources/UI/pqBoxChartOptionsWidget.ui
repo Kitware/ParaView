@@ -1,0 +1,184 @@
+<ui version="4.0" >
+ <class>pqBoxChartOptionsWidget</class>
+ <widget class="QWidget" name="pqBoxChartOptionsWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>346</width>
+    <height>323</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Statistical Box Chart Options</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" colspan="4" >
+    <widget class="QLabel" name="label" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Statistical Box Chart</string>
+     </property>
+    </widget>
+   </item>
+   <item rowspan="3" row="1" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Box Help Format</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2" >
+    <widget class="QLineEdit" name="HelpFormat" />
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="label_3" >
+     <property name="text" >
+      <string>Outlier Help Format</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="2" >
+    <widget class="QLineEdit" name="OutlierFormat" />
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLabel" name="label_4" >
+     <property name="text" >
+      <string>Outline Style</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" >
+    <widget class="QComboBox" name="OutlineStyle" >
+     <item>
+      <property name="text" >
+       <string>Darker</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>Black</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="0" colspan="4" >
+    <widget class="QLabel" name="label_5" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Box Spacing</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType" >
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QLabel" name="label_6" >
+     <property name="text" >
+      <string>Box Width Fraction</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" >
+    <widget class="QDoubleSpinBox" name="WidthFraction" >
+     <property name="maximum" >
+      <double>1.000000000000000</double>
+     </property>
+     <property name="singleStep" >
+      <double>0.100000000000000</double>
+     </property>
+     <property name="value" >
+      <double>0.800000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="6" column="0" colspan="4" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>HelpFormat</tabstop>
+  <tabstop>OutlierFormat</tabstop>
+  <tabstop>OutlineStyle</tabstop>
+  <tabstop>WidthFraction</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
