@@ -51,6 +51,7 @@ pqStackedChartOptionsEditorForm::pqStackedChartOptionsEditorForm()
 
 //-----------------------------------------------------------------------------
 pqStackedChartOptionsEditor::pqStackedChartOptionsEditor(QWidget *widgetParent)
+  : pqOptionsPage(widgetParent)
 {
   this->Form = new pqStackedChartOptionsEditorForm();
   this->Form->setupUi(this);

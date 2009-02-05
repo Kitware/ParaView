@@ -51,6 +51,7 @@ pqLineChartOptionsEditorForm::pqLineChartOptionsEditorForm()
 
 //-----------------------------------------------------------------------------
 pqLineChartOptionsEditor::pqLineChartOptionsEditor(QWidget *widgetParent)
+  : pqOptionsPage(widgetParent)
 {
   this->Form = new pqLineChartOptionsEditorForm();
   this->Form->setupUi(this);
