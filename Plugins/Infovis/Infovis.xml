@@ -698,6 +698,75 @@
       </Hints>
     </SourceProxy>
 
+    <SourceProxy name="MultiCorrelativeStatistics" class="vtkMultiCorrelativeStatistics" label="MultiCorrelative Statistics">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
+      </InputProperty>
+      <InputProperty name="Input Statistics" command="SetInputStatisticsConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+      </InputProperty>
+
+     <StringVectorProperty
+        name="VariableStatus"
+        command="SetColumnStatus"
+        number_of_elements="4"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ColumnInfo" >
+        <ArraySelectionDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="ColumnInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ColumnInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+
+        <CheckableArrayListInformationHelper list_domain_name="array_list" />
+
+        <ArrayListDomain name="array_list" 
+          input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+     </StringVectorProperty>
+
+      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
     <SourceProxy name="GraphLayoutFilter" class="vtkGraphLayout" label="Graph Layout Filter">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
