@@ -162,6 +162,10 @@ protected:
   // ID used to identify renders with the MultiViewManager.
   int RenderersID;
 
+  // A flag that can be turned off by subclasses when they do not 
+  // drive vtkIceTRenderers. In that case we do not want to call nonexistant
+  // methods related to vtkIceTRenderer
+  bool UsingIceTRenderers;
 private:
   vtkSMIceTCompositeViewProxy(const vtkSMIceTCompositeViewProxy&); // Not implemented
   void operator=(const vtkSMIceTCompositeViewProxy&); // Not implemented

@@ -36,7 +36,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIceTCompositeViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMIceTCompositeViewProxy, "1.25");
 
 vtkInformationKeyMacro(vtkSMIceTCompositeViewProxy, KD_TREE, ObjectBase);
 //----------------------------------------------------------------------------
@@ -65,6 +65,7 @@ vtkSMIceTCompositeViewProxy::vtkSMIceTCompositeViewProxy()
   this->ViewSize[0] = this->ViewSize[1] = 400;
 
   this->RenderersID =0;
+  this->UsingIceTRenderers = true;
 }
 
 //----------------------------------------------------------------------------
@@ -224,13 +225,13 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
     this->Connect(this->RenderWindowProxy, this->MultiViewManager, "RenderWindow");
 
     // Make the multiview manager aware of our renderers.
-  this->RenderersID = static_cast<int>(this->GetSelfID().ID);
+    this->RenderersID = static_cast<int>(this->GetSelfID().ID);
     stream  << vtkClientServerStream::Invoke
-      << this->MultiViewManager->GetID()
-      << "AddRenderer"
-      << this->RenderersID
-      << this->RendererProxy->GetID()
-      << vtkClientServerStream::End;
+            << this->MultiViewManager->GetID()
+            << "AddRenderer"
+            << this->RenderersID
+            << this->RendererProxy->GetID()
+            << vtkClientServerStream::End;
 
     stream  << vtkClientServerStream::Invoke
       << this->MultiViewManager->GetID()
@@ -245,7 +246,6 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
     this->Interactor->SetPVRenderView(0);
     this->Interactor->Disable();
     }
-
 
   // * Initialize the ParallelRenderManager.
   this->Connect(this->RenderWindowProxy, 
@@ -298,13 +298,16 @@ void vtkSMIceTCompositeViewProxy::EndCreateVTKObjects()
   // Initialize the ordered compositing stuff.
   this->Connect(this->KdTree, this->KdTreeManager, "KdTree");
 
-  // This call may fail if the server-side renderer is not vtkIceTRenderer.
-  // Hence subclasses must be careful about that.
-  stream  << vtkClientServerStream::Invoke
-          << this->RendererProxy->GetID()
-          << "SetSortingKdTree"
-          << this->KdTree->GetID()
-          << vtkClientServerStream::End;
+  if (this->UsingIceTRenderers)
+    {
+    // This call may fail if the server-side renderer is not vtkIceTRenderer.
+    // Hence subclasses must be careful about that.
+    stream  << vtkClientServerStream::Invoke
+            << this->RendererProxy->GetID()
+            << "SetSortingKdTree"
+            << this->KdTree->GetID()
+            << vtkClientServerStream::End;
+    }
 
   // Set the controllers for the kdtree.
   stream  << vtkClientServerStream::Invoke
@@ -610,17 +613,19 @@ void vtkSMIceTCompositeViewProxy::SetOrderedCompositingDecision(bool decision)
     }
   this->LastOrderedCompositingDecision = decision;
 
-
-  // Cannot do this with the server manager because this method only
-  // exists on the render server, not the client.
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
-          << "SetComposeOperation"
-          << (decision? vtkIceTConstants::ComposeOperationOver :
-            vtkIceTConstants::ComposeOperationClosest)
-          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+  if (this->UsingIceTRenderers)
+    {
+    // Cannot do this with the server manager because this method only
+    // exists on the render server, not the client.
+    vtkClientServerStream stream;
+    stream  << vtkClientServerStream::Invoke << this->RendererProxy->GetID()
+            << "SetComposeOperation"
+            << (decision? vtkIceTConstants::ComposeOperationOver :
+              vtkIceTConstants::ComposeOperationClosest)
+            << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    }
 }
 
 //----------------------------------------------------------------------------
