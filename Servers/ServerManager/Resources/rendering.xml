@@ -3528,14 +3528,11 @@
 
       <!-- End of SpreadSheetView -->
     </ViewProxy>
-
-    <ViewProxy name="BarChartView2" 
-      base_proxygroup="views" 
-      base_proxyname="ViewBase"
-      representation_name="BarChartRepresentation">
-
-      <!-- Add non-command properties that will help
-          keep client-only BarChart properties in SM such as colors etc etc -->
+    
+    <Proxy name="ChartOptionsBase">
+      <Documentation>
+        Defines common options API for all chart views.
+      </Documentation>
 
       <StringVectorProperty
         name="ChartTitle"
@@ -3737,6 +3734,54 @@
         default_values="1 1 1 1">
         <IntRangeDomain name="range" min="0" max="2" />
       </IntVectorProperty>
+
+      <!-- End of ChartOptionsBase -->
+    </Proxy>
+
+    <ViewProxy name="BarChartView2" 
+      base_proxygroup="views" 
+      base_proxyname="ViewBase"
+      representation_name="BarChartRepresentation">
+
+      <!-- Add non-command properties that will help
+          keep client-only BarChart properties in SM such as colors etc etc -->
+
+      <SubProxy>
+        <Proxy name="ChartOptionsBase" proxyname="ChartOptionsBase"
+          proxygroup="views">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ChartTitle" />
+          <Property name="ChartTitleFont" />
+          <Property name="ChartTitleColor" />
+          <Property name="ChartTitleAlignment" />
+          <Property name="ShowLegend" />
+          <Property name="LegendLocation" />
+          <Property name="LegendFlow" />
+          <Property name="ShowAxis" />
+          <Property name="ShowAxisGrid" />
+          <Property name="AxisGridType" />
+          <Property name="AxisColor" />
+          <Property name="AxisGridColor" />
+          <Property name="ShowAxisLabels" />
+          <Property name="AxisLabelFont" />
+          <Property name="AxisLabelColor" />
+          <Property name="AxisLabelNotation" />
+          <Property name="AxisLabelPrecision" />
+          <Property name="AxisScale" />
+          <Property name="AxisBehavior" />
+          <Property name="AxisMinimum" />
+          <Property name="AxisMaximum" />
+          <Property name="LeftAxisLabels" />
+          <Property name="BottomAxisLabels" />
+          <Property name="RightAxisLabels" />
+          <Property name="TopAxisLabels" />
+          <Property name="AxisTitle" />
+          <Property name="AxisTitleFont" />
+          <Property name="AxisTitleColor" />
+          <Property name="AxisTitleAlignment" />
+        </ExposedProperties>
+      </SubProxy>
 
       <StringVectorProperty
         name="HelpFormat"
