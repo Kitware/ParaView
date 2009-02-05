@@ -459,9 +459,13 @@ protected:
   // Description:
   // Expose a subproxy property from the base proxy. The property with the name
   // "property_name" on the subproxy with the name "subproxy_name" is exposed 
-  // with the name "exposed_name".
+  // with the name "exposed_name". 
+  // If the overrideOK flag is set, then no warning is printed when a new 
+  // exposed property replaces a preexisting one.
   void ExposeSubProxyProperty(const char* subproxy_name, 
-    const char* property_name, const char* exposed_name);
+                              const char* property_name,
+                              const char* exposed_name,
+                              int overrideOK = 0);
 
 
   // Description:
@@ -605,11 +609,17 @@ protected:
 
   // Description:
   // Add a property to self.
-  void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
+  // If the overrideOK flag is set, then no warning is printed when a new 
+  // property replaces a preexisting one.
+  void AddPropertyToSelf(const char* name, vtkSMProperty* prop, 
+                         int overrideOK=0);
 
   // Description:
   // Add a sub-proxy.
-  void AddSubProxy(const char* name, vtkSMProxy* proxy);
+  // If the overrideOK flag is set, then no warning is printed when a new 
+  // subproxy replaces a preexisting one.
+  void AddSubProxy(const char* name, vtkSMProxy* proxy,
+                   int overrideOK=0);
 
   // Description:
   // Remove a sub-proxy.
@@ -688,8 +698,11 @@ protected:
   // Description:
   // Creates a new proxy and initializes it by calling ReadXMLAttributes()
   // with the right XML element.
+  // If the overrideOK flag is set, then no warning is printed when a new 
+  // property replaces a preexisting one.
   vtkSMProperty* NewProperty(const char* name);
-  vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
+  vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement,
+                             int overrideOK = 0);
 
   // Description:
   // Return a property of the given name from self or one of

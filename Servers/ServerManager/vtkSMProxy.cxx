@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.109");
+vtkCxxRevisionMacro(vtkSMProxy, "1.110");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -593,7 +593,7 @@ void vtkSMProxy::AddProperty(const char* subProxyName,
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddPropertyToSelf(
-  const char* name, vtkSMProperty* prop)
+  const char* name, vtkSMProperty* prop, int override)
 {
   if (!prop)
     {
@@ -612,7 +612,10 @@ void vtkSMProxy::AddPropertyToSelf(
 
   if (it != this->Internals->Properties.end())
     {
-    vtkWarningMacro("Property " << name  << " already exists. Replacing");
+    if (!override)
+      {
+      vtkWarningMacro("Property " << name  << " already exists. Replacing");
+      }
     vtkSMProperty* oldProp = it->second.Property.GetPointer();
     if (it->second.ObserverTag > 0)
       {
@@ -1445,7 +1448,8 @@ vtkSMProxy* vtkSMProxy::GetSubProxy(const char* name)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
+void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy, 
+  int override)
 {
   // Check if the proxy already exists. If it does, we will
   // replace it
@@ -1454,7 +1458,10 @@ void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
 
   if (it != this->Internals->SubProxies.end())
     {
-    vtkWarningMacro("Proxy " << name  << " already exists. Replacing");
+    if (!override)
+      {
+      vtkWarningMacro("Proxy " << name  << " already exists. Replacing");
+      }
     // needed to remove any observers.
     this->RemoveSubProxy(name);
     }
@@ -1819,7 +1826,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
 
 //----------------------------------------------------------------------------
 vtkSMProperty* vtkSMProxy::NewProperty(const char* name, 
-  vtkPVXMLElement* propElement)
+  vtkPVXMLElement* propElement, int override)
 {
   vtkSMProperty* property = this->GetProperty(name, 1);
   if (property)
@@ -1859,7 +1866,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
         this->DoNotModifyProperty = 1;
         }
       }
-    this->AddPropertyToSelf(name, property);
+    this->AddPropertyToSelf(name, property, override);
     if (!property->ReadXMLAttributes(this, propElement))
       {
       vtkErrorMacro("Could not parse property: " << propElement->GetName());
@@ -1987,6 +1994,11 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
         const char* name = subElement->GetAttribute("name");
         const char* pname = subElement->GetAttribute("proxyname");
         const char* gname = subElement->GetAttribute("proxygroup");
+        int override = 0;
+        if (!subElement->GetScalarAttribute("override", &override))
+          {
+          override = 0;
+          }
         if (pname && !gname)
           {
           vtkErrorMacro("proxygroup not specified. Subproxy cannot be created.");
@@ -2014,9 +2026,9 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
                           << (pname?pname:"(none"));
             return 0;
             }
+          this->AddSubProxy(name, subproxy, override);
           this->SetupSharedProperties(subproxy, propElement);
           this->SetupExposedProperties(name, propElement);
-          this->AddSubProxy(name, subproxy);
           subproxy->Delete();
           }
         }
@@ -2025,9 +2037,14 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
       {
       const char* name = propElement->GetAttribute("name");
       vtkstd::string tagName = propElement->GetName();
+      int override = 0;
+      if (!propElement->GetScalarAttribute("override", &override))
+        {
+        override = 0;
+        }
       if (name && tagName.find("Property") == (tagName.size()-8))
         {
-        this->NewProperty(name, propElement);
+        this->NewProperty(name, propElement, override);
         }
       }
     }
@@ -2071,7 +2088,12 @@ void vtkSMProxy::SetupExposedProperties(const char* subproxy_name,
          // use the property name as the exposed name.
          exposed_name = name;
          }
-       this->ExposeSubProxyProperty(subproxy_name, name, exposed_name);
+       int override = 0;
+       if (!propertyElement->GetScalarAttribute("override", &override))
+         {
+         override = 0;
+         }
+       this->ExposeSubProxyProperty(subproxy_name, name, exposed_name, override);
        }
     }
 }
@@ -2445,7 +2467,8 @@ void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass,
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name, 
-  const char* property_name, const char* exposed_name)
+  const char* property_name, const char* exposed_name,
+  int override)
 {
   if (!subproxy_name || !property_name || !exposed_name)
     {
@@ -2457,8 +2480,11 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
     this->Internals->ExposedProperties.find(exposed_name);
   if (iter != this->Internals->ExposedProperties.end())
     {
-    vtkWarningMacro("An exposed property with the name \"" << exposed_name
-      << "\" already exists. It will be replaced.");
+    if (!override)
+      {
+      vtkWarningMacro("An exposed property with the name \"" << exposed_name
+        << "\" already exists. It will be replaced.");
+      }
     }
   
   vtkSMProxyInternals::ExposedPropertyInfo info;
