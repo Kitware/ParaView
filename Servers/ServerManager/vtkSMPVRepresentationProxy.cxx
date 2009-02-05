@@ -68,7 +68,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.22");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -110,9 +110,12 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
   vtkSMProxy* inputProxy = this->GetInputProxy();
   this->CubeAxesRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
     this->GetSubProxy("CubeAxesRepresentation"));
-  this->Connect(inputProxy, this->CubeAxesRepresentation,
-    "Input", this->OutputPort);
-  vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility", 0);
+  if (this->CubeAxesRepresentation)
+    {
+    this->Connect(inputProxy, this->CubeAxesRepresentation,
+      "Input", this->OutputPort);
+    vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility", 0);
+    }
 
   vtkSMSurfaceRepresentationProxy* surfaceRepr = 
     vtkSMSurfaceRepresentationProxy::SafeDownCast(
@@ -159,7 +162,10 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
 //----------------------------------------------------------------------------
 bool vtkSMPVRepresentationProxy::AddToView(vtkSMViewProxy* view)
 {
-  this->CubeAxesRepresentation->AddToView(view);
+  if (this->CubeAxesRepresentation)
+    {
+    this->CubeAxesRepresentation->AddToView(view);
+    }
 
   vtkInternals::RepresentationProxiesSet::iterator iter;
   for (iter = this->Internals->UniqueRepresentationProxies.begin();
@@ -181,7 +187,10 @@ bool vtkSMPVRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     (*iter)->RemoveFromView(view);
     }
 
-  this->CubeAxesRepresentation->RemoveFromView(view);
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesRepresentation->RemoveFromView(view);
+    }
   return this->Superclass::RemoveFromView(view);
 }
 
@@ -227,9 +236,12 @@ void vtkSMPVRepresentationProxy::SetVisibility(int visible)
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 
       visible);
     }
-  vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility",
-    visible && this->CubeAxesVisibility);
-  this->CubeAxesRepresentation->UpdateVTKObjects();
+  if (this->CubeAxesRepresentation)
+    {    
+    vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility",
+      visible && this->CubeAxesVisibility);
+    this->CubeAxesRepresentation->UpdateVTKObjects();
+    }
      
   this->Superclass::SetVisibility(visible);
 }
@@ -237,10 +249,13 @@ void vtkSMPVRepresentationProxy::SetVisibility(int visible)
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::SetCubeAxesVisibility(int visible)
 {
-  this->CubeAxesVisibility = visible;
-  vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility",
-    visible && this->GetVisibility());
-  this->CubeAxesRepresentation->UpdateVTKObjects();
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesVisibility = visible;
+    vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility",
+      visible && this->GetVisibility());
+    this->CubeAxesRepresentation->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -250,7 +265,10 @@ void vtkSMPVRepresentationProxy::Update(vtkSMViewProxy* view)
     {
     this->ActiveRepresentation->Update(view);
     }
-  this->CubeAxesRepresentation->Update(view);
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesRepresentation->Update(view);
+    }
 
   this->Superclass::Update(view);
 }
@@ -298,7 +316,10 @@ void vtkSMPVRepresentationProxy::SetUpdateTime(double time)
     (*iter)->SetUpdateTime(time);
     }
 
-  this->CubeAxesRepresentation->SetUpdateTime(time);
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesRepresentation->SetUpdateTime(time);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -312,7 +333,10 @@ void vtkSMPVRepresentationProxy::SetUseViewUpdateTime(bool use)
     {
     (*iter)->SetUseViewUpdateTime(use);
     }
-  this->CubeAxesRepresentation->SetUseViewUpdateTime(use);
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesRepresentation->SetUseViewUpdateTime(use);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -326,7 +350,10 @@ void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
     {
     (*iter)->SetViewUpdateTime(time);
     }
-  this->CubeAxesRepresentation->SetViewUpdateTime(time);
+  if (this->CubeAxesRepresentation)
+    {    
+    this->CubeAxesRepresentation->SetViewUpdateTime(time);
+    }
 }
 
 //----------------------------------------------------------------------------
