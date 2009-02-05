@@ -46,6 +46,7 @@ class QTWIDGETS_EXPORT pqDoubleRangeWidget : public QWidget
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(bool   strictRange READ strictRange WRITE setStrictRange)
+  Q_PROPERTY(double resolution READ resolution WRITE setResolution)
 public:
   /// constructor requires the proxy, property
   pqDoubleRangeWidget(QWidget* parent = NULL);
@@ -61,6 +62,9 @@ public:
  
   // returns whether the line edit is also limited 
   bool strictRange() const;
+
+  // returns the resolution.
+  double resolution() const;
   
 signals:
   /// signal the value changed
@@ -84,6 +88,9 @@ public slots:
   // whereas other methods just do it on the slider
   void setStrictRange(bool);
 
+  // set the resolution.
+  void setResolution(double);
+
 private slots:
   void sliderChanged(int);
   void textChanged(const QString&);
@@ -92,6 +99,7 @@ private slots:
   void updateSlider();
 
 private:
+  double Resolution;
   double Value;
   double Minimum;
   double Maximum;

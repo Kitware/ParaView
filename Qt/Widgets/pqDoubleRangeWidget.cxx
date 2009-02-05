@@ -45,12 +45,13 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
   this->Value = 0;
   this->Minimum = 0;
   this->Maximum = 1;
+  this->Resolution = 100;
   this->StrictRange = false;
 
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   this->Slider = new QSlider(Qt::Horizontal, this);
-  this->Slider->setRange(0,100);
+  this->Slider->setRange(0, this->Resolution);
   l->addWidget(this->Slider);
   this->Slider->setObjectName("Slider");
   this->LineEdit = new QLineEdit(this);
@@ -71,6 +72,20 @@ pqDoubleRangeWidget::pqDoubleRangeWidget(QWidget* p)
 //-----------------------------------------------------------------------------
 pqDoubleRangeWidget::~pqDoubleRangeWidget()
 {
+}
+
+//-----------------------------------------------------------------------------
+double pqDoubleRangeWidget::resolution() const
+{
+  return this->Resolution;
+}
+
+//-----------------------------------------------------------------------------
+void pqDoubleRangeWidget::setResolution(double val)
+{
+  this->Resolution = val;
+  this->Slider->setRange(0, this->Resolution);
+  this->updateSlider();
 }
 
 //-----------------------------------------------------------------------------
@@ -164,7 +179,7 @@ void pqDoubleRangeWidget::sliderChanged(int val)
 {
   if(!this->BlockUpdate)
     {
-    double fraction = val / 100.0;
+    double fraction = val / this->Resolution;
     double range = this->Maximum - this->Minimum;
     double v = (fraction * range) + this->Minimum;
     this->BlockUpdate = true;
@@ -184,7 +199,7 @@ void pqDoubleRangeWidget::textChanged(const QString& text)
     this->BlockUpdate = true;
     double range = this->Maximum - this->Minimum;
     double fraction = (val - this->Minimum) / range;
-    int sliderVal = qRound(fraction * 100.0);
+    int sliderVal = qRound(fraction * this->Resolution);
     this->Slider->setValue(sliderVal);
     this->setValue(val);
     this->BlockUpdate = false;
@@ -203,7 +218,7 @@ void pqDoubleRangeWidget::updateSlider()
   this->Slider->blockSignals(true);
   double range = this->Maximum - this->Minimum;
   double fraction = (this->Value - this->Minimum) / range;
-  int v = qRound(fraction * 100.0);
+  int v = qRound(fraction * this->Resolution);
   this->Slider->setValue(v);
   this->Slider->blockSignals(false);
 }
