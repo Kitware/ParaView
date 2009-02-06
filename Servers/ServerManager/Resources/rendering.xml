@@ -3784,26 +3784,26 @@
       </SubProxy>
 
       <StringVectorProperty
-        name="HelpFormat"
+        name="BarHelpFormat"
         number_of_elements="1">
       </StringVectorProperty>
 
       <IntVectorProperty
-        name="OutlineStyle"
+        name="BarOutlineStyle"
         number_of_elements="1"
         default_values="0">
         <IntRangeDomain name="range" min="0" max="1" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
-        name="GroupFraction"
+        name="BarGroupFraction"
         number_of_elements="1"
         default_values="0.7">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
-        name="WidthFraction"
+        name="BarWidthFraction"
         number_of_elements="1"
         default_values="0.8">
         <DoubleRangeDomain name="range" min="0" max="1" />
