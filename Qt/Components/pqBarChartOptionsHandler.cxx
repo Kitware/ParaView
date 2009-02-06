@@ -83,24 +83,24 @@ void pqBarChartOptionsHandler::applyChanges()
     {
     QString text;
     this->Options->getHelpFormat(text);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"), text);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BarHelpFormat"), text);
     }
 
   if(this->ModifiedData & OutlineStyleModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("OutlineStyle"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BarOutlineStyle"),
         QVariant((int)this->Options->getOutlineStyle()));
     }
 
   if(this->ModifiedData & GroupFractionModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("GroupFraction"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BarGroupFraction"),
         QVariant((double)this->Options->getBarGroupFraction()));
     }
 
   if(this->ModifiedData & WidthFractionModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("WidthFraction"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BarWidthFraction"),
         QVariant((double)this->Options->getBarWidthFraction()));
     }
 
@@ -130,14 +130,14 @@ void pqBarChartOptionsHandler::initializeOptions()
   this->Options->blockSignals(true);
 
   this->Options->setHelpFormat(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("HelpFormat")).toString());
+      proxy->GetProperty("BarHelpFormat")).toString());
   this->Options->setOutlineStyle(
       (vtkQtBarChartOptions::OutlineStyle)pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("OutlineStyle")).toInt());
+      proxy->GetProperty("BarOutlineStyle")).toInt());
   this->Options->setBarGroupFraction((float)pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("GroupFraction")).toDouble());
+      proxy->GetProperty("BarGroupFraction")).toDouble());
   this->Options->setBarWidthFraction((float)pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("WidthFraction")).toDouble());
+      proxy->GetProperty("BarWidthFraction")).toDouble());
 
   this->Options->blockSignals(false);
 }

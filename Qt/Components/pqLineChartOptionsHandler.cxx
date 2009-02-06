@@ -79,7 +79,8 @@ void pqLineChartOptionsHandler::applyChanges()
     {
     QString text;
     this->Options->getHelpFormat(text);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"), text);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("LineHelpFormat"),
+        text);
     }
 
   this->ModifiedData = 0;
@@ -108,7 +109,7 @@ void pqLineChartOptionsHandler::initializeOptions()
   this->Options->blockSignals(true);
 
   this->Options->setHelpFormat(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("HelpFormat")).toString());
+      proxy->GetProperty("LineHelpFormat")).toString());
 
   this->Options->blockSignals(false);
 }

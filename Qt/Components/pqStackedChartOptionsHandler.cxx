@@ -80,18 +80,19 @@ void pqStackedChartOptionsHandler::applyChanges()
     {
     QString text;
     this->Options->getHelpFormat(text);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"), text);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("StackedHelpFormat"),
+        text);
     }
 
   if(this->ModifiedData & NormalizationModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("Normalize"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("StackedNormalize"),
         QVariant(this->Options->isSumNormalized() ? 1 : 0));
     }
 
   if(this->ModifiedData & GradientModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("ShowGradient"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("StackedShowGradient"),
         QVariant(this->Options->isGradientDisplayed() ? 1 : 0));
     }
 
@@ -121,11 +122,11 @@ void pqStackedChartOptionsHandler::initializeOptions()
   this->Options->blockSignals(true);
 
   this->Options->setHelpFormat(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("HelpFormat")).toString());
+      proxy->GetProperty("StackedHelpFormat")).toString());
   this->Options->setSumNormalized(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("Normalize")).toInt() != 0);
+      proxy->GetProperty("StackedNormalize")).toInt() != 0);
   this->Options->setGradientDisplayed(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("ShowGradient")).toInt() != 0);
+      proxy->GetProperty("StackedShowGradient")).toInt() != 0);
 
   this->Options->blockSignals(false);
 }

@@ -83,25 +83,26 @@ void pqBoxChartOptionsHandler::applyChanges()
     {
     QString text;
     this->Options->getHelpFormat(text);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"), text);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BoxHelpFormat"), text);
     }
 
   if(this->ModifiedData & OutlierFormatModified)
     {
     QString text;
     this->Options->getOutlierFormat(text);
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("OutlierFormat"), text);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BoxOutlierFormat"),
+        text);
     }
 
   if(this->ModifiedData & OutlineStyleModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("OutlineStyle"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BoxOutlineStyle"),
         QVariant((int)this->Options->getOutlineStyle()));
     }
 
   if(this->ModifiedData & WidthFractionModified)
     {
-    pqSMAdaptor::setElementProperty(proxy->GetProperty("WidthFraction"),
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("BoxWidthFraction"),
         QVariant((double)this->Options->getBoxWidthFraction()));
     }
 
@@ -131,15 +132,15 @@ void pqBoxChartOptionsHandler::initializeOptions()
   this->Options->blockSignals(true);
 
   this->Options->setHelpFormat(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("HelpFormat")).toString());
+      proxy->GetProperty("BoxHelpFormat")).toString());
   this->Options->setOutlierFormat(pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("OutlierFormat")).toString());
+      proxy->GetProperty("BoxOutlierFormat")).toString());
   this->Options->setOutlineStyle(
       (vtkQtStatisticalBoxChartOptions::OutlineStyle)
       pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("OutlineStyle")).toInt());
+      proxy->GetProperty("BoxOutlineStyle")).toInt());
   this->Options->setBoxWidthFraction((float)pqSMAdaptor::getElementProperty(
-      proxy->GetProperty("WidthFraction")).toDouble());
+      proxy->GetProperty("BoxWidthFraction")).toDouble());
 
   this->Options->blockSignals(false);
 }
