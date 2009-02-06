@@ -22,7 +22,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.18");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -126,20 +126,23 @@ bool vtkSMIceTDesktopRenderViewProxy::BeginCreateVTKObjects()
   ivp->SetElement(0, this->EnableTiles? 0 : 1);
   this->RenderSyncManager->UpdateVTKObjects();
 
-  // We need to create vtkIceTRenderer on the server side and vtkRenderer on
-  // the client.
-  this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
-  this->RendererProxy->GetID(); // this calls CreateVTKObjects().
+  if (this->UsingIceTRenderers)
+    {
+    // We need to create vtkIceTRenderer on the server side and vtkRenderer on
+    // the client.
+    this->RendererProxy->SetServers(vtkProcessModule::CLIENT);
+    this->RendererProxy->GetID(); // this calls CreateVTKObjects().
+    
+    stream  << vtkClientServerStream::New 
+            << "vtkIceTRenderer" 
+            << this->RendererProxy->GetID()
+            << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    this->RendererProxy->SetServers(
+                                    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->RendererProxy->UpdateVTKObjects();
+    }
 
-  stream  << vtkClientServerStream::New 
-          << "vtkIceTRenderer" 
-          << this->RendererProxy->GetID()
-          << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
-  this->RendererProxy->SetServers(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->RendererProxy->UpdateVTKObjects();
- 
   return true;
 }
 
