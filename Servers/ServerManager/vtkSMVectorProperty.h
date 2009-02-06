@@ -94,6 +94,14 @@ public:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
 
+  // Description:
+  // If SetNumberCommand is set, it is called before Command
+  // with the number of arguments as the parameter.
+  vtkSetStringMacro(SetNumberCommand);
+  vtkGetStringMacro(SetNumberCommand);
+
+  char* SetNumberCommand;
+
 protected:
   vtkSMVectorProperty();
   ~vtkSMVectorProperty();

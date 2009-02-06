@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.46");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.47");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -57,7 +57,6 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkSMDoubleVectorPropertyInternals;
   this->ArgumentIsArray = 0;
-  this->SetNumberCommand = 0;
   this->Initialized = false;
   this->Precision = 0;
 }
@@ -66,7 +65,6 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 vtkSMDoubleVectorProperty::~vtkSMDoubleVectorProperty()
 {
   delete this->Internals;
-  this->SetSetNumberCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -388,12 +386,6 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if(retVal) 
     { 
     this->SetArgumentIsArray(arg_is_array); 
-    }
-
-  const char* numCommand = element->GetAttribute("set_number_command");
-  if (numCommand)
-    {
-    this->SetSetNumberCommand(numCommand);
     }
 
   int precision=0;

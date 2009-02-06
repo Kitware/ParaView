@@ -181,17 +181,10 @@ protected:
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
-  // Description:
-  // If SetNumberCommand is set, it is called before Command
-  // with the number of arguments as the parameter.
-  vtkSetStringMacro(SetNumberCommand);
-  vtkGetStringMacro(SetNumberCommand);
-
   // Subclass may override this if ResetToDefault can reset to default
   // value specified in the configuration file.
   virtual void ResetToDefaultInternal();
 
-  char* SetNumberCommand;
 
   bool Initialized;
 

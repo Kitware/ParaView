@@ -16,7 +16,7 @@
 
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.14");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -26,12 +26,14 @@ vtkSMVectorProperty::vtkSMVectorProperty()
   this->UseIndex = 0;
   this->CleanCommand = 0;
   this->IsInternal = 0;
+  this->SetNumberCommand = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::~vtkSMVectorProperty()
 {
   this->SetCleanCommand(0);
+  this->SetSetNumberCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -81,6 +83,12 @@ int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
   if (!retVal)
     {
     return retVal;
+    }
+
+  const char* numCommand = element->GetAttribute("set_number_command");
+  if (numCommand)
+    {
+    this->SetSetNumberCommand(numCommand);
     }
 
   int use_index;
@@ -137,4 +145,6 @@ void vtkSMVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CleanCommand: " << 
     (this->CleanCommand? this->CleanCommand : "(null)" ) << endl;
   os << indent << "UseIndex: " << this->UseIndex << endl;
+  os << indent << "SetNumberCommand: " <<
+    (this->SetNumberCommand? this->SetNumberCommand : "(null)") << endl;
 }
