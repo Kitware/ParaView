@@ -62,7 +62,7 @@ QStringList pqStandardViewModules::viewTypes() const
   return QStringList() << 
     pqRenderView::renderViewType() << 
     pqTwoDRenderView::twoDRenderViewType() <<
-    //pqBarChartView::barChartViewType() << 
+    pqBarChartView::barChartViewType() << 
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<

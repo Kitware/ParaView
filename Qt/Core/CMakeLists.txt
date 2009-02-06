@@ -45,8 +45,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqBarChartView.h
   pqBarChartRepresentation.h
+  pqBarChartView.h
+  pqChartViewPropertyHandler.h
   pqCommandServerStartup.h
   pqComparativeRenderView.h
   pqComparativePlotView.h
@@ -166,6 +167,8 @@ ADD_LIBRARY(pqCore
   pqBarChartRepresentation.h
   pqBarChartView.cxx
   pqBarChartView.h
+  pqChartViewPropertyHandler.cxx
+  pqChartViewPropertyHandler.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqComparativeRenderView.cxx

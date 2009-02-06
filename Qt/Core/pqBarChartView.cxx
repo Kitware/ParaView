@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartSeriesModelCollection.h"
 #include "vtkQtChartTableRepresentation.h"
 
+#include "pqChartViewPropertyHandler.h"
+
 // Qt Includes.
 #include <QPushButton>
 
@@ -71,6 +73,7 @@ public:
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->BarChartView = vtkSmartPointer<vtkQtBarChartView>::New();
+    this->ChartProperties = 0;
     }
 
   ~pqInternal()
@@ -82,7 +85,7 @@ public:
   vtkSmartPointer<vtkQtBarChartView> BarChartView;
   QMap<pqRepresentation*,
       vtkSmartPointer<vtkQtChartTableRepresentation> > RepresentationMap;
-
+  pqChartViewPropertyHandler* ChartProperties;
 };
 
 //-----------------------------------------------------------------------------
@@ -114,115 +117,24 @@ pqBarChartView::pqBarChartView(
   this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
     this, SIGNAL(canRedoChanged(bool)));
 
-  // Listen for title property changes.
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ChartTitle"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateTitle()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ChartTitleFont"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateTitleFont()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ChartTitleColor"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateTitleColor()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ChartTitleAlignment"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateTitleAlignment()));
-
-  // Listen for axis title property changes.
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisTitle"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisTitle()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisTitleFont"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisTitleFont()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisTitleColor"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisTitleColor()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisTitleAlignment"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateAxisTitleAlignment()));
-
-  // Listen for legend property changes.
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ShowLegend"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateLegendVisibility()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("LegendLocation"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateLegendLocation()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("LegendFlow"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateLegendFlow()));
-
-  // Listen for axis drawing property changes.
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ShowAxis"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisVisibility()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisColor"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisColor()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ShowAxisGrid"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateGridVisibility()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisGridType"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateGridColorType()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisGridColor"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateGridColor()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("ShowAxisLabels"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisLabelVisibility()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisLabelFont"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisLabelFont()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisLabelColor"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisLabelColor()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisLabelPrecision"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisLabelPrecision()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisLabelNotation"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisLabelNotation()));
-
-  // Listen for axis layout property changes.
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisScale"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisScale()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisBehavior"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisBehavior()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisMinimum"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisRange()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("AxisMaximum"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateAxisRange()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("LeftAxisLabels"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateLeftAxisLabels()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("BottomAxisLabels"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateBottomAxisLabels()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("RightAxisLabels"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateRightAxisLabels()));
-  this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("TopAxisLabels"), vtkCommand::ModifiedEvent,
-      this, SLOT(updateTopAxisLabels()));
+  // Set up the basic chart properties handler.
+  this->Internal->ChartProperties = new pqChartViewPropertyHandler(
+    this->Internal->BarChartView, viewModule, this);
+  this->Internal->ChartProperties->connectProperties(
+    this->Internal->VTKConnect);
 
   // Listen for bar chart property changes.
   this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("HelpFormat"), vtkCommand::ModifiedEvent,
+      viewModule->GetProperty("BarHelpFormat"), vtkCommand::ModifiedEvent,
       this, SLOT(updateHelpFormat()));
   this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("OutlineStyle"), vtkCommand::ModifiedEvent,
+      viewModule->GetProperty("BarOutlineStyle"), vtkCommand::ModifiedEvent,
       this, SLOT(updateOutlineStyle()));
   this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("GroupFraction"), vtkCommand::ModifiedEvent,
+      viewModule->GetProperty("BarGroupFraction"), vtkCommand::ModifiedEvent,
       this, SLOT(updateGroupFraction()));
   this->Internal->VTKConnect->Connect(
-      viewModule->GetProperty("WidthFraction"), vtkCommand::ModifiedEvent,
+      viewModule->GetProperty("BarWidthFraction"), vtkCommand::ModifiedEvent,
       this, SLOT(updateWidthFraction()));
 
   // Add the current Representations to the chart.
@@ -251,74 +163,10 @@ void pqBarChartView::setDefaultPropertyValues()
   pqView::setDefaultPropertyValues();
 
   // Load defaults for the properties that need them.
-  int i = 0;
-  QList<QVariant> values;
-  for(i = 0; i < 4; i++)
-    {
-    values.append(QVariant((double)0.0));
-    values.append(QVariant((double)0.0));
-    values.append(QVariant((double)0.0));
-    }
+  this->Internal->ChartProperties->setDefaultPropertyValues();
 
-  vtkSMProxy *proxy = this->getProxy();
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelColor"), values);
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisTitleColor"), values);
-  values.clear();
-  for(i = 0; i < 4; i++)
-    {
-    if(i < 2)
-      {
-      values.append(QVariant((double)0.0));
-      values.append(QVariant((double)0.0));
-      values.append(QVariant((double)0.0));
-      }
-    else
-      {
-      // Use a different color for the right and top axis.
-      values.append(QVariant((double)0.0));
-      values.append(QVariant((double)0.0));
-      values.append(QVariant((double)0.5));
-      }
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisColor"), values);
-  values.clear();
-  for(i = 0; i < 4; i++)
-    {
-    QColor grid = Qt::lightGray;
-    values.append(QVariant((double)grid.redF()));
-    values.append(QVariant((double)grid.greenF()));
-    values.append(QVariant((double)grid.blueF()));
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisGridColor"), values);
-  QFont chartFont = this->Internal->BarChartView->GetChartWidget()->font();
-  values.clear();
-  values.append(chartFont.family());
-  values.append(QVariant(chartFont.pointSize()));
-  values.append(QVariant(chartFont.bold() ? 1 : 0));
-  values.append(QVariant(chartFont.italic() ? 1 : 0));
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("ChartTitleFont"), values);
-  for(i = 0; i < 3; i++)
-    {
-    values.append(chartFont.family());
-    values.append(QVariant(chartFont.pointSize()));
-    values.append(QVariant(chartFont.bold() ? 1 : 0));
-    values.append(QVariant(chartFont.italic() ? 1 : 0));
-    }
-
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisLabelFont"), values);
-  pqSMAdaptor::setMultipleElementProperty(
-      proxy->GetProperty("AxisTitleFont"), values);
-
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("HelpFormat"),
-      QVariant("%s: %1, %2"));
+  pqSMAdaptor::setElementProperty(
+    this->getProxy()->GetProperty("BarHelpFormat"), QVariant("%s: %1, %2"));
 }
 
 //-----------------------------------------------------------------------------
@@ -457,364 +305,30 @@ bool pqBarChartView::canDisplay(pqOutputPort* opPort) const
   return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
 }
 
-void pqBarChartView::updateTitle()
-{
-  this->Internal->BarChartView->SetTitle(pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ChartTitle")).toString().toAscii().data());
-}
-
-void pqBarChartView::updateTitleFont()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("ChartTitleFont"));
-  if(values.size() == 4)
-    {
-    this->Internal->BarChartView->SetTitleFont(
-      values[0].toString().toAscii().data(), values[1].toInt(),
-      values[2].toInt() != 0, values[3].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateTitleColor()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("ChartTitleColor"));
-  if(values.size() == 3)
-    {
-    this->Internal->BarChartView->SetTitleColor(values[0].toDouble(),
-      values[1].toDouble(), values[2].toDouble());
-    }
-}
-
-void pqBarChartView::updateTitleAlignment()
-{
-  this->Internal->BarChartView->SetTitleAlignment(
-    pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ChartTitleAlignment")).toInt());
-}
-
-void pqBarChartView::updateAxisTitle()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisTitle"));
-  for(int i = 0; i < 4 && i < values.size(); ++i)
-    {
-    this->Internal->BarChartView->SetAxisTitle(i,
-      values[i].toString().toAscii().data());
-    }
-}
-
-void pqBarChartView::updateAxisTitleFont()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisTitleFont"));
-  for(i = 0, j = 0; i < 4 && j + 3 < values.size(); i++, j += 4)
-    {
-    this->Internal->BarChartView->SetAxisTitleFont(i,
-      values[j].toString().toAscii().data(), values[j + 1].toInt(),
-      values[j + 2].toInt() != 0, values[j + 3].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateAxisTitleColor()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisTitleColor"));
-  for(i = 0, j = 0; i < 4 && j + 2 < values.size(); i++, j += 3)
-    {
-    this->Internal->BarChartView->SetAxisTitleColor(i, values[j].toDouble(),
-      values[j + 1].toDouble(), values[j + 2].toDouble());
-    }
-}
-
-void pqBarChartView::updateAxisTitleAlignment()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisTitleAlignment"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisTitleAlignment(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateLegendVisibility()
-{
-  this->Internal->BarChartView->SetLegendVisibility(
-    pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("ShowLegend")).toInt() != 0);
-}
-
-void pqBarChartView::updateLegendLocation()
-{
-  this->Internal->BarChartView->SetLegendLocation(
-    pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("LegendLocation")).toInt());
-}
-
-void pqBarChartView::updateLegendFlow()
-{
-  this->Internal->BarChartView->SetLegendFlow(
-    pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("LegendFlow")).toInt());
-}
-
-void pqBarChartView::updateAxisVisibility()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ShowAxis"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisVisibility(i, values[i].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateAxisColor()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisColor"));
-  for(i = 0, j = 0; i < 4 && j + 2 < values.size(); i++, j += 3)
-    {
-    this->Internal->BarChartView->SetAxisColor(i, values[j].toDouble(),
-      values[j + 1].toDouble(), values[j + 2].toDouble());
-    }
-}
-
-void pqBarChartView::updateGridVisibility()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ShowAxisGrid"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetGridVisibility(i, values[i].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateGridColorType()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisGridType"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetGridColorType(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateGridColor()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisGridColor"));
-  for(i = 0, j = 0; i < 4 && j + 2 < values.size(); i++, j += 3)
-    {
-    this->Internal->BarChartView->SetGridColor(i, values[j].toDouble(),
-      values[j + 1].toDouble(), values[j + 2].toDouble());
-    }
-}
-
-void pqBarChartView::updateAxisLabelVisibility()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("ShowAxisLabels"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisLabelVisibility(i,
-      values[i].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateAxisLabelFont()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisLabelFont"));
-  for(i = 0, j = 0; i < 4 && j + 3 < values.size(); i++, j += 4)
-    {
-    this->Internal->BarChartView->SetAxisLabelFont(i,
-      values[j].toString().toAscii().data(), values[j + 1].toInt(),
-      values[j + 2].toInt() != 0, values[j + 3].toInt() != 0);
-    }
-}
-
-void pqBarChartView::updateAxisLabelColor()
-{
-  int i, j;
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisLabelColor"));
-  for(i = 0, j = 0; i < 4 && j + 2 < values.size(); i++, j += 3)
-    {
-    this->Internal->BarChartView->SetAxisLabelColor(i, values[j].toDouble(),
-      values[j + 1].toDouble(), values[j + 2].toDouble());
-    }
-}
-
-void pqBarChartView::updateAxisLabelPrecision()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisLabelPrecision"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisLabelPrecision(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateAxisLabelNotation()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisLabelNotation"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisLabelNotation(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateAxisScale()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisScale"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisScale(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateAxisBehavior()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisBehavior"));
-  for(int i = 0; i < 4 && i < values.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisBehavior(i, values[i].toInt());
-    }
-}
-
-void pqBarChartView::updateAxisRange()
-{
-  QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisMinimum"));
-  QList<QVariant> maxValues = pqSMAdaptor::getMultipleElementProperty(
-    this->getProxy()->GetProperty("AxisMaximum"));
-  for(int i = 0; i < 4 && i < values.size() && i < maxValues.size(); i++)
-    {
-    this->Internal->BarChartView->SetAxisRange(i, values[i].toDouble(),
-      maxValues[i].toDouble());
-    }
-}
-
-void pqBarChartView::updateLeftAxisLabels()
-{
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
-  if(area->getAxisLayer()->getAxisBehavior(vtkQtChartAxis::Left) ==
-    vtkQtChartAxisLayer::FixedInterval)
-    {
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("LeftAxisLabels"));
-    vtkQtChartAxis* axis = this->Internal->BarChartView->GetAxis(0);
-    vtkQtChartAxisModel* model = axis->getModel();
-    model->startModifyingData();
-    model->removeAllLabels();
-    QList<QVariant>::Iterator iter = values.begin();
-    for( ; iter != values.end(); ++iter)
-      {
-      model->addLabel(*iter);
-      }
-
-    model->finishModifyingData();
-    }
-}
-
-void pqBarChartView::updateBottomAxisLabels()
-{
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
-  if(area->getAxisLayer()->getAxisBehavior(vtkQtChartAxis::Bottom) ==
-    vtkQtChartAxisLayer::FixedInterval)
-    {
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("BottomAxisLabels"));
-    vtkQtChartAxis* axis = this->Internal->BarChartView->GetAxis(1);
-    vtkQtChartAxisModel* model = axis->getModel();
-    model->startModifyingData();
-    model->removeAllLabels();
-    QList<QVariant>::Iterator iter = values.begin();
-    for( ; iter != values.end(); ++iter)
-      {
-      model->addLabel(*iter);
-      }
-
-    model->finishModifyingData();
-    }
-}
-
-void pqBarChartView::updateRightAxisLabels()
-{
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
-  if(area->getAxisLayer()->getAxisBehavior(vtkQtChartAxis::Right) ==
-    vtkQtChartAxisLayer::FixedInterval)
-    {
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("RightAxisLabels"));
-    vtkQtChartAxis* axis = this->Internal->BarChartView->GetAxis(2);
-    vtkQtChartAxisModel* model = axis->getModel();
-    model->startModifyingData();
-    model->removeAllLabels();
-    QList<QVariant>::Iterator iter = values.begin();
-    for( ; iter != values.end(); ++iter)
-      {
-      model->addLabel(*iter);
-      }
-
-    model->finishModifyingData();
-    }
-}
-
-void pqBarChartView::updateTopAxisLabels()
-{
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
-  if(area->getAxisLayer()->getAxisBehavior(vtkQtChartAxis::Top) ==
-    vtkQtChartAxisLayer::FixedInterval)
-    {
-    QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      this->getProxy()->GetProperty("TopAxisLabels"));
-    vtkQtChartAxis* axis = this->Internal->BarChartView->GetAxis(3);
-    vtkQtChartAxisModel* model = axis->getModel();
-    model->startModifyingData();
-    model->removeAllLabels();
-    QList<QVariant>::Iterator iter = values.begin();
-    for( ; iter != values.end(); ++iter)
-      {
-      model->addLabel(*iter);
-      }
-
-    model->finishModifyingData();
-    }
-}
-
 void pqBarChartView::updateHelpFormat()
 {
   this->Internal->BarChartView->SetHelpFormat(pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("HelpFormat")).toString().toAscii().data());
+    this->getProxy()->GetProperty("BarHelpFormat")).toString().toAscii().data());
 }
 
 void pqBarChartView::updateOutlineStyle()
 {
   this->Internal->BarChartView->SetOutlineStyle(
     pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("OutlineStyle")).toInt());
+    this->getProxy()->GetProperty("BarOutlineStyle")).toInt());
 }
 
 void pqBarChartView::updateGroupFraction()
 {
   this->Internal->BarChartView->SetBarGroupFraction(
     (float)pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("GroupFraction")).toDouble());
+    this->getProxy()->GetProperty("BarGroupFraction")).toDouble());
 }
 
 void pqBarChartView::updateWidthFraction()
 {
   this->Internal->BarChartView->SetBarWidthFraction(
     (float)pqSMAdaptor::getElementProperty(
-    this->getProxy()->GetProperty("WidthFraction")).toDouble());
+    this->getProxy()->GetProperty("BarWidthFraction")).toDouble());
 }
 

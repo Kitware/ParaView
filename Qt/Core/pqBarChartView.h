@@ -97,41 +97,6 @@ protected slots:
   /// Called to ensure that at most 1 repr is visible at a time.
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
 
-  void updateTitle();
-  void updateTitleFont();
-  void updateTitleColor();
-  void updateTitleAlignment();
-
-  void updateAxisTitle();
-  void updateAxisTitleFont();
-  void updateAxisTitleColor();
-  void updateAxisTitleAlignment();
-
-  void updateLegendVisibility();
-  void updateLegendLocation();
-  void updateLegendFlow();
-
-  void updateAxisVisibility();
-  void updateAxisColor();
-
-  void updateGridVisibility();
-  void updateGridColorType();
-  void updateGridColor();
-
-  void updateAxisLabelVisibility();
-  void updateAxisLabelFont();
-  void updateAxisLabelColor();
-  void updateAxisLabelPrecision();
-  void updateAxisLabelNotation();
-
-  void updateAxisScale();
-  void updateAxisBehavior();
-  void updateAxisRange();
-  void updateLeftAxisLabels();
-  void updateBottomAxisLabels();
-  void updateRightAxisLabels();
-  void updateTopAxisLabels();
-
   void updateHelpFormat();
   void updateOutlineStyle();
   void updateGroupFraction();
