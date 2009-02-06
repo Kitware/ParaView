@@ -462,19 +462,46 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <StringVectorProperty name="SetNominalParameter" command="SetNominalParameter" label="Parameter for Nominal Value" number_of_elements="1" default_values="Mean"/>
+      <StringVectorProperty 
+        name="SetNominalParameter" 
+        command="SetNominalParameter" 
+        label="Parameter for Nominal Value" 
+        number_of_elements="1" 
+        default_values="Mean">
+      </StringVectorProperty>
 
-      <StringVectorProperty name="SetDeviationParameter" command="SetDeviationParameter" label="Parameter for Deviation" number_of_elements="1" default_values="Standard Deviation"/>
+      <StringVectorProperty 
+        name="SetDeviationParameter" 
+        command="SetDeviationParameter" 
+        label="Parameter for Deviation" 
+        number_of_elements="1" 
+        default_values="Standard Deviation">
+      </StringVectorProperty>
 
-      <IntVectorProperty name="SignedDeviations" command="SetSignedDeviations" label="Signed Deviations" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="SignedDeviations" 
+        command="SetSignedDeviations" 
+        label="Signed Deviations" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -539,11 +566,21 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -616,11 +653,21 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -685,11 +732,21 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -754,11 +811,21 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -823,27 +890,66 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty name="Learn" command="SetLearn" label="Learn Model" number_of_elements="1" default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="Assess" command="SetAssess" label="Assess Data" number_of_elements="1" default_values="1">
+      <IntVectorProperty 
+        name="Learn" 
+        command="SetLearn" 
+        label="Learn Model" 
+        number_of_elements="1" 
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <IntVectorProperty 
-         name="FixedBasisSize"
-         label="Fixed Basis Size"
-         number_of_elements="1"
-         default_values="-1">
+        name="Assess" 
+        command="SetAssess" 
+        label="Assess Data" 
+        number_of_elements="1" 
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty 
+        name="NormalizationScheme"
+        command="SetNormalizationScheme" 
+        label="Normalization Scheme" 
+        number_of_elements="1" 
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="None"/>
+          <Entry value="1" text="Specified Triangle"/>
+          <Entry value="2" text="Specified Diagonal"/>
+          <Entry value="3" text="Diagonal Variance"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty 
+        name="BasisScheme" 
+        command="SetBasisScheme" 
+        label="Basis Scheme" 
+        number_of_elements="1" 
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Full Basis"/>
+          <Entry value="1" text="Fixed Basis Size"/>
+          <Entry value="2" text="Fixed Basis Energy"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty 
+        name="FixedBasisSize"
+        command="SetFixedBasisSize"
+        label="Fixed Basis Size"
+        number_of_elements="1"
+        default_values="-1">
        </IntVectorProperty>
 
       <DoubleVectorProperty 
-         name="FixedBasisEnergy"
-         label="Fixed Basis Energy"
-         number_of_elements="1"
-         default_values="1">
-         <DoubleRangeDomain name="range" min="0" max="1" />
+        name="FixedBasisEnergy"
+        command="SetFixedBasisEnergy"
+        label="Fixed Basis Energy"
+        number_of_elements="1"
+        default_values="1">
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
       <Hints>
