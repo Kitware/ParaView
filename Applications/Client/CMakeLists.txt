@@ -99,7 +99,6 @@ IF(WIN32)
   TARGET_LINK_LIBRARIES(${PV_EXE_NAME} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
 
-# Assitiant is required for paraview help. 
 FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
    NAMES assistant_adp assistant 
    PATHS ${QT_BINARY_DIR}
@@ -108,7 +107,10 @@ FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
 FILE(TO_NATIVE_PATH "${QT_ASSISTANT_EXECUTABLE}" PV_ASSISTANT)
 MARK_AS_ADVANCED(QT_ASSISTANT_EXECUTABLE)
 IF(NOT EXISTS ${QT_ASSISTANT_EXECUTABLE})
-  MESSAGE(SEND_ERROR "Qt Assistant is required by ParaView. Set QT_ASSISTANT_EXECUTABLE before continuing.")
+  # Not finding assistant is really an error because of the shared-forward
+  # dependency but treating as a warning will let those who do not install 
+  # to get by without it.
+  MESSAGE("WARNING: Qt Assistant is required by ParaView. Set QT_ASSISTANT_EXECUTABLE before continuing.")
 ENDIF(NOT EXISTS ${QT_ASSISTANT_EXECUTABLE})
 
 # Configure client documentation finder for build tree.
