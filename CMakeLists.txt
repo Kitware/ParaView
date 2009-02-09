@@ -283,7 +283,9 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
                               ${ParaView_SOURCE_DIR}/Qt/Core
                               ${ParaView_BINARY_DIR}/Qt/Core
                               ${ParaView_SOURCE_DIR}/Qt/Components
-                              ${ParaView_BINARY_DIR}/Qt/Components )
+                              ${ParaView_BINARY_DIR}/Qt/Components
+                              ${ParaView_SOURCE_DIR}/Qt/Testing
+                              ${ParaView_BINARY_DIR}/Qt/Testing )
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
 GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview${PV_EXE_SUFFIX} LOCATION)
 GET_TARGET_PROPERTY(PARAVIEW_BATCH_EXECUTABLE pvbatch${PV_EXE_SUFFIX} LOCATION)
