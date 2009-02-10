@@ -16,7 +16,7 @@
 
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.14");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -101,7 +101,8 @@ int vtkSMVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
   retVal = element->GetScalarAttribute("repeat_command", &repeat_command);
   if(retVal) 
     { 
-    this->SetRepeatCommand(repeat_command); 
+    this->SetRepeatCommand(repeat_command);
+    this->Repeatable = repeat_command;
     }
   int numElsPerCommand;
   retVal = 

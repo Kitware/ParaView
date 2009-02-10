@@ -151,6 +151,14 @@ public:
   // used while copying over the values from the two proxy properties.
   virtual void DeepCopy(vtkSMProperty* src, const char* exceptionClass, 
     int proxyPropertyCopyFlag);
+
+  // Description:
+  // If RepeatCommand is true, the command is invoked multiple times,
+  // once for every proxy.
+  vtkGetMacro(RepeatCommand, int);
+  vtkSetMacro(RepeatCommand, int);
+  vtkBooleanMacro(RepeatCommand, int);
+
 protected:
   vtkSMProxyProperty();
   ~vtkSMProxyProperty();
@@ -241,8 +249,6 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
-  vtkSetMacro(RepeatCommand, int);
-  vtkGetMacro(RepeatCommand, int);
   int RepeatCommand;
 
   // When set to true, the property will push a NULL i.e. 0 when there are no

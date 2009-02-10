@@ -769,6 +769,7 @@
       <ProxyProperty name="ViewModules"
         command="AddViewModule"
         clean_command="RemoveAllViewModules"
+        repeat_command="1"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="views" />
@@ -782,6 +783,7 @@
       <ProxyProperty name="Cues"
         update_self="1"
         command="AddCueProxy"
+        repeat_command="1"
         remove_command="RemoveCueProxy">
         <ProxyGroupDomain name="groups">
           <Group name="animation" />
@@ -2191,7 +2193,8 @@
         name="Views"
         command="AddView"
         remove_command="RemoveView"
-        update_self="1">
+        update_self="1"
+        repeatable="1">
         <Documentation>
           Views with their view time linked with this time keeper.
         </Documentation>
@@ -2201,7 +2204,8 @@
         name="TimeSources"
         command="AddTimeSource"
         remove_command="RemoveTimeSource"
-        update_self="1">
+        update_self="1"
+        repeatable="1">
         <Documentation>
           List of proxies that provide time. TimestepValues property has
           a set of timesteps provided by all the sources added to this property

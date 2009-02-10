@@ -31,24 +31,37 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     gc.collect()
     servermanager.Disconnect()
     cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
+    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
     CreateRenderView()
+
     return cid
 
 def CreateRenderView():
-
-    active_objects.view = servermanager.CreateRenderView()
+    "Creates and returns a 3D render view."
+    view = servermanager.CreateRenderView()
     servermanager.ProxyManager().RegisterProxy("views", \
-      "my_view%d" % _funcs_internals.view_counter, active_objects.view)
+      "my_view%d" % _funcs_internals.view_counter, view)
+    active_objects.view = view
     _funcs_internals.view_counter += 1
-    return active_objects.view
+    
+    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    views = tk.Views
+    if not view in views:
+        views.append(view)
+
+    return view
 
 def GetRenderView():
+    "Returns the first render view."
     return servermanager.GetRenderView()
 
 def GetRenderViews():
+    "Returns all render views as a list."
     return servermanager.GetRenderViews()
 
 def GetRepresentation(proxy=None, view=None):
+    """"Given a pipeline object and view, returns the corresponding representation object.
+    If pipeline object and view are not specified, active objects are used."""
     if not view:
         view = active_objects.view
     if not proxy:
@@ -62,9 +75,13 @@ def GetRepresentation(proxy=None, view=None):
     return rep
     
 def GetDisplayProperties(proxy=None, view=None):
+    """"Given a pipeline object and view, returns the corresponding representation object.
+    If pipeline object and/or view are not specified, active objects are used."""
     return GetRepresentation(proxy, view)
     
 def Show(proxy=None, view=None, **params):
+    """Turns the visibility of a given pipeline object on in the given view.
+    If pipeline object and/or view are not specified, active objects are used."""
     rep = GetDisplayProperties(proxy, view)
     for param in params.keys():
         setattr(rep, param, params[param])
@@ -72,10 +89,13 @@ def Show(proxy=None, view=None, **params):
     return rep
 
 def Hide(proxy=None, view=None):
+    """Turns the visibility of a given pipeline object off in the given view.
+    If pipeline object and/or view are not specified, active objects are used."""
     rep = GetDisplayProperties(proxy, view)
     rep.Visibility = 0
 
 def Render(view=None):
+    """Renders the given view (default value is active view)"""
     if not view:
         view = active_objects.view
     view.StillRender()
@@ -86,12 +106,20 @@ def Render(view=None):
     return view
         
 def ResetCamera(view=None):
+    """Resets the settings of the camera to preserver orientation but include
+    the whole scene. If an argument is not provided, the active view is
+    used."""
     if not view:
         view = active_objects.view
     view.ResetCamera()
     Render(view)
 
 def SetProperties(proxy=None, **params):
+    """Sets one or more properties of the given pipeline object. If an argument
+    is not provided, the active source is used. Pass a list of property_name=value
+    pairs to this function to set property values. For example:
+     SetProperties(Center=[1, 2, 3], Radius=3.5)
+    """
     if not proxy:
         proxy = active_objects.source
     for param in params.keys():
@@ -100,10 +128,20 @@ def SetProperties(proxy=None, **params):
         setattr(proxy, param, params[param])
 
 def SetDisplayProperties(proxy=None, view=None, **params):
+    """Sets one or more display properties of the given pipeline object. If an argument
+    is not provided, the active source is used. Pass a list of property_name=value
+    pairs to this function to set property values. For example:
+     SetProperties(Color=[1, 0, 0], LineWidth=2)
+    """
     rep = GetDisplayProperties(proxy, view)
     SetProperties(rep, **params)
 
 def SetViewProperties(view=None, **params):
+    """Sets one or more properties of the given view. If an argument
+    is not provided, the active view is used. Pass a list of property_name=value
+    pairs to this function to set property values. For example:
+     SetProperties(Background=[1, 0, 0], UseImmediateMode=0)
+    """
     if not view:
         view = active_objects.view
     SetProperties(view, **params)
@@ -112,16 +150,88 @@ def FindSource(name):
     return servermanager.ProxyManager().GetProxy("sources", name)
 
 def GetSources():
+    """Given the name of a source, return its Python object."""
     return servermanager.ProxyManager().GetProxiesInGroup("sources")
 
 def GetRepresentations():
+    """Returns all representations (display properties)."""
     return servermanager.ProxyManager().GetProxiesInGroup("representations")
 
 def UpdatePipeline(time=None, proxy=None):
+    """Updates (executes) the given pipeline object for the given time as
+    necessary (i.e. if it did not already execute). If not source is provided,
+    the active source is used instead."""
     if not proxy:
         proxy = active_objects.source
-    proxy.UpdatePipeline(time)
+    if time:
+        proxy.UpdatePipeline(time)
+    else:
+        proxy.UpdatePipeline()
 
+def Delete(proxy=None):
+    """Deletes the given pipeline object or the active source if no argument
+    is specified."""
+    if not proxy:
+        proxy = active_objects.source
+    # Unregister any helper proxies stored by a vtkSMProxyListDomain
+    for prop in proxy:
+        listdomain = prop.GetDomain('proxy_list')
+        if listdomain:
+            if listdomain.GetClassName() != 'vtkSMProxyListDomain':
+                continue
+            group = "pq_helper_proxies." + proxy.GetSelfIDAsString()
+            for i in xrange(listdomain.GetNumberOfProxies()):
+                pm = servermanager.ProxyManager()
+                iproxy = listdomain.GetProxy(i)
+                name = pm.GetProxyName(group, iproxy)
+                if iproxy and name:
+                    pm.UnRegisterProxy(group, name, iproxy)
+                    
+    # Remove source/view from time keeper
+    tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+    if isinstance(proxy, servermanager.SourceProxy):
+        try:
+            idx = tk.TimeSources.index(proxy)
+            del tk.TimeSources[idx]
+        except ValueError:
+            pass
+    else:
+        try:
+            idx = tk.Views.index(proxy)
+            del tk.Views[idx]
+        except ValueError:
+            pass
+    servermanager.UnRegister(proxy)
+    
+    # If this is a representation, remove it from all views.
+    if proxy.SMProxy.IsA("vtkSMRepresentationProxy"):
+        for view in GetRenderViews():
+            view.Representations.remove(proxy)
+    # If this is a source, remove the representation iff it has no consumers
+    # Also change the active source if necessary
+    elif proxy.SMProxy.IsA("vtkSMSourceProxy"):
+        sources = servermanager.ProxyManager().GetProxiesInGroup("sources")
+        for i in range(proxy.GetNumberOfConsumers()):
+            if proxy.GetConsumerProxy(i) in sources:
+                raise RuntimeError("Source has consumers. It cannot be deleted " +
+                  "until all consumers are deleted.")
+        if proxy == GetActiveSource():
+            if hasattr(proxy, "Input") and proxy.Input:
+                if isinstance(proxy.Input, servermanager.Proxy):
+                    SetActiveSource(proxy.Input)
+                else:
+                    SetActiveSource(proxy.Input[0])
+        for rep in GetRepresentations().values():
+            if rep.Input == proxy:
+                Delete(rep)
+    # Change the active view if necessary
+    elif proxy.SMProxy.IsA("vtkSMRenderViewProxy"):
+        if proxy == GetActiveView():
+            if len(GetRenderViews()) > 0:
+                SetActiveView(GetRenderViews()[0])
+            else:
+                SetActiveView(None)
+    
 # TODO: Change this to take the array name and number of components. Register 
 # the lt under the name ncomp.array_name
 def MakeBlueToRedLT(min, max):
@@ -134,6 +244,7 @@ def MakeBlueToRedLT(min, max):
     return lt
     
 def _find_writer(filename):
+    "Internal function."
     extension = None
     parts = filename.rsplit('.')
     if len(parts) > 1:
@@ -153,8 +264,19 @@ def _find_writer(filename):
         return 'vtkJPEGWriter'
     else:
         raise RuntimeError, "Cannot infer filetype from extension:", extension
-    
+
 def WriteImage(filename, view=None, **params):
+    """Saves the given view (or the active one if none is given) as an
+    image. Optionally, you can specify the writer and the magnification
+    using the Writer and Magnification named arguments. For example:
+     WriteImage("foo.mypng", aview, Writer=vtkPNGWriter, Magnification=2)
+    If no writer is provided, the type is determined from the file extension.
+    Currently supported extensions are png, bmp, ppm, tif, tiff, jpg and jpeg.
+    The writer is a VTK class that is capable of writing images.
+    Magnification is used to determine the size of the written image. The size
+    is obtained by multiplying the size of the view with the magnification.
+    Rendering may be done using tiling to obtain the correct size without
+    resizing the view."""
     if not view:
         view = active_objects.view
     writer = None
@@ -168,20 +290,32 @@ def WriteImage(filename, view=None, **params):
     view.WriteImage(filename, writer, mag)
     
 def _create_func(key, module):
-    def myfunc(*input, **params):
+    "Internal function."
+    def CreateObject(*input, **params):
         px = module.__dict__[key]()
-        if len(input) == 1:
-            px.Input = input[0]
-        else:
-            px.Input = active_objects.source
+        if px.GetProperty("Input") != None:
+            if len(input) > 0:
+                px.Input = input
+            else:
+                if px.GetProperty("Input").GetRepeatable() and active_objects.get_selected_sources():
+                    px.Input = active_objects.get_selected_sources()
+                elif active_objects.source:
+                    px.Input = active_objects.source
         for param in params.keys():
             setattr(px, param, params[param])
-        servermanager.Register(px)
+        group, name = servermanager.Register(px)
+        if group == "sources":
+            tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+            sources = tk.TimeSources
+            if not px in sources:
+                sources.append(px)
+
         active_objects.source = px
         return px
-    return myfunc
+    return CreateObject
 
 def _func_name_valid(name):
+    "Internal function."
     valid = True
     for c in key:
         if c == '(' or c ==')':
@@ -196,45 +330,131 @@ for m in [servermanager.filters, servermanager.sources]:
         if not isinstance(cl, str):
             if _func_name_valid(key):
                 exec "%s = _create_func(key, m)" % key
+                exec "%s.__doc__ = m.%s.__doc__" % (key, key)
 del dt, m
 
 def GetActiveView():
+    "Returns the active view."
     return active_objects.view
     
+def SetActiveView(view):
+    "Sets the active view."
+    active_objects.view = view
+    
 def GetActiveSource():
+    "Returns the active source."
     return active_objects.source
     
+def SetActiveSource(source):
+    "Sets the active source."
+    active_objects.source = source
+    
 def GetActiveCamera():
+    """Returns the active camera for the active view. The returned object
+    is an instance of vtkCamera."""
     return GetActiveView().GetActiveCamera()
     
-class active_objects:
-    view = None
-    source = None
+class ActiveObjects(object):
+    """This class manages the active objects (source and view). The active
+    objects are shared between Python and the user interface. This class
+    is for internal use. Use the Set/Get methods for setting and getting
+    active objects."""
+    def __get_selection_model(self, name):
+        "Internal method."
+        pxm = servermanager.ProxyManager()
+        model = pxm.GetSelectionModel(name)
+        if not model:
+            model = servermanager.vtkSMProxySelectionModel()
+            pxm.RegisterSelectionModel(name, model)
+        return model
+
+    def set_view(self, view):
+        "Sets the active view."
+        active_view_model = self.__get_selection_model("ActiveView") 
+        if view:
+            active_view_model.SetCurrentProxy(view.SMProxy, 0)
+        else:
+            active_view_model.SetCurrentProxy(None, 0)
+
+    def get_view(self):
+        "Returns the active view."
+        return servermanager._getPyProxy(
+            self.__get_selection_model("ActiveView").GetCurrentProxy())
+
+    def set_source(self, source):
+        "Sets the active source."
+        active_sources_model = self.__get_selection_model("ActiveSources") 
+        if source:
+            # 3 == CLEAR_AND_SELECT
+            active_sources_model.SetCurrentProxy(source.SMProxy, 3)
+        else:
+            active_sources_model.SetCurrentProxy(None, 3)
+
+    def __convert_proxy(self, px):
+        "Internal method."
+        if not px:
+            return None
+        if px.IsA("vtkSMSourceProxy"):
+            return servermanager._getPyProxy(px)
+        else:
+            return servermanager.OutputPort(
+              servermanager._getPyProxy(px.GetSourceProxy()),
+              px.GetPortIndex())
+        
+    def get_source(self):
+        "Returns the active source."
+        return self.__convert_proxy(
+          self.__get_selection_model("ActiveSources").GetCurrentProxy())
+
+    def get_selected_sources(self):
+        "Returns the set of sources selected in the pipeline browser."
+        model = self.__get_selection_model("ActiveSources")
+        proxies = []
+        for i in xrange(model.GetNumberOfSelectedProxies()):
+            proxies.append(self.__convert_proxy(model.GetSelectedProxy(i)))
+        return proxies
+
+    view = property(get_view, set_view)
+    source = property(get_source, set_source)
+
+active_objects = ActiveObjects()
 
 class _funcs_internals:
+    "Internal class."
     first_render = True
     view_counter = 0
     rep_counter = 0
-
-FIELD_ASSOCIATION_POINTS = 0
-FIELD_ASSOCIATION_CELLS = 1
-FIELD_ASSOCIATION_VERTICES = 4
-FIELD_ASSOCIATION_EDGES = 5
-FIELD_ASSOCIATION_ROWS = 6
 
 if not servermanager.ActiveConnection:
     Connect()
 
 def demo1():
+    """Simple demo that create the following pipeline
+    sphere - shrink - \
+                       - append
+    cone            - /
+    """
+    # Create a sphere of radius = 2, theta res. = 32
+    # This object becomes the active source.
     ss = Sphere(Radius=2, ThetaResolution=32)
+    # Apply the shrink filter. The Input property is optional. If Input
+    # is not specified, the filter is applied to the active source.
     shr = Shrink(Input=ss)
+    # Create a cone source.
     cs = Cone()
+    # Append cone and shrink
     app = AppendDatasets()
     app.Input = [shr, cs]
+    # Show the output of the append filter. The argument is optional
+    # as the app filter is now the active object.
     Show(app)
+    # Render the default view.
     Render()
 
 def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
+    """This demo shows the use of readers, data information and display
+    properties."""
+    
     # Create the exodus reader and specify a file name
     reader = ExodusIIReader(FileName=fname)
     # Get the list of point arrays.
@@ -268,7 +488,7 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
         numComps = ai.GetNumberOfComponents()
         print "Number of components:", numComps
         for j in range(numComps):
-            print "Range:", ai.Range(j)
+            print "Range:", ai.GetRange(j)
     # White is boring. Let's color the geometry using a variable.
     # First create a lookup table. This object controls how scalar
     # values are mapped to colors. See VTK documentation for

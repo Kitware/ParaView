@@ -2429,12 +2429,16 @@ void pqMainWindowCore::initPythonInterpretor()
     {
     int cid = static_cast<int>(activeServer->GetConnectionID());
     QString initStr = QString(
+      "import paraview\n"
+      "paraview.compatibility.major = 3\n"
+      "paraview.compatibility.minor = 5\n"
       "from paraview import servermanager\n"
       "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
       "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n"
       "servermanager.ToggleProgressPrinting()\n"
       "servermanager.fromGUI = True\n"
-      "from paraview.simple import *")
+      "from paraview.simple import *\n"
+      "active_objects.view = servermanager.GetRenderView()")
       .arg(cid)
       .arg(activeServer->getResource().toURI());
     this->Implementation->PythonDialog->print(
