@@ -38,7 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkGraph.h"
 #include "vtkInEdgeIterator.h"
 #include "vtkOutEdgeIterator.h"
+#include "vtkSMSILModel.h"
 #include "vtkStringArray.h"
+#include "vtkMemberFunctionCommand.h"
 
 // Qt Includes.
 #include <QtDebug>
@@ -58,6 +60,12 @@ inline bool INDEX_IS_VALID(const QModelIndex& idx)
 pqSILModel::pqSILModel(QObject* _parent/*=0*/) : Superclass(_parent)
 {
   this->SIL = 0;
+  this->SILModel = vtkSMSILModel::New();
+  vtkCommand* observer = vtkMakeMemberFunctionCommand(*this, 
+    &pqSILModel::checkStateUpdated);
+  this->SILModel->AddObserver(vtkCommand::UpdateDataEvent,
+    observer);
+  observer->Delete();
   this->ModelIndexCache = new QMap<vtkIdType, QModelIndex>();
 }
 
@@ -66,6 +74,7 @@ pqSILModel::~pqSILModel()
 {
   delete this->ModelIndexCache;
   this->ModelIndexCache = 0;
+  this->SILModel->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -73,15 +82,8 @@ void pqSILModel::update(vtkGraph* sil)
 {
   bool prev = this->blockSignals(true);
   this->SIL = sil;
+  this->SILModel->Initialize(sil);
   this->ModelIndexCache->clear();
-
-  vtkIdType numVertices = sil->GetNumberOfVertices();
-  int cursize = this->CheckStates.size();
-  this->CheckStates.resize(numVertices);
-  for (int cc=cursize; cc < numVertices; cc++)
-    {
-    this->CheckStates[cc] = Qt::Checked;
-    }
 
   // Update the list of hierarchies.
   this->Hierarchies.clear();
@@ -91,7 +93,6 @@ void pqSILModel::update(vtkGraph* sil)
     this->SIL->GetVertexData()->GetAbstractArray("Names"));
   vtkAdjacentVertexIterator* iter = vtkAdjacentVertexIterator::New();
   this->SIL->GetAdjacentVertices(0, iter);
-
   int childNo = 0;
   while (iter->HasNext())
     {
@@ -101,45 +102,17 @@ void pqSILModel::update(vtkGraph* sil)
       this->createIndex(childNo, 0, static_cast<quint32>(vertexid));
     this->collectLeaves(vertexid, this->HierarchyVertexIds[hierarchyName]);
     childNo++;
-
-    // This updates the checkstates for the tree, starting with the leaf nodes
-    // thus ensuring that at the end of the initialization, all check states
-    // will be correct.
-    foreach (vtkIdType vid, this->HierarchyVertexIds[hierarchyName])
-      {
-      this->update_check(vid);
-      }
     }
   iter->Delete();
-  
   this->blockSignals(prev);
   this->reset();
 }
 
 //-----------------------------------------------------------------------------
-void pqSILModel::collectLeaves(vtkIdType vertexid, QList<vtkIdType>& list)
+void pqSILModel::collectLeaves(vtkIdType vertexid,
+  vtkstd::set<vtkIdType>& id_set)
 {
-  vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
-    this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
-
-  bool has_child_edge = false;
-  vtkOutEdgeIterator* iter = vtkOutEdgeIterator::New();
-  this->SIL->GetOutEdges(vertexid, iter);
-  while (iter->HasNext())
-    {
-    vtkOutEdgeType edge = iter->Next();
-    if (crossEdgesArray->GetTuple1(edge.Id) == 0)
-      {
-      has_child_edge = true;
-      this->collectLeaves(edge.Target, list);
-      }
-    }
-  iter->Delete();
-
-  if (!has_child_edge)
-    {
-    list.push_back(vertexid);
-    }
+  this->SILModel->GetLeaves(id_set, vertexid, /*traverse_cross_edges=*/false);
 }
 
 //-----------------------------------------------------------------------------
@@ -151,14 +124,12 @@ QList<QVariant> pqSILModel::status(const QString& hierarchyName) const
     return values;
     }
 
-  const QList<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
-  vtkStringArray* names = vtkStringArray::SafeDownCast(
-    this->SIL->GetVertexData()->GetAbstractArray("Names"));
-
+  const vtkstd::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
   foreach (vtkIdType vertex, vertexIds)
     {
-    bool checked = (this->CheckStates[vertex] == Qt::Checked);
-    values.push_back(QString(names->GetValue(vertex)));
+    bool checked = 
+      (this->SILModel->GetCheckStatus(vertex) == vtkSMSILModel::CHECKED);
+    values.push_back(QString(this->SILModel->GetName(vertex)));
     values.push_back(checked? 1 : 0);
     }
   return values;
@@ -181,19 +152,17 @@ void pqSILModel::setStatus(const QString& hierarchyName,
     check_status[name] = checked;
     }
 
-  const QList<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
-  vtkStringArray* names = vtkStringArray::SafeDownCast(
-    this->SIL->GetVertexData()->GetAbstractArray("Names"));
+  const vtkstd::set<vtkIdType> &vertexIds = this->HierarchyVertexIds[hierarchyName];
   foreach (vtkIdType vertex, vertexIds)
     {
-    QString name = QString(names->GetValue(vertex));
+    QString name = QString(this->SILModel->GetName(vertex));
     if (!check_status.contains(name) || check_status[name] == true)
       {
-      this->check(vertex, true);
+      this->SILModel->SetCheckState(vertex, vtkSMSILModel::CHECKED);
       }
     else
       {
-      this->check(vertex, false);
+      this->SILModel->SetCheckState(vertex, vtkSMSILModel::UNCHECKED);
       }
     }
   emit this->checkStatusChanged();
@@ -259,8 +228,6 @@ bool pqSILModel::hasChildren(const QModelIndex &parentIndex/*=QModelIndex()*/) c
     vertexId = static_cast<vtkIdType>(parentIndex.internalId());
     }
 
-
-
   return !this->isLeaf(vertexId);
 }
 
@@ -285,22 +252,7 @@ int pqSILModel::rowCount(const QModelIndex &parentIndex/*=QModelIndex()*/) const
 int pqSILModel::childrenCount(vtkIdType vertexId) const
 {
   // count children edges (skipping cross edges).
-  
-  int count = 0;
-  vtkOutEdgeIterator* iter = vtkOutEdgeIterator::New();
-  this->SIL->GetOutEdges(vertexId, iter);
-  vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
-    this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
-  while (iter->HasNext())
-    {
-    vtkOutEdgeType edge = iter->Next();
-    if (crossEdgesArray->GetTuple1(edge.Id) == 0)
-      {
-      count++; 
-      }
-    }
-  iter->Delete();
-  return count;
+  return this->SILModel->GetNumberOfChildren(vertexId);
 }
 
 //-----------------------------------------------------------------------------
@@ -318,22 +270,7 @@ vtkIdType pqSILModel::parent(vtkIdType vertexId) const
     return 0;
     }
 
-  vtkInEdgeIterator* iter = vtkInEdgeIterator::New();
-  this->SIL->GetInEdges(vertexId, iter);
-  vtkDataArray* crossEdgesArray = vtkDataArray::SafeDownCast(
-    this->SIL->GetEdgeData()->GetAbstractArray("CrossEdges"));
-  while (iter->HasNext())
-    {
-    vtkInEdgeType edge = iter->Next();
-    if (crossEdgesArray->GetTuple1(edge.Id) == 0)
-      {
-      iter->Delete();
-      return edge.Source;
-      }
-    }
-  iter->Delete();
-  qCritical() << vertexId << " has no parent!";
-  return 0;
+  return this->SILModel->GetParentVertex(vertexId);
 }
 
 //-----------------------------------------------------------------------------
@@ -415,14 +352,12 @@ QVariant pqSILModel::data(const QModelIndex &idx,
   case Qt::DisplayRole:
   case Qt::ToolTipRole:
       {
-      vtkStringArray* names = vtkStringArray::SafeDownCast(
-        this->SIL->GetVertexData()->GetAbstractArray("Names"));
-      return QVariant(names->GetValue(vertexId));
+      return QVariant(this->SILModel->GetName(vertexId));
       }
     break;
 
   case Qt::CheckStateRole:
-    return QVariant(this->CheckStates[vertexId]);
+    return QVariant(this->SILModel->GetCheckStatus(vertexId));
     break;
     }
 
@@ -448,125 +383,13 @@ bool pqSILModel::setData(const QModelIndex &idx, const QVariant& value,
   if (role == Qt::CheckStateRole)
     {
     bool checked = (value.toInt() == Qt::Checked);
-    this->check(vertexId, checked, -1);
+    this->SILModel->SetCheckState(vertexId, checked? vtkSMSILModel::CHECKED:
+      vtkSMSILModel::UNCHECKED);
     emit this->checkStatusChanged();
-    //emit this->dataChanged(idx, idx);
     return true;
     }
 
   return false;
-}
-
-
-//-----------------------------------------------------------------------------
-void pqSILModel::check(vtkIdType vertexid, bool checked, 
-  vtkIdType inedgeid/*=-1*/)
-{
-  Qt::CheckState newState = checked? Qt::Checked : Qt::Unchecked;
-  if (this->CheckStates[vertexid] == newState)
-    {
-    // nothing to change.
-    return;
-    }
-
-  this->CheckStates[vertexid] = newState;
-
-  // * For each out-edge, update check.
-  vtkOutEdgeIterator* outEdgeIter = vtkOutEdgeIterator::New();
-  this->SIL->GetOutEdges(vertexid, outEdgeIter);
-  while (outEdgeIter->HasNext())
-    {
-    vtkOutEdgeType edge = outEdgeIter->Next();
-    this->check(edge.Target, checked, edge.Id);
-    }
-  outEdgeIter->Delete();
-
-  //emit this->dataChanged(this->createIndex(0, 0, static_cast<quint32>(firstChild)),
-  //  this->createIndex(outDegree-1, 0, static_cast<quint32>(lastChild)));
-
-  // * For each in-edge (except inedgeid), update the check state.
-  vtkInEdgeIterator* inEdgeIter = vtkInEdgeIterator::New();
-  this->SIL->GetInEdges(vertexid, inEdgeIter);
-  while (inEdgeIter->HasNext())
-    {
-    vtkInEdgeType edge = inEdgeIter->Next();
-    if (edge.Id != inedgeid)
-      {
-      this->update_check(edge.Source);
-      }
-    }
-  inEdgeIter->Delete();
-
-  QModelIndex idx = this->makeIndex(vertexid);
-  emit this->dataChanged(idx, idx);
-}
-
-//-----------------------------------------------------------------------------
-void pqSILModel::update_check(vtkIdType vertexid)
-{
-  int children_count = 0;
-  int checked_children_count = 0;
-  bool partial_child = false;
-
-  // Look at the immediate children of vertexid and decide the check state for
-  // vertexid.
-  vtkAdjacentVertexIterator* aiter = vtkAdjacentVertexIterator::New();
-  this->SIL->GetAdjacentVertices(vertexid, aiter);
-  while (aiter->HasNext() && partial_child == false)
-    {
-    children_count++;
-    vtkIdType childVertex = aiter->Next();
-    Qt::CheckState childCheckState = this->CheckStates[childVertex];
-    switch (childCheckState)
-      {
-    case Qt::PartiallyChecked:
-      partial_child = true;
-      break;
-
-    case Qt::Checked:
-      checked_children_count++;
-      break;
-
-    default:
-      break;
-      }
-    }
-  aiter->Delete();
-
-  Qt::CheckState newState;
-  if (partial_child)
-    {
-    newState = Qt::PartiallyChecked;
-    }
-  else if (children_count == checked_children_count)
-    {
-    newState = Qt::Checked;
-    }
-  else if (checked_children_count == 0)
-    {
-    newState = Qt::Unchecked;
-    }
-  else
-    {
-    newState = Qt::PartiallyChecked;
-    }
-
-  if (newState != this->CheckStates[vertexid])
-    {
-    this->CheckStates[vertexid] = newState;
-    // Ask all the inedges to update checks.
-
-    vtkInEdgeIterator* inEdgeIter = vtkInEdgeIterator::New();
-    this->SIL->GetInEdges(vertexid, inEdgeIter);
-    while (inEdgeIter->HasNext())
-      {
-      this->update_check(inEdgeIter->Next().Source);
-      }
-    inEdgeIter->Delete();
-
-    QModelIndex idx = this->makeIndex(vertexid);
-    emit this->dataChanged(idx, idx);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -592,4 +415,14 @@ Qt::ItemFlags pqSILModel::flags(const QModelIndex &idx) const
     }
 
   return item_flags;
+}
+
+
+//-----------------------------------------------------------------------------
+void pqSILModel::checkStateUpdated(vtkObject* caller,
+  unsigned long eventid, void* calldata)
+{
+  vtkIdType vertexId = *reinterpret_cast<vtkIdType*>(calldata);
+  QModelIndex idx = this->makeIndex(vertexId);
+  emit this->dataChanged(idx, idx);
 }

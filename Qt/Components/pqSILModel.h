@@ -35,12 +35,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 #include <QVector>
 #include <QSet>
+#include <vtkstd/set>
 
 #include "vtkObject.h"
 #include "pqComponentsExport.h"
 #include "vtkSmartPointer.h"
 
 class vtkGraph;
+class vtkSMSILModel;
 
 class PQCOMPONENTS_EXPORT pqSILModel : public QAbstractItemModel
 {
@@ -145,6 +147,11 @@ public slots:
   void update(vtkGraph* sil);
 
 protected:
+  /// Called every time vtkSMSILModel tells us that the check state has changed.
+  /// We fire the dataChanged() event so that the view updates.
+  void checkStateUpdated(vtkObject* caller,
+    unsigned long eventid, void* calldata);
+
   /// Returns if the given vertex id refers to a leaf node.
   bool isLeaf(vtkIdType vertexid) const;
 
@@ -155,17 +162,11 @@ protected:
   /// Returns the number of children for the given vertex.
   int childrenCount(vtkIdType vertexid) const;
 
-  /// Called to check/uncheck an item.
-  void check(vtkIdType vertexid, bool checked, vtkIdType inedgeid = -1);
-
-  /// Determine vertexid's check state using its immediate children.
-  /// If the check-state for the vertex has changed, then it propagates the call
-  /// to the parent node.
-  void update_check(vtkIdType vertexid);
-
   /// Used to initialize the HierarchyVertexIds list with the leaf node ids for
   /// each of the hierarchies.
-  void collectLeaves(vtkIdType vertexid, QList<vtkIdType>& list);
+  void collectLeaves(vtkIdType vertexid, vtkstd::set<vtkIdType>& list);
+
+  vtkSMSILModel* SILModel;
 
   /// Cache used by makeIndex() to avoid iterating over the edges each time.
   QMap<vtkIdType, QModelIndex> *ModelIndexCache;
@@ -174,9 +175,7 @@ protected:
 
   /// This map keeps a list of vertex ids that refer to the leaves in the
   /// hierarchy.
-  QMap<QString, QList<vtkIdType> > HierarchyVertexIds;
-  QVector<Qt::CheckState> CheckStates;
-  QSet<vtkIdType> DirtyVertices;
+  QMap<QString, vtkstd::set<vtkIdType> > HierarchyVertexIds;
   vtkSmartPointer<vtkGraph> SIL;
 
 private:

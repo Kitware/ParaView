@@ -160,6 +160,9 @@ SET(Kit_SRCS
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx
   vtkSMServerSideAnimationPlayer.cxx
+  vtkSMSILDomain.cxx
+  vtkSMSILInformationHelper.cxx
+  vtkSMSILModel.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleIdTypeInformationHelper.cxx
   vtkSMSimpleIntInformationHelper.cxx
