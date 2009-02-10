@@ -419,8 +419,8 @@ Qt::ItemFlags pqSILModel::flags(const QModelIndex &idx) const
 
 
 //-----------------------------------------------------------------------------
-void pqSILModel::checkStateUpdated(vtkObject* caller,
-  unsigned long eventid, void* calldata)
+void pqSILModel::checkStateUpdated(vtkObject* vtkNotUsed(caller),
+  unsigned long vtkNotUsed(eventid), void* calldata)
 {
   vtkIdType vertexId = *reinterpret_cast<vtkIdType*>(calldata);
   QModelIndex idx = this->makeIndex(vertexId);
