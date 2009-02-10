@@ -116,6 +116,16 @@ public:
   // Set the check state for a vertex.
   // Returns true if the status was changed, false if unaffected.
   bool SetCheckState(vtkIdType vertex, int status);
+  bool SetCheckState(const char* name, int status)
+    {
+    vtkIdType vertex = this->FindVertex(name, 0);
+    if (vertex != -1)
+      {
+      return this->SetCheckState(vertex, status);
+      }
+    vtkErrorMacro("Failed to locate " << name);
+    return false;
+    }
 
   // Description:
   // Convenience methods to check/uncheck all items.

@@ -69,8 +69,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMSILModel);
-vtkCxxRevisionMacro(vtkSMSILModel, "1.1");
-vtkCxxSetObjectMacro(vtkSMSILModel, SIL, vtkGraph);
+vtkCxxRevisionMacro(vtkSMSILModel, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMSILModel::vtkSMSILModel()
 {
@@ -102,16 +101,13 @@ vtkSMSILModel::~vtkSMSILModel()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMSILModel::Initialize(vtkGraph* sil)
+void vtkSMSILModel::SetSIL(vtkGraph* sil)
 {
   vtkSetObjectBodyMacro(SIL, vtkGraph, sil);
   if (!this->SIL)
     {
     return;
     }
-
-  // unset the proxy and property, if any.
-  this->Initialize(0, 0);
 
   vtkIdType numVertices = sil->GetNumberOfVertices();
   int cursize = this->Internals->CheckStates.size();
@@ -125,7 +121,14 @@ void vtkSMSILModel::Initialize(vtkGraph* sil)
     {
     this->UpdateCheck(0);
     }
-  this->UpdateProperty();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSILModel::Initialize(vtkGraph* sil)
+{
+  // unset the proxy and property, if any.
+  this->Initialize(0, 0);
+  this->SetSIL(sil);
 }
 
 //-----------------------------------------------------------------------------
@@ -149,7 +152,6 @@ void vtkSMSILModel::Initialize(vtkSMProxy* proxy, vtkSMStringVectorProperty* svp
   if (this->Property && this->Proxy)
     {
     // unset the SIL if any.
-    this->Initialize(0);
     this->Property->AddObserver(vtkCommand::ModifiedEvent, this->PropertyObserver);
 
     vtkSMDomain* domain = this->Property->FindDomain("vtkSMSILDomain");
@@ -450,7 +452,7 @@ void vtkSMSILModel::UpdateStateFromProperty(vtkSMStringVectorProperty* svp)
   this->BlockUpdate = true;
   this->UncheckAll();
 
-  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); )
+  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
     {
     const char* vertexname = svp->GetElement(cc);
     int check_state = atoi(svp->GetElement(cc+1));
@@ -459,6 +461,7 @@ void vtkSMSILModel::UpdateStateFromProperty(vtkSMStringVectorProperty* svp)
       {
       continue;
       }
+
     switch (check_state)
       {
     case CHECKED:
@@ -470,7 +473,6 @@ void vtkSMSILModel::UpdateStateFromProperty(vtkSMStringVectorProperty* svp)
       break;
     default: break;
       }
-    cc+=2;
     }
   this->BlockUpdate = false;
 }
@@ -478,13 +480,13 @@ void vtkSMSILModel::UpdateStateFromProperty(vtkSMStringVectorProperty* svp)
 //-----------------------------------------------------------------------------
 void vtkSMSILModel::CheckAll()
 {
-  this->SetCheckState(0, vtkSMSILModel::CHECKED);
+  this->SetCheckState(static_cast<vtkIdType>(0), vtkSMSILModel::CHECKED);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMSILModel::UncheckAll()
 {
-  this->SetCheckState(0, vtkSMSILModel::UNCHECKED);
+  this->SetCheckState(static_cast<vtkIdType>(0), vtkSMSILModel::UNCHECKED);
 }
 
 //-----------------------------------------------------------------------------
