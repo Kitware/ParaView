@@ -133,6 +133,10 @@ public:
   vtkSMDomain* GetDomain(const char* name);
 
   // Description:
+  // Returns the first domain which is of the specified type.
+  vtkSMDomain* FindDomain(const char* classname);
+
+  // Description:
   // Returns the number of domains this property has. This can be 
   // used to specify a valid index for GetDomain(index).
   unsigned int GetNumberOfDomains();
@@ -241,6 +245,10 @@ public:
       this->PendingModifiedEvents = false;
       }
     }
+
+  // Description:
+  // Provides access to the information helper used by this property, if any.
+  vtkGetObjectMacro(InformationHelper, vtkSMInformationHelper);
 
 protected:
   vtkSMProperty();

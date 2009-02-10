@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.60");
+vtkCxxRevisionMacro(vtkSMProperty, "1.61");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -145,6 +145,21 @@ vtkSMDomain* vtkSMProperty::GetDomain(const char* name)
     }
 
   return it->second.GetPointer();
+}
+
+//---------------------------------------------------------------------------
+vtkSMDomain* vtkSMProperty::FindDomain(const char* classname)
+{
+  vtkSmartPointer<vtkSMDomainIterator> iter;
+  iter.TakeReference(this->NewDomainIterator());
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if (iter->GetDomain()->IsA(classname))
+      {
+      return iter->GetDomain();
+      }
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------
