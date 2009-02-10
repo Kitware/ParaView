@@ -67,17 +67,28 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
 
   QString str = this->sourceModel()->data(idx).toString();
   
-  // file grouping removes extension from the above str,
-  // so let's let the parent item of file groups through.
-  // NOTE: file extension removal is now DISABLED in order
-  // to fix bug #0008159.
+  // To fix bug #0008159, grouped files MUST undergo the for-loop below
+  // to check if the extension part really matches the wildcards / filters. 
   bool pass = false;
+  
+  // The following if-statement is intended to support the visibility
+  // of grouped 'spcth' files in the file dialog. 'str' is updated below
+  // with the full name of the first 'spcth' file (for a group of 'spcth'
+  // files with digits-based extensions, the FIRST one MUST have '.0'
+  // as the extension) such that 'pass' can be updated with 'true' via
+  // the for-loop. This if-statement is added to fix bug #0008493.
+  if ( this->sourceModel()->hasChildren(idx) == true )
+    {
+    QStringList strList = this->Model->getFilePaths(idx);
+    str = strList.at(0);
+    }
 
-  int i=0, end=this->Wildcards.size();
-  for(; i<end && pass == false; i++)
+  int i, end = this->Wildcards.size();
+  for ( i = 0; i < end && pass == false; i ++ )
     {
     pass = this->Wildcards[i].exactMatch(str);
     }
+    
   return pass;
 }
 
