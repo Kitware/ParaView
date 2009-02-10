@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.34");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.35");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -350,7 +350,6 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   runscript += "del output\n";
   runscript += "del myarg\n";
 
-  cout << runscript << endl;
   this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
 
   this->Implementation->Interpretor->FlushMessages();
