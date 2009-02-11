@@ -34,7 +34,7 @@
 #define __vtkSMSILModel_h
 
 #include "vtkSMObject.h"
-#include <vtkstd/set>
+#include <vtkstd/set> // required for vtkset
 
 class vtkGraph;
 class vtkSMStringVectorProperty;
