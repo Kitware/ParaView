@@ -183,6 +183,16 @@ void pqPluginDialog::loadRecentRemotePlugin(int idx)
     this->loadPlugin(this->Server, plugin);
     this->RecentRemoteCombo->setCurrentIndex(0);
     this->refreshRemote();
+    // Move plugin to top of list in settings.
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    QStringList remote = settings->value("/remotePlugins").toStringList();
+    remote.removeAll(plugin);
+    remote.insert(0, plugin);
+    while(remote.count() > 10)
+      {
+      remote.removeLast();
+      }
+    settings->setValue("/remotePlugins", remote);
     }
 }
 
@@ -194,6 +204,16 @@ void pqPluginDialog::loadRecentLocalPlugin(int idx)
     this->loadPlugin(NULL, plugin);
     this->RecentLocalCombo->setCurrentIndex(0);
     this->refreshLocal();
+    // Move plugin to top of list in settings.
+    pqSettings* settings = pqApplicationCore::instance()->settings();
+    QStringList local = settings->value("/localPlugins").toStringList();
+    local.removeAll(plugin);
+    local.insert(0, plugin);
+    while(local.count() > 10)
+      {
+      local.removeLast();
+      }
+    settings->setValue("/localPlugins", local);
     }
 }
 
