@@ -39,7 +39,8 @@ public:
     PVRENDER_SERVER = 0x10,
     PVDATA_SERVER = 0x20,
     PVBATCH = 0x40,
-    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER | PVDATA_SERVER
+    ALLPROCESS = PARAVIEW | PVCLIENT | PVSERVER | PVRENDER_SERVER |
+      PVDATA_SERVER | PVBATCH
   };
 //ETX
   
@@ -98,6 +99,11 @@ public:
   // Description:
   // vtkProcessModule needs to set the render module name
   vtkSetStringMacro(RenderModuleName);
+
+  // Description:
+  // Log filename.
+  vtkSetStringMacro(LogFileName);
+  vtkGetStringMacro(LogFileName);
 
   // Description:
   // vtkPVProcessModule needs to set this.
@@ -208,6 +214,7 @@ private:
   vtkSetStringMacro(GroupFileName);
   char* GroupFileName;
 
+  char* LogFileName;
   int TellVersion;
 //ETX
 private:

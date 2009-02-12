@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.47");
+vtkCxxRevisionMacro(vtkPVOptions, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -76,6 +76,7 @@ vtkPVOptions::vtkPVOptions()
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
   this->ConnectID = 0;
+  this->LogFileName = 0;
 
   this->Timeout = 0;
 
@@ -101,11 +102,16 @@ vtkPVOptions::~vtkPVOptions()
   this->SetClientHostName(0);
   this->SetMachinesFileName(0);
   this->SetStateFileName(0);
+  this->SetLogFileName(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVOptions::Initialize()
 {
+  this->AddArgument("--cslog", 0, &this->LogFileName,
+                    "ClientServerStream log file.",
+                    vtkPVOptions::ALLPROCESS);
+
   this->AddArgument("--data", 0, &this->ParaViewDataName,
                     "Load the specified data. "
                     "To specify file series replace the numeral with a '.' eg. "
@@ -413,4 +419,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "StateFileName: "
     << (this->StateFileName?this->StateFileName:"(none)") << endl;
+  os << indent << "LogFileName: "
+    << (this->LogFileName? this->LogFileName : "(none)") << endl; 
+
 }

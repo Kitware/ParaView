@@ -136,7 +136,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.91");
+vtkCxxRevisionMacro(vtkProcessModule, "1.92");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -936,40 +936,39 @@ void vtkProcessModule::InitializeInterpreter()
   this->Interpreter->AddObserver(vtkCommand::UserEvent,
     this->InterpreterObserver);
 
-
-
-  bool needLog = false;
-  if(getenv("VTK_CLIENT_SERVER_LOG"))
+  if (!this->Options)
     {
-    needLog = true;
-    if (!this->Options)
-      {
-      vtkErrorMacro("Options must be set before calling "
-        "InitializeInterpreter().");
-      }
-    else
-      {
-      if(this->Options->GetClientMode())
-        {
-        needLog = false;
-        this->GetInterpreter()->SetLogFile("paraviewClient.log");
-        }
-      if(this->Options->GetServerMode())
-        {
-        needLog = false;
-        this->GetInterpreter()->SetLogFile("paraviewServer.log");
-        }
-      if(this->Options->GetRenderServerMode())
-        {
-        needLog = false;
-        this->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
-        }
-      }
-    } 
-  if(needLog)
-    {
-    this->GetInterpreter()->SetLogFile("paraview.log");
+    vtkErrorMacro("Options must be set before calling "
+      "InitializeInterpreter().");
     }
+
+  if (getenv("VTK_CLIENT_SERVER_LOG") ||
+    this->Options->GetLogFileName())
+    {
+    const char* logfilename = this->Options->GetLogFileName();
+    if (!logfilename && this->Options->GetClientMode())
+      {
+      logfilename = "paraviewClient.log";
+      }
+    if (!logfilename && this->Options->GetServerMode())
+      {
+      logfilename = "paraviewServer.log";
+      }
+    if (!logfilename && this->Options->GetRenderServerMode())
+      {
+      logfilename = "paraviewRenderServer.log";
+      }
+    if (!logfilename)
+      {
+      logfilename = "paraview.log";
+      }
+
+    // TODO: would be nice if each process could write the log to a separate
+    // file, however InitializeInterpreter() is called before the multi process
+    // controller is initialized hence we cannot really get the information
+    // about number of processes etc.
+    this->Interpreter->SetLogFile(logfilename);
+    } 
 
   // Assign standard IDs.
   vtkClientServerStream css;
