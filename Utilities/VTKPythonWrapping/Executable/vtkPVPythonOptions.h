@@ -34,8 +34,8 @@ public:
   // Description:
   // When set to true, the python script is run on satellites as well, otherwise
   // only the root node processes the python script. Disabled by default.
-  vtkSetMacro(EnableSynchronousScripting, int);
-  vtkGetMacro(EnableSynchronousScripting, int);
+  vtkSetMacro(EnableSymmetricScripting, int);
+  vtkGetMacro(EnableSymmetricScripting, int);
 
   // Description:
   // Called to create the primary self-connection. Default implementation
@@ -77,7 +77,7 @@ protected:
   vtkSetStringMacro(PythonScriptName);
   char* PythonScriptName;
 
-  int EnableSynchronousScripting;
+  int EnableSymmetricScripting;
 private:
   vtkPVPythonOptions(const vtkPVPythonOptions&); // Not implemented
   void operator=(const vtkPVPythonOptions&); // Not implemented

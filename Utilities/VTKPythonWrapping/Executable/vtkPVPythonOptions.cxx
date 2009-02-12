@@ -26,14 +26,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);
-vtkCxxRevisionMacro(vtkPVPythonOptions, "1.5");
+vtkCxxRevisionMacro(vtkPVPythonOptions, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVPythonOptions::vtkPVPythonOptions()
 {
   this->PythonScriptName = 0;
   this->ServerMode = 0;
-  this->EnableSynchronousScripting = false;
+  this->EnableSymmetricScripting = false;
 }
 
 //----------------------------------------------------------------------------
@@ -46,9 +46,9 @@ vtkPVPythonOptions::~vtkPVPythonOptions()
 void vtkPVPythonOptions::Initialize()
 {
   this->Superclass::Initialize();
-  this->AddBooleanArgument("--synchronous", "-sync",
-    &this->EnableSynchronousScripting,
-    "When specified, the python script is processed synchronously on all processes.",
+  this->AddBooleanArgument("--symmetric", "-sym",
+    &this->EnableSymmetricScripting,
+    "When specified, the python script is processed symmetrically on all processes.",
     vtkPVOptions::PVBATCH);
 }
 
@@ -64,10 +64,10 @@ int vtkPVPythonOptions::PostProcess(int argc, const char* const* argv)
     return 0;
     }
 
-  if (this->EnableSynchronousScripting)
+  if (this->EnableSymmetricScripting)
     {
     // Disable render event propagation since satellites are no longer doing
-    // ProcessRMIs() since synchronous script processing is enabled.
+    // ProcessRMIs() since symmetric script processing is enabled.
     vtkParallelRenderManager::SetDefaultRenderEventPropagation(false);
     }
   this->Synchronize();
@@ -93,7 +93,7 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
 //----------------------------------------------------------------------------
 vtkSelfConnection* vtkPVPythonOptions::NewSelfConnection()
 {
-  if (this->EnableSynchronousScripting &&
+  if (this->EnableSymmetricScripting &&
     vtkProcessModule::GetProcessModule()->GetUseMPI())
     {
     return vtkSynchronousMPISelfConnection::New();
@@ -114,14 +114,14 @@ void vtkPVPythonOptions::Synchronize()
     vtkMultiProcessStream stream;
     if (controller->GetLocalProcessId() == 0)
       {
-      stream << this->PythonScriptName << this->EnableSynchronousScripting;
+      stream << this->PythonScriptName << this->EnableSymmetricScripting;
       controller->Broadcast(stream, 0);
       }
     else
       {
       controller->Broadcast(stream, 0);
       vtkstd::string name;
-      stream >> name >> this->EnableSynchronousScripting;
+      stream >> name >> this->EnableSymmetricScripting;
       this->SetPythonScriptName(name.c_str());
       }
     }
@@ -131,6 +131,6 @@ void vtkPVPythonOptions::Synchronize()
 void vtkPVPythonOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "EnableSynchronousScripting: " << this->EnableSynchronousScripting << endl;
+  os << indent << "EnableSymmetricScripting: " << this->EnableSymmetricScripting << endl;
 }
 

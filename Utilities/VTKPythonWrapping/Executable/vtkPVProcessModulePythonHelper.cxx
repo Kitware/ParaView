@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.17");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.18");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -54,7 +54,7 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv,
 {
   vtkPVPythonOptions* boptions = vtkPVPythonOptions::SafeDownCast(
     this->ProcessModule->GetOptions());
-  if (myId > 0 && !boptions->GetEnableSynchronousScripting())
+  if (myId > 0 && !boptions->GetEnableSymmetricScripting())
     {
     return 0;
     }

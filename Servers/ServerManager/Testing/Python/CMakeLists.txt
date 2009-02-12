@@ -98,10 +98,10 @@ FOREACH (tfile ${PVBATCH_TESTS})
       -V ${PVServerManagerTestData}/Baseline/${tfile}.png
       -S ${SMSTATE_FILE_DIR})
 
-    ADD_TEST(${tfile}-SynchronousBatch
+    ADD_TEST(${tfile}-SymmetricBatch
       ${VTK_MPIRUN_EXE} ${VTK_MPI_PRENUMPROC_FLAGS} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS}
       ${EXECUTABLE_OUTPUT_PATH}/pvbatch
-      --synchronous
+      --symmetric
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -116,9 +116,9 @@ FOREACH (tfile ${PVBATCH_TESTS})
       -V ${PVServerManagerTestData}/Baseline/${tfile}.png
       -S ${SMSTATE_FILE_DIR})
 
-    ADD_TEST(${tfile}-SynchronousBatch
+    ADD_TEST(${tfile}-SymmetricBatch
       ${EXECUTABLE_OUTPUT_PATH}/pvbatch
-      --synchronous
+      --symmetric
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
