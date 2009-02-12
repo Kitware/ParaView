@@ -21,15 +21,18 @@
 #ifndef __vtkPVPythonInterpretorWrapper_h
 #define __vtkPVPythonInterpretorWrapper_h
 
+#include "structmember.h"
+
 struct vtkPVPythonInterpretorWrapper
 {
   PyObject_HEAD
+  int softspace;  // Used by print to keep track of its state.
   vtkPVPythonInterpretor* Interpretor;
   bool DumpToError;
 
-  vtkPVPythonInterpretorWrapper() 
-    {
-    }
+  // vtkPVPythonInterpretorWrapper() 
+  //   {
+  //   }
 
   void Write(const char* string)
     {
@@ -61,6 +64,13 @@ static PyObject* vtkPVPythonInterpretorWrapperNew(
   return type->tp_alloc(type, 0);
 }
 
+static PyMemberDef vtkPVPythonInterpretorWrapperMembers[] = {
+  { const_cast<char*>("softspace"),
+    T_INT, offsetof(vtkPVPythonInterpretorWrapper, softspace), 0,
+    const_cast<char *>("Placeholder so print can keep state.") },
+  { NULL, NULL, NULL, NULL, NULL }
+};
+
 static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     PyObject_HEAD_INIT(NULL)
     0,                         // ob_size
@@ -79,8 +89,8 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0,                         // tp_hash 
     0,                         // tp_call
     0,                         // tp_str
-    0,                         // tp_getattro
-    0,                         // tp_setattro
+    PyObject_GenericGetAttr,   // tp_getattro
+    PyObject_GenericSetAttr,   // tp_setattro
     0,                         // tp_as_buffer
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
     const_cast<char*>("vtkPVPythonInterpretorWrapper"),   //  tp_doc 
@@ -91,7 +101,7 @@ static PyTypeObject vtkPVPythonInterpretorWrapperType = {
     0,                         //  tp_iter 
     0,                         //  tp_iternext 
     vtkPVPythonInterpretorWrapperMethods, //  tp_methods 
-    0,                         //  tp_members 
+    vtkPVPythonInterpretorWrapperMembers, //  tp_members 
     0,                         //  tp_getset 
     0,                         //  tp_base 
     0,                         //  tp_dict 
