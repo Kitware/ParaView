@@ -68,7 +68,7 @@ static PyMemberDef vtkPVPythonInterpretorWrapperMembers[] = {
   { const_cast<char*>("softspace"),
     T_INT, offsetof(vtkPVPythonInterpretorWrapper, softspace), 0,
     const_cast<char *>("Placeholder so print can keep state.") },
-  { NULL, NULL, NULL, NULL, NULL }
+  { 0, 0, 0, 0, 0 }
 };
 
 static PyTypeObject vtkPVPythonInterpretorWrapperType = {
