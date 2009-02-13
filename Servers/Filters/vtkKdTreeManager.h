@@ -65,6 +65,7 @@ protected:
 
   void AddDataSetToKdTree(vtkDataSet *data);
 
+  bool KdTreeInitialized;
   vtkAlgorithm* StructuredProducer;
   vtkPKdTree* KdTree;
   int NumberOfPieces;

@@ -24,6 +24,7 @@
 #include "vtkPoints.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSphereSource.h"
 #include "vtkUnstructuredGrid.h"
 
 #define VTK_CREATE(type, name) \
@@ -36,9 +37,8 @@ class vtkKdTreeManager::vtkAlgorithmSet :
   public vtkstd::set<vtkSmartPointer<vtkAlgorithm> > {};
 
 vtkStandardNewMacro(vtkKdTreeManager);
-vtkCxxRevisionMacro(vtkKdTreeManager, "1.7");
+vtkCxxRevisionMacro(vtkKdTreeManager, "1.8");
 vtkCxxSetObjectMacro(vtkKdTreeManager, StructuredProducer, vtkAlgorithm);
-vtkCxxSetObjectMacro(vtkKdTreeManager, KdTree, vtkPKdTree);
 //----------------------------------------------------------------------------
 vtkKdTreeManager::vtkKdTreeManager()
 {
@@ -46,6 +46,7 @@ vtkKdTreeManager::vtkKdTreeManager()
   this->StructuredProducer = 0;
   this->KdTree = 0;
   this->NumberOfPieces = 1;
+  this->KdTreeInitialized = false;
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +96,16 @@ void vtkKdTreeManager::RemoveAllProducers()
 }
 
 //----------------------------------------------------------------------------
+void vtkKdTreeManager::SetKdTree(vtkPKdTree* tree)
+{
+  if (this->KdTree != tree)
+    {
+    vtkSetObjectBodyMacro(KdTree, vtkPKdTree, tree);
+    this->KdTreeInitialized = false;
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKdTreeManager::Update()
 {
   vtkAlgorithmSet::iterator iter;
@@ -132,17 +143,27 @@ void vtkKdTreeManager::Update()
     }
 
   this->KdTree->RemoveAllDataSets();
+  if (!this->KdTreeInitialized)
+    {
+    // HACK: This hack fixes the following issue:
+    // * create wavelet (num procs >= 4)
+    // * volume render -- broken!!!
+    // * change some wavelet parameter (force the KdTree to rebuild) and all's
+    //   fine!  
+    // Seems like something doesn't get initialized correctly, I have no idea
+    // what. This seems to overcome the issue.
+    vtkSphereSource* sphere = vtkSphereSource::New();
+    sphere->Update();
+    this->KdTree->AddDataSet(sphere->GetOutput());
+    sphere->Delete();
+    this->KdTree->BuildLocator();
+    this->KdTree->RemoveAllDataSets();
+    this->KdTreeInitialized = true;
+    }
   for (dsIter = outputs.begin(); dsIter != outputs.end(); ++dsIter)
     {
     this->AddDataSetToKdTree(*dsIter);
-    }
-
-  static bool initialized = false;
-  if (!initialized)
-    {
-    this->KdTree->BuildLocator();
-    initialized = true;
-    }
+    } 
 
   if (this->StructuredProducer)
     {
