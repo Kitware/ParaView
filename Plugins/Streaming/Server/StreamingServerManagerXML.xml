@@ -33,6 +33,8 @@
         <Proxy name="RootView" proxygroup="views" proxyname="RenderView">
         </Proxy>
         <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="UseTriangleStrips" />
@@ -100,6 +102,8 @@
                proxygroup="views" proxyname="ClientServerRenderView">
         </Proxy>
         <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="UseTriangleStrips" />
@@ -168,6 +172,8 @@
                proxygroup="views" proxyname="IceTDesktopRenderView">
         </Proxy>
         <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="UseTriangleStrips" />
@@ -239,6 +245,8 @@
                proxygroup="views" proxyname="IceTMultiDisplayRenderView">
         </Proxy>
         <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
           <Property name="LODThreshold" />
           <Property name="LODResolution" />
           <Property name="UseTriangleStrips" />
@@ -744,9 +752,11 @@
        The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset. 
      </Documentation>
 
-      <StringVectorProperty name="FileName"
-        command="SetFilename"
-        animateable="0" >
+      <StringVectorProperty 
+         name="FileName"
+         command="SetFilename"
+         animateable="0"
+         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
           This property specifies the file name to read.
