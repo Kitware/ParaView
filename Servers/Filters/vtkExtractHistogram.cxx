@@ -51,7 +51,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.23");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.24");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -65,6 +65,9 @@ vtkExtractHistogram::vtkExtractHistogram() :
     vtkDataSetAttributes::SCALARS);
   this->Internal = new vtkEHInternals;
   this->CalculateAverages = 0;
+  this->UseCustomBinRanges = false;
+  this->CustomBinRanges[0] = 0;
+  this->CustomBinRanges[1] = 100;
 }
 
 //-----------------------------------------------------------------------------
@@ -80,6 +83,9 @@ void vtkExtractHistogram::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "Component: " << this->Component << "\n";
   os << indent << "BinCount: " << this->BinCount << "\n";
+  os << indent << "UseCustomBinRanges: " << this->UseCustomBinRanges << endl;
+  os << indent << "CustomBinRanges: " <<
+    this->CustomBinRanges[0] << ", " << this->CustomBinRanges[1] << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -213,6 +219,12 @@ bool vtkExtractHistogram::InitializeBinExtents(
     data_array->GetRange(range, this->Component);
 
     bin_extents->SetName(data_array->GetName());
+    }
+
+  if (this->UseCustomBinRanges)
+    {
+    range[0] = this->CustomBinRanges[0];
+    range[1] = this->CustomBinRanges[1];
     }
   
   // Calculate the extents of each bin, based on the range of values in the

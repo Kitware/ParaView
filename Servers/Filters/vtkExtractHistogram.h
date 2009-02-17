@@ -51,6 +51,19 @@ public:
   // Controls the number of bins N in the output histogram data
   vtkSetClampMacro(BinCount, int, 1, VTK_LARGE_INTEGER);
   vtkGetMacro(BinCount, int);
+
+  // Description:
+  // Get/Set custom bin ranges to use. These are used only when
+  // UseCustomBinRanges is set to true.
+  vtkSetVector2Macro(CustomBinRanges, double);
+  vtkGetVector2Macro(CustomBinRanges, double);
+
+  // Description:
+  // When set to true, CustomBinRanges will  be used instead of using the full
+  // range for the selected array. By default, set to false.
+  vtkSetMacro(UseCustomBinRanges, bool);
+  vtkGetMacro(UseCustomBinRanges, bool);
+  vtkBooleanMacro(UseCustomBinRanges, bool);
   
   // Description:
   // This option controls whether the algorithm calculates averages
@@ -86,6 +99,8 @@ protected:
 
   void FillBinExtents(vtkDoubleArray* bin_extents, double min, double max);
 
+  double CustomBinRanges[2];
+  bool UseCustomBinRanges;
   int Component;
   int BinCount;
   int CalculateAverages;
