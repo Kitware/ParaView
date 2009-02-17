@@ -1593,6 +1593,7 @@ The filter operates on any type of data set, but the input data set must have at
        <EnumerationDomain name="enum">
          <Entry value="1" text="point_data"/>
          <Entry value="2" text="cell_data"/>
+         <Entry value="5" text="field_data"/>
        </EnumerationDomain>
        <Documentation>
          This property determines whether the computation is to be performed on point-centered or cell-centered data.
@@ -7492,10 +7493,38 @@ This filter extracts a list of datasets from hierarchical datasets.
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty name="UseCustomBinRanges"
+       command="SetUseCustomBinRanges"
+       number_of_elements="1"
+       default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         When set to true, CustomBinRanges will  be used instead of using the
+         full range for the selected array. By default, set to false.
+       </Documentation>
+     </IntVectorProperty>
+  
+     <DoubleVectorProperty name="CustomBinRanges"
+       command="SetCustomBinRanges"
+       number_of_elements="2"
+       default_values="0.0 100.0">
+       <Documentation>
+         Set custom bin ranges to use. These are used only when
+         UseCustomBinRanges is set to true.
+       </Documentation>
+       <ArrayRangeDomain name="scalar_range">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputArray" function="ArraySelection"/>
+         </RequiredProperties>
+       </ArrayRangeDomain>
+     </DoubleVectorProperty>
+
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
        <View type="BarChartView" />
      </Hints>
+
    <!-- End ExtractHistogram -->
    </SourceProxy>
 
@@ -7560,6 +7589,14 @@ This filter extracts a list of datasets from hierarchical datasets.
 
    <SourceProxy name="TextureMapToPlane" class="vtkTextureMapToPlane"
      label="Texture Map to Plane">
+     <Documentation
+      short_help="Generate texture coordinates by mapping points to plane."
+      long_help="Generate texture coordinates by mapping points to plane." >
+      TextureMapToPlane is a filter that generates 2D texture coordinates by
+      mapping input dataset points onto a plane. The plane is generated
+      automatically. A least squares method is used to generate the plane
+      automatically.
+     </Documentation>
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -7580,6 +7617,18 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- ==================================================================== -->
    <SourceProxy name="TextureMapToSphere" class="vtkTextureMapToSphere"
      label="Texture Map to Sphere">
+     <Documentation
+      short_help= "Generate texture coordinates by mapping points to sphere."
+      long_help= "Generate texture coordinates by mapping points to sphere." >
+      This is a filter that generates 2D texture coordinates by mapping input
+      dataset points onto a sphere. The sphere is generated automatically. The
+      sphere is generated automatically by computing the center i.e. averaged
+      coordinates, of the sphere. Note that the generated texture coordinates
+      range between (0,1). The s-coordinate lies in the angular direction around
+      the z-axis, measured counter-clockwise from the x-axis. The t-coordinate
+      lies in the angular direction measured down from the north pole towards
+      the south pole.
+     </Documentation>
      <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -7599,6 +7648,17 @@ This filter extracts a list of datasets from hierarchical datasets.
 
    <SourceProxy name="TextureMapToCylinder" class="vtkTextureMapToCylinder"
      label="Texture Map to Cylinder">
+     <Documentation
+      short_help="Generate texture coordinates by mapping points to cylinder."
+      long_help="Generate texture coordinates by mapping points to cylinder." >
+     This is a filter that generates 2D texture coordinates by mapping input
+     dataset points onto a cylinder. The cylinder is generated automatically.
+     The cylinder is generated automatically by computing the axis of the
+     cylinder. Note that the generated texture coordinates for the s-coordinate
+     ranges from (0-1) (corresponding to angle of 0->360 around axis), while the
+     mapping of the t-coordinate is controlled by the projection of points along
+     the axis.
+     </Documentation>
      <InputProperty
        name="Input"
        command="SetInputConnection">
