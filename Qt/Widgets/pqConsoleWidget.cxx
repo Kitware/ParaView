@@ -231,9 +231,9 @@ public:
     c.movePosition(QTextCursor::End);
     c.insertText("\n");
 
+    this->InteractivePosition = this->documentEnd();
     this->Parent.internalExecuteCommand(this->commandBuffer());
     
-    this->InteractivePosition = this->documentEnd();
     
     if(!this->commandBuffer().isEmpty()) // Don't store empty commands in the history
       {
@@ -290,6 +290,13 @@ void pqConsoleWidget::printString(const QString& Text)
   this->Implementation->textCursor().insertText(Text);
   this->Implementation->InteractivePosition = this->Implementation->documentEnd();
   this->Implementation->ensureCursorVisible();
+}
+
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::printCommand(const QString& cmd)
+{
+  this->Implementation->textCursor().insertText(cmd);
+  this->Implementation->updateCommandBuffer();
 }
 
 //-----------------------------------------------------------------------------

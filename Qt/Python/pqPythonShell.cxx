@@ -119,7 +119,7 @@ struct pqPythonShell::pqImplementation
       this->Interpreter->Push(Command.toAscii().data());
   }
 
-  void promptForInput()
+  void promptForInput(const QString& indent=QString())
   {
     QTextCharFormat format = this->Console.getFormat();
     format.setForeground(QColor(0, 0, 0));
@@ -128,12 +128,15 @@ struct pqPythonShell::pqImplementation
     this->Interpreter->MakeCurrent();
     if(!this->MultilineStatement)
       {
-      this->Console.prompt(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
+      this->Console.prompt(
+        PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
       }
     else
       {
-      this->Console.prompt(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
+      this->Console.prompt(
+        PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
       }
+    this->Console.printCommand(indent);
     this->Interpreter->ReleaseControl();
   }
 
@@ -266,7 +269,15 @@ void pqPythonShell::onExecuteCommand(const QString& Command)
   QString command = Command;
   command.replace(QRegExp("\\s*$"), "");
   this->internalExecuteCommand(command);
-  this->promptForInput();
+
+  // Find the indent for the command.
+  QRegExp regExp("^(\\s+)");
+  QString indent;
+  if (regExp.indexIn(command) != -1)
+    {
+    indent = regExp.cap(1);
+    }
+  this->Implementation->promptForInput(indent);
 }
 
 void pqPythonShell::promptForInput()

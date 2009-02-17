@@ -39,8 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTextCharFormat>
 
 /**
-  Qt widget that provides an interactive console - you can send text to the console by calling printString(),
-  and receive user input by connecting to the executeCommand() slot.
+  Qt widget that provides an interactive console - you can send text to the
+  console by calling printString() and receive user input by connecting to the
+  executeCommand() slot.
   
   \sa pqPythonShell, pqOutputWindow
 */
@@ -66,6 +67,10 @@ signals:
 public slots:
   /// Writes the supplied text to the console
   void printString(const QString& Text);
+
+  /// Updates the current command. Unlike printString, this will affect the
+  /// current command being typed.
+  void printCommand(const QString& cmd);
 
   /// Clears the contents of the console
   void clear();
