@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.57");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.58");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -632,12 +632,9 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
   propertyElement->AddAttribute("number_of_elements", numProxies);
   for (unsigned int idx=0; idx<numProxies; idx++)
     {
-    vtkSMProxy* proxy = this->GetProxy(idx);
-    if (proxy)
+    vtkPVXMLElement* proxyElement = this->SaveProxyElementState(idx, false);
+    if (proxyElement)
       {
-      vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
-      proxyElement->SetName("Proxy");
-      proxyElement->AddAttribute("value", proxy->GetSelfIDAsString());
       propertyElement->AddNestedElement(proxyElement);
       proxyElement->Delete();
       }
@@ -651,12 +648,9 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
     element->AddAttribute("number_of_elements", numProxies);
     for (unsigned int cc=0; cc < numProxies; cc++)
       {
-      vtkSMProxy* proxy = this->PPInternals->PreviousProxies[cc];
-      if (proxy)
+      vtkPVXMLElement* proxyElement = this->SaveProxyElementState(cc, true);
+      if (proxyElement)
         {
-        vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
-        proxyElement->SetName("Proxy");
-        proxyElement->AddAttribute("value", proxy->GetSelfIDAsString());
         element->AddNestedElement(proxyElement);
         proxyElement->Delete();
         }
@@ -664,6 +658,24 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
     propertyElement->AddNestedElement(element);
     element->Delete();
     }
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyProperty::SaveProxyElementState(
+  unsigned int idx, bool use_previous_proxies)
+{
+  // We can assume idx is valid since it's called by ChildSaveState().
+  vtkSMProxy* proxy = use_previous_proxies? 
+    this->PPInternals->PreviousProxies[idx].GetPointer():
+    this->GetProxy(idx);
+  vtkPVXMLElement* proxyElement = 0;
+  if (proxy)
+    {
+    proxyElement = vtkPVXMLElement::New();
+    proxyElement->SetName("Proxy");
+    proxyElement->AddAttribute("value", proxy->GetSelfIDAsString());
+    }
+  return proxyElement;
 }
 
 //---------------------------------------------------------------------------

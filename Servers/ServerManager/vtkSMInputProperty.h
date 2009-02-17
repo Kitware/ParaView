@@ -132,11 +132,11 @@ protected:
     vtkSMProxyLocator* loader, int loadLastPushedValues=0);
 
   // Description:
-  // Saves the state of the object in XML format. 
-  // if \c saveLastPushedValues is set, then the state includes
-  // the values that were last pushed on to the server. This is used for
-  // undo/redo state.
-  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
+  // Called by ChildSaveState to save the XML for every proxy. Overridden to
+  // save output port information.
+  virtual vtkPVXMLElement* SaveProxyElementState(
+    unsigned int idx, bool use_previous_proxies);
+
   //BTX
   // Description:
   // Description:

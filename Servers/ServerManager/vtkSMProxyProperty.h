@@ -196,6 +196,13 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
+  // Called by ChildSaveState to save the XML for every proxy. Gives the
+  // subclass an opportunity to add additional attributes to the XML element
+  // (such as output port info).
+  virtual vtkPVXMLElement* SaveProxyElementState(
+    unsigned int idx, bool use_previous_proxies);
+
+  // Description:
   // Previous proxies are used by the ProxyProperty internally.  This is a
   // collection of proxies to whcih the owner proxy of this property get
   // added as a consumer. This list helps is breaking this dependence when

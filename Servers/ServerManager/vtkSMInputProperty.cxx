@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.25");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -430,73 +430,18 @@ int vtkSMInputProperty::LoadState(vtkPVXMLElement* element,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMInputProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
-                                       int saveLastPushedValues)
+vtkPVXMLElement* vtkSMInputProperty::SaveProxyElementState(
+  unsigned int idx, bool use_previous_proxies)
 {
-  this->Superclass::ChildSaveState(propertyElement, saveLastPushedValues);
-
-  // Add to the DOM built by the superclass. This makes this implementation
-  // on that of the superclass so beware of changes to vtkSMProxyProperty's
-  // ChildSaveState().
-  unsigned int numNested = propertyElement->GetNumberOfNestedElements();
-  for (unsigned int idx=0; idx<numNested; idx++)
+  vtkPVXMLElement* proxyElement = this->Superclass::SaveProxyElementState(idx,
+    use_previous_proxies);
+  if (proxyElement)
     {
-    vtkPVXMLElement* proxyElement = propertyElement->GetNestedElement(idx);
-    // For each proxy element
-    if (proxyElement->GetName() && 
-        strcmp(proxyElement->GetName(), "Proxy") == 0)
-      {
-      // Find the index of the proxy
-      const char* idasstring = proxyElement->GetAttribute("value");
-      if (idasstring)
-        {
-        unsigned int numProxies = this->GetNumberOfProxies();
-        for (unsigned int jdx=0; jdx<numProxies; jdx++)
-          {
-          vtkSMProxy* proxy = this->GetProxy(jdx);
-          // Set the appropriate output port
-          if (proxy && strcmp(idasstring, proxy->GetSelfIDAsString()) == 0)
-            {
-            proxyElement->AddAttribute("output_port", 
-                                       this->GetOutputPortForConnection(jdx));
-            }
-          }
-        }
-      }
+    proxyElement->AddAttribute("output_port",
+      (use_previous_proxies?
+       this->GetPreviousOutputPortForConnection(idx) :
+       this->GetOutputPortForConnection(idx)));
     }
-
-  if (saveLastPushedValues)
-    {
-    vtkPVXMLElement* lastPushedElem = 
-      propertyElement->FindNestedElementByName("LastPushedValues");
-    if (lastPushedElem)
-      {
-      numNested = lastPushedElem->GetNumberOfNestedElements();
-      for (unsigned int idx=0; idx<numNested; idx++)
-        {
-        vtkPVXMLElement* proxyElement = lastPushedElem->GetNestedElement(idx);
-        // For each proxy element
-        if (proxyElement->GetName() && 
-            strcmp(proxyElement->GetName(), "Proxy") == 0)
-          {
-          // Find the index of the proxy
-          const char* idasstring = proxyElement->GetAttribute("value");
-          if (idasstring)
-            {
-            unsigned int numProxies = this->GetNumberOfPreviousProxies();
-            for (unsigned int jdx=0; jdx<numProxies; jdx++)
-              {
-              vtkSMProxy* proxy = this->GetPreviousProxy(jdx);
-              // Set the appropriate output port
-              if (proxy && strcmp(idasstring, proxy->GetSelfIDAsString()) == 0)
-                {
-                proxyElement->AddAttribute(
-                  "output_port", this->GetPreviousOutputPortForConnection(jdx));
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  return proxyElement;
 }
+
