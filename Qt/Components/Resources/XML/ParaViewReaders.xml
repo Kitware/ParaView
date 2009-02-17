@@ -112,7 +112,7 @@
           file_description="Digital Elevation Map Files">
   </Reader>
   <Reader name="vrmlreader"
-          extensions="wrl"
+          extensions="wrl vrml"
           file_description="VRML 2 Files">
   </Reader>
   <Reader name="plyreader"
