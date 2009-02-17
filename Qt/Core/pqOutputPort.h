@@ -103,9 +103,8 @@ public:
   void renderAllViews(bool force=false);
 
   /// Returns the current data information at this output port. 
-  /// If \c update is true, then the pipeline is updated before obtaining the
-  /// data information, otherwise the current data information is returned.
-  vtkPVDataInformation* getDataInformation(bool update) const;
+  /// Note \c update is no longer used and will be deprecated soon.
+  vtkPVDataInformation* getDataInformation(bool update=false) const;
 
   /// Simply returns the data information as available on the client, without any
   /// gathers from the server side or any pipeline updates.

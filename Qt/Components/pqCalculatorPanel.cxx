@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes
 #include "vtkSMProperty.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -49,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes
 #include "pqPipelineFilter.h"
+#include "pqOutputPort.h"
 #include "pqSMAdaptor.h"
 #include "pqScalarBarRepresentation.h"
 #include "ui_pqCalculatorPanel.h"
@@ -398,13 +398,13 @@ void pqCalculatorPanel::updateVariables(const QString& mode)
 
   if(mode == "Point Data")
     {
-    fdi = vtkSMSourceProxy::SafeDownCast(f->getInput(0)->getProxy())->
-      GetDataInformation()->GetPointDataInformation();
+    fdi = f->getInput(f->getInputPortName(0), 0)->getDataInformation()
+      ->GetPointDataInformation();
     }
   else if(mode == "Cell Data")
     {
-    fdi = vtkSMSourceProxy::SafeDownCast(f->getInput(0)->getProxy())->
-      GetDataInformation()->GetCellDataInformation();
+    fdi = f->getInput(f->getInputPortName(0), 0)->getDataInformation()
+      ->GetCellDataInformation();
     }
   
   if(!fdi)
