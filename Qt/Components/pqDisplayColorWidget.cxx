@@ -67,7 +67,7 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   this->Variables->setMaxVisibleItems(60);
   this->Variables->setObjectName("Variables");
   this->Variables->setMinimumSize( QSize( 150, 0 ) );
-  this->Variables->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLength);
+  this->Variables->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   
   this->Components = new QComboBox( this );
   this->Components->setObjectName("Components");
