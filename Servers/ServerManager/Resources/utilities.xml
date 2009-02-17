@@ -2256,6 +2256,24 @@
         <StringArrayHelper />
       </StringVectorProperty>
 
+      <StringVectorProperty name="PythonModuleNames"
+                            command="GetPythonModuleNames"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="PythonModuleSources"
+                            command="GetPythonModuleSources"
+                            information_only="1">
+        <StringArrayHelper />
+      </StringVectorProperty>
+
+      <IntVectorProperty name="PythonPackageFlags"
+                         command="GetPythonPackageFlags"
+                         information_only="1">
+        <IntArrayInformationHelper />
+      </IntVectorProperty>
+
       <!-- End of PluginLoader -->
     </Proxy>
     

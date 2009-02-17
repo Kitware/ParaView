@@ -2014,6 +2014,26 @@ def CreateRepresentation(aProxy, view, **extraArgs):
     view.Representations.append(proxy)
     return proxy
 
+class _ModuleLoader(object):
+    def find_module(self, fullname, path=None):
+        if vtkPVPythonModule.HasModule(fullname):
+            return self
+        else:
+            return None
+    def load_module(self, fullname):
+        import imp
+        moduleInfo = vtkPVPythonModule.GetModule(fullname)
+        if not moduleInfo:
+            raise ImportError
+        module = sys.modules.setdefault(fullname, imp.new_module(fullname))
+        module.__file__ = "<%s>" % moduleInfo.GetFullName()
+        module.__loader__ = self
+        if moduleInfo.GetIsPackage:
+            module.__path__ = moduleInfo.GetFullName()
+        code = compile(moduleInfo.GetSource(), module.__file__, 'exec')
+        exec code in module.__dict__
+        return module
+
 def LoadPlugin(filename, connection=None):
     """ Given a filename and a connection (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
@@ -2036,15 +2056,34 @@ def LoadPlugin(filename, connection=None):
     # Make sure that the plugin was loaded successfully
     if pld.GetProperty("Loaded").GetElement(0):
         # Get the XML, parse it and load it
-        xmlstring = pld.GetProperty("ServerManagerXML").GetElement(0)
-        if xmlstring:
-            parser = vtkSMXMLParser()
-            parser.Parse(xmlstring)
-            parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
-            # Update the modules
-            updateModules()
+        xmlproperty = pld.GetProperty("ServerManagerXML")
+        for i in xrange(xmlproperty.GetNumberOfElements()):
+            xmlstring = xmlproperty.GetElement(i)
+            if xmlstring:
+                parser = vtkSMXMLParser()
+                parser.Parse(xmlstring)
+                parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
+                # Update the modules
+                updateModules()
+        # Get the python modules and load them
+        pynameproperty = pld.GetProperty("PythonModuleNames");
+        pysrcproperty = pld.GetProperty("PythonModuleSources");
+        pypackageflagproperty = pld.GetProperty("PythonPackageFlags");
+        if pynameproperty.GetNumberOfElements() > 0:
+            import sys
+            # Check to see if the importer facility we use is available
+            try: sys.meta_path
+            except: raise RuntimeError, "meta_path importer does not exist.  You need Python 2.3 or later to load plugins with python modules."
+
+            for i in xrange(pynameproperty.GetNumberOfElements()):
+                moduleInfo = vtkPVPythonModule()
+                moduleInfo.SetFullName(pynameproperty.GetElement(i))
+                moduleInfo.SetSource(pysrcproperty.GetElement(i))
+                moduleInfo.SetIsPackage(pypackageflagproperty.GetElement(i))
+                vtkPVPythonModule.RegisterModule(moduleInfo)
     else:
-        print("Warning: plugin failed to load")
+        raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
+            
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """
@@ -2770,3 +2809,6 @@ _pyproxies = {}
 # Create needed sub-modules
 _createModules()
 
+# Set up our custom importer (if possible)
+loader = _ModuleLoader()
+sys.meta_path.append(loader)

@@ -40,16 +40,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QResource>
 
-#include "vtkSMXMLParser.h"
-#include "vtkPVPluginLoader.h"
-#include "vtkStringArray.h"
+#include "vtkIntArray.h"
 #include "vtkProcessModule.h"
+#include "vtkPVEnvironmentInformation.h"
+#include "vtkPVEnvironmentInformationHelper.h"
+#include "vtkPVPluginLoader.h"
+#include "vtkPVPythonModule.h"
+#include "vtkSMXMLParser.h"
+#include "vtkStringArray.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
-#include "vtkPVEnvironmentInformation.h"
-#include "vtkPVEnvironmentInformationHelper.h"
+#include "vtkToolkits.h"
+
 #include "vtksys/SystemTools.hxx"
+
+#include "vtkSmartPointer.h"
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include "pqApplicationCore.h"
 #include "pqAutoStartInterface.h"
@@ -126,10 +134,27 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
         QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
         foreach(QVariant xml, xmls)
           {
-          vtkSmartPointer<vtkSMXMLParser> parser = vtkSmartPointer<vtkSMXMLParser>::New();
+          VTK_CREATE(vtkSMXMLParser, parser);
           parser->Parse(xml.toString().toAscii().data());
           parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
           }
+
+#ifdef VTK_WRAP_PYTHON
+        prop = pxy->GetProperty("PythonModuleNames");
+        QList<QVariant> names = pqSMAdaptor::getMultipleElementProperty(prop);
+        prop = pxy->GetProperty("PythonModuleSources");
+        QList<QVariant> sources = pqSMAdaptor::getMultipleElementProperty(prop);
+        prop = pxy->GetProperty("PythonPackageFlags");
+        QList<QVariant> pflags = pqSMAdaptor::getMultipleElementProperty(prop);
+        for (int i = 0; i < names.size(); i++)
+          {
+          VTK_CREATE(vtkPVPythonModule, module);
+          module->SetFullName(names[i].toString().toAscii().data());
+          module->SetSource(sources[i].toString().toAscii().data());
+          module->SetIsPackage(pflags[i].toInt());
+          vtkPVPythonModule::RegisterModule(module);
+          }
+#endif //VTK_WRAP_PYTHON
         }
       else
         {
@@ -141,19 +166,33 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
     }
   else
     {
-    vtkSmartPointer<vtkPVPluginLoader> loader =
-      vtkSmartPointer<vtkPVPluginLoader>::New();
+    VTK_CREATE(vtkPVPluginLoader, loader);
     loader->SetFileName(lib.toAscii().data());
     success = loader->GetLoaded() ? LOADED : NOTLOADED;
     if(success == LOADED)
       {
+      int i;
       vtkStringArray* xmls = loader->GetServerManagerXML();
-      for(int i=0; i<xmls->GetNumberOfValues(); i++)
+      for(i=0; i<xmls->GetNumberOfValues(); i++)
         {
-        vtkSmartPointer<vtkSMXMLParser> parser = vtkSmartPointer<vtkSMXMLParser>::New();
+        VTK_CREATE(vtkSMXMLParser, parser);
         parser->Parse(xmls->GetValue(i).c_str());
         parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
         }
+
+#ifdef VTK_WRAP_PYTHON
+      vtkStringArray *names = loader->GetPythonModuleNames();
+      vtkStringArray *sources = loader->GetPythonModuleSources();
+      vtkIntArray *pflags = loader->GetPythonPackageFlags();
+      for (i = 0; i < names->GetNumberOfValues(); i++)
+        {
+        VTK_CREATE(vtkPVPythonModule, module);
+        module->SetFullName(names->GetValue(i).c_str());
+        module->SetSource(sources->GetValue(i).c_str());
+        module->SetIsPackage(pflags->GetValue(i));
+        vtkPVPythonModule::RegisterModule(module);
+        }
+#endif //VTK_WRAP_PYTHON
       }
     else
       {

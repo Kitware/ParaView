@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
     {
     vtkstd::string fname = argv[cc];
     vtkstd::string moduleName;
-    vtksys::RegularExpression mnrex(".*/(.*).(xml|pvsm)$");
+    vtksys::RegularExpression mnrex(".*/(.*).(xml|pvsm|py)$");
     if ( mnrex.find(fname) )
       {
       moduleName = mnrex.match(1);

@@ -22,6 +22,7 @@
 
 #include "vtkObject.h"
 
+class vtkIntArray;
 class vtkStringArray;
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject
@@ -40,6 +41,25 @@ public:
   // Get the Server Manager XML from a loaded plugin
   // the string array contains chunks of XML to process
   vtkGetObjectMacro(ServerManagerXML, vtkStringArray);
+
+  // Description:
+  // Get a list of Python modules from a loaded plugin.  The string array
+  // contains full names of Python modules.
+  vtkGetObjectMacro(PythonModuleNames, vtkStringArray);
+
+  // Description:
+  // Get the Python source for the Python modules in a loaded plugin.  The
+  // string array contains the Python source for a given module.  The entries in
+  // this array correspond to the entries of the same index in the
+  // PythonModuleNames array.
+  vtkGetObjectMacro(PythonModuleSources, vtkStringArray);
+
+  // Description:
+  // Get a list of flags specifying whether a given module is really a package.
+  // A 1 for package, 0 for module.  The entries in this array correspond to the
+  // entries of the same index in the PythonModuleNames and PythonModuleSources
+  // arrays.
+  vtkGetObjectMacro(PythonPackageFlags, vtkIntArray);
 
   // Desctiption:
   // Get whether the plugin is loaded
@@ -64,6 +84,9 @@ protected:
   char* FileName;
   int Loaded;
   vtkStringArray* ServerManagerXML;
+  vtkStringArray* PythonModuleNames;
+  vtkStringArray* PythonModuleSources;
+  vtkIntArray*    PythonPackageFlags;
   char* Error;
   char* SearchPaths;
 

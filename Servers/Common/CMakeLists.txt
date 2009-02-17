@@ -62,6 +62,7 @@ SET(Kit_SRCS
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx
+  vtkPVPythonModule.cxx
   vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
