@@ -1,7 +1,8 @@
 #include "vtkDataSetAttributes.h"
 #include "vtkProcessModule.h"
-#include "vtkPVXMLParser.h"
+#include "vtkPVOptions.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMApplication.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMBoundsDomain.h"
@@ -18,8 +19,8 @@
 #include "vtkSMNumberOfPartsDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
 #include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxy.h"
 #include "vtkSMProxyListDomain.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringListDomain.h"
@@ -1015,6 +1016,9 @@ int main(int argc, char *argv[])
   proxyTypeName++;
   
   vtkProcessModule *pm = vtkProcessModule::New();
+  vtkPVOptions* options  = vtkPVOptions::New();
+  pm->SetOptions(options);
+
   pm->Initialize();
   vtkProcessModule::SetProcessModule(pm);
   vtkSMApplication *app = vtkSMApplication::New();
@@ -1071,6 +1075,7 @@ int main(int argc, char *argv[])
   parser->Delete();
   pm->Finalize();
   pm->Delete();
+  options->Delete();
   app->Finalize();
   app->Delete();
   return 0;
