@@ -2026,6 +2026,10 @@ def LoadPlugin(filename, connection=None):
 
     pxm=ProxyManager()
     pld = CreateProxy("misc", "PluginLoader")
+    pld.SetServers(0x10) #vtkProcessModule.h::CLIENT
+    pld.GetProperty("FileName").SetElement(0, filename)
+    pld.UpdateVTKObjects()
+    pld = CreateProxy("misc", "PluginLoader")
     pld.GetProperty("FileName").SetElement(0, filename)
     pld.UpdateVTKObjects()
     pld.UpdatePropertyInformation()
@@ -2039,7 +2043,8 @@ def LoadPlugin(filename, connection=None):
             parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
             # Update the modules
             updateModules()
-
+    else:
+        print("Warning: plugin failed to load")
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """

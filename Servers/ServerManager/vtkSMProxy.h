@@ -322,7 +322,6 @@ public:
   // actual objects.
   virtual void MarkAllPropertiesAsModified();
   
-//BTX
   // Description:
   // Set server ids on self and sub-proxies.
   virtual void SetServers(vtkTypeUInt32 servers);
@@ -331,7 +330,6 @@ public:
   // Return the servers.
   vtkTypeUInt32 GetServers();
 
-//ETX
   // Description:
   // Set the server connection ID on self and sub-proxies.
   virtual void SetConnectionID(vtkIdType id);
