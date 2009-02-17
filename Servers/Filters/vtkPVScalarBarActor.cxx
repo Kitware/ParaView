@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.10");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.11");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -821,11 +821,11 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
     vtkMath::RGBToHSV(color, color);
     if (color[2] > 0.5)
       {
-      color[2] -= 0.33;
+      color[2] -= 0.2;
       }
     else
       {
-      color[2] += 0.33;
+      color[2] += 0.2;
       }
     vtkMath::HSVToRGB(color, color);
     this->TickMarksActor->GetProperty()->SetColor(color);
