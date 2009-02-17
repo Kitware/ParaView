@@ -19,6 +19,7 @@
 #include "vtkCamera.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
+#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -27,22 +28,24 @@
 #include "vtkSmartPointer.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+//#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStreamingRepresentation.h"
 #include "vtkSMStreamingViewHelper.h"
+#include "vtkSMUtilities.h"
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkWindowToImageFilter.h"
 
 #include <vtkstd/vector>
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.7");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -238,6 +241,80 @@ void vtkSMStreamingViewProxy::InteractiveRender()
   this->GetRootView()->EndInteractiveRender();
   this->EndInteractiveRender();
   in_interactive_render = false;
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* vtkSMStreamingViewProxy::CaptureWindow(int magnification)
+{
+  vtkRenderWindow *renWin = this->GetRootView()->GetRenderWindow();
+
+  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(renWin);
+  w2i->SetMagnification(magnification);
+  w2i->ReadFrontBufferOn();
+  w2i->ShouldRerenderOff();
+  w2i->Update();
+
+  vtkImageData* capture = vtkImageData::New();
+  capture->ShallowCopy(w2i->GetOutput());
+  w2i->Delete();
+
+#if !defined(__APPLE__)
+  if (useOffscreenRenderingForScreenshots && !prevOffscreen)
+    {
+    renWin->SetOffScreenRendering(0);
+    }
+
+  if (useOffscreenRenderingForScreenshots)
+    {
+    vtkDataArray* scalars = capture->GetPointData()->GetScalars();
+    bool invalid_image = true;
+    for (int comp=0; comp < scalars->GetNumberOfComponents(); comp++)
+      {
+      double range[2];
+      scalars->GetRange(range, comp);
+      if (range[0] != 0.0 || range[1] != 0.0)
+        {
+        invalid_image = false;
+        break;
+        }
+      }
+
+    if (invalid_image && 
+      vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() == 1)
+      {
+      // free up current image.
+      capture->Delete();
+      capture = 0;
+      vtkWarningMacro("Disabling offscreen rendering since empty image was detected.");
+      this->UseOffscreenRenderingForScreenshots = false;
+      if (prevOffscreen)
+        {
+        renWin->SetOffScreenRendering(0);
+        }
+      return this->CaptureWindow(magnification);
+      }
+    }
+#endif
+
+  // Update image extents based on ViewPosition
+  int extents[6];
+  capture->GetExtent(extents);
+  for (int cc=0; cc < 4; cc++)
+    {
+    extents[cc] += this->ViewPosition[cc/2]*magnification;
+    }
+  capture->SetExtent(extents);
+
+  return capture;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMStreamingViewProxy::WriteImage(const char* filename, int magnification)
+{
+  vtkSmartPointer<vtkImageData> shot;
+  shot.TakeReference(this->CaptureWindow(magnification));
+  return vtkSMUtilities::SaveImage(shot, filename);
 }
 
 //STUFF TO MAKE A PLUGIN VIEW WITH SPECIALIZED STREAMING REPS and STRATS

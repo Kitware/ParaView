@@ -28,6 +28,7 @@ class vtkSMRenderViewProxy;
 class vtkTimerLog;
 class vtkSMStreamingViewHelper;
 class vtkSMStreamingOptionsProxy;
+class vtkImageData;
 
 class VTK_EXPORT vtkSMStreamingViewProxy : public vtkSMViewProxy
 {
@@ -82,10 +83,19 @@ public:
   // Overridden to choose the correct type of render view.
   virtual const char* GetSuggestedViewType(vtkIdType connectionID);
 
-
   // Description:
   // Get the streaming helper proxy.
   static vtkSMStreamingOptionsProxy* GetStreamingOptionsProxy();
+
+  // Description:
+  // Generate a screenshot from the render window.
+  // The file format is determined from the extension of the file to write.
+  int WriteImage(const char* filename, int magnification);
+
+  // Description:
+  // Returns an image data that contains a "screenshot" of the window.
+  // It is the responsibility of the caller to delete the image data.
+  virtual vtkImageData* CaptureWindow(int magnification);
 
 //BTX
 protected:
