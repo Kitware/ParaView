@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.8");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -258,44 +258,6 @@ vtkImageData* vtkSMStreamingViewProxy::CaptureWindow(int magnification)
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
   w2i->Delete();
-
-#if !defined(__APPLE__)
-  if (useOffscreenRenderingForScreenshots && !prevOffscreen)
-    {
-    renWin->SetOffScreenRendering(0);
-    }
-
-  if (useOffscreenRenderingForScreenshots)
-    {
-    vtkDataArray* scalars = capture->GetPointData()->GetScalars();
-    bool invalid_image = true;
-    for (int comp=0; comp < scalars->GetNumberOfComponents(); comp++)
-      {
-      double range[2];
-      scalars->GetRange(range, comp);
-      if (range[0] != 0.0 || range[1] != 0.0)
-        {
-        invalid_image = false;
-        break;
-        }
-      }
-
-    if (invalid_image && 
-      vtkProcessModule::GetProcessModule()->GetNumberOfLocalPartitions() == 1)
-      {
-      // free up current image.
-      capture->Delete();
-      capture = 0;
-      vtkWarningMacro("Disabling offscreen rendering since empty image was detected.");
-      this->UseOffscreenRenderingForScreenshots = false;
-      if (prevOffscreen)
-        {
-        renWin->SetOffScreenRendering(0);
-        }
-      return this->CaptureWindow(magnification);
-      }
-    }
-#endif
 
   // Update image extents based on ViewPosition
   int extents[6];
