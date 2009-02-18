@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqFileDialogModel.h"
 #include "pqFileDialogFavoriteModel.h"
+#include "pqFileDialogRecentDirsModel.h"
 #include "pqFileDialogFilter.h"
 #include "pqServer.h"
 
@@ -125,6 +126,7 @@ class pqFileDialog::pqImplementation : public QObject
 public:
   pqFileDialogModel* const Model;
   pqFileDialogFavoriteModel* const FavoriteModel;
+  pqFileDialogRecentDirsModel* const RecentModel;
   pqFileDialogFilter FileFilter;
   FileMode Mode;
   Ui::pqFileDialog Ui;
@@ -140,16 +142,20 @@ public:
     QObject(p),
     Model(new pqFileDialogModel(server, NULL)),
     FavoriteModel(new pqFileDialogFavoriteModel(server, NULL)),
+    RecentModel(new pqFileDialogRecentDirsModel(Model, server, NULL)),
     FileFilter(this->Model),
     Mode(ExistingFile),
     SupressOverwriteWarning(false)
   {
+  QObject::connect(p, SIGNAL(filesSelected(const QStringList&)),
+    this->RecentModel, SLOT(setChosenFiles(const QStringList&)));
   }
   
   ~pqImplementation()
   {
-    delete this->Model;
+    delete this->RecentModel;
     delete this->FavoriteModel;
+    delete this->Model;
   }
   
   QString getStartPath()
@@ -280,6 +286,11 @@ pqFileDialog::pqFileDialog(
   this->Implementation->Ui.Favorites->setModel(this->Implementation->FavoriteModel);
   this->Implementation->Ui.Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+  this->Implementation->Ui.Recent->setModel(
+    this->Implementation->RecentModel);
+  this->Implementation->Ui.Recent->setSelectionBehavior(
+    QAbstractItemView::SelectRows);
+
   this->setFileMode(ExistingFile);
 
   QObject::connect(this->Implementation->Model,
@@ -312,6 +323,11 @@ pqFileDialog::pqFileDialog(
                    this, 
                    SLOT(onClickedFavorite(const QModelIndex&)));
 
+  QObject::connect(this->Implementation->Ui.Recent, 
+                   SIGNAL(clicked(const QModelIndex&)), 
+                   this, 
+                   SLOT(onClickedRecent(const QModelIndex&)));
+
   QObject::connect(this->Implementation->Ui.Files, 
                    SIGNAL(clicked(const QModelIndex&)), 
                    this, 
@@ -327,6 +343,11 @@ pqFileDialog::pqFileDialog(
                    SIGNAL(activated(const QModelIndex&)), 
                    this, 
                    SLOT(onActivateFavorite(const QModelIndex&)));
+
+  QObject::connect(this->Implementation->Ui.Recent, 
+                   SIGNAL(activated(const QModelIndex&)), 
+                   this, 
+                   SLOT(onActivateRecent(const QModelIndex&)));
 
   QObject::connect(this->Implementation->Ui.Files, 
                    SIGNAL(activated(const QModelIndex&)), 
@@ -661,6 +682,12 @@ void pqFileDialog::onClickedFavorite(const QModelIndex&)
 }
 
 //-----------------------------------------------------------------------------
+void pqFileDialog::onClickedRecent(const QModelIndex&)
+{
+  this->Implementation->Ui.Files->clearSelection();
+}
+
+//-----------------------------------------------------------------------------
 void pqFileDialog::onClickedFile(const QModelIndex&)
 {
   this->Implementation->Ui.Favorites->clearSelection();
@@ -675,6 +702,14 @@ void pqFileDialog::onActivateFavorite(const QModelIndex& index)
     this->onNavigate(file);
     this->Implementation->Ui.FileName->selectAll();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqFileDialog::onActivateRecent(const QModelIndex& index)
+{
+  QString file = this->Implementation->RecentModel->filePath(index);
+  this->onNavigate(file);
+  this->Implementation->Ui.FileName->selectAll();
 }
 
 //-----------------------------------------------------------------------------

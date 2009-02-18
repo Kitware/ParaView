@@ -140,10 +140,12 @@ private slots:
   void onNavigateDown(const QModelIndex&);
   void onFilterChange(const QString&);
 
+  void onClickedRecent(const QModelIndex&);
   void onClickedFavorite(const QModelIndex&);
   void onClickedFile(const QModelIndex&);
   
   void onActivateFavorite(const QModelIndex&);
+  void onActivateRecent(const QModelIndex&);
   void onActivateFile(const QModelIndex&);
   
   void onTextEdited(const QString&);
