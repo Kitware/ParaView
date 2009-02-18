@@ -1,7 +1,4 @@
 <ui version="4.0" >
- <author></author>
- <comment></comment>
- <exportmacro></exportmacro>
  <class>pqStreamTracerPanel</class>
  <widget class="QWidget" name="pqStreamTracerPanel" >
   <property name="geometry" >
@@ -16,11 +13,20 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="margin" >
-    <number>9</number>
-   </property>
    <property name="spacing" >
     <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
    </property>
    <item>
     <widget class="pqCollapsedGroup" name="streamTracerGroup" >
@@ -28,10 +34,22 @@
       <string>Stream Tracer</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="1" column="0" >
@@ -176,10 +194,22 @@
       <string>Seeds</string>
      </property>
      <layout class="QGridLayout" >
-      <property name="margin" >
+      <property name="leftMargin" >
        <number>9</number>
       </property>
-      <property name="spacing" >
+      <property name="topMargin" >
+       <number>9</number>
+      </property>
+      <property name="rightMargin" >
+       <number>9</number>
+      </property>
+      <property name="bottomMargin" >
+       <number>9</number>
+      </property>
+      <property name="horizontalSpacing" >
+       <number>6</number>
+      </property>
+      <property name="verticalSpacing" >
        <number>6</number>
       </property>
       <item row="0" column="0" >
@@ -206,7 +236,7 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QStackedWidget" name="stackedWidget" >
         <property name="currentIndex" >
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="pointSource" />
         <widget class="QWidget" name="lineSource" />
@@ -230,16 +260,31 @@
    </item>
   </layout>
  </widget>
- <pixmapfunction></pixmapfunction>
  <customwidgets>
   <customwidget>
    <class>pqCollapsedGroup</class>
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
-   <container>0</container>
-   <pixmap></pixmap>
+   <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>SelectInputVectors</tabstop>
+  <tabstop>MaximumPropagationUnit</tabstop>
+  <tabstop>MaximumPropagation</tabstop>
+  <tabstop>InitialIntegrationStepUnit</tabstop>
+  <tabstop>InitialIntegrationStep</tabstop>
+  <tabstop>IntegrationDirection</tabstop>
+  <tabstop>MaximumNumberOfSteps</tabstop>
+  <tabstop>TerminalSpeed</tabstop>
+  <tabstop>IntegratorType</tabstop>
+  <tabstop>MinimumIntegrationStepUnit</tabstop>
+  <tabstop>MinimumIntegrationStep</tabstop>
+  <tabstop>MaximumIntegrationStepUnit</tabstop>
+  <tabstop>MaximumIntegrationStep</tabstop>
+  <tabstop>MaximumError</tabstop>
+  <tabstop>seedType</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
