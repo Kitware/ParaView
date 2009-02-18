@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVXMLElement.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
-#include <vtkSMProxyProperty.h>
+#include <vtkSMInputProperty.h>
 #include <vtkSMSourceProxy.h>
 
 #include <QVBoxLayout>
@@ -92,15 +92,16 @@ pqParticleTracerPanel::pqParticleTracerPanel(pqProxy* object_proxy, QWidget* p) 
   double proxy_center[3];
   double proxy_size[3];
   
-  if(vtkSMProxyProperty* const input_property =
-    vtkSMProxyProperty::SafeDownCast(
+  if(vtkSMInputProperty* const input_property =
+    vtkSMInputProperty::SafeDownCast(
       this->proxy()->GetProperty("Input")))
     {
     if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
       input_property->GetProxy(0)))
       {
       double input_bounds[6];
-      input_proxy->GetDataInformation()->GetBounds(input_bounds);
+      input_proxy->GetDataInformation(
+        input_property->GetOutputPortForConnection(0))->GetBounds(input_bounds);
 
       proxy_center[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
       proxy_center[1] = (input_bounds[2] + input_bounds[3]) / 2.0;

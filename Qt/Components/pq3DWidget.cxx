@@ -506,15 +506,17 @@ int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
   vtkSMSourceProxy* input = NULL;
   vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
     this->getReferenceProxy()->GetProperty("Input"));
+  int output_port = 0;
   if(ivp && ivp->GetNumberOfProxies())
     {
     vtkSMProxy* pxy = ivp->GetProxy(0);
     input = vtkSMSourceProxy::SafeDownCast(pxy);
+    output_port =ivp->GetOutputPortForConnection(0);
     }
 
   if(input)
     {
-    input->GetDataInformation()->GetBounds(bounds);
+    input->GetDataInformation(output_port)->GetBounds(bounds);
     return 1;
     }
   return 0;
