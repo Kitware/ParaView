@@ -96,6 +96,11 @@ public:
   /// The default implementation iterates over all properties
   /// of the proxy and sets them to default values. 
   void setDefaultPropertyValues();
+
+  /// Used by editors to trigger keyframesModified() signal after bulk of
+  /// modifications have been made to the cue/key frames.
+  void triggerKeyFramesModified()
+    { emit this->keyframesModified(); }
     
 signals:
   // emitted when something about the keyframes changes.
