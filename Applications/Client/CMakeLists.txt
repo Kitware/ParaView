@@ -308,6 +308,7 @@ IF(BUILD_TESTING)
     SaveColorMap
     SaveCSV
     SelectReader
+    Selection
     SimpleInteraction
     Slice
     SPTimeseries
