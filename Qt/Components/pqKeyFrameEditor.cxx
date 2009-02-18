@@ -558,6 +558,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
     stack->beginUndoSet("Edit Keyframes");
     }
 
+  bool prev = this->Internal->Cue->blockSignals(true);
   for(int i=0; i<oldNumber-newNumber; i++)
     {
     this->Internal->Cue->deleteKeyFrame(0);
@@ -642,6 +643,9 @@ void pqKeyFrameEditor::writeKeyFrameData()
       }
     keyFrame->UpdateVTKObjects();
     }
+
+  this->Internal->Cue->blockSignals(prev);
+  this->Internal->Cue->triggerKeyFramesModified();
   
   if(stack)
     {

@@ -65,6 +65,12 @@ protected:
   vtkSMCompositeKeyFrameProxy();
   ~vtkSMCompositeKeyFrameProxy();
 
+  void InvokeModified()
+    {
+    this->Modified();
+    }
+
+
   // Description:
   // Given the number of objects (numObjects), class name (VTKClassName)
   // and server ids ( this->GetServerIDs()), this methods instantiates

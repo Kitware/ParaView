@@ -17,9 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkMemberFunctionCommand.h"
 
 vtkStandardNewMacro(vtkSMCompositeKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCompositeKeyFrameProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMCompositeKeyFrameProxy::vtkSMCompositeKeyFrameProxy()
 {
@@ -101,6 +102,9 @@ void vtkSMCompositeKeyFrameProxy::CreateVTKObjects()
     return;
     }
 
+  vtkCommand* observer = vtkMakeMemberFunctionCommand(*this,
+    &vtkSMCompositeKeyFrameProxy::InvokeModified);
+
   // Link properties between the subproxies.
   for (int cc= NONE+1; cc <= SINUSOID; cc++)
     {
@@ -110,11 +114,13 @@ void vtkSMCompositeKeyFrameProxy::CreateVTKObjects()
       vtkWarningMacro("Missing subproxy with name " << this->GetTypeAsString(cc));
       continue;
       }
+    proxy->AddObserver(vtkCommand::ModifiedEvent, observer);
     this->TimeLink->AddLinkedProperty(proxy->GetProperty("KeyTime"),
       vtkSMLink::OUTPUT);
     this->ValueLink->AddLinkedProperty(proxy->GetProperty("KeyValues"),
       vtkSMLink::OUTPUT);
     }
+  observer->Delete();
 
   this->TimeLink->AddLinkedProperty(this->GetProperty("KeyTime"),
     vtkSMLink::INPUT);

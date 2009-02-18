@@ -24,7 +24,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.27");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -140,8 +140,13 @@ void vtkSMAnimationCueProxy::SetManipulator(
   this->Manipulator = manipulator;
   if (this->Manipulator)
     {
+    // Listen to the manipulator's ModifiedEvent. The manipilator fires this
+    // event when the manipulator changes, its keyframes change or the values of
+    // those key frames change. We simply propagate that event out so
+    // applications can only listen to vtkSMAnimationCueProxy for modification
+    // of the entire track.
     this->Manipulator->AddObserver(
-      vtkSMAnimationCueManipulatorProxy::StateModifiedEvent,
+      vtkCommand::ModifiedEvent,
       this->Observer);
     this->Manipulator->Register(this);
     }
@@ -214,6 +219,13 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
       this->TickInternal(calldata);
       break;
       }
+    }
+
+  vtkSMAnimationCueManipulatorProxy* manip =
+    vtkSMAnimationCueManipulatorProxy::SafeDownCast(obj);
+  if (manip && event == vtkCommand::ModifiedEvent)
+    {
+    this->Modified();
     }
 }
 
