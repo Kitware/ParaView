@@ -531,9 +531,9 @@ void pqFilterInputDialog::changeCurrentInput(int id)
     }
 
   // Clear the current selection.
-  this->InChangeInput = true;
-  QItemSelectionModel *model = this->Sources->getSelectionModel();
-  model->clear();
+  this->InChangeInput = true; // this will block ::changeInput() from changing
+                              // what the user selected for the previous input
+                              // port.
 
   // Clear the previous selectable settings.
   this->Pipeline->setSubtreeSelectable(this->Filter->getServer(), true);
@@ -578,21 +578,13 @@ void pqFilterInputDialog::changeCurrentInput(int id)
       }
 
     // Update the selectable settings for the current input.
-    QList<QPersistentModelIndex>::Iterator jter;
     if(this->Internal->Current->Invalid)
       {
-      jter = this->Internal->Current->Invalid->begin();
-      for( ; jter != this->Internal->Current->Invalid->end(); ++jter)
+      foreach (QPersistentModelIndex invalid_index,
+        *(this->Internal->Current->Invalid))
         {
-        this->Pipeline->setSelectable(*jter, false);
+        this->Pipeline->setSelectable(invalid_index, false);
         }
-      }
-
-    // Change the selection to match the new input(s).
-    jter = this->Internal->Current->Inputs.begin();
-    for( ; jter != this->Internal->Current->Inputs.end(); ++jter)
-      {
-      model->setCurrentIndex(*jter, QItemSelectionModel::Select);
       }
     }
 
@@ -610,6 +602,16 @@ void pqFilterInputDialog::changeCurrentInput(int id)
     this->Sources->setSelectionMode(pqFlatTreeView::SingleSelection);
     this->SourcesLabel->setText("Select Source");
     this->MultiHint->hide();
+    }
+
+
+  // Update the selection in the "Source Source" box to reflect the current
+  // state.
+  QItemSelectionModel *model = this->Sources->getSelectionModel();
+  model->clear();
+  foreach (QPersistentModelIndex index, this->Internal->Current->Inputs)
+    {
+    model->select(index, QItemSelectionModel::Select);
     }
 
   this->InChangeInput = false;
