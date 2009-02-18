@@ -308,6 +308,7 @@ void pqRenderView::resetCamera()
   this->fakeInteraction(true);
   this->getRenderViewProxy()->ResetCamera();
   this->fakeInteraction(false);
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
