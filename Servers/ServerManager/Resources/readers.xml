@@ -2527,7 +2527,7 @@
                         default_values="1">
        <BooleanDomain name="bool" />
        <Documentation>
-         This property determines whether the data originates in the lower left corner (on) or the upper left corner (off).  Most scientific data is written with a right-handed axes that originates in the lower left corner.  However, several 2D image file formats write the image from the upper right corner.
+         This property determines whether the data originates in the lower left corner (on) or the upper left corner (off).  Most scientific data is written with a right-handed axes that originates in the lower left corner.  However, several 2D image file formats write the image from the upper left corner.
        </Documentation>
      </IntVectorProperty>
    <!-- End ImageReader -->
