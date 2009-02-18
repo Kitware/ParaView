@@ -3185,7 +3185,6 @@
                         command="SetTimeStep"
                         number_of_elements="1"
                         default_values="0"
-                        animateable="0"
                         information_property="TimestepValues">
        <IntRangeDomain name="range">
          <RequiredProperties>
@@ -3345,7 +3344,6 @@
                         command="SetTimeStep"
                         number_of_elements="1"
                         default_values="0"
-                        animateable="0"
                         information_property="TimestepValues">
        <IntRangeDomain name="range">
          <RequiredProperties>
