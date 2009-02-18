@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkSequenceAnimationPlayer);
-vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.4");
+vtkCxxRevisionMacro(vtkSequenceAnimationPlayer, "1.5");
 //----------------------------------------------------------------------------
 vtkSequenceAnimationPlayer::vtkSequenceAnimationPlayer()
 {
@@ -59,6 +59,11 @@ void vtkSequenceAnimationPlayer::StartLoop(double starttime, double endtime,
 double vtkSequenceAnimationPlayer::GetNextTime(double vtkNotUsed(curtime))
 { 
   this->FrameNo++;
+  if (this->StartTime == this->EndTime && this->FrameNo >= this->NumberOfFrames)
+    {
+    return VTK_DOUBLE_MAX;
+    }
+
   double time = this->StartTime + 
     ((this->EndTime - this->StartTime)*this->FrameNo)/(this->NumberOfFrames-1);
   return time;
