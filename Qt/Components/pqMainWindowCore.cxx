@@ -3290,17 +3290,10 @@ void pqMainWindowCore::disableAutomaticDisplays()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::resetCamera()
 {
-  pqRenderViewBase* ren = 
-    qobject_cast<pqRenderViewBase*>(pqActiveView::instance().current());
-  if (ren)
+  pqView* view = pqActiveView::instance().current();
+  if (view)
     {
-    ren->resetCamera();
-    ren->render();
-    }
-  pqPlotView* chart = qobject_cast<pqPlotView*>(pqActiveView::instance().current());
-  if (chart)
-    {
-    chart->resetCamera();
+    view->resetDisplay();
     }
 }
 

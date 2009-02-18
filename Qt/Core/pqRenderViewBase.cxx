@@ -316,6 +316,12 @@ const int* pqRenderViewBase::defaultBackgroundColor() const
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderViewBase::resetDisplay()
+{
+  this->resetCamera();
+}
+
+//-----------------------------------------------------------------------------
 static const char* pqRenderViewModuleLightSettings [] = {
   "LightSwitch",
   "LightIntensity",

@@ -70,6 +70,9 @@ public:
   /// action gets pushed on the interaction undo stack.
   virtual void resetCamera()=0;
 
+  /// Called to reset the view's display.  This method calls resetCamera().
+  virtual void resetDisplay();
+
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
   /// for proxies created by the GUI itself i.e.

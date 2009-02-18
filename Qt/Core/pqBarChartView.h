@@ -36,42 +36,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMSourceProxy;
 class pqDataRepresentation;
+class vtkQtBarChartView;
 
 /// Bar chart view
 class PQCORE_EXPORT pqBarChartView : public pqView
 {
   Q_OBJECT
   typedef pqView Superclass;
+
 public:
   static QString barChartViewType() { return "BarChartView2"; }
   static QString barChartViewTypeName() { return "Bar Chart View 2"; }
 
 public:
-  pqBarChartView(const QString& group, const QString& name, 
-    vtkSMViewProxy* viewModule, pqServer* server, 
-    QObject* parent=NULL);
+
+  pqBarChartView(const QString& group,
+                 const QString& name, 
+                 vtkSMViewProxy* viewModule,
+                 pqServer* server, 
+                 QObject* parent=NULL);
+
   virtual ~pqBarChartView();
 
   /// Return a widget associated with this view.
-  /// This view has no widget.
   virtual QWidget* getWidget();
 
-  virtual void setDefaultPropertyValues();
+  /// Return the internal vtkQtBarChartView.
+  vtkQtBarChartView* getVtkBarChartView() const;
 
-  /// Requests a delayed chart widget render.
-  virtual void render();
+  virtual void setDefaultPropertyValues();
 
   /// This view does not support saving to image.
   virtual bool saveImage(int /*width*/, int /*height*/, 
     const QString& /*filename*/)
     { return false; }
 
-  /// This view does not support image capture, return 0;
+  /// This view does not support image capture.
+  /// This method always returns 0.
   virtual vtkImageData* captureImage(int /*magnification*/)
     { return 0; }
   virtual vtkImageData* captureImage(const QSize& asize)
     { return this->Superclass::captureImage(asize); } 
 
+  /// This view supports undo so this method always returns true.
   virtual bool supportsUndo() const {return true;}
 
   /// Called to undo interaction.
@@ -86,16 +93,30 @@ public:
   /// Returns true if redo can be done.
   virtual bool canRedo() const;
 
-  /// 
+  /// Resets the zoom level to 100%.
+  virtual void resetDisplay();
+
+  /// Returns true if data on the given output port can be displayed by this view.
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
 protected slots:
-  /// Called when a new repr is added.
+  /// Called when a new representation is added.
   void onAddRepresentation(pqRepresentation*);
+
+  /// Called when a representation is removed.
   void onRemoveRepresentation(pqRepresentation*);
 
-  /// Called to ensure that at most 1 repr is visible at a time.
+  /// Called when a representation's visibility has changed.
   void updateRepresentationVisibility(pqRepresentation* repr, bool visible);
+
+  /// Called when the underlying view proxy invokes an EndRender event.
+  /// Since ServerManager does not really "render" for charts,
+  /// we catch the signal and render in the client.
+  void renderInternal();
+
+  /// This internal method adds representations to the bar chart when
+  /// the representations' table data has become available on the client.
+  void addPendingRepresentations();
 
   void updateHelpFormat();
   void updateOutlineStyle();

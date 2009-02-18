@@ -52,18 +52,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartSeriesModelCollection.h"
 #include "vtkQtChartTableRepresentation.h"
 
-#include "pqChartViewPropertyHandler.h"
-
-// Qt Includes.
-#include <QPushButton>
-
 // ParaView Includes.
-#include "pqDataRepresentation.h"
 #include "pqBarChartRepresentation.h"
+#include "pqChartViewPropertyHandler.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
+
+// Qt Includes.
+#include <QDebug>
 
 //-----------------------------------------------------------------------------
 class pqBarChartView::pqInternal
@@ -81,19 +79,21 @@ public:
 
     }
 
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSmartPointer<vtkQtBarChartView> BarChartView;
+  vtkSmartPointer<vtkEventQtSlotConnect>               VTKConnect;
+  vtkSmartPointer<vtkQtBarChartView>                   BarChartView;
   QMap<pqRepresentation*,
       vtkSmartPointer<vtkQtChartTableRepresentation> > RepresentationMap;
-  pqChartViewPropertyHandler* ChartProperties;
+  pqChartViewPropertyHandler*                          ChartProperties;
+  QList<pqBarChartRepresentation*>                     RepsToBeAdded;
 };
 
 //-----------------------------------------------------------------------------
-pqBarChartView::pqBarChartView(
- const QString& group, const QString& name, 
-    vtkSMViewProxy* viewModule, pqServer* server, 
-    QObject* _parent/*=NULL*/):
-   pqView(barChartViewType(), group, name, viewModule, server, _parent)
+pqBarChartView::pqBarChartView(const QString& group,
+                               const QString& name, 
+                               vtkSMViewProxy* viewModule,
+                               pqServer* server, 
+                               QObject* parent/*=NULL*/):
+  pqView(barChartViewType(), group, name, viewModule, server, parent)
 {
   this->Internal = new pqInternal();
   QObject::connect(this, SIGNAL(representationAdded(pqRepresentation*)),
@@ -104,11 +104,15 @@ pqBarChartView::pqBarChartView(
     this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
     this, SLOT(updateRepresentationVisibility(pqRepresentation*, bool)));
 
+  QObject::connect(
+    this, SIGNAL(endRender()),
+    this, SLOT(renderInternal()));
+
   // Set up the paraview style interactor.
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
   vtkQtChartMouseSelection* selector =
     vtkQtChartInteractorSetup::createSplitZoom(area);
-  this->Internal->BarChartView->AddChartSelectionHandlers(selector);
+  this->getVtkBarChartView()->AddChartSelectionHandlers(selector);
 
   // Set up the view undo/redo.
   vtkQtChartContentsSpace *contents = area->getContentsSpace();
@@ -119,7 +123,7 @@ pqBarChartView::pqBarChartView(
 
   // Set up the basic chart properties handler.
   this->Internal->ChartProperties = new pqChartViewPropertyHandler(
-    this->Internal->BarChartView, viewModule, this);
+    this->getVtkBarChartView(), viewModule, this);
   this->Internal->ChartProperties->connectProperties(
     this->Internal->VTKConnect);
 
@@ -143,6 +147,9 @@ pqBarChartView::pqBarChartView(
     {
     this->onAddRepresentation(rep);
     }
+
+  // Set default color scheme to blues
+  this->getVtkBarChartView()->SetColorSchemeToBlues();
 }
 
 //-----------------------------------------------------------------------------
@@ -154,7 +161,13 @@ pqBarChartView::~pqBarChartView()
 //-----------------------------------------------------------------------------
 QWidget* pqBarChartView::getWidget()
 {
-  return this->Internal->BarChartView->GetChartWidget();
+  return this->getVtkBarChartView()->GetChartWidget();
+}
+
+//-----------------------------------------------------------------------------
+vtkQtBarChartView* pqBarChartView::getVtkBarChartView() const
+{
+  return this->Internal->BarChartView;
 }
 
 //-----------------------------------------------------------------------------
@@ -170,66 +183,89 @@ void pqBarChartView::setDefaultPropertyValues()
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartView::render()
+void pqBarChartView::addPendingRepresentations()
 {
-  this->Internal->BarChartView->Render();
+  // For each representation in the list of representations to be added
+  foreach(pqBarChartRepresentation* rep, this->Internal->RepsToBeAdded)
+    {
+    // Get the table data
+    vtkTable* table = rep->getClientSideData();
+
+    // Make sure table data is valid
+    if (!table)
+      {
+      qWarning() << "Cannot add representation because represtation's table "
+                    "data is null.";
+      continue;
+      }
+
+    // Add the table to the view and get the returned representation
+    vtkQtChartTableRepresentation* barChartRep =
+      vtkQtChartTableRepresentation::SafeDownCast(
+      this->getVtkBarChartView()->AddRepresentationFromInput(table));
+
+    // Store the representation in the map for future lookup
+    this->Internal->RepresentationMap.insert(rep, barChartRep);
+    }
+
+  // Clear the list
+  this->Internal->RepsToBeAdded.clear();
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartView::renderInternal()
+{
+  // Add representations from the list of representations to be added
+  this->addPendingRepresentations();
+
+  // Update and render the chart view
+  this->getVtkBarChartView()->Update();
+  this->getVtkBarChartView()->Render();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::onAddRepresentation(pqRepresentation* repr)
 {
-  if (this->Internal->RepresentationMap.contains(repr))
-    {
-    return;
-    }
-
+  // Make sure it is a bar chart representation
   pqBarChartRepresentation* chartRep =
     qobject_cast<pqBarChartRepresentation*>(repr);
-
-  if(!chartRep)
+  if (!chartRep)
     {
+    qWarning() << "Cannot add representation because given representation is "
+                "not a pqBarChartRepresentation.";
     return;
     }
 
-  // For some reason the vtkTable is null at this point, this
-  // is my attempt to update the proxy so it won't be null,
-  // but even after this the table still has no data :(
-  vtkSMChartRepresentationProxy::
-    SafeDownCast(chartRep->getProxy())->Update(
-    vtkSMViewProxy::SafeDownCast(this->getProxy()));
-
-  vtkTable* table = chartRep->getClientSideData();
-  if (!table)
-    {
-    return;
-    }
-
-  // Add the representation to the view
-  vtkQtChartTableRepresentation* barChartRep =
-    vtkQtChartTableRepresentation::SafeDownCast(
-    this->Internal->BarChartView->AddRepresentationFromInput(table));
-
-  // Store the created representation in the map
-  this->Internal->RepresentationMap.insert(repr, barChartRep);
-
-  // Update the chart view
-  this->Internal->BarChartView->Update();
+  // A pqBarChartRepresentation holds a vtkTable.  However, the vtkTable
+  // might be null at this point because the data may not have been collected
+  // from the server(s).  The vtkTable is not guaranteed to be valid until
+  // the view proxy invokes the EndRender event.  So all we do here is add the
+  // representation to a list to be added later.
+  this->Internal->RepsToBeAdded.append(chartRep);
 }
 
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::onRemoveRepresentation(pqRepresentation* repr)
 {
+  // Remove from pending list in case the representation is there.
+  // It could be in this list of the representation was added during
+  // onAddRepresentation() and then removed before renderInternal() is called.
+  this->Internal->RepsToBeAdded.removeAll(
+    qobject_cast<pqBarChartRepresentation*>(repr));
+
+  // The representation must be in our representation map
   if (!this->Internal->RepresentationMap.contains(repr))
     {
     return;
     }
 
+  // Lookup the chart representation mapped to the given pqRepresentation
   vtkQtChartTableRepresentation* barChartRep =
     this->Internal->RepresentationMap.value(repr);
 
-  this->Internal->BarChartView->RemoveRepresentation(barChartRep);
-  this->Internal->BarChartView->Update();
+  // Remove the chart representation from the bar chart view
+  this->getVtkBarChartView()->RemoveRepresentation(barChartRep);
 
   // Remove representation from representation map
   this->Internal->RepresentationMap.remove(repr);
@@ -239,52 +275,59 @@ void pqBarChartView::onRemoveRepresentation(pqRepresentation* repr)
 void pqBarChartView::updateRepresentationVisibility(
   pqRepresentation* repr, bool visible)
 {
+  // The representation must be in our representation map
   if (!this->Internal->RepresentationMap.contains(repr))
     {
     return;
     }
 
+  // Lookup the chart representation mapped to the given pqRepresentation.
   vtkQtChartTableRepresentation* barChartRep =
     this->Internal->RepresentationMap.value(repr);
 
   if (visible)
     {
-    this->Internal->BarChartView->AddRepresentation(barChartRep);
+    this->getVtkBarChartView()->AddRepresentation(barChartRep);
     }
   else
     {
-    this->Internal->BarChartView->RemoveRepresentation(barChartRep);
+    this->getVtkBarChartView()->RemoveRepresentation(barChartRep);
     }
-
-  this->Internal->BarChartView->Update();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::undo()
 {
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
   area->getContentsSpace()->historyPrevious();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::redo()
 {
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
   area->getContentsSpace()->historyNext();
 }
 
 //-----------------------------------------------------------------------------
 bool pqBarChartView::canUndo() const
 {
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
   return area->getContentsSpace()->isHistoryPreviousAvailable();
 }
 
 //-----------------------------------------------------------------------------
 bool pqBarChartView::canRedo() const
 {
-  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
   return area->getContentsSpace()->isHistoryNextAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartView::resetDisplay()
+{
+  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  area->getContentsSpace()->resetZoom();
 }
 
 //-----------------------------------------------------------------------------
@@ -305,30 +348,33 @@ bool pqBarChartView::canDisplay(pqOutputPort* opPort) const
   return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
 }
 
+//-----------------------------------------------------------------------------
 void pqBarChartView::updateHelpFormat()
 {
-  this->Internal->BarChartView->SetHelpFormat(pqSMAdaptor::getElementProperty(
+  this->getVtkBarChartView()->SetHelpFormat(pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("BarHelpFormat")).toString().toAscii().data());
 }
 
+//-----------------------------------------------------------------------------
 void pqBarChartView::updateOutlineStyle()
 {
-  this->Internal->BarChartView->SetOutlineStyle(
+  this->getVtkBarChartView()->SetOutlineStyle(
     pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("BarOutlineStyle")).toInt());
 }
 
+//-----------------------------------------------------------------------------
 void pqBarChartView::updateGroupFraction()
 {
-  this->Internal->BarChartView->SetBarGroupFraction(
+  this->getVtkBarChartView()->SetBarGroupFraction(
     (float)pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("BarGroupFraction")).toDouble());
 }
 
+//-----------------------------------------------------------------------------
 void pqBarChartView::updateWidthFraction()
 {
-  this->Internal->BarChartView->SetBarWidthFraction(
+  this->getVtkBarChartView()->SetBarWidthFraction(
     (float)pqSMAdaptor::getElementProperty(
     this->getProxy()->GetProperty("BarWidthFraction")).toDouble());
 }
-

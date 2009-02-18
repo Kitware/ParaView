@@ -96,6 +96,11 @@ public slots:
   /// View modules supporting interaction undo must override this method.
   virtual void redo() {}
 
+  /// Called to reset the view's display.
+  /// For example, reset the camera or zoom level.
+  /// The default implementation does nothing, but subclasses may override.
+  virtual void resetDisplay() {}
+
 public:
   /// Returns true if undo can be done.
   virtual bool canUndo() const {return false;}

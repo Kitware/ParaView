@@ -356,7 +356,7 @@ void pqPlotView::render()
 }
 
 //-----------------------------------------------------------------------------
-void pqPlotView::resetCamera()
+void pqPlotView::resetDisplay()
 {
   if(!this->Internal->Chart.isNull())
     {
