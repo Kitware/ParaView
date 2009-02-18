@@ -13,25 +13,25 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>0</number>
    </property>
-   <property name="spacing" >
-    <number>6</number>
+   <property name="topMargin" >
+    <number>0</number>
+   </property>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
    </property>
    <item row="0" column="0" >
     <widget class="QStackedWidget" name="stackedWidget" >
      <property name="currentIndex" >
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General" >
       <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
        <item row="2" column="0" >
         <spacer>
          <property name="orientation" >
@@ -64,12 +64,6 @@
           <string>Background Color</string>
          </property>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item row="0" column="1" >
            <widget class="QPushButton" name="restoreDefault" >
             <property name="text" >
@@ -94,20 +88,8 @@
      </widget>
      <widget class="QWidget" name="Lights" >
       <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
        <item row="2" column="0" >
         <layout class="QHBoxLayout" >
-         <property name="margin" >
-          <number>0</number>
-         </property>
-         <property name="spacing" >
-          <number>6</number>
-         </property>
          <item>
           <spacer>
            <property name="orientation" >
@@ -133,9 +115,7 @@
        <item row="0" column="0" >
         <widget class="QGroupBox" name="DefaultLightSwitch" >
          <property name="sizePolicy" >
-          <sizepolicy>
-           <hsizetype>5</hsizetype>
-           <vsizetype>5</vsizetype>
+          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -153,12 +133,6 @@
           <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item>
            <widget class="QSlider" name="LightIntensity" >
             <property name="maximum" >
@@ -184,9 +158,7 @@
           <item>
            <widget class="QLineEdit" name="LightIntensity_Edit" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>5</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -199,9 +171,7 @@
           <item>
            <widget class="pqColorChooserButton" name="SetLightColor" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>5</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -245,18 +215,10 @@
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item row="2" column="8" >
            <widget class="QDoubleSpinBox" name="BackLightAzimuth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -270,11 +232,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>180.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>180.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -297,9 +259,7 @@
           <item row="1" column="4" >
            <widget class="QDoubleSpinBox" name="FillLightK_F_Ratio" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -321,9 +281,7 @@
           <item row="2" column="2" >
            <widget class="QDoubleSpinBox" name="BackLightWarmth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -358,9 +316,7 @@
           <item row="3" column="2" >
            <widget class="QDoubleSpinBox" name="HeadLightWarmth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -414,9 +370,7 @@
           <item row="3" column="4" >
            <widget class="QDoubleSpinBox" name="HeadLightK_H_Ratio" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -454,9 +408,7 @@
           <item row="0" column="2" >
            <widget class="QDoubleSpinBox" name="KeyLightWarmth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -507,9 +459,7 @@
           <item row="2" column="6" >
            <widget class="QDoubleSpinBox" name="BackLightElevation" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -523,11 +473,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>90.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-90.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>90.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -537,9 +487,7 @@
           <item row="0" column="4" >
            <widget class="QDoubleSpinBox" name="KeyLightIntensity" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -590,9 +538,7 @@
           <item row="0" column="6" >
            <widget class="QDoubleSpinBox" name="KeyLightElevation" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -606,11 +552,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>90.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-90.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>90.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -620,9 +566,7 @@
           <item row="0" column="8" >
            <widget class="QDoubleSpinBox" name="KeyLightAzimuth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -636,11 +580,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>180.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>180.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -698,9 +642,7 @@
           <item row="1" column="6" >
            <widget class="QDoubleSpinBox" name="FillLightElevation" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -714,11 +656,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>90.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-90.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>90.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -728,9 +670,7 @@
           <item row="1" column="2" >
            <widget class="QDoubleSpinBox" name="FillLightWarmth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -813,9 +753,7 @@
           <item row="1" column="8" >
            <widget class="QDoubleSpinBox" name="FillLightAzimuth" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -829,11 +767,11 @@
             <property name="decimals" >
              <number>0</number>
             </property>
-            <property name="maximum" >
-             <double>180.000000000000000</double>
-            </property>
             <property name="minimum" >
              <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>180.000000000000000</double>
             </property>
             <property name="singleStep" >
              <double>10.000000000000000</double>
@@ -875,9 +813,7 @@
           <item row="2" column="4" >
            <widget class="QDoubleSpinBox" name="BackLightK_B_Ratio" >
             <property name="sizePolicy" >
-             <sizepolicy>
-              <hsizetype>1</hsizetype>
-              <vsizetype>0</vsizetype>
+             <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -919,12 +855,6 @@
      </widget>
      <widget class="QWidget" name="Annotation" >
       <layout class="QGridLayout" >
-       <property name="margin" >
-        <number>9</number>
-       </property>
-       <property name="spacing" >
-        <number>6</number>
-       </property>
        <item row="2" column="0" >
         <spacer>
          <property name="orientation" >
@@ -944,12 +874,6 @@
           <string>Center Of Rotation</string>
          </property>
          <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item>
            <widget class="QCheckBox" name="CenterAxesVisibility" >
             <property name="toolTip" >
@@ -972,12 +896,6 @@
           <bool>true</bool>
          </property>
          <layout class="QVBoxLayout" >
-          <property name="margin" >
-           <number>9</number>
-          </property>
-          <property name="spacing" >
-           <number>6</number>
-          </property>
           <item>
            <widget class="QCheckBox" name="OrientationAxesInteraction" >
             <property name="toolTip" >
@@ -993,12 +911,6 @@
           </item>
           <item>
            <layout class="QHBoxLayout" >
-            <property name="margin" >
-             <number>0</number>
-            </property>
-            <property name="spacing" >
-             <number>6</number>
-            </property>
             <item>
              <widget class="pqColorChooserButton" name="OrientationAxesOutlineColor" >
               <property name="enabled" >
@@ -1046,6 +958,37 @@
    <header>pqColorChooserButton.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>backgroundColor</tabstop>
+  <tabstop>restoreDefault</tabstop>
+  <tabstop>parallelProjection</tabstop>
+  <tabstop>DefaultLightSwitch</tabstop>
+  <tabstop>LightIntensity</tabstop>
+  <tabstop>LightIntensity_Edit</tabstop>
+  <tabstop>SetLightColor</tabstop>
+  <tabstop>UseLight</tabstop>
+  <tabstop>KeyLightWarmth</tabstop>
+  <tabstop>KeyLightIntensity</tabstop>
+  <tabstop>KeyLightElevation</tabstop>
+  <tabstop>KeyLightAzimuth</tabstop>
+  <tabstop>FillLightWarmth</tabstop>
+  <tabstop>FillLightK_F_Ratio</tabstop>
+  <tabstop>FillLightElevation</tabstop>
+  <tabstop>FillLightAzimuth</tabstop>
+  <tabstop>BackLightWarmth</tabstop>
+  <tabstop>BackLightK_B_Ratio</tabstop>
+  <tabstop>BackLightElevation</tabstop>
+  <tabstop>BackLightAzimuth</tabstop>
+  <tabstop>HeadLightWarmth</tabstop>
+  <tabstop>HeadLightK_H_Ratio</tabstop>
+  <tabstop>MaintainLuminance</tabstop>
+  <tabstop>ResetLight</tabstop>
+  <tabstop>OrientationAxes</tabstop>
+  <tabstop>OrientationAxesInteraction</tabstop>
+  <tabstop>OrientationAxesOutlineColor</tabstop>
+  <tabstop>OrientationAxesLabelColor</tabstop>
+  <tabstop>CenterAxesVisibility</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
