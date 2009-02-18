@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 vtkStandardNewMacro(pqClientProcessModuleGUIHelper);
-vtkCxxRevisionMacro(pqClientProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(pqClientProcessModuleGUIHelper, "1.2");
 
 //-----------------------------------------------------------------------------
 pqClientProcessModuleGUIHelper::pqClientProcessModuleGUIHelper()
 {
-  QPixmap pix(":/pqWidget/Icons/PVSplashScreen.png");
-  this->Splash = new QSplashScreen(pix);
+  QPixmap pix(":/pqWidgets/Icons/PVSplashScreen.png");
+  this->Splash = new QSplashScreen(pix, Qt::SplashScreen|Qt::WindowStaysOnTopHint);
   this->Splash->setMask(pix.createMaskFromColor(QColor(Qt::transparent)));
   this->Splash->setAttribute(Qt::WA_DeleteOnClose);
   this->Splash->show();
