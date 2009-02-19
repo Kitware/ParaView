@@ -227,9 +227,11 @@ ENDMACRO(ADD_PYTHON_EXTENSION)
 #    XML_NAME xmlname
 #    XML_GROUP xmlgroup
 #  CLASS_NAME: optional name for the class that implements pqObjectPanel
-#              if none give ${XML_NAME} is assumed
-#  XML_NAME : the xml name of the source/filter this panel corresponds with
+#              if none give ${XML_NAME}Panel is assumed (if XML_NAME is a list, then
+#              the first name in  the list is assumed).
 #  XML_GROUP : the xml group of the source/filter this panel corresponds with
+#  XML_NAME  : the xml name of the source/filter this panel corresponds with.
+#              XML_NAME can be single name or a list of names.
 MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
 
   SET(ARG_CLASS_NAME)
@@ -239,7 +241,8 @@ MACRO(ADD_PARAVIEW_OBJECT_PANEL OUTIFACES OUTSRCS)
   IF(ARG_CLASS_NAME)
     SET(PANEL_NAME ${ARG_CLASS_NAME})
   ELSE(ARG_CLASS_NAME)
-    SET(PANEL_NAME ${ARG_XML_NAME}Panel)
+    LIST(GET ${ARG_XML_NAME} 0 first_xml_name)
+    SET(PANEL_NAME ${first_xml_name}Panel)
   ENDIF(ARG_CLASS_NAME)
   SET(PANEL_XML_NAME ${ARG_XML_NAME})
   SET(PANEL_XML_GROUP ${ARG_XML_GROUP})

@@ -50,7 +50,18 @@ pqObjectPanel* @PANEL_NAME@Implementation::createPanel(pqProxy* object_proxy, QW
 
 bool @PANEL_NAME@Implementation::canCreatePanel(pqProxy* proxy) const
 {
-  return (QString("@PANEL_XML_NAME@") == proxy->getProxy()->GetXMLName()
-     && QString("@PANEL_XML_GROUP@") == proxy->getProxy()->GetXMLGroup());
+  if (QString("@PANEL_XML_GROUP@") != proxy->getProxy()->GetXMLGroup())
+    {
+    return false;
+    }
+  foreach (QString name, QString("@PANEL_XML_NAME@").split(';',
+      QString::SkipEmptyParts))
+    {
+    if (name == proxy->getProxy()->GetXMLName())
+      {
+      return true;
+      }
+    }
+  return false;
 }
 
