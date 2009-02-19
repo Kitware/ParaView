@@ -147,7 +147,7 @@ QVariant pqFileDialogRecentDirsModel::data(const QModelIndex& idx, int role) con
  
 //-----------------------------------------------------------------------------
 /// return the number of rows in the model 
-int pqFileDialogRecentDirsModel::rowCount(const QModelIndex& idx) const
+int pqFileDialogRecentDirsModel::rowCount(const QModelIndex&) const
 {
   return this->Directories.size();
 }
