@@ -70,7 +70,7 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
 
   if (!scaleFactor)
     {
-    qDebug() << "Failed to locate ScaleFactor widget.";
+    qWarning() << "Failed to locate ScaleFactor widget.";
     return;
     }
 
@@ -108,6 +108,33 @@ pqGlyphPanel::pqGlyphPanel(pqProxy* object_proxy, QWidget* _parent)
     this->ScaleFactorWidget, SLOT(setEnabled(bool)));
   lockButton->toggle();
   lockButton->toggle();
+
+  // Get the widgets for selecting the scalars and vectors so that we can
+  // set their enabled flags to reflect their usefulness.
+  this->ScalarsWidget = this->findChild<QWidget*>("SelectInputScalars");
+  if (!this->ScalarsWidget)
+    {
+    qWarning() << "Failed to locate Scalars widget.";
+    return;
+    }
+
+  this->VectorsWidget = this->findChild<QWidget*>("SelectInputVectors");
+  if (!this->VectorsWidget)
+    {
+    qWarning() << "Failed to locate Vectors widget.";
+    return;
+    }
+
+  this->OrientWidget = this->findChild<QCheckBox*>("SetOrient");
+  if (!this->OrientWidget)
+    {
+    qWarning() << "Failed to locate Orient widget.";
+    return;
+    }
+
+  QObject::connect(this->propertyManager(), SIGNAL(modified()),
+                   this, SLOT(updateScalarsVectorsEnable()),
+                   Qt::QueuedConnection);
 
   if (object_proxy->modifiedState() == pqProxy::UNINITIALIZED)
     {
@@ -193,3 +220,39 @@ void pqGlyphPanel::updateScaleFactor()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqGlyphPanel::updateScalarsVectorsEnable()
+{
+  vtkSMProxy* filterProxy = this->proxy();
+  filterProxy->GetProperty("Input")->UpdateDependentDomains();
+
+  vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
+                   filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
+
+  int valid;
+  int scale_mode = enumDomain->GetEntryValue(
+    this->ScaleModeWidget->currentText().toAscii().data(), valid);
+  if (!valid) return;
+
+  bool orientGlyphs = this->OrientWidget->isChecked();
+
+  if (scale_mode == VTK_SCALE_BY_SCALAR)
+    {
+    this->ScalarsWidget->setEnabled(true);
+    }
+  else
+    {
+    this->ScalarsWidget->setEnabled(false);
+    }
+
+  if (   orientGlyphs
+      || (scale_mode == VTK_SCALE_BY_VECTOR)
+      || (scale_mode == VTK_SCALE_BY_VECTORCOMPONENTS) )
+    {
+    this->VectorsWidget->setEnabled(true);
+    }
+  else
+    {
+    this->VectorsWidget->setEnabled(false);
+    }
+}
