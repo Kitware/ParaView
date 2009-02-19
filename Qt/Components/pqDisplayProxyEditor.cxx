@@ -190,6 +190,10 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     "checked", SIGNAL(stateChanged(int)),
     reprProxy, reprProxy->GetProperty("Visibility"));
 
+  this->Internal->Links->addPropertyLink(this->Internal->Selectable,
+    "checked", SIGNAL(stateChanged(int)),
+    reprProxy, reprProxy->GetProperty("Pickable"));
+
   vtkSMProperty* prop = 0;
 
   // setup cube axes visibility.

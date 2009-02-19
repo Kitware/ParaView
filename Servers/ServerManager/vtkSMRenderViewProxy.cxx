@@ -92,7 +92,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.84");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.85");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1527,6 +1527,12 @@ bool vtkSMRenderViewProxy::SelectFrustum(unsigned int x0,
       vtkSMDataRepresentationProxy::SafeDownCast(reprIter->GetCurrentObject());
     if (!repr || !repr->GetVisibility())
       {
+      continue;
+      }
+    if (repr->GetProperty("Pickable") &&
+      vtkSMPropertyHelper(repr, "Pickable").GetAsInt() == 0)
+      {
+      // skip non-pickable representations.
       continue;
       }
     vtkPVDataInformation* datainfo = repr->GetRepresentedDataInformation(true);

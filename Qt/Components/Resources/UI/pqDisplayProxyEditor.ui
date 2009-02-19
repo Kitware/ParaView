@@ -33,23 +33,8 @@
      <property name="title" >
       <string>View</string>
      </property>
-     <layout class="QHBoxLayout" >
-      <property name="spacing" >
-       <number>6</number>
-      </property>
-      <property name="leftMargin" >
-       <number>6</number>
-      </property>
-      <property name="topMargin" >
-       <number>6</number>
-      </property>
-      <property name="rightMargin" >
-       <number>6</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>6</number>
-      </property>
-      <item>
+     <layout class="QGridLayout" >
+      <item row="0" column="0" >
        <widget class="QCheckBox" name="ViewData" >
         <property name="toolTip" >
          <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle visibility of this dataset's geometry.&lt;/p>&lt;/body>&lt;/html></string>
@@ -59,7 +44,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1" >
        <widget class="QPushButton" name="ViewZoomToData" >
         <property name="enabled" >
          <bool>true</bool>
@@ -69,6 +54,16 @@
         </property>
         <property name="text" >
          <string>&amp;Zoom To Data</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="Selectable" >
+        <property name="toolTip" >
+         <string>&lt;html>Toggle the selectablity of the object. Only selectable objects can be selected using the selection mechanisms&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Selectable</string>
         </property>
        </widget>
       </item>
