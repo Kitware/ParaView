@@ -282,13 +282,21 @@ void pqProxyMenuManager::populateMenu()
     {
     QMenu* categoryMenu = this->Menu->addMenu(categoryIter.value().Label)
       << pqSetName(categoryIter.key());
+    QList<QAction*> action_list;
     foreach (QString pname, categoryIter.value().Proxies)
       {
       QAction* action = this->getAction(pname);
       if (action)
         {
-        categoryMenu->addAction(action);
+        // build an action list, so that we can sort it and then add to the
+        // menu (BUG #8364).
+        action_list.push_back(action);
         }
+      }
+    qSort(action_list.begin(), action_list.end(), ::actionTextSort);
+    foreach (QAction* action, action_list)
+      {
+      categoryMenu->addAction(action);
       }
     }
 
