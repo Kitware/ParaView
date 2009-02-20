@@ -88,6 +88,7 @@ void pqTwoDRenderView::resetCamera()
 
   vtkSMRenderViewProxy* renModule = view->GetRenderView();
   renModule->ResetCamera();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
