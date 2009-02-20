@@ -8505,7 +8505,7 @@
       </DoubleVectorProperty>
 
       <SubProxy>
-        <SourceProxy name="OutlineFilter" class="vtkOutlineFilter">
+        <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
           <!-- 
             Outline filter generates a partial outline on all processes.
           -->
