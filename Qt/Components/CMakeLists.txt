@@ -81,6 +81,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCameraDialog.h
   pqCameraWidget.h
   pqChartOptionsEditor.h
+  pqChartViewContextMenu.h
+  pqChartViewContextMenuHandler.h
   pqClientAboutDialog.h
   pqClientMainWindow.h
   pqClipPanel.h
@@ -390,10 +392,14 @@ ADD_LIBRARY(pqComponents
   pqBarChartOptionsEditor.h
   pqBarChartOptionsHandler.cxx
   pqBarChartOptionsHandler.h
+  pqBarChartViewContextMenuHandler.cxx
+  pqBarChartViewContextMenuHandler.h
   pqBoxChartOptionsEditor.cxx
   pqBoxChartOptionsEditor.h
   pqBoxChartOptionsHandler.cxx
   pqBoxChartOptionsHandler.h
+  pqBoxChartViewContextMenuHandler.cxx
+  pqBoxChartViewContextMenuHandler.h
   pqBoxWidget.cxx
   pqBoxWidget.h
   pqCalculatorPanel.cxx
@@ -406,6 +412,10 @@ ADD_LIBRARY(pqComponents
   pqChartOptionsEditor.h
   pqChartOptionsHandler.cxx
   pqChartOptionsHandler.h
+  pqChartViewContextMenu.cxx
+  pqChartViewContextMenu.h
+  pqChartViewContextMenuHandler.cxx
+  pqChartViewContextMenuHandler.h
   pqClientAboutDialog.cxx
   pqClientAboutDialog.h
   pqClientMainWindow.cxx
@@ -507,6 +517,8 @@ ADD_LIBRARY(pqComponents
   pqLineChartOptionsEditor.h
   pqLineChartOptionsHandler.cxx
   pqLineChartOptionsHandler.h
+  pqLineChartViewContextMenuHandler.cxx
+  pqLineChartViewContextMenuHandler.h
   pqLineSourceWidget.cxx
   pqLineSourceWidget.h
   pqLineWidget.cxx
@@ -673,6 +685,8 @@ ADD_LIBRARY(pqComponents
   pqStackedChartOptionsEditor.h
   pqStackedChartOptionsHandler.cxx
   pqStackedChartOptionsHandler.h
+  pqStackedChartViewContextMenuHandler.cxx
+  pqStackedChartViewContextMenuHandler.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.cxx

@@ -62,6 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqApplicationOptionsDialog.h"
 #include "pqBarChartView.h"
+#include "pqBarChartViewContextMenuHandler.h"
+#include "pqBoxChartViewContextMenuHandler.h"
 #include "pqCameraDialog.h"
 #include "pqColorScaleToolbar.h"
 #include "pqCloseViewUndoElement.h"
@@ -77,6 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFiltersMenuManager.h"
 #include "pqSourcesMenuManager.h"
 #include "pqHelperProxyRegisterUndoElement.h"
+#include "pqLineChartViewContextMenuHandler.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
 #include "pqLookmarkBrowserModel.h"
@@ -127,6 +130,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSplitViewUndoElement.h"
 #include "pqSpreadSheetView.h"
 #include "pqSpreadSheetViewDecorator.h"
+#include "pqStackedChartViewContextMenuHandler.h"
 #include "pqStateLoader.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
@@ -1144,6 +1148,46 @@ pqViewContextMenuManager* pqMainWindowCore::getViewContextMenuManager()
       pqPlotView::barChartType(), handler);
     this->Implementation->ViewContextMenu->registerHandler(
       pqPlotView::XYPlotType(), handler);
+
+    // Bar chart
+    pqBarChartViewContextMenuHandler *barChart =
+      new pqBarChartViewContextMenuHandler(
+      this->Implementation->ViewContextMenu);
+    barChart->setOptionsManager(this->getActiveViewOptionsManager());
+    this->connect(barChart, SIGNAL(screenshotRequested()),
+      this, SLOT(onFileSaveScreenshot()));
+    this->Implementation->ViewContextMenu->registerHandler(
+      pqBarChartView::barChartViewType(), barChart);
+
+    // TODO: Line chart
+    pqLineChartViewContextMenuHandler *lineChart =
+      new pqLineChartViewContextMenuHandler(
+      this->Implementation->ViewContextMenu);
+    lineChart->setOptionsManager(this->getActiveViewOptionsManager());
+    this->connect(lineChart, SIGNAL(screenshotRequested()),
+      this, SLOT(onFileSaveScreenshot()));
+    //this->Implementation->ViewContextMenu->registerHandler(
+    //  pqLineChartView::lineChartViewType(), lineChart);
+
+    // TODO: Stacked chart
+    pqStackedChartViewContextMenuHandler *stackedChart =
+      new pqStackedChartViewContextMenuHandler(
+      this->Implementation->ViewContextMenu);
+    stackedChart->setOptionsManager(this->getActiveViewOptionsManager());
+    this->connect(stackedChart, SIGNAL(screenshotRequested()),
+      this, SLOT(onFileSaveScreenshot()));
+    //this->Implementation->ViewContextMenu->registerHandler(
+    //  pqStackedChartView::stackedChartViewType(), stackedChart);
+
+    // TODO: Statistical box chart
+    pqBoxChartViewContextMenuHandler *boxChart =
+      new pqBoxChartViewContextMenuHandler(
+      this->Implementation->ViewContextMenu);
+    boxChart->setOptionsManager(this->getActiveViewOptionsManager());
+    this->connect(boxChart, SIGNAL(screenshotRequested()),
+      this, SLOT(onFileSaveScreenshot()));
+    //this->Implementation->ViewContextMenu->registerHandler(
+    //  pqBoxChartView::boxChartViewType(), boxChart);
     }
 
   return this->Implementation->ViewContextMenu;
