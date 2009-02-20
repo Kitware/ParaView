@@ -113,6 +113,9 @@ void pqSpreadSheetViewDecorator::showing(pqDataRepresentation* repr)
     this->Internal->Links.addPropertyLink(this->Internal->AttributeAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       reprProxy, reprProxy->GetProperty("FieldAssociation"));
+    this->Internal->Links.addPropertyLink(this->Internal->SelectionOnly,
+      "checked", SIGNAL(toggled(bool)),
+      reprProxy, reprProxy->GetProperty("SelectionOnly"));
     }
   else
     {

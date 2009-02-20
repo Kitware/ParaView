@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
-    <height>28</height>
+    <width>352</width>
+    <height>25</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -14,19 +14,19 @@
   </property>
   <layout class="QHBoxLayout" >
    <property name="spacing" >
-    <number>5</number>
+    <number>1</number>
    </property>
    <property name="leftMargin" >
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="topMargin" >
-    <number>1</number>
+    <number>0</number>
    </property>
    <property name="rightMargin" >
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin" >
-    <number>1</number>
+    <number>0</number>
    </property>
    <item>
     <widget class="QLabel" name="label" >
@@ -87,14 +87,39 @@
     </widget>
    </item>
    <item>
+    <widget class="QToolButton" name="SelectionOnly" >
+     <property name="toolTip" >
+      <string>Show only selected elements.</string>
+     </property>
+     <property name="statusTip" >
+      <string>Show only selected elements.</string>
+     </property>
+     <property name="whatsThis" >
+      <string>Show only selected elements.</string>
+     </property>
+     <property name="text" >
+      <string>Selected</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqSelect16.png</iconset>
+     </property>
+     <property name="checkable" >
+      <bool>true</bool>
+     </property>
+     <property name="toolButtonStyle" >
+      <enum>Qt::ToolButtonIconOnly</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer>
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="sizeHint" >
       <size>
-       <width>40</width>
-       <height>20</height>
+       <width>58</width>
+       <height>23</height>
       </size>
      </property>
     </spacer>
@@ -108,6 +133,8 @@
    <header>pqOutputPortComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../pqComponents.qrc" />
+ </resources>
  <connections/>
 </ui>
