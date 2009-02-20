@@ -3570,11 +3570,39 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
     }
   else if(splitName.size() == 2 && splitName[0] == "MenuBar")
     {
-    QMenu* menu = new QMenu(splitName[1], mw);
-    menu->setObjectName(splitName[1]);
-    menu->addActions(iface->actionGroup()->actions());
-    mw->menuBar()->addMenu(menu);
-    this->Implementation->PluginToolBars.append(menu);
+    QMenu *menu = NULL;
+    QList<QAction *> menuBarActions = mw->menuBar()->actions();
+    foreach(QAction *existingMenuAction, menuBarActions)
+      {
+      QString menuName = existingMenuAction->text();
+      menuName.remove('&');
+      if (menuName == splitName[1])
+        {
+        menu = existingMenuAction->menu();
+        break;
+        }
+      }
+    if (menu)
+      {
+      // Add to existing menu.
+      QAction *a;
+      a = menu->addSeparator();
+      this->Implementation->PluginToolBars.append(a);
+      foreach(a, iface->actionGroup()->actions())
+        {
+        menu->addAction(a);
+        this->Implementation->PluginToolBars.append(a);
+        }
+      }
+    else
+      {
+      // Create new menu.
+      menu = new QMenu(splitName[1], mw);
+      menu->setObjectName(splitName[1]);
+      menu->addActions(iface->actionGroup()->actions());
+      mw->menuBar()->addMenu(menu);
+      this->Implementation->PluginToolBars.append(menu);
+      }
     }
   else if (splitName.size())
     {
