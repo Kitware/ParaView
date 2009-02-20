@@ -91,13 +91,14 @@ protected:
   vtkSMNewWidgetRepresentationObserver* Observer;
   vtkSMNewWidgetRepresentationInternals* Internal;
 
-//BTX
   friend class vtkSMNewWidgetRepresentationObserver;
-//ETX
+
+  // Description:
+  // Called every time the user interacts with the widget.
+  virtual void ExecuteEvent(unsigned long event);
 
   int Enabled;
 private:
-  void ExecuteEvent(unsigned long event);
 
   vtkSMNewWidgetRepresentationProxy(const vtkSMNewWidgetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMNewWidgetRepresentationProxy&); // Not implemented

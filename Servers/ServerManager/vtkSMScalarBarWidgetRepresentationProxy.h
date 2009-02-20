@@ -41,7 +41,7 @@ public:
   // Overrridden to not pass the enabled state to WidgetProxy unless the
   // representation has been added to a view.
   virtual void SetEnabled(int enable);
-
+//BTX
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();
   ~vtkSMScalarBarWidgetRepresentationProxy();
@@ -67,11 +67,14 @@ protected:
   vtkSMViewProxy* ViewProxy;
   int Enabled;
 
-private:
-  void ExecuteEvent(unsigned long event);
+  // Description:
+  // Called every time the user interacts with the widget.
+  virtual void ExecuteEvent(unsigned long event);
 
+private:
   vtkSMScalarBarWidgetRepresentationProxy(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
   void operator=(const vtkSMScalarBarWidgetRepresentationProxy&); // Not implemented
+//ETX
 };
 
 #endif

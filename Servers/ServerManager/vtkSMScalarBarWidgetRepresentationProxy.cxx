@@ -14,27 +14,15 @@
 =========================================================================*/
 #include "vtkSMScalarBarWidgetRepresentationProxy.h"
 
-#include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkProcessModule.h"
-#include "vtkScalarBarWidget.h"
-#include "vtkRenderer.h"
-#include "vtkScalarBarActor.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMPropertyLink.h"
+#include "vtkScalarBarRepresentation.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSmartPointer.h"
-
-#include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
@@ -127,6 +115,41 @@ void vtkSMScalarBarWidgetRepresentationProxy::SetEnabled(int enable)
     }
 
   this->Enabled = enable;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScalarBarWidgetRepresentationProxy::ExecuteEvent(unsigned long event)
+{
+  if (event == vtkCommand::InteractionEvent)
+    {
+    // BUG #5399. If the widget's position is beyond the viewport, fix it.
+    vtkScalarBarRepresentation* repr = vtkScalarBarRepresentation::SafeDownCast(
+      this->RepresentationProxy->GetClientSideObject());
+    if (repr)
+      {
+      double position[2];
+      position[0] = repr->GetPosition()[0];
+      position[1] = repr->GetPosition()[1];
+      if (position[0] < 0.0)
+        {
+        position[0] = 0.0;
+        }
+      if (position[0] > 0.97)
+        {
+        position[0] = 0.97;
+        }
+      if (position[1] < 0.0)
+        {
+        position[1] = 0.0;
+        }
+      if (position[1] > 0.97)
+        {
+        position[1] = 0.97;
+        }
+      repr->SetPosition(position);
+      }
+    }
+  this->Superclass::ExecuteEvent(event);
 }
 
 //----------------------------------------------------------------------------
