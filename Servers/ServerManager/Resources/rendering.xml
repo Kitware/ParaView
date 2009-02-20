@@ -167,6 +167,19 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="MaximumNumberOfPeels"
+        command="SetMaximumNumberOfPeels"
+        number_of_elements="1"
+        default_values="4">
+        <Documentation>
+          In case of depth peeling, define the maximum number of peeling layers.
+          Initial value is 4. A special value of 0 means no maximum limit. It
+          has to be a positive value.
+        </Documentation>
+        <IntRangeDomain name="range" min="0" />
+      </IntVectorProperty>
+
       <DoubleVectorProperty
         name="Background"
         command="SetBackground"
@@ -4446,6 +4459,7 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="DepthPeeling" />
+          <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4526,6 +4540,7 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="DepthPeeling" />
+          <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4632,6 +4647,7 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="DepthPeeling" />
+          <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4758,6 +4774,7 @@
         <ExposedProperties>
           <Property name="Background" />
           <Property name="DepthPeeling" />
+          <Property name="MaximumNumberOfPeels" />
         </ExposedProperties>
       </SubProxy>
 

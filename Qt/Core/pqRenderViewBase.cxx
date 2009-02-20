@@ -358,6 +358,7 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "StillRenderImageReductionFactor",
   "CollectGeometryThreshold",
   "DepthPeeling",
+  "MaximumNumberOfPeels",
   "UseOffscreenRenderingForScreenshots",
   NULL
   };

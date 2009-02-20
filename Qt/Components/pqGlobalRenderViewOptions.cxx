@@ -226,6 +226,10 @@ void pqGlobalRenderViewOptions::init()
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
+  QObject::connect(this->Internal->numberOfPeels,
+                  SIGNAL(valueChanged(int)),
+                  this, SIGNAL(changesAvailable()));
+
   QObject::connect(this->Internal->useOffscreenRenderingForScreenshots,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
@@ -348,6 +352,9 @@ void pqGlobalRenderViewOptions::applyChanges()
 
   settings->setValue("DepthPeeling",
     this->Internal->depthPeeling->isChecked());
+
+  settings->setValue("MaximumNumberOfPeels",
+    this->Internal->numberOfPeels->value());
 
   settings->setValue("UseOffscreenRenderingForScreenshots",
     this->Internal->useOffscreenRenderingForScreenshots->isChecked());
@@ -515,6 +522,12 @@ void pqGlobalRenderViewOptions::resetChanges()
 
   val = settings->value("DepthPeeling", true);
   this->Internal->depthPeeling->setChecked(val.toBool());
+
+  val = settings->value("MaximumNumberOfPeels", 4);
+  this->Internal->numberOfPeels->setMinimum(1);
+  this->Internal->numberOfPeels->setMaximum(100);
+  this->Internal->numberOfPeels->setStrictRange(true);
+  this->Internal->numberOfPeels->setValue(val.toInt());
 
   val = settings->value("UseOffscreenRenderingForScreenshots", true);
   if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
