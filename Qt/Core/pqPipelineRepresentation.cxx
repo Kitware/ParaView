@@ -502,6 +502,14 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
     pqSMAdaptor::setElementProperty(
       repr->GetProperty("ColorArrayName"), "");
     repr->UpdateVTKObjects();
+
+    // BUG #6818. If user switched to solid color, we need to update the lut
+    // visibility.
+    pqScalarsToColors* lut = this->getLookupTable();
+    if (lut)
+      {
+      lut->hideUnusedScalarBars();
+      }
     return;
     }
 
@@ -556,22 +564,14 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
     return;
     }
 
-  vtkSMProxy* oldlutProxy = 
-    pqSMAdaptor::getProxyProperty(repr->GetProperty("LookupTable"));
-  pqScalarsToColors* old_stc = 0;
-  if (oldlutProxy != lut)
-    {
-    // Locate pqScalarsToColors for the old LUT and update 
-    // it's scalar bar visibility.
-    pqServerManagerModel* smmodel = core->getServerManagerModel();
-    old_stc = smmodel->findItem<pqScalarsToColors*>(oldlutProxy);
-    }
-  
+  // Locate pqScalarsToColors for the old LUT and update 
+  // it's scalar bar visibility.
+  pqScalarsToColors* old_stc = this->getLookupTable();
   pqSMAdaptor::setProxyProperty(
     repr->GetProperty("LookupTable"), lut);
 
   // If old LUT was present update the visibility of the scalar bars
-  if (old_stc)
+  if (old_stc && old_stc->getProxy() != lut)
       {
       old_stc->hideUnusedScalarBars();
       }

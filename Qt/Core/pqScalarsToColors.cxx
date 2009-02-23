@@ -146,8 +146,9 @@ void pqScalarsToColors::hideUnusedScalarBars()
   bool used_at_all = false;
   foreach(pqPipelineRepresentation* display, displays)
     {
-    if (display->getColorField(true) != pqPipelineRepresentation::solidColor()
-      && display->getLookupTableProxy() == this->getProxy())
+    if (display->isVisible() &&
+      display->getColorField(true) != pqPipelineRepresentation::solidColor() &&
+      display->getLookupTableProxy() == this->getProxy())
       {
       used_at_all = true;
       break;
