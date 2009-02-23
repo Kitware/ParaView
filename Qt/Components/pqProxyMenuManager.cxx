@@ -293,9 +293,7 @@ void pqProxyMenuManager::populateMenu()
         action_list.push_back(action);
         }
       }
-    // disable sorting for now since the dashboard test are failing. Now I need
-    // to update all the tests :(.
-    // qSort(action_list.begin(), action_list.end(), ::actionTextSort);
+    qSort(action_list.begin(), action_list.end(), ::actionTextSort);
     foreach (QAction* action, action_list)
       {
       categoryMenu->addAction(action);

@@ -3,7 +3,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/Iron Xdmf/Iron_Protein.StructuredGrid.xmf" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton2" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.364847,0.410431,1,1,0)" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.462051,0.482993,1,0,0)" />
