@@ -79,35 +79,6 @@ public:
       (*iter)->SetUseCache(usecache);
       }
     }
-
-  void DisableInteractionAllViews()
-    {
-    VectorOfViews::iterator iter = this->ViewModules.begin();
-    for (; iter != this->ViewModules.end(); ++iter)
-      {
-      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
-        iter->GetPointer());
-      if (rm)
-        {
-        rm->GetInteractor()->Disable();
-        }
-      }
-    }
-
-  void EnableInteractionAllViews()
-    {
-    VectorOfViews::iterator iter = this->ViewModules.begin();
-    for (; iter != this->ViewModules.end(); ++iter)
-      {
-      vtkSMRenderViewProxy* rm = vtkSMRenderViewProxy::SafeDownCast(
-        iter->GetPointer());
-      if (rm)
-        {
-        rm->GetInteractor()->Enable();
-        }
-      }
-    }
-
 };
 
 class vtkSMAnimationSceneProxy::vtkPlayerObserver : public vtkCommand
@@ -148,7 +119,7 @@ private:
 
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.56");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.57");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -419,7 +390,6 @@ void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 //-----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::OnStartPlay()
 {
-  this->Internals->DisableInteractionAllViews();
   this->Internals->PassUseCache(this->GetCaching()>0);
 }
 
@@ -427,7 +397,6 @@ void vtkSMAnimationSceneProxy::OnStartPlay()
 void vtkSMAnimationSceneProxy::OnEndPlay()
 {
   this->Internals->PassUseCache(false);
-  this->Internals->EnableInteractionAllViews();
 }
 
 //-----------------------------------------------------------------------------
