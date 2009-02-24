@@ -96,13 +96,14 @@ void pqFiltersMenuManager::updateEnableState()
       {
       continue;
       }
-    action->setEnabled(false);
     if (outputPorts.size() == 0)
       {
+      action->setEnabled(false);
       continue;
       }
     if (!this->Enabled)
       {
+      action->setEnabled(false);
       continue;
       }
 
@@ -111,6 +112,7 @@ void pqFiltersMenuManager::updateEnableState()
       filterName.toAscii().data());
     if (!output)
       {
+      action->setEnabled(false);
       continue;
       }
 
@@ -122,6 +124,7 @@ void pqFiltersMenuManager::updateEnableState()
       {
       // Skip single process filters when running in multiprocesses and vice
       // versa.
+      action->setEnabled(false);
       continue;
       }
         
@@ -132,6 +135,7 @@ void pqFiltersMenuManager::updateEnableState()
       {
       if(!input->GetMultipleInput() && selItems->size() > 1)
         {
+        action->setEnabled(false);
         continue;
         }
 
@@ -147,6 +151,10 @@ void pqFiltersMenuManager::updateEnableState()
         {
         action->setEnabled(true);
         some_enabled = true;
+        }
+      else
+        {
+        action->setEnabled(false);
         }
       input->RemoveAllUncheckedProxies();
       }
