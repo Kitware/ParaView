@@ -233,7 +233,7 @@ SET(UI_FORMS
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationPanel.ui
   Resources/UI/pqAnimationSettings.ui
-  Resources/UI/pqAnimationViewWidget.ui
+#Resources/UI/pqAnimationViewWidget.ui
   Resources/UI/pqApplicationOptions.ui
   Resources/UI/pqBarChartDisplayEditor.ui
   Resources/UI/pqBarChartOptionsWidget.ui
