@@ -130,6 +130,10 @@ protected slots:
 
   /// Called to update the types of selections available.
   void updateSelectionTypesAvailable();
+
+  /// Called when selection color is changed, we save the selection color in
+  /// settings so that it's preserved across sessions.
+  void onSelectionColorChanged(const QColor& color);
 protected:
   /// Sets up the GUI by created default signal/slot bindings etc.
   void setupGUI();

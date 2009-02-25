@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
-#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -43,6 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMClientDeliveryRepresentationProxy.h"
 #include "vtkSMCompositeTreeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
 #include "vtkSMProxyManager.h"
@@ -73,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
+#include "pqSettings.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqSignalAdaptorTreeWidget.h"
@@ -713,10 +715,23 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->Implementation->RepLinks->addPropertyLink(this->Implementation->Sel_StyleOpacity,
     "value", SIGNAL(valueChanged(double)),
     reprProxy, reprProxy->GetProperty("SelectionOpacity"));
+
   // setup for choosing color
-  this->Implementation->RepLinks->addPropertyLink(this->Implementation->SelectionColorAdaptor,
+  // Note: we are linking to the global property for selection color here, so
+  // that all selection colors are affected instead of simply the current
+  // objects selection color. BUG #6816.
+  vtkSMGlobalPropertiesManager* gpm =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  this->Implementation->RepLinks->addPropertyLink(
+    this->Implementation->SelectionColorAdaptor,
     "color", SIGNAL(colorChanged(const QVariant&)),
-    reprProxy, reprProxy->GetProperty("SelectionColor"));
+    gpm, gpm->GetProperty("SelectionColor"));
+  // We also need to save the color change in the settings so that it's
+  // preserved across sessions.
+  QObject::connect(
+    this->Implementation->Sel_buttonColor,
+    SIGNAL(chosenColorChanged(const QColor&)),
+    this, SLOT(onSelectionColorChanged(const QColor&)));
 
   // Selection Label Properties
 
@@ -1748,4 +1763,11 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
     }
   this->Implementation->comboSelectionType->blockSignals(prev);
   this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::onSelectionColorChanged(const QColor& color)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  settings->setValue("GlobalProperties/SelectionColor", color);
 }

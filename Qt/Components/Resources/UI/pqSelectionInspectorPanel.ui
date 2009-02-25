@@ -1805,6 +1805,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QToolButton</extends>
+   <header>pqColorChooserButton.h</header>
+  </customwidget>
+  <customwidget>
    <class>pqTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>pqTreeWidget.h</header>
@@ -1814,11 +1819,6 @@
    <extends>QGroupBox</extends>
    <header>pqCollapsedGroup.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
   </customwidget>
   <customwidget>
    <class>pqOutputPortComboBox</class>
