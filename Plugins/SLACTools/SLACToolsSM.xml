@@ -1,0 +1,67 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+
+    <SourceProxy name="SamplePlaneSource" class="vtkSamplePlaneSource">
+      <Documentation long_help="Internal filter for creating planes with even samping."
+                     short_help="Plane for sampling other data.">
+        Internal for creating planes to use for probing.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          The input of this filter simply provides the bounds that will be used
+          to set the size of the plane.
+        </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty name="Center"
+                            command="SetCenter"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 0.0">
+        <Documentation>
+          The center of the geometry created.
+        </Documentation>
+        <BoundsDomain name="range" mode="normal" default_mode="mid">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="Normal"
+                            command="SetNormal"
+                            number_of_elements="3"
+                            default_values="0.0 0.0 1.0">
+        <Documentation>
+          The normal to the plane.
+        </Documentation>
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Resolution"
+                         command="SetResolution"
+                         number_of_elements="1"
+                         default_values="100">
+        <Documentation>
+          The number of probe samples to have in each direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="Plane">
+          <Property name="Center" function="Origin" />
+          <Property name="Normal" function="Normal" />
+        </PropertyGroup>
+      </Hints>
+
+    </SourceProxy> <!-- SamplePlaneSource -->
+
+  </ProxyGroup> <!-- filters -->
+</ServerManagerConfiguration>
