@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxy.h"
 #include "pqSMAdaptor.h"
+#include "pqApplicationCore.h"
+#include "vtkSMGlobalPropertiesManager.h"
 
 //-----------------------------------------------------------------------------
 pqTextRepresentation::pqTextRepresentation(const QString& group, 
@@ -71,5 +73,9 @@ void pqTextRepresentation::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(
     proxy->GetProperty("FontSize"),18);
 
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "TextAnnotationColor", proxy, "Color");
   proxy->UpdateVTKObjects();
 }

@@ -39,10 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 
+#include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
 #include "pqRepresentation.h"
-#include "pqTextRepresentation.h"
 #include "pqSignalAdaptors.h"
+#include "pqStandardColorLinkAdaptor.h"
+#include "pqTextRepresentation.h"
+#include "pqUndoStack.h"
 
 class pqTextDisplayPropertiesWidget::pqInternal : 
   public Ui::pqTextDisplayPropertiesWidget
@@ -96,6 +99,17 @@ pqTextDisplayPropertiesWidget::pqTextDisplayPropertiesWidget(pqRepresentation* d
       this->Internal->comboTextAlign);
 
   this->setDisplay(display);
+
+  this->Internal->buttonColor->setUndoLabel("Change Color");
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    QObject::connect(this->Internal->buttonColor,
+      SIGNAL(beginUndo(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this->Internal->buttonColor,
+      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -154,6 +168,9 @@ void pqTextDisplayPropertiesWidget::setDisplay(pqRepresentation* display)
   this->Internal->Links.addPropertyLink(this->Internal->ColorAdaptor, 
       "color", SIGNAL(colorChanged(const QVariant&)),
       proxy, proxy->GetProperty("Color"));
+  // This manages the global property linking.
+  new pqStandardColorLinkAdaptor(this->Internal->buttonColor,
+    proxy, "Color");
   this->Internal->Links.addPropertyLink(this->Internal->FontFamilyAdaptor,
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       proxy, proxy->GetProperty("FontFamily"));
