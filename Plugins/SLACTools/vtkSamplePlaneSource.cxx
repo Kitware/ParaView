@@ -36,7 +36,7 @@
 #include <math.h>
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSamplePlaneSource, "1.1");
+vtkCxxRevisionMacro(vtkSamplePlaneSource, "1.2");
 vtkStandardNewMacro(vtkSamplePlaneSource);
 
 vtkCxxSetObjectMacro(vtkSamplePlaneSource, Controller,
@@ -76,6 +76,7 @@ void vtkSamplePlaneSource::PrintSelf(ostream &os, vtkIndent indent)
                               << this->Normal[1] << ", "
                               << this->Normal[2] << ")" << endl;;
   os << indent << "Resolution: " << this->Resolution << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }
 
 //-----------------------------------------------------------------------------
