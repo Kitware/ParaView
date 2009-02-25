@@ -1,0 +1,221 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="internal_sources">
+
+    <SourceProxy name="SLACParticleReaderCore"
+                 class="vtkSLACParticleReader"
+                 label="SLAC Particle Data Reader">
+      <Documentation>
+        The SLAC Particle data reader.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+    </SourceProxy> <!-- SLACParticleReaderCore -->
+
+  </ProxyGroup> <!-- internal_sources -->
+
+  <ProxyGroup name="sources">
+
+    <!-- TODO: Make a meta-reader that can switch between netCDF readers -->
+    <!-- based on content. -->
+
+    <SourceProxy name="netCDFReader"
+                 class="vtkNetCDFCOARDSReader"
+                 label="netCDF Reader">
+      <Documentation short_help="Fill me in."
+                     long_help="Fill me in.">
+        Fill me in.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Variable"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayStatus"
+                            command="SetVariableArrayStatus"
+                            number_of_elements="0"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="VariableArrayInfo"
+                            label="Variables">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="VariableArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which netCDF variables to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SphericalCoordinates"
+                         command="SetSphericalCoordinates"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, then 3D data with latitude/longitude dimensions will be
+          read in as curvilinear data shaped like spherical coordinates.
+          If false, then the data will always be read in Cartesian
+          coordinates.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy> <!-- netCDFReader -->
+
+    <SourceProxy name="SLACReader"
+                 class="vtkPSLACReader"
+                 label="SLAC Data Reader">
+      <Documentation>
+        A reader for a data format used by Omega3p, Tau3p, and several
+        other tools used at the Standford Linear Accelerator Center (SLAC).
+        The underlying format uses netCDF to store arrays, but also imposes
+        several conventions to form an unstructured grid of elements.
+      </Documentation>
+
+      <StringVectorProperty name="MeshFileName"
+                            command="SetMeshFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the mesh file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ModeFileName"
+                            command="SetModeFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the mode file to load.  The points in the mode file should be the same as the mesh file.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ReadInternalVolume"
+                         command="SetReadInternalVolume"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, read the internal volume of the data set.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadExternalSurface"
+                         command="SetReadExternalSurface"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, read the external surfaces of the data set.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadMidpoints"
+                         command="SetReadMidpoints"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, reads midpoint information for external surfaces and builds
+          quadratic surface triangles.
+        </Documentation>
+      </IntVectorProperty>
+
+<!--       <StringVectorProperty name="VariableArrayStatus" -->
+<!--                             command="SetVariableArrayStatus" -->
+<!--                             number_of_elements="0" -->
+<!--                             repeat_command="1" -->
+<!--                             number_of_elements_per_command="2" -->
+<!--                             element_types="2 0" -->
+<!--                             information_property="VariableArrayInfo" -->
+<!--                             label="Variables"> -->
+<!--         <ArraySelectionDomain name="array_list"> -->
+<!--           <RequiredProperties> -->
+<!--             <Property name="VariableArrayInfo" function="ArrayList" /> -->
+<!--           </RequiredProperties> -->
+<!--         </ArraySelectionDomain> -->
+<!--         <Documentation> -->
+<!--           This property lists which mode variables to load from the mode file. -->
+<!--         </Documentation> -->
+<!--       </StringVectorProperty> -->
+
+    </SourceProxy> <!-- SLACReader -->
+
+    <FileSeriesReaderProxy name="SLACParticleReader"
+                           class="vtkFileSeriesReader"
+                           label="SLAC Particle Data Reader"
+                           file_name_method="SetFileName">
+      <Documentation>
+        The SLAC Particle data reader.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources" proxyname="SLACParticleReaderCore">
+        </Proxy>
+
+      </SubProxy>
+
+      <StringVectorProperty name="FileName"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            animateable="0"
+                            number_of_elements="0"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          A list of files to be read in a time series.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+    </FileSeriesReaderProxy> <!-- SLACParticleReader -->
+
+  </ProxyGroup> <!-- sources -->
+
+</ServerManagerConfiguration>
