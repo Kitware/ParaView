@@ -126,7 +126,7 @@ void pqStandardColorButton::updateMenu()
   popupMenu << pqSetName("StandardColorMenu");
   this->setMenu(popupMenu);
 
-  QActionGroup * group = new QActionGroup(popupMenu);
+  QActionGroup * action_group = new QActionGroup(popupMenu);
 
   QObject::connect(popupMenu, SIGNAL(triggered(QAction*)),
     this, SLOT(actionTriggered(QAction*)));
@@ -146,7 +146,7 @@ void pqStandardColorButton::updateMenu()
       action << pqSetName(iter->GetKey());
       action->setData(QVariant(iter->GetKey()));
       action->setCheckable(true);
-      group->addAction(action);
+      action_group->addAction(action);
       }
     }
   iter->Delete();
