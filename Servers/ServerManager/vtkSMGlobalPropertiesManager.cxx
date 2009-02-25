@@ -43,7 +43,7 @@ public:
 
 
 vtkStandardNewMacro(vtkSMGlobalPropertiesManager);
-vtkCxxRevisionMacro(vtkSMGlobalPropertiesManager, "1.1");
+vtkCxxRevisionMacro(vtkSMGlobalPropertiesManager, "1.2");
 //----------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager::vtkSMGlobalPropertiesManager()
 {
@@ -153,7 +153,12 @@ void vtkSMGlobalPropertiesManager::SetGlobalPropertyLink(
   this->Internals->Links[globalPropertyName].push_back(value);
   proxy->GetProperty(propname)->Copy(
     this->GetProperty(globalPropertyName));
-  proxy->UpdateVTKObjects();
+  if (proxy->GetObjectsCreated())
+    {
+    // This handles the case when the proxy hasn't been created yet (which
+    // happens when reviving servermanager on the server side.
+    proxy->UpdateVTKObjects();
+    }
 
   ModifiedInfo info;
   info.AddLink = true;
