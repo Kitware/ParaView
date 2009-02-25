@@ -79,6 +79,8 @@ SET(Kit_SRCS
   vtkSMFileListDomain.cxx
   vtkSMFileSeriesReaderProxy.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMGlobalPropertiesManager.cxx
+  vtkSMGlobalPropertiesLinkUndoElement.cxx
   vtkSMHardwareSelector.cxx
   vtkSMIceTCompositeViewProxy.cxx
   vtkSMIceTDesktopRenderViewProxy.cxx

@@ -42,8 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPQStateLoader.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -74,6 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
+#include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
@@ -86,7 +89,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
-#include "pqRenderView.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -103,6 +105,7 @@ public:
   pqLinksModel LinksModel;
   pqPluginManager* PluginManager;
   pqProgressManager* ProgressManager;
+  vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
 
   QPointer<pqUndoStack> UndoStack;
 
@@ -112,7 +115,6 @@ public:
   QPointer<pqServerStartups> ServerStartups;
   QPointer<pqSettings> Settings;
 };
-
 
 //-----------------------------------------------------------------------------
 pqApplicationCore* pqApplicationCore::Instance = 0;
@@ -172,7 +174,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // add standard server manager model interface
   this->Internal->PluginManager->addInterface(
     new pqStandardServerManagerModelInterface(this->Internal->PluginManager));
-
   this->LoadingState = false;
 }
 
@@ -275,6 +276,63 @@ void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy)
 pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
 {
   return this->Internal->DisplayPolicy;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMGlobalPropertiesManager* pqApplicationCore::getGlobalPropertiesManager()
+{
+  if (!this->Internal->GlobalPropertiesManager)
+    {
+    // Setup the application's "GlobalProperties" proxy.
+    // This is used to keep track of foreground color etc.
+    this->Internal->GlobalPropertiesManager =
+      vtkSmartPointer<vtkSMGlobalPropertiesManager>::New();
+    this->Internal->GlobalPropertiesManager->InitializeProperties("misc",
+      "GlobalProperties");
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->SetGlobalPropertiesManager("ParaViewProperties",
+      this->Internal->GlobalPropertiesManager);
+
+    // load settings.
+    this->loadGlobalPropertiesFromSettings();
+    }
+  return this->Internal->GlobalPropertiesManager;
+}
+
+#define SET_COLOR_MACRO(settingkey, defaultvalue, propertyname)\
+  color = _settings->value(settingkey, defaultvalue).value<QColor>();\
+  rgb[0] = color.redF();\
+  rgb[1] = color.greenF();\
+  rgb[2] = color.blueF();\
+  vtkSMPropertyHelper(mgr, propertyname).Set(rgb, 3);
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadGlobalPropertiesFromSettings()
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  QColor color;
+  double rgb[3];
+  pqSettings* _settings = this->settings();
+  SET_COLOR_MACRO(
+    "GlobalProperties/ForegroundColor",
+    QColor::fromRgbF(1, 1, 1),
+    "ForegroundColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/BackgroundColor",
+    QColor::fromRgbF(0.32, 0.34, 0.43),
+    "BackgroundColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/TextAnnotationColor",
+    QColor::fromRgbF(1, 1, 1),
+    "TextAnnotationColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/SelectionColor",
+    QColor::fromRgbF(1, 0, 1),
+    "SelectionColor");
+  SET_COLOR_MACRO(
+    "GlobalProperties/EdgeColor",
+    QColor::fromRgbF(0.0, 0, 0.5),
+    "EdgeColor");
 }
 
 //-----------------------------------------------------------------------------

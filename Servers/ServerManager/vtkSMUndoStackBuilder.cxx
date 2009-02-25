@@ -19,6 +19,8 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMGlobalPropertiesLinkUndoElement.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxy.h"
@@ -64,7 +66,7 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackBuilder);
-vtkCxxRevisionMacro(vtkSMUndoStackBuilder, "1.1");
+vtkCxxRevisionMacro(vtkSMUndoStackBuilder, "1.2");
 vtkCxxSetObjectMacro(vtkSMUndoStackBuilder, UndoStack, vtkSMUndoStack);
 //-----------------------------------------------------------------------------
 vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
@@ -93,6 +95,13 @@ vtkSMUndoStackBuilder::vtkSMUndoStackBuilder()
     pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer, 100);
     pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer, 100);
     pxm->AddObserver(vtkCommand::UpdateInformationEvent, this->Observer, 100);
+    }
+
+  // Add existing global properties managers.
+  for (unsigned int cc=0; cc < pxm->GetNumberOfGlobalPropertiesManagers(); cc++)
+    {
+    this->OnRegisterGlobalPropertiesManager(
+      pxm->GetGlobalPropertiesManager(cc));
     }
 }
 
@@ -176,9 +185,34 @@ void vtkSMUndoStackBuilder::Add(vtkUndoElement* element)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
+void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* caller, 
   unsigned long eventid, void* data)
 {
+  // These must be handled irrespective of whether IgnoreAllChanges or
+  // HandleChangeEvents is set.
+  if (eventid == vtkCommand::RegisterEvent)
+    {
+    vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
+      vtkSMProxyManager::RegisteredProxyInformation*>(data));
+    if (info.Type == 
+      vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER)
+      {
+        this->OnRegisterGlobalPropertiesManager(
+          vtkSMGlobalPropertiesManager::SafeDownCast(info.Proxy));
+      }
+    }
+  else if (eventid == vtkCommand::UnRegisterEvent)
+    {
+    vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
+      vtkSMProxyManager::RegisteredProxyInformation*>(data));
+    if (info.Type == 
+      vtkSMProxyManager::RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER)
+      {
+        this->OnUnRegisterGlobalPropertiesManager(
+          vtkSMGlobalPropertiesManager::SafeDownCast(info.Proxy));
+      }
+    }
+
   if (this->IgnoreAllChanges || !this->HandleChangeEvents())
     {
     return;
@@ -191,18 +225,20 @@ void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* vtkNotUsed(caller),
       vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
         vtkSMProxyManager::RegisteredProxyInformation*>(data));
 
-      if (info.IsCompoundProxyDefinition)
+      switch (info.Type)
         {
+      case vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION:
         // Compound proxy definition registered.
-        }
-      else if (info.IsLink)
-        {
+        break;
+
+      case vtkSMProxyManager::RegisteredProxyInformation::LINK:
         // link registered.
         this->OnRegisterLink(info.ProxyName);
-        }
-      else
-        {
+        break;
+
+      case vtkSMProxyManager::RegisteredProxyInformation::PROXY:
         this->OnRegisterProxy(info.GroupName, info.ProxyName, info.Proxy);
+        break;
         }
       }
     break;
@@ -212,17 +248,20 @@ void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* vtkNotUsed(caller),
       vtkSMProxyManager::RegisteredProxyInformation &info =*(reinterpret_cast<
         vtkSMProxyManager::RegisteredProxyInformation*>(data));
 
-      if (info.IsCompoundProxyDefinition)
+      switch (info.Type)
         {
-        }
-      else if (info.IsLink)
-        {
+      case vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION:
+        // Compound proxy definition registered.
+        break;
+
+      case vtkSMProxyManager::RegisteredProxyInformation::LINK:
         // link unregistered.
         this->OnUnRegisterLink(info.ProxyName);
-        }
-      else
-        {
+        break;
+
+      case vtkSMProxyManager::RegisteredProxyInformation::PROXY:
         this->OnUnRegisterProxy(info.GroupName, info.ProxyName, info.Proxy);
+        break;
         }
       }
     break;
@@ -240,6 +279,31 @@ void vtkSMUndoStackBuilder::ExecuteEvent(vtkObject* vtkNotUsed(caller),
       this->OnUpdateInformation(reinterpret_cast<vtkSMProxy*>(data));
       }
     break;
+
+  case vtkCommand::ModifiedEvent:
+      {
+      vtkSMGlobalPropertiesManager* mgr =
+        vtkSMGlobalPropertiesManager::SafeDownCast(caller);
+      vtkSMGlobalPropertiesManager::ModifiedInfo *info =
+        reinterpret_cast<vtkSMGlobalPropertiesManager::ModifiedInfo*>(data);
+      if (mgr && info)
+        {
+        if (info->AddLink)
+          {
+          this->GlobalPropertiesLinkAdded(
+            this->GetProxyManager()->GetGlobalPropertiesManagerName(mgr),
+            info->GlobalPropertyName, info->Proxy, info->PropertyName);
+          }
+        else
+          {
+          this->GlobalPropertiesLinkRemoved(
+            this->GetProxyManager()->GetGlobalPropertiesManagerName(mgr),
+            info->GlobalPropertyName, info->Proxy, info->PropertyName);
+          }
+        }
+      }
+    break;
+
     }
 }
 
@@ -325,6 +389,44 @@ void vtkSMUndoStackBuilder::OnRegisterLink(const char* vtkNotUsed(name))
 void vtkSMUndoStackBuilder::OnUnRegisterLink(const char* vtkNotUsed(name))
 {
   // TODO: This will be implemented in future.
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnRegisterGlobalPropertiesManager(
+  vtkSMGlobalPropertiesManager* mgr)
+{
+  mgr->AddObserver(vtkCommand::ModifiedEvent, this->Observer, 100);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::OnUnRegisterGlobalPropertiesManager(
+  vtkSMGlobalPropertiesManager* mgr)
+{
+  mgr->RemoveObserver(this->Observer);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::GlobalPropertiesLinkAdded(
+  const char* mgrname,
+  const char* globalname, vtkSMProxy* proxy, const char* propname)
+{
+  vtkSMGlobalPropertiesLinkUndoElement* elem = 
+    vtkSMGlobalPropertiesLinkUndoElement::New();
+  elem->LinkAdded(mgrname, globalname, proxy, propname);
+  this->UndoSet->AddElement(elem);
+  elem->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStackBuilder::GlobalPropertiesLinkRemoved(
+  const char* mgrname,
+  const char* globalname, vtkSMProxy* proxy, const char* propname)
+{
+  vtkSMGlobalPropertiesLinkUndoElement* elem = 
+    vtkSMGlobalPropertiesLinkUndoElement::New();
+  elem->LinkRemoved(mgrname, globalname, proxy, propname);
+  this->UndoSet->AddElement(elem);
+  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMCameraLink.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
@@ -33,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.31");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.32");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -290,6 +291,45 @@ void vtkSMStateLoader::HandleCustomProxyDefinitions(
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
+{
+  vtkSMProxyManager* pxm = this->GetProxyManager();
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    vtkPVXMLElement* currentElement= element->GetNestedElement(cc);
+    const char* name = currentElement->GetName();
+    const char* mgrname = currentElement->GetAttribute("name");
+    if (!name || !mgrname || strcmp(name, "GlobalPropertiesManager") != 0)
+      {
+      continue;
+      }
+    vtkstd::string group = currentElement->GetAttribute("group");
+    vtkstd::string type = currentElement->GetAttribute("type");
+    vtkSMGlobalPropertiesManager* mgr =
+      pxm->GetGlobalPropertiesManager(mgrname);
+    if (mgr && (group != mgr->GetXMLGroup() || type != mgr->GetXMLName()))
+      {
+      vtkErrorMacro("GlobalPropertiesManager with name " << mgrname
+        << " exists, however is of different type.");
+      return 0;
+      }
+    if (!mgr)
+      {
+      mgr = vtkSMGlobalPropertiesManager::New();
+      mgr->InitializeProperties(group.c_str(), type.c_str());
+      pxm->SetGlobalPropertiesManager(mgrname, mgr);
+      mgr->Delete();
+      }
+    if (!mgr->LoadState(currentElement, this->ProxyLocator))
+      {
+      return 0;
+      }
+    }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
 {
   vtkSMProxyManager* pxm = this->GetProxyManager();
@@ -474,6 +514,10 @@ int vtkSMStateLoader::LoadStateInternal(vtkPVXMLElement* rootElement)
       else if (strcmp(name, "Links") == 0)
         {
         this->HandleLinks(currentElement);
+        }
+      else if (strcmp(name, "GlobalPropertiesManagers") == 0)
+        {
+        this->HandleGlobalPropertiesManagers(currentElement);
         }
       }
     }

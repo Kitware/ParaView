@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 
-#include <QPushButton>
+#include <QToolButton>
 #include <QColor>
 
 /// 
-class QTWIDGETS_EXPORT pqColorChooserButton : public QPushButton
+class QTWIDGETS_EXPORT pqColorChooserButton : public QToolButton
 {
   Q_OBJECT
   Q_PROPERTY(QColor chosenColor READ chosenColor WRITE setChosenColor)
@@ -48,18 +48,31 @@ public:
   pqColorChooserButton(QWidget* p);
   /// get the color
   QColor chosenColor() const;
+
+  /// Set the label to be used when firing beginUndo() signal.
+  void setUndoLabel(const QString& lbl)
+    { this->UndoLabel = lbl; }
+  const QString& undoLabel() const
+    { return this->UndoLabel; }
 signals:
+  /// Signals fired before and after the chosenColorChanged() signal is fired.
+  /// This is used in ParaView to set up the creation of undo set.
+  void beginUndo(const QString&);
+  void endUndo();
+
   /// signal color changed
   void chosenColorChanged(const QColor&);  
   /// signal color selected
   void validColorChosen(const QColor&);  
 public slots:
   /// set the color
-  void setChosenColor(const QColor&);
+  virtual void setChosenColor(const QColor&);
+
   /// show a dialog to choose the color
-  void chooseColor();
+  virtual void chooseColor();
 protected:
   QColor Color;
+  QString UndoLabel;
 };
 
 #endif

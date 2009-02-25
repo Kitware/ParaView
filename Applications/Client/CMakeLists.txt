@@ -293,6 +293,7 @@ IF(BUILD_TESTING)
     Flow2
     Fractal2D
     Fractal3D
+    GlobalProperties
     LinePlot
     LoadSaveStateAnimation
     LoadState

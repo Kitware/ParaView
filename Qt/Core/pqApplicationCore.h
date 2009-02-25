@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqDisplayPolicy;
+class vtkSMGlobalPropertiesManager;
 class pqLinksModel;
 class pqLookmarkManagerModel;
 class pqLookupTableManager;
@@ -189,6 +190,12 @@ public:
 
   // Check to see if its in the process of loading a state
   bool isLoadingState(){return this->LoadingState;};
+
+  /// Returns the manager for the global properties such as ForegroundColor etc.
+  vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
+
+  /// Loads global properties values from settings.
+  void loadGlobalPropertiesFromSettings();
 
 public slots:
   /// Called QCoreApplication::quit().

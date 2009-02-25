@@ -32,11 +32,12 @@
 
 #include "vtkSMObject.h"
 
+class vtkSMGlobalPropertiesManager;
+class vtkSMProxy;
+class vtkSMUndoStack;
 class vtkSMUndoStackBuilderObserver;
 class vtkUndoElement;
 class vtkUndoSet;
-class vtkSMUndoStack;
-class vtkSMProxy;
 
 class VTK_EXPORT vtkSMUndoStackBuilder : public vtkSMObject
 {
@@ -132,6 +133,12 @@ protected:
   virtual void OnUpdateInformation(vtkSMProxy* proxy);
   virtual void OnRegisterLink(const char* name);
   virtual void OnUnRegisterLink(const char* name);
+  virtual void OnRegisterGlobalPropertiesManager(vtkSMGlobalPropertiesManager*);
+  virtual void OnUnRegisterGlobalPropertiesManager(vtkSMGlobalPropertiesManager*);
+  virtual void GlobalPropertiesLinkAdded( const char* mgrname,
+    const char* globalname, vtkSMProxy* proxy, const char* propname);
+  virtual void GlobalPropertiesLinkRemoved( const char* mgrname,
+    const char* globalname, vtkSMProxy* proxy, const char* propname);
 
   vtkSMUndoStack* UndoStack;
   vtkIdType ConnectionID;

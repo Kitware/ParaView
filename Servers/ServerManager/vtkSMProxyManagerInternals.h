@@ -18,6 +18,7 @@
 
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManagerExtension.h"
@@ -212,6 +213,12 @@ struct vtkSMProxyManagerInternals
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
     SelectionModelsType;
   SelectionModelsType SelectionModels;
+
+  // Data structure for storing GlobalPropertiesManagers.
+  typedef vtkstd::map<vtkstd::string,
+          vtkSmartPointer<vtkSMGlobalPropertiesManager> >
+            GlobalPropertiesManagersType;
+  GlobalPropertiesManagersType GlobalPropertiesManagers;
 
   // Helper method to retrieve the proxy element.
   vtkPVXMLElement* GetProxyElement(const char* groupName, const char* proxyName)

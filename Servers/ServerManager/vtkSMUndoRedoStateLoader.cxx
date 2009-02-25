@@ -22,6 +22,7 @@
 #include "vtkSMProxyRegisterUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
 #include "vtkSMUpdateInformationUndoElement.h"
+#include "vtkSMGlobalPropertiesLinkUndoElement.h"
 #include "vtkUndoSet.h"
 
 #include <vtkstd/vector>
@@ -33,7 +34,7 @@ class vtkSMUndoRedoStateLoaderVector :
 
 
 vtkStandardNewMacro(vtkSMUndoRedoStateLoader);
-vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.4");
+vtkCxxRevisionMacro(vtkSMUndoRedoStateLoader, "1.5");
 vtkCxxSetObjectMacro(vtkSMUndoRedoStateLoader, RootElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
@@ -55,6 +56,10 @@ vtkSMUndoRedoStateLoader::vtkSMUndoRedoStateLoader()
   elem->Delete();
 
   elem = vtkSMUpdateInformationUndoElement::New();
+  this->RegisterElement(elem);
+  elem->Delete();
+
+  elem = vtkSMGlobalPropertiesLinkUndoElement::New();
   this->RegisterElement(elem);
   elem->Delete();
 }

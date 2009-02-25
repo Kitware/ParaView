@@ -588,7 +588,7 @@ protected:
   // is modified, it invokes all observers and the observers set the
   // appropriate flags in the proxies. 
   // Changes the modified flag of a property. Used by the observers
-  void SetPropertyModifiedFlag(const char* name, int flag);
+  virtual void SetPropertyModifiedFlag(const char* name, int flag);
 
   // Description:
   // Add a property to either self (subProxyName = 0) or a sub-proxy.

@@ -36,6 +36,7 @@ class vtkCollection;
 class vtkPVXMLElement;
 class vtkSMCompoundSourceProxy;
 class vtkSMDocumentation;
+class vtkSMGlobalPropertiesManager;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -364,8 +365,15 @@ public:
     const char* ProxyName;
     // Set when the register/unregister event if fired for registration of 
     // a compound proxy definition.
-    int IsCompoundProxyDefinition;
-    int IsLink;
+    unsigned int Type;
+
+    enum
+      {
+      PROXY =0x1,
+      COMPOUND_PROXY_DEFINITION = 0x2,
+      LINK = 0x3,
+      GLOBAL_PROPERTIES_MANAGER = 0x4
+      };
   };
 
   struct ModifiedPropertyInformation
@@ -438,6 +446,23 @@ public:
   // registered.
   vtkSMProxySelectionModel* GetSelectionModel(const char* name);
 
+  // Description:
+  // ParaView has notion of "global properties". These are application wide
+  // properties such as foreground color, text color etc. Changing values of
+  // these properties affects all objects that are linked to these properties.
+  // This class provides convenient API to setup/remove such links.
+  void SetGlobalPropertiesManager(const char* name,
+    vtkSMGlobalPropertiesManager*);
+  void RemoveGlobalPropertiesManager(const char* name);
+
+  // Description:
+  // Accessors for global properties managers.
+  unsigned int GetNumberOfGlobalPropertiesManagers();
+  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(unsigned int index);
+  vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
+  const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
+
+//BTX
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -448,13 +473,12 @@ protected:
   void AddElement(
     const char* groupName, const char* name, vtkPVXMLElement* element);
 
-//BTX
-  friend class vtkSMXMLParser;
-  friend class vtkSMProxyIterator;
-  friend class vtkSMProxyDefinitionIterator;
+  friend class vtkSMGlobalPropertiesManager;
   friend class vtkSMProxy;
+  friend class vtkSMProxyDefinitionIterator;
+  friend class vtkSMProxyIterator;
   friend class vtkSMProxyManagerObserver;
-//ETX
+  friend class vtkSMXMLParser;
 
   // Description:
   // Given an XML element and group name create a proxy 
@@ -482,6 +506,10 @@ protected:
   void SaveRegisteredLinks(vtkPVXMLElement* root);
 
   // Description:
+  // Save global property managers.
+  void SaveGlobalPropertiesManagers(vtkPVXMLElement* root);
+
+  // Description:
   // Internal method to save server manager state in an XML
   // and return a new vtkPVXMLElement for it. The caller has 
   // the responsibility of freeing the vtkPVXMLElement returned.
@@ -501,6 +529,7 @@ private:
 private:
   vtkSMProxyManager(const vtkSMProxyManager&); // Not implemented
   void operator=(const vtkSMProxyManager&); // Not implemented
+//ETX
 };
 
 #endif

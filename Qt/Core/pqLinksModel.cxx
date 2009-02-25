@@ -68,7 +68,8 @@ public:
     vtkSMProxyManager::RegisteredProxyInformation *info =
       reinterpret_cast<vtkSMProxyManager::RegisteredProxyInformation *>(callData);
 
-    if(!info || !info->IsLink)
+    if(!info ||
+      info->Type != vtkSMProxyManager::RegisteredProxyInformation::LINK)
       {
       return;
       }

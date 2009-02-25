@@ -205,6 +205,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
   pqStackedChartOptionsEditor.h
+  pqStandardColorButton.h
+  pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.h
   pqTextureComboBox.h
@@ -231,6 +233,7 @@ SET(UI_FORMS
   #Resources/UI/pqAddSourceDialog.ui
   Resources/UI/pqAnimationPanel.ui
   Resources/UI/pqAnimationSettings.ui
+  Resources/UI/pqAnimationViewWidget.ui
   Resources/UI/pqApplicationOptions.ui
   Resources/UI/pqBarChartDisplayEditor.ui
   Resources/UI/pqBarChartOptionsWidget.ui
@@ -687,6 +690,10 @@ ADD_LIBRARY(pqComponents
   pqStackedChartOptionsHandler.h
   pqStackedChartViewContextMenuHandler.cxx
   pqStackedChartViewContextMenuHandler.h
+  pqStandardColorButton.cxx
+  pqStandardColorButton.h
+  pqStandardColorLinkAdaptor.cxx
+  pqStandardColorLinkAdaptor.h
   pqStreamTracerPanel.cxx
   pqStreamTracerPanel.h
   pqTextDisplayPropertiesWidget.cxx

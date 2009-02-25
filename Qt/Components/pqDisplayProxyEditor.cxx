@@ -77,6 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarsToColors.h"
 #include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardColorLinkAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqWidgetRangeDomain.h"
 
@@ -496,8 +497,16 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   this->Internal->StyleMaterial->blockSignals(false);
 #endif
 
+
+  new pqStandardColorLinkAdaptor(this->Internal->ColorActorColor,
+    reprProxy, "DiffuseColor");
+  if (reprProxy->GetProperty("EdgeColor"))
+    {
+    new pqStandardColorLinkAdaptor(this->Internal->EdgeColor,
+      reprProxy, "EdgeColor");
+    }
+
   this->DisableSlots = 0;
-  
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
 }
 
@@ -524,14 +533,39 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->StyleInterpolation);
   this->Internal->InterpolationAdaptor->setObjectName(
     "StyleInterpolationAdapator");
- 
+
   QObject::connect(this->Internal->ColorActorColor,
     SIGNAL(chosenColorChanged(const QColor&)),
     this, SLOT(setSolidColor(const QColor&)));
 
+  /// Set up signal-slot connections to create a single undo-set for all the
+  /// changes that happen when the solid color is changed.
+  /// We need to do this for both solid and edge color since we want to make
+  /// sure that the undo-element for setting up of the "global property" link
+  /// gets added in the same set in which the solid/edge color is changed.
+  this->Internal->ColorActorColor->setUndoLabel("Change Solid Color");
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    QObject::connect(this->Internal->ColorActorColor,
+      SIGNAL(beginUndo(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this->Internal->ColorActorColor,
+      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    }
+
   this->Internal->EdgeColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->EdgeColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)), false);
+  this->Internal->EdgeColor->setUndoLabel("Change Edge Color");
+  if (stack)
+    {
+    QObject::connect(this->Internal->EdgeColor,
+      SIGNAL(beginUndo(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this->Internal->EdgeColor,
+      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    }
 
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
@@ -846,23 +880,14 @@ void pqDisplayProxyEditor::setSolidColor(const QColor& color)
   val.push_back(color.green()/255.0);
   val.push_back(color.blue()/255.0);
 
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    stack->beginUndoSet("Change Solid Color");
-    }
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->Representation->getProxy()->GetProperty("AmbientColor"), val);
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->Representation->getProxy()->GetProperty("DiffuseColor"), val);
 
-  // If specular while if off, then we want to update the specular color as
+  // If specular white is off, then we want to update the specular color as
   // well.
   emit this->specularColorChanged();
-  if (stack)
-    {
-    stack->endUndoSet();
-    }
 }
 
 //-----------------------------------------------------------------------------

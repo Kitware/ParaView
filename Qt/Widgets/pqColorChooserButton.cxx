@@ -38,9 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPainter>
 
 pqColorChooserButton::pqColorChooserButton(QWidget* p)
-  : QPushButton(p)
+  : QToolButton(p)
 {
-  this->connect(this, SIGNAL(pressed()), SLOT(chooseColor()));
+  this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  this->connect(this, SIGNAL(clicked()), SLOT(chooseColor()));
 }
 
 QColor pqColorChooserButton::chosenColor() const
@@ -66,7 +67,10 @@ void pqColorChooserButton::setChosenColor(const QColor& color)
       painter.end();
 
       this->setIcon(QIcon(pix));
+      
+      emit this->beginUndo(this->UndoLabel);
       emit this->chosenColorChanged(this->Color);
+      emit this->endUndo();
       }
     emit this->validColorChosen(this->Color);
     }

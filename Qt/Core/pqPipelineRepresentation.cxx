@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMPVRepresentationProxy.h"
@@ -256,13 +257,17 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
 
   pqSMAdaptor::setEnumerationProperty(repr->GetProperty("SelectionRepresentation"),
     "Wireframe");
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
-    0, 1.0);
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
-    1, 0.0);
-  pqSMAdaptor::setMultipleElementProperty(repr->GetProperty("SelectionColor"),
-    2, 1.0);
   pqSMAdaptor::setElementProperty(repr->GetProperty("SelectionLineWidth"), 2);
+
+  // Set up some global property links by default.
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "SelectionColor", repr, "SelectionColor");
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "ForegroundColor", repr, "DiffuseColor");
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "EdgeColor", repr, "EdgeColor");
 
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it

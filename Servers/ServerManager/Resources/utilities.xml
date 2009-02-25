@@ -2539,6 +2539,60 @@
       <!-- End of RepresentationAnimationHelper -->
     </RepresentationAnimationHelperProxy>
 
+    <Proxy name="GlobalProperties" >
+      <DoubleVectorProperty name="ForegroundColor"
+        label="Foreground"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Foreground color.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackgroundColor"
+        label="Background"
+        number_of_elements="3"
+        default_values="0.32 0.34 0.43">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Background color.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TextAnnotationColor"
+        label="Text"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Color used for text annotations.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SelectionColor"
+        label="Selection"
+        number_of_elements="3"
+        default_values="1.0 0.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Color used for showing selected cells/points.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EdgeColor"
+        label="Edges"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.5">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Color used for showing selected cells/points.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    <!-- End of GlobalProperties -->
+    </Proxy>
+
     <!-- End of group "misc" -->
   </ProxyGroup>
 

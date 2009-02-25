@@ -106,11 +106,13 @@ void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     return;
     }
 
-  if(info->IsCompoundProxyDefinition)
+  if (info->Type ==
+    vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION)
     {
     emit this->compoundProxyDefinitionRegistered(info->ProxyName);
     }
-  else if (!info->IsLink && info->Proxy)
+  else if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY
+    && info->Proxy)
     {
     emit this->proxyRegistered(info->GroupName, info->ProxyName,
       info->Proxy);
@@ -130,11 +132,13 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     return;
     }
 
-  if(info->IsCompoundProxyDefinition)
+  if (info->Type ==
+    vtkSMProxyManager::RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION)
     {
     emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
     }
-  else if (!info->IsLink && info->Proxy)
+  else if (info->Type == vtkSMProxyManager::RegisteredProxyInformation::PROXY
+    && info->Proxy)
     {
     emit this->proxyUnRegistered(info->GroupName, info->ProxyName,
       info->Proxy);

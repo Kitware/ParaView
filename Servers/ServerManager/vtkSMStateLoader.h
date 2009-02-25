@@ -71,11 +71,14 @@ protected:
   virtual vtkSMProxy* CreateProxy(
     const char* xmlgroup, const char* xmlname, vtkIdType cid);
 
-
   virtual int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   virtual void HandleCustomProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
   virtual int BuildProxyCollectionInformation(vtkPVXMLElement*);
+
+  // Description:
+  // Process the <GlobalPropertiesManagers /> element.
+  int HandleGlobalPropertiesManagers(vtkPVXMLElement*);
 
   // Description:
   // This method scans through the internal data structure built 

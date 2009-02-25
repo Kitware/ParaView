@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqApplicationOptions.h
+   Module:    pqStandardColorLinkAdaptor.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,42 +28,46 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqStandardColorLinkAdaptor_h 
+#define __pqStandardColorLinkAdaptor_h
 
-#ifndef _pqApplicationOptions_h
-#define _pqApplicationOptions_h
-
+#include <QObject>
 #include "pqComponentsExport.h"
-#include "pqOptionsContainer.h"
 
-/// options container for pages of render view options
-class PQCOMPONENTS_EXPORT pqApplicationOptions : public pqOptionsContainer
+class vtkEventQtSlotConnect;
+class pqStandardColorButton;
+class vtkSMProxy;
+
+class PQCOMPONENTS_EXPORT pqStandardColorLinkAdaptor : public QObject
 {
   Q_OBJECT
-
+  typedef QObject Superclass;
 public:
-  pqApplicationOptions(QWidget *parent=0);
-  virtual ~pqApplicationOptions();
-
-  // set the current page
-  virtual void setPage(const QString &page);
-  // return a list of strings for pages we have
-  virtual QStringList getPageList();
-
-  // apply the changes
-  virtual void applyChanges();
-  // reset the changes
-  virtual void resetChanges();
-
-  // tell pqOptionsDialog that we want an apply button
-  virtual bool isApplyUsed() const { return true; }
+  pqStandardColorLinkAdaptor(
+    pqStandardColorButton*, vtkSMProxy* proxy, const char* propname);
+  ~pqStandardColorLinkAdaptor();
 
 protected slots:
-  void resetColorsToDefault();
+  /// called when pqStandardColorButton fires standardColorChanged() signal.
+  /// We update the property link between the standard color and the
+  /// colorProperty.
+  void onStandardColorChanged(const QString&);
+
+  /// called when vtkSMGlobalPropertiesManager fires the modified event
+  /// indicating that some links have been made or broken.
+  void onGlobalPropertiesChanged();
 
 private:
-  class pqInternal;
-  pqInternal* Internal;
+  pqStandardColorLinkAdaptor(const pqStandardColorLinkAdaptor&); // Not implemented.
+  void operator=(const pqStandardColorLinkAdaptor&); // Not implemented.
+
+  vtkSMProxy* Proxy;
+  QString PropertyName;
+  vtkEventQtSlotConnect* VTKConnect;
+  bool IgnoreModifiedEvents;
 };
 
 #endif
+
+

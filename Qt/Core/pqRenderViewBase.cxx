@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
@@ -195,11 +196,10 @@ void pqRenderViewBase::setDefaultPropertyValues()
       proxy->GetProperty("UseOffscreenRenderingForScreenshots"), 0);
     }
 
-  const int* bg = this->defaultBackgroundColor();
-  vtkSMProperty* backgroundProperty = proxy->GetProperty("Background");
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 0, bg[0]/255.0);
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 1, bg[1]/255.0);
-  pqSMAdaptor::setMultipleElementProperty(backgroundProperty, 2, bg[2]/255.0);
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "BackgroundColor", proxy, "Background");
   proxy->UpdateVTKObjects();
 
   this->restoreSettings(false);
@@ -387,7 +387,6 @@ static const char* pqRenderViewModuleLightSettingsMulti[] = {
   };
 
 static const char* pqRenderViewModuleMiscSettingsMulti[] = {
-  "Background",
   NULL  // keep last
   };
 

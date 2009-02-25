@@ -95,7 +95,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.78");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.79");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -694,8 +694,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
         info.Proxy = it3->GetPointer()->Proxy;
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
-        info.IsCompoundProxyDefinition = 0;
-        info.IsLink = 0;
+        info.Type = RegisteredProxyInformation::PROXY;
 
         this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
         this->UnMarkProxyAsModified(info.Proxy);
@@ -730,8 +729,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
         info.Proxy = it3->GetPointer()->Proxy;
         info.GroupName = it->first.c_str();
         info.ProxyName = it2->first.c_str();
-        info.IsCompoundProxyDefinition = 0;
-        info.IsLink = 0;
+        info.Type = RegisteredProxyInformation::PROXY;
       
         this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
         this->UnMarkProxyAsModified(info.Proxy);
@@ -858,8 +856,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   info.Proxy = proxy;
   info.GroupName = groupname;
   info.ProxyName = name;
-  info.IsCompoundProxyDefinition = 0;
-  info.IsLink = 0;
+  info.Type = RegisteredProxyInformation::PROXY;
 
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
@@ -984,8 +981,7 @@ void vtkSMProxyManager::RegisterLink(const char* name, vtkSMLink* link)
   info.Proxy = 0;
   info.GroupName = 0;
   info.ProxyName = name;
-  info.IsCompoundProxyDefinition = 0;
-  info.IsLink = 1;
+  info.Type = RegisteredProxyInformation::LINK;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
@@ -1012,8 +1008,7 @@ void vtkSMProxyManager::UnRegisterLink(const char* name)
     info.Proxy = 0;
     info.GroupName = 0;
     info.ProxyName = name;
-    info.IsCompoundProxyDefinition = 0;
-    info.IsLink = 1;
+    info.Type = RegisteredProxyInformation::LINK;
     this->Internals->RegisteredLinkMap.erase(it);
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     }
@@ -1368,6 +1363,12 @@ vtkPVXMLElement* vtkSMProxyManager::SaveStateInternal(vtkIdType connectionID,
     links->Delete();
     }
 
+  vtkPVXMLElement* globalProps = vtkPVXMLElement::New();
+  globalProps->SetName("GlobalPropertiesManagers");
+  this->SaveGlobalPropertiesManagers(globalProps);
+  rootElement->AddNestedElement(globalProps);
+  globalProps->Delete();
+
   return rootElement;
 }
 
@@ -1410,8 +1411,7 @@ void vtkSMProxyManager::UnRegisterCustomProxyDefinition(
     info.Proxy = 0;
     info.GroupName = group;
     info.ProxyName = name;
-    info.IsCompoundProxyDefinition = 1;
-    info.IsLink = 0;
+    info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
     this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
     elementMap.erase(iter);
     return;
@@ -1458,8 +1458,7 @@ void vtkSMProxyManager::RegisterCustomProxyDefinition(
   info.Proxy = 0;
   info.GroupName = group;
   info.ProxyName = name;
-  info.IsCompoundProxyDefinition = 1;
-  info.IsLink = 0;
+  info.Type = RegisteredProxyInformation::COMPOUND_PROXY_DEFINITION;
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
@@ -1577,6 +1576,21 @@ void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
   for (; it != this->Internals->RegisteredLinkMap.end(); ++it)
     {
     it->second.GetPointer()->SaveState(it->first.c_str(), rootElement);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveGlobalPropertiesManagers(vtkPVXMLElement* root)
+{
+  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  for (iter = this->Internals->GlobalPropertiesManagers.begin();
+    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
+    {
+    vtkPVXMLElement* elem = iter->second->SaveState(root);
+    if (elem)
+      {
+      elem->AddAttribute("name", iter->first.c_str());
+      }
     }
 }
 
@@ -1699,6 +1713,90 @@ vtkSMProxySelectionModel* vtkSMProxyManager::GetSelectionModel(
     }
 
   return iter->second;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SetGlobalPropertiesManager(const char* name,
+    vtkSMGlobalPropertiesManager* mgr)
+{
+  vtkSMGlobalPropertiesManager* old_mgr = this->GetGlobalPropertiesManager(name);
+  if (old_mgr == mgr)
+    {
+    return;
+    }
+  this->RemoveGlobalPropertiesManager(name);
+  this->Internals->GlobalPropertiesManagers[name] = mgr;
+
+  RegisteredProxyInformation info;
+  info.Proxy = mgr;
+  info.GroupName = NULL;
+  info.ProxyName = name;
+  info.Type = RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetGlobalPropertiesManagerName(
+  vtkSMGlobalPropertiesManager* mgr)
+{
+  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  for (iter = this->Internals->GlobalPropertiesManagers.begin();
+    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter)
+    {
+    if (iter->second == mgr)
+      {
+      return iter->first.c_str();
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
+  const char* name)
+{
+  return this->Internals->GlobalPropertiesManagers[name].GetPointer();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RemoveGlobalPropertiesManager(const char* name)
+{
+  vtkSMGlobalPropertiesManager* gm = this->GetGlobalPropertiesManager(name);
+  if (gm)
+    {
+    RegisteredProxyInformation info;
+    info.Proxy = gm;
+    info.GroupName = NULL;
+    info.ProxyName = name;
+    info.Type = RegisteredProxyInformation::GLOBAL_PROPERTIES_MANAGER;
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+    }
+  this->Internals->GlobalPropertiesManagers.erase(name);
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxyManager::GetNumberOfGlobalPropertiesManagers()
+{
+  return static_cast<unsigned int>(
+    this->Internals->GlobalPropertiesManagers.size());
+}
+
+//---------------------------------------------------------------------------
+vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
+  unsigned int index)
+{
+  unsigned int cur =0;
+  vtkSMProxyManagerInternals::GlobalPropertiesManagersType::iterator iter;
+  for (iter = this->Internals->GlobalPropertiesManagers.begin();
+    iter != this->Internals->GlobalPropertiesManagers.end(); ++iter, ++cur)
+    {
+    if (cur == index)
+      {
+      return iter->second;
+      }
+    }
+
+  return NULL;
 }
 
 //---------------------------------------------------------------------------

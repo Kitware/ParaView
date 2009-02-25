@@ -35,12 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqApplicationOptions.h"
 
 #include "pqApplicationCore.h"
-#include "pqViewModuleInterface.h"
-#include "pqSettings.h"
+#include "pqObjectInspectorWidget.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
-#include "pqObjectInspectorWidget.h"
+#include "pqSettings.h"
+#include "pqViewModuleInterface.h"
 
 #include <QDoubleValidator>
 
@@ -60,7 +60,7 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QDoubleValidator* validator = new QDoubleValidator(this->Internal->HeartBeatTimeout);
   validator->setDecimals(2);
   this->Internal->HeartBeatTimeout->setValidator(validator);
-  
+
   this->Internal->DefaultViewType->addItem("None", "None");
   // Get available view types.
   QObjectList ifaces =
@@ -102,6 +102,26 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->CrashRecovery,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->ForegroundColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->BackgroundColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->TextAnnotationColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->EdgeColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->SelectionColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->ResetColorsToDefault, 
+    SIGNAL(clicked()),
+    this, SLOT(resetColorsToDefault()));
 }
 
 //-----------------------------------------------------------------------------
@@ -136,7 +156,7 @@ QStringList pqApplicationOptions::getPageList()
     }
   return pages;
 }
-  
+
 //-----------------------------------------------------------------------------
 void pqApplicationOptions::applyChanges()
 {
@@ -153,6 +173,19 @@ void pqApplicationOptions::applyChanges()
 
   bool crashRecovery = this->Internal->CrashRecovery->isChecked();
   settings->setValue("crashRecovery",crashRecovery);
+
+  settings->setValue("GlobalProperties/ForegroundColor", 
+    this->Internal->ForegroundColor->chosenColor());
+  settings->setValue("GlobalProperties/BackgroundColor", 
+    this->Internal->BackgroundColor->chosenColor());
+  settings->setValue("GlobalProperties/TextAnnotationColor", 
+    this->Internal->TextAnnotationColor->chosenColor());
+  settings->setValue("GlobalProperties/SelectionColor", 
+    this->Internal->SelectionColor->chosenColor());
+  settings->setValue("GlobalProperties/EdgeColor", 
+    this->Internal->EdgeColor->chosenColor());
+
+  pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 }
 
 //-----------------------------------------------------------------------------
@@ -174,5 +207,33 @@ void pqApplicationOptions::resetChanges()
 
   this->Internal->CrashRecovery->setChecked(
     settings->value("crashRecovery", false).toBool());
+  
+  this->Internal->ForegroundColor->setChosenColor(
+    settings->value("GlobalProperties/ForegroundColor",
+      QColor::fromRgbF(1, 1,1)).value<QColor>());
+  this->Internal->BackgroundColor->setChosenColor(
+    settings->value("GlobalProperties/BackgroundColor",
+      QColor::fromRgbF(0.32, 0.34, 0.43)).value<QColor>());
+  this->Internal->TextAnnotationColor->setChosenColor(
+    settings->value("GlobalProperties/TextAnnotationColor",
+      QColor::fromRgbF(1, 1, 1)).value<QColor>());
+  this->Internal->SelectionColor->setChosenColor(
+    settings->value("GlobalProperties/SelectionColor",
+      QColor::fromRgbF(1, 0, 1)).value<QColor>());
+  this->Internal->EdgeColor->setChosenColor(
+    settings->value("GlobalProperties/EdgeColor",
+      QColor::fromRgbF(0, 0, 0.5)).value<QColor>());
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::resetColorsToDefault()
+{
+  // FIXME: Need some mechanism to centralize this crap! But this has taken too
+  // long already so I am leaving this for now.
+  this->Internal->ForegroundColor->setChosenColor(QColor::fromRgbF(1, 1,1));
+  this->Internal->BackgroundColor->setChosenColor(
+    QColor::fromRgbF(0.32, 0.34, 0.43));
+  this->Internal->TextAnnotationColor->setChosenColor(QColor::fromRgbF(1, 1, 1));
+  this->Internal->SelectionColor->setChosenColor(QColor::fromRgbF(1, 0, 1));
+  this->Internal->EdgeColor->setChosenColor(QColor::fromRgbF(0, 0, 0.5));
+}
