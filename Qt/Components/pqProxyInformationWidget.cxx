@@ -186,8 +186,14 @@ void pqProxyInformationWidget::updateInformation()
         {
         if (diter->GetDomain()->IsA("vtkSMFileListDomain"))
           {
+          vtkSMProperty* property = piter->GetProperty();
+          if (property->GetInformationProperty())
+            {
+            property = property->GetInformationProperty();
+            source->getProxy()->UpdatePropertyInformation(property);
+            }
           QString filename = 
-            pqSMAdaptor::getElementProperty(piter->GetProperty()).toString();
+            pqSMAdaptor::getElementProperty(property).toString();
           this->Ui->properties->show();
           this->Ui->filename->setText(vtksys::SystemTools::GetFilenameName(
               filename.toAscii().data()).c_str());

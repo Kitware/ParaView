@@ -1073,11 +1073,18 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
-                           number_of_elements="0" 
+                           number_of_elements="0"
+                           information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
        <Documentation>
@@ -1118,11 +1125,18 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
+                           information_property="FileNameInfo"
                            repeat_command="1">
        <FileListDomain name="files"/>
        <Documentation>
@@ -1163,12 +1177,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo" >
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML image data format. The standard extension is .vti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1208,12 +1229,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML structured grid data format. The standard extension is .vts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1253,12 +1281,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the VTK XML rectilinear grid data format. The standard extension is .vtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1297,12 +1332,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML polygonal dataset format. The standard extension is .pvtp. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1342,12 +1384,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML unstructured grid data format. The standard extension is .pvtu. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1387,12 +1436,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML image data format. The standard extension is .pvti. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1432,12 +1488,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML structured grid data format. The standard extension is .pvts. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1477,12 +1540,19 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            clean_command="RemoveAllFileNames"
                            command="AddFileName"
                            animateable="0"
                            number_of_elements="0" 
-                           repeat_command="1">
+                           repeat_command="1"
+                           information_property="FileNameInfo">
        <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. Each file is expected to be in the partitioned VTK XML rectilinear grid data format. The standard extension is .pvtr. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -1567,13 +1637,20 @@
         </Proxy>
       </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="FileNames"
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
         number_of_elements="0" 
-        repeat_command="1">
+        repeat_command="1"
+        information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -2141,6 +2218,13 @@
               proxygroup="internal_sources" proxyname="stlreadercore">
        </Proxy>
      </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      
      <StringVectorProperty
         name="FileNames"
@@ -2148,7 +2232,8 @@
         command="AddFileName"
         animateable="0"
         number_of_elements="0" 
-        repeat_command="1">
+        repeat_command="1"
+        information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than 1 file is specified, the reader will switch to file series mode in which it will pretend that it can support time and provide 1 file per time step.
@@ -4118,13 +4203,21 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+
      <StringVectorProperty
         name="FileNames"
         clean_command="RemoveAllFileNames"
         command="AddFileName"
         animateable="0"
         number_of_elements="0" 
-        repeat_command="1">
+        repeat_command="1"
+        information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
          The list of files to be read by the reader. If more than 1 file is
@@ -4703,7 +4796,8 @@
                             command="AddFileName"
                             animateable="0"
                             number_of_elements="0" 
-                            repeat_command="1">
+                            repeat_command="1"
+                            information_property="FileNameInfo">
         <FileListDomain name="files"/>
         <Documentation>
           The list of files to be read by the reader. Each file is expected to be
@@ -4712,6 +4806,13 @@
           provide 1 file per time step.
         </Documentation>
       </StringVectorProperty>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
  
       <DoubleVectorProperty name="TimestepValues"
                             repeatable="1"
