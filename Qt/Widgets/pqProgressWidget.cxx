@@ -81,7 +81,7 @@ pqProgressWidget::~pqProgressWidget()
 void pqProgressWidget::setProgress(const QString& message, int value)
 {
   if (this->PendingEnableProgress &&
-    this->EnableTime.msecsTo(QTime::currentTime()) >= 100)
+    this->EnableTime.elapsed() >= 100)
     {
     this->PendingEnableProgress = false;
     this->ProgressBar->enableProgress(true);
@@ -97,7 +97,7 @@ void pqProgressWidget::enableProgress(bool enabled)
     if (!this->PendingEnableProgress)
       {
       this->PendingEnableProgress = true;
-      this->EnableTime = QTime::currentTime();
+      this->EnableTime.start();
       }
     }
   else
