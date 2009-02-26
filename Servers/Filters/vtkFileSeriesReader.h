@@ -99,6 +99,10 @@ public:
   virtual const char* GetFileName(unsigned int idx);
 
   // Description:
+  // Returns the most recent filename used.
+  vtkGetStringMacro(CurrentFileName);
+
+  // Description:
   // Get/set the filename for the meta-file.  Has no effect unless UseMetaFile
   // is true.
   vtkGetStringMacro(MetaFileName);
@@ -157,6 +161,8 @@ protected:
   virtual void SetReaderFileName(const char* fname);
   vtkAlgorithm* Reader;
 
+  vtkSetStringMacro(CurrentFileName);
+  char* CurrentFileName;
   char* FileNameMethod;
 
   char *MetaFileName;

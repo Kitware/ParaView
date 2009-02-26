@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.11");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.12");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -329,6 +329,7 @@ vtkFileSeriesReader::vtkFileSeriesReader()
 
   this->MetaFileName = NULL;
   this->UseMetaFile = 0;
+  this->CurrentFileName = 0;
 
   this->LastRequestInformationIndex = -1;
 }
@@ -336,6 +337,7 @@ vtkFileSeriesReader::vtkFileSeriesReader()
 //-----------------------------------------------------------------------------
 vtkFileSeriesReader::~vtkFileSeriesReader()
 {
+  this->SetCurrentFileName(0);
   this->SetMetaFileName(NULL);
   this->SetReader(NULL);
   delete this->Internal->TimeRanges;
@@ -665,6 +667,7 @@ void vtkFileSeriesReader::SetReaderFileName(const char* fname)
       interp->ProcessStream(stream);
       }
     }
+  this->SetCurrentFileName(fname);
 }
 
 //-----------------------------------------------------------------------------
