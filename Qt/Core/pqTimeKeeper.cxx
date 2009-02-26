@@ -213,6 +213,14 @@ void pqTimeKeeper::sourceRemoved(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
+bool pqTimeKeeper::isSourceAdded(pqPipelineSource* source)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("TimeSources"));
+  return (source && pp->IsProxyAdded(source->getProxy()));
+}
+
+//-----------------------------------------------------------------------------
 void pqTimeKeeper::viewAdded(pqView* view)
 {
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(

@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>970</width>
-     <height>19</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -75,6 +75,7 @@
     <addaction name="actionEditCameraRedo" />
     <addaction name="separator" />
     <addaction name="actionChangeInput" />
+    <addaction name="actionIgnoreTime" />
     <addaction name="actionDelete" />
     <addaction name="actionDelete_All" />
     <addaction name="separator" />
@@ -223,7 +224,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionFileOpen" />
    <addaction name="actionFileSaveData" />
@@ -244,7 +248,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionMoveMode" />
    <addaction name="actionSelectionMode" />
@@ -261,7 +268,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionEditUndo" />
    <addaction name="actionEditRedo" />
@@ -274,7 +284,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionVCRFirstFrame" />
    <addaction name="actionVCRPreviousFrame" />
@@ -291,7 +304,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QToolBar" name="variableToolbar" >
@@ -302,7 +318,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionScalarBarVisibility" />
    <addaction name="actionEditColorMap" />
@@ -316,7 +335,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QToolBar" name="lookmarkToolbar" >
@@ -336,7 +358,10 @@
     </size>
    </property>
    <attribute name="toolBarArea" >
-    <number>2</number>
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QToolBar" name="cameraToolbar" >
@@ -347,7 +372,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionResetCamera" />
    <addaction name="actionPositiveX" />
@@ -368,7 +396,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
@@ -385,9 +416,7 @@
   </widget>
   <widget class="QDockWidget" name="lookmarkBrowserDock" >
    <property name="sizePolicy" >
-    <sizepolicy>
-     <hsizetype>5</hsizetype>
-     <vsizetype>5</vsizetype>
+    <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -426,7 +455,10 @@
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
-    <number>4</number>
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
   </widget>
   <widget class="QDockWidget" name="comparativePanelDock" >
@@ -1303,6 +1335,23 @@
    </property>
    <property name="statusTip" >
     <string>Rescale to Data Range</string>
+   </property>
+  </action>
+  <action name="actionIgnoreTime" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Ignore Time</string>
+   </property>
+   <property name="toolTip" >
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="statusTip" >
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Disregard this source/filter's time from animations</string>
    </property>
   </action>
  </widget>

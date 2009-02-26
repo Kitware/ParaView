@@ -234,6 +234,25 @@ int pqPipelineFilter::getNumberOfInputs(const QString& portname) const
 }
 
 //-----------------------------------------------------------------------------
+QList<pqOutputPort*> pqPipelineFilter::getAllInputs() const
+{
+  QList<pqOutputPort*> list;
+
+  foreach (const pqInternal::InputList& inputs, this->Internal->Inputs)
+    {
+    for (int cc=0; cc < inputs.size(); cc++)
+      {
+      if (inputs[cc] && !list.contains(inputs[cc]))
+        {
+        list.push_back(inputs[cc]);
+        }
+      }
+    }
+
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 QList<pqOutputPort*> pqPipelineFilter::getInputs(const QString& portname) const
 {
   QList<pqOutputPort*> list;

@@ -495,12 +495,20 @@ MainWindow::MainWindow() :
     browser, SLOT(deleteSelected()));
   pqPipelineBrowserContextMenu *browserMenu =
     new pqPipelineBrowserContextMenu(browser);
-  browserMenu->setMenuAction(this->Implementation->UI.actionFileOpen);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::OPEN,
+    this->Implementation->UI.actionFileOpen);
   //browserMenu->setMenuAction(this->Implementation->UI.actionAddSource);
   //browserMenu->setMenuAction(this->Implementation->UI.actionAddFilter);
-  browserMenu->setMenuAction(this->Implementation->UI.actionChangeInput);
-  browserMenu->setMenuAction(this->Implementation->UI.actionDelete);
-  browserMenu->setMenuAction(this->Implementation->UI.actionToolsCreateCustomFilter);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::CHANGE_INPUT,    
+    this->Implementation->UI.actionChangeInput);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::DELETE,    
+    this->Implementation->UI.actionDelete);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::CREATE_CUSTOM_FILTER,    
+    this->Implementation->UI.actionToolsCreateCustomFilter);
 
   this->Implementation->ProxyTab =
     this->Implementation->Core.setupProxyTabWidget(

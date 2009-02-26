@@ -35,9 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineMenu.h"
 
-#include "pqPipelineModel.h"
 #include "pqPipelineFilter.h"
+#include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqOutputPort.h"
+#include "pqServer.h"
+#include "pqTimeKeeper.h"
 
 #include <QAction>
 #include <QItemSelectionModel>
@@ -197,6 +200,32 @@ void pqPipelineMenu::updateActions()
       }
 
     this->MenuList[pqPipelineMenu::DeleteAction]->setEnabled(enabled);
+    }
+
+  if (this->MenuList[pqPipelineMenu::IgnoreTimeAction] != 0)
+    {
+    enabled = (indexes.size() >= 1);
+    bool checked = false;
+    if (enabled)
+      {
+      // Now determine the check state for the action.
+      foreach (QModelIndex idx, indexes)
+        {
+        pqOutputPort* port = qobject_cast<pqOutputPort*>(
+          this->Model->getItemFor(idx));
+        pqPipelineSource* source = port? port->getSource():
+          qobject_cast<pqPipelineSource*>(this->Model->getItemFor(idx));
+        if (!source)
+          {
+          enabled = false;
+          break;
+          }
+        pqTimeKeeper* timekeeper = source->getServer()->getTimeKeeper();
+        checked = checked || !timekeeper->isSourceAdded(source);
+        }
+      }
+    this->MenuList[pqPipelineMenu::IgnoreTimeAction]->setEnabled(enabled);
+    this->MenuList[pqPipelineMenu::IgnoreTimeAction]->setChecked(checked);
     }
 }
 

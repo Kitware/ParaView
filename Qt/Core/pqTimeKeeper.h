@@ -83,6 +83,10 @@ public:
   void addTimeSource(pqPipelineSource*);
   void removeTimeSource(pqPipelineSource*);
 
+  /// Returns true if the source's time values will be considered by the
+  /// timekeeper in determining time ranges/time steps etc.
+  bool isSourceAdded(pqPipelineSource*);
+
 signals:
   /// Fired when the keeper updates the times.
   void timeStepsChanged();
@@ -92,6 +96,17 @@ signals:
 
   /// Fired when the time range changes.
   void timeRangeChanged();
+
+public slots:
+  /// By default all sources/filters created are added to the time keeper as a
+  /// source that can contribute timesteps. These timesteps are used in making
+  /// decisions such as animation end times, timesteps to snap to when playing
+  /// animation in "Snap to Timesteps" mode etc. This addSource/removeSource API
+  /// makes it possible to explicitly add/remove sources.
+  void addSource(pqPipelineSource* source)
+    { this->sourceAdded(source); }
+  void removeSource(pqPipelineSource* source)
+    { this->sourceRemoved(source); }
 
 protected slots:
   /// Called when a source is added.

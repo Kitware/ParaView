@@ -334,6 +334,8 @@ public slots:
   void onServerConnect();
   void onServerDisconnect();
 
+  /// Ignore timesteps provided by selected sources.
+  void ignoreTimesFromSelectedSources(bool ignore);
   void onToolsCreateCustomFilter();
   void onToolsManageCustomFilters();
   

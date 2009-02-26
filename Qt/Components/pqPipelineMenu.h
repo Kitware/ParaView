@@ -61,6 +61,7 @@ public:
     AddSourceAction = 0,
     AddFilterAction,
     ChangeInputAction,
+    IgnoreTimeAction,
     DeleteAction,
     LastAction = DeleteAction
     };

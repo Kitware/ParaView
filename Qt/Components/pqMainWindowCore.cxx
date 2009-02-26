@@ -132,6 +132,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSpreadSheetViewDecorator.h"
 #include "pqStackedChartViewContextMenuHandler.h"
 #include "pqStateLoader.h"
+#include "pqTimeKeeper.h"
 #include "pqTimerLogDisplay.h"
 #include "pqToolTipTrapper.h"
 #include "pqTwoDRenderView.h"
@@ -2197,6 +2198,33 @@ void pqMainWindowCore::onServerDisconnect()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::ignoreTimesFromSelectedSources(bool ignore)
+{
+  this->Implementation->UndoStack->beginUndoSet(
+    QString("Toggle Ignore Time"));
+  const pqServerManagerSelection *selections =
+    pqApplicationCore::instance()->getSelectionModel()->selectedItems();
+  foreach (pqServerManagerModelItem* item, (*selections))
+    {
+    pqOutputPort* port = qobject_cast<pqOutputPort*>(item);
+    pqPipelineSource* source = port? port->getSource():
+      qobject_cast<pqPipelineSource*>(item);
+    if (source)
+      {
+      if (ignore)
+        {
+        source->getServer()->getTimeKeeper()->removeSource(source);
+        }
+      else
+        {
+        source->getServer()->getTimeKeeper()->addSource(source);
+        }
+      }
+    }
+  this->Implementation->UndoStack->endUndoSet();
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsCreateCustomFilter()
 {
   // Get the selected sources from the application core. Notify the user
@@ -2946,6 +2974,38 @@ void pqMainWindowCore::onProxyCreation(pqProxy* proxy)
     }
 }
 
+
+// Go upstream till we find an input that has timesteps and hide its time.
+static void pqMainWindowCoreHideInputTimes(pqPipelineFilter* filter,
+  bool hide)
+{
+  if (!filter)
+    {
+    return;
+    }
+  QList<pqOutputPort*> inputs = filter->getAllInputs();
+  foreach (pqOutputPort* input, inputs)
+    {
+    pqPipelineSource* source = input->getSource();
+    if (source->getProxy()->GetProperty("TimestepValues"))
+      {
+      if (hide)
+        {
+        source->getServer()->getTimeKeeper()->removeSource(source);
+        }
+      else
+        {
+        source->getServer()->getTimeKeeper()->addSource(source);
+        }
+      }
+    else
+      {
+      pqMainWindowCoreHideInputTimes(
+        qobject_cast<pqPipelineFilter*>(source), hide);
+      }
+    }
+}
+
 //-----------------------------------------------------------------------------
 /// Called when a new source/filter/reader is created
 /// by the GUI. Unlike  onSourceCreationFinished
@@ -2956,6 +3016,15 @@ void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
 {
   this->Implementation->PendingDisplayManager.addPendingDisplayForSource(
     source);
+  
+  // If the newly created source is a filter has TimestepValues then we assume
+  // that this is a "temporal" filter which may distort the time. So we hide the
+  // timesteps from all the inputs.
+  pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
+  if (filter && filter->getProxy()->GetProperty("TimestepValues"))
+    {
+    pqMainWindowCoreHideInputTimes(filter, true);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -3045,6 +3114,11 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
           input_disp->setVisible(true);
           }
         }
+      }
+
+    if (filter->getProxy()->GetProperty("TimestepValues"))
+      {
+      pqMainWindowCoreHideInputTimes(filter, false);
       }
     }
 

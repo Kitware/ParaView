@@ -71,6 +71,9 @@ public:
   /// Returns the input proxies connected to the given named input port.
   QList<pqOutputPort*> getInputs(const QString& portname) const;
 
+  /// Returns inputs connected to all input ports connections. 
+  QList<pqOutputPort*> getAllInputs() const;
+
   /// Returns a map of input port name to the list of output ports that are set
   /// as the input to that port.
   QMap<QString, QList<pqOutputPort*> > getNamedInputs() const;

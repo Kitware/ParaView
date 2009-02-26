@@ -188,34 +188,29 @@ void pqPendingDisplayManager::createPendingDisplays(
         int replace_input = filter->replaceInput();
         if (replace_input > 0)
           {
-          int num_input_ports = filter->getNumberOfInputPorts();
-          for (int in_port=0; in_port < num_input_ports; in_port++)
+          // hide input source.
+          QList<pqOutputPort*> inputs = filter->getAllInputs();
+          for(int kk=0; kk < inputs.size(); ++kk)
             {
-            // hide input source.
-            QList<pqOutputPort*> inputs = filter->getInputs(
-              filter->getInputPortName(in_port));
-            for(int kk=0; kk < inputs.size(); ++kk)
+            pqOutputPort* input = inputs[kk];
+            pqDataRepresentation* inputRepr = input->getRepresentation(view);
+            if (inputRepr)
               {
-              pqOutputPort* input = inputs[kk];
-              pqDataRepresentation* inputRepr = input->getRepresentation(view);
-              if (inputRepr)
+              pqPipelineRepresentation* sourceDisp =
+                qobject_cast<pqPipelineRepresentation*>(inputRepr);
+              if (sourceDisp && replace_input == 2)
                 {
-                pqPipelineRepresentation* sourceDisp =
-                  qobject_cast<pqPipelineRepresentation*>(inputRepr);
-                if (sourceDisp && replace_input == 2)
+                // Conditionally turn off the input. The input should be turned
+                // off if the representation is surface and the opacity is 1.
+                int reprType = sourceDisp->getRepresentationType();
+                if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
+                    reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
+                  sourceDisp->getOpacity() < 1.0)
                   {
-                  // Conditionaly turn off the input. The input should be turned
-                  // off if the representation is surface and the opacity is 1.
-                  int reprType = sourceDisp->getRepresentationType();
-                  if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
-                      reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
-                    sourceDisp->getOpacity() < 1.0)
-                    {
-                    continue;
-                    }
+                  continue;
                   }
-                inputRepr->setVisible(false);
                 }
+              inputRepr->setVisible(false);
               }
             }
           }

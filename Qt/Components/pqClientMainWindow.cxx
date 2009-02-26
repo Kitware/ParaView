@@ -310,8 +310,14 @@ void pqClientMainWindow::constructorHelper()
     pqPipelineMenu::ChangeInputAction, this->Implementation->UI.actionChangeInput);
   this->Implementation->Core->pipelineMenu().setMenuAction(
     pqPipelineMenu::DeleteAction, this->Implementation->UI.actionDelete);
+  this->Implementation->Core->pipelineMenu().setMenuAction(
+    pqPipelineMenu::IgnoreTimeAction, this->Implementation->UI.actionIgnoreTime);
   connect(this->Implementation->UI.actionDelete_All, SIGNAL(triggered()),
           this, SLOT(onDeleteAll()));
+
+  connect(this->Implementation->UI.actionIgnoreTime, SIGNAL(triggered(bool)),
+    this->Implementation->Core,
+    SLOT(ignoreTimesFromSelectedSources(bool)));
 
   connect(this->Implementation->UI.actionToolsCreateLookmark,
     SIGNAL(triggered()), this->Implementation->Core, SLOT(onToolsCreateLookmark()));
@@ -518,12 +524,23 @@ void pqClientMainWindow::constructorHelper()
     browser, SLOT(deleteSelected()));
   pqPipelineBrowserContextMenu *browserMenu =
     new pqPipelineBrowserContextMenu(browser);
-  browserMenu->setMenuAction(this->Implementation->UI.actionFileOpen);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::OPEN,
+    this->Implementation->UI.actionFileOpen);
   //browserMenu->setMenuAction(this->Implementation->UI.actionAddSource);
   //browserMenu->setMenuAction(this->Implementation->UI.actionAddFilter);
-  browserMenu->setMenuAction(this->Implementation->UI.actionChangeInput);
-  browserMenu->setMenuAction(this->Implementation->UI.actionDelete);
-  browserMenu->setMenuAction(this->Implementation->UI.actionToolsCreateCustomFilter);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::CHANGE_INPUT,
+    this->Implementation->UI.actionChangeInput);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::DELETE,
+    this->Implementation->UI.actionDelete);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::CREATE_CUSTOM_FILTER,
+    this->Implementation->UI.actionToolsCreateCustomFilter);
+  browserMenu->setMenuAction(
+    pqPipelineBrowserContextMenu::IGNORE_TIME,
+    this->Implementation->UI.actionIgnoreTime);
 
   pqProxyTabWidget* const proxyTab =
     this->Implementation->Core->setupProxyTabWidget(

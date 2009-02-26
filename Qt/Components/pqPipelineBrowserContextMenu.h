@@ -54,7 +54,19 @@ public:
   pqPipelineBrowserContextMenu(pqPipelineBrowser *browser);
   virtual ~pqPipelineBrowserContextMenu();
 
-  void setMenuAction(QAction *action);
+  enum ActionTypes
+    {
+    OPEN,
+    ADD_SOURCE,
+    ADD_FILTER,
+    CREATE_CUSTOM_FILTER,
+    CHANGE_INPUT,
+    DELETE,
+    IGNORE_TIME
+    };
+
+  // Add an action to the menu.
+  void setMenuAction(ActionTypes type, QAction *action);
 
 public slots:
   void showContextMenu(const QPoint &pos);

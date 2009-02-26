@@ -56,8 +56,8 @@ public:
   QPointer<QAction> CustomFilter;
   QPointer<QAction> ChangeInput;
   QPointer<QAction> Delete;
+  QPointer<QAction> IgnoreTime;
 };
-
 
 //-----------------------------------------------------------------------------
 pqPipelineBrowserContextMenuInternal::pqPipelineBrowserContextMenuInternal()
@@ -65,7 +65,6 @@ pqPipelineBrowserContextMenuInternal::pqPipelineBrowserContextMenuInternal()
     Delete()
 {
 }
-
 
 //-----------------------------------------------------------------------------
 pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
@@ -93,38 +92,42 @@ pqPipelineBrowserContextMenu::~pqPipelineBrowserContextMenu()
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBrowserContextMenu::setMenuAction(QAction *action)
+void pqPipelineBrowserContextMenu::setMenuAction(
+  ActionTypes type, QAction *action)
 {
-  if(!action)
+  if (!action)
     {
     return;
     }
 
-  // Use the action's text to determine which one it is.
-  QString name = action->text();
-  if(name == "&Open")
+  switch (type)
     {
+  case OPEN:
     this->Internal->OpenFile = action;
-    }
-  else if(name == "Add &Source...")
-    {
+    break;
+
+  case ADD_SOURCE:
     this->Internal->AddSource = action;
-    }
-  else if(name == "Add &Filter...")
-    {
+    break;
+
+  case ADD_FILTER:
     this->Internal->AddFilter = action;
-    }
-  else if(name == "&Create Custom Filter...")
-    {
+    break;
+
+  case CREATE_CUSTOM_FILTER:
     this->Internal->CustomFilter = action;
-    }
-  else if(name == "Change &Input...")
-    {
+    break;
+
+  case CHANGE_INPUT:
     this->Internal->ChangeInput = action;
-    }
-  else if(name == "&Delete")
-    {
+    break;
+
+  case DELETE:
     this->Internal->Delete = action;
+    break;
+
+  case IGNORE_TIME:
+    this->Internal->IgnoreTime = action;
     }
 }
 
@@ -187,11 +190,20 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
       menu.addAction(this->Internal->ChangeInput);
       }
 
+    // Add "ignore time" item.
+    if (!this->Internal->IgnoreTime.isNull() &&
+      this->Internal->IgnoreTime->isEnabled())
+      {
+      menu.addAction(this->Internal->IgnoreTime);
+      }
+
     // Add the 'delete' item to the menu.
     if(!this->Internal->Delete.isNull())
       {
       menu.addAction(this->Internal->Delete);
       }
+    
+
     }
 
   if(menu.actions().size() > 0)
