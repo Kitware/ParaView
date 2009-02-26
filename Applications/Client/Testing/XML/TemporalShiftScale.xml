@@ -11,11 +11,7 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scale" command="key" arguments="46" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Scale" command="set_string" arguments=".5" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/VCRToolbar/1QToolButton3" command="activate" arguments="" />
