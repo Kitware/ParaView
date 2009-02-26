@@ -690,7 +690,7 @@
            </widget>
           </item>
           <item row="2" column="5" colspan="2" >
-           <widget class="pqColorChooserButton" name="TitleColorButton" >
+           <widget class="pqStandardColorButton" name="TitleColorButton" >
             <property name="whatsThis" >
              <string>Click this button to set the title color.</string>
             </property>
@@ -895,7 +895,7 @@
            </widget>
           </item>
           <item row="1" column="6" colspan="2" >
-           <widget class="pqColorChooserButton" name="LabelColorButton" >
+           <widget class="pqStandardColorButton" name="LabelColorButton" >
             <property name="whatsThis" >
              <string>Click this button to set the label color.</string>
             </property>
@@ -995,9 +995,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>pqColorChooserButton</class>
-   <extends>QPushButton</extends>
-   <header>pqColorChooserButton.h</header>
+   <class>pqStandardColorButton</class>
+   <extends>QToolButton</extends>
+   <header>pqStandardColorButton.h</header>
   </customwidget>
   <customwidget>
    <class>QVTKWidget</class>

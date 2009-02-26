@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxy.h"
@@ -241,6 +242,15 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Repositionable"), 1);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("TitleFontSize"), 12);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LabelFontSize"), 12);
+
+  // setup global property link. By default, color is linked with
+  // TextAnnotationColor.
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "TextAnnotationColor", proxy, "TitleColor");
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "TextAnnotationColor", proxy, "LabelColor");
 
   proxy->UpdateVTKObjects();
 }

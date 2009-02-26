@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
 #include "pqSignalAdaptors.h"
+#include "pqStandardColorLinkAdaptor.h"
 #include "pqSMAdaptor.h"
 
 #include <QCloseEvent>
@@ -86,12 +87,14 @@ class pqColorScaleEditorForm : public Ui::pqColorScaleDialog
 {
 public:
   pqColorScaleEditorForm();
-  ~pqColorScaleEditorForm() {}
+  ~pqColorScaleEditorForm() { }
 
   pqPropertyLinks Links; // used to link properties on the legend
   pqPropertyLinks ReprLinks; // used to link properties on the representation.
   pqSignalAdaptorColor *TitleColorAdaptor;
   pqSignalAdaptorColor *LabelColorAdaptor;
+  pqStandardColorLinkAdaptor* TitleColorLink;
+  pqStandardColorLinkAdaptor* LabelColorLink;
   pqSignalAdaptorComboBox *TitleFontAdaptor;
   pqSignalAdaptorComboBox *LabelFontAdaptor;
   vtkEventQtSlotConnect *Listener;
@@ -112,6 +115,8 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
 {
   this->TitleColorAdaptor = 0;
   this->LabelColorAdaptor = 0;
+  this->TitleColorLink = 0;
+  this->LabelColorLink = 0;
   this->TitleFontAdaptor = 0;
   this->LabelFontAdaptor = 0;
   this->Listener = 0;
@@ -123,7 +128,6 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->IsDormant = true;
   this->MakingLegend = false;
 }
-
 
 //----------------------------------------------------------------------------
 pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
@@ -1307,6 +1311,10 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
     // Clean up the current connections.
     this->disconnect(this->Legend, 0, this, 0);
     this->Form->Links.removeAllPropertyLinks();
+    delete this->Form->TitleColorLink;
+    this->Form->TitleColorLink = 0;
+    delete this->Form->LabelColorLink;
+    this->Form->LabelColorLink = 0;
     }
 
   this->Legend = legend;
@@ -1379,6 +1387,12 @@ void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
                                       "value", SIGNAL(valueChanged(double)),
                                       proxy, proxy->GetProperty("AspectRatio"));
 
+    // this manages the linking between the global properties and the color
+    // properties.
+    this->Form->TitleColorLink = new pqStandardColorLinkAdaptor(
+      this->Form->TitleColorButton, proxy, "TitleColor");
+    this->Form->LabelColorLink = new pqStandardColorLinkAdaptor(
+      this->Form->LabelColorButton, proxy, "LabelColor");
     // Update the legend title gui.
     this->updateLegendTitle();
     }
