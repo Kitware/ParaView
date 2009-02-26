@@ -5395,6 +5395,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
 
+     <DoubleVectorProperty name="TimeRange"
+        information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
+
       <!-- End TemporalInterpolator -->
     </SourceProxy>
 
