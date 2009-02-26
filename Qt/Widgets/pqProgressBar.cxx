@@ -180,7 +180,7 @@ void pqProgressBar::enableProgress(bool e)
     }
 }
 
-
+//-----------------------------------------------------------------------------
 void pqProgressBar::cleanup()
 {
   this->CleanUp = false;

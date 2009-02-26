@@ -66,8 +66,9 @@ pqProgressWidget::pqProgressWidget(QWidget* _parent/*=0*/)
     this, SIGNAL(abortPressed()));
 
   gridLayout->addWidget(this->AbortButton, 0, 0, 1, 1);
-}
 
+  this->PendingEnableProgress = true;
+}
 
 //-----------------------------------------------------------------------------
 pqProgressWidget::~pqProgressWidget()
@@ -79,13 +80,31 @@ pqProgressWidget::~pqProgressWidget()
 //-----------------------------------------------------------------------------
 void pqProgressWidget::setProgress(const QString& message, int value)
 {
+  if (this->PendingEnableProgress &&
+    this->EnableTime.msecsTo(QTime::currentTime()) >= 100)
+    {
+    this->PendingEnableProgress = false;
+    this->ProgressBar->enableProgress(true);
+    }
   this->ProgressBar->setProgress(message, value);
 }
 
 //-----------------------------------------------------------------------------
 void pqProgressWidget::enableProgress(bool enabled)
 {
-  this->ProgressBar->enableProgress(enabled);
+  if (enabled)
+    {
+    if (!this->PendingEnableProgress)
+      {
+      this->PendingEnableProgress = true;
+      this->EnableTime = QTime::currentTime();
+      }
+    }
+  else
+    {
+    this->ProgressBar->enableProgress(false);
+    this->PendingEnableProgress = false;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -93,3 +112,5 @@ void pqProgressWidget::enableAbort(bool enabled)
 {
   this->AbortButton->setEnabled(enabled);
 }
+
+
