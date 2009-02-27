@@ -1,5 +1,5 @@
 <ParaViewFilters>
-  <Category name="Common" menu_label="&amp;Common">
+  <Category name="Common" menu_label="&amp;Common" preserve_order="1">
     <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
     <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
     <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>

@@ -68,7 +68,9 @@ public:
   struct CategoryInfo
     {
     QString Label;
+    bool PreserveOrder;
     QList<QString> Proxies;
+    CategoryInfo() { this->PreserveOrder = false; }
     };
 
   typedef QMap<QString, CategoryInfo> CategoryInfoMap;
@@ -293,7 +295,12 @@ void pqProxyMenuManager::populateMenu()
         action_list.push_back(action);
         }
       }
-    qSort(action_list.begin(), action_list.end(), ::actionTextSort);
+    if (categoryIter.value().PreserveOrder == false)
+      {
+      // sort unless the XML overrode the sorting using the "preserve_order"
+      // attribute.
+      qSort(action_list.begin(), action_list.end(), ::actionTextSort);
+      }
     foreach (QAction* action, action_list)
       {
       categoryMenu->addAction(action);
@@ -461,10 +468,13 @@ void pqProxyMenuManager::updateFromXML(const QString& xmlfilename)
       QString categoryName = curElem->GetAttribute("name");
       QString categoryLabel = curElem->GetAttribute("menu_label")?
         curElem->GetAttribute("menu_label") : categoryName;
+      int preserve_order = 0;
+      curElem->GetScalarAttribute("preserve_order", &preserve_order);
 
       // Valid category encountered. Update the internal datastructures.
       pqInternal::CategoryInfo& category = this->Internal->Categories[categoryName];
       category.Label = categoryLabel;
+      category.PreserveOrder = (preserve_order==1);
       unsigned int numCategoryElems = curElem->GetNumberOfNestedElements();
       for (unsigned int kk=0; kk < numCategoryElems; ++kk)
         {
