@@ -607,10 +607,7 @@ protected:
 
   // Description:
   // Add a property to self.
-  // If the overrideOK flag is set, then no warning is printed when a new 
-  // property replaces a preexisting one.
-  void AddPropertyToSelf(const char* name, vtkSMProperty* prop, 
-                         int overrideOK=0);
+  void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
 
   // Description:
   // Add a sub-proxy.
@@ -696,11 +693,8 @@ protected:
   // Description:
   // Creates a new proxy and initializes it by calling ReadXMLAttributes()
   // with the right XML element.
-  // If the overrideOK flag is set, then no warning is printed when a new 
-  // property replaces a preexisting one.
   vtkSMProperty* NewProperty(const char* name);
-  vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement,
-                             int overrideOK = 0);
+  vtkSMProperty* NewProperty(const char* name, vtkPVXMLElement* propElement);
 
   // Description:
   // Return a property of the given name from self or one of

@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.111");
+vtkCxxRevisionMacro(vtkSMProxy, "1.112");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -593,7 +593,7 @@ void vtkSMProxy::AddProperty(const char* subProxyName,
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::AddPropertyToSelf(
-  const char* name, vtkSMProperty* prop, int override)
+  const char* name, vtkSMProperty* prop)
 {
   if (!prop)
     {
@@ -612,10 +612,7 @@ void vtkSMProxy::AddPropertyToSelf(
 
   if (it != this->Internals->Properties.end())
     {
-    if (!override)
-      {
-      vtkWarningMacro("Property " << name  << " already exists. Replacing");
-      }
+    vtkWarningMacro("Property " << name  << " already exists. Replacing");
     vtkSMProperty* oldProp = it->second.Property.GetPointer();
     if (it->second.ObserverTag > 0)
       {
@@ -1826,7 +1823,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
 
 //----------------------------------------------------------------------------
 vtkSMProperty* vtkSMProxy::NewProperty(const char* name, 
-  vtkPVXMLElement* propElement, int override)
+                                       vtkPVXMLElement* propElement)
 {
   vtkSMProperty* property = this->GetProperty(name, 1);
   if (property)
@@ -1866,7 +1863,7 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name,
         this->DoNotModifyProperty = 1;
         }
       }
-    this->AddPropertyToSelf(name, property, override);
+    this->AddPropertyToSelf(name, property);
     if (!property->ReadXMLAttributes(this, propElement))
       {
       vtkErrorMacro("Could not parse property: " << propElement->GetName());
@@ -2037,14 +2034,9 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
       {
       const char* name = propElement->GetAttribute("name");
       vtkstd::string tagName = propElement->GetName();
-      int override = 0;
-      if (!propElement->GetScalarAttribute("override", &override))
-        {
-        override = 0;
-        }
       if (name && tagName.find("Property") == (tagName.size()-8))
         {
-        this->NewProperty(name, propElement, override);
+        this->NewProperty(name, propElement);
         }
       }
     }
