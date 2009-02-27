@@ -289,7 +289,7 @@ void pqProxyInformationWidget::fillDataInformation(
     }
   
   QString memory = QString("%1 MB").arg(dataInformation->GetMemorySize()/1000.0,
-                                     0, 'e', 2);
+                                     0, 'g', 2);
   this->Ui->memory->setText(memory);
 
   if (dataInformation->GetHasTime())
@@ -399,9 +399,9 @@ void pqProxyInformationWidget::fillDataInformation(
   else
     {
     xrange = QString("%1 to %2 (delta: %3)");
-    xrange = xrange.arg(bounds[0], -1, 'f', 3);
-    xrange = xrange.arg(bounds[1], -1, 'f', 3);
-    xrange = xrange.arg(bounds[1] - bounds[0], -1, 'f', 3);
+    xrange = xrange.arg(bounds[0], -1, 'g', 3);
+    xrange = xrange.arg(bounds[1], -1, 'g', 3);
+    xrange = xrange.arg(bounds[1] - bounds[0], -1, 'g', 3);
     }
   this->Ui->xRange->setText(xrange);
 
@@ -413,9 +413,9 @@ void pqProxyInformationWidget::fillDataInformation(
   else
     {
     yrange = QString("%1 to %2 (delta: %3)");
-    yrange = yrange.arg(bounds[2], -1, 'f', 3);
-    yrange = yrange.arg(bounds[3], -1, 'f', 3);
-    yrange = yrange.arg(bounds[3] - bounds[2], -1, 'f', 3);
+    yrange = yrange.arg(bounds[2], -1, 'g', 3);
+    yrange = yrange.arg(bounds[3], -1, 'g', 3);
+    yrange = yrange.arg(bounds[3] - bounds[2], -1, 'g', 3);
     }
   this->Ui->yRange->setText(yrange);
 
@@ -427,9 +427,9 @@ void pqProxyInformationWidget::fillDataInformation(
   else
     {
     zrange = QString("%1 to %2 (delta: %3)");
-    zrange = zrange.arg(bounds[4], -1, 'f', 3);
-    zrange = zrange.arg(bounds[5], -1, 'f', 3);
-    zrange = zrange.arg(bounds[5] - bounds[4], -1, 'f', 3);
+    zrange = zrange.arg(bounds[4], -1, 'g', 3);
+    zrange = zrange.arg(bounds[5], -1, 'g', 3);
+    zrange = zrange.arg(bounds[5] - bounds[4], -1, 'g', 3);
     }
   this->Ui->zRange->setText(zrange);
 }
