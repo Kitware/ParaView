@@ -18,7 +18,7 @@ QtTesting.playCommand(object5, 'set_boolean', 'false')
 object6 = 'pqClientMainWindow/variableToolbar/displayColor/Variables'
 QtTesting.playCommand(object6, 'set_string', 'cellNormals')
 QtTesting.playCommand(object6, 'set_string', 'thickness')
-object7 = 'pqClientMainWindow/commonFilters/1QToolButton10'
+object7 = 'pqClientMainWindow/commonFilters/1QToolButton8'
 QtTesting.playCommand(object7, 'activate', '')
 QtTesting.playCommand(object3, 'activate', '')
 #object8 = 'pqClientMainWindow/menubar/menuTools'

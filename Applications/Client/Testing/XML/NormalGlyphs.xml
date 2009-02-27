@@ -13,7 +13,7 @@
   <!-- Create a simple multiblock source -->
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="CubeSource" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton6" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton9" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
 
   <!-- Add normal glyphs -->
