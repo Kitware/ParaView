@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartView.h
+   Module:    pqLineChartView.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,40 +29,40 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBarChartView_h 
-#define __pqBarChartView_h
+#ifndef __pqLineChartView_h 
+#define __pqLineChartView_h
 
 #include "pqView.h"
 
 class vtkSMSourceProxy;
 class pqDataRepresentation;
-class vtkQtBarChartView;
+class vtkQtLineChartView;
 
-/// Bar chart view
-class PQCORE_EXPORT pqBarChartView : public pqView
+/// Line chart view
+class PQCORE_EXPORT pqLineChartView : public pqView
 {
   Q_OBJECT
   typedef pqView Superclass;
 
 public:
-  static QString barChartViewType() { return "BarChartView2"; }
-  static QString barChartViewTypeName() { return "Bar Chart View 2"; }
+  static QString lineChartViewType() { return "LineChartView"; }
+  static QString lineChartViewTypeName() { return "Line Chart View"; }
 
 public:
 
-  pqBarChartView(const QString& group,
+  pqLineChartView(const QString& group,
                  const QString& name, 
                  vtkSMViewProxy* viewModule,
                  pqServer* server, 
                  QObject* parent=NULL);
 
-  virtual ~pqBarChartView();
+  virtual ~pqLineChartView();
 
   /// Return a widget associated with this view.
   virtual QWidget* getWidget();
 
-  /// Return the internal vtkQtBarChartView.
-  vtkQtBarChartView* getVtkBarChartView() const;
+  /// Return the internal vtkQtLineChartView.
+  vtkQtLineChartView* getVtkLineChartView() const;
 
   virtual void setDefaultPropertyValues();
 
@@ -100,8 +100,8 @@ public:
   virtual bool canDisplay(pqOutputPort* opPort) const;
 
 private:
-  pqBarChartView(const pqBarChartView&); // Not implemented.
-  void operator=(const pqBarChartView&); // Not implemented.
+  pqLineChartView(const pqLineChartView&); // Not implemented.
+  void operator=(const pqLineChartView&); // Not implemented.
 
   class pqInternal;
   pqInternal* Internal;

@@ -47,7 +47,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqApplicationCore.h
   pqBarChartRepresentation.h
   pqBarChartView.h
-  pqChartViewPropertyHandler.h
   pqCommandServerStartup.h
   pqComparativeRenderView.h
   pqComparativePlotView.h
@@ -64,6 +63,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFormBuilder.h
   pqHistogramTableModel.h
   pqLineChartRepresentation.h
+  pqLineChartView.h
   pqLinksModel.h
   pqLinkViewWidget.h
   pqLookupTableManager.h
@@ -168,8 +168,6 @@ ADD_LIBRARY(pqCore
   pqBarChartRepresentation.h
   pqBarChartView.cxx
   pqBarChartView.h
-  pqChartViewPropertyHandler.cxx
-  pqChartViewPropertyHandler.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqComparativeRenderView.cxx
@@ -213,6 +211,8 @@ ADD_LIBRARY(pqCore
   pqImageUtil.h
   pqLineChartRepresentation.cxx
   pqLineChartRepresentation.h
+  pqLineChartView.cxx
+  pqLineChartView.h
   pqLinksModel.cxx
   pqLinksModel.h
   pqLinkViewWidget.cxx

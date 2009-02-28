@@ -36,10 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 
 #include "pqBarChartRepresentation.h"
-#include "pqComparativeRenderView.h"
-#include "pqComparativePlotView.h"
-#include "pqLineChartRepresentation.h"
 #include "pqBarChartView.h"
+#include "pqComparativePlotView.h"
+#include "pqComparativeRenderView.h"
+#include "pqLineChartRepresentation.h"
+#include "pqLineChartView.h"
 #include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
@@ -63,6 +64,7 @@ QStringList pqStandardViewModules::viewTypes() const
     pqRenderView::renderViewType() << 
     pqTwoDRenderView::twoDRenderViewType() <<
     pqBarChartView::barChartViewType() << 
+    pqLineChartView::lineChartViewType() << 
     pqPlotView::barChartType() << 
     pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
@@ -76,7 +78,9 @@ QStringList pqStandardViewModules::displayTypes() const
 {
   return QStringList() 
     << "BarChartRepresentation"
+    << "BarChartRepresentation2"
     << "XYPlotRepresentation"
+    << "LineChartRepresentation"
     << "TextSourceRepresentation";
 }
 
@@ -89,6 +93,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if(type == pqBarChartView::barChartViewType())
     {
     return pqBarChartView::barChartViewTypeName();
+    }
+  else if(type == pqLineChartView::lineChartViewType())
+    {
+    return pqLineChartView::lineChartViewTypeName();
     }
   else if(type == pqPlotView::barChartType())
     {
@@ -160,6 +168,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "BarChartView2";
     }
+  else if(viewtype == pqLineChartView::lineChartViewType())
+    {
+    root_xmlname = "LineChartView";
+    }
   else if(viewtype == pqPlotView::barChartType())
     {
     root_xmlname = "BarChartView";
@@ -213,6 +225,10 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqBarChartView(group, viewname, viewmodule, server, p);
     }
+  else if (viewtype == pqLineChartView::lineChartViewType())
+    {
+    return new pqLineChartView(group, viewname, viewmodule, server, p);
+    }
   else if(viewtype == "TableView")
     {
     // return new pqTableView(group, viewname, viewmodule, server, p);
@@ -259,11 +275,13 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  if(display_type == "BarChartRepresentation")
+  if(display_type == "BarChartRepresentation" ||
+    display_type == "BarChartRepresentation2")
     {
     return new pqBarChartRepresentation(group, n, proxy, server, p);
     }
-  else if (display_type == "XYPlotRepresentation")
+  else if (display_type == "XYPlotRepresentation"||
+    display_type == "LineChartRepresentation")
     {
     return new pqLineChartRepresentation(group, n, proxy, server, p);
     }

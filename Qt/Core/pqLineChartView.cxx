@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartView.cxx
+   Module:    pqLineChartView.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,19 +29,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqBarChartView.h"
+#include "pqLineChartView.h"
 
 // Server Manager Includes.
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMBarChartViewProxy.h"
+#include "vtkSMLineChartViewProxy.h"
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkPVDataInformation.h"
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkTable.h"
 #include "vtkSmartPointer.h"
-#include "vtkQtBarChartView.h"
+#include "vtkQtLineChartView.h"
 #include "vtkQtChartArea.h"
 #include "vtkQtChartAxis.h"
 #include "vtkQtChartAxisLayer.h"
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartTableRepresentation.h"
 
 // ParaView Includes.
-#include "pqBarChartRepresentation.h"
+#include "pqLineChartRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-class pqBarChartView::pqInternal
+class pqLineChartView::pqInternal
 {
 public:
   pqInternal()
@@ -75,24 +75,24 @@ public:
 
     }
 
-  vtkSmartPointer<vtkQtBarChartView>                   BarChartView;
+  vtkSmartPointer<vtkQtLineChartView>                   LineChartView;
 };
 
 //-----------------------------------------------------------------------------
-pqBarChartView::pqBarChartView(const QString& group,
+pqLineChartView::pqLineChartView(const QString& group,
                                const QString& name, 
                                vtkSMViewProxy* viewModule,
                                pqServer* server, 
                                QObject* parent/*=NULL*/):
-  pqView(barChartViewType(), group, name, viewModule, server, parent)
+  pqView(lineChartViewType(), group, name, viewModule, server, parent)
 {
   this->Internal = new pqInternal();
-  this->Internal->BarChartView = vtkSMBarChartViewProxy::SafeDownCast(
-    viewModule)->GetBarChartView();
+  this->Internal->LineChartView = vtkSMLineChartViewProxy::SafeDownCast(
+    viewModule)->GetLineChartView();
 
   // Set up the view undo/redo.
   vtkQtChartContentsSpace *contents =
-    this->getVtkBarChartView()->GetChartArea()->getContentsSpace();
+    this->getVtkLineChartView()->GetChartArea()->getContentsSpace();
   this->connect(contents, SIGNAL(historyPreviousAvailabilityChanged(bool)),
     this, SIGNAL(canUndoChanged(bool)));
   this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
@@ -100,66 +100,66 @@ pqBarChartView::pqBarChartView(const QString& group,
 }
 
 //-----------------------------------------------------------------------------
-pqBarChartView::~pqBarChartView()
+pqLineChartView::~pqLineChartView()
 {
   delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
-QWidget* pqBarChartView::getWidget()
+QWidget* pqLineChartView::getWidget()
 {
-  return this->getVtkBarChartView()->GetChartWidget();
+  return this->getVtkLineChartView()->GetChartWidget();
 }
 
 //-----------------------------------------------------------------------------
-vtkQtBarChartView* pqBarChartView::getVtkBarChartView() const
+vtkQtLineChartView* pqLineChartView::getVtkLineChartView() const
 {
-  return this->Internal->BarChartView;
+  return this->Internal->LineChartView;
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartView::setDefaultPropertyValues()
+void pqLineChartView::setDefaultPropertyValues()
 {
   pqView::setDefaultPropertyValues();
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartView::undo()
+void pqLineChartView::undo()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
   area->getContentsSpace()->historyPrevious();
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartView::redo()
+void pqLineChartView::redo()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
   area->getContentsSpace()->historyNext();
 }
 
 //-----------------------------------------------------------------------------
-bool pqBarChartView::canUndo() const
+bool pqLineChartView::canUndo() const
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
   return area->getContentsSpace()->isHistoryPreviousAvailable();
 }
 
 //-----------------------------------------------------------------------------
-bool pqBarChartView::canRedo() const
+bool pqLineChartView::canRedo() const
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
   return area->getContentsSpace()->isHistoryNextAvailable();
 }
 
 //-----------------------------------------------------------------------------
-void pqBarChartView::resetDisplay()
+void pqLineChartView::resetDisplay()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
   area->getContentsSpace()->resetZoom();
 }
 
 //-----------------------------------------------------------------------------
-bool pqBarChartView::canDisplay(pqOutputPort* opPort) const
+bool pqLineChartView::canDisplay(pqOutputPort* opPort) const
 {
   pqPipelineSource* source = opPort? opPort->getSource() :0;
   vtkSMSourceProxy* sourceProxy = source ? 

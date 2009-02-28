@@ -216,6 +216,26 @@ SET(Kit_SRCS
   vtkSMDataSourceProxy.cxx
   )
 
+IF (VTK_USE_QVTK)
+  SET (Kit_SRCS
+    ${Kit_SRCS}
+    vtkSMChartOptionsProxy.cxx
+    vtkSMBarChartViewProxy.cxx
+    vtkSMBarChartRepresentationProxy.cxx
+    vtkSMLineChartViewProxy.cxx
+    vtkSMLineChartRepresentationProxy.cxx
+    )
+  FIND_PACKAGE(Qt4)
+  INCLUDE(${QT_USE_FILE})
+  INCLUDE_DIRECTORIES(
+    ${QT_INCLUDE_DIR}
+    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+    ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
+    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
+    ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart)
+ENDIF (VTK_USE_QVTK)
+
+
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
   vtkSMXMLParser.cxx
@@ -313,6 +333,14 @@ TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkClientServer
   ${KWCommon_LIBRARIES}
   vtkXdmfCS vtkXdmf)
+
+IF (VTK_USE_QVTK)
+  TARGET_LINK_LIBRARIES(vtk${KIT}
+    QtChart
+    vtkQtChart
+    QVTK)
+ENDIF (VTK_USE_QVTK)
+
 
 IF (PARAVIEW_ENABLE_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS)
