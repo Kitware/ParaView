@@ -23,27 +23,21 @@
 #include "vtkSMChartOptionsProxy.h"
 
 vtkStandardNewMacro(vtkSMBarChartViewProxy);
-vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::vtkSMBarChartViewProxy()
 {
-  this->ChartView = vtkQtBarChartView::New();
-
-  // Set up the paraview style interactor.
-  vtkQtChartArea* area = this->ChartView->GetChartArea();
-  vtkQtChartMouseSelection* selector =
-    vtkQtChartInteractorSetup::createSplitZoom(area);
-  this->ChartView->AddChartSelectionHandlers(selector);
-
-  // Set default color scheme to blues
-  this->ChartView->SetColorSchemeToBlues();
+  this->ChartView = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::~vtkSMBarChartViewProxy()
 {
-  this->ChartView->Delete();
-  this->ChartView = 0;
+  if (this->ChartView)
+    {
+    this->ChartView->Delete();
+    this->ChartView = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -54,7 +48,19 @@ void vtkSMBarChartViewProxy::CreateVTKObjects()
     return;
     }
 
+
+  this->ChartView = vtkQtBarChartView::New();
+
+  // Set up the paraview style interactor.
+  vtkQtChartArea* area = this->ChartView->GetChartArea();
+  vtkQtChartMouseSelection* selector =
+    vtkQtChartInteractorSetup::createSplitZoom(area);
+  this->ChartView->AddChartSelectionHandlers(selector);
+
   this->Superclass::CreateVTKObjects();
+  
+  // Set default color scheme to blues
+  this->ChartView->SetColorSchemeToBlues();
 
   vtkSMChartOptionsProxy::SafeDownCast(
     this->GetSubProxy("ChartOptions"))->SetChartView(

@@ -22,10 +22,31 @@
 #include "vtkQtChartInteractorSetup.h"
 
 vtkStandardNewMacro(vtkSMLineChartViewProxy);
-vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMLineChartViewProxy::vtkSMLineChartViewProxy()
 {
+  this->ChartView = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkSMLineChartViewProxy::~vtkSMLineChartViewProxy()
+{
+  if (this->ChartView)
+    {
+    this->ChartView->Delete();
+    this->ChartView = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMLineChartViewProxy::CreateVTKObjects()
+{
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+
   this->ChartView = vtkQtLineChartView::New();
 
   // Set up the paraview style interactor.
@@ -36,13 +57,8 @@ vtkSMLineChartViewProxy::vtkSMLineChartViewProxy()
 
   // Set default color scheme to blues
   this->ChartView->SetColorSchemeToBlues();
-}
-
-//----------------------------------------------------------------------------
-vtkSMLineChartViewProxy::~vtkSMLineChartViewProxy()
-{
-  this->ChartView->Delete();
-  this->ChartView = 0;
+  
+  this->Superclass::CreateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

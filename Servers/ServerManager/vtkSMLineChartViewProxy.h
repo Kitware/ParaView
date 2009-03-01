@@ -52,6 +52,9 @@ protected:
   ~vtkSMLineChartViewProxy();
 
   // Description:
+  virtual void CreateVTKObjects();
+
+  // Description:
   // Performs the actual rendering. This method is called by
   // both InteractiveRender() and StillRender(). 
   // Default implementation is empty.
