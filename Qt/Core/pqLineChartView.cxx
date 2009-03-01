@@ -86,6 +86,7 @@ pqLineChartView::pqLineChartView(const QString& group,
                                QObject* parent/*=NULL*/):
   pqView(lineChartViewType(), group, name, viewModule, server, parent)
 {
+  viewModule->GetID(); // this results in calling CreateVTKObjects().
   this->Internal = new pqInternal();
   this->Internal->LineChartView = vtkSMLineChartViewProxy::SafeDownCast(
     viewModule)->GetLineChartView();

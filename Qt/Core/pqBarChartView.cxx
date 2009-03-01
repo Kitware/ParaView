@@ -86,6 +86,8 @@ pqBarChartView::pqBarChartView(const QString& group,
                                QObject* parent/*=NULL*/):
   pqView(barChartViewType(), group, name, viewModule, server, parent)
 {
+  viewModule->GetID(); // this results in calling CreateVTKObjects().
+
   this->Internal = new pqInternal();
   this->Internal->BarChartView = vtkSMBarChartViewProxy::SafeDownCast(
     viewModule)->GetBarChartView();
