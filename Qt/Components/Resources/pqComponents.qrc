@@ -232,6 +232,7 @@
         <file>Icons/pqZPlus16.png</file>
         <file>Icons/pqZPlus24.png</file>
         <file>Icons/pqZPlus32.png</file>
+        <file>Icons/pqZoomToSelection24.png</file>
         <file>Icons/SplitViewHorizontal.png</file>
         <file>Icons/SplitViewVertical.png</file>
     </qresource>

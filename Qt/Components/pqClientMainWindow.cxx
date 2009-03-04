@@ -761,6 +761,13 @@ void pqClientMainWindow::constructorHelper()
   QObject::connect(
     this->Implementation->Core, SIGNAL(pickingCenter(bool)),
     this->Implementation->UI.actionPickCenter, SLOT(setChecked(bool)));
+  QObject::connect(
+    this->Implementation->Core->renderViewSelectionHelper(),
+    SIGNAL(enableZoom(bool)),
+    this->Implementation->UI.actionZoomToBox, SLOT(setEnabled(bool)));
+  QObject::connect(
+    this->Implementation->UI.actionZoomToBox, SIGNAL(triggered()),
+    this->Implementation->Core->renderViewSelectionHelper(), SLOT(beginZoom()));
 
   connect(this->Implementation->UI.actionManage_Plugins,
     SIGNAL(triggered()), this->Implementation->Core, SLOT(onManagePlugins()));
@@ -1102,32 +1109,40 @@ void pqClientMainWindow::onSelectionModeChanged(int mode)
 {
   if(this->Implementation->UI.selectionToolbar->isEnabled())
     {
-    if(mode == pqRubberBandHelper::SELECT) //surface selection
+    switch (mode)
       {
+    case pqRubberBandHelper::SELECT://surface selection
       this->Implementation->UI.actionSelectionMode->setChecked(true);
-      }
-    else if(mode == pqRubberBandHelper::SELECT_POINTS) //surface selection
-      {
+      break;
+
+    case pqRubberBandHelper::SELECT_POINTS: //surface selection
       this->Implementation->UI.actionSelectSurfacePoints->setChecked(true);
-      }
-    else if(mode == pqRubberBandHelper::FRUSTUM)
-      {
+      break;
+
+    case pqRubberBandHelper::FRUSTUM:
       this->Implementation->UI.actionSelect_Frustum->setChecked(true);
-      }
-    else if(mode == pqRubberBandHelper::FRUSTUM_POINTS)
-      {
+      break;
+
+    case pqRubberBandHelper::FRUSTUM_POINTS:
       this->Implementation->UI.actionSelectFrustumPoints->setChecked(true);
-      }
-    else if (mode == pqRubberBandHelper::BLOCKS)
-      {
+      break;
+
+    case pqRubberBandHelper::BLOCKS:
       this->Implementation->UI.actionSelect_Block->setChecked(true);
-      }
-    else // INTERACT
-      {
+      break;
+
+    case pqRubberBandHelper::INTERACT:
       this->Implementation->UI.actionMoveMode->setChecked(true);
-      }
+      break;
+
+    default:
+      break;
     }
   }
+  this->Implementation->UI.actionZoomToBox->setChecked(mode ==
+    pqRubberBandHelper::ZOOM);
+}
+
 
 //-----------------------------------------------------------------------------
 QVariant pqClientMainWindow::findToolBarActionsNotInMenus()

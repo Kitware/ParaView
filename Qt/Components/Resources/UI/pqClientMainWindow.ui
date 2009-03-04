@@ -103,6 +103,7 @@
       <string>Camera</string>
      </property>
      <addaction name="actionResetCamera" />
+     <addaction name="actionZoomToBox" />
      <addaction name="actionPositiveX" />
      <addaction name="actionNegativeX" />
      <addaction name="actionPositiveY" />
@@ -378,6 +379,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionResetCamera" />
+   <addaction name="actionZoomToBox" />
    <addaction name="actionPositiveX" />
    <addaction name="actionNegativeX" />
    <addaction name="actionPositiveY" />
@@ -1352,6 +1354,20 @@
    </property>
    <property name="whatsThis" >
     <string>Disregard this source/filter's time from animations</string>
+   </property>
+  </action>
+  <action name="actionZoomToBox" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqZoomToSelection24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Zoom to Box</string>
+   </property>
+   <property name="statusTip" >
+    <string>Zoom to Box</string>
    </property>
   </action>
  </widget>

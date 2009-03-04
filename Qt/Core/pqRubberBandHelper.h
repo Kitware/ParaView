@@ -70,7 +70,8 @@ public:
     SELECT_POINTS,
     FRUSTUM,
     FRUSTUM_POINTS,
-    BLOCKS
+    BLOCKS,
+    ZOOM
   };
   //ETX
 
@@ -86,10 +87,13 @@ public slots:
   void beginFrustumSelection();
   void beginFrustumPointsSelection();
   void beginBlockSelection();
+  void beginZoom();
 
   /// End rubber band selection.
   /// Has any effect only if active view is a render view.
   void endSelection();
+  void endZoom()
+    { this->endSelection(); }
 
   /// Called to disable selection.
   void DisabledPush();
@@ -109,6 +113,7 @@ signals:
   void enableFrustumSelection(bool enabled);
   void enableFrustumPointSelection(bool enabled);
   void enableBlockSelection(bool enabled);
+  void enableZoom(bool enabled);
 
   /// Fired with selection mode changes. 
   /// \c selectionMode is enum Modes{...}.

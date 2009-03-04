@@ -42,12 +42,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "vtkCommand.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkInteractorObserver.h"
 #include "vtkInteractorStyleRubberBandPick.h"
-#include "vtkSMRenderViewProxy.h"
+#include "vtkInteractorStyleRubberBandZoom.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMRenderViewProxy.h"
+
+#include "zoom.xpm"
 
 //---------------------------------------------------------------------------
 // Observer for the start and end interaction events
@@ -88,6 +91,9 @@ public:
   //the style I use to draw the rubber band
   vtkSmartPointer<vtkInteractorStyleRubberBandPick> RubberBandStyle;
 
+  // style used for rubber band zoom.
+  vtkSmartPointer<vtkInteractorStyleRubberBandZoom> ZoomStyle;
+
   // Saved style to return to after rubber band finishes
   vtkSmartPointer<vtkInteractorObserver> SavedStyle;
 
@@ -97,10 +103,14 @@ public:
   // Current render view.
   QPointer<pqRenderView> RenderView;
 
-  pqInternal(pqRubberBandHelper* parent)
+  QCursor ZoomCursor;
+
+  pqInternal(pqRubberBandHelper* parent) :
+    ZoomCursor(QPixmap(zoom_xpm), 11, 11)
     {
     this->RubberBandStyle = 
       vtkSmartPointer<vtkInteractorStyleRubberBandPick>::New();
+    this->ZoomStyle = vtkSmartPointer<vtkInteractorStyleRubberBandZoom>::New();
     this->SelectionObserver = 
       vtkSmartPointer<vtkPQSelectionObserver>::New();
     this->SelectionObserver->RubberBandHelper = parent;
@@ -153,6 +163,7 @@ void pqRubberBandHelper::emitEnabledSignals()
   if (this->DisableCount == 1 || !this->Internal->RenderView)
     {
     emit this->enableSurfaceSelection(false);
+    emit this->enableZoom(false);
     emit this->enableSurfacePointsSelection(false);
     emit this->enableFrustumSelection(false);
     emit this->enableFrustumPointSelection(false);
@@ -169,6 +180,7 @@ void pqRubberBandHelper::emitEnabledSignals()
       proxy->IsSelectVisiblePointsAvailable() == NULL);
     emit this->enableFrustumSelection(true);
     emit this->enableFrustumPointSelection(true);
+    emit this->enableZoom(true);
     }
 }
 
@@ -223,16 +235,25 @@ int pqRubberBandHelper::setRubberBandOn(int selectionMode)
 
   //start watching left mouse actions to get a begin and end pixel
   this->Internal->SavedStyle = rwi->GetInteractorStyle();
-  rwi->SetInteractorStyle(this->Internal->RubberBandStyle);
-  
+
+  if (selectionMode == ZOOM)
+    {
+    rwi->SetInteractorStyle(this->Internal->ZoomStyle);
+    this->Internal->RenderView->getWidget()->setCursor(
+      this->Internal->ZoomCursor);
+    }
+  else
+    {
+    rwi->SetInteractorStyle(this->Internal->RubberBandStyle);
+    this->Internal->RubberBandStyle->StartSelect();
+    this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
+    }
+
   rwi->AddObserver(vtkCommand::LeftButtonPressEvent, 
-                   this->Internal->SelectionObserver);
+    this->Internal->SelectionObserver);
   rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
-                   this->Internal->SelectionObserver);
+    this->Internal->SelectionObserver);
 
-  this->Internal->RubberBandStyle->StartSelect();
-
-  this->Internal->RenderView->getWidget()->setCursor(Qt::CrossCursor);
 
   this->Mode = selectionMode;
   emit this->selectionModeChanged(this->Mode);
@@ -320,6 +341,12 @@ void pqRubberBandHelper::beginBlockSelection()
 }
 
 //-----------------------------------------------------------------------------
+void pqRubberBandHelper::beginZoom()
+{
+  this->setRubberBandOn(ZOOM);
+}
+
+//-----------------------------------------------------------------------------
 void pqRubberBandHelper::endSelection()
 {
   this->setRubberBandOff();
@@ -402,6 +429,10 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
 
         case BLOCKS:
           this->Internal->RenderView->selectBlock(rectOut, ctrl);
+          break;
+
+        case ZOOM:
+          // nothing to do.
           break;
           }
         }
