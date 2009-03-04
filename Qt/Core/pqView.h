@@ -129,7 +129,7 @@ public:
   /// Returns the number representations in the view.
   int getNumberOfRepresentations() const;
 
-  // Returns the number of representations currently visibile in the view.
+  // Returns the number of representations currently visible in the view.
   int getNumberOfVisibleRepresentations() const;
 
   /// Returns the representation for the specified index where

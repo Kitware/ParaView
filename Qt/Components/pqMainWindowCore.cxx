@@ -3103,7 +3103,7 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
         {
         continue;
         }
-      // For each input, if it is not visibile in any of the views
+      // For each input, if it is not visible in any of the views
       // that the delete filter is visible, we make the input visible.
       for(int cc=0; cc < inputs.size(); ++cc)
         {
