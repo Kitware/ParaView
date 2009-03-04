@@ -511,8 +511,9 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       else if (QString(xml_type->GetName()) == "File")
         {
         pqFileChooserWidget* const widget = new pqFileChooserWidget();
+        widget->setForceSingleFile(true);
         widget->setEnabled(!option_readonly);
-        widget->setFilename(widget_default);
+        widget->setSingleFilename(widget_default);
         layout->addWidget(widget, row, widget_column,
           Qt::AlignLeft | Qt::AlignVCenter);
         widgets[xml_option] = widget;
@@ -610,7 +611,7 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
     else if (pqFileChooserWidget* const widget6 =
       qobject_cast<pqFileChooserWidget*>(option_widget))
       {
-      val = widget6->filename();
+      val = widget6->singleFilename();
       }
 
     bool option_readonly;

@@ -36,7 +36,9 @@
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
 #include "vtkSmartPointer.h"    // For ivars
+#include "vtkStdString.h"       // For ivars
 #include <vtkstd/map>           // For internal map
+#include <vtkstd/vector>        // For ivars
 
 class vtkDataArraySelection;
 class vtkIdTypeArray;
@@ -53,8 +55,14 @@ public:
   vtkGetStringMacro(MeshFileName);
   vtkSetStringMacro(MeshFileName);
 
-  vtkGetStringMacro(ModeFileName);
-  vtkSetStringMacro(ModeFileName);
+  // Description:
+  // There may be one mode file (usually for actual modes) or multiple mode
+  // files (which usually actually represent time series).  These methods
+  // set and clear the list of mode files (which can be a single mode file).
+  virtual void AddModeFileName(const char *fname);
+  virtual void RemoveAllModeFileNames();
+  virtual unsigned int GetNumberOfModeFileNames();
+  virtual const char *GetModeFileName(unsigned int idx);
 
   // Description:
   // If on, reads the internal volume of the data set.  Set to off by default.
@@ -109,7 +117,9 @@ protected:
   ~vtkSLACReader();
 
   char *MeshFileName;
-  char *ModeFileName;
+//BTX
+  vtkstd::vector<vtkStdString> ModeFileNames;
+//ETX
 
   int ReadInternalVolume;
   int ReadExternalSurface;

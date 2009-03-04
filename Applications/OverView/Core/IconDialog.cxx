@@ -76,8 +76,8 @@ class IconDialog::pqImplementation
 public:
   pqImplementation(
     pqRepresentation *representation) :
-    Representation(representation),
-    IconTexture(0)
+    IconTexture(0),
+    Representation(representation)
   {
   }
 
@@ -114,6 +114,8 @@ IconDialog::IconDialog(
   this->Implementation->UI.table->setColumnWidth(0,130);
   this->Implementation->UI.table->setColumnWidth(1,130);
 
+  this->Implementation->UI.iconFile->setForceSingleFile(true);
+
   // Call this before we set up the connections
   this->initializeDisplay();
 
@@ -147,14 +149,14 @@ void IconDialog::initializeDisplay()
 
   this->Implementation->UI.iconArrayName->setCurrentIndex(this->Implementation->UI.iconArrayName->findText(pqPropertyHelper(proxy, "IconArray").GetAsString()));
   this->Implementation->UI.iconSize->setValue(vtkSMPropertyHelper(proxy, "IconSize").GetAsInt());
-  this->Implementation->UI.iconFile->setFilename(pqPropertyHelper(proxy, "IconFile").GetAsString());
+  this->Implementation->UI.iconFile->setSingleFilename(pqPropertyHelper(proxy, "IconFile").GetAsString());
 
-  if(this->Implementation->UI.iconFile->filename().isEmpty())
+  if(this->Implementation->UI.iconFile->singleFilename().isEmpty())
     {
     return;
     }
 
-  this->readIconSheetFromFile(this->Implementation->UI.iconFile->filename());
+  this->readIconSheetFromFile(this->Implementation->UI.iconFile->singleFilename());
 
   vtkSMStringVectorProperty *iconTypes = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("IconTypes"));
   vtkSMIntVectorProperty *iconIndices = vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("IconIndices"));
@@ -182,7 +184,7 @@ void IconDialog::acceptInternal()
 
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(this->Implementation->Representation->getProxy());
 
-  pqPropertyHelper(proxy, "IconFile").Set(this->Implementation->UI.iconFile->filename());
+  pqPropertyHelper(proxy, "IconFile").Set(this->Implementation->UI.iconFile->singleFilename());
   pqPropertyHelper(proxy, "IconArray").Set(this->Implementation->UI.iconArrayName->currentText());
   vtkSMPropertyHelper(proxy, "IconSize").Set(this->Implementation->UI.iconSize->value());
   vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("IconTexture"));
@@ -277,7 +279,7 @@ void IconDialog::onIconSizeChanged()
 
 void IconDialog::onApplyIconSize()
 {
-  QString filename = this->Implementation->UI.iconFile->filename();
+  QString filename = this->Implementation->UI.iconFile->singleFilename();
   if(!filename.isEmpty())
     {
     this->readIconSheetFromFile(filename);

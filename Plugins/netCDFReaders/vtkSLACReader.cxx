@@ -210,7 +210,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.1");
+vtkCxxRevisionMacro(vtkSLACReader, "1.2");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -224,7 +224,6 @@ vtkSLACReader::vtkSLACReader()
   this->SetNumberOfInputPorts(0);
 
   this->MeshFileName = NULL;
-  this->ModeFileName = NULL;
 
   this->ReadInternalVolume = 0;
   this->ReadExternalSurface = 1;
@@ -249,7 +248,11 @@ void vtkSLACReader::PrintSelf(ostream &os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "MeshFileName: " << this->MeshFileName << endl;
-  os << indent << "ModeFileName: " << this->ModeFileName << endl;
+  for (unsigned int i = 0; i < this->ModeFileNames.size(); i++)
+    {
+    os << indent << "ModeFileName[" << i << "]: "
+       << this->ModeFileNames[i] << endl;
+    }
 
   os << indent << "ReadInternalVolume: " << this->ReadInternalVolume << endl;
   os << indent << "ReadExternalSurface: " << this->ReadExternalSurface << endl;
@@ -273,6 +276,31 @@ int vtkSLACReader::CanReadFile(const char *filename)
   if (nc_inq_varid(ncFD(), "surface_midpoint", &dummy) != NC_NOERR) return 0;
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSLACReader::AddModeFileName(const char *fname)
+{
+  this->ModeFileNames.push_back(fname);
+  this->Modified();
+}
+
+void vtkSLACReader::RemoveAllModeFileNames()
+{
+  this->ModeFileNames.clear();
+  this->Modified();
+}
+
+unsigned int vtkSLACReader::GetNumberOfModeFileNames()
+{
+  return this->ModeFileNames.size();
+  this->Modified();
+}
+
+const char *vtkSLACReader::GetModeFileName(unsigned int idx)
+{
+  return this->ModeFileNames[idx].c_str();
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
@@ -324,9 +352,10 @@ int vtkSLACReader::RequestInformation(
   if (!meshFD.Valid()) return 0;
 
   this->ReadModeData = false;   // Assume false until everything checks out.
-  if (this->ModeFileName && (this->ModeFileName[0] != '\0'))
+  if (!this->ModeFileNames.empty())
     {
-    vtkSLACReaderAutoCloseNetCDF modeFD(this->ModeFileName, NC_NOWRITE);
+    // Check the first mode file, assume that the rest follow.
+    vtkSLACReaderAutoCloseNetCDF modeFD(this->ModeFileNames[0], NC_NOWRITE);
     if (!modeFD.Valid()) return 0;
 
     int meshCoordsVarId, modeCoordsVarId;
@@ -336,7 +365,7 @@ int vtkSLACReader::RequestInformation(
     if (   this->GetNumTuplesInVariable(meshFD(), meshCoordsVarId, 3)
         != this->GetNumTuplesInVariable(modeFD(), modeCoordsVarId, 3) )
       {
-      vtkWarningMacro(<< "Mode file " << this->ModeFileName
+      vtkWarningMacro(<< "Mode file " << this->ModeFileNames[0].c_str()
                       << " invalid for mesh file " << this->MeshFileName
                       << "; the number of coordinates do not match.");
       }
@@ -406,7 +435,7 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
 
   if (this->ReadModeData)
     {
-    vtkSLACReaderAutoCloseNetCDF modeFD(this->ModeFileName, NC_NOWRITE);
+    vtkSLACReaderAutoCloseNetCDF modeFD(this->ModeFileNames[0], NC_NOWRITE);
     if (!modeFD.Valid()) return 0;
 
     if (!this->ReadFieldData(modeFD(), output)) return 0;

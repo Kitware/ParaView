@@ -73,6 +73,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView includes
 #include "pqSMProxy.h"
 
+#include <QStringList>
+
 static const int metaId = qRegisterMetaType<QList<QList<QVariant> > >("ListOfList");
 
 pqSMAdaptor::pqSMAdaptor()
@@ -1732,46 +1734,65 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
   return domain;
 }
 
-QString pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
+QStringList pqSMAdaptor::getFileListProperty(vtkSMProperty* Property)
 {
-  QString file;
+  QStringList files;
 
   vtkSMStringVectorProperty* svp;
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
-  if(svp && svp->GetNumberOfElements() > 0)
+  if (svp)
     {
-    file = svp->GetElement(0);
+    for (unsigned int i = 0; i < svp->GetNumberOfElements(); i++)
+      {
+      files.append(svp->GetElement(i));
+      }
     }
-  return file;
+
+  return files;
 }
 
-void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property, QString Value)
+void pqSMAdaptor::setFileListProperty(vtkSMProperty* Property,
+                                      QStringList Value)
 {
   vtkSMStringVectorProperty* svp;
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
-  if(svp && svp->GetNumberOfElements() > 0)
+  if (!svp) return;
+
+  unsigned int i = 0;
+  foreach (QString file, Value)
     {
-    if(!Value.isNull())
-      {
-      svp->SetElement(0, Value.toAscii().data());
-      }
+    if (!svp->GetRepeatCommand() && (i >= svp->GetNumberOfElements())) break;
+    svp->SetElement(i, file.toAscii().data());
+    i++;
+    }
+
+  if (static_cast<int>(svp->GetNumberOfElements()) != Value.size())
+    {
+    svp->SetNumberOfElements(svp->GetNumberOfElements());
     }
 }
 
 void pqSMAdaptor::setUncheckedFileListProperty(vtkSMProperty* Property,
-                                               QString Value)
+                                               QStringList Value)
 {
   vtkSMStringVectorProperty* svp;
   svp = vtkSMStringVectorProperty::SafeDownCast(Property);
 
-  if(svp && svp->GetNumberOfElements() > 0)
+  if (!svp) return;
+
+  unsigned int i = 0;
+  foreach (QString file, Value)
     {
-    if(!Value.isNull())
-      {
-      svp->SetUncheckedElement(0, Value.toAscii().data());
-      }
+    if (!svp->GetRepeatCommand() && (i >= svp->GetNumberOfElements())) break;
+    svp->SetUncheckedElement(i, file.toAscii().data());
+    i++;
+    }
+
+  if (static_cast<int>(svp->GetNumberOfElements()) != Value.size())
+    {
+    svp->SetNumberOfElements(svp->GetNumberOfElements());
     }
   Property->UpdateDependentDomains();
 }

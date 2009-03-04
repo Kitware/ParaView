@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   : QWidget(p), Server(NULL)
 {
+  this->ForceSingleFile = false;
+
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   l->setSpacing(2);
@@ -61,8 +63,7 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
 
   QObject::connect(this->LineEdit,
                    SIGNAL(textChanged(const QString&)),
-                   this,
-                   SIGNAL(filenameChanged(const QString&)));
+                   this, SLOT(emitFilenamesChanged(const QString&)));
 
 }
 
@@ -71,14 +72,46 @@ pqFileChooserWidget::~pqFileChooserWidget()
 }
 
 
-QString pqFileChooserWidget::filename()
+QStringList pqFileChooserWidget::filenames()
 {
-  return this->LineEdit->text();
+  return pqFileChooserWidget::splitFilenames(this->LineEdit->text());
 }
 
-void pqFileChooserWidget::setFilename(const QString& file)
+void pqFileChooserWidget::setFilenames(const QStringList& files)
 {
-  this->LineEdit->setText(file);
+  if (this->ForceSingleFile)
+    {
+    if (!files.isEmpty())
+      {
+      this->LineEdit->setText(files[0]);
+      }
+    else
+      {
+      this->LineEdit->setText("");
+      }
+    }
+  else
+    {
+    this->LineEdit->setText(pqFileChooserWidget::joinFilenames(files));
+    }
+}
+
+QString pqFileChooserWidget::singleFilename()
+{
+  QStringList files = this->filenames();
+  if (files.isEmpty())
+    {
+    return "";
+    }
+  else
+    {
+    return files[0];
+    }
+}
+
+void pqFileChooserWidget::setSingleFilename(const QString &file)
+{
+  this->setFilenames(QStringList(file));
 }
 
 QString pqFileChooserWidget::extension()
@@ -114,10 +147,21 @@ void pqFileChooserWidget::chooseFile()
     QStringList files = dialog->getSelectedFiles();
     if(files.size())
       {
-      this->LineEdit->setText(files[0]);
+      this->setFilenames(files);
       }
     }
 }
 
-
-
+void pqFileChooserWidget::emitFilenamesChanged(const QString &fileString)
+{
+  QStringList fileList = pqFileChooserWidget::splitFilenames(fileString);
+  emit this->filenamesChanged(fileList);
+  if (!fileList.empty())
+    {
+    emit this->filenameChanged(fileList[0]);
+    }
+  else
+    {
+    emit this->filenameChanged("");
+    }
+}

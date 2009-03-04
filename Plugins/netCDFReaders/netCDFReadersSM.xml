@@ -116,12 +116,14 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="ModeFileName"
-                            command="SetModeFileName"
+                            clean_command="RemoveAllModeFileNames"
+                            command="AddModeFileName"
                             animateable="0"
-                            number_of_elements="1">
+                            number_of_elements="0"
+                            repeat_command="1">
         <FileListDomain name="files" />
         <Documentation>
-          The name of the mode file to load.  The points in the mode file should be the same as the mesh file.
+          The name of the mode files to load.  The points in the mode file should be the same as the mesh file.
         </Documentation>
       </StringVectorProperty>
 

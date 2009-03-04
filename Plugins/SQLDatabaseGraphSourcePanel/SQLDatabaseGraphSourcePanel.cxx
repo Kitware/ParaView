@@ -26,6 +26,8 @@ SQLDatabaseGraphSourcePanel::SQLDatabaseGraphSourcePanel(pqProxy* proxy, QWidget
   this->Widgets.databaseType->addItem("mysql");
   this->Widgets.databaseType->addItem("sqlite");
 
+  this->Widgets.databaseFile->setForceSingleFile(true);
+
   // First populate database controls using settings
   this->loadDefaultSettings();
 
@@ -102,7 +104,7 @@ void SQLDatabaseGraphSourcePanel::accept()
   if(this->Widgets.databaseType->currentText() == "sqlite")
     {
     url = this->Widgets.databaseType->currentText() + QString("://") +
-      this->Widgets.databaseFile->filename();
+      this->Widgets.databaseFile->singleFilename();
     }
   else
     {
@@ -170,7 +172,7 @@ void SQLDatabaseGraphSourcePanel::loadDefaultSettings()
   
   settings->beginGroup("OpenDatabase");
   this->Widgets.databaseType->setCurrentIndex(this->Widgets.databaseType->findText(settings->value("DatabaseType", "sqlite").toString()));
-  this->Widgets.databaseFile->setFilename(settings->value("DatabaseFile").toString());
+  this->Widgets.databaseFile->setSingleFilename(settings->value("DatabaseFile").toString());
   this->Widgets.databaseName->setText(settings->value("DatabaseName").toString());
   this->Widgets.databaseUser->setText(settings->value("DatabaseUser").toString());
   this->Widgets.databaseHost->setText(settings->value("DatabaseHost").toString());
@@ -184,7 +186,7 @@ void SQLDatabaseGraphSourcePanel::saveDefaultSettings()
 
   settings->beginGroup("OpenDatabase");
   settings->setValue("DatabaseType", this->Widgets.databaseType->currentText());
-  settings->setValue("DatabaseFile", this->Widgets.databaseFile->filename());
+  settings->setValue("DatabaseFile", this->Widgets.databaseFile->singleFilename());
   settings->setValue("DatabaseName", this->Widgets.databaseName->text());
   settings->setValue("DatabaseUser", this->Widgets.databaseUser->text());
   settings->setValue("DatabaseHost", this->Widgets.databaseHost->text());

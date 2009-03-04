@@ -38,11 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QString>
+#include <QStringList>
 #include <QPointer>
 #include <QVariant>
 #include <QSet>
 #include <QSignalMapper>
 #include <QTimer>
+#include <QtDebug>
 
 // VTK includes
 #include "vtkEventQtSlotConnect.h"
@@ -379,13 +381,27 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged()
         {
         if(this->Internal->UseUncheckedProperties)
           {
-          pqSMAdaptor::setUncheckedFileListProperty(
-            this->Internal->Property, prop.toString());
+          if (!prop.canConvert<QStringList>())
+            {
+            qWarning() << "File list is not a list.";
+            }
+          else
+            {
+            pqSMAdaptor::setUncheckedFileListProperty(
+                           this->Internal->Property, prop.value<QStringList>());
+            }
           }
         else
           {
-          pqSMAdaptor::setFileListProperty(
-            this->Internal->Property, prop.toString());
+          if (!prop.canConvert<QStringList>())
+            {
+            qWarning() << "File list is not a list.";
+            }
+          else
+            {
+            pqSMAdaptor::setFileListProperty(
+                           this->Internal->Property, prop.value<QStringList>());
+            }
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();

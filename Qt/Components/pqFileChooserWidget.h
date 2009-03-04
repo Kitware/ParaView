@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 #include <QString>
+#include <QStringList>
 class QLineEdit;
 class pqServer;
 
@@ -45,9 +46,11 @@ class pqServer;
 /// file will be put in the line edit
 class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
-  Q_OBJECT
-  Q_PROPERTY(QString filename READ filename WRITE setFilename USER true)
-  Q_PROPERTY(QString extension READ extension WRITE setExtension)
+  Q_OBJECT;
+  Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true);
+  Q_PROPERTY(QString extension READ extension WRITE setExtension);
+  Q_PROPERTY(bool forceSingleFile
+             READ forceSingleFile WRITE setForceSingleFile);
 
 public:
   /// constructor
@@ -56,31 +59,60 @@ public:
   ~pqFileChooserWidget();
 
   /// get the filename
-  QString filename();
+  QStringList filenames();
   /// set the filename
-  void setFilename(const QString&);
+  void setFilenames(const QStringList&);
+
+  /// convienince functions for when using only a single file (see
+  /// forceSingleFile property).
+  QString singleFilename();
+  void setSingleFilename(const QString &);
   
   /// get the file extension for the file dialog
   QString extension();
   /// set the file extension for the file dialog
   void setExtension(const QString&);
 
+  /// flag specifying whether this widget should accept multiple files
+  bool forceSingleFile() { return this->ForceSingleFile; }
+  void setForceSingleFile(bool flag) {
+    this->ForceSingleFile = flag;
+    this->setFilenames(this->filenames());
+  }
+
   /// set server to work on.
   /// If server is NULL, a local file dialog is used
   void setServer(pqServer* server);
   pqServer* server();
 
+  /// Converts between a list of file names and delimited string of filenames
+  /// (which is shown in the line edit box).
+  static QStringList splitFilenames(const QString &filesString) {
+    return filesString.split(";");
+  }
+  static QString joinFilenames(const QStringList &filesList) {
+    return filesList.join(";");
+  }
+
 signals:
-  /// signal emitted when the filename changes
+  /// Signal emitted when the filename changes.  The single string version is a
+  /// convenience for when you are only grabbing the first file anyway.
+  void filenamesChanged(const QStringList&);
   void filenameChanged(const QString&);
 
 protected slots:
+  /// Called when the user hits the choose file button.
   void chooseFile();
+  /// Takes a string with delimited files and emits the filenamesChanged
+  /// signals.  Generally used to convert the textChanged signal of the line
+  /// edit to the filenamesChanged signals.
+  void emitFilenamesChanged(const QString &fileString);
 
 protected:
   QString Extension;
   QLineEdit* LineEdit;
   pqServer* Server;
+  bool ForceSingleFile;
 };
 
 #endif // _pqFileChooserWidget_h

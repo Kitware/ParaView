@@ -174,12 +174,12 @@ public:
                        vtkSMProperty* Property, unsigned int Index);
 
   /// get the single element of a property (integer, string, real, etc..)
-  static QString getFileListProperty(vtkSMProperty* Property);
+  static QStringList getFileListProperty(vtkSMProperty* Property);
   /// set the single element of a property (integer, string, real, etc..)
   static void setFileListProperty(vtkSMProperty* Property, 
-                                  QString Value);
+                                  QStringList Value);
   static void setUncheckedFileListProperty(vtkSMProperty* Property, 
-                                           QString Value);
+                                           QStringList Value);
 
   /// get/set the field selection mode (point, cell, ...)
   static QString getFieldSelectionMode(vtkSMProperty* prop);
