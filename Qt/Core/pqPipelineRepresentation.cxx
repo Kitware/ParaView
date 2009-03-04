@@ -575,9 +575,16 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
   pqSMAdaptor::setProxyProperty(
     repr->GetProperty("LookupTable"), lut);
 
+  bool current_scalar_bar_visibility = false;
   // If old LUT was present update the visibility of the scalar bars
   if (old_stc && old_stc->getProxy() != lut)
       {
+      pqScalarBarRepresentation* scalar_bar = old_stc->getScalarBar(
+        qobject_cast<pqRenderViewBase*>(this->getView()));
+      if (scalar_bar)
+        {
+        current_scalar_bar_visibility = scalar_bar->isVisible();
+        }
       old_stc->hideUnusedScalarBars();
       }
 
@@ -597,6 +604,14 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
   repr->UpdateVTKObjects();
 
   this->updateLookupTableScalarRange();
+
+  
+  if (current_scalar_bar_visibility && lut_mgr && this->getLookupTable())
+    {
+    lut_mgr->setScalarBarVisibility(this->getView(),
+      this->getLookupTable(),
+      current_scalar_bar_visibility);
+    }
 }
 
 //-----------------------------------------------------------------------------

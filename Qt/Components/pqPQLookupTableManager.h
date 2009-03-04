@@ -58,6 +58,11 @@ public:
   /// will have the same state as this one.
   virtual void saveAsDefault(pqScalarsToColors*);
 
+  /// Used to get the array the \c lut is associated with.
+  /// Return false if no such association exists.
+  virtual bool getLookupTableProperties(pqScalarsToColors* lut,
+    QString& arrayname, int &numComponents, int &component);
+
   /// Setting key used to save the default lookup table.
   static const char* DEFAULT_LOOKUPTABLE_SETTING_KEY()
     {

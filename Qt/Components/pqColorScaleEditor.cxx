@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorPresetModel.h"
 #include "pqDataRepresentation.h"
 #include "pqLookupTableManager.h"
-#include "pqObjectBuilder.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderViewBase.h"
@@ -934,14 +933,10 @@ void pqColorScaleEditor::setLegendVisibility(bool visible)
       // Create a scalar bar in the current view. Use the display to
       // set up the title.
       this->Form->MakingLegend = true;
-      pqObjectBuilder *builder =
-          pqApplicationCore::instance()->getObjectBuilder();
-      pqRenderViewBase *renderModule = qobject_cast<pqRenderViewBase *>(
-          this->Display->getView());
-      pqScalarBarRepresentation *legend = builder->createScalarBarDisplay(
-          this->ColorMap, renderModule);
-      legend->makeTitle(qobject_cast<pqPipelineRepresentation *>(
-          this->Display));
+      pqLookupTableManager* lutManager =
+        pqApplicationCore::instance()->getLookupTableManager();
+      pqScalarBarRepresentation* legend = lutManager->setScalarBarVisibility(
+        this->Display->getView(), this->ColorMap, visible);
       this->setLegend(legend);
       this->Form->MakingLegend = false;
       }

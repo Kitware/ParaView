@@ -90,7 +90,6 @@ public:
       return (this->NumberOfComponents < k.NumberOfComponents);
       }
 
-  private:
     vtkIdType ConnectionID;
     QString Arrayname;
     int NumberOfComponents;
@@ -191,6 +190,23 @@ pqScalarsToColors* pqPQLookupTableManager::getLookupTable(pqServer* server,
   // Create a new lookuptable.
   return this->createLookupTable(
     server, arrayname, number_of_components, component);
+}
+
+//-----------------------------------------------------------------------------
+bool pqPQLookupTableManager::getLookupTableProperties(
+  pqScalarsToColors* lut,
+  QString& arrayname, int &numComponents, int &component)
+{
+  pqInternal::Key key = this->Internal->LookupTables.key(lut);
+  if (!key.Arrayname.isEmpty())
+    {
+    arrayname = key.Arrayname;
+    numComponents = key.NumberOfComponents;
+    component = lut->getVectorMode() == pqScalarsToColors::MAGNITUDE? -1:
+      lut->getVectorComponent();
+    return true;
+    }
+  return false;
 }
 
 //-----------------------------------------------------------------------------

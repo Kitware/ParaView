@@ -170,42 +170,19 @@ void pqScalarBarRepresentation::setTitle(const QString& name, const QString& com
 }
 
 //-----------------------------------------------------------------------------
-void pqScalarBarRepresentation::makeTitle(pqPipelineRepresentation* display)
-{
-  if (!this->Internal->LookupTable)
-    {
-    qDebug() << "Cannot setup title when not connected to any LUT.";
-    return;
-    }
-
-  QString arrayname = display->getColorField(true);
-  if (arrayname == "Solid Color" || arrayname == "")
-    {
-    // cannot decide title without array name.
-    return;
-    }
-
-  pqScalarsToColors::Mode mode = this->Internal->LookupTable->getVectorMode();
-  int component_no = this->Internal->LookupTable->getVectorComponent();
-  int num_components = display->getColorFieldNumberOfComponents(
-    display->getColorField(false));
-
-  QString component = (num_components > 1)? "Magnitude" : "";
-  if (num_components > 1 && 
-    mode == pqScalarsToColors::COMPONENT && component_no >= 0)
-    {
-    component = pqScalarBarRepresentation::getDefaultComponentLabel(
-      component_no,  num_components);
-    }
-  this->setTitle(arrayname, component);
-}
-
-//-----------------------------------------------------------------------------
 QString pqScalarBarRepresentation::getDefaultComponentLabel(
   int component_no, int num_components)
 {
   QString component;
-  if (num_components <= 3 && component_no < 3)
+  if (num_components <= 1)
+    {
+    component = "";
+    }
+  else if (component_no == -1)
+    {
+    component = "Magnitude";
+    }
+  else if (num_components <= 3 && component_no < 3)
     {
     const char* titles[] = { "X", "Y", "Z"};
     component = titles[component_no];

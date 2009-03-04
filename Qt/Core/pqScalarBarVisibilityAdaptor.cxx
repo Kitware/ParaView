@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqUndoStack.h"
-
+#include "pqLookupTableManager.h"
 //-----------------------------------------------------------------------------
 class pqScalarBarVisibilityAdaptor::pqInternal
 {
@@ -124,34 +124,22 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     return;
     }
 
-  pqScalarBarRepresentation* sb = 
-    lut->getScalarBar(this->Internal->ActiveRenderView);
-
-  if (!sb && !visible)
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqLookupTableManager* lut_mgr = core->getLookupTableManager();
+  if (!lut_mgr)
     {
-    // nothing to do, scalar bar already invisible.
+    qCritical() << "pqScalarBarVisibilityAdaptor needs a pqLookupTableManager";
     return;
     }
 
   emit this->begin("Toggle Color Legend Visibility");
-  if (!sb)
-    {
-    pqObjectBuilder* builder = 
-      pqApplicationCore::instance()->getObjectBuilder();
-    sb = builder->createScalarBarDisplay(lut, this->Internal->ActiveRenderView);
-    sb->makeTitle(this->Internal->ActiveDisplay);
-    }
-  if (!sb)
-    {
-    qDebug() << "Failed to locate/create scalar bar.";
-    return;
-    }
-  sb->setVisible(visible);
-
+  pqScalarBarRepresentation* scalar_bar =
+    lut_mgr->setScalarBarVisibility(this->Internal->ActiveRenderView, lut, visible);
   emit this->end();
-
-  sb->renderViewEventually();
-
+  if (scalar_bar)
+    {
+    scalar_bar->renderViewEventually();
+    }
   this->updateState();
 }
 

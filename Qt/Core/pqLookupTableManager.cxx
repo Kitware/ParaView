@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
+#include "pqRenderViewBase.h"
+#include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServerManagerModel.h"
 
@@ -70,4 +73,64 @@ void pqLookupTableManager::onRemoveProxy(pqProxy* proxy)
     {
     this->onRemoveLookupTable(lut);
     }
+}
+
+//-----------------------------------------------------------------------------
+pqScalarBarRepresentation* pqLookupTableManager::setScalarBarVisibility(
+  pqView* view, pqScalarsToColors* stc, bool visible)
+{
+
+  if (!stc || !view)
+    {
+    qCritical() << "Arguments  to pqLookupTableManager::setScalarBarVisibility "
+      "cannot be null";
+    return NULL;
+    }
+
+  pqRenderViewBase* renderView = qobject_cast<pqRenderViewBase*>(view);
+  if (!renderView)
+    {
+    qWarning() << "Scalar bar cannot be created for the view specified";
+    return NULL;
+    }
+
+  pqScalarBarRepresentation* sb = stc->getScalarBar(renderView);
+  if (!sb && !visible)
+    {
+    // nothing to do, scalar bar already invisible.
+    return NULL;
+    }
+
+  if (!sb)
+    {
+    // No scalar bar exists currently, so we create a new one.
+    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+    sb = builder->createScalarBarDisplay(stc, renderView);
+
+    QString arrayName;
+    int numComponents;
+    int component;
+
+    if (!this->getLookupTableProperties(stc, arrayName, numComponents, component))
+      {
+      qWarning() << "LookupTable is not managed by this pqLookupTableManager.";
+      }
+    else
+      {
+      // Now set the title for the scalar bar.
+      QString compName = pqScalarBarRepresentation::getDefaultComponentLabel(
+        component, numComponents);
+      sb->setTitle(arrayName, compName);
+      }
+    }
+
+  if (sb)
+    {
+    sb->setVisible(visible);
+    }
+  else
+    {
+    qDebug() << "Failed to locate/create scalar bar.";
+    }
+  return sb;
 }

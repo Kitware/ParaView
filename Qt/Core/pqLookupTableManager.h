@@ -36,8 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 
 class pqProxy;
+class pqScalarBarRepresentation;
 class pqScalarsToColors;
 class pqServer;
+class pqView;
 
 /// pqLookupTableManager is the manager that manages color lookup objects.
 /// This is an abstract class that defines the API for any LUT manager.
@@ -59,6 +61,21 @@ public:
   /// Saves the state of the lut so that the next time a new LUT is created, it
   /// will have the same state as this one.
   virtual void saveAsDefault(pqScalarsToColors*)=0;
+
+  /// Set the scalar bar's visibility for the given lookup table in the given
+  /// view. This may result in creating of a new scalar bar.
+  /// This assumes that the pqScalarsToColors passed as an argument is indeed
+  /// managed by this pqLookupTableManager (that's needed to determine the
+  /// default labels for the scalar bar if a new scalar bar is created).
+  /// Returns the scalar bar, if any.
+  virtual pqScalarBarRepresentation* setScalarBarVisibility(
+    pqView* view, pqScalarsToColors*, bool visible);
+
+  /// Used to get the array the \c lut is associated with.
+  /// Return false if no such association exists.
+  virtual bool getLookupTableProperties(pqScalarsToColors* lut,
+    QString& arrayname, int &numComponents, int &component)=0;
+
 public slots:
   /// Called to update scalar ranges of all lookup tables.
   virtual void updateLookupTableScalarRanges()=0;
