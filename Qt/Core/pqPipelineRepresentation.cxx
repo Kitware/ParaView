@@ -262,6 +262,8 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
+  // Note that the representation created for the 2D view doesn't even have
+  // these properties.
   globalPropertiesManager->SetGlobalPropertyLink(
     "SelectionColor", repr, "SelectionColor");
   globalPropertiesManager->SetGlobalPropertyLink(
