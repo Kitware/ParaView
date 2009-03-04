@@ -232,7 +232,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.3");
+vtkCxxRevisionMacro(vtkSLACReader, "1.4");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -430,7 +430,12 @@ int vtkSLACReader::RequestInformation(
       // the difference, but things happen very quickly (less than nanoseconds)
       // in simulations that write out this data.  Thus, we expect large numbers
       // to be frequency (in Hz) and small numbers to be time (in seconds).
-      CALL_NETCDF(nc_get_scalar_double(modeFD(),"frequency",&this->Frequency));
+      if (   (nc_get_scalar_double(modeFD(), "frequency", &this->Frequency) != NC_NOERR)
+          && (nc_get_scalar_double(modeFD(), "frequencyreal", &this->Frequency) != NC_NOERR) )
+        {
+        vtkWarningMacro(<< "Could not find frequency in mode data.");
+        return 0;
+        }
       if (this->Frequency < 100)
         {
         this->TimeStepModes = true;
@@ -455,7 +460,12 @@ int vtkSLACReader::RequestInformation(
       vtkSLACReaderAutoCloseNetCDF modeFD(*fileitr, NC_NOWRITE);
       if (!modeFD.Valid()) return 0;
 
-      CALL_NETCDF(nc_get_scalar_double(modeFD(),"frequency",&this->Frequency));
+      if (   (nc_get_scalar_double(modeFD(), "frequency", &this->Frequency) != NC_NOERR)
+          && (nc_get_scalar_double(modeFD(), "frequencyreal", &this->Frequency) != NC_NOERR) )
+        {
+        vtkWarningMacro(<< "Could not find frequency in mode data.");
+        return 0;
+        }
       this->TimeStepToFile[this->Frequency] = *fileitr;
       }
 
