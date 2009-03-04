@@ -224,6 +224,10 @@ void pqRenderView::initializeWidgets()
 
   // setup the center axes.
   this->initializeCenterAxes();
+  
+  // ensure that center axis visibility etc. is updated as per user's
+  // preferences.
+  this->restoreAnnotationSettings();
 
   this->Internal->UndoStackBuilder->SetRenderView(renModule);
 }
@@ -501,55 +505,59 @@ bool pqRenderView::getCenterAxesVisibility() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderView::restoreSettings(bool only_global)
+void pqRenderView::restoreAnnotationSettings()
 {
-  this->Superclass::restoreSettings(only_global);
-  
-  // Now load default values from the QSettings, if available.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   QString sgroup = this->viewSettingsGroup();
   settings->beginGroup(sgroup);
-  if (!only_global)
+  // Orientation Axes settings.
+  settings->beginGroup("OrientationAxes");
+  if (settings->contains("Visibility"))
     {
-    // Orientation Axes settings.
-    settings->beginGroup("OrientationAxes");
-    if (settings->contains("Visibility"))
-      {
-      this->setOrientationAxesVisibility(
-        settings->value("Visibility").toBool());
-      }
-    if (settings->contains("Interactivity"))
-      {
-      this->setOrientationAxesInteractivity(
-        settings->value("Interactivity").toBool());
-      }
-    if (settings->contains("OutlineColor"))
-      {
-      this->setOrientationAxesOutlineColor(
-        settings->value("OutlineColor").value<QColor>());
-      }
-    if (settings->contains("LabelColor"))
-      {
-      this->setOrientationAxesLabelColor(
-        settings->value("LabelColor").value<QColor>());
-      }
-    settings->endGroup();
-
-    // Center Axes settings.
-    settings->beginGroup("CenterAxes");
-    if (settings->contains("Visibility"))
-      {
-      this->setCenterAxesVisibility(
-        settings->value("Visibility").toBool());
-      }
-    if (settings->contains("ResetCenterWithCamera"))
-      {
-      this->ResetCenterWithCamera =
-        settings->value("ResetCenterWithCamera").toBool();
-      }
-    settings->endGroup();
+    this->setOrientationAxesVisibility(
+      settings->value("Visibility").toBool());
+    }
+  if (settings->contains("Interactivity"))
+    {
+    this->setOrientationAxesInteractivity(
+      settings->value("Interactivity").toBool());
+    }
+  if (settings->contains("OutlineColor"))
+    {
+    this->setOrientationAxesOutlineColor(
+      settings->value("OutlineColor").value<QColor>());
+    }
+  if (settings->contains("LabelColor"))
+    {
+    this->setOrientationAxesLabelColor(
+      settings->value("LabelColor").value<QColor>());
     }
   settings->endGroup();
+
+  // Center Axes settings.
+  settings->beginGroup("CenterAxes");
+  if (settings->contains("Visibility"))
+    {
+    this->setCenterAxesVisibility(
+      settings->value("Visibility").toBool());
+    }
+  if (settings->contains("ResetCenterWithCamera"))
+    {
+    this->ResetCenterWithCamera =
+      settings->value("ResetCenterWithCamera").toBool();
+    }
+  settings->endGroup();
+  settings->endGroup();
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::restoreSettings(bool only_global)
+{
+  this->Superclass::restoreSettings(only_global);
+  if (!only_global)
+    {
+    this->restoreAnnotationSettings();
+    }
 }
 
 //-----------------------------------------------------------------------------

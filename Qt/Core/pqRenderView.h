@@ -257,6 +257,10 @@ protected:
   /// off. Once, the user enables the center axes, we will show one.
   void initializeCenterAxes();
 
+  /// Restores the visibility etc. for the annotations added by this view such
+  /// as center axis, orientation axis.
+  void restoreAnnotationSettings();
+
   // When true, the camera center of rotation will be reset when the
   // user reset the camera.
   bool ResetCenterWithCamera;
