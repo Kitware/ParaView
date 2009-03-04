@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.31");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.32");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -991,6 +991,10 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
   // but not followed by ". or _".
   vtksys::RegularExpression reg_ex5("^([0-9.]+)([a-zA-Z])(.*)\\.(.*)$");
 
+  // fallback: any sequence with a number in the middle (taking the last number
+  // if multiple exist).
+  vtksys::RegularExpression reg_ex_last("^(.*[^0-9])([0-9]+)([^0-9]+)");
+
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); )
     {
@@ -1029,6 +1033,12 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
         {
         groupName = ".." + reg_ex5.match(2) + reg_ex5.match(3) + "." + reg_ex5.match(4);
         groupIndex = atoi(reg_ex5.match(1).c_str());
+        match = true;
+        }
+      else if (reg_ex_last.find(obj->GetName()))
+        {
+        groupName = reg_ex_last.match(1) + ".." + reg_ex_last.match(3);
+        groupIndex = atoi(reg_ex_last.match(2).c_str());
         match = true;
         }
 
