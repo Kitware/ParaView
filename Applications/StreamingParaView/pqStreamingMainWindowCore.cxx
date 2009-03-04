@@ -63,7 +63,7 @@ void pqStreamingMainWindowCore::scheduleNextPass()
     }
   else
     {
-    qCritical() << "Could not get streaming helper proxy.";
+    emit this->setMessage("WARNING: Streaming plugin not found.");
     }
 
 

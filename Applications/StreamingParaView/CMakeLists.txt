@@ -1,4 +1,5 @@
 PROJECT(StreamingParaView)
+SET(APP_NAME StreamingParaView)
 
 SET(QT_USE_QTASSISTANT TRUE)
 SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
@@ -26,7 +27,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
-
 
 SET(CUSTOM_GUI_RESOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/CustomResources/CustomWriters.xml
@@ -86,7 +86,7 @@ ENDIF(Q_WS_MAC)
 
 # Add main server executables.
 IF(NOT Q_WS_MAC)
-  SET(PV_EXE_LIST StreamingParaView)
+  SET(PV_EXE_LIST ${STREAMING_APP_NAME})
 ENDIF(NOT Q_WS_MAC)
 # Add Qt assistant to the list of shared lib. forwarded executables.
 # If this is enabled, the build system will create an executable
@@ -95,11 +95,11 @@ ENDIF(NOT Q_WS_MAC)
 # to install assistant-real
 SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
-SET(MACOSX_BUNDLE_BUNDLE_NAME "StreamingParaview")
+SET(MACOSX_BUNDLE_BUNDLE_NAME "${APP_NAME}")
 IF(NOT Q_WS_MAC)
-  SET(PV_EXE_NAME StreamingParaview${PV_EXE_SUFFIX})
+  SET(PV_EXE_NAME ${APP_NAME}${PV_EXE_SUFFIX})
 ELSE(NOT Q_WS_MAC)
-  SET(PV_EXE_NAME StreamingParaview)
+  SET(PV_EXE_NAME ${APP_NAME})
 ENDIF(NOT Q_WS_MAC)
 
 ADD_EXECUTABLE(${PV_EXE_NAME} WIN32 ${MAKE_BUNDLE}  
@@ -130,18 +130,45 @@ IF(WIN32)
   TARGET_LINK_LIBRARIES(${PV_EXE_NAME} ${QT_QTMAIN_LIBRARY} )
 ENDIF(WIN32)
 
-FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
-   NAMES assistant_adp assistant 
-   PATHS ${QT_BINARY_DIR}
-   DOC "path to assistant executable for documentation"
-   NO_DEFAULT_PATH)
-FILE(TO_NATIVE_PATH "${QT_ASSISTANT_EXECUTABLE}" PV_ASSISTANT)
-MARK_AS_ADVANCED(QT_ASSISTANT_EXECUTABLE)
-FILE(TO_NATIVE_PATH "${ParaView_BINARY_DIR}/pqClient.adp" PV_CLIENT_DOC)
+IF(BUILD_TESTING)
+  #PART1 - Tests that run tests inside the application
+  SET(TEST_XML ${StreamingParaView_SOURCE_DIR}/Testing/XML)
+  SET(TEST_PYTHON ${StreamingParaView_SOURCE_DIR}/Testing/Python)
+  SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqClientDocFinder.txt.in"
-               "${EXECUTABLE_OUTPUT_PATH}/pqClientDocFinder.txt"
-               @ONLY IMMEDIATE)
+  #StreamingApplication depends upon the streaming plugin
+  SET(DOLLAR "$")
+  IF(CMAKE_CONFIGURATION_TYPES)
+    SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE}/${APP_NAME} --test-directory=${PARAVIEW_TEST_DIR})
+    SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH}/${DOLLAR}{CTEST_CONFIGURATION_TYPE})
+  ELSE(CMAKE_CONFIGURATION_TYPES)
+    SET(RUN_PATH ${EXECUTABLE_OUTPUT_PATH})
+    IF(Q_WS_MAC)
+      SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${APP_NAME}.app/Contents/MacOS/${APP_NAME} --test-directory=${PARAVIEW_TEST_DIR})
+    ELSE(Q_WS_MAC)
+      SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/${APP_NAME} --test-directory=${PARAVIEW_TEST_DIR})
+    ENDIF(Q_WS_MAC)
+  ENDIF(CMAKE_CONFIGURATION_TYPES)
+
+  IF (QT_TESTING_WITH_PYTHON AND PARAVIEW_DATA_ROOT)
+    SET(PLUGIN_TESTS
+      TestStreamingApplication
+      )
+    
+    FOREACH(test ${PLUGIN_TESTS})
+      ADD_TEST(pqSClient${test}
+        ${CMAKE_COMMAND} -E chdir ${RUN_PATH}
+        ${TEST_BINARY} -dr --run-test=${TEST_PYTHON}/${test}.py
+        --test-directory=${PARAVIEW_TEST_DIR}
+        --compare-view=${TEST_IMAGE}/${test}.png
+        ${THRESHOLD_CMD}
+        --exit)
+    ENDFOREACH(test)
+  ENDIF (QT_TESTING_WITH_PYTHON AND PARAVIEW_DATA_ROOT)
+
+  #PART2 - Tests that use a driver to orchestrate several executables (client/server etc)
+
+ENDIF(BUILD_TESTING)
   
 # Add shared link forwarding executables if necessary.
 IF(PV_NEED_SHARED_FORWARD)
@@ -162,24 +189,6 @@ IF(NOT Q_WS_MAC)
     DESTINATION ${PV_EXE_INSTALL}
     COMPONENT Runtime)
 ENDIF(NOT Q_WS_MAC)
-
-# Install system libraries on Linux (will not work on any other Unix
-# yet)
-FOREACH(fmpglib avcodec avformat avutil)
-  IF(FFMPEG_${fmpglib}_LIBRARY)
-    GET_FILENAME_COMPONENT(FFMPEG_LIB_DIR_tmp ${FFMPEG_${fmpglib}_LIBRARY} PATH)
-    GET_FILENAME_COMPONENT(FFMPEG_LIB_NAME_tmp ${FFMPEG_${fmpglib}_LIBRARY} NAME)
-    FILE(GLOB FFMPEG_LIB_LIST RELATIVE ${FFMPEG_LIB_DIR_tmp} "${FFMPEG_${fmpglib}_LIBRARY}*")
-    INSTALL(CODE "
-MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}/${FFMPEG_LIB_NAME_tmp}\")
-EXECUTE_PROCESS (WORKING_DIRECTORY ${FFMPEG_LIB_DIR_tmp}
-                 COMMAND tar c ${FFMPEG_LIB_LIST}
-                 COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR})
-        " COMPONENT Runtime)
-    #INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY} DESTINATION ${PV_INSTALL_LIB_DIR})
-    
-  ENDIF(FFMPEG_${fmpglib}_LIBRARY)
-ENDFOREACH(fmpglib)
 
 SET (QTLIBLIST QTCORE QTGUI QTNETWORK QTXML QTTEST QTSQL)
 # the variable and library names are not the same

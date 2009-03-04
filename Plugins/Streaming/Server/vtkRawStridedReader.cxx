@@ -33,7 +33,7 @@
 #include <string>
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkRawStridedReader, "1.4");
+vtkCxxRevisionMacro(vtkRawStridedReader, "1.5");
 vtkStandardNewMacro(vtkRawStridedReader);
 
 #define DEBUGPRINT_STRIDED_READER_DETAILS(arg)\
@@ -510,8 +510,8 @@ int vtkRawStridedReaderPiece::read(ifstream& file,
 
     DEBUGPRINT_STRIDED_READER_DETAILS(
     cerr << "read line " 
-         << k << "," << j 
-         << "(" << k*strides[2] <<","<<j*strides[1] << ")" 
+         << k << "," << j << "," << i << " " 
+         << "(" << k*strides[2] <<","<<j*strides[1] <<","<<i*strides[0] << ")" 
          << " from " << offset << endl;
                                       );
     // Seek to the beginning of the line we want to extract.
@@ -881,7 +881,7 @@ int vtkRawStridedReader::ProcessRequest(vtkInformation *request,
       }
     if (match)
       {
-      cerr << "WARNING: Whole extent requested from " << this->GetClassName() << endl;
+      vtkErrorMacro("Whole extent requested, streaming is not working.");
       }
 
     }
