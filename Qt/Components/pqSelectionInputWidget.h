@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqExtractSelectionsPanel.h
+   Module:    pqSelectionInputWidget.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,33 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqExtractSelectionsPanel_h
-#define __pqExtractSelectionsPanel_h
+#ifndef __pqSelectionInputWidget_h
+#define __pqSelectionInputWidget_h
 
 
-#include "pqObjectPanel.h"
-class vtkSMSourceProxy;
+#include "pqComponentsExport.h"
+#include <QWidget>
 
-/// pqExtractSelectionsPanel is a custom panel used for 
-/// "ExtractCellSelection" and "ExtractPointSelection" filters.
-class PQCOMPONENTS_EXPORT pqExtractSelectionsPanel : public pqObjectPanel
+#include "pqSMProxy.h"  // For property.
+
+/// pqSelectionInputWidget is a custom widget used for specifying
+/// the selection to use on filters that have a selection as input.
+class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
 {
-  Q_OBJECT
-  typedef pqObjectPanel Superclass;
+  Q_OBJECT;
+  Q_PROPERTY(pqSMProxy selection
+             READ selection
+             WRITE setSelection
+             USER true);
+  typedef QWidget Superclass;
 public:
-  pqExtractSelectionsPanel(pqProxy* proxy, QWidget* parent=0);
-  ~pqExtractSelectionsPanel();
-  
+  pqSelectionInputWidget(QWidget* parent=0);
+  ~pqSelectionInputWidget();
+
+  virtual pqSMProxy selection() { return this->SelectionSource; }
+
 public slots:
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  /// subclasses should only change properties when accept is called to work
-  /// properly with undo/redo
-  virtual void accept();
-  
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  virtual void reset();
+  virtual void setSelection(pqSMProxy selection);
+
+signals:
+  /// Signal that the selection proxy changed.
+  void selectionChanged(pqSMProxy);
 
 protected slots:
   // Copy active selection.
@@ -63,17 +67,17 @@ protected slots:
 
   void onActiveSelectionChanged();
 
-  void selectionInputChanged();
-
   void updateLabels();
 
+protected:
+  pqSMProxy SelectionSource;
+
 private:
-  pqExtractSelectionsPanel(const pqExtractSelectionsPanel&); // Not implemented.
-  void operator=(const pqExtractSelectionsPanel&); // Not implemented.
+  pqSelectionInputWidget(const pqSelectionInputWidget&); // Not implemented.
+  void operator=(const pqSelectionInputWidget&); // Not implemented.
 
-
-  class pqInternal;
-  pqInternal *Internal;
+  class UI;
+  UI *ui;
 };
 
 #endif

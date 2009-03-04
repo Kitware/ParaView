@@ -114,7 +114,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExodusIIPanel.h
   pqExodusPanel.h
   pqExtractCTHPartsPanel.h
-  pqExtractSelectionsPanel.h  
   pqFileChooserWidget.h
   pqFilterInputDialog.h
   pqFiltersMenuManager.h
@@ -193,6 +192,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSignalAdaptorTreeWidget.h
   pqSILModel.h
   pqProxySILModel.h
+  pqSelectionInputWidget.h
   pqSimpleServerStartup.h
   pqSourceComboBox.h
   #pqSourceHistoryModel.h
@@ -260,7 +260,6 @@ SET(UI_FORMS
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
   Resources/UI/pqExodusPanel.ui
-  Resources/UI/pqExtractSelectionsPanel.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -287,6 +286,7 @@ SET(UI_FORMS
   Resources/UI/pqSampleScalarAddRangeDialog.ui
   Resources/UI/pqSampleScalarWidget.ui
   Resources/UI/pqSaveSnapshotDialog.ui
+  Resources/UI/pqSelectionInputWidget.ui
   Resources/UI/pqSelectionInspectorPanel.ui
   Resources/UI/pqSelectReaderDialog.ui
   Resources/UI/pqServerBrowser.ui
@@ -490,8 +490,6 @@ ADD_LIBRARY(pqComponents
   pqExodusPanel.h
   pqExtractCTHPartsPanel.cxx
   pqExtractCTHPartsPanel.h
-  pqExtractSelectionsPanel.cxx
-  pqExtractSelectionsPanel.h
   pqFileChooserWidget.cxx
   pqFileChooserWidget.h
   pqFilterInputDialog.cxx
@@ -632,6 +630,8 @@ ADD_LIBRARY(pqComponents
   pqSelectThroughPanel.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
+  pqSelectionInputWidget.cxx
+  pqSelectionInputWidget.h
   pqSelectionManager.cxx
   pqSelectionManager.h
   pqServerBrowser.cxx

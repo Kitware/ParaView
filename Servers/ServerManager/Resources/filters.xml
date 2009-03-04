@@ -43,10 +43,10 @@
          The input that provides the selection object.
        </Documentation>
        <Hints>
-        <!-- This tag implies that all the auto-generated panels and the 
-             number of inputs counting code should simply ignore this property.
-        -->
-        <NoGUI />
+         <!-- This tag alerts the auto-generated panels and input selection
+              that this input is a selection.  It should use the special
+              selection GUI. -->
+         <SelectionInput />
        </Hints>
      </InputProperty>
      
@@ -7987,10 +7987,10 @@ This property controls how the filter works to generate tensor cell data. You ca
          The input that provides the selection object.
        </Documentation>
        <Hints>
-        <!-- This tag implies that all the auto-generated panels and the 
-             number of inputs counting code should simply ignore this property.
-        -->
-        <NoGUI />
+         <!-- This tag alerts the auto-generated panels and input selection
+              that this input is a selection.  It should use the special
+              selection GUI. -->
+         <SelectionInput />
        </Hints>
      </InputProperty>
 

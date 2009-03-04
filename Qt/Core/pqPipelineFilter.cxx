@@ -111,7 +111,9 @@ static void pqPipelineFilterGetInputProperties(QList<const char*> &list,
     if (inputProp)
       {
       vtkPVXMLElement* hints = inputProp->GetHints();
-      if (hints && hints->FindNestedElementByName("NoGUI"))
+      if (   hints
+          && (   hints->FindNestedElementByName("NoGUI")
+              || hints->FindNestedElementByName("SelectionInput") ) )
         {
         // hints suggest that this input property is not to be considered by the
         // GUI.

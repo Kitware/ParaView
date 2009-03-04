@@ -1,6 +1,6 @@
 <ui version="4.0" >
- <class>ExtractSelectionsPanel</class>
- <widget class="QWidget" name="ExtractSelectionsPanel" >
+ <class>pqSelectionInputWidget</class>
+ <widget class="QWidget" name="pqSelectionInputWidget" >
   <property name="geometry" >
    <rect>
     <x>0</x>

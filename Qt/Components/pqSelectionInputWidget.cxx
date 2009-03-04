@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqExtractSelectionsPanel.cxx
+   Module:    pqSelectionInputWidget.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,8 +29,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqExtractSelectionsPanel.h"
-#include "ui_pqExtractSelectionsPanel.h"
+#include "pqSelectionInputWidget.h"
 
 #include "vtkEventQtSlotConnect.h"
 #include "vtkSelection.h"
@@ -49,106 +48,58 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqSMAdaptor.h"
 
-class pqExtractSelectionsPanel::pqInternal : public Ui::ExtractSelectionsPanel
-{
-public:
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSmartPointer<vtkSMProxy> SelectionSource;
-  vtkSmartPointer<vtkSMProxy> UnacceptedSelectionSource;
-  bool SourceChanged;
-};
+#include "ui_pqSelectionInputWidget.h"
+class pqSelectionInputWidget::UI : public Ui::pqSelectionInputWidget { };
 
 //-----------------------------------------------------------------------------
-pqExtractSelectionsPanel::pqExtractSelectionsPanel(pqProxy* _proxy, QWidget* _parent)
-  : pqObjectPanel(_proxy, _parent)
+pqSelectionInputWidget::pqSelectionInputWidget(QWidget* _parent)
+  : QWidget(_parent)
 {
-  this->Internal = new pqInternal();
-  this->Internal->setupUi(this);
-  this->Internal->SourceChanged = false;
-  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-  this->Internal->VTKConnect->Connect(
-    _proxy->getProxy()->GetProperty("Selection"), vtkCommand::ModifiedEvent,
-    this, SLOT(selectionInputChanged()));
+  this->ui = new pqSelectionInputWidget::UI();
+  this->ui->setupUi(this);
 
-  QObject::connect(this->Internal->pushButtonCopySelection, SIGNAL(clicked()),
-    this, SLOT(copyActiveSelection()));
+  QObject::connect(this->ui->pushButtonCopySelection, SIGNAL(clicked()),
+                   this, SLOT(copyActiveSelection()));
 
   pqSelectionManager* selMan = qobject_cast<pqSelectionManager*>(
-    pqApplicationCore::instance()->manager("SelectionManager"));
+                    pqApplicationCore::instance()->manager("SelectionManager"));
 
   if (selMan)
     {
     QObject::connect(selMan, SIGNAL(selectionChanged(pqOutputPort*)),
-      this, SLOT(onActiveSelectionChanged()));
+                     this, SLOT(onActiveSelectionChanged()));
     }
 
-  QTimer::singleShot(10, this, SLOT(selectionInputChanged()));
+  QTimer::singleShot(10, this, SLOT(copyActiveSelection()));
 }
 
 //-----------------------------------------------------------------------------
-pqExtractSelectionsPanel::~pqExtractSelectionsPanel()
+pqSelectionInputWidget::~pqSelectionInputWidget()
 {
-  delete this->Internal;
+  delete this->ui;
 }
 
 //-----------------------------------------------------------------------------
-void pqExtractSelectionsPanel::selectionInputChanged()
+void pqSelectionInputWidget::updateLabels()
 {
-  vtkSMProxy* filterProxy = this->referenceProxy()->getProxy();
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    filterProxy->GetProperty("Selection"));
-
-  vtkSMProxy* newSelSource = 0;
-  if (pp->GetNumberOfProxies() == 1)
+  if (!this->SelectionSource)
     {
-    newSelSource = pp->GetProxy(0);
-    }
-
-  if (newSelSource == this->Internal->SelectionSource.GetPointer())
-    {
+    this->ui->label->setText("No selection");
     return;
     }
 
-  if (this->Internal->SelectionSource)
-    {
-    this->Internal->VTKConnect->Disconnect(
-      this->Internal->SelectionSource, vtkCommand::PropertyModifiedEvent);
-    }
-  this->Internal->SelectionSource = newSelSource;
-  if (newSelSource)
-    {
-    this->Internal->VTKConnect->Connect(
-      this->Internal->SelectionSource, vtkCommand::PropertyModifiedEvent,
-      this, SLOT(updateLabels()));
-    }
-
-  QTimer::singleShot(10, this, SLOT(updateLabels()));
-}
-
-//-----------------------------------------------------------------------------
-void pqExtractSelectionsPanel::updateLabels()
-{
-  vtkSMProxy* selectionSource = this->Internal->UnacceptedSelectionSource?
-    this->Internal->UnacceptedSelectionSource : this->Internal->SelectionSource;
-
-  if (!selectionSource)
-    {
-    this->Internal->label->setText("No selection");
-    return;
-    }
-
-  this->Internal->label->setText("Copied Selection");
+  this->ui->label->setText("Copied Selection");
 
   int fieldType = pqSMAdaptor::getElementProperty(
-    selectionSource->GetProperty("FieldType")).toInt();
+                       this->SelectionSource->GetProperty("FieldType")).toInt();
  
-  const char* xmlname = selectionSource->GetXMLName();
+  const char* xmlname = this->SelectionSource->GetXMLName();
   QString text = QString("Type: ");
   QTextStream columnValues(&text, QIODevice::ReadWrite);
   if(strcmp(xmlname, "FrustumSelectionSource") == 0)
     {  
     columnValues << "Frustum Selection" << endl << endl << "Values:" << endl ;
-    vtkSMProperty* dvp = selectionSource->GetProperty("Frustum");
+    vtkSMProperty* dvp = this->SelectionSource->GetProperty("Frustum");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(dvp);
     for (int cc=0; cc <value.size(); cc++)
       {
@@ -163,7 +114,7 @@ void pqExtractSelectionsPanel::updateLabels()
     {
     columnValues << "Global ID Selection" << endl << endl << endl;
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(
-      selectionSource->GetProperty("IDs"));
+      this->SelectionSource->GetProperty("IDs"));
     columnValues << "Global ID" << endl;
     foreach (QVariant val, value)
       {
@@ -175,7 +126,7 @@ void pqExtractSelectionsPanel::updateLabels()
     columnValues << QString("%1 ID Selection").arg(
       fieldType == 0? "Cell" : "Point") << endl << endl << endl;
     columnValues << "Process ID" << "\t\t" << "Index" << endl;
-    vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
+    vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
       {
@@ -192,7 +143,7 @@ void pqExtractSelectionsPanel::updateLabels()
       fieldType == 0? "Cell" : "Point") << endl << endl << endl;
     columnValues  << "Composite ID" 
       << "\t" << "Process ID" << "\t\t" << "Index" << endl;
-    vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
+    vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
       {
@@ -209,7 +160,7 @@ void pqExtractSelectionsPanel::updateLabels()
       fieldType == 0? "Cell" : "Point") << endl << endl << endl;
     columnValues  << "Level" << "\t\t" << "Dataset" << "\t\t" 
       << "Index" << endl;
-    vtkSMProperty* idvp = selectionSource->GetProperty("IDs");
+    vtkSMProperty* idvp = this->SelectionSource->GetProperty("IDs");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
       {
@@ -224,7 +175,7 @@ void pqExtractSelectionsPanel::updateLabels()
     {
     columnValues << "Location-based Selection" << endl << endl << endl;
     columnValues << "Probe Locations" << endl;
-    vtkSMProperty* idvp = selectionSource->GetProperty("Locations");
+    vtkSMProperty* idvp = this->SelectionSource->GetProperty("Locations");
     QList<QVariant> value = pqSMAdaptor::getMultipleElementProperty(idvp);
     for (int cc=0; cc <value.size(); cc++)
       {
@@ -239,7 +190,7 @@ void pqExtractSelectionsPanel::updateLabels()
     {
     columnValues << "Block Selection" << endl << endl << endl;
     columnValues << "Blocks" << endl;
-    vtkSMProperty* prop = selectionSource->GetProperty("Blocks");
+    vtkSMProperty* prop = this->SelectionSource->GetProperty("Blocks");
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(prop);
     foreach (const QVariant& value, values)
       {
@@ -251,10 +202,10 @@ void pqExtractSelectionsPanel::updateLabels()
     columnValues << "Threshold Selection" << endl;
     columnValues << "Array: " 
       << pqSMAdaptor::getElementProperty(
-        selectionSource->GetProperty("ArrayName")).toString() 
+        this->SelectionSource->GetProperty("ArrayName")).toString() 
       << (fieldType == 0? " (cell)" : " (point)") << endl << endl;
     QList<QVariant> values = pqSMAdaptor::getMultipleElementProperty(
-      selectionSource->GetProperty("Thresholds"));
+      this->SelectionSource->GetProperty("Thresholds"));
     for (int cc=0; cc <values.size(); cc++)
       {
       const QVariant& value = values[cc];
@@ -274,17 +225,17 @@ void pqExtractSelectionsPanel::updateLabels()
     columnValues << "None" << endl;
     }
 
-  this->Internal->textBrowser->setText(text);
+  this->ui->textBrowser->setText(text);
   columnValues.flush();
 }
 
 //-----------------------------------------------------------------------------
 // This will update the UnacceptedSelectionSource proxy with a clone of the
 // active selection proxy. The filter proxy is not modified yet.
-void pqExtractSelectionsPanel::copyActiveSelection()
+void pqSelectionInputWidget::copyActiveSelection()
 {
   pqSelectionManager* selMan = (pqSelectionManager*)(
-    pqApplicationCore::instance()->manager("SelectionManager"));
+                    pqApplicationCore::instance()->manager("SelectionManager"));
 
   if (!selMan)
     {
@@ -306,71 +257,31 @@ void pqExtractSelectionsPanel::copyActiveSelection()
     }
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  if (!this->Internal->UnacceptedSelectionSource ||
-     strcmp(this->Internal->UnacceptedSelectionSource->GetXMLName(),
-       activeSelection->GetXMLName()) != 0)
-    {
-    vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
-      activeSelection->GetXMLName());
-    newSource->SetConnectionID(activeSelection->GetConnectionID());
-    this->Internal->UnacceptedSelectionSource = newSource;
-    newSource->Delete();
-    }
-
-  this->Internal->UnacceptedSelectionSource->Copy(activeSelection, 
-    0, vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
-  this->updateLabels();
-
-  this->setModified();
+  vtkSMProxy* newSource = pxm->NewProxy(activeSelection->GetXMLGroup(),
+                                        activeSelection->GetXMLName());
+  newSource->SetConnectionID(activeSelection->GetConnectionID());
+  newSource->Copy(activeSelection, 0,
+                  vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
+  newSource->UpdateVTKObjects();
+  this->setSelection(newSource);
+  newSource->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void pqExtractSelectionsPanel::onActiveSelectionChanged()
+void pqSelectionInputWidget::setSelection(pqSMProxy newSelection)
+{
+  if (this->SelectionSource == newSelection) return;
+
+  this->SelectionSource = newSelection;
+
+  this->updateLabels();
+  emit this->selectionChanged(this->SelectionSource);
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionInputWidget::onActiveSelectionChanged()
 {
   // The selection has changed, either a new selection was created
   // or an old one cleared.
-  this->Internal->label->setText("Copied Selection (Active Selection Changed)");
-}
-
-//-----------------------------------------------------------------------------
-void pqExtractSelectionsPanel::reset()
-{
-  this->Internal->UnacceptedSelectionSource = 0;
-  this->updateLabels();
-  this->Superclass::reset();
-}
-
-//-----------------------------------------------------------------------------
-void pqExtractSelectionsPanel::accept()
-{
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkSMProxy* filterProxy = this->referenceProxy()->getProxy();
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    filterProxy->GetProperty("Selection"));
-
-  // remove current selection input.
-  if (pp->GetNumberOfProxies() != 0)
-    {
-    vtkSMProxy* curSelInput = pp->GetProxy(0);
-    // if curSelInput is registered under the "selection_sources" group, then we
-    // should unregister it.
-    const char* name = pxm->GetProxyName("selection_sources", curSelInput);
-    if (name)
-      {
-      pxm->UnRegisterProxy("selection_sources", name, curSelInput);
-      }
-    }
-
-  pp->RemoveAllProxies();
-  if (this->Internal->UnacceptedSelectionSource)
-    {
-    pxm->RegisterProxy("selection_sources", 
-      this->Internal->UnacceptedSelectionSource->GetSelfIDAsString(),
-      this->Internal->UnacceptedSelectionSource);
-    this->Internal->UnacceptedSelectionSource->UpdateVTKObjects();
-    pp->AddProxy(this->Internal->UnacceptedSelectionSource); 
-    }
-
-  filterProxy->UpdateVTKObjects();
-  this->Superclass::accept();
+  this->ui->label->setText("Copied Selection (Active Selection Changed)");
 }

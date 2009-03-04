@@ -57,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusIIPanel.h"
 #include "pqExodusPanel.h"
 #include "pqExtractCTHPartsPanel.h"
-#include "pqExtractSelectionsPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqObjectBuilder.h"
@@ -121,11 +120,6 @@ public:
       if(QString("Threshold") == proxy->getProxy()->GetXMLName())
         {
         return new pqThresholdPanel(proxy, p);
-        }
-      if (QString("ExtractSelection") == proxy->getProxy()->GetXMLName() ||
-        QString("ExtractSelectionOverTime") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExtractSelectionsPanel(proxy, p);
         }
       if(QString("Contour") == proxy->getProxy()->GetXMLName())
         {

@@ -81,6 +81,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
+#include "pqSelectionInputWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
@@ -255,6 +256,18 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       property_manager->registerLink(
         proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
         proxy, SMProperty);
+      }
+
+    pqSelectionInputWidget *selectWidget
+      = qobject_cast<pqSelectionInputWidget*>(object);
+    if (selectWidget)
+      {
+      QString userProperty, userSignal;
+      if (pqNamedWidgets::propertyInformation(object, userProperty, userSignal))
+        {
+        pqNamedWidgets::linkObject(object, userProperty, userSignal,
+                                   proxy, SMProperty, -1, property_manager);
+        }
       }
     }
   else if (pt == pqSMAdaptor::PROXYSELECTION)
@@ -777,8 +790,7 @@ static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 }
 
 //-----------------------------------------------------------------------------
-void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
-                                               vtkSMProxy* pxy)
+void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 {
   int rowCount = 0;
   int skippedFirstFileProperty = 0;
@@ -878,6 +890,8 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
     pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
     QList<QString> domainsTypes = pqSMAdaptor::getDomainTypes(SMProperty);
 
+    vtkPVXMLElement *hints = SMProperty->GetHints();
+
     // skip input properties
     if(pt == pqSMAdaptor::PROXY || pt == pqSMAdaptor::PROXYLIST)
       {
@@ -889,19 +903,31 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
 
     if(pt == pqSMAdaptor::PROXY)
       {
-      // create a combo box with list of proxies
-      QComboBox* combo = new QComboBox(panelLayout->parentWidget());
-      if(informationOnly)
+      if (hints && hints->FindNestedElementByName("SelectionInput"))
         {
-        combo->setEnabled(false);
+        // Create a widget for grabbing the current selection.
+        pqSelectionInputWidget *selectWidget
+          = new pqSelectionInputWidget(panelLayout->parentWidget());
+        selectWidget->setObjectName(propertyName);
+        panelLayout->addWidget(selectWidget, rowCount, 0, 1, -1);
+        rowCount++;
         }
-      combo->setObjectName(propertyName);
-      QLabel* label = createPanelLabel(panelLayout->parentWidget(),
-                                       propertyLabel,
-                                       propertyName);
-      panelLayout->addWidget(label, rowCount, 0, 1, 1);
-      panelLayout->addWidget(combo, rowCount, 1, 1, 1);
-      rowCount++;
+      else
+        {
+        // create a combo box with list of proxies
+        QComboBox* combo = new QComboBox(panelLayout->parentWidget());
+        if(informationOnly)
+          {
+          combo->setEnabled(false);
+          }
+        combo->setObjectName(propertyName);
+        QLabel* label = createPanelLabel(panelLayout->parentWidget(),
+                                         propertyLabel,
+                                         propertyName);
+        panelLayout->addWidget(label, rowCount, 0, 1, 1);
+        panelLayout->addWidget(combo, rowCount, 1, 1, 1);
+        rowCount++;
+        }
       }
     else if(pt == pqSMAdaptor::PROXYLIST)
       {
@@ -1095,7 +1121,6 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout,
         {
         //  what entry widget we should use for a stringvectorproperty
         bool multiLineString = false;
-        vtkPVXMLElement* hints = SMProperty->GetHints();
         if (hints)
           {
           vtkPVXMLElement* widgetHint = hints->FindNestedElementByName("Widget");
