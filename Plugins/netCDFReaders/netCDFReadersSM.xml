@@ -179,6 +179,17 @@
 <!--         </Documentation> -->
 <!--       </StringVectorProperty> -->
 
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
     </SourceProxy> <!-- SLACReader -->
 
     <FileSeriesReaderProxy name="SLACParticleReader"

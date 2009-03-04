@@ -67,40 +67,8 @@ using namespace vtkstd;
 #ifdef VTK_USE_64BIT_IDS
 #ifdef NC_INT64
 // This may or may not work with the netCDF 4 library reading in netCDF 3 files.
-#define nc_get_var_vtkIdType nc_get_var_longlong
 #define nc_get_vars_vtkIdType nc_get_vars_longlong
 #else // NC_INT64
-static int nc_get_var_vtkIdType(int ncid, int varid, vtkIdType *ip)
-{
-  // Step 1, figure out how many entries in the given variable.
-  int numdims, dimids[NC_MAX_VAR_DIMS];
-  WRAP_NETCDF(nc_inq_varndims(ncid, varid, &numdims));
-  WRAP_NETCDF(nc_inq_vardimid(ncid, varid, dimids));
-  vtkIdType numValues = 1;
-  for (int dim = 0; dim < numdims; dim++)
-    {
-    size_t dimlen;
-    WRAP_NETCDF(nc_inq_dimlen(ncid, dimids[dim], &dimlen));
-    numValues *= dimlen;
-    }
-
-  // Step 2, read the data in as 32 bit integers.  Recast the input buffer
-  // so we do not have to create a new one.
-  long *smallIp = reinterpret_cast<long*>(ip);
-  WRAP_NETCDF(nc_get_var_long(ncid, varid, smallIp));
-
-  // Step 3, recast the data from 32 bit integers to 64 bit integers.  Since we
-  // are storing both in the same buffer, we need to be careful to not overwrite
-  // uncopied 32 bit numbers with 64 bit numbers.  We can do that by copying
-  // backwards.
-  for (vtkIdType i = numValues-1; i >= 0; i--)
-    {
-    ip[i] = static_cast<vtkIdType>(smallIp[i]);
-    }
-
-  return NC_NOERR;
-}
-
 static int nc_get_vars_vtkIdType(int ncid, int varid, const size_t start[],
                                  const size_t count[], const ptrdiff_t stride[],
                                  vtkIdType *ip)
@@ -132,7 +100,6 @@ static int nc_get_vars_vtkIdType(int ncid, int varid, const size_t start[],
 }
 #endif // NC_INT64
 #else // VTK_USE_64_BIT_IDS
-#define nc_get_var_vtkIdType nc_get_var_int
 #define nc_get_vars_vtkIdType nc_get_vars_int
 #endif // VTK_USE_64BIT_IDS
 
@@ -195,7 +162,7 @@ private:
 };
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACParticleReader, "1.1");
+vtkCxxRevisionMacro(vtkSLACParticleReader, "1.2");
 vtkStandardNewMacro(vtkSLACParticleReader);
 
 //-----------------------------------------------------------------------------

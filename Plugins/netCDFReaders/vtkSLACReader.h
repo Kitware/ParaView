@@ -116,17 +116,32 @@ protected:
   vtkSLACReader();
   ~vtkSLACReader();
 
-  char *MeshFileName;
 //BTX
+
+  char *MeshFileName;
   vtkstd::vector<vtkStdString> ModeFileNames;
-//ETX
 
   int ReadInternalVolume;
   int ReadExternalSurface;
   int ReadMidpoints;
 
-//BTX
   vtkSmartPointer<vtkDataArraySelection> VariableArraySelection;
+
+  // Description:
+  // True if reading from a proper mode file.  Set in RequestInformation.
+  bool ReadModeData;
+
+  // Description:
+  // True if "mode" files are a sequence of time steps.
+  bool TimeStepModes;
+  // Description:
+  // A quick lookup to find the correct mode file name given a time value.
+  // Only valid when TimeStepModes is true.
+  vtkstd::map<double, vtkStdString> TimeStepToFile;
+
+  // TODO variable.
+  double Frequency;
+
 //ETX
 
   virtual int RequestInformation(vtkInformation *request,
@@ -150,10 +165,6 @@ protected:
   // error is emitted and 0 is returned if the checks fail.
   virtual vtkIdType GetNumTuplesInVariable(int ncFD, int varId,
                                            int expectedNumComponents);
-
-  // Description:
-  // True if reading from a proper mode file.  Set in RequestInformation.
-  bool ReadModeData;
 
   // Description:
   // Read the connectivity information from the mesh file.  Returns 1 on

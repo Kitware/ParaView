@@ -30,11 +30,13 @@
 #include "vtkIdTypeArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationIntegerKey.h"
+#include "vtkInformationVector.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 
@@ -63,6 +65,7 @@ using namespace vtkstd;
     if (errorcode != NC_NOERR) return errorcode; \
   }
 
+//-----------------------------------------------------------------------------
 #ifdef VTK_USE_64BIT_IDS
 #ifdef NC_INT64
 // This may or may not work with the netCDF 4 library reading in netCDF 3 files.
@@ -102,6 +105,25 @@ static int nc_get_var_vtkIdType(int ncid, int varid, vtkIdType *ip)
 #else // VTK_USE_64_BIT_IDS
 #define nc_get_var_vtkIdType nc_get_var_int
 #endif // VTK_USE_64BIT_IDS
+
+//-----------------------------------------------------------------------------
+// This convenience function gets a scalar variable as a double, doing the
+// appropriate checks.
+static int nc_get_scalar_double(int ncid, const char *name, double *dp)
+{
+  int varid;
+  WRAP_NETCDF(nc_inq_varid(ncid, name, &varid));
+  int numdims;
+  WRAP_NETCDF(nc_inq_varndims(ncid, varid, &numdims));
+  if (numdims != 0)
+    {
+    // Not a great error to return, but better than nothing.
+    return NC_EVARSIZE;
+    }
+  WRAP_NETCDF(nc_get_var_double(ncid, varid, dp));
+
+  return NC_NOERR;
+}
 
 //=============================================================================
 // Describes how faces are defined in a tetrahedra in the files.
@@ -210,7 +232,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.2");
+vtkCxxRevisionMacro(vtkSLACReader, "1.3");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -236,6 +258,7 @@ vtkSLACReader::vtkSLACReader()
   this->VariableArraySelection->AddObserver(vtkCommand::ModifiedEvent, cbc);
 
   this->ReadModeData = false;
+  this->TimeStepModes = false;
 }
 
 vtkSLACReader::~vtkSLACReader()
@@ -338,8 +361,12 @@ vtkIdType vtkSLACReader::GetNumTuplesInVariable(int ncFD, int varId,
 int vtkSLACReader::RequestInformation(
                                  vtkInformation *vtkNotUsed(request),
                                  vtkInformationVector **vtkNotUsed(inputVector),
-                                 vtkInformationVector *vtkNotUsed(outputVector))
+                                 vtkInformationVector *outputVector)
 {
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+  outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+
   if (!this->MeshFileName)
     {
     vtkErrorMacro("No filename specified.");
@@ -352,6 +379,8 @@ int vtkSLACReader::RequestInformation(
   if (!meshFD.Valid()) return 0;
 
   this->ReadModeData = false;   // Assume false until everything checks out.
+  this->TimeStepModes = false;
+  this->TimeStepToFile.clear();
   if (!this->ModeFileNames.empty())
     {
     // Check the first mode file, assume that the rest follow.
@@ -395,7 +424,53 @@ int vtkSLACReader::RequestInformation(
         }
 
       this->ReadModeData = true;
+
+      // Read the "frequency".  When a time series is written, the frequency
+      // variable is overloaded to mean time.  There is no direct way to tell
+      // the difference, but things happen very quickly (less than nanoseconds)
+      // in simulations that write out this data.  Thus, we expect large numbers
+      // to be frequency (in Hz) and small numbers to be time (in seconds).
+      CALL_NETCDF(nc_get_scalar_double(modeFD(),"frequency",&this->Frequency));
+      if (this->Frequency < 100)
+        {
+        this->TimeStepModes = true;
+        this->TimeStepToFile[this->Frequency] = this->ModeFileNames[0];
+        }
+      else
+        {
+        // TODO: Setup frequency reading.
+        }
       }
+    }
+
+  if (this->TimeStepModes)
+    {
+    // If we are in time steps modes, we need to read in the time values from
+    // all the files (and we have already read the first one).  We then report
+    // the time steps we have.
+    vtkstd::vector<vtkStdString>::iterator fileitr =this->ModeFileNames.begin();
+    fileitr++;
+    for ( ; fileitr != this->ModeFileNames.end(); fileitr++)
+      {
+      vtkSLACReaderAutoCloseNetCDF modeFD(*fileitr, NC_NOWRITE);
+      if (!modeFD.Valid()) return 0;
+
+      CALL_NETCDF(nc_get_scalar_double(modeFD(),"frequency",&this->Frequency));
+      this->TimeStepToFile[this->Frequency] = *fileitr;
+      }
+
+    double range[2];
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    vtkstd::map<double, vtkStdString>::iterator timeitr
+      = this->TimeStepToFile.begin();
+    range[0] = timeitr->first;
+    for ( ; timeitr != this->TimeStepToFile.end(); timeitr++)
+      {
+      range[1] = timeitr->first;        // Eventually set to last value.
+      outInfo->Append(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
+                      timeitr->first);
+      }
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), range, 2);
     }
 
   return 1;
@@ -406,7 +481,8 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
                                vtkInformationVector **vtkNotUsed(inputVector),
                                vtkInformationVector *outputVector)
 {
-  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outputVector);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outInfo);
 
   if (!this->MeshFileName)
     {
@@ -435,7 +511,19 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
 
   if (this->ReadModeData)
     {
-    vtkSLACReaderAutoCloseNetCDF modeFD(this->ModeFileNames[0], NC_NOWRITE);
+    vtkStdString modeFileName;
+    if (   this->TimeStepModes
+        && outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) )
+      {
+      double time
+        = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),0);
+      modeFileName = this->TimeStepToFile.lower_bound(time)->second;
+      }
+    else
+      {
+      modeFileName = this->ModeFileNames[0];
+      }
+    vtkSLACReaderAutoCloseNetCDF modeFD(modeFileName, NC_NOWRITE);
     if (!modeFD.Valid()) return 0;
 
     if (!this->ReadFieldData(modeFD(), output)) return 0;
