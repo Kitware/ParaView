@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMPropertyIterator.h"
 
 // Qt Includes.
 #include <QMenu>
@@ -56,6 +57,22 @@ pqFiltersMenuManager::~pqFiltersMenuManager()
 {
 }
 
+static vtkSMInputProperty* getInputProperty(vtkSMProxy* proxy)
+{
+  // if "Input" is present, we return that, otherwise the "first"
+  // vtkSMInputProperty encountered is returned.
+
+  vtkSMInputProperty *prop = vtkSMInputProperty::SafeDownCast(
+    proxy->GetProperty("Input"));
+  vtkSMPropertyIterator* propIter = proxy->NewPropertyIterator();
+  for (propIter->Begin(); !prop && !propIter->IsAtEnd(); propIter->Next())
+    {
+    prop = vtkSMInputProperty::SafeDownCast(propIter->GetProperty());
+    }
+
+  propIter->Delete();
+  return prop;
+}
 //-----------------------------------------------------------------------------
 void pqFiltersMenuManager::updateEnableState()
 {
@@ -118,9 +135,9 @@ void pqFiltersMenuManager::updateEnableState()
 
     int numProcs = outputPorts[0]->getServer()->getNumberOfPartitions();
     vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(output);
-    if (sp &&
+    if (sp && (
         (sp->GetProcessSupport() == vtkSMSourceProxy::SINGLE_PROCESS && numProcs > 1) ||
-        (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1))
+        (sp->GetProcessSupport() == vtkSMSourceProxy::MULTIPLE_PROCESSES && numProcs == 1)))
       {
       // Skip single process filters when running in multiprocesses and vice
       // versa.
@@ -129,9 +146,8 @@ void pqFiltersMenuManager::updateEnableState()
       }
         
     // TODO: Handle case where a proxy has multiple input properties.
-    vtkSMInputProperty *input = vtkSMInputProperty::SafeDownCast(
-      output->GetProperty("Input"));
-    if(input)
+    vtkSMInputProperty *input = ::getInputProperty(output); 
+    if (input)
       {
       if(!input->GetMultipleInput() && selItems->size() > 1)
         {
