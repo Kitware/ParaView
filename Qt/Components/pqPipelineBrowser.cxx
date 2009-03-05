@@ -380,28 +380,61 @@ void pqPipelineBrowser::changeInput()
 void pqPipelineBrowser::deleteSelected()
 {
   QModelIndexList indexes = this->getSelectionModel()->selectedIndexes();
-  if(indexes.size() != 1)
+  if (indexes.size() <= 0)
     {
-    // TODO: Add support for deleting multiple items at once.
     return;
     }
 
-  // Get the selected item(s) from the selection model.
-  pqServerManagerModelItem *item = this->Model->getItemFor(indexes.first());
-  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
-  pqServer *server = dynamic_cast<pqServer *>(item);
-  if(source)
+  if (indexes.size() > 1)
     {
-    if(source->getNumberOfConsumers() == 0)
+    QSet<pqPipelineSource*> selectedSources;
+    foreach (QModelIndex index, indexes)
       {
-      emit this->beginUndo(QString("Delete %1").arg(source->getSMName()));
-      pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
-      emit this->endUndo();
+      pqPipelineSource *source = qobject_cast<pqPipelineSource*>(
+        this->Model->getItemFor(index));
+      if (source)
+        {
+        selectedSources.insert(source);
+        }
       }
+
+    // multiple item delete.
+    emit this->beginUndo(QString("Delete Selection"));
+    bool something_deleted = true;
+    while (something_deleted)
+      {
+      something_deleted = false;
+      foreach (pqPipelineSource* source, selectedSources)
+        {
+        if (source && source->getNumberOfConsumers() == 0)
+          {
+          selectedSources.remove(source);
+          pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
+          something_deleted = true;
+          }
+        }
+      }
+    emit this->endUndo();
     }
-  else if(server)
+  else if (indexes.size() == 1)
     {
-    pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
+    // Get the selected item(s) from the selection model.
+    pqServerManagerModelItem *item = this->Model->getItemFor(indexes.first());
+    pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(item);
+    pqServer *server = dynamic_cast<pqServer *>(item);
+    if(source)
+      {
+      if(source->getNumberOfConsumers() == 0)
+        {
+        emit this->beginUndo(QString("Delete %1").arg(source->getSMName()));
+        pqApplicationCore::instance()->getObjectBuilder()->destroy(source);
+        emit this->endUndo();
+        }
+      }
+    else if(server)
+      {
+      pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
+      }
     }
 }
 

@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemSelectionModel>
 #include <QPushButton>
 #include <QtDebug>
-
+#include <QSet>
 
 
 //----------------------------------------------------------------------------
@@ -186,18 +186,18 @@ void pqPipelineMenu::updateActions()
 
   if(this->MenuList[pqPipelineMenu::DeleteAction] != 0)
     {
-    // TODO: Allow for deleting multiple items at once.
-    enabled = indexes.size() == 1;
-    if(enabled)
-      {
-      // TODO: If the item is a link, it can always be removed.
-      pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
-          this->Model->getItemFor(indexes.first()));
-      if(source)
-        {
-        enabled = source->getNumberOfConsumers() == 0;
-        }
-      }
+    // TODO: If the item is a link, it can always be removed.
+    // Ensure that no item outside the current selection is a consumer for the
+    // items in the current selection. Then alone can the current selection be
+    // deleted.
+    enabled = this->canDeleteIndexes(indexes);
+
+    //pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
+    //    this->Model->getItemFor(indexes.first()));
+    //if(source)
+    //  {
+    //  enabled = source->getNumberOfConsumers() == 0;
+    //  }
 
     this->MenuList[pqPipelineMenu::DeleteAction]->setEnabled(enabled);
     }
@@ -259,4 +259,32 @@ void pqPipelineMenu::handleConnectionChange(const QModelIndex &parentIndex)
     }
 }
 
+bool pqPipelineMenu::canDeleteIndexes(const QModelIndexList& indexes)
+{
+  QSet<pqPipelineSource*> selectedSources;
+  foreach (QModelIndex index, indexes)
+    {
+    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(
+      this->Model->getItemFor(index));
+    if (source)
+      {
+      selectedSources.insert(source);
+      }
+    }
 
+  // Now ensure that all consumers for the current sources don't have consumers
+  // outside the selectedSources, then alone can we delete the selected items.
+  foreach (pqPipelineSource* source, selectedSources)
+    {
+    QList<pqPipelineSource*> consumers = source->getAllConsumers();
+    for (int cc=0; cc < consumers.size(); cc++)
+      {
+      pqPipelineSource* consumer = consumers[cc];
+      if (consumer && !selectedSources.contains(consumer))
+        {
+        return false;
+        }
+      }
+    }
+  return true;
+}

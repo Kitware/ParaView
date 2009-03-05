@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include <QObject>
+#include <QAbstractItemModel>
 
 class pqPipelineModel;
 class QAction;
@@ -83,6 +84,10 @@ public slots:
 private slots:
   void handleDeletion();
   void handleConnectionChange(const QModelIndex &parent);
+
+private:
+  /// Returns true if it's possible to delete the selected items.
+  bool canDeleteIndexes(const QModelIndexList& indexes);
 
 private:
   pqPipelineModel *Model;
