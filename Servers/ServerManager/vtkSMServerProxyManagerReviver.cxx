@@ -34,7 +34,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMServerProxyManagerReviver);
-vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.18");
+vtkCxxRevisionMacro(vtkSMServerProxyManagerReviver, "1.19");
 //-----------------------------------------------------------------------------
 vtkSMServerProxyManagerReviver::vtkSMServerProxyManagerReviver()
 {
@@ -83,6 +83,11 @@ int vtkSMServerProxyManagerReviver::ReviveRemoteServerManager(vtkIdType cid)
   iter->Delete();
 
   // 2) Cleanup client side proxy manager objects for the cid.
+  // No need to do SendStreamToClientOnlyOn() this anymore since
+  // CreateVTKObjects() is never called when
+  // reviving proxies. In fact, doing this can cause issues since we have now
+  // changed the StateLoader to call UpdateVTKObjects() as and when the proxies
+  // are created and their state loaded completely.
   // pm->SendStreamToClientOnlyOn();
   pxm->UnRegisterProxies(cid);  
   // pm->SendStreamToClientOnlyOff();
@@ -144,14 +149,14 @@ int vtkSMServerProxyManagerReviver::ReviveServerServerManager(
   // are assigned, the ones already used aren't reassigned.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->ReserveID(id);
-  pm->SendStreamToClientOnlyOn();
+  //pm->SendStreamToClientOnlyOn();
   vtkProcessModule::DebugLog("Pre--FilterStateXML");
   this->FilterStateXML(parser->GetRootElement());
   vtkProcessModule::DebugLog("Post--FilterStateXML");
   
   int ret = loader->LoadState(parser->GetRootElement());
   vtkProcessModule::DebugLog("Post--LoadState");
-  pm->SendStreamToClientOnlyOff();
+  //pm->SendStreamToClientOnlyOff();
   
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   vtkProcessModule::DebugLog("Pre--UpdateRegisteredProxies");
