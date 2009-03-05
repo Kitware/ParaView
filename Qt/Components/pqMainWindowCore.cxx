@@ -2987,7 +2987,8 @@ static void pqMainWindowCoreHideInputTimes(pqPipelineFilter* filter,
   foreach (pqOutputPort* input, inputs)
     {
     pqPipelineSource* source = input->getSource();
-    if (source->getProxy()->GetProperty("TimestepValues"))
+    if (   source->getProxy()->GetProperty("TimestepValues")
+        || source->getProxy()->GetProperty("TimeRange") )
       {
       if (hide)
         {
@@ -3017,11 +3018,12 @@ void pqMainWindowCore::onSourceCreation(pqPipelineSource *source)
   this->Implementation->PendingDisplayManager.addPendingDisplayForSource(
     source);
   
-  // If the newly created source is a filter has TimestepValues then we assume
-  // that this is a "temporal" filter which may distort the time. So we hide the
-  // timesteps from all the inputs.
+  // If the newly created source is a filter has TimestepValues or TimeRange
+  // then we assume that this is a "temporal" filter which may distort the
+  // time. So we hide the timesteps from all the inputs.
   pqPipelineFilter* filter = qobject_cast<pqPipelineFilter*>(source);
-  if (filter && filter->getProxy()->GetProperty("TimestepValues"))
+  if (filter && (   filter->getProxy()->GetProperty("TimestepValues")
+                 || filter->getProxy()->GetProperty("TimeRange") ))
     {
     pqMainWindowCoreHideInputTimes(filter, true);
     }
@@ -3116,7 +3118,8 @@ void pqMainWindowCore::onRemovingSource(pqPipelineSource *source)
         }
       }
 
-    if (filter->getProxy()->GetProperty("TimestepValues"))
+    if (   filter->getProxy()->GetProperty("TimestepValues")
+        || filter->getProxy()->GetProperty("TimeRange") )
       {
       pqMainWindowCoreHideInputTimes(filter, false);
       }

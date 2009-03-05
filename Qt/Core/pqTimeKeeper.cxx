@@ -70,6 +70,8 @@ pqTimeKeeper::pqTimeKeeper( const QString& group, const QString& name,
     vtkCommand::ModifiedEvent, this, SIGNAL(timeStepsChanged()));
   this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimestepValues"),
     vtkCommand::ModifiedEvent, this, SIGNAL(timeRangeChanged()));
+  this->Internals->VTKConnect->Connect(timekeeper->GetProperty("TimeRange"),
+    vtkCommand::ModifiedEvent, this, SIGNAL(timeRangeChanged()));
 
   pqServerManagerModel* smmodel = 
     pqApplicationCore::instance()->getServerManagerModel();
