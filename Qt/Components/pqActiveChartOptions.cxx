@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBoxChartOptionsHandler.h"
 #include "pqChartOptionsEditor.h"
 #include "pqChartOptionsHandler.h"
+#include "pqLineChartView.h"
 #include "pqLineChartOptionsEditor.h"
 #include "pqLineChartOptionsHandler.h"
 #include "pqOptionsDialog.h"
@@ -198,10 +199,10 @@ void pqActiveChartOptions::changeView(pqView *view)
     {
     pqPlotView *plotView = qobject_cast<pqPlotView *>(view);
     pqBarChartView *barChart = qobject_cast<pqBarChartView *>(view);
-    //pqLineChartView *lineChart = qobject_cast<pqBarChartView *>(view);
-    //pqStackedChartView *stackedChart = qobject_cast<pqBarChartView *>(view);
+    pqLineChartView *lineChart = qobject_cast<pqLineChartView *>(view);
+    //pqStackedChartView *stackedChart = qobject_cast<pqStackedChartView *>(view);
     //pqBoxChartView *boxChart = qobject_cast<pqBoxChartView *>(view);
-    if(plotView || barChart /*|| lineChart || stackedChart || boxChart*/)
+    if(plotView || barChart || lineChart /*|| stackedChart || boxChart*/)
       {
       this->Chart->setView(view);
       }
@@ -253,7 +254,7 @@ void pqActiveChartOptions::changeView(pqView *view)
       }
 
     pqLineChartOptionsEditor *lineOptions = this->LineChart->getOptions();
-    /*if(lineChart)
+    if(lineChart)
       {
       // Set the dialog title.
       this->Dialog->setWindowTitle("Line Chart Options");
@@ -272,7 +273,7 @@ void pqActiveChartOptions::changeView(pqView *view)
             this, SLOT(setLineHelpFormatModified()));
         }
       }
-    else*/ if(lineOptions)
+    else if(lineOptions)
       {
       // Remove the line chart options from the dialog.
       this->Dialog->removeOptions(lineOptions);

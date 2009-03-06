@@ -38,11 +38,11 @@ public:
   //ETX
 
   // Description:
-  // Provides access to the bar chart view.
+  // Provides access to the line chart view.
   vtkQtLineChartView* GetLineChartView();
 
   // Description:
-  // Sets the bar chart help format.
+  // Sets the line chart help format.
   // Don't call these methods directly, the should be used via properties alone.
   void SetHelpFormat(const char* format);
 

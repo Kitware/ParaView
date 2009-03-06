@@ -20,9 +20,10 @@
 #include "vtkQtChartWidget.h"
 #include "vtkQtChartMouseSelection.h"
 #include "vtkQtChartInteractorSetup.h"
+#include "vtkSMChartOptionsProxy.h"
 
 vtkStandardNewMacro(vtkSMLineChartViewProxy);
-vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMLineChartViewProxy::vtkSMLineChartViewProxy()
 {
@@ -57,7 +58,11 @@ void vtkSMLineChartViewProxy::CreateVTKObjects()
 
   // Set default color scheme to blues
   this->ChartView->SetColorSchemeToBlues();
-  
+
+  vtkSMChartOptionsProxy::SafeDownCast(
+    this->GetSubProxy("ChartOptions"))->SetChartView(
+    this->GetLineChartView());
+
   this->Superclass::CreateVTKObjects();
 }
 

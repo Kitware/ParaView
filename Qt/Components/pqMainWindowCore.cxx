@@ -79,6 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFiltersMenuManager.h"
 #include "pqSourcesMenuManager.h"
 #include "pqHelperProxyRegisterUndoElement.h"
+#include "pqLineChartView.h"
 #include "pqLineChartViewContextMenuHandler.h"
 #include "pqLinksManager.h"
 #include "pqLookmarkBrowser.h"
@@ -1116,6 +1117,8 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
       pqPlotView::XYPlotType(), chartOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
       pqBarChartView::barChartViewType(), chartOptions);
+    this->Implementation->ActiveViewOptions->registerOptions(
+      pqLineChartView::lineChartViewType(), chartOptions);
 
     pqActiveTwoDRenderViewOptions* twoDOptions = new pqActiveTwoDRenderViewOptions(
       this->Implementation->ActiveViewOptions);
@@ -1160,15 +1163,15 @@ pqViewContextMenuManager* pqMainWindowCore::getViewContextMenuManager()
     this->Implementation->ViewContextMenu->registerHandler(
       pqBarChartView::barChartViewType(), barChart);
 
-    // TODO: Line chart
+    // Line chart
     pqLineChartViewContextMenuHandler *lineChart =
       new pqLineChartViewContextMenuHandler(
       this->Implementation->ViewContextMenu);
     lineChart->setOptionsManager(this->getActiveViewOptionsManager());
     this->connect(lineChart, SIGNAL(screenshotRequested()),
       this, SLOT(onFileSaveScreenshot()));
-    //this->Implementation->ViewContextMenu->registerHandler(
-    //  pqLineChartView::lineChartViewType(), lineChart);
+    this->Implementation->ViewContextMenu->registerHandler(
+      pqLineChartView::lineChartViewType(), lineChart);
 
     // TODO: Stacked chart
     pqStackedChartViewContextMenuHandler *stackedChart =
