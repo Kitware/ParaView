@@ -236,6 +236,10 @@ public slots:
   /// View modules supporting interaction undo must override this method.
   virtual void redo();
 
+  /// Resets center of rotation if this->ResetCenterWithCamera is true.
+  void resetCenterOfRotationIfNeeded()
+    { this->onResetCameraEvent(); }
+
 private slots:
   // Called when vtkSMRenderViewProxy fires
   // ResetCameraEvent.

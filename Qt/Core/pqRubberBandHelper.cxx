@@ -433,6 +433,7 @@ void pqRubberBandHelper::processEvents(unsigned long eventId)
 
         case ZOOM:
           // nothing to do.
+          this->Internal->RenderView->resetCenterOfRotationIfNeeded();
           break;
           }
         }
