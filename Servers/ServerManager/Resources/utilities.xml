@@ -2560,6 +2560,16 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="SurfaceColor"
+        label="Surface"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
+        <Documentation>
+          Surface color.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <DoubleVectorProperty name="TextAnnotationColor"
         label="Text"
         number_of_elements="3"
