@@ -169,6 +169,19 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
+        <widget class="pqColorChooserButton" name="SurfaceColor" >
+         <property name="sizePolicy" >
+          <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text" >
+          <string>Surface Color</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="pqColorChooserButton" name="TextAnnotationColor" >
          <property name="sizePolicy" >
           <sizepolicy vsizetype="Fixed" hsizetype="Minimum" >

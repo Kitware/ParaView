@@ -106,6 +106,9 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->ForegroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->SurfaceColor,
+                  SIGNAL(chosenColorChanged(const QColor&)),
+                  this, SIGNAL(changesAvailable()));
   QObject::connect(this->Internal->BackgroundColor,
                   SIGNAL(chosenColorChanged(const QColor&)),
                   this, SIGNAL(changesAvailable()));
@@ -176,6 +179,8 @@ void pqApplicationOptions::applyChanges()
 
   settings->setValue("GlobalProperties/ForegroundColor", 
     this->Internal->ForegroundColor->chosenColor());
+  settings->setValue("GlobalProperties/SurfaceColor", 
+    this->Internal->SurfaceColor->chosenColor());
   settings->setValue("GlobalProperties/BackgroundColor", 
     this->Internal->BackgroundColor->chosenColor());
   settings->setValue("GlobalProperties/TextAnnotationColor", 
@@ -211,6 +216,9 @@ void pqApplicationOptions::resetChanges()
   this->Internal->ForegroundColor->setChosenColor(
     settings->value("GlobalProperties/ForegroundColor",
       QColor::fromRgbF(1, 1,1)).value<QColor>());
+  this->Internal->SurfaceColor->setChosenColor(
+    settings->value("GlobalProperties/SurfaceColor",
+      QColor::fromRgbF(1, 1,1)).value<QColor>());
   this->Internal->BackgroundColor->setChosenColor(
     settings->value("GlobalProperties/BackgroundColor",
       QColor::fromRgbF(0.32, 0.34, 0.43)).value<QColor>());
@@ -231,6 +239,7 @@ void pqApplicationOptions::resetColorsToDefault()
   // FIXME: Need some mechanism to centralize this crap! But this has taken too
   // long already so I am leaving this for now.
   this->Internal->ForegroundColor->setChosenColor(QColor::fromRgbF(1, 1,1));
+  this->Internal->SurfaceColor->setChosenColor(QColor::fromRgbF(1, 1,1));
   this->Internal->BackgroundColor->setChosenColor(
     QColor::fromRgbF(0.32, 0.34, 0.43));
   this->Internal->TextAnnotationColor->setChosenColor(QColor::fromRgbF(1, 1, 1));

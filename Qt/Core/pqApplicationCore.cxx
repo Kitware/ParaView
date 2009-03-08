@@ -318,6 +318,10 @@ void pqApplicationCore::loadGlobalPropertiesFromSettings()
     QColor::fromRgbF(1, 1, 1),
     "ForegroundColor");
   SET_COLOR_MACRO(
+    "GlobalProperties/SurfaceColor",
+    QColor::fromRgbF(1, 1, 1),
+    "SurfaceColor");
+  SET_COLOR_MACRO(
     "GlobalProperties/BackgroundColor",
     QColor::fromRgbF(0.32, 0.34, 0.43),
     "BackgroundColor");
