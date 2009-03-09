@@ -139,8 +139,16 @@ protected:
   // Only valid when TimeStepModes is true.
   vtkstd::map<double, vtkStdString> TimeStepToFile;
 
-  // TODO variable.
+  // Description:
+  // True if mode files describe vibrating fields.
+  bool FrequencyModes;
+  // Description:
+  // The rate at which the fields repeat.
+  // Only valid when FrequencyModes is true.
   double Frequency;
+  // Description:
+  // The phase of the current time step.  Set at the begining of RequestData.
+  double Phase;
 
 //ETX
 

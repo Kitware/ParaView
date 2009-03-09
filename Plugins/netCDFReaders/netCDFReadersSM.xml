@@ -190,6 +190,17 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="TimeRange" information_only="1">
+        <TimeRangeInformationHelper/>
+        <Documentation>
+          This magic property sends time range information to the animation
+          panel.  ParaView uses this information to set the range of time
+          for the animation.  This property is important for when there are
+          no timesteps but you still want to give ParaView a range of
+          values to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
     </SourceProxy> <!-- SLACReader -->
 
     <FileSeriesReaderProxy name="SLACParticleReader"

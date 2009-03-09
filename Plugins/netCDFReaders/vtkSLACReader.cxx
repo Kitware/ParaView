@@ -32,6 +32,7 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
 #include "vtkInformationObjectBaseKey.h"
+#include "vtkMath.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
@@ -45,6 +46,9 @@
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include <netcdf.h>
+
+#include <vtksys/RegularExpression.hxx>
+#include <math.h>
 
 using namespace vtkstd;
 
@@ -232,7 +236,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.4");
+vtkCxxRevisionMacro(vtkSLACReader, "1.5");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -259,6 +263,7 @@ vtkSLACReader::vtkSLACReader()
 
   this->ReadModeData = false;
   this->TimeStepModes = false;
+  this->FrequencyModes = false;
 }
 
 vtkSLACReader::~vtkSLACReader()
@@ -381,6 +386,8 @@ int vtkSLACReader::RequestInformation(
   this->ReadModeData = false;   // Assume false until everything checks out.
   this->TimeStepModes = false;
   this->TimeStepToFile.clear();
+  this->FrequencyModes = false;
+  this->Frequency = 0.0;
   if (!this->ModeFileNames.empty())
     {
     // Check the first mode file, assume that the rest follow.
@@ -400,29 +407,6 @@ int vtkSLACReader::RequestInformation(
       }
     else
       {
-      int ncoordDim;
-      CALL_NETCDF(nc_inq_dimid(modeFD(), "ncoord", &ncoordDim));
-
-      int numVariables;
-      CALL_NETCDF(nc_inq_nvars(modeFD(), &numVariables));
-
-      for (int i = 0; i < numVariables; i++)
-        {
-        int numDims;
-        CALL_NETCDF(nc_inq_varndims(modeFD(), i, &numDims));
-        if ((numDims < 1) || (numDims > 2)) continue;
-
-        int dimIds[2];
-        CALL_NETCDF(nc_inq_vardimid(modeFD(), i, dimIds));
-        if (dimIds[0] != ncoordDim) continue;
-
-        char name[NC_MAX_NAME+1];
-        CALL_NETCDF(nc_inq_varname(modeFD(), i, name));
-        if (strcmp(name, "coords") == 0) continue;
-
-        this->VariableArraySelection->AddArray(name);
-        }
-
       this->ReadModeData = true;
 
       // Read the "frequency".  When a time series is written, the frequency
@@ -443,7 +427,33 @@ int vtkSLACReader::RequestInformation(
         }
       else
         {
-        // TODO: Setup frequency reading.
+        this->FrequencyModes = true;
+        }
+
+      vtksys::RegularExpression imaginaryVar("_imag$");
+
+      int ncoordDim;
+      CALL_NETCDF(nc_inq_dimid(modeFD(), "ncoord", &ncoordDim));
+
+      int numVariables;
+      CALL_NETCDF(nc_inq_nvars(modeFD(), &numVariables));
+
+      for (int i = 0; i < numVariables; i++)
+        {
+        int numDims;
+        CALL_NETCDF(nc_inq_varndims(modeFD(), i, &numDims));
+        if ((numDims < 1) || (numDims > 2)) continue;
+
+        int dimIds[2];
+        CALL_NETCDF(nc_inq_vardimid(modeFD(), i, dimIds));
+        if (dimIds[0] != ncoordDim) continue;
+
+        char name[NC_MAX_NAME+1];
+        CALL_NETCDF(nc_inq_varname(modeFD(), i, name));
+        if (strcmp(name, "coords") == 0) continue;
+        if (this->FrequencyModes && imaginaryVar.find(name)) continue;
+
+        this->VariableArraySelection->AddArray(name);
         }
       }
     }
@@ -482,6 +492,13 @@ int vtkSLACReader::RequestInformation(
       }
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), range, 2);
     }
+  else if (this->FrequencyModes)
+    {
+    double range[2];
+    range[0] = 0;
+    range[1] = 1.0/this->Frequency;
+    outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), range, 2);
+    }
 
   return 1;
 }
@@ -498,6 +515,19 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
     {
     vtkErrorMacro("No filename specified.");
     return 0;
+    }
+
+  double time =  0.0;
+  bool timeValid = false;
+  if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
+    {
+    time =outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),0);
+    timeValid = true;
+    }
+
+  if (this->FrequencyModes)
+    {
+    this->Phase = vtkMath::DoubleTwoPi()*(time*this->Frequency);
     }
 
   // Set up point data.
@@ -522,11 +552,8 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
   if (this->ReadModeData)
     {
     vtkStdString modeFileName;
-    if (   this->TimeStepModes
-        && outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()) )
+    if (this->TimeStepModes && timeValid)
       {
-      double time
-        = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS(),0);
       modeFileName = this->TimeStepToFile.lower_bound(time)->second;
       }
     else
@@ -856,6 +883,36 @@ int vtkSLACReader::ReadFieldData(int modeFD, vtkMultiBlockDataSet *output)
     vtkSmartPointer<vtkDataArray> dataArray
       = this->ReadPointDataArray(modeFD, varId);
     if (!dataArray) continue;
+
+    // Check for imaginary component of mode data.
+    if (this->FrequencyModes)
+      {
+      vtkStdString imagName = name;
+      imagName += "_imag";
+      if (nc_inq_varid(modeFD, imagName.c_str(), &varId) == NC_NOERR)
+        {
+        // I am assuming here that the imaginary data (if it exists) has the
+        // same dimensions as the real data.
+        vtkSmartPointer<vtkDataArray> imagDataArray
+          = this->ReadPointDataArray(modeFD, varId);
+        if (imagDataArray)
+          {
+          int numComponents = dataArray->GetNumberOfComponents();
+          vtkIdType numTuples = dataArray->GetNumberOfTuples();
+          for (vtkIdType i = 0; i < numTuples; i++)
+            {
+            for (int j = 0; j < numComponents; j++)
+              {
+              double real = dataArray->GetComponent(i, j);
+              double imag = imagDataArray->GetComponent(i, j);
+              double mag = sqrt(real*real + imag*imag);
+              double startphase = atan2(imag, real);
+              dataArray->SetComponent(i, j, mag*cos(startphase*this->Phase));
+              }
+            }
+          }
+        }
+      }
 
     // Add the data to the point data.
     dataArray->SetName(name);
