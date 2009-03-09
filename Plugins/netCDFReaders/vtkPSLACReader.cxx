@@ -32,6 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkSortDataArray.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkDoubleArray.h"
@@ -157,7 +158,7 @@ void vtkPSLACReaderMapValues1(const T *inArray, T *outArray, int numComponents,
 // }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPSLACReader, "1.1");
+vtkCxxRevisionMacro(vtkPSLACReader, "1.2");
 vtkStandardNewMacro(vtkPSLACReader);
 
 vtkCxxSetObjectMacro(vtkPSLACReader, Controller, vtkMultiProcessController);
@@ -333,7 +334,7 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
 
   // Iterate over all points of all cells and mark what points we encounter
   // in GlobalToLocalIds.
-  this->GlobalToLocalIds.clear ();
+  this->GlobalToLocalIds.clear();
   VTK_CREATE(vtkCompositeDataIterator, outputIter);
   for (outputIter.TakeReference(output->NewIterator());
        !outputIter->IsDoneWithTraversal(); outputIter->GoToNextItem())
@@ -362,12 +363,27 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
         }
       }
     }
-  this->LocalToGlobalIds->Allocate(this->GlobalToLocalIds.size());
 
   // ---------------------------------
-  // Now that we have the local/global id maps, we can determine which process
-  // will send what point data where.  This is also where we assign local ids to
-  // global ids (i.e. determine locally where we store each point).
+  // Now that we know all the global ids we have, create a map from local
+  // to global ids.  First we'll just copy the global ids into the array and
+  // then sort them.  Sorting them will make the global ids monotonically
+  // increasing, which means that when we get data from another process we
+  // can just copy it into a block of memory.  We are only calculating the
+  // local to global id map for now.  We will fill the global to local id
+  // later when we iterate over the local ids.
+  this->LocalToGlobalIds->Allocate(this->GlobalToLocalIds.size());
+  for (GlobalToLocalIdType::iterator itr = this->GlobalToLocalIds.begin();
+       itr != this->GlobalToLocalIds.end(); itr++)
+    {
+    this->LocalToGlobalIds->InsertNextValue(itr->first);
+    }
+  vtkSortDataArray::Sort(this->LocalToGlobalIds);
+
+  // ---------------------------------
+  // Now that we have the local to global id maps, we can determine which
+  // process will send what point data where.  This is also where we assign
+  // local ids to global ids (i.e. determine locally where we store each point).
   this->PointsExpectedFromProcessesLengths = vtkSmartPointer<vtkIdTypeArray>::New();
   this->PointsExpectedFromProcessesLengths->SetNumberOfTuples(this->NumberOfPieces);
   this->PointsExpectedFromProcessesOffsets = vtkSmartPointer<vtkIdTypeArray>::New();
@@ -384,23 +400,21 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
   this->NumberOfGlobalPoints
     = this->GetNumTuplesInVariable(meshFD, coordsVarId, 3);
 
-  // Iterate over our GlobalToLocalIds map and determine which process reads
+  // Iterate over our LocalToGlobalIds map and determine which process reads
   // which points.
-  GlobalToLocalIdType::iterator itr = this->GlobalToLocalIds.begin();
+  vtkIdType localId = 0;
+  vtkIdType numLocalIds = this->LocalToGlobalIds->GetNumberOfTuples();
   for (int process = 0; process < this->NumberOfPieces; process++)
     {
     VTK_CREATE(vtkIdTypeArray, pointList);
     pointList->Allocate(this->NumberOfGlobalPoints/this->NumberOfPieces,
                         this->NumberOfGlobalPoints/this->NumberOfPieces);
     vtkIdType lastId = this->EndPointRead(process);
-    for ( ; (itr != this->GlobalToLocalIds.end()) && (itr->first < lastId); itr++)
+    for ( ; (localId < numLocalIds); localId++)
       {
-      // As we iterate over ids we load, assign local ids such that they
-      // monotonically increase with respect to their global ids.  That way,
-      // we can copy data directly from what each process sends us.
-      vtkIdType globalId = itr->first;
-      vtkIdType localId = this->LocalToGlobalIds->InsertNextValue(globalId);
-      itr->second = localId;
+      vtkIdType globalId = this->LocalToGlobalIds->GetValue(localId);
+      if (globalId >= lastId) break;
+      this->GlobalToLocalIds[globalId] = localId;
       pointList->InsertNextValue(globalId);
       }
 

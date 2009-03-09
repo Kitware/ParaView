@@ -36,8 +36,13 @@
 #include "vtkSLACReader.h"
 
 #include <vtkstd/vector>        // For interal lists
+#include <vtksys/hash_map.hxx>  // For internal maps
 
 class vtkMultiProcessController;
+
+struct vtkSLACReaderIdTypeHash {
+  size_t operator()(vtkIdType val) const { return val; }
+};
 
 class vtkPSLACReader : public vtkSLACReader
 {
@@ -90,7 +95,8 @@ protected:
   // Description:
   // A map from local point ids to global ids.  Can also be used as the
   // global point ids.
-  typedef vtkstd::map<vtkIdType, vtkIdType> GlobalToLocalIdType;
+  typedef vtksys::hash_map<vtkIdType, vtkIdType, vtkSLACReaderIdTypeHash>
+    GlobalToLocalIdType;
   GlobalToLocalIdType GlobalToLocalIds;
   vtkSmartPointer<vtkIdTypeArray> LocalToGlobalIds;
 
