@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.9");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -461,12 +461,10 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
     //cls
     if (firstpass) //workaround a crash that shows up on some mac's
       {
+      renWin->Render();
       firstpass = false;
       }
-    else
-      {
-      ren->Clear(); 
-      }    
+    ren->Clear(); 
     //don't cls on following render passes
     renWin->EraseOff();
     ren->EraseOff();
