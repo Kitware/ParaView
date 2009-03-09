@@ -236,7 +236,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.5");
+vtkCxxRevisionMacro(vtkSLACReader, "1.6");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -980,7 +980,8 @@ int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
   vtkIdType newPointTotal = points->GetNumberOfPoints () + midpointCoords.size ();
 
   // Get a map of found midpoints ready (edge -> local point id).
-  typedef map<pair<vtkIdType, vtkIdType>, vtkIdType> vtkMidpointIdMap;
+  typedef vtksys::hash_map<pair<vtkIdType, vtkIdType>, vtkIdType,
+                           vtkSLACReaderIdTypePairHash> vtkMidpointIdMap;
   vtkMidpointIdMap midpointIds;
 
   // Set up the point information for adding new points.

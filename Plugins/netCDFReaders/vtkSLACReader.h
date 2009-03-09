@@ -37,13 +37,25 @@
 
 #include "vtkSmartPointer.h"    // For ivars
 #include "vtkStdString.h"       // For ivars
-#include <vtkstd/map>           // For internal map
+#include <vtkstd/map>           // For internal maps
 #include <vtkstd/vector>        // For ivars
+#include <vtksys/hash_map.hxx>  // For internal maps
 
 class vtkDataArraySelection;
 class vtkIdTypeArray;
 class vtkInformationIntegerKey;
 class vtkInformationObjectBaseKey;
+
+struct vtkSLACReaderIdTypeHash {
+  size_t operator()(vtkIdType val) const { return static_cast<size_t>(val); }
+};
+
+struct vtkSLACReaderIdTypePairHash {
+  size_t operator()(vtkstd::pair<vtkIdType, vtkIdType> val) const {
+    return (  static_cast<size_t>(val.first)
+            + 3*static_cast<size_t>(val.second) );
+  }
+};
 
 class vtkSLACReader : public vtkMultiBlockDataSetAlgorithm
 {
@@ -235,7 +247,8 @@ protected:
   // Description:
   // A map from two edge midpoints to their midpoint.  This is how midpoints are
   // stored in the mesh files.
-  typedef vtkstd::map<vtkstd::pair<vtkIdType, vtkIdType>, vtkMidpoint>
+  typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>, vtkMidpoint,
+                           vtkSLACReaderIdTypePairHash>
     vtkMidpointCoordinateMap;
 //ETX
 

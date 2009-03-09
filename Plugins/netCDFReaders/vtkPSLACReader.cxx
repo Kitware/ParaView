@@ -158,7 +158,7 @@ void vtkPSLACReaderMapValues1(const T *inArray, T *outArray, int numComponents,
 // }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPSLACReader, "1.2");
+vtkCxxRevisionMacro(vtkPSLACReader, "1.3");
 vtkStandardNewMacro(vtkPSLACReader);
 
 vtkCxxSetObjectMacro(vtkPSLACReader, Controller, vtkMultiProcessController);
@@ -759,7 +759,9 @@ int vtkPSLACReader::ReadMidpointCoordinates (
                     process);
     }
 
-  vtkstd::map< vtkstd::pair<vtkIdType, vtkIdType>, double *> MidpointsAvailable;
+  typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>, double *,
+                           vtkSLACReaderIdTypePairHash> MidpointsAvailableType;
+  MidpointsAvailableType MidpointsAvailable;
   for (int i = 0; i < MidpointsToRedistribute->GetNumberOfTuples (); i ++) 
     {
     double *mp  = MidpointsToRedistribute->GetPointer (i*6);
@@ -793,7 +795,7 @@ int vtkPSLACReader::ReadMidpointCoordinates (
     midpointsToRedistribute->SetNumberOfComponents (6);
     for (vtkIdType i = start; i < end; i ++)
       {
-      vtkstd::map< vtkstd::pair<vtkIdType, vtkIdType>, double*>::const_iterator iter;
+      MidpointsAvailableType::const_iterator iter;
       vtkIdType e[2];
       this->EdgesToSendToProcesses->GetTupleValue (i, e);
       iter = MidpointsAvailable.find (vtkstd::make_pair(MY_MIN(e[0], e[1]), MY_MAX(e[0], e[1])));
@@ -819,7 +821,8 @@ int vtkPSLACReader::ReadMidpointCoordinates (
   // finally, we have all midpoints that correspond to edges we know about
   // convert their edge points to localId and insert into the map and return.
   vtkIdType numMids = MidpointsToReceive->GetNumberOfTuples ();
-  vtkstd::map<vtkIdType, vtkIdType> localMap;
+  typedef vtksys::hash_map<vtkIdType, vtkIdType, vtkSLACReaderIdTypeHash> localMapType;
+  localMapType localMap;
   for (vtkIdType i = 0; i < numMids; i ++)
     {
     double *mp = MidpointsToReceive->GetPointer (i * 6);
@@ -827,7 +830,7 @@ int vtkPSLACReader::ReadMidpointCoordinates (
      
     vtkIdType local0 = this->GlobalToLocalIds[static_cast<vtkIdType>(mp[0])];
     vtkIdType local1 = this->GlobalToLocalIds[static_cast<vtkIdType>(mp[1])];
-    vtkstd::map<vtkIdType, vtkIdType>::const_iterator iter;
+    localMapType::const_iterator iter;
     iter = localMap.find (static_cast<vtkIdType>(mp[5]));
     vtkIdType index;
     if (iter == localMap.end ())

@@ -36,13 +36,8 @@
 #include "vtkSLACReader.h"
 
 #include <vtkstd/vector>        // For interal lists
-#include <vtksys/hash_map.hxx>  // For internal maps
 
 class vtkMultiProcessController;
-
-struct vtkSLACReaderIdTypeHash {
-  size_t operator()(vtkIdType val) const { return val; }
-};
 
 class vtkPSLACReader : public vtkSLACReader
 {
