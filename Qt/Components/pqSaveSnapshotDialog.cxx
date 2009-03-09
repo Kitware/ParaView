@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIntValidator>
 
 // ParaView Includes.
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSMProxy.h"
 
 class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
@@ -79,6 +82,20 @@ pqSaveSnapshotDialog::pqSaveSnapshotDialog(QWidget* _parent,
     this, SLOT(onLockAspectRatio(bool)));
   QObject::connect(this->Internal->selectedViewOnly, SIGNAL(toggled(bool)),
     this, SLOT(updateSize()));
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin("palettes"); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetKey());
+    if (prototype)
+      {
+      this->Internal->palette->addItem(prototype->GetXMLLabel(),
+        prototype->GetXMLName());
+      }
+    }
+  iter->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -178,3 +195,10 @@ void pqSaveSnapshotDialog::onHeightEdited()
     }
 }
 
+//-----------------------------------------------------------------------------
+QString pqSaveSnapshotDialog::palette() const
+{
+  QString data = this->Internal->palette->itemData(
+    this->Internal->palette->currentIndex()).toString();
+  return data;
+}

@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>283</width>
-    <height>174</height>
+    <width>286</width>
+    <height>232</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -117,6 +117,25 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <widget class="pqIntRangeWidget" native="1" name="quality" />
+   </item>
+   <item>
+    <widget class="QLabel" name="label_4" >
+     <property name="text" >
+      <string>&lt;b>Override Color Palette&lt;/b></string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QComboBox" name="palette" >
+     <item>
+      <property name="text" >
+       <string>Current Palette</string>
+      </property>
+     </item>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" >

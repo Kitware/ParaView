@@ -2606,6 +2606,91 @@
     <!-- End of group "misc" -->
   </ProxyGroup>
 
+  <ProxyGroup name="palettes">
+    <Proxy name="Screen" label="Screen">
+      <DoubleVectorProperty name="ForegroundColor"
+        label="Foreground"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackgroundColor"
+        label="Background"
+        number_of_elements="3"
+        default_values="0.32 0.34 0.43">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SurfaceColor"
+        label="Surface"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TextAnnotationColor"
+        label="Text"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SelectionColor"
+        label="Selection"
+        number_of_elements="3"
+        default_values="1.0 0.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EdgeColor"
+        label="Edges"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.5">
+      </DoubleVectorProperty>
+
+    <!-- End of (palettes, Screen) -->
+    </Proxy>
+
+    <Proxy name="Print" label="Print">
+      <DoubleVectorProperty name="ForegroundColor"
+        label="Foreground"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="BackgroundColor"
+        label="Background"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SurfaceColor"
+        label="Surface"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TextAnnotationColor"
+        label="Text"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SelectionColor"
+        label="Selection"
+        number_of_elements="3"
+        default_values="1.0 0.0 1.0">
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="EdgeColor"
+        label="Edges"
+        number_of_elements="3"
+        default_values="0.0 0.0 0.5">
+      </DoubleVectorProperty>
+
+    <!-- End of (palettes, Print) -->
+    </Proxy>
+
+
+    <!-- End of group "palettes" -->
+  </ProxyGroup>
+
   <ProxyGroup name="exporters">
     <!-- Proxy group for exporters used to export views.  -->
 

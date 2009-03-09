@@ -34,6 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationOptions.h"
 #include "ui_pqApplicationOptions.h"
 
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyDefinitionIterator.h"
+#include "vtkSMPropertyHelper.h"
+
 #include "pqApplicationCore.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPluginManager.h"
@@ -41,8 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
+#include "pqSetName.h"
 
+#include <QMenu>
 #include <QDoubleValidator>
+#include <QtDebug>
 
 class pqApplicationOptions::pqInternal 
   : public Ui::pqApplicationOptions
@@ -125,6 +132,27 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
   QObject::connect(this->Internal->ResetColorsToDefault, 
     SIGNAL(clicked()),
     this, SLOT(resetColorsToDefault()));
+
+  QMenu* paletteMenu = new QMenu(this->Internal->Palette)
+    << pqSetName("paletteMenu");
+  this->Internal->Palette->setMenu(paletteMenu);
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxyDefinitionIterator* iter = vtkSMProxyDefinitionIterator::New();
+  iter->SetModeToOneGroup();
+  for (iter->Begin("palettes"); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes", iter->GetKey());
+    if (prototype)
+      {
+      paletteMenu->addAction(prototype->GetXMLLabel())
+        << pqSetName(prototype->GetXMLName());
+      }
+    }
+  iter->Delete();
+
+  QObject::connect(paletteMenu, SIGNAL(triggered(QAction*)),
+    this, SLOT(onPalette(QAction*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -245,4 +273,45 @@ void pqApplicationOptions::resetColorsToDefault()
   this->Internal->TextAnnotationColor->setChosenColor(QColor::fromRgbF(1, 1, 1));
   this->Internal->SelectionColor->setChosenColor(QColor::fromRgbF(1, 0, 1));
   this->Internal->EdgeColor->setChosenColor(QColor::fromRgbF(0, 0, 0.5));
+}
+
+
+inline QColor getQColor(vtkSMProxy* proxy, const char* pname)
+{
+  vtkSMPropertyHelper helper(proxy, pname);
+  return QColor::fromRgbF(
+    helper.GetAsDouble(0),
+    helper.GetAsDouble(1),
+    helper.GetAsDouble(2));
+}
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::loadPalette(const QString& paletteName)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
+    paletteName.toAscii().data());
+  if (!prototype)
+    {
+    qCritical() << "No such palette " << paletteName;
+    return;
+    }
+ 
+  this->Internal->ForegroundColor->setChosenColor(
+    ::getQColor(prototype, "ForegroundColor"));
+  this->Internal->BackgroundColor->setChosenColor(
+    ::getQColor(prototype, "BackgroundColor"));
+  this->Internal->SurfaceColor->setChosenColor(
+    ::getQColor(prototype, "SurfaceColor"));
+  this->Internal->TextAnnotationColor->setChosenColor(
+    ::getQColor(prototype, "TextAnnotationColor"));
+  this->Internal->EdgeColor->setChosenColor(
+    ::getQColor(prototype, "EdgeColor"));
+  this->Internal->SelectionColor->setChosenColor(
+    ::getQColor(prototype, "SelectionColor"));
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::onPalette(QAction* action)
+{
+  this->loadPalette(action->objectName());
 }

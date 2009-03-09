@@ -1970,7 +1970,6 @@ void pqMainWindowCore::onFileSaveScreenshot()
     {
     return;
     }
-  QSize chosenSize = ssDialog.viewSize();
 
   QString filters;
   filters += "PNG image (*.png)";
@@ -1979,37 +1978,57 @@ void pqMainWindowCore::onFileSaveScreenshot()
   filters += ";;PPM image (*.ppm)";
   filters += ";;JPG image (*.jpg)";
   filters += ";;PDF file (*.pdf)";
-  pqFileDialog* const file_dialog = new pqFileDialog(NULL,
+  pqFileDialog file_dialog(NULL,
     this->Implementation->Parent, tr("Save Screenshot:"), QString(), filters);
-  file_dialog->setRecentlyUsedExtension(this->ScreenshotExtension);
-  file_dialog->setObjectName("FileSaveScreenshotDialog");
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-  if (file_dialog->exec() == QDialog::Accepted)
+  file_dialog.setRecentlyUsedExtension(this->ScreenshotExtension);
+  file_dialog.setObjectName("FileSaveScreenshotDialog");
+  file_dialog.setFileMode(pqFileDialog::AnyFile);
+  if (file_dialog.exec() != QDialog::Accepted)
     {
-    vtkSmartPointer<vtkImageData> img;
-    QString file = file_dialog->getSelectedFiles()[0];
-    QFileInfo fileInfo = QFileInfo( file );
-    this->ScreenshotExtension = QString("*.") + fileInfo.suffix();
-    
-    if (ssDialog.saveAllViews())
-      {
-      img.TakeReference(this->multiViewManager().captureImage( 
-          chosenSize.width(), chosenSize.height()));
-      }
-    else
-      {
-      img.TakeReference(view->captureImage(chosenSize));
-      }
-
-    if (img.GetPointer() == NULL)
-      {
-      qCritical() << "Save Image failed.";
-      }
-    else
-      {
-      pqImageUtil::saveImage(img, file, ssDialog.quality());
-      }
+    return;
     }
+
+  QSize chosenSize = ssDialog.viewSize();
+  QString palette = ssDialog.palette();
+
+  // temporarily load the color palette chosen by the user.
+  vtkSmartPointer<vtkPVXMLElement> currentPalette;
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (!palette.isEmpty())
+    {
+    currentPalette.TakeReference(core->getCurrrentPalette());
+    core->loadPalette(palette);
+    }
+  vtkSmartPointer<vtkImageData> img;
+  QString file = file_dialog.getSelectedFiles()[0];
+  QFileInfo fileInfo = QFileInfo( file );
+  this->ScreenshotExtension = QString("*.") + fileInfo.suffix();
+
+  if (ssDialog.saveAllViews())
+    {
+    img.TakeReference(this->multiViewManager().captureImage( 
+        chosenSize.width(), chosenSize.height()));
+    }
+  else
+    {
+    img.TakeReference(view->captureImage(chosenSize));
+    }
+
+  if (img.GetPointer() == NULL)
+    {
+    qCritical() << "Save Image failed.";
+    }
+  else
+    {
+    pqImageUtil::saveImage(img, file, ssDialog.quality());
+    }
+
+  // restore palette.
+  if (!palette.isEmpty())
+    {
+    core->loadPalette(currentPalette);
+    }
+
 }
 
 //-----------------------------------------------------------------------------

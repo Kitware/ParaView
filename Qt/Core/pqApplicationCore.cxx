@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPQStateLoader.h"
 #include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -337,6 +338,51 @@ void pqApplicationCore::loadGlobalPropertiesFromSettings()
     "GlobalProperties/EdgeColor",
     QColor::fromRgbF(0.0, 0, 0.5),
     "EdgeColor");
+}
+
+//-----------------------------------------------------------------------------
+/// loads palette i.e. global property values given the name of the palette.
+void pqApplicationCore::loadPalette(const QString& paletteName)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("palettes",
+    paletteName.toAscii().data());
+  if (!prototype)
+    {
+    qCritical() << "No such palette " << paletteName;
+    return;
+    }
+
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  vtkSMPropertyIterator * iter = mgr->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    if (prototype->GetProperty(iter->GetKey()))
+      {
+      iter->GetProperty()->Copy(
+        prototype->GetProperty(iter->GetKey()));
+      }
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+/// loads palette i.e. global property values given the name XML state for a
+/// palette.
+void pqApplicationCore::loadPalette(vtkPVXMLElement* xml)
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  mgr->LoadState(xml, NULL);
+}
+
+//-----------------------------------------------------------------------------
+/// save the current palette as XML. A new reference is returned, so the
+/// caller is responsible for releasing memory i.e. call Delete() on the
+/// returned value.
+vtkPVXMLElement* pqApplicationCore::getCurrrentPalette()
+{
+  vtkSMGlobalPropertiesManager* mgr = this->getGlobalPropertiesManager();
+  return mgr->SaveState(NULL);
 }
 
 //-----------------------------------------------------------------------------

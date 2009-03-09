@@ -223,14 +223,33 @@ p, li { white-space: pre-wrap; }
        <item>
         <layout class="QHBoxLayout" >
          <item>
+          <widget class="QToolButton" name="Palette" >
+           <property name="text" >
+            <string>Choose Palette</string>
+           </property>
+           <property name="popupMode" >
+            <enum>QToolButton::MenuButtonPopup</enum>
+           </property>
+           <property name="toolButtonStyle" >
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise" >
+            <bool>false</bool>
+           </property>
+           <property name="arrowType" >
+            <enum>Qt::NoArrow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer>
            <property name="orientation" >
             <enum>Qt::Horizontal</enum>
            </property>
            <property name="sizeHint" >
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>53</width>
+             <height>28</height>
             </size>
            </property>
           </spacer>

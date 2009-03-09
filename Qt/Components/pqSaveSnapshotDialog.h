@@ -60,6 +60,11 @@ public:
 
   /// Returns if the user requested to save all views.
   bool saveAllViews() const;
+
+  /// Returns the color palette chosen. If none is chosen 
+  /// (i.e. "Current Palette" is selected, then an empty string is returned.
+  QString palette() const;
+
 protected slots:
   /// Called when the user has edited width. If aspect ratio is locked,
   /// we will scale the height to maintain the aspect ration.

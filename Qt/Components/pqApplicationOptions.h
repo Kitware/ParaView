@@ -58,8 +58,13 @@ public:
   // tell pqOptionsDialog that we want an apply button
   virtual bool isApplyUsed() const { return true; }
 
+public slots:
+  /// load a palette with the given name.
+  void loadPalette(const QString& name);
+
 protected slots:
   void resetColorsToDefault();
+  void onPalette(QAction*);
 
 private:
   class pqInternal;

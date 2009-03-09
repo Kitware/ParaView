@@ -58,16 +58,12 @@ public:
     vtkSMProxy*, const char* propname);
 
   // Description:
-  // Saves the state. This totally overrides the superclass method, since in
-  // near future I want to make this class a vtkSMObject subclass (and not a
-  // vtkSMProxy).
-  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+  // Saves the links state.
+  virtual vtkPVXMLElement* SaveLinkState(vtkPVXMLElement* root);
 
   // Description:
-  // Loads the state. This totally overrides the superclass method, since in
-  // near future I want to make this class a vtkSMObject subclass (and not a
-  // vtkSMProxy).
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+  // Loads the state for the links.
+  virtual int LoadLinkState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
 
 //BTX
   struct ModifiedInfo

@@ -197,6 +197,18 @@ public:
   /// Loads global properties values from settings.
   void loadGlobalPropertiesFromSettings();
 
+  /// loads palette i.e. global property values given the name of the palette.
+  void loadPalette(const QString& name);
+
+  /// loads palette i.e. global property values given the name XML state for a
+  /// palette.
+  void loadPalette(vtkPVXMLElement* xml);
+
+  /// save the current palette as XML. A new reference is returned, so the
+  /// caller is responsible for releasing memory i.e. call Delete() on the
+  /// returned value.
+  vtkPVXMLElement* getCurrrentPalette();
+ 
 public slots:
   /// Called QCoreApplication::quit().
   /// Applications should use this method instead of directly

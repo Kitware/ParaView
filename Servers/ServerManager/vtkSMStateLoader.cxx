@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.33");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.34");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -318,7 +318,7 @@ int vtkSMStateLoader::HandleGlobalPropertiesManagers(vtkPVXMLElement* element)
       pxm->SetGlobalPropertiesManager(mgrname, mgr);
       mgr->Delete();
       }
-    if (!mgr->LoadState(currentElement, this->ProxyLocator))
+    if (!mgr->LoadLinkState(currentElement, this->ProxyLocator))
       {
       return 0;
       }

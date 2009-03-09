@@ -43,7 +43,7 @@ public:
 
 
 vtkStandardNewMacro(vtkSMGlobalPropertiesManager);
-vtkCxxRevisionMacro(vtkSMGlobalPropertiesManager, "1.3");
+vtkCxxRevisionMacro(vtkSMGlobalPropertiesManager, "1.4");
 //----------------------------------------------------------------------------
 vtkSMGlobalPropertiesManager::vtkSMGlobalPropertiesManager()
 {
@@ -197,7 +197,7 @@ void vtkSMGlobalPropertiesManager::SetPropertyModifiedFlag(const char* name,
 }
 
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkSMGlobalPropertiesManager::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMGlobalPropertiesManager::SaveLinkState(vtkPVXMLElement* root)
 {
   vtkPVXMLElement* elem = vtkPVXMLElement::New();
   elem->SetName("GlobalPropertiesManager");
@@ -235,7 +235,7 @@ vtkPVXMLElement* vtkSMGlobalPropertiesManager::SaveState(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-int vtkSMGlobalPropertiesManager::LoadState(
+int vtkSMGlobalPropertiesManager::LoadLinkState(
   vtkPVXMLElement* elem, vtkSMProxyLocator* locator)
 {
   unsigned int numElems = elem->GetNumberOfNestedElements();
