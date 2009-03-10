@@ -204,14 +204,17 @@ ClientGeoView::ClientGeoView(
     vtkSmartPointer<vtkGeoTerrain> terrain =
       vtkSmartPointer<vtkGeoTerrain>::New();
     terrain->SetSource(globeSource);
+    globeSource->Initialize();
     this->Implementation->View->SetTerrain(terrain);
 
     vtkSmartPointer<vtkGeoFileImageSource> imageSource =
       vtkSmartPointer<vtkGeoFileImageSource>::New();
     imageSource->SetPath(tileDatabase.c_str());
+    imageSource->Initialize();
     vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
       vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
     imageRep->SetSource(imageSource);
+
     this->Implementation->View->AddRepresentation(imageRep);
     }
 

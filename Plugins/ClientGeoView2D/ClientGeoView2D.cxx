@@ -116,6 +116,7 @@ public:
     this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
     this->ImageSource = vtkSmartPointer<vtkGeoAlignedImageSource>::New();
     this->ProjectionSource = vtkSmartPointer<vtkGeoProjectionSource>::New();
+    this->ProjectionSource->Initialize();
     this->Transform = vtkSmartPointer<vtkGeoTransform>::New();
     this->ProjectionIndex = 40;
     vtkSmartPointer<vtkGeoProjection> proj =
@@ -205,6 +206,7 @@ ClientGeoView2D::ClientGeoView2D(
     vtkSmartPointer<vtkGeoFileImageSource> imageSource =
       vtkSmartPointer<vtkGeoFileImageSource>::New();
     imageSource->SetPath(tileDatabase.c_str());
+    imageSource->Initialize();
     vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
       vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
     imageRep->SetSource(imageSource);
