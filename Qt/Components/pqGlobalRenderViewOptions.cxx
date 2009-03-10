@@ -149,7 +149,7 @@ void pqGlobalRenderViewOptions::init()
       << this->Internal->comboBoxCamera3D_8 << this->Internal->comboBoxCamera3D_9;
  
   this->Internal->CameraControl3DComboItemList //<< "FlyIn" << "FlyOut" << "Move"
-     << "Pan" << "Roll" << "Rotate" << "Zoom";
+    << "Pan" << "Roll" << "Rotate" << "Multi-Rotate" << "Zoom";
   
   for ( int cc = 0; cc < this->Internal->CameraControl3DComboBoxList.size(); cc++ )
     {

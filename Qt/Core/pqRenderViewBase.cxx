@@ -285,6 +285,10 @@ vtkSMProxy* pqRenderViewBase::createCameraManipulator(
     {
     strManipName = "TrackballPan1";
     }
+  else if (name.compare("Multi-Rotate") == 0)
+    {
+    strManipName = "TrackballMultiRotate";
+    }
   else
     {
     strManipName = "None";

@@ -2747,6 +2747,10 @@
 
     <Proxy name="TrackballZoom" class="vtkPVTrackballZoom" base_proxygroup="cameramanipulators"
       base_proxyname="CameraManipulator"/>
+
+    <Proxy name="TrackballMultiRotate" class="vtkPVTrackballMultiRotate"
+           base_proxygroup="cameramanipulators"
+           base_proxyname="CameraManipulator" />
   </ProxyGroup>
 
   <ProxyGroup name="compositers">

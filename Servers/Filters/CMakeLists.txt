@@ -118,6 +118,7 @@ SET(Filters_SRCS
   vtkPVSummaryHelper.cxx
   vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
+  vtkPVTrackballMultiRotate.cxx
   vtkPVTrackballPan.cxx
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
