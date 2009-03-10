@@ -289,6 +289,7 @@ IF(BUILD_TESTING)
     ExTimeseries
     ExtractBlock
     ExtractLevel
+    FFTOverTime
     Flow
     Flow2
     Fractal2D

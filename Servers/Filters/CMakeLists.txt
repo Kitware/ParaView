@@ -139,6 +139,7 @@ SET(Filters_SRCS
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
   vtkSurfaceVectors.cxx
+  vtkTableFFT.cxx
   vtkTableStreamer.cxx
 #  vtkTemporalCacheFilter.cxx
 #  vtkTemporalPickFilter.cxx

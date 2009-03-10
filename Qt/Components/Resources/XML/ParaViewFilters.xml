@@ -79,6 +79,7 @@
   <Filter name="ExtractSelectionOverTime" />
   <Filter name="ExtractHierarchicalDataSets" />
   <Filter name="FeatureEdges" />
+  <Filter name="FFTSelectionOverTime" />
   <Filter name="GenerateIdScalars"/>
   <Filter name="Glyph" />
   <Filter name="Gradient" />
