@@ -68,7 +68,7 @@ protected:
 
 private:
   vtkPVTrackballMultiRotate(const vtkPVTrackballMultiRotate &); // Not implemented
-  void operator=(const vtkPVTrackballMultiRotate &);
+  void operator=(const vtkPVTrackballMultiRotate &); // Not implemented
 };
 
 #endif //__vtkPVTrackballMultiRotate_h
