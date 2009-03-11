@@ -35,8 +35,11 @@
 
 #include <string.h>
 
+#include <vtksys/SystemTools.hxx>
+using namespace vtksys;
+
 //=============================================================================
-vtkCxxRevisionMacro(vtkTableFFT, "1.2");
+vtkCxxRevisionMacro(vtkTableFFT, "1.3");
 vtkStandardNewMacro(vtkTableFFT);
 
 //-----------------------------------------------------------------------------
@@ -77,7 +80,7 @@ int vtkTableFFT::RequestData(vtkInformation *vtkNotUsed(request),
     if (array->GetNumberOfComponents() != 1) continue;
     if (array->GetName())
       {
-      if (strcasecmp(array->GetName(),"time") == 0) continue;
+      if (SystemTools::Strucmp(array->GetName(),"time") == 0) continue;
       if (strcmp(array->GetName(), "vtkValidPointMask") == 0)
         {
         output->AddColumn(array);
