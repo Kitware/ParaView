@@ -40,7 +40,7 @@
 
 #include "vtkSmartPointer.h"    // For internal method.
 
-class vtkTableFFT : public vtkTableAlgorithm
+class VTK_EXPORT vtkTableFFT : public vtkTableAlgorithm
 {
 public:
   vtkTypeRevisionMacro(vtkTableFFT, vtkTableAlgorithm);
