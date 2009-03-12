@@ -71,6 +71,13 @@ pqScalarsToColors::pqScalarsToColors(const QString& group, const QString& name,
 : pqProxy(group, name, proxy, server, _parent)
 {
   this->Internal = new pqScalarsToColorsInternal;
+
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("RGBPoints"),
+                                      vtkCommand::ModifiedEvent,
+                                      this, SLOT(checkRange()));
+  this->Internal->VTKConnect->Connect(proxy->GetProperty("UseLogScale"),
+                                      vtkCommand::ModifiedEvent,
+                                      this, SLOT(checkRange()));
 }
 
 //-----------------------------------------------------------------------------
@@ -255,6 +262,46 @@ void pqScalarsToColors::setWholeScalarRange(double min, double max)
     }
 
   this->setScalarRange(min, max);
+}
+
+//-----------------------------------------------------------------------------
+bool pqScalarsToColors::getUseLogScale() const
+{
+  vtkSMProxy *proxy = this->getProxy();
+  vtkSMProperty *prop = proxy->GetProperty("UseLogScale");
+  return (pqSMAdaptor::getElementProperty(prop).toInt() != 0);
+}
+
+//-----------------------------------------------------------------------------
+void pqScalarsToColors::checkRange()
+{
+  // Only need to adjust range if using log scale.
+  if (!this->getUseLogScale()) return;
+
+  QPair<double, double> range = this->getScalarRange();
+  if (range.first > 0.0) return;
+
+  // If we are here, we need to adjust the range to be all positive.
+  QPair<double, double> newRange;
+  if (range.second > 1.0)
+    {
+    newRange.first = 1.0;
+    newRange.second = range.second;
+    }
+  else if (range.second > 0.0)
+    {
+    newRange.first = range.second/10.0;
+    newRange.second = range.second;
+    }
+  else
+    {
+    range.first = 1.0;
+    range.second = 10.0;
+    }
+
+  qWarning("Warning: Range [%g,%g] invalid for log scaling.  Changing to [%g,%g].",
+           range.first, range.second, newRange.first, newRange.second);
+  this->setScalarRange(newRange.first, newRange.second);
 }
 
 //-----------------------------------------------------------------------------

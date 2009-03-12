@@ -72,6 +72,9 @@ public:
   /// returns (0, 0).
   QPair<double, double> getScalarRange() const;
 
+  /// Returns true if a log scale is being used.
+  bool getUseLogScale() const;
+
   enum Mode
     {
     MAGNITUDE = 0,
@@ -111,6 +114,11 @@ protected:
 
   void addScalarBar(pqScalarBarRepresentation*);
   void removeScalarBar(pqScalarBarRepresentation*);
+
+protected slots:
+  /// Checks to make sure that the range is compatible with the log flag
+  /// and adjusts it if necessary.
+  void checkRange();
 
 private:
   pqScalarsToColorsInternal* Internal;

@@ -778,30 +778,13 @@ void pqColorScaleEditor::setLogScale(bool on)
   pqSMAdaptor::setElementProperty(
       lookupTable->GetProperty("UseLogScale"), on ? 1 : 0);
 
-  // If the range is invalid, modify the range for log scale.
-  QPair<double, double> range = this->ColorMap->getScalarRange();
-  if(on && range.first <= 0.0)
-    {
-    // Use a minimum value to make the range valid.
-    range.first = 1.0;
-    if(range.second < range.first)
-      {
-      range.second = 10.0;
-      }
+  // Set the log scale flag on the editor.
+  this->Viewer->GetColorFunction()->SetScale(
+                                           on ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
+  this->Viewer->Render();
 
-    this->Form->UseAutoRescale->setChecked(false);
-    this->setScalarRange(range.first, range.second);
-    }
-  else
-    {
-    // Set the log scale flag on the editor.
-    this->Viewer->GetColorFunction()->SetScale(
-        on ? VTK_CTF_LOG10 : VTK_CTF_LINEAR);
-    this->Viewer->Render();
-
-    lookupTable->UpdateVTKObjects();
-    this->Display->renderViewEventually();
-    }
+  lookupTable->UpdateVTKObjects();
+  this->Display->renderViewEventually();
 }
 
 void pqColorScaleEditor::setAutoRescale(bool on)
@@ -1285,13 +1268,6 @@ void pqColorScaleEditor::updateScalarRange(double min, double max)
   // Update the editor scalar range.
   this->Viewer->SetWholeScalarRange(min, max);
   this->Viewer->SetVisibleScalarRange(min, max);
-
-  // Check the scalar range when log scale is on.
-  if(this->Form->UseLogScale->isChecked() && min <= 0.0)
-    {
-    // Clear the log scale flag on the editor and proxy.
-    this->Form->UseLogScale->setChecked(false);
-    }
 }
 
 void pqColorScaleEditor::setLegend(pqScalarBarRepresentation *legend)
