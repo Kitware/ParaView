@@ -204,7 +204,7 @@ void pqDisplayColorWidget::onVariableActivated(int row)
     return;
     }
 
-  const QStringList d = this->Variables->itemData(row).toString().split("|");
+  const QStringList d = this->Variables->itemData(row).toStringList();
   if(d.size() != 2)
     return;
     
@@ -225,20 +225,29 @@ void pqDisplayColorWidget::onVariableActivated(int row)
 }
 
 //-----------------------------------------------------------------------------
-const QString pqDisplayColorWidget::variableData(pqVariableType type, 
-  const QString& name)
+const QStringList pqDisplayColorWidget::variableData(pqVariableType type, 
+                                                     const QString& name)
 {
+  QStringList result;
+  result << name;
+
   switch(type)
     {
     case VARIABLE_TYPE_NONE:
-      return name + "|none";
+      result << "none";
+      break;
     case VARIABLE_TYPE_NODE:
-      return name + "|point";
+      result << "point";
+      break;
     case VARIABLE_TYPE_CELL:
-      return name + "|cell";
+      result << "cell";
+      break;
+    default:
+      // Return empty list.
+      return QStringList();
     }
     
-  return QString();
+  return result;
 }
 
 //-----------------------------------------------------------------------------
