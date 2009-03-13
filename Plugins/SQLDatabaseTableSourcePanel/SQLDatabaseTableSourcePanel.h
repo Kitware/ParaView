@@ -1,6 +1,6 @@
 #include "pqObjectPanel.h"
 
-#include "ui_SQLDatabaseTableSourcePanel.h"
+class QModelIndex;
 
 class SQLDatabaseTableSourcePanel :
   public pqObjectPanel
@@ -11,12 +11,15 @@ class SQLDatabaseTableSourcePanel :
   
 public:
   SQLDatabaseTableSourcePanel(pqProxy* proxy, QWidget* p);
+  ~SQLDatabaseTableSourcePanel();
 
 private slots:
   virtual void accept();
   virtual void reset();
 
   void onDatabaseTypeChanged(const QString &databaseType);
+  void slotDatabaseInfo();
+  void slotTableInfo(const QModelIndex&);
   
 protected:
   void loadDefaultSettings();
@@ -25,6 +28,7 @@ protected:
   void loadInitialState();
 
 private:
-  Ui::SQLDatabaseTableSourcePanel Widgets;
+  class implementation;
+  implementation* const Implementation;
 };
 

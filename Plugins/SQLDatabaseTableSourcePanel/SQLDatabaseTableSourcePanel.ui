@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
-    <height>666</height>
+    <width>311</width>
+    <height>935</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -112,23 +112,23 @@
       <property name="verticalSpacing" >
        <number>4</number>
       </property>
-      <item row="3" column="2" >
+      <item row="3" column="1" >
        <widget class="QLineEdit" name="databaseHost" />
       </item>
-      <item row="2" column="2" >
+      <item row="2" column="1" >
        <widget class="QLineEdit" name="databasePassword" >
         <property name="echoMode" >
          <enum>QLineEdit::Password</enum>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
+      <item row="1" column="1" >
        <widget class="QLineEdit" name="databaseUser" />
       </item>
-      <item row="0" column="2" >
+      <item row="0" column="1" >
        <widget class="QLineEdit" name="databaseName" />
       </item>
-      <item row="0" column="0" colspan="2" >
+      <item row="0" column="0" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
          <string>DataBase Name</string>
@@ -163,13 +163,45 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="2" >
+      <item row="4" column="1" >
        <widget class="QLineEdit" name="databasePort" />
       </item>
      </layout>
     </widget>
    </item>
    <item row="3" column="0" >
+    <widget class="pqCollapsedGroup" native="1" name="databaseInfoGroupBox" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+       <horstretch>0</horstretch>
+       <verstretch>100</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title" stdset="0" >
+      <string>Database Table Info</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <item>
+       <widget class="QPushButton" name="getDatabaseInfo" >
+        <property name="text" >
+         <string>Get Database Information</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTreeView" name="databasePreview" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
+          <horstretch>0</horstretch>
+          <verstretch>50</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" >
     <widget class="pqCollapsedGroup" native="1" name="groupBox_3" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Expanding" hsizetype="Expanding" >
