@@ -35,8 +35,8 @@
 #include <vtkLookupTable.h>
 #include <vtkPVDataInformation.h>
 #include <vtkQtListView.h>
-#include <vtkQtChartRepresentation.h>
-#include <vtkQtChartView.h>
+#include <vtkQtChartTableRepresentation.h>
+#include <vtkQtBarChartView.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>
 #include "vtkSMProperty.h"
@@ -73,6 +73,7 @@
 #include "vtkQtChartMouseSelection.h"
 #include "vtkQtChartSeriesLayer.h"
 #include "vtkQtChartSeriesModel.h"
+#include "vtkQtChartSeriesModelCollection.h"
 #include "vtkQtChartSeriesOptions.h"
 #include "vtkQtChartSeriesSelectionHandler.h"
 #include "vtkQtChartStyleManager.h"
@@ -93,19 +94,11 @@ class ClientChartView::implementation
 {
 public:
   implementation() :
-    ChartLayer(0),
-    ChartView(vtkSmartPointer<vtkQtChartView>::New()),
-    ChartRepresentation(vtkQtChartRepresentation::New()),
+    ChartRepresentation(vtkQtChartTableRepresentation::New()),
     AxisLayoutModified(true),
     ShowLegend(true),
     VTKConnect(vtkSmartPointer<vtkEventQtSlotConnect>::New())
   {
-    this->Widgets.setupUi(&this->Widget);
-
-    // Set up the chart legend.
-    this->Legend = new vtkQtChartLegend();
-    this->LegendModel = this->Legend->getModel();
-
     // Set up the chart titles. The axis titles should be in the same
     // order as the properties: left, bottom, right, top.
     this->Title = new vtkQtChartTitle();
@@ -114,48 +107,14 @@ public:
     this->AxisTitles.append(new vtkQtChartTitle());
     this->AxisTitles.append(new vtkQtChartTitle(Qt::Vertical));
     this->AxisTitles.append(new vtkQtChartTitle());
-
-    vtkQtChartArea *view = this->Widgets.chartWidget->getChartArea();
-
-    // Set the chart color scheme to custom so we can use our own lookup table
-    vtkQtChartStyleManager *style = view->getStyleManager();
-    vtkQtChartColorStyleGenerator *gen = new vtkQtChartColorStyleGenerator(style, vtkQtChartColors::Custom);
-    style->setGenerator(gen);
-
-    // Set up the default interactor.
-    // Create a new interactor and add it to the chart area.
-    vtkQtChartInteractor *interactor = new vtkQtChartInteractor(view);
-    view->setInteractor(interactor);
-
-    // Set up the mouse buttons. Start with pan on the right button.
-    interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoom(interactor));
-    interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoomX(interactor),
-        Qt::ControlModifier);
-    interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoomY(interactor),
-        Qt::AltModifier);
-
-    // Add the zoom functionality to the middle button since the middle
-    // button usually has the wheel, which is used for zooming.
-    interactor->addFunction(Qt::MidButton, new vtkQtChartMousePan(interactor));
-
-    // Add zoom functionality to the wheel.
-    interactor->addWheelFunction(new vtkQtChartMouseZoom(interactor));
-    interactor->addWheelFunction(new vtkQtChartMouseZoomX(interactor),
-        Qt::ControlModifier);
-    interactor->addWheelFunction(new vtkQtChartMouseZoomY(interactor),
-        Qt::AltModifier);
-
-    // Add selection to the left button.
-    this->ChartMouseSelection =
-        new vtkQtChartMouseSelection(interactor);
-    interactor->addFunction(Qt::LeftButton, this->ChartMouseSelection);
-    this->ChartSeriesSelectionHandler =
-        new vtkQtChartSeriesSelectionHandler(this->ChartMouseSelection);
-    this->ChartSeriesSelectionHandler->setModeNames("Chart - Series", "Chart - Points");
-    this->ChartSeriesSelectionHandler->setMousePressModifiers(Qt::ShiftModifier, Qt::ControlModifier);
-
-    // Give the chart view the chart area to draw in
-    this->ChartView->SetChartView(view);
+/*
+    vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+    lut->SetHueRange(0.0, 1.0);
+    lut->SetValueRange(0.8, 0.8);
+    lut->SetRange(0.0, 1.0);
+    lut->Build();
+    this->ChartRepresentation->SetColorTable(lut);
+*/
   }
 
   ~implementation()
@@ -166,7 +125,6 @@ public:
       this->ChartRepresentation = 0;
       }
 
-    delete this->Legend;
     delete this->Title;
 
     QVector<QPointer<vtkQtChartTitle> >::Iterator iter = this->AxisTitles.begin();
@@ -179,19 +137,11 @@ public:
       }
   }
 
-  vtkQtChartRepresentation *ChartRepresentation;
-  vtkQtChartSeriesLayer* ChartLayer;
-  QWidget Widget;
-  Ui::ClientChartView Widgets;
-  vtkSmartPointer<vtkQtChartView> ChartView;
+  vtkQtChartTableRepresentation *ChartRepresentation;
 
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  QPointer<vtkQtChartLegend> Legend;
   QPointer<vtkQtChartTitle> Title;
-  QPointer<vtkQtChartMouseSelection> ChartMouseSelection;
-  QPointer<vtkQtChartSeriesSelectionHandler> ChartSeriesSelectionHandler;
   QVector<QPointer<vtkQtChartTitle> > AxisTitles;
-  vtkQtChartLegendModel *LegendModel;
   bool ShowLegend;
   bool AxisLayoutModified;
 };
@@ -209,6 +159,8 @@ ClientChartView::ClientChartView(
   pqSingleInputView(viewmoduletype, group, name, viewmodule, server, p),
   Implementation(new implementation())
 {
+  this->ChartView = 0;
+
   // Listen for axis layout property changes.
   this->Implementation->VTKConnect->Connect(
       viewmodule->GetProperty("AxisScale"), vtkCommand::ModifiedEvent,
@@ -235,38 +187,18 @@ ClientChartView::ClientChartView(
       viewmodule->GetProperty("TopAxisLabels"), vtkCommand::ModifiedEvent,
       this, SLOT(setAxisLayoutModified()));
 
-  QObject::connect(this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace(),
-                   SIGNAL(historyPreviousAvailabilityChanged(bool)),
-                   this,
-                   SIGNAL(canUndoChanged(bool)));
-  QObject::connect(this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace(),
-                   SIGNAL(historyNextAvailabilityChanged(bool)),
-                   this,
-                   SIGNAL(canRedoChanged(bool)));
 }
 
 ClientChartView::~ClientChartView()
 {
   delete this->Implementation;
+  if(this->ChartView)
+    this->ChartView->Delete();
 }
 
 QWidget* ClientChartView::getWidget()
 {
-  return &this->Implementation->Widget;
-}
-
-//-----------------------------------------------------------------------------
-void ClientChartView::setChart(vtkQtChartSeriesLayer *chart)
-{
-  this->Implementation->ChartLayer = chart;
-  this->Implementation->ChartRepresentation->SetChartLayer(chart);
-  this->Implementation->ChartSeriesSelectionHandler->setLayer(this->Implementation->ChartLayer);
-}
-
-//-----------------------------------------------------------------------------
-vtkQtChartSeriesLayer* ClientChartView::getChart()
-{
-  return this->Implementation->ChartLayer;
+  return this->ChartView->GetWidget();
 }
 
 bool ClientChartView::canDisplay(pqOutputPort* output_port) const
@@ -320,27 +252,22 @@ void ClientChartView::updateRepresentation(pqRepresentation* representation)
     this->Implementation->ChartRepresentation->SetFirstDataColumn(table->GetColumnName(0));
     this->Implementation->ChartRepresentation->SetLastDataColumn(table->GetColumnName(table->GetNumberOfColumns()-1));
     this->Implementation->ChartRepresentation->SetInput(output);
-    this->Implementation->ChartView->AddRepresentation(this->Implementation->ChartRepresentation);
-    this->Implementation->ChartView->Update();
+    this->ChartView->AddRepresentation(this->Implementation->ChartRepresentation);
+    this->ChartView->Update();
     }
 }
 
 void ClientChartView::showRepresentation(pqRepresentation* representation)
 {
-  this->Implementation->ChartMouseSelection->addHandler(this->Implementation->ChartSeriesSelectionHandler);
-  this->Implementation->ChartMouseSelection->setSelectionMode("Chart - Series");
-
   this->updateRepresentation(representation);
+
+  this->ChartView->Show();
 }
 
 void ClientChartView::hideRepresentation(pqRepresentation* representation)
 {
-  // Prevent mouse events from being sent to the series selection handler 
-  // (since there will be none)
-  this->Implementation->ChartMouseSelection->removeHandler(this->Implementation->ChartSeriesSelectionHandler);
-
-  this->Implementation->ChartView->RemoveRepresentation(this->Implementation->ChartRepresentation);
-  this->Implementation->ChartView->Update();
+  this->ChartView->RemoveRepresentation(this->Implementation->ChartRepresentation);
+  this->ChartView->Update();
 }
 
 void ClientChartView::renderInternal()
@@ -375,30 +302,31 @@ void ClientChartView::renderInternal()
         QString series = seriesHelper.GetAsString(i);
         bool status = QVariant(seriesHelper.GetAsString(i+1)).toBool() && series.startsWith(seriesText);
 
-        for(int j=0; j<this->Implementation->ChartLayer->getModel()->getNumberOfSeries(); ++j)
+        for(int j=0; j<this->ChartView->GetChartSeriesModel()->getNumberOfSeries(); ++j)
           {
-          if(series == this->Implementation->ChartLayer->getModel()->getSeriesName(j))
+          if(series == this->ChartView->GetChartSeriesModel()->getSeriesName(j))
             {
-            this->Implementation->ChartLayer->getSeriesOptions(j)->setVisible(status);
+            this->ChartView->GetChartSeriesOptions(j)->setVisible(status);
             break;
             }
           }
+
         }
       }
     }
-
+/*
   // Update the chart legend.
   QList<QVariant> values;
   this->Implementation->ShowLegend = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("ShowLegend")).toInt() != 0;
-  if((this->Implementation->LegendModel->getNumberOfEntries() == 0 ||
-      !this->Implementation->ShowLegend) && this->Implementation->Widgets.chartWidget->getLegend() != 0)
+  if((this->ChartView->GetLegendModel()->getNumberOfEntries() == 0 ||
+      !this->Implementation->ShowLegend) && this->ChartView->GetLegend() != 0)
     {
     // Remove the legend from the chart since it is not needed.
-    this->Implementation->Widgets.chartWidget->setLegend(0);
+    dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget()->SetLegend(0);
     }
   else if(this->Implementation->LegendModel->getNumberOfEntries() > 0 &&
-      this->Implementation->ShowLegend && this->Implementation->Widgets.chartWidget->getLegend() == 0)
+      this->Implementation->ShowLegend && this->ChartView->GetLegend() == 0)
     {
     // Add the legend to the chart since it is needed.
     this->Implementation->Widgets.chartWidget->setLegend(this->Implementation->Legend);
@@ -410,6 +338,7 @@ void ClientChartView::renderInternal()
   this->Implementation->Legend->setFlow((vtkQtChartLegend::ItemFlow)
       pqSMAdaptor::getElementProperty(proxy->GetProperty(
       "LegendFlow")).toInt());
+*/
 
   // Update the chart titles.
   this->updateTitles();
@@ -431,11 +360,12 @@ void ClientChartView::renderInternal()
     {
     this->resetAxes();
     }
+
 }
 
 bool ClientChartView::saveImage(int vtkNotUsed(width), int vtkNotUsed(height), const QString &filename )
 {
-  this->Implementation->Widgets.chartWidget->saveChart(filename);
+  dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->saveChart(filename);
 
   return true;
 }
@@ -491,7 +421,7 @@ void ClientChartView::setDefaultPropertyValues()
 
   pqSMAdaptor::setMultipleElementProperty(
       proxy->GetProperty("AxisGridColor"), values);
-  QFont chartFont = this->Implementation->Widgets.chartWidget->font();
+  QFont chartFont = dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->font();
   values.clear();
   values.append(chartFont.family());
   values.append(QVariant(chartFont.pointSize()));
@@ -526,15 +456,15 @@ void ClientChartView::updateTitles()
   vtkSMProxy *proxy = this->getProxy();
   QString titleText = pqSMAdaptor::getElementProperty(
       proxy->GetProperty("ChartTitle")).toString();
-  if(titleText.isEmpty() && this->Implementation->Widgets.chartWidget->getTitle() != 0)
+  if(titleText.isEmpty() && dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->getTitle() != 0)
     {
     // Remove the chart title.
-    this->Implementation->Widgets.chartWidget->setTitle(0);
+    this->ChartView->SetTitle(0);
     }
-  else if(!titleText.isEmpty() && this->Implementation->Widgets.chartWidget->getTitle() == 0)
+  else if(!titleText.isEmpty() && dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->getTitle() == 0)
     {
     // Add the title to the chart.
-    this->Implementation->Widgets.chartWidget->setTitle(this->Implementation->Title);
+    //this->ChartView->SetTitle(this->Implementation->Title);
     }
 
   this->Implementation->Title->setText(titleText);
@@ -591,16 +521,16 @@ void ClientChartView::updateTitles()
     {
     titleText = values[i].toString();
     if(titleText.isEmpty() &&
-        this->Implementation->Widgets.chartWidget->getAxisTitle(axes[i]) != 0)
+        dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->getAxisTitle(axes[i]) != 0)
       {
       // Remove the axis title.
-      this->Implementation->Widgets.chartWidget->setAxisTitle(axes[i], 0);
+      dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->setAxisTitle(axes[i], 0);
       }
     else if(!titleText.isEmpty() &&
-        this->Implementation->Widgets.chartWidget->getAxisTitle(axes[i]) == 0)
+        dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->getAxisTitle(axes[i]) == 0)
       {
       // Add the axis title to the chart.
-      this->Implementation->Widgets.chartWidget->setAxisTitle(axes[i], this->Implementation->AxisTitles[i]);
+      dynamic_cast<vtkQtChartWidget*>(this->ChartView->GetWidget())->setAxisTitle(axes[i], this->Implementation->AxisTitles[i]);
       }
 
     this->Implementation->AxisTitles[i]->setText(titleText);
@@ -651,7 +581,7 @@ void ClientChartView::updateTitles()
 //-----------------------------------------------------------------------------
 void ClientChartView::updateAxisLayout()
 {
-  vtkQtChartAxisLayer *area = this->Implementation->Widgets.chartWidget->getChartArea()->getAxisLayer();
+  vtkQtChartAxisLayer *area = this->ChartView->GetChartArea()->getAxisLayer();
   vtkQtChartAxis *axes[] = {0, 0, 0, 0};
   vtkQtChartAxis::AxisLocation location[] =
     {
@@ -729,7 +659,7 @@ void ClientChartView::updateAxisLayout()
 //-----------------------------------------------------------------------------
 void ClientChartView::updateAxisOptions()
 {
-  vtkQtChartAxisLayer *area = this->Implementation->Widgets.chartWidget->getChartArea()->getAxisLayer();
+  vtkQtChartAxisLayer *area = this->ChartView->GetChartArea()->getAxisLayer();
   vtkQtChartAxisOptions *options[] = {0, 0, 0, 0};
   options[0] = area->getAxis(vtkQtChartAxis::Left)->getOptions();
   options[1] = area->getAxis(vtkQtChartAxis::Bottom)->getOptions();
@@ -818,7 +748,9 @@ void ClientChartView::updateAxisOptions()
 //-----------------------------------------------------------------------------
 void ClientChartView::updateZoomingBehavior()
 {
-  vtkQtChartInteractor *interactor = this->Implementation->Widgets.chartWidget->getChartArea()->getInteractor();
+  vtkQtChartInteractor *interactor = this->ChartView->GetChartArea()->getInteractor();
+  if(!interactor)
+    return;
 
   vtkSMProxy *proxy = this->getProxy();
   QString value = pqSMAdaptor::getEnumerationProperty(
@@ -849,7 +781,7 @@ void ClientChartView::updateZoomingBehavior()
 //-----------------------------------------------------------------------------
 void ClientChartView::resetAxes()
 {
-  vtkQtChartAxisLayer *area = this->Implementation->Widgets.chartWidget->getChartArea()->getAxisLayer();
+  vtkQtChartAxisLayer *area = this->ChartView->GetChartArea()->getAxisLayer();
   vtkQtChartAxis *axes[] = {0, 0, 0, 0};
   vtkQtChartAxis::AxisLocation location[] =
     {
@@ -868,27 +800,27 @@ void ClientChartView::resetAxes()
 //-----------------------------------------------------------------------------
 void ClientChartView::undo()
 {
-  vtkQtChartContentsSpace *space = this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace();
+  vtkQtChartContentsSpace *space = this->ChartView->GetChartArea()->getContentsSpace();
   space->historyPrevious();
 }
 
 //-----------------------------------------------------------------------------
 void ClientChartView::redo()
 {
-  vtkQtChartContentsSpace *space = this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace();
+  vtkQtChartContentsSpace *space = this->ChartView->GetChartArea()->getContentsSpace();
   space->historyNext();
 }
 
 //-----------------------------------------------------------------------------
 bool ClientChartView::canUndo() const
 {
-  vtkQtChartContentsSpace *space = this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace();
+  vtkQtChartContentsSpace *space = this->ChartView->GetChartArea()->getContentsSpace();
   return space->isHistoryPreviousAvailable();
 }
 
 //-----------------------------------------------------------------------------
 bool ClientChartView::canRedo() const
 {
-  vtkQtChartContentsSpace *space = this->Implementation->Widgets.chartWidget->getChartArea()->getContentsSpace();
+  vtkQtChartContentsSpace *space = this->ChartView->GetChartArea()->getContentsSpace();
   return space->isHistoryNextAvailable();
 }

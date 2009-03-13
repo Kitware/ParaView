@@ -26,24 +26,28 @@
 */
 
 #include "ClientRecordView.h"
-#include "ui_ClientRecordView.h"
 
+#include <vtkCommand.h>
 #include <vtkConvertSelection.h>
 #include <vtkDataArray.h>
 #include <vtkDataArrayTemplate.h>
+#include <vtkDataObject.h>
 #include <vtkDataObjectToTable.h>
 #include <vtkDataObjectTypes.h>
+#include <vtkDataRepresentation.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkGraph.h>
 #include <vtkIdList.h>
 #include <vtkIdTypeArray.h>
 #include <vtkPVDataInformation.h>
-#include <vtkQtTableModelAdapter.h>
+#include <vtkQtRecordView.h>
 #include <vtkSelection.h>
+#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMViewProxy.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkVariant.h>
@@ -56,29 +60,48 @@
 #include <pqSelectionManager.h>
 #include <pqServer.h>
 
+#include <QPointer>
+#include <QVBoxLayout>
+#include <QWidget>
+
+////////////////////////////////////////////////////////////////////////////////////
+// ClientTableView::command
+
+class ClientRecordView::command : public vtkCommand
+{
+public:
+  command(ClientRecordView& view) : Target(view) { }
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    Target.selectionChanged();
+  }
+  ClientRecordView& Target;
+};
+
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientRecordView::implementation
 
 class ClientRecordView::implementation
 {
 public:
-  implementation() :
-    Table(vtkTable::New()),
-    RowIndex(0)
+  implementation()
   {
+  this->Widget = new QWidget();
+  this->View = vtkSmartPointer<vtkQtRecordView>::New();
+  QVBoxLayout *layout = new QVBoxLayout(this->Widget);
+  layout->addWidget(this->View->GetWidget());
+  layout->setContentsMargins(0,0,0,0);
   }
 
   ~implementation()
   {
-    this->Table->Delete();
+    if(this->Widget)
+      delete this->Widget;
+    this->View->RemoveAllRepresentations();
   }
 
-  vtkTable* const Table;
-  int CurrentAttributeType;
-  vtkIdType RowIndex;
-
-  Ui::ClientRecordView Widgets;
-  QWidget Widget;
+  vtkSmartPointer<vtkQtRecordView> View;
+  QPointer<QWidget> Widget;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -92,19 +115,45 @@ ClientRecordView::ClientRecordView(
     pqServer* server, 
     QObject* p) :
   pqSingleInputView(viewmoduletype, group, name, viewmodule, server, p),
-  Implementation(new implementation())
+  Implementation(new implementation()),
+  Command(new command(*this))
 {
-  this->Implementation->Widgets.setupUi(&this->Implementation->Widget);
+  this->Implementation->View->AddObserver(
+    vtkCommand::SelectionChangedEvent, this->Command);
+  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 }
 
 ClientRecordView::~ClientRecordView()
 {
   delete this->Implementation;
+  this->Command->Delete();
+}
+
+void ClientRecordView::selectionChanged()
+{
+  // Get the representaion's source
+  pqDataRepresentation* pqRepr =
+    qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
+    opPort->getSource()->getProxy());
+
+  // Fill the selection source with the selection from the view
+  this->Implementation->View->GetRepresentation()->GetSelectionLink()->Update();
+  vtkSelection* sel = this->Implementation->View->GetRepresentation()->
+    GetSelectionLink()->GetOutput();
+  vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
+    sel, repSource->GetConnectionID());
+
+  // Set the selection on the representation's source
+  repSource->SetSelectionInput(opPort->getPortNumber(),
+    selectionSource, 0);
+  selectionSource->Delete();
 }
 
 QWidget* ClientRecordView::getWidget()
 {
-  return &this->Implementation->Widget;
+  return this->Implementation->Widget;
 }
 
 bool ClientRecordView::canDisplay(pqOutputPort* output_port) const
@@ -143,14 +192,39 @@ bool ClientRecordView::canDisplay(pqOutputPort* output_port) const
   return false;
 }
 
+void ClientRecordView::updateRepresentation(pqRepresentation* repr)
+{
+  vtkSMSelectionDeliveryRepresentationProxy* const proxy = repr ? 
+    vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(repr->getProxy()) : NULL;
+  proxy->Update(vtkSMViewProxy::SafeDownCast(this->getProxy()));  
+
+  vtkDataObject *data = proxy? vtkDataObject::SafeDownCast(proxy->GetOutput()) : NULL;
+  if (!data)
+    {
+    return;
+    }
+
+  // Add the representation to the view
+  this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutput()->GetProducerPort());
+}
+
+
 void ClientRecordView::showRepresentation(pqRepresentation* representation)
 {
   this->updateRepresentation(representation);
 }
 
-void ClientRecordView::updateRepresentation(pqRepresentation* representation)
+void ClientRecordView::hideRepresentation(pqRepresentation* representation)
 {
-  vtkSMSelectionDeliveryRepresentationProxy* const proxy = representation?
+  // Because this view can only take one representation, we can do this, and thus
+  // not keep track of the vtk reprsentations
+  this->Implementation->View->RemoveAllRepresentations();
+}
+
+void ClientRecordView::renderInternal()
+{
+  pqRepresentation* representation = this->visibleRepresentation();
+  vtkSMSelectionDeliveryRepresentationProxy* const proxy = representation ?
     vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(representation->getProxy()) : NULL;
 
   if(!proxy)
@@ -158,188 +232,37 @@ void ClientRecordView::updateRepresentation(pqRepresentation* representation)
     return;
     }
 
+  vtkDataRepresentation *rep = this->Implementation->View->GetRepresentation();
+  if(rep)
+    {
+    proxy->GetSelectionRepresentation()->Update();
+    vtkSelection* sel = vtkSelection::SafeDownCast(
+      proxy->GetSelectionRepresentation()->GetOutput());
+    rep->GetSelectionLink()->SetSelection(sel);  
+    }
+
   int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
 
-  int fieldType;
-  vtkGraph *graph = vtkGraph::SafeDownCast(proxy->GetOutput());
-  vtkTable *inputTable = vtkTable::SafeDownCast(proxy->GetOutput());
-  if(graph)
+  if (attributeType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
-    if (attributeType == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
-      {
-      fieldType = vtkDataObjectToTable::VERTEX_DATA;
-      }
-    else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
-      {
-      fieldType = vtkDataObjectToTable::EDGE_DATA;
-      }
-    else
-      {
-      return;
-      }
+    this->Implementation->View->SetFieldType(vtkQtRecordView::POINT_DATA);
     }
-  else if(inputTable && attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
-    fieldType = vtkDataObjectToTable::FIELD_DATA;
+    this->Implementation->View->SetFieldType(vtkQtRecordView::CELL_DATA);
     }
-  else
+  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
     {
-    return;
+    this->Implementation->View->SetFieldType(vtkQtRecordView::VERTEX_DATA);
+    }
+  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
+    {
+    this->Implementation->View->SetFieldType(vtkQtRecordView::EDGE_DATA);
+    }
+  else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+    this->Implementation->View->SetFieldType(vtkQtRecordView::ROW_DATA);
     }
 
-  vtkDataObjectToTable *dataObjectToTable = vtkDataObjectToTable::New();
-  dataObjectToTable->SetFieldType(fieldType);
-  dataObjectToTable->SetInput(proxy->GetOutput());
-  dataObjectToTable->Update();
-
-  vtkTable *table = dataObjectToTable->GetOutput();
-  if (!table)
-    {
-    return;
-    }
-
-  this->Implementation->Table->ShallowCopy(table);
-  this->Implementation->CurrentAttributeType = attributeType;
-
-  proxy->GetSelectionRepresentation()->Update();
-  vtkSelection* sel = vtkSelection::SafeDownCast(
-    proxy->GetSelectionRepresentation()->GetOutput());
-
-  this->updateSelection(sel);
-
-  // Display text data ...
-  const vtkIdType row_count = table->GetNumberOfRows();
-  const vtkIdType column_count = table->GetNumberOfColumns();
-
-  if(row_count && column_count && this->Implementation->RowIndex>=0)
-    {
-    vtkIdType row_index = this->Implementation->RowIndex % row_count;
-    while(row_index < 0)
-      row_index += row_count;
-
-    QString html;
-    for(vtkIdType i = 0; i != column_count; ++i)
-      {
-      html += "<b>" + QString(table->GetColumnName(i)) + ":</b> ";
-      html += table->GetValue(row_index, i).ToString().c_str();
-      html += "<br>\n";
-      }
-      
-    this->Implementation->Widgets.body->setHtml(html);
-    }
-  else
-    {
-    this->Implementation->Widgets.body->setPlainText("");
-    }
-
-  dataObjectToTable->Delete();
-
-}
-
-void ClientRecordView::hideRepresentation(pqRepresentation* representation)
-{
-  this->Implementation->Table->Initialize();
-  this->Implementation->Widgets.body->setPlainText("");
-}
-
-void ClientRecordView::renderInternal()
-{
-  pqRepresentation* representation = this->visibleRepresentation();
-  vtkSMClientDeliveryRepresentationProxy* const proxy = representation?
-    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(representation->getProxy()) : NULL;
-
-  if(!proxy)
-    {
-    return;
-    }
-
-  proxy->Update();
-
-  this->updateRepresentation(representation);
-}
-
-void ClientRecordView::updateSelection(vtkSelection *origSelection)
-{
-  if(!origSelection)
-    {
-    return;
-    }
-
-  vtkAbstractArray *pedigreeIdArray = this->Implementation->Table->GetRowData()->GetPedigreeIds();
-  if(!pedigreeIdArray)
-    {
-    return;
-    }
-
-  int selType = -1;
-  switch (this->Implementation->CurrentAttributeType)
-    {
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      selType = vtkSelectionNode::VERTEX;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      selType = vtkSelectionNode::EDGE;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      selType = vtkSelectionNode::ROW;
-      break;
-    }
-  
-  if(selType < 0)
-    return;
-
-  // Does the selection have a compatible field type?
-  vtkSelectionNode* selection = 0;
-  if (origSelection)
-    {
-    vtkSelectionNode* node = NULL;
-    for (unsigned int i = 0; i < origSelection->GetNumberOfNodes(); i++)
-      {
-      node = origSelection->GetNode(i);
-      if (node && selType == node->GetFieldType()) 
-        {
-        selection = vtkSelectionNode::New();
-        selection->ShallowCopy(node);
-        break;
-        }
-      }
-    if(!selection && node)
-      {
-      /// Use the last valid selection node
-      selection = vtkSelectionNode::New();
-      selection->ShallowCopy(node);
-      }
-    }
-  
-  if(!selection || selection->GetContentType() != vtkSelectionNode::PEDIGREEIDS)
-    {
-    // Did not find a selection with the same field type
-    return;
-    }
-
-  vtkAbstractArray *arr = selection->GetSelectionList();
-  vtkVariant v;
-  switch (arr->GetDataType())
-    {
-    vtkExtraExtendedTemplateMacro(v = *static_cast<VTK_TT*>(arr->GetVoidPointer(0)));
-    }
-  
-  this->Implementation->RowIndex = pedigreeIdArray->LookupValue(v);
-
-/*
-  selection->SetFieldType(vtkSelectionNode::ROW);
-  vtkSelection *indexSelection = 
-      vtkConvertSelection::ToIndexSelection(selection, this->Implementation->Table);
-  vtkIdTypeArray *idxList = 
-      vtkIdTypeArray::SafeDownCast(indexSelection->GetSelectionList());
-
-  if(idxList && idxList->GetNumberOfTuples()>=0)
-    {
-    this->Implementation->RowIndex = idxList->GetValue(0);
-    }
-
-  indexSelection->Delete();
-*/
-
-  selection->Delete();
+  this->Implementation->View->Update();
 }

@@ -13,33 +13,23 @@
    <string/>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>0</number>
-   </property>
    <item>
-    <widget class="QTextEdit" name="body" >
-     <property name="acceptDrops" >
-      <bool>false</bool>
-     </property>
-     <property name="undoRedoEnabled" >
-      <bool>false</bool>
-     </property>
-     <property name="textInteractionFlags" >
-      <set>Qt::TextSelectableByMouse</set>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" >
+     <item>
+      <widget class="vtkQtRecordView" native="1" name="view" />
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>vtkQtRecordView</class>
+   <extends>QWidget</extends>
+   <header>vtkqtrecordview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

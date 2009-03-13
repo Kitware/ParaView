@@ -48,7 +48,7 @@ ClientStatisticalBoxChartView::ClientStatisticalBoxChartView(
     QObject* p) :
   ClientChartView(viewmoduletype, group, name, viewmodule, server, p)
 {
-  this->setChart(new vtkQtStatisticalBoxChart());
+  this->ChartView = new vtkQtStatisticalBoxChart();
 }
 
 ClientStatisticalBoxChartView::~ClientStatisticalBoxChartView()
@@ -61,6 +61,6 @@ void ClientStatisticalBoxChartView::renderInternal()
   ClientChartView::renderInternal();
 
   // For now, force x-axis to invisible since the labels make no sense
-  vtkQtChartAxisLayer *area = this->getChart()->getChartArea()->getAxisLayer();
+  vtkQtChartAxisLayer *area = this->ChartView->GetChartArea()->getAxisLayer();
   area->getAxis(vtkQtChartAxis::Bottom)->getOptions()->setVisible(0);
 }

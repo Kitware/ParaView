@@ -35,7 +35,7 @@
 #include <pqRepresentation.h>
 #include "pqSMAdaptor.h"
 
-#include "vtkQtStackedChart.h"
+//#include "vtkQtStackedChartView.h"
 #include "vtkQtStackedChartOptions.h"
 
 
@@ -51,9 +51,8 @@ ClientStackedChartView::ClientStackedChartView(
     QObject* p) :
   ClientChartView(viewmoduletype, group, name, viewmodule, server, p)
 {
-  vtkQtStackedChart *chart = new vtkQtStackedChart();
-  chart->getOptions()->setGradientDisplayed(true);
-  this->setChart(chart);
+  //this->ChartView = vtkQtStackedChartView::New();
+  //this->ChartView->GetOptions()->setGradientDisplayed(true);
 }
 
 ClientStackedChartView::~ClientStackedChartView()

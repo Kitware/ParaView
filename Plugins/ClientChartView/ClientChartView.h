@@ -30,7 +30,7 @@
 
 #include <pqSingleInputView.h>
 
-class vtkQtChartSeriesLayer;
+class vtkQtChartViewBase;
 
 class ClientChartView : public pqSingleInputView
 {
@@ -47,12 +47,6 @@ public:
   ~ClientChartView();
 
   QWidget* getWidget();
-
-  /// Set/Get the chart series layer which determines
-  /// what type of chart we are creating. Subclasses should
-  /// call this with their own instance of vtkQtLineChart, vtkQtBarChart, etc.
-  void setChart(vtkQtChartSeriesLayer *chart);
-  vtkQtChartSeriesLayer* getChart();
 
   bool canDisplay(pqOutputPort* opPort) const;
 
@@ -85,6 +79,9 @@ private slots:
 
   /// Sets the axis layout modified.
   void setAxisLayoutModified();
+
+protected:
+  vtkQtChartViewBase *ChartView;
 
 private:
   virtual void showRepresentation(pqRepresentation*);

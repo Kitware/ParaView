@@ -54,15 +54,19 @@ public:
 protected:
   /// Implement this to perform the actual rendering.
   virtual void renderInternal();
-  void showRepresentation(pqRepresentation*);
-  void updateRepresentation(pqRepresentation*);
-  void hideRepresentation(pqRepresentation*);
-
-  void updateSelection(vtkSelection* sel);
 
 private:
   class implementation;
   implementation* const Implementation;
+
+  void showRepresentation(pqRepresentation*);
+  void hideRepresentation(pqRepresentation*);
+  void updateRepresentation(pqRepresentation*);
+
+  void selectionChanged();
+
+  class command;
+  command* const Command;
 };
 
 #endif // _ClientRecordView_h

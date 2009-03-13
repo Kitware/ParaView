@@ -100,8 +100,7 @@ pqBarChartView::pqBarChartView(const QString& group,
   vtkQtChartInteractorSetup::setupDefaultKeys(area->getInteractor());
 
   // Set up the view undo/redo.
-  vtkQtChartContentsSpace *contents =
-    this->getVtkBarChartView()->GetChartArea()->getContentsSpace();
+  vtkQtChartContentsSpace *contents = area->getContentsSpace();
   this->connect(contents, SIGNAL(historyPreviousAvailabilityChanged(bool)),
     this, SIGNAL(canUndoChanged(bool)));
   this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
@@ -117,53 +116,114 @@ pqBarChartView::~pqBarChartView()
 //-----------------------------------------------------------------------------
 QWidget* pqBarChartView::getWidget()
 {
-  return this->getVtkBarChartView()->GetChartWidget();
-}
-
-//-----------------------------------------------------------------------------
-vtkQtBarChartView* pqBarChartView::getVtkBarChartView() const
-{
-  return this->Internal->BarChartView;
+  return this->Internal->BarChartView->GetWidget();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::setDefaultPropertyValues()
 {
   pqView::setDefaultPropertyValues();
+
+  // Load defaults for the properties that need them.
+  int i = 0;
+  QList<QVariant> values;
+  for(i = 0; i < 4; i++)
+    {
+    values.append(QVariant((double)0.0));
+    values.append(QVariant((double)0.0));
+    values.append(QVariant((double)0.0));
+    }
+
+  vtkSMProxy *proxy = this->getProxy();
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelColor"), values);
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisTitleColor"), values);
+  values.clear();
+  for(i = 0; i < 4; i++)
+    {
+    if(i < 2)
+      {
+      values.append(QVariant((double)0.0));
+      values.append(QVariant((double)0.0));
+      values.append(QVariant((double)0.0));
+      }
+    else
+      {
+      // Use a different color for the right and top axis.
+      values.append(QVariant((double)0.0));
+      values.append(QVariant((double)0.0));
+      values.append(QVariant((double)0.5));
+      }
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisColor"), values);
+  values.clear();
+  for(i = 0; i < 4; i++)
+    {
+    QColor grid = Qt::lightGray;
+    values.append(QVariant((double)grid.redF()));
+    values.append(QVariant((double)grid.greenF()));
+    values.append(QVariant((double)grid.blueF()));
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisGridColor"), values);
+  QFont chartFont = this->Internal->BarChartView->GetWidget()->font();
+  values.clear();
+  values.append(chartFont.family());
+  values.append(QVariant(chartFont.pointSize()));
+  values.append(QVariant(chartFont.bold() ? 1 : 0));
+  values.append(QVariant(chartFont.italic() ? 1 : 0));
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("ChartTitleFont"), values);
+  for(i = 0; i < 3; i++)
+    {
+    values.append(chartFont.family());
+    values.append(QVariant(chartFont.pointSize()));
+    values.append(QVariant(chartFont.bold() ? 1 : 0));
+    values.append(QVariant(chartFont.italic() ? 1 : 0));
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisLabelFont"), values);
+  pqSMAdaptor::setMultipleElementProperty(
+      proxy->GetProperty("AxisTitleFont"), values);
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::undo()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
   area->getContentsSpace()->historyPrevious();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::redo()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
   area->getContentsSpace()->historyNext();
 }
 
 //-----------------------------------------------------------------------------
 bool pqBarChartView::canUndo() const
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
   return area->getContentsSpace()->isHistoryPreviousAvailable();
 }
 
 //-----------------------------------------------------------------------------
 bool pqBarChartView::canRedo() const
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
   return area->getContentsSpace()->isHistoryNextAvailable();
 }
 
 //-----------------------------------------------------------------------------
 void pqBarChartView::resetDisplay()
 {
-  vtkQtChartArea* area = this->getVtkBarChartView()->GetChartArea();
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
   area->getContentsSpace()->resetZoom();
 }
 

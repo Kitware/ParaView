@@ -109,7 +109,7 @@ pqLineChartView::~pqLineChartView()
 //-----------------------------------------------------------------------------
 QWidget* pqLineChartView::getWidget()
 {
-  return this->getVtkLineChartView()->GetChartWidget();
+  return this->getVtkLineChartView()->GetWidget();
 }
 
 //-----------------------------------------------------------------------------

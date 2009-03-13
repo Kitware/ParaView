@@ -61,9 +61,7 @@ public:
   /// Return a widget associated with this view.
   virtual QWidget* getWidget();
 
-  /// Return the internal vtkQtBarChartView.
-  vtkQtBarChartView* getVtkBarChartView() const;
-
+  /// Set property values.
   virtual void setDefaultPropertyValues();
 
   /// This view does not support saving to image.

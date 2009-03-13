@@ -35,7 +35,15 @@
 #include <pqRepresentation.h>
 #include "pqSMAdaptor.h"
 
-#include "vtkQtLineChart.h"
+#include "vtkQtChartArea.h"
+#include "vtkQtChartContentsSpace.h"
+#include "vtkQtLineChartView.h"
+#include "vtkQtChartStyleManager.h"
+#include "vtkQtChartColorStyleGenerator.h"
+#include "vtkQtChartInteractor.h"
+#include "vtkQtChartMouseZoom.h"
+#include "vtkQtChartMousePan.h"
+#include "vtkQtChartMouseSelection.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +58,46 @@ ClientLineChartView::ClientLineChartView(
     QObject* p) :
   ClientChartView(viewmoduletype, group, name, viewmodule, server, p)
 {
-  this->setChart(new vtkQtLineChart());
+  this->ChartView = vtkQtLineChartView::New();
+
+  // Set the chart color scheme to custom so we can use our own lookup table
+  //vtkQtChartStyleManager *style = this->ChartView->GetChartArea()->getStyleManager();
+  //vtkQtChartColorStyleGenerator *gen = new vtkQtChartColorStyleGenerator(style, vtkQtChartColors::Custom);
+  //style->setGenerator(gen);
+
+  // Set up the default interactor.
+  // Create a new interactor and add it to the chart area.
+  vtkQtChartInteractor *interactor = new vtkQtChartInteractor(this->ChartView->GetChartArea());
+  this->ChartView->GetChartArea()->setInteractor(interactor);
+
+  // Set up the mouse buttons. Start with pan on the right button.
+  interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoom(interactor));
+  interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoomX(interactor),
+      Qt::ControlModifier);
+  interactor->addFunction(Qt::RightButton, new vtkQtChartMouseZoomY(interactor),
+      Qt::AltModifier);
+
+  // Add the zoom functionality to the middle button since the middle
+  // button usually has the wheel, which is used for zooming.
+  interactor->addFunction(Qt::MidButton, new vtkQtChartMousePan(interactor));
+
+  // Add zoom functionality to the wheel.
+  interactor->addWheelFunction(new vtkQtChartMouseZoom(interactor));
+  interactor->addWheelFunction(new vtkQtChartMouseZoomX(interactor),
+      Qt::ControlModifier);
+  interactor->addWheelFunction(new vtkQtChartMouseZoomY(interactor),
+      Qt::AltModifier);
+
+  this->ChartView->AddChartSelectionHandlers(new vtkQtChartMouseSelection(interactor));
+
+  QObject::connect(this->ChartView->GetChartArea()->getContentsSpace(),
+                   SIGNAL(historyPreviousAvailabilityChanged(bool)),
+                   this,
+                   SIGNAL(canUndoChanged(bool)));
+  QObject::connect(this->ChartView->GetChartArea()->getContentsSpace(),
+                   SIGNAL(historyNextAvailabilityChanged(bool)),
+                   this,
+                   SIGNAL(canRedoChanged(bool)));
 }
 
 ClientLineChartView::~ClientLineChartView()

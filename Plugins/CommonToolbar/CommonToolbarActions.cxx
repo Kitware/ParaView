@@ -141,7 +141,7 @@ void CommonToolbarActions::updateEnableState()
   actions[3]->setEnabled(false);
   actions[4]->setEnabled(false);
   actions[5]->setEnabled(false);
-  actions[6]->setEnabled(false);
+  actions[6]->setEnabled(true);
   actions[7]->setEnabled(true);
   actions[8]->setEnabled(true);
   actions[9]->setEnabled(false);
@@ -164,8 +164,7 @@ void CommonToolbarActions::updateEnableState()
     case VTK_TABLE : 
       actions[3]->setEnabled(true);
       actions[4]->setEnabled(true);
-      actions[5]->setEnabled(true);
-      actions[6]->setEnabled(true);
+      //actions[5]->setEnabled(true);
       break;
     case VTK_GRAPH : 
     case VTK_TREE : 

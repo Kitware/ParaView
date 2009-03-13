@@ -111,7 +111,7 @@ ClientChartDisplay::ClientChartDisplay(pqRepresentation* representation, QWidget
 
   // Assign colors to series, using the same lookup table given to the chart
   // TODO: Store lookup table as a display property
-
+/*
   vtkLookupTable *lut = vtkLookupTable::New();
   lut->SetHueRange(0.0, 1.0);
   lut->SetValueRange(0.8, 0.8);
@@ -144,7 +144,7 @@ ClientChartDisplay::ClientChartDisplay(pqRepresentation* representation, QWidget
     }
 
   lut->Delete();
-
+*/
   this->Implementation->Links.addPropertyLink(
     seriesAdaptor,
     "values",

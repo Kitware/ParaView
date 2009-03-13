@@ -26,6 +26,21 @@
       <widget class="QComboBox" name="attribute_mode" >
        <item>
         <property name="text" >
+         <string>Field Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Point Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Cell Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
          <string>Vertex Data</string>
         </property>
        </item>
@@ -36,7 +51,7 @@
        </item>
        <item>
         <property name="text" >
-         <string>Field Data</string>
+         <string>Row Data</string>
         </property>
        </item>
       </widget>

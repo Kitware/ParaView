@@ -76,7 +76,9 @@
 #include <pqSelectionManager.h>
 #include <pqServer.h>
 
+#include <QBoxLayout>
 #include <QTimer>
+#include <QTreeView>
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientHierarchyView::command
@@ -110,8 +112,10 @@ public:
     this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateMellowTheme());
     
     this->TreeView = vtkSmartPointer<vtkQtTreeView>::New();
-    this->TreeView->SetItemView(this->Widgets.treeView);
-    this->TreeView->SetItemModelAdapter(&this->TreeAdapter);
+    this->TreeWidget = qobject_cast<QTreeView*>(this->TreeView->GetWidget());
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(this->TreeWidget);
+    this->Widgets.treeFrame->setLayout(layout);
 
     this->HierarchicalGraphView = vtkSmartPointer<vtkHierarchicalGraphView>::New();
     this->HierarchicalGraphView->SetupRenderWindow(this->Widgets.hierarchicalGraphView->GetRenderWindow());
@@ -127,13 +131,13 @@ public:
   pqRepresentation* GraphRepresentation;
 
   vtkSmartPointer<vtkQtTreeView> TreeView;
+  QTreeView* TreeWidget;
 
   QWidget Widget;
   Ui::ClientHierarchyView Widgets;
  
   vtkSmartPointer<vtkViewTheme> HierarchicalGraphTheme; 
 
-  vtkQtTreeModelAdapter TreeAdapter;
   vtkSmartPointer<vtkHierarchicalGraphView> HierarchicalGraphView;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
@@ -168,8 +172,8 @@ ClientHierarchyView::ClientHierarchyView(
   Implementation(new implementation()),
   Command(new command(*this))
 {
-  QObject::connect(this->Implementation->Widgets.treeView, SIGNAL(expanded(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
-  QObject::connect(this->Implementation->Widgets.treeView, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
+  QObject::connect(this->Implementation->TreeWidget, SIGNAL(expanded(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
+  QObject::connect(this->Implementation->TreeWidget, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
 
   QObject::connect(&this->Implementation->UpdateTimer, SIGNAL(timeout()), this, SLOT(synchronizeViews()));
 
@@ -274,7 +278,7 @@ bool ClientHierarchyView::canDisplay(pqOutputPort* output_port) const
 
 const bool ClientHierarchyView::treeVisible()
 {
-  return this->Implementation->Widgets.treeView->isVisible();
+  return this->Implementation->Widgets.treeFrame->isVisible();
 }
 
 const bool ClientHierarchyView::hierarchicalGraphVisible()
@@ -284,7 +288,7 @@ const bool ClientHierarchyView::hierarchicalGraphVisible()
 
 void ClientHierarchyView::showTree(bool visible)
 {
-  this->Implementation->Widgets.treeView->setVisible(visible);
+  this->Implementation->Widgets.treeFrame->setVisible(visible);
 }
 
 void ClientHierarchyView::showHierarchicalGraph(bool visible)
@@ -561,9 +565,9 @@ void ClientHierarchyView::synchronizeViews()
   if(this->Implementation->UpdateFlags & UPDATE_TREE_VIEW)
     {
     this->Implementation->TreeView->Update();
-    this->Implementation->Widgets.treeView->expandToDepth(2);
-    this->Implementation->Widgets.treeView->resizeColumnToContents(0);
-    this->Implementation->Widgets.treeView->resizeColumnToContents(1);
+    this->Implementation->TreeWidget->expandToDepth(2);
+    this->Implementation->TreeWidget->resizeColumnToContents(0);
+    this->Implementation->TreeWidget->resizeColumnToContents(1);
     }
 
   // Update the hierarchical graph view ...

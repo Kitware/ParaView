@@ -23,7 +23,7 @@
 #include "vtkSMChartOptionsProxy.h"
 
 vtkStandardNewMacro(vtkSMBarChartViewProxy);
-vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::vtkSMBarChartViewProxy()
 {
@@ -70,7 +70,7 @@ void vtkSMBarChartViewProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 vtkQtChartWidget* vtkSMBarChartViewProxy::GetChartWidget()
 {
-  return this->ChartView->GetChartWidget();
+  return qobject_cast<vtkQtChartWidget*>(this->ChartView->GetWidget());
 }
 
 //----------------------------------------------------------------------------

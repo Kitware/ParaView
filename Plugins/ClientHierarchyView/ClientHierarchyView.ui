@@ -13,29 +13,20 @@
    <string/>
   </property>
   <layout class="QVBoxLayout" >
-   <property name="leftMargin" >
-    <number>0</number>
-   </property>
-   <property name="topMargin" >
-    <number>0</number>
-   </property>
-   <property name="rightMargin" >
-    <number>0</number>
-   </property>
-   <property name="bottomMargin" >
-    <number>0</number>
-   </property>
    <item>
     <widget class="QSplitter" name="horizontalSplitter" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QTreeView" name="treeView" >
-      <property name="rootIsDecorated" >
-       <bool>false</bool>
+     <widget class="QFrame" name="treeFrame" >
+      <property name="frameShape" >
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow" >
+       <enum>QFrame::Raised</enum>
       </property>
      </widget>
-     <widget class="QSplitter" name="verticalSplitter" >
+     <widget class="QSplitter" name="splitter" >
       <property name="orientation" >
        <enum>Qt::Vertical</enum>
       </property>

@@ -23,7 +23,7 @@
 #include "vtkSMChartOptionsProxy.h"
 
 vtkStandardNewMacro(vtkSMLineChartViewProxy);
-vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLineChartViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMLineChartViewProxy::vtkSMLineChartViewProxy()
 {
@@ -69,7 +69,7 @@ void vtkSMLineChartViewProxy::CreateVTKObjects()
 //----------------------------------------------------------------------------
 vtkQtChartWidget* vtkSMLineChartViewProxy::GetChartWidget()
 {
-  return this->ChartView->GetChartWidget();
+  return qobject_cast<vtkQtChartWidget*>(this->ChartView->GetWidget());
 }
 
 //----------------------------------------------------------------------------
