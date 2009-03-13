@@ -92,6 +92,13 @@ pqBarChartView::pqBarChartView(const QString& group,
   this->Internal->BarChartView = vtkSMBarChartViewProxy::SafeDownCast(
     viewModule)->GetBarChartView();
 
+  // Set up the paraview style interactor.
+  vtkQtChartArea* area = this->Internal->BarChartView->GetChartArea();
+  vtkQtChartMouseSelection* selector =
+    vtkQtChartInteractorSetup::createSplitZoom(area);
+  this->Internal->BarChartView->AddChartSelectionHandlers(selector);
+  vtkQtChartInteractorSetup::setupDefaultKeys(area->getInteractor());
+
   // Set up the view undo/redo.
   vtkQtChartContentsSpace *contents =
     this->getVtkBarChartView()->GetChartArea()->getContentsSpace();
