@@ -30,14 +30,17 @@
 
 #include <vtkAbstractArray.h>
 #include <vtkConvertSelection.h>
+#include <vtkDataObjectToTable.h>
 #include <vtkDataObjectTypes.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkGraph.h>
 #include <vtkIdTypeArray.h>
 #include <vtkIntArray.h>
 #include <vtkPVDataInformation.h>
 #include <vtkQtTableModelAdapter.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
+#include <vtkSMPropertyHelper.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkTable.h>
@@ -71,6 +74,7 @@ public:
     this->Table->Delete();
   }
 
+  int CurrentAttributeType;
   bool UpdatingSelection;
   vtkTable* const Table;
   vtkQtTableModelAdapter TableAdapter;
@@ -136,6 +140,11 @@ bool ClientTableView::canDisplay(pqOutputPort* output_port) const
   int type = vtkDataObjectTypes::GetTypeIdFromClassName(name);
   switch(type)
     {
+    case VTK_DIRECTED_ACYCLIC_GRAPH:
+    case VTK_DIRECTED_GRAPH:
+    case VTK_GRAPH:
+    case VTK_TREE:
+    case VTK_UNDIRECTED_GRAPH:
     case VTK_TABLE:
       return true;
     }
@@ -147,23 +156,79 @@ void ClientTableView::updateRepresentation(pqRepresentation* representation)
 {
   vtkSMSelectionDeliveryRepresentationProxy* const proxy = representation?
     vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(representation->getProxy()) : NULL;
-  vtkTable *table = proxy? vtkTable::SafeDownCast(proxy->GetOutput()) : NULL;
-  if (table)
+
+  if(!proxy)
     {
-    this->Implementation->Table->ShallowCopy(table);
-      
-    vtkIntArray *selectionColumn = vtkIntArray::New();
-    selectionColumn->SetName("Selected");
-    selectionColumn->SetNumberOfTuples(this->Implementation->Table->GetNumberOfRows());
-    this->Implementation->Table->AddColumn(selectionColumn);
-    selectionColumn->Delete();
-
-    this->Implementation->TableAdapter.reset();
-    this->Implementation->Widgets.rowCount->setText(QString::number(table->GetNumberOfRows()));
-    this->Implementation->Widgets.columnCount->setText(QString::number(table->GetNumberOfColumns()));
-
-    this->Implementation->Widgets.tableView->hideColumn(this->Implementation->Table->GetNumberOfColumns()-1);
+    return;
     }
+
+  proxy->Update();
+
+  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
+
+  QString attributeTypeAsString;
+  int fieldType;
+  QString attributeName;
+  vtkGraph *graph = vtkGraph::SafeDownCast(proxy->GetOutput());
+  vtkTable *inputTable = vtkTable::SafeDownCast(proxy->GetOutput());
+  if(graph)
+    {
+    if (attributeType == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
+      {
+      fieldType = vtkDataObjectToTable::VERTEX_DATA;
+      attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
+      attributeTypeAsString = "Vertex Data";
+      }
+    else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
+      {
+      fieldType = vtkDataObjectToTable::EDGE_DATA;
+      attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
+      attributeTypeAsString = "Edge Data";
+      }
+    else
+      {
+      return;
+      }
+    }
+  else if(inputTable && attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+    fieldType = vtkDataObjectToTable::FIELD_DATA;
+    attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
+    attributeTypeAsString = "Row Data";
+    }
+  else
+    {
+    return;
+    }
+
+  vtkDataObjectToTable *dataObjectToTable = vtkDataObjectToTable::New();
+  dataObjectToTable->SetFieldType(fieldType);
+  dataObjectToTable->SetInput(proxy->GetOutput());
+  dataObjectToTable->Update();
+
+  vtkTable *table = dataObjectToTable->GetOutput();
+  if (!table)
+    {
+    return;
+    }
+
+  this->Implementation->CurrentAttributeType = attributeType;
+
+  this->Implementation->Table->ShallowCopy(table);
+   
+  vtkIntArray *selectionColumn = vtkIntArray::New();
+  selectionColumn->SetName("Selected");
+  selectionColumn->SetNumberOfTuples(this->Implementation->Table->GetNumberOfRows());
+  this->Implementation->Table->AddColumn(selectionColumn);
+  selectionColumn->Delete();
+
+  this->Implementation->TableAdapter.reset();
+  this->Implementation->Widgets.rowCount->setText(QString::number(table->GetNumberOfRows()));
+  this->Implementation->Widgets.columnCount->setText(QString::number(table->GetNumberOfColumns()));
+
+  this->Implementation->Widgets.tableView->hideColumn(this->Implementation->Table->GetNumberOfColumns()-1);
+
+  dataObjectToTable->Delete();
 }
 
 void ClientTableView::showRepresentation(pqRepresentation* representation)
@@ -189,6 +254,17 @@ void ClientTableView::renderInternal()
     {
     return;
     }
+
+  proxy->Update();
+
+  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
+  QString attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
+
+  if(attributeType != this->Implementation->CurrentAttributeType)
+    {
+    this->updateRepresentation(representation);
+    }
+
 
   proxy->GetSelectionRepresentation()->Update();
   vtkSelection* sel = vtkSelection::SafeDownCast(
@@ -300,6 +376,23 @@ void ClientTableView::updateSelection(vtkSelection *origSelection)
     {
     return;
     }
+
+  int selType = -1;
+  switch (this->Implementation->CurrentAttributeType)
+    {
+    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
+      selType = vtkSelectionNode::VERTEX;
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
+      selType = vtkSelectionNode::EDGE;
+      break;
+    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
+      selType = vtkSelectionNode::ROW;
+      break;
+    }
+
+  if(selType < 0)
+    return;
 
   // Does the selection have a compatible field type?
   vtkSelectionNode* selection = 0;

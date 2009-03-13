@@ -26,21 +26,75 @@
 */
 
 #include "ClientTableDisplay.h"
+#include "ui_ClientTableDisplay.h"
 
-#include <QVBoxLayout>
-#include <QLabel>
+#include <pqApplicationCore.h>
+#include <pqComboBoxDomain.h>
+#include <pqNamedWidgets.h>
+#include <pqOutputPort.h>
+#include <pqPipelineSource.h>
+#include <pqPropertyHelper.h>
+#include <pqPropertyLinks.h>
+#include <pqPropertyManager.h>
+#include <pqServerManagerModel.h>
+#include <pqSignalAdaptors.h>
+
+#include <vtkDataSetAttributes.h>
+#include <vtkGraph.h>
+#include <vtkSMClientDeliveryRepresentationProxy.h>
+#include <vtkSMProperty.h>
+#include <vtkSMPropertyHelper.h>
+#include <vtkSMProxy.h>
+#include <vtkSmartPointer.h>
+#include <vtkTable.h>
+
+class ClientTableDisplay::implementation
+{
+public:
+  implementation()
+  {
+  }
+
+  ~implementation()
+  {
+    delete this->PropertyManager;
+  }
+
+  Ui::ClientTableDisplay Widgets;
+
+  pqPropertyManager* PropertyManager;
+  pqPropertyLinks Links;
+};
 
 ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget* p) :
-  pqDisplayPanel(representation, p)
+  pqDisplayPanel(representation, p),
+  Implementation(new implementation())
 {
-  QLabel* const label = new QLabel("No display properties.", this);
-  label->setAlignment(Qt::AlignHCenter);
-  
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->addWidget(label);
+  this->Implementation->PropertyManager = new pqPropertyManager(this);
+
+  vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(representation->getProxy());
+
+  this->Implementation->Widgets.setupUi(this);
+
+  pqSignalAdaptorComboBox* attributeTypeAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.attribute_mode);
+  attributeTypeAdaptor->setObjectName("ComboBoxAdaptor");
+
+  this->Implementation->Links.addPropertyLink(
+    attributeTypeAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("AttributeType"),0);
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(updateAllViews()));
+
+  pqNamedWidgets::linkObject(this->Implementation->Widgets.attribute_mode, proxy, "AttributeType", this->Implementation->PropertyManager);
+
 }
 
 ClientTableDisplay::~ClientTableDisplay()
 {
+  delete this->Implementation;
 }
-

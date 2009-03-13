@@ -37,6 +37,10 @@ class ClientTableDisplay : public pqDisplayPanel
 public:
   ClientTableDisplay(pqRepresentation* display, QWidget* p);
   ~ClientTableDisplay();
+
+private:
+  class implementation;
+  implementation* const Implementation;
 };
 
 #endif // ClientTableDisplay_h

@@ -2,7 +2,24 @@
  <ProxyGroup name="representations">
    <SelectionDeliveryRepresentationProxy name="ClientTableDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
       <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+        <InputArrayDomain name="input_array" number_of_components="1">
+         <RequiredProperties>
+           <Property name="AttributeType" function="FieldDataSelection"/>
+         </RequiredProperties>
+        </InputArrayDomain>
       </InputProperty>
+
+      <StringVectorProperty name="AttributeType" number_of_elements="5"  element_types="0 0 0 0 2">
+       <FieldDataDomain name="field_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+      </StringVectorProperty>
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 

@@ -59,7 +59,7 @@ protected:
   void updateRepresentation(pqRepresentation*);
   void updateSelection(vtkSelection *origSelection);
 
-private slots:
+public slots:
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
 
 private:

@@ -1,0 +1,78 @@
+<ui version="4.0" >
+ <class>ClientTableDisplay</class>
+ <widget class="QWidget" name="ClientTableDisplay" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>287</width>
+    <height>160</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <layout class="QGridLayout" >
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label_7" >
+       <property name="text" >
+        <string>Attribute Type</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" >
+      <widget class="QComboBox" name="attribute_mode" >
+       <item>
+        <property name="text" >
+         <string>Field Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Point Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Cell Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Vertex Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Edge Data</string>
+        </property>
+       </item>
+       <item>
+        <property name="text" >
+         <string>Row Data</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2" >
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" >
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
