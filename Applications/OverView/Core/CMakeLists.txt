@@ -40,6 +40,7 @@ QT4_WRAP_CPP(MOC_SRCS
   GlobalGraphViewOptions.h
   IconDialog.h
   MainWindow.h
+  StopListDialog.h
   ToolbarActions.h
   pqMultiInputView.h
   pqSingleInputView.h
@@ -51,6 +52,7 @@ SET(UI_FORMS
   GlobalGraphViewOptions.ui
   IconDialog.ui
   MainWindow.ui
+  StopListDialog.ui
   )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES

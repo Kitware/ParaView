@@ -43,6 +43,7 @@
     <addaction name="actionFileLoadServerState" />
     <addaction name="actionFileSaveServerState" />
     <addaction name="separator" />
+    <addaction name="actionFileSaveData" />
     <addaction name="actionFileSaveScreenshot" />
     <addaction name="separator" />
     <addaction name="actionServerConnect" />

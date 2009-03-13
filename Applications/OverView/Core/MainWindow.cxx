@@ -744,7 +744,7 @@ MainWindow::MainWindow() :
   pqApplicationCore::instance()->settings()->setValue("/defaultViewType","ClientGraphView");
 
   this->Implementation->UI.actionScalarBarVisibility->setEnabled(false);
-
+/*
   // Remove ParaView-specific views from interface
   QObjectList ifaces =
   pqApplicationCore::instance()->getPluginManager()->interfaces();
@@ -756,7 +756,7 @@ MainWindow::MainWindow() :
       pqApplicationCore::instance()->getPluginManager()->removeInterface(iface);
       }
     }
-  
+*/
   // add standard graph layout strategies
   pqApplicationCore::instance()->getPluginManager()->addInterface(
     new pqStandardGraphLayoutStrategies(pqApplicationCore::instance()->getPluginManager()));
