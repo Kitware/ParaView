@@ -371,57 +371,19 @@ void ClientTableView::updateSelection(vtkSelection *origSelection)
     return;
     }
 
-  vtkAbstractArray *pedigreeIds = this->Implementation->Table->GetRowData()->GetPedigreeIds();
-  if(!pedigreeIds)
+  vtkSMSelectionDeliveryRepresentationProxy* const proxy = this->visibleRepresentation()?
+    vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(this->visibleRepresentation()->getProxy()) : NULL;
+  if(!proxy)
     {
     return;
     }
 
-  int selType = -1;
-  switch (this->Implementation->CurrentAttributeType)
-    {
-    case vtkDataObject::FIELD_ASSOCIATION_VERTICES:
-      selType = vtkSelectionNode::VERTEX;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_EDGES:
-      selType = vtkSelectionNode::EDGE;
-      break;
-    case vtkDataObject::FIELD_ASSOCIATION_ROWS:
-      selType = vtkSelectionNode::ROW;
-      break;
-    }
-
-  if(selType < 0)
+  vtkSmartPointer<vtkSelection> indexSel = vtkSmartPointer<vtkSelection>::New();
+  indexSel.TakeReference(vtkConvertSelection::ToIndexSelection(origSelection, proxy->GetOutput()));
+  vtkSelectionNode *node = indexSel->GetNode(0);
+  if(!node)
     return;
-
-  // Does the selection have a compatible field type?
-  vtkSelectionNode* selection = 0;
-  if (origSelection)
-    {
-    for (unsigned int i = 0; i < origSelection->GetNumberOfNodes(); i++)
-      {
-      vtkSelectionNode* node = origSelection->GetNode(i);
-      if (node)
-        {
-        selection = vtkSelectionNode::New();
-        selection->ShallowCopy(node);
-        break;
-        }
-      }
-    }
-  
-  if(!selection || selection->GetContentType() != vtkSelectionNode::PEDIGREEIDS)
-    {
-    // Did not find a selection with the same field type
-    return;
-    }
-
-  selection->SetFieldType(vtkSelectionNode::ROW);
-  vtkSmartPointer<vtkSelection> tempSel = vtkSmartPointer<vtkSelection>::New();
-  tempSel->AddNode(selection);
-  selection->Delete();
-  vtkSmartPointer<vtkIdTypeArray> indexArr = vtkSmartPointer<vtkIdTypeArray>::New();
-  vtkConvertSelection::GetSelectedRows(tempSel, this->Implementation->Table, indexArr);
+  vtkIdTypeArray *indexArr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
 
   int rows = this->Implementation->Table->GetNumberOfRows();
   int cols = this->Implementation->Table->GetNumberOfColumns();
@@ -443,7 +405,8 @@ void ClientTableView::updateSelection(vtkSelection *origSelection)
   // HACK: This is the only way to regenerate vtkQtTableModelAdapter's hash map:
   this->Implementation->TableAdapter.setTable(0);
   this->Implementation->TableAdapter.setTable(this->Implementation->Table);
-
+  QItemSelection list = this->Implementation->TableAdapter.VTKIndexSelectionToQItemSelection(indexSel);
+/*
   QItemSelection list;
   for (vtkIdType i = 0; i < indexArr->GetNumberOfTuples(); i++)
     {
@@ -456,7 +419,7 @@ void ClientTableView::updateSelection(vtkSelection *origSelection)
     QModelIndex sortIndex = this->Implementation->TableSort.mapFromSource(index);
     list.select(sortIndex, sortIndex);
     }
-  
+*/
   this->disconnect(this->Implementation->Widgets.tableView->selectionModel(), 
     SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
     this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
