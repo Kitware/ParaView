@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidget.h"
 
 // ParaView Server Manager includes.
+#include "vtkBoundingBox.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkMemberFunctionCommand.h"
 #include "vtkPVDataInformation.h"
@@ -498,26 +499,35 @@ void pq3DWidget::hideWidget()
 //-----------------------------------------------------------------------------
 int pq3DWidget::getReferenceInputBounds(double bounds[6]) const
 {
-  if (!this->getReferenceProxy())
+  vtkSMProxy* refProxy = this->getReferenceProxy();
+  if (!refProxy)
     {
     return 0;
     }
   
   vtkSMSourceProxy* input = NULL;
   vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
-    this->getReferenceProxy()->GetProperty("Input"));
+    refProxy->GetProperty("Input"));
   int output_port = 0;
-  if(ivp && ivp->GetNumberOfProxies())
+  if (ivp && ivp->GetNumberOfProxies())
     {
     vtkSMProxy* pxy = ivp->GetProxy(0);
     input = vtkSMSourceProxy::SafeDownCast(pxy);
     output_port =ivp->GetOutputPortForConnection(0);
     }
+  else
+    {
+    // reference proxy has no input. This generally happens when the widget is
+    // controlling properties of a source. In that case, if the source has been
+    // "created", simply use the source's bounds.
+    input = vtkSMSourceProxy::SafeDownCast(refProxy);
+    }
 
   if(input)
     {
     input->GetDataInformation(output_port)->GetBounds(bounds);
-    return 1;
+    return (bounds[1] >= bounds[0] && bounds[3] >= bounds[2] && bounds[5] >=
+      bounds[4]) ? 1 : 0;
     }
   return 0;
 }
@@ -567,3 +577,16 @@ void pq3DWidget::updatePickShortcut()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pq3DWidget::resetBounds()
+{
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  double input_bounds[6];
+  if (!widget || !this->getReferenceInputBounds(input_bounds))
+    {
+    return;
+    }
+  this->resetBounds(input_bounds);
+  this->setModified();
+  this->render();
+}

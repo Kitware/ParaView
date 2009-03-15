@@ -56,7 +56,9 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
-  virtual void resetBounds();
+  virtual void resetBounds()
+    { this->Superclass::resetBounds(); }
+  virtual void resetBounds(double bounds[6]);
 
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
 

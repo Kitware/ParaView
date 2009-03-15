@@ -93,7 +93,7 @@ pqHandleWidget::pqHandleWidget(vtkSMProxy* _smproxy, vtkSMProxy* pxy, QWidget* p
     this, SLOT(onWidgetVisibilityChanged(bool)));
 
   QObject::connect(this->Implementation->UI->useCenterBounds,
-    SIGNAL(clicked()), this, SLOT(onResetBounds()));
+    SIGNAL(clicked()), this, SLOT(resetBounds()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
@@ -184,33 +184,21 @@ void pqHandleWidget::onWidgetVisibilityChanged(bool visible)
 }
 
 //-----------------------------------------------------------------------------
-void pqHandleWidget::resetBounds()
+void pqHandleWidget::resetBounds(double input_bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double input_bounds[6];
-  if(widget && this->getReferenceInputBounds(input_bounds))
-    {
-    double input_origin[3];
-    input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
-    input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
-    input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+  double input_origin[3];
+  input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+  input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+  input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-    if(vtkSMDoubleVectorProperty* const widget_position =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("WorldPosition")))
-      {
-      widget_position->SetElements(input_origin);
-      widget->UpdateVTKObjects();
-      }
-    this->setModified();
+  if(vtkSMDoubleVectorProperty* const widget_position =
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      widget->GetProperty("WorldPosition")))
+    {
+    widget_position->SetElements(input_origin);
+    widget->UpdateVTKObjects();
     }
 }
 
-//-----------------------------------------------------------------------------
-void pqHandleWidget::onResetBounds()
-{
-  this->resetBounds();
-  this->render();
-
-}
 

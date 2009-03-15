@@ -162,20 +162,11 @@ void pqBoxWidget::select()
 }
 
 //-----------------------------------------------------------------------------
-void pqBoxWidget::resetBounds()
+void pqBoxWidget::resetBounds(double input_bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double input_bounds[6];
-  if (!widget || !this->getReferenceInputBounds(input_bounds))
-    {
-    return;
-    }
-
   vtkSMPropertyHelper(widget, "PlaceWidget").Set(input_bounds, 6);
   widget->UpdateVTKObjects();
-
-  this->setModified();
-  this->render();
 }
 
 //-----------------------------------------------------------------------------

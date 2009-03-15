@@ -339,15 +339,9 @@ void pqLineWidget::createWidget(pqServer* server, const QString& xmlname)
 }
 
 //-----------------------------------------------------------------------------
-void pqLineWidget::resetBounds()
+void pqLineWidget::resetBounds(double bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double bounds[6];
-  if (!widget || !this->getReferenceInputBounds(bounds))
-    {
-    return;
-    }
-
   if(vtkSMDoubleVectorProperty* const place_widget =
     vtkSMDoubleVectorProperty::SafeDownCast(
       widget->GetProperty("PlaceWidget")))

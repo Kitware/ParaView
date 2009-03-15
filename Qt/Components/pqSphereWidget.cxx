@@ -149,15 +149,9 @@ void pqSphereWidget::onWidgetVisibilityChanged(bool visible)
 }
 
 //-----------------------------------------------------------------------------
-void pqSphereWidget::resetBounds()
+void pqSphereWidget::resetBounds(double input_bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double input_bounds[6];
-  if (!widget || !this->getReferenceInputBounds(input_bounds))
-    {
-    return;
-    }
-
 
   vtkBoundingBox box;
   box.SetBounds(input_bounds);
@@ -168,9 +162,6 @@ void pqSphereWidget::resetBounds()
   vtkSMPropertyHelper(widget, "Center").Set(center, 3);
   vtkSMPropertyHelper(widget, "Radius").Set(box.GetMaxLength()/2.0);
   widget->UpdateVTKObjects();
-
-  this->setModified();
-  this->render();
 }
 
 //-----------------------------------------------------------------------------

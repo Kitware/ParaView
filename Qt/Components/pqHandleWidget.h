@@ -54,12 +54,11 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
-  virtual void resetBounds();
+  virtual void resetBounds()
+    { this->Superclass::resetBounds(); }
+  virtual void resetBounds(double bounds[6]);
 
 private slots:
-  /// Called to reset the 3D widget bounds to the reference proxy bounds
-  void onResetBounds();
-
   /// Called when the user changes widget visibility
   void onWidgetVisibilityChanged(bool visible);
 

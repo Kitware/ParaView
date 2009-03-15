@@ -332,15 +332,9 @@ void pqImplicitPlaneWidget::select()
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::resetBounds()
+void pqImplicitPlaneWidget::resetBounds(double input_bounds[6])
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  double input_bounds[6];
-  if (!widget || !this->getReferenceInputBounds(input_bounds))
-    {
-    return;
-    }
-
   vtkBoundingBox box(input_bounds);
 
   double input_origin[3];

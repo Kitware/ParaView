@@ -55,7 +55,9 @@ public:
 
 public slots:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
-  virtual void resetBounds();
+  virtual void resetBounds()
+    { this->Superclass::resetBounds(); }
+  virtual void resetBounds(double bounds[6]);
 
   /// accept the changes
   void accept();

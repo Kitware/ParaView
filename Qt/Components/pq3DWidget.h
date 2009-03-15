@@ -88,6 +88,11 @@ public:
   /// Returns the current render view.
   pqRenderView* renderView() const;
 
+  /// Reset the bounds to the specified bounds.
+  /// This typically calls PlaceWidget on the underlying 3D Widget 
+  /// with reference proxy bounds.
+  virtual void resetBounds(double bounds[6])=0;
+
 signals:
   /// Notifies observers that widget visibility has changed
   void widgetVisibilityChanged(bool);
@@ -138,7 +143,10 @@ public slots:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
-  virtual void resetBounds() =0;
+  /// Default implementation uses the getReferenceInputBounds() to get the
+  /// bounds and then calls resetBounds(double bounds[]). Subclasses generally
+  /// need to override this resetBounds(double*) method.
+  virtual void resetBounds();
 
 protected slots:
   /// Called to request a render.
