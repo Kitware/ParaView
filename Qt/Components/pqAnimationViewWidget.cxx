@@ -738,30 +738,8 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
     }
 }
 
-static void pqAnimationPanelResetCameraKeyFrameToCurrent(vtkSMRenderViewProxy* ren,
-                                                         vtkSMProxy* dest)
-{
-  ren->SynchronizeCameraProperties();
-
-  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
-  const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
-    "CameraViewUpInfo",  "CameraViewAngle", 0 };
-  for (int cc=0; names[cc] && snames[cc]; cc++)
-    {
-    QList<QVariant> p =
-      pqSMAdaptor::getMultipleElementProperty(ren->GetProperty(snames[cc]));
-    pqSMAdaptor::setMultipleElementProperty(dest->GetProperty(names[cc]),p);
-    }
-}
-  
 void pqAnimationViewWidget::createTrack()
 {
-  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
-  if(undo)
-    {
-    undo->beginUndoSet("Add Animation Track");
-    }
-
   vtkSMRenderViewProxy* ren =
     vtkSMRenderViewProxy::SafeDownCast(this->Internal->CreateSource->getCurrentProxy());
   // Need to create new cue for this property.
@@ -789,83 +767,18 @@ void pqAnimationViewWidget::createTrack()
     // hmm something went wrong
     return;
     }
-  
-  
-  // Check is we are creating a camera cue or a regular cue.
-  if(ren)
-    {
-    pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy,
-      pname.toAscii().data(), pindex, "CameraAnimationCue");
-    cue->setKeyFrameType("CameraKeyFrame");
-    vtkSMProxy* kf = cue->insertKeyFrame(0);
-    pqAnimationPanelResetCameraKeyFrameToCurrent(ren, kf);
-    kf->UpdateVTKObjects();
-    kf = cue->insertKeyFrame(1);
-    pqAnimationPanelResetCameraKeyFrameToCurrent(ren, kf);
-    kf->UpdateVTKObjects();
-    }
-  else
-    {
-    pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy, 
-      pname.toAscii().data(), pindex, "KeyFrameAnimationCue");
-    vtkSMProxy* kf1 = cue->insertKeyFrame(0);
-    vtkSMProxy* kf2 = cue->insertKeyFrame(1);
 
-    vtkSMProperty* prop = curProxy->GetProperty(pname.toAscii().data());
-    QList<QVariant> mins;
-    QList<QVariant> maxs;
-    if(pindex == -1 && prop)
-      {
-      QList<QList<QVariant> > domains =
-        pqSMAdaptor::getMultipleElementPropertyDomain(prop);
-      QList<QVariant> currents = pqSMAdaptor::getMultipleElementProperty(prop);
-      for(int i=0; i<currents.size(); i++)
-        {
-        if(domains.size() > i && domains[i].size())
-          {
-          mins.append(domains[i][0].isValid() ? domains[i][0] : currents[i]);
-          maxs.append(domains[i][1].isValid() ? domains[i][1] : currents[i]);
-          }
-        else
-          {
-          mins.append(currents[i]);
-          maxs.append(currents[i]);
-          }
-        }
-      }
-    else
-      {
-      QList<QVariant> domain =
-        pqSMAdaptor::getMultipleElementPropertyDomain(prop, pindex);
-      QVariant current = pqSMAdaptor::getMultipleElementProperty(prop, pindex);
-      if(domain.size() && domain[0].isValid())
-        {
-        mins.append(domain[0]);
-        }
-      else
-        {
-        mins.append(current);
-        }
-      if(domain.size() && domain[1].isValid())
-        {
-        maxs.append(domain[1]);
-        }
-      else
-        {
-        maxs.append(current);
-        }
-      }
-
-    pqSMAdaptor::setMultipleElementProperty(
-      kf1->GetProperty("KeyValues"), mins);
-    pqSMAdaptor::setMultipleElementProperty(
-      kf2->GetProperty("KeyValues"), maxs);
-
-    kf1->UpdateVTKObjects();
-    kf2->UpdateVTKObjects();
-    }
-  
+  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
   if(undo)
+    {
+    undo->beginUndoSet("Add Animation Track");
+    }
+
+  // This will create the cue and initialize it with default keyframes.
+  this->Internal->Scene->createCue(curProxy,
+    pname.toAscii().data(), pindex, ren? "CameraAnimationCue" :
+    "KeyFrameAnimationCue");
+  if (undo)
     {
     undo->endUndoSet();
     }

@@ -13,19 +13,23 @@
 
 =========================================================================*/
 #include "vtkSMCameraKeyFrameProxy.h"
-#include "vtkObjectFactory.h"
 
 #include "vtkCamera.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkCameraInterpolator2.h"
+#include "vtkObjectFactory.h"
 #include "vtkSMAnimationCueProxy.h"
+#include "vtkSMCameraManipulatorProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.4");
+#include <assert.h>
+
+vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.5");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()
 {
   this->Camera = vtkCamera::New();
-  
 }
 
 //----------------------------------------------------------------------------
@@ -34,74 +38,19 @@ vtkSMCameraKeyFrameProxy::~vtkSMCameraKeyFrameProxy()
   this->Camera->Delete();
 }
 
-// MACROS to simplify our life.
-#define PropertyToCamera(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid "Info"));\
-  if (dvp)\
-    {\
-    camera->Set##propertyid (dvp->GetElements());\
-    }\
-  else  \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid "Info");\
-    }\
-}
-
-#define PropertyToCameraSingleElement(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid "Info"));\
-  if (dvp)\
-    {\
-    camera->Set##propertyid (dvp->GetElement(0));\
-    }\
-  else  \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid "Info");\
-    }\
-}
-
-#define CameraToProperty(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid));\
-  if (dvp) \
-    {\
-    dvp->SetElements(camera->Get##propertyid());\
-    }\
-  else \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid );\
-    }\
-}
-
-#define CameraToPropertySingleElement(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid));\
-  if (dvp) \
-    {\
-    dvp->SetElement(0,camera->Get##propertyid());\
-    }\
-  else \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid );\
-    }\
-}
 //----------------------------------------------------------------------------
-void vtkSMCameraKeyFrameProxy::SetKeyValue(vtkSMProxy* cameraProxy)
+void vtkSMCameraKeyFrameProxy::CopyValue(vtkCamera* camera)
 {
-  cameraProxy->UpdatePropertyInformation();
-
-  PropertyToCamera(cameraProxy, this->Camera, Position);
-  PropertyToCamera(cameraProxy, this->Camera, FocalPoint);
-  PropertyToCamera(cameraProxy, this->Camera, ViewUp);
-  PropertyToCamera(cameraProxy, this->Camera, ClippingRange);
-  PropertyToCameraSingleElement(cameraProxy, this->Camera, ViewAngle);
-  PropertyToCameraSingleElement(cameraProxy, this->Camera, ParallelScale);
-  
+  if (camera)
+    {
+    vtkSMPropertyHelper(this, "Position").Set(camera->GetPosition(), 3);
+    vtkSMPropertyHelper(this, "FocalPoint").Set(camera->GetFocalPoint(), 3);
+    vtkSMPropertyHelper(this, "ViewUp").Set(camera->GetViewUp(), 3);
+    vtkSMPropertyHelper(this, "ViewAngle").Set(0, camera->GetViewAngle());
+    vtkSMPropertyHelper(this, "ParallelScale").Set(0,
+      camera->GetParallelScale());
+    this->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -126,6 +75,64 @@ void vtkSMCameraKeyFrameProxy::SetViewUp(double x, double y, double z)
 void vtkSMCameraKeyFrameProxy::SetViewAngle(double angle)
 {
   this->Camera->SetViewAngle(angle);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCameraKeyFrameProxy::SetParallelScale(double scale)
+{
+  this->Camera->SetParallelScale(scale);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCameraKeyFrameProxy::UpdateValue(double currenttime,
+  vtkSMAnimationCueProxy* cueProxy,
+  vtkSMKeyFrameProxy* next)
+{
+  if (next == this)
+    {
+    assert(currenttime == 0.0);
+    // Happens for the last keyframe. In PATH based animations, the last
+    // keyframe is bogus, we really want to the previous keyframe to handle
+    // this. So we do that.
+    vtkSMCameraManipulatorProxy* manip =
+      vtkSMCameraManipulatorProxy::SafeDownCast(
+        cueProxy->GetManipulator());
+    if (manip)
+      {
+      vtkSMKeyFrameProxy* kf = manip->GetPreviousKeyFrame(this);
+      if (kf && kf != this)
+        {
+        kf->UpdateValue(1.0, cueProxy, this);
+        return;
+        }
+      }
+    }
+  vtkSMProxy* cameraProxy = cueProxy->GetAnimatedProxy();
+  
+  vtkCamera* camera = vtkCamera::New();
+  camera->SetPosition(this->Camera->GetPosition());
+  camera->SetFocalPoint(this->Camera->GetFocalPoint());
+  camera->SetViewUp(this->Camera->GetViewUp());
+  camera->SetViewAngle(this->Camera->GetViewAngle());
+  camera->SetParallelScale(this->Camera->GetParallelScale());
+
+  vtkCameraInterpolator2* interpolator = vtkCameraInterpolator2::SafeDownCast(
+    this->GetClientSideObject());
+  if (!interpolator)
+    {
+    vtkErrorMacro("Failed to locate vtkCameraInterpolator2.");
+    return;
+    }
+  interpolator->InterpolateCamera(currenttime, camera);
+
+  vtkSMPropertyHelper(cameraProxy, "CameraPosition").Set(camera->GetPosition(), 3);
+  vtkSMPropertyHelper(cameraProxy, "CameraFocalPoint").Set(camera->GetFocalPoint(), 3);
+  vtkSMPropertyHelper(cameraProxy, "CameraViewUp").Set(camera->GetViewUp(), 3);
+  vtkSMPropertyHelper(cameraProxy, "CameraViewAngle").Set(0, camera->GetViewAngle());
+  vtkSMPropertyHelper(cameraProxy, "CameraParallelScale").Set(0,
+    camera->GetParallelScale());
+  camera->Delete();
+  cameraProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

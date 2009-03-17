@@ -70,6 +70,9 @@ public:
   /// Returns the pqOutputPort given the name of the port.
   pqOutputPort* getOutputPort(const QString& portName) const;
 
+  /// Returns all the output ports.
+  QList<pqOutputPort*> getOutputPorts() const;
+
   /// Returns the number of consumers connected to the given output port.
   int getNumberOfConsumers(int outputport) const;
 

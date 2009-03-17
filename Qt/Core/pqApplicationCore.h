@@ -127,7 +127,7 @@ public:
   /// using pqServerManagerModelItem subclasses. It makes it possible to
   /// explore the ServerManager with ease by separating proxies based 
   /// on their functionality/type.
-  pqServerManagerModel* getServerManagerModel();
+  pqServerManagerModel* getServerManagerModel() const;
 
   pq3DWidgetFactory* get3DWidgetFactory();
   pqLinksModel* getLinksModel();
@@ -208,6 +208,9 @@ public:
   /// caller is responsible for releasing memory i.e. call Delete() on the
   /// returned value.
   vtkPVXMLElement* getCurrrentPalette();
+
+  /// returns the active server is any.
+  pqServer* getActiveServer() const;
  
 public slots:
   /// Called QCoreApplication::quit().

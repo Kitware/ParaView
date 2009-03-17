@@ -178,6 +178,41 @@
     </PVLookupTableProxy>
   </ProxyGroup>
 
+  <ProxyGroup name="parametric_functions">
+    <Proxy name="Spline" class="vtkParametricSpline">
+      <DoubleVectorProperty name="Points"
+        command="SetPoint"
+        set_number_command="SetNumberOfPoints"
+        use_index="1"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        number_of_elements="6"
+        default_values="0 0 0 1 0 0">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Closed"
+        command="SetClosed"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no 
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+        <PropertyGroup type="Spline">
+          <Property name="Points" function="HandlePositions" />
+          <Property name="Closed" function="Closed" />
+        </PropertyGroup>
+      </Hints>
+      <!-- end of Spline -->
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="implicit_functions">
     <NullProxy name="None">
     </NullProxy>
@@ -526,6 +561,10 @@
       base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
     </Proxy>
 
+    <Proxy name="SplineWidget2" class="vtkSplineWidget2"
+      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
+    </Proxy>
+
     <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
       base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
       <IntVectorProperty name="Selectable"
@@ -731,6 +770,7 @@
         <ExposedProperties>
           <Property name="KeyFrames" />
           <Property name="LastAddedKeyFrameIndex" />
+          <Property name="Mode" />
         </ExposedProperties>
       </SubProxy>
       <!-- End of CameraAnimationCue -->
@@ -1141,7 +1181,17 @@
     <CameraManipulatorProxy name="CameraManipulator"
       base_proxygroup="animation_manipulators" 
       base_proxyname="KeyFrameAnimationCueManipulator">
-      <!-- Not special interface -->
+
+      <IntVectorProperty name="Mode"
+        command="SetMode"
+        update_self="1"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Interpolate Camera" value="0" />
+          <Entry text="Path-based" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
     </CameraManipulatorProxy>
 
   </ProxyGroup>
@@ -1295,38 +1345,102 @@
     </SinusoidKeyFrameProxy>
 
     <CameraKeyFrameProxy name="CameraKeyFrame"
+      class="vtkCameraInterpolator2"
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
-      <!-- TODO: added interface to set key value using properties -->
-      <DoubleVectorProperty
-        name="Position"
+
+      <DoubleVectorProperty name="Position"
         command="SetPosition"
         number_of_elements="3"
         update_self="1"
         default_values="0.0 0.0 0.0">
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="FocalPoint"
+      <DoubleVectorProperty name="FocalPoint"
         command="SetFocalPoint"
         number_of_elements="3"
         update_self="1"
         default_values="0.0 0.0 0.0">
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="ViewUp"
+      <DoubleVectorProperty name="ViewUp"
         command="SetViewUp"
         number_of_elements="3"
         update_self="1"
         default_values="0.0 1.0 0.0">
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="ViewAngle"
+      <DoubleVectorProperty name="ViewAngle"
         command="SetViewAngle"
         number_of_elements="1"
+        update_self="1"
         default_values="30">
       </DoubleVectorProperty> 
+
+      <DoubleVectorProperty name="ParallelScale"
+        command="SetParallelScale"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      <!-- These are properties for the new style camera interpolation
+           using path
+      -->
+      <DoubleVectorProperty name="PositionPathPoints"
+        command="AddPositionPathPoint"
+        clean_command="ClearPositionPath"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        number_of_elements="9"
+        default_values="5 0 0 5 5 0 5 0 0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="FocalPathPoints"
+        command="AddFocalPathPoint"
+        clean_command="ClearFocalPath"
+        number_of_elements_per_command="3"
+        repeat_command="1"
+        number_of_elements="6"
+        default_values="0 0 0 1 0 0" >
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="PositionMode"
+        command="SetPositionMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Path" value="0" />
+          <Entry text="FixedDirection" value="1" />
+          <Entry text="LookAhead" value="2" />
+          <Entry text="Orthogonal" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FocalPointMode"
+        command="SetFocalPointMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Path" value="0" />
+          <Entry text="FixedDirection" value="1" />
+          <Entry text="LookAhead" value="2" />
+          <Entry text="Orthogonal" value="3" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ClosedFocalPath"
+        command="SetClosedFocalPath"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ClosedPositionPath"
+        command="SetClosedPositionPath"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
     </CameraKeyFrameProxy>
 
   </ProxyGroup>

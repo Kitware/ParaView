@@ -34,17 +34,19 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Camera interpolation is not performed by the Keyframe proxy.
-  // Instead the Manipulator manages it.
-  // Thus method does nothing.
-  virtual void UpdateValue(double ,
-    vtkSMAnimationCueProxy* , vtkSMKeyFrameProxy* )  { }
+  // If the vtkSMCameraManipulatorProxy is in CAMERA mode, then this method is
+  // not even called since the interpolation is done by vtkCameraInterpolator
+  // maintained by vtkSMCameraManipulatorProxy itself. However,  in PATH mode,
+  // this method is called to allow the key frame to use vtkCameraInterpolator2
+  // to do path-based interpolations for the camera.
+  virtual void UpdateValue(double currenttime,
+    vtkSMAnimationCueProxy* cueProxy,
+    vtkSMKeyFrameProxy* next);
  
   // Description:
-  // Since this keyframe animates a proxy, the KeyValue at a given time
-  // is also a proxy (Camera Proxy). The info properties are updated
-  // (UpdateInformation) and then the values are stored. 
-  void SetKeyValue(vtkSMProxy* cameraProxy);
+  // Updates the keyframe's current value using the camera.
+  // This is a convenience method, it updates the properties on this proxy.
+  void CopyValue(vtkCamera*);
 
   // Overridden, since these methods are not supported by this class.
   virtual void SetKeyValue(unsigned int , double ) { }
@@ -60,12 +62,14 @@ public:
   void SetFocalPoint(double x, double y, double z);
   void SetViewUp(double x, double y, double z);
   void SetViewAngle(double angle);
+  void SetParallelScale(double scale);
 
 protected:
   vtkSMCameraKeyFrameProxy();
   ~vtkSMCameraKeyFrameProxy();
+
   vtkCamera* Camera;
-  
+
 private:
   vtkSMCameraKeyFrameProxy(const vtkSMCameraKeyFrameProxy&); // Not implemented.
   void operator=(const vtkSMCameraKeyFrameProxy&); // Not implemented.

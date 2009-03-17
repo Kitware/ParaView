@@ -5,162 +5,399 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>342</width>
-    <height>118</height>
+    <width>420</width>
+    <height>438</height>
    </rect>
   </property>
   <property name="windowTitle" >
    <string>Form</string>
   </property>
   <layout class="QGridLayout" >
-   <property name="margin" >
+   <property name="leftMargin" >
     <number>0</number>
    </property>
-   <property name="spacing" >
-    <number>6</number>
+   <property name="topMargin" >
+    <number>0</number>
    </property>
-   <item row="0" column="1" >
-    <widget class="QDoubleSpinBox" name="position0" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QDoubleSpinBox" name="viewUp0" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" >
-    <widget class="QDoubleSpinBox" name="focalPoint2" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label_13" >
-     <property name="text" >
-      <string>View Up</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3" >
-    <widget class="QDoubleSpinBox" name="position2" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" >
-    <widget class="QDoubleSpinBox" name="focalPoint1" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2" >
-    <widget class="QDoubleSpinBox" name="viewUp1" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
+   <property name="rightMargin" >
+    <number>0</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>0</number>
+   </property>
    <item row="0" column="0" >
-    <widget class="QLabel" name="label_10" >
-     <property name="text" >
-      <string>Position</string>
+    <widget class="QStackedWidget" name="stackedWidget" >
+     <property name="currentIndex" >
+      <number>1</number>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="2" >
-    <widget class="QDoubleSpinBox" name="position1" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" >
-    <widget class="QLabel" name="label_11" >
-     <property name="text" >
-      <string>View Angle</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" >
-    <widget class="QLabel" name="label_12" >
-     <property name="text" >
-      <string>Focal Point</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" >
-    <widget class="QDoubleSpinBox" name="focalPoint0" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" >
-    <widget class="QDoubleSpinBox" name="viewAngle" >
-     <property name="maximum" >
-      <double>360.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-360.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3" >
-    <widget class="QDoubleSpinBox" name="viewUp2" >
-     <property name="maximum" >
-      <double>10000.000000000000000</double>
-     </property>
-     <property name="minimum" >
-      <double>-10000.000000000000000</double>
-     </property>
+     <widget class="QWidget" name="page0" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QPushButton" name="useCurrent" >
+         <property name="text" >
+          <string>Use Current</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_10" >
+         <property name="text" >
+          <string>Position</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QDoubleSpinBox" name="position0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="QDoubleSpinBox" name="position1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QDoubleSpinBox" name="position2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_12" >
+         <property name="text" >
+          <string>Focal Point</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QDoubleSpinBox" name="focalPoint0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QDoubleSpinBox" name="focalPoint1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QDoubleSpinBox" name="focalPoint2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="label_13" >
+         <property name="text" >
+          <string>View Up</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QDoubleSpinBox" name="viewUp0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" >
+        <widget class="QDoubleSpinBox" name="viewUp1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" >
+        <widget class="QDoubleSpinBox" name="viewUp2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" >
+        <widget class="QLabel" name="label_11" >
+         <property name="text" >
+          <string>View Angle</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QDoubleSpinBox" name="viewAngle" >
+         <property name="minimum" >
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>360.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page1" >
+      <layout class="QVBoxLayout" >
+       <item>
+        <widget class="pqCollapsedGroup" name="groupBox_2" >
+         <property name="title" >
+          <string>Camera Position</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label_2" >
+            <property name="text" >
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QComboBox" name="positionMode" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+            <item>
+             <property name="text" >
+              <string>Path</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Fixed Direction</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Look Ahead</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Orthogonal</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2" >
+           <widget class="QPushButton" name="createPathPosition" >
+            <property name="text" >
+             <string>Create Path</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2" >
+           <widget class="pqCollapsedGroup" name="groupBox_3" >
+            <property name="title" >
+             <string>Control Points</string>
+            </property>
+            <layout class="QGridLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item row="0" column="0" >
+              <widget class="QWidget" native="1" name="positionSplineContainer" />
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqCollapsedGroup" name="groupBox" >
+         <property name="title" >
+          <string>Focal Point</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" >
+           <widget class="QComboBox" name="focalPointMode" >
+            <property name="enabled" >
+             <bool>false</bool>
+            </property>
+            <item>
+             <property name="text" >
+              <string>Path</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Fixed Direction</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Look Ahead</string>
+             </property>
+            </item>
+            <item>
+             <property name="text" >
+              <string>Orthogonal</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" >
+           <widget class="QPushButton" name="createPathFocalPoint" >
+            <property name="text" >
+             <string>Create Path</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3" >
+           <widget class="pqCollapsedGroup" name="groupBox_4" >
+            <property name="title" >
+             <string>Control Points</string>
+            </property>
+            <layout class="QGridLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item row="0" column="0" >
+              <widget class="QWidget" native="1" name="focalSplineContainer" />
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="pqCollapsedGroup" name="groupBox_5" >
+         <property name="title" >
+          <string>Up Direction</string>
+         </property>
+         <layout class="QGridLayout" >
+          <item row="0" column="0" >
+           <widget class="QDoubleSpinBox" name="viewUpX" >
+            <property name="minimum" >
+             <double>-1000.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>1000.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" >
+           <widget class="QDoubleSpinBox" name="viewUpY" >
+            <property name="minimum" >
+             <double>-1000.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>1000.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" >
+           <widget class="QDoubleSpinBox" name="viewUpZ" >
+            <property name="minimum" >
+             <double>-1000.000000000000000</double>
+            </property>
+            <property name="maximum" >
+             <double>1000.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>402</width>
+           <height>71</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>position0</tabstop>
-  <tabstop>position1</tabstop>
-  <tabstop>position2</tabstop>
-  <tabstop>focalPoint0</tabstop>
-  <tabstop>focalPoint1</tabstop>
-  <tabstop>focalPoint2</tabstop>
-  <tabstop>viewUp0</tabstop>
-  <tabstop>viewUp1</tabstop>
-  <tabstop>viewUp2</tabstop>
-  <tabstop>viewAngle</tabstop>
- </tabstops>
+ <customwidgets>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

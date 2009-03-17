@@ -58,6 +58,10 @@ public:
   /// default).
   void setValuesOnly(bool);
   bool valuesOnly() const;
+
+signals:
+  void useCameraPaths(bool);
+
 public slots:
   /// read the key frame data and display it
   void readKeyFrameData();
@@ -69,6 +73,7 @@ private slots:
   void deleteKeyFrame();
   void deleteAllKeyFrames();
   void useCurrentCamera(QObject*);
+  void modeChanged(const QString&);
 
 private:
   class pqInternal;

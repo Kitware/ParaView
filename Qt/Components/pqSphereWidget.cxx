@@ -70,6 +70,9 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   this->Implementation->centerX->setValidator(validator);
   this->Implementation->centerY->setValidator(validator);
   this->Implementation->centerZ->setValidator(validator);
+  this->Implementation->normalX->setValidator(validator);
+  this->Implementation->normalY->setValidator(validator);
+  this->Implementation->normalZ->setValidator(validator);
   
   validator = new QDoubleValidator(this);
   validator->setBottom(0.0);
@@ -78,6 +81,9 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   PVSPHEREWIDGET_TRIGGER_RENDER(centerX);
   PVSPHEREWIDGET_TRIGGER_RENDER(centerY);
   PVSPHEREWIDGET_TRIGGER_RENDER(centerZ);
+  PVSPHEREWIDGET_TRIGGER_RENDER(normalX);
+  PVSPHEREWIDGET_TRIGGER_RENDER(normalY);
+  PVSPHEREWIDGET_TRIGGER_RENDER(normalZ);
   PVSPHEREWIDGET_TRIGGER_RENDER(radius);
 
   QObject::connect(this->Implementation->show3DWidget,
@@ -95,6 +101,9 @@ pqSphereWidget::pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _
   pqServerManagerModel* smmodel =
     pqApplicationCore::instance()->getServerManagerModel();
   this->createWidget(smmodel->findServer(refProxy->GetConnectionID()));
+
+  // by default, we don't use this widget for direction.
+  this->enableDirection(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -103,6 +112,25 @@ pqSphereWidget::~pqSphereWidget()
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
+void pqSphereWidget::enableDirection(bool enable)
+{
+  this->Implementation->normalLabel->setVisible(enable);
+  this->Implementation->normalX->setVisible(enable);
+  this->Implementation->normalY->setVisible(enable);
+  this->Implementation->normalZ->setVisible(enable);
+
+  // the vtkSphereWidget's handle is really funny. I am just not going to use
+  // it for now. We need a new widget to set up orbits. Until then, we just
+  // overload this one.
+  vtkSMProxy* widgetProxy = this->getWidgetProxy();
+  vtkSMPropertyHelper(widgetProxy, "HandleVisibility").Set(0);
+  vtkSMPropertyHelper(widgetProxy, "RadialLine").Set(0);
+  widgetProxy->UpdateVTKObjects();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
 #define PVSPHEREWIDGET_LINK(ui, smproperty, index)\
 {\
   this->Implementation->Links.addPropertyLink(\
@@ -126,6 +154,9 @@ void pqSphereWidget::createWidget(pqServer* server)
   PVSPHEREWIDGET_LINK(centerY, "Center", 1);
   PVSPHEREWIDGET_LINK(centerZ, "Center", 2);
   PVSPHEREWIDGET_LINK(radius, "Radius", 0);
+  PVSPHEREWIDGET_LINK(normalX, "HandleDirection", 0);
+  PVSPHEREWIDGET_LINK(normalY, "HandleDirection", 1);
+  PVSPHEREWIDGET_LINK(normalZ, "HandleDirection", 2);
 }
 
 //-----------------------------------------------------------------------------

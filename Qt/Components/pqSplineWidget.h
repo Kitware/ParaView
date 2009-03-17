@@ -1,15 +1,15 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSphereWidget.h
+   Module:    pqSplineWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.1. 
-
-   See License_v1.1.txt for the full ParaView license.
+   under the terms of the ParaView license version 1.2. 
+   
+   See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -29,19 +29,22 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqSphereWidget_h 
-#define __pqSphereWidget_h
+#ifndef __pqSplineWidget_h 
+#define __pqSplineWidget_h
 
 #include "pq3DWidget.h"
+#include <QColor>
 
 class pqServer;
-class PQCOMPONENTS_EXPORT pqSphereWidget : public pq3DWidget
+
+/// GUI for SplineWidgetRepresentation. This is a 3D widget that edits a spline.
+class PQCOMPONENTS_EXPORT pqSplineWidget : public pq3DWidget
 {
   Q_OBJECT
   typedef pq3DWidget Superclass;
 public:
-  pqSphereWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p = 0);
-  virtual ~pqSphereWidget();
+  pqSplineWidget(vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* parent);
+  virtual ~pqSplineWidget();
 
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
@@ -49,18 +52,14 @@ public:
   /// This should be explicitly called after the panel is created
   /// and the widget is initialized i.e. the reference proxy, controlled proxy
   /// and hints have been set.
+  virtual void resetBounds(double bounds[6]) {}
   virtual void resetBounds()
-    { this->Superclass::resetBounds(); }
-  virtual void resetBounds(double bounds[6]);
+    { return this->Superclass::resetBounds(); }
 
-  /// accept the changes. Overridden to hide handles.
-  virtual void accept();
-
-  /// reset the changes. Overridden to hide handles.
-  virtual void reset();
-
-  /// When set, the widget can also be used to setup a direction vector.
-  void enableDirection(bool);
+  void setLineColor(const QColor& color);
+protected slots:
+  void addPoint();
+  void removePoints();
 
 protected:
   /// Internal method to create the widget.
@@ -68,17 +67,12 @@ protected:
   
   /// Internal method to cleanup widget.
   void cleanupWidget();
-
-private slots:
-  /// Called when the user changes widget visibility
-  void onWidgetVisibilityChanged(bool visible);
-
 private:
-  pqSphereWidget(const pqSphereWidget&); // Not implemented.
-  void operator=(const pqSphereWidget&); // Not implemented.
+  pqSplineWidget(const pqSplineWidget&); // Not implemented.
+  void operator=(const pqSplineWidget&); // Not implemented.
 
-  class pqImplementation;
-  pqImplementation* Implementation;
+  class pqInternals;
+  pqInternals* Internals;
 };
 
 #endif

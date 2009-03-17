@@ -107,6 +107,7 @@ public:
   void Set(const int* values, unsigned int count);
   int GetAsInt(unsigned int index = 0);
   unsigned int Get(int* values, unsigned int count);
+  const int* GetAsIntPtr();
 
   // Description:
   // Set/Get methods with \c double API. Calling these method on
@@ -117,6 +118,7 @@ public:
   void Set(const double* values, unsigned int count);
   double GetAsDouble(unsigned int index = 0);
   unsigned int Get(double* values, unsigned int count);
+  const double* GetAsDoublePtr();
 
 #if VTK_SIZEOF_ID_TYPE != VTK_SIZEOF_INT
   // Description:
@@ -129,6 +131,7 @@ public:
   unsigned int Get(vtkIdType* values, unsigned int count);
 #endif
   vtkIdType GetAsIdType(unsigned int index = 0);
+  const vtkIdType* GetAsIdTypePtr();
 
   // Description:
   // Set/Get methods for vtkSMStringVectorProperty. Calling these methods on any
@@ -164,6 +167,10 @@ private:
     INPUT,
     NONE
   };
+
+  double* DoubleValues;
+  int* IntValues;
+  vtkIdType* IdTypeValues;
 
   vtkSMProxy* Proxy;
   vtkSMProperty* Property;

@@ -325,8 +325,16 @@
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
+        name="CameraViewAngleInfo"
+        command="GetViewAngle"
+        information_only="1">
+        <SimpleDoubleInformationHelper />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
         name="CameraViewAngle"
         command="SetViewAngle"
+        information_property="CameraViewAngleInfo"
         number_of_elements="1"
         immediate_update="1"
         default_values="30">
@@ -1835,6 +1843,16 @@
         </Documentation>
       </IntVectorProperty>
 
+      <DoubleVectorProperty name="HandleDirection"
+        number_of_elements="3"
+        default_values="0 0 1">
+        <Documentation>
+          Set/Get the direction vector of the handle relative to the center of
+          the sphere. This may affect the position of the handle and the radius
+          of the sphere.
+        </Documentation>
+      </DoubleVectorProperty>
+
       <!-- End of SphereRepresentation -->
     </Proxy>
 
@@ -2030,6 +2048,71 @@
         <DoubleRangeDomain name="range" min="0.01"/>
       </DoubleVectorProperty>
       <!-- End of WidgetRepresentation -->
+    </Proxy>
+
+    <Proxy name="SplineRepresentation" class="vtkSplineRepresentation">
+      <Documentation>
+        Proxy for vtkSplineRepresentation. Don't use directly since it's not
+        coupled with the widget. Use "SplineWidgetRepresentation" instead which
+        include this representation as well as the widget to modify the
+        representation.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.01" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HandlePositions"
+        command="SetHandlePosition"
+        set_number_command="SetNumberOfHandles"
+        use_index="1"
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        number_of_elements="6"
+        default_values="0 0 0 1 0 0"
+        information_property="HandlePositionsInfo" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="HandlePositionsInfo"
+        command="GetHandlePositions"
+        information_only="1">
+        <DoubleArrayInformationHelper />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="Closed"
+        command="SetClosed"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="LineColor"
+        command="SetLineColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 0.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <!-- End of SplineRepresentation -->
     </Proxy>
 
     <Proxy name="CubeAxesActor" class="vtkCubeAxesActor">
@@ -8559,6 +8642,9 @@
           <Property name="CenterInfo" />
           <Property name="Radius" />
           <Property name="RadiusInfo" />
+          <Property name="HandleVisibility" />
+          <Property name="RadialLine" />
+          <Property name="HandleDirection" />
         </ExposedProperties>
       </SubProxy>
 
@@ -8604,6 +8690,38 @@
         </Proxy>
       </SubProxy>
       <!--- End of SliderWidgetRepresentaion -->
+    </NewWidgetRepresentationProxy>
+
+    <NewWidgetRepresentationProxy name="SplineWidgetRepresentation">
+      <Documentation>
+        Representation proxy for the the spline widget. This includes the
+        widget/representation proxies for the sphere 3D widget.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="SplineRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+          <Property name="HandlePositions" />
+          <Property name="HandlePositionsInfo" />
+          <Property name="Closed" />
+          <Property name="LineColor" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="SplineWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of SplineWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
 
     <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">

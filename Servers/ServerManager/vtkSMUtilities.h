@@ -22,6 +22,7 @@
 #include "vtkSMObject.h"
 
 class vtkImageData;
+class vtkPoints;
 class VTK_EXPORT vtkSMUtilities : public vtkSMObject
 {
 public:
@@ -39,6 +40,15 @@ public:
     int quality);
   static int SaveImage(vtkImageData* image, const char* filename)
     { return vtkSMUtilities::SaveImage(image, filename, -1); }
+
+  // Description:
+  // Returns the points an orbit to revolve around the \c center at a distance
+  // of \c radius in the plane defined by the \c center and the \c normal. The
+  // number of points returned is equal to \c resolution.
+  // Returns a new instance of vtkPoints. The caller is responsible for freeing
+  // the allocated memory.
+  static vtkPoints* CreateOrbit(const double center[3],
+    const double normal[3], double radius, int resolution);
 
 //BTX
 protected:

@@ -132,6 +132,10 @@ QTreeWidgetItem* pqSignalAdaptorTreeWidget::newItem(
     {
     item = new QTreeWidgetItem(columnValues);
     }
+  if (this->Editable)
+    {
+    item->setFlags(item->flags()| Qt::ItemIsEditable);
+    }
   return item;
 }
 
@@ -187,10 +191,6 @@ void pqSignalAdaptorTreeWidget::setValues(const QList<QVariant>& new_values)
       }
 
     QTreeWidgetItem* item = this->newItem(column_values);
-    if (this->Editable)
-      {
-      item->setFlags(item->flags()| Qt::ItemIsEditable);
-      }
     items.push_back(item);
     }
   this->TreeWidget->addTopLevelItems(items);
@@ -214,7 +214,6 @@ void pqSignalAdaptorTreeWidget::updateSortingLinks()
     }
 }
 
-
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorTreeWidget::sort(int column)
 {
@@ -226,13 +225,15 @@ void pqSignalAdaptorTreeWidget::sort(int column)
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorTreeWidget::growTable()
+QTreeWidgetItem* pqSignalAdaptorTreeWidget::growTable()
 {
   this->TreeWidget->setSortingEnabled(false);
   int columnCount = this->TreeWidget->columnCount();
 
-  QTreeWidgetItem* sample = 0;
-  if (this->TreeWidget->topLevelItemCount()>0)
+  // We will try to add the new value after the current one, if any. Otherwise
+  // it will be added to the end of the list.
+  QTreeWidgetItem* sample = this->TreeWidget->currentItem();
+  if (!sample && this->TreeWidget->topLevelItemCount()>0)
     {
     sample = this->TreeWidget->topLevelItem(this->TreeWidget->topLevelItemCount()-1);
     }
@@ -251,7 +252,9 @@ void pqSignalAdaptorTreeWidget::growTable()
     }
 
   bool prev = this->blockSignals(true);
-  QTreeWidgetItem* item = this->appendValue(newvalue);
+  QTreeWidgetItem* item = this->newItem(newvalue);
+  int index = (this->TreeWidget->indexOfTopLevelItem(sample) + 1);
+  this->TreeWidget->insertTopLevelItem(index, item);
   this->blockSignals(prev);
 
   // Give the listeners a chance to change item default values.
@@ -262,4 +265,6 @@ void pqSignalAdaptorTreeWidget::growTable()
   // he's done filling values by clicking on the header.
   this->updateSortingLinks();
   emit this->valuesChanged();
+
+  return item;
 }

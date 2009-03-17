@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>289</width>
-    <height>166</height>
+    <width>263</width>
+    <height>172</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -39,13 +39,29 @@
       <widget class="pqLineEdit" name="centerZ" />
      </item>
      <item row="1" column="0" >
+      <widget class="QLabel" name="normalLabel" >
+       <property name="text" >
+        <string>Normal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="pqLineEdit" name="normalX" />
+     </item>
+     <item row="1" column="2" >
+      <widget class="pqLineEdit" name="normalY" />
+     </item>
+     <item row="1" column="3" >
+      <widget class="pqLineEdit" name="normalZ" />
+     </item>
+     <item row="2" column="0" >
       <widget class="QLabel" name="label_2" >
        <property name="text" >
         <string>Radius</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1" >
+     <item row="2" column="1" >
       <widget class="pqLineEdit" name="radius" />
      </item>
     </layout>

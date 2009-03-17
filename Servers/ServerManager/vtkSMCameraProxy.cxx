@@ -20,7 +20,7 @@
 #include "vtkCamera.h"
 
 vtkStandardNewMacro(vtkSMCameraProxy);
-vtkCxxRevisionMacro(vtkSMCameraProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCameraProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMCameraProxy::vtkSMCameraProxy()
 {
@@ -67,6 +67,10 @@ void vtkSMCameraProxy::UpdatePropertyInformation()
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("CameraParallelScaleInfo"));
   dvp->SetElement(0, camera->GetParallelScale());
+
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetProperty("CameraViewAngleInfo"));
+  dvp->SetElement(0, camera->GetViewAngle());
 }
 
 //-----------------------------------------------------------------------------

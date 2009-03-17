@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxyUnRegisterUndoElement.h"
 
 vtkStandardNewMacro(pqUndoStackBuilder);
-vtkCxxRevisionMacro(pqUndoStackBuilder, "1.7");
+vtkCxxRevisionMacro(pqUndoStackBuilder, "1.8");
 //-----------------------------------------------------------------------------
 pqUndoStackBuilder::pqUndoStackBuilder()
 {
@@ -220,6 +220,8 @@ void pqUndoStackBuilder::OnPropertyModified(vtkSMProxy* proxy,
     // Ignore interaction changes.
     const char* names[] = {
       "CameraPosition", "CameraFocalPoint", 
+      "CameraViewAngle",
+      "CameraParallelScale",
       "CameraViewUp", "CameraClippingRange", "CenterOfRotation", 0};
     for (int cc=0; names[cc]; cc++)
       {

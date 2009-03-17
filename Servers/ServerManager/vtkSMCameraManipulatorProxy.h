@@ -38,9 +38,31 @@ public:
     vtkSMKeyFrameAnimationCueManipulatorProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
+  enum Modes
+    {
+    CAMERA,
+    PATH
+    };
+  //ETX
+
+  // Description:
+  // This manipulator has two modes:
+  // \li CAMERA - the traditional mode using vtkCameraInterpolator where camera
+  // values are directly interpolated.
+  // \li PATH - the easy-to-use path  based interpolation where the camera
+  // position/camera focal point paths can be explicitly specified.
+  // We may eventually deprecate CAMERA mode since it may run out of usability
+  // as PATH mode matures. So the code precariously meanders between the two
+  // right now, but deprecating the old should help clean that up.
+  vtkSetClampMacro(Mode, int, CAMERA, PATH);
+  vtkGetMacro(Mode, int);
+
 protected:
   vtkSMCameraManipulatorProxy();
   ~vtkSMCameraManipulatorProxy();
+
+  int Mode;
  
   virtual void Initialize(vtkSMAnimationCueProxy*);
   virtual void Finalize(vtkSMAnimationCueProxy*);

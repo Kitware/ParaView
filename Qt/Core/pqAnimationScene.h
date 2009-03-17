@@ -167,6 +167,12 @@ private slots:
   /// called when "AnimationTime" property changes. We fire the animationTime()
   /// signal.
   void onAnimationTimePropertyChanged();
+
+protected:
+  /// Initializes the newly create animation cue with default keyframes.
+  void initializeCue(
+    vtkSMProxy* proxy, const char* propertyname, int index,
+    pqAnimationCue* cue);
 private:
   pqAnimationScene(const pqAnimationScene&); // Not implemented.
   void operator=(const pqAnimationScene&); // Not implemented.

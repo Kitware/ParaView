@@ -148,6 +148,16 @@ public slots:
   /// need to override this resetBounds(double*) method.
   virtual void resetBounds();
 
+  /// When set to true, instead of using the referenceProxy to obtain the
+  /// default bounds to reset to, it will use the bounds for the selected sources
+  /// as indicated by
+  /// pqApplicationCore::getSelectionModel()->getSelectionDataBounds().
+  /// Default is false.
+  virtual void setUseSelectionDataBounds(bool use)
+    { this->UseSelectionDataBounds = use; }
+  bool useSelectionDataBounds()
+    {return this->UseSelectionDataBounds; }
+
 protected slots:
   /// Called to request a render.
   void render();
@@ -188,6 +198,8 @@ private:
 
   void updateWidgetVisibility();
   pq3DWidgetInternal* const Internal;
+
+  bool UseSelectionDataBounds;
 };
 
 #endif

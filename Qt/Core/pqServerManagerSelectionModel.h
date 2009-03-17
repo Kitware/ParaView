@@ -96,6 +96,11 @@ public:
   /// Returns the list of selected items.
   const pqServerManagerSelection* selectedItems() const;
 
+  /// Convenience method to get the data bounds for all sources/filters
+  /// currently selected. Returns true if the bounds were computed correctly,
+  /// false if no items are selected or selected items are not data sources.
+  bool getSelectionDataBounds(double bounds[6]) const;
+
 public slots:
   void select(pqServerManagerModelItem* item, 
     const pqServerManagerSelectionModel::SelectionFlags& command);

@@ -63,8 +63,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderView.h"
+#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
+#include "pqSplineWidget.h"
 
 class pq3DWidgetInternal
 {
@@ -102,6 +104,7 @@ pq3DWidget::pq3DWidget(vtkSMProxy* refProxy, vtkSMProxy* pxy, QWidget* _p) :
   pqProxyPanel(pxy, _p),
   Internal(new pq3DWidgetInternal())
 {
+  this->UseSelectionDataBounds = false;
   this->Internal->ReferenceProxy = refProxy;
 
   this->Internal->ControlledPropertiesObserver.TakeReference(
@@ -169,6 +172,10 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
       else if (widgetType == "Sphere")
         {
         widget = new pqSphereWidget(refProxy, pxy, 0);
+        }
+      else if (widgetType == "Spline")
+        {
+        widget = new pqSplineWidget(refProxy, pxy, 0);
         }
 
       if (widget)
@@ -581,8 +588,21 @@ void pq3DWidget::updatePickShortcut()
 void pq3DWidget::resetBounds()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if (!widget)
+    {
+    return;
+    }
+
   double input_bounds[6];
-  if (!widget || !this->getReferenceInputBounds(input_bounds))
+  if (this->UseSelectionDataBounds)
+    {
+    if (!pqApplicationCore::instance()->getSelectionModel()->
+      getSelectionDataBounds(input_bounds))
+      {
+      return;
+      }
+    }
+  else if (!this->getReferenceInputBounds(input_bounds))
     {
     return;
     }

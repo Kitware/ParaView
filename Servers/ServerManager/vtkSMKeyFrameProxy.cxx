@@ -13,9 +13,10 @@
 
 =========================================================================*/
 #include "vtkSMKeyFrameProxy.h"
-#include "vtkSMAnimationCueProxy.h"
+
 #include "vtkObjectFactory.h"
-#include "vtkClientServerID.h"
+#include "vtkProcessModule.h"
+#include "vtkSMAnimationCueProxy.h"
 
 #include <vtkstd/vector>
 //----------------------------------------------------------------------------
@@ -28,13 +29,14 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.12");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
 {
   this->KeyTime = -1.0;
   this->Internals = new vtkSMKeyFrameProxyInternals;
+  this->SetServers(vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------

@@ -19,8 +19,9 @@
 // animates with time, while vtkPVAnimationScene represents scene or setup 
 // for the animation, which consists of individual cues or other scenes.
 //
-// A scene can be played in real time mode, or as a seqence of frames
-// 1/frame rate apart in time.
+// The main difference between vtkAnimationScene and vtkPVAnimationScene is that
+// vtkPVAnimationScene does not include any of the scene playing logic. All that
+// has been moved to the vtkAnimationPlayer (and subclasses).
 // .SECTION See Also
 // vtkAnimationCue
 

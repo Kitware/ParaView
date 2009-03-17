@@ -80,6 +80,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCalculatorPanel.h
   pqCameraDialog.h
   pqCameraWidget.h
+  pqCameraPathCreator.h
   pqChartOptionsEditor.h
   pqChartViewContextMenu.h
   pqChartViewContextMenuHandler.h
@@ -149,6 +150,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOptionsContainer.h
   pqOptionsDialog.h
   pqOptionsPage.h
+  pqOrbitWidget.h
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
@@ -202,6 +204,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   #pqSourceInfoModel.h
   pqSourcesMenuManager.h
   pqSphereWidget.h
+  pqSplineWidget.h
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.h
   pqStackedChartOptionsEditor.h
@@ -242,6 +245,7 @@ SET(UI_FORMS
   Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqCameraDialog.ui
   Resources/UI/pqCameraWidget.ui
+  Resources/UI/pqCameraPathCreator.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqClientAboutDialog.ui
   Resources/UI/pqClientMainWindow.ui
@@ -293,6 +297,7 @@ SET(UI_FORMS
   Resources/UI/pqServerStartupDialog.ui
   Resources/UI/pqSignalAdaptorKeyFrameValue.ui
   Resources/UI/pqSphereWidget.ui
+  Resources/UI/pqSplineWidget.ui
   Resources/UI/pqSpreadSheetDisplayEditor.ui
   Resources/UI/pqSpreadSheetViewDecorator.ui
   Resources/UI/pqStackedChartOptionsWidget.ui
@@ -411,6 +416,8 @@ ADD_LIBRARY(pqComponents
   pqCameraDialog.h
   pqCameraWidget.cxx
   pqCameraWidget.h
+  pqCameraPathCreator.cxx
+  pqCameraPathCreator.h
   pqChartOptionsEditor.cxx
   pqChartOptionsEditor.h
   pqChartOptionsHandler.cxx
@@ -568,6 +575,8 @@ ADD_LIBRARY(pqComponents
   pqOptionsDialog.h
   pqOptionsPage.cxx
   pqOptionsPage.h
+  pqOrbitWidget.cxx
+  pqOrbitWidget.h
   pqOutputPortComboBox.cxx
   pqOutputPortComboBox.h
   pqPQLookupTableManager.cxx
@@ -676,6 +685,8 @@ ADD_LIBRARY(pqComponents
   pqSourcesMenuManager.h
   pqSphereWidget.cxx
   pqSphereWidget.h
+  pqSplineWidget.cxx
+  pqSplineWidget.h
   pqSplitViewUndoElement.cxx
   pqSplitViewUndoElement.h
   pqStateLoader.cxx

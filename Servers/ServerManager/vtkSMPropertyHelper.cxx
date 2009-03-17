@@ -61,6 +61,9 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
   this->Proxy = proxy;
   this->Property = proxy->GetProperty(pname);
   this->Type = vtkSMPropertyHelper::NONE;
+  this->DoubleValues = NULL;
+  this->IntValues = NULL;
+  this->IdTypeValues = NULL;
 
   if (!this->Property)
     {
@@ -99,8 +102,10 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
 //----------------------------------------------------------------------------
 vtkSMPropertyHelper::~vtkSMPropertyHelper()
 {
+  delete [] this->IntValues;
+  delete [] this->IdTypeValues;
+  delete [] this->DoubleValues;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkSMPropertyHelper::UpdateValueFromServer()
@@ -205,6 +210,20 @@ unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count)
 }
 
 //----------------------------------------------------------------------------
+const int* vtkSMPropertyHelper::GetAsIntPtr()
+{
+  delete [] this->IntValues;
+  this->IntValues = NULL;
+  int num_elems = this->GetNumberOfElements();
+  if (num_elems)
+    {
+    this->IntValues = new int[num_elems];
+    this->Get(this->IntValues, num_elems);
+    }
+  return this->IntValues;
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
 {
   switch (this->Type)
@@ -270,6 +289,20 @@ unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count)
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const double* vtkSMPropertyHelper::GetAsDoublePtr()
+{
+  delete [] this->DoubleValues;
+  this->DoubleValues = NULL;
+  int num_elems = this->GetNumberOfElements();
+  if (num_elems)
+    {
+    this->DoubleValues= new double[num_elems];
+    this->Get(this->DoubleValues, num_elems);
+    }
+  return this->DoubleValues;
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +395,20 @@ vtkIdType vtkSMPropertyHelper::GetAsIdType(unsigned int index /*=0*/)
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const vtkIdType* vtkSMPropertyHelper::GetAsIdTypePtr()
+{
+  delete [] this->IdTypeValues;
+  this->IdTypeValues = NULL;
+  int num_elems = this->GetNumberOfElements();
+  if (num_elems)
+    {
+    this->IdTypeValues = new vtkIdType[num_elems];
+    this->Get(this->IdTypeValues, num_elems);
+    }
+  return this->IdTypeValues;
 }
 
 //----------------------------------------------------------------------------

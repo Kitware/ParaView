@@ -33,6 +33,7 @@ SET(Filters_SRCS
   vtkCTHFragmentProcessLoading.cxx
   vtkCTHFragmentProcessRing.cxx
   vtkCTHFragmentToProcMap.cxx
+  vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
   vtkCaveRenderManager.cxx

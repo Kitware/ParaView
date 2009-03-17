@@ -1832,5 +1832,24 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
      <!-- End of NetworkImageSource -->
    </NetworkImageSourceProxy>
 
+   <SourceProxy name="SplineSource"
+    class="vtkParametricFunctionSource">
+    <Documentation
+      short_help="Tessellate parametric functions."
+      long_help="Tessellate parametric functions.">
+      This class tessellates parametric functions. The user must specify how
+      many points in the parametric coordinate directions are required (i.e.,
+      the resolution), and the mode to use to generate scalars.
+    </Documentation>
+
+    <ProxyProperty name="ParametricFunction"
+      command="SetParametricFunction"
+      label="Parametric Function">
+      <ProxyListDomain name="proxy_list">
+        <Proxy group="parametric_functions" name="Spline" />
+      </ProxyListDomain>
+    </ProxyProperty>
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

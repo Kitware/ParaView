@@ -406,6 +406,17 @@ void pqPipelineSource::createAnimationHelpersIfNeeded()
 }
 
 //-----------------------------------------------------------------------------
+QList<pqOutputPort*> pqPipelineSource::getOutputPorts() const
+{
+  QList<pqOutputPort*> ports;
+  foreach (pqOutputPort* port, this->Internal->OutputPorts)
+    {
+    ports << port;
+    }
+  return ports;
+}
+
+//-----------------------------------------------------------------------------
 pqOutputPort* pqPipelineSource::getOutputPort(int outputport) const
 {
   if (outputport < 0 || outputport >= this->Internal->OutputPorts.size())

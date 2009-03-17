@@ -232,7 +232,7 @@ pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
 }
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel* pqApplicationCore::getServerManagerModel()
+pqServerManagerModel* pqApplicationCore::getServerManagerModel() const
 {
   return this->Internal->ServerManagerModel;
 }
@@ -611,6 +611,13 @@ void pqApplicationCore::sendProgress(const char* name, int value)
     {
     this->Internal->ProgressManager->setProgress(message, value);
     }
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqApplicationCore::getActiveServer() const
+{
+  pqServerManagerModel* smmodel = this->getServerManagerModel();
+  return smmodel->getItemAtIndex<pqServer*>(0);
 }
 
 //-----------------------------------------------------------------------------

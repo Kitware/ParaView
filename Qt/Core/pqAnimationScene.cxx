@@ -32,14 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAnimationScene.h"
 
 #include "vtkAnimationCue.h"
+#include "vtkBoundingBox.h"
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPoints.h"
 #include "vtkProcessModule.h"
-#include "vtkSMViewProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMUtilities.h"
+#include "vtkSMViewProxy.h"
 
 #include <QPointer>
 #include <QSet>
@@ -51,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqTimeKeeper.h"
@@ -338,6 +343,129 @@ pqAnimationCue* pqAnimationScene::createCue(vtkSMProxy* proxy,
 }
 
 //-----------------------------------------------------------------------------
+static void pqAnimationSceneResetCameraKeyFrameToCurrent(vtkSMProxy* ren,
+                                                         vtkSMProxy* dest)
+{
+  ren->UpdatePropertyInformation();
+  const char* names[] = { "Position", "FocalPoint", "ViewUp", "ViewAngle",  0 };
+  const char* snames[] = { "CameraPositionInfo", "CameraFocalPointInfo", 
+    "CameraViewUpInfo",  "CameraViewAngle", 0 };
+  for (int cc=0; names[cc] && snames[cc]; cc++)
+    {
+    QList<QVariant> p =
+      pqSMAdaptor::getMultipleElementProperty(ren->GetProperty(snames[cc]));
+    pqSMAdaptor::setMultipleElementProperty(dest->GetProperty(names[cc]),p);
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Initialize the cue with some default key frames.
+void pqAnimationScene::initializeCue(
+  vtkSMProxy* proxy, const char* propertyname, int index,
+  pqAnimationCue* cue)
+{
+  // (This code has simply been moved from pqAnimationViewWidget to keep it
+  // centralized in the "controller". Ideally this may even move to the server
+  // manager layer -- but I'll do that in the next iteration as the location
+  // for the controller materializes.)
+
+  QString cueType = cue->getProxy()->GetXMLName();
+  if (cueType == "KeyFrameAnimationCue")
+    {
+    // Create a pair of default keyframes for this new cue.
+    vtkSMProxy* kf1 = cue->insertKeyFrame(0);
+    vtkSMProxy* kf2 = cue->insertKeyFrame(1);
+
+    // Initialize default values for the newly keyframes based on the domain
+    // for the property to be animated.
+    vtkSMProperty* prop = proxy->GetProperty(propertyname);
+    QList<QVariant> mins;
+    QList<QVariant> maxs;
+    if (index == -1 && prop)
+      {
+      QList<QList<QVariant> > domains =
+        pqSMAdaptor::getMultipleElementPropertyDomain(prop);
+      QList<QVariant> currents = pqSMAdaptor::getMultipleElementProperty(prop);
+      for (int i=0; i<currents.size(); i++)
+        {
+        if (domains.size() > i && domains[i].size())
+          {
+          mins.append(domains[i][0].isValid() ? domains[i][0] : currents[i]);
+          maxs.append(domains[i][1].isValid() ? domains[i][1] : currents[i]);
+          }
+        else
+          {
+          mins.append(currents[i]);
+          maxs.append(currents[i]);
+          }
+        }
+      }
+    else
+      {
+      QList<QVariant> domain =
+        pqSMAdaptor::getMultipleElementPropertyDomain(prop, index);
+      QVariant current = pqSMAdaptor::getMultipleElementProperty(prop, index);
+      if (domain.size() && domain[0].isValid())
+        {
+        mins.append(domain[0]);
+        }
+      else
+        {
+        mins.append(current);
+        }
+      if (domain.size() && domain[1].isValid())
+        {
+        maxs.append(domain[1]);
+        }
+      else
+        {
+        maxs.append(current);
+        }
+      }
+
+    pqSMAdaptor::setMultipleElementProperty(
+      kf1->GetProperty("KeyValues"), mins);
+    pqSMAdaptor::setMultipleElementProperty(
+      kf2->GetProperty("KeyValues"), maxs);
+    kf1->UpdateVTKObjects();
+    kf2->UpdateVTKObjects();
+    }
+  else if (cueType == "CameraAnimationCue")
+    {
+    cue->setKeyFrameType("CameraKeyFrame");
+
+    // Setup default animation to revolve around the selected objects (if any)
+    // in a plane normal to the current view-up vector.
+    pqSMAdaptor::setElementProperty(
+      cue->getProxy()->GetProperty("Mode"), 1); // PATH-based animation.
+    vtkSMProxy* kf0 = cue->insertKeyFrame(0);
+    vtkSMProxy* kf1 = cue->insertKeyFrame(1);
+    pqAnimationSceneResetCameraKeyFrameToCurrent(proxy, kf0);
+    pqAnimationSceneResetCameraKeyFrameToCurrent(proxy, kf1);
+    kf0->UpdateVTKObjects();
+    kf1->UpdateVTKObjects();
+
+    double bounds[6] = {-1, 1, -1, 1, -1, 1};
+    pqApplicationCore::instance()->getSelectionModel()->getSelectionDataBounds(
+      bounds);
+
+    vtkBoundingBox bbox(bounds);
+    double center[3];
+    bbox.GetCenter(center);
+    vtkPoints* pts = vtkSMUtilities::CreateOrbit(center,
+      vtkSMPropertyHelper(kf0, "ViewUp").GetAsDoublePtr(),
+      5*bbox.GetMaxLength()/2.0, 10);
+    vtkSMPropertyHelper(kf0, "PositionPathPoints").Set(
+      reinterpret_cast<double*>(pts->GetVoidPointer(0)),
+      pts->GetNumberOfPoints()*3);
+    vtkSMPropertyHelper(kf0, "ClosedPositionPath").Set(1);
+    vtkSMPropertyHelper(kf0, "FocalPathPoints").Set(center, 3);
+    kf0->UpdateVTKObjects();
+    pts->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
 pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
   vtkSMProxy* proxy, const char* propertyname, int index) 
 {
@@ -365,6 +493,8 @@ pqAnimationCue* pqAnimationScene::createCueInternal(const QString& cuetype,
   vtkSMProxy* sceneProxy = this->getProxy();
   pqSMAdaptor::addProxyProperty(sceneProxy->GetProperty("Cues"), cueProxy);
   sceneProxy->UpdateVTKObjects();
+
+  this->initializeCue(proxy, propertyname, index, cue);
 
   // We don't directly add this cue to the internal Cues, it will get added
   // as a side effect of the change in the "Cues" property.

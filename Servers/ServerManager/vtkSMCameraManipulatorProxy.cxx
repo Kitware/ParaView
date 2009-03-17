@@ -19,13 +19,15 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMCameraKeyFrameProxy.h"
-#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMRenderViewProxy.h"
 
 vtkStandardNewMacro(vtkSMCameraManipulatorProxy);
-vtkCxxRevisionMacro(vtkSMCameraManipulatorProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCameraManipulatorProxy, "1.5");
 //------------------------------------------------------------------------------
 vtkSMCameraManipulatorProxy::vtkSMCameraManipulatorProxy()
 {
+  this->Mode = PATH;
   this->CameraInterpolator = vtkCameraInterpolator::New();
 }
 
@@ -47,7 +49,14 @@ void vtkSMCameraManipulatorProxy::Initialize(vtkSMAnimationCueProxy* cue)
     vtkErrorMacro("Too few keyframes to animate.");
     return;
     }
-  
+ 
+  if (this->Mode == PATH)
+    {
+    // No need to initialize this->CameraInterpolator in PATH mode.
+    return;
+    }
+
+  // Set up this->CameraInterpolator.
   for(int i=0; i < nos; i++)
     {
     vtkSMCameraKeyFrameProxy* kf = vtkSMCameraKeyFrameProxy::SafeDownCast(
@@ -69,53 +78,39 @@ void vtkSMCameraManipulatorProxy::Finalize(vtkSMAnimationCueProxy* cue)
 }
 
 //------------------------------------------------------------------------------
-#define CameraToProperty(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid));\
-  if (dvp) \
-    {\
-    dvp->SetElements(camera->Get##propertyid());\
-    }\
-  else \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid );\
-    }\
-}
-
-#define CameraToPropertySingleElement(proxy, camera, propertyid) \
-{\
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(\
-    proxy->GetProperty("Camera" #propertyid));\
-  if (dvp) \
-    {\
-    dvp->SetElement(0,camera->Get##propertyid());\
-    }\
-  else \
-    {\
-    vtkErrorMacro("Failed to find property Camera" #propertyid );\
-    }\
-}
-//------------------------------------------------------------------------------
 void vtkSMCameraManipulatorProxy::UpdateValue(double currenttime,
   vtkSMAnimationCueProxy* cue)
 {
-  vtkSMProxy* cameraProxy = cue->GetAnimatedProxy();
-  vtkCamera* interpolatedCamera = vtkCamera::New();
-  this->CameraInterpolator->InterpolateCamera(currenttime, interpolatedCamera);
-  CameraToProperty(cameraProxy, interpolatedCamera, Position); 
-  CameraToProperty(cameraProxy, interpolatedCamera, FocalPoint); 
-  CameraToProperty(cameraProxy, interpolatedCamera, ViewUp); 
-  CameraToProperty(cameraProxy, interpolatedCamera, ClippingRange); 
-  CameraToPropertySingleElement(cameraProxy, interpolatedCamera, ViewAngle);
-  CameraToPropertySingleElement(cameraProxy, interpolatedCamera, ParallelScale);
-  
-  cameraProxy->UpdateVTKObjects(); 
-  interpolatedCamera->Delete();
+  if (this->Mode == CAMERA)
+    {
+    vtkSMProxy* renderViewProxy = cue->GetAnimatedProxy();
+    vtkCamera* camera = vtkCamera::New();
+    this->CameraInterpolator->InterpolateCamera(currenttime, camera);
+    vtkSMPropertyHelper(renderViewProxy, "CameraPosition").Set(camera->GetPosition(), 3);
+    vtkSMPropertyHelper(renderViewProxy, "CameraFocalPoint").Set(camera->GetFocalPoint(), 3);
+    vtkSMPropertyHelper(renderViewProxy, "CameraViewUp").Set(camera->GetViewUp(), 3);
+    vtkSMPropertyHelper(renderViewProxy, "CameraViewAngle").Set(0, camera->GetViewAngle());
+    vtkSMPropertyHelper(renderViewProxy,
+      "CameraClippingRange").Set(camera->GetClippingRange(), 2);
+    vtkSMPropertyHelper(renderViewProxy, "CameraParallelScale").Set(0,
+      camera->GetParallelScale());
+    camera->Delete();
+    renderViewProxy->UpdateVTKObjects();
+
+    if (vtkSMRenderViewProxy::SafeDownCast(renderViewProxy))
+      {
+      vtkSMRenderViewProxy::SafeDownCast(renderViewProxy)->ResetCameraClippingRange();
+      }
+    }
+  else
+    {
+    this->Superclass::UpdateValue(currenttime, cue);
+    }
 }
 
 //------------------------------------------------------------------------------
 void vtkSMCameraManipulatorProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Mode:" << this->Mode << endl;
 }

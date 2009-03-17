@@ -18,6 +18,7 @@
   <Source name="PointSource" />
   <Source name="ProgrammableSource" />
   <Source name="SphereSource" />
+  <Source name="SplineSource" />
   <Source name="SuperquadricSource" />
   <Source name="TextSource" />
   <Source name="TimeSource" />

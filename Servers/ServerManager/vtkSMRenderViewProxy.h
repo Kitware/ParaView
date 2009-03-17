@@ -264,6 +264,10 @@ public:
   // observers etc. //DDM TODO Do I have to make this public?
   virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
 
+  // Description:
+  // Reset the camera clipping range.
+  void ResetCameraClippingRange();
+
 //BTX
 protected:
   vtkSMRenderViewProxy();
@@ -308,10 +312,6 @@ protected:
   // Synchornizes the properties of the 2D and 3D renders before
   // each render.
   void SynchronizeRenderers();
-
-  // Description:
-  // Reset the camera clipping range.
-  void ResetCameraClippingRange();
 
   // Description:
   // Returns a new selection consisting of all the selections with the given

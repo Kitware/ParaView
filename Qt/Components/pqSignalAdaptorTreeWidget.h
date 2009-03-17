@@ -94,7 +94,7 @@ public slots:
 
   /// Called when user navigates beyond the end in the indices table widget. We
   /// add a new row to simplify editing.
-  void growTable();
+  QTreeWidgetItem* growTable();
 
 private slots:
   void sort(int);

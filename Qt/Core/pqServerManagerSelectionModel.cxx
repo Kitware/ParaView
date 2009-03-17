@@ -31,20 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqServerManagerSelectionModel.h"
 
+#include "vtkBoundingBox.h"
 #include "vtkCollection.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMOutputPort.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxySelectionModel.h"
-#include "vtkSMOutputPort.h"
 
 #include <QPointer>
 #include <QGlobalStatic>
 
-#include "pqServerManagerModel.h"
-#include "pqServerManagerModelItem.h"
-#include "pqProxy.h"
 #include "pqOutputPort.h"
+#include "pqPipelineSource.h"
+#include "pqProxy.h"
+#include "pqServerManagerModel.h"
 
 // register meta type for pqSMProxy
 static const int pqServerManagerSelectionId = 
@@ -258,4 +260,36 @@ pqServerManagerSelectionModel::getProxy(pqServerManagerModelItem* item)
     return source->getProxy();
     }
   return 0;
+}
+
+
+//-----------------------------------------------------------------------------
+bool pqServerManagerSelectionModel::getSelectionDataBounds(double bounds[6])
+  const
+{
+  vtkBoundingBox bbox;
+  // Reset bounds to the bounds of the active selection.
+  const pqServerManagerSelection* selection = this->selectedItems();
+  foreach (pqServerManagerModelItem* item, *selection)
+    {
+    pqPipelineSource* source = qobject_cast<pqPipelineSource*>(item);
+    if (!source)
+      {
+      continue;
+      }
+    QList<pqOutputPort*> ports = source->getOutputPorts();
+    for (int cc=0; cc <ports.size(); cc++)
+      {
+      vtkPVDataInformation* dinfo = ports[cc]->getDataInformation();
+      bbox.AddBounds(dinfo->GetBounds());
+      }
+    }
+
+  if (bbox.IsValid())
+    {
+    bbox.GetBounds(bounds);
+    return true;
+    }
+
+  return false;
 }

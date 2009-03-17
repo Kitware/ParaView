@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include "pqComponentsExport.h"
 
-/// widget class with editors for position, focalpoint, viewup and view angle
+/// widget class with createors for position, focalpoint, viewup and view angle
 class PQCOMPONENTS_EXPORT pqCameraWidget : public QWidget 
 {
   Q_OBJECT
@@ -45,6 +45,8 @@ class PQCOMPONENTS_EXPORT pqCameraWidget : public QWidget
   Q_PROPERTY(QList<QVariant> focalPoint READ focalPoint WRITE setFocalPoint)
   Q_PROPERTY(QList<QVariant> viewUp READ viewUp WRITE setViewUp)
   Q_PROPERTY(QVariant viewAngle READ viewAngle WRITE setViewAngle)
+
+  typedef QWidget Superclass;
 public:
   pqCameraWidget(QWidget* parent=NULL);
   virtual ~pqCameraWidget();
@@ -54,19 +56,40 @@ signals:
   void focalPointChanged();
   void viewUpChanged();
   void viewAngleChanged();
+  void useCurrent();
 
 public slots:
   void setPosition(QList<QVariant>);
   void setFocalPoint(QList<QVariant>);
   void setViewUp(QList<QVariant>);
   void setViewAngle(QVariant);
+  void setUsePaths(bool);
+  void setFocalPointPath(const QList<QVariant>&);
+  void setPositionPath(const QList<QVariant>&);
+  void setClosedPositionPath(bool);
+  void setClosedFocalPath(bool);
+
+protected slots:
+  void createFocalPointPath();
+  void createPositionPath();
+  void showDialog();
+  void hideDialog();
+
+protected:
+  // Overridden to update the 3D widget's visibility states.
+  virtual void showEvent(QShowEvent*);
+  virtual void hideEvent(QHideEvent*);
 
 public:
   QList<QVariant> position() const;
   QList<QVariant> focalPoint() const;
   QList<QVariant> viewUp() const;
+  QList<QVariant> focalPath() const;
+  QList<QVariant> positionPath() const;
   QVariant viewAngle() const;
-
+  bool usePaths() const;
+  bool closedPositionPath() const;
+  bool closedFocalPath() const;
 private:
   class pqInternal;
   pqInternal* Internal;
