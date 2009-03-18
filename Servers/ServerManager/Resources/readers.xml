@@ -4776,6 +4776,81 @@
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
+    <SourceProxy name="netCDFReader"
+                 class="vtkNetCDFCOARDSReader"
+                 label="netCDF Reader">
+      <Documentation short_help="Read regular arrays from netCDF files."
+                     long_help="Read regular arrays from netCDF files.  Will also read any topological information specified byt he COARDS convention.">
+        Reads arrays from netCDF files into structured VTK data sets.  In
+        the absence of any other information, the files will be read as
+        image data.  This reader will also look for meta information
+        specified by the COARDS convention that specify things like
+        topology and time.  This information can cause the output to be a
+        nonuniform rectilinear grid or curvilinear (structured) grid.
+        Details on the COARDS convention can be found at
+        http://ferret.wrc.noaa.gov/noaa_coop/coop_cdf_profile.html.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+                            command="SetFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayInfo"
+                            information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Variable"/>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="VariableArrayStatus"
+                            command="SetVariableArrayStatus"
+                            number_of_elements="0"
+                            repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 0"
+                            information_property="VariableArrayInfo"
+                            label="Variables">
+        <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+            <Property name="VariableArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </ArraySelectionDomain>
+        <Documentation>
+          This property lists which netCDF variables to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="SphericalCoordinates"
+                         command="SetSphericalCoordinates"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, then 3D data with latitude/longitude dimensions will be
+          read in as curvilinear data shaped like spherical coordinates.
+          If false, then the data will always be read in Cartesian
+          coordinates.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy> <!-- netCDFReader -->
+
    <FileSeriesReaderProxy name="CSVReader"
                           class="vtkFileSeriesReader"
                           label="CSV reader"

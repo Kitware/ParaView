@@ -5609,7 +5609,13 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       <Documentation
          long_help="Creates polylines representing pathlines of animating particles"
          short_help="Particle Pathlines">
-        Creates polylines representing pathlines of animating particles
+        Particle Pathlines takes any dataset as input, it extracts the
+        point locations of all cells over time to build up a polyline
+        trail.  The point number (index) is used as the 'key' if the points
+        are randomly changing their respective order in the points list,
+        then you should specify a scalar that represents the unique
+        ID. This is intended to handle the output of a filter such as the
+        TemporalStreamTracer.
       </Documentation>
       
       <InputProperty
@@ -5623,6 +5629,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           <DataType value="vtkPointSet"/>
         </DataTypeDomain>
         <InputArrayDomain name="input_array" attribute_type="point"/>
+        <Documentation>
+          The input cells to create pathlines for.
+        </Documentation>
       </InputProperty>
 
       <InputProperty
@@ -5635,6 +5644,15 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
+        <Documentation>
+          Set a second input, which is a selection. Particles with the same
+          Id in the selection as the primary input will be chosen for
+          pathlines Note that you must have the same IdChannelArray in the
+          selection as the input
+        </Documentation>
       </InputProperty>
 
       <IntVectorProperty
@@ -5642,6 +5660,10 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           command="SetMaskPoints"
           number_of_elements="1"
           default_values="100" >
+        <Documentation>
+          Set the number of particles to track as a ratio of the input.
+          Example: setting MaskPoints to 10 will track every 10th point.
+        </Documentation>
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -5649,6 +5671,15 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           command="SetMaxTrackLength"
           number_of_elements="1"
           default_values="25" >
+        <Documentation>
+          If the Particles being traced animate for a long time, the trails
+          or traces will become long and stringy. Setting the
+          MaxTraceTimeLength will limit how much of the trace is
+          displayed. Tracks longer then the Max will disappear and the
+          trace will apppear like a snake of fixed length which progresses
+          as the particle moves.  This length is given with respect to
+          timesteps.
+        </Documentation>
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -5659,7 +5690,13 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Prevent spurious trails from wrapping around datasets or jumping between particles by limiting the distance allowed.)
+          If a particle disappears from one end of asimulation and
+          reappears on the other side, the track left will be
+          unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
+          threshold above which if a step occurs larger than the value (for
+          the dimension), the track will be dropped and restarted after the
+          step. (ie the part before the wrap around will be dropped and the
+          newer part kept).
         </Documentation>
       </DoubleVectorProperty>
 
@@ -5669,6 +5706,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          number_of_elements="1"
          default_values="1" >
         <BooleanDomain name="bool"/>
+        <Documentation>
+          We use the index of the point as the ID.  As the particle moves,
+          the coords for each ID are updated to create a path. If the IDs
+          are supplied as a separate scalar array then disable this option
+          and set the array using IdChannelArray
+        </Documentation>
       </IntVectorProperty>
 
       <StringVectorProperty 
@@ -5682,23 +5725,10 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           </RequiredProperties>
         </ArrayListDomain>
         <Documentation>
-          This property specifies the name of the array to use for Ids
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty 
-          name="ScalarArray" 
-          command="SetScalarArray"
-          number_of_elements="1"
-          element_types="2"
-          animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-        <Documentation>
-          This property specifies which array use as colour scalars
+          Specify the name of a scalar array which will be used to fetch
+          the index of each point. This is necessary only if the particles
+          change position (Id order) on each time step. The Id can be used
+          to identify particles at each step and hence track them properly
         </Documentation>
       </StringVectorProperty>
    </SourceProxy>

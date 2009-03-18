@@ -76,6 +76,10 @@
           extensions="sos SOS"
           file_description="EnSight Master Server Files">
   </Reader>
+  <Reader name="netCDFReader"
+          extensions="ncdf nc"
+          file_description="netCDF Files">
+  </Reader>
   <Reader name="byureader"
           extensions="g"
           file_description="BYU Files">
