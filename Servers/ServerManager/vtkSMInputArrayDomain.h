@@ -94,6 +94,7 @@ public:
     VERTEX = 3,
     EDGE = 4,
     ROW = 5,
+    NONE = 6,
     LAST_ATTRIBUTE_TYPE
   };
 //ETX

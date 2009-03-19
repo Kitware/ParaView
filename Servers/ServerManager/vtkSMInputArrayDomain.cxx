@@ -26,7 +26,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.16");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.17");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -35,7 +35,8 @@ static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
   "any",
   "vertex",
   "edge",
-  "row"
+  "row",
+  "none"
 };
 
 //---------------------------------------------------------------------------
@@ -152,6 +153,16 @@ int vtkSMInputArrayDomain::IsInDomain(vtkSMSourceProxy* proxy,
       }
     }
 
+  if (this->AttributeType == vtkSMInputArrayDomain::NONE||
+      this->AttributeType == vtkSMInputArrayDomain::ANY)
+    {
+    if (this->AttributeInfoContainsArray(proxy, outputport,
+                                         info->GetFieldDataInformation()))
+      {
+      return 1;
+      }
+    }
+
 
   return 0;
 }
@@ -234,6 +245,10 @@ int vtkSMInputArrayDomain::IsFieldValid(
         {
         attributeType = vtkSMInputArrayDomain::ROW;
         }
+      else if (val == vtkDataObject::FIELD_ASSOCIATION_NONE)
+        {
+        attributeType = vtkSMInputArrayDomain::NONE;
+        }
       }
     }
 
@@ -270,6 +285,13 @@ int vtkSMInputArrayDomain::IsFieldValid(
        attributeType == vtkSMInputArrayDomain::ANY) )
     {
     isField = this->CheckForArray(arrayInfo, info->GetRowDataInformation());
+    }
+
+  if (!isField &&
+      (attributeType == vtkSMInputArrayDomain::NONE||
+       attributeType == vtkSMInputArrayDomain::ANY) )
+    {
+    isField = this->CheckForArray(arrayInfo, info->GetFieldDataInformation());
     }
 
   if (!isField)
