@@ -386,7 +386,7 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
   if (reprProxy->GetProperty("InterpolateScalarsBeforeMapping"))
     {
     this->Internal->Links->addPropertyLink(
-      this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
+      this->Internal->ColorInterpolateScalars, "checked", SIGNAL(stateChanged(int)),
       reprProxy, reprProxy->GetProperty("InterpolateScalarsBeforeMapping"));
     }
 
@@ -588,7 +588,7 @@ void pqDisplayProxyEditor::updateEnableState()
 {
   if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
     {
-    this->Internal->ColorInterpolateColors->setEnabled(false);
+    this->Internal->ColorInterpolateScalars->setEnabled(false);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->SolidColorPage);
     this->Internal->LightingGroup->setEnabled(true);
@@ -599,7 +599,7 @@ void pqDisplayProxyEditor::updateEnableState()
       {
       this->Internal->LightingGroup->setEnabled(false);
       }
-    this->Internal->ColorInterpolateColors->setEnabled(true);
+    this->Internal->ColorInterpolateScalars->setEnabled(true);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->ColorMapPage);
     }
