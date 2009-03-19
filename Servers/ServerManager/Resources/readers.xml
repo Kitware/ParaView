@@ -4438,10 +4438,12 @@
           Set the file name for the MFIX reader.
         </Documentation>
       </StringVectorProperty>
+
       <StringVectorProperty name="CellArrayInfo"
                            information_only="1">
         <ArraySelectionInformationHelper attribute_name="Cell"/>
       </StringVectorProperty>
+
       <StringVectorProperty name="CellArrayStatus"
                             command="SetCellArrayStatus"
                             number_of_elements="0"
@@ -4459,32 +4461,13 @@
           Select which cell-centered arrays to read.
         </Documentation>
       </StringVectorProperty>
-      <IntVectorProperty name="TimeStepRangeInfo" 
-                         command="GetTimeStepRange" 
-                         information_only="1">
-        <SimpleIntInformationHelper/>
-      </IntVectorProperty>
+
       <DoubleVectorProperty 
           name="TimestepValues" 
           repeatable="1"
           information_only="1">
        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
-      <IntVectorProperty name="TimeStep" 
-                         command="SetTimeStep" 
-                         number_of_elements="1" 
-                         animateable="1" 
-                         default_values="0">
-        <IntRangeDomain name="range">
-          <RequiredProperties>
-            <Property name="TimeStepRangeInfo"
-                      function="Range"/>
-          </RequiredProperties>
-        </IntRangeDomain>
-        <Documentation>
-          Set the current timestep.
-        </Documentation>
-      </IntVectorProperty>
     </SourceProxy>
     <!-- End of MFIX Reader -->
 
