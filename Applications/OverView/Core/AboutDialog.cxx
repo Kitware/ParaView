@@ -117,9 +117,9 @@ void AboutDialog::AddClientInformation()
   ::addItem(tree, OverView::GetBrandedApplicationTitle() + " Version", OverView::GetBrandedFullVersion());
   ::addItem(tree, "OverView Version", OVERVIEW_VERSION_FULL);
 #if defined(PARAVIEW_ENABLE_PYTHON)
-  ::addItem(tree, "Embeded Python", "On");
+  ::addItem(tree, "Embedded Python", "On");
 #else
-  ::addItem(tree, "Embeded Python", "Off");
+  ::addItem(tree, "Embedded Python", "Off");
 #endif
 
 #if defined(QT_TESTING_WITH_PYTHON)

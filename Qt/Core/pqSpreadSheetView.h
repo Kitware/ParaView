@@ -62,7 +62,7 @@ public:
     const QString& /*filename*/)
     { return false; }
 
-  /// This view does not support image caprture, return 0;
+  /// This view does not support image capture, return 0;
   virtual vtkImageData* captureImage(int /*magnification*/)
     { return 0; }
   virtual vtkImageData* captureImage(const QSize& asize)
