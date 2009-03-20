@@ -90,6 +90,7 @@ public:
     this->InterpolationAdaptor = 0;
     this->EdgeColorAdaptor = 0;
     this->SliceDirectionAdaptor = 0;
+    this->BackfaceRepresentationAdaptor = 0;
     this->SliceDomain = 0;
     this->SelectedMapperAdaptor = 0;
     this->CompositeTreeAdaptor = 0;
@@ -100,6 +101,7 @@ public:
     delete this->Links;
     delete this->InterpolationAdaptor;
     delete this->SliceDirectionAdaptor;
+    delete this->BackfaceRepresentationAdaptor;
     delete this->SliceDomain;
     }
 
@@ -111,6 +113,7 @@ public:
   pqSignalAdaptorColor*    EdgeColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
   pqSignalAdaptorComboBox* SelectedMapperAdaptor;
+  pqSignalAdaptorComboBox* BackfaceRepresentationAdaptor;
   pqWidgetRangeDomain* SliceDomain;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
 
@@ -460,7 +463,53 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       reprProxy, reprProxy->GetProperty("SelectedMapperIndex"));
     }
-    
+
+  this->Internal->BackfaceStyleRepresentation->clear();
+  if ((prop = reprProxy->GetProperty("BackfaceRepresentation")) != NULL)
+    {
+    prop->UpdateDependentDomains();
+    QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(prop);
+    foreach (QVariant item, items)
+      {
+      this->Internal->BackfaceStyleRepresentation->addItem(item.toString());
+      }
+    this->Internal->Links->addPropertyLink(
+                      this->Internal->BackfaceRepresentationAdaptor,
+                      "currentText", SIGNAL(currentTextChanged(const QString&)),
+                      reprProxy, prop);
+    this->Internal->BackfaceStyleGroup->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->BackfaceStyleGroup->setEnabled(false);
+    }
+
+  QObject::connect(this->Internal->BackfaceStyleRepresentation,
+                   SIGNAL(currentIndexChanged(const QString&)),
+                   this, SLOT(updateEnableState()), Qt::QueuedConnection);
+
+  // setup for choosing backface color
+  if (reprProxy->GetProperty("BackfaceDiffuseColor"))
+    {
+    QList<QVariant> curColor = pqSMAdaptor::getMultipleElementProperty(
+                                reprProxy->GetProperty("BackfaceDiffuseColor"));
+
+    bool prev = this->Internal->BackfaceActorColor->blockSignals(true);
+    this->Internal->BackfaceActorColor->setChosenColor(
+                               QColor(qRound(curColor[0].toDouble()*255),
+                                      qRound(curColor[1].toDouble()*255),
+                                      qRound(curColor[2].toDouble()*255), 255));
+    this->Internal->BackfaceActorColor->blockSignals(prev);
+
+    new pqStandardColorLinkAdaptor(this->Internal->BackfaceActorColor,
+                                   reprProxy, "BackfaceDiffuseColor");
+    }
+
+  // setup for backface opacity
+  this->Internal->Links->addPropertyLink(this->Internal->BackfaceOpacity,
+                                         "value", SIGNAL(editingFinished()),
+                                         reprProxy,
+                                         reprProxy->GetProperty("BackfaceOpacity"));
 
 #if 0                                       //FIXME 
   // material
@@ -581,6 +630,26 @@ void pqDisplayProxyEditor::setupGUIConnections()
   QObject::connect(this->Internal->SelectedMapperAdaptor,
     SIGNAL(currentTextChanged(const QString&)),
     this, SLOT(selectedMapperChanged()), Qt::QueuedConnection);
+
+  this->Internal->BackfaceRepresentationAdaptor = new pqSignalAdaptorComboBox(
+                                   this->Internal->BackfaceStyleRepresentation);
+  this->Internal->BackfaceRepresentationAdaptor->setObjectName(
+                                         "BackfaceStyleRepresentationAdapator");
+
+  QObject::connect(this->Internal->BackfaceActorColor,
+                   SIGNAL(chosenColorChanged(const QColor&)),
+                   this, SLOT(setBackfaceSolidColor(const QColor&)));
+
+  this->Internal->BackfaceActorColor->setUndoLabel("Change Backface Solid Color");
+  stack = pqApplicationCore::instance()->getUndoStack();
+  if (stack)
+    {
+    QObject::connect(this->Internal->BackfaceActorColor,
+                     SIGNAL(beginUndo(const QString&)),
+                     stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this->Internal->BackfaceActorColor,
+                     SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -592,6 +661,7 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->SolidColorPage);
     this->Internal->LightingGroup->setEnabled(true);
+    this->Internal->BackfaceActorColor->setEnabled(true);
     }
   else
     {
@@ -602,6 +672,7 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->ColorInterpolateScalars->setEnabled(true);
     this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->ColorMapPage);
+    this->Internal->BackfaceActorColor->setEnabled(false);
     }
 
   int reprType = this->Internal->Representation->getRepresentationType();
@@ -626,6 +697,30 @@ void pqDisplayProxyEditor::updateEnableState()
   this->Internal->SelectedMapperIndex->setEnabled(
     reprType == vtkSMPVRepresentationProxy::VOLUME
     && this->Internal->Representation->getProxy()->GetProperty("SelectedMapperIndex"));
+
+  vtkSMProperty *backfaceRepProperty = this->Internal->Representation
+    ->getRepresentationProxy()->GetProperty("BackfaceRepresentation");
+  if (   !backfaceRepProperty
+      || (   (reprType != vtkSMPVRepresentationProxy::POINTS)
+          && (reprType != vtkSMPVRepresentationProxy::WIREFRAME)
+          && (reprType != vtkSMPVRepresentationProxy::SURFACE)
+          && (reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ) )
+    {
+    this->Internal->BackfaceStyleGroup->setEnabled(false);
+    }
+  else
+    {
+    this->Internal->BackfaceStyleGroup->setEnabled(true);
+    int backRepType
+      = pqSMAdaptor::getElementProperty(backfaceRepProperty).toInt();
+
+    bool backFollowsFront
+      = (   (backRepType == vtkSMPVRepresentationProxy::FOLLOW_FRONTFACE)
+         || (backRepType == vtkSMPVRepresentationProxy::CULL_BACKFACE)
+         || (backRepType == vtkSMPVRepresentationProxy::CULL_FRONTFACE) );
+
+    this->Internal->BackfaceStyleGroupOptions->setEnabled(!backFollowsFront);
+    }
 
   vtkSMDataRepresentationProxy* display = 
     this->Internal->Representation->getRepresentationProxy();
@@ -884,6 +979,25 @@ void pqDisplayProxyEditor::setSolidColor(const QColor& color)
     this->Internal->Representation->getProxy()->GetProperty("AmbientColor"), val);
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->Representation->getProxy()->GetProperty("DiffuseColor"), val);
+
+  // If specular white is off, then we want to update the specular color as
+  // well.
+  emit this->specularColorChanged();
+}
+
+//-----------------------------------------------------------------------------
+// Called when the GUI selection for the backface solid color changes.
+void pqDisplayProxyEditor::setBackfaceSolidColor(const QColor& color)
+{
+  QList<QVariant> val;
+  val.push_back(color.red()/255.0);
+  val.push_back(color.green()/255.0);
+  val.push_back(color.blue()/255.0);
+
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->Representation->getProxy()->GetProperty("BackfaceAmbientColor"), val);
+  pqSMAdaptor::setMultipleElementProperty(
+    this->Internal->Representation->getProxy()->GetProperty("BackfaceDiffuseColor"), val);
 
   // If specular white is off, then we want to update the specular color as
   // well.

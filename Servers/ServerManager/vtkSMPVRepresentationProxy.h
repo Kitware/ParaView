@@ -41,6 +41,12 @@ public:
   vtkGetMacro(Representation, int);
 
   // Description:
+  // Set the type of representation for the backface (assuming surfaces are
+  // rendered for the front face).
+  virtual void SetBackfaceRepresentation(int type);
+  vtkGetMacro(BackfaceRepresentation, int);
+
+  // Description:
   // Set the representation's visibility.
   virtual void SetVisibility(int visible);
 
@@ -155,7 +161,11 @@ public:
     VOLUME=4,
     SURFACE_WITH_EDGES=5,
     SLICE=6,
-    USER_DEFINED=100
+    USER_DEFINED=100,
+    // Special identifiers for back faces.
+    FOLLOW_FRONTFACE=400,
+    CULL_BACKFACE=401,
+    CULL_FRONTFACE=402
     };
 protected:
   vtkSMPVRepresentationProxy();
@@ -182,10 +192,16 @@ protected:
   // Read attributes from an XML element.
   virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
+  // Description:
+  // Returns true if the active representation is of a surface type.
+  virtual bool ActiveRepresentationIsSurface();
+
   vtkSMDataRepresentationProxy* ActiveRepresentation;
+  vtkSMDataRepresentationProxy* BackfaceSurfaceRepresentation;
   vtkSMDataRepresentationProxy* CubeAxesRepresentation;
 
   int Representation;
+  int BackfaceRepresentation;
   int CubeAxesVisibility;
 private:
   vtkSMPVRepresentationProxy(const vtkSMPVRepresentationProxy&); // Not implemented

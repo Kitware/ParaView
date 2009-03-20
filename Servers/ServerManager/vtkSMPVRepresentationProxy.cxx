@@ -68,11 +68,12 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.23");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
-  this->Representation = VTK_SURFACE;
+  this->Representation = vtkSMPVRepresentationProxy::SURFACE;
+  this->BackfaceRepresentation = vtkSMPVRepresentationProxy::FOLLOW_FRONTFACE;
   this->CubeAxesRepresentation = 0;
   this->CubeAxesVisibility = 0;
   this->ActiveRepresentation = 0;
@@ -98,6 +99,11 @@ void vtkSMPVRepresentationProxy::SetViewInformation(vtkInformation* info)
     (*iter)->SetViewInformation(info);
     }
 
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->SetViewInformation(info);
+    }
+
   if (this->CubeAxesRepresentation)
     {
     this->CubeAxesRepresentation->SetViewInformation(info);
@@ -117,11 +123,30 @@ bool vtkSMPVRepresentationProxy::EndCreateVTKObjects()
     vtkSMPVRepresentationProxySetInt(this->CubeAxesRepresentation, "Visibility", 0);
     }
 
+  vtkCommand* observer = this->GetObserver();
+
+  this->BackfaceSurfaceRepresentation
+    = vtkSMDataRepresentationProxy::SafeDownCast(
+                            this->GetSubProxy("BackfaceSurfaceRepresentation"));
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->Connect(inputProxy, this->BackfaceSurfaceRepresentation,
+                  "Input", this->OutputPort);
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", 0);
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "FrontfaceCulling", 1);
+
+    this->BackfaceSurfaceRepresentation->AddObserver(vtkCommand::StartEvent,
+                                                     observer);
+    this->BackfaceSurfaceRepresentation->AddObserver(vtkCommand::EndEvent,
+                                                     observer);
+    }
+
   vtkSMSurfaceRepresentationProxy* surfaceRepr = 
     vtkSMSurfaceRepresentationProxy::SafeDownCast(
       this->GetSubProxy("SurfaceRepresentation"));
 
-  vtkCommand* observer = this->GetObserver();
   vtkInternals::RepresentationProxiesSet::iterator iter;
   for (iter = this->Internals->UniqueRepresentationProxies.begin();
     iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
@@ -167,6 +192,11 @@ bool vtkSMPVRepresentationProxy::AddToView(vtkSMViewProxy* view)
     this->CubeAxesRepresentation->AddToView(view);
     }
 
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->AddToView(view);
+    }
+
   vtkInternals::RepresentationProxiesSet::iterator iter;
   for (iter = this->Internals->UniqueRepresentationProxies.begin();
     iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
@@ -185,6 +215,11 @@ bool vtkSMPVRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     iter != this->Internals->UniqueRepresentationProxies.end(); ++iter)
     {
     (*iter)->RemoveFromView(view);
+    }
+
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->RemoveFromView(view);
     }
 
   if (this->CubeAxesRepresentation)
@@ -224,7 +259,90 @@ void vtkSMPVRepresentationProxy::SetRepresentation(int repr)
 
     vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation, "Visibility", 
       this->GetVisibility());
+
+    // Make sure the backface visibility and all culling, which also depends on
+    // the front face representation, is set correctly.
+    this->SetBackfaceRepresentation(this->BackfaceRepresentation);
+
     this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPVRepresentationProxy::SetBackfaceRepresentation(int repr)
+{
+  if (this->BackfaceRepresentation != repr)
+    {
+    this->BackfaceRepresentation = repr;
+    this->Modified();
+    }
+
+  if (!this->ActiveRepresentationIsSurface())
+    {
+    // Not rendering surfaces.
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", 0);
+    }
+  else if (this->BackfaceRepresentation == FOLLOW_FRONTFACE)
+    {
+    // Let the "frontface" surface also be the backface.
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", 0);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "BackfaceCulling", 0);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "FrontfaceCulling", 0);
+    }
+  else if (this->BackfaceRepresentation == CULL_BACKFACE)
+    {
+    // Turn off the back face.
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", 0);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "BackfaceCulling", 1);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "FrontfaceCulling", 0);
+    }
+  else if (this->BackfaceRepresentation == CULL_FRONTFACE)
+    {
+    // Just let SurfaceRepresentation be the backface
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", 0);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "BackfaceCulling", 0);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "FrontfaceCulling", 1);
+    }
+  else
+    {
+    // Both surfaces will be rendered.
+    vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                     "Visibility", this->GetVisibility());
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "BackfaceCulling", 1);
+    vtkSMPVRepresentationProxySetInt(this->ActiveRepresentation,
+                                     "FrontfaceCulling", 0);
+    switch (this->BackfaceRepresentation)
+      {
+      case POINTS:
+        vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                         "Representation", VTK_POINTS);
+        break;
+      case WIREFRAME:
+        vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                         "Representation", VTK_WIREFRAME);
+        break;
+      case SURFACE_WITH_EDGES:
+        vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                         "Representation",
+                                         VTK_SURFACE_WITH_EDGES);
+        break;
+      case SURFACE:
+      default:
+        vtkSMPVRepresentationProxySetInt(this->BackfaceSurfaceRepresentation,
+                                         "Representation", VTK_SURFACE);
+        break;
+      }
     }
 }
 
@@ -242,6 +360,8 @@ void vtkSMPVRepresentationProxy::SetVisibility(int visible)
       visible && this->CubeAxesVisibility);
     this->CubeAxesRepresentation->UpdateVTKObjects();
     }
+  // Visibility is a bit more complicated for back face.
+  this->SetBackfaceRepresentation(this->BackfaceRepresentation);
      
   this->Superclass::SetVisibility(visible);
 }
@@ -264,6 +384,11 @@ void vtkSMPVRepresentationProxy::Update(vtkSMViewProxy* view)
   if (this->ActiveRepresentation)
     {
     this->ActiveRepresentation->Update(view);
+    }
+  if (   this->BackfaceSurfaceRepresentation
+      && this->ActiveRepresentationIsSurface() )
+    {
+    this->BackfaceSurfaceRepresentation->Update(view);
     }
   if (this->CubeAxesRepresentation)
     {    
@@ -316,6 +441,11 @@ void vtkSMPVRepresentationProxy::SetUpdateTime(double time)
     (*iter)->SetUpdateTime(time);
     }
 
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->SetUpdateTime(time);
+    }
+
   if (this->CubeAxesRepresentation)
     {    
     this->CubeAxesRepresentation->SetUpdateTime(time);
@@ -333,6 +463,12 @@ void vtkSMPVRepresentationProxy::SetUseViewUpdateTime(bool use)
     {
     (*iter)->SetUseViewUpdateTime(use);
     }
+
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->SetUseViewUpdateTime(use);
+    }
+
   if (this->CubeAxesRepresentation)
     {    
     this->CubeAxesRepresentation->SetUseViewUpdateTime(use);
@@ -350,6 +486,12 @@ void vtkSMPVRepresentationProxy::SetViewUpdateTime(double time)
     {
     (*iter)->SetViewUpdateTime(time);
     }
+
+  if (this->BackfaceSurfaceRepresentation)
+    {
+    this->BackfaceSurfaceRepresentation->SetViewUpdateTime(time);
+    }
+
   if (this->CubeAxesRepresentation)
     {    
     this->CubeAxesRepresentation->SetViewUpdateTime(time);
@@ -362,6 +504,12 @@ void vtkSMPVRepresentationProxy::MarkDirty(vtkSMProxy* modifiedProxy)
   if (modifiedProxy != this && this->ActiveRepresentation)
     {
     this->ActiveRepresentation->MarkDirty(modifiedProxy);
+    }
+
+  if (   (modifiedProxy != this) && this->BackfaceSurfaceRepresentation
+      && this->ActiveRepresentationIsSurface() )
+    {
+    this->BackfaceSurfaceRepresentation->MarkDirty(modifiedProxy);
     }
 
   this->Superclass::MarkDirty(modifiedProxy);
@@ -433,6 +581,15 @@ bool vtkSMPVRepresentationProxy::HasVisibleProp3D(vtkProp3D* prop)
       {
       return true;
       }
+    }
+
+  if (   this->GetVisibility() && this->BackfaceSurfaceRepresentation
+      && this->ActiveRepresentationIsSurface() )
+    {
+    vtkSMPropRepresentationProxy* repr
+      = vtkSMPropRepresentationProxy::SafeDownCast(
+                                           this->BackfaceSurfaceRepresentation);
+    if (repr && repr->HasVisibleProp3D(prop)) return true;
     }
 
   return false;
@@ -509,37 +666,50 @@ int vtkSMPVRepresentationProxy::ReadXMLAttributes(
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+bool vtkSMPVRepresentationProxy::ActiveRepresentationIsSurface()
+{
+  vtkSMSurfaceRepresentationProxy *activeSurfaceRep
+    = vtkSMSurfaceRepresentationProxy::SafeDownCast(this->ActiveRepresentation);
+  return (activeSurfaceRep != NULL);
+}
+
 //----------------------------------------------------------------------------
 void vtkSMPVRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+#define PRINT_REP_CASE(type) case type: os << #type << endl; break;
   os << indent << "Representation: " ;
   switch (this->Representation)
     {
-  case SURFACE:
-    os << "Surface";
-    break;
-
-  case WIREFRAME:
-    os << "Wireframe";
-    break;
-
-  case POINTS:
-    os << "Points";
-    break;
-
-  case OUTLINE:
-    os << "Outline";
-    break;
-
-  case VOLUME:
-    os << "Volume";
-    break;
-
-  default:
-    os << "(unknown)";
+    PRINT_REP_CASE(SURFACE);
+    PRINT_REP_CASE(WIREFRAME);
+    PRINT_REP_CASE(POINTS);
+    PRINT_REP_CASE(OUTLINE);
+    PRINT_REP_CASE(VOLUME);
+    PRINT_REP_CASE(SURFACE_WITH_EDGES);
+    PRINT_REP_CASE(SLICE);
+    PRINT_REP_CASE(USER_DEFINED);
+    default:
+      os << "(unknown)" << endl;;
     }
-  os << endl;
+  os << indent << "BackfaceRepresentation: " ;
+  switch (this->BackfaceRepresentation)
+    {
+    PRINT_REP_CASE(SURFACE);
+    PRINT_REP_CASE(WIREFRAME);
+    PRINT_REP_CASE(POINTS);
+    PRINT_REP_CASE(OUTLINE);
+    PRINT_REP_CASE(VOLUME);
+    PRINT_REP_CASE(SURFACE_WITH_EDGES);
+    PRINT_REP_CASE(SLICE);
+    PRINT_REP_CASE(USER_DEFINED);
+    PRINT_REP_CASE(FOLLOW_FRONTFACE);
+    PRINT_REP_CASE(CULL_BACKFACE);
+    PRINT_REP_CASE(CULL_FRONTFACE);
+    default:
+      os << "(unknown)" << endl;;
+    }
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
 }
 

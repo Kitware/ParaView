@@ -270,6 +270,8 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     "SurfaceColor", repr, "DiffuseColor");
   globalPropertiesManager->SetGlobalPropertyLink(
     "EdgeColor", repr, "EdgeColor");
+  globalPropertiesManager->SetGlobalPropertyLink(
+    "SurfaceColor", repr, "BackfaceDiffuseColor");
 
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it

@@ -7017,6 +7017,30 @@
       </SubProxy>
 
       <SubProxy>
+        <Proxy name="BackfaceSurfaceRepresentation"
+               proxygroup="representations"
+               proxyname="SurfaceRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="AmbientColor" />
+          <Exception name="BackfaceCulling" />
+          <Exception name="Color" />
+          <Exception name="DiffuseColor" />
+          <Exception name="FrontfaceCulling" />
+          <Exception name="Opacity" />
+          <Exception name="Representation" />
+          <Exception name="Visibility" />
+        </ShareProperties>
+        <ExposedProperties>
+          <Property name="AmbientColor" exposed_name="BackfaceAmbientColor" />
+          <Property name="Color" exposed_name="BackfaceColor" />
+          <Property name="DiffuseColor" exposed_name="BackfaceDiffuseColor" />
+          <Property name="Opacity" exposed_name="BackfaceOpacity" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
         <Proxy name="OutlineRepresentation"
           proxygroup="representations" proxyname="OutlineRepresentation">
         </Proxy>
@@ -7147,6 +7171,22 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="BackfaceRepresentation"
+                         command="SetBackfaceRepresentation"
+                         number_of_elements="1"
+                         default_values="400"
+                         update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
+          <Entry value="0"   text="Points" />
+          <Entry value="1"   text="Wireframe" />
+          <Entry value="2"   text="Surface" />
+          <Entry value="5"   text="Surface With Edges" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <Hints>
         <InheritRepresentationProperties>
           <!-- Inherit apperance properties -->
@@ -7170,7 +7210,13 @@
           <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
-        
+
+          <!-- Inherit backface appearance properties -->
+          <Property name="BackfaceAmbientColor" />
+          <Property name="BackfaceColor" />
+          <Property name="BackfaceDiffuseColor" />
+          <Property name="BackfaceOpacity" />
+
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />
           <Property name="SelectionLineWidth" />
@@ -7249,6 +7295,22 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="BackfaceRepresentation"
+                         command="SetBackfaceRepresentation"
+                         number_of_elements="1"
+                         default_values="400"
+                         update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
+          <Entry value="0"   text="Points" />
+          <Entry value="1"   text="Wireframe" />
+          <Entry value="2"   text="Surface" />
+          <Entry value="5"   text="Surface With Edges" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="VolumeRepresentation"
           proxygroup="representations"
@@ -7288,6 +7350,12 @@
           <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
+
+          <!-- Inherit backface appearance properties -->
+          <Property name="BackfaceAmbientColor" />
+          <Property name="BackfaceColor" />
+          <Property name="BackfaceDiffuseColor" />
+          <Property name="BackfaceOpacity" />
         
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />
@@ -7369,6 +7437,22 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
+      <IntVectorProperty name="BackfaceRepresentation"
+                         command="SetBackfaceRepresentation"
+                         number_of_elements="1"
+                         default_values="400"
+                         update_self="1">
+        <EnumerationDomain name="enum">
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
+          <Entry value="0"   text="Points" />
+          <Entry value="1"   text="Wireframe" />
+          <Entry value="2"   text="Surface" />
+          <Entry value="5"   text="Surface With Edges" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="VolumeRepresentation"
           proxygroup="representations"
@@ -7421,6 +7505,12 @@
           <Property name="Specular" />
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
+
+          <!-- Inherit backface appearance properties -->
+          <Property name="BackfaceAmbientColor" />
+          <Property name="BackfaceColor" />
+          <Property name="BackfaceDiffuseColor" />
+          <Property name="BackfaceOpacity" />
         
           <!-- Inherit selection properties -->
           <Property name="SelectionColor" />

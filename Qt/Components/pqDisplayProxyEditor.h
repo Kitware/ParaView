@@ -79,6 +79,7 @@ protected slots:
   void selectedMapperChanged();
   void volumeBlockSelected();
   void setSolidColor(const QColor& color);
+  void setBackfaceSolidColor(const QColor& color);
 protected:
 
   /// Set the display whose properties we want to edit.
