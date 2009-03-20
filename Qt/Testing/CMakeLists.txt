@@ -88,6 +88,8 @@ ADD_LIBRARY(QtTesting
   pqAbstractItemViewEventPlayer.h
   pqAbstractItemViewEventTranslator.cxx
   pqAbstractItemViewEventTranslator.h
+  pqAbstractMiscellaneousEventPlayer.cxx
+  pqAbstractMiscellaneousEventPlayer.h
   pqAbstractSliderEventTranslator.cxx
   pqAbstractSliderEventTranslator.h
   pqAbstractStringEventPlayer.cxx
