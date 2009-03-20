@@ -746,7 +746,7 @@
       <item row="1" column="1" >
        <widget class="QSpinBox" name="SpecularPower" >
         <property name="maximum" >
-         <number>100</number>
+         <number>128</number>
         </property>
        </widget>
       </item>
