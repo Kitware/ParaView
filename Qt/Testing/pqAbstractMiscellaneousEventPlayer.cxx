@@ -44,9 +44,10 @@ class SleeperThread : public QThread
 {
 public:
   //Allows for cross platform sleep function
-  static void msleep(unsigned long msecs)
+  static bool msleep(unsigned long msecs)
   {
     QThread::msleep(msecs);
+    return true;
   }
 };
 
@@ -62,10 +63,15 @@ bool pqAbstractMiscellaneousEventPlayer::playEvent(QObject* Object, const QStrin
   if (Command == "pause")
     {
     const int value = Arguments.toInt();
-    SleeperThread::msleep(value);
-    return true;
+    if(SleeperThread::msleep(value))
+      {
+      return true;
+      }
+    Error = true;
+    qCritical() << "calling pause on unhandled type " << Object;
     }
-    return false;
+
+  return false;
 }
 
 
