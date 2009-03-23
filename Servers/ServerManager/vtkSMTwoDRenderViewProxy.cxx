@@ -27,7 +27,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::vtkSMTwoDRenderViewProxy()
 {
@@ -197,7 +197,8 @@ bool vtkSMTwoDRenderViewProxy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 const char* vtkSMTwoDRenderViewProxy::GetSuggestedViewType(vtkIdType connectionID)
 {
-  vtkSMViewProxy* rootView = vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RootView"));
+  vtkSMViewProxy* rootView =
+    vtkSMViewProxy::SafeDownCast(this->GetSubProxy("RenderView"));
   if (rootView)
     {
     vtksys_ios::ostringstream stream;
