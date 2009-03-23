@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.10");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -461,7 +461,17 @@ void vtkSMStreamingViewProxy::PrepareRenderPass()
     //cls
     if (firstpass) //workaround a crash that shows up on some mac's
       {
-      renWin->Render();
+      vtkSMRenderViewProxy *RVP = this->GetRootView();
+      vtkSMProxy *RWProxy = RVP->GetRenderWindowProxy();
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << RWProxy->GetID()
+             << "Render"
+             << vtkClientServerStream::End;
+      vtkProcessModule::GetProcessModule()->SendStream(
+                                                       this->ConnectionID,
+                                                       vtkProcessModule::CLIENT,
+                                                       stream);
       firstpass = false;
       }
     ren->Clear(); 
