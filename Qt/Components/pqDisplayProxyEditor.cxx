@@ -506,10 +506,13 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     }
 
   // setup for backface opacity
-  this->Internal->Links->addPropertyLink(this->Internal->BackfaceOpacity,
+  if (reprProxy->GetProperty("BackfaceOpacity"))
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->BackfaceOpacity,
                                          "value", SIGNAL(editingFinished()),
                                          reprProxy,
                                          reprProxy->GetProperty("BackfaceOpacity"));
+    }
 
 #if 0                                       //FIXME 
   // material
