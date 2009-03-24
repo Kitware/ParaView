@@ -219,6 +219,9 @@ void pqApplicationOptions::applyChanges()
     this->Internal->EdgeColor->chosenColor());
 
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
+
+  // render all views.
+  pqApplicationCore::instance()->render();
 }
 
 //-----------------------------------------------------------------------------
