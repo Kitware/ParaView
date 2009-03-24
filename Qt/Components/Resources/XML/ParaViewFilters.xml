@@ -27,7 +27,7 @@
             icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
     <Filter name="ProbePoint" 
             icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
-    <Filter name="Programmable Filter" 
+    <Filter name="ProgrammableFilter" 
             icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
 
