@@ -92,7 +92,7 @@ inline bool SetIntVectorProperty(vtkSMProxy* proxy, const char* pname,
 }
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.85");
+vtkCxxRevisionMacro(vtkSMRenderViewProxy, "1.86");
 vtkStandardNewMacro(vtkSMRenderViewProxy);
 
 vtkInformationKeyMacro(vtkSMRenderViewProxy, LOD_RESOLUTION, Integer);
@@ -1061,7 +1061,17 @@ vtkImageData* vtkSMRenderViewProxy::CaptureWindow(int magnification)
   w2i->SetMagnification(magnification);
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
-  w2i->Update();
+
+  // BUG #8715: We go through this indirection since the active connection needs
+  // to be set during update since it may request re-renders if magnification >1.
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << w2i << "Update"
+         << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID,
+    vtkProcessModule::CLIENT,
+    stream);
 
   vtkImageData* capture = vtkImageData::New();
   capture->ShallowCopy(w2i->GetOutput());
