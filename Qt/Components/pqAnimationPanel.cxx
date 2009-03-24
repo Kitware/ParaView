@@ -671,16 +671,6 @@ void pqAnimationPanel::addKeyFrameCallback()
     }
   emit this->beginUndo("Insert Key Frame");
   this->insertKeyFrame(index);
-  if (index ==0 && 
-    this->Internal->ActiveCue->getNumberOfKeyFrames() == 1)
-    {
-    this->Internal->ValueAdaptor->setValueToMin();
-
-    this->insertKeyFrame(index+1);
-    this->Internal->ValueAdaptor->setValueToMax();
-    
-    this->showKeyFrame(0);
-    }
   emit this->endUndo();
 }
 
@@ -755,19 +745,21 @@ void pqAnimationPanel::insertKeyFrame(int index)
       }
     this->setActiveCue(cue);
     }
-
-  // Now the actual add keyframe stuff.
-  vtkSMProxy* kf = cue->insertKeyFrame(index);
-  if (kf)
+  else
     {
-    this->showKeyFrame(index);
-    if (kf->IsA("vtkSMCameraKeyFrameProxy"))
+    // Now the actual add keyframe stuff.
+    vtkSMProxy* kf = cue->insertKeyFrame(index);
+    if (kf)
       {
-      this->resetCameraKeyFrameToCurrent();
-      }
-    else
-      {
-      this->Internal->ValueAdaptor->setValueToCurrent();
+      this->showKeyFrame(index);
+      if (kf->IsA("vtkSMCameraKeyFrameProxy"))
+        {
+        this->resetCameraKeyFrameToCurrent();
+        }
+      else
+        {
+        this->Internal->ValueAdaptor->setValueToCurrent();
+        }
       }
     }
 
