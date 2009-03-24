@@ -137,8 +137,8 @@ IF(BORLAND)
   ENDFOREACH(KIT)
 ENDIF(BORLAND)
 
-# Install vtkPVPythonInterpretor library.
-INSTALL(TARGETS vtkPVPythonInterpretor
+# Install vtkPVPythonInterpretor and vtkPVPython library.
+INSTALL(TARGETS vtkPVPythonInterpretor vtkPVPython
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
