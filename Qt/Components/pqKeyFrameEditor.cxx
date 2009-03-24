@@ -431,10 +431,10 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
 
   if (cue->getProxy()->GetProperty("Mode"))
     {
-    QList<QVariant> domain = pqSMAdaptor::getEnumerationPropertyDomain(
+    QList<QVariant> adomain = pqSMAdaptor::getEnumerationPropertyDomain(
       cue->getProxy()->GetProperty("Mode"));
     this->Internal->Ui.cbMode->clear();
-    foreach (QVariant val, domain)
+    foreach (QVariant val, adomain)
       {
       this->Internal->Ui.cbMode->addItem(val.toString());
       }

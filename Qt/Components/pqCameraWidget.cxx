@@ -416,9 +416,9 @@ void pqCameraWidget::showDialog()
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraWidget::showEvent(QShowEvent* event)
+void pqCameraWidget::showEvent(QShowEvent* anEvent)
 {
-  this->Superclass::showEvent(event);
+  this->Superclass::showEvent(anEvent);
   if (this->Internal->PositionSplineWidget && this->usePaths())
     {
     this->Internal->PositionSplineWidget->select();
@@ -427,9 +427,9 @@ void pqCameraWidget::showEvent(QShowEvent* event)
 }
 
 //-----------------------------------------------------------------------------
-void pqCameraWidget::hideEvent(QHideEvent* event)
+void pqCameraWidget::hideEvent(QHideEvent* anEvent)
 {
-  this->Superclass::hideEvent(event);
+  this->Superclass::hideEvent(anEvent);
   if (this->Internal->PositionSplineWidget)
     {
     this->Internal->PositionSplineWidget->deselect();

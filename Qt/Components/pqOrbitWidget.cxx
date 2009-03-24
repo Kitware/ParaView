@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqOrbitWidget::pqOrbitWidget(
-  vtkSMProxy* refProxy, vtkSMProxy* proxy, QWidget* p):
-  Superclass(refProxy, proxy, p)
+  vtkSMProxy* refProxy, vtkSMProxy* aProxy, QWidget* p):
+  Superclass(refProxy, aProxy, p)
 {
   this->enableDirection(true);
 }
