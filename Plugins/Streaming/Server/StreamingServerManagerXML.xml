@@ -810,7 +810,7 @@
         name="BlockReadSize"
         command="SetBlockReadSize"
         number_of_elements="1" 
-        default_values="4194304" >
+        default_values="4000" >
        <Documentation>
          This property specifies the skip dimension.
        </Documentation>
