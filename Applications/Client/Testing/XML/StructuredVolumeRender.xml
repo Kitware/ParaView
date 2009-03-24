@@ -3,7 +3,8 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorInterpolateColors" command="set_boolean" arguments="false" />
+  <pqevent
+  object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ColorGroup/ColorInterpolateScalars" command="set_boolean" arguments="false" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/StyleGroup/StyleRepresentation/comboBox" command="set_string" arguments="Volume" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.174487,0.536122,1,1,0)" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.285924,0.60076,1,0,0)" />
