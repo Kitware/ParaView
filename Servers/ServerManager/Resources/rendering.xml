@@ -1161,7 +1161,7 @@
       <IntVectorProperty name="TextScaleMode"
         command="SetTextScaleMode"
         number_of_elements="1"
-        default_values="1"
+        default_values="2"
         animateable="0">
         <EnumerationDomain>
           <Entry value="0" text="None" />
@@ -2429,7 +2429,7 @@
         name="FontSize"
         command="SetFontSize"
         number_of_elements="1"
-        default_values="12"
+        default_values="18"
         animateable="0">
         <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>

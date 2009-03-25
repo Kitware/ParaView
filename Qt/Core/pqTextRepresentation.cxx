@@ -63,15 +63,7 @@ void pqTextRepresentation::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   
   pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("Selectable"), 0);
-  pqSMAdaptor::setElementProperty(
     proxy->GetProperty("Enabled"),1);
-  pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("TextScaleMode"),2);
-  pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("Resizable"),0);
-  pqSMAdaptor::setElementProperty(
-    proxy->GetProperty("FontSize"),18);
 
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
