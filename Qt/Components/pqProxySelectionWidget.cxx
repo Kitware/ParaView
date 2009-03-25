@@ -228,9 +228,9 @@ void pqProxySelectionWidget::initialize3DWidget()
     // auto generate one
     if(!this->Internal->Widget)
       {
-      pqProxyPanel* panel = new pqProxyPanel(smProxy, this);
-      pqCollapsedGroup* group = new pqCollapsedGroup(panel);
-      QGridLayout* gl = new QGridLayout(panel);
+      pqProxyPanel* sub_panel = new pqProxyPanel(smProxy, this);
+      pqCollapsedGroup* group = new pqCollapsedGroup(sub_panel);
+      QGridLayout* gl = new QGridLayout(sub_panel);
       gl->setMargin(0);
       gl->addWidget(group);
       gl = new QGridLayout(group);
@@ -239,14 +239,14 @@ void pqProxySelectionWidget::initialize3DWidget()
       pqNamedWidgets::createWidgets(gl, smProxy);
       if (gl->rowCount() <= 2)
         {
-        // no widgets were added for the proxy...so don't show any panel.
-        delete panel;
+        // no widgets were added for the proxy...so don't show any sub_panel.
+        delete sub_panel;
         }
       else
         {
-        pqNamedWidgets::link(group, smProxy, panel->propertyManager());
+        pqNamedWidgets::link(group, smProxy, sub_panel->propertyManager());
         QGridLayout* l = qobject_cast<QGridLayout*>(this->layout());
-        this->Internal->Widget = panel;
+        this->Internal->Widget = sub_panel;
         l->addWidget(this->Internal->Widget, 1, 0, 1, 2);
         }
       }
