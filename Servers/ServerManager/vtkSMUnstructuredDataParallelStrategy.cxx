@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.3");
+vtkCxxRevisionMacro(vtkSMUnstructuredDataParallelStrategy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMUnstructuredDataParallelStrategy::vtkSMUnstructuredDataParallelStrategy()
 {
@@ -183,10 +183,7 @@ void vtkSMUnstructuredDataParallelStrategy::CreatePipelineInternal(
   this->Connect(input, updatesuppressor);
   updatesuppressor->UpdateVTKObjects();
 
-  // Now send to the render server.
-  // This order of sending first to CLIENT|DATA_SERVER and then to render server
-  // ensures that the connections are set up correctly even when data server and
-  // render server are the same.
+  // Connect the distrubutor and set it up, only on the render server.
   stream  << vtkClientServerStream::Invoke
           << distributor->GetID() 
           << "GetOutputPort" << 0
