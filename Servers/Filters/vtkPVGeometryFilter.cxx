@@ -58,7 +58,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.91");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.92");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -188,7 +188,10 @@ void vtkPVGeometryFilter::InternalProgressCallback(vtkAlgorithm *algorithm)
 {
   // This limits progress for only the DataSetSurfaceFilter.
   float progress = algorithm->GetProgress();
-  this->UpdateProgress(progress);
+  if (progress > 0 && progress < 1)
+    {
+    this->UpdateProgress(progress);
+    }
   if (this->AbortExecute)
     {
     algorithm->SetAbortExecute(1);
