@@ -2338,6 +2338,12 @@ def _printProgress(caller, event):
 
     pm = vtkProcessModule.GetProcessModule()
     progress = pm.GetLastProgress() / 10
+    # If we got a 100% as the first thing, ignore
+    # This is to get around the fact that some vtk
+    # algorithms report 100% more than once (which is
+    # a bug)
+    if not currentAlgorithm and progress == 10:
+        return
     alg = pm.GetLastProgressName()
     if alg != currentAlgorithm and alg:
         if currentAlgorithm:
