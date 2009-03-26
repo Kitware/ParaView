@@ -85,6 +85,9 @@ public:
   {
     this->MPIMoveData = mp;
   }
+  //Description:
+  //Called in parallel runs to ensure communication when pieces are reused.
+  void MarkMoveDataModified();
 
 //BTX
 protected:

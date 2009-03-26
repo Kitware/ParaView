@@ -81,6 +81,11 @@ protected:
   // Overridden to clean piececache too.
   virtual void InvalidatePipeline();
 
+  // Description:
+  // Updates the data pipeline (non-LOD only).
+  // Overridden to operate in a way that is OK with streaming.
+  virtual void UpdatePipeline();
+
   vtkSMSourceProxy* PieceCache;
   vtkSMSourceProxy* ViewSorter;
 

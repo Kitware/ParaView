@@ -32,7 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.5");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.6");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 #define DEBUGPRINT_EXECUTION(arg)\
@@ -68,8 +68,13 @@ vtkStreamingUpdateSuppressor::~vtkStreamingUpdateSuppressor()
 //----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::ForceUpdate()
 {    
+
   int gPiece = this->UpdatePiece*this->NumberOfPasses + this->GetPiece();
   int gPieces = this->UpdateNumberOfPieces*this->NumberOfPasses;
+
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") ForceUpdate " << gPiece << "/" << gPieces << endl;
+                       );
 
   // Make sure that output type matches input type
   this->UpdateInformation();
@@ -170,13 +175,8 @@ int vtkStreamingUpdateSuppressor::GetPiece(int p)
 }
 
 //----------------------------------------------------------------------------
-void vtkStreamingUpdateSuppressor::SetPassNumber(int pass, int NPasses)
+void vtkStreamingUpdateSuppressor::MarkMoveDataModified()
 {
-  DEBUGPRINT_EXECUTION(
-  cerr << "US(" << this << ") SetPassNumber " << Pass << "/" << NPasses << endl;
-                       );
-  this->SetPass(pass);
-  this->SetNumberOfPasses(NPasses);
   if (this->MPIMoveData)
     {
     //We have to ensure that communication isn't halted when a piece is reused.
@@ -186,6 +186,17 @@ void vtkStreamingUpdateSuppressor::SetPassNumber(int pass, int NPasses)
     //communications will hang.
     this->MPIMoveData->Modified();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkStreamingUpdateSuppressor::SetPassNumber(int pass, int NPasses)
+{
+  DEBUGPRINT_EXECUTION(
+  cerr << "US(" << this << ") SetPassNumber " << Pass << "/" << NPasses << endl;
+                       );
+  this->SetPass(pass);
+  this->SetNumberOfPasses(NPasses);
+  this->MarkMoveDataModified();
 }
 
 //-----------------------------------------------------------------------------

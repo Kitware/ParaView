@@ -54,6 +54,8 @@ protected:
   vtkPriorityHelper();
   ~vtkPriorityHelper();
 
+  vtkDataObject *InternalUpdate(bool ReturnObject);
+
   vtkAlgorithm *Input;
   int Port;
   int Piece;

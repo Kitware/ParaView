@@ -866,6 +866,7 @@
 
       <Property name="ClearPriorities" command="ClearPriorities" />
       <Property name="ComputePriorities" command="ComputePriorities" />
+      <Property name="MarkMoveDataModified" command="MarkMoveDataModified" />
 
       <IntVectorProperty
         name="GetMaxPass"

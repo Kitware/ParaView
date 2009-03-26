@@ -14,20 +14,22 @@
 =========================================================================*/
 #include "vtkSMSUnstructuredDataParallelStrategy.h"
 #include "vtkStreamingOptions.h"
+
 #include "vtkClientServerStream.h"
 #include "vtkInformation.h"
 #include "vtkMPIMoveData.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVInformation.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIceTMultiDisplayRenderViewProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkPVInformation.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMSUnstructuredDataParallelStrategy);
-vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.9");
+vtkCxxRevisionMacro(vtkSMSUnstructuredDataParallelStrategy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMSUnstructuredDataParallelStrategy::vtkSMSUnstructuredDataParallelStrategy()
 {
@@ -87,12 +89,10 @@ void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
     cacher->GetProperty("CachingEnabled"));
   ivp->SetElement(0, 0);
 
-  this->Connect(input, this->ViewSorter);//, "Input", outputport);
+  this->Connect(input, this->ViewSorter, "Input", outputport);
   this->Connect(this->ViewSorter, this->PieceCache);
-  this->Superclass::CreatePipeline(this->PieceCache, outputport);
-  //input->VS->PC->Collect->PostCollectUS->Distr
-  //             |                       \>PostDistrUS
-  //             \>US
+  this->Superclass::CreatePipeline(this->PieceCache, 0);
+  //input->VS->PC->US->Collect->PostCollectUS->Distr->pdUS
 
   //use streams instead of a proxy property here 
   //so that proxyproperty dependencies are not invoked 
@@ -101,6 +101,16 @@ void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
          << this->PostDistributorSuppressor->GetID()
+         << "SetMPIMoveData" 
+         << this->Collect->GetID()
+         << vtkClientServerStream::End;
+  pm->SendStream(this->GetConnectionID(),
+                 vtkProcessModule::CLIENT_AND_SERVERS,
+                 stream);
+
+  stream.Reset();
+  stream << vtkClientServerStream::Invoke
+         << this->PostCollectUpdateSuppressor->GetID()
          << "SetMPIMoveData" 
          << this->Collect->GetID()
          << vtkClientServerStream::End;
@@ -123,9 +133,9 @@ void vtkSMSUnstructuredDataParallelStrategy::CreatePipeline(vtkSMSourceProxy* in
 //----------------------------------------------------------------------------
 void vtkSMSUnstructuredDataParallelStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputport)
 {
-  this->Connect(input, this->ViewSorter);
+  this->Connect(input, this->ViewSorter, "Input", outputport);
   this->Connect(this->ViewSorter, this->PieceCache);
-  this->Superclass::CreateLODPipeline(this->PieceCache, outputport);
+  this->Superclass::CreateLODPipeline(this->PieceCache, 0);
   //input->VS->PC->LODDec->CollectLOD->PostCollectUSLOD->DistrLOD
   //                     |                              \>USLOD
   //                     \>USLOD
@@ -429,4 +439,103 @@ void vtkSMSUnstructuredDataParallelStrategy::SetViewState(double *camera, double
     this->ViewSorter->GetProperty("SetFrustum"));
   dvp->SetElements(frustum);
   this->ViewSorter->UpdateVTKObjects();      
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSUnstructuredDataParallelStrategy::UpdatePipeline()
+{
+  //I have inlined the code that normally happens in the parent classes.
+  //Each parent class checks locally if data is valid and if not calls 
+  //superclass Update before updating the parts of the pipeline it is 
+  //responsible for. Doing it that way squeezes the data downward along
+  //the intestine, as it were, toward the client.
+  //
+  //I had to do all this here just to bypass the blockage that
+  //streamingoutputport makes on the MPIMoveData filter.
+
+  //this->vtkSMUnstructuredDataParallelStrategy::UpdatePipeline();
+    { 
+   
+    if (this->vtkSMUnstructuredDataParallelStrategy::GetDataValid())
+      {
+      return;
+      }
+    
+    //this->vtkSMSimpleParallelStrategy::UpdatePipeline();
+      {
+      if (this->vtkSMSimpleParallelStrategy::GetDataValid())
+        {
+        return;
+        }
+      
+      //this->vtkSMSimpleStrategy::UpdatePipeline();
+        {
+        // We check to see if the part of the pipeline that will up updated by this
+        // class needs any update. Then alone do we call update.
+        if (this->vtkSMSimpleStrategy::GetDataValid())
+          {
+          return;
+          }
+        
+        //this->vtkSMRepresentationStrategy::UpdatePipeline()
+          {
+          // Update the CacheKeeper.                    
+          this->DataValid = true;
+          this->InformationValid = false; 
+          }
+        
+        this->UpdateSuppressor->InvokeCommand("ForceUpdate");
+        // This is called for its side-effects; i.e. to force a PostUpdateData()
+        this->UpdateSuppressor->UpdatePipeline();        
+        }
+      
+      vtkSMPropertyHelper(this->Collect, "MoveMode").Set(this->GetMoveMode()); 
+      this->Collect->UpdateProperty("MoveMode");
+      
+      // It is essential to mark the Collect filter explicitly modified.
+      vtkClientServerStream stream;
+      stream  << vtkClientServerStream::Invoke
+              << this->Collect->GetID()
+              << "Modified"
+              << vtkClientServerStream::End;
+      vtkProcessModule::GetProcessModule()->SendStream(
+              this->ConnectionID, this->Collect->GetServers(), stream);
+      
+      this->PostCollectUpdateSuppressor->InvokeCommand("ForceUpdate");
+
+#if 0
+//ORIGINAL - BUSTED
+      // This is called for its side-effects; i.e. to force a PostUpdateData()
+      this->PostCollectUpdateSuppressor->UpdatePipeline();
+#endif
+
+#if 0
+//HACK1 - OK
+      this->PostCollectUpdateSuppressor->InvokeCommand("MarkMoveDataModified");
+      this->PostCollectUpdateSuppressor->UpdatePipeline();
+      this->PostCollectUpdateSuppressor->InvokeCommand("MarkMoveDataModified");
+#endif
+
+#if 1
+//HACK2 - also OK, but faster
+      //this->PostCollectUpdateSuppressor->UpdatePipeline();
+#endif
+
+      this->CollectedDataValid = true;      
+      }
+      
+    bool usecompositing = this->GetUseCompositing();
+    // cout << "usecompositing: " << usecompositing << endl;
+    
+    // cout << "use ordered compositing: " << (usecompositing && this->UseOrderedCompositing)
+    //  << endl;
+    vtkSMPropertyHelper(this->Distributor, "PassThrough").Set(
+           (usecompositing && this->UseOrderedCompositing)? 0 : 1);
+    this->Distributor->UpdateProperty("PassThrough");
+    
+    this->PostDistributorSuppressor->InvokeCommand("ForceUpdate");
+    // This is called for its side-effects; i.e. to force a PostUpdateData()
+    this->PostDistributorSuppressor->UpdatePipeline();
+    this->DistributedDataValid = true;
+    }
 }

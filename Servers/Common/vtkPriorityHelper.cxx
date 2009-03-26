@@ -5,8 +5,14 @@
 #include "vtkAlgorithmOutput.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPriorityHelper, "1.2");
+vtkCxxRevisionMacro(vtkPriorityHelper, "1.3");
 vtkStandardNewMacro(vtkPriorityHelper);
+
+#define DEBUGPRINT_PRIORITY(arg)\
+  if (this->EnableStreamMessages)                       \
+    {                                                   \
+    arg;                                                \
+    }
 
 //-----------------------------------------------------------------------------
 vtkPriorityHelper::vtkPriorityHelper()
@@ -72,7 +78,11 @@ int vtkPriorityHelper::SetSplitUpdateExtent(int port,
         this->NumPieces = numPieces;
         this->NumPasses = numPasses;
         }
-      int ret = sddp->SetSplitUpdateExtent(port, piece, 
+      DEBUGPRINT_PRIORITY(
+        cerr << "PHelper(" << this << ") SetSplitUE " 
+             << piece*numPasses+offset << "/" << numPieces*numPasses << endl;
+                          );
+      int ret = sddp->SetSplitUpdateExtent(port, piece*numPasses, 
                                            offset, 
                                            numPieces*numPasses, 0);      
       return ret;
@@ -82,79 +92,65 @@ int vtkPriorityHelper::SetSplitUpdateExtent(int port,
 }
 
 //-----------------------------------------------------------------------------
-vtkDataObject *vtkPriorityHelper::ConditionallyGetDataObject()
+vtkDataObject *vtkPriorityHelper::InternalUpdate(bool ReturnObject)
 {
   //run through available pieces
   //look for first one (if any) with nonzero priority and get that
   if (this->Input)
     {
     double ret = 0.0;
-    for (int i = 0; i < this->NumPasses;)
+    int i = 0;
+    while (ret == 0.0 && i < this->NumPasses)
       {
       ret = this->ComputePriority();
-      if (ret > 0.0)
-        {
-        break;
-        } 
-      if (this->EnableStreamMessages)
-        {
-        cerr << "PHelper(" << this << ") Skipping GetDataObject on " 
-             << (this->Piece + i) << endl;
-        }
+      DEBUGPRINT_PRIORITY(
+                          cerr << "PHelper(" << this << ") Priority on " 
+                          << (this->Piece*this->NumPasses + i) << " was " << ret << endl;
+                          );
       i++;
-      this->SetSplitUpdateExtent(this->Port, this->Piece, i, 
-                                 this->NumPieces, this->NumPasses, 0, 0);
+      if (ret == 0.0) //not useful, move along to next one
+        {
+        DEBUGPRINT_PRIORITY(
+                            cerr << "PHelper(" << this << ") Skipping " 
+                            << (this->Piece*this->NumPasses + (i-1)) << endl;
+                            );
+        this->SetSplitUpdateExtent(this->Port, this->Piece, i, 
+                                   this->NumPieces, this->NumPasses, 0, 0);
+        }
       }
     if (ret > 0.0)
       {
-      return this->Input->GetOutputDataObject(this->Port);
+      if (ReturnObject)
+        {       
+        return this->Input->GetOutputDataObject(this->Port);
+        }
+      else
+        {
+        this->Input->Update();      
+        return NULL;
+        }
       }
     else
       {
-      if (this->EnableStreamMessages)
-        {
-        cerr << "PHelper(" << this << ") No DataObject to get." << endl;
-        }
+      this->SetSplitUpdateExtent(this->Port, this->Piece, 0, 
+                                 this->NumPieces, this->NumPasses, 0, 0);
+      DEBUGPRINT_PRIORITY(
+                          cerr << "PHelper(" << this << ") Nothing worth updating for." << endl;
+                          );
       }
     }
   return NULL;
 }
 
 //-----------------------------------------------------------------------------
+vtkDataObject *vtkPriorityHelper::ConditionallyGetDataObject()
+{
+  return this->InternalUpdate(true);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPriorityHelper::ConditionallyUpdate()
 {
-  //run through available pieces
-  //look for first one (if any) with nonzero priority and update that
-  if (this->Input)
-    {
-    double ret = 0.0;
-    for (int i = 0; i < this->NumPasses;)
-      {
-      ret = this->ComputePriority();
-      if (ret > 0.0)
-        {
-        break;
-        }
-      if (this->EnableStreamMessages)
-        {
-        cerr << "PHelper(" << this << ") Skipping Update on " 
-             << (this->Piece + i) << endl;
-        }
-      i++;
-      this->SetSplitUpdateExtent(this->Port, this->Piece, i, 
-                                 this->NumPieces, this->NumPasses, 0, 0);
-      }
-    if (ret > 0.0)
-      {
-      this->Input->Update();      
-      }
-    else
-      {
-      if (this->EnableStreamMessages)
-        {
-        cerr << "PHelper(" << this << ") Not worth updating. " << endl;
-        }
-      }
-    }
+  this->InternalUpdate(false);
 }
 
