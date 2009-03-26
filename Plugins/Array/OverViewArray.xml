@@ -87,14 +87,14 @@
       <IntVectorProperty name="MaximumCount" command="SetMaximumCount" number_of_elements="1" default_values="100" label="Maximum Count"/> 
     </SourceProxy>
  
-    <SourceProxy name="ExtractFactoredArray" class="vtkExtractFactoredArray" label="Extract Factored Array">
+    <SourceProxy name="ExtractArray" class="vtkExtractArray" label="Extract Array">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
-          <DataType value="vtkFactoredArrayData"/>
+          <DataType value="vtkArrayData"/>
         </DataTypeDomain>
       </InputProperty>
       <IntVectorProperty name="Index" command="SetIndex" number_of_elements="1" default_values="0"/> 

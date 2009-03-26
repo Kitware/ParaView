@@ -23,7 +23,7 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkBoostRandomSparseArraySource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkCosineSimilarity.h
     ${VTK_SOURCE_DIR}/Infovis/vtkDiagonalMatrixSource.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkExtractFactoredArray.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkExtractArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkMatricizeArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkMatrixColumnNorm.h
     ${VTK_SOURCE_DIR}/Infovis/vtkNormalizeMatrixVectors.h
