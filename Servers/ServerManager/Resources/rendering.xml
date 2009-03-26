@@ -3628,7 +3628,8 @@
 
       <!-- End of SpreadSheetView -->
     </ViewProxy>
-    
+   
+#ifdef VTK_USE_QVTK
     <ChartOptionsProxy name="ChartOptionsBase">
       <Documentation>
         Defines common options API for all chart views.
@@ -3940,6 +3941,7 @@
 
       <!-- End of ChartOptionsBase -->
     </ChartOptionsProxy>
+#endif
 
 #ifdef VTK_USE_QVTK
     <BarChartViewProxy name="BarChartView2" 
