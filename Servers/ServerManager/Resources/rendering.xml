@@ -3941,6 +3941,7 @@
       <!-- End of ChartOptionsBase -->
     </ChartOptionsProxy>
 
+#ifdef VTK_USE_QVTK
     <BarChartViewProxy name="BarChartView2" 
       base_proxygroup="views" 
       base_proxyname="ViewBase"
@@ -4022,7 +4023,9 @@
 
       <!-- End of BarChartView2 -->
     </BarChartViewProxy>
+#endif
 
+#ifdef VTK_USE_QVTK
     <LineChartViewProxy name="LineChartView" 
       base_proxygroup="views" 
       base_proxyname="ViewBase"
@@ -4077,6 +4080,7 @@
 
       <!-- End of LineChartView -->
     </LineChartViewProxy>
+#endif
 
     <ViewProxy name="BarChartView" 
       base_proxygroup="views" base_proxyname="ViewBase"
@@ -7669,6 +7673,7 @@
     </ClientDeliveryRepresentationProxy>
 
     <!-- =================================================================== -->
+#ifdef VTK_USE_QVTK
     <BarChartRepresentationProxy name="BarChartRepresentation2">
       <Documentation>
         Representation used in BarChartView.
@@ -7817,8 +7822,10 @@
 
       <!-- End of BarChartRepresentation -->
     </BarChartRepresentationProxy>
+#endif
 
     <!-- =================================================================== -->
+#ifdef VTK_USE_QVTK
     <LineChartRepresentationProxy name="LineChartRepresentation">
       <Documentation>
         Representation used by XYPlotView.
@@ -7971,6 +7978,7 @@
       </SubProxy>
       <!-- End of LineChartRepresentation -->
     </LineChartRepresentationProxy>
+#endif
 
     <!-- =================================================================== -->
     <ChartRepresentationProxy name="BarChartRepresentation">
