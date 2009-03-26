@@ -7678,6 +7678,20 @@ This filter extracts a list of datasets from hierarchical datasets.
             Set the input to the Texture Map to Sphere filter.
           </Documentation>
      </InputProperty>
+
+     <IntVectorProperty name="PreventSeam"
+                        command="SetPreventSeam"
+                        number_of_elements="1"
+                        default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Control how the texture coordinates are generated. If Prevent Seam
+         is set, the s-coordinate ranges from 0-&gt;1 and 1-&gt;0 corresponding
+         to the theta angle variation between 0-&gt;180 and 180-&gt;0
+         degrees. Otherwise, the s-coordinate ranges from 0-&gt;1 between
+         0-&gt;360 degrees.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End TextureMapToSphere -->
    </SourceProxy>
 
@@ -7708,6 +7722,20 @@ This filter extracts a list of datasets from hierarchical datasets.
             Set the input to the Texture Map to Cylinder filter.
           </Documentation>
      </InputProperty>
+
+     <IntVectorProperty name="PreventSeam"
+                        command="SetPreventSeam"
+                        number_of_elements="1"
+                        default_values="1">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         Control how the texture coordinates are generated. If Prevent Seam
+         is set, the s-coordinate ranges from 0-&gt;1 and 1-&gt;0 corresponding
+         to the theta angle variation between 0-&gt;180 and 180-&gt;0
+         degrees. Otherwise, the s-coordinate ranges from 0-&gt;1 between
+         0-&gt;360 degrees.
+       </Documentation>
+     </IntVectorProperty>
    <!-- End TextureMapToCylinder -->
    </SourceProxy>
 
