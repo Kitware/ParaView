@@ -428,7 +428,7 @@ QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
     if (this->IndexMode == INDEX_MODE_FLAT)
       {
       QVariant metadata = item->data(0, FLAT_INDEX);
-      cout << metadata.toInt()  << ": " << item->checkState(0) << endl;
+      //cout << metadata.toInt()  << ": " << item->checkState(0) << endl;
       if (metadata.isValid() && item->checkState(0)== Qt::Checked)
         {
         // metadata has the flat index for the node.
