@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>299</width>
-    <height>568</height>
+    <width>341</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -403,6 +403,13 @@
             </layout>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="AnimateModeShapes" >
+           <property name="text" >
+            <string>Animate Vibrations</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

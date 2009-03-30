@@ -3410,6 +3410,22 @@
        </Documentation>
      </IntVectorProperty>
 
+     <IntVectorProperty name="AnimateModeShapes"
+                        command="SetAnimateModeShapes"
+                        number_of_elements="1"
+                        default_values="1"
+                        animateable="0"
+                        label="Animate Vibrations">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this flag is on and HasModeShapes is also on, then this reader
+         will report a continuous time range [0,1] and animate the
+         displacements in a periodic sinusoid.  If this flag is off and
+         HasModeShapes is on, this reader ignores time.  This flag has no
+         effect if HasModeShapes is off.
+       </Documentation>
+     </IntVectorProperty>
+
      <!-- The following two properties magically send time information -->
      <!-- to the animation panel.  Usually you only need one (the former -->
      <!-- for discrete time, the latter for continuous time), but changing -->
@@ -4016,6 +4032,7 @@
          <Property name="XMLFileName" />
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
+         <Property name="AnimateModeShapes" />
          <Property name="Refresh" />
          <Property name="SILUpdateStamp" />
          <Property name="EdgeBlockArrayInfo" />
