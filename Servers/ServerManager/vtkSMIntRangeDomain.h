@@ -23,6 +23,16 @@
 // @endverbatim
 // Both min and max attributes can have one or more space space
 // separated (int) arguments.
+// Optionally, a Required Property may be specified (which typically is a
+// information property) which can be used to obtain the range for the values as
+// follows:
+// @verbatim
+// <IntRangeDomain ...>
+//    <RequiredProperties>
+//      <Property name="<InfoPropName>" function="RangeInfo" />
+//    </RequiredProperties>
+// </IntRangeDomain>
+// @endverbatim
 // .SECTION See Also
 // vtkSMDomain 
 
