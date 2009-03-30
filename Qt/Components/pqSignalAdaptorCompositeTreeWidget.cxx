@@ -71,13 +71,18 @@ public:
 class pqSignalAdaptorCompositeTreeWidget::pqCallbackAdaptor :
   public pqTreeWidgetItem::pqCallbackHandler
 {
+  int ChangeDepth;// used to avoid repeated valuesChanged() signal firing when
+                  // check states are being changed as a consequence of toggle
+                  // the check state for a non-leaf node.
   bool BlockCallbacks;
+  bool PrevBlockSignals;
   pqSignalAdaptorCompositeTreeWidget* Adaptor;
 public:
   pqCallbackAdaptor(pqSignalAdaptorCompositeTreeWidget* adaptor)
     {
     this->Adaptor = adaptor;
     this->BlockCallbacks = false;
+    this->ChangeDepth = 0;
     }
   bool blockCallbacks(bool val)
     {
@@ -87,9 +92,30 @@ public:
     }
   virtual void checkStateChanged(pqTreeWidgetItem* item, int column)
     {
+    // When a non-leaf node is toggled, Qt changes the check state of all child
+    // nodes. When that's happening we don't want to repeatedly fire
+    // valuesChanged() signal. Hence we use this ChangeDepth magic.
+    this->ChangeDepth--;
+    if (this->ChangeDepth == 0)
+      {
+      this->Adaptor->blockSignals(this->PrevBlockSignals);
+      }
     if (this->BlockCallbacks == false)
       {
       this->Adaptor->updateCheckState(item, column);
+      }
+    }
+
+  virtual void checkStateAboutToChange(
+    pqTreeWidgetItem* /*item*/, int /*column*/)
+    {
+    // When a non-leaf node is toggled, Qt changes the check state of all child
+    // nodes. When that's happening we don't want to repeatedly fire
+    // valuesChanged() signal. Hence we use this ChangeDepth magic.
+    this->ChangeDepth++;
+    if (this->ChangeDepth == 1)
+      {
+      this->PrevBlockSignals = this->Adaptor->blockSignals(true);
       }
     }
 
@@ -133,20 +159,25 @@ class pqCompositeTreeWidgetItem : public pqTreeWidgetItem
 {
   typedef pqTreeWidgetItem Superclass;
   int triStateCheckState;
+  bool inSetData;
 public:
   pqCompositeTreeWidgetItem(QTreeWidget* tree, QStringList _values):
-    Superclass(tree, _values), triStateCheckState(Qt::Unchecked)
+    Superclass(tree, _values), triStateCheckState(-1),
+    inSetData(false)
+
   {
   }
 
   pqCompositeTreeWidgetItem(QTreeWidgetItem* item, QStringList _values):
-    Superclass(item, _values), triStateCheckState(Qt::Unchecked)
+    Superclass(item, _values), triStateCheckState(-1),
+    inSetData(false)
   {
   }
 
   virtual QVariant data(int column, int role) const
     {
     if (role == Qt::CheckStateRole && 
+      this->triStateCheckState != -1 &&
       this->childCount() > 0 && (this->flags() & Qt::ItemIsTristate))
       {
       // superclass implementation of this method only checks the immediate
@@ -164,17 +195,22 @@ public:
         }
       return this->triStateCheckState;
       }
-    return this->Superclass::data(column, role);
 
+    return this->Superclass::data(column, role);
     }
 
-  virtual void setData(int column, int role, const QVariant &value)
+  virtual void setData(int column, int role, const QVariant &in_value)
     {
+    this->inSetData = true;
+    this->triStateCheckState = -1;
+
     // Superclass will also mark all children checked or unchecked.
-    this->Superclass::setData(column, role, value);
+    this->Superclass::setData(column, role, in_value);
 
     if (role == Qt::CheckStateRole && column==0)
       {
+      QVariant value = this->data(column, role);
+
       if (this->flags() & Qt::ItemIsTristate)
         {
         this->triStateCheckState = value.toInt();
@@ -184,7 +220,7 @@ public:
       pqCompositeTreeWidgetItem* itemParent = 
         dynamic_cast<pqCompositeTreeWidgetItem*>(
           static_cast<QTreeWidgetItem*>(this)->parent());
-      while (itemParent)
+      while (itemParent && !itemParent->inSetData)
         {
         itemParent->triStateCheckState = Qt::PartiallyChecked;
         itemParent = 
@@ -192,6 +228,7 @@ public:
             static_cast<QTreeWidgetItem*>(itemParent)->parent());
         }
       }
+    this->inSetData = false;
     }
 
 
@@ -280,10 +317,10 @@ pqSignalAdaptorCompositeTreeWidget::pqSignalAdaptorCompositeTreeWidget(
     }
 
   // * Initialize the widget using the current value.
-  bool prev = this->Internal->TreeWidget->blockSignals(true);
+  bool prev = this->blockSignals(true);
   QList<QVariant> curValues = pqSMAdaptor::getMultipleElementProperty(smproperty);
   this->setValues(curValues);
-  this->Internal->TreeWidget->blockSignals(prev);
+  this->blockSignals(prev);
 }
 
 //-----------------------------------------------------------------------------
@@ -391,6 +428,7 @@ QList<QVariant> pqSignalAdaptorCompositeTreeWidget::values() const
     if (this->IndexMode == INDEX_MODE_FLAT)
       {
       QVariant metadata = item->data(0, FLAT_INDEX);
+      cout << metadata.toInt()  << ": " << item->checkState(0) << endl;
       if (metadata.isValid() && item->checkState(0)== Qt::Checked)
         {
         // metadata has the flat index for the node.
@@ -432,7 +470,7 @@ inline bool pqItemIsCheckable(QTreeWidgetItem* item)
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_values)
 {
-  bool prev = this->Internal->TreeWidget->blockSignals(true);
+  bool prev = this->blockSignals(true);
   QList<pqTreeWidgetItem*> treeitems = this->Internal->Items; 
   bool changed = false;
 
@@ -490,7 +528,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
         }
       }
     }
-  this->Internal->TreeWidget->blockSignals(prev);
+  this->blockSignals(prev);
   if (changed)
     {
     emit this->valuesChanged();
@@ -500,7 +538,7 @@ void pqSignalAdaptorCompositeTreeWidget::setValues(const QList<QVariant>& new_va
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorCompositeTreeWidget::domainChanged()
 {
-  bool prev = this->Internal->TreeWidget->blockSignals(true);
+  bool prev = this->blockSignals(true);
   QList<QVariant> widgetvalues = this->values();
   this->Internal->Items.clear();
   this->Internal->TreeWidget->clear();
@@ -522,7 +560,7 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
   
   // now update check state.
   this->setValues(widgetvalues);
-  this->Internal->TreeWidget->blockSignals(prev);
+  this->blockSignals(prev);
 
   if (this->AutoUpdateWidgetVisibility)
     {
@@ -545,7 +583,7 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
 //-----------------------------------------------------------------------------
 void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
 {
-  bool prev = this->Internal->TreeWidget->blockSignals(true);
+  bool prev = this->blockSignals(true);
   QList<QVariant> widgetvalues = this->values();
   this->Internal->Items.clear();
   this->Internal->TreeWidget->clear();
@@ -567,7 +605,7 @@ void pqSignalAdaptorCompositeTreeWidget::portInformationChanged()
 
   // now update check state.
   this->setValues(widgetvalues);
-  this->Internal->TreeWidget->blockSignals(prev);
+  this->blockSignals(prev);
 
   if (this->AutoUpdateWidgetVisibility)
     {

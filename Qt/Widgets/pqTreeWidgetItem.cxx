@@ -41,28 +41,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 void pqTreeWidgetItem::setData(int column, int role, const QVariant& v)
 {
   QVariant curValue = this->data(column, role);
-  if (v != curValue)
+  if (this->CallbackHandler)
     {
-    if (this->CallbackHandler)
+    if (!this->CallbackHandler->acceptChange(this, curValue, v, column, role))
       {
-      if (!this->CallbackHandler->acceptChange(this, curValue, v, column, role))
-        {
-        // reject the change.
-        return;
-        }
+      // reject the change.
+      return;
       }
-    this->Superclass::setData(column, role, v);
+    }
+  if (this->CallbackHandler)
+    {
+    this->CallbackHandler->dataAboutToChange(this, column, role);
     if (Qt::CheckStateRole == role)
       {
-      if (this->CallbackHandler)
-        {
-        this->CallbackHandler->checkStateChanged(this, column);
-        }
+      this->CallbackHandler->checkStateAboutToChange(this, column);
       }
-    if (this->CallbackHandler)
+    }
+  this->Superclass::setData(column, role, v);
+  if (this->CallbackHandler)
+    {
+    if (Qt::CheckStateRole == role)
       {
-      this->CallbackHandler->dataChanged(this, column, role);
+      this->CallbackHandler->checkStateChanged(this, column);
       }
+    this->CallbackHandler->dataChanged(this, column, role);
     }
 }
 
