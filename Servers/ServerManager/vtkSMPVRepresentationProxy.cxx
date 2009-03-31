@@ -68,7 +68,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.23");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.24");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -275,6 +275,11 @@ void vtkSMPVRepresentationProxy::SetBackfaceRepresentation(int repr)
     {
     this->BackfaceRepresentation = repr;
     this->Modified();
+    }
+
+  if (!this->BackfaceSurfaceRepresentation)
+    {
+    return;
     }
 
   if (!this->ActiveRepresentationIsSurface())
