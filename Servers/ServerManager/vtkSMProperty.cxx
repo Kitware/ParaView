@@ -33,7 +33,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.62");
+vtkCxxRevisionMacro(vtkSMProperty, "1.63");
 
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
@@ -338,7 +338,7 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
+int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* vtkNotUsed(proxy),
                                      vtkPVXMLElement* element)
 {
   const char* xmlname = element->GetAttribute("name");
