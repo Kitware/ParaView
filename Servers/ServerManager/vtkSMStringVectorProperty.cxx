@@ -18,12 +18,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkProcessModule.h"
+#include "vtkStringList.h"
 
 #include <vtkstd/vector>
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.45");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.46");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -205,6 +206,70 @@ unsigned int vtkSMStringVectorProperty::GetNumberOfElements()
 const char* vtkSMStringVectorProperty::GetElement(unsigned int idx)
 {
   return this->Internals->Values[idx].c_str();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::GetElements(vtkStringList* list)
+{
+  list->RemoveAllItems();
+
+  unsigned int numElems = this->GetNumberOfElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    list->AddString(this->GetElement(cc));
+    }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElements(vtkStringList* list)
+{
+  unsigned int count = static_cast<unsigned int>(list->GetLength());
+  unsigned int numElems = this->GetNumberOfElements();
+
+  if (this->Initialized && count == numElems)
+    {
+    // Check is cur values are same as the new values.
+    int modified = 0;
+    for (unsigned int cc=0; cc < numElems; cc++)
+      {
+      const char* value = list->GetString(cc)? list->GetString(cc) : "";
+      if (this->Internals->Values[cc] != value)
+        {
+        modified = 1;
+        break;
+        }
+      }
+    if (!modified)
+      {
+      // nothing changed.
+      return 1;
+      }
+    }
+
+  if ( vtkSMProperty::GetCheckDomains() )
+    {
+    this->SetNumberOfUncheckedElements(count);
+    for(unsigned int cc=0; cc<count; cc++)
+      {
+      this->SetUncheckedElement(cc, list->GetString(cc)?
+        list->GetString(cc):"");
+      }
+    
+    if (!this->IsInDomains())
+      {
+      this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+      return 0;
+      }
+    }
+
+  this->Internals->Resize(count);
+  for (unsigned int cc=0; cc < count; cc++)
+    {
+    this->Internals->Values[cc] = list->GetString(cc)? list->GetString(cc) : "";
+    }
+  this->Initialized = true;
+  this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------

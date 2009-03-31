@@ -32,6 +32,8 @@
 struct vtkSMStringVectorPropertyInternals;
 //ETX
 
+class vtkStringList;
+
 class VTK_EXPORT vtkSMStringVectorProperty : public vtkSMVectorProperty
 {
 public:
@@ -57,6 +59,14 @@ public:
   // Description:
   // Sets multiple elements. The size of the property is changed to match count.
   int SetElements(unsigned int count, const char* values[]);
+
+  // Description:
+  // Sets multiple elements. The size of the property is changed to match count.
+  int SetElements(vtkStringList* newvalue);
+
+  // Description:
+  // Fills up the vtkStringList instance with the current value.
+  void GetElements(vtkStringList* list);
 
   // Description:
   // Returns the value of 1 element.
