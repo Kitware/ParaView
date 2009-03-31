@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMBarChartRepresentationProxy.h
+  Module:    vtkSMChartTableRepresentationProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,24 +12,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBarChartRepresentationProxy
+// .NAME vtkSMChartTableRepresentationProxy
 // .SECTION Description
 //
 
-#ifndef __vtkSMBarChartRepresentationProxy_h
-#define __vtkSMBarChartRepresentationProxy_h
+#ifndef __vtkSMChartTableRepresentationProxy_h
+#define __vtkSMChartTableRepresentationProxy_h
 
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
 class vtkQtChartTableRepresentation;
-class vtkSMBarChartViewProxy;
+class vtkSMChartViewProxy;
+class vtkSMChartNamedOptionsModelProxy;
 
-class VTK_EXPORT vtkSMBarChartRepresentationProxy : public vtkSMChartRepresentationProxy
+class VTK_EXPORT vtkSMChartTableRepresentationProxy : public vtkSMChartRepresentationProxy
 {
 public:
-  static vtkSMBarChartRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMBarChartRepresentationProxy, vtkSMChartRepresentationProxy);
+  static vtkSMChartTableRepresentationProxy* New();
+  vtkTypeRevisionMacro(vtkSMChartTableRepresentationProxy, vtkSMChartRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -62,17 +63,48 @@ public:
   // Don't call directly. This method must be called through properties alone.
   void SetVisibility(int visible);
 
+  // Description:
+  // Get the number of series in this representation
+  int GetNumberOfSeries();
+
+  // Description:
+  // Get the name of the series with the given index.  Returns 0 is the index
+  // is out of range.  The returned pointer is only valid until the next call
+  // to GetSeriesName.
+  const char* GetSeriesName(int series);
+
+  // Description:
+  // Set the series to use as the X-axis.
+  void SetXAxisSeriesName(const char* name);
+
+  // Description:
+  // When set, the array index will be used for X axis, otherwise the array
+  // identified by XArrayName will be used.
+  void SetUseIndexForXAxis(bool use_index);
+
 //BTX
 protected:
-  vtkSMBarChartRepresentationProxy();
-  ~vtkSMBarChartRepresentationProxy();
+  vtkSMChartTableRepresentationProxy();
+  ~vtkSMChartTableRepresentationProxy();
 
-  vtkWeakPointer<vtkSMBarChartViewProxy> ChartViewProxy;
+  virtual bool EndCreateVTKObjects();
+
+  // Description:
+  // Called by SetXAxisSeriesName and SetUseIndexForXAxis to update the
+  // KeyColumn for the internal chart.
+  void UpdateXSeriesName();
+
+  vtkWeakPointer<vtkSMChartViewProxy> ChartViewProxy;
   vtkQtChartTableRepresentation* VTKRepresentation;
+  vtkSMChartNamedOptionsModelProxy* OptionsProxy;
   int Visibility;
+  bool UseIndexForXAxis;
+  char* XSeriesName;
+  vtkSetStringMacro(XSeriesName);
+
 private:
-  vtkSMBarChartRepresentationProxy(const vtkSMBarChartRepresentationProxy&); // Not implemented
-  void operator=(const vtkSMBarChartRepresentationProxy&); // Not implemented
+  vtkSMChartTableRepresentationProxy(const vtkSMChartTableRepresentationProxy&); // Not implemented
+  void operator=(const vtkSMChartTableRepresentationProxy&); // Not implemented
 //ETX
 };
 

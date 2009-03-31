@@ -15,99 +15,54 @@
 #include "vtkSMBarChartViewProxy.h"
 
 #include "vtkObjectFactory.h"
-
 #include "vtkQtBarChartView.h"
-#include "vtkQtChartWidget.h"
-#include "vtkQtChartMouseSelection.h"
-#include "vtkQtChartInteractorSetup.h"
-#include "vtkSMChartOptionsProxy.h"
 
 vtkStandardNewMacro(vtkSMBarChartViewProxy);
-vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::vtkSMBarChartViewProxy()
 {
-  this->ChartView = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::~vtkSMBarChartViewProxy()
 {
-  if (this->ChartView)
-    {
-    this->ChartView->Delete();
-    this->ChartView = 0;
-    }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBarChartViewProxy::CreateVTKObjects()
+vtkQtChartViewBase* vtkSMBarChartViewProxy::NewChartView()
 {
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-
-
-  this->ChartView = vtkQtBarChartView::New();
-
-  // Set up the paraview style interactor.
-  vtkQtChartArea* area = this->ChartView->GetChartArea();
-  vtkQtChartMouseSelection* selector =
-    vtkQtChartInteractorSetup::createSplitZoom(area);
-  this->ChartView->AddChartSelectionHandlers(selector);
-
-  this->Superclass::CreateVTKObjects();
-  
-  // Set default color scheme to blues
-  this->ChartView->SetColorSchemeToBlues();
-
-  vtkSMChartOptionsProxy::SafeDownCast(
-    this->GetSubProxy("ChartOptions"))->SetChartView(
-    this->GetBarChartView());
-}
-
-//----------------------------------------------------------------------------
-vtkQtChartWidget* vtkSMBarChartViewProxy::GetChartWidget()
-{
-  return qobject_cast<vtkQtChartWidget*>(this->ChartView->GetWidget());
+  return vtkQtBarChartView::New();
 }
 
 //----------------------------------------------------------------------------
 vtkQtBarChartView* vtkSMBarChartViewProxy::GetBarChartView()
 {
-  return this->ChartView;
-}
-
-//----------------------------------------------------------------------------
-void vtkSMBarChartViewProxy::SetHelpFormat(const char* format)
-{
-  this->ChartView->SetHelpFormat(format);
+  return vtkQtBarChartView::SafeDownCast(this->ChartView);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMBarChartViewProxy::SetOutlineStyle(int outline)
 {
-  this->ChartView->SetOutlineStyle(outline);
+  this->GetBarChartView()->SetOutlineStyle(outline);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMBarChartViewProxy::SetBarGroupFraction(float fraction)
 {
-  this->ChartView->SetBarGroupFraction(fraction);
+  this->GetBarChartView()->SetBarGroupFraction(fraction);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMBarChartViewProxy::SetBarWidthFraction(float fraction)
 {
-  this->ChartView->SetBarWidthFraction(fraction);
+  this->GetBarChartView()->SetBarWidthFraction(fraction);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMBarChartViewProxy::PerformRender()
+void vtkSMBarChartViewProxy::SetHelpFormat(const char* format)
 {
-  this->ChartView->Update();
-  this->ChartView->Render();
+  this->GetBarChartView()->SetHelpFormat(format);
 }
 
 //----------------------------------------------------------------------------

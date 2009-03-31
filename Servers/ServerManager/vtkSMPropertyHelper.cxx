@@ -48,6 +48,9 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkStringList.h"
+
+#include <vtksys/ios/sstream>
 
 #include <assert.h>
 inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
@@ -530,4 +533,192 @@ unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
   return 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetStatus(const char* key, int value)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return;
+    }
 
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+  if (svp->GetNumberOfElementsPerCommand() != 2)
+    {
+    vtkGenericWarningMacro("NumberOfElementsPerCommand != 2");
+    return;
+    }
+
+  if (!svp->GetRepeatCommand())
+    {
+    vtkGenericWarningMacro("Property is non-repeatable.");
+    return;
+    }
+
+
+  vtksys_ios::ostringstream str;
+  str << value;
+
+  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+    {
+    if (strcmp(svp->GetElement(cc), key) == 0)
+      {
+      svp->SetElement(cc+1, str.str().c_str());
+      return;
+      }
+    }
+
+  vtkStringList* list = vtkStringList::New();
+  svp->GetElements(list);
+  list->AddString(key);
+  list->AddString(str.str().c_str());
+  svp->SetElements(list);
+  list->Delete();
+}
+
+//----------------------------------------------------------------------------
+int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return default_value;
+    }
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+  while (svp)
+    {
+    if (svp->GetNumberOfElementsPerCommand() != 2)
+      {
+      vtkGenericWarningMacro("NumberOfElementsPerCommand != 2");
+      return default_value;
+      }
+
+    if (!svp->GetRepeatCommand())
+      {
+      vtkGenericWarningMacro("Property is non-repeatable.");
+      return default_value;
+      }
+
+    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+      {
+      if (strcmp(svp->GetElement(cc), key) == 0)
+        {
+        return atoi(svp->GetElement(cc+1));
+        }
+      }
+
+    // Now check if the information_property has the value.
+    svp = svp->GetInformationOnly() == 0? 
+      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty()) : 0;
+    }
+
+  return default_value;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
+  int num_values)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return;
+    }
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+  if (svp->GetNumberOfElementsPerCommand() != num_values+1)
+    {
+    vtkGenericWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+    return;
+    }
+
+  if (!svp->GetRepeatCommand())
+    {
+    vtkGenericWarningMacro("Property is non-repeatable.");
+    return;
+    }
+
+
+  vtkStringList* list = vtkStringList::New();
+  svp->GetElements(list);
+
+  bool append = true;
+  for (unsigned int cc=0; (cc+num_values+1) <= svp->GetNumberOfElements();
+    cc+=(num_values+1))
+    {
+    if (strcmp(svp->GetElement(cc), key) == 0)
+      {
+      for (int kk=0; kk < num_values; kk++)
+        {
+        vtksys_ios::ostringstream str;
+        str << values[kk];
+        list->SetString(cc+kk+1, str.str().c_str());
+        }
+      append = false;
+      }
+    }
+
+  if (append)
+    {
+    list->AddString(key);
+    for (int kk=0; kk < num_values; kk++)
+      {
+      vtksys_ios::ostringstream str;
+      str << values[kk];
+      list->AddString(str.str().c_str());
+      }
+    }
+  svp->SetElements(list);
+  list->Delete();
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMPropertyHelper::GetStatus(const char* key, double *values, int num_values)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return false;
+    }
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+
+  while (svp)
+    {
+    if (svp->GetNumberOfElementsPerCommand() != num_values+1)
+      {
+      vtkGenericWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+      return false;
+      }
+
+    if (!svp->GetRepeatCommand())
+      {
+      vtkGenericWarningMacro("Property is non-repeatable.");
+      return false;
+      }
+
+    for (unsigned int cc=0; (cc+num_values+1) <= svp->GetNumberOfElements();
+      cc+=(num_values+1))
+      {
+      if (strcmp(svp->GetElement(cc), key) == 0)
+        {
+        for (int kk=0; kk < num_values; kk++)
+          {
+          values[kk] = atof(svp->GetElement(cc+kk+1));
+          }
+        return true;
+        }
+      }
+
+    // Now check if the information_property has the value.
+    svp = svp->GetInformationOnly() == 0? 
+      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty()) : 0;
+    }
+
+  return false;
+}

@@ -250,6 +250,13 @@ public:
   // Provides access to the information helper used by this property, if any.
   vtkGetObjectMacro(InformationHelper, vtkSMInformationHelper);
 
+  // Description:
+  // Get the proxy to which this property belongs. Note that is this property is
+  // belong to a sub-proxy of a proxy, the returned value will indeed be that
+  // sub-proxy (and not the outer container proxy).
+  vtkSMProxy* GetParent()
+    { return this->Proxy; }
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -366,10 +373,6 @@ protected:
 
   static int CheckDomains;
   
-  // Set during xml parsing only. Do not use outside ReadXMLAttributes().
-  vtkSMProxy* Proxy;
-  void SetProxy(vtkSMProxy* proxy);
-
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;
 
@@ -400,6 +403,14 @@ protected:
   // Returns if any modified evetns are pending.
   // This gets cleared when Modified() is called.
   vtkGetMacro(PendingModifiedEvents, bool);
+
+  // Proxy is not reference-counted to avoid reference loops.
+  void SetParent(vtkSMProxy* proxy)
+    {
+    this->Proxy = proxy;
+    }
+
+  vtkSMProxy* Proxy;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

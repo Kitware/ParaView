@@ -33,9 +33,8 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.61");
+vtkCxxRevisionMacro(vtkSMProperty, "1.62");
 
-vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
@@ -66,6 +65,8 @@ vtkSMProperty::vtkSMProperty()
   this->Hints = 0;
   this->BlockModifiedEvents = false;
   this->PendingModifiedEvents = false;
+
+  this->Proxy = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -76,11 +77,11 @@ vtkSMProperty::~vtkSMProperty()
   this->SetXMLName(0);
   this->SetXMLLabel(0);
   this->DomainIterator->Delete();
-  this->SetProxy(0);
   this->SetInformationHelper(0);
   this->SetInformationProperty(0);
   this->SetDocumentation(0);
   this->SetHints(0);
+  this->SetParent(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -340,10 +341,6 @@ void vtkSMProperty::CreatePrettyLabel(const char* xmlname)
 int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
                                      vtkPVXMLElement* element)
 {
-  // Set during xml parsing only. Used in NewProperty() which is
-  // called by domains to get required properties.
-  this->SetProxy(proxy);
-
   const char* xmlname = element->GetAttribute("name");
   if(xmlname) 
     { 
@@ -476,7 +473,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
       }
     }
 
-  this->SetProxy(0);
   return 1;
 }
 
@@ -583,7 +579,7 @@ void vtkSMProperty::ResetToDefault()
 void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  os << indent << "Proxy: " << this->Proxy << endl;
   os << indent << "Command: " 
      << (this->Command ? this->Command : "(null)") << endl;
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;

@@ -7676,161 +7676,9 @@
 
     <!-- =================================================================== -->
 #ifdef VTK_USE_QVTK
-    <BarChartRepresentationProxy name="BarChartRepresentation2">
+    <ChartTableRepresentationProxy name="BarChartRepresentation2">
       <Documentation>
-        Representation used in BarChartView.
-      </Documentation>
-
-      <InputProperty name="Input" command="not-used">
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject"/>
-        </DataTypeDomain>
-        <Documentation>
-          Data input for the representation.
-        </Documentation>
-      </InputProperty>
-
-      <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1" >
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Visibility of the representation.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty name="UpdateTime"
-        command="SetUpdateTime"
-        update_self="1"
-        is_internal="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="none">
-        <DoubleRangeDomain name="range" />
-        <Documentation>
-          This time is not used unless UseViewUpdateTime is off.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="UseViewUpdateTime"
-        command="SetUseViewUpdateTime"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Indicates if the representation should use the view time to update the
-          pipeline or use "UpdateTime" set on the representation instead.
-        </Documentation>
-      </IntVectorProperty>
-
-      <ProxyProperty name="LookupTable">
-        <Documentation>
-          The lookup table proxy used to color the bar chart.
-        </Documentation>
-        <ProxyGroupDomain name="groups">
-          <Group name="lookup_tables"/>
-        </ProxyGroupDomain>
-      </ProxyProperty>
-
-      <SubProxy>
-        <Proxy name="PreProcessor"
-          proxygroup="extended_filters"
-          proxyname="ChartRepresentationPreprocessor">
-        </Proxy>
-        <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
-        a single leaf in the composite dataset alone -->
-        <ExposedProperties>
-          <Property name="FieldAssociation" />
-          <Property name="CompositeDataSetIndex" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <SubProxy>
-        <!--
-          Dummy consumer is used so that domains work correctly for XArrayName,
-          YArrayName etc.
-        -->
-        <Proxy name="DummyConsumer">
-          <ProxyProperty name="Input">
-            <DataTypeDomain>
-              <DataType value="vtkTable"/>
-            </DataTypeDomain>
-            <InputArrayDomain name="input_array" />
-          </ProxyProperty>
-
-          <StringVectorProperty name="XArrayName"
-            number_of_elements="1">
-            <Documentation>
-              Set the array to use on X axis. 
-            </Documentation>
-            <ArrayListDomain name="array_list">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-          </StringVectorProperty>
-          
-          <IntVectorProperty name="XArrayComponent"
-            number_of_elements="1"
-            default_values="0">
-            <Documentation>
-              Choose the array component for X-axis.
-            </Documentation>
-            <NumberOfComponentsDomain name="comps">
-              <RequiredProperties>
-                <Property name="Input" function="Input" />
-                <Property name="XArrayName" function="ArraySelection"/>
-              </RequiredProperties>
-            </NumberOfComponentsDomain>
-          </IntVectorProperty>
-
-          <StringVectorProperty name="YArrayName"
-            number_of_elements="1"
-            default_values="bin_values" >
-            <Documentation>
-              Set the array to use on Y axis. 
-            </Documentation>
-            <ArrayListDomain name="array_list">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-          </StringVectorProperty>
-          
-          <IntVectorProperty name="YArrayComponent"
-            number_of_elements="1"
-            default_values="0">
-            <Documentation>
-              Choose the array component for Y-axis.
-            </Documentation>
-            <NumberOfComponentsDomain name="comps">
-              <RequiredProperties>
-                <Property name="Input" function="Input" />
-                <Property name="YArrayName" function="ArraySelection"/>
-              </RequiredProperties>
-            </NumberOfComponentsDomain>
-          </IntVectorProperty>
-        </Proxy>
-        <ExposedProperties>
-          <Property name="XArrayName" />
-          <Property name="XArrayComponent" />
-          <Property name="YArrayName" />
-          <Property name="YArrayComponent" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <!-- End of BarChartRepresentation -->
-    </BarChartRepresentationProxy>
-#endif
-
-    <!-- =================================================================== -->
-#ifdef VTK_USE_QVTK
-    <LineChartRepresentationProxy name="LineChartRepresentation">
-      <Documentation>
-        Representation used by XYPlotView.
+        Representation used by BarChartView.
       </Documentation>
 
       <InputProperty name="Input"
@@ -7879,13 +7727,132 @@
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="UseYArrayIndex" 
+      <SubProxy>
+        <Proxy name="PreProcessor"
+          proxygroup="extended_filters"
+          proxyname="ChartRepresentationPreprocessor">
+        </Proxy>
+        <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
+        a single leaf in the composite dataset alone -->
+        <ExposedProperties>
+          <Property name="FieldAssociation" exposed_name="AttributeType" />
+          <Property name="CompositeDataSetIndex" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+        <ChartingArraysInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+        command="SetXAxisSeriesName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on X axis. This is used only when
+          UseIndexForXAxis is set to 0. 
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseIndexForXAxis"
+        command="SetUseIndexForXAxis"
+        update_self="1"
         number_of_elements="1"
         default_values="1">
-        <Documentation>
-          When set array index is plotted on the X axis.
-        </Documentation>
         <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the array index will be used for X axis, otherwise the array
+          identified by XArrayName will be used.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="SeriesOptions" 
+          proxygroup="options"
+          proxyname="BarChartSeriesOptions">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="LineColor" exposed_name="SeriesLineColor" />
+          <Property name="LineThickness" exposed_name="SeriesLineThickness" />
+          <Property name="LineStyle" exposed_name="SeriesLineStyle" />
+
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="LineColorInfo" exposed_name="SeriesLineColorInfo" />
+          <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
+          <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of BarChartRepresentation2 -->
+    </ChartTableRepresentationProxy>
+
+#endif
+
+    <!-- =================================================================== -->
+#ifdef VTK_USE_QVTK
+    <ChartTableRepresentationProxy name="LineChartRepresentation">
+      <Documentation>
+        Representation used by LineChartView.
+      </Documentation>
+
+      <InputProperty name="Input"
+        command="SetInput-not-used" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Visibility of the representation.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="UseViewUpdateTime"
+        command="SetUseViewUpdateTime"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Indicates if the representation should use the view time to update the
+          pipeline or use "UpdateTime" set on the representation instead.
+        </Documentation>
       </IntVectorProperty>
 
       <SubProxy>
@@ -7901,85 +7868,69 @@
         </ExposedProperties>
       </SubProxy>
 
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+        <ChartingArraysInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+        command="SetXAxisSeriesName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on X axis. This is used only when
+          UseIndexForXAxis is set to 0. 
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseIndexForXAxis"
+        command="SetUseIndexForXAxis"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          When set, the array index will be used for X axis, otherwise the array
+          identified by XArrayName will be used.
+        </Documentation>
+      </IntVectorProperty>
+
       <SubProxy>
-        <!--
-          Dummy consumer is used so that domains work correctly for array names
-          etc.
-        -->
-        <Proxy name="DummyConsumer">
-          <ProxyProperty name="Input">
-            <DataTypeDomain>
-              <DataType value="vtkTable"/>
-            </DataTypeDomain>
-            <InputArrayDomain name="input_array" 
-              attribute_type="row" />
-          </ProxyProperty>
-
-          <StringVectorProperty name="YArrayStatus"
-            repeat_command="1"
-            number_of_elements_per_command="11"
-            element_types="2 2 0 0 1 1 1 0 0 0 0" >
-              <Documentation>
-                Set the array to use on Y axis (arrayname, legendname, 
-                enabled, inlegend, r, g, b, thickness, linestyle, axesindex, 
-               component)
-              </Documentation>
-             <ArraySelectionDomain name="array_list">
-               <RequiredProperties>
-                 <Property name="ArrayInfo" function="ArrayList" />
-               </RequiredProperties>
-             </ArraySelectionDomain>
-          </StringVectorProperty>
-
-          <StringVectorProperty name="ArrayInfo"
-            number_of_elements_per_command="1"
-            element_types="2"
-            update_self="1"
-            information_only="1">
-            <Documentation>
-              Internal property used to provide list of available arrays
-              for the ArraySelectionDomain on the YArrayStatus property.
-            </Documentation>
-
-            <ArrayListInformationHelper 
-              list_domain_name="array_list" />
-
-            <ArrayListDomain name="array_list" 
-              input_domain_name="input_array">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-          </StringVectorProperty>
-
-          <StringVectorProperty name="XArrayName"
-            number_of_elements="1">
-            <Documentation>
-              Set the array to use on X axis. This is used only if
-              UseYCellArrayIndex is set to 0 
-            </Documentation>
-            <ArrayListDomain name="array_list" 
-              input_domain_name="input_array">
-              <RequiredProperties>
-                 <Property name="Input" function="Input"/>
-              </RequiredProperties>
-            </ArrayListDomain>
-          </StringVectorProperty>
-
-          <IntVectorProperty name="XArrayComponent"
-            number_of_elements="1"
-            default_values="-2">
-          </IntVectorProperty>
+        <Proxy name="SeriesOptions" 
+          proxygroup="options"
+          proxyname="LineChartSeriesOptions">
         </Proxy>
         <ExposedProperties>
-          <Property name="YArrayStatus" />
-          <Property name="ArrayInfo" />
-          <Property name="XArrayName" />
-          <Property name="XArrayComponent" />
+          <Property name="Visibility" exposed_name="SeriesVisibility" />
+          <Property name="LineColor" exposed_name="SeriesLineColor" />
+          <Property name="LineThickness" exposed_name="SeriesLineThickness" />
+          <Property name="LineStyle" exposed_name="SeriesLineStyle" />
+          <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
+          <Property name="AxisCorner" exposed_name="SeriesAxisCorner" />
+
+          <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
+          <Property name="LineColorInfo" exposed_name="SeriesLineColorInfo" />
+          <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
+          <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
+          <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
         </ExposedProperties>
       </SubProxy>
+
       <!-- End of LineChartRepresentation -->
-    </LineChartRepresentationProxy>
+    </ChartTableRepresentationProxy>
+
 #endif
 
     <!-- =================================================================== -->
@@ -9247,6 +9198,155 @@
       <!-- End of CubeAxesRepresentation -->
     </CubeAxesRepresentationProxy>
     
+  </ProxyGroup>
+
+  <ProxyGroup name="options">
+    <!-- =================================================================== -->
+    <ChartNamedOptionsModelProxy name="SeriesOptionsBase">
+      <StringVectorProperty name="VisibilityInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of visibility for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Visibility"
+        command="SetVisibility"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="VisibilityInfo" >
+        <Documentation>
+          Set the series visibility.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineColorInfo"
+        number_of_elements_per_command="4"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineColor"
+        command="SetLineColor"
+        update_self="1"
+        number_of_elements_per_command="4"
+        element_types="2 1 1 1"
+        repeat_command="1"
+        information_property="LineColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThicknessInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line thickness for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineThickness"
+        command="SetLineThickness"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="LineThicknessInfo" >
+        <Documentation>
+          Set the series line thickness.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyleInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="LineStyle"
+        command="SetLineStyle"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="LineStyleInfo">
+        <Documentation>
+          Set the series line style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <!-- End of SeriesOptionsBase -->
+    </ChartNamedOptionsModelProxy>
+
+    <!-- =================================================================== -->
+    <LineChartSeriesOptionsProxy name="LineChartSeriesOptions"
+      base_proxygroup="options"
+      base_proxyname="SeriesOptionsBase">
+
+      <StringVectorProperty name="MarkerStyleInfo"
+        number_of_elements_per_command="2"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of marker style for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="MarkerStyle"
+        command="SetMarkerStyle"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1"
+        information_property="MarkerStyleInfo">
+        <Documentation>
+          Set the series marker style.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="AxisCorner"
+        command="SetAxisCorner"
+        update_self="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        repeat_command="1">
+        <Documentation>
+          Set the series line style.
+        </Documentation>
+      </StringVectorProperty>
+    
+      <!-- End of LineChartSeriesOptions -->
+    </LineChartSeriesOptionsProxy>
+
+    <!-- =================================================================== -->
+    <BarChartSeriesOptionsProxy name="BarChartSeriesOptions"
+      base_proxygroup="options"
+      base_proxyname="SeriesOptionsBase">
+      <Documentation>
+        Series options proxy for BoxWidgetRepresentation2.
+        Don't create this directly, it's a subproxy in the
+        BarChartRepresentation2.
+      </Documentation>
+
+      <!-- End of BarChartSeriesOptions -->
+    </BarChartSeriesOptionsProxy>
   </ProxyGroup>
 
 

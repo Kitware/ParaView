@@ -275,15 +275,19 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  if(display_type == "BarChartRepresentation" ||
-    display_type == "BarChartRepresentation2")
+  if(display_type == "BarChartRepresentation")
     {
     return new pqBarChartRepresentation(group, n, proxy, server, p);
     }
-  else if (display_type == "XYPlotRepresentation"||
-    display_type == "LineChartRepresentation")
+  else if (display_type == "XYPlotRepresentation") // old line chart
     {
     return new pqLineChartRepresentation(group, n, proxy, server, p);
+    }
+  else if (display_type == "LineChartRepresentation" ||
+    display_type == "BarChartRepresentation2")
+    {
+    // new chart representations.
+    return new pqDataRepresentation(group, n, proxy, server, p);
     }
   else if (display_type == "TextSourceRepresentation")
     {

@@ -734,6 +734,13 @@ protected:
   // object ID. This makes it possible to restore the servermanager state
   // while reusing server side object id.
   virtual int LoadRevivalState(vtkPVXMLElement* revivalElement);
+
+  // Description:
+  // Called to update the property information on the property. It is assured
+  // that the property passed in as an argument is a self property. Both the
+  // overloads of UpdatePropertyInformation() call this method, so subclass can
+  // override this method to perform special tasks.
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
  
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);

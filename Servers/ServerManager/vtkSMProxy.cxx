@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.112");
+vtkCxxRevisionMacro(vtkSMProxy, "1.113");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -164,6 +164,7 @@ vtkSMProxy::~vtkSMProxy()
       vtkSMProxyProperty::SafeDownCast(
         prop)->RemoveConsumerFromPreviousProxies(this);
       }
+    prop->SetParent(0);
     }
   delete this->Internals;
   this->SetVTKClassName(0);
@@ -531,6 +532,7 @@ void vtkSMProxy::RemoveProperty(const char* name)
     this->Internals->Properties.find(name);
   if (it != this->Internals->Properties.end())
     {
+    it->second.Property->SetParent(0);
     this->Internals->Properties.erase(it);
     }
 
@@ -618,6 +620,7 @@ void vtkSMProxy::AddPropertyToSelf(
       {
       oldProp->RemoveObserver(it->second.ObserverTag);
       }
+    oldProp->SetParent(0);
     }
 
   unsigned int tag=0;
@@ -629,6 +632,8 @@ void vtkSMProxy::AddPropertyToSelf(
   // the observer later.
   tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
   obs->Delete();
+
+  prop->SetParent(this);
 
   vtkSMProxyInternals::PropertyInfo newEntry;
   newEntry.Property = prop;
@@ -893,7 +898,6 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
     }
   if (!found)
     {
-
     // Check if the property is an exposed property
     const char *exposed_name = this->GetPropertyName(prop);
     if (exposed_name)
@@ -916,30 +920,8 @@ void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
     }
 
   this->CreateVTKObjects();
-
-  if (this->ObjectsCreated)
-    {
-    if (prop->GetInformationOnly())
-      {
-      if (prop->GetUpdateSelf())
-        {
-        prop->UpdateInformation(this->ConnectionID, 
-                                vtkProcessModule::CLIENT, 
-                                this->GetSelfID());
-        }
-      else
-        {
-        prop->UpdateInformation(this->ConnectionID,
-                                this->Servers, 
-                                this->VTKObjectID);
-        }
-      prop->UpdateDependentDomains();
-      }
-    // I cannot understand why updating a property information
-    // should mark a proxy modified. I am removing this line for now.
-    // If we run into problems, we'll have to investigate.
-    // this->MarkModified(this);
-    }
+  this->UpdatePropertyInformationInternal(prop);
+  prop->UpdateDependentDomains();
 }
 
 //---------------------------------------------------------------------------
@@ -959,20 +941,7 @@ void vtkSMProxy::UpdatePropertyInformation()
     ++it)
     {
     vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (prop->GetInformationOnly())
-      {
-      if (prop->GetUpdateSelf())
-        {
-        prop->UpdateInformation(this->ConnectionID,
-          vtkProcessModule::CLIENT, this->GetSelfID());
-        }
-      else
-        {
-        prop->UpdateInformation(this->ConnectionID,
-                                this->Servers, 
-                                this->VTKObjectID);
-        }
-      }
+    this->UpdatePropertyInformationInternal(prop);
     }
 
   // Make sure all dependent domains are updated. UpdateInformation()
@@ -993,6 +962,27 @@ void vtkSMProxy::UpdatePropertyInformation()
   for( ; it2 != this->Internals->SubProxies.end(); it2++)
     {
     it2->second.GetPointer()->UpdatePropertyInformation();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdatePropertyInformationInternal(vtkSMProperty* prop)
+{
+  if (this->ObjectsCreated)
+    {
+    if (prop->GetInformationOnly())
+      {
+      if (prop->GetUpdateSelf())
+        {
+        prop->UpdateInformation(this->ConnectionID, 
+          vtkProcessModule::CLIENT, this->GetSelfID());
+        }
+      else
+        {
+        prop->UpdateInformation(this->ConnectionID,
+          this->Servers, this->VTKObjectID);
+        }
+      }
     }
 }
 

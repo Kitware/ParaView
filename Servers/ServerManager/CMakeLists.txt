@@ -46,7 +46,9 @@ SET(Kit_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
+  vtkSMChartingArraysInformationHelper.cxx
   vtkSMChartRepresentationProxy.cxx
+#vtkSMChartRepresentationProxy2.cxx
   vtkSMClientDeliveryRepresentationProxy.cxx
   vtkSMClientDeliveryStrategyProxy.cxx
   vtkSMClientServerRenderSyncManagerHelper.cxx
@@ -219,11 +221,14 @@ SET(Kit_SRCS
 IF (VTK_USE_QVTK)
   SET (Kit_SRCS
     ${Kit_SRCS}
-    vtkSMChartOptionsProxy.cxx
+    vtkSMBarChartSeriesOptionsProxy.cxx
     vtkSMBarChartViewProxy.cxx
-    vtkSMBarChartRepresentationProxy.cxx
+    vtkSMChartNamedOptionsModelProxy.cxx
+    vtkSMChartOptionsProxy.cxx
+    vtkSMChartTableRepresentationProxy.cxx
+    vtkSMChartViewProxy.cxx
+    vtkSMLineChartSeriesOptionsProxy.cxx
     vtkSMLineChartViewProxy.cxx
-    vtkSMLineChartRepresentationProxy.cxx
     )
   FIND_PACKAGE(Qt4)
   INCLUDE(${QT_USE_FILE})
@@ -233,6 +238,11 @@ IF (VTK_USE_QVTK)
     ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
     ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
     ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart)
+
+  SET_SOURCE_FILES_PROPERTIES(
+    vtkSMChartViewProxy.cxx
+    vtkSMChartNamedOptionsModelProxy.cxx
+    ABSTRACT)
 ENDIF (VTK_USE_QVTK)
 
 

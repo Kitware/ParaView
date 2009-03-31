@@ -38,11 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 #include "pqApplicationCore.h"
+#include "pqBarChartDisplayPanel.h"
 #include "pqBarChartDisplayProxyEditor.h"
-#include "pqDisplayPanelInterface.h"
 #include "pqDisplayPanelDecoratorInterface.h"
+#include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
 #include "pqDisplayProxyEditor.h"
+#include "pqLineChartDisplayPanel.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
@@ -76,6 +78,8 @@ public:
     QString type = proxy->getProxy()->GetXMLName();
 
     if(type == "BarChartRepresentation" ||
+       type == "LineChartRepresentation" ||
+       type == "BarChartRepresentation2" ||
        type == "XYPlotRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy))
@@ -102,6 +106,15 @@ public:
     if(type == QString("BarChartRepresentation"))
       {
       return new pqBarChartDisplayProxyEditor(proxy, p);
+      }
+
+    if (type == QString("LineChartRepresentation"))
+      {
+      return new pqLineChartDisplayPanel(proxy, p);
+      }
+    if (type == QString("BarChartRepresentation2"))
+      {
+      return new pqBarChartDisplayPanel(proxy, p);
       }
 
     if (type == "SpreadSheetRepresentation")

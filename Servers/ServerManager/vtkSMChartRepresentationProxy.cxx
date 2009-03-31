@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMChartRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMChartRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
@@ -43,8 +43,11 @@ bool vtkSMChartRepresentationProxy::EndCreateVTKObjects()
   // always deliver tables.
   this->SetReductionType(vtkSMClientDeliveryRepresentationProxy::TABLE_MERGE);
 
-  vtkSMPropertyHelper(this->GetSubProxy("DummyConsumer"), "Input").Set(
-    this->PreProcessorProxy);
+  if (this->GetSubProxy("DummyConsumer"))
+    {
+    vtkSMPropertyHelper(this->GetSubProxy("DummyConsumer"), "Input").Set(
+      this->PreProcessorProxy);
+    }
   return true;
 }
 
@@ -53,8 +56,11 @@ void vtkSMChartRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   this->Superclass::Update(view);
 
-  vtkSMProxy* subProxy = this->GetSubProxy("DummyConsumer");
-  subProxy->GetProperty("Input")->UpdateDependentDomains();
+  if (this->GetSubProxy("DummyConsumer"))
+    {
+    vtkSMProxy* subProxy = this->GetSubProxy("DummyConsumer");
+    subProxy->GetProperty("Input")->UpdateDependentDomains();
+    }
 }
 
 //----------------------------------------------------------------------------

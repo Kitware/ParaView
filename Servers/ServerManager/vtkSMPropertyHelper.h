@@ -152,7 +152,21 @@ public:
   void Add(vtkSMProxy* value, unsigned int outputport=0);
   vtkSMProxy* GetAsProxy(unsigned int index=0);
   unsigned int GetOutputPort(unsigned int index=0);
-  
+ 
+  // Description:
+  // This API is useful for setting values on vtkSMStringVectorProperty that is
+  // used for status where the first value is the name of the array (for
+  // example) and the second value is it's status.
+  void SetStatus(const char* key, int value);
+  int GetStatus(const char* key, int default_value=0);
+
+  // Description:
+  // This API is useful for setting values on vtkSMStringVectorProperty that is
+  // used for status where the first value is the name of the array (for
+  // example) and the second value is it's status.
+  void SetStatus(const char* key, double *values, int num_values);
+  bool GetStatus(const char* key, double *values, int num_values);
+
 //BTX
 private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented

@@ -12,30 +12,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBarChartViewProxy
+// .NAME vtkSMBarChartViewProxy - view proxy for vtkQtBarChartView
 // .SECTION Description
-//
+// vtkSMBarChartViewProxy is a concrete subclass of vtkSMChartViewProxy that
+// creates a vtkQtBarChartView as the chart view.
 
 #ifndef __vtkSMBarChartViewProxy_h
 #define __vtkSMBarChartViewProxy_h
 
-#include "vtkSMViewProxy.h"
+#include "vtkSMChartViewProxy.h"
 
-class vtkQtChartWidget;
 class vtkQtBarChartView;
 
-class VTK_EXPORT vtkSMBarChartViewProxy : public vtkSMViewProxy
+class VTK_EXPORT vtkSMBarChartViewProxy : public vtkSMChartViewProxy
 {
 public:
   static vtkSMBarChartViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMBarChartViewProxy, vtkSMViewProxy);
+  vtkTypeRevisionMacro(vtkSMBarChartViewProxy, vtkSMChartViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  //BTX
-  // Description:
-  // Provides access to the bar chart widget.
-  vtkQtChartWidget* GetChartWidget();
-  //ETX
 
   // Description:
   // Provides access to the bar chart view.
@@ -66,17 +60,9 @@ protected:
   vtkSMBarChartViewProxy();
   ~vtkSMBarChartViewProxy();
 
-  // Overridden to set up the ChartOptionsProxy.
-  virtual void CreateVTKObjects();
-
   // Description:
-  // Performs the actual rendering. This method is called by
-  // both InteractiveRender() and StillRender(). 
-  // Default implementation is empty.
-  virtual void PerformRender();
-
-
-  vtkQtBarChartView* ChartView;
+  // Called once in CreateVTKObjects() to create a new chart view.
+  virtual vtkQtChartViewBase* NewChartView();
 
 private:
   vtkSMBarChartViewProxy(const vtkSMBarChartViewProxy&); // Not implemented
