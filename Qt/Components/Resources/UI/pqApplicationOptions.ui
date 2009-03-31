@@ -31,7 +31,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget" >
      <property name="currentIndex" >
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="General" >
       <layout class="QGridLayout" >
@@ -134,8 +134,8 @@
          <property name="html" >
           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">These are color categories. When assigning colors to objects, one can select one of these catergories. In that case if color is changed in this dialog, then all colors assigned to the same category are updated automatically.&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt;">These are color categories. When assigning colors to objects, one can select one of these catergories. In that case if color is changed in this dialog, then all colors assigned to the same category are updated automatically.&lt;/p>&lt;/body>&lt;/html></string>
          </property>
          <property name="acceptRichText" >
           <bool>false</bool>
@@ -272,6 +272,62 @@ p, li { white-space: pre-wrap; }
           <size>
            <width>364</width>
            <height>16</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Animation" >
+      <layout class="QGridLayout" >
+       <item row="0" column="0" colspan="2" >
+        <widget class="QCheckBox" name="AnimationCacheGeometry" >
+         <property name="toolTip" >
+          <string>Cache geometry during playback.</string>
+         </property>
+         <property name="text" >
+          <string>Cache Geometry</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="AnimationCacheLimitLabel" >
+         <property name="toolTip" >
+          <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
+         </property>
+         <property name="text" >
+          <string>Cache Limit (in KBs)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QSpinBox" name="AnimationCacheLimit" >
+         <property name="toolTip" >
+          <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
+         </property>
+         <property name="minimum" >
+          <number>10</number>
+         </property>
+         <property name="maximum" >
+          <number>999999999</number>
+         </property>
+         <property name="singleStep" >
+          <number>100</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>358</width>
+           <height>101</height>
           </size>
          </property>
         </spacer>

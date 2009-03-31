@@ -95,6 +95,14 @@ public:
   /// Returns the timesteps from the timekeeper for the animation scene.
   QList<double> getTimeSteps() const;
 
+  /// Application settings for caching.  When caching is on, polygonal geometry
+  /// will be saved at every time step up to the given limit.  The limit is
+  /// given in kilobytes.
+  static void setCacheGeometrySetting(bool flag);
+  static bool getCacheGeometrySetting();
+  static void setCacheLimitSetting(int kilobytes);
+  static int getCacheLimitSetting();
+
 signals:
   /// Fired before a new cue is added to the scene.
   void preAddedCue(pqAnimationCue*);
@@ -150,6 +158,10 @@ public slots:
 
   /// Set the animation time.
   void setAnimationTime(double time);
+
+  /// Refreshes state of the scene to the current application settings.  Should
+  /// be called when the application settings change.
+  void updateApplicationSettings();
 
 private slots:
   /// Called when the "Cues" property on the AnimationScene proxy

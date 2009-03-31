@@ -38,14 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMPropertyHelper.h"
 
+#include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
+#include "pqSetName.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
-#include "pqSetName.h"
 
 #include <QMenu>
 #include <QDoubleValidator>
@@ -133,6 +134,23 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
     SIGNAL(clicked()),
     this, SLOT(resetColorsToDefault()));
 
+  QObject::connect(this->Internal->AnimationCacheGeometry,
+                   SIGNAL(toggled(bool)),
+                   this, SIGNAL(changesAvailable()));
+  QObject::connect(this->Internal->AnimationCacheLimit,
+                   SIGNAL(valueChanged(int)),
+                   this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->AnimationCacheGeometry,
+                   SIGNAL(toggled(bool)),
+                   this->Internal->AnimationCacheLimit,
+                   SLOT(setEnabled(bool)));
+
+  QObject::connect(this->Internal->AnimationCacheGeometry,
+                   SIGNAL(toggled(bool)),
+                   this->Internal->AnimationCacheLimitLabel,
+                   SLOT(setEnabled(bool)));
+
   QMenu* paletteMenu = new QMenu(this->Internal->Palette)
     << pqSetName("paletteMenu");
   this->Internal->Palette->setMenu(paletteMenu);
@@ -218,6 +236,11 @@ void pqApplicationOptions::applyChanges()
   settings->setValue("GlobalProperties/EdgeColor", 
     this->Internal->EdgeColor->chosenColor());
 
+  pqAnimationScene::setCacheGeometrySetting(
+                           this->Internal->AnimationCacheGeometry->isChecked());
+  pqAnimationScene::setCacheLimitSetting(
+                                  this->Internal->AnimationCacheLimit->value());
+
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 
   // render all views.
@@ -262,6 +285,11 @@ void pqApplicationOptions::resetChanges()
   this->Internal->EdgeColor->setChosenColor(
     settings->value("GlobalProperties/EdgeColor",
       QColor::fromRgbF(0, 0, 0.5)).value<QColor>());
+
+  this->Internal->AnimationCacheGeometry->setChecked(
+                                   pqAnimationScene::getCacheGeometrySetting());
+  this->Internal->AnimationCacheLimit->setValue(
+                                      pqAnimationScene::getCacheLimitSetting());
 }
 
 //-----------------------------------------------------------------------------

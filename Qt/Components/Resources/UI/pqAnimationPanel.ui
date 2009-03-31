@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
-    <height>770</height>
+    <width>366</width>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -543,7 +543,7 @@ Otherwise times provided by sources will be used.</string>
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" >
+   <item rowspan="2" row="3" column="0" >
     <spacer>
      <property name="orientation" >
       <enum>Qt::Vertical</enum>
@@ -556,69 +556,15 @@ Otherwise times provided by sources will be used.</string>
      </property>
     </spacer>
    </item>
-   <item row="3" column="0" >
-    <widget class="pqCollapsedGroup" name="animationSettingsGroup" >
-     <property name="title" >
-      <string>Animation Settings</string>
-     </property>
-     <layout class="QGridLayout" >
-      <property name="leftMargin" >
-       <number>4</number>
-      </property>
-      <property name="topMargin" >
-       <number>4</number>
-      </property>
-      <property name="rightMargin" >
-       <number>4</number>
-      </property>
-      <property name="bottomMargin" >
-       <number>4</number>
-      </property>
-      <property name="horizontalSpacing" >
-       <number>2</number>
-      </property>
-      <property name="verticalSpacing" >
-       <number>2</number>
-      </property>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_14" >
-        <property name="text" >
-         <string>Cache Limit (in KBs)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QSpinBox" name="cacheLimit" >
-        <property name="toolTip" >
-         <string>&lt;html>Set the cache limit (in KBs) per node. If while playing animations, the cache size on any node goes beyond this threshold, caching will automatically be disabled.&lt;/html></string>
-        </property>
-        <property name="minimum" >
-         <number>10</number>
-        </property>
-        <property name="maximum" >
-         <number>999999999</number>
-        </property>
-        <property name="singleStep" >
-         <number>100</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QCheckBox" name="caching" >
-        <property name="toolTip" >
-         <string>Cache geometry during playback.</string>
-        </property>
-        <property name="text" >
-         <string>Cache Geometry</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>pqCameraWidget</class>
    <extends>QWidget</extends>
@@ -633,12 +579,6 @@ Otherwise times provided by sources will be used.</string>
    <class>pqAnimatableProxyComboBox</class>
    <extends>QComboBox</extends>
    <header>pqAnimatableProxyComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>pqCollapsedGroup</class>
-   <extends>QGroupBox</extends>
-   <header>pqCollapsedGroup.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>pqKeyFrameTypeWidget</class>

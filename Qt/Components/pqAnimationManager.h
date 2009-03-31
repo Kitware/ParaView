@@ -115,6 +115,9 @@ signals:
 public slots:
   // Called when the active server changes.
   void onActiveServerChanged(pqServer*);
+  /// Refreshes state of scenes to the current application settings.  Should be
+  /// called when the application settings change.
+  void updateApplicationSettings();
 
 protected slots:
   void onProxyAdded(pqProxy*);

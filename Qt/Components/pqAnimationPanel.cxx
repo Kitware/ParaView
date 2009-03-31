@@ -315,12 +315,6 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->duration, "value", SIGNAL(valueChanged(int)),
     sceneProxy, sceneProxy->GetProperty("Duration"));
-  this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->caching, "checked", SIGNAL(toggled(bool)),
-    sceneProxy, sceneProxy->GetProperty("Caching"));
-  this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->cacheLimit, "value", SIGNAL(valueChanged(int)),
-    sceneProxy, sceneProxy->GetProperty("CacheLimit"));
 
   QObject::connect(scene, SIGNAL(playModeChanged()),
     this, SLOT(onScenePlayModeChanged()));

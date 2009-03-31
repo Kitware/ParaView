@@ -294,6 +294,7 @@ signals:
   void refreshSourcesMenu();
   void enableExport(bool);
   void enableTooltips(bool);
+  void applicationSettingsChanged();
   
   /** \todo Hide these private implementation details */
   void postAccept();

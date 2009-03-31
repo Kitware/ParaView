@@ -61,10 +61,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProxy.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 #include "pqViewManager.h"
-#include "pqSettings.h"
 
 #define SEQUENCE 0
 #define REALTIME 1
@@ -645,6 +645,15 @@ void pqAnimationManager::saveSettings()
   // Save the most recently used file extension to QSettings.
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("extensions/AnimationExtension", this->AnimationExtension);
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationManager::updateApplicationSettings()
+{
+  foreach (QPointer<pqAnimationScene> scene, this->Internals->Scenes.values())
+    {
+    scene->updateApplicationSettings();
+    }
 }
 
 //-----------------------------------------------------------------------------

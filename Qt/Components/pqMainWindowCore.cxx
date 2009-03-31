@@ -994,6 +994,10 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
       this->Implementation->AnimationManager, 
       SLOT(onActiveServerChanged(pqServer*)));
 
+    QObject::connect(this, SIGNAL(applicationSettingsChanged()),
+                     this->Implementation->AnimationManager,
+                     SLOT(updateApplicationSettings()));
+
     QObject::connect(this->Implementation->AnimationManager,
                      SIGNAL(activeSceneChanged(pqAnimationScene*)),
                      this, 
@@ -2624,6 +2628,9 @@ void pqMainWindowCore::setupApplicationSettingsDialog()
       new pqApplicationOptionsDialog(this->Implementation->Parent);
     this->Implementation->ApplicationSettings->setObjectName("ApplicationSettings");
     this->Implementation->ApplicationSettings->setAttribute(Qt::WA_QuitOnClose, false);
+    QObject::connect(this->Implementation->ApplicationSettings,
+                     SIGNAL(appliedChanges()),
+                     this, SIGNAL(applicationSettingsChanged()));
     }
 }
 
