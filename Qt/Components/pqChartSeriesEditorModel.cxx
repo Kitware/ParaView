@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 //-----------------------------------------------------------------------------
 pqChartSeriesEditorModel::pqChartSeriesEditorModel(QObject* parentObject)
-  : Superclass(parentObject)
+: Superclass(parentObject)
 {
   // Set up the column headers.
   this->insertHeaderSections(Qt::Horizontal, 0, 1);
@@ -297,7 +297,7 @@ void pqChartSeriesEditorModel::setSeriesColor(int row, const QColor &color)
     double double_color[3];
     color.getRgbF(double_color, double_color+1, double_color+2);
     vtkSMPropertyHelper(this->RepresentationProxy,
-      "SeriesLineColor").SetStatus(
+      "SeriesColor").SetStatus(
       this->getSeriesName(row), double_color, 3);
     this->RepresentationProxy->UpdateVTKObjects();
 
@@ -311,7 +311,7 @@ QColor pqChartSeriesEditorModel::getSeriesColor(int row) const
 {
   double tmp[3] = {0.0, 1, 0};
   vtkSMPropertyHelper(this->RepresentationProxy,
-    "SeriesLineColor").GetStatus(
+    "SeriesColor").GetStatus(
     this->getSeriesName(row), tmp, 3);
   return QColor::fromRgbF(tmp[0], tmp[1], tmp[2]);
 }

@@ -7786,12 +7786,12 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
-          <Property name="LineColor" exposed_name="SeriesLineColor" />
+          <Property name="Color" exposed_name="SeriesColor" />
           <Property name="LineThickness" exposed_name="SeriesLineThickness" />
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="LineColorInfo" exposed_name="SeriesLineColorInfo" />
+          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
           <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
         </ExposedProperties>
@@ -7914,14 +7914,14 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" exposed_name="SeriesVisibility" />
-          <Property name="LineColor" exposed_name="SeriesLineColor" />
+          <Property name="Color" exposed_name="SeriesColor" />
           <Property name="LineThickness" exposed_name="SeriesLineThickness" />
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
           <Property name="MarkerStyle" exposed_name="SeriesMarkerStyle" />
           <Property name="AxisCorner" exposed_name="SeriesAxisCorner" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="LineColorInfo" exposed_name="SeriesLineColorInfo" />
+          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
           <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
           <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
@@ -9225,28 +9225,6 @@
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="LineColorInfo"
-        number_of_elements_per_command="4"
-        repeat_command="1"
-        information_only="1">
-        <Documentation>
-          Property which has the current state of line color for the series
-          available currently.
-        </Documentation>
-      </StringVectorProperty>
-
-      <StringVectorProperty name="LineColor"
-        command="SetLineColor"
-        update_self="1"
-        number_of_elements_per_command="4"
-        element_types="2 1 1 1"
-        repeat_command="1"
-        information_property="LineColorInfo" >
-        <Documentation>
-          Set the series line color.
-        </Documentation>
-      </StringVectorProperty>
-
       <StringVectorProperty name="LineThicknessInfo"
         number_of_elements_per_command="2"
         repeat_command="1"
@@ -9331,6 +9309,28 @@
           Set the series line style.
         </Documentation>
       </StringVectorProperty>
+
+      <StringVectorProperty name="ColorInfo"
+        number_of_elements_per_command="4"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Color"
+        command="SetColor"
+        update_self="1"
+        number_of_elements_per_command="4"
+        element_types="2 1 1 1"
+        repeat_command="1"
+        information_property="ColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
     
       <!-- End of LineChartSeriesOptions -->
     </LineChartSeriesOptionsProxy>
@@ -9344,6 +9344,28 @@
         Don't create this directly, it's a subproxy in the
         BarChartRepresentation2.
       </Documentation>
+
+      <StringVectorProperty name="ColorInfo"
+        number_of_elements_per_command="4"
+        repeat_command="1"
+        information_only="1">
+        <Documentation>
+          Property which has the current state of line color for the series
+          available currently.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="Color"
+        command="SetColor"
+        update_self="1"
+        number_of_elements_per_command="4"
+        element_types="2 1 1 1"
+        repeat_command="1"
+        information_property="ColorInfo" >
+        <Documentation>
+          Set the series line color.
+        </Documentation>
+      </StringVectorProperty>
 
       <!-- End of BarChartSeriesOptions -->
     </BarChartSeriesOptionsProxy>

@@ -37,7 +37,6 @@ public:
   // Get/Set series visibility for the series with the given name.
   void SetVisibility(const char* name, int visible);
 
-  void SetLineColor(const char* name, double r, double g, double b);
   void SetLineThickness(const char* name, int value);
   void SetLineStyle(const char* name, int value);
 

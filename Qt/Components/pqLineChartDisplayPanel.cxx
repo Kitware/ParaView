@@ -312,6 +312,9 @@ void pqLineChartDisplayPanel::activateItem(const QModelIndex &index)
     {
     // Set the new color
     this->Internal->Model->setSeriesColor(index.row(), color);
+    this->Internal->ColorButton->blockSignals(true);
+    this->Internal->ColorButton->setChosenColor(color);
+    this->Internal->ColorButton->blockSignals(false);
     this->updateAllViews();
     }
 }

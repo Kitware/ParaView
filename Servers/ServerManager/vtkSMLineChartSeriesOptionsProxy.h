@@ -30,6 +30,7 @@ public:
   vtkTypeRevisionMacro(vtkSMLineChartSeriesOptionsProxy, vtkSMChartNamedOptionsModelProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void SetColor(const char* name, double r, double g, double b);
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
 

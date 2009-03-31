@@ -30,6 +30,8 @@ public:
   vtkTypeRevisionMacro(vtkSMBarChartSeriesOptionsProxy, vtkSMChartNamedOptionsModelProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void SetColor(const char* name, double r, double g, double b);
+
 //BTX
 protected:
   vtkSMBarChartSeriesOptionsProxy();
@@ -39,6 +41,13 @@ protected:
   // Subclasses must override this method to create the right type of options
   // for the type of layer/view/representation they are to be used for.
   virtual vtkQtChartSeriesOptions* NewOptions();
+
+  // Description:
+  // Called to update the property information on the property. It is assured
+  // that the property passed in as an argument is a self property. Both the
+  // overloads of UpdatePropertyInformation() call this method, so subclass can
+  // override this method to perform special tasks.
+  virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
 
 private:
   vtkSMBarChartSeriesOptionsProxy(const vtkSMBarChartSeriesOptionsProxy&); // Not implemented

@@ -23,7 +23,6 @@
 #include "vtkSMStringVectorProperty.h"
 
 #include <QPen>
-#include <QColor>
 
 class vtkSMChartNamedOptionsModelProxy::vtkInternals
 {
@@ -44,7 +43,7 @@ public:
 
 };
 
-vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMChartNamedOptionsModelProxy::vtkSMChartNamedOptionsModelProxy()
 {
@@ -110,15 +109,6 @@ void vtkSMChartNamedOptionsModelProxy::UpdatePropertyInformationInternal(
         new_values->AddString(
           QString::number(options->isVisible()? 1 : 0).toAscii().data());
         }
-      else if (strcmp(propname, "LineColorInfo") == 0)
-        {
-        new_values->AddString(name.toAscii().data());
-
-        QPen pen = options->getPen();
-        new_values->AddString(QString::number(pen.color().redF()).toAscii().data());
-        new_values->AddString(QString::number(pen.color().greenF()).toAscii().data());
-        new_values->AddString(QString::number(pen.color().blueF()).toAscii().data());
-        }
       else if (strcmp(propname, "LineThicknessInfo") == 0)
         {
         new_values->AddString(name.toAscii().data());
@@ -154,16 +144,6 @@ void vtkSMChartNamedOptionsModelProxy::SetVisibility(
 {
   vtkQtChartSeriesOptions* options = this->GetOptions(name);
   options->setVisible(visible != 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMChartNamedOptionsModelProxy::SetLineColor(
-  const char* name, double r, double g, double b)
-{
-  vtkQtChartSeriesOptions* options = this->GetOptions(name);
-  QPen pen = options->getPen();
-  pen.setColor(QColor::fromRgbF(r, g, b));
-  options->setPen(pen);
 }
 
 //----------------------------------------------------------------------------

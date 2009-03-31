@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QPointer>
 #include <QDebug>
+#include <QColorDialog>
 
 #include "pqChartSeriesEditorModel.h"
 #include "pqComboBoxDomain.h"
@@ -147,6 +148,13 @@ pqBarChartDisplayPanel::pqBarChartDisplayPanel(pqRepresentation* repr,
 
   QObject::connect(this->Internal->SeriesEnabled, SIGNAL(stateChanged(int)),
     this, SLOT(setCurrentSeriesEnabled(int)));
+  QObject::connect(
+    this->Internal->ColorButton, SIGNAL(chosenColorChanged(const QColor &)),
+    this, SLOT(setCurrentSeriesColor(const QColor &)));
+
+  QObject::connect(
+    this->Internal->SeriesList, SIGNAL(activated(const QModelIndex &)),
+    this, SLOT(activateItem(const QModelIndex &)));
 
   this->Internal->Model->reload();
   this->updateSeriesOptions();
@@ -162,6 +170,92 @@ pqBarChartDisplayPanel::~pqBarChartDisplayPanel()
 //-----------------------------------------------------------------------------
 void pqBarChartDisplayPanel::updateSeriesOptions()
 {
+  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
+  QModelIndex current = model->currentIndex();
+  QModelIndexList indexes = model->selectedIndexes();
+  if((!current.isValid() || !model->isSelected(current)) &&
+    indexes.size() > 0)
+    {
+    current = indexes.last();
+    }
+
+  // Use the selection list to determine the tri-state of the
+  // enabled and legend check boxes.
+  this->Internal->SeriesEnabled->blockSignals(true);
+  this->Internal->SeriesEnabled->setCheckState(this->getEnabledState());
+  this->Internal->SeriesEnabled->blockSignals(false);
+
+  this->Internal->ColorButton->blockSignals(true);
+  if (current.isValid())
+    {
+    int seriesIndex = current.row();
+    QColor color = this->Internal->Model->getSeriesColor(seriesIndex);
+    this->Internal->ColorButton->setChosenColor(color);
+    }
+  else
+    {
+    this->Internal->ColorButton->setChosenColor(Qt::white);
+    }
+  this->Internal->ColorButton->blockSignals(false);
+
+  // Disable the widgets if nothing is selected or current.
+  bool hasItems = indexes.size() > 0;
+  this->Internal->SeriesEnabled->setEnabled(hasItems);
+  this->Internal->ColorButton->setEnabled(hasItems);
+}
+
+//-----------------------------------------------------------------------------
+Qt::CheckState pqBarChartDisplayPanel::getEnabledState() const
+{
+  Qt::CheckState enabledState = Qt::Unchecked;
+  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
+  // Use the selection list to determine the tri-state of the
+  // enabled check box.
+  bool enabled = false;
+  QModelIndexList indexes = model->selectedIndexes();
+  bool initialized = false;
+  foreach (QModelIndex index, indexes)
+    {
+    enabled = this->Internal->Model->getSeriesEnabled(index.row()); 
+    if (!initialized)
+      {
+      enabledState = enabled ? Qt::Checked : Qt::Unchecked;
+      initialized = true;
+      }
+    else if((enabled && enabledState == Qt::Unchecked) ||
+      (!enabled && enabledState == Qt::Checked))
+      {
+      enabledState = Qt::PartiallyChecked;
+      break;
+      }
+    }
+
+  return enabledState;
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplayPanel::activateItem(const QModelIndex &index)
+{
+  if (!index.isValid() || index.column() != 1)
+    {
+    // We are interested in clicks on the color swab alone.
+    return;
+    }
+
+  // Get current color
+  QColor color = this->Internal->Model->getSeriesColor(index.row());
+
+  // Show color selector dialog to get a new color
+  color = QColorDialog::getColor(color, this);
+  if (color.isValid())
+    {
+    // Set the new color
+    this->Internal->Model->setSeriesColor(index.row(), color);
+    this->Internal->ColorButton->blockSignals(true);
+    this->Internal->ColorButton->setChosenColor(color);
+    this->Internal->ColorButton->blockSignals(false);
+    this->updateAllViews();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -187,4 +281,17 @@ void pqBarChartDisplayPanel::setCurrentSeriesEnabled(int state)
     {
     this->updateAllViews();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplayPanel::setCurrentSeriesColor(const QColor &color)
+{
+  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
+  QModelIndexList indexes = model->selectedIndexes();
+  foreach (QModelIndex index, indexes)
+    {
+    this->Internal->Model->setSeriesColor(index.row(), color);
+    }
+
+  this->updateAllViews();
 }

@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayPanel.h"
 
+class QModelIndex;
+
 /// pqBarChartDisplayPanel is the display panel for BarChartRepresentation2
 /// proxy i.e. the representation for bar chart view.
 class PQCOMPONENTS_EXPORT pqBarChartDisplayPanel : public pqDisplayPanel
@@ -51,6 +53,16 @@ protected slots:
 
   /// Update the series enabled state for currently selected series.
   void setCurrentSeriesEnabled(int state);
+
+  /// Update the series color for currently selected series.
+  void setCurrentSeriesColor(const QColor &color);
+
+  /// Slot to listen to clicks for changing color.
+  void activateItem(const QModelIndex &index);
+
+private:
+  Qt::CheckState getEnabledState() const;
+
 private:
   pqBarChartDisplayPanel(const pqBarChartDisplayPanel&); // Not implemented.
   void operator=(const pqBarChartDisplayPanel&); // Not implemented.

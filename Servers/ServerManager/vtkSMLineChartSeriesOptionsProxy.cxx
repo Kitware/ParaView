@@ -20,8 +20,11 @@
 #include "vtkStringList.h"
 #include "vtkQtChartNamedSeriesOptionsModel.h"
 
+#include <QColor>
+#include <QPen>
+
 vtkStandardNewMacro(vtkSMLineChartSeriesOptionsProxy);
-vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMLineChartSeriesOptionsProxy::vtkSMLineChartSeriesOptionsProxy()
 {
@@ -65,6 +68,15 @@ void vtkSMLineChartSeriesOptionsProxy::SetMarkerStyle(
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkSMLineChartSeriesOptionsProxy::SetColor(
+  const char* name, double r, double g, double b)
+{
+  vtkQtChartSeriesOptions* options = this->GetOptions(name);
+  QPen pen = options->getPen();
+  pen.setColor(QColor::fromRgbF(r, g, b));
+  options->setPen(pen);
+}
 
 //----------------------------------------------------------------------------
 void vtkSMLineChartSeriesOptionsProxy::UpdatePropertyInformationInternal(
@@ -92,6 +104,15 @@ void vtkSMLineChartSeriesOptionsProxy::UpdatePropertyInformationInternal(
         new_values->AddString(name.toAscii().data());
         new_values->AddString(QString::number(
             static_cast<int>(options->getMarkerStyle())).toAscii().data());
+        }
+      else if (options && strcmp(propname, "ColorInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+
+        QPen pen = options->getPen();
+        new_values->AddString(QString::number(pen.color().redF()).toAscii().data());
+        new_values->AddString(QString::number(pen.color().greenF()).toAscii().data());
+        new_values->AddString(QString::number(pen.color().blueF()).toAscii().data());
         }
       else
         {
