@@ -24,7 +24,7 @@
 #include <QPen>
 
 vtkStandardNewMacro(vtkSMLineChartSeriesOptionsProxy);
-vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMLineChartSeriesOptionsProxy::vtkSMLineChartSeriesOptionsProxy()
 {
@@ -63,8 +63,17 @@ void vtkSMLineChartSeriesOptionsProxy::SetMarkerStyle(
       this->GetOptions(name));
   if (options)
     {
-    options->setMarkerStyle(
-      static_cast<vtkQtPointMarker::MarkerStyle>(value));
+    int style = vtkQtPointMarker::Cross;
+    if (value == 0)
+      {
+      options->setPointsVisible(false);
+      }
+    else
+      {
+      style = vtkQtPointMarker::Cross + (value-1);
+      options->setPointsVisible(true);
+      }
+    options->setMarkerStyle(static_cast<vtkQtPointMarker::MarkerStyle>(style));
     }
 }
 
@@ -102,8 +111,15 @@ void vtkSMLineChartSeriesOptionsProxy::UpdatePropertyInformationInternal(
       if (options && strcmp(propname, "MarkerStyleInfo") == 0)
         {
         new_values->AddString(name.toAscii().data());
-        new_values->AddString(QString::number(
-            static_cast<int>(options->getMarkerStyle())).toAscii().data());
+        if (options->arePointsVisible())
+          {
+          new_values->AddString(QString::number(
+              static_cast<int>(options->getMarkerStyle())+1).toAscii().data());
+          }
+        else
+          {
+          new_values->AddString("0");
+          }
         }
       else if (options && strcmp(propname, "ColorInfo") == 0)
         {

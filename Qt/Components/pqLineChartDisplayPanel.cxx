@@ -355,7 +355,7 @@ void pqLineChartDisplayPanel::updateOptionsWidgets()
       this->Internal->StyleList->setCurrentIndex(
         this->Internal->Model->getSeriesStyle(seriesIndex));
       this->Internal->MarkerStyleList->setCurrentIndex(
-        this->Internal->Model->getSeriesStyle(seriesIndex));
+        this->Internal->Model->getSeriesMarkerStyle(seriesIndex));
       this->Internal->AxisList->setCurrentIndex(
         this->Internal->Model->getSeriesAxisCorner(seriesIndex));
       }

@@ -394,5 +394,5 @@ int pqChartSeriesEditorModel::getSeriesMarkerStyle(int row) const
 {
   return vtkSMPropertyHelper(this->RepresentationProxy,
     "SeriesMarkerStyle").GetStatus(
-    this->getSeriesName(row), 0); // CROSS by default.
+    this->getSeriesName(row), 0); // None by default.
 }
