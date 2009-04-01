@@ -565,7 +565,8 @@ void pqSignalAdaptorCompositeTreeWidget::domainChanged()
   if (this->AutoUpdateWidgetVisibility)
     {
     this->Internal->TreeWidget->setVisible(
-      dInfo->GetCompositeDataInformation()->GetDataIsComposite()==1);
+      dInfo?
+      dInfo->GetCompositeDataInformation()->GetDataIsComposite()==1 : 0);
     }
 
   if (this->ShowSelectedElementCounts)
