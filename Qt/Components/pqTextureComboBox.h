@@ -73,7 +73,7 @@ public slots:
 
 protected slots:
   /// Update the enable state of the widget.
-  void updateEnableState();
+  virtual void updateEnableState();
 
   /// Called when user activates an item.
   void onActivated(int);
