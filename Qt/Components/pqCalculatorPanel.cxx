@@ -321,7 +321,7 @@ void pqCalculatorPanel::accept()
   
   pqSMAdaptor::setElementProperty(
           CalcProxy->GetProperty("ReplacementValue"),
-          this->Internal->ResultArrayName->text());
+          this->Internal->ReplacementValue->text());
 
   pqSMAdaptor::setElementProperty(
                  CalcProxy->GetProperty("Function"),
