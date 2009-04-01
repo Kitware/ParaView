@@ -51,7 +51,7 @@ struct vtkEHInternals
 };
 
 vtkStandardNewMacro(vtkExtractHistogram);
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.25");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.26");
 //-----------------------------------------------------------------------------
 vtkExtractHistogram::vtkExtractHistogram() :
   Component(0),
@@ -263,6 +263,14 @@ void vtkExtractHistogram::FillBinExtents(vtkDoubleArray* bin_extents,
     }
 }
 
+
+inline int vtkExtractHistogramClamp(int value, int min, int max)
+{
+  value = value < min ? min : value;
+  value = value > max ? max : value;
+  return value;
+}
+
 //-----------------------------------------------------------------------------
 void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
                                      vtkIntArray *bin_values,
@@ -289,8 +297,7 @@ void vtkExtractHistogram::BinAnArray(vtkDataArray *data_array,
     const double value = data_array->GetComponent(i, this->Component);
     int index = static_cast<int>((value - min) / bin_delta);
     // If the value is equal to max, include it in the last bin.
-    index = ( index == this->BinCount ? index - 1 : index );
-    index = ( index < 0  ? 0 : index );
+    index = ::vtkExtractHistogramClamp(index, 0, this->BinCount-1);
     bin_values->SetValue(index, bin_values->GetValue(index)+1);
     
     if (this->CalculateAverages)
@@ -330,6 +337,16 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   // encounter any problems
   vtkTable* const output_data = vtkTable::GetData(outputVector, 0);
   output_data->Initialize();
+
+  if (this->UseCustomBinRanges && this->CustomBinRanges[1] <
+    this->CustomBinRanges[0])
+    {
+    double min = this->CustomBinRanges[1];
+    double max = this->CustomBinRanges[0];
+    this->CustomBinRanges[0] = min;
+    this->CustomBinRanges[1] = max;
+    vtkWarningMacro("Custom bin range adjusted to keep min <= max value");
+    }
 
   // These are the mid-points for each of the bins
   vtkSmartPointer<vtkDoubleArray> bin_extents =
