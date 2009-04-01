@@ -252,7 +252,9 @@ void pqCheckableHeaderModel::updateCheckState(int section,
     if(item->State != state)
       {
       item->State = state;
+      this->beginMultiStateChange();
       emit this->headerDataChanged(orient, section, section);
+      this->endMultipleStateChange();
       }
     }
 }
@@ -354,6 +356,10 @@ void pqCheckableHeaderModel::endMultipleStateChange()
 void pqCheckableHeaderModel::setIndexCheckState(Qt::Orientation orient,
     int first, int last)
 {
+  if (this->Internal->IgnoreUpdate)
+    {
+    return;
+    }
   this->beginMultiStateChange();
   for(int section = first; section <= last; section++)
     {
