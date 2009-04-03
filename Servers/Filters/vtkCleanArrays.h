@@ -14,10 +14,9 @@
 =========================================================================*/
 // .NAME vtkCleanArrays - filter used to remove partial arrays across processes.
 // .SECTION Description
-// vtkCleanArrays is a filter used to remove partial arrays in a vtkDataSet
-// across processes. Empty dataset on any processes is ignored i.e. it does not
-// affect the arrays on any processes.
-
+// vtkCleanArrays is a filter used to remove (or fill up) partial arrays in a
+// vtkDataSet across processes. Empty dataset on any processes is ignored i.e.
+// it does not affect the arrays on any processes.
 #ifndef __vtkCleanArrays_h
 #define __vtkCleanArrays_h
 
@@ -38,6 +37,13 @@ public:
   void SetController(vtkMultiProcessController *controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  // Description:
+  // When set to true (false by default), 0 filled array will be added for
+  // missing arrays on this process (instead of removing partial arrays).
+  vtkSetMacro(FillPartialArrays, bool);
+  vtkGetMacro(FillPartialArrays, bool);
+  vtkBooleanMacro(FillPartialArrays, bool);
+
 //BTX
 protected:
   vtkCleanArrays();
@@ -48,6 +54,8 @@ protected:
     vtkInformationVector* outputVector);
 
   vtkMultiProcessController* Controller;
+
+  bool FillPartialArrays;
 private:
   vtkCleanArrays(const vtkCleanArrays&); // Not implemented
   void operator=(const vtkCleanArrays&); // Not implemented

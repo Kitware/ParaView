@@ -28,11 +28,12 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkCleanArrays);
-vtkCxxRevisionMacro(vtkCleanArrays, "1.1");
+vtkCxxRevisionMacro(vtkCleanArrays, "1.2");
 vtkCxxSetObjectMacro(vtkCleanArrays, Controller, vtkMultiProcessController);
 //----------------------------------------------------------------------------
 vtkCleanArrays::vtkCleanArrays()
 {
+  this->FillPartialArrays = false;
   this->Controller = 0;
   this->SetController(
     vtkMultiProcessController::GetGlobalController());
@@ -81,6 +82,23 @@ public:
     this->Name = array->GetName();
     this->NumberOfComponents = array->GetNumberOfComponents();
     this->Type = array->GetDataType();
+    }
+
+  vtkAbstractArray* NewArray(vtkIdType numTuples)const
+    {
+    vtkAbstractArray* array = vtkAbstractArray::CreateArray(this->Type);
+    if (array)
+      {
+      array->SetName(this->Name.c_str());
+      array->SetNumberOfComponents(this->NumberOfComponents);
+      array->SetNumberOfTuples(numTuples);
+      vtkDataArray* data_array = vtkDataArray::SafeDownCast(array);
+      for (int cc=0; data_array && cc < this->NumberOfComponents; cc++)
+        {
+        data_array->FillComponent(cc, 0.0);
+        }
+      }
+    return array;
     }
 
 };
@@ -140,6 +158,20 @@ public:
           //cout << "Removing: " << array->GetName() << endl;
           dsa->RemoveArray(array->GetName());
           }
+        else
+          {
+          this->erase(mda);
+          }
+        }
+      }
+    // Now fill any missing arrays.
+    for (iterator iter = this->begin(); iter != this->end(); ++iter)
+      {
+      vtkAbstractArray* array = iter->NewArray(dsa->GetNumberOfTuples());
+      if (array)
+        {
+        dsa->AddArray(array);
+        array->Delete();
         }
       }
     }
@@ -218,6 +250,36 @@ static void IntersectStreams(
   setC.Save(B);
 }
 
+//----------------------------------------------------------------------------
+static void UnionStreams(
+  vtkMultiProcessStream& A, vtkMultiProcessStream& B)
+{
+  vtkCleanArrays::vtkArraySet setA;
+  vtkCleanArrays::vtkArraySet setB;
+  vtkCleanArrays::vtkArraySet setC;
+
+  setA.Load(A);
+  setB.Load(B);
+  if (setA.IsValid() && setB.IsValid())
+    {
+    vtkstd::set_union(setA.begin(), setA.end(),
+      setB.begin(), setB.end(),
+      vtkstd::inserter(setC, setC.begin()));
+    setC.MarkValid();
+    }
+  else if (setA.IsValid())
+    {
+    setC = setA;
+    }
+  else if (setB.IsValid())
+    {
+    setC = setB;
+    }
+
+  B.Reset();
+  setC.Save(B);
+}
+
 
 //----------------------------------------------------------------------------
 int vtkCleanArrays::RequestData(
@@ -250,12 +312,12 @@ int vtkCleanArrays::RequestData(
   vtkMultiProcessControllerHelper::ReduceToAll(
     controller,
     pdStream,
-    ::IntersectStreams,
+    this->FillPartialArrays ? ::UnionStreams : ::IntersectStreams,
     1278392);
   vtkMultiProcessControllerHelper::ReduceToAll(
     controller,
     cdStream,
-    ::IntersectStreams,
+    this->FillPartialArrays ? ::UnionStreams : ::IntersectStreams,
     1278393);
   pdSet.Load(pdStream);
   cdSet.Load(cdStream);
@@ -269,6 +331,8 @@ int vtkCleanArrays::RequestData(
 void vtkCleanArrays::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "FillPartialArrays: " << this->FillPartialArrays << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }
 
 
