@@ -146,6 +146,13 @@ public:
   vtkGetVector2Macro(GUISize, int);
   vtkSetVector2Macro(GUISize, int);
 
+  vtkGetVector2Macro(GUISizeCompact, int);
+  vtkSetVector2Macro(GUISizeCompact, int);
+  vtkGetVector2Macro(ViewSizeCompact, int);
+  vtkSetVector2Macro(ViewSizeCompact, int);
+  vtkGetVector2Macro(ViewPositionCompact, int);
+  vtkSetVector2Macro(ViewPositionCompact, int);
+
   virtual void SetImageReductionFactorForUpdateRate(double desiredUpdateRate);
   float GetZBufferValue(int x, int y);
 
@@ -168,6 +175,7 @@ protected:
   double TransferTime;
 
   virtual void CollectWindowInformation(vtkMultiProcessStream& stream);
+  virtual void CollectWindowInformation2(vtkMultiProcessStream& stream);
   virtual void CollectRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   // Squirt options (probably to be replaced later).
@@ -184,6 +192,10 @@ protected:
 
   int WindowPosition[2];
   int GUISize[2];
+
+  int GUISizeCompact[2];
+  int ViewSizeCompact[2];
+  int ViewPositionCompact[2];
 
   int ReceivedImageFromServer;
   vtkCommand *ReceiveImageCallback;

@@ -68,6 +68,21 @@ public:
   // Overridden to pass the ViewPosition to the RenderSyncManager.
   virtual void SetViewPosition(int x, int y);
 
+  // Description:
+  //
+  virtual void SetGUISizeCompact(int x, int y);
+  vtkGetVector2Macro(GUISizeCompact, int);
+
+  // Description:
+  //
+  virtual void SetViewPositionCompact(int x, int y);
+  vtkGetVector2Macro(ViewPositionCompact, int);
+
+  // Description:
+  //
+  virtual void SetViewSizeCompact(int x, int y);
+  vtkGetVector2Macro(ViewSizeCompact, int);
+
 //BTX
 protected:
   vtkSMIceTMultiDisplayRenderViewProxy();
@@ -115,6 +130,11 @@ protected:
   double TileDisplayCompositeThreshold;
 
   bool LastClientCollectionDecision;
+
+  int GUISizeCompact[2];
+  int ViewSizeCompact[2];
+  int ViewPositionCompact[2];
+
 private:
   vtkSMIceTMultiDisplayRenderViewProxy(const vtkSMIceTMultiDisplayRenderViewProxy&); // Not implemented.
   void operator=(const vtkSMIceTMultiDisplayRenderViewProxy&); // Not implemented.

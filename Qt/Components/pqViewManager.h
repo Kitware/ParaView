@@ -234,6 +234,11 @@ protected:
   /// on all view modules.
   void updateViewPositions();
 
+  /// Update the GUISize/WindowPosition properties
+  /// using compact values to produce gapless multi views
+  /// on the render server.
+  void updateCompactViewPositions();
+
   /// Updates the context menu.
   void updateConversionActions(pqMultiViewFrame* frame);
 

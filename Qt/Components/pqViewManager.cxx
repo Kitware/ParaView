@@ -1017,6 +1017,66 @@ void pqViewManager::updateViewPositions()
     }
 
   emit this->endNonUndoableChanges();
+  this->updateCompactViewPositions();
+}
+
+
+//-----------------------------------------------------------------------------
+//
+// This method is called at the end of updateViewPositions().
+// This method tries to set the properties GUISizeCompact,
+// ViewPositionCompact, and ViewSizeCompact.  For now, only the
+// vtkSMIceTMultiDisplayRenderViewProxy has these properties.
+//
+void pqViewManager::updateCompactViewPositions()
+{
+  QMap<pqMultiViewFrame*, QPair<QPoint, QSize> > ViewInfo;
+  this->computeCompactSizes(ViewInfo);
+  QSize totalGUISize = this->getMultiViewWidget()->size();
+
+  /// GUISize, ViewSize and ViewPosition properties are managed
+  /// by the GUI, the undo/redo stack should not worry about 
+  /// the changes made to them.
+  emit this->beginNonUndoableChanges();
+
+  // Loop for each view
+  QList<pqMultiViewFrame*> frames = ViewInfo.keys();
+  foreach(pqMultiViewFrame* frame, frames)
+    {
+    pqView * view = this->getView(frame);
+    if (!view)
+      {
+      continue;
+      }
+    vtkSMIntVectorProperty* prop = 0;
+
+    // Set GUISize
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      view->getProxy()->GetProperty("GUISizeCompact"));
+    if(prop)
+      {
+      prop->SetElements2(totalGUISize.width(), totalGUISize.height());
+      }
+
+    // Set ViewPosition
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      view->getProxy()->GetProperty("ViewPositionCompact"));
+    if(prop)
+      {
+      QPoint pos = ViewInfo[frame].first;
+      prop->SetElements2(pos.x(), pos.y());
+      }
+
+    // Set ViewSize
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      view->getProxy()->GetProperty("ViewSizeCompact"));
+    if (prop)
+      {
+      QSize size = ViewInfo[frame].second;
+      prop->SetElements2(size.width(), size.height());
+      }
+    }
+  emit this->endNonUndoableChanges();
 }
 
 //-----------------------------------------------------------------------------

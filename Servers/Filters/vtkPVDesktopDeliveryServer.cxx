@@ -55,7 +55,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.13");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.14");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -252,6 +252,8 @@ void vtkPVDesktopDeliveryServer::UseRendererSet(int id)
 bool vtkPVDesktopDeliveryServer::ProcessWindowInformation(
   vtkMultiProcessStream& stream)
 {
+  return this->ProcessWindowInformation2(stream);
+/*
   if (!this->Superclass::ProcessWindowInformation(stream))
     {
     return false;
@@ -279,6 +281,74 @@ bool vtkPVDesktopDeliveryServer::ProcessWindowInformation(
   this->ClientWindowPosition[1] = winGeoInfo.Position[1];
   this->ClientGUISize[0] = winGeoInfo.GUISize[0];
   this->ClientGUISize[1] = winGeoInfo.GUISize[1];
+
+  this->AnnotationLayer = winGeoInfo.AnnotationLayer;
+
+  this->UseRendererSet(winGeoInfo.Id);
+
+  vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
+  if (!squirtOptions.Restore(stream))
+    {
+    vtkErrorMacro("Failed to read SquirtOptions.");
+    return false;
+    }
+  this->Squirt = squirtOptions.Enabled;
+  this->SquirtCompressionLevel = squirtOptions.CompressLevel;
+  return true;
+*/
+}
+
+//----------------------------------------------------------------------------
+//
+// This method replaces the original ProcessWindowInformation(vtkMultiProcessStream&).
+//
+// In the original, this->ClientWindowSize is set to this->FullImageSize,
+// where this->FullImageSize was equal to client_render_window->GetActualSize()
+//
+// In this method, this->ClientWindowSize is set to winGeoInfo.ViewSize,
+// where winGeoInfo.ViewSize is sent by vtkPVDesktopDeliveryClient.
+// vtkPVDesktopDeliveryClient sets winGeoInfo.Viewsize to either
+// to client_render_window->GetActualSize(), or to the ivar
+// CompactViewSize if the ivar is available.  The ivar is only
+// available when using tile display (icetmultidisplay)
+// 
+//
+bool vtkPVDesktopDeliveryServer::ProcessWindowInformation2(
+  vtkMultiProcessStream& stream)
+{
+
+  if (!this->Superclass::ProcessWindowInformation(stream))
+    {
+    return false;
+    }
+
+  vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
+  if (!winGeoInfo.Restore(stream))
+    {
+    vtkErrorMacro("Failed to read WindowGeometry info.");
+    return false;
+    }
+
+  // Correct window size.
+  this->ClientWindowSize[0] = winGeoInfo.ViewSize[0];
+  this->ClientWindowSize[1] = winGeoInfo.ViewSize[1];
+  this->ClientRequestedImageSize[0] = this->ReducedImageSize[0];
+  this->ClientRequestedImageSize[1] = this->ReducedImageSize[1];
+  this->FullImageSize[0] = winGeoInfo.GUISize[0];
+  this->FullImageSize[1] = winGeoInfo.GUISize[1];
+  this->ReducedImageSize[0]
+    = (int)(this->FullImageSize[0]/this->ImageReductionFactor);
+  this->ReducedImageSize[1]
+    = (int)(this->FullImageSize[1]/this->ImageReductionFactor);
+  this->ClientWindowPosition[0] = winGeoInfo.Position[0];
+  this->ClientWindowPosition[1] = winGeoInfo.Position[1];
+  this->ClientGUISize[0] = winGeoInfo.GUISize[0];
+  this->ClientGUISize[1] = winGeoInfo.GUISize[1];
+
+  //printf("-----ReceiveWindowInformation-----\n");
+  //printf("  ViewSize: %d %d\n", this->ClientWindowSize[0], this->ClientWindowSize[1]);
+  //printf("  ViewPos: %d %d\n", this->ClientWindowPosition[0], this->ClientWindowPosition[1]);
+  //printf("  GuiSize: %d %d\n", this->ClientGUISize[0], this->ClientGUISize[1]);
 
   this->AnnotationLayer = winGeoInfo.AnnotationLayer;
 
@@ -694,6 +764,7 @@ void vtkPVDesktopDeliveryServer::WindowGeometry::Save(vtkMultiProcessStream& str
   stream << vtkPVDesktopDeliveryServer::WINDOW_GEOMETRY_TAG;
   stream << this->Position[0] << this->Position[1]
     << this->GUISize[0] << this->GUISize[1]
+    << this->ViewSize[0] << this->ViewSize[1]
     << this->Id
     << this->AnnotationLayer;
 }
@@ -709,6 +780,7 @@ bool vtkPVDesktopDeliveryServer::WindowGeometry::Restore(vtkMultiProcessStream& 
     }
   stream >> this->Position[0] >> this->Position[1]
     >> this->GUISize[0] >> this->GUISize[1]
+    >> this->ViewSize[0] >> this->ViewSize[1]
     >> this->Id
     >> this->AnnotationLayer;
   return true;

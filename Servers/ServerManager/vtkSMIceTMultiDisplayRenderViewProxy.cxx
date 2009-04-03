@@ -27,7 +27,7 @@ vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_COLLECT, Int
 vtkInformationKeyMacro(vtkSMIceTMultiDisplayRenderViewProxy, CLIENT_RENDER, Integer);
 
 vtkStandardNewMacro(vtkSMIceTMultiDisplayRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMIceTMultiDisplayRenderViewProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
 {
@@ -39,6 +39,10 @@ vtkSMIceTMultiDisplayRenderViewProxy::vtkSMIceTMultiDisplayRenderViewProxy()
   this->LastClientCollectionDecision = false;
   this->Information->Set(CLIENT_RENDER(), 1);
   this->Information->Set(CLIENT_COLLECT(), 0);
+
+  this->GUISizeCompact[0] = this->GUISizeCompact[1] = 0;
+  this->ViewSizeCompact[0] = this->ViewSizeCompact[1] = 0;
+  this->ViewPositionCompact[0] = this->ViewPositionCompact[1] = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -178,6 +182,43 @@ NewStrategyInternal(int dataType)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkSMIceTMultiDisplayRenderViewProxy::SetGUISizeCompact(int x, int y)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID()
+          << "SetGUISizeCompact" << x << y
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTMultiDisplayRenderViewProxy::SetViewPositionCompact(int x, int y)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID()
+          << "SetViewPositionCompact" << x << y
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTMultiDisplayRenderViewProxy::SetViewSizeCompact(int x, int y)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke 
+          << this->RenderSyncManager->GetID()
+          << "SetViewSizeCompact" << x << y
+          << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, vtkProcessModule::CLIENT, stream);
+}
+
+
 //-----------------------------------------------------------------------------
 void vtkSMIceTMultiDisplayRenderViewProxy::SetGUISize(int x, int y)
 {
@@ -219,3 +260,4 @@ void vtkSMIceTMultiDisplayRenderViewProxy::PrintSelf(ostream& os, vtkIndent inde
   os << indent << "TileDisplayCompositeThreshold: " 
     << this->TileDisplayCompositeThreshold << endl;
 }
+

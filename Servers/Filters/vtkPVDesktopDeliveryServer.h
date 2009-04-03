@@ -127,6 +127,7 @@ public:
   struct WindowGeometry {
     int Position[2];
     int GUISize[2];
+    int ViewSize[2];
     int Id;
     int AnnotationLayer;
     void Save(vtkMultiProcessStream& stream);
@@ -178,6 +179,7 @@ protected:
   virtual void ReadReducedImage();
 
   virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
+  virtual bool ProcessWindowInformation2(vtkMultiProcessStream&);
   virtual bool ProcessRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   int Squirt;

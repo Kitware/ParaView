@@ -4988,6 +4988,46 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <IntVectorProperty
+        name="ViewPositionCompact"
+        command="SetViewPositionCompact"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="0 0" />
+        <Documentation>
+          Position of the view. This is useful in multiview configurations.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="GUISizeCompact"
+        command="SetGUISizeCompact"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="0 0" />
+        <Documentation>
+          Total GUI size when using mutliple views. This includes the sizes of
+          all view modules.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ViewSizeCompact"
+        command="SetViewSizeCompact"
+        number_of_elements="2"
+        default_values="0 0"
+        update_self="1"
+        immediate_update="1">
+        <IntRangeDomain name="range" min="0 0" />
+        <Documentation>
+          The ViewSize to use for gapless multi display on the server.
+        </Documentation>
+      </IntVectorProperty>
+
       <!-- End of IceTMultiDisplayRenderView -->
     </IceTMultiDisplayRenderViewProxy>
 
