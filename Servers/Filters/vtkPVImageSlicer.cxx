@@ -14,15 +14,16 @@
 =========================================================================*/
 #include "vtkPVImageSlicer.h"
 
-#include "vtkObjectFactory.h"
+#include "vtkExtentTranslator.h"
 #include "vtkExtractVOI.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkImageData.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkImageData.h"
+#include "vtkObjectFactory.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.5");
+vtkCxxRevisionMacro(vtkPVImageSlicer, "1.6");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {
@@ -48,11 +49,32 @@ int vtkPVImageSlicer::RequestUpdateExtent(
 
   if (inInfo)
     {
-    int *updateExt = outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
+    // The output WholeExtent for this filter is just a slice. In VTK world, we
+    // ask the input for simply the slice i.e. pass what the downstream filter
+    // requested to the upstream. However, that results in subtle bugs such as
+    // Bug #8658. So, we always ask from the input the full data for this piece
+    // as if no slicing was employed.
+    vtkStreamingDemandDrivenPipeline* executive =
+      vtkStreamingDemandDrivenPipeline::SafeDownCast(this->GetExecutive());
+    int piece = executive->GetUpdatePiece(outInfo);
+    int numPieces = executive->GetUpdateNumberOfPieces(outInfo);
+    int ghostLevel = executive->GetUpdateGhostLevel(outInfo);
 
-    // simply pass the downstream request.
-    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), updateExt, 6);
-    // We can handle anything.
+    int inWholeExtent[6];
+    inInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), 
+      inWholeExtent);
+
+    vtkExtentTranslator* translator = executive->GetExtentTranslator(0);
+    translator->SetWholeExtent(inWholeExtent);
+    translator->SetPiece(piece);
+    translator->SetNumberOfPieces(numPieces);
+    translator->SetGhostLevel(ghostLevel);
+    translator->PieceToExtent();
+
+    inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(),
+      translator->GetExtent(), 6);
+
+    //// We can handle anything.
     inInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 0);
     }
   return 1;
