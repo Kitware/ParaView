@@ -115,17 +115,31 @@ public:
     this->Theme.TakeReference(vtkViewTheme::CreateMellowTheme());
 
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->ImageRepresentation = 0;
+    this->Terrain = 0;
   }
 
   ~implementation()
   {
     delete this->Widget;
+    if (this->ImageRepresentation)
+      {
+      this->ImageRepresentation->GetSource()->ShutDown();
+      this->ImageRepresentation->Delete();
+      }
+    if (this->Terrain)
+      {
+      this->Terrain->GetSource()->ShutDown();
+      this->Terrain->Delete();
+      }
   }
 
   QVTKWidget* const Widget;
   vtkSmartPointer<vtkGeoView> View;
   vtkSmartPointer<vtkViewTheme> Theme;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkGeoAlignedImageRepresentation* ImageRepresentation;
+  vtkGeoTerrain* Terrain;
 
   typedef vtksys_stl::map<pqRepresentation*, vtkSmartPointer<vtkGeoGraphRepresentation> >
     RepresentationsT;
@@ -172,6 +186,17 @@ ClientGeoView::ClientGeoView(
   theme->Delete();
 
   emit this->beginProgress();
+
+  // Add default terrain
+  vtkSmartPointer<vtkGeoGlobeSource> terrainSource =
+    vtkSmartPointer<vtkGeoGlobeSource>::New();
+  terrainSource->Initialize();
+  this->Implementation->Terrain = vtkGeoTerrain::New();
+  this->Implementation->Terrain->SetSource(terrainSource);
+  this->Implementation->View->SetTerrain(this->Implementation->Terrain);
+  this->Implementation->ImageRepresentation =
+    vtkGeoAlignedImageRepresentation::New();
+
   vtkStdString tileDatabase(CLIENT_GEO_VIEW_TILE_PATH);
   if (tileDatabase.length() == 0)
     {
@@ -187,52 +212,30 @@ ClientGeoView::ClientGeoView(
       }
 
     this->Implementation->VTKConnect->Connect(
-      reader,  vtkCommand::ProgressEvent,
-      this, SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
+      reader,  vtkCommand::ProgressEvent, this,
+      SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
     reader->Update();
     this->Implementation->VTKConnect->Disconnect(reader);
-
-    // Use the following to create a new tile database.
-    this->Implementation->View->AddDefaultImageRepresentation(
-      reader->GetOutput());
+    vtkImageData* image = reader->GetOutput();
+    vtkSmartPointer<vtkGeoAlignedImageSource> imageSource =
+      vtkSmartPointer<vtkGeoAlignedImageSource>::New();
+    imageSource->SetImage(image);
+    imageSource->Initialize();
+    this->Implementation->ImageRepresentation->SetSource(imageSource);
     reader->Delete();
     }
   else
     {
-    vtkSmartPointer<vtkGeoGlobeSource> globeSource =
-      vtkSmartPointer<vtkGeoGlobeSource>::New();
-    vtkSmartPointer<vtkGeoTerrain> terrain =
-      vtkSmartPointer<vtkGeoTerrain>::New();
-    terrain->SetSource(globeSource);
-    globeSource->Initialize();
-    this->Implementation->View->SetTerrain(terrain);
-
     vtkSmartPointer<vtkGeoFileImageSource> imageSource =
       vtkSmartPointer<vtkGeoFileImageSource>::New();
     imageSource->SetPath(tileDatabase.c_str());
     imageSource->Initialize();
-    vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
-      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
-    imageRep->SetSource(imageSource);
-
-    this->Implementation->View->AddRepresentation(imageRep);
+    this->Implementation->ImageRepresentation->SetSource(imageSource);
     }
 
-  // Load political boundaries and write as XML
-  //vtkOGRReader* const lineReader = vtkOGRReader::New();
-  //lineReader->SetFileName(
-  //  VTKSNL_DATA_DIRECTORY "/Applications/GeoView/world_adm0.shp");
-  //vtkGeometryFilter* const geometry = vtkGeometryFilter::New();
-  //vtkMultiBlockDataSet* const lines = lineReader->GetOutput();
-  //vtkDataObject* const firstBlock = lines->GetBlock(0);
-  //geometry->SetInput(firstBlock);
-  //vtkXMLPolyDataWriter* const writer = vtkXMLPolyDataWriter::New();
-  //writer->SetInputConnection(geometry->GetOutputPort());
-  //writer->SetFileName("political.vtp");
-  //writer->Write();
-  //writer->Delete();
-  //lineReader->Delete();
-  //geometry->Delete();
+  // Add image representation
+  this->Implementation->View->AddRepresentation(
+    this->Implementation->ImageRepresentation);
 
   // Load political boundaries
   vtkGeoLineRepresentation* const lineRep = vtkGeoLineRepresentation::New();
@@ -255,7 +258,9 @@ ClientGeoView::ClientGeoView(
   // the view. Note that this is happening in  the constructor, so it's called
   // before any of the external representations are added. Consequently, this is not
   // triggering any external pipeline updates and hence is totally safe.
-  this->Implementation->View->Update();
+  //this->Implementation->View->Update();
+  this->Implementation->View->GetRenderer()->ResetCameraClippingRange();
+  this->Implementation->Widget->GetRenderWindow()->Render();
   lineRep->Delete();
   pbReader->Delete();
 
@@ -526,7 +531,7 @@ void ClientGeoView::renderGeoViewInternal()
     }
 
   emit this->beginProgress();
-  this->Implementation->View->Update();
+  this->Implementation->Widget->GetRenderWindow()->Render();
   emit this->endProgress();
 }
 

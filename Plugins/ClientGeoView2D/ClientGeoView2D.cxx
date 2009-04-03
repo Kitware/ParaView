@@ -114,9 +114,6 @@ public:
 
     this->View = vtkSmartPointer<vtkGeoView2D>::New();
     this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
-    this->ImageSource = vtkSmartPointer<vtkGeoAlignedImageSource>::New();
-    this->ProjectionSource = vtkSmartPointer<vtkGeoProjectionSource>::New();
-    this->ProjectionSource->Initialize();
     this->Transform = vtkSmartPointer<vtkGeoTransform>::New();
     this->ProjectionIndex = 40;
     vtkSmartPointer<vtkGeoProjection> proj =
@@ -132,15 +129,25 @@ public:
   ~implementation()
   {
     delete this->Widget;
+    if (this->ImageRepresentation)
+      {
+      this->ImageRepresentation->GetSource()->ShutDown();
+      this->ImageRepresentation->Delete();
+      }
+    if (this->Terrain)
+      {
+      this->Terrain->GetSource()->ShutDown();
+      this->Terrain->Delete();
+      }
   }
 
   QVTKWidget* const Widget;
   vtkSmartPointer<vtkGeoView2D> View;
-  vtkSmartPointer<vtkGeoAlignedImageSource> ImageSource;
-  vtkSmartPointer<vtkGeoProjectionSource> ProjectionSource;
   vtkSmartPointer<vtkGeoTransform> Transform;
   vtkSmartPointer<vtkViewTheme> Theme;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkGeoAlignedImageRepresentation* ImageRepresentation;
+  vtkGeoTerrain2D* Terrain;
   int ProjectionIndex;
 
   typedef vtksys_stl::map<pqRepresentation*, vtkSmartPointer<vtkGeoGraphRepresentation2D> >
@@ -177,6 +184,8 @@ ClientGeoView2D::ClientGeoView2D(
   this->Implementation->View->ApplyViewTheme(theme);
   theme->Delete();
 
+  this->Implementation->ImageRepresentation =
+    vtkGeoAlignedImageRepresentation::New();
   vtkStdString tileDatabase(CLIENT_GEO_VIEW_TILE_PATH);
   if (tileDatabase.length() == 0)
     {
@@ -195,11 +204,12 @@ ClientGeoView2D::ClientGeoView2D(
     vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
     reader->SetFileName(filename.c_str());
     reader->Update();
-    this->Implementation->ImageSource->SetImage(reader->GetOutput());
-    vtkSmartPointer<vtkGeoAlignedImageRepresentation> rep =
-      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
-    rep->SetSource(this->Implementation->ImageSource);
-    this->Implementation->View->AddRepresentation(rep);
+    vtkImageData* image = reader->GetOutput();
+    vtkSmartPointer<vtkGeoAlignedImageSource> imageSource =
+      vtkSmartPointer<vtkGeoAlignedImageSource>::New();
+    imageSource->SetImage(image);
+    imageSource->Initialize();
+    this->Implementation->ImageRepresentation->SetSource(imageSource);
     }
   else
     {
@@ -207,29 +217,32 @@ ClientGeoView2D::ClientGeoView2D(
       vtkSmartPointer<vtkGeoFileImageSource>::New();
     imageSource->SetPath(tileDatabase.c_str());
     imageSource->Initialize();
-    vtkSmartPointer<vtkGeoAlignedImageRepresentation> imageRep =
-      vtkSmartPointer<vtkGeoAlignedImageRepresentation>::New();
-    imageRep->SetSource(imageSource);
-    this->Implementation->View->AddRepresentation(imageRep);
+    this->Implementation->ImageRepresentation->SetSource(imageSource);
     }
 
-  // Create surface.
-  this->Implementation->ProjectionSource->SetProjection(
-    this->Implementation->ProjectionIndex);
-  vtkSmartPointer<vtkGeoTerrain2D> surf = vtkSmartPointer<vtkGeoTerrain2D>::New();
-  surf->SetSource(this->Implementation->ProjectionSource);
-  this->Implementation->View->SetSurface(surf);
+  // Add image representation
+  this->Implementation->View->AddRepresentation(
+    this->Implementation->ImageRepresentation);
+
+  // Add default terrain
+  vtkSmartPointer<vtkGeoProjectionSource> terrainSource =
+    vtkSmartPointer<vtkGeoProjectionSource>::New();
+  terrainSource->SetProjection(this->Implementation->ProjectionIndex);
+  terrainSource->Initialize();
+  this->Implementation->Terrain = vtkGeoTerrain2D::New();
+  this->Implementation->Terrain->SetSource(terrainSource);
+  this->Implementation->View->SetSurface(this->Implementation->Terrain);
 
   // Set up the viewport
   vtkSmartPointer<vtkGeoTerrainNode> root = vtkSmartPointer<vtkGeoTerrainNode>::New();
-  this->Implementation->ProjectionSource->FetchRoot(root);
+  this->Implementation->Terrain->GetSource()->FetchRoot(root);
   double bounds[4];
   root->GetProjectionBounds(bounds);
   this->Implementation->View->GetRenderer()->GetActiveCamera()->
     SetParallelScale((bounds[3] - bounds[2]) / 2.0);
 
   // Perform initial update
-  this->Implementation->View->Update();
+  this->Implementation->Widget->GetRenderWindow()->Render();
 
   // Load political boundaries
   vtkSmartPointer<vtkGeoLineRepresentation> lineRep =
@@ -519,7 +532,7 @@ void ClientGeoView2D::renderGeoViewInternal()
     }
 
   emit this->beginProgress();
-  this->Implementation->View->Update();
+  this->Implementation->Widget->GetRenderWindow()->Render();
   emit this->endProgress();
 }
 

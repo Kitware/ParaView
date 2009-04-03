@@ -347,6 +347,7 @@ void ClientGraphView::showRepresentation(pqRepresentation* representation)
 {
   vtkSMClientDeliveryRepresentationProxy* const proxy = vtkSMClientDeliveryRepresentationProxy::SafeDownCast(representation->getProxy());
   this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  this->Implementation->View->Update();
   this->Implementation->ResetCamera = true;
 }
 
@@ -569,7 +570,7 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->GetRenderer()->ResetCamera();
   this->Implementation->ResetCamera = false;
 
-  this->Implementation->View->Update();
+  this->Implementation->View->GetRenderer()->GetRenderWindow()->Render();
   emit this->endProgress();
 }
 
