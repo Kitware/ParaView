@@ -9,6 +9,10 @@
     <Proxy name="Circular" class="vtkCircularLayoutStrategy"/>
     <Proxy name="Tree" class="vtkTreeLayoutStrategy"/>
     <Proxy name="TreeOrbit" class="vtkTreeOrbitLayoutStrategy"/>
+    <Proxy name="Box" class="vtkBoxLayoutStrategy"/>
+    <Proxy name="SliceAndDice" class="vtkSliceAndDiceLayoutStrategy"/>
+    <Proxy name="Squarify" class="vtkSquarifyLayoutStrategy"/>
+    <Proxy name="StackedTree" class="vtkStackedTreeLayoutStrategy"/>
     <Proxy name="None" class="vtkPassThroughLayoutStrategy"/>
   </ProxyGroup>
 
@@ -23,6 +27,15 @@
       <IntVectorProperty name="HaveHeaders" command="SetHaveHeaders" number_of_elements="1" default_values="1"/>
       <IntVectorProperty name="MergeConsecutiveDelimiters" command="SetMergeConsecutiveDelimiters" number_of_elements="1" default_values="0"/>
       <IntVectorProperty name="MaxRecords" command="SetMaxRecords" number_of_elements="1" default_values="0"/>
+      <IntVectorProperty name="OutputPedigreeIds" command="SetOutputPedigreeIds" number_of_elements="1" label="Output Pedigree IDs" default_values="1">
+      <IntVectorProperty name="DetectNumericColumns" command="SetDetectNumericColumns" number_of_elements="1" default_values="1"/>
+      <IntVectorProperty name="OutputPedigreeIds" command="SetOutputPedigreeIds" number_of_elements="1" label="Output Pedigree IDs" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty name="GeneratePedigreeIds" command="SetGeneratePedigreeIds" number_of_elements="1" label="Generate Pedigree IDs" default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <StringVectorProperty name="PedigreeIdArrayName" command="SetPedigreeIdArrayName" number_of_elements="1" label="Pedigree ID Array Name"/> 
       <Hints>
         <View type="ClientTableView"/>
       </Hints>
@@ -232,6 +245,30 @@
       </Hints>
     </SourceProxy>
 
+    <SourceProxy name="ExpandSelectedGraph" class="vtkExpandSelectedGraph">
+      <!-- Graph Input -->
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- Selection Input -->
+      <InputProperty name="Graph" command="SetGraphConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="BFSDistance" command="SetBFSDistance" number_of_elements="1" default_values="1"/>
+    </SourceProxy>
+
     <SourceProxy name="DataObjectToTable" class="vtkDataObjectToTable">
       <InputProperty name="Input" command="SetInputConnection">
       </InputProperty>
@@ -317,8 +354,54 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable"/>
         </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
       </InputProperty>
+      <StringVectorProperty name="Field1" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="Field2" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="Field3" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="Field4" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="Field5" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="Field6" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <StringVectorProperty name="Fields" command="AddField" clean_command="ClearFields" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
+       <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
     </SourceProxy>
 
     <SourceProxy name="TableToGraph" class="vtkTableToGraph">
@@ -330,6 +413,7 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable"/>
         </DataTypeDomain>
+        <InputArrayDomain name="row_arrays" attribute_type="row"/>
       </InputProperty>
       <InputProperty name="VertexTable" command="SetVertexTableConnection">
         <ProxyGroupDomain name="groups">
@@ -340,6 +424,41 @@
           <DataType value="vtkTable"/>
         </DataTypeDomain>
       </InputProperty>
+      <StringVectorProperty name="VertexField1" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexField2" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexField3" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexField4" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      <StringVectorProperty name="VertexField5" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="row_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
       <StringVectorProperty name="LinkVertices" command="AddLinkVertex" clean_command="ClearLinkVertices" repeat_command="1" number_of_elements_per_command="3" element_types="2 2 0"/>
       <StringVectorProperty name="LinkEdges" command="AddLinkEdge" clean_command="ClearLinkEdges" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
       <Hints>
@@ -971,6 +1090,25 @@
      <ProxyProperty name="LayoutStrategy" command="SetLayoutStrategy"
         label="Layout Strategy"/>
 
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+    </SourceProxy>
+
+    <SourceProxy name="PassThroughFilter" class="vtkPassThrough" label="Data Copy">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+      <IntVectorProperty name="DeepCopyInput" 
+        command="SetDeepCopyInput" 
+        label="Deep Copy" 
+        number_of_elements="1" 
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <Hints>
         <View type="ClientGraphView"/>
       </Hints>

@@ -22,10 +22,12 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkClustering2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkCollapseGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkExpandSelectedGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkForceDirectedLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkGenerateIndexArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkGraphLayout.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkPassThrough.h
     ${VTK_SOURCE_DIR}/Infovis/vtkPassThroughLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkRandomGraphSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkSQLDatabaseGraphSource.h
