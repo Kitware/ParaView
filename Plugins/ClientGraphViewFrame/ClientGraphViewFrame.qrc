@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/ClientGraphViewFrame" >
+    <file>Icons/cut_16.png</file>
+    <file>Icons/expand_selection_16.png</file>
+    <file>Icons/reset_camera_16.png</file>
+    <file>Icons/zoom_to_selection_16.png</file>
+  </qresource> 
+</RCC>   
