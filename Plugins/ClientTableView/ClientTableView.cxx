@@ -26,23 +26,26 @@
 */
 
 #include "ClientTableView.h"
-#include "ui_ClientTableView.h"
 
 #include <vtkAbstractArray.h>
+#include <vtkCommand.h>
 #include <vtkConvertSelection.h>
-#include <vtkDataObjectToTable.h>
 #include <vtkDataObjectTypes.h>
+#include <vtkDataRepresentation.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkGraph.h>
 #include <vtkIdTypeArray.h>
 #include <vtkIntArray.h>
 #include <vtkPVDataInformation.h>
-#include <vtkQtTableModelAdapter.h>
+#include <vtkQtTableView.h>
 #include <vtkSelection.h>
+#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
+#include <vtkSmartPointer.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMViewProxy.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
 
@@ -53,7 +56,23 @@
 #include <pqSelectionManager.h>
 #include <pqServer.h>
 
-#include <QSortFilterProxyModel>
+#include <QPointer>
+#include <QVBoxLayout>
+#include <QWidget>
+
+////////////////////////////////////////////////////////////////////////////////////
+// ClientTableView::command
+
+class ClientTableView::command : public vtkCommand
+{
+public:
+  command(ClientTableView& view) : Target(view) { }
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    Target.selectionChanged();
+  }
+  ClientTableView& Target;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientTableView::implementation
@@ -61,27 +80,26 @@
 class ClientTableView::implementation
 {
 public:
-  implementation() :
-    Table(vtkTable::New()),
-    UpdatingSelection(false)
+  implementation()
   {
-    this->TableAdapter.setTable(this->Table);
-    this->TableSort.setSourceModel(&this->TableAdapter);
+    this->Widget = new QWidget();
+    this->View = vtkSmartPointer<vtkQtTableView>::New();
+    QVBoxLayout *layout = new QVBoxLayout(this->Widget);
+    layout->addWidget(this->View->GetWidget());
+    layout->setContentsMargins(0,0,0,0);
+    this->AttributeType = -1;
   }
 
   ~implementation()
   {
-    this->Table->Delete();
+    this->View->RemoveAllRepresentations();
+    if(this->Widget)
+      delete this->Widget;
   }
 
-  int CurrentAttributeType;
-  bool UpdatingSelection;
-  vtkTable* const Table;
-  vtkQtTableModelAdapter TableAdapter;
-  QSortFilterProxyModel TableSort;
-
-  Ui::ClientTableView Widgets;
-  QWidget Widget;
+  int AttributeType;
+  vtkSmartPointer<vtkQtTableView> View;
+  QPointer<QWidget> Widget;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -95,25 +113,45 @@ ClientTableView::ClientTableView(
     pqServer* server, 
     QObject* p) :
   pqSingleInputView(viewmoduletype, group, name, viewmodule, server, p),
-  Implementation(new implementation())
+  Implementation(new implementation()),
+  Command(new command(*this))
 {
-  this->Implementation->Widgets.setupUi(&this->Implementation->Widget);
-  this->Implementation->Widgets.tableView->setModel(&this->Implementation->TableSort);
-
-  this->connect(this->Implementation->Widgets.tableView->selectionModel(), 
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
-    this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
+  this->Implementation->View->AddObserver(
+    vtkCommand::SelectionChangedEvent, this->Command);
+  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 }
 
 ClientTableView::~ClientTableView()
 {
   delete this->Implementation;
+  this->Command->Delete();
 }
 
 QWidget* ClientTableView::getWidget()
 {
-  return &this->Implementation->Widget;
+  return this->Implementation->Widget;
+}
+
+void ClientTableView::selectionChanged()
+{
+  // Get the representaion's source
+  pqDataRepresentation* pqRepr =
+    qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
+    opPort->getSource()->getProxy());
+
+  // Fill the selection source with the selection from the view
+  this->Implementation->View->GetRepresentation()->GetSelectionLink()->Update();
+  vtkSelection* sel = this->Implementation->View->GetRepresentation()->
+    GetSelectionLink()->GetOutput();
+  vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
+    sel, repSource->GetConnectionID());
+
+  // Set the selection on the representation's source
+  repSource->SetSelectionInput(opPort->getPortNumber(),
+    selectionSource, 0);
+  selectionSource->Delete();
 }
 
 bool ClientTableView::canDisplay(pqOutputPort* output_port) const
@@ -152,83 +190,20 @@ bool ClientTableView::canDisplay(pqOutputPort* output_port) const
   return false;
 }
 
-void ClientTableView::updateRepresentation(pqRepresentation* representation)
+void ClientTableView::updateRepresentation(pqRepresentation* repr)
 {
-  vtkSMSelectionDeliveryRepresentationProxy* const proxy = representation?
-    vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(representation->getProxy()) : NULL;
+  vtkSMClientDeliveryRepresentationProxy* const proxy = repr ? 
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(repr->getProxy()) : NULL;
+  proxy->Update(vtkSMViewProxy::SafeDownCast(this->getProxy()));  
 
-  if(!proxy)
+  vtkDataObject *data = proxy ? proxy->GetOutput() : NULL;
+  if (!data)
     {
     return;
     }
 
-  proxy->Update();
-
-  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
-
-  QString attributeTypeAsString;
-  int fieldType;
-  QString attributeName;
-  vtkGraph *graph = vtkGraph::SafeDownCast(proxy->GetOutput());
-  vtkTable *inputTable = vtkTable::SafeDownCast(proxy->GetOutput());
-  if(graph)
-    {
-    if (attributeType == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
-      {
-      fieldType = vtkDataObjectToTable::VERTEX_DATA;
-      attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
-      attributeTypeAsString = "Vertex Data";
-      }
-    else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
-      {
-      fieldType = vtkDataObjectToTable::EDGE_DATA;
-      attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
-      attributeTypeAsString = "Edge Data";
-      }
-    else
-      {
-      return;
-      }
-    }
-  else if(inputTable && attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
-    {
-    fieldType = vtkDataObjectToTable::FIELD_DATA;
-    attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
-    attributeTypeAsString = "Row Data";
-    }
-  else
-    {
-    return;
-    }
-
-  vtkDataObjectToTable *dataObjectToTable = vtkDataObjectToTable::New();
-  dataObjectToTable->SetFieldType(fieldType);
-  dataObjectToTable->SetInput(proxy->GetOutput());
-  dataObjectToTable->Update();
-
-  vtkTable *table = dataObjectToTable->GetOutput();
-  if (!table)
-    {
-    return;
-    }
-
-  this->Implementation->CurrentAttributeType = attributeType;
-
-  this->Implementation->Table->ShallowCopy(table);
-   
-  vtkIntArray *selectionColumn = vtkIntArray::New();
-  selectionColumn->SetName("Selected");
-  selectionColumn->SetNumberOfTuples(this->Implementation->Table->GetNumberOfRows());
-  this->Implementation->Table->AddColumn(selectionColumn);
-  selectionColumn->Delete();
-
-  this->Implementation->TableAdapter.reset();
-  this->Implementation->Widgets.rowCount->setText(QString::number(table->GetNumberOfRows()));
-  this->Implementation->Widgets.columnCount->setText(QString::number(table->GetNumberOfColumns()));
-
-  this->Implementation->Widgets.tableView->hideColumn(this->Implementation->Table->GetNumberOfColumns()-1);
-
-  dataObjectToTable->Delete();
+  // Add the representation to the view
+  this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
 }
 
 void ClientTableView::showRepresentation(pqRepresentation* representation)
@@ -238,10 +213,7 @@ void ClientTableView::showRepresentation(pqRepresentation* representation)
 
 void ClientTableView::hideRepresentation(pqRepresentation* representation)
 {
-  this->Implementation->Table->Initialize();
-  this->Implementation->TableAdapter.reset();
-  this->Implementation->Widgets.rowCount->setText("None");
-  this->Implementation->Widgets.columnCount->setText("None");
+  this->Implementation->View->RemoveAllRepresentations();
 }
 
 void ClientTableView::renderInternal()
@@ -249,7 +221,6 @@ void ClientTableView::renderInternal()
   pqRepresentation* representation = this->visibleRepresentation();
   vtkSMSelectionDeliveryRepresentationProxy* const proxy = representation?
     vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(representation->getProxy()) : NULL;
-
   if(!proxy)
     {
     return;
@@ -258,196 +229,28 @@ void ClientTableView::renderInternal()
   proxy->Update();
 
   int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
-  QString attributeName = vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(4);
 
-  if(attributeType != this->Implementation->CurrentAttributeType)
+  if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
     {
-    this->updateRepresentation(representation);
+    this->Implementation->View->SetFieldType(vtkQtTableView::EDGE_DATA);
+    }
+  else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+    this->Implementation->View->SetFieldType(vtkQtTableView::ROW_DATA);
+    }
+  else
+    {
+    this->Implementation->View->SetFieldType(vtkQtTableView::VERTEX_DATA);
     }
 
+  if(this->Implementation->View->GetRepresentation())
+    {
+    proxy->GetSelectionRepresentation()->Update();
+    vtkSelection* sel = vtkSelection::SafeDownCast(
+      proxy->GetSelectionRepresentation()->GetOutput());
+    this->Implementation->View->GetRepresentation()->GetSelectionLink()->SetSelection(sel);
+    }
 
-  proxy->GetSelectionRepresentation()->Update();
-  vtkSelection* sel = vtkSelection::SafeDownCast(
-    proxy->GetSelectionRepresentation()->GetOutput());
-
-  this->updateSelection(sel);
+  this->Implementation->View->Update();
 }
 
-
-void ClientTableView::onSelectionChanged(const QItemSelection&, const QItemSelection&)
-{
-  vtkAbstractArray *pedigreeIds = this->Implementation->Table->GetRowData()->GetPedigreeIds();
-  if(!pedigreeIds)
-    {
-    return;
-    }
-
-  vtkSelection* selection = vtkSelection::New();
-  
-  vtkAbstractArray *domainArray = this->Implementation->Table->GetColumnByName("domain");
-  const QModelIndexList selectedIndices = this->Implementation->Widgets.tableView->selectionModel()->selectedRows();
-  for (int i = 0; i < selectedIndices.size(); i++)
-    {
-    QModelIndex index = this->Implementation->TableSort.mapToSource(selectedIndices.at(i));
-
-    QString domain;
-    if(domainArray)
-      {
-      vtkVariant d;
-      switch(domainArray->GetDataType())
-        {
-        vtkExtraExtendedTemplateMacro(d = *static_cast<VTK_TT*>(domainArray->GetVoidPointer(index.row())));
-        }
-      domain = d.ToString();
-      }
-    else
-      {
-      domain = pedigreeIds->GetName();
-      }
-
-    vtkSelectionNode *node = NULL;
-    for(unsigned int j=0; j<selection->GetNumberOfNodes(); ++j)
-      {
-      vtkSelectionNode *curNode = selection->GetNode(j);
-      if(domain == curNode->GetSelectionList()->GetName())
-        {
-        node = curNode;
-        break;
-        }
-      }
-
-    if(!node)
-      {
-      node = vtkSelectionNode::New();
-      node->SetContentType(vtkSelectionNode::PEDIGREEIDS);
-      node->SetFieldType(vtkSelectionNode::ROW);
-      vtkVariantArray* nodeList = vtkVariantArray::New();
-      nodeList->SetName(domain.toAscii().data());
-      node->SetSelectionList(nodeList);
-      nodeList->Delete();
-      selection->AddNode(node);
-      node->Delete();
-      }
-
-    vtkVariant v(0);
-    switch (pedigreeIds->GetDataType())
-      {
-      vtkExtraExtendedTemplateMacro(v = *static_cast<VTK_TT*>(pedigreeIds->GetVoidPointer(index.row())));
-      }
-    vtkVariantArray::SafeDownCast(node->GetSelectionList())->InsertNextValue(v);
-    }
-
-  this->Implementation->UpdatingSelection = true;
-
-  // Get the representaion's source
-  pqDataRepresentation* pqRepr =
-    qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
-  pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
-  vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
-    opPort->getSource()->getProxy());
-
-  // Fill the selection source with the selection from the view
-  vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
-    selection, repSource->GetConnectionID());
-
-  // Set the selection on the representation's source
-  repSource->SetSelectionInput(opPort->getPortNumber(),
-    selectionSource, 0);
-
-  selectionSource->Delete();
-  selection->Delete();
-}
-
-void ClientTableView::updateSelection(vtkSelection *origSelection)
-{
-  if (this->Implementation->UpdatingSelection)
-    {
-    this->Implementation->UpdatingSelection = false;
-    return;
-    }
-  
-  if(!origSelection)
-    {
-    return;
-    }
-
-  vtkSMSelectionDeliveryRepresentationProxy* const proxy = this->visibleRepresentation()?
-    vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(this->visibleRepresentation()->getProxy()) : NULL;
-  if(!proxy)
-    {
-    return;
-    }
-
-  vtkSmartPointer<vtkSelection> indexSel = vtkSmartPointer<vtkSelection>::New();
-  indexSel.TakeReference(vtkConvertSelection::ToIndexSelection(origSelection, proxy->GetOutput()));
-  vtkSelectionNode *node = indexSel->GetNode(0);
-  if(!node)
-    return;
-  vtkIdTypeArray *indexArr = vtkIdTypeArray::SafeDownCast(node->GetSelectionList());
-
-  int rows = this->Implementation->Table->GetNumberOfRows();
-  int cols = this->Implementation->Table->GetNumberOfColumns();
-
-  // Clear the selection column
-  vtkIntArray *selectionColumn = vtkIntArray::SafeDownCast(this->Implementation->Table->GetColumn(cols-1));
-  for (vtkIdType r = 0; r < rows; r++)
-    {
-    selectionColumn->SetValue(r,0);
-    }
-
-  // modify the selection column to denote selected items
-  for (vtkIdType i = 0; i < indexArr->GetNumberOfTuples(); i++)
-    {
-    vtkIdType selectedRow = indexArr->GetValue(i);
-    selectionColumn->SetValue(indexArr->GetValue(i),1);
-    }
-
-  // HACK: This is the only way to regenerate vtkQtTableModelAdapter's hash map:
-  this->Implementation->TableAdapter.setTable(0);
-  this->Implementation->TableAdapter.setTable(this->Implementation->Table);
-  QItemSelection list = this->Implementation->TableAdapter.VTKIndexSelectionToQItemSelection(indexSel);
-/*
-  QItemSelection list;
-  for (vtkIdType i = 0; i < indexArr->GetNumberOfTuples(); i++)
-    {
-    vtkIdType selectedRow = indexArr->GetValue(i);
-    selectionColumn->SetValue(selectedRow,1);
-    QModelIndex index = 
-      this->Implementation->TableAdapter.PedigreeToQModelIndex(
-      this->Implementation->TableAdapter.IdToPedigree(selectedRow));
-  
-    QModelIndex sortIndex = this->Implementation->TableSort.mapFromSource(index);
-    list.select(sortIndex, sortIndex);
-    }
-*/
-  this->disconnect(this->Implementation->Widgets.tableView->selectionModel(), 
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
-    this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
-  this->Implementation->Widgets.tableView->selectionModel()->select(list, 
-    QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-
-  this->connect(this->Implementation->Widgets.tableView->selectionModel(), 
-    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), 
-    this, SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
-/*
-  int selectedColumn = 0;
-  int visibleColumnCount = 0;
-  for(int i = 0; i != this->Implementation->TableSort.columnCount(); ++i)
-    {
-    if(this->Implementation->TableSort.headerData(i,Qt::Horizontal,Qt::DisplayRole ).toString() == "Selected")
-      {
-      //selectedColumn = visibleColumnCount;
-      selectedColumn = this->Implementation->Widgets.tableView->horizontalHeader()->visualIndex(i);
-      break;
-      }
-    if(this->Implementation->Widgets.tableView->isColumnHidden(i) == false)
-      {
-      visibleColumnCount++;
-      }
-    }
-*/
-  this->Implementation->Widgets.tableView->sortByColumn(cols-1, Qt::DescendingOrder);
-  this->Implementation->Widgets.tableView->scrollToTop();
-}

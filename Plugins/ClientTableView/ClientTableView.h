@@ -54,17 +54,19 @@ public:
 protected:
   /// Implement this to perform the actual rendering.
   virtual void renderInternal();
+
+private:
   void showRepresentation(pqRepresentation*);
   void hideRepresentation(pqRepresentation*);
   void updateRepresentation(pqRepresentation*);
-  void updateSelection(vtkSelection *origSelection);
 
-public slots:
-  void onSelectionChanged(const QItemSelection&, const QItemSelection&);
+  void selectionChanged();
 
-private:
   class implementation;
   implementation* const Implementation;
+
+  class command;
+  command* const Command;
 };
 
 #endif // _ClientTableView_h

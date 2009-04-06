@@ -76,12 +76,29 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
 
   this->Implementation->Widgets.setupUi(this);
 
-  pqSignalAdaptorComboBox* attributeTypeAdaptor = 
+  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
+
+  pqComboBoxDomain* d0 = new pqComboBoxDomain(
+    this->Implementation->Widgets.attribute_mode, 
+    proxy->GetProperty("AttributeType"),
+    "field_list");
+  d0->setObjectName("FieldModeDomain");
+
+  vtkSMPropertyHelper(proxy, "AttributeType").Set(3, vtkVariant(attributeType).ToString());
+
+  pqSignalAdaptorComboBox* adaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.attribute_mode);
-  attributeTypeAdaptor->setObjectName("ComboBoxAdaptor");
+  adaptor->setObjectName("ComboBoxAdaptor");
+
+  this->Implementation->PropertyManager->registerLink(
+    adaptor, 
+    "currentText", 
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy, 
+    proxy->GetProperty("AttributeType"), 0); 
 
   this->Implementation->Links.addPropertyLink(
-    attributeTypeAdaptor,
+    adaptor,
     "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     proxy,
@@ -89,9 +106,6 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
-
-  pqNamedWidgets::linkObject(this->Implementation->Widgets.attribute_mode, proxy, "AttributeType", this->Implementation->PropertyManager);
-
 }
 
 ClientTableDisplay::~ClientTableDisplay()

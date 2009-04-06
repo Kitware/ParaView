@@ -13,7 +13,7 @@
         </InputArrayDomain>
       </InputProperty>
 
-      <StringVectorProperty name="AttributeType" number_of_elements="5"  element_types="0 0 0 0 2">
+      <StringVectorProperty name="AttributeType" number_of_elements="5"  element_types="0 0 0 0 2" default_values="0 0 0 4 0">
        <FieldDataDomain name="field_list">
          <RequiredProperties>
            <Property name="Input" function="Input"/>

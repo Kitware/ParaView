@@ -8,7 +8,6 @@ QT4_WRAP_CPP(
 
 SET(UI_FORMS
   ClientTableDisplay.ui
-  ClientTableView.ui
   )
 
 QT4_WRAP_UI(
