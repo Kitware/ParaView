@@ -16,6 +16,14 @@
         <InputArrayDomain name="edge_arrays" attribute_type="edge"/>
       </InputProperty>
 
+      <StringVectorProperty name="EdgeWeightArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
       <IntVectorProperty name="VertexLabels" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>
@@ -132,10 +140,11 @@
       </IntVectorProperty>
 
       <ProxyProperty name="DomainMap"/>
-      
+     
       <Hints>
         <InheritRepresentationProperties>
           <Property name="LayoutStrategy" />
+          <Property name="EdgeWeightArray" />
           <Property name="VertexLabels" />
           <Property name="VertexLabelArray" />
           <Property name="IconVisibility" />
@@ -172,6 +181,16 @@
 
  <ProxyGroup name="views">
    <ViewProxy name="ClientGraphView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientGraphDisplay">
+      <IntVectorProperty
+        name="ResetCamera"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ZoomToSelection"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

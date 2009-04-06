@@ -41,13 +41,20 @@
 #include <pqServerManagerModel.h>
 #include <pqSignalAdaptors.h>
 
+#include <vtkAbstractArray.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
+#include <vtkGraph.h>
+#include <vtkSMClientDeliveryRepresentationProxy.h>
 #include <vtkSMProperty.h>
 #include <vtkSMPropertyHelper.h>
 #include <vtkSMProxy.h>
+#include <vtkSMStringVectorProperty.h>
 #include <vtkSmartPointer.h>
 
 #include <iostream>
+#include <vtksys/stl/set>
+using vtksys_stl::set;
 
 class ClientGraphDisplay::implementation
 {
@@ -360,8 +367,29 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     SIGNAL(currentIndexChanged(vtkSMProxy*)),
     this, SLOT(onComboBoxDomainMapChanged()));
 
+  pqSignalAdaptorComboBox* edgeWeightArrayAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.edgeWeightArray);
+  edgeWeightArrayAdaptor->setObjectName("ComboBoxAdaptor");
+
+  pqComboBoxDomain* const edge_weight_array_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.edgeWeightArray,
+    proxy->GetProperty("EdgeWeightArray"),
+    "array_list");
+
+  this->Implementation->Links.addPropertyLink(
+    edgeWeightArrayAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("EdgeWeightArray"));
+
+  //QObject::connect(this->Implementation->Widgets.layoutStrategy, 
+  //                SIGNAL(currentIndexChanged(const QString&)),
+  //                this, SLOT(onLayoutStrategyChanged()));
+
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
+
 }
 
 ClientGraphDisplay::~ClientGraphDisplay()
