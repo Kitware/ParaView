@@ -45,6 +45,7 @@ QT4_WRAP_CPP(MOC_SRCS
   pqMultiInputView.h
   pqSingleInputView.h
   pqStandardGraphLayoutStrategies.h
+  pqStandardTreeLayoutStrategies.h
   )
 
 SET(UI_FORMS

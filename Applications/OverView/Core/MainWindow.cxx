@@ -71,6 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSettings.h>
 #include <pqStandardViewModules.h>
 #include <pqStandardGraphLayoutStrategies.h>
+#include <pqStandardTreeLayoutStrategies.h>
 #include <pqUndoStack.h>
 #include <pqVCRController.h>
 #include <pqView.h>
@@ -760,6 +761,10 @@ MainWindow::MainWindow() :
   // add standard graph layout strategies
   pqApplicationCore::instance()->getPluginManager()->addInterface(
     new pqStandardGraphLayoutStrategies(pqApplicationCore::instance()->getPluginManager()));
+
+  // add standard graph layout strategies
+  pqApplicationCore::instance()->getPluginManager()->addInterface(
+    new pqStandardTreeLayoutStrategies(pqApplicationCore::instance()->getPluginManager()));
 
   // Simplify main window for the TLP:
   if(OverView::GetBrandedApplicationTitle() == "NetViewPrototype")
