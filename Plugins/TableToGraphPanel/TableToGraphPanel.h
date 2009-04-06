@@ -15,6 +15,7 @@ public:
 private slots:
   virtual void accept();
   virtual void reset();
+  virtual void onVertexTypeChanged();
 
 private:
   Ui::TableToGraphPanel Widgets;
