@@ -8762,6 +8762,63 @@ This property controls how the filter works to generate tensor cell data. You ca
       </Hints>
     </CompoundSourceProxy> <!-- FFTSelectionOverTime -->
 
+    <!-- ================================================================== -->
+    <SourceProxy name="AttributeDataToTableFilter"
+      class="vtkAttributeDataToTableFilter"
+      label="Extract Attributes">
+      <Documentation
+        short_help="Extract attribute data as a table."
+        long_help="Extract attribute data as a table.">
+        This is a filter that produces a vtkTable from the chosen attribute in
+        the input dataobject. This filter can accept composite datasets. If the
+        input is a composite dataset, the output is a multiblock with vtkTable
+        leaves.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+
+      <IntVectorProperty name="FieldAssociation"
+        command="SetFieldAssociation"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Select the attribute data to pass.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Points" value="0" />
+          <Entry text="Cells" value="1" />
+          <Entry text="Field Data" value="2" />
+          <Entry text="Vertices" value="4" />
+          <Entry text="Edges" value="5" />
+          <Entry text="Rows" value="6" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="AddMetaData"
+        command="SetAddMetaData"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          It is possible for this filter to add additional meta-data to the
+          field data such as point coordinates (when point attributes are
+          selected and input is pointset) or structured coordinates etc. To
+          enable this addition of extra information, turn this flag on. Off by
+          default.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of AttributeDataToTableFilter -->
+    </SourceProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>
