@@ -8,7 +8,6 @@ QT4_WRAP_CPP(
 
 SET(UI_FORMS
   ClientRecordDisplay.ui
-  ClientRecordView.ui
   )
 
 QT4_WRAP_UI(

@@ -56,7 +56,7 @@
        </item>
       </widget>
      </item>
-     <item row="1" column="0" colspan="2" >
+     <item row="2" column="0" colspan="2" >
       <spacer>
        <property name="orientation" >
         <enum>Qt::Vertical</enum>
@@ -68,6 +68,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="1" column="0" >
+      <widget class="QCheckBox" name="freezeContents" >
+       <property name="text" >
+        <string>Freeze Contents</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

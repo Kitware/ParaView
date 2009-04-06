@@ -233,7 +233,7 @@ void ClientRecordView::renderInternal()
     }
 
   vtkDataRepresentation *rep = this->Implementation->View->GetRepresentation();
-  if(rep)
+  if(rep && !vtkSMPropertyHelper(proxy, "FreezeContents").GetAsInt())
     {
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(

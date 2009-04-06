@@ -87,6 +87,13 @@ ClientRecordDisplay::ClientRecordDisplay(pqRepresentation* representation, QWidg
     proxy,
     proxy->GetProperty("AttributeType"),0);
 
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.freezeContents,
+    "checked",
+    SIGNAL(toggled(bool)),
+    proxy,
+    proxy->GetProperty("FreezeContents"));
+
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
 
