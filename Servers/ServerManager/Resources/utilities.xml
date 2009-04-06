@@ -2497,15 +2497,11 @@
         <XDMFInformationHelper info_type="grids"/>
      </StringVectorProperty> 
 
-     <Property
-       name="RemoveAllGrids"
-       command="RemoveAllGrids">
-     </Property>
-                  
      <StringVectorProperty
         name="EnableGrid"
         command="EnableGrid"
         number_of_elements="1" 
+        clean_command="DisableAllGrids"
         repeat_command="1">
      </StringVectorProperty>
      

@@ -126,6 +126,8 @@ void pqXDMFPanel::accept()
 
   this->proxy()->UpdateVTKObjects();
 
+  this->setGridProperty(this->proxy());
+
   pqNamedObjectPanel::accept();
 }
 
@@ -210,10 +212,6 @@ void pqXDMFPanel::populateGridWidget()
   QObject::disconnect(gridWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), 
                       this, SLOT(gridItemChanged(QTreeWidgetItem*, int)));
   gridWidget->clear();
-
-  this->UI->XDMFHelper->GetProperty("RemoveAllGrids")->Modified();
-  this->UI->XDMFHelper->UpdateVTKObjects();
-  this->UI->XDMFHelper->UpdatePropertyInformation();
 
   vtkSMProperty* GetNamesProperty = 
     this->UI->XDMFHelper->GetProperty("GetGridName");
@@ -305,7 +303,8 @@ void pqXDMFPanel::populateArrayWidget()
   QObject::disconnect(this->UI->Variables,
                       SIGNAL(itemChanged(QTreeWidgetItem*, int)),
                       this, SLOT(setModified()));
-  
+ 
+  this->UI->XDMFHelper->UpdatePropertyInformation();
   this->resetArrays();
 
   this->UI->Variables->clear();
@@ -439,8 +438,6 @@ void pqXDMFPanel::gridItemChanged(QTreeWidgetItem* item, int)
 //---------------------------------------------------------------------------
 void pqXDMFPanel::setGridProperty(vtkSMProxy* pxy)
 {
-  pxy->GetProperty("RemoveAllGrids")->Modified();
-  pxy->UpdateVTKObjects();
   QList<QVariant> grids;
   for(int i=0; i<this->UI->GridNames->topLevelItemCount(); i++)
     {

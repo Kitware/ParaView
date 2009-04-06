@@ -2675,23 +2675,13 @@
         </Documentation>
      </StringVectorProperty>
 
-     <Property
-       name="DisableAllGrids"
-       command="DisableAllGrids"
-       is_internal="1">
-     </Property>
 
-     <Property
-       name="RemoveAllGrids"
-       command="RemoveAllGrids"
-       is_internal="1">
-     </Property>
-                  
      <StringVectorProperty
         name="EnableGrid"
         command="EnableGrid"
         number_of_elements="1" 
-        repeat_command="1">
+        repeat_command="1"
+        clean_command="DisableAllGrids" >
         <Documentation>
           This property indicates which grid(s) to enable.
         </Documentation>
