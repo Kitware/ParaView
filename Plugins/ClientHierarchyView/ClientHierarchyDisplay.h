@@ -39,7 +39,6 @@ public:
   ~ClientHierarchyDisplay();
 
 private slots:
-  void onConfigureIcons();
   void onProxyDomainMapChanged();
   void onComboBoxDomainMapChanged();
 

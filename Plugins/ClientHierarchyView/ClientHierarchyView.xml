@@ -1,11 +1,133 @@
 <ServerManagerConfiguration>
  <ProxyGroup name="representations">
-   <SelectionDeliveryRepresentationProxy name="ClientHierarchyDisplay" base_proxygroup="representations" base_proxyname="ClientGraphDisplay">
-      <SubProxy>
-        <Proxy name="PostProcessor" 
-          proxygroup="filters" proxyname="PassThrough">
-        </Proxy>
-      </SubProxy>
+   <SelectionDeliveryRepresentationProxy name="ClientHierarchyDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
+
+      <StringVectorProperty name="LayoutStrategy" number_of_elements="1" default_values="StackedTree">
+        <Hints>
+          <!-- This overrides the GUI's default mechanism to
+          not set the default value for this property
+          using the domain when the proxy is created -->
+          <NoDefault/>
+        </Hints>
+      </StringVectorProperty>
+
+      <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+        <InputArrayDomain name="vertex_arrays" attribute_type="vertex"/>
+        <InputArrayDomain name="edge_arrays" attribute_type="edge"/>
+      </InputProperty>
+
+      <IntVectorProperty name="AreaLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="AreaLabelArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty name="AreaLabelFontSize" number_of_elements="1" default_values="12"/>
+
+      <IntVectorProperty name="AreaColorByArray" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="AreaColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="AreaSizeArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
+      <StringVectorProperty name="AreaLabelPriorityArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+            
+      <StringVectorProperty name="AreaLabelHoverArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
+      <IntVectorProperty name="EdgeLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="EdgeLabelArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
+      <DoubleVectorProperty name="EdgeLabelFontSize" number_of_elements="1" default_values="10"/>
+
+      <DoubleVectorProperty name="EdgeColor" number_of_elements="3" default_values="0 0 0"/>
+      <DoubleVectorProperty name="AreaColor" number_of_elements="3" default_values="0 0 0"/>
+
+      <IntVectorProperty name="EdgeColorByArray" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+      
+      <StringVectorProperty name="EdgeColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="UseDomainMap" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <ProxyProperty name="DomainMap"/>
+
+      <DoubleVectorProperty name="EdgeBundlingStrength" number_of_elements="1" default_values="0.5"/>
+
+      <DoubleVectorProperty name="ShrinkPercentage" number_of_elements="1" default_values="0.25"/>
+     
+      <Hints>
+        <InheritRepresentationProperties>
+          <Property name="LayoutStrategy" />
+          <Property name="AreaColor" />
+          <Property name="AreaLabels" />
+          <Property name="AreaLabelArray" />
+          <Property name="AreaLabelFontSize" />
+          <Property name="AreaColorByArray" />
+          <Property name="AreaColorArray" />
+          <Property name="AreaLabelSizeArray" />
+          <Property name="AreaHoverArray" />
+          <Property name="EdgeLabels" />
+          <Property name="EdgeLabelArray" />
+          <Property name="EdgeLabelFontSize" />
+          <Property name="EdgeColor" />
+          <Property name="EdgeColorByArray" />
+          <Property name="EdgeColorArray" />
+          <Property name="EdgeBundlingStrength" />
+          <Property name="ShrinkPercentage" />
+          <Property name="UseDomainMap" />
+          <Property name="DomainMap" />
+        </InheritRepresentationProperties>
+      </Hints>
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 
@@ -13,18 +135,4 @@
    <ViewProxy name="ClientHierarchyView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientHierarchyDisplay">
    </ViewProxy>
  </ProxyGroup>
-
- <ProxyGroup name="filters">
-    <SourceProxy name="PassThrough" class="vtkPassThrough">
-      <InputProperty name="Input" command="SetInputConnection">
-        <ProxyGroupDomain name="groups">
-          <Group name="sources"/>
-          <Group name="filters"/>
-        </ProxyGroupDomain>
-      </InputProperty>
-    </SourceProxy>
- </ProxyGroup>
-
 </ServerManagerConfiguration>
-
-

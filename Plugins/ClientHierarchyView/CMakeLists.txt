@@ -3,14 +3,11 @@ INCLUDE(${QT_USE_FILE})
 QT4_WRAP_CPP(MOC_SRCS
   ClientHierarchyDisplay.h
   ClientHierarchyView.h
-  ClientHierarchyViewActiveOptions.h
-  ClientHierarchyViewOptions.h
   )
 
 SET(UI_FORMS
   ClientHierarchyDisplay.ui
   ClientHierarchyView.ui
-  ClientHierarchyViewOptions.ui
   )
 
 QT4_WRAP_UI(
@@ -21,8 +18,6 @@ QT4_WRAP_UI(
 SET(SOURCES
   ClientHierarchyDisplay.cxx
   ClientHierarchyView.cxx
-  ClientHierarchyViewActiveOptions.cxx
-  ClientHierarchyViewOptions.cxx  
   )
 
 INCLUDE_DIRECTORIES(
@@ -49,17 +44,11 @@ ADD_PARAVIEW_VIEW_MODULE(
   DISPLAY_XML ClientHierarchyDisplay
   DISPLAY_PANEL ClientHierarchyDisplay)
 
-ADD_PARAVIEW_VIEW_OPTIONS(
-  OPTIONS_IFACE OPTIONS_IFACE_SRCS
-  VIEW_TYPE ClientHierarchyView
-  ACTIVE_VIEW_OPTIONS ClientHierarchyViewActiveOptions)
-
 ADD_PARAVIEW_PLUGIN(
   ClientHierarchyViewPlugin "1.0"
   GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
   SOURCES ${SOURCES} ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS}
   SERVER_MANAGER_XML ClientHierarchyView.xml
-  SERVER_MANAGER_SOURCES ${VTK_SOURCE_DIR}/Infovis/vtkPassThrough.h
   )
 
 TARGET_LINK_LIBRARIES(

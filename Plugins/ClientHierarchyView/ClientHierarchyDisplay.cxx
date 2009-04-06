@@ -33,9 +33,12 @@
 #include <pqApplicationCore.h>
 #include <pqComboBoxDomain.h>
 #include <pqPipelineSource.h>
+#include <pqPluginManager.h>
+#include <pqPropertyHelper.h>
 #include <pqPropertyLinks.h>
 #include <pqServerManagerModel.h>
 #include <pqSignalAdaptors.h>
+#include <pqTreeLayoutStrategyInterface.h>
 
 #include <vtkCommand.h>
 #include <vtkEventQtSlotConnect.h>
@@ -51,7 +54,7 @@ class ClientHierarchyDisplay::implementation
 {
 public:
   implementation() :
-    VertexColorAdaptor(0),
+    AreaColorAdaptor(0),
     EdgeColorAdaptor(0)
   {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -60,13 +63,13 @@ public:
   ~implementation()
   {
     delete this->EdgeColorAdaptor;
-    delete this->VertexColorAdaptor;
+    delete this->AreaColorAdaptor;
   }
 
   Ui::ClientHierarchyDisplay Widgets;
 
   pqPropertyLinks Links;
-  pqSignalAdaptorColor* VertexColorAdaptor;
+  pqSignalAdaptorColor* AreaColorAdaptor;
   pqSignalAdaptorColor* EdgeColorAdaptor;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
@@ -79,8 +82,8 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
 
   this->Implementation->Widgets.setupUi(this);
 
-  this->Implementation->VertexColorAdaptor = new pqSignalAdaptorColor(
-    this->Implementation->Widgets.vertexColor,
+  this->Implementation->AreaColorAdaptor = new pqSignalAdaptorColor(
+    this->Implementation->Widgets.areaColor,
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)),
     false);
@@ -90,80 +93,101 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
     "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)),
     false);
+    
+
+
+  QObjectList ifaces =
+    pqApplicationCore::instance()->getPluginManager()->interfaces();
+  foreach(QObject* iface, ifaces)
+    {
+    pqTreeLayoutStrategyInterface* glsi = qobject_cast<pqTreeLayoutStrategyInterface*>(iface);
+    if(glsi)
+      {
+      this->Implementation->Widgets.layoutStrategy->addItems(glsi->treeLayoutStrategies());
+      }
+    }
+
+  pqSignalAdaptorComboBox* layoutStrategyAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.layoutStrategy);
+  layoutStrategyAdaptor->setObjectName("ComboBoxAdaptor");
+
+  pqComboBoxDomain* const layout_strategy_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.layoutStrategy,
+    proxy->GetProperty("LayoutStrategy"),
+    "domain");
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.vertexLabels,
-    "checked",
-    SIGNAL(toggled(bool)),
-    proxy,
-    proxy->GetProperty("VertexLabels"));
-
-  pqSignalAdaptorComboBox* vertexLabelAdaptor = 
-    new pqSignalAdaptorComboBox(this->Implementation->Widgets.vertexLabelArray);
-  vertexLabelAdaptor->setObjectName("vertComboBoxAdaptor");
-
-  pqComboBoxDomain* const vertex_label_array_domain = new pqComboBoxDomain(
-    this->Implementation->Widgets.vertexLabelArray,
-    proxy->GetProperty("VertexLabelArray"),
-    "array_list");
-
-  this->Implementation->Links.addPropertyLink(
-    vertexLabelAdaptor,
+    layoutStrategyAdaptor,
     "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     proxy,
-    proxy->GetProperty("VertexLabelArray"));
+    proxy->GetProperty("LayoutStrategy"));
+
+  this->Implementation->Widgets.layoutStrategy->setCurrentIndex(
+    this->Implementation->Widgets.layoutStrategy->
+    findText(pqPropertyHelper(proxy, "LayoutStrategy").GetAsString()));
+
+
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.vertexLabelFontSize,
+    this->Implementation->Widgets.areaLabels,
+    "checked",
+    SIGNAL(toggled(bool)),
+    proxy,
+    proxy->GetProperty("AreaLabels"));
+
+  pqSignalAdaptorComboBox* areaLabelAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.areaLabelArray);
+  areaLabelAdaptor->setObjectName("areaComboBoxAdaptor");
+
+  pqComboBoxDomain* const area_label_array_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.areaLabelArray,
+    proxy->GetProperty("AreaLabelArray"),
+    "array_list");
+
+  this->Implementation->Links.addPropertyLink(
+    areaLabelAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("AreaLabelArray"));
+
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.areaLabelFontSize,
     "value",
     SIGNAL(valueChanged(double)),
     proxy,
-    proxy->GetProperty("VertexLabelFontSize"));
+    proxy->GetProperty("AreaLabelFontSize"));
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.vertexSize,
-    "value",
-    SIGNAL(valueChanged(double)),
-    proxy,
-    proxy->GetProperty("VertexSize"));
-
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.vertexOpacity,
-    "value",
-    SIGNAL(valueChanged(double)),
-    proxy,
-    proxy->GetProperty("VertexOpacity"));
-
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->VertexColorAdaptor,
+    this->Implementation->AreaColorAdaptor,
     "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy,
-    proxy->GetProperty("VertexColor"));
+    proxy->GetProperty("AreaColor"));
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.vertexColorByArray,
+    this->Implementation->Widgets.areaColorByArray,
     "checked",
     SIGNAL(toggled(bool)),
     proxy,
-    proxy->GetProperty("VertexColorByArray"));
+    proxy->GetProperty("AreaColorByArray"));
 
-  pqSignalAdaptorComboBox* vertexColorAdaptor = 
-    new pqSignalAdaptorComboBox(this->Implementation->Widgets.vertexColorArray);
-  vertexColorAdaptor->setObjectName("vertColorComboBoxAdaptor");
+  pqSignalAdaptorComboBox* areaColorAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.areaColorArray);
+  areaColorAdaptor->setObjectName("areaColorComboBoxAdaptor");
 
-  pqComboBoxDomain* const vertex_color_array_domain = new pqComboBoxDomain(
-    this->Implementation->Widgets.vertexColorArray,
-    proxy->GetProperty("VertexColorArray"),
+  pqComboBoxDomain* const area_color_array_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.areaColorArray,
+    proxy->GetProperty("AreaColorArray"),
     "array_list");
 
   this->Implementation->Links.addPropertyLink(
-    vertexColorAdaptor,
+    areaColorAdaptor,
     "currentText",
     SIGNAL(currentTextChanged(const QString&)),
     proxy,
-    proxy->GetProperty("VertexColorArray"));
+    proxy->GetProperty("AreaColorArray"));
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.edgeLabels,
@@ -196,27 +220,13 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
     proxy->GetProperty("EdgeLabelFontSize"));
 
   this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.edgeWidth,
-    "value",
-    SIGNAL(valueChanged(double)),
-    proxy,
-    proxy->GetProperty("EdgeWidth"));
-
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.edgeOpacity,
-    "value",
-    SIGNAL(valueChanged(double)),
-    proxy,
-    proxy->GetProperty("EdgeOpacity"));
-
-  this->Implementation->Links.addPropertyLink(
     this->Implementation->EdgeColorAdaptor,
     "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy,
     proxy->GetProperty("EdgeColor"));
 
-  vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("EdgeColorByArray"))->SetElement(0,0);
+  //vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("EdgeColorByArray"))->SetElement(0,0);
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.edgeColorByArray,
     "checked",
@@ -240,28 +250,73 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
     proxy,
     proxy->GetProperty("EdgeColorArray"));
 
-  this->Implementation->Links.addPropertyLink(
-    this->Implementation->Widgets.iconVisibility,
-    "checked",
-    SIGNAL(toggled(bool)),
-    proxy,
-    proxy->GetProperty("IconVisibility"));
 
+  pqSignalAdaptorComboBox* areaLabelPriorityAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.areaLabelPriorityArray);
+  areaLabelPriorityAdaptor->setObjectName("areaLabelPriorityComboBoxAdaptor");
 
-  pqSignalAdaptorComboBox* iconAlignmentAdaptor = 
-    new pqSignalAdaptorComboBox(this->Implementation->Widgets.iconAlignment);
-  iconAlignmentAdaptor->setObjectName("ComboBoxAdaptor");
+  pqComboBoxDomain* const area_label_priority_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.areaLabelPriorityArray,
+    proxy->GetProperty("AreaLabelPriorityArray"),
+    "array_list");
 
   this->Implementation->Links.addPropertyLink(
-    iconAlignmentAdaptor,
-    "currentIndex",
-    SIGNAL(currentIndexChanged(int)),
+    areaLabelPriorityAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
     proxy,
-    proxy->GetProperty("IconAlignment"));
+    proxy->GetProperty("AreaLabelPriorityArray"));
 
-  QObject::connect(this->Implementation->Widgets.configureIcons, 
-                  SIGNAL(pressed()),
-                  this, SLOT(onConfigureIcons()));
+
+  pqSignalAdaptorComboBox* areaLabelHoverAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.areaLabelHoverArray);
+  areaLabelHoverAdaptor->setObjectName("areaLabelHoverComboBoxAdaptor");
+
+  pqComboBoxDomain* const area_label_Hover_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.areaLabelHoverArray,
+    proxy->GetProperty("AreaLabelHoverArray"),
+    "array_list");
+
+  this->Implementation->Links.addPropertyLink(
+    areaLabelHoverAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("AreaLabelHoverArray"));
+
+
+  pqSignalAdaptorComboBox* areaSizeAdaptor = 
+    new pqSignalAdaptorComboBox(this->Implementation->Widgets.areaSizeArray);
+  areaSizeAdaptor->setObjectName("areaSizeComboBoxAdaptor");
+
+  pqComboBoxDomain* const area_size_domain = new pqComboBoxDomain(
+    this->Implementation->Widgets.areaSizeArray,
+    proxy->GetProperty("AreaSizeArray"),
+    "array_list");
+
+  this->Implementation->Links.addPropertyLink(
+    areaSizeAdaptor,
+    "currentText",
+    SIGNAL(currentTextChanged(const QString&)),
+    proxy,
+    proxy->GetProperty("AreaSizeArray"));
+
+
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.edgeBundlingStrength,
+    "value",
+    SIGNAL(valueChanged(double)),
+    proxy,
+    proxy->GetProperty("EdgeBundlingStrength"));
+
+
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.shrinkPercentage,
+    "value",
+    SIGNAL(valueChanged(double)),
+    proxy,
+    proxy->GetProperty("ShrinkPercentage"));
+
 
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.useDomainMap,
@@ -302,14 +357,6 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
 ClientHierarchyDisplay::~ClientHierarchyDisplay()
 {
   delete this->Implementation;
-}
-
-void ClientHierarchyDisplay::onConfigureIcons()
-{
-  IconDialog dialog(this->getRepresentation());
-  dialog.exec();
-
-  this->updateAllViews();
 }
 
 void ClientHierarchyDisplay::onProxyDomainMapChanged()

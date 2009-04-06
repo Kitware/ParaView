@@ -52,28 +52,16 @@ public:
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
 
-  const bool treeVisible();
-  const bool hierarchicalGraphVisible();
-
   /// This view supports undo/redo.
   virtual bool supportsUndo() const { return true; }
  
   /// This view supports lookmarks.
   virtual bool supportsLookmarks() const { return true; }
 
-public slots:
-  void showTree(bool);
-  void showHierarchicalGraph(bool);
-  void setHierarchicalGraphLayout(const QString&);
-  void setTreeLeafSpacing(double);
-  void setTreeLevelSpacing(double);
-  void setEdgeBundlingStrength(double);
-  void setRadialAngle(int);
-  void setRadialLayout(bool);
+protected:
+  virtual void renderInternal();
 
 private slots:
-  virtual void render();
-
   /// Called whenever branches in the Qt tree widget are expanded/collapsed
   void treeVisibilityChanged();
   /// Called once to synchronize all views with changes in state / data
