@@ -27,7 +27,6 @@
       <IntVectorProperty name="HaveHeaders" command="SetHaveHeaders" number_of_elements="1" default_values="1"/>
       <IntVectorProperty name="MergeConsecutiveDelimiters" command="SetMergeConsecutiveDelimiters" number_of_elements="1" default_values="0"/>
       <IntVectorProperty name="MaxRecords" command="SetMaxRecords" number_of_elements="1" default_values="0"/>
-      <IntVectorProperty name="OutputPedigreeIds" command="SetOutputPedigreeIds" number_of_elements="1" label="Output Pedigree IDs" default_values="1">
       <IntVectorProperty name="DetectNumericColumns" command="SetDetectNumericColumns" number_of_elements="1" default_values="1"/>
       <IntVectorProperty name="OutputPedigreeIds" command="SetOutputPedigreeIds" number_of_elements="1" label="Output Pedigree IDs" default_values="1">
         <BooleanDomain name="bool"/>
