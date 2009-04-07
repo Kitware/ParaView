@@ -17,11 +17,6 @@ private slots:
   // pipline selection changes.
   void updateEnableState();
 
-  // Description:
-  // Given a graph+selection, this extracts the selected graph
-  // out and creates a new graph source from the subgraph.
-  // (i.e., vtkExtractSelectedGraph).
-  void createGraphSourceFromGraphSelection();
 };
 #endif
 

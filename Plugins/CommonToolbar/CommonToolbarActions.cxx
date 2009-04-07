@@ -49,6 +49,13 @@ CommonToolbarActions::CommonToolbarActions(QObject* p)
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createSource()));
 
+  action = new QAction("Table To Graph", this);
+  action->setData("TableToGraph");
+  action->setIcon(QIcon(":CommonToolbar/Icons/table_to_graph_48.png"));
+  this->addAction(action);
+  QObject::connect(action, SIGNAL(triggered(bool)),
+    this, SLOT(createFilter()));
+
   action = new QAction("Geospatial View", this);
   action->setData("ClientGeoView");
   action->setIcon(QIcon(":CommonToolbar/Icons/internet_48.png"));
@@ -57,21 +64,21 @@ CommonToolbarActions::CommonToolbarActions(QObject* p)
     this, SLOT(createView()));
 
   action = new QAction("Bar Chart", this);
-  action->setData("ClientBarChartView");
+  action->setData("BarChartView");
   action->setIcon(QIcon(":CommonToolbar/Icons/column_chart_48.png"));
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createView()));
 
   action = new QAction("Line Chart", this);
-  action->setData("ClientLineChartView");
+  action->setData("LineChartView");
   action->setIcon(QIcon(":CommonToolbar/Icons/line_chart_48.png"));
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createView()));
 
   action = new QAction("Stacked Chart", this);
-  action->setData("ClientStackedChartView");
+  action->setData("StackedChartView");
   action->setIcon(QIcon(":CommonToolbar/Icons/area_chart_48.png"));
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
@@ -97,20 +104,7 @@ CommonToolbarActions::CommonToolbarActions(QObject* p)
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createView()));
-
-  action = new QAction("Extract Selected Graph", this);
-  action->setData("FreezeGraph");
-  action->setIcon(QIcon(":CommonToolbar/Icons/extract_graph_48.png"));
-  this->addAction(action);
-  QObject::connect(action, SIGNAL(triggered(bool)), 
-    this, SLOT(createGraphSourceFromGraphSelection()));
-    
-  action = new QAction("Nearest Neighbors Selection", this);
-  action->setData("ExpandSelection");
-  action->setIcon(QIcon(":CommonToolbar/Icons/nearest_neighbor_48.png"));
-  this->addAction(action);
-  QObject::connect(action, SIGNAL(triggered(bool)), this, SLOT(createSelectionFilter()));
-    
+  
   pqServerManagerSelectionModel *selection =
       pqApplicationCore::instance()->getSelectionModel();
   QObject::connect(selection, SIGNAL(currentChanged(pqServerManagerModelItem*)),
@@ -141,11 +135,10 @@ void CommonToolbarActions::updateEnableState()
   actions[3]->setEnabled(false);
   actions[4]->setEnabled(false);
   actions[5]->setEnabled(false);
-  actions[6]->setEnabled(true);
+  actions[6]->setEnabled(false);
   actions[7]->setEnabled(true);
   actions[8]->setEnabled(true);
-  actions[9]->setEnabled(false);
-  actions[10]->setEnabled(false);
+  actions[9]->setEnabled(true);
 
   pqPipelineSource *src = this->getActiveSource();
   if(!src)
@@ -162,97 +155,19 @@ void CommonToolbarActions::updateEnableState()
   switch( opPort->getDataInformation(false)->GetDataSetType() )
     {
     case VTK_TABLE : 
-      actions[3]->setEnabled(true);
+      actions[2]->setEnabled(true);
       actions[4]->setEnabled(true);
-      //actions[5]->setEnabled(true);
+      actions[5]->setEnabled(true);
+      actions[6]->setEnabled(true);
       break;
     case VTK_GRAPH : 
     case VTK_TREE : 
     case VTK_DIRECTED_GRAPH : 
     case VTK_UNDIRECTED_GRAPH : 
     case VTK_DIRECTED_ACYCLIC_GRAPH : 
-      actions[2]->setEnabled(true);
-      actions[9]->setEnabled(true);
-      actions[10]->setEnabled(true);
+      //actions[3]->setEnabled(true);
       break;
     default:
       break;
     }
 }
-
-//-----------------------------------------------------------------------------
-void CommonToolbarActions::createGraphSourceFromGraphSelection()
-{
-  QAction * action = qobject_cast<QAction*>(this->sender());
-  if(!action)
-    {
-    return;
-    }
-
-  QString type=action->data().toString();
-  if(type != "FreezeGraph")
-    {
-    return;
-    }
-
-  pqServer * server = pqApplicationCore::instance()->getServerManagerModel()->getItemAtIndex<pqServer*>(0);
-  if(!server)
-    {
-    qDebug() << "No server present, cannot convert source.";
-    }
-
-  // Get the currently selected source
-  pqPipelineSource * src = this->getActiveSource();
-  if(!src)
-    {
-    return;
-    }
-
-  pqPendingDisplayManager * pdm = qobject_cast<pqPendingDisplayManager*>(pqApplicationCore::instance()->manager("PENDING_DISPLAY_MANAGER"));
-
-  // Create ExtractSelectedGraph filter
-  vtkSMSourceProxy *selProxy = vtkSMSourceProxy::SafeDownCast(src->getProxy())->GetSelectionInput(0);
-  vtkSMSourceProxy* filterProxy = vtkSMSourceProxy::SafeDownCast(vtkSMProxyManager::GetProxyManager()->NewProxy("filters", "ExtractSelectedGraph"));
-  filterProxy->SetConnectionID(server->GetConnectionID());
-  vtkSMProxyManager::GetProxyManager()->RegisterProxy("filters", "Extract Selected Graph", filterProxy);
-  vtkSMInputProperty *selInput = vtkSMInputProperty::SafeDownCast(filterProxy->GetProperty("Input"));
-  selInput->AddInputConnection(src->getProxy(),0);
-  vtkSMInputProperty *graphInput = vtkSMInputProperty::SafeDownCast(filterProxy->GetProperty("Selection"));
-  graphInput->AddInputConnection(selProxy,0);
-  filterProxy->UpdatePipeline();
-
-  // Create the FreezeGraph filter
-  vtkSMSourceProxy* freezeGraphProxy = vtkSMSourceProxy::SafeDownCast(vtkSMProxyManager::GetProxyManager()->NewProxy("filters", "FreezeGraph"));
-  freezeGraphProxy->SetConnectionID(server->GetConnectionID());
-  vtkSMProxyManager::GetProxyManager()->RegisterProxy("sources", "Graph Copy", freezeGraphProxy);
-  vtkSMInputProperty *fgInput = vtkSMInputProperty::SafeDownCast(freezeGraphProxy->GetProperty("Input"));
-  fgInput->AddInputConnection(filterProxy,0);
-  freezeGraphProxy->UpdatePipeline();
-
-  pdm->setAddSourceIgnored(true);
-  pqPipelineSource* pqFreezeGraphProxy = pqApplicationCore::instance()->
-      getServerManagerModel()->findItem<pqPipelineSource*>(freezeGraphProxy);
-  pdm->setAddSourceIgnored(false);
- 
-  // create a view...
-  pqOutputPort * opPort = pqFreezeGraphProxy->getOutputPort(0);
-  QString preferredViewType = pqApplicationCore::instance()->getDisplayPolicy()->getPreferredViewType(opPort,0);
-  if(preferredViewType.isNull())
-    {
-    return;
-    }
-
-  // Add it to the view.
-  pqObjectBuilder * builder = pqApplicationCore::instance()->getObjectBuilder();
-  pqView * view = builder->createView(preferredViewType, server);
-  builder->createDataRepresentation(pqFreezeGraphProxy->getOutputPort(0), view);
-  view->render();
-
-  // Cleanup. Disconnect filter inputs.
-  fgInput->RemoveAllProxies();
-  selInput->RemoveAllProxies();
-  graphInput->RemoveAllProxies();
-  filterProxy->Delete();
-  freezeGraphProxy->Delete();
-}
-

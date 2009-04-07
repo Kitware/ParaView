@@ -35,5 +35,6 @@
         <file>Icons/men_working_48.png</file>
         <file>Icons/extract_graph_48.png</file>
         <file>Icons/row_zoom_48.png</file>
+        <file>Icons/table_to_graph_48.png</file>
     </qresource>
 </RCC>  
