@@ -23,16 +23,6 @@ SET(Filters_SRCS
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
-  vtkCTHFragmentCommBuffer.cxx
-  vtkCTHFragmentConnect.cxx
-  vtkCTHFragmentIdList.cxx
-  vtkCTHFragmentIntersect.cxx
-  vtkCTHFragmentPieceLoading.cxx
-  vtkCTHFragmentPieceTransaction.cxx
-  vtkCTHFragmentPieceTransactionMatrix.cxx
-  vtkCTHFragmentProcessLoading.cxx
-  vtkCTHFragmentProcessRing.cxx
-  vtkCTHFragmentToProcMap.cxx
   vtkCameraInterpolator2.cxx
   vtkCameraManipulator.cxx
   vtkCameraManipulatorGUIHelper.cxx
@@ -180,14 +170,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSpyPlotIStream.cxx
   vtkSpyPlotBlockIterator.cxx
   vtkSpyPlotReaderMap.cxx
-  vtkCTHFragmentCommBuffer.cxx
-  vtkCTHFragmentIdList.cxx
-  vtkCTHFragmentPieceLoading.cxx
-  vtkCTHFragmentPieceTransaction.cxx
-  vtkCTHFragmentPieceTransactionMatrix.cxx
-  vtkCTHFragmentProcessLoading.cxx
-  vtkCTHFragmentProcessRing.cxx
-  vtkCTHFragmentToProcMap.cxx
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES(
