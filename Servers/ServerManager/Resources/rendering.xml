@@ -2499,25 +2499,27 @@
       </DoubleVectorProperty>
     </Proxy>
 
-    <Proxy name="Property" class="vtkProperty">
-      <DoubleVectorProperty
-        name="LineWidth"
+    <Proxy name="PropertyBase" class="vtkProperty">
+      <Documentation>
+        This is a vtkProperty API without any color properties.
+      </Documentation>
+      <DoubleVectorProperty name="LineWidth"
         command="SetLineWidth"
         number_of_elements="1"
         default_values="1.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="PointSize"
+
+      <DoubleVectorProperty name="PointSize"
         command="SetPointSize"
         number_of_elements="1"
         default_values="5.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
-      <IntVectorProperty
-        name="Interpolation"
+
+      <IntVectorProperty name="Interpolation"
         command="SetInterpolation"
         number_of_elements="1"
         default_values="1"
@@ -2528,8 +2530,8 @@
           <!--<Entry value="2" text="Phong" />-->
         </EnumerationDomain>
       </IntVectorProperty>
-      <IntVectorProperty
-        name="Representation"
+
+      <IntVectorProperty name="Representation"
         command="SetRepresentation"
         number_of_elements="1"
         default_values="2"
@@ -2540,89 +2542,56 @@
           <Entry value="2" text="Surface" />
         </EnumerationDomain>
       </IntVectorProperty>
-      <DoubleVectorProperty
-        name="Color"
-        command="SetColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="AmbientColor"
-        command="SetAmbientColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="DiffuseColor"
-        command="SetDiffuseColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-      </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="Opacity"
+
+      <DoubleVectorProperty name="Opacity"
         command="SetOpacity"
         number_of_elements="1"
         default_values="1.0"
         animateable="1">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="Ambient"
+
+      <DoubleVectorProperty name="Ambient"
         command="SetAmbient"
         number_of_elements="1"
         default_values="0.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="Diffuse"
+
+      <DoubleVectorProperty name="Diffuse"
         command="SetDiffuse"
         number_of_elements="1"
         default_values="1.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
-      <IntVectorProperty
-        name="Shading"
+
+      <IntVectorProperty name="Shading"
         command="SetShading"
         number_of_elements="1"
         default_values="0"
         animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <DoubleVectorProperty
-        name="Specular"
+
+      <DoubleVectorProperty name="Specular"
         command="SetSpecular"
         number_of_elements="1"
         default_values="0.1"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="SpecularPower"
+
+      <DoubleVectorProperty name="SpecularPower"
         command="SetSpecularPower"
         number_of_elements="1"
         default_values="100.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="100" />
       </DoubleVectorProperty>
-      <DoubleVectorProperty
-        name="SpecularColor"
-        command="SetSpecularColor"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0"
-        animateable="0">
-        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
-      </DoubleVectorProperty>
 
-      <DoubleVectorProperty
-        name="EdgeColor"
+      <DoubleVectorProperty name="EdgeColor"
         command="SetEdgeColor"
         number_of_elements="3"
         default_values="0 0 0.5">
@@ -2633,8 +2602,7 @@
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
       </DoubleVectorProperty>
 
-      <IntVectorProperty
-        name="EdgeVisibility"
+      <IntVectorProperty name="EdgeVisibility"
         command="SetEdgeVisibility"
         number_of_elements="1"
         default_values="0">
@@ -2666,7 +2634,57 @@
         </Documentation>
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <!-- End of PropertyBase -->
+    </Proxy>
+
+    <Proxy name="Property" class="vtkProperty"
+      base_proxygroup="properties" base_proxyname="PropertyBase">
+      <Documentation>
+        Proxy for vtkProperty with 3 separate properties for the 3 colors.
+      </Documentation>
+
+      <DoubleVectorProperty name="AmbientColor"
+        command="SetAmbientColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="DiffuseColor"
+        command="SetDiffuseColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="SpecularColor"
+        command="SetSpecularColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
       <!-- End of Property -->
+    </Proxy>
+
+    <Proxy name="Property2" class="vtkProperty"
+      base_proxygroup="properties" base_proxyname="PropertyBase">
+      <Documentation>
+        Proxy for vtkProperty with a single property "Color" for controlling all
+        the 3 color components.
+      </Documentation>
+      <DoubleVectorProperty name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0"
+        animateable="0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+      <!-- End of Property2 -->
     </Proxy>
     
     <Proxy name="Property2D" class="vtkProperty2D">
@@ -6059,21 +6077,13 @@
         <!--
           Property for the vtkProp.
         -->
-        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <Proxy name="Property" proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
-          <Property name="Ambient" />
-          <Property name="AmbientColor" />
           <Property name="Color"/> 
-          <Property name="Diffuse"/> 
-          <Property name="DiffuseColor"/> 
-          <Property name="Interpolation"/> 
           <Property name="LineWidth"/> 
           <Property name="Opacity"/> 
           <Property name="PointSize"/> 
           <Property name="Representation"/> 
-          <Property name="Specular"/> 
-          <Property name="SpecularColor"/> 
-          <Property name="SpecularPower"/> 
         </ExposedProperties>
       </SubProxy>
       
@@ -6284,7 +6294,6 @@
         <ExposedProperties>
           <Property name="AmbientColor" />
           <Property name="BackfaceCulling" />
-          <Property name="Color" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
           <Property name="FrontfaceCulling" />
@@ -6507,7 +6516,6 @@
           <Property name="LineWidth" />
           <Property name="Interpolation" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
           -->
@@ -6627,7 +6635,6 @@
         <ExposedProperties>
           <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="Interpolation" />
@@ -7045,7 +7052,6 @@
           <!-- Property properties -->
           <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
@@ -7071,7 +7077,6 @@
           <Exception name="Input" />
           <Exception name="AmbientColor" />
           <Exception name="BackfaceCulling" />
-          <Exception name="Color" />
           <Exception name="DiffuseColor" />
           <Exception name="FrontfaceCulling" />
           <Exception name="Opacity" />
@@ -7080,7 +7085,6 @@
         </ShareProperties>
         <ExposedProperties>
           <Property name="AmbientColor" exposed_name="BackfaceAmbientColor" />
-          <Property name="Color" exposed_name="BackfaceColor" />
           <Property name="DiffuseColor" exposed_name="BackfaceDiffuseColor" />
           <Property name="Opacity" exposed_name="BackfaceOpacity" />
         </ExposedProperties>
@@ -7101,18 +7105,12 @@
           proxygroup="representations"
           proxyname="SelectionRepresentation" />
         <ExposedProperties>
-          <Property name="Color" 
-                    exposed_name="SelectionColor" />
-          <Property name="LineWidth" 
-                    exposed_name="SelectionLineWidth" />
-          <Property name="Opacity" 
-                    exposed_name="SelectionOpacity" />
-          <Property name="PointSize" 
-                    exposed_name="SelectionPointSize" />
-          <Property name="Representation" 
+          <Property name="Color" exposed_name="SelectionColor" />
+          <Property name="LineWidth" exposed_name="SelectionLineWidth" />
+          <Property name="Opacity" exposed_name="SelectionOpacity" />
+          <Property name="PointSize" exposed_name="SelectionPointSize" />
+          <Property name="Representation"
                     exposed_name="SelectionRepresentation" />
-          <Property name="Interpolation"
-                    exposed_name="SelectionInterpolation" />
           
           <Property name="PointLabelVisibility" 
                     exposed_name="SelectionPointLabelVisibility" />
@@ -7171,7 +7169,6 @@
         </ExposedProperties>
         <ShareProperties subproxy="SurfaceRepresentation">
           <Exception name="Input" />
-          <Exception name="Color" />
           <Exception name="Visibility" />
         </ShareProperties>
       </SubProxy>
@@ -7243,7 +7240,6 @@
           <Property name="Texture" />
           <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
@@ -7383,7 +7379,6 @@
           <Property name="Texture" />
           <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
@@ -7538,7 +7533,6 @@
           <Property name="Texture" />
           <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Color" />
           <Property name="Diffuse" />
           <Property name="DiffuseColor" />
           <Property name="EdgeColor" />
@@ -8498,7 +8492,7 @@
       </SubProxy>
 
       <SubProxy>
-        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <Proxy name="Property" proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
           <Property name="Color" />
           <Property name="LineWidth" />
@@ -9229,7 +9223,7 @@
 
       <SubProxy>
         <Proxy name="Property"
-          proxygroup="properties" proxyname="Property" />
+          proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
           <Property name="Color" />
         </ExposedProperties>
