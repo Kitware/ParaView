@@ -44,7 +44,7 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.10");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.11");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -142,56 +142,12 @@ void vtkPVDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
 //----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryClient::CollectWindowInformation(vtkMultiProcessStream& stream)
 {
-  this->CollectWindowInformation2(stream);
-  return;
-/*
-  this->Superclass::CollectWindowInformation(stream);
-  vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
-  if ((this->GUISize[0] == 0) || (this->GUISize[1] == 0))
-    {
-    winGeoInfo.GUISize[0] = this->RenderWindow->GetActualSize()[0];
-    winGeoInfo.GUISize[1] = this->RenderWindow->GetActualSize()[1];
-    }
-  else
-    {
-    winGeoInfo.GUISize[0] = this->GUISize[0];
-    winGeoInfo.GUISize[1] = this->GUISize[1];
-    }
-  // Flip Y possition to lower left to make things easier for server.
-  winGeoInfo.Position[0] = this->WindowPosition[0];
-  winGeoInfo.Position[1]
-    = (  winGeoInfo.GUISize[1]
-       - this->WindowPosition[1] - this->RenderWindow->GetActualSize()[1] );
-  winGeoInfo.Id = this->Id;
-  winGeoInfo.AnnotationLayer = this->AnnotationLayer;
-  winGeoInfo.Save(stream);
-
-  vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
-  squirtOptions.Enabled = this->Squirt;
-  squirtOptions.CompressLevel = this->SquirtCompressionLevel;
-  squirtOptions.Save(stream);
-*/
-}
-
-//----------------------------------------------------------------------------
-//
-// This method replaces the original SendWindowInformation.
-//
-// This method checks to see if GUISizeCompact has been set.
-// If it has been set, then this method sends GUISizeCompact,
-// ViewSizeCompact, and ViewPositionCompact to the server.
-//
-// If GUISizeCompact has not been set, this method will act
-// exactly as the original did. (sends GUISize and WindowPosition)
-//
-void vtkPVDesktopDeliveryClient::CollectWindowInformation2(vtkMultiProcessStream& stream)
-{
   this->Superclass::CollectWindowInformation(stream);
 
   vtkPVDesktopDeliveryServer::WindowGeometry winGeoInfo;
 
   // If GUISizeCompact has been set to a non-zero value
-  // then we are using multi display, so we'll use the
+  // then we are using multi display i.e. tiledisplay, so we'll use the
   // compact values to eliminate gaps on the server tile display.
   if (this->GUISizeCompact[0] != 0 && this->GUISizeCompact[1] != 0)
     {
@@ -201,32 +157,32 @@ void vtkPVDesktopDeliveryClient::CollectWindowInformation2(vtkMultiProcessStream
     winGeoInfo.ViewSize[1] = this->ViewSizeCompact[1];
     winGeoInfo.Position[0] = this->ViewPositionCompact[0];
     winGeoInfo.Position[1] = this->ViewPositionCompact[1];
+
+    // Flip Y possition to lower left to make things easier for server.
+    winGeoInfo.Position[1] =
+      winGeoInfo.GUISize[1] - winGeoInfo.Position[1] - winGeoInfo.ViewSize[1];
     }
   else  // Use regular values
     {
     winGeoInfo.GUISize[0] = this->GUISize[0];
     winGeoInfo.GUISize[1] = this->GUISize[1];
-    winGeoInfo.ViewSize[0] = this->RenderWindow->GetActualSize()[0];
-    winGeoInfo.ViewSize[1] = this->RenderWindow->GetActualSize()[0];
+    if ((this->GUISize[0] == 0) || (this->GUISize[1] == 0))
+      {
+      winGeoInfo.GUISize[0] = this->RenderWindow->GetActualSize()[0];
+      winGeoInfo.GUISize[1] = this->RenderWindow->GetActualSize()[1];
+      }
+    // This ensures that the server side uses this->FullImageSize as the
+    // ClientWindowSize (look at
+    // vtkPVDesktopDeliveryServer::ProcessWindowInformation()).
+    winGeoInfo.ViewSize[0] = 0;
+    winGeoInfo.ViewSize[1] = 0;
+
+    // Flip Y possition to lower left to make things easier for server.
     winGeoInfo.Position[0] = this->WindowPosition[0];
-    winGeoInfo.Position[1] = this->WindowPosition[1];
+    winGeoInfo.Position[1]
+      = (  winGeoInfo.GUISize[1]
+        - this->WindowPosition[1] - this->RenderWindow->GetActualSize()[1] );
     }
-
-  // Flip Y possition to lower left to make things easier for server.
-  winGeoInfo.Position[1] =
-    winGeoInfo.GUISize[1] - winGeoInfo.Position[1] - winGeoInfo.ViewSize[1];
-
-  // I'm not sure if this block is ever triggered, but for now lets leave it.
-  if ((winGeoInfo.GUISize[0] == 0) || (winGeoInfo.GUISize[1] == 0))
-    {
-    winGeoInfo.GUISize[0] = winGeoInfo.ViewSize[0];
-    winGeoInfo.GUISize[1] = winGeoInfo.ViewSize[1];
-    }
-
-  //printf("-----SendingWindowInformation-----\n");
-  //printf("  GuiSize: %d %d\n", winGeoInfo.GUISize[0], winGeoInfo.GUISize[1]);
-  //printf("  ViewPos: %d %d\n", winGeoInfo.Position[0], winGeoInfo.Position[1]);
-  //printf("  ViewSize: %d %d\n", winGeoInfo.ViewSize[0], winGeoInfo.ViewSize[1]);
 
   winGeoInfo.Id = this->Id;
   winGeoInfo.AnnotationLayer = this->AnnotationLayer;

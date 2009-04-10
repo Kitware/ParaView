@@ -175,7 +175,6 @@ protected:
   double TransferTime;
 
   virtual void CollectWindowInformation(vtkMultiProcessStream& stream);
-  virtual void CollectWindowInformation2(vtkMultiProcessStream& stream);
   virtual void CollectRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   // Squirt options (probably to be replaced later).

@@ -179,7 +179,6 @@ protected:
   virtual void ReadReducedImage();
 
   virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
-  virtual bool ProcessWindowInformation2(vtkMultiProcessStream&);
   virtual bool ProcessRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
   int Squirt;
