@@ -46,7 +46,6 @@ SET(Kit_SRCS
   vtkSMCameraLink.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCameraProxy.cxx
-  vtkSMChartingArraysInformationHelper.cxx
   vtkSMChartRepresentationProxy.cxx
 #vtkSMChartRepresentationProxy2.cxx
   vtkSMClientDeliveryRepresentationProxy.cxx
@@ -223,6 +222,7 @@ IF (VTK_USE_QVTK)
     ${Kit_SRCS}
     vtkSMBarChartSeriesOptionsProxy.cxx
     vtkSMBarChartViewProxy.cxx
+    vtkSMChartingArraysInformationHelper.cxx
     vtkSMChartNamedOptionsModelProxy.cxx
     vtkSMChartOptionsProxy.cxx
     vtkSMChartTableRepresentationProxy.cxx
