@@ -85,7 +85,7 @@ IF (PARAVIEW_BUILD_QT_GUI)
   
   # set vars to build the QVTK library
   SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
-  SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
+  SET(VTK_USE_QT ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
   # ParaView requires this minimum version of Qt, and let's do it here before
   # our first call to FindQt4.cmake
@@ -111,11 +111,11 @@ IF (PARAVIEW_BUILD_QT_GUI)
       SET(VTK_USE_COCOA OFF CACHE BOOL "Build VTK with Cocoa" FORCE)
     ENDIF(Q_WS_MAC)
     # Mark these Qt variables as advanced. Users don't really have to set them.
-    MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QVTK VTK_USE_GUISUPPORT)
+    MARK_AS_ADVANCED(DESIRED_QT_VERSION VTK_USE_QT VTK_USE_GUISUPPORT)
     MARK_AS_ADVANCED(QT_MKSPECS_DIR QT_PLUGINS_DIR QT_X11_X11_LIBRARY QT_X11_Xext_LIBRARY QT_X11_m_LIBRARY)
   ENDIF(NOT QT4_FOUND)
 ELSE (PARAVIEW_BUILD_QT_GUI)
-  SET(VTK_USE_QVTK OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
+  SET(VTK_USE_QT OFF CACHE BOOL "Build VTK with Qt Support" FORCE)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 
