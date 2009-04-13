@@ -1,0 +1,296 @@
+--- /home/burlen/ext2/visit/visit1.10.0/./src/avt/Makefile.in	2009-01-06 14:59:15.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/avt/Makefile.in	2009-01-06 15:01:34.000000000 -0500
+@@ -95,9 +95,14 @@
+ @VARIABLES@
+ @DIRTARGETS@
+ 
+-SUBDIRS=DBAtts Math IVP Pipeline DDF MIR Shapelets\
+-        View Filters Database Expressions Queries Plotter FileWriter \
+-        @VISWINDOW@ QtVisWindow
++SUBDIRS=DBAtts Database Expressions Math Pipeline Filters Queries Shapelets IVP DDF MIR View FileWriter Plotter
++#        IVP DDF MIR Shapelets\
++#        View Filters Database Expressions Queries Plotter FileWriter \
++#         @VISWINDOW@ QtVisWindow
++
++# SUBDIRS=DBAtts Math IVP Pipeline DDF MIR Shapelets\
++#         View Filters Database Expressions Queries Plotter FileWriter \
++#         @VISWINDOW@ QtVisWindow
+ 
+ message:
+ 	@echo
+--- /home/burlen/ext2/visit/visit1.10.0/./src/avt/Plotter/Makefile.in	2009-01-06 14:59:23.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/avt/Plotter/Makefile.in	2009-01-27 11:45:20.000000000 -0500
+@@ -191,23 +191,25 @@
+ ##
+ ## Files...
+ ##
+-OPENGL_SRC=avtOpenGLSurfaceAndWireframeRenderer.C
+-MESA_SRC=avtMesaSurfaceAndWireframeRenderer.C
+-
+-SRC=avtLegend.C avtVariableLegend.C avtGeometryDrawable.C avtActor.C \
+-    avtBehavior.C avtTheater.C avtMapper.C avtVariableMapper.C avtPlot.C \
+-    avtImageMapper.C avtImageDrawable.C avtLevelsLegend.C \
+-    avtLevelsMapper.C avtDrawer.C avtVectorGlyphMapper.C \
+-    avtUserDefinedMapper.C RenderOrder.C avtVolumeVariableLegend.C \
+-    avtColorTables.C avtSurfaceAndWireframeRenderer.C avtLookupTable.C \
+-    avtLightList.C avtPickActor.C avtCustomRenderer.C \
+-    avtLineoutActor.C avtTransparencyActor.C avtLabelActor.C \
+-    avtDecorationsDrawable.C avtDecorationsMapper.C avtLabeledCurveMapper.C \
+-    avtExternallyRenderedImagesActor.C avtTensorGlyphMapper.C avtDrawable.C \
+-    avtPointGlypher.C avtVariablePointGlyphMapper.C avtSoftwareShader.C \
+-    avtLevelsPointGlyphMapper.C avtCurveLegend.C
+-
+-
++# OPENGL_SRC=avtOpenGLSurfaceAndWireframeRenderer.C
++# MESA_SRC=avtMesaSurfaceAndWireframeRenderer.C
++# 
++# SRC=avtLegend.C avtVariableLegend.C avtGeometryDrawable.C avtActor.C \
++#     avtBehavior.C avtTheater.C avtMapper.C avtVariableMapper.C avtPlot.C \
++#     avtImageMapper.C avtImageDrawable.C avtLevelsLegend.C \
++#     avtLevelsMapper.C avtDrawer.C avtVectorGlyphMapper.C \
++#     avtUserDefinedMapper.C RenderOrder.C avtVolumeVariableLegend.C \
++#     avtColorTables.C avtSurfaceAndWireframeRenderer.C avtLookupTable.C \
++#     avtLightList.C avtPickActor.C avtCustomRenderer.C \
++#     avtLineoutActor.C avtTransparencyActor.C avtLabelActor.C \
++#     avtDecorationsDrawable.C avtDecorationsMapper.C avtLabeledCurveMapper.C \
++#     avtExternallyRenderedImagesActor.C avtTensorGlyphMapper.C avtDrawable.C \
++#     avtPointGlypher.C avtVariablePointGlyphMapper.C avtSoftwareShader.C \
++#     avtLevelsPointGlyphMapper.C avtCurveLegend.C
++
++SRC=\
++	avtColorTables.C\
++	avtLookupTable.C
+ 
+ CPPFLAGS=-I../../include/visit @COMPONENT_CPPFLAGS@ @CPPFLAGS@
+ 
+--- /home/burlen/ext2/visit/visit1.10.0/./src/visit_vtk/full/Makefile.in	2009-01-06 15:00:01.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/visit_vtk/full/Makefile.in	2009-01-27 11:43:18.000000000 -0500
+@@ -314,24 +314,11 @@
+ ##
+ ## Files...
+ ##
+-OPENGL_SRC=vtkVisItOpenGLPolyDataMapper.C \
+-    vtkOpenGLRectilinearGridMapper.C \
+-    vtkOpenGLStructuredGridMapper.C \
+-    vtkOpenGLTexturedBackgroundMapper.C \
+-    vtkVisItOpenGLTexture.C
+-
+-MESA_SRC=vtkOSMesaRenderWindow.C \
+-    vtkMesaRectilinearGridMapper.C \
+-    vtkMesaStructuredGridMapper.C \
+-    vtkMesaTexturedBackgroundMapper.C \
+-    vtkVisItMesaPolyDataMapper.C
+ 
+-SRC=InitVTK.C \
++SRC=\
+     vtkAxisDepthSort.C \
+-    vtkBackgroundActor.C \
+     vtkConnectedTubeFilter.C \
+     vtkCSGGrid.C \
+-    vtkDashedXorGridMapper2D.C \
+     vtkDataSetRemoveGhostCells.C \
+     vtkDisjointCubesFacelistFilter.C \
+     vtkLineLegend.C \
+@@ -344,37 +331,25 @@
+     vtkPPMWriter.C \
+     vtkRGBWriter.C \
+     vtkRectilinearGridFacelistFilter.C \
+-    vtkRectilinearGridMapper.C \
+-    vtkRubberBandMapper2D.C \
+     vtkSkewLookupTable.C \
+     vtkSlicer.C \
+     vtkStructuredGridFacelistFilter.C \
+-    vtkStructuredGridMapper.C \
+     vtkSurfaceFilter.C \
+     vtkSurfaceFromVolume.C \
+     vtkTensorReduceFilter.C \
+-    vtkTexturedBackgroundActor.C \
+-    vtkTimeSliderActor.C \
+-    vtkTriad2D.C \
+     vtkUniqueFeatureEdges.C \
+     vtkUnstructuredGridRelevantPointsFilter.C \
+     vtkVectorFontCharacterData.C \
+     vtkVectorGlyph.C \
+     vtkVectorReduceFilter.C \
+     vtkVertexFilter.C \
+-    vtkVerticalScalarBarActor.C \
+-    vtkVerticalScalarBarWithOpacityActor.C \
+-    vtkVisItAxisActor.C \
+-    vtkVisItAxisActor2D.C \
+     vtkVisItCellDataToPointData.C \
+     vtkVisItCellLocator.C \
+     vtkVisItClipper.C \
+     vtkVisItContourFilter.C \
+-    vtkVisItCubeAxesActor.C \
+     vtkVisItCutter.C \
+-    vtkVisItDataSetMapper.C \
+     vtkVisItExtractGrid.C \
+-    vtkVisItExtractRectilinearGrid.C \
++		vtkVisItExtractRectilinearGrid.C\
+     vtkVisItFeatureEdges.C \
+     vtkVisItGlyph3D.C \
+     vtkVisItProbeFilter.C \
+@@ -389,6 +364,81 @@
+     vtkVisItTIFFWriter.C \
+     vtkVolumeFromVolume.C
+ 
++# OPENGL_SRC=vtkVisItOpenGLPolyDataMapper.C \
++#     vtkOpenGLRectilinearGridMapper.C \
++#     vtkOpenGLStructuredGridMapper.C \
++#     vtkOpenGLTexturedBackgroundMapper.C \
++#     vtkVisItOpenGLTexture.C
++# 
++# MESA_SRC=vtkOSMesaRenderWindow.C \
++#     vtkMesaRectilinearGridMapper.C \
++#     vtkMesaStructuredGridMapper.C \
++#     vtkMesaTexturedBackgroundMapper.C \
++#     vtkVisItMesaPolyDataMapper.C
++# 
++# SRC=InitVTK.C \
++#     vtkAxisDepthSort.C \
++#     vtkBackgroundActor.C \
++#     vtkConnectedTubeFilter.C \
++#     vtkCSGGrid.C \
++#     vtkDashedXorGridMapper2D.C \
++#     vtkDataSetRemoveGhostCells.C \
++#     vtkDisjointCubesFacelistFilter.C \
++#     vtkLineLegend.C \
++#     vtkLineoutFilter.C \
++#     vtkLinesFromOriginalCells.C \
++#     vtkMultiFontVectorText.C \
++#     vtkOBJWriter.C \
++#     vtkOnionPeelFilter.C \
++#     vtkPolyDataOnionPeelFilter.C \
++#     vtkPPMWriter.C \
++#     vtkRGBWriter.C \
++#     vtkRectilinearGridFacelistFilter.C \
++#     vtkRectilinearGridMapper.C \
++#     vtkRubberBandMapper2D.C \
++#     vtkSkewLookupTable.C \
++#     vtkSlicer.C \
++#     vtkStructuredGridFacelistFilter.C \
++#     vtkStructuredGridMapper.C \
++#     vtkSurfaceFilter.C \
++#     vtkSurfaceFromVolume.C \
++#     vtkTensorReduceFilter.C \
++#     vtkTexturedBackgroundActor.C \
++#     vtkTimeSliderActor.C \
++#     vtkTriad2D.C \
++#     vtkUniqueFeatureEdges.C \
++#     vtkUnstructuredGridRelevantPointsFilter.C \
++#     vtkVectorFontCharacterData.C \
++#     vtkVectorGlyph.C \
++#     vtkVectorReduceFilter.C \
++#     vtkVertexFilter.C \
++#     vtkVerticalScalarBarActor.C \
++#     vtkVerticalScalarBarWithOpacityActor.C \
++#     vtkVisItAxisActor.C \
++#     vtkVisItAxisActor2D.C \
++#     vtkVisItCellDataToPointData.C \
++#     vtkVisItCellLocator.C \
++#     vtkVisItClipper.C \
++#     vtkVisItContourFilter.C \
++#     vtkVisItCubeAxesActor.C \
++#     vtkVisItCutter.C \
++#     vtkVisItDataSetMapper.C \
++#     vtkVisItExtractGrid.C \
++#     vtkVisItExtractRectilinearGrid.C \
++#     vtkVisItFeatureEdges.C \
++#     vtkVisItGlyph3D.C \
++#     vtkVisItProbeFilter.C \
++#     vtkVisItPolyDataNormals.C \
++#     vtkVisItRectilinearGrid.C \
++#     vtkVisItSTLWriter.C \
++#     vtkVisItScalarTree.C \
++#     vtkVisItStreamLine.C \
++#     vtkVisItStructuredGrid.C \
++#     vtkVisItStructuredGridNormals.C \
++#     vtkVisItTensorGlyph.C \
++#     vtkVisItTIFFWriter.C \
++#     vtkVolumeFromVolume.C
++
+ 
+ CPPFLAGS=-I$(TOPDIR)/include @VISIT_VTK_CPPFLAGS@ @CPPFLAGS@ @ANNOTATION_FLAGS@ -I../../include -I. $(GLEW_INCLUDE)
+ 
+--- /home/burlen/ext2/visit/visit1.10.0/./src/databases/Makefile.in	2009-01-06 15:00:27.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/databases/Makefile.in	2009-01-06 15:02:00.000000000 -0500
+@@ -406,14 +406,13 @@
+  VASP \
+  Vis5D \
+  Vista \
+- VTK \
+  WavefrontOBJ \
+  Xmdv \
+  XYZ \
+  ZipWrapper
+ 
+ # The following is a minimal subset of the OPTIONAL/REQUIRED plugins
+-MINIMAL=Curve2D Silo VTK
++MINIMAL=Curve2D Silo
+ 
+ THIRDPARTY_DEPENDENT=@EXODUS@ @HDF4@ @HDF5@ @PDB@ @MILI@ @BOXLIB2D@ @BOXLIB3D@ @VISUS@ @NETCDF@ @CGNS@ @GDAL@ @CFITSIO@ @ITAPS_C@ @ITAPS_S@ @H5PART@ @CCMIO@ @SIMULATION@
+ 
+--- /home/burlen/ext2/visit/visit1.10.0/./src/Makefile.in	2009-01-06 14:27:16.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/Makefile.in	2009-01-27 11:50:25.000000000 -0500
+@@ -137,14 +137,27 @@
+ #
+ ##############################################################################
+ 
++
++# NOTES: Building with cvs VTK.
++# 
++# The patch:
++# for f in `find ./ -type f -name 'Makefile.in'`; do diff -u ../../../visit1.10.0/src/$f $f; done > VisItPV3Build.in.patch
++# 
++# Configuration:
++# ./configure --enable-parallel --disable-scripting --disable-visitmodule --disable-viewer-mesa-stub --disable-icet --disable-bilib --disable-glew --disable-bzip2 --with-dbs=all
++#
++#
++
+ @SET_MAKE@
+ @VARIABLES@
+ @DIRTARGETS@
+ 
+-SUBDIRS=include lib bin third_party_builtin common @VTKQT@ visit_vtk \
+-        avt engine launcher @METADATA_SERVER@ winutil @VIEWER@ \
+-	@GUI@ @VISITPY@ @JAVA_TARGET@ plots operators databases @HELP@ \
+-	sim tools
++SUBDIRS=include lib bin third_party_builtin common avt databases visit_vtk
++
++# SUBDIRS=include lib bin third_party_builtin common @VTKQT@ visit_vtk \
++#         avt engine launcher @METADATA_SERVER@ winutil @VIEWER@ \
++# 	@GUI@ @VISITPY@ @JAVA_TARGET@ plots operators databases @HELP@ \
++# 	sim tools
+ 
+ #
+ # Make sure that the installation directories exist
+--- /home/burlen/ext2/visit/visit1.10.0/./src/engine/Makefile.in	2009-01-06 14:59:47.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/engine/Makefile.in	2009-01-27 11:48:49.000000000 -0500
+@@ -54,6 +54,7 @@
+ # subdirectory `main' must be last.
+ SUBDIRS=rpc parstate @ENGINEPROXYDIR@ main
+ 
++
+ message:
+ 	@echo
+ 	@echo "****************************************************************************"
+
+--- /home/burlen/ext2/visit/visit1.10.0/./src/databases/CGNS/avtCGNSFileFormat.C	2009-01-06 14:27:16.000000000 -0500
++++ /home/burlen/ext2/visit/v2/visit1.10.0/./src/databases/CGNS/avtCGNSFileFormat.C	2009-01-27 11:50:25.000000000 -0500
+@@ -41,7 +41,6 @@
+ // ************************************************************************* //
+ 
+ #include <avtCGNSFileFormat.h>
+-#include <cgnslib.h>
+ 
+ #include <algorithm>
+ #include <string>
+@@ -66,6 +65,8 @@
+ #include <InvalidFilesException.h>
+ #include <InvalidVariableException.h>
+ 
++#include <cgnslib.h>
++
+ #define INVALID_FILE_HANDLE -1
+ 
+ // Include more source code.

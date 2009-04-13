@@ -1,0 +1,476 @@
+
+<ParaViewReaders>
+
+<!--
+========================================================================ANALYZE -->
+<Reader
+    name="ANALYZEVisItDatabaseBridge"
+    extensions="img hdr"
+    file_description="ANALYZE VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================ANSYS -->
+<Reader
+    name="ANSYSVisItDatabaseBridge"
+    extensions="inp"
+    file_description="ANSYS VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================AUXFile -->
+<Reader
+    name="AUXFileVisItDatabaseBridge"
+    extensions="aux"
+    file_description="AUXFile VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================AugDecomp -->
+<Reader
+    name="AugDecompVisItDatabaseBridge"
+    extensions="augd"
+    file_description="AugDecomp VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================BOV -->
+<Reader
+    name="BOVVisItDatabaseBridge"
+    extensions="bov"
+    file_description="BOV VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================BOW -->
+<Reader
+    name="BOWVisItDatabaseBridge"
+    extensions="txt"
+    file_description="BOW VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Boxlib2D -->
+<Reader
+    name="Boxlib2DVisItDatabaseBridge"
+    extensions="boxlib2d boxlib2D"
+    file_description="Boxlib2D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Boxlib3D -->
+<Reader
+    name="Boxlib3DVisItDatabaseBridge"
+    extensions="boxlib3d boxlib3D"
+    file_description="Boxlib3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================CEAucd -->
+<Reader
+    name="CEAucdVisItDatabaseBridge"
+    extensions="inp"
+    file_description="CEAucd VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================CGNS -->
+<Reader
+    name="CGNSVisItDatabaseBridge"
+    extensions="cgns"
+    file_description="CGNS VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================CMAT -->
+<Reader
+    name="CMATVisItDatabaseBridge"
+    extensions="cmat"
+    file_description="CMAT VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================CTRL -->
+<Reader
+    name="CTRLVisItDatabaseBridge"
+    extensions="ctrl CTRL"
+    file_description="CTRL VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Cale -->
+<Reader
+    name="CaleVisItDatabaseBridge"
+    extensions="pdb cale"
+    file_description="Cale VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Chombo -->
+<Reader
+    name="ChomboVisItDatabaseBridge"
+    extensions="hdf5 h5"
+    file_description="Chombo VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Claw -->
+<Reader
+    name="ClawVisItDatabaseBridge"
+    extensions="claw"
+    file_description="Claw VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Cosmos -->
+<Reader
+    name="CosmosVisItDatabaseBridge"
+    extensions="cosmos"
+    file_description="Cosmos VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================CosmosPP -->
+<Reader
+    name="CosmosPPVisItDatabaseBridge"
+    extensions="cosmospp cosmos++"
+    file_description="CosmosPP VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Curve2D -->
+<Reader
+    name="Curve2DVisItDatabaseBridge"
+    extensions="curve ultra ult u"
+    file_description="Curve2D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================DDCMD -->
+<Reader
+    name="DDCMDVisItDatabaseBridge"
+    extensions="ddcMD ddcmd DDCMD"
+    file_description="DDCMD VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Dune -->
+<Reader
+    name="DuneVisItDatabaseBridge"
+    extensions="Dat"
+    file_description="Dune VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Dyna3D -->
+<Reader
+    name="Dyna3DVisItDatabaseBridge"
+    extensions="dyn"
+    file_description="Dyna3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Enzo -->
+<Reader
+    name="EnzoVisItDatabaseBridge"
+    extensions="hierarchy boundary"
+    file_description="Enzo VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================ExtrudedVol -->
+<Reader
+    name="ExtrudedVolVisItDatabaseBridge"
+    extensions="exvol"
+    file_description="ExtrudedVol VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================FITS -->
+<Reader
+    name="FITSVisItDatabaseBridge"
+    extensions="fit fits imh"
+    file_description="FITS VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================FLASH -->
+<Reader
+    name="FLASHVisItDatabaseBridge"
+    extensions=""
+    file_description="FLASH VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================GDAL -->
+<Reader
+    name="GDALVisItDatabaseBridge"
+    extensions="adf asc bt ddf dem ecw gxf jp2 map mem mpl mpr n1 nat ntf pix rsw sid vrt xpm"
+    file_description="GDAL VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================GGCM -->
+<Reader
+    name="GGCMVisItDatabaseBridge"
+    extensions="3df"
+    file_description="GGCM VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================GTC -->
+<Reader
+    name="GTCVisItDatabaseBridge"
+    extensions="h5"
+    file_description="GTC VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================H5Nimrod -->
+<Reader
+    name="H5NimrodVisItDatabaseBridge"
+    extensions=".h5nimrod"
+    file_description="H5Nimrod VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================H5Part -->
+<Reader
+    name="H5PartVisItDatabaseBridge"
+    extensions="h5part"
+    file_description="H5Part VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Hex -->
+<Reader
+    name="HexVisItDatabaseBridge"
+    extensions="hex"
+    file_description="Hex VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================KullLite -->
+<Reader
+    name="KullLiteVisItDatabaseBridge"
+    extensions="pdb mkf"
+    file_description="KullLite VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Lines -->
+<Reader
+    name="LinesVisItDatabaseBridge"
+    extensions=""
+    file_description="Lines VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================M3D -->
+<Reader
+    name="M3DVisItDatabaseBridge"
+    extensions="m3d"
+    file_description="M3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================MM5 -->
+<Reader
+    name="MM5VisItDatabaseBridge"
+    extensions="mm5"
+    file_description="MM5 VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Miranda -->
+<Reader
+    name="MirandaVisItDatabaseBridge"
+    extensions="mir raw"
+    file_description="Miranda VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================NASTRAN -->
+<Reader
+    name="NASTRANVisItDatabaseBridge"
+    extensions="nas f06"
+    file_description="NASTRAN VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================NETCDF -->
+<Reader
+    name="NETCDFVisItDatabaseBridge"
+    extensions="nc cdf elev ncd"
+    file_description="NETCDF VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Nek3D -->
+<Reader
+    name="Nek3DVisItDatabaseBridge"
+    extensions="nek3d nek2d nek"
+    file_description="Nek3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================PATRAN -->
+<Reader
+    name="PATRANVisItDatabaseBridge"
+    extensions="neu"
+    file_description="PATRAN VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================PDB -->
+<Reader
+    name="PDBVisItDatabaseBridge"
+    extensions="pdb r0000"
+    file_description="PDB VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================PFLOTRAN -->
+<Reader
+    name="PFLOTRANVisItDatabaseBridge"
+    extensions="h5"
+    file_description="PFLOTRAN VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================PLOT2D -->
+<Reader
+    name="PLOT2DVisItDatabaseBridge"
+    extensions="p2d"
+    file_description="PLOT2D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Pixie -->
+<Reader
+    name="PixieVisItDatabaseBridge"
+    extensions="h5"
+    file_description="Pixie VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================PlainText -->
+<Reader
+    name="PlainTextVisItDatabaseBridge"
+    extensions=""
+    file_description="PlainText VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Point3D -->
+<Reader
+    name="Point3DVisItDatabaseBridge"
+    extensions=".3D"
+    file_description="Point3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Rect -->
+<Reader
+    name="RectVisItDatabaseBridge"
+    extensions="rect"
+    file_description="Rect VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================S3D -->
+<Reader
+    name="S3DVisItDatabaseBridge"
+    extensions="s3d"
+    file_description="S3D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================SAMI -->
+<Reader
+    name="SAMIVisItDatabaseBridge"
+    extensions="sami"
+    file_description="SAMI VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================SAMRAI -->
+<Reader
+    name="SAMRAIVisItDatabaseBridge"
+    extensions="samrai"
+    file_description="SAMRAI VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================SAR -->
+<Reader
+    name="SARVisItDatabaseBridge"
+    extensions="sar SAR"
+    file_description="SAR VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================SAS -->
+<Reader
+    name="SASVisItDatabaseBridge"
+    extensions="sasgeom sasdata sas"
+    file_description="SAS VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Shapefile -->
+<Reader
+    name="ShapefileVisItDatabaseBridge"
+    extensions="shp shx dbf"
+    file_description="Shapefile VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Silo -->
+<Reader
+    name="SiloVisItDatabaseBridge"
+    extensions="silo pdb"
+    file_description="Silo VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Spheral -->
+<Reader
+    name="SpheralVisItDatabaseBridge"
+    extensions="sv spheral"
+    file_description="Spheral VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================TFT -->
+<Reader
+    name="TFTVisItDatabaseBridge"
+    extensions="dat DAT Dat tft TFT Tft"
+    file_description="TFT VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================TSurf -->
+<Reader
+    name="TSurfVisItDatabaseBridge"
+    extensions="ts_deg83"
+    file_description="TSurf VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Tecplot -->
+<Reader
+    name="TecplotVisItDatabaseBridge"
+    extensions="tp plt tec"
+    file_description="Tecplot VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Tetrad -->
+<Reader
+    name="TetradVisItDatabaseBridge"
+    extensions="h5 hdf5"
+    file_description="Tetrad VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================UNIC -->
+<Reader
+    name="UNICVisItDatabaseBridge"
+    extensions="h5"
+    file_description="UNIC VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================VASP -->
+<Reader
+    name="VASPVisItDatabaseBridge"
+    extensions="vasp VASP"
+    file_description="VASP VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================VLI -->
+<Reader
+    name="VLIVisItDatabaseBridge"
+    extensions=""
+    file_description="VLI VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Vis5D -->
+<Reader
+    name="Vis5DVisItDatabaseBridge"
+    extensions="v5d"
+    file_description="Vis5D VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Vista -->
+<Reader
+    name="VistaVisItDatabaseBridge"
+    extensions="vista"
+    file_description="Vista VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================Xmdv -->
+<Reader
+    name="XmdvVisItDatabaseBridge"
+    extensions="okc"
+    file_description="Xmdv VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================ZeusMP -->
+<Reader
+    name="ZeusMPVisItDatabaseBridge"
+    extensions="zeus"
+    file_description="ZeusMP VisIt DatabaseBridge">
+</Reader>
+<!--
+========================================================================ZipWrapper -->
+<Reader
+    name="ZipWrapperVisItDatabaseBridge"
+    extensions="gz bz2 zip"
+    file_description="ZipWrapper VisIt DatabaseBridge">
+</Reader>
+
+
+</ParaViewReaders>
+

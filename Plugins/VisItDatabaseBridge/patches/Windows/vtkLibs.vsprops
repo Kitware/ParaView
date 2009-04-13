@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="vtkLibs"
+	>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalDependencies="opengl32.lib KWCommon.lib Xdmf.lib vtkClientServer.lib vtkCommon.lib vtkCommonCS.lib vtkDICOMParser.lib vtkFiltering.lib vtkFilteringCS.lib vtkGenericFiltering.lib vtkGenericFilteringCS.lib vtkGeovis.lib vtkGraphics.lib vtkGraphicsCS.lib vtkHybrid.lib vtkHybridCS.lib vtkIO.lib vtkIOCS.lib vtkImaging.lib vtkImagingCS.lib vtkInfovis.lib vtkInfovisCS.lib vtkNetCDF.lib vtkParallel.lib vtkParallelCS.lib vtkQtChart.lib vtkRendering.lib vtkRenderingCS.lib vtkViews.lib vtkViewsCS.lib vtkVolumeRendering.lib vtkVolumeRenderingCS.lib vtkWidgets.lib vtkWidgetsCS.lib vtkXdmf.lib vtkXdmfCS.lib vtkalglib.lib vtkexoIIc.lib vtkexpat.lib vtkfreetype.lib vtkftgl.lib vtkhdf5.lib vtkjpeg.lib vtklibxml2.lib vtkmetaio.lib vtkpng.lib vtkproj4.lib vtksqlite.lib vtksys.lib vtktiff.lib vtkverdict.lib vtkzlib.lib"
+	/>
+</VisualStudioPropertySheet>

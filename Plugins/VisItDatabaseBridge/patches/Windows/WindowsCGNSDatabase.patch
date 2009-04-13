@@ -1,0 +1,21 @@
+Index: src/databases/CGNS/avtCGNSFileFormat.C
+===================================================================
+--- src/databases/CGNS/avtCGNSFileFormat.C	(revision 6355)
++++ src/databases/CGNS/avtCGNSFileFormat.C	(working copy)
+@@ -41,7 +41,6 @@
+ // ************************************************************************* //
+ 
+ #include <avtCGNSFileFormat.h>
+-#include <cgnslib.h>
+ 
+ #include <algorithm>
+ #include <string>
+@@ -66,6 +65,8 @@
+ #include <InvalidFilesException.h>
+ #include <InvalidVariableException.h>
+ 
++#include <cgnslib.h>
++
+ #define INVALID_FILE_HANDLE -1
+ 
+ // Include more source code.

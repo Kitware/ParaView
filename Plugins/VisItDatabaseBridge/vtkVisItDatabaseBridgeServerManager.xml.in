@@ -1,0 +1,119 @@
+<ServerManagerConfiguration>
+<ProxyGroup name="sources">
+
+<!--
+========================================================================U.I. -->
+<Proxy
+  name="VisItDatabaseBridgeUI">
+  <Documentation>
+  Common U.I. for the VisitDatabaseBridge components.
+  </Documentation>
+  <!-- Initialize the server side U.I. settings. -->
+  <Property 
+    name="InitializeUI"
+    command="InitializeUI"
+    is_internal="1">
+  </Property>
+  <!-- The following arrays work together to identify active SIL
+       sets, expressions, and data arrays  -->
+  <IntVectorProperty
+    name="SetMeshIds"
+    command="SetMeshIds"
+    number_of_elements="1"
+    argument_is_array="1"
+    default_values="0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetArrayIds"
+    command="SetArrayIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetExpressionIds"
+    command="SetExpressionIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetDomainSSIds"
+    command="SetDomainSSIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetBlockSSIds"
+    command="SetBlockSSIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetAssemblySSIds"
+    command="SetAssemblySSIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetMaterialSSIds"
+    command="SetMaterialSSIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+  <IntVectorProperty
+    name="SetSpeciesSSIds"
+    command="SetSpeciesSSIds"
+    number_of_elements="2"
+    argument_is_array="1"
+    default_values="0 0"
+    is_internal="1">
+  </IntVectorProperty>
+
+  <!-- Time Steps -->
+    <DoubleVectorProperty 
+      name="TimestepValues" 
+      repeatable="1"
+      information_only="1">
+      <TimeStepsInformationHelper/>
+    </DoubleVectorProperty>
+
+  <!-- File Name -->
+  <StringVectorProperty
+    name="FileName"
+    animateable="0"
+    command="SetFileName"
+    number_of_elements="1">
+  <FileListDomain name="files"/>
+  <Documentation>
+    This property specifies the file name for the reader.
+  </Documentation>
+  </StringVectorProperty>
+  <!-- Path to available Visit plugins -->
+  <StringVectorProperty
+    name="PluginPath"
+    command="SetPluginPath"
+    number_of_elements="1"
+    default_values="@PLUGIN_PATH@">
+    <Documentation>
+      The plugin id.
+    </Documentation>
+  </StringVectorProperty>
+</Proxy>
+
+@SOURCE_PROXIES@
+
+</ProxyGroup>
+</ServerManagerConfiguration>
+
