@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class vtkEventQtSlotConnect;
-class vtkQtChartViewBase;
+class vtkQtChartView;
 class vtkSMProxy;
 
 
@@ -46,7 +46,7 @@ class PQCORE_EXPORT pqChartViewPropertyHandler : public QObject
   Q_OBJECT
 
 public:
-  pqChartViewPropertyHandler(vtkQtChartViewBase* chartView,
+  pqChartViewPropertyHandler(vtkQtChartView* chartView,
     vtkSMProxy* proxy, QObject* parent=0);
   virtual ~pqChartViewPropertyHandler() {}
 
@@ -92,7 +92,7 @@ public slots:
   void updateTopAxisLabels();
 
 private:
-  vtkQtChartViewBase* ChartView;
+  vtkQtChartView* ChartView;
   vtkSMProxy* Proxy;
 };
 

@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartInteractorSetup.h"
 #include "vtkQtChartWidget.h"
 #include "vtkQtChartSeriesModelCollection.h"
-#include "vtkQtChartTableRepresentation.h"
+#include "vtkQtChartRepresentation.h"
 
 // ParaView Includes.
 #include "pqBarChartRepresentation.h"

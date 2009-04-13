@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqChartSeriesEditorModel.h"
 
-#include "vtkQtChartTableRepresentation.h"
+#include "vtkQtChartRepresentation.h"
 #include "vtkQtChartTableSeriesModel.h"
 #include "vtkSMChartTableRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqLineChartDisplayPanel.h"
 
 #include "vtkSMChartTableRepresentationProxy.h"
-#include "vtkQtChartTableRepresentation.h"
+#include "vtkQtChartRepresentation.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
 #include "vtkSMArraySelectionDomain.h"

@@ -22,7 +22,7 @@
 #include "vtkSMProxy.h"
 
 class vtkQtChartSeriesOptions;
-class vtkQtChartTableRepresentation;
+class vtkQtChartRepresentation;
 class vtkQtChartNamedSeriesOptionsModel;
 
 class VTK_EXPORT vtkSMChartNamedOptionsModelProxy : public vtkSMProxy
@@ -54,7 +54,7 @@ protected:
 
   // Description:
   // Creates internal objects that depend on the representation.
-  void CreateObjects(vtkQtChartTableRepresentation* repr);
+  void CreateObjects(vtkQtChartRepresentation* repr);
 
   // Description:
   // Subclasses must override this method to create the right type of options

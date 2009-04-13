@@ -26,7 +26,7 @@
 
 #include "vtkSMProxy.h"
 
-class vtkQtChartViewBase;
+class vtkQtChartView;
 
 class VTK_EXPORT vtkSMChartOptionsProxy : public vtkSMProxy
 {
@@ -36,9 +36,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the vtkQtChartViewBase whose options are to be edited by this proxy.
-  vtkGetObjectMacro(ChartView, vtkQtChartViewBase);
-  void SetChartView(vtkQtChartViewBase*);
+  // Get/Set the vtkQtChartView whose options are to be edited by this proxy.
+  vtkGetObjectMacro(ChartView, vtkQtChartView);
+  void SetChartView(vtkQtChartView*);
 
   // Description:
   // Set the chart's title.
@@ -222,7 +222,7 @@ protected:
   vtkSMChartOptionsProxy();
   ~vtkSMChartOptionsProxy();
 
-  vtkQtChartViewBase* ChartView;
+  vtkQtChartView* ChartView;
 
 private:
   vtkSMChartOptionsProxy(const vtkSMChartOptionsProxy&); // Not implemented

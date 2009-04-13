@@ -22,7 +22,7 @@
 #include "vtkSMChartRepresentationProxy.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
 
-class vtkQtChartTableRepresentation;
+class vtkQtChartRepresentation;
 class vtkSMChartViewProxy;
 class vtkSMChartNamedOptionsModelProxy;
 
@@ -35,7 +35,7 @@ public:
 
   // Description:
   // Provides access to the underlying VTK representation.
-  vtkGetObjectMacro(VTKRepresentation, vtkQtChartTableRepresentation);
+  vtkGetObjectMacro(VTKRepresentation, vtkQtChartRepresentation);
 
   // Description:
   // Called when a representation is added to a view. 
@@ -95,7 +95,7 @@ protected:
   void UpdateXSeriesName();
 
   vtkWeakPointer<vtkSMChartViewProxy> ChartViewProxy;
-  vtkQtChartTableRepresentation* VTKRepresentation;
+  vtkQtChartRepresentation* VTKRepresentation;
   vtkSMChartNamedOptionsModelProxy* OptionsProxy;
   int Visibility;
   bool UseIndexForXAxis;

@@ -35,7 +35,7 @@
 #include <vtkLookupTable.h>
 #include <vtkPVDataInformation.h>
 #include <vtkQtListView.h>
-#include <vtkQtChartTableRepresentation.h>
+#include <vtkQtChartRepresentation.h>
 #include <vtkQtBarChartView.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>
@@ -94,7 +94,7 @@ class ClientChartView::implementation
 {
 public:
   implementation() :
-    ChartRepresentation(vtkQtChartTableRepresentation::New()),
+    ChartRepresentation(vtkQtChartRepresentation::New()),
     AxisLayoutModified(true),
     ShowLegend(true),
     VTKConnect(vtkSmartPointer<vtkEventQtSlotConnect>::New())
@@ -137,7 +137,7 @@ public:
       }
   }
 
-  vtkQtChartTableRepresentation *ChartRepresentation;
+  vtkQtChartRepresentation *ChartRepresentation;
 
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<vtkQtChartTitle> Title;

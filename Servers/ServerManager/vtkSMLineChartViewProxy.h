@@ -47,7 +47,7 @@ protected:
 
   // Description:
   // Called once in CreateVTKObjects() to create a new chart view.
-  virtual vtkQtChartViewBase* NewChartView();
+  virtual vtkQtChartView* NewChartView();
 
 private:
   vtkSMLineChartViewProxy(const vtkSMLineChartViewProxy&); // Not implemented

@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkSMChartViewProxy - abstract base class for all Chart Views.
 // .SECTION Description
-// vtkSMChartViewProxy is an abstract base class for all vtkQtChartViewBase
+// vtkSMChartViewProxy is an abstract base class for all vtkQtChartView
 // subclasses. These are the Qt-based charting views.
 
 #ifndef __vtkSMChartViewProxy_h
@@ -22,7 +22,7 @@
 
 #include "vtkSMViewProxy.h"
 
-class vtkQtChartViewBase;
+class vtkQtChartView;
 class vtkQtChartWidget;
 
 class VTK_EXPORT vtkSMChartViewProxy : public vtkSMViewProxy
@@ -39,7 +39,7 @@ public:
 
   // Description:
   // Provides access to the line chart view.
-  vtkQtChartViewBase* GetChartView();
+  vtkQtChartView* GetChartView();
 
 //BTX
 protected:
@@ -48,7 +48,7 @@ protected:
 
   // Description:
   // Called once in CreateVTKObjects() to create a new chart view.
-  virtual vtkQtChartViewBase* NewChartView()=0;
+  virtual vtkQtChartView* NewChartView()=0;
 
   // Description:
   virtual void CreateVTKObjects();
@@ -59,7 +59,7 @@ protected:
   // Default implementation is empty.
   virtual void PerformRender();
 
-  vtkQtChartViewBase* ChartView;
+  vtkQtChartView* ChartView;
 private:
   vtkSMChartViewProxy(const vtkSMChartViewProxy&); // Not implemented
   void operator=(const vtkSMChartViewProxy&); // Not implemented

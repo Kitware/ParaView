@@ -30,7 +30,7 @@
 
 #include <pqSingleInputView.h>
 
-class vtkQtChartViewBase;
+class vtkQtChartView;
 
 class ClientChartView : public pqSingleInputView
 {
@@ -81,7 +81,7 @@ private slots:
   void setAxisLayoutModified();
 
 protected:
-  vtkQtChartViewBase *ChartView;
+  vtkQtChartView *ChartView;
 
 private:
   virtual void showRepresentation(pqRepresentation*);

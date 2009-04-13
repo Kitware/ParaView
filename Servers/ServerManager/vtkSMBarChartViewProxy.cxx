@@ -18,7 +18,7 @@
 #include "vtkQtBarChartView.h"
 
 vtkStandardNewMacro(vtkSMBarChartViewProxy);
-vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMBarChartViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMBarChartViewProxy::vtkSMBarChartViewProxy()
 {
@@ -30,7 +30,7 @@ vtkSMBarChartViewProxy::~vtkSMBarChartViewProxy()
 }
 
 //----------------------------------------------------------------------------
-vtkQtChartViewBase* vtkSMBarChartViewProxy::NewChartView()
+vtkQtChartView* vtkSMBarChartViewProxy::NewChartView()
 {
   return vtkQtBarChartView::New();
 }

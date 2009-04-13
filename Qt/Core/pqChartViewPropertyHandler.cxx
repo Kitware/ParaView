@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 #include "vtkEventQtSlotConnect.h"
-#include "vtkQtChartViewBase.h"
+#include "vtkQtChartView.h"
 
 #include "vtkQtChartArea.h"
 #include "vtkQtChartAxis.h"
@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqChartViewPropertyHandler::pqChartViewPropertyHandler(
-  vtkQtChartViewBase* chartView, vtkSMProxy* proxy, QObject* parentObject)
+  vtkQtChartView* chartView, vtkSMProxy* proxy, QObject* parentObject)
   : QObject(parentObject)
 {
   this->ChartView = chartView;
