@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.20");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.21");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -411,6 +411,12 @@ int vtkXMLCollectionReader::RequestDataObject(
   if (n == 1 && !this->ForceOutputTypeToMultiBlock)
     {
     vtkDataObject* output = this->SetupOutput(filePath.c_str(), 0);
+    if (!output)
+      {
+      vtkErrorMacro("Could not determine the data type for the first dataset. " 
+        << "Please make sure this file format is supported.");
+      return 0;
+      }
     output->SetPipelineInformation(info);
     output->Delete();
     this->InternalForceMultiBlock = false;
@@ -751,6 +757,7 @@ vtkXMLCollectionReaderInternals::ReaderList[] =
   {"vtu", "vtkXMLUnstructuredGridReader"},
   {"vti", "vtkXMLImageDataReader"},
   {"vtr", "vtkXMLRectilinearGridReader"},
+  {"vtm", "vtkXMLMultiBlockDataReader"},
   {"vtmb", "vtkXMLMultiBlockDataReader"},
   {"vtmg", "vtkXMLMultiGroupDataReader"}, // legacy reader - produces vtkMultiBlockDataSet.
   {"vthd", "vtkXMLHierarchicalDataReader"}, // legacy reader - produces vtkMultiBlockDataSet.
