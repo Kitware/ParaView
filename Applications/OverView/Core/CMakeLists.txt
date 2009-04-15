@@ -51,7 +51,7 @@ QT4_WRAP_CPP(MOC_SRCS
 
 SET(UI_FORMS
   AboutDialog.ui
-  EmptyMainwindow.ui
+  EmptyMainWindow.ui
   GlobalGraphViewOptions.ui
   IconDialog.ui
   MainWindow.ui
