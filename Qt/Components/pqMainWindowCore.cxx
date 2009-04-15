@@ -3630,8 +3630,11 @@ void pqMainWindowCore::onManagePlugins()
 void pqMainWindowCore::extensionLoaded()
 {
   // plugins may contain new entries for menus
-  this->Implementation->FiltersMenuManager->update();
-  this->Implementation->SourcesMenuManager->update();
+  if(this->Implementation->FiltersMenuManager)
+    this->Implementation->FiltersMenuManager->update();
+
+  if(this->Implementation->SourcesMenuManager)
+    this->Implementation->SourcesMenuManager->update();
 }
 
 //-----------------------------------------------------------------------------

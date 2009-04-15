@@ -287,7 +287,7 @@ EmptyMainWindow::EmptyMainWindow() :
 
   this->Implementation->Core.sourcesMenuManager()->setFilteringXMLDir(":/OverViewResources");
   this->Implementation->Core.sourcesMenuManager()->initialize();
-  
+
   connect(
     &this->Implementation->Core,
     SIGNAL(enableSourceCreate(bool)),
@@ -299,7 +299,7 @@ EmptyMainWindow::EmptyMainWindow() :
 
   this->Implementation->Core.filtersMenuManager()->setFilteringXMLDir(":/OverViewResources");
   this->Implementation->Core.filtersMenuManager()->initialize();
-  
+
   connect(
     &this->Implementation->Core,
     SIGNAL(enableFilterCreate(bool)),
