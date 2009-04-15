@@ -39,21 +39,18 @@ class OVERVIEW_CORE_EXPORT OverView
 {
 public:
   static int main(int argc, char* argv[],
+    const QString& WindowType,
     const QStringList& ConfiguredPlugins,
     const QString& BrandedApplicationTitle,
     const QString& BrandedSplashTextColor,
     const QString& BrandedVersion,
-    const QString& BrandedFullVersion,
-    const QString& GeoTilePath,
-    const bool InstallerSupport
+    const QString& BrandedFullVersion
     );
 
   static const QString GetBrandedApplicationTitle();
   static const QString GetBrandedSplashTextColor();
   static const QString GetBrandedVersion();
   static const QString GetBrandedFullVersion();
-  static const QString GetGeoTilePath();
-  static const bool GetInstallerSupport();
 };
 
 #endif // !OVERVIEW_H

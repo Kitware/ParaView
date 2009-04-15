@@ -37,6 +37,7 @@ QT4_WRAP_CPP(MOC_SRCS
   AboutDialog.h
   ApplicationOptionsDialog.h
   DisplayPolicy.h
+  EmptyMainWindow.h
   GlobalGraphViewOptions.h
   IconDialog.h
   MainWindow.h
@@ -50,6 +51,7 @@ QT4_WRAP_CPP(MOC_SRCS
 
 SET(UI_FORMS
   AboutDialog.ui
+  EmptyMainwindow.ui
   GlobalGraphViewOptions.ui
   IconDialog.ui
   MainWindow.ui

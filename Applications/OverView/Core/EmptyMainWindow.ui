@@ -1,0 +1,972 @@
+<ui version="4.0" >
+ <class>EmptyMainWindow</class>
+ <widget class="QMainWindow" name="EmptyMainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1014</width>
+    <height>726</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset/>
+  </property>
+  <property name="toolButtonStyle" >
+   <enum>Qt::ToolButtonIconOnly</enum>
+  </property>
+  <widget class="QWidget" name="centralwidget" />
+  <widget class="QMenuBar" name="menubar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1014</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <widget class="QDockWidget" name="pipelineBrowserDock" >
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Pipeline Browser</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2" >
+    <property name="minimumSize" >
+     <size>
+      <width>100</width>
+      <height>16</height>
+     </size>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="objectInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Object Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_3" />
+  </widget>
+  <widget class="QDockWidget" name="statisticsViewDock" >
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::NoDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Statistics View</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_4" />
+  </widget>
+  <widget class="QDockWidget" name="animationPanelDock" >
+   <property name="windowTitle" >
+    <string>Animation Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents" />
+  </widget>
+  <widget class="QDockWidget" name="lookmarkBrowserDock" >
+   <property name="sizePolicy" >
+    <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="floating" >
+    <bool>false</bool>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Lookmark Browser</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_6" />
+  </widget>
+  <widget class="QDockWidget" name="lookmarkInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Lookmark Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_7" />
+  </widget>
+  <widget class="QDockWidget" name="comparativePanelDock" >
+   <property name="windowTitle" >
+    <string>Comparative View Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_11" />
+  </widget>
+  <widget class="QDockWidget" name="animationViewDock" >
+   <property name="windowTitle" >
+    <string>Animation View</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_9" />
+  </widget>
+  <widget class="QDockWidget" name="selectionInspectorDock" >
+   <property name="allowedAreas" >
+    <set>Qt::AllDockWidgetAreas</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Selection Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea" >
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_8" />
+  </widget>
+  <widget class="QToolBar" name="lookmarkToolbar" >
+   <property name="contextMenuPolicy" >
+    <enum>Qt::CustomContextMenu</enum>
+   </property>
+   <property name="windowTitle" >
+    <string>Lookmarks</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Vertical</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>48</width>
+     <height>48</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actionFileOpen" >
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Open</string>
+   </property>
+   <property name="statusTip" >
+    <string>Open</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
+   </property>
+   <property name="visible" >
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionFileExit" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+   <property name="statusTip" >
+    <string>Exit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionHelpAbout" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>About</string>
+   </property>
+   <property name="statusTip" >
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionHelpHelp" >
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqHelp32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Help</string>
+   </property>
+   <property name="shortcut" >
+    <string>F1</string>
+   </property>
+  </action>
+  <action name="actionScalarBarVisibility" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Show Color Legend</string>
+   </property>
+   <property name="toolTip" >
+    <string>Toggle Color Legend Visibility</string>
+   </property>
+   <property name="statusTip" >
+    <string>Toggle Color Legend Visibility</string>
+   </property>
+  </action>
+  <action name="actionServerConnect" >
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Connect</string>
+   </property>
+   <property name="statusTip" >
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionServerDisconnect" >
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDisconnect32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Disconnect</string>
+   </property>
+   <property name="statusTip" >
+    <string>Disconnect</string>
+   </property>
+  </action>
+  <action name="actionFileSaveScreenshot" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Save Screenshot</string>
+   </property>
+  </action>
+  <action name="actionFileSaveAnimation" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Save &amp;Animation</string>
+   </property>
+  </action>
+  <action name="actionVCRPreviousFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Pre&amp;vious Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRFirstFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;First Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRNextFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;Next Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRLastFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;Last Frame</string>
+   </property>
+  </action>
+  <action name="actionFileSaveData" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Save Data</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionFileLoadServerState" >
+   <property name="text" >
+    <string>&amp;Load State</string>
+   </property>
+  </action>
+  <action name="actionFileSaveServerState" >
+   <property name="text" >
+    <string>&amp;Save State</string>
+   </property>
+  </action>
+  <action name="actionHelpEnableTooltips" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Enable Tooltips</string>
+   </property>
+  </action>
+  <action name="actionMoveMode" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Interact</string>
+   </property>
+   <property name="iconText" >
+    <string>Interact</string>
+   </property>
+   <property name="toolTip" >
+    <string>Interact</string>
+   </property>
+   <property name="statusTip" >
+    <string>Interact</string>
+   </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
+  </action>
+  <action name="actionSelectionMode" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Select Cells On</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Cells On</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Cells On</string>
+   </property>
+   <property name="statusTip" >
+    <string>Select Cells On</string>
+   </property>
+  </action>
+  <action name="actionSelect_Frustum" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Select Cells Through</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Cells Through</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Cells Through</string>
+   </property>
+   <property name="statusTip" >
+    <string>Select Cells Through</string>
+   </property>
+  </action>
+  <action name="actionSelectSurfacePoints" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Select Points On</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Points On</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Points On</string>
+   </property>
+   <property name="statusTip" >
+    <string>Select Points On</string>
+   </property>
+  </action>
+  <action name="actionSelectFrustumPoints" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Select Points Through</string>
+   </property>
+   <property name="iconText" >
+    <string>Select Points Through</string>
+   </property>
+   <property name="toolTip" >
+    <string>Select Points Through</string>
+   </property>
+   <property name="statusTip" >
+    <string>Select Points Through</string>
+   </property>
+  </action>
+  <action name="actionSelect_Thresholds" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Select Thresholds</string>
+   </property>
+  </action>
+  <action name="actionEditUndo" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqUndo32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Undo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Z</string>
+   </property>
+   <property name="visible" >
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="actionEditRedo" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqRedo32.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Redo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionEditCameraUndo" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Camera Undo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionEditCameraRedo" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Camera Redo</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionToolsDumpWidgetNames" >
+   <property name="text" >
+    <string>&amp;Dump Widget Names</string>
+   </property>
+  </action>
+  <action name="actionToolsRecordTest" >
+   <property name="text" >
+    <string>&amp;Record Test</string>
+   </property>
+  </action>
+  <action name="actionToolsRecordTestScreenshot" >
+   <property name="text" >
+    <string>Record &amp;Test Screenshot</string>
+   </property>
+  </action>
+  <action name="actionToolsPythonShell" >
+   <property name="text" >
+    <string>Python &amp;Shell</string>
+   </property>
+  </action>
+  <action name="actionToolsCreateCustomFilter" >
+   <property name="text" >
+    <string>&amp;Create Custom Filter...</string>
+   </property>
+  </action>
+  <action name="actionToolsManageCustomFilters" >
+   <property name="text" >
+    <string>&amp;Manage Custom Filters...</string>
+   </property>
+  </action>
+  <action name="actionVCRPlay" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;Play</string>
+   </property>
+  </action>
+  <action name="actionToolsPlayTest" >
+   <property name="text" >
+    <string>Play Test</string>
+   </property>
+  </action>
+  <action name="actionEditSettings" >
+   <property name="text" >
+    <string>Settings...</string>
+   </property>
+   <property name="iconText" >
+    <string>Settings</string>
+   </property>
+   <property name="toolTip" >
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionResetCamera" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;Reset</string>
+   </property>
+   <property name="iconText" >
+    <string>Reset Camera</string>
+   </property>
+   <property name="statusTip" >
+    <string>Reset Camera</string>
+   </property>
+  </action>
+  <action name="actionPositiveX" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>+X</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +X</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +X</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +X</string>
+   </property>
+  </action>
+  <action name="actionNegativeX" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>-X</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -X</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -X</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -X</string>
+   </property>
+  </action>
+  <action name="actionPositiveY" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>+Y</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +Y</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +Y</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +Y</string>
+   </property>
+  </action>
+  <action name="actionNegativeY" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>-Y</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -Y</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -Y</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -Y</string>
+   </property>
+  </action>
+  <action name="actionPositiveZ" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>+Z</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to +Z</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to +Z</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to +Z</string>
+   </property>
+  </action>
+  <action name="actionNegativeZ" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>-Z</string>
+   </property>
+   <property name="toolTip" >
+    <string>Set view direction to -Z</string>
+   </property>
+   <property name="statusTip" >
+    <string>Set view direction to -Z</string>
+   </property>
+   <property name="whatsThis" >
+    <string>Set view direction to -Z</string>
+   </property>
+  </action>
+  <action name="actionHistogram" >
+   <property name="text" >
+    <string>&amp;Histogram</string>
+   </property>
+  </action>
+  <action name="actionXY_Plot" >
+   <property name="text" >
+    <string>XY &amp;Plot</string>
+   </property>
+  </action>
+  <action name="actionTesting_Window_Size" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Max Window Size: 300x300</string>
+   </property>
+  </action>
+  <action name="actionTable_View" >
+   <property name="text" >
+    <string>Table View</string>
+   </property>
+  </action>
+  <action name="actionShowCenterAxes" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Show Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Show/Hide center of rotation</string>
+   </property>
+  </action>
+  <action name="actionResetCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Reset Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Reset center of rotation</string>
+   </property>
+  </action>
+  <action name="actionAddSource" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Add &amp;Source...</string>
+   </property>
+   <property name="iconText" >
+    <string>Add Source...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add a Source to the Pipeline</string>
+   </property>
+   <property name="statusTip" >
+    <string>Add a Source to the Pipeline</string>
+   </property>
+  </action>
+  <action name="actionAddFilter" >
+   <property name="text" >
+    <string>Add &amp;Filter...</string>
+   </property>
+   <property name="iconText" >
+    <string>Add Filter...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Add a Filter to the Pipeline</string>
+   </property>
+   <property name="statusTip" >
+    <string>Add a Filter to the Pipeline</string>
+   </property>
+  </action>
+  <action name="actionChangeInput" >
+   <property name="text" >
+    <string>Change &amp;Input...</string>
+   </property>
+   <property name="iconText" >
+    <string>Change Input...</string>
+   </property>
+   <property name="toolTip" >
+    <string>Change a Filter's Input</string>
+   </property>
+   <property name="statusTip" >
+    <string>Change a Filter's Input</string>
+   </property>
+  </action>
+  <action name="actionDelete" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>&amp;Delete</string>
+   </property>
+   <property name="statusTip" >
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionDelete_All" >
+   <property name="text" >
+    <string>Delete All</string>
+   </property>
+  </action>
+  <action name="actionToolsManageLinks" >
+   <property name="text" >
+    <string>Manage Links...</string>
+   </property>
+  </action>
+  <action name="actionFileSaveGeometry" >
+   <property name="text" >
+    <string>Save &amp;Geometry</string>
+   </property>
+  </action>
+  <action name="actionVCRLoop" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>L&amp;oop</string>
+   </property>
+   <property name="iconText" >
+    <string>Loop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Loop</string>
+   </property>
+   <property name="statusTip" >
+    <string>Loop</string>
+   </property>
+  </action>
+  <action name="actionToolsOutputWindow" >
+   <property name="text" >
+    <string>&amp;Output Window</string>
+   </property>
+  </action>
+  <action name="actionToolsTimerLog" >
+   <property name="text" >
+    <string>Timer &amp;Log</string>
+   </property>
+  </action>
+  <action name="actionManage_Plugins" >
+   <property name="text" >
+    <string>Manage Plugins...</string>
+   </property>
+  </action>
+  <action name="actionToolsCreateLookmark" >
+   <property name="text" >
+    <string>Create Lookmark</string>
+   </property>
+  </action>
+  <action name="actionToolsAddCameraLink" >
+   <property name="text" >
+    <string>Add Camera Link...</string>
+   </property>
+  </action>
+  <action name="actionPickCenter" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Pick Center</string>
+   </property>
+   <property name="iconText" >
+    <string>Pick Center</string>
+   </property>
+   <property name="toolTip" >
+    <string>Pick Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Mouse press to pick center of rotation</string>
+   </property>
+  </action>
+  <action name="actionEnterCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>Enter Center</string>
+   </property>
+   <property name="iconText" >
+    <string>Enter Center</string>
+   </property>
+   <property name="toolTip" >
+    <string>Enter Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Enter coordinates of center of rotation</string>
+   </property>
+  </action>
+  <action name="actionEditViewSettings" >
+   <property name="text" >
+    <string>View Settings...</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../../Qt/Components/Resources/pqComponents.qrc" />
+ </resources>
+ <connections/>
+</ui>

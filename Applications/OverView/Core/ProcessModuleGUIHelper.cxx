@@ -30,23 +30,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "vtkPVConfig.h"
+
 #include "Config.h"
-#include "ProcessModuleGUIHelper.h"
+#include "EmptyMainWindow.h"
+#include "MainWindow.h"
 #include "OverView.h"
+#include "ProcessModuleGUIHelper.h"
 
 #include <QApplication>
-#include <QTimer>
 #include <QBitmap>
-#include "MainWindow.h"
+#include <QTimer>
 
 #include <pqApplicationCore.h>
 #include <pqPluginManager.h>
 #include <vtkObjectFactory.h>
 
-#include "vtkPVConfig.h"
-
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -69,6 +70,11 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 {
 }
 
+void ProcessModuleGUIHelper::SetWindowType(const QString& window_type)
+{
+  this->WindowType = window_type;
+}
+
 void ProcessModuleGUIHelper::SetConfiguredPlugins(const QStringList& configured_plugins)
 {
   this->ConfiguredPlugins = configured_plugins;
@@ -79,7 +85,17 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
   pqApplicationCore::instance()->setApplicationName(OverView::GetBrandedApplicationTitle() + " " + OverView::GetBrandedVersion());
   pqApplicationCore::instance()->setOrganizationName("Sandia National Laboratories");
-  QWidget* w = new MainWindow();
+  
+  QWidget* window = 0;
+  if(this->WindowType == "empty")
+    {
+    window = new EmptyMainWindow();
+    }
+  else
+    {
+    window = new MainWindow();
+    }
+  
   QTimer::singleShot(3500, this->Splash, SLOT(close()));
 
   for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
@@ -98,7 +114,7 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
       }
     }
 
-  return w;
+  return window;
 }
 
 //-----------------------------------------------------------------------------
@@ -111,11 +127,12 @@ void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage,
   double Threshold, ostream& Output, const QString& TempDirectory)
 {
+/*
   if(MainWindow* const main_window = qobject_cast<MainWindow*>(this->GetMainWindow()))
   {
     return main_window->compareView(ReferenceImage, Threshold, Output, TempDirectory);
   }
-  
+*/ 
   return false;
 }
 

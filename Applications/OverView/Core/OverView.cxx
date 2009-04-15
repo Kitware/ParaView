@@ -46,25 +46,20 @@ static QString g_BrandedApplicationTitle;
 static QString g_BrandedSplashTextColor;
 static QString g_BrandedVersion;
 static QString g_BrandedFullVersion;
-static QString g_GeoTilePath;
-static bool g_InstallerSupport = false;
 
 int OverView::main(int argc, char* argv[],
+  const QString& WindowType,
   const QStringList& ConfiguredPlugins,
   const QString& BrandedApplicationTitle,
   const QString& BrandedSplashTextColor,
   const QString& BrandedVersion,
-  const QString& BrandedFullVersion,
-  const QString& GeoTilePath,
-  const bool InstallerSupport
+  const QString& BrandedFullVersion
   )
 {
   g_BrandedApplicationTitle = BrandedApplicationTitle;
   g_BrandedSplashTextColor = BrandedSplashTextColor;
   g_BrandedVersion = BrandedVersion;
   g_BrandedFullVersion = BrandedFullVersion;
-  g_GeoTilePath = GeoTilePath;
-  g_InstallerSupport = InstallerSupport;
 
   QApplication app(argc, argv);
 
@@ -77,15 +72,20 @@ int OverView::main(int argc, char* argv[],
 
   pqComponentsInit();
 
+/* Pretty-sure this code is never used ... could probably get rid of it ...
+
+#ifdef OVERVIEW_INSTALLER_SUPPORT
   // If building an installer, look in a special location
   // for Qt plugins.
-#ifdef OVERVIEW_INSTALLER_SUPPORT
   QDir plugin_directory(QApplication::applicationDirPath());
   plugin_directory.cd("qtplugins");
   QApplication::setLibraryPaths(QStringList(plugin_directory.absolutePath()));
 #endif
 
+\*/
+
   vtkSmartPointer<ProcessModuleGUIHelper> helper = vtkSmartPointer<ProcessModuleGUIHelper>::New();
+  helper->SetWindowType(WindowType);
   helper->SetConfiguredPlugins(ConfiguredPlugins);
 
   return pqMain::Run(app, helper);
@@ -109,15 +109,5 @@ const QString OverView::GetBrandedVersion()
 const QString OverView::GetBrandedFullVersion()
 {
   return g_BrandedFullVersion;
-}
-
-const QString OverView::GetGeoTilePath()
-{
-  return g_GeoTilePath;
-}
-
-const bool OverView::GetInstallerSupport()
-{
-  return g_InstallerSupport;
 }
 

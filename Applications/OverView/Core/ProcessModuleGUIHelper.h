@@ -50,6 +50,7 @@ public:
   vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void SetWindowType(const QString& window_type);
   void SetConfiguredPlugins(const QStringList& configured_plugins);
 
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
@@ -63,6 +64,7 @@ protected:
   virtual QWidget* CreateMainWindow();
 
   QPointer<QSplashScreen> Splash;
+  QString WindowType;
   QStringList ConfiguredPlugins;
 
 private:
