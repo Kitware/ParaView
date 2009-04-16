@@ -1,3 +1,7 @@
+# Setup some paths that plugins and clients will find useful
+SET(OverViewCore_SOURCE_DIR "@OverViewCore_SOURCE_DIR@")
+SET(OverViewCore_BINARY_DIR "@OverViewCore_BINARY_DIR@")
+
 SET(OVERVIEW_STARTUP_PLUGIN_FILES )
 SET(OVERVIEW_STARTUP_PLUGIN_DIRECTORIES )
 
