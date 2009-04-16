@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 
 #include "Config.h"
-#include "EmptyMainWindow.h"
 #include "MainWindow.h"
 #include "OverView.h"
 #include "ProcessModuleGUIHelper.h"
 
 #include <QApplication>
 #include <QBitmap>
+#include <QMainWindow>
 #include <QTimer>
 
 #include <pqApplicationCore.h>
@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.4");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -80,20 +80,24 @@ void ProcessModuleGUIHelper::SetConfiguredPlugins(const QStringList& configured_
   this->ConfiguredPlugins = configured_plugins;
 }
 
+QWidget* ProcessModuleGUIHelper::GetUserInterface()
+{
+  return this->UserInterface;
+}
+
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
   pqApplicationCore::instance()->setApplicationName(OverView::GetBrandedApplicationTitle() + " " + OverView::GetBrandedVersion());
   pqApplicationCore::instance()->setOrganizationName("Sandia National Laboratories");
-  
-  QWidget* window = 0;
-  if(this->WindowType == "empty")
+
+  if(this->WindowType == "QMainWindow")
     {
-    window = new EmptyMainWindow();
+    this->UserInterface = new QMainWindow();
     }
   else
     {
-    window = new MainWindow();
+    this->UserInterface = new MainWindow();
     }
   
   QTimer::singleShot(3500, this->Splash, SLOT(close()));
@@ -114,7 +118,7 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
       }
     }
 
-  return window;
+  return this->UserInterface;
 }
 
 //-----------------------------------------------------------------------------

@@ -53,8 +53,11 @@ public:
   void SetWindowType(const QString& window_type);
   void SetConfiguredPlugins(const QStringList& configured_plugins);
 
+  QWidget* GetUserInterface();
+
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
-  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+  virtual bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+
 protected:
   ProcessModuleGUIHelper();
   ~ProcessModuleGUIHelper();
@@ -65,6 +68,7 @@ protected:
 
   QPointer<QSplashScreen> Splash;
   QString WindowType;
+  QPointer<QWidget> UserInterface;
   QStringList ConfiguredPlugins;
 
 private:

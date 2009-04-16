@@ -46,6 +46,7 @@ static QString g_BrandedApplicationTitle;
 static QString g_BrandedSplashTextColor;
 static QString g_BrandedVersion;
 static QString g_BrandedFullVersion;
+static ProcessModuleGUIHelper* g_ProcessModuleGUIHelper = 0;
 
 int OverView::main(int argc, char* argv[],
   const QString& WindowType,
@@ -85,6 +86,7 @@ int OverView::main(int argc, char* argv[],
 \*/
 
   vtkSmartPointer<ProcessModuleGUIHelper> helper = vtkSmartPointer<ProcessModuleGUIHelper>::New();
+  g_ProcessModuleGUIHelper = helper;
   helper->SetWindowType(WindowType);
   helper->SetConfiguredPlugins(ConfiguredPlugins);
 
@@ -109,5 +111,10 @@ const QString OverView::GetBrandedVersion()
 const QString OverView::GetBrandedFullVersion()
 {
   return g_BrandedFullVersion;
+}
+
+QWidget* OverView::GetUserInterface()
+{
+  return g_ProcessModuleGUIHelper ? g_ProcessModuleGUIHelper->GetUserInterface() : 0;
 }
 

@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OverViewCoreExport.h"
 #include <QStringList>
 
+class QWidget;
+
 class OVERVIEW_CORE_EXPORT OverView
 {
 public:
@@ -51,6 +53,8 @@ public:
   static const QString GetBrandedSplashTextColor();
   static const QString GetBrandedVersion();
   static const QString GetBrandedFullVersion();
+
+  static QWidget* GetUserInterface();
 };
 
 #endif // !OVERVIEW_H
