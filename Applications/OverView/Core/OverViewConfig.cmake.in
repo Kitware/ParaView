@@ -127,6 +127,12 @@ MACRO(overview_build_client)
     ENDWHILE()
   ENDIF(APPLE)
 
+  # Setup Mac packaging ...
+  IF(APPLE)
+    INCLUDE("@ParaView_BINARY_DIR@/OverViewOSXDistribution.cmake")
+  ENDIF(APPLE)
+
+  # Setup Win32 packaging ...
   IF(WIN32)
     INCLUDE("@ParaView_BINARY_DIR@/OverViewWin32Distribution.cmake")
   ENDIF(WIN32)

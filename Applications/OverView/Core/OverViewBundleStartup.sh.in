@@ -1,0 +1,47 @@
+#!/bin/sh
+
+BUNDLE="`echo "$0" | sed -e 's/\/Contents\/MacOS\/@OVERVIEW_BRANDED_APPLICATION_TITLE@ @OVERVIEW_BRANDED_VERSION@//'`"
+FRAMEWORKS="$BUNDLE/Contents/Frameworks"
+RESOURCES="$BUNDLE/Contents/Resources"
+
+echo "Running $0"
+echo "BUNDLE: $BUNDLE"
+
+export DYLD_LIBRARY_PATH=$RESOURCES/bin
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$RESOURCES/lib
+
+#export PATH=$RESOURCES/bin/assistant.app/Contents/MacOS:$PATH
+
+ln -sf "$RESOURCES/lib/libArrayPlugin.dylib" "$RESOURCES/bin/libArrayPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientAttributeViewPlugin.dylib" "$RESOURCES/bin/libClientAttributeViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientGeoView2DPlugin.dylib" "$RESOURCES/bin/libClientGeoView2DPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientGeoViewPlugin.dylib" "$RESOURCES/bin/libClientGeoViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientGraphViewPlugin.dylib" "$RESOURCES/bin/libClientGraphViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientHierarchyViewPlugin.dylib" "$RESOURCES/bin/libClientHierarchyViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientRecordViewPlugin.dylib" "$RESOURCES/bin/libClientRecordViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientTableViewPlugin.dylib" "$RESOURCES/bin/libClientTableViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libCommonToolbarPlugin.dylib" "$RESOURCES/bin/libCommonToolbarPlugin.dylib"
+ln -sf "$RESOURCES/lib/libGraphLayoutFilterPanelPlugin.dylib" "$RESOURCES/bin/libGraphLayoutFilterPanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libInfovisPlugin.dylib" "$RESOURCES/bin/libInfovisPlugin.dylib"
+ln -sf "$RESOURCES/lib/libSQLDatabaseGraphSourcePanelPlugin.dylib" "$RESOURCES/bin/libSQLDatabaseGraphSourcePanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libSQLDatabaseTableSourcePanelPlugin.dylib" "$RESOURCES/bin/libSQLDatabaseTableSourcePanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libSplitTableFieldPanelPlugin.dylib" "$RESOURCES/bin/libSplitTableFieldPanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libStatisticsToolbarPlugin.dylib" "$RESOURCES/bin/libStatisticsToolbarPlugin.dylib"
+ln -sf "$RESOURCES/lib/libTableToGraphPanelPlugin.dylib" "$RESOURCES/bin/libTableToGraphPanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libTableToSparseArrayPanelPlugin.dylib" "$RESOURCES/bin/libTableToSparseArrayPanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libThresholdTablePanelPlugin.dylib" "$RESOURCES/bin/libThresholdTablePanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientGraphViewFramePlugin.dylib" "$RESOURCES/bin/libClientGraphViewFramePlugin.dylib"
+
+ln -sf "$RESOURCES/lib/libGraphAttributeFilterPanelPlugin.dylib" "$RESOURCES/bin/libGraphAttributeFilterPanelPlugin.dylib"
+ln -sf "$RESOURCES/lib/libSNLInfovisPlugin.dylib" "$RESOURCES/bin/libSNLInfovisPlugin.dylib"
+ln -sf "$RESOURCES/lib/libMTGLPlugin.dylib" "$RESOURCES/bin/libMTGLPlugin.dylib"
+ln -sf "$RESOURCES/lib/libMTGLToolbarPlugin.dylib" "$RESOURCES/bin/libMTGLToolbarPlugin.dylib"
+ln -sf "$RESOURCES/lib/libClientNeighborViewPlugin.dylib" "$RESOURCES/bin/libClientNeighborViewPlugin.dylib"
+ln -sf "$RESOURCES/lib/libAddEdgesPanelPlugin.dylib" "$RESOURCES/bin/libAddEdgesPanelPlugin.dylib"
+
+#ln -sf "$RESOURCES/lib/libCARGIOStateLoaderPlugin.dylib" "$RESOURCES/bin/libCARGIOStateLoaderPlugin.dylib"
+#ln -sf "$RESOURCES/lib/libCARGIOGraphSourcePanelPlugin.dylib" "$RESOURCES/bin/libCARGIOGraphSourcePanelPlugin.dylib"
+
+export
+exec "$RESOURCES/bin/@OVERVIEW_BRANDED_APPLICATION_TITLE@"
+
