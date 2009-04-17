@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 #include <map>
 using namespace std;
@@ -174,11 +176,11 @@ int main(int argc, char **argv)
     {
     cerr << "VisIt database bridge plugin configuration generator." << endl
          << "Usage:" << endl
-         << argv[0] << endl
-         << "\trequired:/path/to/plugins " << endl
-         << "\trequired:/path/to/servermanager.xml.in " << endl
-         << "\trequired:/path/to/readers.xml.in " << endl
-         << "\trequired:/path/to/CMakeLists.txt.in " << endl
+         << "\trequired:/path/to/plugins" << endl
+         << "\trequired:/runtime/path/for/plugin/manager" << endl
+         << "\trequired:/path/to/servermanager.xml.in" << endl
+         << "\trequired:/path/to/readers.xml.in" << endl
+         << "\trequired:/path/to/CMakeLists.txt.in" << endl
          << "\toptional:/path/to/skip/file" << endl
          << "Paths should be privded using Unix seperators." << endl;
     return 1;
@@ -189,10 +191,13 @@ int main(int argc, char **argv)
   // tail argument. The plugin manager will give us access to 
   // all of the plugins there.
   const char *pluginPath=argv[1];
+  // At runtime the PluginManager needs to know where to look
+  // for plugins.
+  const char *runTimePluginPath=argv[2];
   // The server manager configuration file has been provided as
   // the second command tail argument. We will configure this file
   // and write the results.
-  string smConfigFileIn(argv[2]);
+  string smConfigFileIn(argv[3]);
   string smConfigText;
   if (!LoadText(smConfigFileIn,smConfigText))
     {
@@ -206,7 +211,7 @@ int main(int argc, char **argv)
   // The client side configuration file (i.e. readers.xml) has been
   // provided as the third command tail argument. We will configure
   // this file and write the results.
-  string pqReadersConfigFileIn(argv[3]);
+  string pqReadersConfigFileIn(argv[4]);
   string pqReadersConfigText;
   if (!LoadText(pqReadersConfigFileIn,pqReadersConfigText))
     {
@@ -220,7 +225,7 @@ int main(int argc, char **argv)
   // The cmake lists configuration file has been provided in the
   // fourth command tail argument. We will configure this file and
   // write the results.
-  string cmakeConfigFileIn(argv[4]);
+  string cmakeConfigFileIn(argv[5]);
   string cmakeConfigText;
   if (!LoadText(cmakeConfigFileIn,cmakeConfigText))
     {
@@ -235,18 +240,25 @@ int main(int argc, char **argv)
   // fifth command tail  argument. The format of this file is 
   // expected to be one plugin name per line.
   vector<string> skipSet;
-  if (argc>5)
+  if (argc>6)
     {
-    LoadLines(argv[5],skipSet);
+    LoadLines(argv[6],skipSet);
     }
+  // A flag that indicates we should use a path relative to the 
+  // paraview binary.
 
   // Report pre run summary. Run time info is sent to stderr.
-  cerr << "Configuring " 
-       << smConfigFileIn << ", " 
-       << pqReadersConfigFileIn << ", "
-       << cmakeConfigFileIn << "." << endl;
-  cerr << "Searching " << pluginPath << "." << endl;
-  cerr << "Will skip " << skipSet << "." << endl;
+  cerr << "Configuring:" << endl
+       << "\t" << smConfigFileIn << endl
+       << "\t" << pqReadersConfigFileIn << endl
+       << "\t" << cmakeConfigFileIn << endl
+       << "Searching:" << endl
+       << "\t" << pluginPath <<  endl
+       << "Runtime path:" << endl
+       << "\t" << runTimePluginPath << endl
+       << "Will skip:" << endl
+       << "\t" << skipSet << endl;
+
   // Statistics to track for end of run summary.
   int nProcessed=0;
   int nSkipped=0;

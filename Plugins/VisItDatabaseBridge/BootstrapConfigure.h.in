@@ -1,9 +1,6 @@
 #ifndef BootstrapConfigure_h
 #define BootstrapConfigure_h
 
-// Configures things for Windows run, we are going to assume that Linux users
-// are capable of configuring their environment correctly.
-
 #include <cstdlib>
 #include <cstring>
 
@@ -29,7 +26,7 @@ void InitializeEnvironment(int argc, char **argv)
 {
   #ifdef WIN32
   // Set path to ParaView build.
-  char PV3_BIN[]="@PARAVIEW_LIBRARY_DIRS@/@VISIT_BUILD_TYPE@";
+  char PV3_BIN[]="@PARAVIEW_LIBRARY_DIRS@/@PLUGIN_BUILD_TYPE@";
   UnixToWindowsPath(PV3_BIN);
   SetDllDirectory(PV3_BIN);
   // Clean up command tail.

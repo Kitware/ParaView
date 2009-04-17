@@ -1,0 +1,27 @@
+# +---------------------------------------------------------------------------+
+# |                                                                           |
+# |                   VisIt Database Bridge PQ Panel                          |
+# |                                                                           |
+# +---------------------------------------------------------------------------+
+#
+# Builds the custom panel for the database bridge, this file is 
+# configured during the boostrap process based on what plugins
+# are found.
+#
+set(PANEL_ASSOCIATION
+@PANEL_ASSOCIATIONS@)
+
+QT4_WRAP_CPP(MOC_SRCS pqVisItDatabaseBridgePanel.h)
+QT4_WRAP_UI(UI_SRCS pqVisItDatabaseBridgeForm.ui)
+ADD_PARAVIEW_OBJECT_PANEL(
+  IFACES IFACE_SRCS
+  CLASS_NAME pqVisItDatabaseBridgePanel
+  XML_NAME ${PANEL_ASSOCIATION}
+  XML_GROUP sources)
+
+ADD_PARAVIEW_PLUGIN(
+  vtkVisItDatabaseBridgePanel "1.0"
+  GUI_INTERFACES ${IFACES}
+  SOURCES pqVisItDatabaseBridgePanel.cxx ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS})
+
+install(TARGETS vtkVisItDatabaseBridgePanel DESTINATION ${CMAKE_INSTALL_PREFIX})

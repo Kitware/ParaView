@@ -35,6 +35,10 @@ Project(vtkVisItDatabaseBridge)
 
 set(BOOTSTRAP ON CACHE BOOL "Build configuration or PV3 Plugin.")
 
+if (WINDOWS)
+  set(PLUGIN_BUILD_TYPE "Debug" CACHE STRING "Build type for windows builds (Release or Debug).")
+endif (WINDOWS)
+
 include("CMake/ParaViewConfig.cmake")               # Locate ParaView.
 include("CMake/VisItConfig.cmake")                  # Locate VisIt.
 
@@ -46,5 +50,6 @@ elseif(NOT BOOTSTRAP)
   include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
   include("CMake/vtkVisItDatabaseBridge.cmake")     # Build the VTK source.
   include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
+  include("CMake/install.cmake")                    # Install plugins and VisIt databases.
   # TODO include make install generated above.
 endif (BOOTSTRAP)

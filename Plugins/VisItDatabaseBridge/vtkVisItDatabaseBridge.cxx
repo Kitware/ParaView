@@ -37,7 +37,7 @@ using vtkstd::string;
 using vtkstd::vector;
 
 
-vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.1");
+vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.2");
 vtkStandardNewMacro(vtkVisItDatabaseBridge);
 
 // Never try to print a null pointer to a string.
@@ -591,7 +591,7 @@ int vtkVisItDatabaseBridge::RequestData(
         this->DomainSSIds,
         this->MaterialSSIds,
         dataOut);
-ok=1;
+  ok=1; //TODO This is because AMR support is only partially complete. Remove this line after 3.6 release.
   if (!ok)
     {
     vtkWarningMacro(
