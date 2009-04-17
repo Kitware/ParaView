@@ -578,7 +578,7 @@ void pqMultiView::computeCompactSizesHelper(
     else if (childFrame)  // It's a multi view frame
       {
       // Get size of frame
-      QSize frameSize = childFrame->size();
+      QSize viewSize = childFrame->size();
 
       // Get the position of the frame
       QPoint position =
@@ -587,25 +587,25 @@ void pqMultiView::computeCompactSizesHelper(
       // Expand size and adjust position as needed
       if (rflag)
         {
-        frameSize.rwidth() += handlePadding;
+        viewSize.rwidth() += handlePadding;
         }
       if (bflag)
         {
-        frameSize.rheight() += handlePadding;
+        viewSize.rheight() += handlePadding;
         }
       if (lflag)
         {
-        frameSize.rwidth() += handlePadding;
+        viewSize.rwidth() += handlePadding;
         position.rx() -= handlePadding;
         }
       if (tflag)
         {
-        frameSize.rheight() += handlePadding;
+        viewSize.rheight() += handlePadding;
         position.ry() -= handlePadding;
         }
 
       // Store the size and position in the map
-      ViewInfo[childFrame] = qMakePair(position, frameSize);
+      ViewInfo[childFrame] = qMakePair(position, viewSize);
       }
     }
 }

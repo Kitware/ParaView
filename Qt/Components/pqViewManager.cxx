@@ -1063,8 +1063,8 @@ void pqViewManager::updateCompactViewPositions()
       view->getProxy()->GetProperty("ViewPositionCompact"));
     if(prop)
       {
-      QPoint pos = ViewInfo[frame].first;
-      prop->SetElements2(pos.x(), pos.y());
+      QPoint viewPos = ViewInfo[frame].first;
+      prop->SetElements2(viewPos.x(), viewPos.y());
       }
 
     // Set ViewSize
@@ -1072,8 +1072,8 @@ void pqViewManager::updateCompactViewPositions()
       view->getProxy()->GetProperty("ViewSizeCompact"));
     if (prop)
       {
-      QSize size = ViewInfo[frame].second;
-      prop->SetElements2(size.width(), size.height());
+      QSize viewSize = ViewInfo[frame].second;
+      prop->SetElements2(viewSize.width(), viewSize.height());
       }
     }
   emit this->endNonUndoableChanges();
