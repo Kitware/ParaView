@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsInit.h"
 #include "pqMain.h"
 #include "vtkSmartPointer.h"
+
 #include <QApplication>
-#include <QDir>
+#include <QTimer>
 
 #ifdef Q_WS_X11
 #include <QPlastiqueStyle>
@@ -73,18 +74,6 @@ int OverView::main(int argc, char* argv[],
 
   pqComponentsInit();
 
-/* Pretty-sure this code is never used ... could probably get rid of it ...
-
-#ifdef OVERVIEW_INSTALLER_SUPPORT
-  // If building an installer, look in a special location
-  // for Qt plugins.
-  QDir plugin_directory(QApplication::applicationDirPath());
-  plugin_directory.cd("qtplugins");
-  QApplication::setLibraryPaths(QStringList(plugin_directory.absolutePath()));
-#endif
-
-\*/
-
   vtkSmartPointer<ProcessModuleGUIHelper> helper = vtkSmartPointer<ProcessModuleGUIHelper>::New();
   g_ProcessModuleGUIHelper = helper;
   helper->SetWindowType(WindowType);
@@ -116,5 +105,10 @@ const QString OverView::GetBrandedFullVersion()
 QWidget* OverView::GetUserInterface()
 {
   return g_ProcessModuleGUIHelper ? g_ProcessModuleGUIHelper->GetUserInterface() : 0;
+}
+
+void OverView::ExitApplication()
+{
+  QTimer::singleShot(0, QApplication::instance(), SLOT(quit()));
 }
 

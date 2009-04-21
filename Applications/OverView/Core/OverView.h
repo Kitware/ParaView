@@ -55,6 +55,8 @@ public:
   static const QString GetBrandedFullVersion();
 
   static QWidget* GetUserInterface();
+
+  static void ExitApplication();
 };
 
 #endif // !OVERVIEW_H
