@@ -179,11 +179,12 @@ void pqMultiView::init()
 //-----------------------------------------------------------------------------
 pqMultiView::~pqMultiView()
 {
-  // emit signals for removing frames
   QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
   foreach(pqMultiViewFrame* v, frames)
     {
-    this->removeWidget(v);
+    emit this->preFrameRemoved(qobject_cast<pqMultiViewFrame*>(v));
+    emit this->frameRemoved(qobject_cast<pqMultiViewFrame*>(v));
+    delete v;
     }
 }
 
