@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.7");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 //----------------------------------------------------------------------------
@@ -117,6 +117,9 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
     {
     this->Texture->Render(ren);
     }
+
+  this->Device->SetTexture(this->Texture);
+  this->Device->SetMapper(mapper);
   
   // make sure the device has the same matrix
   matrix = this->Device->GetUserMatrix();
