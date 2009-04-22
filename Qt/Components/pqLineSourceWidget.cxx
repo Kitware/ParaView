@@ -78,6 +78,9 @@ pqLineSourceWidget::pqLineSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* 
     &this->Implementation->ControlsContainer);
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
+  QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key \n to change point position</b>", this);
+  label->setWordWrap(1);
+  this->layout()->addWidget(label);
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(setModified()));
