@@ -846,9 +846,8 @@
 
       <DoubleVectorProperty name="StartTime"
         label="Start Time"
-        command="SetCustomStartTime"
+        command="SetStartTime"
         number_of_elements="1"
-        update_self="1"
         information_property="StartTimeInfo"
         precision="16"
         default_values="0.0">
@@ -859,9 +858,8 @@
 
       <DoubleVectorProperty name="EndTime"
         label="End Time"
-        command="SetCustomEndTime"
+        command="SetEndTime"
         number_of_elements="1"
-        update_self="1"
         information_property="EndTimeInfo"
         precision="16"
         default_values="1.0">
@@ -882,32 +880,27 @@
         <SimpleDoubleInformationHelper />
       </DoubleVectorProperty>
 
-      <IntVectorProperty name="UseCustomEndTimes"
-        command="SetUseCustomEndTimes"
+      <IntVectorProperty name="LockStartTime"
+        command="SetLockStartTime"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
         update_self="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          When set the StartTime and EndTime are used as the
-          animation start and end times. Otherwise the time range is obtained
-          from the TimeKeeper, if set. If no time keeper is present, then
-          StartTime and EndTime will be used irrespective of the
-          status of this flag. 
+          When set the StartTime will not be changed when the data time steps
+          change. 
         </Documentation>
       </IntVectorProperty>
 
-      <IntVectorProperty name="DisableAutomaticTimeAdjustment"
+      <IntVectorProperty name="LockEndTime"
+        command="SetLockEndTime"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        update_self="1">
         <BooleanDomain name="bool" />
         <Documentation>
-          This is a no-op property. It is set by the GUI with the user manually
-          changes the UseCustomEndTimes, StartTime and EndTime properties.
-          If that's done, then the GUI will no longer adjust start time/end
-          time when data sets are loaded or new timesteps are available etc.
-          (Look at pqAnimationScene for details on how this property affects the
-          GUI)
+          When set the EndTime will not be changed when the data time steps
+          change. 
         </Documentation>
       </IntVectorProperty>
 

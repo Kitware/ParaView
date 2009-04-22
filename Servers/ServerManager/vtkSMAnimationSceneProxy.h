@@ -85,29 +85,21 @@ public:
   vtkGetObjectMacro(TimeKeeper, vtkSMTimeKeeperProxy);
 
   // Description:
-  // Get/Set user specified start and end times. These times are used if
-  // TimeKeeper is NULL or UseCustomEndTimes is set to true. If
-  // UseCustomEndTimes is false and TimeKeeper is set, then the animation end
-  // times are obtained from the time range provided by the TimeKeeper. Look at
-  // vtkSMTimeKeeperProxy for details on what a time keeper is and how it can be
-  // used to manager time in ServerManager.
-  vtkSetMacro(CustomStartTime, double);
-  vtkGetMacro(CustomStartTime, double);
-  vtkSetMacro(CustomEndTime, double);
-  vtkGetMacro(CustomEndTime, double);
+  // Lock the start time. When locked, the StartTime won't be automatically
+  // updated when data time changes.
+  vtkSetMacro(LockStartTime, bool);
+  vtkGetMacro(LockStartTime, bool);
+  vtkBooleanMacro(LockStartTime, bool);
 
   // Description:
-  // When set the CustomStartTime and CustomEndTime are used as the animation
-  // start and end times. Otherwise the time range is obtained from the
-  // TimeKeeper, if set. If no time keeper is present, then CustomStartTime and
-  // CustomEndTime will be used irrespective of the status of this flag.
-  vtkSetMacro(UseCustomEndTimes, bool);
-  vtkGetMacro(UseCustomEndTimes, bool);
-  vtkBooleanMacro(UseCustomEndTimes, bool);
+  // Lock the end time. When locked, the EndTime won't be automatically updated
+  // when the data time changes.
+  vtkSetMacro(LockEndTime, bool);
+  vtkGetMacro(LockEndTime, bool);
+  vtkBooleanMacro(LockEndTime, bool);
 
   // Description:
-  // Overridden to ensure that correct end-times are set on the scene based on
-  // the status of UseCustomEndTimes.
+  // Overridden to ensure that correct end-times are set on the scene. 
   virtual void UpdateVTKObjects();
 //BTX
 protected:
@@ -149,9 +141,8 @@ protected:
   vtkSMProxy* AnimationPlayer;
   vtkSMTimeKeeperProxy* TimeKeeper;
 
-  bool UseCustomEndTimes;
-  double CustomStartTime;
-  double CustomEndTime;
+  bool LockEndTime;
+  bool LockStartTime;
 
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.

@@ -119,7 +119,7 @@ private:
 
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.57");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.58");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -132,9 +132,8 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->PlayerObserver->SetTarget(this);
   this->InTick = false;
   this->TimeKeeper = 0;
-  this->CustomStartTime = 0.0;
-  this->CustomEndTime = 1.0;
-  this->UseCustomEndTimes = false;
+  this->LockStartTime = false;
+  this->LockEndTime = false;
   this->TimeRangeObserver = vtkMakeMemberFunctionCommand(
     *this, &vtkSMAnimationSceneProxy::TimeKeeperTimeRangeChanged);
   this->TimestepValuesObserver = vtkMakeMemberFunctionCommand(
@@ -163,19 +162,14 @@ void vtkSMAnimationSceneProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
  
-  vtkPVAnimationScene* scene = vtkPVAnimationScene::SafeDownCast(
-    this->AnimationCue);
-  if (this->UseCustomEndTimes || !this->TimeKeeper)
+  if (this->TimeKeeper)
     {
-    scene->SetStartTime(this->CustomStartTime);
-    scene->SetEndTime(this->CustomEndTime);
-    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
-    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
+    this->TimeKeeperTimeRangeChanged();
     }
   else
     {
-    // ensure timekeeper's time range is pushed.
-    this->TimeKeeperTimeRangeChanged();
+    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
+    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
     }
 }
 
@@ -218,17 +212,25 @@ void vtkSMAnimationSceneProxy::TimeKeeperTimestepsChanged()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::TimeKeeperTimeRangeChanged()
 {
-  if (!this->UseCustomEndTimes)
+  // If time keeper has a non-trivial time range and the times are not locked,
+  // then we change the times to match the time range.
+  vtkPVAnimationScene* scene = vtkPVAnimationScene::SafeDownCast(
+    this->AnimationCue);
+  double min = vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(0);
+  double max = vtkSMPropertyHelper(this->TimeKeeper,"TimeRange").GetAsDouble(1);
+  if (max > min)
     {
-    vtkPVAnimationScene* scene = vtkPVAnimationScene::SafeDownCast(
-      this->AnimationCue);
-    scene->SetStartTime(vtkSMPropertyHelper(
-        this->TimeKeeper,"TimeRange").GetAsDouble(0));
-    scene->SetEndTime(vtkSMPropertyHelper(
-        this->TimeKeeper,"TimeRange").GetAsDouble(1));
-    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
-    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
+    if (!this->LockStartTime)
+      {
+      scene->SetStartTime(min);
+      }
+    if (!this->LockEndTime)
+      {
+      scene->SetEndTime(max);
+      }
     }
+  this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
+  this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
 }
 
 //----------------------------------------------------------------------------
@@ -488,7 +490,4 @@ void vtkSMAnimationSceneProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OverrideStillRender: " << this->OverrideStillRender << endl;
   os << indent << "CacheLimit: " << this->CacheLimit << endl;
   os << indent << "Caching: " << this->Caching << endl;
-  os << indent << "CustomStartTime: " << this->CustomStartTime << endl;
-  os << indent << "CustomEndTime: " << this->CustomEndTime << endl;
-  os << indent << "UseCustomEndTimes: " << this->UseCustomEndTimes << endl;
 }

@@ -32,17 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationViewWidget.h"
 
-#include <QVBoxLayout>
-#include <QPointer>
-#include <QSignalMapper>
-#include <QDialog>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QSpinBox>
-#include <QLabel>
+#include <QDialog>
 #include <QDialogButtonBox>
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPointer>
+#include <QSignalMapper>
+#include <QSpinBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include "pqAnimationWidget.h"
 #include "pqAnimationModel.h"
@@ -99,6 +100,8 @@ public:
   pqPropertyLinks DurationLink;
   pqAnimatableProxyComboBox* CreateSource;
   pqAnimatablePropertiesComboBox* CreateProperty;
+  QPushButton* LockEndTime;
+  QPushButton* LockStartTime;
 
   pqAnimationTrack* findTrack(pqAnimationCue* cue)
     {
@@ -253,11 +256,31 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   this->Internal->StartTime->setValidator(
     new QDoubleValidator(this->Internal->StartTime));
   hboxlayout->addWidget(this->Internal->StartTime);
+  this->Internal->LockStartTime = new QPushButton(this);
+  this->Internal->LockStartTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
+  this->Internal->LockStartTime->setToolTip(
+    "<html>Lock the start time to keep ParaView from changing it "
+    "as available data times change</html>");
+  this->Internal->LockStartTime->setStatusTip(
+    "<html>Lock the start time to keep ParaView from changing it "
+    "as available data times change</html>");
+  this->Internal->LockStartTime->setCheckable(true);
+  hboxlayout->addWidget(this->Internal->LockStartTime);
   hboxlayout->addWidget(new QLabel("End Time:", this));
   this->Internal->EndTime = new QLineEdit(this);
   this->Internal->EndTime->setValidator(
     new QDoubleValidator(this->Internal->EndTime));
   hboxlayout->addWidget(this->Internal->EndTime);
+  this->Internal->LockEndTime = new QPushButton(this);
+  this->Internal->LockEndTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
+  this->Internal->LockEndTime->setToolTip(
+    "<html>Lock the end time to keep ParaView from changing it"
+    " as available data times change</html>");
+  this->Internal->LockEndTime->setStatusTip(
+    "<html>Lock the end time to keep ParaView from changing it"
+    " as available data times change</html>");
+  this->Internal->LockEndTime->setCheckable(true);
+  hboxlayout->addWidget(this->Internal->LockEndTime);
   this->Internal->DurationLabel = new QLabel(this);
   hboxlayout->addWidget(this->Internal->DurationLabel);
   this->Internal->Duration = new QSpinBox(this);
@@ -369,6 +392,13 @@ void pqAnimationViewWidget::setScene(pqAnimationScene* scene)
     this->Internal->Links.addPropertyLink(this->Internal->EndTime, "text",
       SIGNAL(editingFinished()), scene->getProxy(),
       scene->getProxy()->GetProperty("EndTime"));
+    // connect lock start time.
+    this->Internal->Links.addPropertyLink(this->Internal->LockStartTime,
+      "checked", SIGNAL(toggled(bool)), scene->getProxy(),
+      scene->getProxy()->GetProperty("LockStartTime"));
+    this->Internal->Links.addPropertyLink(this->Internal->LockEndTime,
+      "checked", SIGNAL(toggled(bool)), scene->getProxy(),
+      scene->getProxy()->GetProperty("LockEndTime"));
 
     QObject::connect(scene, SIGNAL(cuesChanged()), 
       this, SLOT(onSceneCuesChanged()));

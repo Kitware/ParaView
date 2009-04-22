@@ -185,37 +185,24 @@ void pqAnimationScene::updateTimeSteps()
 
   // Adjust the play mode based on whether or not we have time steps.
   vtkSMProperty *playModeProperty = sceneProxy->GetProperty("PlayMode");
-  if (timekeeper->getNumberOfTimeStepValues() == 0)
+  if (timekeeper->getNumberOfTimeStepValues() <= 1)
     {
     if (pqSMAdaptor::getEnumerationProperty(playModeProperty)
       == "Snap To TimeSteps" )
       {
       pqSMAdaptor::setEnumerationProperty(playModeProperty, "Sequence");
-      pqSMAdaptor::setElementProperty(
-        sceneProxy->GetProperty("UseCustomEndTimes"), 1);
       }
     }
   else
     {
     pqSMAdaptor::setEnumerationProperty(playModeProperty, "Snap To TimeSteps");
-    pqSMAdaptor::setElementProperty(
-      sceneProxy->GetProperty("UseCustomEndTimes"), 0);
-    }
-
-  bool disable_automatic =
-    pqSMAdaptor::getElementProperty(
-      sceneProxy->GetProperty("DisableAutomaticTimeAdjustment")).toBool();
-
-  if (!disable_automatic)
-    {
-    QPair<double, double> range = timekeeper->getTimeRange();
-    pqSMAdaptor::setElementProperty(
-      sceneProxy->GetProperty("StartTime"), range.first);
-    pqSMAdaptor::setElementProperty(
-      sceneProxy->GetProperty("EndTime"), range.second);
     }
 
   sceneProxy->UpdateVTKObjects();
+  // This will internally adjust the Start and End times for the animation scene
+  // based of the Locks for the times. We not simply need to copy the info
+  // property values.
+
 
   /// If the animation time is not in the scene time range, set it to the min
   /// value.
@@ -225,6 +212,11 @@ void pqAnimationScene::updateTimeSteps()
     sceneProxy->GetProperty("EndTimeInfo")).toDouble();
   double cur = pqSMAdaptor::getElementProperty(
     sceneProxy->GetProperty("AnimationTime")).toDouble();
+
+  // Ensure that the values of the properties match the times used.
+  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("StartTime"), min);
+  pqSMAdaptor::setElementProperty(sceneProxy->GetProperty("EndTime"), max);
+  sceneProxy->UpdateVTKObjects();
   if (cur < min || cur > max)
     {
     this->setAnimationTime(min);

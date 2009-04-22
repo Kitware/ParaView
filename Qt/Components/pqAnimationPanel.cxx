@@ -297,9 +297,9 @@ void pqAnimationPanel::onActiveSceneChanged(pqAnimationScene* scene)
   this->Internal->SceneLinks.addPropertyLink(
     this->Internal->endTime, "text", SIGNAL(textChanged(const QString&)),
     sceneProxy, sceneProxy->GetProperty("EndTime"));
-  this->Internal->SceneLinks.addPropertyLink(
-    this->Internal->UseCustomEndTimes, "checked", SIGNAL(toggled(bool)),
-    sceneProxy, sceneProxy->GetProperty("UseCustomEndTimes"));
+  //this->Internal->SceneLinks.addPropertyLink(
+  //  this->Internal->UseCustomEndTimes, "checked", SIGNAL(toggled(bool)),
+  //  sceneProxy, sceneProxy->GetProperty("UseCustomEndTimes"));
   //this->Internal->SceneLinks.addPropertyLink(
   //  this->Internal->endTimeLock, "checked", SIGNAL(toggled(bool)),
   //  sceneProxy, sceneProxy->GetProperty("ClockTimeRangeLocks"), 1);
