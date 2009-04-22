@@ -2,10 +2,12 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="SphereSource" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/playMode" command="set_string" arguments="Sequence" />
-  <pqevent object="pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName" command="set_string" arguments="Start Theta" />
-  <pqevent object="pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame" command="activate" arguments="" />
+
+  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo" command="set_string" arguments="Start Theta" />  
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,2" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,2" />
+
   <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileSaveGeometry" />
   <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="remove" arguments="$PARAVIEW_TEST_ROOT/SaveAnimationGeometry.pvd" />
   <pqevent object="pqClientMainWindow/FileSaveAnimationDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/SaveAnimationGeometry.pvd" />

@@ -42,8 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_MainWindow.h"
 
 #include <pqActiveView.h>
-#include <pqAnimationPanel.h>
-#include <pqAnimationPanel.h>
 #include <pqAnimationViewWidget.h>
 #include <pqApplicationCore.h>
 #include <pqComparativeVisPanel.h>
@@ -129,8 +127,6 @@ public:
   pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
   pqViewMenu* ToolbarsMenu;
-  QLineEdit* CurrentTimeWidget;
-  QSpinBox* CurrentTimeIndexWidget;
   pqProxyTabWidget* ProxyTab;
   QPointer<pqServer> ActiveServer;
   QPointer<ApplicationOptionsDialog> ApplicationSettings;
@@ -543,10 +539,6 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupSelectionInspector(
     this->Implementation->UI.selectionInspectorDock);
     
-  pqAnimationPanel* animation_panel = 
-    this->Implementation->Core.setupAnimationPanel(
-    this->Implementation->UI.animationPanelDock);
-
   pqComparativeVisPanel* cv_panel = 
     new pqComparativeVisPanel(
     this->Implementation->UI.comparativePanelDock);
@@ -568,10 +560,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.lookmarkToolbar,
     this->Implementation->UI.lookmarkToolbar->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.animationPanelDock,
-    this->Implementation->UI.animationPanelDock->windowTitle());
-  
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationViewDock,
     this->Implementation->UI.animationViewDock->windowTitle());
@@ -616,7 +604,6 @@ MainWindow::MainWindow() :
 
   // Setup the default dock configuration ...
   this->Implementation->UI.statisticsViewDock->hide();
-  this->Implementation->UI.animationPanelDock->hide();
   this->Implementation->UI.comparativePanelDock->hide();
   this->Implementation->UI.animationViewDock->hide();
   this->Implementation->UI.selectionInspectorDock->hide();

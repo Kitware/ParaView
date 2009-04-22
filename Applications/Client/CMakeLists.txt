@@ -325,7 +325,8 @@ IF(BUILD_TESTING)
     UndoRedo1
     UndoRedo2
     UndoRedo3
-    UndoRedo4
+    #UndoRedo4 -- disabled since AnimationPanel was removed. We need to create a
+               #new test to test animation undo-redo using the animation view.
     UndoRedo5
     UndoRedo6
     UndoRedo7

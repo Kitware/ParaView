@@ -44,33 +44,36 @@ object10 = 'pqClientMainWindow/FileOpenDialog'
 QtTesting.playCommand(object10, 'filesSelected', '$PARAVIEW_DATA_ROOT/Data/dualSphereAnimation.pvd')
 QtTesting.playCommand(object2, 'activate', '')
 object11 = 'pqClientMainWindow/menubar/menuView'
-QtTesting.playCommand(object11, 'activate', 'Animation Inspector')
-object12 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
-object14 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
+QtTesting.playCommand(object11, 'activate', 'Animation View')
+
+
 object15 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
 QtTesting.playCommand(object15, 'currentChanged', '/0/1|0')
+
+#object12 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
+#object14 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
+#QtTesting.playCommand(object12, 'set_string', 'End Theta')
+#QtTesting.playCommand(object14, 'activate', '')
+
+object12 = 'pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo'
 QtTesting.playCommand(object12, 'set_string', 'End Theta')
-QtTesting.playCommand(object14, 'activate', '')
-object16 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/keyFrameIndex'
-QtTesting.playCommand(object16, 'set_int', '1')
-QtTesting.playCommand(object16, 'set_int', '0')
+object10 = "pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0"
+QtTesting.playCommand(object10, "mousePress", "1,1,0,0,0,2")
+QtTesting.playCommand(object10, "mouseRelease", "1,1,0,0,0,2")
+
 QtTesting.playCommand(object15, 'currentChanged', '/0/0|0')
-QtTesting.playCommand(object14, 'activate', '')
-QtTesting.playCommand(object16, 'set_int', '1')
-QtTesting.playCommand(object16, 'set_int', '0')
+QtTesting.playCommand(object10, "mousePress", "1,1,0,0,0,3")
+QtTesting.playCommand(object10, "mouseRelease", "1,1,0,0,0,3")
+
 object17 = 'pqClientMainWindow/VCRToolbar/1QToolButton0'
 QtTesting.playCommand(object17, 'activate', '')
 object18 = 'pqClientMainWindow/VCRToolbar/1QToolButton3'
-QtTesting.playCommand(object16, 'set_int', '1')
-QtTesting.playCommand(object16, 'set_int', '0')
-QtTesting.playCommand(object16, 'set_int', '1')
-QtTesting.playCommand(object16, 'set_int', '0')
-QtTesting.playCommand(object16, 'set_int', '1')
-object19 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/SignalAdaptorKeyFrameValue/lineEdit'
-QtTesting.playCommand(object19, 'set_string', '10')
-QtTesting.playCommand(object19, 'set_string', '10')
+
+#object19 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/editorFrame/SignalAdaptorKeyFrameValue/lineEdit'
+#QtTesting.playCommand(object19, 'set_string', '10')
+#QtTesting.playCommand(object19, 'set_string', '10')
 object20 = 'pqClientMainWindow/VCRToolbar/1QToolButton1'
-QtTesting.playCommand(object11, 'activate', 'Animation Inspector')
+QtTesting.playCommand(object11, 'activate', 'Animation View')
 QtTesting.playCommand(object11, 'activate', 'Object Inspector')
 QtTesting.playCommand(object11, 'activate', 'Pipeline Browser')
 QtTesting.playCommand(object9, 'activate', 'actionFileSaveAnimation')

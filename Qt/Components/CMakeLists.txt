@@ -68,7 +68,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimatablePropertiesComboBox.h
   pqAnimatableProxyComboBox.h
   pqAnimationManager.h
-  pqAnimationPanel.h
   pqAnimationViewWidget.h
   pqApplicationOptions.h
   pqApplicationOptionsDialog.h
@@ -99,6 +98,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqContourPanel.h
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
+  pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionWizard.h
   pqCustomFilterManager.h
   pqCustomFilterManagerModel.h
@@ -237,9 +237,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 SET(UI_FORMS
   Resources/UI/pqAbortAnimation.ui
   #Resources/UI/pqAddSourceDialog.ui
-  Resources/UI/pqAnimationPanel.ui
   Resources/UI/pqAnimationSettings.ui
-#Resources/UI/pqAnimationViewWidget.ui
   Resources/UI/pqApplicationOptions.ui
   Resources/UI/pqBarChartDisplayPanel.ui
   Resources/UI/pqBarChartDisplayEditor.ui
@@ -389,8 +387,6 @@ ADD_LIBRARY(pqComponents
   pqAnimatableProxyComboBox.h
   pqAnimationManager.cxx
   pqAnimationManager.h
-  pqAnimationPanel.cxx
-  pqAnimationPanel.h
   pqAnimationViewWidget.cxx
   pqAnimationViewWidget.h
   pqApplicationOptions.cxx
@@ -468,6 +464,8 @@ ADD_LIBRARY(pqComponents
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.cxx
   pqCubeAxesEditorDialog.h
+  pqCurrentTimeToolbar.cxx
+  pqCurrentTimeToolbar.h
   pqCustomFilterDefinitionModel.cxx
   pqCustomFilterDefinitionModel.h
   pqCustomFilterDefinitionWizard.cxx

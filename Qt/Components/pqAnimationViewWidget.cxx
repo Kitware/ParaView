@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqUndoStack.h"
+#include "pqSetName.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternal
@@ -243,20 +244,21 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   hboxlayout->setMargin(0);
 
   hboxlayout->addWidget(new QLabel("Mode:", this));
-  this->Internal->PlayMode = new QComboBox(this);
+  this->Internal->PlayMode = new QComboBox(this) << pqSetName("PlayMode");
   this->Internal->PlayMode->addItem("Snap to Timesteps");
   hboxlayout->addWidget(this->Internal->PlayMode);
   hboxlayout->addWidget(new QLabel("Time:", this));
-  this->Internal->Time = new QLineEdit(this);
+  this->Internal->Time = new QLineEdit(this) << pqSetName("Time");
   this->Internal->Time->setValidator(
     new QDoubleValidator(this->Internal->Time));
   hboxlayout->addWidget(this->Internal->Time);
   hboxlayout->addWidget(new QLabel("Start Time:", this));
-  this->Internal->StartTime = new QLineEdit(this);
+  this->Internal->StartTime = new QLineEdit(this) << pqSetName("StartTime");
   this->Internal->StartTime->setValidator(
     new QDoubleValidator(this->Internal->StartTime));
   hboxlayout->addWidget(this->Internal->StartTime);
-  this->Internal->LockStartTime = new QPushButton(this);
+  this->Internal->LockStartTime = new QPushButton(this) <<
+    pqSetName("LockStartTime");
   this->Internal->LockStartTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
   this->Internal->LockStartTime->setToolTip(
     "<html>Lock the start time to keep ParaView from changing it "
@@ -267,11 +269,12 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   this->Internal->LockStartTime->setCheckable(true);
   hboxlayout->addWidget(this->Internal->LockStartTime);
   hboxlayout->addWidget(new QLabel("End Time:", this));
-  this->Internal->EndTime = new QLineEdit(this);
+  this->Internal->EndTime = new QLineEdit(this) << pqSetName("EndTime");
   this->Internal->EndTime->setValidator(
     new QDoubleValidator(this->Internal->EndTime));
   hboxlayout->addWidget(this->Internal->EndTime);
-  this->Internal->LockEndTime = new QPushButton(this);
+  this->Internal->LockEndTime = new QPushButton(this) <<
+    pqSetName("LockEndTime");
   this->Internal->LockEndTime->setIcon(QIcon(":pqWidgets/Icons/pqLock24.png"));
   this->Internal->LockEndTime->setToolTip(
     "<html>Lock the end time to keep ParaView from changing it"
@@ -283,17 +286,20 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
   hboxlayout->addWidget(this->Internal->LockEndTime);
   this->Internal->DurationLabel = new QLabel(this);
   hboxlayout->addWidget(this->Internal->DurationLabel);
-  this->Internal->Duration = new QSpinBox(this);
+  this->Internal->Duration = new QSpinBox(this) << pqSetName("Duration");
   this->Internal->Duration->setRange(1, (int)(~0u >> 1));
   hboxlayout->addWidget(this->Internal->Duration);
   hboxlayout->addStretch();
 
-  this->Internal->AnimationWidget = new pqAnimationWidget(this);
+  this->Internal->AnimationWidget = new pqAnimationWidget(this)
+    << pqSetName("pqAnimationWidget");
   this->Internal->AnimationWidget->animationModel()->setInteractive(true);
   QWidget* w = this->Internal->AnimationWidget->createDeleteWidget();
 
-  this->Internal->CreateSource = new pqAnimatableProxyComboBox(w);
-  this->Internal->CreateProperty = new pqAnimatablePropertiesComboBox(w);
+  this->Internal->CreateSource = new pqAnimatableProxyComboBox(w)
+    << pqSetName("ProxyCombo");
+  this->Internal->CreateProperty = new pqAnimatablePropertiesComboBox(w)
+    << pqSetName("PropertyCombo");
   this->Internal->CreateSource->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   this->Internal->CreateProperty->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   QHBoxLayout* l = new QHBoxLayout(w);

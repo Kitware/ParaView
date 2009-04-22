@@ -20,11 +20,12 @@ QtTesting.playCommand(object6, 'set_tab', '1')
 object7 = 'pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/Form/ViewGroup/ViewData'
 QtTesting.playCommand(object7, 'set_boolean', 'true')
 object8 = 'pqClientMainWindow/menubar/menuView'
-QtTesting.playCommand(object8, 'activate', 'Animation Inspector')
-object9 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/tracksGroup/propertyName'
+QtTesting.playCommand(object8, 'activate', 'Animation View')
+object9 = 'pqClientMainWindow/animationViewDock/animationView/pqAnimationWidget/CreateDeleteWidget/PropertyCombo'
 QtTesting.playCommand(object9, 'set_string', 'Start Theta')
-object10 = 'pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/keyFramePropertiesGroup/addKeyFrame'
-QtTesting.playCommand(object10, 'activate', '')
+object10 = "pqClientMainWindow/animationViewDock/animationView/1pqAnimationWidget0/1QHeaderView0"
+QtTesting.playCommand(object10, "mousePress", "1,1,0,0,0,2")
+QtTesting.playCommand(object10, "mouseRelease", "1,1,0,0,0,2")
 object11 = 'pqClientMainWindow/VCRToolbar/1QToolButton3'
 QtTesting.playCommand(object11, 'activate', '')
 QtTesting.playCommand(object11, 'activate', '')

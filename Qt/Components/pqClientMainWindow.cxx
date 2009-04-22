@@ -38,8 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqClientMainWindow.h"
 
 #include <pqActiveView.h>
-#include <pqAnimationPanel.h>
-#include <pqAnimationPanel.h>
+#include <pqAnimationManager.h>
 #include <pqAnimationViewWidget.h>
 #include <pqApplicationCore.h>
 #include <pqColorScaleToolbar.h>
@@ -54,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
 #include <pqPlotView.h>
+#include <pqProgressManager.h>
 #include <pqProxyTabWidget.h>
 #include <pqRecentFilesMenu.h>
 #include <pqRenderView.h>
@@ -65,7 +65,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqVCRController.h>
 #include <pqViewManager.h>
 #include <pqViewMenu.h>
-#include <pqProgressManager.h>
 
 #include <QAssistantClient>
 #include <QDir>
@@ -583,11 +582,11 @@ void pqClientMainWindow::constructorHelper()
   this->Implementation->Core->setupLookmarkInspector(
     this->Implementation->UI.lookmarkInspectorDock);
 
-  pqAnimationPanel* animation_panel =
-    this->Implementation->Core->setupAnimationPanel(
-    this->Implementation->UI.animationPanelDock);
-  animation_panel->setCurrentTimeToolbar(
-    this->Implementation->UI.currentTimeToolbar);
+  QObject::connect(
+    this->Implementation->Core->getAnimationManager(),
+    SIGNAL(activeSceneChanged(pqAnimationScene*)),
+    this->Implementation->UI.currentTimeToolbar,
+    SLOT(setAnimationScene(pqAnimationScene*)));
 
   pqComparativeVisPanel* cv_panel =
     new pqComparativeVisPanel(
@@ -648,10 +647,6 @@ void pqClientMainWindow::constructorHelper()
 
 
   this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.animationPanelDock,
-    this->Implementation->UI.animationPanelDock->windowTitle());
-
-  this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.animationViewDock,
     this->Implementation->UI.animationViewDock->windowTitle());
 
@@ -697,7 +692,6 @@ void pqClientMainWindow::constructorHelper()
   this->Implementation->UI.lookmarkBrowserDock->hide();
   this->Implementation->UI.lookmarkInspectorDock->hide();
   this->Implementation->UI.statisticsViewDock->hide();
-  this->Implementation->UI.animationPanelDock->hide();
   this->Implementation->UI.comparativePanelDock->hide();
   this->Implementation->UI.animationViewDock->hide();
   this->Implementation->UI.selectionInspectorDock->hide();

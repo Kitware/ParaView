@@ -45,7 +45,6 @@ class pqActionGroupInterface;
 class pqActiveServer;
 class pqActiveViewOptionsManager;
 class pqAnimationManager;
-class pqAnimationPanel;
 class pqAnimationScene;
 class pqAnimationViewWidget;
 class pqColorScaleToolbar;
@@ -147,9 +146,6 @@ public:
   /// Setup lookmark inspector, attaching it to the given dock
   void setupLookmarkInspector(QDockWidget* parent);
 
-  /// Setup the animation panel, attaching it to the given dock.
-  pqAnimationPanel* setupAnimationPanel(QDockWidget* parent);
-  
   /// Setup the animation view, attaching it to the given dock.
   pqAnimationViewWidget* setupAnimationView(QDockWidget* parent);
   

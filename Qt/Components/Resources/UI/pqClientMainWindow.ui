@@ -297,7 +297,7 @@
    <addaction name="actionVCRLastFrame" />
    <addaction name="actionVCRLoop" />
   </widget>
-  <widget class="QToolBar" name="currentTimeToolbar" >
+  <widget class="pqCurrentTimeToolbar" name="currentTimeToolbar" >
    <property name="windowTitle" >
     <string>Current Time Controls</string>
    </property>
@@ -406,15 +406,6 @@
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
    <addaction name="actionPickCenter" />
-  </widget>
-  <widget class="QDockWidget" name="animationPanelDock" >
-   <property name="windowTitle" >
-    <string>Animation Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea" >
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents" />
   </widget>
   <widget class="QDockWidget" name="lookmarkBrowserDock" >
    <property name="sizePolicy" >
@@ -1371,6 +1362,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqCurrentTimeToolbar</class>
+   <extends>QToolBar</extends>
+   <header>pqCurrentTimeToolbar.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../pqComponents.qrc" />
  </resources>

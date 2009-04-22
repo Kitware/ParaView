@@ -76,6 +76,7 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   this->Model->setRowHeight(this->Header->defaultSectionSize());
   
   this->CreateDeleteWidget = new QWidget(this);
+  this->CreateDeleteWidget->setObjectName("CreateDeleteWidget");
 
   QObject::connect(this->Header->model(),
                    SIGNAL(rowsInserted(QModelIndex,int,int)),

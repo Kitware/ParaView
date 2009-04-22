@@ -243,15 +243,6 @@
    <addaction name="actionEditUndo" />
    <addaction name="actionEditRedo" />
   </widget>
-  <widget class="QDockWidget" name="animationPanelDock" >
-   <property name="windowTitle" >
-    <string>Animation Inspector</string>
-   </property>
-   <attribute name="dockWidgetArea" >
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents" />
-  </widget>
   <widget class="QDockWidget" name="lookmarkBrowserDock" >
    <property name="sizePolicy" >
     <sizepolicy>

@@ -57,7 +57,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveView.h"
 #include "pqActiveViewOptionsManager.h"
 #include "pqAnimationManager.h"
-#include "pqAnimationPanel.h"
 #include "pqAnimationViewWidget.h"
 #include "pqApplicationCore.h"
 #include "pqApplicationOptionsDialog.h"
@@ -1026,25 +1025,6 @@ pqAnimationManager* pqMainWindowCore::getAnimationManager()
                      Qt::QueuedConnection);
     }
   return this->Implementation->AnimationManager;
-}
-
-//-----------------------------------------------------------------------------
-pqAnimationPanel* pqMainWindowCore::setupAnimationPanel(QDockWidget* dock_widget)
-{
-  pqAnimationPanel* const panel = new pqAnimationPanel(dock_widget);
-
-  QObject::connect(panel, 
-                   SIGNAL(beginUndo(const QString&)),
-                   this->Implementation->UndoStack, 
-                   SLOT(beginUndoSet(const QString&)));
-
-  QObject::connect(panel,                           SIGNAL(endUndo()),
-                   this->Implementation->UndoStack, SLOT(endUndoSet()));
-
-  pqAnimationManager* mgr = this->getAnimationManager();
-  panel->setManager(mgr);
-  dock_widget->setWidget(panel);
-  return  panel;
 }
 
 //-----------------------------------------------------------------------------

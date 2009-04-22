@@ -12,8 +12,8 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="TemporalInterpolator" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation Inspector" />
-  <pqevent object="pqClientMainWindow/animationPanelDock/1pqAnimationPanel0/scrollArea/qt_scrollarea_viewport/AnimationPanel/playbackGroup/playMode" command="set_string" arguments="Real Time" />
+  <pqevent object="pqClientMainWindow/menubar/menuView" command="activate" arguments="Animation View" />
+  <pqevent object="pqClientMainWindow/animationViewDock/animationView/PlayMode" command="set_string" arguments="Real Time" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="46" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="set_string" arguments="0.2" />
   <pqevent object="pqClientMainWindow/currentTimeToolbar/CurrentTime" command="key" arguments="16777220" />
