@@ -133,11 +133,11 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
         int idx = args[5].toInt();
         if(header->orientation() == Qt::Horizontal)
           {
-          pt = QPoint(header->sectionPosition(idx), 4);
+          pt = QPoint(header->sectionPosition(idx)+4, 4);
           }
         else
           {
-          pt = QPoint(4, header->sectionPosition(idx));
+          pt = QPoint(4, header->sectionPosition(idx)+4);
           }
         }
       else
