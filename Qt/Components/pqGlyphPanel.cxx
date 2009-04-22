@@ -158,6 +158,8 @@ void pqGlyphPanel::updateScaleFactor()
 
   vtkSMProxy* filterProxy = this->proxy();
   filterProxy->GetProperty("Input")->UpdateDependentDomains();
+  filterProxy->GetProperty("SelectInputScalars")->UpdateDependentDomains();
+  filterProxy->GetProperty("SelectInputVectors")->UpdateDependentDomains();
 
   vtkSMEnumerationDomain* enumDomain = vtkSMEnumerationDomain::SafeDownCast(
     filterProxy->GetProperty("SetScaleMode")->GetDomain("enum"));
@@ -211,7 +213,11 @@ void pqGlyphPanel::updateScaleFactor()
     break;
     }
 
-  divisor = (divisor < 1.0)? 1 : divisor;
+  divisor = fabs(divisor);
+  // the divisor can sometimes be very close to 0, which happens in case the
+  // vectors indeed have same value but due to precision issues are not reported
+  // as identical. In that case we just treat it as 0.
+  divisor = (divisor < 0.000000001)? 1 : divisor;
   scalefactor /= divisor;
 
   if (this->ScaleFactorWidget->property("text").toDouble() != scalefactor)
