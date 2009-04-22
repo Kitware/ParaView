@@ -4376,6 +4376,15 @@
     <!-- Beginning of FOAM Reader -->
     <SourceProxy name="OpenFOAMReader" 
                     class="vtkOpenFOAMReader">
+      <Documentation
+        short_help="Reads a dataset in OpenFOAM format."
+        long_help="Reads a dataset in OpenFOAM format." >
+        vtkOpenFOAMReader creates an multiblock dataset. It reads a controlDict
+        file, mesh information, and time dependent data.  The controlDict file
+        contains timestep information. The polyMesh folders contain mesh information
+        The time folders contain transient data for the cells  Each folder can
+        contain any number of data files.
+      </Documentation>
       <StringVectorProperty name="FileName"
                             command="SetFileName"
                             animateable="0"
@@ -4436,6 +4445,16 @@
 
     <!-- Beginning of MFIX Reader -->
     <SourceProxy name="MFIXReader" class="vtkMFIXReader">
+      <Documentation
+        short_help="Reads a dataset in MFIX file format."
+        long_help="Reads a dataset in MFIX file format." >
+        vtkMFIXReader creates an unstructured grid dataset. It reads a restart
+        file and a set of sp files.  The restart file contains the mesh 
+        information.  MFIX meshes are either cylindrical or rectilinear, but 
+        this reader will convert them to an unstructured grid.  The sp files 
+        contain transient data for the cells.  Each sp file has one or more 
+        variables stored inside it.
+      </Documentation>
       <StringVectorProperty name="FileName" 
                             command="SetFileName" 
                             animateable="0" 
@@ -4481,6 +4500,12 @@
    <!-- Beginning of FLUENT Reader -->
    <SourceProxy name="FLUENTReader"
                 class="vtkFLUENTReader">
+     <Documentation
+        short_help="Reads a dataset in Fluent file format."
+        long_help="Reads a dataset in Fluent file format." >
+        FLUENTReader creates an unstructured grid dataset. It reads .cas and
+        .dat files stored in FLUENT native format.
+     </Documentation>
      <StringVectorProperty name="FileName"
                            command="SetFileName"
                            animateable="0"
@@ -4517,6 +4542,11 @@
 
    <!-- Beginning of LSDyna Reader -->
    <SourceProxy name="LSDynaReader" class="vtkLSDynaReader">
+     <Documentation
+      short_help="Read LS-Dyna databases (d3plot)."
+      long_help="Read LS-Dyna databases (d3plot)." >
+      This reader reads LS-Dyna databases.
+     </Documentation>
 
      <StringVectorProperty name="FileName" 
                            command="SetFileName" 

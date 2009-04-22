@@ -4,7 +4,9 @@
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkExtractArraysOverTime"
       label="Plot Selection Over Time">
-      <Documentation>
+      <Documentation
+        short_help="Extracts selection over time and then plots it."
+        long_help="Extracts selection over time and then plots it." >
         This filter extracts the selection over time, i.e.  cell and/or point 
         variables at a cells/point selected are extracted over time
         The output multi-block consists of 1D rectilinear grids where the x coordinate
@@ -61,7 +63,9 @@
    <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"
                           label="Plot Global Variables over Time">
-     <Documentation>
+     <Documentation
+      short_help="Extracts and plots data in field data over time."
+      long_help="Extracts and plots data in field data over time." >
 This filter extracts the variables that reside in a dataset's field data and are
 defined over time. The output is a 1D rectilinear grid where the x coordinates
 correspond to time (the same array is also copied to a point array named Time or
@@ -5406,6 +5410,13 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
     <SourceProxy name="TemporalSnapToTimeStep" 
                  class="vtkTemporalSnapToTimeStep"
                  label="Temporal Snap-to-Time-Step">
+      <Documentation
+        short_help="Modifies the time range/steps of temporal data."
+        long_help="Modifies the time range/steps of temporal data." >
+        This file modifies the time range or time steps of
+        the data without changing the data itself. The data is not resampled
+        by this filter, only the information accompanying the data is modified.
+      </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -7845,7 +7856,8 @@ This property controls how the filter works to generate tensor cell data. You ca
 
    <!-- ==================================================================== -->
     <CompoundSourceProxy name="NormalGlyphs" label="Normal Glyphs">
-      <Documentation>
+      <Documentation short_help="Filter computing surface normals."
+        long_help="Filter computing surface normals.">
         Filter computing surface normals.
       </Documentation>
       <Proxy group="filters" type="DataSetSurfaceFilter" id="1013" servers="1" compound_name="ExtractSurface2">
@@ -8201,7 +8213,8 @@ This property controls how the filter works to generate tensor cell data. You ca
     <SourceProxy name="TableToPolyData" 
                 class="vtkTableToPolyData"
                 label="Table To Points" >
-      <Documentation>
+      <Documentation short_help="Converts table to set of points."
+        long_help="Converts table to set of points." >
         The TableToPolyData filter converts a vtkTable to a set of points in a
         vtkPolyData. One must specifies the columns in the input table to use as
         the X, Y and Z coordinates for the points in the output.
@@ -8257,7 +8270,9 @@ This property controls how the filter works to generate tensor cell data. You ca
     <SourceProxy name="TableToStructuredGrid" 
                 class="vtkPTableToStructuredGrid"
                 label="Table To Structured Grid" >
-      <Documentation>
+      <Documentation
+        short_help="Converts to table to structured grid."
+        long_help="Converts to table to structured grid." >
         The TableToStructuredGrid filter converts a vtkTable to a
         vtkStructuredGrid.  One must specifies the columns in the input table to
         use as the X, Y and Z coordinates for the points in the output, and the
@@ -8353,7 +8368,9 @@ This property controls how the filter works to generate tensor cell data. You ca
     <!-- ================================================================== -->
     <CompoundSourceProxy name="FFTSelectionOverTime"
                          label="FFT of Selection Over Time">
-      <Documentation>
+      <Documentation
+        short_help="Extracts selection over time and plots the FFT"
+        long_help="Extracts selection over time and plots the FFT" >
         Extracts the data of a selection (e.g. points or cells) over time,
         takes the FFT of them, and plots them.
       </Documentation>
