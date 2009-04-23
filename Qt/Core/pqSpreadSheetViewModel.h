@@ -125,6 +125,10 @@ public:
   /// Resets the composite dataset index on the representation to point to the
   /// first non-empty block.
   void resetCompositeDataSetIndex();
+  
+  /// Set/Get the decimal precision for float and double type data.
+  void setDecimalPrecision(int);
+  int getDecimalPrecision();
 
 signals:
   void requestDelayedUpdate() const;

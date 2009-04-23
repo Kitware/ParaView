@@ -458,3 +458,9 @@ void pqSpreadSheetView::onSelectionOnly(int selOnly)
       QAbstractItemView::ExtendedSelection);
     }
 }
+
+//-----------------------------------------------------------------------------
+pqSpreadSheetViewModel* pqSpreadSheetView::getViewModel()
+{
+  return &this->Internal->Model;
+}

@@ -54,7 +54,8 @@ public:
 protected slots:
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
-
+  void displayPrecisionChanged(int);
+  
 protected:
   pqSpreadSheetView* Spreadsheet;
 

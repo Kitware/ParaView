@@ -79,6 +79,7 @@ public:
   this->ActiveBlockNumber = 0;
   this->Dirty = true;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->DecimalPrecision = 6;
   }
 
   QPointer<pqDataRepresentation> DataRepresentation;
@@ -87,7 +88,8 @@ public:
   int NumberOfRows;
   QItemSelectionModel SelectionModel;
   vtkIdType ActiveBlockNumber;
-
+  int DecimalPrecision;
+  
   vtkIdType getBlockSize()
     {
     vtkIdType blocksize = pqSMAdaptor::getElementProperty(
@@ -452,6 +454,7 @@ QVariant pqSpreadSheetViewModel::data(
     if (table)
       {
       vtkVariant value = table->GetValue(blockOffset, column);
+      
       QString str = value.ToString().c_str();
       if (value.IsChar() || value.IsUnsignedChar() || value.IsSignedChar())
         {
@@ -463,20 +466,45 @@ QVariant pqSpreadSheetViewModel::data(
         // it's possible that it's a char array, then too we need to do the
         // number magic.
         vtkDataArray* array = vtkDataArray::SafeDownCast(value.ToArray());
-        if (array && (
-            array->GetDataType() == VTK_CHAR ||
-            array->GetDataType() == VTK_UNSIGNED_CHAR ||
-            array->GetDataType() == VTK_SIGNED_CHAR))
+        if (array)
           {
-          str = QString();
-          for (vtkIdType cc=0; cc < array->GetNumberOfTuples(); cc++)
+          switch(array->GetDataType())
             {
-            double *tuple = array->GetTuple(cc);
-            for (vtkIdType kk=0; kk < array->GetNumberOfComponents(); kk++)
+            case VTK_CHAR :
+            case VTK_UNSIGNED_CHAR :
+            case VTK_SIGNED_CHAR:
               {
-              str += QString::number(static_cast<int>(tuple[kk])) + " ";
+              str = QString();
+              for (vtkIdType cc=0; cc < array->GetNumberOfTuples(); cc++)
+                {
+                double *tuple = array->GetTuple(cc);
+                for (vtkIdType kk=0; kk < array->GetNumberOfComponents(); kk++)
+                  {
+                  str += QString::number(static_cast<int>(tuple[kk])) + " ";
+                  }
+                str = str.trimmed();
+                }
+              break;
               }
-            str = str.trimmed();
+            case VTK_DOUBLE :
+            case VTK_FLOAT :
+              {
+              str = QString();
+              for (vtkIdType cc=0; cc < array->GetNumberOfTuples(); cc++)
+                {
+                double *tuple = array->GetTuple(cc);
+                for (vtkIdType kk=0; kk < array->GetNumberOfComponents(); kk++)
+                  {
+                  str += QString::number(static_cast<double>(tuple[kk]), 'g', 
+                         this->Internal->DecimalPrecision) + " ";
+                  }
+                str = str.trimmed();
+                }
+              break;
+              break;
+              }
+            default :
+              break;
             }
           }
         }
@@ -903,4 +931,20 @@ void pqSpreadSheetViewModel::resetCompositeDataSetIndex()
   pqSMAdaptor::setElementProperty(
     reprProxy->GetProperty("CompositeDataSetIndex"), cur_index);
   reprProxy->UpdateVTKObjects();
+}
+   
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewModel::setDecimalPrecision(int dPrecision)
+{
+  if(this->Internal->DecimalPrecision != dPrecision)
+    {
+    this->Internal->DecimalPrecision = dPrecision;
+    this->forceUpdate();
+    }
+}
+
+//-----------------------------------------------------------------------------
+int pqSpreadSheetViewModel::getDecimalPrecision()
+{
+  return this->Internal->DecimalPrecision;
 }

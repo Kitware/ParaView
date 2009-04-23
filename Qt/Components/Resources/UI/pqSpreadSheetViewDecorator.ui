@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>25</height>
+    <width>472</width>
+    <height>26</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -84,6 +84,29 @@
        <string>Rows</string>
       </property>
      </item>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_Precision" >
+     <property name="font" >
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text" >
+      <string>Decimal Precision:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="spinBoxPrecision" >
+     <property name="alignment" >
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="maximum" >
+      <number>32</number>
+     </property>
     </widget>
    </item>
    <item>

@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqSignalAdaptors.h"
 #include "pqSpreadSheetView.h"
+#include "pqSpreadSheetViewModel.h"
 
 class pqSpreadSheetViewDecorator::pqInternal : public Ui::pqSpreadSheetViewDecorator
 {
@@ -55,6 +56,7 @@ public:
   pqPropertyLinks Links;
   pqSignalAdaptorComboBox* AttributeAdaptor;
   pqComboBoxDomain* AttributeDomain;
+  pqSignalAdaptorSpinBox* DecimalPrecisionAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -74,6 +76,13 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
   this->Internal->Source->fillExistingPorts();
   this->Internal->AttributeAdaptor = 
     new pqSignalAdaptorComboBox(this->Internal->Attribute);
+  this->Internal->spinBoxPrecision->setValue(
+    this->Spreadsheet->getViewModel()->getDecimalPrecision());
+  this->Internal->DecimalPrecisionAdaptor = new pqSignalAdaptorSpinBox(
+    this->Internal->spinBoxPrecision);
+  QObject::connect(this->Internal->spinBoxPrecision, SIGNAL(valueChanged(int)),
+    this, SLOT(displayPrecisionChanged(int)));
+    
   this->Internal->AttributeDomain = 0;
 
   QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
@@ -152,4 +161,10 @@ void pqSpreadSheetViewDecorator::currentIndexChanged(pqOutputPort* port)
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSpreadSheetViewDecorator::displayPrecisionChanged(int precision)
+{
+  this->Spreadsheet->getViewModel()->setDecimalPrecision(precision);
 }
