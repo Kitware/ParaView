@@ -144,7 +144,8 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   this->Form->Listener = vtkEventQtSlotConnect::New();
   this->Form->Presets = new pqColorPresetManager(this);
   this->Form->Presets->restoreSettings();
-
+  this->Form->ColorScale->setToolTip("Note: Use Tab or Shift+Tab to navigate among points.");
+  
   vtkRenderWindow *win = this->Form->ColorScale->GetRenderWindow();
   vtkRenderWindowInteractor *iren = this->Form->ColorScale->GetInteractor();
   this->Viewer->SetInteractor(iren);
