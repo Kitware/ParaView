@@ -204,6 +204,10 @@ void ClientGraphView::selectionChanged()
   // Get the representaion's source
   pqDataRepresentation* pqRepr =
     qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+  if (!pqRepr)
+    {
+    return;
+    }
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
   vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
     opPort->getSource()->getProxy());

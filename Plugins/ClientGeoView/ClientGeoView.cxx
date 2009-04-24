@@ -37,7 +37,6 @@
 #include <vtkGeoCamera.h>
 #include <vtkGeoFileImageSource.h>
 #include <vtkGeoGlobeSource.h>
-#include <vtkGeoGraphRepresentation.h>
 #include <vtkGeoInteractorStyle.h>
 #include <vtkGeoLineRepresentation.h>
 #include <vtkGeometryFilter.h>
@@ -50,6 +49,7 @@
 #include <vtkPNGReader.h>
 #include <vtkPointSet.h>
 #include <vtkPVDataInformation.h>
+#include <vtkRenderedGraphRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
@@ -61,6 +61,7 @@
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSmartPointer.h>
+#include <vtkTextProperty.h>
 #include <vtkTimerLog.h>
 #include <vtkTable.h>
 #include <vtkViewTheme.h>
@@ -141,7 +142,7 @@ public:
   vtkGeoAlignedImageRepresentation* ImageRepresentation;
   vtkGeoTerrain* Terrain;
 
-  typedef vtksys_stl::map<pqRepresentation*, vtkSmartPointer<vtkGeoGraphRepresentation> >
+  typedef vtksys_stl::map<pqRepresentation*, vtkSmartPointer<vtkRenderedGraphRepresentation> >
     RepresentationsT;
   RepresentationsT Representations;
 };
@@ -289,7 +290,7 @@ void ClientGeoView::selectionChanged()
       {
       continue;
       }
-    vtkGeoGraphRepresentation* const rep = it->second;
+    vtkRenderedGraphRepresentation* const rep = it->second;
 
     // Get the representaion's source
     pqDataRepresentation* pqRepr =
@@ -380,8 +381,9 @@ void ClientGeoView::onRepresentationVisibilityChanged(pqRepresentation* pqrep, b
       return;
       }
 
-    vtkGeoGraphRepresentation* vtkrep = vtkGeoGraphRepresentation::New();
+    vtkRenderedGraphRepresentation* vtkrep = vtkRenderedGraphRepresentation::New();
     vtkrep->SetInputConnection(proxy->GetOutputPort());
+    vtkrep->SetEdgeLayoutStrategyToGeo();
     this->Implementation->Representations[pqrep] = vtkrep;
     vtkrep->Delete();
     iter = this->Implementation->Representations.find(pqrep);
@@ -416,7 +418,7 @@ void ClientGeoView::renderGeoViewInternal()
   for(; it != itEnd; ++it)
     {
     pqRepresentation* const representation = it->first;
-    vtkGeoGraphRepresentation* const rep = it->second;
+    vtkRenderedGraphRepresentation* const rep = it->second;
     vtkSMSelectionDeliveryRepresentationProxy* const proxy = 
       vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(
         representation->getProxy());
@@ -457,10 +459,9 @@ void ClientGeoView::renderGeoViewInternal()
 
     vtkStdString latArr = pqPropertyHelper(proxy, "LatitudeArrayName").GetAsString().toStdString();
     vtkStdString lonArr = pqPropertyHelper(proxy, "LongitudeArrayName").GetAsString().toStdString();
-    rep->SetLatitudeArrayName(latArr);
-    rep->SetLongitudeArrayName(lonArr);
+    rep->SetLayoutStrategyToAssignCoordinates(lonArr, latArr);
     double explode = vtkSMPropertyHelper(proxy, "ExplodeFactor").GetAsDouble();
-    rep->SetExplodeFactor(explode);
+    rep->SetEdgeLayoutStrategyToGeo(explode);
     bool vertexLabelVis = vtkSMPropertyHelper(proxy, "VertexLabelVisibility").GetAsInt();
     rep->SetVertexLabelVisibility(vertexLabelVis);
     if (vertexLabelVis)
@@ -469,7 +470,7 @@ void ClientGeoView::renderGeoViewInternal()
       rep->SetVertexLabelArrayName(vertexLabelArr);
       }
 
-    rep->SetVertexLabelFontSize(
+    rep->GetVertexLabelTextProperty()->SetFontSize(
       vtkSMPropertyHelper(proxy, "VertexLabelFontSize").GetAsInt());
 
     this->Implementation->Theme->SetPointSize(
@@ -480,14 +481,14 @@ void ClientGeoView::renderGeoViewInternal()
 
     if(vtkSMPropertyHelper(proxy, "VertexColorByArray").GetAsInt())
       {
-      rep->SetColorVertices(true);
+      rep->SetColorVerticesByArray(true);
 
       rep->SetVertexColorArrayName(
         vtkSMPropertyHelper(proxy, "VertexColorArray").GetAsString());
       }
     else
       {
-      rep->SetColorVertices(false);
+      rep->SetColorVerticesByArray(false);
 
       this->Implementation->Theme->SetPointColor(
         vtkSMPropertyHelper(proxy, "VertexColor").GetAsDouble(0),
@@ -501,7 +502,7 @@ void ClientGeoView::renderGeoViewInternal()
     rep->SetEdgeLabelArrayName(
       vtkSMPropertyHelper(proxy, "EdgeLabelArray").GetAsString());
 
-    rep->SetEdgeLabelFontSize(
+    rep->GetEdgeLabelTextProperty()->SetFontSize(
       vtkSMPropertyHelper(proxy, "EdgeLabelFontSize").GetAsInt());
 
     this->Implementation->Theme->SetLineWidth(
@@ -512,14 +513,14 @@ void ClientGeoView::renderGeoViewInternal()
 
     if(vtkSMPropertyHelper(proxy, "EdgeColorByArray").GetAsInt())
       {
-      rep->SetColorEdges(true);
+      rep->SetColorEdgesByArray(true);
 
       rep->SetEdgeColorArrayName(
         vtkSMPropertyHelper(proxy, "EdgeColorArray").GetAsString());
       }
     else
       {
-      rep->SetColorEdges(false);
+      rep->SetColorEdgesByArray(false);
 
       this->Implementation->Theme->SetCellColor(
         vtkSMPropertyHelper(proxy, "EdgeColor").GetAsDouble(0),

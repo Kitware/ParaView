@@ -69,6 +69,7 @@
 #include <vtkTable.h>
 #include <vtkTexture.h>
 #include <vtkTree.h>
+#include <vtkRenderedTreeAreaRepresentation.h>
 #include <vtkTreeAreaView.h>
 #include <vtkTreeMapToPolyData.h>
 #include <vtkVariantArray.h>
@@ -133,6 +134,8 @@ public:
     this->HierarchicalGraphView->SetEdgeColorToSplineFraction();
     this->HierarchicalGraphView->SetUseRectangularCoordinates(true);
 
+    this->TreeAreaRepresentation = vtkSmartPointer<vtkRenderedTreeAreaRepresentation>::New();
+
     this->UpdateTimer.setInterval(0);
     this->UpdateTimer.setSingleShot(true);
 
@@ -152,6 +155,7 @@ public:
 
   vtkSmartPointer<vtkTreeAreaView> HierarchicalGraphView;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  vtkSmartPointer<vtkRenderedTreeAreaRepresentation> TreeAreaRepresentation;
 
   /// Used to "collapse" redundant updates
   QTimer UpdateTimer;
@@ -234,8 +238,8 @@ void ClientHierarchyView::selectionChanged()
     opPort->getSource()->getProxy());
 
   // Fill the selection source with the selection from the view
-  vtkSelection* sel = this->Implementation->HierarchicalGraphView->
-    GetGraphRepresentation()->GetSelectionLink()->GetSelection();
+  vtkSelection* sel = this->Implementation->TreeAreaRepresentation->
+    GetSelectionLink()->GetSelection();
   vtkSMSourceProxy* selectionSource =
     pqSelectionManager::createSelectionSource(sel, repSource->GetConnectionID());
 
@@ -293,16 +297,19 @@ void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
 
   vtkGraph *graph = vtkGraph::SafeDownCast(output);
   vtkTree *tree = vtkTree::SafeDownCast(output);
-  if(tree)
+  if(tree &&
+     this->Implementation->TreeAreaRepresentation->GetNumberOfInputConnections(0) == 0)
     {
     this->Implementation->TreeRepresentation = representation;
+
     vtkDataRepresentation* qttree_rep = this->Implementation->TreeView->
       SetRepresentationFromInputConnection(output->GetProducerPort());
-    vtkDataRepresentation* htree_rep = this->Implementation->
-      HierarchicalGraphView->SetTreeFromInput(tree);
+
+    this->Implementation->TreeAreaRepresentation->SetInput(tree);
+    this->Implementation->HierarchicalGraphView->SetRepresentation(this->Implementation->TreeAreaRepresentation);
 
     // Set tree selection link.
-    vtkSelectionLink *link = htree_rep->GetSelectionLink();
+    vtkSelectionLink *link = this->Implementation->TreeAreaRepresentation->GetSelectionLink();
     qttree_rep->SetSelectionLink(link);
 
     this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_TREE_VIEW | UPDATE_HGRAPH_VIEW );
@@ -310,7 +317,7 @@ void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
   else if(graph)
     {
     this->Implementation->GraphRepresentation = representation;
-    this->Implementation->HierarchicalGraphView->SetGraphFromInput(graph);
+    this->Implementation->TreeAreaRepresentation->AddInput(1, graph);
 
     this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
@@ -389,10 +396,10 @@ void ClientHierarchyView::synchronizeViews()
 
   if(tree_proxy && graph_proxy)
     {
-    vtkSelectionLink* graph_link = this->Implementation->HierarchicalGraphView->
-      GetGraphRepresentation()->GetSelectionLink();
-    vtkSelectionLink* tree_link = this->Implementation->HierarchicalGraphView->
-      GetTreeRepresentation()->GetSelectionLink();
+    vtkSelectionLink* graph_link = this->Implementation->TreeAreaRepresentation->
+      GetSelectionLink();
+    vtkSelectionLink* tree_link = this->Implementation->TreeAreaRepresentation->
+      GetSelectionLink();
 
     // Update the selection.
     tree_proxy->GetSelectionRepresentation()->Update();
@@ -450,12 +457,12 @@ void ClientHierarchyView::synchronizeViews()
 
       if(vtkSMPropertyHelper(tree_proxy, "AreaColorByArray").GetAsInt())
         {
-        this->Implementation->HierarchicalGraphView->SetColorVertices(true);
+        this->Implementation->HierarchicalGraphView->SetColorAreas(true);
         this->Implementation->HierarchicalGraphView->SetAreaColorArrayName(vtkSMPropertyHelper(tree_proxy, "AreaColorArray").GetAsString());
         }
       else
         {
-        this->Implementation->HierarchicalGraphView->SetColorVertices(false);
+        this->Implementation->HierarchicalGraphView->SetColorAreas(false);
 
         this->Implementation->HierarchicalGraphTheme->SetPointColor(
           vtkSMPropertyHelper(tree_proxy, "AreaColor").GetAsDouble(0),
@@ -541,7 +548,7 @@ void ClientHierarchyView::synchronizeViews()
   // Update the hierarchical graph view ...
   if(this->Implementation->UpdateFlags & UPDATE_HGRAPH_VIEW)
     {
-    this->Implementation->HierarchicalGraphView->Update();
+    this->Implementation->HierarchicalGraphView->Render();
     }
 
   this->Implementation->UpdateFlags = 0;
