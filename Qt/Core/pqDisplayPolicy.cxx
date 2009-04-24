@@ -189,6 +189,11 @@ pqView* pqDisplayPolicy::getPreferredView(
       }
     else
       {
+      // if the currentView is empty (no visible representations), destroy it
+      if(currentView && !currentView->getNumberOfVisibleRepresentations())
+        {
+        builder->destroy(currentView);
+        }
       // Create the preferred view only if the current one is not of the same type
       // as the preferred view.
       currentView = builder->createView(view_type, opPort->getServer());
