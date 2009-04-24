@@ -64,7 +64,7 @@ int pqMain::preRun(QApplication& app, pqProcessModuleGUIHelper* helperIn,
   int argc = app.argc();
   char** argv = app.argv();
 
-  vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
+  vtkPVMain::SetUseMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
   PVMain = vtkPVMain::New();
@@ -100,7 +100,7 @@ int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper * helperIn)
   char** argv = app.argv();
   PVHelper = helperIn;
 
-  vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
+  vtkPVMain::SetUseMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
   PVMain = vtkPVMain::New();

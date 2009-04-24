@@ -29,7 +29,7 @@ static void ParaViewInitializeInterpreter(vtkProcessModule* pm)
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::SetInitializeMPI(0); // don't use MPI even when available.
+  vtkPVMain::SetUseMPI(0); // don't use MPI even when available.
   vtkPVMain::Initialize(&argc, &argv); 
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkPVPythonOptions* options = vtkPVPythonOptions::New();

@@ -49,10 +49,10 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.23");
+vtkCxxRevisionMacro(vtkPVMain, "1.24");
 
-int vtkPVMain::InitializeMPI = 1;
-
+int vtkPVMain::UseMPI = 1;
+int vtkPVMain::FinalizeMPI = 0;
 
 //----------------------------------------------------------------------------
 vtkPVMain::vtkPVMain()
@@ -61,15 +61,15 @@ vtkPVMain::vtkPVMain()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMain::SetInitializeMPI(int s)
+void vtkPVMain::SetUseMPI(int s)
 {
-  vtkPVMain::InitializeMPI = s;
+  vtkPVMain::UseMPI = s;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVMain::GetInitializeMPI()
+int vtkPVMain::GetUseMPI()
 {
-  return vtkPVMain::InitializeMPI;
+  return vtkPVMain::UseMPI;
 }
 
 //----------------------------------------------------------------------------
@@ -89,26 +89,28 @@ vtkPVMain::~vtkPVMain()
 void vtkPVMain::Initialize(int* argc, char** argv[])
 {
 #ifdef VTK_USE_MPI
-  if (vtkPVMain::InitializeMPI)
+  if(vtkPVMain::UseMPI)
     {
-    // MPICH changes the current working directory after MPI_Init. We fix that
-    // by changing the CWD back to the original one after MPI_Init.
-    vtkstd::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
+    int flag = 0;
+    MPI_Initialized(&flag);
+    if(flag == 0)
+      {
+      // MPICH changes the current working directory after MPI_Init. We fix that
+      // by changing the CWD back to the original one after MPI_Init.
+      vtkstd::string cwd = vtksys::SystemTools::GetCurrentWorkingDirectory(true);
+      
+      // This is here to avoid false leak messages from vtkDebugLeaks when
+      // using mpich. It appears that the root process which spawns all the
+      // main processes waits in MPI_Init() and calls exit() when
+      // the others are done, causing apparent memory leaks for any objects
+      // created before MPI_Init().
+      MPI_Init(argc, argv);
+      
+      // restore CWD to what it was before the MPI intialization.
+      vtksys::SystemTools::ChangeDirectory(cwd.c_str());
 
-    // This is here to avoid false leak messages from vtkDebugLeaks when
-    // using mpich. It appears that the root process which spawns all the
-    // main processes waits in MPI_Init() and calls exit() when
-    // the others are done, causing apparent memory leaks for any objects
-    // created before MPI_Init().
-    int myId = 0;
-    MPI_Init(argc, argv);
-    // Might as well get our process ID here.  I use it to determine
-    // Whether to initialize tk.  Once again, splitting Tk and Tcl 
-    // initialization would clean things up.
-    MPI_Comm_rank(MPI_COMM_WORLD,&myId);
-
-    // restore CWD to what it was before the MPI intialization.
-    vtksys::SystemTools::ChangeDirectory(cwd.c_str());
+      vtkPVMain::FinalizeMPI = 1;
+      }
     }
 #else
   (void)argc;
@@ -149,7 +151,7 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
 void vtkPVMain::Finalize()
 {
 #ifdef VTK_USE_MPI
-  if (vtkPVMain::InitializeMPI)
+  if (vtkPVMain::FinalizeMPI)
     {
     MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
@@ -228,7 +230,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
   this->ProcessModule->SetOptions(options);
   vtkProcessModule::SetProcessModule(this->ProcessModule);
   // PM can use MPI only if MPI was initialized.
-  this->ProcessModule->SetUseMPI(vtkPVMain::InitializeMPI);
+  this->ProcessModule->SetUseMPI(vtkPVMain::UseMPI);
   if(helper)
     {
     helper->SetProcessModule(this->ProcessModule);

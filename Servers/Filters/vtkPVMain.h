@@ -22,7 +22,6 @@
 
 #include "vtkObject.h"
 class vtkProcessModule;
-class vtkProcessModule;
 class vtkPVOptions;
 class vtkProcessModuleGUIHelper;
 
@@ -57,11 +56,11 @@ public:
   int Run(vtkPVOptions*);
 
   // Description:
-  // This flag is set by default. If cleared, MPI is not initialized.
-  // This flag is ignored if VTK_USE_MPI is not defined, i.e. VTK
-  // was not build with MPI support.
-  static void SetInitializeMPI(int s);
-  static int GetInitializeMPI();
+  // This flag is set by default to 1. If cleared/set to 0, 
+  // MPI is not initialized. This flag is ignored if VTK_USE_MPI 
+  // is not defined, i.e. VTK was not built with MPI support.
+  static void SetUseMPI(int s);
+  static int GetUseMPI();
 //BTX
 protected:
   // Description:
@@ -71,11 +70,17 @@ protected:
   // Description:
   // Destructor.
   virtual ~vtkPVMain();
-  static int InitializeMPI;
+  static int UseMPI;
+
 private:
   vtkProcessModule* ProcessModule;
   vtkPVMain(const vtkPVMain&); // Not implemented
   void operator=(const vtkPVMain&); // Not implemented
+
+  // Description
+  // Mark whether or not this class needs to call MPI_Finalize().
+  // This should only be done if this class called MPI_Init().
+  static int FinalizeMPI;
 //ETX
 };
 
