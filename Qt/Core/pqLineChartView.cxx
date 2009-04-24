@@ -31,149 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqLineChartView.h"
 
-// Server Manager Includes.
-#include "vtkSMProperty.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMLineChartViewProxy.h"
-#include "vtkSMChartRepresentationProxy.h"
-#include "vtkPVDataInformation.h"
-
-#include "vtkEventQtSlotConnect.h"
-#include "vtkTable.h"
-#include "vtkSmartPointer.h"
-#include "vtkQtLineChartView.h"
-#include "vtkQtChartArea.h"
-#include "vtkQtChartAxis.h"
-#include "vtkQtChartAxisLayer.h"
-#include "vtkQtChartAxisModel.h"
-#include "vtkQtChartContentsSpace.h"
-#include "vtkQtChartInteractorSetup.h"
-#include "vtkQtChartWidget.h"
-#include "vtkQtChartSeriesModelCollection.h"
-#include "vtkQtChartRepresentation.h"
-
-// ParaView Includes.
-#include "pqLineChartRepresentation.h"
-#include "pqOutputPort.h"
-#include "pqPipelineSource.h"
-#include "pqServer.h"
-#include "pqSMAdaptor.h"
-
 // Qt Includes.
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-class pqLineChartView::pqInternal
-{
-public:
-  pqInternal()
-    {
-    }
-
-  ~pqInternal()
-    {
-
-    }
-
-  vtkSmartPointer<vtkQtLineChartView>                   LineChartView;
-};
-
-//-----------------------------------------------------------------------------
 pqLineChartView::pqLineChartView(const QString& group,
                                const QString& name, 
-                               vtkSMViewProxy* viewModule,
+                               vtkSMChartViewProxy* viewModule,
                                pqServer* server, 
-                               QObject* parent/*=NULL*/):
-  pqView(lineChartViewType(), group, name, viewModule, server, parent)
+                               QObject* parent/*=NULL*/)
+: Superclass(lineChartViewType(), group, name, viewModule, server, parent)
 {
-  viewModule->GetID(); // this results in calling CreateVTKObjects().
-  this->Internal = new pqInternal();
-  this->Internal->LineChartView = vtkSMLineChartViewProxy::SafeDownCast(
-    viewModule)->GetLineChartView();
 
-  // Set up the view undo/redo.
-  vtkQtChartContentsSpace *contents =
-    this->getVtkLineChartView()->GetChartArea()->getContentsSpace();
-  this->connect(contents, SIGNAL(historyPreviousAvailabilityChanged(bool)),
-    this, SIGNAL(canUndoChanged(bool)));
-  this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
-    this, SIGNAL(canRedoChanged(bool)));
 }
 
 //-----------------------------------------------------------------------------
 pqLineChartView::~pqLineChartView()
 {
-  delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-QWidget* pqLineChartView::getWidget()
-{
-  return this->getVtkLineChartView()->GetWidget();
-}
-
-//-----------------------------------------------------------------------------
-vtkQtLineChartView* pqLineChartView::getVtkLineChartView() const
-{
-  return this->Internal->LineChartView;
-}
-
-//-----------------------------------------------------------------------------
-void pqLineChartView::setDefaultPropertyValues()
-{
-  pqView::setDefaultPropertyValues();
-}
-
-//-----------------------------------------------------------------------------
-void pqLineChartView::undo()
-{
-  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
-  area->getContentsSpace()->historyPrevious();
-}
-
-//-----------------------------------------------------------------------------
-void pqLineChartView::redo()
-{
-  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
-  area->getContentsSpace()->historyNext();
-}
-
-//-----------------------------------------------------------------------------
-bool pqLineChartView::canUndo() const
-{
-  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
-  return area->getContentsSpace()->isHistoryPreviousAvailable();
-}
-
-//-----------------------------------------------------------------------------
-bool pqLineChartView::canRedo() const
-{
-  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
-  return area->getContentsSpace()->isHistoryNextAvailable();
-}
-
-//-----------------------------------------------------------------------------
-void pqLineChartView::resetDisplay()
-{
-  vtkQtChartArea* area = this->getVtkLineChartView()->GetChartArea();
-  area->getContentsSpace()->resetZoom();
-}
-
-//-----------------------------------------------------------------------------
-bool pqLineChartView::canDisplay(pqOutputPort* opPort) const
-{
-  pqPipelineSource* source = opPort? opPort->getSource() :0;
-  vtkSMSourceProxy* sourceProxy = source ? 
-    vtkSMSourceProxy::SafeDownCast(source->getProxy()) : 0;
-  if(!opPort || !source ||
-     opPort->getServer()->GetConnectionID() !=
-     this->getServer()->GetConnectionID() || !sourceProxy ||
-     sourceProxy->GetOutputPortsCreated()==0)
-    {
-    return false;
-    }
-
-  vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
-  return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
 }
 

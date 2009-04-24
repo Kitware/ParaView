@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxyManager.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMChartViewProxy.h"
 
 #include "pqBarChartRepresentation.h"
 #include "pqBarChartView.h"
@@ -221,13 +222,17 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqPlotView(pqPlotView::XYPlotType(),
                               group, viewname, viewmodule, server, p);
     }
-  else if(viewtype == pqBarChartView::barChartViewType())
+  else if(viewtype == pqBarChartView::barChartViewType() &&
+    viewmodule->IsA("vtkSMChartViewProxy"))
     {
-    return new pqBarChartView(group, viewname, viewmodule, server, p);
+    return new pqBarChartView(group, viewname,
+      vtkSMChartViewProxy::SafeDownCast(viewmodule), server, p);
     }
-  else if (viewtype == pqLineChartView::lineChartViewType())
+  else if (viewtype == pqLineChartView::lineChartViewType() &&
+    viewmodule->IsA("vtkSMChartViewProxy"))
     {
-    return new pqLineChartView(group, viewname, viewmodule, server, p);
+    return new pqLineChartView(group, viewname, 
+      vtkSMChartViewProxy::SafeDownCast(viewmodule), server, p);
     }
   else if(viewtype == "TableView")
     {

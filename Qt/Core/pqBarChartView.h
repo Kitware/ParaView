@@ -32,77 +32,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqBarChartView_h 
 #define __pqBarChartView_h
 
-#include "pqView.h"
+#include "pqChartView.h"
 
 class vtkSMSourceProxy;
 class pqDataRepresentation;
 class vtkQtBarChartView;
 
 /// Bar chart view
-class PQCORE_EXPORT pqBarChartView : public pqView
+class PQCORE_EXPORT pqBarChartView : public pqChartView
 {
   Q_OBJECT
-  typedef pqView Superclass;
+  typedef pqChartView Superclass;
 
 public:
   static QString barChartViewType() { return "BarChartView2"; }
   static QString barChartViewTypeName() { return "Bar Chart View 2"; }
 
 public:
-
   pqBarChartView(const QString& group,
                  const QString& name, 
-                 vtkSMViewProxy* viewModule,
+                 vtkSMChartViewProxy* viewModule,
                  pqServer* server, 
                  QObject* parent=NULL);
 
   virtual ~pqBarChartView();
 
-  /// Return a widget associated with this view.
-  virtual QWidget* getWidget();
-
   /// Set property values.
   virtual void setDefaultPropertyValues();
-
-  /// This view does not support saving to image.
-  virtual bool saveImage(int /*width*/, int /*height*/, 
-    const QString& /*filename*/)
-    { return false; }
-
-  /// This view does not support image capture.
-  /// This method always returns 0.
-  virtual vtkImageData* captureImage(int /*magnification*/)
-    { return 0; }
-  virtual vtkImageData* captureImage(const QSize& asize)
-    { return this->Superclass::captureImage(asize); } 
-
-  /// This view supports undo so this method always returns true.
-  virtual bool supportsUndo() const {return true;}
-
-  /// Called to undo interaction.
-  virtual void undo();
-
-  /// Called to redo interaction.
-  virtual void redo();
-
-  /// Returns true if undo can be done.
-  virtual bool canUndo() const;
-
-  /// Returns true if redo can be done.
-  virtual bool canRedo() const;
-
-  /// Resets the zoom level to 100%.
-  virtual void resetDisplay();
-
-  /// Returns true if data on the given output port can be displayed by this view.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
 
 private:
   pqBarChartView(const pqBarChartView&); // Not implemented.
   void operator=(const pqBarChartView&); // Not implemented.
-
-  class pqInternal;
-  pqInternal* Internal;
 };
 
 #endif
