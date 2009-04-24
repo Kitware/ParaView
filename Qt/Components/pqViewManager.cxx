@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMUtilities.h"
+#include "vtkSMPropertyHelper.h"
 
 // Qt includes.
 #include <QAction>
@@ -980,38 +981,26 @@ void pqViewManager::updateViewPositions()
   // Now we loop thorough all view modules and set the GUISize/ViewPosition.
   foreach(pqView* view, this->Internal->Frames)
     {
+    // set size containing all views
+    int gui_size[2] = { totalBounds.width(), totalBounds.height() };
+    vtkSMPropertyHelper(view->getProxy(), "GUISize", true).Set(gui_size, 2);
+    
     if (!view->getWidget()->isVisible())
       {
       continue;
       }
-    vtkSMIntVectorProperty* prop = 0;
-
-    // set size containing all views
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("GUISize"));
-    if(prop)
-      {
-      prop->SetElements2(totalBounds.width(), totalBounds.height());
-      }
 
     // position relative to the bounds of all views
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("ViewPosition"));
-    if(prop)
-      {
-      QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));
-      view_pos -= totalBounds.topLeft();
-      prop->SetElements2(view_pos.x(), view_pos.y());
-      }
+    QPoint view_pos = view->getWidget()->mapToGlobal(QPoint(0,0));
+    view_pos -= totalBounds.topLeft();
+    int position[2] = { view_pos.x(), view_pos.y() };
+    vtkSMPropertyHelper(view->getProxy(), "ViewPosition", true).Set(position, 2);
 
     // size of each view.
-    prop = vtkSMIntVectorProperty::SafeDownCast(
-      view->getProxy()->GetProperty("ViewSize"));
-    if (prop)
-      {
-      QRect bounds = view->getWidget()->rect();
-      prop->SetElements2(bounds.width(), bounds.height());
-      }
+    QRect bounds = view->getWidget()->rect();
+    int view_size[2] = {bounds.width(), bounds.height() };
+    vtkSMPropertyHelper(view->getProxy(), "ViewSize", true).Set(view_size, 2);
+
     // This is causing problems with tests.
     // view->getProxy()->UpdateProperty("ViewSize");
     }
