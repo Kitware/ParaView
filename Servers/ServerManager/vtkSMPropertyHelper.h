@@ -75,7 +75,10 @@ class vtkSMProxy;
 class VTK_EXPORT vtkSMPropertyHelper 
 {
 public:
-  vtkSMPropertyHelper(vtkSMProxy* proxy, const char* name);
+  // Description:
+  // If quiet is true, then no errors or warning are raised if the property is
+  // missing or of incorrect type.
+  vtkSMPropertyHelper(vtkSMProxy* proxy, const char* name, bool quiet=false);
   ~vtkSMPropertyHelper();
 
   // Description:
@@ -182,6 +185,7 @@ private:
     NONE
   };
 
+  bool Quiet;
   double* DoubleValues;
   int* IntValues;
   vtkIdType* IdTypeValues;

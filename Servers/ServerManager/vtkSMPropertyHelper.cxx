@@ -58,8 +58,16 @@ inline unsigned int vtkSMPropertyHelperMin(unsigned int x, unsigned int y)
   return x < y? x : y;
 }
 
+#define vtkSMPropertyHelperWarningMacro(blah)\
+  if (this->Quiet == false) \
+  {\
+    vtkGenericWarningMacro(blah)\
+  }
+
+
 //----------------------------------------------------------------------------
-vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
+vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname,
+  bool quiet)
 {
   this->Proxy = proxy;
   this->Property = proxy->GetProperty(pname);
@@ -67,10 +75,11 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
   this->DoubleValues = NULL;
   this->IntValues = NULL;
   this->IdTypeValues = NULL;
+  this->Quiet = quiet;
 
   if (!this->Property)
     {
-    vtkGenericWarningMacro("Failed to locate property: " << pname);
+    vtkSMPropertyHelperWarningMacro("Failed to locate property: " << pname);
     }
   else if (this->Property->IsA("vtkSMIntVectorProperty"))
     {
@@ -98,7 +107,7 @@ vtkSMPropertyHelper::vtkSMPropertyHelper(vtkSMProxy* proxy, const char* pname)
     }
   else
     {
-    vtkGenericWarningMacro("Unhandled property type : " << this->Property->GetClassName());
+    vtkSMPropertyHelperWarningMacro("Unhandled property type : " << this->Property->GetClassName());
     }
 }
 
@@ -146,7 +155,7 @@ void vtkSMPropertyHelper::SetNumberOfElements(unsigned int elems)
     SM_TEMPLATE_MACRO_VP(SMProperty->SetNumberOfElements(elems));
     SM_TEMPLATE_MACRO_PP(SMProperty->SetNumberOfProxies(elems));
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -159,7 +168,7 @@ unsigned int vtkSMPropertyHelper::GetNumberOfElements()
     SM_TEMPLATE_MACRO_PP(return SMProperty->GetNumberOfProxies());
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -172,7 +181,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, int value)
     {
     SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -185,7 +194,7 @@ int vtkSMPropertyHelper::GetAsInt(unsigned int index /*=0*/)
       return static_cast<int>(SMProperty->GetElement(index)));
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -206,7 +215,7 @@ unsigned int vtkSMPropertyHelper::Get(int *values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -243,7 +252,7 @@ void vtkSMPropertyHelper::Set(const int* values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -254,7 +263,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, double value)
     {
     SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -267,7 +276,7 @@ double vtkSMPropertyHelper::GetAsDouble(unsigned int index /*=0*/)
       return static_cast<double>(SMProperty->GetElement(index)));
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -288,7 +297,7 @@ unsigned int vtkSMPropertyHelper::Get(double *values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -325,7 +334,7 @@ void vtkSMPropertyHelper::Set(const double* values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -338,7 +347,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkIdType value)
     SM_TEMPLATE_MACRO_NUM(SMProperty->SetElement(index, static_cast<VTK_TT>(value)));
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -359,7 +368,7 @@ void vtkSMPropertyHelper::Set(const vtkIdType* values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -378,7 +387,7 @@ unsigned int vtkSMPropertyHelper::Get(vtkIdType* values, unsigned int count)
     );
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -394,7 +403,7 @@ vtkIdType vtkSMPropertyHelper::GetAsIdType(unsigned int index /*=0*/)
       return static_cast<vtkIdType>(SMProperty->GetElement(index)));
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 
   return 0;
@@ -425,7 +434,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, const char* value)
     }
   else
     {
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -439,7 +448,7 @@ const char* vtkSMPropertyHelper::GetAsString(unsigned int index /*=0*/)
     return svp->GetElement(index);
     }
 
-  vtkGenericWarningMacro("Call not supported for the current property type.");
+  vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
   return 0;
 }
 
@@ -459,7 +468,7 @@ void vtkSMPropertyHelper::Set(unsigned int index, vtkSMProxy* value,
     }
   else
     {
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -479,7 +488,7 @@ void vtkSMPropertyHelper::Set(vtkSMProxy** value, unsigned int count,
     }
   else
     {
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -498,7 +507,7 @@ void vtkSMPropertyHelper::Add(vtkSMProxy* value, unsigned int outputport/*=0*/)
     }
   else
     {
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
 }
 
@@ -515,7 +524,7 @@ vtkSMProxy* vtkSMPropertyHelper::GetAsProxy(unsigned int index/*=0*/)
     }
 
   default:
-    vtkGenericWarningMacro("Call not supported for the current property type.");
+    vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
     }
   return 0;
 }
@@ -529,7 +538,7 @@ unsigned int vtkSMPropertyHelper::GetOutputPort(unsigned int index/*=0*/)
     return ip->GetOutputPortForConnection(index);
     }
 
-  vtkGenericWarningMacro("Call not supported for the current property type.");
+  vtkSMPropertyHelperWarningMacro("Call not supported for the current property type.");
   return 0;
 }
 
@@ -538,7 +547,7 @@ void vtkSMPropertyHelper::SetStatus(const char* key, int value)
 {
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
-    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
     return;
     }
 
@@ -546,13 +555,13 @@ void vtkSMPropertyHelper::SetStatus(const char* key, int value)
     this->Property);
   if (svp->GetNumberOfElementsPerCommand() != 2)
     {
-    vtkGenericWarningMacro("NumberOfElementsPerCommand != 2");
+    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
     return;
     }
 
   if (!svp->GetRepeatCommand())
     {
-    vtkGenericWarningMacro("Property is non-repeatable.");
+    vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
     return;
     }
 
@@ -582,7 +591,7 @@ int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
 {
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
-    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
     return default_value;
     }
 
@@ -592,13 +601,13 @@ int vtkSMPropertyHelper::GetStatus(const char* key, int default_value/*=0*/)
     {
     if (svp->GetNumberOfElementsPerCommand() != 2)
       {
-      vtkGenericWarningMacro("NumberOfElementsPerCommand != 2");
+      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
       return default_value;
       }
 
     if (!svp->GetRepeatCommand())
       {
-      vtkGenericWarningMacro("Property is non-repeatable.");
+      vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
       return default_value;
       }
 
@@ -624,7 +633,7 @@ void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
 {
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
-    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
     return;
     }
 
@@ -632,13 +641,13 @@ void vtkSMPropertyHelper::SetStatus(const char* key, double *values,
     this->Property);
   if (svp->GetNumberOfElementsPerCommand() != num_values+1)
     {
-    vtkGenericWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
     return;
     }
 
   if (!svp->GetRepeatCommand())
     {
-    vtkGenericWarningMacro("Property is non-repeatable.");
+    vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
     return;
     }
 
@@ -681,7 +690,7 @@ bool vtkSMPropertyHelper::GetStatus(const char* key, double *values, int num_val
 {
   if (this->Type != vtkSMPropertyHelper::STRING)
     {
-    vtkGenericWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
     return false;
     }
 
@@ -692,13 +701,13 @@ bool vtkSMPropertyHelper::GetStatus(const char* key, double *values, int num_val
     {
     if (svp->GetNumberOfElementsPerCommand() != num_values+1)
       {
-      vtkGenericWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
+      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != " << num_values + 1);
       return false;
       }
 
     if (!svp->GetRepeatCommand())
       {
-      vtkGenericWarningMacro("Property is non-repeatable.");
+      vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
       return false;
       }
 
