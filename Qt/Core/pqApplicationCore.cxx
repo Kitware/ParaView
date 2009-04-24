@@ -181,6 +181,9 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 //-----------------------------------------------------------------------------
 pqApplicationCore::~pqApplicationCore()
 {
+  // Ensure that startup plugins get a chance to cleanup before pqApplicationCore is gone.
+  delete this->Internal->PluginManager;
+
   // give chance to save before pqApplicationCore is gone
   delete this->Internal->ServerStartups;
 
