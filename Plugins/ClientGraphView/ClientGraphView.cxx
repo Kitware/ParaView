@@ -152,10 +152,11 @@ public:
 
   ~implementation()
   {
-    delete this->Widget;
+    if(this->Widget)
+      delete this->Widget;
   }
 
-  QVTKWidget* const Widget;
+  const QPointer<QVTKWidget> Widget;
   vtkSmartPointer<vtkViewTheme> Theme;
   vtkSmartPointer<vtkGraphLayoutView> View;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
