@@ -65,6 +65,8 @@ pqChartView::~pqChartView()
 //-----------------------------------------------------------------------------
 void pqChartView::initialize()
 {
+  this->Superclass::initialize();
+
   // Set up the view undo/redo.
   vtkQtChartContentsSpace *contents =
     this->getVTKChartView()->GetChartArea()->getContentsSpace();
