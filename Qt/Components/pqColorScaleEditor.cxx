@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqColorScaleDialog.h"
 
 #include "pqApplicationCore.h"
-#include "pqBarChartRepresentation.h"
 #include "pqChartValue.h"
 #include "pqColorMapColorChanger.h"
 #include "pqColorMapModel.h"
@@ -817,18 +816,18 @@ void pqColorScaleEditor::rescaleToDataRange()
 {
   pqPipelineRepresentation *pipeline =
       qobject_cast<pqPipelineRepresentation *>(this->Display);
-  pqBarChartRepresentation *histogram =
-      qobject_cast<pqBarChartRepresentation *>(this->Display);
+  //pqBarChartRepresentation *histogram =
+  //    qobject_cast<pqBarChartRepresentation *>(this->Display);
   if(pipeline)
     {
     pipeline->resetLookupTableScalarRange();
     pipeline->renderViewEventually();
     }
-  else if(histogram)
-    {
-    histogram->resetLookupTableScalarRange();
-    histogram->renderViewEventually();
-    }
+  //else if(histogram)
+  //  {
+  //  histogram->resetLookupTableScalarRange();
+  //  histogram->renderViewEventually();
+  //  }
 }
 
 void pqColorScaleEditor::setUseDiscreteColors(bool on)

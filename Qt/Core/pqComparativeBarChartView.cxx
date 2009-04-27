@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartView.h
+   Module:    pqComparativeBarChartView.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -29,40 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBarChartView_h 
-#define __pqBarChartView_h
+#include "pqComparativeBarChartView.h"
 
-#include "pqChartView.h"
+// Server Manager Includes.
 
-class vtkSMSourceProxy;
-class pqDataRepresentation;
-class vtkQtBarChartView;
+// Qt Includes.
 
-/// Bar chart view
-class PQCORE_EXPORT pqBarChartView : public pqChartView
+// ParaView Includes.
+
+//-----------------------------------------------------------------------------
+pqComparativeBarChartView::pqComparativeBarChartView(
+  const QString& group, const QString& name, 
+  vtkSMComparativeViewProxy* view, pqServer* server, QObject* parentObject)
+: Superclass(comparativeBarChartViewType(),
+  group, name, view, server, parentObject)
+
 {
-  Q_OBJECT
-  typedef pqChartView Superclass;
+}
 
-public:
-  static QString barChartViewType() { return "BarChartView"; }
-  static QString barChartViewTypeName() { return "Bar Chart View"; }
+//-----------------------------------------------------------------------------
+pqComparativeBarChartView::~pqComparativeBarChartView()
+{
+}
 
-public:
-  pqBarChartView(const QString& group,
-                 const QString& name, 
-                 vtkSMChartViewProxy* viewModule,
-                 pqServer* server, 
-                 QObject* parent=NULL);
 
-  virtual ~pqBarChartView();
-
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
-
-private:
-  pqBarChartView(const pqBarChartView&); // Not implemented.
-  void operator=(const pqBarChartView&); // Not implemented.
-};
-
-#endif

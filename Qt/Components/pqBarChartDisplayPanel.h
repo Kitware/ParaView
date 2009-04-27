@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QModelIndex;
 
-/// pqBarChartDisplayPanel is the display panel for BarChartRepresentation2
+/// pqBarChartDisplayPanel is the display panel for BarChartRepresentation
 /// proxy i.e. the representation for bar chart view.
 class PQCOMPONENTS_EXPORT pqBarChartDisplayPanel : public pqDisplayPanel
 {

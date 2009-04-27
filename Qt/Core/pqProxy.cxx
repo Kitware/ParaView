@@ -304,6 +304,7 @@ void pqProxy::setDefaultPropertyValues()
     }
 
   iter->Delete();
+  proxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

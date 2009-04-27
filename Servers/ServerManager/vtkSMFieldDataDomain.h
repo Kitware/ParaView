@@ -29,6 +29,10 @@
 // ("Row Data", vtkDataObject::FIELD_ASSOCIATION_ROWS) in case of vtkTable and
 // subclasses.
 // It requires Input (vtkSMProxyProperty) property.
+// If attribute "disable_update_domain_entries" is set to true (false by
+// default),
+// then the domain values will not changed based on input field availability.
+// Only the default value setting will be affected by that.
 // .SECTION See Also
 // vtkSMEnumerationDomain vtkSMProxyProperty
 
@@ -55,6 +59,11 @@ public:
   // vtkSMInputArrayDomain.
   virtual void Update(vtkSMProperty* prop);
 
+  // Description:
+  // Overridden to ensure that the property's default value is valid for the
+  // enumeration, if not it will be set to the first enumeration value.
+  virtual int SetDefaultValues(vtkSMProperty*);
+
 protected:
   vtkSMFieldDataDomain();
   ~vtkSMFieldDataDomain();
@@ -66,7 +75,11 @@ protected:
 
   // When true, "Field Data" option is added to the domain.
   bool EnableFieldDataSelection;
+  bool DisableUpdateDomainEntries;
 private:
+
+  // Used by SetDefaultValues.
+  int DefaultValue;
 
   // Description:
   // Utility functions called by Update()

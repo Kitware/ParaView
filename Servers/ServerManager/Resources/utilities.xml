@@ -2023,14 +2023,13 @@
          <Documentation>
            Select the attribute data to pass.
          </Documentation>
-         <EnumerationDomain name="enum">
-           <Entry text="Points" value="0" />
-           <Entry text="Cells" value="1" />
-           <Entry text="Field Data" value="2" />
-           <Entry text="Vertices" value="4" />
-           <Entry text="Edges" value="5" />
-           <Entry text="Rows" value="6" />
-         </EnumerationDomain>
+         <FieldDataDomain name="enum"
+            enable_field_data="1"
+            disable_update_domain_entries="1" >
+           <RequiredProperties>
+              <Property name="Input" function="Input"/>
+           </RequiredProperties>
+         </FieldDataDomain>
        </IntVectorProperty>
 
        <IntVectorProperty name="CompositeDataSetIndex"

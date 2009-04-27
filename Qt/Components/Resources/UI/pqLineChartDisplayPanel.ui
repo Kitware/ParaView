@@ -38,7 +38,7 @@ p, li { white-space: pre-wrap; }
     <widget class="QComboBox" name="AttributeMode" >
      <item>
       <property name="text" >
-       <string>Points</string>
+       <string>Point Data</string>
       </property>
       <property name="icon" >
        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPointData16.png</iconset>
@@ -46,7 +46,7 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <property name="text" >
-       <string>Cells</string>
+       <string>Cell Data</string>
       </property>
       <property name="icon" >
        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqCellData16.png</iconset>
@@ -54,7 +54,7 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <property name="text" >
-       <string>Vertices</string>
+       <string>Vertex Data</string>
       </property>
       <property name="icon" >
        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPointData16.png</iconset>
@@ -62,7 +62,7 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <property name="text" >
-       <string>Edges</string>
+       <string>Edge Data</string>
       </property>
       <property name="icon" >
        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqRamp24.png</iconset>
@@ -70,7 +70,7 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <property name="text" >
-       <string>Rows</string>
+       <string>Row Data</string>
       </property>
       <property name="icon" >
        <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqSpreadsheet16.png</iconset>

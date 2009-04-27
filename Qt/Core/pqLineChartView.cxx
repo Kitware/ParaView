@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqLineChartView.h"
 
+#include "vtkSMChartViewProxy.h"
+
 // Qt Includes.
 #include <QDebug>
 

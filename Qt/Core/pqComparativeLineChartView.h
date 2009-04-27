@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqPlotViewHistogram.h
+   Module:    pqComparativeLineChartView.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -28,52 +28,30 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=========================================================================*/
+========================================================================*/
+#ifndef __pqComparativeLineChartView_h 
+#define __pqComparativeLineChartView_h
 
-/// \file pqPlotViewHistogram.h
-/// \date 7/13/2007
+#include "pqComparativeChartView.h"
 
-#ifndef _pqPlotViewHistogram_h
-#define _pqPlotViewHistogram_h
-
-
-#include "pqCoreExport.h"
-#include <QObject>
-
-class pqBarChartRepresentation;
-class pqChartArea;
-class pqHistogramChart;
-class pqPlotViewHistogramInternal;
-class pqRepresentation;
-
-
-class PQCORE_EXPORT pqPlotViewHistogram : public QObject
+/// pqComparativeChartView subclass for comparative line chart.
+class PQCORE_EXPORT pqComparativeLineChartView : public pqComparativeChartView
 {
   Q_OBJECT
-
+  typedef pqComparativeChartView Superclass;
 public:
-  pqPlotViewHistogram(QObject *parent=0);
-  virtual ~pqPlotViewHistogram();
+    pqComparativeLineChartView(const QString& group, const QString& name, 
+    vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent=NULL);
+  ~pqComparativeLineChartView();
 
-  void initialize(pqChartArea *chartArea);
-
-  pqHistogramChart *getChartLayer() const;
-
-  pqBarChartRepresentation *getCurrentRepresentation() const;
-  void setCurrentRepresentation(pqBarChartRepresentation *display);
-
-  void update(bool force=false);
-  bool isUpdateNeeded();
-
-  void addRepresentation(pqBarChartRepresentation *histogram);
-  void removeRepresentation(pqBarChartRepresentation *histogram);
-  void removeAllRepresentations();
-
-private slots:
-  void updateVisibility(pqRepresentation* display);
+  static QString comparativeLineChartViewType() { return "ComparativeXYPlotView"; }
+  static QString comparativeLineChartViewTypeName() { return "XY Plot View (Comparative)"; }
 
 private:
-  pqPlotViewHistogramInternal *Internal;
+  pqComparativeLineChartView(const pqComparativeLineChartView&); // Not implemented.
+  void operator=(const pqComparativeLineChartView&); // Not implemented.
 };
 
 #endif
+
+

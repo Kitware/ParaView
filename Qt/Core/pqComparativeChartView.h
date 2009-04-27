@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqChartView.h
+   Module:    pqComparativeChartView.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,22 +29,23 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqChartView_h 
-#define __pqChartView_h
+#ifndef __pqComparativeChartView_h 
+#define __pqComparativeChartView_h
 
-#include "pqView.h"
+#include "pqChartView.h"
+#include <QPointer>
 
-class vtkSMChartViewProxy;
-class vtkQtChartView;
+class vtkSMComparativeViewProxy;
 
-/// pqChartView is an abstract base class for all charting views based on VTK
-/// Charting library.
-class PQCORE_EXPORT pqChartView : public pqView
+/// pqComparativeChartView is the abstract base class for comparative-chart
+/// views. It handles the laying out of the individual plot views in the
+/// comparative view.
+class PQCORE_EXPORT pqComparativeChartView : public pqChartView
 {
   Q_OBJECT
-  typedef pqView Superclass;
+  typedef pqChartView Superclass;
 public:
-  virtual ~pqChartView();
+  virtual ~pqComparativeChartView();
 
   /// Return a widget associated with this view.
   virtual QWidget* getWidget();
@@ -53,37 +54,32 @@ public:
   /// the chart rendering.
   virtual vtkQtChartView* getVTKChartView() const;
 
-  /// This view does not support saving to image.
-  virtual bool saveImage(int width, int height, const QString& filename);
+  /// Returns the comparative view proxy.
+  vtkSMComparativeViewProxy* getComparativeViewProxy() const;
 
-  /// Capture the view image into a new vtkImageData with the given magnification
-  /// and returns it. The caller is responsible for freeing the returned image.
-  virtual vtkImageData* captureImage(int magnification);
+  /// Returns the proxy of the root plot view in the comparative view.
+  virtual vtkSMViewProxy* getViewProxy() const;
 
-  /// Capture the view image of the given size and returns it. The caller is
-  /// responsible for freeing the returned image.
-  virtual vtkImageData* captureImage(const QSize& asize);
+  /// Sets default values for the underlying proxy. 
+  /// This is during the initialization stage of the pqProxy 
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called. 
+  virtual void setDefaultPropertyValues();
 
-  /// This view supports undo so this method always returns true.
-  virtual bool supportsUndo() const {return true;}
+protected slots:
+  /// Called when the layout on the comparative vis changes.
+  void onComparativeVisLayoutChanged();
 
-  /// Called to undo interaction.
-  virtual void undo();
+  ///// This method may be used to adjust the chart title
+  ///// text by inserting comparative variable values or
+  ///// time values.
+  //virtual void adjustTitleText(const pqPlotView *, QString &);
 
-  /// Called to redo interaction.
-  virtual void redo();
-
-  /// Returns true if undo can be done.
-  virtual bool canUndo() const;
-
-  /// Returns true if redo can be done.
-  virtual bool canRedo() const;
-
-  /// Resets the zoom level to 100%.
-  virtual void resetDisplay();
-
-  /// Returns true if data on the given output port can be displayed by this view.
-  virtual bool canDisplay(pqOutputPort* opPort) const;
+protected:
+  /// On creation of the view, we need to layout the initial plots. Hence, we
+  /// override this method. 
+  virtual void initialize();
 
 protected:
   /// Constructor:
@@ -93,18 +89,18 @@ protected:
   /// \c view  :- View proxy.
   /// \c server:- server on which the proxy is created.
   /// \c parent:- QObject parent.
-  pqChartView(const QString& type,
+  pqComparativeChartView(const QString& type,
     const QString& group, 
     const QString& name, 
-    vtkSMViewProxy* view, 
+    vtkSMComparativeViewProxy* view, 
     pqServer* server, 
     QObject* parent=NULL);
 
-  /// Overridden to set up some default signal-slot connections.
-  virtual void initialize();
+  QPointer<QWidget> Widget;
+
 private:
-  pqChartView(const pqChartView&); // Not implemented.
-  void operator=(const pqChartView&); // Not implemented.
+  pqComparativeChartView(const pqComparativeChartView&); // Not implemented.
+  void operator=(const pqComparativeChartView&); // Not implemented.
 };
 
 #endif

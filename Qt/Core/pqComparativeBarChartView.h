@@ -1,14 +1,14 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartView.h
+   Module:    pqComparativeBarChartView.h
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
    under the terms of the ParaView license version 1.2. 
-
+   
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
@@ -29,40 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBarChartView_h 
-#define __pqBarChartView_h
+#ifndef __pqComparativeBarChartView_h 
+#define __pqComparativeBarChartView_h
 
-#include "pqChartView.h"
+#include "pqComparativeChartView.h"
 
-class vtkSMSourceProxy;
-class pqDataRepresentation;
-class vtkQtBarChartView;
-
-/// Bar chart view
-class PQCORE_EXPORT pqBarChartView : public pqChartView
+/// pqComparativeChartView subclass for comparative bar chart.
+class PQCORE_EXPORT pqComparativeBarChartView : public pqComparativeChartView
 {
   Q_OBJECT
-  typedef pqChartView Superclass;
-
+  typedef pqComparativeChartView Superclass;
 public:
-  static QString barChartViewType() { return "BarChartView"; }
-  static QString barChartViewTypeName() { return "Bar Chart View"; }
+  pqComparativeBarChartView(const QString& group, const QString& name, 
+    vtkSMComparativeViewProxy* view, pqServer* server, QObject* parent=NULL);
+  ~pqComparativeBarChartView();
 
-public:
-  pqBarChartView(const QString& group,
-                 const QString& name, 
-                 vtkSMChartViewProxy* viewModule,
-                 pqServer* server, 
-                 QObject* parent=NULL);
-
-  virtual ~pqBarChartView();
-
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
+  static QString comparativeBarChartViewType() { return "ComparativeBarChartView"; }
+  static QString comparativeBarChartViewTypeName() { return "Bar Chart View (Comparative)"; }
 
 private:
-  pqBarChartView(const pqBarChartView&); // Not implemented.
-  void operator=(const pqBarChartView&); // Not implemented.
+  pqComparativeBarChartView(const pqComparativeBarChartView&); // Not implemented.
+  void operator=(const pqComparativeBarChartView&); // Not implemented.
 };
 
 #endif
+
+

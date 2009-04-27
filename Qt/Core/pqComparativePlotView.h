@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMComparativeViewProxy;
 
 /// PlotView used for comparative visualization (or film-strip visualization).
+/// THIS CLASS HAS BEEN DEPRECATED. IT'S NO LONGER USED. IT HAS BEEN REPLACED BY
+/// pqComparativeChartView AND SUBCLASSES. THIS CLASS IS LEFT AROUND UNTIL ALL
+//THE FUNCTIONALITY HAS MOVED TO THE NEW CLASSES.
 class PQCORE_EXPORT pqComparativePlotView : public pqPlotView
 {
   Q_OBJECT

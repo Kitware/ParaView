@@ -58,7 +58,6 @@ class pqOptionsContainer;
 class pqPipelineBrowser;
 class pqPipelineMenu;
 class pqPipelineSource;
-class pqPlotViewModule;
 class pqProxy;
 class pqProxyMenuManager;
 class pqProxyTabWidget;

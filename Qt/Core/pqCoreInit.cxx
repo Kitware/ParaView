@@ -40,8 +40,6 @@ void pqCoreInit()
   Q_INIT_RESOURCE(pqCore);
   Q_INIT_RESOURCE(QtWidgets);
   Q_IMPORT_PLUGIN(QtWidgets);
-  Q_INIT_RESOURCE(pqChart);
-  Q_IMPORT_PLUGIN(QtChart);
 #endif
 }
 

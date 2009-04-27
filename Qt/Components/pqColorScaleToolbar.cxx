@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorScaleToolbar.h"
 
-#include "pqBarChartRepresentation.h"
 #include "pqColorScaleEditor.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayColorWidget.h"
@@ -166,13 +165,14 @@ void pqColorScaleToolbar::changeColor()
 {
   if(!this->Internal->ColorBy.isNull())
     {
+    /*
     pqBarChartRepresentation *histogram =
         qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
     if(histogram)
       {
       this->editColorMap(this->Internal->Representation);
       }
-    else if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
+    else */if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
       {
       if(!this->Internal->Representation.isNull())
         {
@@ -219,18 +219,19 @@ void pqColorScaleToolbar::rescaleRange()
 {
   pqPipelineRepresentation *pipeline =
       qobject_cast<pqPipelineRepresentation *>(this->Internal->Representation);
-  pqBarChartRepresentation *histogram =
-      qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
+  //pqBarChartRepresentation *histogram =
+  //    qobject_cast<pqBarChartRepresentation *>(this->Internal->Representation);
   if(pipeline)
     {
     pipeline->resetLookupTableScalarRange();
     pipeline->renderViewEventually();
     }
+  /*
   else if(histogram)
     {
     histogram->resetLookupTableScalarRange();
     histogram->renderViewEventually();
-    }
+    }*/
 }
 
 

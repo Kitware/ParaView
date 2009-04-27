@@ -45,8 +45,8 @@ class PQCORE_EXPORT pqLineChartView : public pqChartView
   typedef pqChartView Superclass;
 
 public:
-  static QString lineChartViewType() { return "LineChartView"; }
-  static QString lineChartViewTypeName() { return "Line Chart View"; }
+  static QString lineChartViewType() { return "XYPlotView"; }
+  static QString lineChartViewTypeName() { return "XY Plot View"; }
 
 public:
   pqLineChartView(const QString& group,

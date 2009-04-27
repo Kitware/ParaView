@@ -51,8 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
 #include "pqRepresentation.h"
-#include "pqLineChartRepresentation.h"
-#include "pqBarChartRepresentation.h"
+//#include "pqLineChartRepresentation.h"
+//#include "pqBarChartRepresentation.h"
 #include "pqServerManagerModel.h"
 #include "pqApplicationCore.h"
 #include "pqChartWidget.h"
@@ -65,7 +65,7 @@ public:
   // Since we use internal proxies that are not registered
   // with the server manager, we must maintain our own
   // mappings of SMProxy to pqObject
-  QMap<vtkSMViewProxy*, QPointer<pqPlotView> > ViewMap;
+  //QMap<vtkSMViewProxy*, QPointer<pqPlotView> > ViewMap;
   QMap<vtkSMRepresentationProxy*, pqRepresentation*> RepresentationMap;
 
   // This map allows us to determine which reprs are to be added/removed
@@ -76,7 +76,7 @@ public:
   // Since pqRepresentation::setView is protected, we cannot call it on
   // the internally created pqRepresentations, so we must keep track
   // of what view the pqRepr belongs.
-  QMap<pqRepresentation*, pqPlotView* > RepresentationViewMap;
+  //QMap<pqRepresentation*, pqPlotView* > RepresentationViewMap;
 
   // This list is for convenience.  It makes it easier to look up
   // which pqReprs were created internally.
@@ -114,6 +114,7 @@ pqComparativePlotView::pqComparativePlotView(
 //-----------------------------------------------------------------------------
 pqComparativePlotView::~pqComparativePlotView()
 {
+  /*
   foreach (pqPlotView* view, this->Internal->ViewMap.values())
     {
     delete view;
@@ -125,6 +126,7 @@ pqComparativePlotView::~pqComparativePlotView()
     }
 
   delete this->Internal;
+  */
 }
 
 //-----------------------------------------------------------------------------
@@ -180,6 +182,7 @@ void pqComparativePlotView::updateVisibility()
 //-----------------------------------------------------------------------------
 void pqComparativePlotView::onComparativeVisLayoutChanged()
 {
+  /*
   // Get a collection of current views from the ComparativeViewProxy
   vtkCollection* currentViews =  vtkCollection::New();
   vtkSMComparativeViewProxy* compView = this->getComparativeViewProxy();
@@ -286,12 +289,13 @@ void pqComparativePlotView::onComparativeVisLayoutChanged()
   currentViews->Delete();
 
   this->representationsChanged();
+  */
 }
 
 //-----------------------------------------------------------------------------
 void pqComparativePlotView::representationsChanged()
 {
-
+  /*
   // Get the server manager model
   pqServerManagerModel* smModel = pqApplicationCore::instance()->getServerManagerModel();
 
@@ -387,9 +391,9 @@ void pqComparativePlotView::representationsChanged()
       }
 
     }
-
+  */
 }
-
+/*
 //-----------------------------------------------------------------------------
 void pqComparativePlotView::adjustTitleText(const pqPlotView * plotView, QString & titleText)
 {
@@ -418,6 +422,6 @@ void pqComparativePlotView::adjustTitleText(const pqPlotView * plotView, QString
     titleText.replace("%time%", replacement);
     }
 }
-
+*/
 
 

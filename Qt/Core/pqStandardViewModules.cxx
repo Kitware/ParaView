@@ -32,23 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqStandardViewModules.h"
 
-#include "vtkSMProxyManager.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMChartViewProxy.h"
-
-#include "pqBarChartRepresentation.h"
 #include "pqBarChartView.h"
-#include "pqComparativePlotView.h"
+#include "pqComparativeBarChartView.h"
+#include "pqComparativeLineChartView.h"
 #include "pqComparativeRenderView.h"
-#include "pqLineChartRepresentation.h"
 #include "pqLineChartView.h"
-#include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqSpreadSheetView.h"
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
 #include "pqTwoDRenderView.h"
+#include "vtkSMChartViewProxy.h"
+#include "vtkSMComparativeViewProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderViewProxy.h"
 
 pqStandardViewModules::pqStandardViewModules(QObject* o)
   : QObject(o)
@@ -66,12 +64,10 @@ QStringList pqStandardViewModules::viewTypes() const
     pqTwoDRenderView::twoDRenderViewType() <<
     pqBarChartView::barChartViewType() << 
     pqLineChartView::lineChartViewType() << 
-    pqPlotView::barChartType() << 
-    pqPlotView::XYPlotType() << 
     pqTableView::tableType() <<
     pqComparativeRenderView::comparativeRenderViewType() <<
-    pqComparativePlotView::comparativeXYPlotViewType() <<
-    pqComparativePlotView::comparativeBarChartViewType() <<
+    pqComparativeBarChartView::comparativeBarChartViewType() <<
+    pqComparativeLineChartView::comparativeLineChartViewType() <<
     pqSpreadSheetView::spreadsheetViewType();
 }
 
@@ -79,9 +75,7 @@ QStringList pqStandardViewModules::displayTypes() const
 {
   return QStringList() 
     << "BarChartRepresentation"
-    << "BarChartRepresentation2"
     << "XYPlotRepresentation"
-    << "LineChartRepresentation"
     << "TextSourceRepresentation";
 }
 
@@ -99,14 +93,6 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqLineChartView::lineChartViewTypeName();
     }
-  else if(type == pqPlotView::barChartType())
-    {
-    return pqPlotView::barChartTypeName();
-    }
-  else if(type == pqPlotView::XYPlotType())
-    {
-    return pqPlotView::XYPlotTypeName();
-    }
   else if(type == pqTableView::tableType())
     {
     return pqTableView::tableTypeName();
@@ -115,13 +101,13 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
     {
     return pqComparativeRenderView::comparativeRenderViewTypeName();
     }
-  else if (type == pqComparativePlotView::comparativeXYPlotViewType())
+  else if (type == pqComparativeBarChartView::comparativeBarChartViewType())
     {
-    return pqComparativePlotView::comparativeXYPlotViewTypeName();
+    return pqComparativeBarChartView::comparativeBarChartViewTypeName();
     }
-  else if (type == pqComparativePlotView::comparativeBarChartViewType())
+  else if (type == pqComparativeLineChartView::comparativeLineChartViewType())
     {
-    return pqComparativePlotView::comparativeBarChartViewTypeName();
+    return pqComparativeLineChartView::comparativeLineChartViewTypeName();
     }
   else if (type == pqSpreadSheetView::spreadsheetViewType())
     {
@@ -153,13 +139,13 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "ComparativeRenderView";
     }
-  else if(viewtype == pqComparativePlotView::comparativeXYPlotViewType())
-    {
-    root_xmlname = "ComparativeXYPlotView";
-    }
-  else if(viewtype == pqComparativePlotView::comparativeBarChartViewType())
+  else if(viewtype == pqComparativeBarChartView::comparativeBarChartViewType())
     {
     root_xmlname = "ComparativeBarChartView";
+    }
+  else if(viewtype == pqComparativeLineChartView::comparativeLineChartViewType())
+    {
+    root_xmlname = "ComparativeXYPlotView";
     }
   else if (viewtype == pqTwoDRenderView::twoDRenderViewType())
     {
@@ -167,17 +153,9 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     }
   else if(viewtype == pqBarChartView::barChartViewType())
     {
-    root_xmlname = "BarChartView2";
-    }
-  else if(viewtype == pqLineChartView::lineChartViewType())
-    {
-    root_xmlname = "LineChartView";
-    }
-  else if(viewtype == pqPlotView::barChartType())
-    {
     root_xmlname = "BarChartView";
     }
-  else if(viewtype == pqPlotView::XYPlotType())
+  else if(viewtype == pqLineChartView::lineChartViewType())
     {
     root_xmlname = "XYPlotView";
     }
@@ -212,17 +190,7 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
                                                 pqServer* server,
                                                 QObject* p)
 {
-  if(viewtype == pqPlotView::barChartType())
-    {
-    return new pqPlotView(pqPlotView::barChartType(),
-                              group, viewname, viewmodule, server, p);
-    }
-  else if(viewtype == pqPlotView::XYPlotType())
-    {
-    return new pqPlotView(pqPlotView::XYPlotType(),
-                              group, viewname, viewmodule, server, p);
-    }
-  else if(viewtype == pqBarChartView::barChartViewType() &&
+  if(viewtype == pqBarChartView::barChartViewType() &&
     viewmodule->IsA("vtkSMChartViewProxy"))
     {
     return new pqBarChartView(group, viewname,
@@ -248,15 +216,17 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
     }
-  else if (viewtype == pqComparativePlotView::comparativeBarChartViewType())
+  else if (viewtype == pqComparativeBarChartView::comparativeBarChartViewType()
+    && viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
-    return new pqComparativePlotView(pqPlotView::barChartType(),
-                 group, viewname, viewmodule, server, p);
+    return new pqComparativeBarChartView(
+      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule), server, p);
     }
-  else if (viewtype == pqComparativePlotView::comparativeXYPlotViewType())
+  else if (viewtype == pqComparativeLineChartView::comparativeLineChartViewType()
+    && viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
-    return new pqComparativePlotView(pqPlotView::XYPlotType(),
-                 group, viewname, viewmodule, server, p);
+    return new pqComparativeLineChartView(
+      group, viewname, vtkSMComparativeViewProxy::SafeDownCast(viewmodule), server, p);
     }
   else if (viewmodule->IsA("vtkSMComparativeViewProxy"))
     {
@@ -280,16 +250,8 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
   pqServer* server,
   QObject* p)
 {
-  if(display_type == "BarChartRepresentation")
-    {
-    return new pqBarChartRepresentation(group, n, proxy, server, p);
-    }
-  else if (display_type == "XYPlotRepresentation") // old line chart
-    {
-    return new pqLineChartRepresentation(group, n, proxy, server, p);
-    }
-  else if (display_type == "LineChartRepresentation" ||
-    display_type == "BarChartRepresentation2")
+  if (display_type == "XYPlotRepresentation" ||
+    display_type == "BarChartRepresentation")
     {
     // new chart representations.
     return new pqDataRepresentation(group, n, proxy, server, p);

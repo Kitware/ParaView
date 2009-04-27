@@ -48,18 +48,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqActiveView.h"
+#include "pqAnimationCue.h"
 #include "pqAnimationKeyFrame.h"
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
 #include "pqApplicationCore.h"
+#include "pqComparativeChartView.h"
 #include "pqComparativeRenderView.h"
-#include "pqComparativePlotView.h"
-#include "pqPropertyLinks.h"
 #include "pqPipelineSource.h"
+#include "pqPropertyLinks.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
-#include "pqAnimationCue.h"
 
 class pqComparativeVisPanel::pqInternal : public Ui::ComparativeView
 {
@@ -180,7 +180,7 @@ void pqComparativeVisPanel::setView(pqView* view)
 
   // View must be a comparative render/plot view
   if (   !qobject_cast<pqComparativeRenderView*>(view)
-      && !qobject_cast<pqComparativePlotView*>(view))
+      && !qobject_cast<pqComparativeChartView*>(view))
     {
     this->Internal->View = 0;
     this->setEnabled(false);

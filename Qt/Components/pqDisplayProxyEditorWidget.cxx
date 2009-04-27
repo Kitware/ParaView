@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqBarChartDisplayPanel.h"
-#include "pqBarChartDisplayProxyEditor.h"
 #include "pqDisplayPanelDecoratorInterface.h"
 #include "pqDisplayPanelInterface.h"
 #include "pqDisplayPolicy.h"
@@ -55,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTextRepresentation.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
-#include "pqXYPlotDisplayProxyEditor.h"
 
 /// standard display panels
 class pqStandardDisplayPanels : public QObject,
@@ -77,10 +75,8 @@ public:
 
     QString type = proxy->getProxy()->GetXMLName();
 
-    if(type == "BarChartRepresentation" ||
-       type == "LineChartRepresentation" ||
-       type == "BarChartRepresentation2" ||
-       type == "XYPlotRepresentation" ||
+    if (type == "XYPlotRepresentation" ||
+       type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
        qobject_cast<pqTextRepresentation*>(proxy))
       {
@@ -98,21 +94,11 @@ public:
       }
 
     QString type = proxy->getProxy()->GetXMLName();
-    if(type == QString("XYPlotRepresentation"))
-      {
-      return new pqXYPlotDisplayProxyEditor(proxy, p);
-      }
-    
-    if(type == QString("BarChartRepresentation"))
-      {
-      return new pqBarChartDisplayProxyEditor(proxy, p);
-      }
-
-    if (type == QString("LineChartRepresentation"))
+    if (type == QString("XYPlotRepresentation"))
       {
       return new pqLineChartDisplayPanel(proxy, p);
       }
-    if (type == QString("BarChartRepresentation2"))
+    if (type == QString("BarChartRepresentation"))
       {
       return new pqBarChartDisplayPanel(proxy, p);
       }

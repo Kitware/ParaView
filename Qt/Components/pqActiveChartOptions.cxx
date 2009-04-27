@@ -47,7 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineChartOptionsEditor.h"
 #include "pqLineChartOptionsHandler.h"
 #include "pqOptionsDialog.h"
-#include "pqPlotView.h"
 #include "pqStackedChartOptionsEditor.h"
 #include "pqStackedChartOptionsHandler.h"
 #include "pqUndoStack.h"
@@ -197,12 +196,11 @@ void pqActiveChartOptions::changeView(pqView *view)
 {
   if(this->Dialog)
     {
-    pqPlotView *plotView = qobject_cast<pqPlotView *>(view);
     pqBarChartView *barChart = qobject_cast<pqBarChartView *>(view);
     pqLineChartView *lineChart = qobject_cast<pqLineChartView *>(view);
     //pqStackedChartView *stackedChart = qobject_cast<pqStackedChartView *>(view);
     //pqBoxChartView *boxChart = qobject_cast<pqBoxChartView *>(view);
-    if(plotView || barChart || lineChart /*|| stackedChart || boxChart*/)
+    if(barChart || lineChart /*|| stackedChart || boxChart*/)
       {
       this->Chart->setView(view);
       }
@@ -210,11 +208,6 @@ void pqActiveChartOptions::changeView(pqView *view)
       {
       this->Dialog->setWindowTitle("Chart Options");
       this->Chart->setView(0);
-      }
-
-    if(plotView)
-      {
-      this->Dialog->setWindowTitle("Chart Options");
       }
 
     pqBarChartOptionsEditor *barOptions = this->BarChart->getOptions();

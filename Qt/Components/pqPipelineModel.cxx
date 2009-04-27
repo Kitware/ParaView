@@ -36,11 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqApplicationCore.h"
+#include "pqBarChartView.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
+#include "pqLineChartView.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqPlotView.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerModelItem.h"
@@ -561,11 +562,11 @@ pqPipelineModelItem::IconType pqPipelineModelSource::getIconType() const
     {
     QString type = policy->getPreferredViewType(
       this->Source->getOutputPort(0), false);
-    if (type == pqPlotView::barChartType())
+    if (type == pqBarChartView::barChartViewType())
       {
       return BARCHART;
       }
-    if (type == pqPlotView::XYPlotType())
+    if (type == pqLineChartView::lineChartViewType())
       {
       return LINECHART;
       }
@@ -679,11 +680,11 @@ pqPipelineModelItem::IconType pqPipelineModelOutputPort::getIconType() const
     {
     QString type = policy->getPreferredViewType(
       this->Source->getSource()->getOutputPort(this->Port), false);
-    if (type == pqPlotView::barChartType())
+    if (type == pqBarChartView::barChartViewType())
       {
       return BARCHART;
       }
-    if (type == pqPlotView::XYPlotType())
+    if (type == pqLineChartView::lineChartViewType())
       {
       return LINECHART;
       }

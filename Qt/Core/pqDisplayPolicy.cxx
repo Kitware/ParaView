@@ -45,11 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 #include "pqApplicationCore.h"
+#include "pqBarChartView.h"
 #include "pqDataRepresentation.h"
+#include "pqLineChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqTwoDRenderView.h"
@@ -158,7 +159,7 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     if (dimensionality == 1 && cellDataInfo->GetNumberOfArrays() > 0)
       {
       // Has cell data, mostlikely this is a histogram.
-      view_type = pqPlotView::barChartType();
+      view_type = pqBarChartView::barChartViewType();
       }
     else if (dimensionality == 1 && 
       (pointDataInfo->GetNumberOfArrays() > 0 ||
@@ -166,7 +167,7 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
       datainfo->GetNumberOfPoints() > 1)
       {
       // No cell data, but some point data -- may be a XY line plot.
-      view_type = pqPlotView::XYPlotType();
+      view_type = pqLineChartView::lineChartViewType();
       }
     }
 

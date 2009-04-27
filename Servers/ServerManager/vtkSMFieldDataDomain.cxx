@@ -24,15 +24,18 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
 {
   this->EnableFieldDataSelection = false;
+  this->DisableUpdateDomainEntries = false;
+  this->DefaultValue = -1;
 }
 
 //---------------------------------------------------------------------------
@@ -72,27 +75,37 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     return;
     }
 
-  if (this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad))
+  bool has_pd = 
+    this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad);
+  bool has_cd = 
+    this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad);
+  bool has_vd = 
+    this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad);
+  bool has_ed = 
+    this->CheckForArray(sp, outputport, info->GetEdgeDataInformation(), iad);
+  bool has_rd = 
+    this->CheckForArray(sp, outputport, info->GetRowDataInformation(), iad);
+
+  if (this->DisableUpdateDomainEntries || has_pd)
     {
     this->AddEntry("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS);
     }
-
-  if (this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad))
+  if (this->DisableUpdateDomainEntries || has_cd)
     {
     this->AddEntry("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS);
     }
 
-  if (this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad))
+  if (this->DisableUpdateDomainEntries || has_vd)
     {
     this->AddEntry("Vertex Data", vtkDataObject::FIELD_ASSOCIATION_VERTICES);
     }
 
-  if (this->CheckForArray(sp, outputport, info->GetEdgeDataInformation(), iad))
+  if (this->DisableUpdateDomainEntries || has_ed)
     {
     this->AddEntry("Edge Data", vtkDataObject::FIELD_ASSOCIATION_EDGES);
     }
 
-  if (this->CheckForArray(sp, outputport, info->GetRowDataInformation(), iad))
+  if (this->DisableUpdateDomainEntries || has_rd)
     {
     this->AddEntry("Row Data", vtkDataObject::FIELD_ASSOCIATION_ROWS);
     }
@@ -100,6 +113,32 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
   if (this->EnableFieldDataSelection)
     {
     this->AddEntry("Field Data", vtkDataObject::FIELD_ASSOCIATION_NONE);
+    }
+
+  this->DefaultValue = -1;
+  if (has_pd)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_POINTS;
+    }
+  else if (has_cd)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_CELLS;
+    }
+  else if (has_vd)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_VERTICES;
+    }
+  else if (has_ed)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_EDGES;
+    }
+  else if (has_rd)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_ROWS;
+    }
+  else if (this->EnableFieldDataSelection)
+    {
+    this->DefaultValue = vtkDataObject::FIELD_ASSOCIATION_NONE;
     }
 
   this->InvokeModified();
@@ -174,6 +213,20 @@ void vtkSMFieldDataDomain::Update(vtkSMProperty*)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMFieldDataDomain::SetDefaultValues(vtkSMProperty* prop)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
+  if (ivp && this->DefaultValue != -1)
+    {
+    ivp->SetElement(0, this->DefaultValue);
+    return 1;
+    }
+
+  return this->Superclass::SetDefaultValues(prop);
+}
+
+
+//---------------------------------------------------------------------------
 int vtkSMFieldDataDomain::ReadXMLAttributes(
   vtkSMProperty* prop, vtkPVXMLElement* element)
 {
@@ -187,6 +240,13 @@ int vtkSMFieldDataDomain::ReadXMLAttributes(
     {
     this->EnableFieldDataSelection = (enable_field_data!=0)? true : false;
     }
+  int disable_update_domain_entries=0;
+  if (element->GetScalarAttribute("disable_update_domain_entries",
+      &disable_update_domain_entries))
+    {
+    this->DisableUpdateDomainEntries = (disable_update_domain_entries!=0)? true : false;
+    }
+
   return 1;
 }
 

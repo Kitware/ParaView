@@ -45,12 +45,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationCue.h
   pqAnimationScene.h
   pqApplicationCore.h
-  pqBarChartRepresentation.h
   pqBarChartView.h
   pqChartView.h
   pqCommandServerStartup.h
+  pqComparativeBarChartView.h
+  pqComparativeChartView.h
+  pqComparativeLineChartView.h
   pqComparativeRenderView.h
-  pqComparativePlotView.h
   pqCoreTestUtility.h
   pqDataRepresentation.h
   pqDisplayPolicy.h
@@ -63,7 +64,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
   pqHistogramTableModel.h
-  pqLineChartRepresentation.h
   pqLineChartView.h
   pqLinksModel.h
   pqLinkViewWidget.h
@@ -78,9 +78,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineSource.h
   pqPipelineFilter.h
   pqPipelineRepresentation.h
-  pqPlotView.h
-  pqPlotViewHistogram.h
-  pqPlotViewLineChart.h
   pqPluginManager.h
   pqProgressManager.h
   pqPropertyLinks.h
@@ -117,7 +114,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqUndoStack.h
   pqView.h
   pqViewExporterManager.h
-  pqVTKHistogramModel.h
   pqWriterFactory.h
   pqXMLEventObserver.h
   pqXMLEventSource.h
@@ -165,18 +161,20 @@ ADD_LIBRARY(pqCore
   pqAnimationSceneImageWriter.h
   pqApplicationCore.cxx
   pqApplicationCore.h
-  pqBarChartRepresentation.cxx
-  pqBarChartRepresentation.h
   pqBarChartView.cxx
   pqBarChartView.h
   pqChartView.cxx
   pqChartView.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
+  pqComparativeBarChartView.cxx
+  pqComparativeBarChartView.h
+  pqComparativeChartView.cxx
+  pqComparativeChartView.h
+  pqComparativeLineChartView.cxx
+  pqComparativeLineChartView.h
   pqComparativeRenderView.cxx
   pqComparativeRenderView.h
-  pqComparativePlotView.cxx
-  pqComparativePlotView.h
   pqCoreExport.h
   pqCoreInit.cxx
   pqCoreInit.h
@@ -212,8 +210,6 @@ ADD_LIBRARY(pqCore
   pqHistogramTableModel.h
   pqImageUtil.cxx
   pqImageUtil.h
-  pqLineChartRepresentation.cxx
-  pqLineChartRepresentation.h
   pqLineChartView.cxx
   pqLineChartView.h
   pqLinksModel.cxx
@@ -250,12 +246,6 @@ ADD_LIBRARY(pqCore
   pqPipelineSource.h
   pqPipelineRepresentation.cxx
   pqPipelineRepresentation.h
-  pqPlotView.cxx
-  pqPlotView.h
-  pqPlotViewHistogram.cxx
-  pqPlotViewHistogram.h
-  pqPlotViewLineChart.cxx
-  pqPlotViewLineChart.h
   pqPluginManager.cxx
   pqPluginManager.h
   pqProcessModuleGUIHelper.cxx
@@ -339,12 +329,6 @@ ADD_LIBRARY(pqCore
   pqView.h
   pqViewExporterManager.cxx
   pqViewExporterManager.h
-  pqVTKHistogramColor.cxx
-  pqVTKHistogramColor.h
-  pqVTKHistogramModel.cxx
-  pqVTKHistogramModel.h
-  pqVTKLineChartSeries.cxx
-  pqVTKLineChartSeries.h
   pqWriterFactory.cxx
   pqWriterFactory.h
   pqXMLEventObserver.cxx
@@ -367,7 +351,6 @@ ADD_LIBRARY(pqCore
 )
 
 TARGET_LINK_LIBRARIES(pqCore
-  QtChart
   QtTesting
   pqWidgets
   QVTK

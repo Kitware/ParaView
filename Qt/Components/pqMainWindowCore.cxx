@@ -103,8 +103,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineMenu.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineRepresentation.h"
-#include "pqPlotViewContextMenuHandler.h"
-#include "pqPlotView.h"
 #include "pqPluginDialog.h"
 #include "pqPluginManager.h"
 #include "pqPQLookupTableManager.h"
@@ -1096,10 +1094,6 @@ pqActiveViewOptionsManager* pqMainWindowCore::getActiveViewOptionsManager()
     pqActiveChartOptions *chartOptions = new pqActiveChartOptions(
       this->Implementation->ActiveViewOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
-      pqPlotView::barChartType(), chartOptions);
-    this->Implementation->ActiveViewOptions->registerOptions(
-      pqPlotView::XYPlotType(), chartOptions);
-    this->Implementation->ActiveViewOptions->registerOptions(
       pqBarChartView::barChartViewType(), chartOptions);
     this->Implementation->ActiveViewOptions->registerOptions(
       pqLineChartView::lineChartViewType(), chartOptions);
@@ -1125,17 +1119,6 @@ pqViewContextMenuManager* pqMainWindowCore::getViewContextMenuManager()
       this->Implementation->ViewContextMenu, SLOT(setupContextMenu(pqView*)));
     QObject::connect(smModel, SIGNAL(viewRemoved(pqView*)),
       this->Implementation->ViewContextMenu, SLOT(cleanupContextMenu(pqView*)));
-
-    // Set up the default context menu handlers.
-    pqPlotViewContextMenuHandler *handler = new pqPlotViewContextMenuHandler(
-      this->Implementation->ViewContextMenu);
-    handler->setOptionsManager(this->getActiveViewOptionsManager());
-    this->connect(handler, SIGNAL(screenshotRequested()),
-      this, SLOT(onFileSaveScreenshot()));
-    this->Implementation->ViewContextMenu->registerHandler(
-      pqPlotView::barChartType(), handler);
-    this->Implementation->ViewContextMenu->registerHandler(
-      pqPlotView::XYPlotType(), handler);
 
     // Bar chart
     pqBarChartViewContextMenuHandler *barChart =

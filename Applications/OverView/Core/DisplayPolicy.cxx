@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqPlotView.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
 #include "pqTwoDRenderView.h"

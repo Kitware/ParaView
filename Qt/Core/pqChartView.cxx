@@ -49,13 +49,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqChartView::pqChartView(
   const QString& type, const QString& group, 
   const QString& name, 
-  vtkSMChartViewProxy* viewProxy, 
+  vtkSMViewProxy* viewProxy, 
   pqServer* server, 
   QObject* parentObject)
 : Superclass(type, group, name, viewProxy, server, parentObject)
 {
   viewProxy->GetID(); // this results in calling CreateVTKObjects().
+}
 
+//-----------------------------------------------------------------------------
+pqChartView::~pqChartView()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqChartView::initialize()
+{
   // Set up the view undo/redo.
   vtkQtChartContentsSpace *contents =
     this->getVTKChartView()->GetChartArea()->getContentsSpace();
@@ -63,11 +72,6 @@ pqChartView::pqChartView(
     this, SIGNAL(canUndoChanged(bool)));
   this->connect(contents, SIGNAL(historyNextAvailabilityChanged(bool)),
     this, SIGNAL(canRedoChanged(bool)));
-}
-
-//-----------------------------------------------------------------------------
-pqChartView::~pqChartView()
-{
 }
 
 //-----------------------------------------------------------------------------

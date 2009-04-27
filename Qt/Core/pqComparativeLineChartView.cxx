@@ -1,9 +1,9 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartView.h
+   Module:    pqComparativeLineChartView.cxx
 
-   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
@@ -29,40 +29,20 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBarChartView_h 
-#define __pqBarChartView_h
+#include "pqComparativeLineChartView.h"
 
-#include "pqChartView.h"
-
-class vtkSMSourceProxy;
-class pqDataRepresentation;
-class vtkQtBarChartView;
-
-/// Bar chart view
-class PQCORE_EXPORT pqBarChartView : public pqChartView
+//-----------------------------------------------------------------------------
+pqComparativeLineChartView::pqComparativeLineChartView(
+  const QString& group, const QString& name, 
+  vtkSMComparativeViewProxy* view, pqServer* server, QObject* parentObject)
+: Superclass(comparativeLineChartViewType(),
+  group, name, view, server, parentObject)
 {
-  Q_OBJECT
-  typedef pqChartView Superclass;
+}
 
-public:
-  static QString barChartViewType() { return "BarChartView"; }
-  static QString barChartViewTypeName() { return "Bar Chart View"; }
+//-----------------------------------------------------------------------------
+pqComparativeLineChartView::~pqComparativeLineChartView()
+{
+}
 
-public:
-  pqBarChartView(const QString& group,
-                 const QString& name, 
-                 vtkSMChartViewProxy* viewModule,
-                 pqServer* server, 
-                 QObject* parent=NULL);
 
-  virtual ~pqBarChartView();
-
-  /// Set property values.
-  virtual void setDefaultPropertyValues();
-
-private:
-  pqBarChartView(const pqBarChartView&); // Not implemented.
-  void operator=(const pqBarChartView&); // Not implemented.
-};
-
-#endif

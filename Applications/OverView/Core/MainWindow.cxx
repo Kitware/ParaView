@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineBrowser.h>
 #include <pqPipelineMenu.h>
 #include <pqPipelineSource.h>
-#include <pqPlotView.h>
 #include <pqPluginManager.h>
 #include <pqProxyMenuManager.h>
 #include <pqProxyTabWidget.h>
