@@ -26,6 +26,7 @@
 */
 
 #include "ClientTableView.h"
+#include "ClientTableViewDecorator.h"
 
 #include <vtkAbstractArray.h>
 #include <vtkCommand.h>
@@ -88,6 +89,7 @@ public:
     layout->addWidget(this->View->GetWidget());
     layout->setContentsMargins(0,0,0,0);
     this->AttributeType = -1;
+    this->LastSelectionMTime = 0;
   }
 
   ~implementation()
@@ -97,6 +99,7 @@ public:
       delete this->Widget;
   }
 
+  int LastSelectionMTime;
   int AttributeType;
   vtkSmartPointer<vtkQtTableView> View;
   QPointer<QWidget> Widget;
@@ -119,6 +122,8 @@ ClientTableView::ClientTableView(
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
   this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
+
+  new ClientTableViewDecorator(this);
 }
 
 ClientTableView::~ClientTableView()
@@ -152,6 +157,8 @@ void ClientTableView::selectionChanged()
   repSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
   selectionSource->Delete();
+
+  this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
 }
 
 bool ClientTableView::canDisplay(pqOutputPort* output_port) const
@@ -192,28 +199,32 @@ bool ClientTableView::canDisplay(pqOutputPort* output_port) const
 
 void ClientTableView::updateRepresentation(pqRepresentation* repr)
 {
+/*
   vtkSMClientDeliveryRepresentationProxy* const proxy = repr ? 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(repr->getProxy()) : NULL;
   proxy->Update(vtkSMViewProxy::SafeDownCast(this->getProxy()));  
 
-  vtkDataObject *data = proxy ? proxy->GetOutput() : NULL;
-  if (!data)
-    {
-    return;
-    }
-
   // Add the representation to the view
   this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  */
 }
 
-void ClientTableView::showRepresentation(pqRepresentation* representation)
+void ClientTableView::showRepresentation(pqRepresentation* pqRepr)
 {
-  this->updateRepresentation(representation);
+  //this->updateRepresentation(representation);
+
+  vtkSMClientDeliveryRepresentationProxy* const proxy = pqRepr ? 
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
+  vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  rep->Update();
 }
 
-void ClientTableView::hideRepresentation(pqRepresentation* representation)
+void ClientTableView::hideRepresentation(pqRepresentation* repr)
 {
-  this->Implementation->View->RemoveAllRepresentations();
+  //this->Implementation->View->RemoveAllRepresentations();
+  vtkSMClientDeliveryRepresentationProxy* const proxy = vtkSMClientDeliveryRepresentationProxy::SafeDownCast(repr->getProxy());
+  this->Implementation->View->RemoveRepresentation(proxy->GetOutputPort());
+  this->Implementation->View->Update();
 }
 
 void ClientTableView::renderInternal()
@@ -245,10 +256,23 @@ void ClientTableView::renderInternal()
 
   if(this->Implementation->View->GetRepresentation())
     {
+    pqDataRepresentation* pqRepr =
+      qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+    pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+    vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
+      opPort->getSource()->getProxy());
+
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    this->Implementation->View->GetRepresentation()->GetSelectionLink()->SetSelection(sel);
+
+    if(repSource->GetSelectionInput(0) &&
+      repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
+      {
+      this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
+      this->Implementation->View->GetRepresentation()->GetSelectionLink()->SetSelection(sel);
+      this->Implementation->View->GetRepresentation()->Update();
+      }
     }
 
   this->Implementation->View->Update();

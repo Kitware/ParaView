@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSingleInputView.h"
 
 #include <pqApplicationCore.h>
-#include <pqRepresentation.h>
+#include <pqDataRepresentation.h>
 
 #include <vtkstd/algorithm>
 #include <vtkstd/vector>
@@ -110,6 +110,7 @@ void pqSingleInputView::onRepresentationAdded(pqRepresentation* representation)
 
 void pqSingleInputView::onRepresentationVisibilityChanged(pqRepresentation* representation, bool visible)
 {
+  pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(representation);
   if(visible && representation != this->Implementation->VisibleRepresentation)
     {
     if(this->Implementation->VisibleRepresentation)
@@ -123,6 +124,7 @@ void pqSingleInputView::onRepresentationVisibilityChanged(pqRepresentation* repr
 
     this->Implementation->VisibleRepresentation = representation;
     this->showRepresentation(this->Implementation->VisibleRepresentation);
+    emit this->showing(dataRepr);
     }
   else if(!visible && representation == this->Implementation->VisibleRepresentation)
     {
@@ -130,7 +132,16 @@ void pqSingleInputView::onRepresentationVisibilityChanged(pqRepresentation* repr
       {
       this->hideRepresentation(this->Implementation->VisibleRepresentation);
       this->Implementation->VisibleRepresentation = 0;
+      emit this->showing(0);
       }
+    }
+  else if(visible)
+    {
+    emit this->showing(dataRepr);
+    }
+  else
+    {
+    emit this->showing(0);
     }
 }
 

@@ -26,6 +26,7 @@
 */
 
 #include "ClientRecordView.h"
+#include "ClientRecordViewDecorator.h"
 
 #include <vtkCommand.h>
 #include <vtkConvertSelection.h>
@@ -121,6 +122,8 @@ ClientRecordView::ClientRecordView(
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
   this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
+
+  new ClientRecordViewDecorator(this);
 }
 
 ClientRecordView::~ClientRecordView()
@@ -232,6 +235,23 @@ void ClientRecordView::renderInternal()
     return;
     }
 
+  proxy->Update();
+
+  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
+
+  if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
+    {
+    this->Implementation->View->SetFieldType(vtkQtRecordView::EDGE_DATA);
+    }
+  else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
+    {
+    this->Implementation->View->SetFieldType(vtkQtRecordView::ROW_DATA);
+    }
+  else
+    {
+    this->Implementation->View->SetFieldType(vtkQtRecordView::VERTEX_DATA);
+    }
+
   vtkDataRepresentation *rep = this->Implementation->View->GetRepresentation();
   if(rep && !vtkSMPropertyHelper(proxy, "FreezeContents").GetAsInt())
     {
@@ -239,29 +259,6 @@ void ClientRecordView::renderInternal()
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
     rep->GetSelectionLink()->SetSelection(sel);  
-    }
-
-  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
-
-  if (attributeType == vtkDataObject::FIELD_ASSOCIATION_POINTS)
-    {
-    this->Implementation->View->SetFieldType(vtkQtRecordView::POINT_DATA);
-    }
-  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_CELLS)
-    {
-    this->Implementation->View->SetFieldType(vtkQtRecordView::CELL_DATA);
-    }
-  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_VERTICES)
-    {
-    this->Implementation->View->SetFieldType(vtkQtRecordView::VERTEX_DATA);
-    }
-  else if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
-    {
-    this->Implementation->View->SetFieldType(vtkQtRecordView::EDGE_DATA);
-    }
-  else if(attributeType == vtkDataObject::FIELD_ASSOCIATION_ROWS)
-    {
-    this->Implementation->View->SetFieldType(vtkQtRecordView::ROW_DATA);
     }
 
   this->Implementation->View->Update();

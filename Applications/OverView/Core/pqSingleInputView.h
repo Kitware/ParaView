@@ -34,8 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSingleInputView_h
 
 #include "OverViewCoreExport.h"
-
 #include "pqView.h"
+
+class pqDataRepresentation;
 
 /// Convenience view class that enforces "single input" behavior
 class OVERVIEW_CORE_EXPORT pqSingleInputView : public pqView
@@ -58,6 +59,11 @@ public:
   vtkImageData* captureImage(int);
   vtkImageData* captureImage(const QSize& asize)
     { return this->pqView::captureImage(asize); }
+
+signals:
+  /// Fired when the currently shown representation changes. \c repr may be
+  /// NULL.
+  void showing(pqDataRepresentation* repr);
 
 protected:
   pqRepresentation* visibleRepresentation();

@@ -73,7 +73,7 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(representation->getProxy());
-
+/*
   this->Implementation->Widgets.setupUi(this);
 
   int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
@@ -106,6 +106,7 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
+  */
 }
 
 ClientTableDisplay::~ClientTableDisplay()

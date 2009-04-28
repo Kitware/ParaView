@@ -3,11 +3,13 @@ INCLUDE(${QT_USE_FILE})
 QT4_WRAP_CPP(
   MOC_SRCS
   ClientRecordView.h
+  ClientRecordViewDecorator.h
   ClientRecordDisplay.h
   )
 
 SET(UI_FORMS
   ClientRecordDisplay.ui
+  ClientRecordViewDecorator.ui
   )
 
 QT4_WRAP_UI(
@@ -43,7 +45,7 @@ ADD_PARAVIEW_VIEW_MODULE(
 ADD_PARAVIEW_PLUGIN(
   ClientRecordViewPlugin "1.0"
   GUI_INTERFACES ${IFACES}
-  SOURCES ClientRecordView.cxx ClientRecordDisplay.cxx ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS}
+  SOURCES ClientRecordView.cxx ClientRecordViewDecorator.cxx ClientRecordDisplay.cxx ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS}
   SERVER_MANAGER_XML ClientRecordView.xml
   )
 

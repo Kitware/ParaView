@@ -73,7 +73,7 @@ ClientRecordDisplay::ClientRecordDisplay(pqRepresentation* representation, QWidg
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(representation->getProxy());
-
+/*
   this->Implementation->Widgets.setupUi(this);
 
   pqSignalAdaptorComboBox* attributeTypeAdaptor = 
@@ -98,7 +98,7 @@ ClientRecordDisplay::ClientRecordDisplay(pqRepresentation* representation, QWidg
     this, SLOT(updateAllViews()));
 
   pqNamedWidgets::linkObject(this->Implementation->Widgets.attribute_mode, proxy, "AttributeType", this->Implementation->PropertyManager);
-
+*/
 }
 
 ClientRecordDisplay::~ClientRecordDisplay()
