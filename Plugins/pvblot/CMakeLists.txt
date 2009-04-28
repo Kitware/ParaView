@@ -49,3 +49,37 @@ ADD_PARAVIEW_PLUGIN(pvblot "1.0"
   GUI_RESOURCES pvblot.qrc
   SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} ${CLIENT_SRCS}
   )
+
+#############################################################################
+# Set up a simple shell script to run pvblot from the command line.
+GET_TARGET_PROPERTY(PVBLOT_PVPYTHON_EXECUTABLE pvpython LOCATION)
+SET(PVBLOT_BLOTISH_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot.in"
+  "${EXECUTABLE_OUTPUT_PATH}/pvblot"
+  @ONLY
+  )
+
+#############################################################################
+# Set up pvblot script for when ParaView is installed.  This includes
+# installing the Python source files.
+INSTALL(
+  FILES ${PYMODULES}
+  DESTINATION ${PV_INSTALL_LIB_DIR}
+  )
+
+SET(PVBLOT_PVPYTHON_EXECUTABLE "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}/pvpython${PV_EXE_SUFFIX}")
+SET(PVBLOT_BLOTISH_PATH "${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}")
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/pvblot.in"
+  "${ParaView_BINARY_DIR}/CMake/tmp/pvblot"
+  @ONLY
+  )
+
+INSTALL(
+  FILES "${ParaView_BINARY_DIR}/CMake/tmp/pvblot"
+  DESTINATION ${PV_INSTALL_BIN_DIR}
+  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+  )

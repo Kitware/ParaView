@@ -3,3 +3,4 @@
 *.sh.in          crlf=input
 newalpha         crlf=input
 newversion       crlf=input
+pvblot.in        crlf=input
