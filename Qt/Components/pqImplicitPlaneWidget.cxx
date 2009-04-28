@@ -442,8 +442,9 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
   if (widget)
     {
-    if (vtkCamera* const camera = 
-      this->renderView()->getRenderViewProxy()->GetActiveCamera())
+    pqRenderView* renView = qobject_cast<pqRenderView*>(this->renderView());
+    if (vtkCamera* const camera = renView? 
+      renView->getRenderViewProxy()->GetActiveCamera() : 0)
       {
       double camera_normal[3];
       camera->GetViewPlaneNormal(camera_normal);

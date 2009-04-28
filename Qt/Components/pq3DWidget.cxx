@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
-#include "pqRenderView.h"
+#include "pqRenderViewBase.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSphereWidget.h"
@@ -189,9 +189,9 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
 }
 
 //-----------------------------------------------------------------------------
-pqRenderView* pq3DWidget::renderView() const
+pqRenderViewBase* pq3DWidget::renderView() const
 {
-  return qobject_cast<pqRenderView*>(this->view());
+  return qobject_cast<pqRenderViewBase*>(this->view());
 }
 
 //-----------------------------------------------------------------------------
@@ -203,7 +203,7 @@ void pq3DWidget::pickingSupported(const QKeySequence& key)
 //-----------------------------------------------------------------------------
 void pq3DWidget::setView(pqView* pqview)
 { 
-  pqRenderView* rview = this->renderView();
+  pqRenderViewBase* rview = this->renderView();
   if (pqview == rview)
     {
     this->Superclass::setView(pqview);
@@ -222,7 +222,7 @@ void pq3DWidget::setView(pqView* pqview)
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    rview->getRenderViewProxy()->RemoveRepresentation(widget);
+    rview->getViewProxy()->RemoveRepresentation(widget);
     }
 
   this->Superclass::setView(pqview);
@@ -243,7 +243,7 @@ void pq3DWidget::setView(pqView* pqview)
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    rview->getRenderViewProxy()->AddRepresentation(widget);
+    rview->getViewProxy()->AddRepresentation(widget);
     }
 
   if (cur_visbility)
@@ -256,7 +256,7 @@ void pq3DWidget::setView(pqView* pqview)
 //-----------------------------------------------------------------------------
 void pq3DWidget::render()
 {
-  if (pqRenderView* rview = this->renderView())
+  if (pqRenderViewBase* rview = this->renderView())
     {
     rview->render();
     }
@@ -280,13 +280,13 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
   this->Internal->VTKConnect->Disconnect();
 
     vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
-  pqRenderView* rview = this->renderView();
+  pqRenderViewBase* rview = this->renderView();
   if (rview && widget)
     {
     // To add/remove the 3D widget display from the view module.
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
-    rview->getRenderViewProxy()->RemoveRepresentation(widget);
+    rview->getViewProxy()->RemoveRepresentation(widget);
     rview->render();
     }
 
@@ -310,7 +310,7 @@ void pq3DWidget::setWidgetProxy(vtkSMNewWidgetRepresentationProxy* pxy)
     // we don't use the property. This is so since the 3D widget add/remove 
     // should not get saved in state or undo-redo. 
     this->updateWidgetVisibility();
-    rview->getRenderViewProxy()->AddRepresentation(widget);
+    rview->getViewProxy()->AddRepresentation(widget);
     rview->render();
     }
 }

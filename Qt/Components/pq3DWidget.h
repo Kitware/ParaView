@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pq3DWidgetInternal;
 class pqProxy;
-class pqRenderView;
+class pqRenderViewBase;
 class QKeySequence;
 class vtkPVXMLElement;
 class vtkSMNewWidgetRepresentationProxy;
@@ -86,7 +86,7 @@ public:
   bool widgetVisible() const;
 
   /// Returns the current render view.
-  pqRenderView* renderView() const;
+  pqRenderViewBase* renderView() const;
 
   /// Reset the bounds to the specified bounds.
   /// This typically calls PlaceWidget on the underlying 3D Widget 
