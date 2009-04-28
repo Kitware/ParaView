@@ -80,7 +80,7 @@ pqPointSourceWidget::pqPointSourceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget
     setValidator(new QDoubleValidator(this->Implementation->Controls.Radius));
 
   this->layout()->addWidget(&this->Implementation->ControlsContainer);
-  QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key \n to change point position</b>", this);
+  QLabel* label =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
   label->setWordWrap(1);
   this->layout()->addWidget(label);
 

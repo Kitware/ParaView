@@ -52,6 +52,9 @@ pqDistanceWidget::pqDistanceWidget(vtkSMProxy* o, vtkSMProxy* pxy, QWidget* p)
     QLabel* label =new QLabel("<b>Distance:</b> <i>na</i> ", this);
     l->insertWidget(0, label);
     this->Label = label;
+    QLabel* notelabel =new QLabel("<b>Note: Move mouse and use 'P' key to change point position</b>", this);
+    notelabel->setWordWrap(1);
+    l->addWidget(notelabel);
     }
 
   QObject::connect(this, SIGNAL(widgetInteraction()), this, SLOT(updateDistance()));
