@@ -90,14 +90,14 @@ CommonToolbarActions::CommonToolbarActions(QObject* p)
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createView()));
-  
+/*  
   action = new QAction("Attribute View", this);
   action->setData("ClientAttributeView");
   action->setIcon(QIcon(":CommonToolbar/Icons/column_zoom_48.png"));
   this->addAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
     this, SLOT(createView()));
-
+*/
   action = new QAction("Record View", this);
   action->setData("ClientRecordView");
   action->setIcon(QIcon(":CommonToolbar/Icons/row_zoom_48.png"));
@@ -138,7 +138,7 @@ void CommonToolbarActions::updateEnableState()
   actions[6]->setEnabled(false);
   actions[7]->setEnabled(true);
   actions[8]->setEnabled(true);
-  actions[9]->setEnabled(true);
+  //actions[9]->setEnabled(true);
 
   pqPipelineSource *src = this->getActiveSource();
   if(!src)
