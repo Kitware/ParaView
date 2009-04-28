@@ -461,6 +461,11 @@ QVariant pqSpreadSheetViewModel::data(
         // Don't show ASCII characted for char arrays.
         str = QString::number(value.ToInt());
         }
+      else if(value.IsFloat() || value.IsDouble())
+        {
+        str = QString::number(value.ToDouble(), 'g', 
+              this->Internal->DecimalPrecision);        
+        }
       else if (value.IsArray())
         {
         // it's possible that it's a char array, then too we need to do the
