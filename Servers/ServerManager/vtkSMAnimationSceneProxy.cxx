@@ -119,7 +119,7 @@ private:
 
 
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.58");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.59");
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
@@ -161,16 +161,8 @@ vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 void vtkSMAnimationSceneProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
- 
-  if (this->TimeKeeper)
-    {
-    this->TimeKeeperTimeRangeChanged();
-    }
-  else
-    {
-    this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
-    this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
-    }
+  this->UpdatePropertyInformation(this->GetProperty("StartTimeInfo"));
+  this->UpdatePropertyInformation(this->GetProperty("EndTimeInfo"));
 }
 
 //----------------------------------------------------------------------------
