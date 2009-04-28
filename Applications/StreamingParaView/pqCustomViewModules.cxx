@@ -2,7 +2,7 @@
 #include "pqCustomViewModules.h"
 #include <pqRenderView.h>
 #include <pqTwoDRenderView.h>
-#include <pqPlotView.h>
+//#include <pqPlotView.h>
 //#include <pqTableView.h>
 #include <pqComparativeRenderView.h>
 #include <pqSpreadSheetView.h>
