@@ -158,7 +158,7 @@ void vtkPSLACReaderMapValues1(const T *inArray, T *outArray, int numComponents,
 // }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPSLACReader, "1.3");
+vtkCxxRevisionMacro(vtkPSLACReader, "1.4");
 vtkStandardNewMacro(vtkPSLACReader);
 
 vtkCxxSetObjectMacro(vtkPSLACReader, Controller, vtkMultiProcessController);
@@ -172,6 +172,8 @@ vtkPSLACReader::vtkPSLACReader()
     {
     this->SetController(vtkSmartPointer<vtkDummyController>::New());
     }
+  this->NumberOfPiecesCache = 0;
+  this->RequestedPieceCache = -1;
 }
 
 vtkPSLACReader::~vtkPSLACReader()
@@ -237,16 +239,6 @@ int vtkPSLACReader::RequestData(vtkInformation *request,
   // RequestData will call other methods that we have overloaded to read
   // partitioned pieces.
   int retval =this->Superclass::RequestData(request, inputVector, outputVector);
-
-  // Clean up search structure.  When we support time data, we may want to keep
-  // this arround so that we do not have to recalculate them for every time
-  // step.
-  this->LocalToGlobalIds = NULL;
-  this->PointsExpectedFromProcessesLengths = NULL;
-  this->PointsExpectedFromProcessesOffsets = NULL;
-  this->PointsToSendToProcesses = NULL;
-  this->PointsToSendToProcessesLengths = NULL;
-  this->PointsToSendToProcessesOffsets = NULL;
 
   return retval;
 }
@@ -401,7 +393,8 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
     = this->GetNumTuplesInVariable(meshFD, coordsVarId, 3);
 
   // Iterate over our LocalToGlobalIds map and determine which process reads
-  // which points.
+  // which points.  We also fill out GlobalToLocalIds.  Until this point we
+  // only have keys and we need to set the values.
   vtkIdType localId = 0;
   vtkIdType numLocalIds = this->LocalToGlobalIds->GetNumberOfTuples();
   for (int process = 0; process < this->NumberOfPieces; process++)
@@ -534,6 +527,20 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
                                 process);
       }
     }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPSLACReader::RestoreMeshCache(vtkMultiBlockDataSet *output)
+{
+  if (!this->Superclass::RestoreMeshCache(output)) return 0;
+
+  // Record the global ids in the point data.
+  vtkPointData *pd = vtkPointData::SafeDownCast(
+                    output->GetInformation()->Get(vtkSLACReader::POINT_DATA()));
+  pd->SetGlobalIds(this->LocalToGlobalIds);
+  pd->SetPedigreeIds(this->LocalToGlobalIds);
+
   return 1;
 }
 
@@ -850,9 +857,10 @@ int vtkPSLACReader::ReadMidpointCoordinates (
 }
 
 //-----------------------------------------------------------------------------
-int vtkPSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
+int vtkPSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output,
+                                     vtkMidpointIdMap &map)
 {
-  int result = this->Superclass::ReadMidpointData(meshFD, output); 
+  int result = this->Superclass::ReadMidpointData(meshFD, output, map); 
   if (result != 1)
     {
     return result;
@@ -877,4 +885,17 @@ int vtkPSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
     }
 
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkPSLACReader::MeshUpToDate()
+{
+  int localflag = this->Superclass::MeshUpToDate();
+  localflag &= (this->NumberOfPieces != this->NumberOfPiecesCache);
+  localflag &= (this->RequestedPieceCache != this->RequestedPiece);
+
+  int globalflag;
+  this->Controller->AllReduce(&localflag, &globalflag, 1,
+                              vtkCommunicator::LOGICAL_AND_OP);
+  return globalflag;
 }

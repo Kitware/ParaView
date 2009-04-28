@@ -70,15 +70,19 @@ protected:
 
   virtual int ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output);
   virtual int ReadCoordinates(int meshFD, vtkMultiBlockDataSet *output);
-  virtual int ReadFieldData(int modeFD, vtkMultiBlockDataSet *output);
   virtual int ReadMidpointCoordinates(int meshFD, vtkMultiBlockDataSet *output,
                                       vtkMidpointCoordinateMap &map);
-  virtual int ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output);
+  virtual int ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output,
+                               vtkMidpointIdMap &map);
+  virtual int RestoreMeshCache(vtkMultiBlockDataSet *output);
+  virtual int ReadFieldData(int modeFD, vtkMultiBlockDataSet *output);
 
   virtual int ReadTetrahedronInteriorArray(int meshFD,
                                            vtkIdTypeArray *connectivity);
   virtual int ReadTetrahedronExteriorArray(int meshFD,
                                            vtkIdTypeArray *connectivity);
+
+  virtual int MeshUpToDate();
 
 //BTX
   // Description:
@@ -143,6 +147,11 @@ protected:
     if (result > this->NumberOfGlobalPoints) result=this->NumberOfGlobalPoints;
     return result;
   }
+
+  // Description:
+  // Piece information from the last call.
+  int NumberOfPiecesCache;
+  int RequestedPieceCache;
 
 private:
   vtkPSLACReader(const vtkPSLACReader &);       // Not implemented

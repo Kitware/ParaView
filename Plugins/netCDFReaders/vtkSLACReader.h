@@ -35,11 +35,13 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
-#include "vtkSmartPointer.h"    // For ivars
-#include "vtkStdString.h"       // For ivars
-#include <vtkstd/map>           // For internal maps
-#include <vtkstd/vector>        // For ivars
-#include <vtksys/hash_map.hxx>  // For internal maps
+#include "vtkMultiBlockDataSet.h" // For ivars
+#include "vtkPoints.h"            // For ivars
+#include "vtkSmartPointer.h"      // For ivars
+#include "vtkStdString.h"         // For ivars
+#include <vtkstd/map>             // For internal maps
+#include <vtkstd/vector>          // For ivars
+#include <vtksys/hash_map.hxx>    // For internal maps
 
 class vtkDataArraySelection;
 class vtkIdTypeArray;
@@ -213,21 +215,6 @@ protected:
   };
 //ETX
 
-  // Description:
-  // Read in the point coordinate data from the mesh file.  Returns 1 on
-  // success, 0 on failure.
-  virtual int ReadCoordinates(int meshFD, vtkMultiBlockDataSet *output);
-
-  // Description:
-  // Read in the field data from the mode file.  Returns 1 on success, 0
-  // on failure.
-  virtual int ReadFieldData(int modeFD, vtkMultiBlockDataSet *output);
-
-  // Description:
-  // Read in the midpoint data from the mesh file.  Returns 1 on success,
-  // 0 on failure.
-  virtual int ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output);
-
 //BTX
   // Description:
   // Simple structure for holding midpoint information.
@@ -245,12 +232,22 @@ protected:
   };
 
   // Description:
-  // A map from two edge midpoints to their midpoint.  This is how midpoints are
+  // A map from two edge points to their midpoint.  This is how midpoints are
   // stored in the mesh files.
   typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>, vtkMidpoint,
                            vtkSLACReaderIdTypePairHash>
     vtkMidpointCoordinateMap;
+
+  // Description:
+  // A map from an edge (defined by two point ids) to a midpoint id.
+  typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>, vtkIdType,
+                           vtkSLACReaderIdTypePairHash> vtkMidpointIdMap;
 //ETX
+
+  // Description:
+  // Read in the point coordinate data from the mesh file.  Returns 1 on
+  // success, 0 on failure.
+  virtual int ReadCoordinates(int meshFD, vtkMultiBlockDataSet *output);
 
   // Description:
   // Reads in the midpoint coordinate data from the mesh file and returns a map
@@ -258,6 +255,51 @@ protected:
   // Returns 1 on success, 0 on failure.
   virtual int ReadMidpointCoordinates(int meshFD, vtkMultiBlockDataSet *output,
                                       vtkMidpointCoordinateMap &map);
+
+  // Description:
+  // Read in the midpoint data from the mesh file.  Returns 1 on success,
+  // 0 on failure.  Also fills a midpoint id map that will be passed into
+  // InterpolateMidpointFieldData.
+  virtual int ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output,
+                               vtkMidpointIdMap &map);
+
+  // Description:
+  // Instead of reading data from the mesh file, restore the data from the
+  // previous mesh file read.
+  virtual int RestoreMeshCache(vtkMultiBlockDataSet *output);
+
+  // Description:
+  // Read in the field data from the mode file.  Returns 1 on success, 0
+  // on failure.
+  virtual int ReadFieldData(int modeFD, vtkMultiBlockDataSet *output);
+
+  // Description:
+  // Takes the data read on the fields and interpolates data for the midpoints.
+  // map is the same map that was created in ReadMidpointData.
+  virtual int InterpolateMidpointData(vtkMultiBlockDataSet *output,
+                                      vtkMidpointIdMap &map);
+
+  // Description:
+  // A time stamp for the last time the mesh file was read.  This is used to
+  // determine whether the mesh needs to be read in again or if we just need
+  // to read the mode data.
+  vtkTimeStamp MeshReadTime;
+
+  // Description:
+  // Returns 1 if the mesh is up to date, 0 if the mesh needs to be read from
+  // disk.
+  virtual int MeshUpToDate();
+
+//BTX
+
+  // Description:
+  // References and shallow copies to the last output data.  We keep this
+  // arround in case we do not have to read everything in again.
+  vtkSmartPointer<vtkPoints> PointCache;
+  vtkSmartPointer<vtkMultiBlockDataSet> MeshCache;
+  vtkMidpointIdMap MidpointIdCache;
+
+//ETX
 
 private:
   vtkSLACReader(const vtkSLACReader &);         // Not implemented

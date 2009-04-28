@@ -236,7 +236,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.6");
+vtkCxxRevisionMacro(vtkSLACReader, "1.7");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
@@ -530,24 +530,50 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
     this->Phase = vtkMath::DoubleTwoPi()*(time*this->Frequency);
     }
 
-  // Set up point data.
-  VTK_CREATE(vtkPoints, points);
-  output->GetInformation()->Set(vtkSLACReader::POINTS(), points);
-  VTK_CREATE(vtkPointData, pd);
-  output->GetInformation()->Set(vtkSLACReader::POINT_DATA(), pd);
+  int readMesh = !this->MeshUpToDate();
 
-  vtkSLACReaderAutoCloseNetCDF meshFD(this->MeshFileName, NC_NOWRITE);
-  if (!meshFD.Valid()) return 0;
+  if (readMesh)
+    {
+    this->MidpointIdCache.clear();
+    this->MeshCache = vtkSmartPointer<vtkMultiBlockDataSet>::New();
 
-  if (!this->ReadInternalVolume && !this->ReadExternalSurface) return 1;
+    vtkSLACReaderAutoCloseNetCDF meshFD(this->MeshFileName, NC_NOWRITE);
+    if (!meshFD.Valid()) return 0;
 
-  if (!this->ReadConnectivity(meshFD(), output)) return 0;
+    // Set up point data.
+    VTK_CREATE(vtkPoints, points);
+    VTK_CREATE(vtkPointData, pd);
+    output->GetInformation()->Set(vtkSLACReader::POINTS(), points);
+    output->GetInformation()->Set(vtkSLACReader::POINT_DATA(), pd);
 
-  this->UpdateProgress(0.25);
+    if (!this->ReadInternalVolume && !this->ReadExternalSurface) return 1;
 
-  if (!this->ReadCoordinates(meshFD(), output)) return 0;
+    if (!this->ReadConnectivity(meshFD(), output)) return 0;
 
-  this->UpdateProgress(0.5);
+    this->UpdateProgress(0.25);
+
+    if (!this->ReadCoordinates(meshFD(), output)) return 0;
+
+    this->UpdateProgress(0.5);
+
+    if (this->ReadMidpoints)
+      {
+      if (!this->ReadMidpointData(meshFD(), output, this->MidpointIdCache))
+        {
+        return 0;
+        }
+      }
+
+    this->MeshCache->ShallowCopy(output);
+    this->PointCache = points;
+    this->MeshReadTime.Modified();
+    }
+  else
+    {
+    if (!this->RestoreMeshCache(output)) return 0;
+    }
+
+  this->UpdateProgress(0.75);
 
   if (this->ReadModeData)
     {
@@ -564,17 +590,14 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
     if (!modeFD.Valid()) return 0;
 
     if (!this->ReadFieldData(modeFD(), output)) return 0;
-    }
 
-  this->UpdateProgress(0.75);
+    this->UpdateProgress(0.875);
 
-  if (this->ReadMidpoints)
-    {
-    if (!this->ReadMidpointData(meshFD(), output)) return 0;
+    if (!this->InterpolateMidpointData(output, this->MidpointIdCache));
     }
 
   // Push points to output.
-  points = vtkPoints::SafeDownCast(
+  vtkPoints *points = vtkPoints::SafeDownCast(
                         output->GetInformation()->Get(vtkSLACReader::POINTS()));
   VTK_CREATE(vtkCompositeDataIterator, outputIter);
   for (outputIter.TakeReference(output->NewIterator());
@@ -586,7 +609,7 @@ int vtkSLACReader::RequestData(vtkInformation *vtkNotUsed(request),
     }
 
   // Push point field data to output.
-  pd = vtkPointData::SafeDownCast(
+  vtkPointData *pd = vtkPointData::SafeDownCast(
                     output->GetInformation()->Get(vtkSLACReader::POINT_DATA()));
   for (outputIter.TakeReference(output->NewIterator());
        !outputIter->IsDoneWithTraversal(); outputIter->GoToNextItem())
@@ -958,7 +981,8 @@ int vtkSLACReader::ReadMidpointCoordinates(
 }
 
 //-----------------------------------------------------------------------------
-int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
+int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output,
+                                    vtkMidpointIdMap &midpointIds)
 {
   static bool GaveMidpointWarning = false;
   if (!GaveMidpointWarning)
@@ -970,22 +994,12 @@ int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
   // Get the point information from the data.
   vtkPoints *points = vtkPoints::SafeDownCast(
                         output->GetInformation()->Get(vtkSLACReader::POINTS()));
-  vtkPointData *pd = vtkPointData::SafeDownCast(
-                    output->GetInformation()->Get(vtkSLACReader::POINT_DATA()));
 
   // Read in the midpoint coordinates.
   vtkMidpointCoordinateMap midpointCoords;
   if (!this->ReadMidpointCoordinates(meshFD, output, midpointCoords)) return 0;
 
-  vtkIdType newPointTotal = points->GetNumberOfPoints () + midpointCoords.size ();
-
-  // Get a map of found midpoints ready (edge -> local point id).
-  typedef vtksys::hash_map<pair<vtkIdType, vtkIdType>, vtkIdType,
-                           vtkSLACReaderIdTypePairHash> vtkMidpointIdMap;
-  vtkMidpointIdMap midpointIds;
-
-  // Set up the point information for adding new points.
-  if (pd) pd->InterpolateAllocate(pd, points->GetNumberOfPoints());
+  vtkIdType newPointTotal = points->GetNumberOfPoints() + midpointCoords.size();
 
   // Iterate over all of the parts in the output and visit the ones for the
   // external surface.
@@ -1018,7 +1032,6 @@ int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
       for (int edgeInc = 0; edgeInc < 3; edgeInc++)
         {
         // Get the points defining the edge.
-        // TODO: Use global ids.
         vtkIdType p0 = pts[triEdges[edgeInc][0]];
         vtkIdType p1 = pts[triEdges[edgeInc][1]];
         pair<vtkIdType,vtkIdType> edge = make_pair(MY_MIN(p0,p1),MY_MAX(p0,p1));
@@ -1058,7 +1071,6 @@ int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
 
           // Add the new point to the point data.
           points->InsertPoint(midpoint.ID, midpoint.Coordinate);
-          if (pd) pd->InterpolateEdge(pd, midpoint.ID, p0, p1, 0.5);
 
           // Add the new point to the id map.
           midpointIds.insert(make_pair(edge, midpoint.ID));
@@ -1073,6 +1085,62 @@ int vtkSLACReader::ReadMidpointData(int meshFD, vtkMultiBlockDataSet *output)
     // Save the new cells in the data.
     ugrid->SetCells(VTK_QUADRATIC_TRIANGLE, newCells);
     }
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSLACReader::InterpolateMidpointData(vtkMultiBlockDataSet *output,
+                                           vtkMidpointIdMap &map)
+{
+  // Get the point information from the output data (where it was placed
+  // earlier).
+  vtkPoints *points = vtkPoints::SafeDownCast(
+                        output->GetInformation()->Get(vtkSLACReader::POINTS()));
+  vtkPointData *pd = vtkPointData::SafeDownCast(
+                    output->GetInformation()->Get(vtkSLACReader::POINT_DATA()));
+  if (!pd)
+    {
+    vtkWarningMacro(<< "Missing point data.");
+    return 0;
+    }
+
+  // Set up the point data for adding new points and interpolating their values.
+  pd->InterpolateAllocate(pd, points->GetNumberOfPoints());
+
+  for (vtkMidpointIdMap::iterator i = map.begin(); i != map.end(); i++)
+    {
+    vtkIdType edgePoint0 = i->first.first;
+    vtkIdType edgePoint1 = i->first.second;
+    vtkIdType midpoint = i->second;
+    pd->InterpolateEdge(pd, midpoint, edgePoint0, edgePoint1, 0.5);
+    }
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSLACReader::MeshUpToDate()
+{
+  if (this->MeshReadTime < this->GetMTime())
+    {
+    return 0;
+    }
+  if (this->MeshReadTime < this->VariableArraySelection->GetMTime())
+    {
+    return 0;
+    }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSLACReader::RestoreMeshCache(vtkMultiBlockDataSet *output)
+{
+  output->ShallowCopy(this->MeshCache);
+  output->GetInformation()->Set(vtkSLACReader::POINTS(), this->PointCache);
+
+  VTK_CREATE(vtkPointData, pd);
+  output->GetInformation()->Set(vtkSLACReader::POINT_DATA(), pd);
 
   return 1;
 }
