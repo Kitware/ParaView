@@ -1,0 +1,74 @@
+<ui version="4.0" >
+ <class>pqBlotDialog</class>
+ <widget class="QDialog" name="pqBlotDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>645</width>
+    <height>395</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="pqBlotShell" name="shellWidget" />
+   </item>
+   <item>
+    <widget class="QWidget" native="1" name="buttons" >
+     <layout class="QHBoxLayout" >
+      <item>
+       <spacer>
+        <property name="orientation" >
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" >
+         <size>
+          <width>141</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="close" >
+        <property name="text" >
+         <string>Close</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionWireframe" >
+   <property name="icon" >
+    <iconset resource="pvblot.qrc" >:/pvblot/Icons/Wireframe.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Wireframe</string>
+   </property>
+  </action>
+  <action name="actionSolid" >
+   <property name="icon" >
+    <iconset resource="pvblot.qrc" >:/pvblot/Icons/Solid.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Solid</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqBlotShell</class>
+   <extends>QTextEdit</extends>
+   <header>pqblotShell.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="pvblot.qrc" />
+ </resources>
+ <connections/>
+</ui>

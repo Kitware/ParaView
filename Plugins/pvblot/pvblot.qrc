@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/pvblot">
+    <file>Icons/Solid.png</file>
+    <file>Icons/Wireframe.png</file>
+  </qresource>
+</RCC>
