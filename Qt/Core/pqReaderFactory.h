@@ -90,6 +90,12 @@ public:
   /// be instantiated on the server will be considered.
   QStringList getSupportedReaders(pqServer* server);
 
+  /// Same as getSupportedReaders but further constrains the list to contain
+  /// only those readers that report they can read the file pointed to by
+  /// \c filename (or perhaps do not report anything)
+  QStringList getSupportedReadersForFile(pqServer* server,
+                                         const QString &filename);
+
   /// Returns a short description of the reader.
   QString getReaderDescription(const QString& readerName);
 

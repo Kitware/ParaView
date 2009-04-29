@@ -96,7 +96,7 @@ struct pqReaderInfo
       return false;
       }
 
-    if (!this->Extensions.contains(extension))
+    if (!extension.isEmpty() && !this->Extensions.contains(extension))
       {
       return false;
       }
@@ -364,17 +364,25 @@ QString pqReaderFactory::getSupportedFileTypes(pqServer* server)
 //-----------------------------------------------------------------------------
 QStringList pqReaderFactory::getSupportedReaders(pqServer* server)
 {
+  return this->getSupportedReadersForFile(server, QString());
+}
+
+//-----------------------------------------------------------------------------
+QStringList pqReaderFactory::getSupportedReadersForFile(pqServer *server,
+                                                        const QString &filename)
+{
   QStringList supportedSources;
   QStringList supportedReaders;
 
   // TODO: We are only looking into sources group for now.
   server->getSupportedProxies("sources", supportedSources);
-  
 
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
-    if (info.PrototypeProxy && 
-      supportedSources.contains(info.PrototypeProxy->GetXMLName()))
+    cout << info.PrototypeProxy->GetXMLName() << endl;
+    if (   info.PrototypeProxy
+        && supportedSources.contains(info.PrototypeProxy->GetXMLName())
+        && (filename.isEmpty() || info.canReadFile(filename,QString(),server)) )
       {
       supportedReaders.append(info.PrototypeProxy->GetXMLName());
       }

@@ -60,7 +60,7 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
 
-  QStringList readers = readerInfo->getSupportedReaders(s);
+  QStringList readers = readerInfo->getSupportedReadersForFile(s, file);
   foreach(QString reader, readers)
     {
     QString desc = readerInfo->getReaderDescription(reader);
