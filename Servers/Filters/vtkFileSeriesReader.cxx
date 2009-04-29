@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.13");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.14");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -139,6 +139,17 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation *outInfo)
                        ->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[0];
   timeRange[1] = (--this->RangeMap.end())->second
                        ->Get(vtkStreamingDemandDrivenPipeline::TIME_RANGE())[1];
+
+  // Special case: if the time range is a single value, supress it.  This is
+  // most likely from a data set that is a single file with no time anyway.
+  // Even if it is not, how much value added is there for a single time value?
+  if (timeRange[0] >= timeRange[1])
+    {
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    return 1;
+    }
+
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), timeRange, 2);
 
   vtkstd::vector<double> timeSteps;
@@ -502,6 +513,8 @@ int vtkFileSeriesReader::RequestInformation(
                                  vtkInformationVector* outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
+
+  this->Internal->TimeRanges->Reset();
 
   int numFiles = (int)this->GetNumberOfFileNames();
   if (numFiles < 1)
