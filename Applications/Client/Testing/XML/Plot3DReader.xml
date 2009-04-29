@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/combxyz.bin" />
-  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChanged" arguments="/23|0" />
+  <pqevent object="pqSelectReaderDialog/listWidget" command="currentChanged" arguments="/2|0" />
   <pqevent object="pqSelectReaderDialog/okButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/QFileName/FileButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/QFileName/pqFileDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/combq.bin" />
