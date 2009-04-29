@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.15");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.16");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -731,7 +731,7 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
     vtkStdString fname;
     metafile >> fname;
     if (fname.empty()) continue;
-    if ((fname.at(0) != '/') && (fname.at(1) != ':'))
+    if ((fname.at(0) != '/') && ((fname.size() < 2) || (fname.at(1) != ':')))
       {
       fname = filePath + fname;
       }
