@@ -24,7 +24,7 @@
 #include <QPen>
 
 vtkStandardNewMacro(vtkSMLineChartSeriesOptionsProxy);
-vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLineChartSeriesOptionsProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMLineChartSeriesOptionsProxy::vtkSMLineChartSeriesOptionsProxy()
 {
@@ -63,14 +63,14 @@ void vtkSMLineChartSeriesOptionsProxy::SetMarkerStyle(
       this->GetOptions(name));
   if (options)
     {
-    int style = vtkQtPointMarker::Cross;
+    int style = vtkQtPointMarker::NoMarker;
     if (value == 0)
       {
       options->setPointsVisible(false);
       }
     else
       {
-      style = vtkQtPointMarker::Cross + (value-1);
+      style = value;
       options->setPointsVisible(true);
       }
     options->setMarkerStyle(static_cast<vtkQtPointMarker::MarkerStyle>(style));
@@ -114,7 +114,7 @@ void vtkSMLineChartSeriesOptionsProxy::UpdatePropertyInformationInternal(
         if (options->arePointsVisible())
           {
           new_values->AddString(QString::number(
-              static_cast<int>(options->getMarkerStyle())+1).toAscii().data());
+              static_cast<int>(options->getMarkerStyle())).toAscii().data());
           }
         else
           {
