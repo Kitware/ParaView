@@ -141,7 +141,14 @@ void pqFileChooserWidget::chooseFile()
 
   pqFileDialog* dialog = new pqFileDialog(this->Server,
     this, tr("Open File:"), QString(), filters);
-  dialog->setFileMode(pqFileDialog::ExistingFile);
+  if (this->ForceSingleFile)
+    {
+    dialog->setFileMode(pqFileDialog::ExistingFile);
+    }
+  else
+    {
+    dialog->setFileMode(pqFileDialog::ExistingFiles);
+    }
   if(QDialog::Accepted == dialog->exec())
     {
     QStringList files = dialog->getSelectedFiles();
