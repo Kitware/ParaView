@@ -19,9 +19,9 @@
   the U.S. Government retains certain rights in this software.
 -------------------------------------------------------------------------*/
 
-#include "pqBlotShell.h"
-
 #include <vtkPython.h> // python first
+
+#include "pqBlotShell.h"
 
 #include "pqConsoleWidget.h"
 #include "pqServer.h"
@@ -218,7 +218,8 @@ void pqBlotShell::promptForInput()
   PyObject *pvblotmodule = PyDict_GetItemString(modules, "pvblot");
   PyObject *pvblotdict = PyModule_GetDict(pvblotmodule);
   PyObject *pvblotinterp = PyDict_GetItemString(pvblotdict, "interpreter");
-  PyObject *promptObj = PyObject_GetAttrString(pvblotinterp, "prompt");
+  PyObject *promptObj = PyObject_GetAttrString(pvblotinterp,
+                                               const_cast<char*>("prompt"));
   char *prompt = PyString_AsString(PyObject_Str(promptObj));
   this->Console->prompt(prompt);
   this->Interpretor->ReleaseControl();

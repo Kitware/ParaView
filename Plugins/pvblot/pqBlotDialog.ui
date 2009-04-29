@@ -64,7 +64,7 @@
   <customwidget>
    <class>pqBlotShell</class>
    <extends>QTextEdit</extends>
-   <header>pqblotShell.h</header>
+   <header>pqBlotShell.h</header>
   </customwidget>
  </customwidgets>
  <resources>
