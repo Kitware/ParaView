@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.72");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.73");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -1317,7 +1317,7 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
   char magic[8];
   if ( !spis.ReadString(magic, 8) )
     {
-    vtkErrorMacro( "Cannot read magic" );
+    vtkDebugMacro( "Cannot read magic" );
     return 0;
     }
   if ( strncmp(magic, "spydata", 7) != 0 &&
