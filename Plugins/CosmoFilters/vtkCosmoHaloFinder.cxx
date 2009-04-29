@@ -83,13 +83,14 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtksys/ios/fstream>
 #include <vtkstd/string>
+#include <vtkstd/algorithm>
 
 #define numDataDims 3
 #define dataX 0
 #define dataY 1
 #define dataZ 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.1");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 struct ValueIdPair
