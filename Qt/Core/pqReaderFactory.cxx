@@ -379,7 +379,6 @@ QStringList pqReaderFactory::getSupportedReadersForFile(pqServer *server,
 
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
-    cout << info.PrototypeProxy->GetXMLName() << endl;
     if (   info.PrototypeProxy
         && supportedSources.contains(info.PrototypeProxy->GetXMLName())
         && (filename.isEmpty() || info.canReadFile(filename,QString(),server)) )
