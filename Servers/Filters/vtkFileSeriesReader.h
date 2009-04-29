@@ -156,7 +156,8 @@ protected:
   // Reads a metadata file and returns a list of filenames (in filesToRead).  If
   // the file could not be read correctly, 0 is returned.
   virtual int ReadMetaDataFile(const char *metafilename,
-                               vtkStringArray *filesToRead);
+                               vtkStringArray *filesToRead,
+                               int maxFilesToRead = VTK_LARGE_INTEGER);
 
   virtual void SetReaderFileName(const char* fname);
   vtkAlgorithm* Reader;

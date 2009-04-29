@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.14");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.15");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -413,7 +413,7 @@ int vtkFileSeriesReader::CanReadFile(const char* filename)
     {
     // filename really points to a metafile.
     VTK_CREATE(vtkStringArray, dataFiles);
-    if (this->ReadMetaDataFile(filename, dataFiles))
+    if (this->ReadMetaDataFile(filename, dataFiles, 1))
       {
       if (dataFiles->GetNumberOfValues() > 0)
         {
@@ -701,7 +701,8 @@ int vtkFileSeriesReader::FillOutputPortInformation(int port,
 
 //-----------------------------------------------------------------------------
 int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
-                                          vtkStringArray *filesToRead)
+                                          vtkStringArray *filesToRead,
+                                          int maxFilesToRead /*= VTK_LARGE_INTEGER*/)
 {
   // Open the metafile.
   ifstream metafile(metafilename);
@@ -724,7 +725,8 @@ int vtkFileSeriesReader::ReadMetaDataFile(const char *metafilename,
   // Iterate over all files pointed to by the metafile.
   filesToRead->SetNumberOfTuples(0);
   filesToRead->SetNumberOfComponents(1);
-  while (metafile.good() && !metafile.eof())
+  while (   metafile.good() && !metafile.eof()
+         && (filesToRead->GetNumberOfTuples() < maxFilesToRead) )
     {
     vtkStdString fname;
     metafile >> fname;
