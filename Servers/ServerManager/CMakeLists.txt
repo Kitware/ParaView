@@ -220,14 +220,12 @@ SET(Kit_SRCS
 IF (VTK_USE_QVTK)
   SET (Kit_SRCS
     ${Kit_SRCS}
-    vtkSMBarChartSeriesOptionsProxy.cxx
     vtkSMBarChartViewProxy.cxx
     vtkSMChartingArraysInformationHelper.cxx
     vtkSMChartNamedOptionsModelProxy.cxx
     vtkSMChartOptionsProxy.cxx
     vtkSMChartTableRepresentationProxy.cxx
     vtkSMChartViewProxy.cxx
-    vtkSMLineChartSeriesOptionsProxy.cxx
     vtkSMLineChartViewProxy.cxx
     )
   FIND_PACKAGE(Qt4)
@@ -241,7 +239,6 @@ IF (VTK_USE_QVTK)
 
   SET_SOURCE_FILES_PROPERTIES(
     vtkSMChartViewProxy.cxx
-    vtkSMChartNamedOptionsModelProxy.cxx
     ABSTRACT)
 ENDIF (VTK_USE_QVTK)
 

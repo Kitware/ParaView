@@ -43,7 +43,8 @@ public:
 
 };
 
-vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.3");
+vtkStandardNewMacro(vtkSMChartNamedOptionsModelProxy);
+vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMChartNamedOptionsModelProxy::vtkSMChartNamedOptionsModelProxy()
 {
@@ -80,8 +81,7 @@ vtkQtChartSeriesOptions* vtkSMChartNamedOptionsModelProxy::GetOptions(
     this->Internals->OptionsModel->getOptions(name);
   if (!options)
     {
-    options = this->NewOptions();
-    options->setParent(this->Internals->OptionsModel);
+    options = new vtkQtChartSeriesOptions(this->Internals->OptionsModel);
     this->Internals->OptionsModel->addOptions(name, options);
     }
   return options;
@@ -124,6 +124,30 @@ void vtkSMChartNamedOptionsModelProxy::UpdatePropertyInformationInternal(
         new_values->AddString(QString::number(
             static_cast<int>(pen.style())).toAscii().data());
         }
+      else if (strcmp(propname, "BrushColorInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+
+        QBrush brush = options->getBrush();
+        new_values->AddString(QString::number(brush.color().redF()).toAscii().data());
+        new_values->AddString(QString::number(brush.color().greenF()).toAscii().data());
+        new_values->AddString(QString::number(brush.color().blueF()).toAscii().data());
+        }
+      else if (options && strcmp(propname, "MarkerStyleInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+        new_values->AddString(QString::number(
+            static_cast<int>(options->getMarkerStyle())).toAscii().data());
+        }
+      else if (options && strcmp(propname, "PenColorInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+
+        QPen pen = options->getPen();
+        new_values->AddString(QString::number(pen.color().redF()).toAscii().data());
+        new_values->AddString(QString::number(pen.color().greenF()).toAscii().data());
+        new_values->AddString(QString::number(pen.color().blueF()).toAscii().data());
+        }
       else
         {
         skip = true;
@@ -165,6 +189,51 @@ void vtkSMChartNamedOptionsModelProxy::SetLineStyle(
   value = value>4? 4 : value;
   QPen pen= options->getPen();
   pen.setStyle(static_cast<Qt::PenStyle>(value));
+  options->setPen(pen);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartNamedOptionsModelProxy::SetBrushColor(
+  const char* name, double r, double g, double b)
+{
+  vtkQtChartSeriesOptions* options = this->GetOptions(name);
+  QBrush brush = QBrush(QColor::fromRgbF(r, g, b));
+  options->setBrush(brush);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartNamedOptionsModelProxy::SetAxisCorner(
+  const char* name, int value)
+{
+  vtkQtChartSeriesOptions* options = 
+    qobject_cast<vtkQtChartSeriesOptions*>(
+      this->GetOptions(name));
+  if (options)
+    {
+    options->setAxesCorner(static_cast<vtkQtChartLayer::AxesCorner>(value));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartNamedOptionsModelProxy::SetMarkerStyle(
+  const char* name, int value)
+{
+  vtkQtChartSeriesOptions* options = 
+    qobject_cast<vtkQtChartSeriesOptions*>(
+      this->GetOptions(name));
+  if (options)
+    {
+    options->setMarkerStyle(static_cast<vtkQtPointMarker::MarkerStyle>(value));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartNamedOptionsModelProxy::SetPenColor(
+  const char* name, double r, double g, double b)
+{
+  vtkQtChartSeriesOptions* options = this->GetOptions(name);
+  QPen pen = options->getPen();
+  pen.setColor(QColor::fromRgbF(r, g, b));
   options->setPen(pen);
 }
 

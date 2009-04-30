@@ -7390,7 +7390,7 @@
           <Property name="LineStyle" exposed_name="SeriesLineStyle" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
+          <Property name="BrushColorInfo" exposed_name="SeriesColorInfo" />
           <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
         </ExposedProperties>
@@ -7520,7 +7520,7 @@
           <Property name="AxisCorner" exposed_name="SeriesAxisCorner" />
 
           <Property name="VisibilityInfo" exposed_name="SeriesVisibilityInfo" />
-          <Property name="ColorInfo" exposed_name="SeriesColorInfo" />
+          <Property name="PenColorInfo" exposed_name="SeriesColorInfo" />
           <Property name="LineThicknessInfo" exposed_name="SeriesLineThicknessInfo" />
           <Property name="LineStyleInfo" exposed_name="SeriesLineStyleInfo" />
           <Property name="MarkerStyleInfo" exposed_name="SeriesMarkerStyleInfo" />
@@ -8572,7 +8572,7 @@
     </ChartNamedOptionsModelProxy>
 
     <!-- =================================================================== -->
-    <LineChartSeriesOptionsProxy name="LineChartSeriesOptions"
+    <ChartNamedOptionsModelProxy name="LineChartSeriesOptions"
       base_proxygroup="options"
       base_proxyname="SeriesOptionsBase">
 
@@ -8609,7 +8609,7 @@
         </Documentation>
       </StringVectorProperty>
 
-      <StringVectorProperty name="ColorInfo"
+      <StringVectorProperty name="PenColorInfo"
         number_of_elements_per_command="4"
         repeat_command="1"
         information_only="1">
@@ -8620,22 +8620,22 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="Color"
-        command="SetColor"
+        command="SetPenColor"
         update_self="1"
         number_of_elements_per_command="4"
         element_types="2 1 1 1"
         repeat_command="1"
-        information_property="ColorInfo" >
+        information_property="PenColorInfo" >
         <Documentation>
           Set the series line color.
         </Documentation>
       </StringVectorProperty>
     
       <!-- End of LineChartSeriesOptions -->
-    </LineChartSeriesOptionsProxy>
+    </ChartNamedOptionsModelProxy>
 
     <!-- =================================================================== -->
-    <BarChartSeriesOptionsProxy name="BarChartSeriesOptions"
+    <ChartNamedOptionsModelProxy name="BarChartSeriesOptions"
       base_proxygroup="options"
       base_proxyname="SeriesOptionsBase">
       <Documentation>
@@ -8644,7 +8644,7 @@
         BarChartRepresentation.
       </Documentation>
 
-      <StringVectorProperty name="ColorInfo"
+      <StringVectorProperty name="BrushColorInfo"
         number_of_elements_per_command="4"
         repeat_command="1"
         information_only="1">
@@ -8655,19 +8655,19 @@
       </StringVectorProperty>
 
       <StringVectorProperty name="Color"
-        command="SetColor"
+        command="SetBrushColor"
         update_self="1"
         number_of_elements_per_command="4"
         element_types="2 1 1 1"
         repeat_command="1"
-        information_property="ColorInfo" >
+        information_property="BrushColorInfo" >
         <Documentation>
           Set the series line color.
         </Documentation>
       </StringVectorProperty>
 
       <!-- End of BarChartSeriesOptions -->
-    </BarChartSeriesOptionsProxy>
+    </ChartNamedOptionsModelProxy>
   </ProxyGroup>
 
 

@@ -28,6 +28,7 @@ class vtkQtChartNamedSeriesOptionsModel;
 class VTK_EXPORT vtkSMChartNamedOptionsModelProxy : public vtkSMProxy
 {
 public:
+  static vtkSMChartNamedOptionsModelProxy* New();
   vtkTypeRevisionMacro(vtkSMChartNamedOptionsModelProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -36,9 +37,12 @@ public:
   // Description:
   // Get/Set series visibility for the series with the given name.
   void SetVisibility(const char* name, int visible);
-
   void SetLineThickness(const char* name, int value);
   void SetLineStyle(const char* name, int value);
+  void SetBrushColor(const char* name, double r, double g, double b);
+  void SetPenColor(const char* name, double r, double g, double b);
+  void SetAxisCorner(const char* name, int corner);
+  void SetMarkerStyle(const char* name, int style);
 
 //BTX
 protected:
@@ -55,11 +59,6 @@ protected:
   // Description:
   // Creates internal objects that depend on the representation.
   void CreateObjects(vtkQtChartRepresentation* repr);
-
-  // Description:
-  // Subclasses must override this method to create the right type of options
-  // for the type of layer/view/representation they are to be used for.
-  virtual vtkQtChartSeriesOptions* NewOptions() = 0;
 
   // Description:
   // Called to update the property information on the property. It is assured
