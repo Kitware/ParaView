@@ -1030,6 +1030,10 @@ void pqClientMainWindow::makeAssistant()
 #endif
     }
 
+#if defined(Q_WS_MAC)
+  // if assistantExe needs to point to the app, not the internal executable.
+  assistantExe.remove(QRegExp(".app/Contents/MacOS/assistant$"));
+#endif
   this->Implementation->AssistantClient =
     new QAssistantClient(assistantExe, this);
   QObject::connect(this->Implementation->AssistantClient,
