@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBarChartDisplayPanel.h
+   Module:    pqChartRepresentation.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,49 +29,37 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqBarChartDisplayPanel_h 
-#define __pqBarChartDisplayPanel_h
+#ifndef __pqChartRepresentation_h 
+#define __pqChartRepresentation_h
 
-#include "pqDisplayPanel.h"
+#include "pqDataRepresentation.h"
 
-class QModelIndex;
-
-/// pqBarChartDisplayPanel is the display panel for BarChartRepresentation
-/// proxy i.e. the representation for bar chart view.
-class PQCOMPONENTS_EXPORT pqBarChartDisplayPanel : public pqDisplayPanel
+/// pqChartRepresentation is pqDataRepresentation subclass with logic to setup
+/// good defaults for chart representations. The default setting logic will
+/// eventually move to a controller layer. For now, it sits in the pq-layer to
+/// be consistent with the existing framework.
+class PQCORE_EXPORT pqChartRepresentation : public pqDataRepresentation
 {
   Q_OBJECT
-  typedef pqDisplayPanel Superclass;
+  typedef pqDataRepresentation Superclass;
 public:
-  pqBarChartDisplayPanel(pqRepresentation* representation, QWidget* parent=0);
-  ~pqBarChartDisplayPanel();
+  pqChartRepresentation(const QString& group, const QString& name,
+    vtkSMProxy* reprProxy, pqServer* server,
+    QObject* parent=0);
+  virtual ~pqChartRepresentation();
 
-protected slots:
-  /// Updates the state of the widgets showing the selected series options based
-  /// on the active selection.
-  void updateSeriesOptions();
-
-  /// Update the series enabled state for currently selected series.
-  void setCurrentSeriesEnabled(int state);
-
-  /// Update the series color for currently selected series.
-  void setCurrentSeriesColor(const QColor &color);
-
-  /// Slot to listen to clicks for changing color.
-  void activateItem(const QModelIndex &index);
-
-  void useArrayIndexToggled(bool);
-  void useDataArrayToggled(bool);
+  /// Sets default values for the underlying proxy.
+  /// This is during the initialization stage of the pqProxy
+  /// for proxies created by the GUI itself i.e.
+  /// for proxies loaded through state or created by python client
+  /// this method won't be called.
+  /// The default implementation iterates over all properties
+  /// of the proxy and sets them to default values.
+  virtual void setDefaultPropertyValues();
 
 private:
-  Qt::CheckState getEnabledState() const;
-
-private:
-  pqBarChartDisplayPanel(const pqBarChartDisplayPanel&); // Not implemented.
-  void operator=(const pqBarChartDisplayPanel&); // Not implemented.
-
-  class pqInternal;
-  pqInternal* Internal;
+  pqChartRepresentation(const pqChartRepresentation&); // Not implemented.
+  void operator=(const pqChartRepresentation&); // Not implemented.
 };
 
 #endif

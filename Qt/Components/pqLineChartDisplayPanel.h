@@ -70,6 +70,10 @@ protected slots:
 
   void setCurrentSeriesMarkerStyle(int listIndex);
 
+  void useArrayIndexToggled(bool);
+
+  void useDataArrayToggled(bool);
+
 private:
   pqLineChartDisplayPanel(const pqLineChartDisplayPanel&); // Not implemented.
   void operator=(const pqLineChartDisplayPanel&); // Not implemented.

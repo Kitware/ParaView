@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 
 #include "pqBarChartView.h"
+#include "pqChartRepresentation.h"
 #include "pqComparativeBarChartView.h"
 #include "pqComparativeLineChartView.h"
 #include "pqComparativeRenderView.h"
@@ -254,7 +255,7 @@ pqDataRepresentation* pqStandardViewModules::createDisplay(const QString& displa
     display_type == "BarChartRepresentation")
     {
     // new chart representations.
-    return new pqDataRepresentation(group, n, proxy, server, p);
+    return new pqChartRepresentation(group, n, proxy, server, p);
     }
   else if (display_type == "TextSourceRepresentation")
     {

@@ -174,6 +174,11 @@ pqLineChartDisplayPanel::pqLineChartDisplayPanel(
     this, SLOT(updateAllViews()),
     Qt::QueuedConnection);
 
+  QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
+    this, SLOT(useArrayIndexToggled(bool)));
+  QObject::connect(this->Internal->UseDataArray, SIGNAL(toggled(bool)), 
+    this, SLOT(useDataArrayToggled(bool)));
+
   QObject::connect(this->Internal->AttributeModeAdaptor,
     SIGNAL(currentTextChanged(const QString&)), 
     this, SLOT(onAttributeModeChanged()),
@@ -538,4 +543,14 @@ Qt::CheckState pqLineChartDisplayPanel::getEnabledState() const
   return enabledState;
 }
 
+//-----------------------------------------------------------------------------
+void pqLineChartDisplayPanel::useArrayIndexToggled(bool toggle)
+{
+  this->Internal->UseDataArray->setChecked(!toggle);
+}
 
+//-----------------------------------------------------------------------------
+void pqLineChartDisplayPanel::useDataArrayToggled(bool toggle)
+{
+  this->Internal->UseArrayIndex->setChecked(!toggle);
+}

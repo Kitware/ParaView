@@ -7272,23 +7272,12 @@
 
       <!-- End of ClientDeliveryRepresentation -->
     </ClientDeliveryRepresentationProxy>
-
     <!-- =================================================================== -->
 #ifdef VTK_USE_QVTK
-    <ChartTableRepresentationProxy name="BarChartRepresentation">
+    <Proxy name="ChartRepresentationBase">
       <Documentation>
-        Representation used by BarChartView.
+        Defines API common to all chart representations. Don't use directly.
       </Documentation>
-
-      <InputProperty name="Input"
-        command="SetInput-not-used" >
-        <Documentation>
-          Data input for the representation.
-        </Documentation>
-        <DataTypeDomain name="input_type">
-          <DataType value="vtkDataObject"/>
-        </DataTypeDomain>
-      </InputProperty>
 
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
@@ -7377,6 +7366,29 @@
           identified by XArrayName will be used.
         </Documentation>
       </IntVectorProperty>
+
+      <!-- End of ChartRepresentationBase -->
+    </Proxy>
+#endif
+
+    <!-- =================================================================== -->
+#ifdef VTK_USE_QVTK
+    <ChartTableRepresentationProxy name="BarChartRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ChartRepresentationBase" >
+      <Documentation>
+        Representation used by BarChartView.
+      </Documentation>
+
+      <InputProperty name="Input"
+        command="SetInput-not-used" >
+        <Documentation>
+          Data input for the representation.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
+      </InputProperty>
 
       <SubProxy>
         <Proxy name="SeriesOptions" 
@@ -7403,7 +7415,9 @@
 
     <!-- =================================================================== -->
 #ifdef VTK_USE_QVTK
-    <ChartTableRepresentationProxy name="XYPlotRepresentation">
+    <ChartTableRepresentationProxy name="XYPlotRepresentation"
+      base_proxygroup="representations"
+      base_proxyname="ChartRepresentationBase" >
       <Documentation>
         Representation used by XYPlotView.
       </Documentation>
@@ -7417,94 +7431,6 @@
           <DataType value="vtkDataObject"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <IntVectorProperty name="Visibility"
-        command="SetVisibility"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1" >
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Visibility of the representation.
-        </Documentation>
-      </IntVectorProperty>
-
-      <DoubleVectorProperty name="UpdateTime"
-        command="SetUpdateTime"
-        update_self="1"
-        is_internal="1"
-        immediate_update="1"
-        number_of_elements="1"
-        default_values="none">
-        <DoubleRangeDomain name="range" />
-        <Documentation>
-          This time is not used unless UseViewUpdateTime is off.
-        </Documentation>
-      </DoubleVectorProperty>
-
-      <IntVectorProperty name="UseViewUpdateTime"
-        command="SetUseViewUpdateTime"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Indicates if the representation should use the view time to update the
-          pipeline or use "UpdateTime" set on the representation instead.
-        </Documentation>
-      </IntVectorProperty>
-
-      <SubProxy>
-        <Proxy name="PreProcessor"
-          proxygroup="extended_filters"
-          proxyname="ChartRepresentationPreprocessor">
-        </Proxy>
-        <!-- TODO: Change Domain of CompositeDataSetIndex so that one can select
-        a single leaf in the composite dataset alone -->
-        <ExposedProperties>
-          <Property name="FieldAssociation" exposed_name="AttributeType" />
-          <Property name="CompositeDataSetIndex" />
-        </ExposedProperties>
-      </SubProxy>
-
-      <StringVectorProperty name="SeriesNamesInfo"
-        number_of_elements_per_command="1"
-        element_types="2"
-        update_self="1"
-        information_only="1">
-        <Documentation>
-          Property providing list of available series that can be plotted.
-        </Documentation>
-        <ChartingArraysInformationHelper />
-      </StringVectorProperty>
-
-      <StringVectorProperty name="XArrayName"
-        command="SetXAxisSeriesName"
-        update_self="1"
-        number_of_elements="1"
-        default_values="">
-        <Documentation>
-          Set the array to use on X axis. This is used only when
-          UseIndexForXAxis is set to 0. 
-        </Documentation>
-        <StringListDomain name="array_list" >
-          <RequiredProperties>
-             <Property name="SeriesNamesInfo" function="ArrayList"/>
-          </RequiredProperties>
-        </StringListDomain>
-      </StringVectorProperty>
-
-      <IntVectorProperty name="UseIndexForXAxis"
-        command="SetUseIndexForXAxis"
-        update_self="1"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          When set, the array index will be used for X axis, otherwise the array
-          identified by XArrayName will be used.
-        </Documentation>
-      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="SeriesOptions" 

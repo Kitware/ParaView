@@ -90,6 +90,11 @@ pqBarChartDisplayPanel::pqBarChartDisplayPanel(pqRepresentation* repr,
   this->Internal->Model->setRepresentation(
     qobject_cast<pqDataRepresentation*>(repr));
 
+  QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
+    this, SLOT(useArrayIndexToggled(bool)));
+  QObject::connect(this->Internal->UseDataArray, SIGNAL(toggled(bool)), 
+    this, SLOT(useDataArrayToggled(bool)));
+
   /// Setup property links.
 
   // Connect ViewData checkbox to the proxy's Visibility property
@@ -294,4 +299,16 @@ void pqBarChartDisplayPanel::setCurrentSeriesColor(const QColor &color)
     }
 
   this->updateAllViews();
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplayPanel::useArrayIndexToggled(bool toggle)
+{
+  this->Internal->UseDataArray->setChecked(!toggle);
+}
+
+//-----------------------------------------------------------------------------
+void pqBarChartDisplayPanel::useDataArrayToggled(bool toggle)
+{
+  this->Internal->UseArrayIndex->setChecked(!toggle);
 }

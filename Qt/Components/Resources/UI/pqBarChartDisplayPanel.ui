@@ -107,6 +107,9 @@ p, li { white-space: pre-wrap; }
         <property name="checked" >
          <bool>true</bool>
         </property>
+        <property name="autoExclusive" >
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item row="1" column="0" >
@@ -116,6 +119,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text" >
          <string>Use Data Array</string>
+        </property>
+        <property name="autoExclusive" >
+         <bool>false</bool>
         </property>
        </widget>
       </item>

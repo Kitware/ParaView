@@ -1,4 +1,86 @@
 <ServerManagerConfiguration>
+  <ProxyGroup name="internal_filters">
+   <!-- ==================================================================== -->
+   <SourceProxy name="AppendArcLength" class="vtkAppendArcLength"
+      label="Append Arc-Length" >
+      <Documentation
+        short_help="Appends Arc length for input poly lines."
+        long_help="Appends Arc length for input poly lines." >
+        Internal filter used by (filters, ProbeLine).
+
+        vtkAppendArcLength is used for filter such as plot-over-line. In such
+        cases, we need to add an attribute array that is the arc_length over the
+        length of the probed line. That's when vtkAppendArcLength can be used.
+        It adds a new point-data array named "arc_length" with the computed arc
+        length for each of the polylines in the input. For all other cell types,
+        the arc length is set to 0.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+      <!-- End of AppendArcLength -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="ProbeLine" class="vtkPProbeFilter" >
+      <Documentation>
+        Internal filter used by (filters, ProbeLine).
+
+        The Plot Over Line filter samples the data set attributes of the current
+        data set at the points along a line. The values of the point-centered variables
+        along that line will be displayed in an XY Plot. This filter uses interpolation
+        to determine the values at the selected point, whether or not it lies at an
+        input point. The Probe filter operates on any type of data and produces
+        polygonal output (a line).
+      </Documentation>
+      <InputProperty
+       name="Input"
+       command="SetSourceConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkCompositeDataSet"/>
+          </DataTypeDomain>
+          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
+          <InputArrayDomain name="input_array"/>
+          <Documentation>
+            This property specifies the dataset from which to obtain probe values.
+          </Documentation>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetInputConnection"
+        label="Probe Type">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+             <Proxy group="extended_sources" name="HighResLineSource" />
+           </ProxyListDomain>
+           <Documentation>
+             This property specifies the dataset whose geometry will be used in determining positions to probe.
+           </Documentation>
+      </InputProperty>
+   <!-- End ProbeLine -->
+   </SourceProxy>
+
+    <!-- End of internal_filters -->
+  </ProxyGroup>
+
+
   <ProxyGroup name="filters">
 
    <!-- ==================================================================== -->
@@ -4731,52 +4813,36 @@ The Probe filter samples the data set attributes of the current data set at the 
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ProbeLine" class="vtkPProbeFilter"
-    label="Plot Over Line">
-    <Documentation
+   <CompoundSourceProxy name="ProbeLine" label="Plot Over Line">
+     <Documentation
        long_help="Sample data attributes at the points along a line.  Probed lines will be displayed in a graph of the attributes."
        short_help="Sample data values at the points along a line.">
-The Plot Over Line filter samples the data set attributes of the current data set at the points along a line. The values of the point-centered variables along that line will be displayed in an XY Plot. This filter uses interpolation to determine the values at the selected point, whether or not it lies at an input point. The Probe filter operates on any type of data and produces polygonal output (a line).
-    </Documentation>
-    <InputProperty
-       name="Input"
-       command="SetSourceConnection">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-            <DataType value="vtkCompositeDataSet"/>
-          </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
-          <InputArrayDomain name="input_array"/>
-          <Documentation>
-            This property specifies the dataset from which to obtain probe values.
-          </Documentation>
-     </InputProperty>
-
-     <InputProperty
-        name="Source"
-        command="SetInputConnection"
-        label="Probe Type">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-           </ProxyGroupDomain>
-           <ProxyListDomain name="proxy_list">
-             <Proxy group="extended_sources" name="HighResLineSource" />
-           </ProxyListDomain>
-           <Documentation>
-             This property specifies the dataset whose geometry will be used in determining positions to probe.
-           </Documentation>
-      </InputProperty>
-      <Hints>
-        <Visibility replace_input="0" />
-        <!-- View can be used to specify the preferred view for the proxy -->
-       <View type="XYPlotView" />
-      </Hints>
-   <!-- End ProbeLine -->
-   </SourceProxy>
+        The Plot Over Line filter samples the data set attributes of the current
+        data set at the points along a line. The values of the point-centered variables
+        along that line will be displayed in an XY Plot. This filter uses interpolation
+        to determine the values at the selected point, whether or not it lies at an
+        input point. The Probe filter operates on any type of data and produces
+        polygonal output (a line).
+     </Documentation>
+     <Proxy group="internal_filters" type="ProbeLine" id="491" servers="1"
+            compound_name="PlotOverLine1" />
+     <Proxy group="internal_filters" type="AppendArcLength" id="588" servers="1" compound_name="AppendArcLength1">
+       <Property name="Input" id="588.Input" number_of_elements="1">
+         <Proxy value="491" output_port="0"/>
+       </Property>
+     </Proxy>
+     <ExposedProperties>
+       <Property name="Input" proxy_name="PlotOverLine1" exposed_name="Input"/>
+       <Property name="Source" proxy_name="PlotOverLine1" exposed_name="Source"/>
+     </ExposedProperties>
+     <OutputPort name="Output" proxy="AppendArcLength1" port_index="0"/>
+     <Hints>
+       <Visibility replace_input="0" />
+       <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="XYPlotView" />
+     </Hints>
+    <!-- End ProbeLine -->
+   </CompoundSourceProxy>
 
    <!-- ==================================================================== -->
    <SourceProxy name="Probe" class="vtkPProbeFilter"
@@ -8504,6 +8570,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       </IntVectorProperty>
       <!-- End of AttributeDataToTableFilter -->
     </SourceProxy>
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

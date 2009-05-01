@@ -20,6 +20,7 @@ ENDIF(PARAVIEW_ENABLE_PYTHON)
 SET(Filters_SRCS
   vtkAnimationPlayer.cxx
   vtkAppendRectilinearGrid.cxx
+  vtkAppendArcLength.cxx
   vtkAttributeDataReductionFilter.cxx
   vtkAttributeDataToTableFilter.cxx
   vtkBlockDeliveryPreprocessor.cxx
