@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QBitmap>
+#include <QFileInfo>
 #include <QMainWindow>
 #include <QTimer>
 
@@ -47,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.5");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.6");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -100,21 +101,43 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
     this->UserInterface = new MainWindow();
     }
   
-  QTimer::singleShot(3500, this->Splash, SLOT(close()));
+  QTimer::singleShot(2500, this->Splash, SLOT(close()));
 
-  for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
+  const QString manifest = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-plugin-manifest";
+  if(QFileInfo(manifest).exists())
     {
-    const QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
-
-    cerr << "Loading startup plugin: " << plugin.toAscii().data() << " ... ";
-    QString error_message;
-    if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin, &error_message))
+    ifstream manifest_stream(manifest.toAscii().data());
+    vtkstd::string plugin;
+    for(vtkstd::getline(manifest_stream, plugin); manifest_stream; vtkstd::getline(manifest_stream, plugin))
       {
-      cerr << "failed: " << error_message.toAscii().data() << endl;
+      cerr << "Loading manifest plugin: " << plugin << " ... ";
+      QString error_message;
+      if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin.c_str(), &error_message))
+        {
+        cerr << "failed: " << error_message.toAscii().data() << endl;
+        }
+      else
+        {
+        cerr << "succeeded" << endl;
+        }
       }
-    else
+    }
+  else
+    {
+    for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
       {
-      cerr << "succeeded" << endl;
+      const QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
+
+      cerr << "Loading configured plugin: " << plugin.toAscii().data() << " ... ";
+      QString error_message;
+      if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin, &error_message))
+        {
+        cerr << "failed: " << error_message.toAscii().data() << endl;
+        }
+      else
+        {
+        cerr << "succeeded" << endl;
+        }
       }
     }
 
