@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartRepresentation.h"
 
 #include "pqSMAdaptor.h"
+#include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
@@ -61,18 +62,28 @@ void pqChartRepresentation::setDefaultPropertyValues()
     return;
     }
 
-  vtkSMProxy* proxy = this->getProxy();
+  // Set default arrays and lookup table.
+  vtkSMRepresentationProxy* proxy = vtkSMRepresentationProxy::SafeDownCast(
+    this->getProxy());
+ 
+  // This update is needed since when resetting default property values, the
+  // superclass may have changed some property such as the "composite_index"
+  // which requires the representation to be re-updated to get correct data
+  // information.
+  proxy->Update();
+  proxy->UpdatePropertyInformation();
 
   // * Determine the x-axis array: are we using index or do we have some array
   //   that suits out purpose better?
   QList<QVariant> series_arrays = pqSMAdaptor::getMultipleElementProperty(
     proxy->GetProperty("SeriesNamesInfo"));
+
   QString x_array;
-  if (series_arrays.contains("Time"))
+  if (series_arrays.contains(QVariant("Time")))
     {
     x_array = "Time";
     }
-  else if (series_arrays.contains("arc_length"))
+  else if (series_arrays.contains(QVariant("arc_length")))
     {
     x_array = "arc_length";
     }
@@ -104,6 +115,14 @@ void pqChartRepresentation::setDefaultPropertyValues()
         helper.SetStatus(array.toAscii().data(), 0);
         }
       else if (array.contains(QRegExp("^Points")))
+        {
+        helper.SetStatus(array.toAscii().data(), 0);
+        }
+      else if (array == "Time")
+        {
+        helper.SetStatus(array.toAscii().data(), 0);
+        }
+      else if (array.contains(QRegExp("^Pedigree")))
         {
         helper.SetStatus(array.toAscii().data(), 0);
         }
