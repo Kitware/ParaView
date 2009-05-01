@@ -114,7 +114,7 @@ void pqChartRepresentation::setDefaultPropertyValues()
         // when y_array is set, the only visible array is the y-array.
         helper.SetStatus(array.toAscii().data(), 0);
         }
-      else if (array.contains(QRegExp("\\(d+\\)$")))
+      else if (array.contains(QRegExp("\\(\\d+\\)$")))
         {
         // by default only "vector magnitudes" are plotted, not the components.
         helper.SetStatus(array.toAscii().data(), 0);
