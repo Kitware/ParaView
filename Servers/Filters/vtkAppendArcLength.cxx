@@ -24,7 +24,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkAppendArcLength);
-vtkCxxRevisionMacro(vtkAppendArcLength, "1.1");
+vtkCxxRevisionMacro(vtkAppendArcLength, "1.2");
 //----------------------------------------------------------------------------
 vtkAppendArcLength::vtkAppendArcLength()
 {
@@ -36,7 +36,7 @@ vtkAppendArcLength::~vtkAppendArcLength()
 }
 
 //----------------------------------------------------------------------------
-int vtkAppendArcLength::RequestData(vtkInformation* request,
+int vtkAppendArcLength::RequestData(vtkInformation*,
   vtkInformationVector** inputVector, vtkInformationVector* outputVector)
 {
   vtkPolyData* input = vtkPolyData::GetData(inputVector[0], 0);
