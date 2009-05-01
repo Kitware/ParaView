@@ -252,6 +252,7 @@ void pqCheckableHeaderModel::updateCheckState(int section,
     if(item->State != state)
       {
       item->State = state;
+      item->Previous = item->State;
       this->beginMultiStateChange();
       emit this->headerDataChanged(orient, section, section);
       this->endMultipleStateChange();
