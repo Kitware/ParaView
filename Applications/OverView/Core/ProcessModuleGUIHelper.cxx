@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.4");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.5");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -104,7 +104,7 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 
   for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
     {
-    const QString plugin = QApplication::applicationDirPath() + "/" + this->ConfiguredPlugins[i];
+    const QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
 
     cerr << "Loading startup plugin: " << plugin.toAscii().data() << " ... ";
     QString error_message;
