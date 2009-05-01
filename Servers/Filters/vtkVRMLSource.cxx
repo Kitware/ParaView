@@ -33,7 +33,7 @@
 #include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.11");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.12");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -56,6 +56,25 @@ vtkVRMLSource::~vtkVRMLSource()
     this->Importer->Delete();
     this->Importer = NULL;
     }
+}
+
+//-----------------------------------------------------------------------------
+int vtkVRMLSource::CanReadFile(const char *filename)
+{
+  FILE *fd = fopen(filename, "r");
+  if (!fd) return 0;
+
+  char header[128];
+  fgets(header, 128, fd);
+
+  // Technically, the header should start with "#VRML V2.0 utf8", but who's
+  // to say that new versions will not be forward compatible.  Let's not be
+  // perscriptive yet.  If some future version of VRML is incompatible, we
+  // can make this test more strict.
+  int valid = (strncmp(header, "#VRML ", 6) == 0);
+
+  fclose(fd);
+  return valid;
 }
 
 //------------------------------------------------------------------------------

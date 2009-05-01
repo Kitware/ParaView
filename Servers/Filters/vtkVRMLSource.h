@@ -50,6 +50,8 @@ public:
   vtkGetMacro(Append,int);
   vtkBooleanMacro(Append,int);
 
+  static int CanReadFile(const char *filename);
+
 protected:
   vtkVRMLSource();
   ~vtkVRMLSource();

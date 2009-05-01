@@ -43,9 +43,20 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
 
+  // Description:
+  // If on, then the Parse method will NOT report an error using vtkErrorMacro.
+  // Rather, it will just return false.  This feature is useful when simply
+  // checking to see if a file is a valid XML file or there is otherwise a way
+  // to recover from the failed parse.  This flag is off by default.
+  vtkGetMacro(SuppressErrorMessages, int);
+  vtkSetMacro(SuppressErrorMessages, int);
+  vtkBooleanMacro(SuppressErrorMessages, int);
+
 protected:
   vtkPVXMLParser();
   ~vtkPVXMLParser();
+
+  int SuppressErrorMessages;
 
   void StartElement(const char* name, const char** atts);
   void EndElement(const char* name);
@@ -69,6 +80,9 @@ protected:
   // Called by Parse() to read the stream and call ParseBuffer.  Can
   // be replaced by subclasses to change how input is read.
   virtual int ParseXML();
+
+  // Overridden to implement the SuppressErrorMessages feature.
+  virtual void ReportXmlParseError();
 
 private:
   vtkPVXMLParser(const vtkPVXMLParser&);  // Not implemented.

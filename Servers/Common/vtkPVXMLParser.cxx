@@ -17,7 +17,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtksys/ios/sstream"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.2");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.3");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -30,6 +30,7 @@ vtkPVXMLParser::vtkPVXMLParser()
   this->OpenElements = new vtkPVXMLElement*[this->OpenElementsSize];
   this->ElementIdIndex = 0;
   this->RootElement = 0;
+  this->SuppressErrorMessages = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -53,6 +54,8 @@ void vtkPVXMLParser::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "FileName: " << (this->FileName? this->FileName : "(none)")
+     << "\n";
+  os << indent << "SuppressErrorMessages: " << this->SuppressErrorMessages
      << "\n";
 }
 
@@ -155,4 +158,13 @@ int vtkPVXMLParser::ParseXML()
 vtkPVXMLElement* vtkPVXMLParser::GetRootElement()
 {
   return this->RootElement;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVXMLParser::ReportXmlParseError()
+{
+  if (!this->SuppressErrorMessages)
+    {
+    this->Superclass::ReportXmlParseError();
+    }
 }

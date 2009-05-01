@@ -147,6 +147,8 @@ public:
   // The min and max values of timesteps.
   vtkGetVector2Macro(TimeStepRange, int);
 
+  static int CanReadFile(const char *filename);
+
 protected:
   vtkPPhastaReader();
   ~vtkPPhastaReader();
