@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartSeriesEditorModel.h"
 
 #include "vtkQtChartRepresentation.h"
+#include "vtkQtChartSeriesOptionsModel.h"
 #include "vtkQtChartTableSeriesModel.h"
 #include "vtkSMChartTableRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -83,6 +84,14 @@ void pqChartSeriesEditorModel::setRepresentation(pqDataRepresentation *repr)
   // Whenever the representation updates, we want to update the list of arrays
   // shown in the series browser.
   QObject::connect(dataModel, SIGNAL(modelReset()), this, SLOT(reload()));
+
+  vtkQtChartSeriesOptionsModel *optionsModel = 
+    chartRep->GetVTKRepresentation()->GetOptionsModel();
+
+  QObject::connect(
+    optionsModel, 
+    SIGNAL(optionsChanged(vtkQtChartSeriesOptions*, int, const QVariant&, const QVariant&)),
+    this, SLOT(optionsChanged(vtkQtChartSeriesOptions*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -395,4 +404,15 @@ int pqChartSeriesEditorModel::getSeriesMarkerStyle(int row) const
   return vtkSMPropertyHelper(this->RepresentationProxy,
     "SeriesMarkerStyle").GetStatus(
     this->getSeriesName(row), 0); // None by default.
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSeriesEditorModel::optionsChanged(vtkQtChartSeriesOptions* options)
+{
+  vtkQtChartSeriesOptionsModel *optionsModel = 
+    this->RepresentationProxy->GetVTKRepresentation()->GetOptionsModel();
+  int row = optionsModel->getOptionsIndex(options);
+
+  emit this->dataChanged(
+    this->createIndex(row, 0), this->createIndex(row, 1));
 }

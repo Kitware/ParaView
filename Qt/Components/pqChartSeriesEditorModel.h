@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWeakPointer.h"
 
 class pqDataRepresentation;
+class vtkQtChartSeriesOptions;
 class vtkSMChartTableRepresentationProxy;
 
 /// pqChartSeriesEditorModel is a model that can be used to connect to a
@@ -159,6 +160,10 @@ public slots:
   int getSeriesStyle(int row) const;
   int getSeriesAxisCorner(int row) const;
   int getSeriesMarkerStyle(int row) const;
+
+private slots:
+  /// When ever an option changes, we want to fire data-changed signal.
+  void optionsChanged(vtkQtChartSeriesOptions* options);
 
 private:
   QPointer<pqDataRepresentation> Representation;
