@@ -79,7 +79,14 @@ void pqChartRepresentation::setDefaultPropertyValues()
     proxy->GetProperty("SeriesNamesInfo"));
 
   QString x_array;
-  if (series_arrays.contains(QVariant("Time")))
+  QString y_array;
+  if (series_arrays.contains("bin_values"))
+    {
+    // typically implies that the output is from a histogram filter.
+    x_array = series_arrays[0].toString();
+    y_array = "bin_values";
+    }
+  else if (series_arrays.contains(QVariant("Time")))
     {
     x_array = "Time";
     }
@@ -87,6 +94,7 @@ void pqChartRepresentation::setDefaultPropertyValues()
     {
     x_array = "arc_length";
     }
+
 
   if (!x_array.isEmpty())
     {
@@ -101,7 +109,12 @@ void pqChartRepresentation::setDefaultPropertyValues()
     foreach (QVariant varray, series_arrays)
       {
       QString array = varray.toString();
-      if (array.contains(QRegExp("\\(d+\\)$")))
+      if (!y_array.isNull() && array != y_array)
+        {
+        // when y_array is set, the only visible array is the y-array.
+        helper.SetStatus(array.toAscii().data(), 0);
+        }
+      else if (array.contains(QRegExp("\\(d+\\)$")))
         {
         // by default only "vector magnitudes" are plotted, not the components.
         helper.SetStatus(array.toAscii().data(), 0);
@@ -127,6 +140,7 @@ void pqChartRepresentation::setDefaultPropertyValues()
         helper.SetStatus(array.toAscii().data(), 0);
         }
       }
+    helper.SetStatus(y_array.toAscii().data(), 1);
     }
   
   proxy->UpdateVTKObjects();
