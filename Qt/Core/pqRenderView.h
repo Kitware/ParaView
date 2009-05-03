@@ -249,6 +249,10 @@ private slots:
   /// undo signals as required by pqView.
   void onUndoStackChanged();
 
+  /// When the default text annotation color changes, we need to update the
+  /// orientation text actor. 
+  void textAnnotationColorChanged();
+
 protected:
   /// Center Axes represents the 3D axes in the view. When GUI creates the view,
   /// we explicitly create a center axes, register it and add it to the view 

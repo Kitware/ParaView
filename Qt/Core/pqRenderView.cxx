@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMUndoStack.h"
 #include "vtkTrackballPan.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMGlobalPropertiesManager.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -221,6 +223,14 @@ void pqRenderView::initializeWidgets()
   this->Internal->OrientationAxesWidget->SetInteractor(iren);
   this->Internal->OrientationAxesWidget->SetEnabled(1);
   this->Internal->OrientationAxesWidget->SetInteractive(0);
+
+  // Set up some global property links by default.
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  this->getConnector()->Connect(
+    globalPropertiesManager->GetProperty("TextAnnotationColor"),
+    vtkCommand::ModifiedEvent, this, SLOT(textAnnotationColorChanged()));
+  this->textAnnotationColorChanged();
 
   // setup the center axes.
   this->initializeCenterAxes();
@@ -964,7 +974,6 @@ void pqRenderView::selectFrustumPoints(int rect[4])
   this->emitSelectionSignal(output_ports);
 }
 
-
 //-----------------------------------------------------------------------------
 void pqRenderView::selectBlock(int rectangle[4], bool expand)
 {
@@ -973,4 +982,16 @@ void pqRenderView::selectBlock(int rectangle[4], bool expand)
   this->selectOnSurfaceInternal(rectangle, opPorts, false, expand, true);
   this->blockSignals(block);
   this->emitSelectionSignal(opPorts);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderView::textAnnotationColorChanged()
+{
+  // Set up some global property links by default.
+  vtkSMGlobalPropertiesManager* globalPropertiesManager =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  const double* value = vtkSMPropertyHelper(
+    globalPropertiesManager, "TextAnnotationColor").GetAsDoublePtr();
+  this->Internal->OrientationAxesWidget->SetAxisLabelColor(value[0], value[1],
+    value[2]);
 }
