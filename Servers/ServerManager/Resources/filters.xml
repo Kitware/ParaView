@@ -5736,28 +5736,29 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          default_values="1.0 1.0 1.0" >
         <DoubleRangeDomain name="range"/>
         <Documentation>
-          Prevent spurious trails from wrapping around datasets or jumping between particles by limiting the distance allowed.)
+          If a particle disappears from one end of a simulation and
+          reappears on the other side, the track left will be
+          unrepresentative.  Set a MaxStepDistance{x,y,z} which acts as a
+          threshold above which if a step occurs larger than the value (for
+          the dimension), the track will be dropped and restarted after the
+          step. (ie the part before the wrap around will be dropped and the
+          newer part kept).
         </Documentation>
       </DoubleVectorProperty>
-
-      <IntVectorProperty
-         name="UsePointIndexForIds"
-         command="SetUsePointIndexForIds"
-         number_of_elements="1"
-         default_values="1" >
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
 
       <StringVectorProperty 
           name="IdChannelArray" 
           command="SetIdChannelArray"
           number_of_elements="1"
+          default_values="Point-Index as ID"
           animateable="0">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
+          <ArrayListDomain
+            name="array_list" attribute_type="Scalars"
+            none_string="Point-Index as ID">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
         <Documentation>
           This property specifies the name of the array to use for Ids
         </Documentation>
@@ -5778,6 +5779,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           This property specifies which array use as colour scalars
         </Documentation>
       </StringVectorProperty>
+
    </SourceProxy>
 
    <!-- End TemporalPathLineFilter -->
