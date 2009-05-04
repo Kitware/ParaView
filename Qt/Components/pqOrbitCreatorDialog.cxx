@@ -116,13 +116,13 @@ QList<QVariant> pqOrbitCreatorDialog::center() const
 //-----------------------------------------------------------------------------
 QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
 {
-  double center[3];
+  double box_center[3];
   double normal[3];
   double radius;
 
-  center[0] = this->Internals->center0->text().toDouble();
-  center[1] = this->Internals->center1->text().toDouble();
-  center[2] = this->Internals->center2->text().toDouble();
+  box_center[0] = this->Internals->center0->text().toDouble();
+  box_center[1] = this->Internals->center1->text().toDouble();
+  box_center[2] = this->Internals->center2->text().toDouble();
 
   normal[0] = this->Internals->normal0->text().toDouble();
   normal[1] = this->Internals->normal1->text().toDouble();
@@ -132,7 +132,7 @@ QList<QVariant> pqOrbitCreatorDialog::orbitPoints(int resolution) const
 
   QList<QVariant> points;
   vtkPoints* pts = vtkSMUtilities::CreateOrbit(
-    center, normal, radius, resolution);
+    box_center, normal, radius, resolution);
   for (vtkIdType cc=0; cc < pts->GetNumberOfPoints(); cc++)
     {
     double coords[3];
