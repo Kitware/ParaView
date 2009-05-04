@@ -25,7 +25,7 @@
 #include "vtkVariant.h"
 
 vtkStandardNewMacro(vtkPVMergeTables);
-vtkCxxRevisionMacro(vtkPVMergeTables, "1.3");
+vtkCxxRevisionMacro(vtkPVMergeTables, "1.4");
 //----------------------------------------------------------------------------
 vtkPVMergeTables::vtkPVMergeTables()
 {
@@ -120,7 +120,18 @@ int vtkPVMergeTables::RequestData(
         {
         continue;
         }
-      inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+      vtkSmartPointer<vtkCompositeDataIterator> iter2;
+      iter2.TakeReference(inputCD->NewIterator());
+      if (iter2->IsDoneWithTraversal())
+        {
+        // trivial case, the composite dataset being merged is empty, simply
+        // ignore it.
+        inputs[idx] = NULL;
+        }
+      else
+        {
+        inputs[idx] = vtkTable::SafeDownCast(inputCD->GetDataSet(iter));
+        }
       }
     ::vtkPVMergeTablesMerge(outputTable, inputs, num_connections);
     delete [] inputs;

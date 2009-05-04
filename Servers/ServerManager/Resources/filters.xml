@@ -84,7 +84,7 @@
   <ProxyGroup name="filters">
 
    <!-- ==================================================================== -->
-   <SourceProxy name="ExtractSelectionOverTime" class="vtkExtractArraysOverTime"
+   <SourceProxy name="ExtractSelectionOverTime" class="vtkPExtractArraysOverTime"
       label="Plot Selection Over Time">
       <Documentation
         short_help="Extracts selection over time and then plots it."
