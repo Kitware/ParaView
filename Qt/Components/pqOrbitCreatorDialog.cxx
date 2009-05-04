@@ -90,12 +90,12 @@ void pqOrbitCreatorDialog::resetBounds()
     {
     vtkBoundingBox box;
     box.SetBounds(input_bounds);
-    double center[3];
-    box.GetCenter(center);
+    double box_center[3];
+    box.GetCenter(box_center);
     box.Scale(5, 5, 5);
-    this->Internals->center0->setText(QString::number(center[0]));
-    this->Internals->center1->setText(QString::number(center[1]));
-    this->Internals->center2->setText(QString::number(center[2]));
+    this->Internals->center0->setText(QString::number(box_center[0]));
+    this->Internals->center1->setText(QString::number(box_center[1]));
+    this->Internals->center2->setText(QString::number(box_center[2]));
     this->Internals->normal0->setText("0");
     this->Internals->normal1->setText("1");
     this->Internals->normal2->setText("0");
