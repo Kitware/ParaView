@@ -45,34 +45,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "pqAnimationWidget.h"
-#include "pqAnimationModel.h"
-#include "pqAnimationTrack.h"
-#include "pqAnimationKeyFrame.h"
-
-#include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
-#include "vtkSMAnimationSceneProxy.h"
-#include "vtkSMRenderViewProxy.h"
-
-#include "pqApplicationCore.h"
-#include "pqServerManagerModel.h"
-#include "pqAnimationScene.h"
-#include "pqAnimationCue.h"
-#include "pqSMAdaptor.h"
-#include "pqServer.h"
-#include "pqKeyFrameEditor.h"
-#include "pqPipelineTimeKeyFrameEditor.h"
-#include "pqPropertyLinks.h"
-#include "pqComboBoxDomain.h"
-#include "pqSignalAdaptors.h"
+#include "pqActiveView.h"
 #include "pqAnimatablePropertiesComboBox.h"
 #include "pqAnimatableProxyComboBox.h"
-#include "pqActiveView.h"
+#include "pqAnimationCue.h"
+#include "pqAnimationKeyFrame.h"
+#include "pqAnimationModel.h"
+#include "pqAnimationScene.h"
+#include "pqAnimationTrack.h"
+#include "pqAnimationWidget.h"
+#include "pqApplicationCore.h"
+#include "pqComboBoxDomain.h"
+#include "pqKeyFrameEditor.h"
+#include "pqOrbitCreatorDialog.h"
+#include "pqPipelineTimeKeyFrameEditor.h"
+#include "pqPropertyLinks.h"
 #include "pqRenderView.h"
+#include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqUndoStack.h"
 #include "pqSetName.h"
+#include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
+#include "vtkCamera.h"
+#include "vtkSMAnimationSceneProxy.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMRenderViewProxy.h"
 
 //-----------------------------------------------------------------------------
 class pqAnimationViewWidget::pqInternal
@@ -766,7 +766,15 @@ void pqAnimationViewWidget::setCurrentProxy(vtkSMProxy* pxy)
 {
   if(vtkSMRenderViewProxy::SafeDownCast(pxy))
     {
-    this->Internal->CreateProperty->setSource(NULL);
+    this->Internal->CreateProperty->setSourceWithoutProperties(pxy);
+    // add camera animation modes as properties for creating the camera
+    // animation track.
+    this->Internal->CreateProperty->addSMProperty(
+      "Orbit", "orbit", 0);
+    this->Internal->CreateProperty->addSMProperty(
+      "Follow Path", "path", 0);
+    this->Internal->CreateProperty->addSMProperty(
+      "Interpolate camera locations", "camera", 0);
     }
   else
     {
@@ -780,12 +788,18 @@ void pqAnimationViewWidget::createTrack()
     vtkSMRenderViewProxy::SafeDownCast(this->Internal->CreateSource->getCurrentProxy());
   // Need to create new cue for this property.
   vtkSMProxy* curProxy = this->Internal->CreateProperty->getCurrentProxy();
-  if(ren)
-    {
-    curProxy = ren;
-    }
   QString pname = this->Internal->CreateProperty->getCurrentPropertyName();
   int pindex = this->Internal->CreateProperty->getCurrentIndex();
+
+  // used for camera tracks.
+  QString mode = this->Internal->CreateProperty->getCurrentPropertyName();
+
+  if (ren)
+    {
+    curProxy = ren;
+    pname = QString();
+    pindex = 0;
+    }
 
   // check that we don't already have one
   foreach(pqAnimationCue* cue, this->Internal->TrackMap.keys())
@@ -804,6 +818,20 @@ void pqAnimationViewWidget::createTrack()
     return;
     }
 
+  pqOrbitCreatorDialog creator(this);
+
+  // if mode=="orbit" show up a dialog allowing the user to customize the
+  // orbit.
+  if (ren && mode == "orbit")
+    {
+    creator.setNormal(
+      ren->GetActiveCamera()->GetViewUp());
+    if (creator.exec() != QDialog::Accepted)
+      {
+      return;
+      }
+    }
+
   pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
   if(undo)
     {
@@ -811,9 +839,42 @@ void pqAnimationViewWidget::createTrack()
     }
 
   // This will create the cue and initialize it with default keyframes.
-  this->Internal->Scene->createCue(curProxy,
+  pqAnimationCue* cue = this->Internal->Scene->createCue(curProxy,
     pname.toAscii().data(), pindex, ren? "CameraAnimationCue" :
     "KeyFrameAnimationCue");
+
+  if (ren)
+    {
+    if (mode=="path" || mode =="orbit")
+      {
+      // Setup default animation to revolve around the selected objects (if any)
+      // in a plane normal to the current view-up vector.
+      pqSMAdaptor::setElementProperty(
+        cue->getProxy()->GetProperty("Mode"), 1); // PATH-based animation.
+      }
+    else
+      {
+      pqSMAdaptor::setElementProperty(
+        cue->getProxy()->GetProperty("Mode"), 0); // non-PATH-based animation.
+      }
+    cue->getProxy()->UpdateVTKObjects();
+
+    if (mode == "orbit")
+      {
+      // update key frame paramters based on the orbit points.
+      vtkSMProxy* kf = cue->getKeyFrame(0);
+      pqSMAdaptor::setMultipleElementProperty(
+        kf->GetProperty("PositionPathPoints"),
+        creator.orbitPoints(7));
+      pqSMAdaptor::setMultipleElementProperty(
+        kf->GetProperty("FocalPathPoints"),
+        creator.center());
+      pqSMAdaptor::setElementProperty(
+        kf->GetProperty("ClosedPositionPath"), 1);
+      kf->UpdateVTKObjects();
+      }
+    }
+
   if (undo)
     {
     undo->endUndoSet();

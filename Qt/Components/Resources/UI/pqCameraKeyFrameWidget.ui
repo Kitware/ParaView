@@ -1,0 +1,393 @@
+<ui version="4.0" >
+ <class>CameraKeyFrameWidget</class>
+ <widget class="QWidget" name="CameraKeyFrameWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>311</width>
+    <height>221</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Camera Animation</string>
+  </property>
+  <layout class="QGridLayout" >
+   <item row="0" column="0" >
+    <widget class="QStackedWidget" name="stackedWidgetMode" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page_4" >
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>0</number>
+       </property>
+       <property name="topMargin" >
+        <number>0</number>
+       </property>
+       <property name="rightMargin" >
+        <number>0</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>0</number>
+       </property>
+       <item row="0" column="0" >
+        <layout class="QHBoxLayout" >
+         <item>
+          <widget class="QTreeWidget" name="leftPane" >
+           <property name="rootIsDecorated" >
+            <bool>false</bool>
+           </property>
+           <column>
+            <property name="text" >
+             <string>1</string>
+            </property>
+           </column>
+           <item>
+            <property name="text" >
+             <string>Camera Position</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Camera Focus</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
+             <string>Up Direction</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QStackedWidget" name="stackedWidget" >
+           <property name="currentIndex" >
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="page_3" >
+            <layout class="QGridLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item row="0" column="0" >
+              <widget class="QTextBrowser" name="textBrowser" >
+               <property name="html" >
+                <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-weight:600;">Define Camera Parameters&lt;/span>&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;">&lt;span style=" font-weight:400;">Using the left pane, edit the path followed by the camera's position and focal point for the keyframe being edited.&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="page" >
+            <layout class="QVBoxLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="pqCollapsedGroup" name="positionContainer" >
+               <property name="title" >
+                <string>Position Control Points</string>
+               </property>
+               <property name="checkable" >
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="page_6" >
+            <layout class="QGridLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item row="0" column="0" >
+              <widget class="pqCollapsedGroup" name="focusContainer" >
+               <property name="title" >
+                <string>Focus Control Points</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="page_2" >
+            <layout class="QVBoxLayout" >
+             <property name="leftMargin" >
+              <number>0</number>
+             </property>
+             <property name="topMargin" >
+              <number>0</number>
+             </property>
+             <property name="rightMargin" >
+              <number>0</number>
+             </property>
+             <property name="bottomMargin" >
+              <number>0</number>
+             </property>
+             <item>
+              <layout class="QGridLayout" >
+               <item row="0" column="0" >
+                <widget class="QDoubleSpinBox" name="viewUpX" >
+                 <property name="minimum" >
+                  <double>-1000.000000000000000</double>
+                 </property>
+                 <property name="maximum" >
+                  <double>1000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1" >
+                <widget class="QDoubleSpinBox" name="viewUpY" >
+                 <property name="minimum" >
+                  <double>-1000.000000000000000</double>
+                 </property>
+                 <property name="maximum" >
+                  <double>1000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2" >
+                <widget class="QDoubleSpinBox" name="viewUpZ" >
+                 <property name="minimum" >
+                  <double>-1000.000000000000000</double>
+                 </property>
+                 <property name="maximum" >
+                  <double>1000.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer>
+               <property name="orientation" >
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" >
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_5" >
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>0</number>
+       </property>
+       <property name="topMargin" >
+        <number>0</number>
+       </property>
+       <property name="rightMargin" >
+        <number>0</number>
+       </property>
+       <property name="bottomMargin" >
+        <number>0</number>
+       </property>
+       <item row="0" column="0" >
+        <widget class="QPushButton" name="useCurrent" >
+         <property name="text" >
+          <string>Use Current</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_10" >
+         <property name="text" >
+          <string>Position</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QDoubleSpinBox" name="position0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2" >
+        <widget class="QDoubleSpinBox" name="position1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3" >
+        <widget class="QDoubleSpinBox" name="position2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_12" >
+         <property name="text" >
+          <string>Focal Point</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QDoubleSpinBox" name="focalPoint0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QDoubleSpinBox" name="focalPoint1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QDoubleSpinBox" name="focalPoint2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QLabel" name="label_13" >
+         <property name="text" >
+          <string>View Up</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QDoubleSpinBox" name="viewUp0" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" >
+        <widget class="QDoubleSpinBox" name="viewUp1" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" >
+        <widget class="QDoubleSpinBox" name="viewUp2" >
+         <property name="minimum" >
+          <double>-10000.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>10000.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" >
+        <widget class="QLabel" name="label_11" >
+         <property name="text" >
+          <string>View Angle</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" >
+        <widget class="QDoubleSpinBox" name="viewAngle" >
+         <property name="minimum" >
+          <double>-360.000000000000000</double>
+         </property>
+         <property name="maximum" >
+          <double>360.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
+        <spacer>
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqCollapsedGroup</class>
+   <extends>QGroupBox</extends>
+   <header>pqCollapsedGroup.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

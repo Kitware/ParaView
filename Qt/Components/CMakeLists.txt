@@ -78,8 +78,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBoxWidget.h
   pqCalculatorPanel.h
   pqCameraDialog.h
-  pqCameraWidget.h
-  pqCameraPathCreator.h
+  pqCameraKeyFrameWidget.h
   pqChartOptionsEditor.h
   pqChartViewContextMenu.h
   pqChartViewContextMenuHandler.h
@@ -152,6 +151,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOptionsContainer.h
   pqOptionsDialog.h
   pqOptionsPage.h
+  pqOrbitCreatorDialog.h
   pqOrbitWidget.h
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
@@ -241,8 +241,7 @@ SET(UI_FORMS
   Resources/UI/pqBoxWidget.ui
   Resources/UI/pqCalculatorPanel.ui
   Resources/UI/pqCameraDialog.ui
-  Resources/UI/pqCameraWidget.ui
-  Resources/UI/pqCameraPathCreator.ui
+  Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqClientAboutDialog.ui
   Resources/UI/pqClientMainWindow.ui
@@ -278,6 +277,7 @@ SET(UI_FORMS
   Resources/UI/pqLookmarkInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
+  Resources/UI/pqOrbitCreatorDialog.ui
 #  Resources/UI/pqParticleTracerPanel.ui
   Resources/UI/pqPipelineTimeKeyFrameEditor.ui
   Resources/UI/pqPluginDialog.ui
@@ -409,10 +409,8 @@ ADD_LIBRARY(pqComponents
   pqCalculatorPanel.h
   pqCameraDialog.cxx
   pqCameraDialog.h
-  pqCameraWidget.cxx
-  pqCameraWidget.h
-  pqCameraPathCreator.cxx
-  pqCameraPathCreator.h
+  pqCameraKeyFrameWidget.cxx
+  pqCameraKeyFrameWidget.h
   pqChartOptionsEditor.cxx
   pqChartOptionsEditor.h
   pqChartOptionsHandler.cxx
@@ -576,6 +574,8 @@ ADD_LIBRARY(pqComponents
   pqOptionsDialog.h
   pqOptionsPage.cxx
   pqOptionsPage.h
+  pqOrbitCreatorDialog.cxx
+  pqOrbitCreatorDialog.h
   pqOrbitWidget.cxx
   pqOrbitWidget.h
   pqOutputPortComboBox.cxx

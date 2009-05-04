@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorKeyFrameType.h"
 #include "pqSMProxy.h"
 #include "pqPropertyLinks.h"
-#include "pqCameraWidget.h"
+#include "pqCameraKeyFrameWidget.h"
 
 //-----------------------------------------------------------------------------
 // editor dialog that comes and goes for editing a single key frame
@@ -157,15 +157,16 @@ public:
     {
     if(role == Qt::DisplayRole)
       {
-      if (this->CamWidget.usePaths())
+      if (this->CamWidget.usePathBasedMode())
         {
         return "Path ...";
         }
       else
         {
-        QList<QVariant> pos = this->CamWidget.position();
-        return QString("Position(%1,%2,%3), ...").
-          arg(pos[0].toString()).arg(pos[1].toString()).arg(pos[2].toString());
+        return "Position ...";
+        //QList<QVariant> pos = this->CamWidget.position();
+        //return QString("Position(%1,%2,%3), ...").
+        //  arg(pos[0].toString()).arg(pos[1].toString()).arg(pos[2].toString());
         }
       }
     return QVariant();
@@ -175,7 +176,7 @@ public:
     return &Widget;
     }
   QWidget Widget;
-  pqCameraWidget CamWidget;
+  pqCameraKeyFrameWidget CamWidget;
 };
 
 //-----------------------------------------------------------------------------
@@ -316,31 +317,16 @@ public:
   pqCameraKeyFrameItem* newCameraItem(int)
     {
     pqCameraKeyFrameItem* item = NULL;
-    // default to current view
-    vtkSMProxy* pxy = this->Cue->getAnimatedProxy();
     item = new pqCameraKeyFrameItem();
 
-    QObject::connect(&item->CamWidget, SIGNAL(useCurrent()),
+    QObject::connect(&item->CamWidget, SIGNAL(useCurrentCamera()),
                      &this->CameraMapper, SLOT(map()));
     this->CameraMapper.setMapping(&item->CamWidget, item);
-
-    QObject::connect(this->Editor, SIGNAL(useCameraPaths(bool)),
-      &item->CamWidget, SLOT(setUsePaths(bool)));
-    
-    item->CamWidget.setPosition(
-      pqSMAdaptor::getMultipleElementProperty(
-        pxy->GetProperty("CameraPosition")));
-    item->CamWidget.setFocalPoint(
-      pqSMAdaptor::getMultipleElementProperty(
-        pxy->GetProperty("CameraFocalPoint")));
-    item->CamWidget.setViewUp(
-      pqSMAdaptor::getMultipleElementProperty(
-        pxy->GetProperty("CameraViewUp")));
-    item->CamWidget.setViewAngle(
-      pqSMAdaptor::getElementProperty(
-        pxy->GetProperty("CameraViewAngle")));
-    item->CamWidget.setUsePaths(
-      this->Ui.cbMode->currentText() == "Path-based");
+    // default to current view
+    this->Editor->useCurrentCamera(item);
+    item->CamWidget.setUsePathBasedMode(
+      pqSMAdaptor::getEnumerationProperty(
+        this->Cue->getProxy()->GetProperty("Mode")) == "Path-based");
     return item;
     }
   QStandardItem* newValueItem(int row)
@@ -429,29 +415,6 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
     this->Internal->Ui.label->hide();
     }
 
-  if (cue->getProxy()->GetProperty("Mode"))
-    {
-    QList<QVariant> adomain = pqSMAdaptor::getEnumerationPropertyDomain(
-      cue->getProxy()->GetProperty("Mode"));
-    this->Internal->Ui.cbMode->clear();
-    foreach (QVariant val, adomain)
-      {
-      this->Internal->Ui.cbMode->addItem(val.toString());
-      }
-    QObject::connect(
-      this->Internal->Ui.cbMode, SIGNAL(currentIndexChanged(const QString&)),
-      this, SLOT(modeChanged(const QString&)));
-    this->Internal->Ui.cbMode->setCurrentIndex(
-      pqSMAdaptor::getEnumerationProperty(
-        cue->getProxy()->GetProperty("Mode")) == "Path-based"? 1: 0);
-    }
-  else
-    {
-    this->Internal->Ui.cbMode->hide();
-    this->Internal->Ui.lblMode->hide();
-    }
-
-
   this->readKeyFrameData();
 }
 
@@ -459,12 +422,6 @@ pqKeyFrameEditor::pqKeyFrameEditor(pqAnimationScene* scene,
 pqKeyFrameEditor::~pqKeyFrameEditor()
 {
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void pqKeyFrameEditor::modeChanged(const QString& mode)
-{
-  emit this->useCameraPaths(mode == "Path-based");
 }
 
 //-----------------------------------------------------------------------------
@@ -523,41 +480,21 @@ void pqKeyFrameEditor::readKeyFrameData()
     double realKeyTime = this->Internal->realTime(keyTime.toDouble());
     this->Internal->Model.setData(idx, realKeyTime, Qt::DisplayRole);
 
-    if(camera)
+    if (camera)
       {
-      pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
-      QObject::connect(&item->CamWidget, SIGNAL(useCurrent()),
-                       &this->Internal->CameraMapper, SLOT(map()));
-      this->Internal->CameraMapper.setMapping(&item->CamWidget, item);
-      item->CamWidget.setPosition(
-        pqSMAdaptor::getMultipleElementProperty(
-          keyFrame->GetProperty("Position")));
-      item->CamWidget.setFocalPoint(
-        pqSMAdaptor::getMultipleElementProperty(
-          keyFrame->GetProperty("FocalPoint")));
-      item->CamWidget.setViewUp(
-        pqSMAdaptor::getMultipleElementProperty(
-          keyFrame->GetProperty("ViewUp")));
-      item->CamWidget.setViewAngle(
-        pqSMAdaptor::getElementProperty(
-          keyFrame->GetProperty("ViewAngle")));
-      item->CamWidget.setPositionPath(
-        pqSMAdaptor::getMultipleElementProperty(
-          keyFrame->GetProperty("PositionPathPoints")));
-      item->CamWidget.setFocalPointPath(
-        pqSMAdaptor::getMultipleElementProperty(
-          keyFrame->GetProperty("FocalPathPoints")));
-      item->CamWidget.setClosedPositionPath(
-        pqSMAdaptor::getElementProperty(
-          keyFrame->GetProperty("ClosedPositionPath")).toBool());
-      item->CamWidget.setClosedFocalPath(
-        pqSMAdaptor::getElementProperty(
-          keyFrame->GetProperty("ClosedFocalPath")).toBool());
-      QObject::connect(this, SIGNAL(useCameraPaths(bool)),
-        &item->CamWidget, SLOT(setUsePaths(bool)));
-      item->CamWidget.setUsePaths(
-        this->Internal->Ui.cbMode->currentText() == "Path-based");
-      this->Internal->Model.setItem(i, 1, item);
+      bool path_based =      pqSMAdaptor::getEnumerationProperty(
+        this->Internal->Cue->getProxy()->GetProperty("Mode")) ==
+        "Path-based";
+      if ((i < numberKeyFrames - 1) || !path_based)
+        {
+        pqCameraKeyFrameItem* item = new pqCameraKeyFrameItem();
+        QObject::connect(&item->CamWidget, SIGNAL(useCurrentCamera()),
+          &this->Internal->CameraMapper, SLOT(map()));
+        this->Internal->CameraMapper.setMapping(&item->CamWidget, item);
+        item->CamWidget.setUsePathBasedMode(path_based);
+        item->CamWidget.initializeUsingKeyFrame(keyFrame);
+        this->Internal->Model.setItem(i, 1, item);
+        }
       }
     else
       {
@@ -653,26 +590,7 @@ void pqKeyFrameEditor::writeKeyFrameData()
         this->Internal->Model.item(j, 1));
       if(item)
         {
-        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("Position"),
-          item->CamWidget.position());
-        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("FocalPoint"),
-          item->CamWidget.focalPoint());
-        pqSMAdaptor::setMultipleElementProperty(keyFrame->GetProperty("ViewUp"),
-          item->CamWidget.viewUp());
-        pqSMAdaptor::setElementProperty(keyFrame->GetProperty("ViewAngle"),
-          item->CamWidget.viewAngle());
-        pqSMAdaptor::setMultipleElementProperty(
-          keyFrame->GetProperty("PositionPathPoints"),
-          item->CamWidget.positionPath());
-        pqSMAdaptor::setMultipleElementProperty(
-          keyFrame->GetProperty("FocalPathPoints"),
-          item->CamWidget.focalPath());
-        pqSMAdaptor::setElementProperty(
-          keyFrame->GetProperty("ClosedPositionPath"),
-          item->CamWidget.closedPositionPath());
-        pqSMAdaptor::setElementProperty(
-          keyFrame->GetProperty("ClosedFocalPath"),
-          item->CamWidget.closedFocalPath());
+        item->CamWidget.saveToKeyFrame(keyFrame);
         }
       }
     else
@@ -708,16 +626,6 @@ void pqKeyFrameEditor::writeKeyFrameData()
   this->Internal->Cue->blockSignals(prev);
   this->Internal->Cue->triggerKeyFramesModified();
 
-  if (strcmp(this->Internal->Cue->getProxy()->GetXMLName(),
-      "CameraAnimationCue") == 0)
-    {
-    pqSMAdaptor::setEnumerationProperty(
-      this->Internal->Cue->getProxy()->GetProperty("Mode"),
-      this->Internal->Ui.cbMode->currentText());
-    this->Internal->Cue->getProxy()->UpdateVTKObjects();
-    }
-
-  
   if(stack)
     {
     stack->endUndoSet();
@@ -787,19 +695,6 @@ void pqKeyFrameEditor::useCurrentCamera(QObject* o)
   
   vtkSMRenderViewProxy* ren = vtkSMRenderViewProxy::SafeDownCast(pxy);
   ren->SynchronizeCameraProperties();
-  
-  item->CamWidget.setPosition(
-    pqSMAdaptor::getMultipleElementProperty(
-      pxy->GetProperty("CameraPosition")));
-  item->CamWidget.setFocalPoint(
-    pqSMAdaptor::getMultipleElementProperty(
-      pxy->GetProperty("CameraFocalPoint")));
-  item->CamWidget.setViewUp(
-    pqSMAdaptor::getMultipleElementProperty(
-      pxy->GetProperty("CameraViewUp")));
-  item->CamWidget.setViewAngle(
-    pqSMAdaptor::getElementProperty(
-      pxy->GetProperty("CameraViewAngle")));
-
+  item->CamWidget.initializeUsingCamera(ren->GetActiveCamera());
 }
 

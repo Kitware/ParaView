@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqCameraPathCreator.h
+   Module:    pqOrbitCreatorDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,45 +29,43 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqCameraPathCreator_h 
-#define __pqCameraPathCreator_h
+#ifndef __pqOrbitCreatorDialog_h 
+#define __pqOrbitCreatorDialog_h
 
 #include <QDialog>
 #include <QList>
-
+#include <QVariant>
 #include "pqComponentsExport.h"
 
-class PQCOMPONENTS_EXPORT pqCameraPathCreator : public QDialog
+/// pqOrbitCreatorDialog is used by pqAnimationViewWidget to request the orbit
+/// parameters from the user when the user want to create a camera animation track
+/// that orbits some object(s). It's a simple dialog with a bunch of entries for
+/// normal/center/radius of the orbit.
+class PQCOMPONENTS_EXPORT pqOrbitCreatorDialog : public QDialog
 {
   Q_OBJECT
   typedef QDialog Superclass;
 public:
-  pqCameraPathCreator(QWidget* parent=0, Qt::WindowFlags f=0);
-  virtual ~pqCameraPathCreator();
+  pqOrbitCreatorDialog(QWidget* parent=0);
+  virtual ~pqOrbitCreatorDialog();
 
-  // Overridden to fire pathSelected() is accepted.
-  virtual void done(int r);
+  /// Returns the points the orbit based on the user chosen options.
+  QList<QVariant> orbitPoints(int resolution) const;
 
-  static QList<QVariant> createOrbit(const double center[3],
-    const double normal[3], double radius, int resolution);
-signals:
-  void pathSelected(const QList<QVariant>&);
-  void closedPath(bool);
-  void pathNormal(const QList<QVariant>&);
+  /// Returns the center for the orbit.
+  QList<QVariant> center() const;
+
+  void setNormal(double xyz[3]);
 
 protected slots:
-  void fixedLocation(bool);
-  void orbit(bool);
-  void setMode(int);
+  void resetBounds();
 
 private:
-  pqCameraPathCreator(const pqCameraPathCreator&); // Not implemented.
-  void operator=(const pqCameraPathCreator&); // Not implemented.
+  pqOrbitCreatorDialog(const pqOrbitCreatorDialog&); // Not implemented.
+  void operator=(const pqOrbitCreatorDialog&); // Not implemented.
 
   class pqInternals;
   pqInternals* Internals;
-  int Mode;
-  enum { ORBIT, FIXED_LOCATION };
 };
 
 #endif
