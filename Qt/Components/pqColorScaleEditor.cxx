@@ -1001,8 +1001,8 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   pqColorMapModel colorMap;
   pqColorPresetModel *model = this->Form->Presets->getModel();
   colorMap.setColorSpace(pqColorMapModel::DivergingSpace);
-  colorMap.addPoint(pqChartValue((double)0.0), QColor( 35, 61, 181), 0.0);
-  colorMap.addPoint(pqChartValue((double)1.0), QColor(172, 36,  32), 1.0);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor( 59, 76, 192), 0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(180,  4,  38), 1.0);
   model->addBuiltinColorMap(colorMap, "Cool to Warm");
 
   colorMap.removeAllPoints();
@@ -1022,6 +1022,12 @@ void pqColorScaleEditor::loadBuiltinColorPresets()
   colorMap.addPoint(pqChartValue((double)0.0), QColor(0,   0,   0  ), (double)0.0);
   colorMap.addPoint(pqChartValue((double)1.0), QColor(255, 255, 255), (double)1.0);
   model->addBuiltinColorMap(colorMap, "Grayscale");
+
+  colorMap.removeAllPoints();
+  colorMap.setColorSpace(pqColorMapModel::RgbSpace);
+  colorMap.addPoint(pqChartValue((double)0.0), QColor( 10,  10, 242), (double)0.0);
+  colorMap.addPoint(pqChartValue((double)1.0), QColor(242, 242,  10), (double)1.0);
+  model->addBuiltinColorMap(colorMap, "Blue to Yellow");
 
   colorMap.removeAllPoints();
   colorMap.setColorSpace(pqColorMapModel::RgbSpace);

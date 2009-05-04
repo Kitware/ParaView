@@ -248,8 +248,8 @@ void pqPQLookupTableManager::setDefaultState(vtkSMProxy* lutProxy)
 {
   // Setup default LUT to go from Cool to Warm.
   QList<QVariant> values;
-  values << 0.0 << 0.1381 << 0.2411 << 0.7091
-         << 1.0 << 0.6728 << 0.1408 << 0.1266;
+  values << 0.0 << 0.230 << 0.299 << 0.754
+         << 1.0 << 0.706 << 0.016 << 0.150;
   pqSMAdaptor::setMultipleElementProperty(
     lutProxy->GetProperty("RGBPoints"), values);
   pqSMAdaptor::setEnumerationProperty(
