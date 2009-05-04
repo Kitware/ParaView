@@ -246,7 +246,7 @@ def MakeBlueToRedLT(min, max):
 def _find_writer(filename):
     "Internal function."
     extension = None
-    parts = filename.rsplit('.')
+    parts = filename.split('.')
     if len(parts) > 1:
         extension = parts[-1]
     else:
