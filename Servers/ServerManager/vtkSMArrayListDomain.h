@@ -32,6 +32,8 @@
 //      from vtkType.h
 //    - VTK_VOID, and 0 are equivalent to not specifying, meaning any data type
 //      is allowed
+// * none_string - when specified, this string appears as the first entry in
+//      the list and can be used to show "None", or "Not available" etc.
 // @endverbatim
 // Additionally, vtkSMArrayListDomain support 'default_values' attribute which
 // specifies a string (only 1 string value is supported). When
@@ -135,7 +137,11 @@ protected:
   vtkGetStringMacro(InputDomainName);
   vtkSetStringMacro(InputDomainName);
 
+  vtkSetStringMacro(NoneString);
+  vtkGetStringMacro(NoneString);
+
   char* InputDomainName;
+  char* NoneString;
 
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented

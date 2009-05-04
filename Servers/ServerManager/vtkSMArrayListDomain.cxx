@@ -34,7 +34,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.20");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.21");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -49,6 +49,7 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
   this->DefaultElement = 0;
   this->Association = 0;
   this->InputDomainName = 0;
+  this->NoneString = 0;
   this->ALDInternals = new vtkSMArrayListDomainInternals;
 }
 
@@ -56,6 +57,7 @@ vtkSMArrayListDomain::vtkSMArrayListDomain()
 vtkSMArrayListDomain::~vtkSMArrayListDomain()
 {
   this->SetInputDomainName(0);
+  this->SetNoneString(0);
   delete this->ALDInternals;
 }
 
@@ -248,6 +250,10 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
 void vtkSMArrayListDomain::Update(vtkSMProperty*)
 {
   this->RemoveAllStrings();
+  if (this->NoneString)
+    {
+    this->AddString(this->NoneString);
+    }
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->GetRequiredProperty("Input"));
@@ -268,6 +274,13 @@ int vtkSMArrayListDomain::ReadXMLAttributes(
   if (input_domain_name)
     {
     this->SetInputDomainName(input_domain_name);
+    }
+
+  // Search for attribute type with matching name.
+  const char* none_string = element->GetAttribute("none_string");
+  if (none_string)
+    {
+      this->SetNoneString(none_string);
     }
 
   // Search for attribute type with matching name.
