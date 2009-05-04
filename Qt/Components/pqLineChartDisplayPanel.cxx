@@ -246,6 +246,10 @@ void pqLineChartDisplayPanel::setDisplay(pqRepresentation* disp)
     return;
     }
 
+  // this is essential to ensure that when you undo-redo, the representation is
+  // indeed update-to-date, thus ensuring correct domains etc.
+  proxy->Update();
+
   // Give the representation to our series editor model
   this->Internal->Model->setRepresentation(
     qobject_cast<pqDataRepresentation*>(disp));
