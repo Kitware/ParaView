@@ -207,9 +207,9 @@ private:
 //=============================================================================
 // A convenience function that gets a block from a multiblock data set,
 // performing allocation if necessary.
-vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
-                                      unsigned int blockno,
-                                      vtkInformationIntegerKey *typeKey)
+static vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
+                                             unsigned int blockno,
+                                             vtkInformationIntegerKey *typeKey)
 {
   if (blockno > 1000)
     {
@@ -236,7 +236,7 @@ vtkUnstructuredGrid *AllocateGetBlock(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkSLACReader, "1.7");
+vtkCxxRevisionMacro(vtkSLACReader, "1.8");
 vtkStandardNewMacro(vtkSLACReader);
 
 vtkInformationKeyMacro(vtkSLACReader, IS_INTERNAL_VOLUME, Integer);
