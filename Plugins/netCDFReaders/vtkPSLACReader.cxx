@@ -158,7 +158,41 @@ void vtkPSLACReaderMapValues1(const T *inArray, T *outArray, int numComponents,
 // }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPSLACReader, "1.4");
+// Make sure that each process has the same number of blocks in the same
+// position.  Assumes that all blocks are unstructured grids.
+static void SynchronizeBlocks(vtkMultiBlockDataSet *blocks,
+                              vtkMultiProcessController *controller,
+                              vtkInformationIntegerKey *typeKey)
+{
+  unsigned long numBlocks = blocks->GetNumberOfBlocks();
+  controller->AllReduce(&numBlocks, &numBlocks, 1, vtkCommunicator::MAX_OP);
+  if (blocks->GetNumberOfBlocks() < numBlocks)
+    {
+    blocks->SetNumberOfBlocks(numBlocks);
+    }
+
+  for (unsigned int blockId = 0; blockId < numBlocks; blockId++)
+    {
+    vtkDataObject *object = blocks->GetBlock(blockId);
+    if (object && !object->IsA("vtkUnstructuredGrid"))
+      {
+      vtkGenericWarningMacro(<< "Sanity error: found a block that is not an unstructured grid.");
+      }
+    int localBlockExists = (object != NULL);
+    int globalBlockExists = 0;
+    controller->AllReduce(&localBlockExists, &globalBlockExists, 1,
+                          vtkCommunicator::LOGICAL_OR_OP);
+    if (!localBlockExists && globalBlockExists)
+      {
+      VTK_CREATE(vtkUnstructuredGrid, grid);
+      blocks->SetBlock(blockId, grid);
+      blocks->GetMetaData(blockId)->Set(typeKey, 1);
+      }
+    }
+}
+
+//=============================================================================
+vtkCxxRevisionMacro(vtkPSLACReader, "1.5");
 vtkStandardNewMacro(vtkPSLACReader);
 
 vtkCxxSetObjectMacro(vtkPSLACReader, Controller, vtkMultiProcessController);
@@ -311,6 +345,27 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
   // primitives.  The superclass will call the ReadTetrahedron*Array methods,
   // which we have overridden to read only a partition of the cells.
   if (!this->Superclass::ReadConnectivity(meshFD, output)) return 0;
+
+  //---------------------------------
+  // Right now, the output only has blocks that are defined by the local piece.
+  // However, downstream components will expect the multiblock structure to be
+  // uniform amongst all processes.  Thus, we correct that problem here by
+  // adding empty blocks for those not in our local piece.
+  if (this->ReadInternalVolume && this->ReadExternalSurface)
+    {
+    SynchronizeBlocks(vtkMultiBlockDataSet::SafeDownCast(output->GetBlock(0u)),
+                      this->Controller, IS_INTERNAL_VOLUME());
+    SynchronizeBlocks(vtkMultiBlockDataSet::SafeDownCast(output->GetBlock(1u)),
+                      this->Controller, IS_EXTERNAL_SURFACE());
+    }
+  else if (this->ReadInternalVolume) // && !this->ReadExternalSurface
+    {
+    SynchronizeBlocks(output, this->Controller, IS_INTERNAL_VOLUME());
+    }
+  else // this->ReadExternalSurface && !this->ReadInternalVolume
+    {
+    SynchronizeBlocks(output, this->Controller, IS_EXTERNAL_SURFACE());
+    }
 
   // ---------------------------------
   // All the cells have "global" ids.  That is, an index into a global list of
