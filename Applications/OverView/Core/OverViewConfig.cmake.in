@@ -108,10 +108,10 @@ MACRO(overview_build_client)
     TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
   ENDIF(WIN32)
 
-  # To support running from the build directory on all platforms, we create symlinks / shortcuts pointing to our compiled
-  # startup plugins ... note that we have to create our shortcuts at build-time rather than configure-time, to reflect the
-  # user's choice of debug/release build directory on Win32, and that plugins are not necessarily located in the same build
-  # directory as the branded executable that we are building!
+  # To support running from the build directory on all platforms, we create symlinks pointing to our compiled startup
+  # plugins ... note that we have to create our shortcuts at build-time rather than configure-time, to reflect the
+  # user's choice of debug/release build directory on Win32, and that plugins are not necessarily located in the same
+  # build directory as the branded executable that we are building!
   IF(APPLE)
     SET(STARTUP_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS/${OVERVIEW_BRANDED_APPLICATION_TITLE}-startup")
   ELSE()
@@ -137,7 +137,7 @@ MACRO(overview_build_client)
         TARGET ${OVERVIEW_BRANDED_APPLICATION_TITLE}
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${STARTUP_DIRECTORY}
-        COMMAND ${CMAKE_COMMAND} -E echo_append "${PLUGIN_DIRECTORY}/${CMAKE_CFG_INTDIR}/${PLUGIN_FILE}" > "${STARTUP_DIRECTORY}/${PLUGIN_FILE}.symlink"
+        COMMAND ${CMAKE_COMMAND} -E echo_append "${PLUGIN_DIRECTORY}/${CMAKE_CFG_INTDIR}/${PLUGIN_FILE}" > "${STARTUP_DIRECTORY}/${PLUGIN_FILE}.timlink"
         )
     ENDIF()
 
