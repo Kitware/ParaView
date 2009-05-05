@@ -188,12 +188,11 @@ pqColorScaleEditor::pqColorScaleEditor(QWidget *widgetParent)
   // Add the color scale presets menu.
   this->loadBuiltinColorPresets();
 
-  // TODO would be nice to give them their own validators with their own ranges
   // Make sure the line edits only allow number inputs.
-  QDoubleValidator *doubleValidator = new QDoubleValidator(this);
-  this->Form->ScalarValue->setValidator(doubleValidator);
-  this->Form->Opacity->setValidator(doubleValidator);
-  this->Form->ScalarOpacityUnitDistance->setValidator(doubleValidator);
+  this->Form->ScalarValue->setValidator(new QDoubleValidator(this));
+  this->Form->Opacity->setValidator(new QDoubleValidator(this));
+  this->Form->ScalarOpacityUnitDistance->setValidator(
+    new QDoubleValidator(this));
 
   QIntValidator *intValidator = new QIntValidator(this);
   this->Form->TableSizeText->setValidator(intValidator);
@@ -533,15 +532,19 @@ void pqColorScaleEditor::setValueFromText()
     return;
     }
 
+
+
   // Make sure the value is greater than the previous point and less
   // than the next point.
   bool endpoint = this->Form->CurrentIndex == 0;
   if(this->Form->CurrentIndex > 0)
     {
     double prev = this->Viewer->GetElementScalar(this->Form->CurrentIndex - 1);
-    if(value < prev)
+    if(value <= prev)
       {
-      value = prev;
+      // value not acceptable.
+      this->updatePointValues();
+      return;
       }
     }
 
@@ -550,11 +553,15 @@ void pqColorScaleEditor::setValueFromText()
   if(this->Form->CurrentIndex < colors->GetSize() - 1)
     {
     double next = this->Viewer->GetElementScalar(this->Form->CurrentIndex + 1);
-    if(value > next)
+    if(value >= next)
       {
-      value = next;
+      // value not acceptable.
+      this->updatePointValues();
+      return;
       }
     }
+
+  
 
   // Set the new value on the point in the editor.
   this->Form->IgnoreEditor = true;
