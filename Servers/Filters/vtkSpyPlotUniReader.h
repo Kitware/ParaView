@@ -35,6 +35,7 @@ class vtkSpyPlotBlock;
 class vtkDataArraySelection;
 class vtkDataArray;
 class vtkFloatArray;
+class vtkIntArray;
 class vtkUnsignedCharArray;
 class vtkSpyPlotIStream;
 
@@ -116,6 +117,10 @@ public:
   // Mark the block's field to have been fixed w/r bad ghost cells
   int MarkCellFieldDataFixed(int block, int field);
 
+  // Description:
+  // Return the data array for the tracer positions.
+  vtkFloatArray* GetTracers ();
+
   // Return the ith block (i.e. grid) in the reader
   vtkSpyPlotBlock *GetBlock(int i);
   struct CellMaterialField
@@ -145,6 +150,9 @@ public:
     Variable *Variables;
     int NumberOfBlocks;
     int ActualNumberOfBlocks;
+    int NumberOfTracers;
+    vtkFloatArray *TracerCoord;
+    vtkIntArray *TracerBlock;
   };
 
   vtkSpyPlotBlock* GetDataBlock(int block);
@@ -159,6 +167,8 @@ protected:
 
 private:
   int RunLengthDataDecode(const unsigned char* in, int inSize, float* out, 
+                          int outSize);
+  int RunLengthDataDecode(const unsigned char* in, int inSize, int* out, 
                           int outSize);
   int RunLengthDataDecode(const unsigned char* in, int inSize, 
                           unsigned char* out, int outSize);

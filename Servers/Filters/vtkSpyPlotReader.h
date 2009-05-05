@@ -121,6 +121,14 @@ public:
   vtkBooleanMacro(GenerateActiveBlockArray,int);
 
   // Description:
+  // If true, the reader will extract tracer data at each time 
+  // step and include a field data array for the tracers at that 
+  // time.
+  vtkSetMacro(GenerateTracerArray,int);
+  vtkGetMacro(GenerateTracerArray,int);
+  vtkBooleanMacro(GenerateTracerArray,int);
+
+  // Description:
   // If true, the reader will convert volume fraction arrays to unsigned char.
   // True by default.
   void SetDownConvertVolumeFraction(int vf);
@@ -337,6 +345,7 @@ protected:
   int GenerateLevelArray; // user flag
   int GenerateBlockIdArray; // user flag
   int GenerateActiveBlockArray; // user flag
+  int GenerateTracerArray; // user flag
 
   int DownConvertVolumeFraction;
   

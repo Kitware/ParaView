@@ -5,6 +5,7 @@
 #include "vtkDataArray.h"
 #include "vtkSpyPlotIStream.h"
 #include "vtkFloatArray.h"
+#include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkByteSwap.h"
 #include <vtkstd/vector>
@@ -12,7 +13,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.10");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.11");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -98,6 +99,11 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
     delete [] dp->SavedVariables;
     delete [] dp->SavedVariableOffsets;
     delete [] dp->SavedBlockAllocatedStates;
+    if (dp->NumberOfTracers > 0)
+      {
+      dp->TracerCoord->Delete ();
+      dp->TracerBlock->Delete ();
+      }
     int var;
     for ( var = 0; var < dp->NumVars; ++ var)
       {
@@ -377,25 +383,98 @@ int vtkSpyPlotUniReader::ReadInformation()
 
     //printf("Before tracers: %ld\n", ifs.tellg());
     // Skip tracers
-    int numberOfTracers;
-    if ( !spis.ReadInt32s(&numberOfTracers, 1) )
+    if ( !spis.ReadInt32s(&dh->NumberOfTracers, 1) )
       {
       vtkErrorMacro( "Problem reading the num of tracers" );
       return 0;
       }
-    if ( numberOfTracers > 0 )
+    if ( dh->NumberOfTracers > 0 )
       {
+      vtkstd::vector<unsigned char> tracerBuffer;
       int tracer;
-      for ( tracer = 0; tracer < 7; ++ tracer ) // yes, 7 is the magic number
+      vtkFloatArray *coords[3];
+      for (tracer = 0; tracer < 3; tracer ++)
         {
-        int someSize;
-        if ( !spis.ReadInt32s(&someSize, 1) )
+        int numBytes;
+        if ( !spis.ReadInt32s(&numBytes, 1) )
           {
           vtkErrorMacro( "Problem reading the num of tracers" );
           return 0;
           }
-        spis.Seek(someSize, true);
+        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
+          {
+          tracerBuffer.resize (numBytes);
+          }
+        if ( !spis.ReadString(&*tracerBuffer.begin(), numBytes) )
+          {
+          vtkErrorMacro( "Problem reading the bytes" );
+          return 0;
+          }
+        coords[tracer] = vtkFloatArray::New ();
+        coords[tracer]->SetNumberOfValues (dh->NumberOfTracers);
+        float* ptr = coords[tracer]->GetPointer(0);
+        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
+                                        numBytes, ptr, dh->NumberOfTracers) )
+          {
+          vtkErrorMacro( "Problem RLD decoding float data array" );
+          return 0;
+          }
         }
+      dh->TracerCoord = vtkFloatArray::New ();
+      dh->TracerCoord->SetNumberOfComponents (3);
+      dh->TracerCoord->SetNumberOfTuples (dh->NumberOfTracers);
+      for (int n = 0; n < dh->NumberOfTracers; n ++)
+        {
+        dh->TracerCoord->SetComponent (n, 0, coords[0]->GetValue (n));
+        dh->TracerCoord->SetComponent (n, 1, coords[1]->GetValue (n));
+        dh->TracerCoord->SetComponent (n, 2, coords[2]->GetValue (n));
+        }
+      coords[0]->Delete ();
+      coords[1]->Delete ();
+      coords[2]->Delete ();
+
+      vtkIntArray *blocks[4];
+      for ( tracer = 0; tracer < 4; ++ tracer ) // yes, 7 (3 above + 4) is the magic number
+        {
+        int numBytes;
+        if ( !spis.ReadInt32s(&numBytes, 1) )
+          {
+          vtkErrorMacro( "Problem reading the num of tracers" );
+          return 0;
+          }
+        if (static_cast<int> (tracerBuffer.size ()) < numBytes)
+          {
+          tracerBuffer.resize (numBytes);
+          }
+        if ( !spis.ReadString(&*tracerBuffer.begin(), numBytes) )
+          {
+          vtkErrorMacro( "Problem reading the bytes" );
+          return 0;
+          }
+        blocks[tracer] = vtkIntArray::New ();
+        blocks[tracer]->SetNumberOfValues (dh->NumberOfTracers);
+        int * ptr = blocks[tracer]->GetPointer(0);
+        if ( !this->RunLengthDataDecode(&*tracerBuffer.begin(), 
+                                        numBytes, ptr, dh->NumberOfTracers) )
+          {
+          vtkErrorMacro( "Problem RLD decoding int data array" );
+          return 0;
+          }
+        }
+      dh->TracerBlock = vtkIntArray::New ();
+      dh->TracerBlock->SetNumberOfTuples (dh->NumberOfTracers);
+      dh->TracerBlock->SetNumberOfComponents (4);
+      for (int n = 0; n < dh->NumberOfTracers; n ++)
+        {
+        dh->TracerBlock->SetComponent (n, 0, blocks[0]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 1, blocks[1]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 2, blocks[2]->GetValue (n));
+        dh->TracerBlock->SetComponent (n, 3, blocks[3]->GetValue (n));
+        }
+      blocks[0]->Delete ();
+      blocks[1]->Delete ();
+      blocks[2]->Delete ();
+      blocks[3]->Delete ();
       }
 
     // Skip Histogram
@@ -1078,6 +1157,15 @@ int vtkSpyPlotUniReader::RunLengthDataDecode(const unsigned char* in,
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::RunLengthDataDecode(const unsigned char* in, 
+                                             int inSize, int* out, 
+                                             int outSize)
+{
+  return ::vtkSpyPlotUniReaderRunLengthDataDecode(this, in, inSize, out, 
+                                                  outSize);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotUniReader::RunLengthDataDecode(const unsigned char* in, 
                                              int inSize, unsigned char* out, 
                                              int outSize)
 {
@@ -1293,6 +1381,21 @@ int vtkSpyPlotUniReader::MarkCellFieldDataFixed(int block, int field)
   return 1;
 }
 
+//-----------------------------------------------------------------------------
+vtkFloatArray* vtkSpyPlotUniReader::GetTracers()
+{
+  vtkSpyPlotUniReader::DataDump* dp = this->DataDumps+this->CurrentTimeStep;
+  if (dp->NumberOfTracers > 0)
+    {
+    vtkDebugMacro( "GetTracers() = " << dp->TracerCoord);
+    return dp->TracerCoord;
+    }
+  else 
+    {
+    vtkDebugMacro( "GetTracers() = " << 0);
+    return 0;
+    }
+}
 //-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadHeader(vtkSpyPlotIStream *spis)
 {

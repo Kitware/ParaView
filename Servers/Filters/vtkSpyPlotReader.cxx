@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.73");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.74");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -103,6 +103,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
   this->GenerateActiveBlockArray = 0; // by default do not generate active array
+  this->GenerateTracerArray = 0; // by default do not generate tracer array
   this->IsAMR = 1;
 
   this->TimeRequestedFromPipeline = false;
@@ -824,6 +825,8 @@ int vtkSpyPlotReader::RequestData(
     this->AddAttributes(hbds);
     }
 
+  int needTracers = 1;
+
   // read in the data
   if (nBlocks!=0)
     {
@@ -848,6 +851,23 @@ int vtkSpyPlotReader::RequestData(
       block=blockIterator->GetBlock();
       int numFields=blockIterator->GetNumberOfFields();
       uniReader=blockIterator->GetUniReader();
+
+      if (this->GenerateTracerArray == 1 && needTracers)
+        {
+        vtkFieldData *fd = hbds->GetFieldData ();
+        vtkDataArray *array= fd->GetArray("Tracer Coordinates");
+        if (array != 0)
+          {
+          fd->RemoveArray ("Tracer Coordinates");
+          }
+        vtkFloatArray *tracers = uniReader->GetTracers ();
+        if (tracers != 0) 
+          {
+          tracers->SetName ("Tracer Coordinates");
+          fd->AddArray (tracers);
+          }
+        needTracers = 0;
+        }
 
       int dims[3];
       int blockID = blockIterator->GetBlockID();
