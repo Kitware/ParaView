@@ -13,7 +13,7 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.11");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.12");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -382,7 +382,6 @@ int vtkSpyPlotUniReader::ReadInformation()
       }
 
     //printf("Before tracers: %ld\n", ifs.tellg());
-    // Skip tracers
     if ( !spis.ReadInt32s(&dh->NumberOfTracers, 1) )
       {
       vtkErrorMacro( "Problem reading the num of tracers" );
@@ -462,8 +461,8 @@ int vtkSpyPlotUniReader::ReadInformation()
           }
         }
       dh->TracerBlock = vtkIntArray::New ();
-      dh->TracerBlock->SetNumberOfTuples (dh->NumberOfTracers);
       dh->TracerBlock->SetNumberOfComponents (4);
+      dh->TracerBlock->SetNumberOfTuples (dh->NumberOfTracers);
       for (int n = 0; n < dh->NumberOfTracers; n ++)
         {
         dh->TracerBlock->SetComponent (n, 0, blocks[0]->GetValue (n));
