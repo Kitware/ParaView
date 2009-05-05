@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.6");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.7");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -103,41 +103,24 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
   
   QTimer::singleShot(2500, this->Splash, SLOT(close()));
 
-  const QString manifest = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-plugin-manifest";
-  if(QFileInfo(manifest).exists())
+  for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
     {
-    ifstream manifest_stream(manifest.toAscii().data());
-    vtkstd::string plugin;
-    for(vtkstd::getline(manifest_stream, plugin); manifest_stream; vtkstd::getline(manifest_stream, plugin))
-      {
-      cerr << "Loading manifest plugin: " << plugin << " ... ";
-      QString error_message;
-      if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin.c_str(), &error_message))
-        {
-        cerr << "failed: " << error_message.toAscii().data() << endl;
-        }
-      else
-        {
-        cerr << "succeeded" << endl;
-        }
-      }
-    }
-  else
-    {
-    for(vtkIdType i = 0; i < this->ConfiguredPlugins.size(); ++i)
-      {
-      const QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
+    QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
 
-      cerr << "Loading configured plugin: " << plugin.toAscii().data() << " ... ";
-      QString error_message;
-      if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin, &error_message))
-        {
-        cerr << "failed: " << error_message.toAscii().data() << endl;
-        }
-      else
-        {
-        cerr << "succeeded" << endl;
-        }
+    // We handle symlinks explicitly for the benefit of Windoze ...
+    QFileInfo plugin_info(plugin);
+    if(plugin_info.isSymLink())
+      plugin = plugin_info.symLinkTarget();
+
+    cerr << "Loading configured plugin: " << plugin.toAscii().data() << " ... ";
+    QString error_message;
+    if(pqPluginManager::NOTLOADED == pqApplicationCore::instance()->getPluginManager()->loadExtension(0, plugin, &error_message))
+      {
+      cerr << "failed: " << error_message.toAscii().data() << endl;
+      }
+    else
+      {
+      cerr << "succeeded" << endl;
       }
     }
 

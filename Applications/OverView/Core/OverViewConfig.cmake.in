@@ -108,18 +108,16 @@ MACRO(overview_build_client)
     TARGET_LINK_LIBRARIES(${OVERVIEW_BRANDED_APPLICATION_TITLE} ${QT_QTMAIN_LIBRARY} )
   ENDIF(WIN32)
 
-  # To support running from the build directory on different platforms, we have to create a manifest that lists where startup plugins are located ...
-  # note that they are not necessarily located in the same build directory as the branded executable that we are building!
+  # To support running from the build directory on all platforms, we create symlinks / shortcuts pointing to our compiled
+  # startup plugins ... note that we have to create our shortcuts at build-time rather than configure-time, to reflect the
+  # user's choice of debug/release build directory on Win32, and that plugins are not necessarily located in the same build
+  # directory as the branded executable that we are building!
   IF(APPLE)
-    SET(MANIFEST_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS")
+    SET(STARTUP_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS/${OVERVIEW_BRANDED_APPLICATION_TITLE}-startup")
   ELSE()
-    SET(MANIFEST_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
+    SET(STARTUP_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/${OVERVIEW_BRANDED_APPLICATION_TITLE}-startup")
   ENDIF()
-  FILE(MAKE_DIRECTORY "${MANIFEST_DIRECTORY}")
 
-  SET(MANIFEST_FILE "${MANIFEST_DIRECTORY}/${OVERVIEW_BRANDED_APPLICATION_TITLE}-plugin-manifest")
-  FILE(WRITE ${MANIFEST_FILE} "")
-    
   LIST(LENGTH OVERVIEW_STARTUP_PLUGIN_FILES PLUGIN_COUNT)
 
   SET(PLUGIN 0)
@@ -127,7 +125,12 @@ MACRO(overview_build_client)
     LIST(GET OVERVIEW_STARTUP_PLUGIN_FILES ${PLUGIN} PLUGIN_FILE)
     LIST(GET OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN} PLUGIN_DIRECTORY)
 
-    FILE(APPEND ${MANIFEST_FILE} "${PLUGIN_DIRECTORY}/${PLUGIN_FILE}\n")    
+    ADD_CUSTOM_COMMAND(
+      TARGET ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${STARTUP_DIRECTORY}
+      COMMAND ${CMAKE_COMMAND} -E create_symlink ${PLUGIN_DIRECTORY}/${PLUGIN_FILE} ${STARTUP_DIRECTORY}/${PLUGIN_FILE}
+      )
 
     MATH(EXPR PLUGIN "${PLUGIN} + 1")
   ENDWHILE()
