@@ -42,18 +42,17 @@
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="true" />
   <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0/0/1/0|0" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.0453216,0.285171,1,1,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.0818713,0.307985,1,0,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.0818713,0.307985,1,0,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.0818713,0.307985,2,2,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.0804094,0.507605,2,0,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.0804094,0.507605,2,0,0)" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow/MultiViewManager" command="contextMenu" arguments="" />
   <pqevent object="pqClientMainWindow" command="contextMenu" arguments="" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mousePress" arguments="(0.152047,0.256654,4,4,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseMove" arguments="(0.0336257,0.21673,4,0,0)" />
-  <pqevent object="pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/Viewport" command="mouseRelease" arguments="(0.0336257,0.21673,4,0,0)" />
+
+  <!-- hide orientation axes since on some dashboards it's not resized correctly -->
+  <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditViewSettings" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mousePress" arguments="1,1,0,47,5,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/PageNames" command="mouseRelease" arguments="1,0,0,47,5,/2:0" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mousePress" arguments="1,1,0,14,13" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/Stack/pqRenderViewOptions/stackedWidget/Annotation/OrientationAxes" command="mouseRelease" arguments="1,0,0,14,13" />
+  <pqevent object="pqClientMainWindow/ActiveRenderViewOptions/CloseButton" command="activate" arguments="" />
 </pqevents>
