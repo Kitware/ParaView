@@ -1844,6 +1844,17 @@
      </IntVectorProperty>
 
      <IntVectorProperty 
+        name="GenerateTracerArray" 
+        command="SetGenerateTracerArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 1, a cell array will be generated that stores the coordinates of any tracers.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
         name="GenerateBlockIdArray" 
         command="SetGenerateBlockIdArray" 
         number_of_elements="1"
