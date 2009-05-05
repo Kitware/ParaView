@@ -50,7 +50,7 @@ pqColorButtonEventPlayer::~pqColorButtonEventPlayer()
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventPlayer::playEvent(
   QObject* object, const QString& command, 
-  const QString& arguments, bool& error)
+  const QString& arguments, bool& vtkNotUsed(error))
 {
   pqColorChooserButton* button = qobject_cast<pqColorChooserButton*>(object);
   if (!button)
