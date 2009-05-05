@@ -39,70 +39,26 @@
   <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/PageNames" command="mousePress" arguments="1,1,0,34,8,/1:0" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/PageNames" command="mouseRelease" arguments="1,0,0,34,8,/1:0" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,70,14" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,70,14" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,212,88" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,212,88" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,20,83" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,20,83" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,18,16" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,18,16" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/TextAnnotationColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/TextAnnotationColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,11,9" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/TextAnnotationColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,11,9" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/TextAnnotationColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor" command="setChosenColor" arguments="0,85,0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor" command="setChosenColor" arguments="255,255,0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor" command="setChosenColor" arguments="0,0,0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/TextAnnotationColor" command="setChosenColor" arguments="0,0,0" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
 
-    <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,212,134" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,212,134" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0" command="mousePress" arguments="1,1,0,509,18" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0" command="mouseMove" arguments="1,0,0,513,54" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0" command="mouseRelease" arguments="1,0,0,513,54" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mousePress" arguments="1,1,0,16,3" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mouseMove" arguments="1,0,0,14,83" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mouseRelease" arguments="1,0,0,14,83" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,65,91" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mouseMove" arguments="1,0,0,66,92" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,66,92" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="setChosenColor" arguments="255,255,255" />
+
+  <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="setChosenColor" arguments="85,85,0" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileSaveServerState" />
   <pqevent object="pqClientMainWindow/FileSaveServerStateDialog" command="filesSelected" arguments="$PARAVIEW_TEST_ROOT/GlobalProperties.state.pvsm" />
   <pqevent object="pqClientMainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,217,133" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QWellArray0" command="mouseMove" arguments="1,0,0,217,134" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,217,134" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,18,13" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,18,13" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mousePress" arguments="1,1,0,19,199" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mouseMove" arguments="1,0,0,16,87" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QColorLuminancePicker0" command="mouseRelease" arguments="1,0,0,16,87" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QWellArray0" command="mousePress" arguments="1,1,0,45,11" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QWellArray0" command="mouseMove" arguments="1,0,0,45,10" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QWellArray0" command="mouseRelease" arguments="1,0,0,45,10" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0" command="mouseMove" arguments="1,0,0,36,365" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0" command="mouseRelease" arguments="1,0,0,36,365" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor/1QColorDialog0/1QPushButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/ForegroundColor" command="setChosenColor" arguments="255,255,255" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/BackgroundColor" command="setChosenColor" arguments="0,0,0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/SelectionColor" command="setChosenColor" arguments="170,0,0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqApplicationOptions/stackedWidget/Colors/EdgeColor" command="setChosenColor" arguments="0,0,0" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/ApplyButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton3" command="activate" arguments="" />

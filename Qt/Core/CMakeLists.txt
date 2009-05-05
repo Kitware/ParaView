@@ -48,6 +48,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqBarChartView.h
   pqChartRepresentation.h
   pqChartView.h
+  pqColorButtonEventPlayer.h
+  pqColorButtonEventTranslator.h
   pqCommandServerStartup.h
   pqComparativeBarChartView.h
   pqComparativeChartView.h
@@ -168,6 +170,10 @@ ADD_LIBRARY(pqCore
   pqChartRepresentation.h
   pqChartView.cxx
   pqChartView.h
+  pqColorButtonEventPlayer.cxx
+  pqColorButtonEventPlayer.h
+  pqColorButtonEventTranslator.cxx
+  pqColorButtonEventTranslator.h
   pqCommandServerStartup.cxx
   pqCommandServerStartup.h
   pqComparativeBarChartView.cxx

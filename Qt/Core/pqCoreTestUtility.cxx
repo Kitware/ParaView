@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTesting.h"
 
+#include "pqColorButtonEventPlayer.h"
+#include "pqColorButtonEventTranslator.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
 #include "pqFlatTreeViewEventPlayer.h"
@@ -62,6 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProcessModuleGUIHelper.h"
 #include "pqQVTKWidgetEventPlayer.h"
 #include "pqQVTKWidgetEventTranslator.h"
+
 #ifdef QT_TESTING_WITH_PYTHON
 # include "pqPythonEventSourceImage.h"
 #endif
@@ -102,6 +105,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFileDialogEventTranslator(this));
   this->eventTranslator()->addWidgetEventTranslator(
        new pqFlatTreeViewEventTranslator(this));
+  this->eventTranslator()->addWidgetEventTranslator(
+       new pqColorButtonEventTranslator(this));
 
   this->eventPlayer()->addWidgetEventPlayer(
        new pqQVTKWidgetEventPlayer(this));
@@ -109,6 +114,8 @@ pqCoreTestUtility::pqCoreTestUtility(QObject* p) :
        new pqFileDialogEventPlayer(this));
   this->eventPlayer()->addWidgetEventPlayer(
        new pqFlatTreeViewEventPlayer(this));
+  this->eventPlayer()->addWidgetEventPlayer(
+       new pqColorButtonEventPlayer(this));
 }
 
 pqCoreTestUtility::~pqCoreTestUtility()
