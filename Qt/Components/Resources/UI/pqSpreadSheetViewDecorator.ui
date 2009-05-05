@@ -95,7 +95,7 @@
       </font>
      </property>
      <property name="text" >
-      <string>Decimal Precision:</string>
+      <string>Precision:</string>
      </property>
     </widget>
    </item>
