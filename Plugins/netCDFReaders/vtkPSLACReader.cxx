@@ -30,6 +30,7 @@
 #include "vtkInformationVector.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkMultiProcessController.h"
+#include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkSortDataArray.h"
@@ -192,7 +193,119 @@ static void SynchronizeBlocks(vtkMultiBlockDataSet *blocks,
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPSLACReader, "1.5");
+// Structures used by ReadMidpointCoordinates to store and transfer midpoint
+// information.
+namespace vtkPSLACReaderTypes
+{
+  typedef struct {
+    double coord[3];
+  } midpointPositionType;
+  const vtkIdType midpointPositionSize
+    = sizeof(midpointPositionType)/sizeof(double);
+
+  typedef struct {
+    vtkIdType minEdgePoint;
+    vtkIdType maxEdgePoint;
+    vtkIdType globalId;
+  } midpointTopologyType;
+  const vtkIdType midpointTopologySize
+    = sizeof(midpointTopologyType)/sizeof(vtkIdType);
+
+  typedef struct {
+    vtkstd::vector<midpointPositionType> position;
+    vtkstd::vector<midpointTopologyType> topology;
+  } midpointListsType;
+
+  typedef struct {
+    midpointPositionType *position;
+    midpointTopologyType *topology;
+  } midpointPointersType;
+  typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>,
+                           midpointPointersType,
+                           vtkSLACReaderIdTypePairHash> MidpointsAvailableType;
+
+//-----------------------------------------------------------------------------
+// Convenience function for gathering midpoint information to a process.
+  static void GatherMidpoints(vtkMultiProcessController *controller,
+                              const midpointListsType &sendMidpoints,
+                              midpointListsType &recvMidpoints,
+                              int process)
+  {
+    vtkIdType sendLength = sendMidpoints.position.size();
+    if (sendLength != static_cast<vtkIdType>(sendMidpoints.topology.size()))
+      {
+      vtkGenericWarningMacro(<< "Bad midpoint array structure.");
+      return;
+      }
+
+    vtkIdType numProcesses = controller->GetNumberOfProcesses();
+
+    // Gather the amount of data each process is going to send.
+    vtkstd::vector<vtkIdType> receiveCounts(numProcesses);
+    controller->Gather(&sendLength, &receiveCounts.at(0), 1, process);
+
+    // Get ready the arrays for the receiver that determine how much data
+    // to get and where to put it.
+    vtkstd::vector<vtkIdType> positionLengths(numProcesses);
+    vtkstd::vector<vtkIdType> positionOffsets(numProcesses);
+    vtkstd::vector<vtkIdType> topologyLengths(numProcesses);
+    vtkstd::vector<vtkIdType> topologyOffsets(numProcesses);
+
+    const double *sendPositionBuffer
+      = (  (sendLength > 0)
+         ? reinterpret_cast<const double *>(&sendMidpoints.position.at(0))
+         : NULL);
+    const vtkIdType *sendTopologyBuffer
+      = (  (sendLength > 0)
+         ? reinterpret_cast<const vtkIdType *>(&sendMidpoints.topology.at(0))
+         : NULL);
+    double *recvPositionBuffer;
+    vtkIdType *recvTopologyBuffer;
+
+    if (process == controller->GetLocalProcessId())
+      {
+      vtkIdType numEntries = 0;
+      for (int i = 0; i < numProcesses; i++)
+        {
+        positionLengths[i] = midpointPositionSize*receiveCounts[i];
+        positionOffsets[i] = midpointPositionSize*numEntries;
+        topologyLengths[i] = midpointTopologySize*receiveCounts[i];
+        topologyOffsets[i] = midpointTopologySize*numEntries;
+        numEntries += receiveCounts[i];
+        }
+      recvMidpoints.position.resize(numEntries);
+      recvMidpoints.topology.resize(numEntries);
+
+      recvPositionBuffer
+        = (  (numEntries > 0)
+           ? reinterpret_cast<double *>(&recvMidpoints.position.at(0))
+           : NULL);
+      recvTopologyBuffer
+        = (  (numEntries > 0)
+           ? reinterpret_cast<vtkIdType *>(&recvMidpoints.topology.at(0))
+           : NULL);
+      }
+    else
+      {
+      recvPositionBuffer = NULL;
+      recvTopologyBuffer = NULL;
+      }
+
+    // Gather the actual data.
+    controller->GatherV(sendPositionBuffer, recvPositionBuffer,
+                        midpointPositionSize*sendLength,
+                        &positionLengths.at(0), &positionOffsets.at(0),
+                        process);
+    controller->GatherV(sendTopologyBuffer, recvTopologyBuffer,
+                        midpointTopologySize*sendLength,
+                        &topologyLengths.at(0), &topologyOffsets.at(0),
+                        process);
+  }
+};
+using namespace vtkPSLACReaderTypes;
+
+//=============================================================================
+vtkCxxRevisionMacro(vtkPSLACReader, "1.6");
 vtkStandardNewMacro(vtkPSLACReader);
 
 vtkCxxSetObjectMacro(vtkPSLACReader, Controller, vtkMultiProcessController);
@@ -529,10 +642,8 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
   if (this->ReadMidpoints)
     {
     // Setup the Edge transfers 
-    this->EdgesExpectedFromProcessesLengths = vtkSmartPointer<vtkIdTypeArray>::New();
-    this->EdgesExpectedFromProcessesLengths->SetNumberOfTuples(this->NumberOfPieces);
-    this->EdgesExpectedFromProcessesOffsets = vtkSmartPointer<vtkIdTypeArray>::New();
-    this->EdgesExpectedFromProcessesOffsets->SetNumberOfTuples(this->NumberOfPieces);
+    this->EdgesExpectedFromProcessesCounts = vtkSmartPointer<vtkIdTypeArray>::New();
+    this->EdgesExpectedFromProcessesCounts->SetNumberOfTuples(this->NumberOfPieces);
     this->EdgesToSendToProcesses = vtkSmartPointer<vtkIdTypeArray>::New();
     this->EdgesToSendToProcessesLengths = vtkSmartPointer<vtkIdTypeArray>::New();
     this->EdgesToSendToProcessesLengths->SetNumberOfTuples(this->NumberOfPieces);
@@ -557,7 +668,7 @@ int vtkPSLACReader::ReadConnectivity(int meshFD, vtkMultiBlockDataSet *output)
     for (int process = 0; process < this->NumberOfPieces; process ++)
       {
       vtkIdType numEdges = edgeLists[process]->GetNumberOfTuples();
-      this->EdgesExpectedFromProcessesLengths->SetValue(process, numEdges);
+      this->EdgesExpectedFromProcessesCounts->SetValue(process, numEdges);
       this->Controller->Gather(&numEdges,
                                this->EdgesToSendToProcessesLengths->WritePointer(0,this->NumberOfPieces),
                                1, process);
@@ -739,7 +850,10 @@ int vtkPSLACReader::ReadMidpointCoordinates (
   vtkIdType numMidpointsPerPiece = this->NumberOfGlobalMidpoints/this->NumberOfPieces + 1;
   vtkIdType startMidpoint = this->RequestedPiece*numMidpointsPerPiece;
   vtkIdType endMidpoint = startMidpoint + numMidpointsPerPiece;
-  if (endMidpoint > this->NumberOfGlobalMidpoints) endMidpoint = this->NumberOfGlobalMidpoints;
+  if (endMidpoint > this->NumberOfGlobalMidpoints)
+    {
+    endMidpoint = this->NumberOfGlobalMidpoints;
+    }
 
   size_t starts[2];
   size_t counts[2];
@@ -751,162 +865,134 @@ int vtkPSLACReader::ReadMidpointCoordinates (
   midpointData->SetNumberOfComponents (counts[1]);
   midpointData->SetNumberOfTuples (counts[0]);
   CALL_NETCDF(nc_get_vars_double(meshFD, midpointsVar,
-                                    starts, counts, NULL,
-                                    midpointData->GetPointer(0)));
-  
-  // Collect the midpoints we've read on the processes that originally read the corresponding 
-  // main points (the edge the midpoint is on).  These original processes are aware of who 
-  // requested hose original points.  Thus they can redistribute the midpoints that correspond
-  // to those processes that requested the original points.
-  vtkstd::vector< vtkSmartPointer<vtkDoubleArray> > midpointsToDistribute (this->NumberOfPieces);
-  for (int i = 0; i < this->NumberOfPieces; i ++) 
-    {
-    midpointsToDistribute[i] = vtkSmartPointer<vtkDoubleArray>::New ();
-    midpointsToDistribute[i]->SetNumberOfComponents (6);
-    }
-  VTK_CREATE (vtkIdTypeArray, midpointsToDistributeLengths);
-  midpointsToDistributeLengths->SetNumberOfTuples (this->NumberOfPieces);
+                                 starts, counts, NULL,
+                                 midpointData->GetPointer(0)));
+
+  // Collect the midpoints we've read on the processes that originally read the
+  // corresponding main points (the edge the midpoint is on).  These original
+  // processes are aware of who requested hose original points.  Thus they can
+  // redistribute the midpoints that correspond to those processes that
+  // requested the original points.
+  vtkstd::vector<midpointListsType> midpointsToDistribute(this->NumberOfPieces);
 
   int pointsPerProcess = this->NumberOfGlobalPoints / this->NumberOfPieces + 1;
-  for (vtkIdType i = 0; i < numMidpointsPerPiece; i ++) 
+  for (vtkIdType i = 0; i < midpointData->GetNumberOfTuples(); i ++) 
     {
-    double *mp = midpointData->GetPointer (i*5);
+    double *mp = midpointData->GetPointer(i*5);
+
+    midpointPositionType position;
+    position.coord[0] = mp[2];
+    position.coord[1] = mp[3];
+    position.coord[2] = mp[4];
+
+    midpointTopologyType topology;
+    topology.minEdgePoint = static_cast<vtkIdType>(MY_MIN(mp[0], mp[1]));
+    topology.maxEdgePoint = static_cast<vtkIdType>(MY_MAX(mp[0], mp[1]));
+    topology.globalId = i + startMidpoint + this->NumberOfGlobalPoints;
 
     // find the processor the minimum edge point belongs to (by global id)
-    vtkIdType process = static_cast<vtkIdType>(MY_MIN(mp[0], mp[1])) / pointsPerProcess;
+    vtkIdType process = topology.minEdgePoint / pointsPerProcess;
 
     // insert the midpoint's global point id into the data
-    double insert[6];
-    memcpy (insert, mp, sizeof (double) * 5);
-    insert[5] = i + startMidpoint + this->NumberOfGlobalPoints;
-
-    midpointsToDistribute[process]->InsertNextTupleValue (insert);
+    midpointsToDistribute[process].position.push_back(position);
+    midpointsToDistribute[process].topology.push_back(topology);
     }
 
-  for (vtkIdType process = 0; process < this->NumberOfPieces; process ++) 
+  midpointListsType midpointsToRedistribute;
+  for (int process = 0; process < this->NumberOfPieces; process++)
     {
-    midpointsToDistributeLengths->SetValue (process, 
-                    midpointsToDistribute[process]->GetNumberOfTuples ()*6);
+    GatherMidpoints(this->Controller, midpointsToDistribute[process],
+                    midpointsToRedistribute, process);
     }
 
-  VTK_CREATE (vtkDoubleArray, MidpointsToRedistribute);
-  MidpointsToRedistribute->SetNumberOfComponents (6);
-  VTK_CREATE (vtkIdTypeArray, MidpointsToRedistributeLengths);
-  MidpointsToRedistributeLengths->SetNumberOfTuples (this->NumberOfPieces);
-  VTK_CREATE (vtkIdTypeArray, MidpointsToRedistributeOffsets);
-  MidpointsToRedistributeOffsets->SetNumberOfTuples (this->NumberOfPieces);
-  // collect all the midpoints with edge points globalID to corresponding process
-  for (int process = 0; process < this->NumberOfPieces; process ++)
-    {
-    this->Controller->Gather (
-                    midpointsToDistributeLengths->GetPointer(process),
-                    MidpointsToRedistributeLengths->WritePointer(0, this->NumberOfPieces),
-                    1, process);
-    vtkIdType offset = 0;
-    if (this->RequestedPiece == process)
-      {
-      for (int i = 0; i < this->NumberOfPieces; i ++)
-        {
-        MidpointsToRedistributeOffsets->SetValue (i, offset);
-        offset += MidpointsToRedistributeLengths->GetValue (i);
-        }
-      MidpointsToRedistribute->SetNumberOfTuples (offset); 
-      }
-    this->Controller->GatherV (
-                    midpointsToDistribute[process]->GetPointer (0),
-                    MidpointsToRedistribute->WritePointer (0, offset),
-                    midpointsToDistributeLengths->GetValue(process),
-                    MidpointsToRedistributeLengths->GetPointer (0),
-                    MidpointsToRedistributeOffsets->GetPointer (0),
-                    process);
-    }
-
-  typedef vtksys::hash_map<vtkstd::pair<vtkIdType, vtkIdType>, double *,
-                           vtkSLACReaderIdTypePairHash> MidpointsAvailableType;
+  // Build a map of midpoints so that as processes request midpoints we can
+  // quickly find them.
   MidpointsAvailableType MidpointsAvailable;
-  for (int i = 0; i < MidpointsToRedistribute->GetNumberOfTuples (); i ++) 
+
+  vtkstd::vector<midpointPositionType>::iterator posIter;
+  vtkstd::vector<midpointTopologyType>::iterator topIter;
+  for (posIter = midpointsToRedistribute.position.begin(),
+         topIter = midpointsToRedistribute.topology.begin();
+       posIter != midpointsToRedistribute.position.end();
+       posIter++, topIter++)
     {
-    double *mp  = MidpointsToRedistribute->GetPointer (i*6);
+    midpointPointersType mp;
+    mp.position = &(*posIter);  mp.topology = &(*topIter);
     MidpointsAvailable.insert(
-                      vtkstd::make_pair(vtkstd::make_pair(MY_MIN(mp[0], mp[1]), 
-                                                          MY_MAX(mp[0], mp[1])),
-                                        mp));
+                    vtkstd::make_pair(vtkstd::make_pair(topIter->minEdgePoint,
+                                                        topIter->maxEdgePoint),
+                                      mp));
     }
 
-  VTK_CREATE (vtkDoubleArray, MidpointsToReceive);
-  MidpointsToReceive->SetNumberOfComponents (6);
-  vtkIdType offset = 0;
-  for (int process = 0; process < this->NumberOfPieces; process ++)
-    {
-    this->EdgesExpectedFromProcessesOffsets->SetValue (process, offset);
-    vtkIdType len = this->EdgesExpectedFromProcessesLengths->GetValue (process) * 6;
-    this->EdgesExpectedFromProcessesLengths->SetValue (process, len);
-    offset += len;
-    } 
-  MidpointsToReceive->SetNumberOfTuples (offset/6);
-
-  // redistribute midpoints based on the previous requests for edge points
-  for (int process = 0; process < this->NumberOfPieces; process ++)
+  // For each process, find the midpoints we need to send there and then
+  // send them with a gather operation.
+  midpointListsType midpointsToReceive;
+  for (int process = 0; process < this->NumberOfPieces; process++)
     {
     vtkIdType start = this->EdgesToSendToProcessesOffsets->GetValue(process);
-    vtkIdType end = start + this->EdgesToSendToProcessesLengths->GetValue(process);
+    vtkIdType end
+      = start + this->EdgesToSendToProcessesLengths->GetValue(process);
 
-    start /= this->EdgesToSendToProcesses->GetNumberOfComponents ();
-    end /= this->EdgesToSendToProcesses->GetNumberOfComponents ();
-    VTK_CREATE (vtkDoubleArray, midpointsToRedistribute);
-    midpointsToRedistribute->SetNumberOfComponents (6);
+    start /= this->EdgesToSendToProcesses->GetNumberOfComponents();
+    end /= this->EdgesToSendToProcesses->GetNumberOfComponents();
+
+    midpointListsType midpointsToSend;
     for (vtkIdType i = start; i < end; i ++)
       {
       MidpointsAvailableType::const_iterator iter;
       vtkIdType e[2];
-      this->EdgesToSendToProcesses->GetTupleValue (i, e);
-      iter = MidpointsAvailable.find (vtkstd::make_pair(MY_MIN(e[0], e[1]), MY_MAX(e[0], e[1])));
+      this->EdgesToSendToProcesses->GetTupleValue(i, e);
+      iter = MidpointsAvailable.find(vtkstd::make_pair(MY_MIN(e[0], e[1]),
+                                                       MY_MAX(e[0], e[1])));
       if (iter != MidpointsAvailable.end ())
         {
-        midpointsToRedistribute->InsertNextTupleValue (iter->second);
+        midpointsToSend.position.push_back(*iter->second.position);
+        midpointsToSend.topology.push_back(*iter->second.topology);
         }
       else // in order to have the proper length we must insert empty.
         {
-        double mp[6] = { -1.0, -1.0, -1.0, -1.0, -1.0, -1.0 };
-        midpointsToRedistribute->InsertNextTupleValue (mp);
+        midpointPositionType position;
+        position.coord[0]=-1;  position.coord[1]=-1;  position.coord[2]=-1;
+        midpointTopologyType topology;
+        topology.minEdgePoint = -1;  topology.maxEdgePoint = -1;
+        topology.globalId = -1;
+        midpointsToSend.position.push_back(position);
+        midpointsToSend.topology.push_back(topology);
         }
       }
-    this->Controller->GatherV (
-                    midpointsToRedistribute->GetPointer (0),
-                    MidpointsToReceive->WritePointer (0, offset),
-                    midpointsToRedistribute->GetNumberOfTuples () * 6,
-                    this->EdgesExpectedFromProcessesLengths->GetPointer (0),
-                    this->EdgesExpectedFromProcessesOffsets->GetPointer (0),
-                    process);
+
+    GatherMidpoints(this->Controller, midpointsToSend,
+                    midpointsToReceive, process);
     }
   
   // finally, we have all midpoints that correspond to edges we know about
   // convert their edge points to localId and insert into the map and return.
-  vtkIdType numMids = MidpointsToReceive->GetNumberOfTuples ();
   typedef vtksys::hash_map<vtkIdType, vtkIdType, vtkSLACReaderIdTypeHash> localMapType;
   localMapType localMap;
-  for (vtkIdType i = 0; i < numMids; i ++)
+  for (posIter = midpointsToReceive.position.begin(),
+         topIter = midpointsToReceive.topology.begin();
+       posIter != midpointsToReceive.position.end();
+       posIter++, topIter++)
     {
-    double *mp = MidpointsToReceive->GetPointer (i * 6);
-    if (mp[0] < 0) continue;
+    if (topIter->globalId < 0) continue;
      
-    vtkIdType local0 = this->GlobalToLocalIds[static_cast<vtkIdType>(mp[0])];
-    vtkIdType local1 = this->GlobalToLocalIds[static_cast<vtkIdType>(mp[1])];
+    vtkIdType local0 = this->GlobalToLocalIds[topIter->minEdgePoint];
+    vtkIdType local1 = this->GlobalToLocalIds[topIter->maxEdgePoint];
     localMapType::const_iterator iter;
-    iter = localMap.find (static_cast<vtkIdType>(mp[5]));
+    iter = localMap.find(topIter->globalId);
     vtkIdType index;
-    if (iter == localMap.end ())
+    if (iter == localMap.end())
       {
-      index = this->LocalToGlobalIds->InsertNextTupleValue (
-                      reinterpret_cast<vtkIdType*>(mp+5));
-      localMap[mp[5]] = index;
+      index = this->LocalToGlobalIds->InsertNextTupleValue(&topIter->globalId);
+      localMap[topIter->globalId] = index;
       }
     else
       {
       index = iter->second;
       }
     map.insert(vtkstd::make_pair(vtkstd::make_pair(local0, local1),
-                                 vtkSLACReader::vtkMidpoint(mp+2, index)));
+                                 vtkSLACReader::vtkMidpoint(posIter->coord,
+                                                            index)));
     }
   return 1;
 }

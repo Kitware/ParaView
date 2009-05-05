@@ -112,8 +112,7 @@ protected:
   
   // Description:
   // The edge data we expect to receive from each process.
-  vtkSmartPointer<vtkIdTypeArray> EdgesExpectedFromProcessesLengths;
-  vtkSmartPointer<vtkIdTypeArray> EdgesExpectedFromProcessesOffsets;
+  vtkSmartPointer<vtkIdTypeArray> EdgesExpectedFromProcessesCounts;
 
   // Description:
   // The edge data we have to send to each process.  Stored as global ids.
