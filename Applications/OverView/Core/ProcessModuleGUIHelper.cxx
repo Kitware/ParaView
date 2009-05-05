@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.8");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -107,10 +107,15 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
     {
     QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
 
-    // We handle symlinks explicitly for the benefit of Windoze ...
-    QFileInfo plugin_info(plugin);
-    if(plugin_info.isSymLink())
-      plugin = plugin_info.symLinkTarget();
+    // We have created a sophisticated custom 'symlink' capability on Windoze, to facilitate running brands out of the build directory ...
+#ifdef WIN32
+    QFile symlink(plugin + ".symlink");
+    if(symlink.exists())
+      {
+      symlink.open(QIODevice::ReadOnly);
+      plugin = symlink.readAll();
+      }
+#endif // WIN32
 
     cerr << "Loading configured plugin: " << plugin.toAscii().data() << " ... ";
     QString error_message;
