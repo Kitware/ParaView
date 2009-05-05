@@ -8000,9 +8000,14 @@
       <!-- End of SplineWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
 
-    <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">
-      <IntVectorProperty name="Enabled"
-                         command="SetEnabled"
+    <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation"
+      class="vtkScalarBarWidget">
+      <Documentation>
+        Representation for the scalar bar widget. Includes both the scalar bar
+        actor and the interaction widget.
+      </Documentation>
+      <IntVectorProperty name="Visibility"
+                         command="SetVisibility"
                          number_of_elements="1"
                          default_values="0"
                          update_self="1">
@@ -8014,7 +8019,6 @@
                proxygroup="props" proxyname="ScalarBarRepresentation">
         </Proxy>
         <ExposedProperties>
-          <Property name="Visibility"/>
           <Property name="Position"/>
           <Property name="Position2"/>
           <Property name="Orientation" />
