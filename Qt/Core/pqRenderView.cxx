@@ -990,8 +990,9 @@ void pqRenderView::textAnnotationColorChanged()
   // Set up some global property links by default.
   vtkSMGlobalPropertiesManager* globalPropertiesManager =
     pqApplicationCore::instance()->getGlobalPropertiesManager();
-  const double* value = vtkSMPropertyHelper(
-    globalPropertiesManager, "TextAnnotationColor").GetAsDoublePtr();
+  double value[3];
+  vtkSMPropertyHelper(globalPropertiesManager, "TextAnnotationColor").Get(
+    value, 3);
   this->Internal->OrientationAxesWidget->SetAxisLabelColor(value[0], value[1],
     value[2]);
 }
