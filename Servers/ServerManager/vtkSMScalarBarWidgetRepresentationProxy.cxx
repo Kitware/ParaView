@@ -18,11 +18,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkScalarBarRepresentation.h"
-#include "vtkSMPropertyHelper.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMViewProxy.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetRepresentationProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetRepresentationProxy::vtkSMScalarBarWidgetRepresentationProxy()
@@ -68,14 +68,6 @@ bool vtkSMScalarBarWidgetRepresentationProxy::RemoveFromView(
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetRepresentationProxy::SetVisibility(int visible)
-{
-  vtkSMPropertyHelper(this->ActorProxy, "Visibility").Set(visible);
-  this->ActorProxy->UpdateVTKObjects();
-  this->SetEnabled(visible);
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
 {
   if (this->ObjectsCreated)
@@ -101,8 +93,17 @@ void vtkSMScalarBarWidgetRepresentationProxy::CreateVTKObjects()
     return;
     }
 
-  vtkSMPropertyHelper(this->RepresentationProxy, "ScalarBarActor").Set(
-    this->ActorProxy);
+  vtkSMProxyProperty* tapp = vtkSMProxyProperty::SafeDownCast(
+                      this->RepresentationProxy->GetProperty("ScalarBarActor"));
+  if (!tapp)
+    {
+    vtkErrorMacro("Failed to find property ScalarBarActor on ScalarBarRepresentation proxy.");
+    return;
+    }
+  if(!tapp->AddProxy(this->ActorProxy))
+    {
+    return;
+    }
 }
 
 //----------------------------------------------------------------------------

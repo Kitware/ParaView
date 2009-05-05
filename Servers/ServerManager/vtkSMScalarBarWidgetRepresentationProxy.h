@@ -41,12 +41,6 @@ public:
   // Overrridden to not pass the enabled state to WidgetProxy unless the
   // representation has been added to a view.
   virtual void SetEnabled(int enable);
-
-  // Description:
-  // For the scalar bar, the visibility control both whether the widget is
-  // visible as well as whether the widget is interact-able.
-  void SetVisibility(int visible);
-
 //BTX
 protected:
   vtkSMScalarBarWidgetRepresentationProxy();

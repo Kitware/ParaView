@@ -214,6 +214,7 @@ void pqScalarBarRepresentation::setDefaultPropertyValues()
   vtkSMProxy* proxy = this->getProxy();
   
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Selectable"), 0);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("Enabled"), 1);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Resizable"), 1);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("Repositionable"), 1);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("TitleFontSize"), 12);
