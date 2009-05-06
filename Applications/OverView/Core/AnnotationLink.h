@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    MainWindow.h
+   Module:    AnnotationLink.h
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,82 +29,53 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __AnnotationLink_h
+#define __AnnotationLink_h
 
-#ifndef _MainWindow_h
-#define _MainWindow_h
-
+#include <QObject>
 #include "OverViewCoreExport.h"
 
-#include <QDockWidget>
-#include <QMainWindow>
-#include <QVariant>
-#include <vtkIOStream.h>
-
-class pqGenericViewModule;
+class vtkAnnotationLayers;
+class vtkSelection;
+class AnnotationLinkCommand;
+class AnnotationLinkInternals;
 class pqPipelineSource;
-class pqRepresentation;
-class pqView;
+class pqViewManager;
+class vtkSMSourceProxy;
 
-/// Provides the main window for the ParaView application
-class OVERVIEW_CORE_EXPORT MainWindow :
-  public QMainWindow
+/// Provides a central location for managing annotations
+
+class OVERVIEW_CORE_EXPORT AnnotationLink : public QObject
 {
   Q_OBJECT
-
+  
 public:
-  MainWindow();
-  ~MainWindow();
-
-  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
-
-  void setupAnnotationManager(QDockWidget* parent);
-
-public slots:
-  QVariant findToolBarActionsNotInMenus();
+  static AnnotationLink& instance();
   
+  void setAnnotationLayers(vtkAnnotationLayers*);
+  vtkAnnotationLayers* getAnnotationLayers();
+
+  vtkSelection* getSelection();
+  
+  void setViewManager(pqViewManager* manager);
+
 private slots:
-  void onUndoLabel(const QString&);
-  void onRedoLabel(const QString&);
-
-  void onCameraUndoLabel(const QString&);
-  void onCameraRedoLabel(const QString&);
-
-  void onPreAccept();
-  void onPostAccept();
-  void endWaitCursor();
-
-  void onHelpAbout();
-  void onHelpHelp();
-
-  void onSelectionShortcut();
-  void onQuickLaunchShortcut();
-
-  void assistantError(const QString& err);
-
-  void onShowCenterAxisChanged(bool);
-
-  void setTimeRanges(double, double);
-
-  void onPlaying(bool);
-
-  void onAddCameraLink();
-  
-  void onDeleteAll();
-
-  void onSelectionModeChanged(int mode);
-
-  void onEditSettings();
-
   void onSourceAdded(pqPipelineSource*);
   void onSourceRemoved(pqPipelineSource*);
 
-  void onActiveViewChanged(pqView*);
-  void onRepresentationVisibilityChanged(pqRepresentation*,bool);
+protected:
+  void selectionChanged(vtkSMSourceProxy* source);
+  void updateViews();
 
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  AnnotationLink();
+  AnnotationLink(const AnnotationLink&); // Not implemented.
+  void operator=(const AnnotationLink&); // Not implemented.
+  ~AnnotationLink();
+
+  friend class AnnotationLinkCommand;
+  AnnotationLinkCommand* Command;
+  AnnotationLinkInternals* Internals;
 };
 
-#endif // !_MainWindow_h
-
+#endif

@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPQConfig.h>
 
 #include "AboutDialog.h"
+#include "AnnotationLink.h"
+#include "AnnotationManagerPanel.h"
 #include "ApplicationOptionsDialog.h"
 #include "Config.h"
 #include "DisplayPolicy.h"
@@ -309,6 +311,9 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionDelete_All, SIGNAL(triggered()),
           this, SLOT(onDeleteAll()));
 
+  AnnotationLink::instance().setViewManager(
+    & this->Implementation->Core.multiViewManager());
+
   this->Implementation->Core.setupLookmarkToolbar(
     this->Implementation->UI.lookmarkToolbar);
 
@@ -535,8 +540,8 @@ MainWindow::MainWindow() :
   //this->Implementation->Core.setupStatisticsView(
   //  this->Implementation->UI.statisticsViewDock);
 
-  this->Implementation->Core.setupSelectionInspector(
-    this->Implementation->UI.selectionInspectorDock);
+  //this->Implementation->Core.setupSelectionInspector(
+  //  this->Implementation->UI.selectionInspectorDock);
     
   pqComparativeVisPanel* cv_panel = 
     new pqComparativeVisPanel(
@@ -546,6 +551,9 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupAnimationView(
     this->Implementation->UI.animationViewDock);
   
+  this->setupAnnotationManager(
+    this->Implementation->UI.annotationManagerDock);
+
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.mainToolBar,
@@ -568,8 +576,8 @@ MainWindow::MainWindow() :
     this->Implementation->UI.comparativePanelDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
-    this->Implementation->UI.selectionInspectorDock,
-    this->Implementation->UI.selectionInspectorDock->windowTitle());
+    this->Implementation->UI.annotationManagerDock,
+    this->Implementation->UI.annotationManagerDock->windowTitle());
 
   this->Implementation->ViewMenu->addWidget(
     this->Implementation->UI.objectInspectorDock,
@@ -605,7 +613,7 @@ MainWindow::MainWindow() :
   this->Implementation->UI.statisticsViewDock->hide();
   this->Implementation->UI.comparativePanelDock->hide();
   this->Implementation->UI.animationViewDock->hide();
-  this->Implementation->UI.selectionInspectorDock->hide();
+  this->Implementation->UI.annotationManagerDock->hide();
   this->Implementation->UI.lookmarkBrowserDock->hide();
   this->Implementation->UI.lookmarkInspectorDock->hide();
 
@@ -711,6 +719,7 @@ MainWindow::MainWindow() :
     this->Implementation->Core.renderViewSelectionHelper(), SLOT(endSelection()));
 */
   // Listen for adding sources so we can link their selections.
+  /*
   this->Implementation->SourceSelectionLink =
     vtkSmartPointer<vtkSMSourceSelectionLink>::New();
   this->Implementation->SourceSelectionLink->SetViewManager(
@@ -723,6 +732,7 @@ MainWindow::MainWindow() :
     pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
+*/
 
   // Restore the state of the window ...
   pqApplicationCore::instance()->settings()->restoreState("MainWindow", *this);
@@ -1206,4 +1216,14 @@ void MainWindow::onRepresentationVisibilityChanged(pqRepresentation* rep, bool v
     {
     this->Implementation->ProxyTab->setCurrentIndex(pqProxyTabWidget::DISPLAY);
     }
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::setupAnnotationManager(QDockWidget* dock_widget)
+{
+  AnnotationManagerPanel* const annotation_manager = 
+    new AnnotationManagerPanel(dock_widget)
+    << pqSetName("annotationManagerPanel");
+
+  dock_widget->setWidget(annotation_manager);
 }

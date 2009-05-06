@@ -35,6 +35,8 @@ CONFIGURE_FILE(
 
 QT4_WRAP_CPP(MOC_SRCS
   AboutDialog.h
+  AnnotationLink.h
+  AnnotationManagerPanel.h
   ApplicationOptionsDialog.h
   DisplayPolicy.h
   GlobalGraphViewOptions.h
@@ -50,6 +52,7 @@ QT4_WRAP_CPP(MOC_SRCS
 
 SET(UI_FORMS
   AboutDialog.ui
+  AnnotationManagerPanel.ui
   GlobalGraphViewOptions.ui
   IconDialog.ui
   MainWindow.ui

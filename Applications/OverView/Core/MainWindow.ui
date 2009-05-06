@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>1014</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile" >
@@ -245,9 +245,7 @@
   </widget>
   <widget class="QDockWidget" name="lookmarkBrowserDock" >
    <property name="sizePolicy" >
-    <sizepolicy>
-     <hsizetype>5</hsizetype>
-     <vsizetype>5</vsizetype>
+    <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -296,12 +294,12 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_9" />
   </widget>
-  <widget class="QDockWidget" name="selectionInspectorDock" >
+  <widget class="QDockWidget" name="annotationManagerDock" >
    <property name="allowedAreas" >
     <set>Qt::AllDockWidgetAreas</set>
    </property>
    <property name="windowTitle" >
-    <string>Selection Inspector</string>
+    <string>Annotation Manager</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -325,12 +323,15 @@
     </size>
    </property>
    <attribute name="toolBarArea" >
-    <number>2</number>
+    <enum>RightToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
    </attribute>
   </widget>
   <action name="actionFileOpen" >
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Open</string>
@@ -369,7 +370,7 @@
   </action>
   <action name="actionHelpHelp" >
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqHelp32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Help</string>
@@ -400,7 +401,7 @@
   </action>
   <action name="actionServerConnect" >
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Connect</string>
@@ -411,7 +412,7 @@
   </action>
   <action name="actionServerDisconnect" >
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDisconnect32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Disconnect</string>
@@ -655,7 +656,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqUndo32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -669,7 +670,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../../paraview/Qt/Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqRedo32.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
