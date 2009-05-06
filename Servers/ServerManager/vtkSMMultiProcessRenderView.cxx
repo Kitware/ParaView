@@ -22,7 +22,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMRepresentationStrategy.h"
 
-vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.10");
+vtkCxxRevisionMacro(vtkSMMultiProcessRenderView, "1.11");
 //----------------------------------------------------------------------------
 vtkSMMultiProcessRenderView::vtkSMMultiProcessRenderView()
 {
@@ -199,6 +199,14 @@ vtkSelection *vtkSMMultiProcessRenderView::SelectVisibleCells(
   //make this ugly hack unecessary.
   double compThresh = this->GetRemoteRenderThreshold();
   this->SetRemoteRenderThreshold(0.0);
+  if (this->LastCompositingDecision == 0)
+    {
+    // On some configurations (typically dashboards), if we try to select on
+    // forcing a remote render directly, it causes some OpenGL related
+    // segfaults. To overcome those, just trigger a remote render if this is the
+    // first server-side render.
+    this->StillRender();
+    }
   vtkSelection* reply = 
     this->Superclass::SelectVisibleCells(x0, y0, x1, y1, ofPoints);
   this->SetRemoteRenderThreshold(compThresh);
