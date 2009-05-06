@@ -97,6 +97,14 @@ pqScalarBarRepresentation::pqScalarBarRepresentation(const QString& group,
 }
 
 //-----------------------------------------------------------------------------
+void pqScalarBarRepresentation::setVisible(bool visible)
+{
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Enabled"),
+    (visible? 1 : 0));
+  this->Superclass::setVisible(visible);
+}
+
+//-----------------------------------------------------------------------------
 pqScalarBarRepresentation::~pqScalarBarRepresentation()
 {
   if (this->Internal->LookupTable)

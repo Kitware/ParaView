@@ -62,8 +62,13 @@ public:
   /// Set the title formed by combining two parts.
   void setTitle(const QString& name, const QString& component);
 
-  /// set by pqPipelineRepresentation when it forces the visiblity of the scalar
-  /// bar to be off.
+  /// Set the visibility. Note that this affects the visibility of the
+  /// display in the view it has been added to, if any. This method does not 
+  /// call a re-render on the view, caller must call that explicitly.
+  virtual void setVisible(bool visible);
+
+  /// set by pqPipelineRepresentation when it forces the visibility of the
+  /// scalar bar to be off.
   void setAutoHidden(bool h)
     { this->AutoHidden = h; }
   bool getAutoHidden() const
