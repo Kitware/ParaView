@@ -52,7 +52,7 @@ pqColorButtonEventTranslator::~pqColorButtonEventTranslator()
 
 //-----------------------------------------------------------------------------
 bool pqColorButtonEventTranslator::translateEvent(
-  QObject* object, QEvent* event, bool& /*error*/)
+  QObject* object, QEvent* tr_event, bool& /*error*/)
 {
   // Capture events from pqColorChooserButton and all its children.
   if (qobject_cast<QMenu*>(object))
@@ -73,7 +73,7 @@ bool pqColorButtonEventTranslator::translateEvent(
     return false;
     }
 
-  if (event->type() == QEvent::FocusIn)
+  if (tr_event->type() == QEvent::FocusIn)
     {
     QObject::disconnect(color_button, 0, this, 0);
     QObject::connect(color_button, SIGNAL(validColorChosen(const QColor&)),
