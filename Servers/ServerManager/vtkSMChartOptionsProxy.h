@@ -27,6 +27,7 @@
 #include "vtkSMProxy.h"
 
 class vtkQtChartView;
+class vtkSMChartViewProxy;
 
 class VTK_EXPORT vtkSMChartOptionsProxy : public vtkSMProxy
 {
@@ -36,12 +37,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get/Set the vtkQtChartView whose options are to be edited by this proxy.
-  vtkGetObjectMacro(ChartView, vtkQtChartView);
-  void SetChartView(vtkQtChartView*);
-
-  // Description:
   // Set the chart's title.
+  // Chart title can take a special
+  // keyword ${TIME} which will be replaced with the view's time on the fly.
   // These methods should not be called directly. They are made public only so
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
@@ -214,6 +212,20 @@ public:
 protected:
   vtkSMChartOptionsProxy();
   ~vtkSMChartOptionsProxy();
+
+  friend class vtkSMChartViewProxy;
+
+  // Description:
+  void PrepareForRender(vtkSMChartViewProxy* viewProxy);
+
+  // Description:
+  // Get/Set the vtkQtChartView whose options are to be edited by this proxy.
+  // This 
+  vtkGetObjectMacro(ChartView, vtkQtChartView);
+  void SetChartView(vtkQtChartView*);
+
+  char* TitleInternal;
+  vtkSetStringMacro(TitleInternal);
   
   double AxisRanges[4][2];
   int AxisBehavior[4];

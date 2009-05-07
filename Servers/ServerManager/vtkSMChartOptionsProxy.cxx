@@ -19,9 +19,10 @@
 #include "vtkQtChartAxis.h"
 #include "vtkQtChartAxisLayer.h"
 #include "vtkQtChartView.h"
+#include "vtkSMChartViewProxy.h"
 
 vtkStandardNewMacro(vtkSMChartOptionsProxy);
-vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.4");
 vtkCxxSetObjectMacro(vtkSMChartOptionsProxy, ChartView, vtkQtChartView);
 //----------------------------------------------------------------------------
 vtkSMChartOptionsProxy::vtkSMChartOptionsProxy()
@@ -35,6 +36,8 @@ vtkSMChartOptionsProxy::vtkSMChartOptionsProxy()
     this->AxisRanges[cc][0] = 0;
     this->AxisRanges[cc][1] = 0;
     }
+  this->TitleInternal =0;
+  this->SetTitleInternal("");
 }
 
 //----------------------------------------------------------------------------
@@ -44,12 +47,21 @@ vtkSMChartOptionsProxy::~vtkSMChartOptionsProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMChartOptionsProxy::PrepareForRender(vtkSMChartViewProxy* viewProxy)
+{
+  QString time = QString::number(viewProxy->GetViewUpdateTime());
+  QRegExp regExp("\\$\\{TIME\\}", Qt::CaseInsensitive);
+  QString title = this->TitleInternal;
+  title = title.replace(regExp, time);
+  this->ChartView->SetTitle(title.toAscii().data());
+}
+
+//----------------------------------------------------------------------------
 void vtkSMChartOptionsProxy::SetTitle(const char* title)
 {
-  if (this->ChartView)
-    {
-    this->ChartView->SetTitle(title);
-    }
+  this->SetTitleInternal(title);
+  // Actual title set in PrepareForRender() to take TIME into consideration if
+  // requested.
 }
 
 //----------------------------------------------------------------------------
