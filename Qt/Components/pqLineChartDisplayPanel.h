@@ -50,9 +50,6 @@ public slots:
   void reloadSeries();
 
 protected slots:
-  /// Called when the attribute mode selection changes.
-  void onAttributeModeChanged();
-
   /// Slot to listen to clicks for changing color.
   void activateItem(const QModelIndex &index);
 

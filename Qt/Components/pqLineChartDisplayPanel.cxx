@@ -171,21 +171,9 @@ pqLineChartDisplayPanel::pqLineChartDisplayPanel(
     this->Internal->AttributeMode);
   
   QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
-    this, SLOT(updateAllViews()),
-    Qt::QueuedConnection);
-
-  QObject::connect(this->Internal->UseArrayIndex, SIGNAL(toggled(bool)), 
     this, SLOT(useArrayIndexToggled(bool)));
   QObject::connect(this->Internal->UseDataArray, SIGNAL(toggled(bool)), 
     this, SLOT(useDataArrayToggled(bool)));
-
-  QObject::connect(this->Internal->AttributeModeAdaptor,
-    SIGNAL(currentTextChanged(const QString&)), 
-    this, SLOT(onAttributeModeChanged()),
-    Qt::QueuedConnection);
-
-  QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateAllViews()));
 
   QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   QObject::connect(model,
@@ -281,8 +269,6 @@ void pqLineChartDisplayPanel::setDisplay(pqRepresentation* disp)
   this->Internal->Links.addPropertyLink(this->Internal->CompositeIndexAdaptor,
     "values", SIGNAL(valuesChanged()),
     proxy, proxy->GetProperty("CompositeDataSetIndex"));
-  QObject::connect(this->Internal->CompositeIndexAdaptor, SIGNAL(valuesChanged()),
-    this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
   // Connect to the new properties.pqComboBoxDomain will ensure that
   // when ever the domain changes the widget is updated as well.
@@ -293,13 +279,11 @@ void pqLineChartDisplayPanel::setDisplay(pqRepresentation* disp)
       "currentText", SIGNAL(currentTextChanged(const QString&)),
       proxy, proxy->GetProperty("XArrayName"));
 
-  this->reloadSeries();
-}
+  // Request a render when any GUI widget is changed by the user.
+  QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
-//-----------------------------------------------------------------------------
-void pqLineChartDisplayPanel::onAttributeModeChanged()
-{
-  this->updateAllViews();
+  this->reloadSeries();
 }
 
 //-----------------------------------------------------------------------------
