@@ -15,15 +15,26 @@
 #include "vtkSMChartOptionsProxy.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkQtChartArea.h"
+#include "vtkQtChartAxis.h"
+#include "vtkQtChartAxisLayer.h"
 #include "vtkQtChartView.h"
 
 vtkStandardNewMacro(vtkSMChartOptionsProxy);
-vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMChartOptionsProxy, ChartView, vtkQtChartView);
 //----------------------------------------------------------------------------
 vtkSMChartOptionsProxy::vtkSMChartOptionsProxy()
 {
   this->ChartView = 0;
+  this->AxisRangesDirty = false;
+
+  for (int cc=0; cc<4;cc++)
+    {
+    this->AxisBehavior[cc] = 0;
+    this->AxisRanges[cc][0] = 0;
+    this->AxisRanges[cc][1] = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -244,9 +255,12 @@ void vtkSMChartOptionsProxy::SetAxisScale(int index, int scale)
 //----------------------------------------------------------------------------
 void vtkSMChartOptionsProxy::SetAxisBehavior(int index, int behavior)
 {
-  if (this->ChartView)
+  if (index >=0 && index < 4)
     {
-    this->ChartView->SetAxisBehavior(index, behavior);
+    this->AxisBehavior[index] = behavior;
+    this->AxisRangesDirty = true;
+    this->Modified();
+    this->UpdateAxisRanges();
     }
 }
 
@@ -254,18 +268,57 @@ void vtkSMChartOptionsProxy::SetAxisBehavior(int index, int behavior)
 void vtkSMChartOptionsProxy::SetAxisRange(
   int index, double minimum, double maximum)
 {
-  if (this->ChartView)
+  if (index >= 0 && index < 4)
     {
-    this->ChartView->SetAxisRange(index, minimum, maximum);
+    this->AxisRanges[index][0] = minimum;
+    this->AxisRanges[index][1] = maximum;
+    this->AxisRangesDirty = true;
+    this->Modified();
+    this->UpdateAxisRanges();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMChartOptionsProxy::SetAxisRange(int index, int minimum, int maximum)
+void vtkSMChartOptionsProxy::UpdateAxisRanges()
 {
-  if (this->ChartView)
+  // I am not directly using vtkQtChartView::SetAxisRange or SetAxisBehavior
+  // since those methods don't work as expected since the axis ranges etc. are
+  // not cached and overridden when behaviour changes, plus the updateLayout()
+  // is called way too many times.
+  if (this->AxisRangesDirty && this->ChartView)
     {
-    this->ChartView->SetAxisRange(index, minimum, maximum);
+    vtkQtChartArea* area = this->ChartView->GetChartArea();
+    vtkQtChartAxisLayer* axisLayer = area->getAxisLayer();
+    bool relayout_needed = false;
+    for (int cc=0; cc < 4; cc++)
+      {
+      if (axisLayer->getAxisBehavior(
+          static_cast<vtkQtChartAxis::AxisLocation>(cc)) !=
+        this->AxisBehavior[cc])
+        {
+        relayout_needed = true;
+        axisLayer->setAxisBehavior(
+          static_cast<vtkQtChartAxis::AxisLocation>(cc), 
+          static_cast<vtkQtChartAxisLayer::AxisBehavior>(this->AxisBehavior[cc]));
+        }
+      vtkQtChartAxis* axis = this->ChartView->GetAxis(cc);
+      if (axis && this->AxisBehavior[cc] == vtkQtChartAxisLayer::BestFit)
+        {
+        QVariant min, max;
+        axis->getBestFitRange(min, max);
+        if (min.toDouble() != this->AxisRanges[cc][0] || max.toDouble() !=
+          this->AxisRanges[cc][1])
+          {
+          relayout_needed = true;
+          axis->setBestFitRange(this->AxisRanges[cc][0], this->AxisRanges[cc][1]);
+          }
+        }
+      }
+    if (relayout_needed)
+      {
+      area->updateLayout();
+      }
+    this->AxisRangesDirty = false;
     }
 }
 

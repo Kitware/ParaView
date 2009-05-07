@@ -209,20 +209,18 @@ public:
   // that the client-server-stream-interpreter can invoke them. Use the
   // corresponding properties to change these values.
   void SetAxisRange(int index, double minimum, double maximum);
-
-  // Description:
-  // Sets the best fir range for the given axis.
-  // These methods should not be called directly. They are made public only so
-  // that the client-server-stream-interpreter can invoke them. Use the
-  // corresponding properties to change these values.
-  void SetAxisRange(int index, int minimum, int maximum);
-
+ 
 //BTX
 protected:
   vtkSMChartOptionsProxy();
   ~vtkSMChartOptionsProxy();
-
+  
+  double AxisRanges[4][2];
+  int AxisBehavior[4];
+  bool AxisRangesDirty;
   vtkQtChartView* ChartView;
+
+  void UpdateAxisRanges();
 
 private:
   vtkSMChartOptionsProxy(const vtkSMChartOptionsProxy&); // Not implemented

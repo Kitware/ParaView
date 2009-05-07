@@ -316,32 +316,22 @@ void pqChartOptionsHandler::applyChanges()
         proxy->GetProperty("AxisBehavior"), values);
     }
 
-  if(this->ModifiedData & AxisMinimumModified)
+  if ((this->ModifiedData & AxisMinimumModified) ||
+    (this->ModifiedData & AxisMaximumModified))
     {
     pqChartValue minimum;
+    pqChartValue maximum;
     QList<QVariant> values;
     for(i = 0; i < 4; i++)
       {
       this->Options->getAxisMinimum(axes[i], minimum);
       values.append(QVariant(minimum.getDoubleValue()));
-      }
-
-    pqSMAdaptor::setMultipleElementProperty(
-        proxy->GetProperty("AxisMinimum"), values);
-    }
-
-  if(this->ModifiedData & AxisMaximumModified)
-    {
-    pqChartValue maximum;
-    QList<QVariant> values;
-    for(i = 0; i < 4; i++)
-      {
       this->Options->getAxisMaximum(axes[i], maximum);
       values.append(QVariant(maximum.getDoubleValue()));
       }
 
     pqSMAdaptor::setMultipleElementProperty(
-        proxy->GetProperty("AxisMaximum"), values);
+        proxy->GetProperty("AxisRange"), values);
     }
 
   if(this->ModifiedData & AxisLabelsModified)
