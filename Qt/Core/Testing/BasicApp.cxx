@@ -5,9 +5,10 @@
 #include <QApplication>
 #include <QPointer>
 
-#include <QVTKWidget.h>
-#include <vtkObjectFactory.h>
-#include <vtkSmartPointer.h>
+#include "QVTKWidget.h"
+#include "vtkObjectFactory.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMSourceProxy.h"
 
 #include "pqApplicationCore.h"
 #include "pqCoreTestUtility.h"
@@ -17,7 +18,6 @@
 #include "pqProcessModuleGUIHelper.h"
 #include "pqRenderView.h"
 #include "pqServer.h"
-
 
 // our main window
 class MainWindow : public QMainWindow
@@ -40,6 +40,10 @@ public:
     pqPipelineSource* elevation;
 
     source = ob->createSource("sources", "SphereSource", server);
+    // updating source so that when elevation filter is created, the defaults
+    // are setup correctly using the correct data bounds etc.
+    vtkSMSourceProxy::SafeDownCast(source->getProxy())->UpdatePipeline();
+
     elevation = ob->createFilter("filters", "ElevationFilter", source);
     
     // put the elevation in the window
