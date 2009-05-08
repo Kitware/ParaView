@@ -58,7 +58,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.93");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.94");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -517,27 +517,33 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     return 0;
     }
 
-  vtkAppendPolyData* append = vtkAppendPolyData::New();
+  vtkSmartPointer<vtkAppendPolyData> append =
+    vtkSmartPointer<vtkAppendPolyData>::New();
   int numInputs = 0;
-
-  int retVal = 0;
   if (this->ExecuteCompositeDataSet(constructuredInput, append, numInputs))
     {
+    vtkCleanArrays* cleaner = vtkCleanArrays::New();
     if (numInputs > 0)
       {
-      append->Update();
-      // Remove any partial arrays.
-      vtkCleanArrays* cleaner = vtkCleanArrays::New();
+      // vtkAppendPolyData will throw errors if it has no input.
       cleaner->SetInputConnection(append->GetOutputPort());
-      cleaner->Update();
-      output->ShallowCopy(cleaner->GetOutput());
-      cleaner->Delete();
       }
-    output->ShallowCopy(append->GetOutput());
-    retVal = 1;
+    else
+      {
+      // it's legal for some processes to have no blocks. However, in that case
+      // too, we need to ensure that vtkCleanArrays is executed on those
+      // processes as well to avoid deadlocks. Hence we setup an empty polydata
+      // as input.
+      vtkPolyData* emptyInput = vtkPolyData::New();
+      cleaner->SetInput(emptyInput);
+      emptyInput->Delete();
+      }
+    cleaner->Update();
+    output->ShallowCopy(cleaner->GetOutput());
+    cleaner->Delete();
+    return 1;
     }
-  append->Delete();
-  return retVal;
+  return 0;
 }
 
 //----------------------------------------------------------------------------
