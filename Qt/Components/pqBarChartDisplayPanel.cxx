@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBarChartDisplayPanel.h"
 #include "ui_pqBarChartDisplayPanel.h"
 
-#include "vtkSMChartTableRepresentationProxy.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMIntVectorProperty.h"
 
 #include <QPointer>
@@ -62,7 +62,7 @@ public:
     }
 
   pqPropertyLinks Links;
-  vtkWeakPointer<vtkSMChartTableRepresentationProxy> ChartRepresentation;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> ChartRepresentation;
   pqChartSeriesEditorModel *Model;
 };
 
@@ -70,13 +70,13 @@ public:
 pqBarChartDisplayPanel::pqBarChartDisplayPanel(pqRepresentation* repr,
   QWidget* parentObject): Superclass(repr, parentObject), Internal(0)
 {
-  vtkSMChartTableRepresentationProxy* proxy =
-    vtkSMChartTableRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMChartRepresentationProxy* proxy =
+    vtkSMChartRepresentationProxy::SafeDownCast(repr->getProxy());
   if (!proxy)
     {
     this->setEnabled(false);
     qCritical() << "pqBarChartDisplayPanel "
-      "can only work with vtkSMChartTableRepresentationProxy";
+      "can only work with vtkSMChartRepresentationProxy";
     return;
     }
 

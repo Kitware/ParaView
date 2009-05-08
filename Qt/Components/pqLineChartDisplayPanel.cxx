@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineChartDisplayPanel.h"
 #include "ui_pqLineChartDisplayPanel.h"
 
-#include "vtkSMChartTableRepresentationProxy.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkQtChartRepresentation.h"
 #include "vtkDataArray.h"
 #include "vtkDataObject.h"
@@ -140,7 +140,7 @@ public:
   pqComboBoxDomain* XAxisArrayDomain;
   pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
 
-  vtkWeakPointer<vtkSMChartTableRepresentationProxy> ChartRepresentation;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> ChartRepresentation;
 
   pqChartSeriesEditorModel *Model;
 
@@ -224,8 +224,8 @@ void pqLineChartDisplayPanel::setDisplay(pqRepresentation* disp)
   // all "cleanup" code, since it's not applicable.
   assert(this->Internal->ChartRepresentation == 0);
 
-  vtkSMChartTableRepresentationProxy* proxy =
-    vtkSMChartTableRepresentationProxy::SafeDownCast(disp->getProxy());
+  vtkSMChartRepresentationProxy* proxy =
+    vtkSMChartRepresentationProxy::SafeDownCast(disp->getProxy());
   this->Internal->ChartRepresentation = proxy;
   if (!this->Internal->ChartRepresentation)
     {

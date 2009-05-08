@@ -49,7 +49,7 @@ protected:
   vtkSMChartNamedOptionsModelProxy();
   ~vtkSMChartNamedOptionsModelProxy();
 
-  friend class vtkSMChartTableRepresentationProxy;
+  friend class vtkSMChartRepresentationProxy;
 
   // Description:
   // Returns the options for a series with the name. A new instance is created

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqDataRepresentation;
 class vtkQtChartSeriesOptions;
-class vtkSMChartTableRepresentationProxy;
+class vtkSMChartRepresentationProxy;
 
 /// pqChartSeriesEditorModel is a model that can be used to connect to a
 /// Tree or Table view that shows the series that be plotted. It allows the user
@@ -167,7 +167,7 @@ private slots:
 
 private:
   QPointer<pqDataRepresentation> Representation;
-  vtkWeakPointer<vtkSMChartTableRepresentationProxy> RepresentationProxy;
+  vtkWeakPointer<vtkSMChartRepresentationProxy> RepresentationProxy;
 
 private:
   pqChartSeriesEditorModel(const pqChartSeriesEditorModel&); // Not implemented.

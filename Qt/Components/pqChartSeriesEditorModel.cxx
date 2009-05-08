@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkQtChartRepresentation.h"
 #include "vtkQtChartSeriesOptionsModel.h"
 #include "vtkQtChartTableSeriesModel.h"
-#include "vtkSMChartTableRepresentationProxy.h"
+#include "vtkSMChartRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 
 #include <QPixmap>
@@ -73,8 +73,8 @@ void pqChartSeriesEditorModel::setRepresentation(pqDataRepresentation *repr)
     QObject::disconnect(this->Representation, 0, this, 0);
     }
 
-  vtkSMChartTableRepresentationProxy* chartRep =
-    vtkSMChartTableRepresentationProxy::SafeDownCast(repr->getProxy());
+  vtkSMChartRepresentationProxy* chartRep =
+    vtkSMChartRepresentationProxy::SafeDownCast(repr->getProxy());
   this->RepresentationProxy = chartRep;
   this->Representation = repr;
 

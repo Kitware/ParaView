@@ -7424,7 +7424,7 @@
 
     <!-- =================================================================== -->
 #ifdef VTK_USE_QVTK
-    <ChartTableRepresentationProxy name="BarChartRepresentation"
+    <ChartRepresentationProxy name="BarChartRepresentation"
       base_proxygroup="representations"
       base_proxyname="ChartRepresentationBase" >
       <Documentation>
@@ -7460,13 +7460,13 @@
       </SubProxy>
 
       <!-- End of BarChartRepresentation -->
-    </ChartTableRepresentationProxy>
+    </ChartRepresentationProxy>
 
 #endif
 
     <!-- =================================================================== -->
 #ifdef VTK_USE_QVTK
-    <ChartTableRepresentationProxy name="XYPlotRepresentation"
+    <ChartRepresentationProxy name="XYPlotRepresentation"
       base_proxygroup="representations"
       base_proxyname="ChartRepresentationBase" >
       <Documentation>
@@ -7505,7 +7505,7 @@
       </SubProxy>
 
       <!-- End of XYPlotRepresentation -->
-    </ChartTableRepresentationProxy>
+    </ChartRepresentationProxy>
 
 #endif
 
