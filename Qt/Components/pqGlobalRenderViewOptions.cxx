@@ -474,11 +474,11 @@ void pqGlobalRenderViewOptions::applyChanges()
   settings->endGroup();
 
   // loop through render views and apply new settings
-  QList<pqRenderView*> views =
+  QList<pqRenderViewBase*> views =
     pqApplicationCore::instance()->getServerManagerModel()->
-    findItems<pqRenderView*>();
+    findItems<pqRenderViewBase*>();
 
-  foreach(pqRenderView* view, views)
+  foreach(pqRenderViewBase* view, views)
     {
     view->restoreSettings(true);
     }
