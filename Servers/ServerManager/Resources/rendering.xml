@@ -2362,6 +2362,40 @@
       <!-- End of CubeAxesActor -->
     </Proxy>
 
+    <!-- =========================================================== -->
+    <Proxy name="LegendScaleActor" class="vtkLegendScaleActor">
+      <Documentation>
+        This is a proxy for vtkLegendScaleActor. vtkLegendScaleActor can be used
+        to annotate the render window with scale and distance information.
+      </Documentation>
+
+      <IntVectorProperty name="LabelMode"
+        command="SetLabelMode"
+        number_of_elements="1"
+        default_values="1">
+        <EnumerationDomain name="enum">
+          <Entry text="Distance" value="0" />
+          <Entry text="XY Coordinates" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LegendVisibility"
+        command="SetLegendVisibility"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <!-- End of LegendScaleActor -->
+    </Proxy>
+
     <!-- End of group "props" -->
   </ProxyGroup>
 
@@ -5178,9 +5212,26 @@
       <!-- End of ComparativeBarChartView -->
     </ComparativeViewProxy>
 
+    <TwoDRenderViewProxy name="2DRenderViewBase"
+      base_proxygroup="views" base_proxyname="ViewBase">
+      <Documentation>
+        Defines base API for 2DRenderView and subtypes. Don't use directly.
+      </Documentation>
+
+      <SubProxy>
+        <!-- SubProxy used to axes annotation -->
+        <Proxy name="LegendScaleActor"
+          proxygroup="props" proxyname="LegendScaleActor" />
+          <ExposedProperties>
+            <Property name="Visibility" exposed_name="AxesVisibility" />
+          </ExposedProperties>
+      </SubProxy>
+
+      <!-- 2DRenderViewBase -->
+    </TwoDRenderViewProxy>
 
     <TwoDRenderViewProxy name="2DRenderView"
-      base_proxygroup="views" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
         Simplest 2D render view without compositing/client-server support.
         Currently this view can only show image slices.
@@ -5249,7 +5300,7 @@
     </TwoDRenderViewProxy>
 
     <TwoDRenderViewProxy name="2DIceTCompositeView"
-      base_proxygroup="views" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
         IceT based 2D render view. 
         Currently this view can only show image slices.
@@ -5320,7 +5371,7 @@
     </TwoDRenderViewProxy>
 
     <TwoDRenderViewProxy name="2DIceTDesktopRenderView"
-      base_proxygroup="views" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
         IceT based 2D render view. 
         Currently this view can only show image slices.
@@ -5392,7 +5443,7 @@
     </TwoDRenderViewProxy>
 
     <TwoDRenderViewProxy name="2DIceTMultiDisplayRenderView"
-      base_proxygroup="views" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
         This is a 2D view comprising of a
         "IceTMultiDisplayRenderView" proxy (used in case of Tile displays).
@@ -5467,7 +5518,7 @@
     </TwoDRenderViewProxy>
 
     <TwoDRenderViewProxy name="2DClientServerRenderView"
-      base_proxygroup="views" base_proxyname="ViewBase">
+      base_proxygroup="views" base_proxyname="2DRenderViewBase">
       <Documentation>
         2D view used in client-server mode without IceT (single node server).
       </Documentation>

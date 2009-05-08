@@ -101,7 +101,9 @@ protected:
   // Description:
   // Called at the start of CreateVTKObjects().
   virtual bool BeginCreateVTKObjects();
+  virtual void EndCreateVTKObjects();
 
+  vtkSMProxy* LegendScaleActor;
   vtkSMRenderViewProxy* RenderView;
   vtkStdString SuggestedViewType;
 

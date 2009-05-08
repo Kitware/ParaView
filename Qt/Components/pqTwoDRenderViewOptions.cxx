@@ -152,8 +152,10 @@ void pqTwoDRenderViewOptions::connectGUI()
   this->Internal->Links.registerLink(this->Internal->ColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
+  this->Internal->Links.registerLink(this->Internal->showAxes, "checked",
+    SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("AxesVisibility"));
   this->blockSignals(false);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -165,6 +167,9 @@ void pqTwoDRenderViewOptions::disconnectGUI()
   this->Internal->Links.unregisterLink(this->Internal->ColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
+  this->Internal->Links.unregisterLink(this->Internal->showAxes, "checked",
+    SIGNAL(toggled(bool)),
+    proxy, proxy->GetProperty("AxesVisibility"));
 }
 
 //-----------------------------------------------------------------------------

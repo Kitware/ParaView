@@ -27,16 +27,21 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMTwoDRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMTwoDRenderViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::vtkSMTwoDRenderViewProxy()
 {
   this->RenderView = 0;
+  this->LegendScaleActor = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMTwoDRenderViewProxy::~vtkSMTwoDRenderViewProxy()
 {
+  if (this->RenderView && this->LegendScaleActor)
+    {
+    this->RenderView->RemovePropFromRenderer2D(this->LegendScaleActor);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -187,11 +192,28 @@ bool vtkSMTwoDRenderViewProxy::BeginCreateVTKObjects()
     return false;
     }
 
+  this->LegendScaleActor = this->GetSubProxy("LegendScaleActor");
+  if (!this->LegendScaleActor)
+    {
+    vtkErrorMacro("Missing \"LegendScaleActor\" subproxy.");
+    return false;
+    }
+
+  this->LegendScaleActor->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderView->GetProperty("CameraParallelProjection"));
   ivp->SetElement(0, 1);
 
   return this->Superclass::BeginCreateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMTwoDRenderViewProxy::EndCreateVTKObjects()
+{
+  this->Superclass::EndCreateVTKObjects();
+  this->RenderView->AddPropToRenderer2D(this->LegendScaleActor);
 }
 
 //----------------------------------------------------------------------------
