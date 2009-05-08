@@ -2725,25 +2725,6 @@ The Point Data to Cell Data filter averages the values of the point attributes o
         <DataType value="vtkUnstructuredGrid"/>
       </DataTypeDomain>
     </InputProperty>
-    
-    <StringVectorProperty
-        name="SelectSourceArray" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        animateable="0"> 
-      <Documentation>
-        Specifies the offset array from which we interpolate values to quadrature points.
-      </Documentation>
-      <ArrayListDomain 
-          name="array_list" 
-          data_type="VTK_ID_TYPE" 
-          attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-      </ArrayListDomain>
-    </StringVectorProperty>
   </SourceProxy>
   <!-- ############################################################################ -->
   <SourceProxy 
@@ -2773,7 +2754,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       </DataTypeDomain>
       <InputArrayDomain
           name="input_array"
-          attribute_type="cell"/>
+          attribute_type="point"/>
     </InputProperty>
   
     <!-- Source Array-->
@@ -2783,12 +2764,20 @@ The Point Data to Cell Data filter averages the values of the point attributes o
         number_of_elements="5"
         element_types="0 0 0 0 2"
         animateable="0"> 
+        <!--
+        name="SelectSourceArray"
+        command="SetSourceArrayName"
+        clean_command="ClearSourceArrayName"
+        repeat_command="0"
+        number_of_elements_per_command="1"
+        label="Select Source Array">
+        -->
       <Documentation>
-        Specifies the offset array from which we generate quadrature points.
+        Specifies the arrays from which we generate quadrature points.
       </Documentation>
       <ArrayListDomain 
           name="array_list" 
-          data_type="VTK_ID_TYPE" 
+          data_type="VTK_FLOAT VTK_DOUBLE" 
           attribute_type="Scalars">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
