@@ -1808,6 +1808,7 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
      class="vtkNetworkImageSource">
      <StringVectorProperty name="FileName"
       command="SetFileName"
+      number_of_elements="1"
       update_self="1">
       <Documentation>
         Set the name of image file to load.
