@@ -18,6 +18,7 @@
 #include "vtkAssemblyPath.h"
 #include "vtkCamera.h"
 #include "vtkCoordinate.h"
+#include "vtkDiskSource.h"
 #include "vtkGlyph3D.h"
 #include "vtkInteractorObserver.h"
 #include "vtkLine.h"
@@ -31,7 +32,7 @@
 #include "vtkSphereSource.h"
 #include "vtkWindow.h"
 
-vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.3");
+vtkCxxRevisionMacro(vtkPointHandleRepresentationSphere, "1.4");
 vtkStandardNewMacro(vtkPointHandleRepresentationSphere);
 
 vtkCxxSetObjectMacro(vtkPointHandleRepresentationSphere,Property,vtkProperty);
@@ -83,6 +84,12 @@ vtkPointHandleRepresentationSphere::vtkPointHandleRepresentationSphere()
   this->ConstraintAxis = -1;
 
   this->Scalar = VTK_DOUBLE_MAX;
+  
+  this->AddCircleAroundSphere = 0;
+  this->DiskActor = NULL;
+  this->DiskMapper = NULL;
+  this->DiskGlypher = NULL;
+  
 }
 
 //----------------------------------------------------------------------
@@ -98,6 +105,19 @@ vtkPointHandleRepresentationSphere::~vtkPointHandleRepresentationSphere()
 
   this->Property->Delete();
   this->SelectedProperty->Delete();
+  
+  if (this->DiskGlypher)
+    {
+    this->DiskGlypher->Delete();
+    }
+  if (this->DiskMapper)
+    {
+    this->DiskMapper->Delete();
+    }
+  if (this->DiskActor)
+    {
+    this->DiskActor->Delete();
+    }
 }
 
 //----------------------------------------------------------------------
@@ -279,6 +299,10 @@ void vtkPointHandleRepresentationSphere::Scale(double eventPos[2])
   
   // Scale the handle
   this->Glypher->SetScaleFactor(sf);
+  if(this->AddCircleAroundSphere && this->DiskGlypher)
+    {
+    this->DiskGlypher->SetScaleFactor(sf);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -287,10 +311,18 @@ void vtkPointHandleRepresentationSphere::Highlight(int highlight)
   if ( highlight )
     {
     this->Actor->SetProperty(this->SelectedProperty);
+    if(this->AddCircleAroundSphere && this->DiskActor)
+      {
+      this->DiskActor->GetProperty()->SetColor(1.0, 0.0, 1.0);
+      }
     }
   else
     {
     this->Actor->SetProperty(this->Property);
+    if(this->AddCircleAroundSphere && this->DiskActor)
+      {
+      this->DiskActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+      }
     }
 }
 
@@ -342,12 +374,20 @@ void vtkPointHandleRepresentationSphere::ShallowCopy(vtkProp *prop)
 void vtkPointHandleRepresentationSphere::GetActors(vtkPropCollection *pc)
 {
   this->Actor->GetActors(pc);
+  if(this->AddCircleAroundSphere && this->DiskActor)
+    {
+    this->DiskActor->GetActors(pc);
+    }
 }
 
 //----------------------------------------------------------------------
 void vtkPointHandleRepresentationSphere::ReleaseGraphicsResources(vtkWindow *win)
 {
   this->Actor->ReleaseGraphicsResources(win);
+  if(this->DiskActor)
+    {
+    this->DiskActor->ReleaseGraphicsResources(win);
+    }
 }
 
 //----------------------------------------------------------------------
@@ -355,7 +395,75 @@ int vtkPointHandleRepresentationSphere::RenderOpaqueGeometry(
   vtkViewport *viewport)
 {
   this->BuildRepresentation();
-  return this->Actor->RenderOpaqueGeometry(viewport);
+  int res = this->Actor->RenderOpaqueGeometry(viewport);
+  if(res == 1 && this->AddCircleAroundSphere && this->DiskActor)
+    {
+    return this->DiskActor->RenderOpaqueGeometry(viewport);
+    }
+  return res; 
+}
+
+//----------------------------------------------------------------------
+void vtkPointHandleRepresentationSphere::SetAddCircleAroundSphere(
+  int flag )
+{
+  vtkDebugMacro(<< this->GetClassName() << " (" << this
+                << "): setting AddCircleAroundSphere to " << flag);
+  if (this->AddCircleAroundSphere != flag)
+    {
+    this->AddCircleAroundSphere = flag;
+    this->Modified();
+    
+    if(this->AddCircleAroundSphere)
+      {
+      if(!this->DiskActor)
+        {
+        this->CreateDefaultDiskSource();
+        }
+      else
+        {
+        this->DiskActor->SetVisibility(1);
+        }
+      }
+    else
+      {
+      if(this->DiskActor)
+        {
+        this->DiskActor->SetVisibility(0);
+        }
+      }
+    }  
+}
+
+//----------------------------------------------------------------------
+void vtkPointHandleRepresentationSphere::CreateDefaultDiskSource()
+{
+  vtkDiskSource *disk = vtkDiskSource::New();
+  disk->SetCircumferentialResolution(36);
+  disk->SetRadialResolution(5);
+  disk->SetInnerRadius(0.5);
+  disk->SetOuterRadius(0.65);
+  vtkProperty* diskProperty = vtkProperty::New();
+  diskProperty->SetColor(1.0,1.0,1.0);
+  diskProperty->SetLineWidth(0.5);
+
+  this->DiskGlypher = vtkGlyph3D::New();
+  this->DiskGlypher->SetInput(this->FocalData);
+  this->DiskGlypher->SetSource(disk->GetOutput());
+  this->DiskGlypher->SetVectorModeToVectorRotationOff();
+  this->DiskGlypher->ScalingOn();
+  this->DiskGlypher->SetScaleModeToDataScalingOff();
+  this->DiskGlypher->SetScaleFactor(this->Glypher->GetScaleFactor());
+
+  this->DiskMapper = vtkPolyDataMapper::New();
+  this->DiskMapper->SetInput(this->DiskGlypher->GetOutput());
+
+  this->DiskActor = vtkActor::New();
+  this->DiskActor->SetMapper(this->DiskMapper);
+  this->DiskActor->SetProperty(diskProperty);
+  
+  diskProperty->Delete();
+  disk->Delete();
 }
 
 //----------------------------------------------------------------------
@@ -392,4 +500,5 @@ void vtkPointHandleRepresentationSphere::PrintSelf(ostream& os, vtkIndent indent
     }
 
   os << indent << "Scalar: " << this->Scalar << endl;
+  os << indent << "AddCircleAroundSphere: " << this->AddCircleAroundSphere << endl;
 }

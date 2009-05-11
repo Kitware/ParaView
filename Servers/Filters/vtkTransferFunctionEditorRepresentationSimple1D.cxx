@@ -37,7 +37,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.19");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorRepresentationSimple1D, "1.20");
 vtkStandardNewMacro(vtkTransferFunctionEditorRepresentationSimple1D);
 
 // The vtkHandleList is a PIMPLed list<T>.
@@ -499,6 +499,7 @@ unsigned int vtkTransferFunctionEditorRepresentationSimple1D::CreateHandle(
   pointRep->SetProperty(property);
   pointRep->SetSelectedProperty(property);
   pointRep->SetScalar(scalar);
+  pointRep->SetAddCircleAroundSphere(1);
   property->Delete();
 
   rep->SetDisplayPosition(displayPos);

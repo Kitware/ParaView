@@ -88,6 +88,12 @@ public:
   // Set/get the scalar value associated with this handle.
   vtkSetMacro(Scalar, double);
   vtkGetMacro(Scalar, double);
+  
+  // Description:
+  // Set/get the flag whether to add a circle (disk) source around the sphere.
+  void SetAddCircleAroundSphere(int);
+  vtkGetMacro(AddCircleAroundSphere, int);
+  vtkBooleanMacro(AddCircleAroundSphere, int);
 
   // Description:
   // Toggle whether this handle should be highlighted.
@@ -113,7 +119,14 @@ protected:
   int  ConstraintAxis;
   void Translate(double eventPos[2]);
   void Scale(double eventPos[2]);
-
+  
+  // A flag to use the disk source
+  int                   AddCircleAroundSphere;
+  vtkActor             *DiskActor;
+  vtkPolyDataMapper    *DiskMapper;
+  vtkGlyph3D           *DiskGlypher;
+  void CreateDefaultDiskSource();
+  
   // Properties used to control the appearance of selected objects and
   // the manipulator in general.
   vtkProperty *Property;
