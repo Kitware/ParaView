@@ -30,7 +30,8 @@ class VTK_EXPORT vtkSMChartRepresentationProxy : public vtkSMClientDeliveryRepre
 {
 public:
   static vtkSMChartRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMChartRepresentationProxy, vtkSMChartRepresentationProxy);
+  vtkTypeRevisionMacro(vtkSMChartRepresentationProxy,
+    vtkSMClientDeliveryRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
