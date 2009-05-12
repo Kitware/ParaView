@@ -1,0 +1,1051 @@
+<ServerManagerConfiguration>
+
+  <!-- ================================================================= -->
+
+
+
+  <ProxyGroup name="views">
+
+
+    <Proxy name="StreamingViewBase"
+      base_proxygroup="views" base_proxyname="ViewBase">
+      <Documentation>
+        Base interface for the StreamingView. It has all the properties except
+        the RootView subproxy.
+      </Documentation>
+
+      <ProxyProperty name="StreamingOptionsProxy" command="SetOptionsProxy">
+        <ProxyGroupDomain name="groups">
+          <Group name="helpers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <!-- End of StreamingViewBase -->
+    </Proxy>
+
+    <StreamingViewProxy name="StreamingRenderView" 
+      base_proxygroup="views" base_proxyname="StreamingViewBase">
+      <Documentation>
+        A render view that streams to reduce memory footprint.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" proxygroup="views" proxyname="RenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of StreamingRenderView -->
+    </StreamingViewProxy>
+
+    <StreamingViewProxy name="StreamingClientServerRenderView" 
+      base_proxygroup="views" base_proxyname="StreamingViewBase">
+      <Documentation>
+        A render view that streams to reduce memory footprint.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+               proxygroup="views" proxyname="ClientServerRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of StreamingClientServerRenderView -->
+    </StreamingViewProxy>
+
+    <StreamingViewProxy name="StreamingIceTDesktopRenderView" 
+      base_proxygroup="views" base_proxyname="StreamingViewBase">
+      <Documentation>
+        A render view that streams to reduce memory footprint.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+               proxygroup="views" proxyname="IceTDesktopRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of StreamingIceTDesktopRenderView -->
+    </StreamingViewProxy>
+
+    <StreamingViewProxy name="StreamingIceTMultiDisplayRenderView" 
+      base_proxygroup="views" base_proxyname="StreamingViewBase">
+      <Documentation>
+        A render view that streams to reduce memory footprint.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RootView" 
+               proxygroup="views" proxyname="IceTMultiDisplayRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ViewSize"/>
+          <Property name="RenderWindowSizeInfo" />
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RootView" subproxy -->
+      </SubProxy>
+
+      <!-- End of StreamingIceTMultiDisplayRenderView -->
+    </StreamingViewProxy>
+
+  <!-- End of Views -->
+  </ProxyGroup>
+
+
+  <!-- ================================================================= -->
+
+  <ProxyGroup name="representations">
+    <StreamingRepresentation name="StreamingGeometryRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="GeometryRepresentation">
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
+
+      <IntVectorProperty name="PieceBoundsVisibility"
+        command="SetPieceBoundsVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the piece bounds display.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PieceBoundsRepresentation"
+          proxygroup="representations" proxyname="OutlineRepresentation">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of StreamingGeometryRepresentation -->
+    </StreamingRepresentation>
+
+    <StreamingRepresentation name="StreamingUnstructuredGridRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="UnstructuredGridRepresentation">
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="4" subproxy="VolumeRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
+
+      <IntVectorProperty name="PieceBoundsVisibility"
+        command="SetPieceBoundsVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the piece bounds display.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PieceBoundsRepresentation"
+          proxygroup="representations" proxyname="OutlineRepresentation">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of StreamingUnstructuredGridRepresentation -->
+    </StreamingRepresentation>
+
+    <StreamingRepresentation name="StreamingUniformGridRepresentation"
+      base_proxygroup="representations" 
+      base_proxyname="UniformGridRepresentation">
+      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
+      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
+      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
+      <Option representation="3" subproxy="OutlineRepresentation" />
+      <Option representation="4" subproxy="VolumeRepresentation" />
+      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
+      <Option representation="6" subproxy="SliceRepresentation" />
+
+      <IntVectorProperty name="PieceBoundsVisibility"
+        command="SetPieceBoundsVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for the piece bounds display.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <Proxy name="PieceBoundsRepresentation"
+          proxygroup="representations" proxyname="OutlineRepresentation">
+        </Proxy>
+      </SubProxy>
+
+      <!-- End of StreamingUniformGridRepresentation -->
+    </StreamingRepresentation>
+
+    <!-- End of Representations -->
+  </ProxyGroup>
+
+  <!-- ================================================================= -->
+
+  <ProxyGroup name="strategies">
+    <StreamingSerialStrategy name="StreamingPolyDataStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="PolyDataStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingPolyDataStrategy -->
+    </StreamingSerialStrategy>
+
+    <StreamingSerialStrategy name="StreamingUnstructuredGridStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="UnstructuredGridStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingUnstructuredGridStrategy -->
+    </StreamingSerialStrategy>
+
+    <SUnstructuredDataParallelStrategy name="StreamingPolyDataParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="PolyDataParallelStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressor" proxygroup="filters"
+          proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostDistributorSuppressor" proxygroup="filters"
+          proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD" proxygroup="filters"
+          proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostDistributorSuppressorLOD" proxygroup="filters"
+          proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingPolyDataParallelStrategy -->
+    </SUnstructuredDataParallelStrategy>
+
+    <SUnstructuredGridParallelStrategy name="StreamingUnstructuredGridParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="UnstructuredGridParallelStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostDistributorSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostDistributorSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingUnstructuredGridParallelStrategy -->
+    </SUnstructuredGridParallelStrategy>
+
+    <SUniformGridParallelStrategy name="StreamingUniformGridParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="UniformGridParallelStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingUniformGridParalllelStrategy -->
+    </SUniformGridParallelStrategy>
+
+    <SImageDataParallelStrategy name="StreamingImageDataParallelStrategy"
+      base_proxygroup="strategies" 
+      base_proxyname="ImageDataParallelStrategy">
+
+      <SubProxy>
+        <Proxy name="ViewSorter" 
+          proxygroup="filters" proxyname="ViewSorter" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="PieceCache" 
+          proxygroup="filters" proxyname="PieceCache" />
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="UpdateSuppressor" >
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressor"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressor" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="StreamingPostCollectUpdateSuppressorLOD"
+          proxygroup="filters" proxyname="StreamingUpdateSuppressor">
+        </Proxy>
+        <ShareProperties subproxy="StreamingUpdateSuppressorLOD" >
+          <Exception name="Input" />
+          <Exception name="ForceUpdate" />
+          <Exception name="ComputePriorities" />
+        </ShareProperties>
+      </SubProxy>
+
+      <!-- End of StreamingImageDataParallelStrategy -->
+    </SImageDataParallelStrategy>
+
+    <!-- End of Strategies -->
+  </ProxyGroup>
+
+  <!-- ================================================================= -->
+
+  <ProxyGroup name="sources">
+
+   <SourceProxy name="StridedReader" 
+                class="vtkRawStridedReader"
+                label="Strided image reader">
+     <Documentation
+       short_help="Read raw regular rectilinear grid data from a file." 
+       long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
+       The Image reader reads raw regular rectilinear grid (image/volume) data from a file. Because no metadata is provided, the user must specify information about the size, spacing, dimensionality, etc. about the dataset. 
+     </Documentation>
+
+      <StringVectorProperty 
+         name="FileName"
+         command="SetFilename"
+         animateable="0"
+         number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name to read.
+        </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+         name="Origin"
+         command="SetOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          The coordinate contained in this property specifies the position of the point with index (0,0,0).
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Spacing"
+         command="SetSpacing"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
+        <Documentation>
+          This property specifies the size of a voxel in each dimension.
+        </Documentation>
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="WholeExtent"
+        command="SetWholeExtent"
+        number_of_elements="6" 
+        default_values="0 359 0 239 0 4" >
+       <IntRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the minimum and maximum index values of the data in each dimension (xmin, xmax, ymin, ymax, zmin, zmax).
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Stride"
+        command="SetStride"
+        number_of_elements="3" 
+        default_values="1 1 1" >
+       <Documentation>
+         This property specifies the skip dimension.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="BlockReadSize"
+        command="SetBlockReadSize"
+        number_of_elements="1" 
+        default_values="4000" >
+       <Documentation>
+         This property specifies the skip dimension.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="SwapEndian"
+        command="SwapDataByteOrder"
+        number_of_elements="1" 
+        default_values="0" >
+       <BooleanDomain name="bool" />
+       <Documentation>
+         This property specifies if the dataset was written with opposing endianess to the machine you are on.
+       </Documentation>
+     </IntVectorProperty>
+
+   <!-- End StridedReader -->
+   </SourceProxy>
+
+    <!-- End of sources -->
+  </ProxyGroup>
+
+  <!-- ================================================================= -->
+  <ProxyGroup name="filters">
+    <UpdateSuppressorProxy 
+      name="StreamingUpdateSuppressor" 
+      class="vtkStreamingUpdateSuppressor"
+      base_proxygroup="filters" 
+      base_proxyname="UpdateSuppressor2"
+      executive="vtkUpdateSuppressorPipeline">
+
+      <IntVectorProperty
+        name="PassNumber"
+        command="SetPassNumber"
+        number_of_elements="2"
+        default_values="0 16">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          Choose a particular stream piece to render.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="SetNumberOfPasses"
+        command="SetNumberOfPasses"
+        number_of_elements="1"
+        default_values="16">
+        <IntRangeDomain name="range" min="1"/>
+        <Documentation>
+          Let it know total number of passes.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Property name="ClearPriorities" command="ClearPriorities" />
+      <Property name="ComputePriorities" command="ComputePriorities" />
+      <Property name="MarkMoveDataModified" command="MarkMoveDataModified" />
+
+      <IntVectorProperty
+        name="GetMaxPass"
+        command="GetMaxPass"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="SerializedList"
+        command="GetSerializedPriorities"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+      </DoubleVectorProperty>
+
+      <!-- End StreamingUpdateSuppressor -->
+    </UpdateSuppressorProxy>
+
+    <SourceProxy name="ViewSorter" class="vtkVisibilityPrioritizer">
+      <Documentation>
+        Sorts or rejects pieces based on bounds.
+      </Documentation>
+
+      <InputProperty name="Input"
+         command="SetInputConnection">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input which is cached and passed through
+       </Documentation>
+      </InputProperty>
+
+      <DoubleVectorProperty
+        name="SetCamera"
+        command="SetCameraState"
+        argument_is_array="1"
+        number_of_elements="9"
+        default_values="0.0 0.0 -1.0 0.0 1.0 0.0 0.0 0.0 0.0" >
+        <Documentation>
+          Let it know how the camera is situated.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="SetFrustum"
+        command="SetFrustum"
+        argument_is_array="1"
+        number_of_elements="32"
+        default_values="0.0 0.0 0.0 1.0 0.0 0.0 1.0 1.0 0.0 1.0 0.0 1.0 0.0 1.0 1.0 1.0 1.0 0.0 0.0 1.0 1.0 0.0 1.0 1.0 1.0 1.0 0.0 1.0 1.0 1.0 1.0 1.0" >
+        <Documentation>
+          Let it know what the view frustum is.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <!-- End of ViewSorter -->
+    </SourceProxy>
+
+    <SourceProxy name="PieceCache" class="vtkPieceCacheFilter"
+      executive="vtkPieceCacheExecutive">
+      <Documentation>
+        A cache to speed up streaming.
+      </Documentation>
+
+      <InputProperty name="Input"
+         command="SetInputConnection">
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataObject"/>
+       </DataTypeDomain>
+       <Documentation>
+         The input which is cached and passed through
+       </Documentation>
+     </InputProperty>
+
+      <IntVectorProperty
+        name="SetCacheSize"
+        command="SetCacheSize"
+        number_of_elements="1"
+        default_values="16">
+        <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          Let it know total number of pieces it can cache.
+        </Documentation>
+      </IntVectorProperty>
+
+      <Property name="EmptyCache" command="EmptyCache" />
+
+      <!-- End of PieceCacheFilter -->
+   </SourceProxy>
+
+    <!-- End Filters -->
+  </ProxyGroup> 
+
+  <!-- ================================================================= -->
+
+  <ProxyGroup name="helpers">
+
+    <StreamingOptionsProxy name="StreamingOptions" class="vtkStreamingOptions">
+      <Documentation>
+        Helper for setting global options that control the way streaming runs.
+      </Documentation>
+
+      <IntVectorProperty
+        name="StreamedPasses"
+        command="SetStreamedPasses"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="16">
+        <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          The number of pieces that the data will be broken up into.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="EnableStreamMessages"
+        command="SetEnableStreamMessages"
+        immediate_update="1"
+        number_of_elements="1"
+        information_property="EnableStreamMessagesInfo" 
+        default_values="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enable or disable console progress log messages.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UsePrioritization"
+        command="SetUsePrioritization"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+         Enables/Disables prioritization and culling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="UseViewOrdering"
+        command="SetUseViewOrdering"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          Enables/Disables view dependent ordering and frustum culling.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PieceCacheLimit"
+        command="SetPieceCacheLimit"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="16">
+        <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          This number of pieces will be cached after they are first drawn. Subsequent renders will be faster because a full pipeline update can be avoided.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="PieceRenderCutoff"
+        command="SetPieceRenderCutoff"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="16">
+        <IntRangeDomain name="range" min="-1"/>
+        <Documentation>
+          The maximum number of pieces that will be drawn.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of StreamingOptions -->
+    </StreamingOptionsProxy>
+
+    <!-- End helpers -->
+  </ProxyGroup> 
+
+</ServerManagerConfiguration>
