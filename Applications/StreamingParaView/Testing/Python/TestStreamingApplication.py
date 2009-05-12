@@ -3,27 +3,19 @@
 import QtTesting
 import sys
 
-lib1name = 'libStreamingSSPlugin.so'
-lib2name = 'libStreamingCSPlugin.so'
+libname = 'libStreamingPlugin.so'
 if sys.platform == 'win32':
-    lib1name = 'StreamingSSPlugin.dll'
-    lib2name = 'StreamingCSPlugin.dll'
+    libname = 'StreamingPlugin.dll'
 if sys.platform == 'darwin':
-    lib1name = 'libStreamingSSPlugin.dylib'
-    lib2name = 'libStreamingCSPlugin.dylib'
+    libname = 'libStreamingPlugin.dylib'
 
 object1 = 'pqClientMainWindow/menubar/menuTools'
 QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
 object2 = "pqClientMainWindow/pqPluginDialog/localGroup/loadLocal"
 QtTesting.playCommand(object2, 'activate', '')
 object3 = 'pqClientMainWindow/pqPluginDialog/pqFileDialog'
-QtTesting.playCommand(object3, 'filesSelected', lib1name)
+QtTesting.playCommand(object3, 'filesSelected', libname)
 object4 = 'pqClientMainWindow/pqPluginDialog/buttonBox/1QPushButton0'
-QtTesting.playCommand(object4, 'activate', '')
-QtTesting.playCommand(object1, 'activate', 'actionManage_Plugins')
-QtTesting.playCommand(object2, 'activate', '')
-object5 = 'pqClientMainWindow/pqPluginDialog/pqFileDialog'
-QtTesting.playCommand(object3, 'filesSelected', lib2name)
 QtTesting.playCommand(object4, 'activate', '')
 object6 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton'
 QtTesting.playCommand(object6, 'activate', '')
