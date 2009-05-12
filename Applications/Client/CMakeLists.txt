@@ -355,6 +355,12 @@ IF(BUILD_TESTING)
   SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
   SET (XdmfReadImageDataCollection_THRESHOLD 20)
 
+  # Disable some testing configurations for these tests.
+  ## Disable ClientRenderServer tests for FFTOverTime. This is done since
+  ## selection is not supported in render server mode esp. when number of render
+  ## server processess is not same as the data server processes
+  SET (FFTOverTime_DISABLE_CRS TRUE)
+
   # Make these tests use reverse connection.
   SET (CutMulti_REVERSE_CONNECT TRUE)
 
@@ -401,15 +407,17 @@ IF(BUILD_TESTING)
         --exit)
 
       IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
-        ADD_TEST(pqClient${test}-ClientRenderServer
-          ${TEST_BINARY} --test-render-server
-          ${REVERSE_CONNECTION_CMD}
-          --test-directory=${PARAVIEW_TEST_DIR}
-          -dr
-          --run-test=${TEST_XML}/${test}.xml
-          --compare-view=${TEST_IMAGE}/${test}.png
-          ${THRESHOLD_CMD}
-          --exit)
+        IF (NOT ${test}_DISABLE_CRS)
+          ADD_TEST(pqClient${test}-ClientRenderServer
+            ${TEST_BINARY} --test-render-server
+            ${REVERSE_CONNECTION_CMD}
+            --test-directory=${PARAVIEW_TEST_DIR}
+            -dr
+            --run-test=${TEST_XML}/${test}.xml
+            --compare-view=${TEST_IMAGE}/${test}.png
+            ${THRESHOLD_CMD}
+            --exit)
+        ENDIF (NOT ${test}_DISABLE_CRS)
       ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
     ENDFOREACH(test)
 
