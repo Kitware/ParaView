@@ -2382,7 +2382,7 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
@@ -2392,6 +2392,13 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <DoubleVectorProperty name="CornerOffsetFactor"
+        command="SetCornerOffsetFactor"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="1.0" max="5.0" />
+      </DoubleVectorProperty>
 
       <!-- End of LegendScaleActor -->
     </Proxy>
