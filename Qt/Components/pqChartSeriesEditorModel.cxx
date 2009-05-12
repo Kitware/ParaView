@@ -263,7 +263,6 @@ QVariant pqChartSeriesEditorModel::headerData(int section,
 //-----------------------------------------------------------------------------
 void pqChartSeriesEditorModel::reload()
 {
-  cout << "reload" << endl;
   this->reset();
   this->updateCheckState(0, Qt::Horizontal);
 }
