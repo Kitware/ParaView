@@ -116,7 +116,7 @@ public:
     this->View = vtkSmartPointer<vtkGeoView2D>::New();
     this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
     this->Transform = vtkSmartPointer<vtkGeoTransform>::New();
-    this->ProjectionIndex = 40;
+    this->ProjectionIndex = 44;
     vtkSmartPointer<vtkGeoProjection> proj =
       vtkSmartPointer<vtkGeoProjection>::New();
     proj->SetName(vtkGeoProjection::GetProjectionName(this->ProjectionIndex));
