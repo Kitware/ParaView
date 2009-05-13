@@ -19,9 +19,11 @@
 #include "vtkSMProperty.h"
 
 #include <QAction>
+#include <QComboBox>
+#include <QPointer>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <QComboBox>
+
 
 
 class ClientTableViewDecorator::pqInternal : public Ui::ClientTableViewDecorator
@@ -29,8 +31,11 @@ class ClientTableViewDecorator::pqInternal : public Ui::ClientTableViewDecorator
 public:
   pqPropertyLinks Links;
   pqPropertyManager PropertyManager;
-  pqSignalAdaptorComboBox* AttributeAdaptor;
-  pqComboBoxDomain* AttributeDomain;
+  QPointer<pqSignalAdaptorComboBox> AttributeAdaptor; // Because these objects are parented
+  QPointer<pqComboBoxDomain> AttributeDomain;         // by Qt it may get deleted so
+                                                      // we are guarding it with a 
+                                                      // QPointer so that we can check
+                                                      // if it's been deleted later.
 };
 
 //-----------------------------------------------------------------------------
@@ -74,8 +79,14 @@ ClientTableViewDecorator::~ClientTableViewDecorator()
 void ClientTableViewDecorator::showing(pqDataRepresentation* repr)
 {
   this->Internal->Links.removeAllPropertyLinks();
-  delete this->Internal->AttributeDomain;
-  delete this->Internal->AttributeAdaptor;
+  if (this->Internal->AttributeDomain)
+    {
+    delete this->Internal->AttributeDomain;
+    }
+  if (this->Internal->AttributeAdaptor)
+    {
+    delete this->Internal->AttributeAdaptor;
+    }
   this->Internal->AttributeDomain = 0;
   this->Internal->AttributeAdaptor = 0;
   if (repr)
