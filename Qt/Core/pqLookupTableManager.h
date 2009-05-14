@@ -107,10 +107,10 @@ protected:
   virtual void onRemoveLookupTable(pqScalarsToColors* lut) = 0;
   
   /// Called when a OpactiyFunction is added.
-  virtual void onAddOpacityFunction(pqScalarOpacityFunction* opacityFunc){}
+  virtual void onAddOpacityFunction(pqScalarOpacityFunction*){}
 
   /// Called when a OpactiyFunction is removed.
-  virtual void onRemoveOpacityFunction(pqScalarOpacityFunction* opacityFunc){}
+  virtual void onRemoveOpacityFunction(pqScalarOpacityFunction*){}
 
 };
 
