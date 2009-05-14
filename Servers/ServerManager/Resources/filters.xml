@@ -5716,7 +5716,8 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <DataTypeDomain name="input_type">
           <DataType value="vtkPointSet"/>
         </DataTypeDomain>
-        <InputArrayDomain name="input_array" attribute_type="point"/>
+        <InputArrayDomain name="input_array" attribute_type="point"
+                          optional="1"/>
         <Documentation>
           The input cells to create pathlines for.
         </Documentation>
