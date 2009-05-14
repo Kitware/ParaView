@@ -19,6 +19,7 @@ if view.GetProperty("RemoteRenderThreshold"):
 repr = servermanager.CreateRepresentation(sphere, view);
 repr.Input.append(sphere)
 
+view.UseOffscreenRenderingForScreenshotsOff()
 view.ResetCamera()
 view.StillRender()
 
