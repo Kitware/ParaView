@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewBase.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
+#include "pqScalarOpacityFunction.h"
 #include "pqServerManagerModel.h"
 
 //-----------------------------------------------------------------------------
@@ -64,6 +65,10 @@ void pqLookupTableManager::onAddProxy(pqProxy* proxy)
     {
     this->onAddLookupTable(lut);
     }
+  else if (pqScalarOpacityFunction* opf = qobject_cast<pqScalarOpacityFunction*>(proxy))
+    {
+    this->onAddOpacityFunction(opf);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -72,6 +77,10 @@ void pqLookupTableManager::onRemoveProxy(pqProxy* proxy)
   if (pqScalarsToColors* lut = qobject_cast<pqScalarsToColors*>(proxy))
     {
     this->onRemoveLookupTable(lut);
+    }
+  else if (pqScalarOpacityFunction* opf = qobject_cast<pqScalarOpacityFunction*>(proxy))
+    {
+    this->onRemoveOpacityFunction(opf);
     }
 }
 

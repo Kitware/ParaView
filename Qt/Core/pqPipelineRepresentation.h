@@ -190,7 +190,11 @@ protected:
   /// Creates helper proxies such as as the proxy
   /// for volume opacity function.
   void createHelperProxies();
-
+  
+  /// Creates a default proxy for volume opacity function.
+  vtkSMProxy* createOpacityFunctionProxy(
+    vtkSMPropRepresentationProxy* repr);
+  
 private:
   class pqInternal;
   pqInternal* Internal; 

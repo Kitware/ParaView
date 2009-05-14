@@ -1411,6 +1411,10 @@ void pqColorScaleEditor::makeDefault()
   pqLookupTableManager* lut_mgr = core->getLookupTableManager();
   if (lut_mgr)
     {
-    lut_mgr->saveAsDefault(this->ColorMap);
+    lut_mgr->saveLUTAsDefault(this->ColorMap);
+    if(this->OpacityFunction)
+      {
+      lut_mgr->saveOpacityFunctionAsDefault(this->OpacityFunction);
+      }
     }
 }

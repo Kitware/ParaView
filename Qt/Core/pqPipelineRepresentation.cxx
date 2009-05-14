@@ -84,12 +84,12 @@ class pqPipelineRepresentation::pqInternal
 public:
   vtkSmartPointer<vtkSMPropRepresentationProxy> RepresentationProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  pqScalarOpacityFunction *Opacity;
+//  pqScalarOpacityFunction *Opacity;
 
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->Opacity = 0;
+//    this->Opacity = 0;
     }
 
   // Convenience method to get array information.
@@ -194,15 +194,11 @@ pqScalarOpacityFunction* pqPipelineRepresentation::getScalarOpacityFunction()
 {
   if(this->getRepresentationType() == vtkSMPVRepresentationProxy::VOLUME)
     {
-    if(!this->Internal->Opacity)
-      {
-      // TODO: Add the opacity function to the server manager model.
-      this->Internal->Opacity = new pqScalarOpacityFunction(
-        "piecewise_functions", "PiecewiseFunction",
-        this->getScalarOpacityFunctionProxy(), this->getServer(), this);
-      }
+    pqServerManagerModel* smmodel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    vtkSMProxy* opf = this->getScalarOpacityFunctionProxy();
 
-    return this->Internal->Opacity;
+    return (opf? smmodel->findItem<pqScalarOpacityFunction*>(opf): 0);
     }
 
   return 0;
@@ -247,7 +243,9 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
     return;
     }
 
-  this->createHelperProxies();
+  // The HelperProxy is not needed any more since now the OpacityFunction is 
+  // created from LookupTableManager (Bug# 0008876)
+  // this->createHelperProxies();
 
   vtkSMPropRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
@@ -518,7 +516,7 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
   pqApplicationCore* core = pqApplicationCore::instance();
   pqLookupTableManager* lut_mgr = core->getLookupTableManager();
   vtkSMProxy* lut = 0;
-
+  vtkSMProxy* opf = 0;
   if (lut_mgr)
     {
     int number_of_components = this->getNumberOfComponents(
@@ -526,6 +524,9 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
     pqScalarsToColors* pqlut = lut_mgr->getLookupTable(
       this->getServer(), arrayname, number_of_components, 0);
     lut = (pqlut)? pqlut->getProxy() : 0;
+    pqScalarOpacityFunction* pqOPF = lut_mgr->getScalarOpacityFunction(
+      this->getServer(), arrayname, number_of_components, 0);
+    opf = (pqOPF)? pqOPF->getProxy() : 0;
     }
   else
     {
@@ -555,6 +556,8 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
       {
       lut = pp->GetProxy(0);
       }
+      
+    opf = this->createOpacityFunctionProxy(repr);
     }
 
   if (!lut)
@@ -571,6 +574,14 @@ void pqPipelineRepresentation::colorByArray(const char* arrayname, int fieldtype
   pqScalarsToColors* old_stc = this->getLookupTable();
   pqSMAdaptor::setProxyProperty(
     repr->GetProperty("LookupTable"), lut);
+    
+  // set the opacity function
+  if(opf)
+    {
+    pqSMAdaptor::setProxyProperty(
+      repr->GetProperty("ScalarOpacityFunction"), opf);
+    repr->UpdateVTKObjects();
+    }
 
   bool current_scalar_bar_visibility = false;
   // If old LUT was present update the visibility of the scalar bars
@@ -1174,4 +1185,38 @@ double pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()
     }
 
   return 0.5; //  1/2 million cells.
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineRepresentation::createOpacityFunctionProxy(
+  vtkSMPropRepresentationProxy* repr)
+{
+  if(!repr)
+    {
+    return NULL;
+    }
+
+  vtkSMProxy* opacityFunction = 0;
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    repr->GetProperty("ScalarOpacityFunction"));
+  if (pp->GetNumberOfProxies() == 0)
+    {
+    pqObjectBuilder* builder = pqApplicationCore::instance()->getObjectBuilder();
+    opacityFunction = builder->createProxy(
+      "piecewise_functions", "PiecewiseFunction", 
+      this->getServer(), "piecewise_functions");
+    // Setup default opactiy function to go from 0 to 1.
+    QList<QVariant> values;
+    values << 0.0 << 0.0 << 1.0 << 1.0;
+    
+    pqSMAdaptor::setMultipleElementProperty(
+      opacityFunction->GetProperty("Points"), values);
+    opacityFunction->UpdateVTKObjects();
+    }
+  else
+    {
+    opacityFunction = pp->GetProxy(0);
+    }
+
+  return opacityFunction;
 }

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqProxy;
 class pqScalarBarRepresentation;
 class pqScalarsToColors;
+class pqScalarOpacityFunction;
 class pqServer;
 class pqView;
 
@@ -57,11 +58,18 @@ public:
   /// can implemenent their own policy for managing lookup tables.
   virtual pqScalarsToColors* getLookupTable(pqServer* server, 
     const QString& arrayname, int number_of_components, int component) = 0;
+    
+  /// Returns the pqScalarOpacityFunction object for the piecewise
+  /// function used to map scalars to opacity.
+  virtual pqScalarOpacityFunction* getScalarOpacityFunction(pqServer* server, 
+    const QString& arrayname, int number_of_components, int component) = 0;
 
-  /// Saves the state of the lut so that the next time a new LUT is created, it
+  /// Saves the state of the lut/opacity-function so that 
+  /// the next time a new LUT/opacity-function is created, it
   /// will have the same state as this one.
-  virtual void saveAsDefault(pqScalarsToColors*)=0;
-
+  virtual void saveLUTAsDefault(pqScalarsToColors*)=0;
+  virtual void saveOpacityFunctionAsDefault(pqScalarOpacityFunction*)=0;
+  
   /// Set the scalar bar's visibility for the given lookup table in the given
   /// view. This may result in creating of a new scalar bar.
   /// This assumes that the pqScalarsToColors passed as an argument is indeed
@@ -97,6 +105,12 @@ protected:
 
   /// Called when a LUT is removed.
   virtual void onRemoveLookupTable(pqScalarsToColors* lut) = 0;
+  
+  /// Called when a OpactiyFunction is added.
+  virtual void onAddOpacityFunction(pqScalarOpacityFunction* opacityFunc){}
+
+  /// Called when a OpactiyFunction is removed.
+  virtual void onRemoveOpacityFunction(pqScalarOpacityFunction* opacityFunc){}
 
 };
 

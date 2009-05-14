@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
+#include "pqScalarOpacityFunction.h"
 #include "pqTimeKeeper.h"
 #include "pqViewModuleInterface.h"
 
@@ -104,6 +105,10 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
   else if (group == "lookup_tables")
     {
     return new pqScalarsToColors(group, name, proxy, server, 0);
+    }
+  else if (group == "piecewise_functions")
+    {
+    return new pqScalarOpacityFunction(group, name, proxy, server, 0);
     }
   else if (group == "scalar_bars")
     {

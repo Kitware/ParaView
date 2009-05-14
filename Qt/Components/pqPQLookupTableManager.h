@@ -53,10 +53,17 @@ public:
   /// pair. If  none exists, a new one will be created.
   virtual pqScalarsToColors* getLookupTable(pqServer* server, const QString& arrayname,
     int number_of_components, int component);
+    
+  /// Returns the pqScalarOpacityFunction object for the piecewise
+  /// function used to map scalars to opacity.
+  virtual pqScalarOpacityFunction* getScalarOpacityFunction(pqServer* server, 
+    const QString& arrayname, int number_of_components, int component);
 
-  /// Saves the state of the lut so that the next time a new LUT is created, it
+  /// Saves the state of the lut/opacity-function so that the next time a new 
+  /// LUT/opacity-function is created, it
   /// will have the same state as this one.
-  virtual void saveAsDefault(pqScalarsToColors*);
+  virtual void saveLUTAsDefault(pqScalarsToColors*);
+  virtual void saveOpacityFunctionAsDefault(pqScalarOpacityFunction*);
 
   /// Used to get the array the \c lut is associated with.
   /// Return false if no such association exists.
@@ -66,7 +73,13 @@ public:
   /// Setting key used to save the default lookup table.
   static const char* DEFAULT_LOOKUPTABLE_SETTING_KEY()
     {
-    return "/lookupTable/Default";
+    return "/lookupTable/DefaultLUT";
+    }
+    
+  /// Setting key used to save the default opacity function.
+  static const char* DEFAULT_OPACITYFUNCTION_SETTING_KEY()
+    {
+    return "/lookupTable/DefaultOpacity";
     }
 
 public slots:
@@ -83,13 +96,28 @@ protected:
   virtual void onRemoveLookupTable(pqScalarsToColors* lut);
 
   /// set default property values for LUT.
-  void setDefaultState(vtkSMProxy* lut);
+  void setLUTDefaultState(vtkSMProxy* lut);
+  
+  /// Called when a new ScalarOpacityFunction pq object is created.
+  /// This happens as a result of either the GUI or python
+  /// registering a ScalarOpacityFunction proxy.
+  virtual void onAddOpacityFunction(pqScalarOpacityFunction* opFunc);
+  
+  /// Called when a ScalarOpacityFunction is removed.
+  virtual void onRemoveOpacityFunction(pqScalarOpacityFunction* opFunc);
+  
+  /// set default property values for ScalarOpacityFunction.
+  void setOpacityFunctionDefaultState(vtkSMProxy* opFunc);
 
-protected:
   /// creates a new LUT.
   pqScalarsToColors* createLookupTable(pqServer* server,
     const QString& arrayname, int number_of_components, int component);
-
+    
+  /// Returns the proxy for the piecewise function used to
+  /// map scalars to opacity.
+  pqScalarOpacityFunction* createOpacityFunction(pqServer* server,
+    const QString& arrayname, int number_of_components, int component);
+  
 private:
   pqPQLookupTableManager(const pqPQLookupTableManager&); // Not implemented.
   void operator=(const pqPQLookupTableManager&); // Not implemented.
