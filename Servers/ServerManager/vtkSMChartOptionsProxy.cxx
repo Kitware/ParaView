@@ -22,7 +22,7 @@
 #include "vtkSMChartViewProxy.h"
 
 vtkStandardNewMacro(vtkSMChartOptionsProxy);
-vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMChartOptionsProxy, "1.5");
 vtkCxxSetObjectMacro(vtkSMChartOptionsProxy, ChartView, vtkQtChartView);
 //----------------------------------------------------------------------------
 vtkSMChartOptionsProxy::vtkSMChartOptionsProxy()
@@ -324,6 +324,11 @@ void vtkSMChartOptionsProxy::UpdateAxisRanges()
           relayout_needed = true;
           axis->setBestFitRange(this->AxisRanges[cc][0], this->AxisRanges[cc][1]);
           }
+        axis->setBestFitGenerated(true);
+        }
+      else
+        {
+        axis->setBestFitGenerated(false);
         }
       }
     if (relayout_needed)
