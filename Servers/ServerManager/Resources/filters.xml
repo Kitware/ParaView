@@ -83,7 +83,7 @@
 
   <ProxyGroup name="filters">
 
-   <!-- ==================================================================== -->
+    <!-- ==================================================================== -->
    <SourceProxy name="ExtractSelectionOverTime" class="vtkPExtractArraysOverTime"
       label="Plot Selection Over Time">
       <Documentation
@@ -5451,9 +5451,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-       <DataTypeDomain name="input_type" composite_data_supported="1">
-         <DataType value="vtkDataObject"/>
-       </DataTypeDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="1">
+          <DataType value="vtkDataObject"/>
+        </DataTypeDomain>
         <Documentation>
           This property specifies the input of the Temporal Interpolator.
         </Documentation>
@@ -5468,7 +5468,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         <Documentation>
           If Discrete Time Step Interval is set to 0, then the Temporal Interpolator will provide a continuous region of time on its output.  If set to anything else, then the output will define a finite set of time points on its output, each spaced by the Discrete Time Step Interval.  The output will have (time range)/(discrete time step interval) time steps.  (Note that the time range is defined by the time range of the data of the input filter, which may be different from other pipeline objects or the range defined in the animation inspector.)  This is a useful option to use if you have a dataset with one missing time step and wish to 'file-in' the missing data with an interpolated value from the steps on either side.
         </Documentation>
-      </DoubleVectorProperty>      
+      </DoubleVectorProperty>
 
       <DoubleVectorProperty 
          name="TimestepValues"
@@ -5793,11 +5793,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           name="IdChannelArray" 
           command="SetIdChannelArray"
           number_of_elements="1"
-          default_values="Point-Index as ID"
+          default_values="Global or Local IDs"
           animateable="0">
           <ArrayListDomain
             name="array_list" attribute_type="Scalars"
-            none_string="Point-Index as ID">
+            none_string="Global or Local IDs">
             <RequiredProperties>
               <Property name="Input" function="Input"/>
             </RequiredProperties>
@@ -5806,7 +5806,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
           Specify the name of a scalar array which will be used to fetch
           the index of each point. This is necessary only if the particles
           change position (Id order) on each time step. The Id can be used
-          to identify particles at each step and hence track them properly
+          to identify particles at each step and hence track them properly.
+          If this array is set to "Global or Local IDs", the global point
+          ids are used if they exist or the point index is otherwise.
         </Documentation>
       </StringVectorProperty>
 
@@ -6078,7 +6080,7 @@ This filter operates on any type of data set, provided it has point-centered vec
           Turn On/Off particle writing
         </Documentation>
       </IntVectorProperty>
-      
+
       <!-- End ParticleTracer -->
    </SourceProxy>
     
