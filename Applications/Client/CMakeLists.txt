@@ -269,7 +269,6 @@ IF(BUILD_TESTING)
     ContourRange
     CreateAndLoadLookmark
     CreateCustomFilter
-    CreateSource
     CustomFilter
     CustomSourceProbe
     CutMulti
