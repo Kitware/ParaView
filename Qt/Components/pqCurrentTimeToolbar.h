@@ -71,6 +71,9 @@ protected slots:
   /// When user edits the spin-box
   void currentTimeIndexChanged();
   void onPlayModeChanged();
+
+  /// Update range for the spin box.
+  void onTimeStepsChanged();
   
 signals:
   /// emitted to request the scene to change it's animation time.

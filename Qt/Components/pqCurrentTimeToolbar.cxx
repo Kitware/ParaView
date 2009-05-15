@@ -122,9 +122,28 @@ void pqCurrentTimeToolbar::setAnimationScene(pqAnimationScene* scene)
       this, SLOT(onPlayModeChanged()));
     QObject::connect(this, SIGNAL(changeSceneTime(double)),
       this->Scene, SLOT(setAnimationTime(double)));
+    QObject::connect(this->Scene, SIGNAL(timeStepsChanged()),
+      this, SLOT(onTimeStepsChanged()));
 
     this->sceneTimeChanged(this->Scene->getAnimationTime());
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqCurrentTimeToolbar::onTimeStepsChanged()
+{
+  bool prev = this->TimeSpinBox->blockSignals(true);
+  pqTimeKeeper* timekeeper = this->Scene->getServer()->getTimeKeeper();
+  int time_steps = timekeeper->getNumberOfTimeStepValues();
+  if (time_steps > 0)
+    {
+    this->TimeSpinBox->setMaximum(time_steps -1);
+    }
+  else
+    {
+    this->TimeSpinBox->setMaximum(0);
+    }
+  this->TimeSpinBox->blockSignals(prev);
 }
 
 //-----------------------------------------------------------------------------
