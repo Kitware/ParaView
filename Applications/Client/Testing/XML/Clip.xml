@@ -1,7 +1,60 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
-  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Clip" />
-  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
+  <!--
+    This test tests different aspects of using the Clip panel/filter including:
+    * undo/redo
+    * clip plane linking
+  -->
+  <pqevent object="pqClientMainWindow/mainToolBar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton6" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton7" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton4" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton5" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Common" command="activate" arguments="Clip" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/undoRedoToolbar/1QToolButton1" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFile" command="activate" arguments="actionFileOpen" />
+  <pqevent object="pqClientMainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/can.ex2" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Variables/1QHeaderView0" command="mouseRelease" arguments="1,0,0,0,0,0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Variables" command="set_string" arguments="ACCL" />
+  <pqevent object="pqClientMainWindow/variableToolbar/displayColor/Components" command="set_string" arguments="X" />
+  <pqevent object="pqClientMainWindow/commonFilters/1QToolButton2" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/InsideOut" command="set_boolean" arguments="true" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuTools" command="activate" arguments="actionToolsManageLinks" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/addButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mousePress" arguments="1,1,0,-10,16,/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mouseRelease" arguments="1,0,0,-10,16,/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mousePress" arguments="1,1,0,-13,8,/1:0/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mouseRelease" arguments="1,0,0,-13,8,/1:0/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mousePress" arguments="1,1,0,16,7,/1:0/1:0/0:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy1" command="mouseRelease" arguments="1,0,0,16,7,/1:0/1:0/0:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mousePress" arguments="1,1,0,-13,12,/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mouseRelease" arguments="1,0,0,-13,12,/1:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mousePress" arguments="1,1,0,-9,10,/1:0/3:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mouseRelease" arguments="1,0,0,-9,10,/1:0/3:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mousePress" arguments="1,1,0,10,9,/1:0/3:0/0:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/stackedWidget/page/ObjectTreeProxy2" command="mouseRelease" arguments="1,0,0,10,9,/1:0/3:0/0:0" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/pqLinksEditor/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pqLinksManager/buttonBox/1QPushButton0" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,49,13,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,49,13,/0:0/0:0/0:0" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useXNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/ClipFunction/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mousePress" arguments="1,1,0,51,12,/0:0/1:0/0:0" />
+  <pqevent object="pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="mouseRelease" arguments="1,0,0,51,12,/0:0/1:0/0:0" />
 </pqevents>

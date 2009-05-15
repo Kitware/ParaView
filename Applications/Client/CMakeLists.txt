@@ -148,7 +148,6 @@ IF(BUILD_TESTING)
   SET (XML_TESTS_WITH_BASELINES
     # ColorEditor3 doesn't work in client/server mode
     ColorEditor3
-    CreateSourceWithoutConnect
 #    LoadStateSelection
     OpenFile
 #    SelectionUndo
@@ -264,9 +263,6 @@ IF(BUILD_TESTING)
     Calculator
     CameraLink
     Clip
-    ClipHidden
-    ClipPlaneLink
-    ClipUndo
     ColorEditor1
     ColorEditor2
     ColorEditor4

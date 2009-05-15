@@ -1,5 +1,0 @@
-<?xml version="1.0" ?>
-<pqevents>
-  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
-  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
-</pqevents>
