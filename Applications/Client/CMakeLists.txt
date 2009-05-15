@@ -308,7 +308,6 @@ IF(BUILD_TESTING)
     SimpleInteraction
     Slice
     SPTimeseries
-    StreamTracer
     StreamTracerUpdates
     TemporalInterpolator
     TemporalShiftScale
@@ -366,7 +365,7 @@ IF(BUILD_TESTING)
     ContourRange
     D3SmallCells
     Fractal3D
-    StreamTracer
+    StreamTracerUpdates
     UndoRedo2
     )
 
