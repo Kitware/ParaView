@@ -31,19 +31,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqChartView.h"
 
+#include "pqEventDispatcher.h"
+#include "pqImageUtil.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "vtkImageData.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVXMLElement.h"
 #include "vtkQtChartArea.h"
 #include "vtkQtChartContentsSpace.h"
 #include "vtkQtChartView.h"
 #include "vtkQtChartWidget.h"
 #include "vtkSMChartViewProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkImageData.h"
-#include "pqImageUtil.h"
-#include "pqEventDispatcher.h"
 
 //-----------------------------------------------------------------------------
 pqChartView::pqChartView(
@@ -231,8 +232,13 @@ bool pqChartView::canDisplay(pqOutputPort* opPort) const
     return false;
     }
 
-  vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
-  return (dataInfo && dataInfo->DataSetTypeIsA("vtkDataObject"));
-}
+  if (sourceProxy->GetHints() &&
+    sourceProxy->GetHints()->FindNestedElementByName("Plotable"))
+    {
+    return true;
+    }
 
+  vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
+  return (dataInfo && dataInfo->DataSetTypeIsA("vtkTable"));
+}
 

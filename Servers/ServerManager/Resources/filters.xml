@@ -137,6 +137,9 @@
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYPlotView" />
+
+        <!-- Temporary hint to allow the output of this filter to be plotted -->
+        <Plotable />
      </Hints>
      <!-- End of ExtractSelectionOverTime -->
    </SourceProxy>
@@ -171,6 +174,7 @@ TimeData (if Time exists in the input)).
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYPlotView" />
+        <Plotable />
      </Hints>
 
      <!-- End ExtractFieldDatasOverTime -->
@@ -223,6 +227,7 @@ TimeData (if Time exists in the input)).
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYPlotView" />
+        <Plotable />
      </Hints>
    <!-- End ImageShrink -->
    </SourceProxy>
@@ -311,6 +316,7 @@ The Integrate Attributes filter integrates point and cell data over lines and su
      <Visibility replace_input="0" />
      <!-- View can be used to specify the preferred view for the proxy -->
      <View type="SpreadSheetView" />
+     <Plotable />
    </Hints>
    <!-- End IntegrateAttributes -->
    </SourceProxy>
@@ -4851,6 +4857,7 @@ The Probe filter samples the data set attributes of the current data set at the 
        <Visibility replace_input="0" />
        <!-- View can be used to specify the preferred view for the proxy -->
       <View type="XYPlotView" />
+      <Plotable />
      </Hints>
     <!-- End ProbeLine -->
    </CompoundSourceProxy>
@@ -7337,6 +7344,7 @@ This filter extracts a list of datasets from hierarchical datasets.
      <Hints>
        <!-- View can be used to specify the preferred view for the proxy -->
        <View type="BarChartView" />
+       <Plotable />
      </Hints>
 
    <!-- End ExtractHistogram -->
@@ -7372,6 +7380,7 @@ This filter extracts a list of datasets from hierarchical datasets.
         <Visibility replace_input="0" />
        <!-- View can be used to specify the preferred view for the proxy -->
        <View type="XYPlotView" />
+       <Plotable />
      </Hints>
    <!-- End ScatterPlot -->
    </SourceProxy>
@@ -8544,6 +8553,7 @@ This property controls how the filter works to generate tensor cell data. You ca
       <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="XYPlotView" />
+        <Plotable />
       </Hints>
     </CompoundSourceProxy> <!-- FFTSelectionOverTime -->
 
@@ -8605,6 +8615,32 @@ This property controls how the filter works to generate tensor cell data. You ca
       <!-- End of AttributeDataToTableFilter -->
     </SourceProxy>
 
+    <!-- ================================================================== -->
+    <SourceProxy name="PlotAttributes" label="Plot Data"
+      class="vtkPassThrough">
+      <Documentation short_help="Plot data arrays from the input">
+        This filter prepare arbitrary data to be plotted in any of the plots.
+        By default the data is shown in a XY line plot.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataObject" />
+        </DataTypeDomain>
+        <Documentation>
+          The input.
+        </Documentation>
+      </InputProperty>
+      <Hints>
+        <View type="XYPlotView" />
+        <Plotable/>
+      </Hints>
+      <!-- End of PlotAttributes -->
+    </SourceProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>
