@@ -27,6 +27,7 @@ paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView
 paraview_build_optional_plugin(ClientHierarchyView "ClientHierarchyView" ClientHierarchyView OFF)
 paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
+paraview_build_optional_plugin(ClientTreeView "ClientTreeView" ClientTreeView OFF)
 paraview_build_optional_plugin(CommonToolbar "CommonToolbar" CommonToolbar OFF)
 paraview_build_optional_plugin(CosmoFilters "Cosmology Filters" CosmoFilters OFF)
 paraview_build_optional_plugin(GraphLayoutFilterPanel "GraphLayoutFilterPanel" GraphLayoutFilterPanel OFF)

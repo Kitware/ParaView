@@ -476,7 +476,7 @@
         </DataTypeDomain>
       </InputProperty>
       <Hints>
-        <View type="ClientGraphView"/>
+        <View type="ClientTreeView"/>
       </Hints>
     </SourceProxy>
 

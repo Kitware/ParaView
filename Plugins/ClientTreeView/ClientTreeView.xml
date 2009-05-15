@@ -1,0 +1,17 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="representations">
+   <SelectionDeliveryRepresentationProxy name="ClientTreeDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
+      <InputProperty name="Input" command="SetInput-not-used" update_self="1">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       </InputProperty>
+   </SelectionDeliveryRepresentationProxy>
+ </ProxyGroup>
+
+ <ProxyGroup name="views">
+   <ViewProxy name="ClientTreeView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientTreeDisplay">
+   </ViewProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
