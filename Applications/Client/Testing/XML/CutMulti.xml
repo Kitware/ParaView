@@ -3,7 +3,7 @@
   <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QTabBar0" command="set_tab" arguments="1" />
-  <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/1QStackedWidget0/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
+  <pqevent object="pqClientMainWindow/representationToolbar/displayRepresentation/comboBox" command="set_string" arguments="Outline" />  
   <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="Cut" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup0/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
