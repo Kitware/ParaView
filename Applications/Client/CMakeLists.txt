@@ -273,7 +273,6 @@ IF(BUILD_TESTING)
     CreateSource
     CustomFilter
     CustomSourceProbe
-    Cut
     CutMulti
     D3SmallCells
     DualSphereAnimation
