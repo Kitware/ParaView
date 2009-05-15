@@ -312,7 +312,6 @@ IF(BUILD_TESTING)
     TemporalInterpolator
     TemporalShiftScale
     Tessellate
-    TextWidget
     Threshold
     UndoRedo
     UndoRedo1
