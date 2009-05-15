@@ -226,21 +226,25 @@ public:
   
   /// Implements command-execution
   void internalExecuteCommand()
-  {
+    {
+    // First update the history cache. It's essential to update the
+    // this->CommandPosition before calling internalExecuteCommand() since that
+    // can result in a clearing of the current command (BUG #8765).
+    QString command = this->commandBuffer();
+    if (!command.isEmpty()) // Don't store empty commands in the history
+      {
+      this->CommandHistory.push_back("");
+      this->CommandPosition = this->CommandHistory.size() - 1;
+      }
     QTextCursor c(this->document());
     c.movePosition(QTextCursor::End);
     c.insertText("\n");
 
     this->InteractivePosition = this->documentEnd();
-    this->Parent.internalExecuteCommand(this->commandBuffer());
-    
-    
-    if(!this->commandBuffer().isEmpty()) // Don't store empty commands in the history
-      {
-      this->CommandHistory.append("");
-      this->CommandPosition = this->CommandHistory.size() - 1;
-      }
-  }
+
+
+    this->Parent.internalExecuteCommand(command);
+    }
   
   /// Stores a back-reference to our owner
   pqConsoleWidget& Parent;
