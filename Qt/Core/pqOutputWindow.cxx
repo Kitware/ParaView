@@ -88,7 +88,8 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   if (
     text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive) ||
     text.contains("looking for 'HistogramView") || 
-    text.contains("(looking for 'XYPlot")
+    text.contains("(looking for 'XYPlot") ||
+    text.contains("Unrecognised OpenGL version")
     )
     {
     return;
@@ -125,6 +126,13 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 
 void pqOutputWindow::onDisplayErrorText(const QString& text)
 {
+  if (
+    text.contains("Unrecognised OpenGL version")
+  )
+    {
+    return;
+    }
+
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
   format.clearBackground();
