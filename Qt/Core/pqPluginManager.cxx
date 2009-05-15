@@ -453,7 +453,9 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
 {
   if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST"))
     {
-    cout << "Ignoring plugin paths since test is being run on the dashboard";
+    cout << 
+      "Ignoring plugin paths since the application is being run on the dashboard"
+      << endl;
     return QStringList();
     }
 
