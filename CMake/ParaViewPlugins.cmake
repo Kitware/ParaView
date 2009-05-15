@@ -460,7 +460,7 @@ MACRO(ADD_PARAVIEW_VIEW_OPTIONS OUTIFACES OUTSRCS)
 
 ENDMACRO(ADD_PARAVIEW_VIEW_OPTIONS)
 
-# create implementation for a custom display panel interface
+# create implementation for a custom menu or toolbar
 # ADD_PARAVIEW_ACTION_GROUP(
 #    OUTIFACES
 #    OUTSRCS
