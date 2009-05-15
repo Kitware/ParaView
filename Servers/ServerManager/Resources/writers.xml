@@ -421,6 +421,7 @@
 
     <PWriterProxy name="XMLPPolyDataWriter"
       class="vtkXMLPPolyDataWriter"
+      parallel_only="1"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
         short_help="Write polydata in a xml-based vtk data file.">
@@ -445,6 +446,7 @@
 
     <PWriterProxy name="XMLPUnstructuredGridWriter"
       class="vtkXMLPUnstructuredGridWriter"
+      parallel_only="1"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
         short_help="Write unstructured grid in a xml-based vtk data file.">
@@ -469,6 +471,7 @@
 
     <PWriterProxy name="XMLPStructuredGridWriter"
       class="vtkXMLPStructuredGridWriter"
+      parallel_only="1"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
         short_help="Write structured grid in a xml-based vtk data file.">
@@ -493,6 +496,7 @@
 
     <PWriterProxy name="XMLPRectilinearGridWriter"
       class="vtkXMLPRectilinearGridWriter"
+      parallel_only="1"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
         short_help="Write rectilinear grid in a xml-based vtk data file.">
@@ -517,6 +521,7 @@
 
     <PWriterProxy name="XMLPImageDataWriter"
       class="vtkXMLPImageDataWriter"
+      parallel_only="1"
       base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
       <Documentation
         short_help="Write image data in a xml-based vtk data file.">
