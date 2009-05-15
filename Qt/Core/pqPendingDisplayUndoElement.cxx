@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPendingDisplayManager.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.9");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.10");
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
 {
@@ -89,7 +89,6 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     }
 
   vtkSMProxyLocator* locator = this->GetProxyLocator();
-  locator->SetConnectionID(this->GetConnectionID());
   vtkSMProxy* proxy = locator->LocateProxy(id);
 
   if (!proxy)
