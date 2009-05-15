@@ -1191,7 +1191,7 @@ double pqPipelineRepresentation::getUnstructuredGridOutlineThreshold()
 vtkSMProxy* pqPipelineRepresentation::createOpacityFunctionProxy(
   vtkSMPropRepresentationProxy* repr)
 {
-  if(!repr)
+  if (!repr || !repr->GetProperty("ScalarOpacityFunction"))
     {
     return NULL;
     }
