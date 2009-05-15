@@ -370,6 +370,9 @@ void pqPipelineBrowser::changeInput()
         }
       filter->getProxy()->UpdateVTKObjects();
       emit this->endUndo();
+
+      // render all views
+      pqApplicationCore::instance()->render();
       }
 
     delete model;
