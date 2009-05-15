@@ -182,7 +182,6 @@ IF(BUILD_TESTING)
         FileSeries
         SaveLargeScreenshot
         #SaveAnimationMultiView   -- need to fix race condition on Mac
-        VCRAnimation
         )
       # Set image threshold overrides for the tests.
       SET(SaveLargeScreenshot_THRESHOLD 10000)
