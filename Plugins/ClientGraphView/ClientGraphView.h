@@ -81,7 +81,7 @@ private:
   implementation* const Implementation;
 
   class command;
-  command* const Command;
+  command* Command;
 };
 
 #endif // _ClientGraphView_h

@@ -99,7 +99,6 @@ protected:
 //BTX
   friend struct vtkSMPropertyLinkInternals;
   friend class vtkSMPropertyLinkObserver;
-  friend class vtkSMSelectionLink;
 //ETX
 
   // Description:

@@ -69,6 +69,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class AnnotationManagerPanel::command : public vtkCommand
 {
 public:
+  static command* New(AnnotationManagerPanel& view)
+  {
+    return new command(view);
+  }
   command(AnnotationManagerPanel& view) : Target(view) { }
   virtual void Execute(vtkObject*, unsigned long, void* layers)
   {
@@ -104,9 +108,9 @@ public:
 
 AnnotationManagerPanel::AnnotationManagerPanel(QWidget *p) :
   QWidget(p),
-  Implementation(new pqImplementation()),
-  Command(new command(*this))
+  Implementation(new pqImplementation())
 {
+  this->Command = command::New(*this);
   QVBoxLayout* vboxlayout = new QVBoxLayout(this);
   vboxlayout->setSpacing(0);
   vboxlayout->setMargin(0);
@@ -139,6 +143,7 @@ AnnotationManagerPanel::AnnotationManagerPanel(QWidget *p) :
 AnnotationManagerPanel::~AnnotationManagerPanel()
 {
   delete this->Implementation;
+  this->Command->Delete();
 }
 
 //-----------------------------------------------------------------------------

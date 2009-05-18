@@ -28,6 +28,7 @@
 #include "ClientGeoView2D.h"
 
 #include <QVTKWidget.h>
+#include <vtkAnnotationLink.h>
 #include <vtkCamera.h>
 #include <vtkCommand.h>
 #include <vtkDataObject.h>
@@ -38,7 +39,7 @@
 #include <vtkGeoAlignedImageRepresentation.h>
 #include <vtkGeoAlignedImageSource.h>
 #include <vtkGeoFileImageSource.h>
-#include <vtkGeoLineRepresentation.h>
+#include <vtkGeoSampleArcs.h>
 #include <vtkGeometryFilter.h>
 #include <vtkGeoProjection.h>
 #include <vtkGeoProjectionSource.h>
@@ -53,10 +54,10 @@
 #include <vtkPointSet.h>
 #include <vtkPVDataInformation.h>
 #include <vtkRenderedGraphRepresentation.h>
+#include <vtkRenderedSurfaceRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSMIdTypeVectorProperty.h>
 #include <vtkSMProxyManager.h>
@@ -114,7 +115,7 @@ public:
     new QVBoxLayout(this->Widget);
 
     this->View = vtkSmartPointer<vtkGeoView2D>::New();
-    this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
+    this->Widget->SetRenderWindow(this->View->GetRenderWindow());
     this->Transform = vtkSmartPointer<vtkGeoTransform>::New();
     this->ProjectionIndex = 44;
     vtkSmartPointer<vtkGeoProjection> proj =
@@ -180,11 +181,6 @@ ClientGeoView2D::ClientGeoView2D(
   // We connect to endRender() to trigger the vtkView update.
   this->connect(this, SIGNAL(endRender()), this, SLOT(renderGeoViewInternal()));
 
-  // Set mellow theme
-  vtkViewTheme* theme = vtkViewTheme::CreateMellowTheme();
-  this->Implementation->View->ApplyViewTheme(theme);
-  theme->Delete();
-
   this->Implementation->ImageRepresentation =
     vtkGeoAlignedImageRepresentation::New();
   vtkStdString tileDatabase(CLIENT_GEO_VIEW_TILE_PATH);
@@ -243,11 +239,11 @@ ClientGeoView2D::ClientGeoView2D(
     SetParallelScale((bounds[3] - bounds[2]) / 2.0);
 
   // Perform initial update
-  this->Implementation->Widget->GetRenderWindow()->Render();
+  this->Implementation->View->Render();
 
   // Load political boundaries
-  vtkSmartPointer<vtkGeoLineRepresentation> lineRep =
-    vtkSmartPointer<vtkGeoLineRepresentation>::New();
+  vtkSmartPointer<vtkRenderedSurfaceRepresentation> lineRep =
+    vtkSmartPointer<vtkRenderedSurfaceRepresentation>::New();
   vtkSmartPointer<vtkXMLPolyDataReader> pbReader =
     vtkSmartPointer<vtkXMLPolyDataReader>::New();
   if (pqFilesystem::shareDirectory().exists("political.vtp"))
@@ -258,10 +254,17 @@ ClientGeoView2D::ClientGeoView2D(
     {
     pbReader->SetFileName(PARAVIEW_DATA_ROOT "/Data/political.vtp");
     }
-  lineRep->SetTransform(this->Implementation->Transform);
   lineRep->SetInputConnection(pbReader->GetOutputPort());
-  lineRep->CoordinatesInArraysOff();
+  lineRep->SelectableOff();
   this->Implementation->View->AddRepresentation(lineRep);
+
+  // Set mellow theme
+  vtkViewTheme* theme = vtkViewTheme::CreateMellowTheme();
+  theme->SetLineWidth(1);
+  theme->SetCellColor(0.0, 0.0, 0.0);
+  theme->SetCellOpacity(0.2);
+  this->Implementation->View->ApplyViewTheme(theme);
+  theme->Delete();
 
   // Perform another update to show political boundaries
   this->Implementation->View->Update();
@@ -269,7 +272,6 @@ ClientGeoView2D::ClientGeoView2D(
   // Listen for the selection changed event
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
   emit this->endProgress();
 }
 
@@ -301,8 +303,7 @@ void ClientGeoView2D::selectionChanged()
       opPort->getSource()->getProxy());
 
     // Fill the selection source with the selection from the view
-    rep->GetSelectionLink()->Update();
-    vtkSelection* sel = rep->GetSelectionLink()->GetOutput();
+    vtkSelection* sel = rep->GetAnnotationLink()->GetCurrentSelection();
     vtkSMSourceProxy* selectionSource =
       pqSelectionManager::createSelectionSource(sel, repSource->GetConnectionID());
 
@@ -383,6 +384,7 @@ void ClientGeoView2D::onRepresentationVisibilityChanged(pqRepresentation* pqrep,
       }
 
     vtkRenderedGraphRepresentation* vtkrep = vtkRenderedGraphRepresentation::New();
+    vtkrep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
     vtkrep->SetInputConnection(proxy->GetOutputPort());
     vtkrep->SetEdgeLayoutStrategyToArcParallel();
     this->Implementation->Representations[pqrep] = vtkrep;
@@ -428,11 +430,11 @@ void ClientGeoView2D::renderGeoViewInternal()
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    rep->GetSelectionLink()->SetSelection(sel);
+    rep->GetAnnotationLink()->SetCurrentSelection(sel);
 
     // Update the current domain map.
     int useDomainMap = vtkSMPropertyHelper(proxy, "UseDomainMap").GetAsInt();
-    rep->GetSelectionLink()->RemoveAllDomainMaps();
+    rep->GetAnnotationLink()->RemoveAllDomainMaps();
     if (useDomainMap)
       {
       vtkSMSourceProxy* domainMap = 0;
@@ -453,7 +455,7 @@ void ClientGeoView2D::renderGeoViewInternal()
         vtkTable* output = vtkTable::SafeDownCast(delivery->GetOutput());
         if (output)
           {
-          rep->GetSelectionLink()->AddDomainMap(output);
+          rep->GetAnnotationLink()->AddDomainMap(output);
           }
         }
       }
@@ -531,7 +533,7 @@ void ClientGeoView2D::renderGeoViewInternal()
     }
 
   emit this->beginProgress();
-  this->Implementation->Widget->GetRenderWindow()->Render();
+  this->Implementation->View->Render();
   emit this->endProgress();
 }
 

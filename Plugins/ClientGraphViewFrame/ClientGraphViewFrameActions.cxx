@@ -22,7 +22,7 @@
 
 #include <vtkPVDataInformation.h>
 #include <vtkPVXMLElement.h>
-#include <vtkSelectionLink.h>
+#include <vtkSelection.h>
 #include <vtkSMClientDeliveryRepresentationProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMPropertyHelper.h>
@@ -38,7 +38,6 @@
 #include <vtkIdTypeArray.h>
 #include <vtkInformation.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSmartPointer.h>
 #include <vtkTable.h>
@@ -252,7 +251,6 @@ void ClientGraphViewFrameActions::onExtractSubgraph()
       vtkTable* output = vtkTable::SafeDownCast(delivery->GetOutput());
       if (output)
         {
-        vtkSmartPointer<vtkSelectionLink> link = vtkSmartPointer<vtkSelectionLink>::New();
         vtkSMSelectionDeliveryRepresentationProxy* const proxy = 
           vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy());
         proxy->GetSelectionRepresentation()->Update();
@@ -260,16 +258,15 @@ void ClientGraphViewFrameActions::onExtractSubgraph()
         vtkSelection* sel = vtkSelection::SafeDownCast(
           proxy->GetSelectionRepresentation()->GetOutput());
         vtkGraph* data = vtkGraph::SafeDownCast(proxy->GetOutput());
-        link->SetSelection(sel);
-        link->AddDomainMap(output);
         vtkSmartPointer<vtkConvertSelectionDomain> csd = vtkSmartPointer<vtkConvertSelectionDomain>::New();
-        csd->SetInputConnection(0, link->GetOutputPort(0));
-        csd->SetInputConnection(1, link->GetOutputPort(1));
+        csd->SetInput(0, sel);
+        csd->SetInput(1, output);
         csd->SetInputConnection(2, proxy->GetOutputPort());
         csd->Update();
 
         vtkSmartPointer<vtkSelection> converted;
-        converted.TakeReference(vtkConvertSelection::ToIndexSelection(csd->GetOutput(), proxy->GetOutput()));
+        converted.TakeReference(vtkConvertSelection::ToIndexSelection(
+          vtkSelection::SafeDownCast(csd->GetOutput()), proxy->GetOutput()));
 
         vtkSmartPointer<vtkIdTypeArray> edgeList = vtkSmartPointer<vtkIdTypeArray>::New();
         bool hasEdges = false;
@@ -505,7 +502,6 @@ void ClientGraphViewFrameActions::onExpandSelection()
       vtkTable* output = vtkTable::SafeDownCast(delivery->GetOutput());
       if (output)
         {
-        vtkSmartPointer<vtkSelectionLink> link = vtkSmartPointer<vtkSelectionLink>::New();
         vtkSMSelectionDeliveryRepresentationProxy* const proxy = 
           vtkSMSelectionDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy());
         proxy->GetSelectionRepresentation()->Update();
@@ -513,16 +509,15 @@ void ClientGraphViewFrameActions::onExpandSelection()
         vtkSelection* sel = vtkSelection::SafeDownCast(
           proxy->GetSelectionRepresentation()->GetOutput());
         vtkGraph* data = vtkGraph::SafeDownCast(proxy->GetOutput());
-        link->SetSelection(sel);
-        link->AddDomainMap(output);
         vtkSmartPointer<vtkConvertSelectionDomain> csd = vtkSmartPointer<vtkConvertSelectionDomain>::New();
-        csd->SetInputConnection(0, link->GetOutputPort(0));
-        csd->SetInputConnection(1, link->GetOutputPort(1));
+        csd->SetInput(0, sel);
+        csd->SetInput(1, output);
         csd->SetInputConnection(2, proxy->GetOutputPort());
         csd->Update();
 
         vtkSmartPointer<vtkSelection> converted;
-        converted.TakeReference(vtkConvertSelection::ToIndexSelection(csd->GetOutput(), proxy->GetOutput()));
+        converted.TakeReference(vtkConvertSelection::ToIndexSelection(
+          vtkSelection::SafeDownCast(csd->GetOutput()), proxy->GetOutput()));
 
         vtkSmartPointer<vtkIdTypeArray> edgeList = vtkSmartPointer<vtkIdTypeArray>::New();
         bool hasEdges = false;

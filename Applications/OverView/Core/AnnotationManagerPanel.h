@@ -65,7 +65,7 @@ private:
   pqImplementation* const Implementation;
 
   class command;
-  command* const Command;
+  command* Command;
 };
 
 #endif

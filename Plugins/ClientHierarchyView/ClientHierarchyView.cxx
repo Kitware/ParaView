@@ -30,6 +30,7 @@
 #include "ui_ClientHierarchyView.h"
 
 #include <vtkAlgorithmOutput.h>
+#include <vtkAnnotationLink.h>
 #include <vtkAreaLayoutStrategy.h>
 #include <vtkBoxLayoutStrategy.h>
 #include <vtkDataObjectTypes.h>
@@ -51,7 +52,6 @@
 #include <vtkQtTreeView.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSelectionSource.h>
 #include <vtkSliceAndDiceLayoutStrategy.h>
@@ -129,12 +129,13 @@ public:
     this->Widgets.treeFrame->setLayout(layout);
 
     this->HierarchicalGraphView = vtkSmartPointer<vtkTreeAreaView>::New();
-    this->HierarchicalGraphView->SetupRenderWindow(this->Widgets.hierarchicalGraphView->GetRenderWindow());
+    this->Widgets.hierarchicalGraphView->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
     this->HierarchicalGraphView->ApplyViewTheme(this->HierarchicalGraphTheme);
     this->HierarchicalGraphView->SetEdgeColorToSplineFraction();
     this->HierarchicalGraphView->SetUseRectangularCoordinates(true);
 
     this->TreeAreaRepresentation = vtkSmartPointer<vtkRenderedTreeAreaRepresentation>::New();
+    this->TreeAreaRepresentation->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
     this->UpdateTimer.setInterval(0);
     this->UpdateTimer.setSingleShot(true);
@@ -203,11 +204,6 @@ ClientHierarchyView::ClientHierarchyView(
   this->Implementation->TreeView->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
 
-  this->Implementation->TreeView->SetSelectionType(
-    vtkSelectionNode::PEDIGREEIDS);
-  this->Implementation->HierarchicalGraphView->SetSelectionType(
-    vtkSelectionNode::PEDIGREEIDS);
-
   this->Implementation->VTKConnect->Connect(
     this->Implementation->Widgets.hierarchicalGraphView->GetInteractor(), vtkCommand::RenderEvent,
     this, SLOT(forceRender()));
@@ -239,7 +235,7 @@ void ClientHierarchyView::selectionChanged()
 
   // Fill the selection source with the selection from the view
   vtkSelection* sel = this->Implementation->TreeAreaRepresentation->
-    GetSelectionLink()->GetSelection();
+    GetAnnotationLink()->GetCurrentSelection();
   vtkSMSourceProxy* selectionSource =
     pqSelectionManager::createSelectionSource(sel, repSource->GetConnectionID());
 
@@ -304,13 +300,14 @@ void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
 
     vtkDataRepresentation* qttree_rep = this->Implementation->TreeView->
       SetRepresentationFromInputConnection(output->GetProducerPort());
+    qttree_rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
     this->Implementation->TreeAreaRepresentation->SetInput(tree);
     this->Implementation->HierarchicalGraphView->SetRepresentation(this->Implementation->TreeAreaRepresentation);
 
     // Set tree selection link.
-    vtkSelectionLink *link = this->Implementation->TreeAreaRepresentation->GetSelectionLink();
-    qttree_rep->SetSelectionLink(link);
+    vtkAnnotationLink *link = this->Implementation->TreeAreaRepresentation->GetAnnotationLink();
+    qttree_rep->SetAnnotationLink(link);
 
     this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_TREE_VIEW | UPDATE_HGRAPH_VIEW );
     }
@@ -396,17 +393,17 @@ void ClientHierarchyView::synchronizeViews()
 
   if(tree_proxy && graph_proxy)
     {
-    vtkSelectionLink* graph_link = this->Implementation->TreeAreaRepresentation->
-      GetSelectionLink();
-    vtkSelectionLink* tree_link = this->Implementation->TreeAreaRepresentation->
-      GetSelectionLink();
+    vtkAnnotationLink* graph_link = this->Implementation->TreeAreaRepresentation->
+      GetAnnotationLink();
+    vtkAnnotationLink* tree_link = this->Implementation->TreeAreaRepresentation->
+      GetAnnotationLink();
 
     // Update the selection.
     tree_proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       tree_proxy->GetSelectionRepresentation()->GetOutput());
-    graph_link->SetSelection(sel);
-    tree_link->SetSelection(sel);
+    graph_link->SetCurrentSelection(sel);
+    tree_link->SetCurrentSelection(sel);
     this->Implementation->TreeView->Update();
     this->Implementation->HierarchicalGraphView->Update();
 
@@ -533,7 +530,7 @@ void ClientHierarchyView::synchronizeViews()
   // Reset the hgraph camera ...
   if(this->Implementation->UpdateFlags & RESET_HGRAPH_CAMERA)
     {
-    this->Implementation->HierarchicalGraphView->GetRenderer()->ResetCamera();
+    this->Implementation->HierarchicalGraphView->ResetCamera();
     }
 
   // Update the tree view ...
@@ -577,7 +574,7 @@ vtkImageData* ClientHierarchyView::captureImage(int magnification)
 
   renWin->SwapBuffersOff();
   //this->getViewProxy()->StillRender();
-  renWin->Render();
+  this->Implementation->HierarchicalGraphView->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(renWin);

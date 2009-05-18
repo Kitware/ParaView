@@ -28,6 +28,7 @@
 #include "ClientGeoView.h"
 
 #include <QVTKWidget.h>
+#include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
 #include <vtkDataObject.h>
 #include <vtkDataObjectTypes.h>
@@ -38,8 +39,9 @@
 #include <vtkGeoFileImageSource.h>
 #include <vtkGeoGlobeSource.h>
 #include <vtkGeoInteractorStyle.h>
-#include <vtkGeoLineRepresentation.h>
+#include <vtkGeoMath.h>
 #include <vtkGeometryFilter.h>
+#include <vtkGeoSampleArcs.h>
 #include <vtkGeoTerrain.h>
 #include <vtkGeoView.h>
 #include <vtkGraph.h>
@@ -50,10 +52,10 @@
 #include <vtkPointSet.h>
 #include <vtkPVDataInformation.h>
 #include <vtkRenderedGraphRepresentation.h>
+#include <vtkRenderedSurfaceRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSMIdTypeVectorProperty.h>
 #include <vtkSMProxyManager.h>
@@ -111,7 +113,7 @@ public:
     new QVBoxLayout(this->Widget);
 
     this->View = vtkSmartPointer<vtkGeoView>::New();
-    this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
+    this->Widget->SetRenderWindow(this->View->GetRenderWindow());
 
     this->Theme.TakeReference(vtkViewTheme::CreateMellowTheme());
 
@@ -181,11 +183,6 @@ ClientGeoView::ClientGeoView(
     this->Implementation->View, vtkCommand::ViewProgressEvent,
     this, SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
 
-  // Set mellow theme
-  vtkViewTheme* theme = vtkViewTheme::CreateMellowTheme();
-  this->Implementation->View->ApplyViewTheme(theme);
-  theme->Delete();
-
   emit this->beginProgress();
 
   // Add default terrain
@@ -239,7 +236,7 @@ ClientGeoView::ClientGeoView(
     this->Implementation->ImageRepresentation);
 
   // Load political boundaries
-  vtkGeoLineRepresentation* const lineRep = vtkGeoLineRepresentation::New();
+  vtkRenderedSurfaceRepresentation* const lineRep = vtkRenderedSurfaceRepresentation::New();
   vtkXMLPolyDataReader* const pbReader = vtkXMLPolyDataReader::New();
   
   if(pqFilesystem::shareDirectory().exists("political.vtp"))
@@ -250,25 +247,44 @@ ClientGeoView::ClientGeoView(
     {
     pbReader->SetFileName(PARAVIEW_DATA_ROOT "/Data/political.vtp");
     }
+
+  // Sample and expand political boundaries so they show up ok
+  // on the globe.
+  vtkSmartPointer<vtkGeoSampleArcs> sampleArcs =
+    vtkSmartPointer<vtkGeoSampleArcs>::New();
+  sampleArcs->SetInputConnection(pbReader->GetOutputPort());
+  sampleArcs->SetInputCoordinateSystemToSpherical();
+  sampleArcs->SetOutputCoordinateSystemToSpherical();
+  sampleArcs->SetGlobeRadius(vtkGeoMath::EarthRadiusMeters()*1.0001);
   
-  lineRep->SetInputConnection(pbReader->GetOutputPort());
-  lineRep->CoordinatesInArraysOff();
+  // Create representation
+  lineRep->SetInputConnection(sampleArcs->GetOutputPort());
+  lineRep->SelectableOff();
   this->Implementation->View->AddRepresentation(lineRep);
+
+  // Set mellow theme
+  vtkSmartPointer<vtkViewTheme> theme;
+  theme.TakeReference(vtkViewTheme::CreateMellowTheme());
+  this->Implementation->View->ApplyViewTheme(theme);
+  theme->SetLineWidth(1);
+  theme->SetCellColor(0.0, 0.0, 0.0);
+  theme->SetCellOpacity(0.2);
+  this->Implementation->View->ApplyViewTheme(theme);
 
   // This update is needed, since we just added an internal representation to
   // the view. Note that this is happening in  the constructor, so it's called
   // before any of the external representations are added. Consequently, this is not
   // triggering any external pipeline updates and hence is totally safe.
   //this->Implementation->View->Update();
-  this->Implementation->View->GetRenderer()->ResetCameraClippingRange();
-  this->Implementation->Widget->GetRenderWindow()->Render();
+  this->Implementation->View->ResetCameraClippingRange();
+  this->Implementation->View->Render();
   lineRep->Delete();
   pbReader->Delete();
 
   // Listen for the selection changed event
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
+
   emit this->endProgress();
 }
 
@@ -300,8 +316,7 @@ void ClientGeoView::selectionChanged()
       opPort->getSource()->getProxy());
 
     // Fill the selection source with the selection from the view
-    rep->GetSelectionLink()->Update();
-    vtkSelection* sel = rep->GetSelectionLink()->GetOutput();
+    vtkSelection* sel = rep->GetAnnotationLink()->GetCurrentSelection();
     vtkSMSourceProxy* selectionSource =
       pqSelectionManager::createSelectionSource(sel, repSource->GetConnectionID());
 
@@ -382,6 +397,7 @@ void ClientGeoView::onRepresentationVisibilityChanged(pqRepresentation* pqrep, b
       }
 
     vtkRenderedGraphRepresentation* vtkrep = vtkRenderedGraphRepresentation::New();
+    vtkrep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
     vtkrep->SetInputConnection(proxy->GetOutputPort());
     vtkrep->SetEdgeLayoutStrategyToGeo();
     this->Implementation->Representations[pqrep] = vtkrep;
@@ -427,11 +443,11 @@ void ClientGeoView::renderGeoViewInternal()
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    rep->GetSelectionLink()->SetSelection(sel);
+    rep->GetAnnotationLink()->SetCurrentSelection(sel);
 
     // Update the current domain map.
     int useDomainMap = vtkSMPropertyHelper(proxy, "UseDomainMap").GetAsInt();
-    rep->GetSelectionLink()->RemoveAllDomainMaps();
+    rep->GetAnnotationLink()->RemoveAllDomainMaps();
     if (useDomainMap)
       {
       vtkSMSourceProxy* domainMap = 0;
@@ -452,7 +468,7 @@ void ClientGeoView::renderGeoViewInternal()
         vtkTable* output = vtkTable::SafeDownCast(delivery->GetOutput());
         if (output)
           {
-          rep->GetSelectionLink()->AddDomainMap(output);
+          rep->GetAnnotationLink()->AddDomainMap(output);
           }
         }
       }
@@ -532,7 +548,7 @@ void ClientGeoView::renderGeoViewInternal()
     }
 
   emit this->beginProgress();
-  this->Implementation->Widget->GetRenderWindow()->Render();
+  this->Implementation->View->Render();
   emit this->endProgress();
 }
 
@@ -569,14 +585,7 @@ void ClientGeoView::onStateLoaded()
   geoCamera->SetDistance(camDistance);
   geoCamera->SetTilt(camTilt);
   geoCamera->SetHeading(camHeading);
-  style->ResetCameraClippingRange();
-
-  // No forced renders should ever be needed.
-  // this->render();
-
-  // // force a render
-  // vtkRenderWindow *renWin = this->Implementation->View->GetRenderWindow();
-  // renWin->Render();
+  this->Implementation->View->ResetCameraClippingRange();
 }
 
 void ClientGeoView::onViewProgressEvent(vtkObject* obj,

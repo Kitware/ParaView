@@ -28,6 +28,7 @@
 #include "ClientRecordView.h"
 #include "ClientRecordViewDecorator.h"
 
+#include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
 #include <vtkConvertSelection.h>
 #include <vtkDataArray.h>
@@ -43,7 +44,6 @@
 #include <vtkPVDataInformation.h>
 #include <vtkQtRecordView.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMPropertyHelper.h>
@@ -121,7 +121,6 @@ ClientRecordView::ClientRecordView(
 {
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
   new ClientRecordViewDecorator(this);
 }
@@ -142,9 +141,8 @@ void ClientRecordView::selectionChanged()
     opPort->getSource()->getProxy());
 
   // Fill the selection source with the selection from the view
-  this->Implementation->View->GetRepresentation()->GetSelectionLink()->Update();
   vtkSelection* sel = this->Implementation->View->GetRepresentation()->
-    GetSelectionLink()->GetOutput();
+    GetAnnotationLink()->GetCurrentSelection();
   vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
     sel, repSource->GetConnectionID());
 
@@ -208,7 +206,8 @@ void ClientRecordView::updateRepresentation(pqRepresentation* repr)
     }
 
   // Add the representation to the view
-  this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutput()->GetProducerPort());
+  vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutput()->GetProducerPort());
+  rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 }
 
 
@@ -258,7 +257,7 @@ void ClientRecordView::renderInternal()
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    rep->GetSelectionLink()->SetSelection(sel);  
+    rep->GetAnnotationLink()->SetCurrentSelection(sel);  
     }
 
   this->Implementation->View->Update();

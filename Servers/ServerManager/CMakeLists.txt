@@ -155,8 +155,6 @@ SET(Kit_SRCS
   vtkSMScalarBarWidgetRepresentationProxy.cxx
   vtkSMSelectionDeliveryRepresentationProxy.cxx
   vtkSMSelectionHelper.cxx
-  vtkSMSelectionLink.cxx
-  vtkSMSelectionLinkProxy.cxx
   vtkSMSelectionRepresentationProxy.cxx
   vtkSMServerFileListingProxy.cxx
   vtkSMServerProxyManagerReviver.cxx

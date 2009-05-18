@@ -28,6 +28,7 @@
 #include "ClientGraphView.h"
 
 #include <QVTKWidget.h>
+#include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
 #include <vtkDataObject.h>
 #include <vtkDataObjectTypes.h>
@@ -42,7 +43,6 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkTable.h>
 #include <vtkTexture.h>
@@ -85,6 +85,10 @@
 class ClientGraphView::command : public vtkCommand
 {
 public:
+  static command* New(ClientGraphView& view)
+  {
+    return new command(view);
+  }
   command(ClientGraphView& view) : Target(view) { }
   virtual void Execute(vtkObject*, unsigned long, void*)
   {
@@ -144,7 +148,7 @@ public:
 */
     this->View = vtkSmartPointer<vtkGraphLayoutView>::New();
     this->View->SetLayoutStrategyToFast2D();
-    this->View->SetupRenderWindow(this->Widget->GetRenderWindow());
+    this->Widget->SetRenderWindow(this->View->GetRenderWindow());
     this->View->ApplyViewTheme(this->Theme);
     
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
@@ -177,12 +181,11 @@ ClientGraphView::ClientGraphView(
   pqServer* server, 
   QObject* p) :
   pqSingleInputView(viewmoduletype, group, name, viewmodule, server, p),
-  Implementation(new implementation()),
-  Command(new command(*this))
+  Implementation(new implementation())
 {
+  this->Command = command::New(*this);
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
   // Listen to all views that may fire progress events during updating.
   this->Implementation->VTKConnect->Connect(
@@ -190,8 +193,10 @@ ClientGraphView::ClientGraphView(
     this, SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
 
   this->Implementation->VTKConnect->Connect(
-    this->Implementation->Widget->GetInteractor(), vtkCommand::RenderEvent,
+    this->Implementation->View->GetInteractor(), vtkCommand::RenderEvent,
     this, SLOT(forceRender()));
+
+  this->Implementation->View->Render();
 }
 
 ClientGraphView::~ClientGraphView()
@@ -214,9 +219,8 @@ void ClientGraphView::selectionChanged()
     opPort->getSource()->getProxy());
 
   // Fill the selection source with the selection from the view
-  this->Implementation->View->GetRepresentation()->GetSelectionLink()->Update();
   vtkSelection* sel = this->Implementation->View->GetRepresentation()->
-    GetSelectionLink()->GetOutput();
+    GetAnnotationLink()->GetCurrentSelection();
   vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
     sel, repSource->GetConnectionID());
 
@@ -286,7 +290,7 @@ vtkImageData* ClientGraphView::captureImage(int magnification)
 
   renWin->SwapBuffersOff();
   //this->getViewProxy()->StillRender();
-  renWin->Render();
+  this->Implementation->View->Render();
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(renWin);
@@ -385,7 +389,9 @@ void ClientGraphView::onViewProgressEvent(vtkObject*,
 void ClientGraphView::showRepresentation(pqRepresentation* representation)
 {
   vtkSMClientDeliveryRepresentationProxy* const proxy = vtkSMClientDeliveryRepresentationProxy::SafeDownCast(representation->getProxy());
-  this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  vtkDataRepresentation* rep =
+    this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
   this->Implementation->View->Update();
   this->Implementation->ResetCamera = true;
 }
@@ -414,7 +420,7 @@ void ClientGraphView::renderInternal()
 
     // Set the current domain map
     int useDomainMap = vtkSMPropertyHelper(proxy, "UseDomainMap").GetAsInt();
-    vtkSelectionLink* link = this->Implementation->View->GetRepresentation()->GetSelectionLink();
+    vtkAnnotationLink* link = this->Implementation->View->GetRepresentation()->GetAnnotationLink();
     link->RemoveAllDomainMaps();
     if (useDomainMap)
       {
@@ -444,8 +450,8 @@ void ClientGraphView::renderInternal()
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    this->Implementation->View->GetRepresentation()->GetSelectionLink()->
-      SetSelection(sel);
+    this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
+      SetCurrentSelection(sel);
 
     QObjectList ifaces =
       pqApplicationCore::instance()->getPluginManager()->interfaces();
@@ -619,11 +625,11 @@ void ClientGraphView::renderInternal()
     }
 
   if(this->Implementation->ResetCamera)
-    this->Implementation->View->GetRenderer()->ResetCamera();
+    this->Implementation->View->ResetCamera();
 
   this->Implementation->ResetCamera = false;
 
-  this->Implementation->View->GetRenderer()->GetRenderWindow()->Render();
+  this->Implementation->View->Render();
   emit this->endProgress();
 }
 

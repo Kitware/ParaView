@@ -24,7 +24,6 @@
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSelectionLink.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStateVersionController.h"
 #include "vtkSMViewProxy.h"
@@ -34,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.34");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.35");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -369,16 +368,6 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
           pxm->RegisterLink(linkname, link);
           link->Delete();
           }       
-        }
-      if (strcmp(name, "SelectionLink") == 0)
-        {
-        link = pxm->GetRegisteredLink(linkname);
-        if (!link)
-          {
-          link = vtkSMSelectionLink::New();
-          pxm->RegisterLink(linkname, link);
-          link->Delete();
-          }
         }
       if (link)
         {

@@ -29,6 +29,7 @@
 #include "ClientTableViewDecorator.h"
 
 #include <vtkAbstractArray.h>
+#include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
 #include <vtkConvertSelection.h>
 #include <vtkDataObjectTypes.h>
@@ -40,7 +41,6 @@
 #include <vtkPVDataInformation.h>
 #include <vtkQtTableView.h>
 #include <vtkSelection.h>
-#include <vtkSelectionLink.h>
 #include <vtkSelectionNode.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMPropertyHelper.h>
@@ -99,7 +99,7 @@ public:
       delete this->Widget;
   }
 
-  int LastSelectionMTime;
+  unsigned long LastSelectionMTime;
   int AttributeType;
   vtkSmartPointer<vtkQtTableView> View;
   QPointer<QWidget> Widget;
@@ -121,7 +121,6 @@ ClientTableView::ClientTableView(
 {
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->View->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
 
   new ClientTableViewDecorator(this);
 }
@@ -147,9 +146,8 @@ void ClientTableView::selectionChanged()
     opPort->getSource()->getProxy());
 
   // Fill the selection source with the selection from the view
-  this->Implementation->View->GetRepresentation()->GetSelectionLink()->Update();
   vtkSelection* sel = this->Implementation->View->GetRepresentation()->
-    GetSelectionLink()->GetOutput();
+    GetAnnotationLink()->GetCurrentSelection();
   vtkSMSourceProxy* selectionSource = pqSelectionManager::createSelectionSource(
     sel, repSource->GetConnectionID());
 
@@ -216,6 +214,7 @@ void ClientTableView::showRepresentation(pqRepresentation* pqRepr)
   vtkSMClientDeliveryRepresentationProxy* const proxy = pqRepr ? 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
   vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
+  rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
   rep->Update();
 }
 
@@ -270,7 +269,7 @@ void ClientTableView::renderInternal()
       repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
       {
       this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
-      this->Implementation->View->GetRepresentation()->GetSelectionLink()->SetSelection(sel);
+      this->Implementation->View->GetRepresentation()->GetAnnotationLink()->SetCurrentSelection(sel);
       this->Implementation->View->GetRepresentation()->Update();
       }
     }
