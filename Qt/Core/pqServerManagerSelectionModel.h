@@ -139,7 +139,7 @@ inline bool operator==(const QPointer<pqServerManagerModelItem>& lhs,
 
 inline uint qHash(const QPointer<pqServerManagerModelItem>& index)
 {
-  return reinterpret_cast<uint>(static_cast<pqServerManagerModelItem*>(index));
+  return reinterpret_cast<size_t>(static_cast<pqServerManagerModelItem*>(index));
 }
 
 /// This is a selection set. For now, it's simply a QList.
