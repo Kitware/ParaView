@@ -12,6 +12,27 @@
 
  <ProxyGroup name="views">
    <ViewProxy name="ClientTreeView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientTreeDisplay">
+   
+   <IntVectorProperty
+        name="ShowHeaders"
+        number_of_elements="1"
+        default_values="1">
+    </IntVectorProperty>
+    <IntVectorProperty
+        name="ShowRootNode"
+        number_of_elements="1"
+        default_values="0">
+     </IntVectorProperty>
+    <IntVectorProperty
+        name="AlternatingRowColors"
+        number_of_elements="1"
+        default_values="0">
+     </IntVectorProperty>
+    <IntVectorProperty
+        name="HideColumn"
+        number_of_elements="1"
+        default_values="-1">
+     </IntVectorProperty>
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

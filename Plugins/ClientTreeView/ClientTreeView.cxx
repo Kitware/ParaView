@@ -236,6 +236,20 @@ void ClientTreeView::renderInternal()
       }
     }
 
+  // Set parameters on the view
+  this->Implementation->View->SetShowHeaders(
+    vtkSMPropertyHelper(this->getProxy(),"ShowHeaders").GetAsInt());
+  this->Implementation->View->SetShowRootNode(
+    vtkSMPropertyHelper(this->getProxy(),"ShowRootNode").GetAsInt());
+  this->Implementation->View->SetAlternatingRowColors(
+    vtkSMPropertyHelper(this->getProxy(),"AlternatingRowColors").GetAsInt());
+
   this->Implementation->View->Update();
+
+  // Note: You have to do an update first the View has to have a 
+  // populated model in order for HideColumn to work.
+  // FIXME: This will only hide one column right now
+  this->Implementation->View->HideColumn(
+    vtkSMPropertyHelper(this->getProxy(),"HideColumn").GetAsInt());
 }
 
