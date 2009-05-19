@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include "OverViewCoreExport.h"
 
-class vtkAnnotationLayers;
+class vtkAnnotationLink;
 class vtkSelection;
 class AnnotationLinkCommand;
 class AnnotationLinkInternals;
@@ -52,12 +52,11 @@ class OVERVIEW_CORE_EXPORT AnnotationLink : public QObject
 public:
   static AnnotationLink& instance();
   
-  void setAnnotationLayers(vtkAnnotationLayers*);
-  vtkAnnotationLayers* getAnnotationLayers();
-
-  vtkSelection* getSelection();
+  vtkAnnotationLink* getLink();
   
   void setViewManager(pqViewManager* manager);
+
+  void updateViews();
 
 private slots:
   void onSourceAdded(pqPipelineSource*);
@@ -65,7 +64,6 @@ private slots:
 
 protected:
   void selectionChanged(vtkSMSourceProxy* source);
-  void updateViews();
 
 private:
   AnnotationLink();

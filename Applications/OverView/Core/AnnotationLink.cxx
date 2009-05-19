@@ -125,16 +125,9 @@ void AnnotationLink::setViewManager(pqViewManager* mgr)
 }
 
 //-----------------------------------------------------------------------------
-void AnnotationLink::setAnnotationLayers(vtkAnnotationLayers* layers)
+vtkAnnotationLink* AnnotationLink::getLink()
 {
-  this->Internals->VTKLink->SetAnnotationLayers(layers);
-  this->updateViews();
-}
-
-//-----------------------------------------------------------------------------
-vtkAnnotationLayers* AnnotationLink::getAnnotationLayers()
-{
-  return this->Internals->VTKLink->GetAnnotationLayers();
+  return this->Internals->VTKLink;
 }
 
 //-----------------------------------------------------------------------------
@@ -175,7 +168,7 @@ void AnnotationLink::selectionChanged(vtkSMSourceProxy* source)
     this->Internals->InSelectionChanged = false;
     }
 }
-
+/*
 vtkSelection* AnnotationLink::getSelection()
 {
   vtksys_stl::set<vtkSmartPointer<vtkSMSourceProxy> >::iterator it, itEnd;
@@ -197,7 +190,7 @@ vtkSelection* AnnotationLink::getSelection()
     pm->GetObjectFromID(strategy->GetOutput()->GetID()));
   return vtkSelection::SafeDownCast(alg->GetOutputDataObject(0));
 }
-
+*/
 void AnnotationLink::updateViews()
 {
   if (this->Internals->ViewManager)

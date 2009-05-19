@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkInformation.h>
 #include <vtkInformationStringKey.h>
 #include <vtkInformationDoubleVectorKey.h>
+#include <vtkInformationIntegerKey.h>
 #include <vtkInformationVector.h>
 #include "vtkProcessModule.h"
 #include "vtkQtAnnotationView.h"
@@ -91,6 +92,7 @@ public:
     {
     this->View = vtkSmartPointer<vtkQtAnnotationView>::New();
     this->Representation = vtkSmartPointer<vtkDataRepresentation>::New();
+    this->Representation->SetAnnotationLink(AnnotationLink::instance().getLink());
     this->View->SetRepresentation(this->Representation);
     }
 
@@ -179,12 +181,12 @@ void AnnotationManagerPanel::updateEnabledState()
 
 void AnnotationManagerPanel::annotationChanged(vtkAnnotationLayers* a)
 {
-  AnnotationLink::instance().setAnnotationLayers(a);
+  AnnotationLink::instance().updateViews();
 }
 
 void AnnotationManagerPanel::createAnnotationFromCurrentSelection()
 {
-  vtkSelection* sel = AnnotationLink::instance().getSelection();
+  vtkSelection* sel = AnnotationLink::instance().getLink()->GetCurrentSelection();
   if(!sel || sel->GetNumberOfNodes()==0)
     {
     return;
@@ -200,16 +202,17 @@ void AnnotationManagerPanel::createAnnotationFromCurrentSelection()
   vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New();
   s->DeepCopy(sel);
   a->SetSelection(s);
-  vtkAnnotation::LABEL()->Set(a->GetInformation(),label.toAscii().data());
+  vtkInformation* ainfo = a->GetInformation();
+  ainfo->Set(vtkAnnotation::ENABLED(), 0);
+  ainfo->Set(vtkAnnotation::LABEL(),label.toAscii().data());
   QList<QVariant> rgba = this->Implementation->ColorAdapter->color().toList();
   double rgb[3];
   rgb[0] = rgba[0].toDouble();
   rgb[1] = rgba[1].toDouble();
   rgb[2] = rgba[2].toDouble();
-  vtkAnnotation::COLOR()->Set(a->GetInformation(),rgb,3);
+  ainfo->Set(vtkAnnotation::COLOR(),rgb,3);
   vtkAnnotationLayers* annotations = this->Implementation->Representation->GetAnnotationLink()->GetAnnotationLayers();
   annotations->AddAnnotation(a);
-  this->Implementation->Representation->GetAnnotationLink()->SetAnnotationLayers(annotations);
   this->Implementation->Representation->Update();
   this->Implementation->View->Update();
   this->Implementation->label->clear();
