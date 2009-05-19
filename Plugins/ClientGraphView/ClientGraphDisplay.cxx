@@ -138,6 +138,13 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     proxy,
     proxy->GetProperty("VertexLabels"));
 
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.autoHideVertexLabels,
+    "checked",
+    SIGNAL(toggled(bool)),
+    proxy,
+    proxy->GetProperty("AutoHideVertexLabels"));
+
   pqSignalAdaptorComboBox* vertexLabelArrayAdaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.vertexLabelArray);
   vertexLabelArrayAdaptor->setObjectName("ComboBoxAdaptor");
@@ -241,6 +248,13 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     SIGNAL(toggled(bool)),
     proxy,
     proxy->GetProperty("EdgeLabels"));
+
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.autoHideEdgeLabels,
+    "checked",
+    SIGNAL(toggled(bool)),
+    proxy,
+    proxy->GetProperty("AutoHideEdgeLabels"));
 
   pqSignalAdaptorComboBox* edgeLabelArrayAdaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.edgeLabelArray);
@@ -366,6 +380,13 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
   QObject::connect(this->Implementation->Widgets.domainMap,
     SIGNAL(currentIndexChanged(vtkSMProxy*)),
     this, SLOT(onComboBoxDomainMapChanged()));
+
+  this->Implementation->Links.addPropertyLink(
+    this->Implementation->Widgets.weightEdges,
+    "checked",
+    SIGNAL(toggled(bool)),
+    proxy,
+    proxy->GetProperty("WeightEdges"));
 
   pqSignalAdaptorComboBox* edgeWeightArrayAdaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.edgeWeightArray);

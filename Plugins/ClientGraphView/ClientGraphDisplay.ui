@@ -1,149 +1,157 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ClientGraphDisplay</class>
- <widget class="QWidget" name="ClientGraphDisplay" >
-  <property name="geometry" >
+ <widget class="QWidget" name="ClientGraphDisplay">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>338</width>
-    <height>1123</height>
+    <width>266</width>
+    <height>1119</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox_5" >
-     <property name="title" >
-      <string>Graph Layout</string>
-     </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Layout Strategy</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QComboBox" name="layoutStrategy" />
-      </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
-        <property name="text" >
-         <string>Edge Weight Array</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="edgeWeightArray" />
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" >
+    <layout class="QHBoxLayout">
      <item>
-      <widget class="QCheckBox" name="useDomainMap" >
-       <property name="text" >
+      <widget class="QCheckBox" name="useDomainMap">
+       <property name="text">
         <string>Domain Map</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="pqSourceComboBox" name="domainMap" />
+      <widget class="pqSourceComboBox" name="domainMap"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="vertices" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
+      <string>Graph Layout</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Layout Strategy</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="layoutStrategy"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="weightEdges">
+        <property name="text">
+         <string>Weight Edges</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="edgeWeightArray"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="vertices">
+     <property name="title">
       <string>Vertices</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <widget class="QGroupBox" name="groupBox_2" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
          <string>Labels</string>
         </property>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QCheckBox" name="vertexLabels" >
-           <property name="text" >
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="vertexLabels">
+           <property name="text">
             <string>Visible</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QComboBox" name="vertexLabelArray" />
+         <item row="0" column="1">
+          <widget class="QComboBox" name="vertexLabelArray"/>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_8" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
             <string>Font Size</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QDoubleSpinBox" name="vertexLabelFontSize" />
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="vertexLabelFontSize"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="autoHideVertexLabels">
+           <property name="text">
+            <string>Auto-hide</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox">
+        <property name="title">
          <string>Color</string>
         </property>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QCheckBox" name="vertexColorByArray" >
-           <property name="text" >
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="vertexColorByArray">
+           <property name="text">
             <string>Array</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QComboBox" name="vertexColorArray" />
+         <item row="0" column="1">
+          <widget class="QComboBox" name="vertexColorArray"/>
          </item>
-         <item row="1" column="0" >
-          <widget class="QCheckBox" name="vertexScalarBar" >
-           <property name="enabled" >
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="vertexScalarBar">
+           <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Scalar Bar</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QLabel" name="label_10" >
-           <property name="text" >
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
             <string>Default</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1" >
-          <widget class="pqColorChooserButton" name="vertexColor" >
-           <property name="text" >
+         <item row="2" column="1">
+          <widget class="pqColorChooserButton" name="vertexColor">
+           <property name="text">
             <string>Color</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0" >
-          <widget class="QLabel" name="label_3" >
-           <property name="text" >
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
             <string>Opacity</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1" >
-          <widget class="QDoubleSpinBox" name="vertexOpacity" >
-           <property name="maximum" >
+         <item row="3" column="1">
+          <widget class="QDoubleSpinBox" name="vertexOpacity">
+           <property name="maximum">
             <double>1.000000000000000</double>
            </property>
-           <property name="singleStep" >
+           <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
           </widget>
@@ -152,76 +160,76 @@
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_2" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox_2">
+        <property name="title">
          <string>Icons</string>
         </property>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QCheckBox" name="iconVisibility" >
-           <property name="text" >
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="iconVisibility">
+           <property name="text">
             <string>Visible</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QPushButton" name="configureIcons" >
-           <property name="text" >
+         <item row="0" column="1">
+          <widget class="QPushButton" name="configureIcons">
+           <property name="text">
             <string>Configure</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_5" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
             <string>Alignment</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QComboBox" name="iconAlignment" >
+         <item row="1" column="1">
+          <widget class="QComboBox" name="iconAlignment">
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Top Right</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Top</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Top Left</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Right</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Center</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Left</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Bottom Right</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Bottom</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Bottom Left</string>
             </property>
            </item>
@@ -231,16 +239,16 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
-         <widget class="QLabel" name="label" >
-          <property name="text" >
+         <widget class="QLabel" name="label">
+          <property name="text">
            <string>Size</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="vertexSize" />
+         <widget class="QDoubleSpinBox" name="vertexSize"/>
         </item>
        </layout>
       </item>
@@ -248,100 +256,107 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="edges" >
-     <property name="title" >
+    <widget class="QGroupBox" name="edges">
+     <property name="title">
       <string>Edges</string>
      </property>
-     <layout class="QVBoxLayout" >
+     <layout class="QVBoxLayout">
       <item>
-       <widget class="QGroupBox" name="groupBox_4" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox_4">
+        <property name="title">
          <string>Labels</string>
         </property>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QCheckBox" name="edgeLabels" >
-           <property name="text" >
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="edgeLabels">
+           <property name="text">
             <string>Visible</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QComboBox" name="edgeLabelArray" />
+         <item row="0" column="1">
+          <widget class="QComboBox" name="edgeLabelArray"/>
          </item>
-         <item row="1" column="0" >
-          <widget class="QLabel" name="label_9" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
             <string>Font Size</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1" >
-          <widget class="QDoubleSpinBox" name="edgeLabelFontSize" />
+         <item row="1" column="1">
+          <widget class="QDoubleSpinBox" name="edgeLabelFontSize"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="autoHideEdgeLabels">
+           <property name="text">
+            <string>Auto-hide</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_3" >
-        <property name="title" >
+       <widget class="QGroupBox" name="groupBox_3">
+        <property name="title">
          <string>Color</string>
         </property>
-        <layout class="QGridLayout" >
-         <item row="0" column="0" >
-          <widget class="QCheckBox" name="edgeColorByArray" >
-           <property name="text" >
+        <layout class="QGridLayout">
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="edgeColorByArray">
+           <property name="text">
             <string>Array</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1" >
-          <widget class="QComboBox" name="edgeColorArray" />
+         <item row="0" column="1">
+          <widget class="QComboBox" name="edgeColorArray"/>
          </item>
-         <item row="3" column="0" >
-          <widget class="QLabel" name="label_11" >
-           <property name="text" >
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
             <string>Default</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1" >
-          <widget class="pqColorChooserButton" name="edgeColor" >
-           <property name="text" >
+         <item row="3" column="1">
+          <widget class="pqColorChooserButton" name="edgeColor">
+           <property name="text">
             <string>Color</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0" >
-          <widget class="QLabel" name="label_4" >
-           <property name="text" >
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
             <string>Opacity</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1" >
-          <widget class="QDoubleSpinBox" name="edgeOpacity" >
-           <property name="maximum" >
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="edgeOpacity">
+           <property name="maximum">
             <double>1.000000000000000</double>
            </property>
-           <property name="singleStep" >
+           <property name="singleStep">
             <double>0.100000000000000</double>
            </property>
           </widget>
          </item>
-         <item row="1" column="0" >
-          <widget class="QCheckBox" name="flipEdgeColorMap" >
-           <property name="text" >
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="flipEdgeColorMap">
+           <property name="text">
             <string>Flip Colors</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" >
-          <widget class="QCheckBox" name="edgeScalarBar" >
-           <property name="enabled" >
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="edgeScalarBar">
+           <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Scalar Bar</string>
            </property>
           </widget>
@@ -350,22 +365,22 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" >
+       <layout class="QHBoxLayout">
         <item>
-         <widget class="QLabel" name="label_2" >
-          <property name="text" >
+         <widget class="QLabel" name="label_2">
+          <property name="text">
            <string>Width</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="edgeWidth" />
+         <widget class="QDoubleSpinBox" name="edgeWidth"/>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QCheckBox" name="arcEdges" >
-        <property name="text" >
+       <widget class="QCheckBox" name="arcEdges">
+        <property name="text">
          <string>Arc Edges</string>
         </property>
        </widget>
@@ -375,10 +390,10 @@
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
@@ -409,11 +424,11 @@
    <receiver>edgeScalarBar</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>84</x>
      <y>526</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>84</x>
      <y>571</y>
     </hint>
@@ -425,11 +440,11 @@
    <receiver>vertexScalarBar</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>106</x>
      <y>208</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>65</x>
      <y>234</y>
     </hint>

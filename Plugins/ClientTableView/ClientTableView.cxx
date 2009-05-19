@@ -28,6 +28,8 @@
 #include "ClientTableView.h"
 #include "ClientTableViewDecorator.h"
 
+#include <AnnotationLink.h>
+
 #include <vtkAbstractArray.h>
 #include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
@@ -85,6 +87,7 @@ public:
   {
     this->Widget = new QWidget();
     this->View = vtkSmartPointer<vtkQtTableView>::New();
+    this->View->SetShowVerticalHeaders(true);
     QVBoxLayout *layout = new QVBoxLayout(this->Widget);
     layout->addWidget(this->View->GetWidget());
     layout->setContentsMargins(0,0,0,0);
@@ -215,6 +218,7 @@ void ClientTableView::showRepresentation(pqRepresentation* pqRepr)
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
   vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
+  rep->SetAnnotationLink(AnnotationLink::instance().getLink());
   rep->Update();
 }
 

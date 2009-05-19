@@ -27,7 +27,10 @@
 
 #include "ClientGraphView.h"
 
+#include <AnnotationLink.h>
+
 #include <QVTKWidget.h>
+#include <vtkAnnotationLayers.h>
 #include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
 #include <vtkDataObject.h>
@@ -114,38 +117,6 @@ public:
     this->Widget->GetInteractor()->EnableRenderOff();
 
     this->Theme.TakeReference(vtkViewTheme::CreateMellowTheme());
-/*
-    pqSettings* settings = pqApplicationCore::instance()->settings();
-    QVariant bg = settings->value("GlobalProperties/BackgroundColor");
-    double rgb[3];
-    if(!bg.isNull())
-      {
-      QList<QVariant> colorList = bg.toList();
-      rgb[0] = colorList[0].toDouble() * 255.0;
-      rgb[1] = colorList[1].toDouble() * 255.0;
-      rgb[2] = colorList[2].toDouble() * 255.0;
-      this->Theme->SetBackgroundColor(rgb);
-      }
-    QVariant sc = settings->value("GlobalProperties/SelectionColor");
-    if(!sc.isNull())
-      {
-      QList<QVariant> colorList = sc.toList();
-      rgb[0] = colorList[0].toDouble() * 255.0;
-      rgb[1] = colorList[1].toDouble() * 255.0;
-      rgb[2] = colorList[2].toDouble() * 255.0;
-      this->Theme->SetSelectedPointColor(rgb);
-      this->Theme->SetSelectedCellColor(rgb);
-      }
-    QVariant ec = settings->value("GlobalProperties/EdgeColor");
-    if(!ec.isNull())
-      {
-      QList<QVariant> colorList = ec.toList();
-      rgb[0] = colorList[0].toDouble() * 255.0;
-      rgb[1] = colorList[1].toDouble() * 255.0;
-      rgb[2] = colorList[2].toDouble() * 255.0;
-      this->Theme->SetCellColor(rgb);
-      }
-*/
     this->View = vtkSmartPointer<vtkGraphLayoutView>::New();
     this->View->SetLayoutStrategyToFast2D();
     this->Widget->SetRenderWindow(this->View->GetRenderWindow());
@@ -392,6 +363,7 @@ void ClientGraphView::showRepresentation(pqRepresentation* representation)
   vtkDataRepresentation* rep =
     this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
+  rep->SetAnnotationLink(AnnotationLink::instance().getLink());
   this->Implementation->View->Update();
   this->Implementation->ResetCamera = true;
 }
@@ -453,6 +425,11 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
       SetCurrentSelection(sel);
 
+    // Update the annotations
+    //vtkAnnotationLayers* ann = AnnotationLink::instance().getAnnotationLayers();
+    //this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
+    //  SetAnnotationLayers(ann);
+
     QObjectList ifaces =
       pqApplicationCore::instance()->getPluginManager()->interfaces();
     foreach(QObject* iface, ifaces)
@@ -465,6 +442,7 @@ void ClientGraphView::renderInternal()
         // Force a camera reset if the layout strategy has been changed ...
         if( strcmp(layout->GetClassName(), this->Implementation->View->GetLayoutStrategy()->GetClassName()) != 0 )
           this->Implementation->ResetCamera = true;
+        layout->SetWeightEdges(vtkSMPropertyHelper(proxy, "WeightEdges").GetAsInt());
         layout->SetEdgeWeightField(vtkSMPropertyHelper(proxy, "EdgeWeightArray").GetAsString());
         this->Implementation->View->SetLayoutStrategy(layout);
         break;
@@ -479,6 +457,9 @@ void ClientGraphView::renderInternal()
 
     this->Implementation->View->SetVertexLabelVisibility(
       vtkSMPropertyHelper(proxy, "VertexLabels").GetAsInt());
+
+    //this->Implementation->View->SetHideVertexLabelsOnInteraction(
+    //  vtkSMPropertyHelper(proxy, "AutoHideVertexLabels").GetAsInt());
 
     this->Implementation->View->SetVertexLabelArrayName(
       vtkSMPropertyHelper(proxy, "VertexLabelArray").GetAsString());
@@ -545,6 +526,9 @@ void ClientGraphView::renderInternal()
 
     this->Implementation->View->SetEdgeLabelVisibility(
       vtkSMPropertyHelper(proxy, "EdgeLabels").GetAsInt());
+
+    //this->Implementation->View->SetHideEdgeLabelsOnInteraction(
+    //  vtkSMPropertyHelper(proxy, "AutoHideEdgeLabels").GetAsInt());
 
     this->Implementation->View->SetEdgeLabelArrayName(
       vtkSMPropertyHelper(proxy, "EdgeLabelArray").GetAsString());

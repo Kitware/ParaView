@@ -16,6 +16,10 @@
         <InputArrayDomain name="edge_arrays" attribute_type="edge"/>
       </InputProperty>
 
+      <IntVectorProperty name="WeightEdges" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
       <StringVectorProperty name="EdgeWeightArray" number_of_elements="1">
         <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
           <RequiredProperties>
@@ -25,6 +29,10 @@
       </StringVectorProperty>
 
       <IntVectorProperty name="VertexLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+            
+      <IntVectorProperty name="AutoHideVertexLabels" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>
       
@@ -94,7 +102,11 @@
       <IntVectorProperty name="EdgeLabels" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>
-      
+            
+      <IntVectorProperty name="AutoHideEdgeLabels" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
       <StringVectorProperty name="EdgeLabelArray" number_of_elements="1">
         <ArrayListDomain name="array_list" input_domain_name="edge_arrays">
           <RequiredProperties>
@@ -145,7 +157,9 @@
         <InheritRepresentationProperties>
           <Property name="LayoutStrategy" />
           <Property name="EdgeWeightArray" />
+          <Property name="WeightEdges" />
           <Property name="VertexLabels" />
+          <Property name="AutoHideVertexLabels" />
           <Property name="VertexLabelArray" />
           <Property name="IconVisibility" />
           <Property name="IconTexture" />
@@ -162,6 +176,7 @@
           <Property name="VertexScalarBarVisibility" />
           <Property name="VertexColorArray" />
           <Property name="EdgeLabels" />
+          <Property name="AutoHideEdgeLabels" />
           <Property name="EdgeLabelArray" />
           <Property name="EdgeLabelFontSize" />
           <Property name="EdgeWidth" />
