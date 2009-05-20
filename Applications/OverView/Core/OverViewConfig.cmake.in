@@ -24,18 +24,18 @@ MACRO(add_brand_specific_plugin PLUGIN_NAME)
   LIST(APPEND OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN_DIRECTORY})
 ENDMACRO(add_brand_specific_plugin)
 
-# require_paraview_plugin
-MACRO(require_paraview_plugin PLUGIN)
+# require_plugin
+MACRO(require_plugin PLUGIN)
   SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} ON CACHE BOOL "Build ${PLUGIN}" FORCE)
   add_brand_specific_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
-ENDMACRO(require_paraview_plugin)
+ENDMACRO(require_plugin)
 
-# allow_paraview_plugin
-MACRO(allow_paraview_plugin PLUGIN)
+# allow_plugin
+MACRO(allow_plugin PLUGIN)
   IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
     add_brand_specific_plugin(${PLUGIN} ${EXECUTABLE_OUTPUT_PATH})
   ENDIF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-ENDMACRO(allow_paraview_plugin)
+ENDMACRO(allow_plugin)
 
 # overview_build_client
 MACRO(overview_build_client)
