@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMUndoRedoStateLoader.h"
 #include "vtkSMUndoStackBuilder.h"
 #include "vtkSMUndoStack.h"
+#include "vtkPVXMLElement.h"  // vistrails
+#include "vtkSMIdBasedProxyLocator.h"  // vistrails
 
 
 #include <QtDebug>
@@ -195,6 +197,22 @@ void pqUndoStack::onStackChanged()
   emit this->redoLabelChanged(redo_label);
 }
 
+//begin vistrails
+vtkUndoSet* pqUndoStack::getLastUndoSet() {
+    return this->Implementation->UndoStack->getLastUndoSet();
+}
+
+vtkUndoSet* pqUndoStack::getUndoSetFromXML(vtkPVXMLElement *root) {
+  vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
+  locator->SetConnectionID(this->Implementation->UndoStackBuilder->GetConnectionID());
+  locator->SetDeserializer(this->Implementation->StateLoader);
+  vtkUndoSet* undo = this->Implementation->StateLoader->LoadUndoRedoSet(root, locator);
+  locator->Delete();
+
+  return undo;
+}
+//end vistrails
+
 //-----------------------------------------------------------------------------
 void pqUndoStack::beginUndoSet(QString label)
 {
@@ -248,6 +266,18 @@ void pqUndoStack::undo()
   pqApplicationCore::instance()->render();
   emit this->undone();
 }
+
+
+// vistrails begin
+void pqUndoStack::Push(const char *label, vtkUndoSet *set) {
+  this->beginNonUndoableChanges();
+  this->Implementation->UndoStack->Push(
+    this->Implementation->UndoStackBuilder->GetConnectionID(), label, set);
+  this->endNonUndoableChanges();
+}
+// vistrails end
+
+
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::redo()

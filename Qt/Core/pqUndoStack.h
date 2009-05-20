@@ -40,6 +40,8 @@ class vtkSMUndoElement;
 class vtkSMUndoStack;
 class vtkSMUndoStackBuilder;
 class vtkUndoElement;
+class vtkUndoSet; //vistrails
+class vtkPVXMLElement; //vistrails
 
 /// pqUndoStack represents a vtkSMUndoStack along with a
 /// a vtkSMUndoStackBuilder. It provides Qt slots to call
@@ -81,6 +83,12 @@ public:
   /// Get if the stack is currently being undone/redone.
   bool getInUndo() const;
   bool getInRedo() const;
+
+  /// vistrails - push an undo set directly onto the undo stack (don't apply the changes - we want to be able to undo them)
+  void Push(const char *label, vtkUndoSet *set);
+  vtkUndoSet* getLastUndoSet(); //vistrails
+  vtkUndoSet* getUndoSetFromXML(vtkPVXMLElement *root); //vistrails
+
 
 public slots:
   void beginUndoSet(QString label);
