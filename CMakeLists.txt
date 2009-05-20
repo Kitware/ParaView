@@ -38,6 +38,9 @@ ENDIF(COMMAND GET_PROPERTY)
 SET(PARAVIEW_PLUGINLIST_TXT "${ParaView_BINARY_DIR}/PluginList.txt")
 FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
 
+SET(PARAVIEW_PLUGIN_CONFIG_FILE "${ParaView_BINARY_DIR}/ParaViewPluginConfig.cmake")
+FILE(WRITE ${PARAVIEW_PLUGIN_CONFIG_FILE} "")
+
 #########################################################################
 # Warn about ParaQ
 SET(PARAVIEW_WARN_ABOUT_PARAQ)
