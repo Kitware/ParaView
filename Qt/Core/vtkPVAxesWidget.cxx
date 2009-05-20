@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -198,6 +198,7 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       if (this->ParentRenderer->GetRenderWindow())
         {
         this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
+        this->AxesActor->ReleaseGraphicsResources(this->ParentRenderer->GetRenderWindow());
         }
       if (this->StartEventObserverId != 0)
         {
