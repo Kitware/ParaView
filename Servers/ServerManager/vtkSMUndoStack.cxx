@@ -112,7 +112,6 @@ public:
   //begin vistrails
   vtkUndoSet* getLastUndoSet()
   {
-    int status=0;
     vtkPVXMLElement* state;
     if (this->State)
       {
@@ -189,11 +188,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.16");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.17");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.16");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.17");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()

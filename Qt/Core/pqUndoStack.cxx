@@ -206,10 +206,10 @@ vtkUndoSet* pqUndoStack::getUndoSetFromXML(vtkPVXMLElement *root) {
   vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
   locator->SetConnectionID(this->Implementation->UndoStackBuilder->GetConnectionID());
   locator->SetDeserializer(this->Implementation->StateLoader);
-  vtkUndoSet* undo = this->Implementation->StateLoader->LoadUndoRedoSet(root, locator);
+  vtkUndoSet* undoSet = this->Implementation->StateLoader->LoadUndoRedoSet(root, locator);
   locator->Delete();
 
-  return undo;
+  return undoSet;
 }
 //end vistrails
 
