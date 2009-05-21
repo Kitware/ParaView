@@ -38,8 +38,7 @@ ENDIF(COMMAND GET_PROPERTY)
 SET(PARAVIEW_PLUGINLIST_TXT "${ParaView_BINARY_DIR}/PluginList.txt")
 FILE(WRITE ${PARAVIEW_PLUGINLIST_TXT} "")
 
-SET(PARAVIEW_PLUGIN_CONFIG_FILE "${ParaView_BINARY_DIR}/ParaViewPluginConfig.cmake")
-FILE(WRITE ${PARAVIEW_PLUGIN_CONFIG_FILE} "")
+SET(PARAVIEW_PLUGIN_CONFIG_LIST "" CACHE INTERNAL "List of configured plugins.")
 
 #########################################################################
 # Warn about ParaQ
@@ -320,6 +319,19 @@ CONFIGURE_FILE(
     ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
     ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
     @ONLY IMMEDIATE)
+
+####################################################################################
+# Generate a list of configured plugins for use by external projects
+
+SET(PARAVIEW_PLUGIN_CONFIG_FILE "${ParaView_BINARY_DIR}/ParaViewPluginConfig.cmake")
+FILE(WRITE ${PARAVIEW_PLUGIN_CONFIG_FILE} "")
+FOREACH(PLUGIN ${PARAVIEW_PLUGIN_CONFIG_LIST})
+  IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
+    FILE(APPEND ${PARAVIEW_PLUGIN_CONFIG_FILE} "SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} \"ON\")\n")
+  ELSE()
+    FILE(APPEND ${PARAVIEW_PLUGIN_CONFIG_FILE} "SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} \"OFF\")\n")
+  ENDIF()
+ENDFOREACH()
 
 #######################################################################
 # INSTALL
