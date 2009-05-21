@@ -309,19 +309,9 @@ IF (PARAVIEW_BUILD_QT_GUI)
   ADD_SUBDIRECTORY(Applications)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
-# The ParaView library dependencies.
-SET(PARAVIEW_LIBRARY_DEPENDS_FILE
-  "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
-EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
-# Perform build tree configuration. Install configuration is
-# handled below.
-CONFIGURE_FILE(
-    ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
-    ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
-    @ONLY IMMEDIATE)
-
 ####################################################################################
 # Generate a list of configured plugins for use by external projects
+# This must happen AFTER Application, but before creating ParaViewConfig.cmake
 
 SET(PARAVIEW_PLUGIN_CONFIG_FILE "${ParaView_BINARY_DIR}/ParaViewPluginConfig.cmake")
 FILE(WRITE ${PARAVIEW_PLUGIN_CONFIG_FILE} "")
@@ -332,6 +322,17 @@ FOREACH(PLUGIN ${PARAVIEW_PLUGIN_CONFIG_LIST})
     FILE(APPEND ${PARAVIEW_PLUGIN_CONFIG_FILE} "SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} \"OFF\")\n")
   ENDIF()
 ENDFOREACH()
+
+# The ParaView library dependencies.
+SET(PARAVIEW_LIBRARY_DEPENDS_FILE
+  "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
+EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
+# Perform build tree configuration. Install configuration is
+# handled below.
+CONFIGURE_FILE(
+    ${ParaView_SOURCE_DIR}/ParaViewConfig.cmake.in
+    ${ParaView_BINARY_DIR}/ParaViewConfig.cmake 
+    @ONLY IMMEDIATE)
 
 #######################################################################
 # INSTALL
