@@ -166,8 +166,14 @@ void pqClientMainWindow::constructorHelper()
   this->Implementation->Core->setDockWindowMenu(this->Implementation->ViewMenu);
   this->Implementation->Core->setToolbarMenu(this->Implementation->ToolbarsMenu);
 
+  QString suffix = "";
+  if (PARAVIEW_VERSION_MINOR%2 != 0)
+    {
+    suffix = "(development)";
+    }
+    
   this->setWindowTitle(
-    QString("Kitware ParaView %1 (development)").arg(PARAVIEW_VERSION_FULL));
+    QString("Kitware ParaView %1 %2").arg(PARAVIEW_VERSION_FULL).arg(suffix));
 
   // Setup menus and toolbars ...
   connect(this->Implementation->UI.actionFileOpen,
