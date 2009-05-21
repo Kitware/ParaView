@@ -57,7 +57,6 @@ protected:
   virtual void CreateVTKObjects();
   int ErrorCode;
 
-  vtkSMSummaryHelperProxy* SummaryHelperProxy;
 //BTX
   friend class vtkSMXMLPVAnimationWriterProxyInternals;
   vtkSMXMLPVAnimationWriterProxyInternals* Internals;

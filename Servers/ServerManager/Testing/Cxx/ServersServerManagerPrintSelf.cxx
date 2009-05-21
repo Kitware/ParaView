@@ -107,7 +107,6 @@
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMSubPropertyIterator.h"
-#include "vtkSMSummaryHelperProxy.h"
 #include "vtkSMTesting.h"
 #include "vtkSMTimeRangeInformationHelper.h"
 #include "vtkSMTimeStepsInformationHelper.h"
@@ -247,7 +246,6 @@ int main(int , char *[])
   c = vtkSMStringListRangeDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMStringVectorProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMSubPropertyIterator::New(); c->Print( cout ); c->Delete();
-  c = vtkSMSummaryHelperProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMTesting::New(); c->Print( cout ); c->Delete();
   c = vtkSMTimeRangeInformationHelper::New(); c->Print( cout ); c->Delete();
   c = vtkSMTimeStepsInformationHelper::New(); c->Print( cout ); c->Delete();

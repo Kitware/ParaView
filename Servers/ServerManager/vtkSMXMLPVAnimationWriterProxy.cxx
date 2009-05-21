@@ -17,7 +17,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkClientServerStream.h"
-#include "vtkSMSummaryHelperProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProperty.h"
@@ -26,7 +25,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.10");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -42,7 +41,6 @@ vtkSMXMLPVAnimationWriterProxy::vtkSMXMLPVAnimationWriterProxy()
 {
   this->SetServers(vtkProcessModule::DATA_SERVER);
   this->Internals = new vtkSMXMLPVAnimationWriterProxyInternals;
-  this->SummaryHelperProxy = NULL;
   this->ErrorCode = 0;
   this->SetExecutiveName(0);
 }
@@ -63,10 +61,6 @@ vtkSMXMLPVAnimationWriterProxy::~vtkSMXMLPVAnimationWriterProxy()
     pm->SendStream(this->ConnectionID, this->Servers, stream);
     }
   delete this->Internals;
-  if (this->SummaryHelperProxy)
-    {
-    this->SummaryHelperProxy->Delete();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -174,39 +168,7 @@ void vtkSMXMLPVAnimationWriterProxy::Start()
 {
   this->ErrorCode = 0;
   vtkClientServerStream str;
-  
-  // Check if SummaryHelperProxy is needed.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
-  if (numPartitions > 1)
-    {
-    if (!this->SummaryHelperProxy)
-      {
-      vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-      this->SummaryHelperProxy = vtkSMSummaryHelperProxy::SafeDownCast(
-        pxm->NewProxy("writers","SummaryHelper"));
-      if (this->SummaryHelperProxy)
-        {
-        this->SummaryHelperProxy->SetConnectionID(this->ConnectionID);
-        }
-      }
-    if (!this->SummaryHelperProxy)
-      {
-      vtkErrorMacro("Failed to create SummaryHelperProxy");
-      return;
-      }
-    
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->SummaryHelperProxy->GetProperty("Writer"));
-    pp->RemoveAllProxies();
-    pp->AddProxy(this);
-    this->SummaryHelperProxy->UpdateVTKObjects();
-
-    vtkSMProperty* p = this->SummaryHelperProxy->GetProperty("SynchronizeSummaryFiles");
-    p->Modified();
-    this->SummaryHelperProxy->UpdateVTKObjects();
-    }
-  
   str << vtkClientServerStream::Invoke
       << this->GetID() << "Start" << vtkClientServerStream::End;
   pm->SendStream(this->ConnectionID, this->Servers, str);
@@ -227,18 +189,6 @@ void vtkSMXMLPVAnimationWriterProxy::Finish()
   pm->GetLastResult(this->ConnectionID,
     vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
   this->ErrorCode = retVal;
-
-  if (this->SummaryHelperProxy)
-    {
-    // Break cyclic dependency.
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->SummaryHelperProxy->GetProperty("Writer"));
-    pp->RemoveAllProxies();
-    pp->AddProxy(0);
-    this->SummaryHelperProxy->UpdateVTKObjects();
-    this->SummaryHelperProxy->Delete();
-    this->SummaryHelperProxy = 0;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -246,6 +196,4 @@ void vtkSMXMLPVAnimationWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ErrorCode: " << this->ErrorCode << endl;
-  os << indent << "SummaryHelperProxy: " << this->SummaryHelperProxy << endl;
-
 }

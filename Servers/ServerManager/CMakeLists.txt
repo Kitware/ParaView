@@ -178,7 +178,6 @@ SET(Kit_SRCS
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
-  vtkSMSummaryHelperProxy.cxx
   vtkSMSurfaceRepresentationProxy.cxx
   vtkSMTesting.cxx
   vtkSMTextSourceRepresentationProxy.cxx
