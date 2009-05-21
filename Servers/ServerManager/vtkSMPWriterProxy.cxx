@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPWriterProxy);
-vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMPWriterProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMPWriterProxy::vtkSMPWriterProxy()
 {
@@ -111,89 +111,6 @@ void vtkSMPWriterProxy::CreateVTKObjects()
 
   pm->SendStream(this->ConnectionID, this->Servers, str);
 }
-
-//-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::AddInput(unsigned int inputPort,
-                                 vtkSMSourceProxy* input, 
-                                 unsigned int outputPort,
-                                 const char* method)
-{
-
-  vtkSMSourceProxy* completeArrays = vtkSMSourceProxy::SafeDownCast(
-    this->GetSubProxy("CompleteArrays"));
-  if (completeArrays)
-    {
-
-    vtkSMInputProperty* ivp  = vtkSMInputProperty::SafeDownCast(
-      completeArrays->GetProperty("Input"));
-    ivp->RemoveAllProxies();
-    ivp->AddInputConnection(input, outputPort);
-    input = completeArrays; // change the actual input to the writer to be
-      // output of complete arrays.
-    outputPort = 0; // since input changed, outputPort of the  input 
-                    // should also change.
-    completeArrays->UpdateVTKObjects();
-
-    }
-
-  this->Superclass::AddInput(inputPort, input, outputPort, method);
-
-  vtkSMProxy* sumHelper = this->GetSubProxy("SummaryHelper");
-  if (sumHelper)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-
-    stream << vtkClientServerStream::Invoke
-           << sumHelper->GetID() << "SetWriter" << this->GetID()
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << pm->GetProcessModuleID() << "GetController"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-           << sumHelper->GetID() << "SetController"
-           << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::UpdatePipeline()
-{
-  vtkSMProxy* sumHelper = this->GetSubProxy("SummaryHelper");
-  if (sumHelper)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-
-    stream << vtkClientServerStream::Invoke
-           << sumHelper->GetID() 
-           << "SynchronizeSummaryFiles"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
-  this->Superclass::UpdatePipeline();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPWriterProxy::UpdatePipeline(double time)
-{
-  vtkSMProxy* sumHelper = this->GetSubProxy("SummaryHelper");
-  if (sumHelper)
-    {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-
-    stream << vtkClientServerStream::Invoke
-           << sumHelper->GetID() 
-           << "SynchronizeSummaryFiles"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, this->Servers, stream);
-    }
-  this->Superclass::UpdatePipeline(time);
-}
-
 
 //-----------------------------------------------------------------------------
 void vtkSMPWriterProxy::PrintSelf(ostream& os, vtkIndent indent)

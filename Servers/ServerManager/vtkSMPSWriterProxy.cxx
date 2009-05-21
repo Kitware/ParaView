@@ -22,17 +22,15 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMPSWriterProxy);
-vtkCxxRevisionMacro(vtkSMPSWriterProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPSWriterProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMPSWriterProxy::vtkSMPSWriterProxy()
 {
-  this->FileNameMethod = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMPSWriterProxy::~vtkSMPSWriterProxy()
 {
-  this->SetFileNameMethod(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -50,29 +48,16 @@ void vtkSMPSWriterProxy::CreateVTKObjects()
     return;
     }
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  vtkSMSourceProxy* writer = 
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("Writer"));
+  vtkSMProxy* writer = this->GetSubProxy("Writer");
   if (!writer)
     {
     vtkErrorMacro("Missing subproxy: Writer");
     return;
     }
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke 
-         << this->GetID() << "SetWriter" << writer->GetID() 
-         << vtkClientServerStream::End;
-  if (this->GetFileNameMethod())
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetID() 
-           << "SetFileNameMethod" 
-           << this->GetFileNameMethod()
-           << vtkClientServerStream::End;
-    }
-
   if (this->GetSubProxy("PreGatherHelper"))
     {
     stream << vtkClientServerStream::Invoke
@@ -91,19 +76,6 @@ void vtkSMPSWriterProxy::CreateVTKObjects()
            << vtkClientServerStream::End;
     }
   pm->SendStream(this->ConnectionID, this->Servers, stream);
-}
-
-//---------------------------------------------------------------------------
-int vtkSMPSWriterProxy::ReadXMLAttributes(
-  vtkSMProxyManager* pm, vtkPVXMLElement* element)
-{
-  const char* setFileNameMethod = element->GetAttribute("file_name_method");
-  if(setFileNameMethod)
-    {
-    this->SetFileNameMethod(setFileNameMethod);
-    }
-
-  return this->Superclass::ReadXMLAttributes(pm, element);
 }
 
 //-----------------------------------------------------------------------------

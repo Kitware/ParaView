@@ -15,8 +15,8 @@
 #include "vtkXMLPVDWriter.h"
 
 #include "vtkCallbackCommand.h"
-#include "vtkExecutive.h"
 #include "vtkErrorCode.h"
+#include "vtkExecutive.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
@@ -31,15 +31,16 @@
 #include "vtkXMLImageDataWriter.h"
 #include "vtkXMLPDataWriter.h"
 #include "vtkXMLPImageDataWriter.h"
+#include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLPPolyDataWriter.h"
 #include "vtkXMLPRectilinearGridWriter.h"
 #include "vtkXMLPStructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
-#include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
+
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/ios/sstream>
 
@@ -48,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.16");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.17");
 
 class vtkXMLPVDWriterInternals
 {

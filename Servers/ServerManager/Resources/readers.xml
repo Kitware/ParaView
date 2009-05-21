@@ -869,7 +869,44 @@
       <!-- End of CSVReaderCore -->
    </SourceProxy>
 
+   <SourceProxy name="XMLMultiBlockDataReaderCore" 
+                class="vtkXMLMultiBlockDataReader"
+                label="XML Multi-Block Data reader">
+     <Documentation>
+        Internal proxy used by XMLMultiBlockDataWriter.
+     </Documentation>
 
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK multi-block reader.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End MultiBlockDataReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLHierarchicalBoxDataReaderCore" 
+                class="vtkXMLHierarchicalBoxDataReader"
+                label="XML Hierarchical Box Data reader">
+
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the VTK hierarchical box data reader.
+        </Documentation>
+     </StringVectorProperty>
+   <!-- End HierarchicalBoxDataReader -->
+   </SourceProxy>
+
+    <!-- End of "internal_sources" -->
   </ProxyGroup>
 
   <ProxyGroup name="sources">
@@ -979,49 +1016,6 @@
    <!-- End DEMReader -->
    </SourceProxy>
 
-   <SourceProxy name="XMLMultiBlockDataReader" 
-                class="vtkXMLMultiBlockDataReader"
-                label="XML Multi-Block Data reader">
-     <Documentation
-       short_help="Read VTK XML multi-block datasets."
-       long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
-       The XML Multi-Block Data reader reads the VTK XML multi-block data file format. XML multi-block data files are meta-files that point to a list of serial VTK XML files. When reading in parallel, this reader will distribute sub-blocks among processors. The expected file extensions are .vtm and .vtmb.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK multi-block reader.
-        </Documentation>
-     </StringVectorProperty>
-   <!-- End MultiBlockDataReader -->
-   </SourceProxy>
-
-   <SourceProxy name="XMLHierarchicalBoxDataReader" 
-                class="vtkXMLHierarchicalBoxDataReader"
-                label="XML Hierarchical Box Data reader">
-     <Documentation
-       short_help="Read a VTK data file containing a hierarchical box dataset."
-       long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
-       The XML Hierarchical Box Data reader reads VTK's XML-based file format
-       containing a vtkHierarchicalBoxDataSet. The expected file extensions are .vtm and .vthd.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        animateable="0"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the VTK hierarchical box data reader.
-        </Documentation>
-     </StringVectorProperty>
-   <!-- End HierarchicalBoxDataReader -->
-   </SourceProxy>
-
    <SourceProxy name="PVDReader" 
                 class="vtkPVDReader"
                 label="PVD reader">
@@ -1051,6 +1045,116 @@
      </DoubleVectorProperty>
    <!-- End PVDReader -->
    </SourceProxy>
+
+   <FileSeriesReaderProxy name="XMLMultiBlockDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML multi-block data reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read VTK XML multi-block datasets."
+       long_help="Read a VTK XML multi-block data file and the serial VTK XML data files to which it points.">
+       The XML Multi-Block Data reader reads the VTK XML multi-block data file
+       format. XML multi-block data files are meta-files that point to a list of
+       serial VTK XML files. When reading in parallel, this reader will
+       distribute sub-blocks among processors. The expected file extensions are
+       .vtm and .vtmb.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLMultiBlockDataReaderCore">
+       </Proxy>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0"
+                           information_property="FileNameInfo"
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be
+         in the VTK XML polygonal dataset format. The standard extension is
+         .vtp. If more than 1 file is specified, the reader will switch to file
+         series mode in which it will pretend that it can support time and
+         provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   <!-- end of XMLMultiBlockDataReader -->
+   </FileSeriesReaderProxy>
+
+   <FileSeriesReaderProxy name="XMLHierarchicalBoxDataReader"
+                          class="vtkFileSeriesReader"
+                          label="XML Hierarchical Box Data reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a VTK data file containing a hierarchical box dataset."
+       long_help="Read a VTK XML-based data file containing a hierarchical dataset containing vtkUniformGrids.">
+       The XML Hierarchical Box Data reader reads VTK's XML-based file format
+       containing a vtkHierarchicalBoxDataSet. The expected file extensions are
+       .vtm and .vthd.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="XMLHierarchicalBoxDataReaderCore">
+       </Proxy>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0"
+                           information_property="FileNameInfo"
+                           repeat_command="1">
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader. Each file is expected to be
+         in the VTK XML polygonal dataset format. The standard extension is
+         .vtp. If more than 1 file is specified, the reader will switch to file
+         series mode in which it will pretend that it can support time and
+         provide 1 file per time step.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
+
+   <!-- end of XMLHierarchicalBoxDataReader -->
+   </FileSeriesReaderProxy>
 
    <FileSeriesReaderProxy name="XMLPolyDataReader"
                           class="vtkFileSeriesReader"

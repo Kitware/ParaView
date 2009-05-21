@@ -1,0 +1,251 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="internal_writers">
+    <!--
+      *****************************************************************
+      These are proxies used by meta-writers defined in writers.xml
+      *****************************************************************
+    -->
+
+    <!-- ================================================================= -->
+    <Proxy name="DataWriterBase">
+      <!-- Base for non-xml data writers -->
+      <Documentation>
+        This defines the interface for legacy vtk data files writer. 
+      </Documentation>
+
+      <IntVectorProperty name="FileType"
+        command="SetFileType"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Ascii" />
+          <Entry value="2" text="Binary" />
+        </EnumerationDomain>
+        <Documentation>
+          The type for the data file (i.e. ascii or binary).
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of DataWriterBase -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="ParallelWriterBase" class="not-used">
+      <Documentation>
+        This defines the interface for the parallel writers. 
+      </Documentation>
+
+      <!-- Base for parallel writers -->
+
+      <StringVectorProperty name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="GhostLevel" 
+        command="SetGhostLevel"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+        <Documentation>
+          The number of ghost levels to include in the output file(s). Note that
+          some writers (such as ExodusIIWriter) may not support writing ghost
+          levels.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
+          <InputProperty name="Input" command="SetInputConnection">
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+
+      <!-- End of ParallelWriterBase -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="FileSeriesWriter">
+
+      <StringVectorProperty name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0"
+        label="Write all timesteps as file-series" >
+        <BooleanDomain name="bool" /> 
+        <Documentation>
+        When WriteAllTimeSteps is turned ON, the writer is executed 
+        once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End of FileSeriesWriter -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="ParallelFileSeriesWriter">
+
+      <StringVectorProperty name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+        <Documentation>
+          The name of the file to be written.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="WriteAllTimeSteps"
+        command="SetWriteAllTimeSteps"
+        number_of_elements="1"
+        default_values="0"
+        label="Write all timesteps as file-series" >
+        <BooleanDomain name="bool" /> 
+        <Documentation>
+        When WriteAllTimeSteps is turned ON, the writer is executed 
+        once for each timestep available from the reader.
+        </Documentation>
+      </IntVectorProperty>
+
+      <SubProxy>
+        <!-- No harm if use vtkCompleteArrays even in serial mode so, we are
+             letting it be -->
+        <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
+          <InputProperty name="Input" command="SetInputConnection">
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+      
+      <!-- End of ParallelFileSeriesWriter -->
+    </Proxy>
+
+
+    <!-- ================================================================= -->
+    <Proxy name="STLWriter" class="vtkSTLWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation short_help="Write stereo lithography files.">
+      </Documentation>
+      <!-- End of STLWriter -->
+    </Proxy>
+    
+    <!-- ================================================================= -->
+    <Proxy name="PLYWriter" class="vtkPLYWriter"
+      base_proxygroup="internal_writers" base_proxyname="DataWriterBase">
+      <Documentation
+        short_help="Write polygonal data in Stanford University PLY format.">
+      </Documentation>
+      <!-- End of PLYWriter -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="DataSetWriterCore" 
+                 class="vtkGenericDataObjectWriter"
+                 base_proxygroup="internal_writers"
+                 base_proxyname="DataWriterBase">
+      <Documentation>
+        Internal proxy used for writing legacy vtk files. 
+      </Documentation>
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <Proxy name="XMLDataSetWriterCore" class="vtkXMLDataSetWriter">
+      <Documentation>
+        Internal writer for writing xml-based vtk files.
+      </Documentation>
+
+      <IntVectorProperty name="DataMode"
+        command="SetDataMode"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Ascii" />
+          <Entry value="1" text="Binary" />
+          <Entry value="2" text="Appended" />
+        </EnumerationDomain>
+        <Documentation>
+          The mode uses for writing the file's data i.e. ascii, binary, appended
+          binary.
+        </Documentation>
+      </IntVectorProperty>
+      <!-- End of XMLDataSetWriterCore -->
+    </Proxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPMultiBlockDataWriterCore"
+      class="vtkXMLPMultiBlockDataWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Internal proxy used by XMLMultiBlockDataWriter.
+      </Documentation>
+      <!-- End of XMLPMultiBlockDataWriterCore -->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPHierarchicalBoxDataWriterCore"
+      class="vtkXMLPHierarchicalBoxDataWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Internal proxy used by XMLHierarchicalBoxDataWriter.
+      </Documentation>
+      <!-- End of XMLPHierarchicalBoxDataWriterCore -->
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPPolyDataWriterCore"
+      class="vtkXMLPPolyDataWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Internal writer used to write XML poly data in parallel.
+      </Documentation>
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPUnstructuredGridWriterCore"
+      class="vtkXMLPUnstructuredGridWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Internal writer used to write XML poly data in parallel.
+      </Documentation>
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPStructuredGridWriterCore"
+      class="vtkXMLPStructuredGridWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Internal writer used to write XML poly data in parallel.
+      </Documentation>
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPRectilinearGridWriterCore"
+      class="vtkXMLPRectilinearGridWriter"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+
+      <Documentation>
+        Writer to write rectilinear grid in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
+    </PWriterProxy>
+
+    <!-- ================================================================= -->
+    <PWriterProxy name="XMLPImageDataWriterCore"
+      class="vtkXMLPImageDataWriter"
+      parallel_only="1"
+      base_proxygroup="internal_writers" base_proxyname="XMLDataSetWriterCore">
+      <Documentation>
+        Writer to write image data in a xml-based vtk data file. Can be used
+        for parallel writing.
+      </Documentation>
+    </PWriterProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

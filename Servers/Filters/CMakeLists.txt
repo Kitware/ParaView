@@ -43,6 +43,7 @@ SET(Filters_SRCS
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
   vtkFileSeriesReader.cxx
+  vtkFileSeriesWriter.cxx
   vtkHierarchicalFractal.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
@@ -107,7 +108,6 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVStringArrayHelper.cxx
-  vtkPVSummaryHelper.cxx
   vtkPVTextSource.cxx
   vtkPVTrackballMoveActor.cxx
   vtkPVTrackballMultiRotate.cxx

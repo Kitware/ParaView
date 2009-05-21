@@ -140,7 +140,6 @@ SET(Kit_SRCS
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
-  vtkSMPVDWriterProxy.cxx
   vtkSMPVLookupTableProxy.cxx
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
@@ -387,6 +386,7 @@ SET(resourceFiles
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/internal_writers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   ${PARAVIEW_EXTRA_SERVERMANAGER_RESOURCES}
   )

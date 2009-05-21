@@ -74,7 +74,6 @@
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVServerTimeSteps.h"
 #include "vtkPVServerXDMFParameters.h"
-#include "vtkPVSummaryHelper.h"
 #include "vtkPVTextSource.h"
 #include "vtkPVTrackballMoveActor.h"
 #include "vtkPVTrackballPan.h"
@@ -187,7 +186,6 @@ int main(int , char *[])
   c = vtkPVServerSelectTimeSet::New(); c->Print(cout); c->Delete();
   c = vtkPVServerTimeSteps::New(); c->Print(cout); c->Delete();
   c = vtkPVServerXDMFParameters::New(); c->Print(cout); c->Delete();
-  c = vtkPVSummaryHelper::New(); c->Print(cout); c->Delete();
   c = vtkPVTextSource::New(); c->Print(cout); c->Delete();
   c = vtkPVTrackballMoveActor::New(); c->Print(cout); c->Delete();
   c = vtkPVTrackballPan::New(); c->Print(cout); c->Delete();

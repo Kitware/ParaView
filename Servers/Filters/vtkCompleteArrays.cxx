@@ -39,7 +39,7 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.9");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.10");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
@@ -94,6 +94,10 @@ int vtkCompleteArrays::RequestData(
 
   myProcId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
+  if (numProcs <= 1)
+    {
+    return 1;
+    }
 
   if (myProcId == 0)
     {

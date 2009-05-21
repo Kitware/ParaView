@@ -36,17 +36,6 @@ protected:
 
   virtual void CreateVTKObjects();
 
-  // Description:
-  // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
-
-  // This is the name of the method used to set the file name on the
-  // internal reader. See vtkFileSeriesReader for details.
-  vtkSetStringMacro(FileNameMethod);
-  vtkGetStringMacro(FileNameMethod);
-
-  char* FileNameMethod;
-
 private:
   vtkSMPSWriterProxy(const vtkSMPSWriterProxy&); // Not implemented.
   void operator=(const vtkSMPSWriterProxy&); // Not implemented.

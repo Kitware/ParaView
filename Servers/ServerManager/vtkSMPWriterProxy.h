@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notice for more information.
 // writing.
 // .SECTION Description
 // vtkSMPWriterProxy is the proxy for all writers that can write in parallel.
+// The only extra functionality provided by this class is that it sets up the
+// piece information on the writer.
 
 #ifndef __vtkSMPWriterProxy_h
 #define __vtkSMPWriterProxy_h
@@ -28,19 +30,6 @@ public:
   static vtkSMPWriterProxy* New();
   vtkTypeRevisionMacro(vtkSMPWriterProxy, vtkSMWriterProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input, 
-                        unsigned int outputPort,
-                        const char* method);
-  virtual void AddInput(vtkSMSourceProxy* input,
-                        const char* method)
-  {
-    this->AddInput(0, input, 0, method);
-  }
-
-  virtual void UpdatePipeline();
-  virtual void UpdatePipeline(double time);
 
 protected:
   vtkSMPWriterProxy();

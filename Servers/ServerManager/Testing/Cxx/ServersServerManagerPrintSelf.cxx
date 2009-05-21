@@ -88,7 +88,6 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyRegisterUndoElement.h"
 #include "vtkSMProxyUnRegisterUndoElement.h"
-#include "vtkSMPVDWriterProxy.h"
 #include "vtkSMPVLookupTableProxy.h"
 #include "vtkSMPWriterProxy.h"
 #include "vtkSMRampKeyFrameProxy.h"
@@ -229,7 +228,6 @@ int main(int , char *[])
   c = vtkSMProxyProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyRegisterUndoElement::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyUnRegisterUndoElement::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPVDWriterProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMPVLookupTableProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMPWriterProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMRampKeyFrameProxy::New(); c->Print( cout ); c->Delete();
