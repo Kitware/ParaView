@@ -460,6 +460,12 @@ bool pq3DWidget::widgetVisible() const
 }
 
 //-----------------------------------------------------------------------------
+bool pq3DWidget::widgetSelected() const
+{
+  return this->Internal->Selected;
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::select()
 {
   if(true != this->Internal->Selected)
@@ -547,6 +553,12 @@ void pq3DWidget::updateWidgetVisibility()
     
   const bool widget_enabled = widget_visible;
   
+  this->updateWidgetState(widget_visible, widget_enabled);
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::updateWidgetState(bool widget_visible, bool widget_enabled)
+{
   if (this->Internal->WidgetProxy && this->renderView())
     {
     if(vtkSMIntVectorProperty* const visibility =

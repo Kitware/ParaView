@@ -85,6 +85,9 @@ public:
   /// in the display, since this widget's panel might not be visible.
   bool widgetVisible() const;
 
+  /// Returns true if 3D widget is selected.
+  bool widgetSelected() const;
+  
   /// Returns the current render view.
   pqRenderViewBase* renderView() const;
 
@@ -189,14 +192,19 @@ protected:
   /// Used to get the input bounds on for the reference proxy, if any.
   /// returns 1 on success, 0 otherwise.
   int getReferenceInputBounds(double bounds[6]) const;
+  
+  /// Update the widget visibility according to the WidgetVisible and Selected flags
+  virtual void updateWidgetVisibility();
+  
+  /// Update the widget visibility and enable state
+  virtual void updateWidgetState(bool visible, bool enable);
+  
+  /// updates the enable state of the picking shortcut.
+  virtual void updatePickShortcut();
 
 private:
   void setControlledProxy(vtkSMProxy*);
 
-  /// updates the enable state of the picking shortcut.
-  void updatePickShortcut();
-
-  void updateWidgetVisibility();
   pq3DWidgetInternal* const Internal;
 
   bool UseSelectionDataBounds;
