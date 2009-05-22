@@ -1411,6 +1411,17 @@ bool pqNamedWidgets::propertyInformation(QObject* object,
      return true;
      }
 
+  // QMetaMethod notifySignal () const is available in Qt 4.5 
+  // This will make determining the signal name easier and more generic.
+  // and the QGroupBox code will not be needed.
+  QGroupBox* grp = qobject_cast<QGroupBox*>(object);
+  if(grp && grp->isCheckable())
+     {
+     property = "checked";
+     signal = SIGNAL(toggled(bool));
+     return true;
+     }
+
   return false;
 }
 
