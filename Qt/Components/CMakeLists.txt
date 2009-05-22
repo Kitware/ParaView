@@ -113,7 +113,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDistanceWidget.h
   pqEditServerStartupDialog.h
   pqExodusIIPanel.h
-  pqExodusPanel.h
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.h
   pqFilterInputDialog.h
@@ -259,7 +258,6 @@ SET(UI_FORMS
   Resources/UI/pqEditServerStartupDialog.ui
   Resources/UI/pqEmptyView.ui
   Resources/UI/pqExodusIIPanel.ui
-  Resources/UI/pqExodusPanel.ui
   Resources/UI/pqGlobalRenderViewOptions.ui
   Resources/UI/pqHandleWidget.ui
   Resources/UI/pqImplicitPlaneWidget.ui
@@ -490,8 +488,6 @@ ADD_LIBRARY(pqComponents
   pqEditServerStartupDialog.h
   pqExodusIIPanel.cxx
   pqExodusIIPanel.h
-  pqExodusPanel.cxx
-  pqExodusPanel.h
   pqExtractCTHPartsPanel.cxx
   pqExtractCTHPartsPanel.h
   pqFileChooserWidget.cxx

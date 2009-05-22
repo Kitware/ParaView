@@ -207,7 +207,7 @@ if propAdap.GetRangeValue(0) != "arrayFooBar":
   sys.exit(1)
 
 # ExodusReader proxy
-exodusReaderProxy = pxm.NewProxy("sources", "ExodusReader")
+exodusReaderProxy = pxm.NewProxy("sources", "ExodusIIReader")
 # FileRange property
 propAdap.SetProperty(exodusReaderProxy.GetProperty("FileRange"))
 intInfoProp = exodusReaderProxy.GetProperty("FileRangeInfo")

@@ -55,7 +55,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqContourPanel.h"
 #include "pqCutPanel.h"
 #include "pqExodusIIPanel.h"
-#include "pqExodusPanel.h"
 #include "pqExtractCTHPartsPanel.h"
 #include "pqGlyphPanel.h"
 #include "pqLoadedFormObjectPanel.h"
@@ -132,10 +131,6 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("ExodusReader") == proxy->getProxy()->GetXMLName())
-        {
-        return new pqExodusPanel(proxy, p);
-        }
       if(QString("ExodusIIReader") == proxy->getProxy()->GetXMLName())
         {
         return new pqExodusIIPanel(proxy, p);
@@ -181,8 +176,7 @@ public:
       }
     if(QString("sources") == proxy->getProxy()->GetXMLGroup())
       {
-      if(QString("ExodusReader") == proxy->getProxy()->GetXMLName() ||
-         QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
+      if (QString("ExodusIIReader") == proxy->getProxy()->GetXMLName() ||
          QString("ExodusRestartReader") == proxy->getProxy()->GetXMLName() ||
 #ifdef PARAVIEW_USE_SILO
          QString("SiloReader") == proxy->getProxy()->GetXMLName() ||
