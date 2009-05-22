@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.12");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.12.6.1");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -71,7 +71,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
       }
     status = status && this->Process_3_0_To_3_2(root) ;
 
-    // Since now the state file has been update to version 3.1.0, we must update
+    // Since now the state file has been update to version 3.2.0, we must update
     // the version number to reflect that.
     int updated_version[3] = {3, 2, 0};
     this->UpdateVersion(version, updated_version);
@@ -82,12 +82,23 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     {
     status = status && this->Process_3_2_To_3_4(root) ;
 
-    // Since now the state file has been update to version 3.1.0, we must update
+    // Since now the state file has been update to version 3.4.0, we must update
     // the version number to reflect that.
     int updated_version[3] = {3, 4, 0};
     this->UpdateVersion(version, updated_version);
     }
-  return true;
+
+  if (this->GetMajor(version)==3 &&
+    this->GetMinor(version) < 6)
+    {
+    status = status && this->Process_3_4_to_3_6(root);
+    // Since now the state file has been update to version 3.6.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = {3, 6, 0};
+    this->UpdateVersion(version, updated_version);
+    }
+
+  return status;
 }
 
 namespace
@@ -661,6 +672,83 @@ bool vtkSMStateVersionController::Process_3_2_To_3_4(vtkPVXMLElement* root)
     &::ConvertTemporalShiftScale, this);
   }
   
+  return true;
+}
+
+bool ElementFound(
+  vtkPVXMLElement* vtkNotUsed(parent), void* callData)
+{
+  *(reinterpret_cast<bool*>(callData)) = true;
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
+{
+    {
+    // If there's a "CSVReader", it's an irrecoverable error since the output
+    // format for CSVReader changed in 3.6 to be true table so old rectilinear
+    // grid pipelines won't really work.
+    const char* attrs[] = {"type", "CSVReader", 0};
+    bool found = false;
+    this->Select(root, "Proxy", attrs, &::ElementFound, &found);
+    if (found)
+      {
+      vtkErrorMacro("Your state file uses a \"CSVReader\"."
+        "The CSVReader has undergone major changes in 3.6 and hence this state"
+        " file is not recoverable.");
+      return false;
+      }
+    }
+
+    {
+    // "CTHFragmentConnect" was removed from the open source version due to
+    // export control issues. 
+    const char* attrs[] = {"type", "CTHFragmentConnect", 0};
+    bool found = false;
+    this->Select(root, "Proxy", attrs, &::ElementFound, &found);
+    if (found)
+      {
+      vtkErrorMacro("Your state file uses a \"CTHFragmentConnect\"."
+        "CTHFragmentConnect is no longer available in ParaView.");
+      return false;
+      }
+    }
+
+    {
+    // "CTHFragmentIntersect" was removed from the open source version due to
+    // export control issues. 
+    const char* attrs[] = {"type", "CTHFragmentIntersect", 0};
+    bool found = false;
+    this->Select(root, "Proxy", attrs, &::ElementFound, &found);
+    if (found)
+      {
+      vtkErrorMacro("Your state file uses a \"CTHFragmentIntersect\"."
+        "CTHFragmentIntersect is no longer available in ParaView.");
+      return false;
+      }
+    }
+
+    {
+    // If Plot Views are present, warn about them. Suggest that they may have to
+    // recreate the view.
+    const char* attrs0[] = {"type", "XYPlotView", 0};
+    const char* attrs1[] = {"type", "BarChartView", 0};
+    bool found = false;
+    this->Select(root, "Proxy", attrs0, &::ElementFound, &found);
+    if (!found)
+      {
+      this->Select(root, "Proxy", attrs1, &::ElementFound, &found);
+      }
+    if (found)
+      {
+      vtkWarningMacro("Your state file uses plot views. "
+        "Plot views have undergone considerable changes in 3.6 and it's"
+        " possible that the state may not be loaded correctly. "
+        "In that case, simply close the plot views, and recreate them.");
+      }
+    }
+
   return true;
 }
 
