@@ -270,7 +270,7 @@ IF(BUILD_TESTING)
     CreateAndLoadLookmark
     CustomFilter
     CustomSourceProbe
-    CutMulti
+#    CutMulti -Randomly failing test.
     D3SmallCells
     DualSphereAnimation
     ExodusIIPanel
