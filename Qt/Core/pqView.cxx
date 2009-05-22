@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 // ParaView Server Manager includes.
+#include "vtkAnnotationLink.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
@@ -78,9 +79,22 @@ public:
   // List of representation shown by this view.
   QList<QPointer<pqRepresentation> > Representations;
 
+  // The annotation link for linking selections and annotations
+  // between views.
+  vtkAnnotationLink* AnnotationLink;
+
   pqViewInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    this->AnnotationLink = vtkAnnotationLink::New();
+    }
+
+  ~pqViewInternal()
+    {
+    if (this->AnnotationLink)
+      {
+      this->AnnotationLink->Delete();
+      }
     }
 
   QTimer RenderTimer;
@@ -364,4 +378,26 @@ vtkImageData* pqView::captureImage(const QSize& fullsize)
     this->render();
     }
   return vtkimage;
+}
+
+//-----------------------------------------------------------------------------
+void pqView::setAnnotationLink(vtkAnnotationLink* link)
+{
+  if (this->Internal->AnnotationLink != link)
+    {
+    vtkAnnotationLink* tempSGMacroVar = this->Internal->AnnotationLink;
+    this->Internal->AnnotationLink = link;
+    if (this->Internal->AnnotationLink != NULL) { this->Internal->AnnotationLink->Register(0); }
+    if (tempSGMacroVar != NULL)
+      {
+      tempSGMacroVar->UnRegister(0);
+      }
+    this->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkAnnotationLink* pqView::getAnnotationLink()
+{
+  return this->Internal->AnnotationLink;
 }

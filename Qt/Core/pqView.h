@@ -43,6 +43,7 @@ class pqServer;
 class pqUndoStack;
 class pqViewInternal;
 class QWidget;
+class vtkAnnotationLink;
 class vtkImageData;
 class vtkSMViewProxy;
 
@@ -144,6 +145,11 @@ public:
   /// the pqDisplayPolicy object from the pqApplicationCore
   /// are queries it.
   virtual bool canDisplay(pqOutputPort* opPort) const =0;
+
+  /// The annotation link used on representations to share the selection
+  /// and annotations. This is only used in views aware of this link.
+  void setAnnotationLink(vtkAnnotationLink* link);
+  vtkAnnotationLink* getAnnotationLink();
 
 signals:
   /// Fired after a representation has been added to this view.
