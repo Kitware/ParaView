@@ -275,7 +275,6 @@ IF(BUILD_TESTING)
     DualSphereAnimation
     ExodusIIPanel
     ExodusModeShapes
-    ExodusPanel
 #    ExodusWriter -- ENABLE WHEN WRITER IS ADDED
     ExodusXML
     ExTimeseries
