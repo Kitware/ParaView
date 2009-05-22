@@ -28,7 +28,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
@@ -75,15 +75,15 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
     return;
     }
 
-  bool has_pd = 
+  bool has_pd = 0 !=
     this->CheckForArray(sp, outputport, info->GetPointDataInformation(), iad);
-  bool has_cd = 
+  bool has_cd = 0 !=
     this->CheckForArray(sp, outputport, info->GetCellDataInformation(), iad);
-  bool has_vd = 
+  bool has_vd = 0 !=
     this->CheckForArray(sp, outputport, info->GetVertexDataInformation(), iad);
-  bool has_ed = 
+  bool has_ed = 0 !=
     this->CheckForArray(sp, outputport, info->GetEdgeDataInformation(), iad);
-  bool has_rd = 
+  bool has_rd = 0 !=
     this->CheckForArray(sp, outputport, info->GetRowDataInformation(), iad);
 
   if (this->DisableUpdateDomainEntries || has_pd)
