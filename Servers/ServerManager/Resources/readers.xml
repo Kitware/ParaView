@@ -3,7 +3,7 @@
   <ProxyGroup name="internal_sources">
    <SourceProxy name="legacyreader" 
                 class="vtkPDataSetReader"
-                label="Legacy VTK reader">
+                label="Legacy VTK Reader">
      <Documentation
        short_help="Read legacy VTK files."
        long_help="Read files stored in VTK's legacy file format.">
@@ -24,7 +24,7 @@
 
    <SourceProxy name="XMLPolyDataReaderCore" 
                 class="vtkXMLPolyDataReader"
-                label="XML Polydata reader">
+                label="XML PolyData Reader">
      <Documentation
        short_help="Read VTK XML polydata files."
        long_help="Read serial VTK XML polydata files.">
@@ -186,7 +186,7 @@
 
    <SourceProxy name="XMLImageDataReaderCore" 
                 class="vtkXMLImageDataReader"
-                label="XML Image Data reader">
+                label="XML Image Data Reader">
      <Documentation
        short_help="Read VTK XML image data files."
        long_help="Read serial VTK XML image data files.">
@@ -268,7 +268,7 @@
 
    <SourceProxy name="XMLStructuredGridReaderCore" 
                 class="vtkXMLStructuredGridReader"
-                label="XML Structured Grid reader">
+                label="XML Structured Grid Reader">
      <Documentation
        short_help="Read VTK XML structured grid data files."
        long_help="Read serial VTK XML structured grid data files.">
@@ -349,7 +349,7 @@
 
    <SourceProxy name="XMLRectilinearGridReaderCore" 
                 class="vtkXMLRectilinearGridReader"
-                label="XML Rectilinear Grid reader">
+                label="XML Rectilinear Grid Reader">
      <Documentation
        short_help="Read VTK XML rectilinear grid data files."
        long_help="Read serial VTK XML rectilinear grid data files.">
@@ -430,7 +430,7 @@
 
    <SourceProxy name="XMLPPolyDataReaderCore" 
                 class="vtkXMLPPolyDataReader"
-                label="XML Partitioned Polydata reader">
+                label="XML Partitioned Polydata Reader">
      <Documentation
        short_help="Read partitioned VTK XML polydata files."
        long_help="Read the summary file and the associated VTK XML polydata files.">
@@ -502,7 +502,7 @@
 
    <SourceProxy name="XMLPUnstructuredGridReaderCore" 
                 class="vtkXMLPUnstructuredGridReader"
-                label="XML Partitioned Unstructured Grid reader">
+                label="XML Partitioned Unstructured Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML unstructured grid files."
        long_help="Read the summary file and the associated VTK XML unstructured grid files.">
@@ -573,7 +573,7 @@
 
    <SourceProxy name="XMLPImageDataReaderCore" 
                 class="vtkXMLPImageDataReader"
-                label="XML Partitioned Image Data reader">
+                label="XML Partitioned Image Data Reader">
      <Documentation
        short_help="Read partitioned VTK XML image data files."
        long_help="Read the summary file and the associated VTK XML image data files.">
@@ -644,7 +644,7 @@
 
    <SourceProxy name="XMLPStructuredGridReaderCore" 
                 class="vtkXMLPStructuredGridReader"
-                label="XML Partitioned Structured Grid reader">
+                label="XML Partitioned Structured Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML structured grid files."
        long_help="Read the summary file and the associated VTK XML structured grid files.">
@@ -715,7 +715,7 @@
 
    <SourceProxy name="XMLPRectilinearGridReaderCore" 
                 class="vtkXMLPRectilinearGridReader"
-                label="XML Partitioned Rectilinear Grid reader">
+                label="XML Partitioned Rectilinear Grid Reader">
      <Documentation
        short_help="Read partitioned VTK XML rectilinear grid files."
        long_help="Read the summary file and the associated VTK XML rectilinear grid files.">
@@ -784,7 +784,7 @@
    <!-- End XMLPRectilinearGridReaderCore -->
    </SourceProxy>
 
-   <SourceProxy name="stlreadercore" class="vtkSTLReader" label="STL reader">
+   <SourceProxy name="stlreadercore" class="vtkSTLReader" label="STL Reader">
      <Documentation
        short_help="Read STL files."
        long_help="Read ASCII or binary stereo lithography (STL) files.">
@@ -803,7 +803,7 @@
    <!-- End stlreader -->
    </SourceProxy>
 
-   <SourceProxy name="CSVReaderCore" class="vtkDelimitedTextReader" label="CSV reader">
+   <SourceProxy name="CSVReaderCore" class="vtkDelimitedTextReader" label="CSV Reader">
       <Documentation
         short_help="Read a comma-separated values file."
         long_help="Read a comma-separated values file into a 1D rectilinear grid.">
@@ -912,7 +912,7 @@
   <ProxyGroup name="sources">
    <SourceProxy name="CosmoReader" 
                 class="vtkCosmoReader"
-                label="COSMO reader">
+                label="COSMO Reader">
      <Documentation
        short_help="Read a cosmology file."
        long_help="Read a cosmology file into a vtkUnstructuredGrid.">
@@ -996,7 +996,7 @@
 
    <SourceProxy name="DEMReader" 
                 class="vtkDEMReader"
-                label="DEM reader">
+                label="DEM Reader">
      <Documentation
        short_help="Read a dataset in DEM format"
        long_help="Read a DEM (Digital Elevation Model) file.">
@@ -1018,7 +1018,7 @@
 
    <SourceProxy name="PVDReader" 
                 class="vtkPVDReader"
-                label="PVD reader">
+                label="PVD Reader">
      <Documentation
        short_help="Read a PVD file."
        long_help="Load a dataset stored in ParaView's PVD file format.">
@@ -1048,7 +1048,7 @@
 
    <FileSeriesReaderProxy name="XMLMultiBlockDataReader"
                           class="vtkFileSeriesReader"
-                          label="XML multi-block data reader"
+                          label="XML MultiBlock Data Reader"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read VTK XML multi-block datasets."
@@ -1158,7 +1158,7 @@
 
    <FileSeriesReaderProxy name="XMLPolyDataReader"
                           class="vtkFileSeriesReader"
-                          label="XML Polydata reader"
+                          label="XML PolyData Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML polydata files."
                     long_help="Read serial VTK XML polydata files.">
@@ -1209,7 +1209,7 @@
 
    <FileSeriesReaderProxy name="XMLUnstructuredGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Unstructured Grid reader"
+                          label="XML Unstructured Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML unstructured grid data files."
                     long_help="Read serial VTK XML unstructured grid data files.">
@@ -1261,7 +1261,7 @@
 
    <FileSeriesReaderProxy name="XMLImageDataReader"
                           class="vtkFileSeriesReader"
-                          label="XML Image Data reader"
+                          label="XML Image Data Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML image data files."
                     long_help="Read serial VTK XML image data files.">
@@ -1313,7 +1313,7 @@
 
    <FileSeriesReaderProxy name="XMLStructuredGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Structured Grid reader"
+                          label="XML Structured Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML structured grid data files."
                     long_help="Read serial VTK XML structured grid data files.">
@@ -1365,7 +1365,7 @@
 
    <FileSeriesReaderProxy name="XMLRectilinearGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Rectilinear Grid reader"
+                          label="XML Rectilinear Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read VTK XML rectilinear grid data files."
                     long_help="Read serial VTK XML rectilinear grid data files.">
@@ -1417,7 +1417,7 @@
 
    <FileSeriesReaderProxy name="XMLPPolyDataReader"
                           class="vtkFileSeriesReader"
-                          label="XML Partitioned Polydata reader"
+                          label="XML Partitioned Polydata Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML polydata files."
                     long_help="Read the summary file and the assicoated VTK XML polydata files.">
@@ -1468,7 +1468,7 @@
 
    <FileSeriesReaderProxy name="XMLPUnstructuredGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Partitioned Unstructured Grid reader"
+                          label="XML Partitioned Unstructured Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML unstructured grid data files."
                     long_help="Read the summary file and the associated VTK XML unstructured grid data files.">
@@ -1520,7 +1520,7 @@
 
    <FileSeriesReaderProxy name="XMLPImageDataReader"
                           class="vtkFileSeriesReader"
-                          label="XML Partitioned Image Data reader"
+                          label="XML Partitioned Image Data Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML image data files."
                     long_help="Read the summary file and the associated VTK XML image data files.">
@@ -1572,7 +1572,7 @@
 
    <FileSeriesReaderProxy name="XMLPStructuredGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Partitioned Structured Grid reader"
+                          label="XML Partitioned Structured Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML structured grid data files."
                     long_help="Read the summary file and the associated VTK XML structured grid data files.">
@@ -1624,7 +1624,7 @@
 
    <FileSeriesReaderProxy name="XMLPRectilinearGridReader"
                           class="vtkFileSeriesReader"
-                          label="XML Partitioned Rectilinear Grid reader"
+                          label="XML Partitioned Rectilinear Grid Reader"
                           file_name_method="SetFileName">
      <Documentation short_help="Read partitioned VTK XML rectilinear grid data files."
                     long_help="Read the summary file and the associated VTK XML rectilinear grid data files.">
@@ -1728,7 +1728,7 @@
 
    <FileSeriesReaderProxy name="LegacyVTKFileReader"
                           class="vtkFileSeriesReader"
-                          label="Legacy VTK reader"
+                          label="Legacy VTK Reader"
                           file_name_method="SetFileName">
      <Documentation
        short_help="Read legacy VTK files."
@@ -1775,7 +1775,7 @@
 
    <SourceProxy name="pvtkfile" 
                 class="vtkPDataSetReader"
-                label="Partitioned Legacy VTK reader">
+                label="Partitioned Legacy VTK Reader">
      <Documentation
        short_help="Read partitioned legacy VTK files."
        long_help="Read files stored in VTK partitioned legacy format.">
@@ -1796,7 +1796,7 @@
 
    <SourceProxy name="ensight" 
                 class="vtkGenericEnSightReader"
-                label="EnSight reader">
+                label="EnSight Reader">
      <Documentation
        short_help="Read EnSight files."
        long_help="Read EnSight 6 and Gold files.">
@@ -1876,7 +1876,7 @@
    </SourceProxy>
 
    <SourceProxy name="spcthreader" class="vtkSpyPlotReader"
-                label="Spy Plot reader">
+                label="Spy Plot Reader">
      <Documentation
        short_help="Read files in the Spy Plot format."
        long_help="Read files in the SPCTH Spy Plot file format.">
@@ -2062,7 +2062,7 @@
   </FileSeriesReaderProxy>
 
 
-   <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML reader">
+   <SourceProxy name="vrmlreader" class="vtkVRMLSource" label="VRML Reader">
      <Documentation
        short_help="Read VRML 2.0 files."
        long_help="Load the geometry from a VRML 2.0 file.">
@@ -2081,7 +2081,7 @@
    <!-- End vrmlreader -->
    </SourceProxy>
 
-   <SourceProxy name="plyreader" class="vtkPLYReader" label="PLY reader">
+   <SourceProxy name="plyreader" class="vtkPLYReader" label="PLY Reader">
      <Documentation
        short_help="Read PLY polygonal files."
        long_help="Read files stored in Stanford University's PLY polygonal file format.">
@@ -2100,7 +2100,7 @@
    <!-- End plyreader -->
    </SourceProxy>
 
-   <SourceProxy name="pdbreader" class="vtkPDBReader" label="PDB reader">
+   <SourceProxy name="pdbreader" class="vtkPDBReader" label="PDB Reader">
      <Documentation
        short_help="Read PDB files."
        long_help="Read PDB molecule files.">
@@ -2119,7 +2119,7 @@
    <!-- End pdbreader -->
    </SourceProxy>
 
-   <SourceProxy name="xyzreader" class="vtkXYZMolReader" label="XYZ reader">
+   <SourceProxy name="xyzreader" class="vtkXYZMolReader" label="XYZ Reader">
      <Documentation
        short_help="Read XYZ molecular data files."
        long_help="Read XYZ molecular data files into a polygonal dataset.">
@@ -2151,7 +2151,7 @@
    </SourceProxy>
 
    <SourceProxy name="P3DReader" class="vtkMultiBlockPLOT3DReader"
-                label="PLOT3D reader">
+                label="PLOT3D Reader">
      <Documentation
        short_help="Read PLOT3D files."
        long_help="Read ASCII or binary PLOT3D files.">
@@ -2290,7 +2290,7 @@
 
    <SourceProxy name="PhastaReader" 
                 class="vtkPPhastaReader"
-                label="Phasta reader">
+                label="Phasta Reader">
      <Documentation
        short_help="Read datasets stored in the Phasta format."
        long_help="Read the parallel Phasta meta-file and the underlying Phasta files.">
@@ -2320,7 +2320,7 @@
 
    <FileSeriesReaderProxy name="stlreader"
                           class="vtkFileSeriesReader"
-                          label="Legacy VTK reader"
+                          label="Legacy VTK Reader"
                           file_name_method="SetFileName">
      <Documentation
          short_help="Read STL files."
@@ -2367,7 +2367,7 @@
      <!-- End legacyreader_t -->
    </FileSeriesReaderProxy>
 
-   <SourceProxy name="byureader" class="vtkBYUReader" label="BYU reader">
+   <SourceProxy name="byureader" class="vtkBYUReader" label="BYU Reader">
      <Documentation
        short_help="Read Movie.BYU files."
        long_help="Read Movie.BYU files to produce polygonal data.">
@@ -2387,7 +2387,7 @@
    </SourceProxy>
 
    <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader"
-                label="Gaussian Cube reader">
+                label="Gaussian Cube Reader">
      <Documentation
        short_help="Read Gaussian Cube data files."
        long_help="Produce polygonal data by reading a Gaussian Cube file.">
@@ -2432,7 +2432,7 @@
    <!-- End gaussiancubereader -->
    </SourceProxy>
 
-   <SourceProxy name="popreader" class="vtkPOPReader" label="POP reader">
+   <SourceProxy name="popreader" class="vtkPOPReader" label="POP Reader">
      <Documentation
        short_help="Read POP data files."
        long_help="Read data files from the Parallel Ocean Program (POP).">
@@ -2486,7 +2486,7 @@
 
    <SourceProxy name="ensightMS" 
                 class="vtkPVEnSightMasterServerReader"
-                label="EnSight Master Server reader">
+                label="EnSight Master Server Reader">
      <Documentation
        short_help="Read parallel EnSight files."
        long_help="Read files in EnSight's Master Server format.">
@@ -2583,7 +2583,7 @@
 
    <SourceProxy name="ImageReader" 
                 class="vtkImageReader"
-                label="Image reader">
+                label="Image Reader">
      <Documentation
        short_help="Read raw regular rectilinear grid data from a file." 
        long_help="Read raw regular rectilinear grid data from a file. The dimensions and type of the data must be specified.">
@@ -2734,7 +2734,7 @@
    </SourceProxy>
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
-                label="XDMF reader">
+                label="XDMF Reader">
      <Documentation
        short_help="Read XDMF data files."
        long_help="Read XDMF (eXtensible Data Model and Format) files.">
@@ -2926,7 +2926,7 @@
 #ifdef PARAVIEW_USE_SILO
    <SourceProxy name="SiloReader" 
                 class="vtkSiloReader"
-                label="Silo reader">
+                label="Silo Reader">
      <Documentation
         short_help="Read a Silo data file."
         long_help="Reads a Silo data file and generates multi block dataset.">
@@ -3797,7 +3797,7 @@
 
    <SourceProxy name="AVSucdReader" 
                 class="vtkAVSucdReader"
-                label="AVS UCD reader">
+                label="AVS UCD Reader">
      <Documentation
        short_help="Read a dataset in AVS UCD format."
        long_help="Read binary or ASCII files stored in AVS UCD format.">
@@ -3969,7 +3969,7 @@
 
    <SourceProxy name="PNGReader" 
                 class="vtkPNGReader"
-                label="PNG reader">
+                label="PNG Reader">
      <Documentation
        short_help="Read a PNG file."
        long_help="Read a PNG file into an image data.">
@@ -3990,7 +3990,7 @@
 
   <SourceProxy name="TIFFReader" 
                 class="vtkTIFFReader"
-                label="TIFF reader">
+                label="TIFF Reader">
      <Documentation
        short_help="Read a TIFF file."
        long_help="Read a TIFF file into an image data.">
@@ -4011,7 +4011,7 @@
 
    <SourceProxy name="SESAMEReader"
                 class="vtkSESAMEReader"
-                label="SESAME reader">
+                label="SESAME Reader">
      <Documentation
        short_help="Read SESAME data files."
        long_help="Read SESAME data files, producing rectilinear grids.">
@@ -4480,7 +4480,7 @@
 
     <SourceProxy name="netCDFReader"
                  class="vtkNetCDFCOARDSReader"
-                 label="netCDF Reader">
+                 label="NetCDF Reader">
       <Documentation short_help="Read regular arrays from netCDF files."
                      long_help="Read regular arrays from netCDF files.  Will also read any topological information specified byt he COARDS convention.">
         Reads arrays from netCDF files into structured VTK data sets.  In
@@ -4555,7 +4555,7 @@
 
    <FileSeriesReaderProxy name="CSVReader"
                           class="vtkFileSeriesReader"
-                          label="CSV reader"
+                          label="CSV Reader"
                           file_name_method="SetFileName">
       <Documentation
         short_help="Read a comma-separated values file."

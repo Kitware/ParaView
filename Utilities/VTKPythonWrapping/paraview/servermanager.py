@@ -1,17 +1,3 @@
-#==============================================================================
-#
-#  Program:   ParaView
-#  Module:    servermanager.py
-#
-#  Copyright (c) Kitware, Inc.
-#  All rights reserved.
-#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-#
-#     This software is distributed WITHOUT ANY WARRANTY without even
-#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-#     PURPOSE.  See the above copyright notice for more information.
-#
-#==============================================================================
 r"""servermanager is a module for using paraview server manager in Python.
 One can always use the server manager API directly. However, this module
 provides an interface easier to use from Python by wrapping several VTK
@@ -40,12 +26,26 @@ A simple example:
 
   renModule.StillRender()
 """
+#==============================================================================
+#
+#  Program:   ParaView
+#  Module:    servermanager.py
+#
+#  Copyright (c) Kitware, Inc.
+#  All rights reserved.
+#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+#
+#     This software is distributed WITHOUT ANY WARRANTY without even
+#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE.  See the above copyright notice for more information.
+#
+#==============================================================================
 import paraview, re, os, new, sys, vtk
 
 if not paraview.compatibility.minor:
     paraview.compatibility.major = 3
 if not paraview.compatibility.major:
-    paraview.compatibility.minor = 4
+    paraview.compatibility.minor = 5
 
 if os.name == "posix":
     from libvtkPVServerCommonPython import *
@@ -280,8 +280,9 @@ class Proxy(object):
         smproperty = self.SMProxy.GetProperty(name)
         # Maybe they are looking by the label. Try to match that.
         if not smproperty:
-            for prop in self:
-                if name == _make_name_valid(prop.GetXMLLabel()):
+            iter = PropertyIterator(self)
+            for prop in iter:
+                if name == _make_name_valid(iter.PropertyLabel):
                     smproperty = prop.SMProperty
                     break
         if smproperty:
@@ -297,7 +298,9 @@ class Proxy(object):
         property_list = []
         iter = self.__iter__()
         for property in iter:
-            property_list.append(iter.GetKey())
+            name = _make_name_valid(iter.PropertyLabel)
+            if name:
+                property_list.append(name)
         return property_list
 
     def __ConvertArgumentsAndCall(self, *args):
@@ -1145,7 +1148,8 @@ class InputProperty(ProxyProperty):
             values = (values,)
         self.SMProperty.RemoveAllProxies()
         for value in values:
-            self.SMProperty.AddInputConnection(value.SMProxy, value.Port)
+            if value:
+                self.SMProperty.AddInputConnection(value.SMProxy, value.Port)
         self._UpdateProperty()
 
     def _UpdateProperty(self):
@@ -1597,6 +1601,7 @@ class PropertyIterator(object):
             self.SMIterator.UnRegister(None)
             self.SMIterator.Begin()
         self.Key = None
+        self.PropertyLabel = None
         self.Proxy = aProxy
 
     def __iter__(self):
@@ -1610,6 +1615,7 @@ class PropertyIterator(object):
             self.Key = None
             raise StopIteration
         self.Key = self.SMIterator.GetKey()
+        self.PropertyLabel = self.SMIterator.GetPropertyLabel()
         self.SMIterator.Next()
         return self.Proxy.GetProperty(self.Key)
 
@@ -2168,6 +2174,10 @@ def AnimateReader(reader, view, filename=None):
     animates over all time steps of the reader. If the optional
     filename is provided, a movie is created (type depends on the
     extension of the filename."""
+    if not reader:
+        raise RuntimeError, "No reader was specified, cannot animate."
+    if not view:
+        raise RuntimeError, "No view was specified, cannot animate."
     # Create an animation scene
     scene = animation.AnimationScene()
 
@@ -2405,6 +2415,8 @@ class PVModule(object):
     pass
 
 def _make_name_valid(name):
+    if name.find('(') >= 0 or name.find(')') >=0:
+        return None
     name = name.replace(' ','')
     name = name.replace('-','')
     if not name[0].isalpha():
@@ -2441,17 +2453,18 @@ def createModule(groupName, mdl=None):
                 continue
             names = [propName]
             if paraview.compatibility.GetVersion() >= 3.5:
-                if prop.GetXMLLabel() and not proto.GetProperty(prop.GetXMLLabel()):
-                    names = [prop.GetXMLLabel()]
+                names = [iter.PropertyLabel]
+                
             propDoc = None
             if prop.GetDocumentation():
                 propDoc = prop.GetDocumentation().GetDescription()
             for name in names:
                 name = _make_name_valid(name)
-                cdict[name] = property(_createGetProperty(propName),
-                                       _createSetProperty(propName),
-                                       None,
-                                       propDoc)
+                if name:
+                    cdict[name] = property(_createGetProperty(propName),
+                                           _createSetProperty(propName),
+                                           None,
+                                           propDoc)
         # Add the documentation as the class __doc__
         if proto.GetDocumentation() and \
            proto.GetDocumentation().GetDescription():
@@ -2470,9 +2483,10 @@ def createModule(groupName, mdl=None):
             if proto.GetXMLLabel():
                 pname = proto.GetXMLLabel()
         pname = _make_name_valid(pname)
-        cobj = type(pname, superclasses, cdict)
-        # Add it to the modules dictionary
-        mdl.__dict__[pname] = cobj
+        if pname:
+            cobj = type(pname, superclasses, cdict)
+            # Add it to the modules dictionary
+            mdl.__dict__[pname] = cobj
     return mdl
 
 
@@ -2502,6 +2516,8 @@ __nameCounter = {}
 def __determineName(proxy, group):
     global __nameCounter
     name = _make_name_valid(proxy.GetXMLLabel())
+    if not name:
+        return None
     if not __nameCounter.has_key(name):
         __nameCounter[name] = 1
         val = 1
@@ -2516,6 +2532,11 @@ def __getName(proxy, group):
         proxy = proxy.SMProxy
     return pxm.GetProxyName(group, proxy)
 
+class MissingRegistrationInformation(Exception):
+    """Exception for missing registration information. Raised when a name or group 
+    is not specified or when a group cannot be deduced."""
+    pass
+    
 def Register(proxy, **extraArgs):
     """Registers a proxy with the proxy manager. If no 'registrationGroup' is
     specified, then the group is inferred from the type of the proxy.
@@ -2535,7 +2556,7 @@ def Register(proxy, **extraArgs):
         pxm = ProxyManager()
         pxm.RegisterProxy(registrationGroup, registrationName, proxy)
     else:
-        raise RuntimeError, "Registration error %s %s." % (registrationGroup, registrationName)
+        raise MissingRegistrationInformation, "Registration error %s %s." % (registrationGroup, registrationName)
     return (registrationGroup, registrationName)
 
 def UnRegister(proxy, **extraArgs):

@@ -1,3 +1,23 @@
+r"""simple is a module for using paraview server manager in Python. It 
+provides a simple convenience layer to functionality provided by the
+C++ classes wrapped to Python as well as the servermanager module.
+
+A simple example:
+  from paraview.simple import *
+
+  # Create a new sphere proxy on the active connection and register it
+  # in the sources group.
+  sphere = Sphere(ThetaResolution=16, PhiResolution=32)
+
+  # Apply a shrink filter
+  shrink = Shrink(sphere)
+  
+  # Turn the visiblity of the shrink object on.
+  Show(shrink)
+  
+  # Render the scene
+  Render()
+"""
 #==============================================================================
 #
 #  Program:   ParaView
@@ -32,7 +52,6 @@ def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
     servermanager.Disconnect()
     cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
-    CreateRenderView()
 
     return cid
 
@@ -82,6 +101,8 @@ def GetDisplayProperties(proxy=None, view=None):
 def Show(proxy=None, view=None, **params):
     """Turns the visibility of a given pipeline object on in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
+    if not view and len(GetRenderViews()) == 0:
+        CreateRenderView()
     rep = GetDisplayProperties(proxy, view)
     for param in params.keys():
         setattr(rep, param, params[param])
@@ -288,32 +309,90 @@ def WriteImage(filename, view=None, **params):
     if not writer:
         writer = _find_writer(filename)
     view.WriteImage(filename, writer, mag)
-    
+
+def AnimateReader(reader=None, view=None, filename=None):
+    """This is a utility function that, given a reader and a view
+    animates over all time steps of the reader. If the optional
+    filename is provided, a movie is created (type depends on the
+    extension of the filename."""
+    if not reader:
+        reader = active_objects.source
+    if not view:
+        view = active_objects.view
+        
+    return servermanager.AnimateReader(reader, view, filename)
+
+
 def _create_func(key, module):
     "Internal function."
+
     def CreateObject(*input, **params):
+        """This function creates a new proxy. For pipeline objects that accept inputs,
+        all non-keyword arguments are assumed to be inputs. All keyword arguments are
+        assumed to be property,value pairs and are passed to the new proxy."""
+
+        # Instantiate the actual object from the given module.
         px = module.__dict__[key]()
+
+        # Make sure non-keyword arguments are valid
+        for inp in input:
+            if not isinstance(inp, servermanager.Proxy):
+                if px.GetProperty("Input") != None:
+                    raise RuntimeError, "Expecting a proxy as input."
+                else:
+                    raise RuntimeError, "This function does not accept non-keyword arguments."
+
+        # Assign inputs
         if px.GetProperty("Input") != None:
             if len(input) > 0:
                 px.Input = input
             else:
+                # If no input is specified, try the active pipeline object
                 if px.GetProperty("Input").GetRepeatable() and active_objects.get_selected_sources():
                     px.Input = active_objects.get_selected_sources()
                 elif active_objects.source:
                     px.Input = active_objects.source
+        else:
+            if len(input) > 0:
+                raise RuntimeError, "This function does not expect an input."
+
+        # Pass all the named arguments as property,value pairs
         for param in params.keys():
             setattr(px, param, params[param])
-        group, name = servermanager.Register(px)
-        if group == "sources":
-            tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
-            sources = tk.TimeSources
-            if not px in sources:
-                sources.append(px)
 
-        active_objects.source = px
+        try:
+            # Register the proxy with the proxy manager.
+            group, name = servermanager.Register(px)
+
+            # Register pipeline objects with the time keeper. This is used to extract time values
+            # from sources. NOTE: This should really be in the servermanager controller layer.
+            if group == "sources":
+                tk = servermanager.ProxyManager().GetProxiesInGroup("timekeeper").values()[0]
+                sources = tk.TimeSources
+                if not px in sources:
+                    sources.append(px)
+
+                active_objects.source = px
+        except servermanager.MissingRegistrationInformation:
+            pass
+
         return px
+
     return CreateObject
 
+def _create_doc(new, old):
+    "Internal function."
+    import string
+    res = ""
+    for doc in (new, old):
+        ts = []
+        strpd = doc.split('\n')
+        for s in strpd:
+            ts.append(s.lstrip())
+        res += string.join(ts)
+        res += '\n'
+    return res
+    
 def _func_name_valid(name):
     "Internal function."
     valid = True
@@ -323,14 +402,14 @@ def _func_name_valid(name):
             break
     return valid
     
-for m in [servermanager.filters, servermanager.sources]:
+for m in [servermanager.filters, servermanager.sources, servermanager.writers]:
     dt = m.__dict__
     for key in dt.keys():
         cl = dt[key]
         if not isinstance(cl, str):
             if _func_name_valid(key):
                 exec "%s = _create_func(key, m)" % key
-                exec "%s.__doc__ = m.%s.__doc__" % (key, key)
+                exec "%s.__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key, key)
 del dt, m
 
 def GetActiveView():

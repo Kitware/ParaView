@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.10");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.11");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -162,6 +162,25 @@ const char* vtkSMPropertyIterator::GetKey()
       // return the exposed name.
       return this->Internals->ExposedPropertyIterator->first.c_str();
       }
+    }
+
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyIterator::GetPropertyLabel()
+{
+  // Self property
+  if (this->Internals->PropertyIterator != 
+      this->Proxy->Internals->Properties.end())
+    {
+    return this->GetProperty()->GetXMLLabel();
+    }
+
+  // Property of a sub-proxy
+  if (this->TraverseSubProxies)
+    {
+    return this->GetKey();
     }
 
   return 0;
