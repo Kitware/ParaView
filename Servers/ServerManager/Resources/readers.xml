@@ -1,6 +1,79 @@
 <ServerManagerConfiguration>
 
   <ProxyGroup name="internal_sources">
+   <SourceProxy name="AVSucdReader" 
+                class="vtkAVSucdReader"
+                label="AVS UCD Reader">
+     <Documentation
+       short_help="Read a dataset in AVS UCD format."
+       long_help="Read binary or ASCII files stored in AVS UCD format.">
+       The AVS UCD reader reads binary or ASCII files stored in AVS UCD format.
+       The default file extension is .inp. The output of this reader is
+       unstructured grid.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        animateable="0"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the AVS UCD reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="CellArrayInfo"
+        label="Cell Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property contains a list of the cell-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property contains a list of the point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End AVSucdReader -->
+   </SourceProxy>
+
    <SourceProxy name="legacyreader" 
                 class="vtkPDataSetReader"
                 label="Legacy VTK Reader">
@@ -2320,7 +2393,7 @@
 
    <FileSeriesReaderProxy name="stlreader"
                           class="vtkFileSeriesReader"
-                          label="Legacy VTK Reader"
+                          label="STL Reader"
                           file_name_method="SetFileName">
      <Documentation
          short_help="Read STL files."
@@ -3795,78 +3868,6 @@
    </FileSeriesReaderProxy>
 
 
-   <SourceProxy name="AVSucdReader" 
-                class="vtkAVSucdReader"
-                label="AVS UCD Reader">
-     <Documentation
-       short_help="Read a dataset in AVS UCD format."
-       long_help="Read binary or ASCII files stored in AVS UCD format.">
-       The AVS UCD reader reads binary or ASCII files stored in AVS UCD format.
-       The default file extension is .inp. The output of this reader is
-       unstructured grid.
-     </Documentation>
-     <StringVectorProperty
-        name="FileName"
-        animateable="0"
-        command="SetFileName"
-        number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the AVS UCD reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="CellArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Cell"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="CellArrayStatus"
-        command="SetCellArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="CellArrayInfo"
-        label="Cell Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="CellArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property contains a list of the cell-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="PointArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="Point"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointArrayStatus"
-        command="SetPointArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="PointArrayInfo"
-        label="Point Arrays">
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-       <Documentation>
-         This property contains a list of the point-centered arrays to read.
-       </Documentation>
-     </StringVectorProperty>
-   <!-- End AVSucdReader -->
-   </SourceProxy>
 
    <FileSeriesReaderProxy name="AVSucdSeriesReader"
                           class="vtkFileSeriesReader"
@@ -3882,7 +3883,7 @@
 
      <SubProxy>
        <Proxy name="Reader"
-         proxygroup="sources" proxyname="AVSucdReader">
+         proxygroup="internal_sources" proxyname="AVSucdReader">
        </Proxy>
        <ExposedProperties>
           <Property name="CellArrayInfo" />

@@ -1766,7 +1766,7 @@
     </SourceProxy>
 
     <SourceProxy name="HighResLineSource" class="vtkLineSource" 
-                 label="Line Source">
+                 label="High Resolution Line Source">
       <DoubleVectorProperty
          name="Point1"
          command="SetPoint1"
@@ -1874,7 +1874,7 @@
     </SourceProxy>
 
     <SourceProxy name="FixedRadiusPointSource" class="vtkPointSource"
-                 label="Point Source">
+                 label="Fixed Radius Point Source">
        <DoubleVectorProperty
           name="Center"
           command="SetCenter"

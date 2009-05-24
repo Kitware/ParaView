@@ -2437,13 +2437,22 @@ def createModule(groupName, mdl=None):
         mdl = PVModule()
     numProxies = pxm.GetNumberOfXMLProxies(groupName)
     for i in range(numProxies):
-        pname = pxm.GetXMLProxyName(groupName, i)
-        if pname in mdl.__dict__:
+        proxyName = pxm.GetXMLProxyName(groupName, i)
+        proto = pxm.GetPrototypeProxy(groupName, proxyName)
+        if paraview.compatibility.GetVersion() >= 3.5:
+            if proto.GetXMLLabel():
+                pname = proto.GetXMLLabel()
+        else:
+            pname = proxyName
+        pname = _make_name_valid(pname)
+        if not pname:
             continue
+        if pname in mdl.__dict__:
+            if debug:
+                print "Warning: %s is being overwritten. This may point to an issue in the ParaView configuration files" % pname
         cdict = {}
         # Create an Initialize() method for this sub-class.
-        cdict['Initialize'] = _createInitialize(groupName, pname)
-        proto = pxm.GetPrototypeProxy(groupName, pname)
+        cdict['Initialize'] = _createInitialize(groupName, proxyName)
         iter = PropertyIterator(proto)
         # Add all properties as python properties.
         for prop in iter:
@@ -2479,14 +2488,10 @@ def createModule(groupName, mdl=None):
             superclasses = (SourceProxy,)
         else:
             superclasses = (Proxy,)
-        if paraview.compatibility.GetVersion() >= 3.5:
-            if proto.GetXMLLabel():
-                pname = proto.GetXMLLabel()
-        pname = _make_name_valid(pname)
-        if pname:
-            cobj = type(pname, superclasses, cdict)
-            # Add it to the modules dictionary
-            mdl.__dict__[pname] = cobj
+
+        cobj = type(pname, superclasses, cdict)
+        # Add it to the modules dictionary
+        mdl.__dict__[pname] = cobj
     return mdl
 
 
