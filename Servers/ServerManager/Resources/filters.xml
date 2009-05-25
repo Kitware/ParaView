@@ -1869,7 +1869,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
 
    <!-- ==================================================================== -->
    <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter"
-     label="Gradient (Unstructured)">
+     label="Gradient Of Unstructured DataSet">
      <Documentation
        short_help="Compute gradients for any type of dataset."
        long_help="Estimate the gradient for each point or cell in any type of dataset.">
@@ -3583,7 +3583,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Tube">
+   <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Generate Tubes">
     <Documentation
        long_help="Convert lines into tubes. Normals are used to avoid cracks between tube segments."
        short_help="Convert lines into tubes.">
@@ -3721,7 +3721,7 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="WarpScalar" class="vtkWarpScalar" label="Warp (scalar)">
+   <SourceProxy name="WarpScalar" class="vtkWarpScalar" label="Warp By Scalar">
      <Documentation
         long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
         short_help="Warp point scalars into a spatial elevation plot.">
@@ -3809,7 +3809,7 @@ The Warp (scalar) filter translates the points of the input data set along a vec
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="WarpVector" class="vtkWarpVector" label="Warp (vector)">
+   <SourceProxy name="WarpVector" class="vtkWarpVector" label="Warp By Vector">
      <Documentation
         long_help="This filter displaces point coordinates along a vector attribute. It is useful for showing mechanical deformation."
         short_help="Warp (displace) the geometry with a given vector field.">
@@ -3933,7 +3933,7 @@ This filter extracts the portion of the input dataset that lies along the specif
 
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractGeometry" class="vtkExtractGeometry" 
-                label="Extract Cells by Region">
+                label="Extract Cells By Region">
     <Documentation
        long_help="This filter extracts cells that are inside/outside a region or at a region boundary."
        short_help="Extract cells that are inside/outside a region or at a region boundary.">
@@ -4512,7 +4512,7 @@ The Glyph filter generates a glyph (i.e., an arrow, cone, cube, cylinder, line, 
 
    <!-- ==================================================================== -->
    <SourceProxy name="ArbitrarySourceGlyph" class="vtkPVGlyphFilter"
-    label="Glyph (Custom Source)">
+    label="Glyph With Custom Source">
     <Documentation
        long_help="This filter generates a glyph at each point of the input data set.  The glyphs can be oriented and scaled by point attributes of the input dataset."
        short_help="Generate a glyph symbol at each point of the input data set.">
@@ -5161,7 +5161,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
    <!-- ==================================================================== -->
    <SourceProxy name="ArbitrarySourceStreamTracer" class="vtkDistributedStreamTracer"
-    label="Stream Tracer (Custom Source)">
+    label="Stream Tracer With Custom Source">
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
@@ -6094,7 +6094,7 @@ This filter operates on any type of data set, provided it has point-centered vec
    <!-- ==================================================================== -->
    <SourceProxy name="StructuredGridOutlineFilter" 
                 class="vtkStructuredGridOutlineFilter"
-                label="Outline (curvilinear)">
+                label="Outline Curvilinear DataSet">
       <Documentation
          long_help="This filter generates an outline representation of the input."
          short_help="Generates an outline.">
@@ -6117,7 +6117,7 @@ The Outline filter generates an outline of the outside edges of the input datase
    <!-- End StructuredGridOutlineFilter -->
    </SourceProxy>
 
-  <SourceProxy name="GenericClip" class="vtkGenericClip" label="Clip (Generic Datasets)">
+  <SourceProxy name="GenericClip" class="vtkGenericClip" label="Clip Generic Dataset">
     <Documentation
        long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
        short_help="Clip with an implicit plane, sphere or with scalars.">
@@ -6196,7 +6196,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="GenericContour" class="vtkGenericContourFilter" label="Contour (Generic Datasets)">
+   <SourceProxy name="GenericContour" class="vtkGenericContourFilter" label="Contour Generic Dataset">
     <Documentation
        long_help="Generate isolines or isosurfaces using point scalars."
        short_help="Generate isolines or isosurfaces.">
@@ -6283,7 +6283,7 @@ The Generic Contour filter operates on a generic data set, but the input is requ
    </SourceProxy>
 
    <!-- ==================================================================== -->
- <SourceProxy name="GenericCut" class="vtkGenericCutter" label="Slice (Generic Datasets)">
+ <SourceProxy name="GenericCut" class="vtkGenericCutter" label="Slice Generic Dataset">
     <Documentation
        long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
        short_help="Cut datasets with planes or spheres.">
@@ -6355,7 +6355,7 @@ The Generic Cut filter takes a generic dataset as input. Use the Input menu to c
 
    <!-- ==================================================================== -->
   <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter"
-               label="Extract Surface (Generic Datasets)">
+               label="Extract Generic Dataset Surface">
      <Documentation
          long_help="Extract geometry from a higher-order dataset"
          short_help="Extract geometry from a higher-order dataset">
@@ -6381,7 +6381,7 @@ Extract geometry from a higher-order dataset.
 
    <!-- ==================================================================== -->
  <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter"
-     label="Outline (Generic DataSets)">
+     label="Outline Generic DataSet">
      <Documentation
        long_help="This filter generates a bounding box representation of the input."
        short_help="Generates a bounding box.">
@@ -6410,7 +6410,7 @@ The Generic Outline filter generates an axis-aligned bounding box for the input 
 
    <!-- ==================================================================== -->
  <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer"
-              label="Stream Tracer (Generic Datasets)">
+              label="Stream Tracer For Generic Datasets">
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
@@ -6659,7 +6659,7 @@ This filter operates on any type of data set, provided it has point-centered vec
 
    <!-- ==================================================================== -->
   <SourceProxy name="GenericTessellator" class="vtkGenericDataSetTessellator"
-               label="Tessellator (Generic Datasets)">
+               label="Tessellate Generic Dataset">
      <Documentation
          long_help="Tessellate a higher-order dataset"
          short_help="Tessellate a higher-order dataset">
@@ -7530,7 +7530,7 @@ This filter extracts a list of datasets from hierarchical datasets.
    <!-- ==================================================================== -->
    <SourceProxy name="PolyLineToRectilinearGrid"
                 class="vtkPolyLineToRectilinearGridFilter"
-                label="Polyline to Rectilinear Grid">
+                label="PolyLine To Rectilinear Grid">
       <InputProperty
        name="Input"
        command="SetInputConnection">
@@ -7643,7 +7643,7 @@ This filter extracts a list of datasets from hierarchical datasets.
 
    <!-- ==================================================================== -->
    <SourceProxy name="TimeToTextConvertor" class="vtkTimeToTextConvertor"
-     label="Annotate Time" >
+     label="Annotate Time Filter" >
      <Documentation
         short_help="Show data time as text."
         long_help="Shows input data time as text annnotation in the view." >
@@ -8476,7 +8476,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 
     <!-- ================================================================== -->
     <CompoundSourceProxy name="FFTSelectionOverTime"
-                         label="FFT of Selection Over Time">
+                         label="FFT Of Selection Over Time">
       <Documentation
         short_help="Extracts selection over time and plots the FFT"
         long_help="Extracts selection over time and plots the FFT" >

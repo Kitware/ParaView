@@ -63,6 +63,11 @@ public:
   const char* GetKey();
 
   // Description:
+  // Returns the XMLLabel for self properties and the exposed name for
+  // sub-proxy properties.
+  const char* GetPropertyLabel();
+
+  // Description:
   // Returns the property at the current iterator position.
   vtkSMProperty* GetProperty();
 
