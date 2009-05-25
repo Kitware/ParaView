@@ -7134,7 +7134,7 @@ Tessellate a higher-order dataset.
      label="Extract Block">
      <Documentation
         long_help="This filter extracts a range of blocks from a multiblock dataset."
-        short_help="Extract level.">
+        short_help="Extract block.">
 This filter extracts a range of groups from a multiblock dataset    
      </Documentation>
      <InputProperty
@@ -8199,7 +8199,7 @@ This property controls how the filter works to generate tensor cell data. You ca
 
     <!-- ==================================================================== -->
     <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars"
-       label="Level Scalars">
+       label="Deprecated Level Scalars">
       <Documentation
          long_help="The Level Scalars filter uses colors to show levels of a hierarchical dataset."
          short_help="Generate point scalars from level.">
@@ -8278,7 +8278,7 @@ This property controls how the filter works to generate tensor cell data. You ca
     <!-- ==================================================================== -->
     <SourceProxy name="ExtractDataSets" 
                 class="vtkMultiGroupDataExtractDataSets"
-                label="Extract Datasets">
+                label="Deprecated Extract Datasets">
       <Documentation
          long_help="This filter extracts a list of datasets from multigroup datasets."
          short_help="Extract datasets.">

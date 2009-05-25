@@ -211,7 +211,8 @@
     </SourceProxy>
 
     <!-- This is here mainly for backwards compatibility. Use ProgrammableFilter instead -->
-    <SourceProxy name="Programmable Filter" class="vtkPythonProgrammableFilter">
+    <SourceProxy name="Programmable Filter" class="vtkPythonProgrammableFilter"
+            label="Deprecated Programmable Filter">
       <Documentation
          long_help="Executes a user supplied python script on its input dataset to produce an output dataset."
          short_help="Executes a python script to produce data.">
