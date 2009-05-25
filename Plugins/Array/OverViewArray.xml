@@ -58,7 +58,7 @@
       </Hints>
     </SourceProxy>
  
-    <SourceProxy name="ArrayVectorNorm" class="vtkArrayVectorNorm" label="Vector Norm">
+    <SourceProxy name="ArrayNorm" class="vtkArrayNorm" label="Array Norm">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -68,6 +68,7 @@
           <DataType value="vtkArrayData"/>
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty name="Dimension" command="SetDimension" number_of_elements="1" default_values="0"/> 
       <IntVectorProperty name="L" command="SetL" number_of_elements="1" default_values="2"/> 
     </SourceProxy>
  

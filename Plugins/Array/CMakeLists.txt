@@ -18,6 +18,7 @@ ADD_PARAVIEW_PLUGIN(
   SERVER_MANAGER_SOURCES
     ${VTK_SOURCE_DIR}/Filtering/vtkArrayDataAlgorithm.h
     ${VTK_SOURCE_DIR}/Infovis/vtkAdjacencyMatrixToEdgeTable.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkArrayNorm.h
     ${VTK_SOURCE_DIR}/Infovis/vtkArrayToTable.h
     ${VTK_SOURCE_DIR}/Infovis/vtkBoostLogWeighting.h
     ${VTK_SOURCE_DIR}/Infovis/vtkBoostRandomSparseArraySource.h
@@ -25,7 +26,6 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkDiagonalMatrixSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkExtractArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkMatricizeArray.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkMatrixColumnNorm.h
     ${VTK_SOURCE_DIR}/Infovis/vtkNormalizeMatrixVectors.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToSparseArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTransposeMatrix.h
