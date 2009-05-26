@@ -125,21 +125,15 @@ MACRO(overview_build_client)
     LIST(GET OVERVIEW_STARTUP_PLUGIN_FILES ${PLUGIN} PLUGIN_FILE)
     LIST(GET OVERVIEW_STARTUP_PLUGIN_DIRECTORIES ${PLUGIN} PLUGIN_DIRECTORY)
 
-    IF(UNIX)
-      ADD_CUSTOM_COMMAND(
-        TARGET ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${STARTUP_DIRECTORY}
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${PLUGIN_DIRECTORY}/${PLUGIN_FILE} ${STARTUP_DIRECTORY}/${PLUGIN_FILE}
-        )
-    ELSE()
-      ADD_CUSTOM_COMMAND(
-        TARGET ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${STARTUP_DIRECTORY}
-        COMMAND ${CMAKE_COMMAND} -E echo_append "${PLUGIN_DIRECTORY}/${CMAKE_CFG_INTDIR}/${PLUGIN_FILE}" > "${STARTUP_DIRECTORY}/${PLUGIN_FILE}.timlink"
-        )
-    ENDIF()
+    # Note that we don't use platform symlinks here for two reasons: they don't exist on Windoze, and we want to create them
+    # whether the symlink target currenty exists or not (depending on build order, it might not be built at the time this command
+    # executes.
+    ADD_CUSTOM_COMMAND(
+      TARGET ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${STARTUP_DIRECTORY}
+      COMMAND ${CMAKE_COMMAND} -E echo_append "${PLUGIN_DIRECTORY}/${CMAKE_CFG_INTDIR}/${PLUGIN_FILE}" > "${STARTUP_DIRECTORY}/${PLUGIN_FILE}.timlink"
+      )
 
     MATH(EXPR PLUGIN "${PLUGIN} + 1")
   ENDWHILE()

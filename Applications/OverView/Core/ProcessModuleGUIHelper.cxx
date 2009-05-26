@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.9");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.10");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -107,16 +107,14 @@ QWidget* ProcessModuleGUIHelper::CreateMainWindow()
     {
     QString plugin = QApplication::applicationDirPath() + "/" + OverView::GetBrandedApplicationTitle() + "-startup/" + this->ConfiguredPlugins[i];
 
-#ifdef WIN32
-    // We have created a sophisticated new linking capability on Windoze, one so powerful and subtle that I've decided to name it in my own honor.
+    // We have created a sophisticated new linking capability, one so powerful and subtle that I've decided to name it in my own honor.
     // We use this to facilitate running brands out of the build directory.
-    QFile symlink(plugin + ".timlink");
-    if(symlink.exists())
+    QFile timlink(plugin + ".timlink");
+    if(timlink.exists())
       {
-      symlink.open(QIODevice::ReadOnly);
-      plugin = symlink.readAll();
+      timlink.open(QIODevice::ReadOnly);
+      plugin = timlink.readAll();
       }
-#endif // WIN32
 
     cerr << "Loading configured plugin: " << plugin.toAscii().data() << " ... ";
     QString error_message;
