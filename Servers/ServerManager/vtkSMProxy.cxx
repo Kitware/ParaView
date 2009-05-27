@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.113");
+vtkCxxRevisionMacro(vtkSMProxy, "1.114");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1899,6 +1899,26 @@ void vtkSMProxy::ReadCoreXMLAttributes(vtkPVXMLElement* element)
   if (xmllabel)
     {
     this->SetXMLLabel(xmllabel);
+    }
+
+  const char* servers = element->GetAttribute("servers");
+  if (servers)
+    {
+    vtkTypeUInt32 uiServers = 0;
+    vtkstd::string strServers = servers;
+    if (strServers.find("client") != vtkstd::string::npos)
+      {
+      uiServers |= vtkProcessModule::CLIENT;
+      }
+    if (strServers.find("renderserver") != vtkstd::string::npos)
+      {
+      uiServers |= vtkProcessModule::RENDER_SERVER;
+      }
+    if (strServers.find("dataserver") != vtkstd::string::npos)
+      {
+      uiServers |= vtkProcessModule::DATA_SERVER;
+      }
+    this->SetServersSelf(uiServers);
     }
 
   // Locate documentation.
