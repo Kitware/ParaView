@@ -77,7 +77,6 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMPropertyModificationUndoElement.h"
-#include "vtkSMPropertyStatusManager.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyDefinitionIterator.h"
@@ -216,7 +215,6 @@ int main(int , char *[])
   c = vtkSMPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyLink::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyModificationUndoElement::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPropertyStatusManager::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyGroupDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyDefinitionIterator::New(); c->Print( cout ); c->Delete();

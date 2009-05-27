@@ -124,7 +124,6 @@ SET(Kit_SRCS
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
   vtkSMPropertyModificationUndoElement.cxx
-  vtkSMPropertyStatusManager.cxx
   vtkSMPropRepresentationProxy.cxx
   vtkSMProxy.cxx
   vtkSMProxyDefinitionIterator.cxx
