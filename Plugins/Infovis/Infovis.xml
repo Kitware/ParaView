@@ -196,7 +196,33 @@
   
   <!-- FILTERS GROUP -->
   <ProxyGroup name="filters">
-  
+      <SourceProxy name="BoostLogWeighting" class="vtkBoostLogWeighting" label="Boost Log Weighting">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="Base" command="SetBase" number_of_elements="1" default_values="0"/>
+    </SourceProxy>
+
+    <SourceProxy name="ArrayNorm" class="vtkArrayNorm" label="Array Norm">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty name="L" command="SetL" number_of_elements="1" default_values="2"/>
+      <IntVectorProperty name="Dimension" command="SetDimension" number_of_elements="1" default_values="0"/>
+    </SourceProxy>
+
     <SourceProxy name="CollapseGraph" class="vtkCollapseGraph">
       <InputProperty name="Input" command="SetGraphConnection">
         <ProxyGroupDomain name="groups">
