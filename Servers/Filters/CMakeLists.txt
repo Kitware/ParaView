@@ -157,11 +157,6 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
-
-# Backward-Compatibilty classes
-  vtkMultiGroupDataGroupIdScalars.cxx
-  vtkMultiGroupDataExtractGroup.cxx
-  vtkMultiGroupDataExtractDataSets.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
