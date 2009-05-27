@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.114");
+vtkCxxRevisionMacro(vtkSMProxy, "1.115");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1901,24 +1901,24 @@ void vtkSMProxy::ReadCoreXMLAttributes(vtkPVXMLElement* element)
     this->SetXMLLabel(xmllabel);
     }
 
-  const char* servers = element->GetAttribute("servers");
-  if (servers)
+  const char* processes = element->GetAttribute("processes");
+  if (processes)
     {
-    vtkTypeUInt32 uiServers = 0;
-    vtkstd::string strServers = servers;
-    if (strServers.find("client") != vtkstd::string::npos)
+    vtkTypeUInt32 uiprocesses = 0;
+    vtkstd::string strprocesses = processes;
+    if (strprocesses.find("client") != vtkstd::string::npos)
       {
-      uiServers |= vtkProcessModule::CLIENT;
+      uiprocesses |= vtkProcessModule::CLIENT;
       }
-    if (strServers.find("renderserver") != vtkstd::string::npos)
+    if (strprocesses.find("renderserver") != vtkstd::string::npos)
       {
-      uiServers |= vtkProcessModule::RENDER_SERVER;
+      uiprocesses |= vtkProcessModule::RENDER_SERVER;
       }
-    if (strServers.find("dataserver") != vtkstd::string::npos)
+    if (strprocesses.find("dataserver") != vtkstd::string::npos)
       {
-      uiServers |= vtkProcessModule::DATA_SERVER;
+      uiprocesses |= vtkProcessModule::DATA_SERVER;
       }
-    this->SetServersSelf(uiServers);
+    this->SetServersSelf(uiprocesses);
     }
 
   // Locate documentation.
