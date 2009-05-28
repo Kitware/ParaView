@@ -199,6 +199,12 @@ void ClientGraphView::selectionChanged()
   repSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
   selectionSource->Delete();
+
+  // Mark the annotation link as modified so it will be updated
+  if (this->getAnnotationLink())
+    {
+    this->getAnnotationLink()->MarkModified(0);
+    }
 }
 
 QWidget* ClientGraphView::getWidget()
@@ -363,7 +369,15 @@ void ClientGraphView::showRepresentation(pqRepresentation* representation)
   vtkDataRepresentation* rep =
     this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-  rep->SetAnnotationLink(AnnotationLink::instance().getLink());
+
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    rep->SetAnnotationLink(link);
+    }
+
   this->Implementation->View->Update();
   this->Implementation->ResetCamera = true;
 }

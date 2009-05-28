@@ -32,12 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqView.h"
 
 // ParaView Server Manager includes.
-#include "vtkAnnotationLink.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMViewProxy.h"
 #include "vtkImageData.h"
 
@@ -81,12 +81,12 @@ public:
 
   // The annotation link for linking selections and annotations
   // between views.
-  vtkAnnotationLink* AnnotationLink;
+  vtkSMSourceProxy* AnnotationLink;
 
   pqViewInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    this->AnnotationLink = vtkAnnotationLink::New();
+    this->AnnotationLink = 0;
     }
 
   ~pqViewInternal()
@@ -381,23 +381,22 @@ vtkImageData* pqView::captureImage(const QSize& fullsize)
 }
 
 //-----------------------------------------------------------------------------
-void pqView::setAnnotationLink(vtkAnnotationLink* link)
+void pqView::setAnnotationLink(vtkSMSourceProxy* link)
 {
   if (this->Internal->AnnotationLink != link)
     {
-    vtkAnnotationLink* tempSGMacroVar = this->Internal->AnnotationLink;
+    vtkSMSourceProxy* tempSGMacroVar = this->Internal->AnnotationLink;
     this->Internal->AnnotationLink = link;
     if (this->Internal->AnnotationLink != NULL) { this->Internal->AnnotationLink->Register(0); }
     if (tempSGMacroVar != NULL)
       {
       tempSGMacroVar->UnRegister(0);
       }
-    this->render();
     }
 }
 
 //-----------------------------------------------------------------------------
-vtkAnnotationLink* pqView::getAnnotationLink()
+vtkSMSourceProxy* pqView::getAnnotationLink()
 {
   return this->Internal->AnnotationLink;
 }

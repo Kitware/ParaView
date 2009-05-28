@@ -1698,8 +1698,16 @@
   </ProxyGroup>
 
   <ProxyGroup name="selection_helpers">
+
     <Proxy name="Selection" class="vtkSelection">
     </Proxy>
+
+    <SourceProxy name="AnnotationLink" class="vtkAnnotationLink">
+      <OutputPort name="Annotations" index="0"/>
+      <OutputPort name="Domain Maps" index="1"/>
+      <OutputPort name="Selection" index="2"/>
+    </SourceProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="connection_cleaners">

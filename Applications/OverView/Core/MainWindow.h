@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqGenericViewModule;
 class pqPipelineSource;
 class pqRepresentation;
+class pqServer;
 class pqView;
 
 /// Provides the main window for the ParaView application
@@ -100,6 +101,8 @@ private slots:
 
   void onActiveViewChanged(pqView*);
   void onRepresentationVisibilityChanged(pqRepresentation*,bool);
+
+  void onServerAdded(pqServer*);
 
 private:
   class pqImplementation;

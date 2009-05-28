@@ -40,7 +40,8 @@ class vtkSelection;
 class AnnotationLinkCommand;
 class AnnotationLinkInternals;
 class pqPipelineSource;
-class pqViewManager;
+class pqServer;
+class pqView;
 class vtkSMSourceProxy;
 
 /// Provides a central location for managing annotations
@@ -51,16 +52,19 @@ class OVERVIEW_CORE_EXPORT AnnotationLink : public QObject
   
 public:
   static AnnotationLink& instance();
+
+  void initialize(pqServer* server);
   
   vtkAnnotationLink* getLink();
+  vtkSMSourceProxy* getLinkProxy();
   
-  void setViewManager(pqViewManager* manager);
-
   void updateViews();
 
 private slots:
   void onSourceAdded(pqPipelineSource*);
   void onSourceRemoved(pqPipelineSource*);
+  void onViewCreated(pqView*);
+  void onViewDestroyed(pqView*);
 
 protected:
   void selectionChanged(vtkSMSourceProxy* source);

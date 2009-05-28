@@ -43,8 +43,8 @@ class pqServer;
 class pqUndoStack;
 class pqViewInternal;
 class QWidget;
-class vtkAnnotationLink;
 class vtkImageData;
+class vtkSMSourceProxy;
 class vtkSMViewProxy;
 
 /// This is a PQ abstraction of a generic view module. Subclasses can be
@@ -148,8 +148,8 @@ public:
 
   /// The annotation link used on representations to share the selection
   /// and annotations. This is only used in views aware of this link.
-  void setAnnotationLink(vtkAnnotationLink* link);
-  vtkAnnotationLink* getAnnotationLink();
+  void setAnnotationLink(vtkSMSourceProxy* link);
+  vtkSMSourceProxy* getAnnotationLink();
 
 signals:
   /// Fired after a representation has been added to this view.

@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqRepresentation.h>
 #include <pqRubberBandHelper.h>
 #include <pqScalarBarVisibilityAdaptor.h>
+#include <pqServer.h>
 #include <pqServerManagerModel.h>
 #include <pqSetName.h>
 #include <pqSettings.h>
@@ -311,9 +312,6 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionDelete_All, SIGNAL(triggered()),
           this, SLOT(onDeleteAll()));
 
-  AnnotationLink::instance().setViewManager(
-    & this->Implementation->Core.multiViewManager());
-
   this->Implementation->Core.setupLookmarkToolbar(
     this->Implementation->UI.lookmarkToolbar);
 
@@ -551,9 +549,6 @@ MainWindow::MainWindow() :
   this->Implementation->Core.setupAnimationView(
     this->Implementation->UI.animationViewDock);
   
-  this->setupAnnotationManager(
-    this->Implementation->UI.annotationManagerDock);
-
   // Setup the view menu ...
   this->Implementation->ToolbarsMenu->addWidget(
     this->Implementation->UI.mainToolBar,
@@ -778,6 +773,17 @@ MainWindow::MainWindow() :
   DisplayPolicy *dispPolicy = new DisplayPolicy(this);
   pqApplicationCore::instance()->setDisplayPolicy(dispPolicy);
 
+  // Some initialization can only happen when we have an active server.
+  // Either do it now or set it up when the server is created.
+  pqServerManagerModel* serverManagerModel =
+    pqApplicationCore::instance()->getServerManagerModel();
+  QList<pqServer*> servers = serverManagerModel->findItems<pqServer*>();
+  if (servers.length() > 0)
+    {
+    this->onServerAdded(servers[0]);
+    }
+  connect(serverManagerModel,
+    SIGNAL(serverAdded(pqServer*)), this, SLOT(onServerAdded(pqServer*)));
 }
 
 MainWindow::~MainWindow()
@@ -1226,4 +1232,12 @@ void MainWindow::setupAnnotationManager(QDockWidget* dock_widget)
     << pqSetName("annotationManagerPanel");
 
   dock_widget->setWidget(annotation_manager);
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::onServerAdded(pqServer* server)
+{
+  AnnotationLink::instance().initialize(server);
+  this->setupAnnotationManager(
+    this->Implementation->UI.annotationManagerDock);
 }

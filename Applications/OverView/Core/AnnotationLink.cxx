@@ -45,10 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqMultiViewFrame.h"
+#include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
-#include "pqViewManager.h"
 
 #include <vtksys/stl/set>
 
@@ -57,9 +58,8 @@ class AnnotationLinkInternals
 public:
   AnnotationLinkInternals() 
     {
-    this->VTKLink = vtkSmartPointer<vtkAnnotationLink>::New();
+    this->Link = 0;
     this->InSelectionChanged = false;
-    this->ViewManager = 0;
     }
 
   ~AnnotationLinkInternals()
@@ -67,9 +67,9 @@ public:
     }
 
   vtksys_stl::set<vtkSmartPointer<vtkSMSourceProxy> > Sources;
-  vtkSmartPointer<vtkAnnotationLink> VTKLink;
+  vtksys_stl::set<pqView*> Views;
+  vtkSmartPointer<vtkSMSourceProxy> Link;
   bool InSelectionChanged;
-  pqViewManager* ViewManager;
 };
 
 class AnnotationLinkCommand : public vtkCommand
@@ -109,6 +109,14 @@ AnnotationLink::AnnotationLink()
     pqApplicationCore::instance()->getServerManagerModel(),
     SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(onSourceRemoved(pqPipelineSource*)));
+  QObject::connect(
+    pqApplicationCore::instance()->getObjectBuilder(),
+    SIGNAL(viewCreated(pqView*)),
+    this, SLOT(onViewCreated(pqView*)));
+  QObject::connect(
+    pqApplicationCore::instance()->getObjectBuilder(),
+    SIGNAL(destroying(pqView*)),
+    this, SLOT(onViewDestroyed(pqView*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -119,15 +127,30 @@ AnnotationLink::~AnnotationLink()
 }
 
 //-----------------------------------------------------------------------------
-void AnnotationLink::setViewManager(pqViewManager* mgr)
+void AnnotationLink::initialize(pqServer* server)
 {
-  this->Internals->ViewManager = mgr;
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkSMProxy* p = pxm->NewProxy("selection_helpers", "AnnotationLink");
+  this->Internals->Link.TakeReference(static_cast<vtkSMSourceProxy*>(p));
+  this->Internals->Link->SetConnectionID(server->GetConnectionID());
+  pxm->RegisterProxy("selection_helpers", "AnnotationLink", this->Internals->Link);
+  this->Internals->Link->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
 vtkAnnotationLink* AnnotationLink::getLink()
 {
-  return this->Internals->VTKLink;
+  if (this->Internals->Link)
+    {
+    return static_cast<vtkAnnotationLink*>(this->Internals->Link->GetClientSideObject());
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMSourceProxy* AnnotationLink::getLinkProxy()
+{
+  return this->Internals->Link;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +169,20 @@ void AnnotationLink::onSourceRemoved(pqPipelineSource* source)
   proxy->RemoveObserver(this->Command);
 }
 
+//-----------------------------------------------------------------------------
+void AnnotationLink::onViewCreated(pqView* view)
+{
+  this->Internals->Views.insert(view);
+  view->setAnnotationLink(this->Internals->Link);
+}
+
+//-----------------------------------------------------------------------------
+void AnnotationLink::onViewDestroyed(pqView* view)
+{
+  this->Internals->Views.erase(view);
+}
+
+//-----------------------------------------------------------------------------
 void AnnotationLink::selectionChanged(vtkSMSourceProxy* source)
 {
   // Avoid infinite loops
@@ -193,17 +230,10 @@ vtkSelection* AnnotationLink::getSelection()
 */
 void AnnotationLink::updateViews()
 {
-  if (this->Internals->ViewManager)
+  vtksys_stl::set<pqView*>::iterator it, itEnd;
+  itEnd = this->Internals->Views.end();
+  for (it = this->Internals->Views.begin(); it != itEnd; ++it)
     {
-    QList<pqMultiViewFrame*> list =
-      qFindChildren<pqMultiViewFrame*>(this->Internals->ViewManager);
-    for (int i = 0; i < list.size(); ++i)
-      {
-      pqView* view = this->Internals->ViewManager->getView(list[i]);
-      if (view)
-        {
-        view->render();
-        }
-      }
+    (*it)->render();
     }
 }
