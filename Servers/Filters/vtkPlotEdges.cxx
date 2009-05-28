@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.1");
+vtkCxxRevisionMacro(Segment, "1.2");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -261,16 +261,8 @@ void Segment::ComputeDirection(vtkIdType pointIndex,
     }
   //cerr<< "DIR: pointId:" << pointId << " pointIndex: " << pointIndex << endl;
 
-  vtkIdType* cellIds;
-  short unsigned int numCells;
-  vtkCell* cell;
   double point1[3];
 
-  /*
-  this->PolyData->GetPointCells(pointId, numCells, cellIds);
-  cell = this->PolyData->GetCell(cellIds[0]);  
-  cell->GetPoints()->GetPoint(cell->GetPointIds()->IsId(pointId), point1);
-  */
   this->PolyData->GetPoint(pointId, point1);
   //cerr<< "DIR: point1:" << point1[0] << "," << point1[1] << "," << point1[2] << endl;
   
@@ -284,12 +276,6 @@ void Segment::ComputeDirection(vtkIdType pointIndex,
     cerr << " NOT REALLY an error. please erase this line" << pointIndex <<  endl;
     return;
     }
-  /*
-  this->PolyData->GetPointCells(pointId, numCells, cellIds);
-  //cerr<< "DIR: numCells:" << numCells << " cellid0: " << cellIds[0] << endl;
-  cell = this->PolyData->GetCell(cellIds[0]);  
-  cell->GetPoints()->GetPoint(cell->GetPointIds()->IsId(pointId), point2);
-  */
   this->PolyData->GetPoint(pointId, point2);
   //cerr<< "DIR: point2:" << point2[0] << "," << point2[1] << "," << point2[2] << endl;
 
@@ -318,11 +304,6 @@ void Segment::ComputeDirection(vtkIdType pointIndex,
       cerr << "error. it is not logically possible to get this case." << endl;
       return;
       }
-    /*
-    this->PolyData->GetPointCells(pointId, numCells, cellIds);
-    cell = this->PolyData->GetCell(cellIds[0]);
-    cell->GetPoints()->GetPoint(cell->GetPointIds()->IsId(pointId), point2);
-    */
     this->PolyData->GetPoint (pointId, point2);
     //cerr<< "DIR: point1:" << point1[0] << "," << point1[1] << "," << point1[2] << endl;
     //cerr<< "DIR: point2:" << point2[0] << "," << point2[1] << "," << point2[2] << endl;
@@ -492,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.1");
+vtkCxxRevisionMacro(Node, "1.2");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -574,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.1");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.2");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
@@ -957,8 +938,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
   //cerr << "End" << __FUNCTION__ << endl;
 }
 
-void vtkPlotEdges::ConnectSegmentsWithNodes(vtkPolyData* polyData, 
-                                            vtkCollection* segments, 
+void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments, 
                                             vtkCollection* nodes)
 {
   Node* node = NULL;
@@ -1150,7 +1130,6 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments,
     vtkSmartPointer<vtkIdList> cells = vtkSmartPointer<vtkIdList>::New();
 
     vtkIdType numCells = segment->GetPointIdList()->GetNumberOfIds();
-    double curPoint[3];
     for (vtkIdType i = 0; i < numCells; ++i)
       {
       cells->InsertNextId(i);

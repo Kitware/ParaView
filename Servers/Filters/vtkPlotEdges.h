@@ -58,8 +58,7 @@ protected:
                                             char* visitedCells,
                                             vtkIdType cellId, 
                                             Node* node);
-  static void ConnectSegmentsWithNodes (vtkPolyData* polyData, 
-                                        vtkCollection* segments,
+  static void ConnectSegmentsWithNodes (vtkCollection* segments,
                                         vtkCollection* nodes);
   static void SaveToMultiBlockDataSet (vtkCollection* segments,
                                        vtkMultiBlockDataSet* output);
