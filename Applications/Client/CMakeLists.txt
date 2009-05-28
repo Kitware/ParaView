@@ -293,6 +293,8 @@ IF(BUILD_TESTING)
     ObjectInspectorSphere
     OpenSaveData
     Plot3DReader
+    PlotEdges
+    PlotEdges2
     PropertyLink
     ReadXMLPolyDataFileSeries
     RectilinearFractal

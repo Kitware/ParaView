@@ -63,6 +63,7 @@ SET(Filters_SRCS
   vtkPExtractHistogram.cxx
   vtkParallelSerialWriter.cxx
   vtkPhastaReader.cxx
+  vtkPlotEdges.cxx
   vtkPointHandleRepresentationSphere.cxx
   vtkPolyLineToRectilinearGridFilter.cxx
   vtkPPhastaReader.cxx

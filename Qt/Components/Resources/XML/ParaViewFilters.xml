@@ -101,6 +101,8 @@
   <Filter name="ParticleTracer" />
   <Filter name="ParticlePathLines" />
   <Filter name="PlotAttributes" />
+  <Filter name="PlotEdges" />
+  <Filter name="PlotEdgesByPlaneIntersect" />
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
   <Filter name="Probe" />

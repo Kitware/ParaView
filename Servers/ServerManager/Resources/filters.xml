@@ -3369,6 +3369,151 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <!-- ==================================================================== -->
+   <SourceProxy name="PlotEdges" class="vtkPlotEdges"
+    label="Plot Edges">
+    <Documentation
+       long_help=""
+       short_help="">
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData"/>
+          </DataTypeDomain>
+          <Documentation>
+            This property specifies the input to the Plot Edges filter.
+          </Documentation>
+     </InputProperty>
+    <Hints>
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="XYPlotView" />
+      
+      <!-- Temporary hint to allow the output of this filter to be plotted -->
+      <Plotable />
+    </Hints>
+   <!-- End PlotEdges -->
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <CompoundSourceProxy name="PlotEdgesByPlaneIntersect" label="Plot Edges by Plane Intersect">
+     <Documentation
+        short_help="Extracts the edges in a 2D plane and plots them"
+        long_help="Extracts the edges in a 2D plane and plots them" >
+       Extracts the surface, intersect it with a 2D plane. 
+       Plot the resulting polylines.
+     </Documentation>
+     <Proxy group="filters" type="DataSetSurfaceFilter" id="374" servers="1" compound_name="ExtractSurface1">
+       <Property name="Input" id="374.Input" number_of_elements="1">
+         <Domain name="groups" id="374.Input.groups">
+           <Group value="sources"/>
+           <Group value="filters"/>
+         </Domain>
+         <Domain name="input_type" id="374.Input.input_type">
+           <DataType value="vtkDataSet"/>
+         </Domain>
+       </Property>
+       <Property name="PieceInvariant" id="374.PieceInvariant" number_of_elements="1">
+         <Element index="0" value="1"/>
+         <Domain name="bool" id="374.PieceInvariant.bool"/>
+       </Property>
+     </Proxy>
+     <Proxy group="filters" type="PlotEdges" id="971" servers="1" compound_name="PlotEdges1">
+       <Property name="Input" id="971.Input" number_of_elements="1">
+         <Proxy value="667" output_port="0"/>
+         <Domain name="groups" id="971.Input.groups">
+           <Group value="sources"/>
+           <Group value="filters"/>
+         </Domain>
+         <Domain name="input_type" id="971.Input.input_type">
+           <DataType value="vtkPolyData"/>
+         </Domain>
+       </Property>
+     </Proxy>
+     <Proxy group="filters" type="Cut" id="667" servers="1" compound_name="Slice1">
+       <Property name="ContourValues" id="667.ContourValues" number_of_elements="1">
+         <Element index="0" value="0"/>
+         <Domain name="bounds" id="667.ContourValues.bounds">
+           <Min index="0" value="-0.718069"/>
+           <Max index="0" value="0.718069"/>
+         </Domain>
+       </Property>
+       <Property name="CutFunction" id="667.CutFunction" number_of_elements="1">
+         <Proxy value="670"/>
+         <Domain name="groups" id="667.CutFunction.groups">
+           <Group value="implicit_functions"/>
+         </Domain>
+         <Domain name="proxy_list" id="667.CutFunction.proxy_list">
+           <Proxy value="670"/>
+           <Proxy value="671"/>
+           <Proxy value="672"/>
+         </Domain>
+       </Property>
+       <Property name="Input" id="667.Input" number_of_elements="1">
+         <Proxy value="374" output_port="0"/>
+         <Domain name="groups" id="667.Input.groups">
+           <Group value="sources"/>
+           <Group value="filters"/>
+         </Domain>
+         <Domain name="input_type" id="667.Input.input_type">
+           <DataType value="vtkDataSet"/>
+         </Domain>
+       </Property>
+       <Property name="InputBounds" id="667.InputBounds">
+         <Domain name="bounds" id="667.InputBounds.bounds">
+           <Min index="0" value="-0.5"/>
+           <Min index="1" value="-0.124991"/>
+           <Min index="2" value="-0.5"/>
+           <Max index="0" value="0.5"/>
+           <Max index="1" value="0.124991"/>
+           <Max index="2" value="0.5"/>
+         </Domain>
+       </Property>
+     </Proxy>
+     <Proxy group="implicit_functions" type="Plane" id="670" servers="1" compound_name="auto_670">
+       <Property name="Normal" id="670.Normal" number_of_elements="3">
+         <Element index="0" value="1"/>
+         <Element index="1" value="0"/>
+         <Element index="2" value="0"/>
+         <Domain name="range" id="670.Normal.range"/>
+       </Property>
+       <Property name="Offset" id="670.Offset" number_of_elements="1">
+         <Element index="0" value="0"/>
+         <Domain name="range" id="670.Offset.range">
+           <Min index="0" value="0"/>
+           <Max index="0" value="0"/>
+         </Domain>
+       </Property>
+       <Property name="Origin" id="670.Origin" number_of_elements="3">
+         <Element index="0" value="0"/>
+         <Element index="1" value="0"/>
+         <Element index="2" value="0"/>
+         <Domain name="range" id="670.Origin.range">
+           <Min index="0" value="-0.5"/>
+           <Min index="1" value="-0.124991"/>
+           <Min index="2" value="-0.5"/>
+           <Max index="0" value="0.5"/>
+           <Max index="1" value="0.124991"/>
+           <Max index="2" value="0.5"/>
+         </Domain>
+       </Property>
+     </Proxy>
+     <ExposedProperties>
+       <Property name="Input" proxy_name="ExtractSurface1" exposed_name="Input"/>
+       <Property name="CutFunction" proxy_name="Slice1" exposed_name="Slice Type"/>
+     </ExposedProperties>
+     <OutputPort name="Output" proxy="PlotEdges1" port_index="0"/>
+     <Hints>
+       <!-- View can be used to specify the preferred view for the proxy -->
+       <View type="XYPlotView" />
+       <Plotable />
+     </Hints>
+   </CompoundSourceProxy>
+   <!-- ==================================================================== -->
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
     <Documentation
        long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
