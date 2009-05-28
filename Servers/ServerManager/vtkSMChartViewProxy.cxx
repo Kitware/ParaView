@@ -21,7 +21,7 @@
 #include "vtkQtChartView.h"
 #include "vtkSMChartOptionsProxy.h"
 
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.3.2.1");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {
@@ -54,8 +54,8 @@ void vtkSMChartViewProxy::CreateVTKObjects()
     vtkQtChartInteractorSetup::createSplitZoom(area);
   this->ChartView->AddChartSelectionHandlers(selector);
 
-  // Set default color scheme to blues
-  this->ChartView->SetColorSchemeToBlues();
+  // Set default color scheme to spectrum.
+  this->ChartView->SetColorSchemeToSpectrum();
 
   vtkSMChartOptionsProxy::SafeDownCast(
     this->GetSubProxy("ChartOptions"))->SetChartView(this->ChartView);
