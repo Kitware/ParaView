@@ -778,7 +778,7 @@ MainWindow::MainWindow() :
   pqServerManagerModel* serverManagerModel =
     pqApplicationCore::instance()->getServerManagerModel();
   QList<pqServer*> servers = serverManagerModel->findItems<pqServer*>();
-  if (servers.length() > 0)
+  if (servers.size() > 0)
     {
     this->onServerAdded(servers[0]);
     }
