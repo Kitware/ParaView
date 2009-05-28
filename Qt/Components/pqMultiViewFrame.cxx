@@ -45,7 +45,7 @@ static int gPenWidth = 2;
 
 pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   : QWidget(p), EmptyMainWidget(new QWidget(this)), AutoHide(false), Active(false), 
-    Color(QColor("red"))
+    Color(QColor("blue"))
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   boxLayout->setMargin(gPenWidth);
