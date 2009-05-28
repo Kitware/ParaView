@@ -110,6 +110,10 @@ bool pqChartView::saveImage(int width, int height, const QString& filename)
   return true;
 }
 
+#if defined(VTK_USE_QVTK_QTOPENGL) && (QT_EDITION & QT_MODULE_OPENGL)
+#include <QGLWidget>
+#endif
+
 //-----------------------------------------------------------------------------
 /// Capture the view image into a new vtkImageData with the given magnification
 /// and returns it. The caller is responsible for freeing the returned image.
@@ -124,6 +128,15 @@ vtkImageData* pqChartView::captureImage(int magnification)
     plot_widget->resize(newSize);
     }
 
+  vtkQtChartWidget* plot_widget2 = 
+    qobject_cast<vtkQtChartWidget*>(this->getWidget());
+  if (plot_widget2)
+    {
+    // with OpenGL viewport, screenshots don't work correctly, so replace it
+    // with non-openGL viewport.
+    plot_widget2->getChartArea()->setUseOpenGLIfAvailable(false);
+    }
+
   // vtkSMRenderViewProxy::CaptureWindow() ensures that render is called on the
   // view. Hence, we must explicitly call render here to be consistent.
   this->forceRender();
@@ -134,6 +147,11 @@ vtkImageData* pqChartView::captureImage(int magnification)
   pqEventDispatcher::processEventsAndWait(0);
 
   QPixmap grabbedPixMap = QPixmap::grabWidget(plot_widget);
+
+  if (plot_widget2)
+    {
+    plot_widget2->getChartArea()->setUseOpenGLIfAvailable(true);
+    }
 
   if (magnification > 1)
     {
