@@ -29,14 +29,14 @@ class vtkCollection;
 class vtkMultiBlockDataSet;
 //ETX
 
-class VTK_GRAPHICS_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkPlotEdges : public vtkMultiBlockDataSetAlgorithm
 {
 public:
   vtkTypeRevisionMacro(vtkPlotEdges, vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   static vtkPlotEdges *New();
-
+//BTX
 protected:
   vtkPlotEdges();
   virtual ~vtkPlotEdges();
@@ -71,7 +71,7 @@ protected:
 private:
   vtkPlotEdges(const vtkPlotEdges&);  // Not implemented.
   void operator=(const vtkPlotEdges&);  // Not implemented.
-  
+//ETX
 };
 
 #endif

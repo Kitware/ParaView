@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.3");
+vtkCxxRevisionMacro(Segment, "1.4");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -321,7 +321,7 @@ void Segment::ComputeDirection(vtkIdType pointIndex,
   //cerr<< "DIR: direction:" << direction[0] << "," << direction[1] << "," << direction[2] << endl;
 }
 
-void Segment::AddPoint(vtkIdType cellId, vtkIdType pointId)
+void Segment::AddPoint(vtkIdType vtkNotUsed(cellId), vtkIdType pointId)
 {
   if (this->StartId == -1)
     {
@@ -473,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.3");
+vtkCxxRevisionMacro(Node, "1.4");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.3");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.4");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
