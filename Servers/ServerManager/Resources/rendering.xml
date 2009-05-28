@@ -1502,6 +1502,13 @@
         default_values="0 1 0 1 0 1">
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
+      
+     <DoubleVectorProperty name="LineColor"
+        command="SetLineColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+     </DoubleVectorProperty>
 
      <ProxyProperty name="Renderer" command="SetRenderer">
        <ProxyGroupDomain name="groups">
@@ -7843,6 +7850,7 @@
           <Property name="Point2WorldPositionInfo" />
           <Property name="Point2WorldPosition" />
           <Property name="PlaceWidget" />
+          <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
 

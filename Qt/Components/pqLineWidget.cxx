@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNewWidgetRepresentationProxy.h>
+#include <vtkSMPropertyHelper.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMSourceProxy.h>
 
@@ -395,4 +396,17 @@ void pqLineWidget::onWidgetVisibilityChanged(bool visible)
   this->Implementation->UI.visible->blockSignals(true);
   this->Implementation->UI.visible->setChecked(visible);
   this->Implementation->UI.visible->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqLineWidget::setLineColor(const QColor& color)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  vtkSMPropertyHelper(widget,
+    "LineColor").Set(0, color.redF());
+ vtkSMPropertyHelper(widget,
+    "LineColor").Set(1,color.greenF());
+ vtkSMPropertyHelper(widget,
+    "LineColor").Set(2 , color.blueF());
+  widget->UpdateVTKObjects(); 
 }

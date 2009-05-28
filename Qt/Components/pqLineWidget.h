@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidget.h"
 #include "pqComponentsExport.h"
+#include <QColor>
 
 class pqServer;
 
@@ -61,6 +62,7 @@ public:
   virtual void resetBounds(double bounds[6]);
 
   void setControlledProperties(vtkSMProperty* point1, vtkSMProperty* point2);
+  void setLineColor(const QColor& color);
 
 public slots:
   void onXAxis();
