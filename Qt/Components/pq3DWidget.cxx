@@ -590,6 +590,12 @@ void pq3DWidget::updatePickShortcut()
     && this->Internal->WidgetVisible &&
     this->Internal->WidgetProxy && this->renderView());
 
+  this->updatePickShortcut(pickable);
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::updatePickShortcut(bool pickable)
+{
   if (this->Internal->PickShortcut)
     {
     this->Internal->PickShortcut->setEnabled(pickable);

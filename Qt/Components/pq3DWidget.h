@@ -201,7 +201,8 @@ protected:
   
   /// updates the enable state of the picking shortcut.
   virtual void updatePickShortcut();
-
+  virtual void updatePickShortcut(bool pickable);
+  
 private:
   void setControlledProxy(vtkSMProxy*);
 
