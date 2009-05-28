@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.2");
+vtkCxxRevisionMacro(Segment, "1.3");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -473,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.2");
+vtkCxxRevisionMacro(Node, "1.3");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.2");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.3");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
@@ -669,7 +669,7 @@ void vtkPlotEdges::Process(vtkPolyData* input,
   vtkCollection* nodes = vtkCollection::New();
 
   this->ExtractSegments(inputPolyData, segments, nodes);
-  this->ConnectSegmentsWithNodes(inputPolyData, segments, nodes);
+  this->ConnectSegmentsWithNodes(segments, nodes);
   this->SaveToMultiBlockDataSet(segments, outputMultiBlock);
 
   segments->Delete();
