@@ -16,13 +16,13 @@
    <item>
     <widget class="QCheckBox" name="selectedViewOnly" >
      <property name="toolTip" >
-      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+      <string>&lt;html>When checked, only the active view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
      </property>
      <property name="statusTip" >
-      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+      <string>&lt;html>When checked, only the active view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
      </property>
      <property name="whatsThis" >
-      <string>&lt;html>When checked, only the acitve view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
+      <string>&lt;html>When checked, only the active view will be saved, otherwise all views will be saved in the image as they are layed out presently.&lt;/html></string>
      </property>
      <property name="text" >
       <string>Save only selected view</string>
