@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.14");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.15");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -762,6 +762,13 @@ bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
         " We are unable to support legacy exodus state files.");
       return false;
       }
+    }
+
+    {
+    // Convert "Programmable Filter" to "ProgrammableFilter".
+    const char* attrs[] = {"type", "Programmable Filter", 0};
+    const char* newAttrs[] = {"type", "ProgrammableFilter", 0};
+    this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
 
   return true;
