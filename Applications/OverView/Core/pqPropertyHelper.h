@@ -45,6 +45,10 @@ class OVERVIEW_CORE_EXPORT pqPropertyHelper :
 public:
   pqPropertyHelper(vtkSMProxy* proxy, const char* name);
 
+  // Include all the superclass's Set methods into this subclass.
+  // Without this, all the other Set overrides are hidden.
+  using vtkSMPropertyHelper::Set;
+
   void Set(const QString& value);
   void Set(unsigned int index, const QString& value);
   void Set(const QStringList& value);
