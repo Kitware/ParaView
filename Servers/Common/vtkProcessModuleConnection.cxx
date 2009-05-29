@@ -58,7 +58,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.15");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.15.4.1");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -154,7 +154,9 @@ void vtkProcessModuleConnection::OnWrongTagEvent(
     ptr ++;
     if ( val < 0 || val > 100 )
       {
-      vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
+      // BUG: At one point we need to track how in the world are we receiving
+      // negative progress events.
+      //vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
       return;
       }
     this->ProgressHandler->HandleServerProgress(val, ptr);
