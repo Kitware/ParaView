@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.4");
+vtkCxxRevisionMacro(Segment, "1.5");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -473,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.4");
+vtkCxxRevisionMacro(Node, "1.5");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.4");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.5");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
@@ -774,17 +774,22 @@ void vtkPlotEdges::ExtractSegments(vtkPolyData* input,
 
     // As the point may be in many cells, we need to create a node.
     // The nodes will be merged later in ConnectSegmentsWithNodes
-    Node* node = Node::New();
-    node->SetPolyData(polyData);
-    node->SetPointId(cellPts[0]);
-    nodes->AddItem(node);
-    node->Delete();
+    Node* node = NULL;
+    if (numPtCells > 1)
+      {
+      node = Node::New();
+      node->SetPolyData(polyData);
+      node->SetPointId(cellPts[0]);
+      nodes->AddItem(node);
+      node->Delete();
+      }
 
     // Track the branchs from the point. The cell defines a direction
-    for (vtkIdType i=0; i < numPtCells; ++i)
+    for (vtkIdType i = 0; i < numPtCells; ++i)
       {
-      this->ExtractSegmentsFromExtremity( polyData, segments, nodes, 
-                                          visitedCells, cellIds[i], node);
+      this->ExtractSegmentsFromExtremity(polyData, segments, nodes, 
+                                         visitedCells, cellIds[i], 
+                                         cellPts[0], node);
       }
     }
   // we don't need the visited array array
@@ -796,7 +801,9 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
                                                 vtkCollection* segments,
                                                 vtkCollection* nodes,
                                                 char* visitedCells,
-                                                vtkIdType cellId, Node* node)
+                                                vtkIdType cellId, 
+                                                vtkIdType pointId, 
+                                                Node* node)
 {
   //cerr<< __FUNCTION__ << " cell: " << cellId << " point: " << node->GetPointId() << endl;
   if (visitedCells[cellId])
@@ -805,16 +812,15 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
     //cerr << "End" << __FUNCTION__ << endl;
     return;
     }
-  if ((polyData->GetCellType(cellId) != VTK_LINE && 
-       polyData->GetCellType(cellId) != VTK_POLY_LINE) ||
-      !node)
+  if (polyData->GetCellType(cellId) != VTK_LINE && 
+      polyData->GetCellType(cellId) != VTK_POLY_LINE)
     {
     //cerr << "!!!!!!!!!Cell not a line: " << cellId << endl;
     //cerr << "End" << __FUNCTION__ << endl;
     return;
     }
 
-  vtkIdType pointId = node->GetPointId();
+  //vtkIdType pointId = node->GetPointId();
 
   // Get all the points from the cell
   vtkIdType  numCellPts;
@@ -830,24 +836,28 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
     return;
     }
   
-  vtkIdType pointId2 =(cellPts[0] == pointId) ? 
+  // Get the next point
+  vtkIdType pointId2 = (cellPts[0] == pointId) ? 
     cellPts[1] : cellPts[0];
+  
   double p[3];
   polyData->GetPoint(pointId2, p);
-  //cerr << "Point " << pointId2 << " =(" 
-  //          << p[0] << "," << p[1] << "," << p[2] << ")" << endl;
+
   //Create a new segment from the point.
   Segment* segment = Segment::New();
   segment->SetPolyData(polyData);
   segment->AddPoint(cellId, pointId);
   segment->AddPoint(cellId, pointId2);
   
+  // if the pointId is at a node, add the segment to it
+  // maybe node shall not be given as a parameter but 
+  // get using vtkPlotEdges::GetNodeAtPoint()
   if (node)
     {
     node->AddSegment(segment);
     }
   
-  segments->AddItem( segment);
+  segments->AddItem(segment);
   segment->Delete();
   
   visitedCells[cellId] = 1;
@@ -885,7 +895,7 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
              polyData->GetCellType(cellIds[i]) == VTK_POLY_LINE))
           {
           vtkPlotEdges::ExtractSegmentsFromExtremity(
-            polyData, segments, nodes, visitedCells, cellIds[i], node2);
+            polyData, segments, nodes, visitedCells, cellIds[i], pointId2, node2);
           }
         }
       //we were at the extremity of a branch, like if numptCells == 1
@@ -898,8 +908,6 @@ void vtkPlotEdges::ExtractSegmentsFromExtremity(vtkPolyData* polyData,
       //cerr<< "Next Cell is " << cellId2 << endl;
       if (visitedCells[cellId2])
         {
-        //cerr << "Cell " << cellId2 
-        //          << " has already been visited " << endl; 
         break;
         }
       if (polyData->GetCellType(cellId2) != VTK_LINE &&
@@ -979,15 +987,15 @@ void vtkPlotEdges::ConnectSegmentsWithNodes(vtkCollection* segments,
     node = Node::SafeDownCast(nodeIt->GetCurrentObject());
     double point[3];
     node->GetPolyData()->GetPoint(node->GetPointId(), point);
-//  cerr << "Connect node(" << node 
-//            << ") at point: " << node->GetPointId()
-//            << "(" << point[0] << "," 
-//            << point[1] << "," << point[2] << ")" <<endl;
+    //cerr << "Connect node(" << node 
+    //        << ") at point: " << node->GetPointId()
+    //        << "(" << point[0] << "," 
+    //        << point[1] << "," << point[2] << ")" <<endl;
     
     while (node->GetSegments()->GetNumberOfItems() > 1)
       {
-//       cerr << node->GetSegments()->GetNumberOfItems() 
-//                 << " segments" << endl;
+      //cerr << node->GetSegments()->GetNumberOfItems() 
+      //           << " segments" << endl;
 
       vtkCollectionIterator* it = node->GetSegments()->NewIterator();
       vtkCollectionIterator* it2 = node->GetSegments()->NewIterator();

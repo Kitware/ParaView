@@ -56,7 +56,8 @@ protected:
                                             vtkCollection* segments,
                                             vtkCollection* nodes, 
                                             char* visitedCells,
-                                            vtkIdType cellId, 
+                                            vtkIdType cellId,
+                                            vtkIdType pointId,
                                             Node* node);
   static void ConnectSegmentsWithNodes (vtkCollection* segments,
                                         vtkCollection* nodes);
