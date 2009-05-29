@@ -22,33 +22,40 @@ SET(CLIENT_SRCS
   PVBlotPluginActions.cxx
   )
 
-INCLUDE(${QT_USE_FILE})
+IF (PARAVIEW_BUILD_QT_GUI)
 
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIR}
-  ${PARAVIEW_INCLUDE_DIRS}
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${pqCore_SOURCE_DIR}
-  ${pqCore_BINARY_DIR}
-  ${pqComponents_SOURCE_DIR}
-  ${pqComponents_BINARY_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
-  )
+  INCLUDE(${QT_USE_FILE})
 
-QT4_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
-QT4_WRAP_UI(UI_SRCS ${UI_FILES})
+  INCLUDE_DIRECTORIES(
+    ${VTK_INCLUDE_DIR}
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+    ${pqCore_SOURCE_DIR}
+    ${pqCore_BINARY_DIR}
+    ${pqComponents_SOURCE_DIR}
+    ${pqComponents_BINARY_DIR}
+    ${QtWidgets_SOURCE_DIR}
+    ${QtWidgets_BINARY_DIR}
+    )
 
-ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS
-  CLASS_NAME PVBlotPluginActions
-  GROUP_NAME "MenuBar/Tools")
+  QT4_WRAP_CPP(MOC_SRCS ${MOC_HEADERS})
+  QT4_WRAP_UI(UI_SRCS ${UI_FILES})
 
-ADD_PARAVIEW_PLUGIN(pvblot "1.0"
-  PYTHON_MODULES ${PYMODULES}
-  GUI_INTERFACES ${IFACES}
-  GUI_RESOURCES pvblot.qrc
-  SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} ${CLIENT_SRCS}
-  )
+  ADD_PARAVIEW_ACTION_GROUP(IFACES IFACE_SRCS
+    CLASS_NAME PVBlotPluginActions
+    GROUP_NAME "MenuBar/Tools")
+
+  ADD_PARAVIEW_PLUGIN(pvblot "1.0"
+    PYTHON_MODULES ${PYMODULES}
+    GUI_INTERFACES ${IFACES}
+    GUI_RESOURCES pvblot.qrc
+    SOURCES ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS} ${CLIENT_SRCS}
+    )
+ELSE (PARAVIEW_BUILD_QT_GUI)
+  ADD_PARAVIEW_PLUGIN(pvblot "1.0"
+    PYTHON_MODULES ${PYMODULES}
+    )
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #############################################################################
 # Set up a simple shell script to run pvblot from the command line.
