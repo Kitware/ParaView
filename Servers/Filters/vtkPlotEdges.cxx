@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.5");
+vtkCxxRevisionMacro(Segment, "1.6");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -394,7 +394,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
     {
     vtkIdList* unionList = vtkIdList::New();
     vtkDoubleArray* arcLengths = vtkDoubleArray::New();
-    arcLengths->SetName("arc_length");
+    arcLengths->SetName(this->ArcLengths->GetName());
     arcLengths->SetNumberOfComponents(1);
 
     // the segment is concatenated at the beginning.
@@ -473,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.5");
+vtkCxxRevisionMacro(Node, "1.6");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.5");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.6");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
@@ -1134,22 +1134,50 @@ void vtkPlotEdges::SaveToMultiBlockDataSet(vtkCollection* segments,
     vtkSmartPointer<vtkPoints> pts = vtkSmartPointer<vtkPoints>::New();
     pts->SetDataType(polyData->GetPoints()->GetDataType());
 
-    //vtkPoints* points = vtkPoints::New();
     vtkSmartPointer<vtkIdList> cells = vtkSmartPointer<vtkIdList>::New();
 
+    pd->SetLines(ca);
+    pd->SetPoints(pts);
+    pd->InsertNextCell(VTK_POLY_LINE, cells);
+
+
+    vtkPointData* srcPointData = polyData->GetPointData();
+    vtkAbstractArray *data, *newData;
+    int numArray = srcPointData->GetNumberOfArrays();
+    for (int i = 0; i < numArray; i++)
+      {
+      data = srcPointData->GetAbstractArray(i);
+      newData = data->NewInstance(); //instantiate same type of object
+      newData->SetName(data->GetName());
+      if (data->HasInformation())
+        {
+        newData->CopyInformation(data->GetInformation(),/*deep=*/1);
+        }
+      pd->GetPointData()->AddArray(newData);
+      newData->Delete();
+      }
+   
+    vtkIdType pointId;
     vtkIdType numCells = segment->GetPointIdList()->GetNumberOfIds();
     for (vtkIdType i = 0; i < numCells; ++i)
       {
       cells->InsertNextId(i);
-      pts->InsertPoint(
-        i, polyData->GetPoint(segment->GetPointIdList()->GetId(i)));
+      pointId = segment->GetPointIdList()->GetId(i);
+      pts->InsertPoint(i, polyData->GetPoint(pointId));
+      for (int j = 0; j < numArray; j++)
+        {
+        pd->GetPointData()->GetArray(j)
+          ->InsertNextTuple(pointId, srcPointData->GetArray(j));
+        }
       }
     
-    pd->SetLines(ca);
-    pd->SetPoints(pts);
-    pd->InsertNextCell(VTK_POLY_LINE, cells);
-    pd->GetPointData()->AddArray(segment->GetArcLengths());
-    
+      vtkDataArray* arcLength = segment->GetArcLengths();
+      pd->GetPointData()->AddArray(arcLength);
+      if (pd->GetPointData()->GetArray("arc_length"))
+        {
+        arcLength->SetName("PlotEdges arc_length");
+        }
+
     /*
       cerr << "Add PolyLine of " << 
       segment->GetPointIdList()->GetNumberOfIds() << " points" << endl;
