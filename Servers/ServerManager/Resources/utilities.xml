@@ -1439,7 +1439,8 @@
   </ProxyGroup>
 
   <ProxyGroup name="piecewise_functions">
-    <Proxy name="PiecewiseFunction"  class="vtkPiecewiseFunction">
+    <Proxy name="PiecewiseFunction"  class="vtkPiecewiseFunction"
+           servers="client,renderserver" >
       <DoubleVectorProperty
         name="Points"
         command="AddPoint"
