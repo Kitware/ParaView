@@ -188,9 +188,9 @@ void pqGlyphPanel::updateScaleFactor()
       {
       domain = vtkSMArrayRangeDomain::SafeDownCast(
         scaleFactorProperty->GetDomain("scalar_range"));
-      if (domain->GetMaximumExists(0) && domain->GetMinimumExists(0))
+      if (domain->GetMaximumExists(0) /*&& domain->GetMinimumExists(0)*/)
         {
-        divisor = domain->GetMaximum(0)-domain->GetMinimum(0);
+        divisor = domain->GetMaximum(0)/*-domain->GetMinimum(0)*/;
         }
       }
     break;
@@ -200,10 +200,10 @@ void pqGlyphPanel::updateScaleFactor()
       {
       domain = vtkSMArrayRangeDomain::SafeDownCast(
         scaleFactorProperty->GetDomain("vector_range"));
-      if (domain->GetMaximumExists(3) && domain->GetMinimumExists(3))
+      if (domain->GetMaximumExists(3)/* && domain->GetMinimumExists(3)*/)
         {
         // we use the vector magnitude.
-        divisor = domain->GetMaximum(3)-domain->GetMinimum(3);
+        divisor = domain->GetMaximum(3)/*-domain->GetMinimum(3)*/;
         }
       }
     break;
