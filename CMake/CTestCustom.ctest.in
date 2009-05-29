@@ -106,6 +106,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "include.[Qq]t([Cc]ore|[Gg]ui).*warning C4127: conditional expression is constant"
   "[Qq]t.*h.*warning.*declaration of .* shadows a member of .this"
   "[Qq]t.*h.*warning.*(copy constructor|assignment operator) could not be generated"
+
+  # disable any warning coming from Qt headers.
+  "[Qq]t.*/include/qt.*"
   )
 
 IF(APPLE)
