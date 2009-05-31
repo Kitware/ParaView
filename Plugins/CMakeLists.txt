@@ -27,6 +27,7 @@ paraview_build_optional_plugin(ClientGeoView2D "ClientGeoView2D" ClientGeoView2D
 paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView OFF)
 paraview_build_optional_plugin(ClientHierarchyView "ClientHierarchyView" ClientHierarchyView OFF)
 paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
+paraview_build_optional_plugin(ClientRichTextView "ClientRichTextView" ClientRichTextView OFF)
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
 paraview_build_optional_plugin(ClientTreeView "ClientTreeView" ClientTreeView OFF)
 paraview_build_optional_plugin(CommonToolbar "CommonToolbar" CommonToolbar OFF)
