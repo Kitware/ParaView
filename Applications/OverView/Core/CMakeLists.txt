@@ -44,6 +44,7 @@ QT4_WRAP_CPP(MOC_SRCS
   MainWindow.h
   StopListDialog.h
   ToolbarActions.h
+  pqAnnotationLayersModel.h
   pqMultiInputView.h
   pqSingleInputView.h
   pqStandardGraphLayoutStrategies.h
