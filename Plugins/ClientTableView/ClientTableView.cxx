@@ -165,9 +165,10 @@ void ClientTableView::selectionChanged()
   if (this->getAnnotationLink())
     {
     this->getAnnotationLink()->MarkModified(0);
+    this->Implementation->LastSelectionMTime = this->getAnnotationLink()->GetMTime();
     }
 
-  this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
+  //this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
 }
 
 bool ClientTableView::canDisplay(pqOutputPort* output_port) const
@@ -271,7 +272,7 @@ void ClientTableView::renderInternal()
     this->Implementation->View->SetFieldType(vtkQtTableView::VERTEX_DATA);
     }
 
-  if(this->Implementation->View->GetRepresentation())
+  if(this->Implementation->View->GetRepresentation() && this->getAnnotationLink())
     {
     pqDataRepresentation* pqRepr =
       qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
@@ -283,10 +284,12 @@ void ClientTableView::renderInternal()
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
 
-    if(repSource->GetSelectionInput(0) &&
-      repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
+    //if(repSource->GetSelectionInput(0) &&
+    //  repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
+    //  {
+    if (this->getAnnotationLink()->GetMTime() > this->Implementation->LastSelectionMTime)
       {
-      this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
+      this->Implementation->LastSelectionMTime = this->getAnnotationLink()->GetMTime();
       this->Implementation->View->GetRepresentation()->GetAnnotationLink()->SetCurrentSelection(sel);
       this->Implementation->View->GetRepresentation()->Update();
       }
