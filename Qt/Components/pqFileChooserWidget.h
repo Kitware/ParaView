@@ -49,6 +49,8 @@ class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
   Q_OBJECT;
   Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true);
   Q_PROPERTY(QString extension READ extension WRITE setExtension);
+  Q_PROPERTY(bool useDirectoryMode
+             READ useDirectoryMode WRITE setUseDirectoryMode);
   Q_PROPERTY(bool forceSingleFile
              READ forceSingleFile WRITE setForceSingleFile);
 
@@ -77,6 +79,13 @@ public:
   bool forceSingleFile() { return this->ForceSingleFile; }
   void setForceSingleFile(bool flag) {
     this->ForceSingleFile = flag;
+    this->setFilenames(this->filenames());
+  }
+
+  /// flag specifying whether this widget should use directory mode
+  bool useDirectoryMode() { return this->UseDirectoryMode; }
+  void setUseDirectoryMode(bool flag) {
+    this->UseDirectoryMode = flag;
     this->setFilenames(this->filenames());
   }
 
@@ -113,6 +122,7 @@ protected:
   QLineEdit* LineEdit;
   pqServer* Server;
   bool ForceSingleFile;
+  bool UseDirectoryMode;
 };
 
 #endif // _pqFileChooserWidget_h

@@ -1317,6 +1317,15 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
         {
         chooser->setEnabled(false);
         }
+     
+      // If there's a hint on the property indicating that this property expects a
+      // directory name, then, we will use the directory mode.
+      if (SMProperty->IsA("vtkSMStringVectorProperty") && SMProperty->GetHints() && 
+          SMProperty->GetHints()->FindNestedElementByName("UseDirectoryName"))
+        {
+        chooser->setUseDirectoryMode(1);
+        }
+        
       pqServerManagerModel* m =
         pqApplicationCore::instance()->getServerManagerModel();
       chooser->setServer(m->findServer(pxy->GetConnectionID()));

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileChooserWidget.h"
 
 // Qt includes
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QToolButton>
@@ -45,7 +46,8 @@ pqFileChooserWidget::pqFileChooserWidget(QWidget* p)
   : QWidget(p), Server(NULL)
 {
   this->ForceSingleFile = false;
-
+  this->UseDirectoryMode = false;
+  
   QHBoxLayout* l = new QHBoxLayout(this);
   l->setMargin(0);
   l->setSpacing(2);
@@ -79,7 +81,18 @@ QStringList pqFileChooserWidget::filenames()
 
 void pqFileChooserWidget::setFilenames(const QStringList& files)
 {
-  if (this->ForceSingleFile)
+  if(this->UseDirectoryMode)
+    {
+    if (!files.isEmpty())
+      {
+      this->LineEdit->setText(QFileInfo(files[0]).path());
+      }
+    else
+      {
+      this->LineEdit->setText("");
+      }
+    }
+  else if (this->ForceSingleFile)
     {
     if (!files.isEmpty())
       {
@@ -141,7 +154,11 @@ void pqFileChooserWidget::chooseFile()
 
   pqFileDialog* dialog = new pqFileDialog(this->Server,
     this, tr("Open File:"), QString(), filters);
-  if (this->ForceSingleFile)
+  if(this->UseDirectoryMode)
+    {
+    dialog->setFileMode(pqFileDialog::Directory);
+    }
+  else if (this->ForceSingleFile)
     {
     dialog->setFileMode(pqFileDialog::ExistingFile);
     }
