@@ -158,6 +158,12 @@ void ClientRichTextView::selectionChanged()
     selectionSource, 0);
   selectionSource->Delete();
 
+  // Mark the annotation link as modified so it will be updated
+  if (this->getAnnotationLink())
+    {
+    this->getAnnotationLink()->MarkModified(0);
+    }
+
   this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
 }
 
@@ -217,7 +223,13 @@ void ClientRichTextView::showRepresentation(pqRepresentation* pqRepr)
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
   vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-  rep->SetAnnotationLink(AnnotationLink::instance().getLink());
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    rep->SetAnnotationLink(link);
+    }
   rep->Update();
 }
 
