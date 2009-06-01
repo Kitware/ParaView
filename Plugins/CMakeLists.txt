@@ -20,7 +20,6 @@ endif (PARAVIEW_BUILD_StreamingParaView)
 
 paraview_build_optional_plugin(Array "Array" Array OFF)
 #paraview_build_optional_plugin(ChartViewFrame "ChartViewFrame" ChartViewFrame OFF)
-#paraview_build_optional_plugin(ClientAttributeView "ClientAttributeView" ClientAttributeView OFF)
 #paraview_build_optional_plugin(ClientChartView "ClientChartView" ClientChartView OFF)
 paraview_build_optional_plugin(ClientGeoView "ClientGeoView" ClientGeoView OFF)
 paraview_build_optional_plugin(ClientGeoView2D "ClientGeoView2D" ClientGeoView2D OFF)
