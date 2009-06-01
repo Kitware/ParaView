@@ -12,8 +12,6 @@ INCLUDE_DIRECTORIES(
 
 # This is just a simple variable that lists the source files.
 SET(SRCS
-  vtkPSLACReader.cxx
-  vtkSLACReader.cxx
   vtkSLACParticleReader.cxx
   )
 

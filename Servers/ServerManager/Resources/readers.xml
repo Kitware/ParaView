@@ -4554,6 +4554,114 @@
 
     </SourceProxy> <!-- netCDFReader -->
 
+    <SourceProxy name="SLACReader"
+                 class="vtkPSLACReader"
+                 label="SLAC Data Reader">
+      <Documentation>
+        A reader for a data format used by Omega3p, Tau3p, and several
+        other tools used at the Standford Linear Accelerator Center (SLAC).
+        The underlying format uses netCDF to store arrays, but also imposes
+        several conventions to form an unstructured grid of elements.
+      </Documentation>
+
+      <StringVectorProperty name="MeshFileName"
+                            command="SetMeshFileName"
+                            animateable="0"
+                            number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the mesh file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ModeFileName"
+                            clean_command="RemoveAllModeFileNames"
+                            command="AddModeFileName"
+                            animateable="0"
+                            number_of_elements="0"
+                            repeat_command="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the mode files to load.  The points in the mode file should be the same as the mesh file.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ReadInternalVolume"
+                         command="SetReadInternalVolume"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, read the internal volume of the data set.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadExternalSurface"
+                         command="SetReadExternalSurface"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, read the external surfaces of the data set.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ReadMidpoints"
+                         command="SetReadMidpoints"
+                         animateable="0"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          If on, reads midpoint information for external surfaces and builds
+          quadratic surface triangles.
+        </Documentation>
+      </IntVectorProperty>
+
+<!--       <StringVectorProperty name="VariableArrayStatus" -->
+<!--                             command="SetVariableArrayStatus" -->
+<!--                             number_of_elements="0" -->
+<!--                             repeat_command="1" -->
+<!--                             number_of_elements_per_command="2" -->
+<!--                             element_types="2 0" -->
+<!--                             information_property="VariableArrayInfo" -->
+<!--                             label="Variables"> -->
+<!--         <ArraySelectionDomain name="array_list"> -->
+<!--           <RequiredProperties> -->
+<!--             <Property name="VariableArrayInfo" function="ArrayList" /> -->
+<!--           </RequiredProperties> -->
+<!--         </ArraySelectionDomain> -->
+<!--         <Documentation> -->
+<!--           This property lists which mode variables to load from the mode file. -->
+<!--         </Documentation> -->
+<!--       </StringVectorProperty> -->
+
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper />
+        <Documentation>
+          This magic property sends time information to the animation
+          panel.  ParaView will then automatically set up the animation to
+          visit the time steps defined in the file.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="TimeRange" information_only="1">
+        <TimeRangeInformationHelper/>
+        <Documentation>
+          This magic property sends time range information to the animation
+          panel.  ParaView uses this information to set the range of time
+          for the animation.  This property is important for when there are
+          no timesteps but you still want to give ParaView a range of
+          values to use.
+        </Documentation>
+      </DoubleVectorProperty>
+
+    </SourceProxy> <!-- SLACReader -->
+
    <FileSeriesReaderProxy name="CSVReader"
                           class="vtkFileSeriesReader"
                           label="CSV Reader"

@@ -211,4 +211,9 @@
           file_description="Metafile for restarted exodus outputs">
   </Reader>
 
+  <Reader name="SLACReader"
+          extensions="ncdf nc"
+          file_description="SLAC Files">
+  </Reader>
+
 </ParaViewReaders>

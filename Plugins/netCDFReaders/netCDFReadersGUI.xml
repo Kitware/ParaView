@@ -2,10 +2,6 @@
   <!-- Order is important.  The readers with the most strict CanReadFile -->
   <!-- methods should appear last as they will be checked first and -->
   <!-- used first. -->
-  <Reader name="SLACReader"
-          extensions="ncdf nc"
-          file_description="SLAC Files">
-  </Reader>
   <Reader name="SLACParticleReader"
           extensions="ncdf netcdf"
           file_description="SLAC Particle Files">
