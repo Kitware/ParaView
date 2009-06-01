@@ -2431,6 +2431,7 @@
         number_of_elements="1"
         default_values="1.0"
         animateable="0">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
       </DoubleVectorProperty>
 
       <IntVectorProperty
