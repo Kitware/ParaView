@@ -117,6 +117,10 @@ void ClientTreeView::selectionChanged()
   // Get the representaion's source
   pqDataRepresentation* pqRepr =
     qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+  if (!pqRepr)
+    {
+    return;
+    }
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
   vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
     opPort->getSource()->getProxy());
@@ -131,6 +135,12 @@ void ClientTreeView::selectionChanged()
   repSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
   selectionSource->Delete();
+
+  // Mark the annotation link as modified so it will be updated
+  if (this->getAnnotationLink())
+    {
+    this->getAnnotationLink()->MarkModified(0);
+    }
 
   this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
 }
@@ -185,13 +195,20 @@ void ClientTreeView::updateRepresentation(pqRepresentation* repr)
 
 void ClientTreeView::showRepresentation(pqRepresentation* pqRepr)
 {
-  //this->updateRepresentation(representation);
-
   vtkSMClientDeliveryRepresentationProxy* const proxy = pqRepr ? 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
   vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-  rep->Update();
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    rep->SetAnnotationLink(link);
+    }
+
+  //rep->Update();
+  this->Implementation->View->Update();
 }
 
 void ClientTreeView::hideRepresentation(pqRepresentation* repr)

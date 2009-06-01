@@ -28,8 +28,6 @@
 #include "ClientTableView.h"
 #include "ClientTableViewDecorator.h"
 
-#include <AnnotationLink.h>
-
 #include <vtkAbstractArray.h>
 #include <vtkAnnotationLink.h>
 #include <vtkCommand.h>
@@ -144,6 +142,10 @@ void ClientTableView::selectionChanged()
   // Get the representaion's source
   pqDataRepresentation* pqRepr =
     qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
+  if (!pqRepr)
+    {
+    return;
+    }
   pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
   vtkSMSourceProxy* repSource = vtkSMSourceProxy::SafeDownCast(
     opPort->getSource()->getProxy());
@@ -158,6 +160,12 @@ void ClientTableView::selectionChanged()
   repSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
   selectionSource->Delete();
+
+  // Mark the annotation link as modified so it will be updated
+  if (this->getAnnotationLink())
+    {
+    this->getAnnotationLink()->MarkModified(0);
+    }
 
   this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
 }
@@ -212,14 +220,20 @@ void ClientTableView::updateRepresentation(pqRepresentation* repr)
 
 void ClientTableView::showRepresentation(pqRepresentation* pqRepr)
 {
-  //this->updateRepresentation(representation);
-
   vtkSMClientDeliveryRepresentationProxy* const proxy = pqRepr ? 
     vtkSMClientDeliveryRepresentationProxy::SafeDownCast(pqRepr->getProxy()) : NULL;
   vtkDataRepresentation* rep = this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-  rep->SetAnnotationLink(AnnotationLink::instance().getLink());
-  rep->Update();
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    rep->SetAnnotationLink(link);
+    }
+
+  //rep->Update();
+  this->Implementation->View->Update();
 }
 
 void ClientTableView::hideRepresentation(pqRepresentation* repr)

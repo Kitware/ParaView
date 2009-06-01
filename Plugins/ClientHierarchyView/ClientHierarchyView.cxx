@@ -132,7 +132,7 @@ public:
     this->Widgets.hierarchicalGraphView->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
     this->HierarchicalGraphView->ApplyViewTheme(this->HierarchicalGraphTheme);
     this->HierarchicalGraphView->SetEdgeColorToSplineFraction();
-    this->HierarchicalGraphView->SetUseRectangularCoordinates(true);
+    //this->HierarchicalGraphView->SetUseRectangularCoordinates(true);
 
     this->TreeAreaRepresentation = vtkSmartPointer<vtkRenderedTreeAreaRepresentation>::New();
     this->TreeAreaRepresentation->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
@@ -189,6 +189,14 @@ ClientHierarchyView::ClientHierarchyView(
   Implementation(new implementation()),
   Command(new command(*this))
 {
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    this->Implementation->TreeAreaRepresentation->SetAnnotationLink(link);
+    }
+
   QObject::connect(this->Implementation->TreeWidget, SIGNAL(expanded(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
   QObject::connect(this->Implementation->TreeWidget, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
 
@@ -243,6 +251,12 @@ void ClientHierarchyView::selectionChanged()
   repSource->SetSelectionInput(opPort->getPortNumber(),
     selectionSource, 0);
   selectionSource->Delete();
+
+  // Mark the annotation link as modified so it will be updated
+  if (this->getAnnotationLink())
+    {
+    this->getAnnotationLink()->MarkModified(0);
+    }
 }
 
 QWidget* ClientHierarchyView::getWidget()

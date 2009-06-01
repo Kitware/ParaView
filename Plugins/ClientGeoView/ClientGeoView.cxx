@@ -324,7 +324,13 @@ void ClientGeoView::selectionChanged()
     repSource->SetSelectionInput(opPort->getPortNumber(),
       selectionSource, 0);
     selectionSource->Delete();
-  }
+
+    // Mark the annotation link as modified so it will be updated
+    if (this->getAnnotationLink())
+      {
+      this->getAnnotationLink()->MarkModified(0);
+      }
+    }
 }
 
 QWidget* ClientGeoView::getWidget()
@@ -400,6 +406,13 @@ void ClientGeoView::onRepresentationVisibilityChanged(pqRepresentation* pqrep, b
     vtkrep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
     vtkrep->SetInputConnection(proxy->GetOutputPort());
     vtkrep->SetEdgeLayoutStrategyToGeo();
+    // If we have an associated annotation link proxy, set the client side
+    // object as the annotation link on the representation.
+    if (this->getAnnotationLink())
+      {
+      vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+      vtkrep->SetAnnotationLink(link);
+      }
     this->Implementation->Representations[pqrep] = vtkrep;
     vtkrep->Delete();
     iter = this->Implementation->Representations.find(pqrep);
