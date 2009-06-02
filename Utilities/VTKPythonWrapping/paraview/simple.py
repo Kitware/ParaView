@@ -101,9 +101,15 @@ def GetDisplayProperties(proxy=None, view=None):
 def Show(proxy=None, view=None, **params):
     """Turns the visibility of a given pipeline object on in the given view.
     If pipeline object and/or view are not specified, active objects are used."""
+    if proxy == None:
+        proxy = GetActiveSource()
+    if proxy == None:
+        raise RuntimeError, "Show() needs a proxy argument or that an active source is set."
     if not view and len(GetRenderViews()) == 0:
         CreateRenderView()
     rep = GetDisplayProperties(proxy, view)
+    if rep == None:
+        raise RuntimeError, "Could not create a representation object for proxy %s" % proxy.GetXMLLabel()
     for param in params.keys():
         setattr(rep, param, params[param])
     rep.Visibility = 1
@@ -396,21 +402,24 @@ def _create_doc(new, old):
 def _func_name_valid(name):
     "Internal function."
     valid = True
-    for c in key:
+    for c in name:
         if c == '(' or c ==')':
             valid = False
             break
     return valid
-    
-for m in [servermanager.filters, servermanager.sources, servermanager.writers]:
-    dt = m.__dict__
-    for key in dt.keys():
-        cl = dt[key]
-        if not isinstance(cl, str):
-            if _func_name_valid(key):
-                exec "%s = _create_func(key, m)" % key
-                exec "%s.__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key, key)
-del dt, m
+
+def _add_functions(g):
+    for m in [servermanager.filters, servermanager.sources, servermanager.writers]:
+        dt = m.__dict__
+        for key in dt.keys():
+            cl = dt[key]
+            if not isinstance(cl, str):
+                if _func_name_valid(key):
+                    try:
+                        exec "g[key] = _create_func(key, m)"
+                        exec "g[key].__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key)
+                    except NameError:
+                        pass
 
 def GetActiveView():
     "Returns the active view."
@@ -432,7 +441,18 @@ def GetActiveCamera():
     """Returns the active camera for the active view. The returned object
     is an instance of vtkCamera."""
     return GetActiveView().GetActiveCamera()
-    
+
+def LoadPlugin(filename, ns=None):
+    """Loads a ParaView plugin and updates this module with new constructors
+    if any. If you loaded the simple module with from paraview.simple import *,
+    make sure to pass globals() as the second arguments:
+    LoadPlugin("myplugin", globals())
+    Otherwise, the new functions will not appear in the global namespace."""
+    if not ns:
+        ns = globals()
+    servermanager.LoadPlugin(filename)
+    _add_functions(ns)
+
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
     objects are shared between Python and the user interface. This class
@@ -496,16 +516,11 @@ class ActiveObjects(object):
     view = property(get_view, set_view)
     source = property(get_source, set_source)
 
-active_objects = ActiveObjects()
-
 class _funcs_internals:
     "Internal class."
     first_render = True
     view_counter = 0
     rep_counter = 0
-
-if not servermanager.ActiveConnection:
-    Connect()
 
 def demo1():
     """Simple demo that create the following pipeline
@@ -579,3 +594,8 @@ def demo2(fname="/Users/berk/Work/ParaView/ParaViewData/Data/disk_out_ref.ex2"):
     SetDisplayProperties(ColorArrayName = "Pres")
     Render()
 
+_add_functions(globals())
+active_objects = ActiveObjects()
+
+if not servermanager.ActiveConnection:
+    Connect()

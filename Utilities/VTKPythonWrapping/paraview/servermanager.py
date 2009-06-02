@@ -2088,7 +2088,14 @@ def LoadPlugin(filename, connection=None):
                 moduleInfo.SetIsPackage(pypackageflagproperty.GetElement(i))
                 vtkPVPythonModule.RegisterModule(moduleInfo)
     else:
-        raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
+        # Assume that it is an xml file
+        f = open(filename, 'r')
+        parser = vtkSMXMLParser()
+        if not parser.Parse(f.read()):
+            raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
+        parser.ProcessConfiguration(vtkSMObject.GetProxyManager())        
+        # Update the modules
+        updateModules()
             
 
 def Fetch(input, arg1=None, arg2=None, idx=0):

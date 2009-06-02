@@ -95,7 +95,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.80");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.81");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -830,6 +830,11 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
                                       const char* name, 
                                       vtkSMProxy* proxy)
 {
+  if (!proxy)
+    {
+    return;
+    }
+
   vtkSMProxyManagerProxyListType &proxy_list =
     this->Internals->RegisteredProxyMap[groupname][name];
   if (proxy_list.Contains(proxy))
