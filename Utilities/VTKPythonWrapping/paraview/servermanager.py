@@ -2040,6 +2040,15 @@ class _ModuleLoader(object):
         exec code in module.__dict__
         return module
 
+def LoadXML(xmlstring):
+    """Given a server manager XML as a string, parse and process it."""
+    parser = vtkSMXMLParser()
+    if not parser.Parse(xmlstring):
+        raise RuntimeError, "Problem parsing XML string."
+    parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
+    # Update the modules
+    updateModules()
+
 def LoadPlugin(filename, connection=None):
     """ Given a filename and a connection (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
@@ -2066,11 +2075,10 @@ def LoadPlugin(filename, connection=None):
         for i in xrange(xmlproperty.GetNumberOfElements()):
             xmlstring = xmlproperty.GetElement(i)
             if xmlstring:
-                parser = vtkSMXMLParser()
-                parser.Parse(xmlstring)
-                parser.ProcessConfiguration(vtkSMObject.GetProxyManager())
-                # Update the modules
-                updateModules()
+                try:
+                    LoadXML(xmlstring)
+                except RuntimeError:
+                    raise RuntimeError, "Error parsing the XML configuration in the plugin."
         # Get the python modules and load them
         pynameproperty = pld.GetProperty("PythonModuleNames");
         pysrcproperty = pld.GetProperty("PythonModuleSources");
@@ -2090,13 +2098,11 @@ def LoadPlugin(filename, connection=None):
     else:
         # Assume that it is an xml file
         f = open(filename, 'r')
-        parser = vtkSMXMLParser()
-        if not parser.Parse(f.read()):
+        try:
+            LoadXML(f.read())
+        except RuntimeError:
             raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
-        parser.ProcessConfiguration(vtkSMObject.GetProxyManager())        
-        # Update the modules
-        updateModules()
-            
+
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """

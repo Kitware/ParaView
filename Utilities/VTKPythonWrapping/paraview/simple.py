@@ -442,6 +442,17 @@ def GetActiveCamera():
     is an instance of vtkCamera."""
     return GetActiveView().GetActiveCamera()
 
+def LoadXML(xmlstring, ns=None):
+    """Given a server manager XML as a string, parse and process it.
+    If you loaded the simple module with from paraview.simple import *,
+    make sure to pass globals() as the second arguments:
+    LoadXML(xmlstring, globals())
+    Otherwise, the new functions will not appear in the global namespace."""
+    if not ns:
+        ns = globals()
+    servermanager.LoadXML(xmlstring)
+    _add_functions(ns)
+
 def LoadPlugin(filename, ns=None):
     """Loads a ParaView plugin and updates this module with new constructors
     if any. If you loaded the simple module with from paraview.simple import *,
