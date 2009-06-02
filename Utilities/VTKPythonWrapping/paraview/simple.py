@@ -416,7 +416,7 @@ def _add_functions(g):
             if not isinstance(cl, str):
                 if not key in g and _func_name_valid(key):
                     g[key] = _create_func(key, m)
-                    exec "g[key].__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key)
+                    exec "g[key].__doc__ = _create_doc(m.%s.__doc__, g[key].__doc__)" % key
 
 def GetActiveView():
     "Returns the active view."
