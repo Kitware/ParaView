@@ -414,12 +414,9 @@ def _add_functions(g):
         for key in dt.keys():
             cl = dt[key]
             if not isinstance(cl, str):
-                if _func_name_valid(key):
-                    try:
-                        exec "g[key] = _create_func(key, m)"
-                        exec "g[key].__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key)
-                    except NameError:
-                        pass
+                if not key in g and _func_name_valid(key):
+                    g[key] = _create_func(key, m)
+                    exec "g[key].__doc__ = _create_doc(m.%s.__doc__, %s.__doc__)" % (key, key)
 
 def GetActiveView():
     "Returns the active view."
