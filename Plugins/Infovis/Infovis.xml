@@ -223,6 +223,32 @@
       <IntVectorProperty name="Dimension" command="SetDimension" number_of_elements="1" default_values="0"/>
     </SourceProxy>
 
+    <SourceProxy name="MergeTables" class="vtkMergeTables">
+      <!-- Table 1 Input -->
+      <InputProperty name="Input1" command="SetInputConnection" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <!-- Table 2 Input -->
+      <InputProperty name="Input2" command="SetInputConnection" port_index="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
     <SourceProxy name="CollapseGraph" class="vtkCollapseGraph">
       <InputProperty name="Input" command="SetGraphConnection">
         <ProxyGroupDomain name="groups">
