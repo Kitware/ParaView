@@ -336,7 +336,7 @@ def _create_func(key, module):
 
         # Make sure non-keyword arguments are valid
         for inp in input:
-            if not isinstance(inp, servermanager.Proxy):
+            if inp != None and not isinstance(inp, servermanager.Proxy):
                 if px.GetProperty("Input") != None:
                     raise RuntimeError, "Expecting a proxy as input."
                 else:
