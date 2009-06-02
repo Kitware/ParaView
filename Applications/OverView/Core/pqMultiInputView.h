@@ -59,11 +59,15 @@ public:
   vtkImageData* captureImage(const QSize& asize)
     { return this->pqView::captureImage(asize); }
 
-protected:
+protected slots:
+  /// Implement this to perform the actual rendering.
+  /// Subclass should not override pqView::render(). This is the method to
+  /// override to update the internal VTK views.
+  virtual void renderInternal() {};
 
 private slots:
   void onRepresentationAdded(pqRepresentation*);
-  void onRepresentationVisibilityChanged(bool visible);
+  void onRepresentationVisibilityChanged(pqRepresentation*, bool visible);
   void onRepresentationUpdated();
   void onRepresentationRemoved(pqRepresentation*);
   void onStateLoaded();

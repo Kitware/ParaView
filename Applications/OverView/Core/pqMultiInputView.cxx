@@ -64,8 +64,11 @@ pqMultiInputView::pqMultiInputView(
 {
   this->connect(this, SIGNAL(representationAdded(pqRepresentation*)),
     SLOT(onRepresentationAdded(pqRepresentation*)));
+  this->connect(this, SIGNAL(representationVisibilityChanged(pqRepresentation*, bool)),
+    SLOT(onRepresentationVisibilityChanged(pqRepresentation*, bool)));
   this->connect(this, SIGNAL(representationRemoved(pqRepresentation*)),
     SLOT(onRepresentationRemoved(pqRepresentation*)));
+  this->connect(this, SIGNAL(endRender()), this, SLOT(renderInternal()));
   this->connect(pqApplicationCore::instance(), SIGNAL(stateLoaded()),
     SLOT(onStateLoaded()));
 }
@@ -87,21 +90,18 @@ vtkImageData* pqMultiInputView::captureImage(int)
 
 void pqMultiInputView::onRepresentationAdded(pqRepresentation* representation)
 {
-  QObject::connect(representation, SIGNAL(visibilityChanged(bool)), this, SLOT(onRepresentationVisibilityChanged(bool)));
+  //QObject::connect(representation, SIGNAL(visibilityChanged(bool)), this, SLOT(onRepresentationVisibilityChanged(bool)));
   QObject::connect(representation, SIGNAL(updated()), this, SLOT(onRepresentationUpdated()));
 
   this->showRepresentation(representation);
 }
 
-void pqMultiInputView::onRepresentationVisibilityChanged(bool visible)
+void pqMultiInputView::onRepresentationVisibilityChanged(pqRepresentation *rep, bool visible)
 {
-  pqRepresentation* const sender = qobject_cast<pqRepresentation*>(QObject::sender());
-  assert(sender);
-
   if(visible)
-    this->showRepresentation(sender);
+    this->showRepresentation(rep);
   else
-    this->hideRepresentation(sender);
+    this->hideRepresentation(rep);
 }
 
 void pqMultiInputView::onRepresentationUpdated()
