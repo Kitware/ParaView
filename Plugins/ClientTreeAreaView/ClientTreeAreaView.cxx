@@ -25,10 +25,9 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ClientHierarchyView.h"
+#include "ClientTreeAreaView.h"
 
-#include "ui_ClientHierarchyView.h"
-
+#include <QVTKWidget.h>
 #include <vtkAlgorithmOutput.h>
 #include <vtkAnnotationLink.h>
 #include <vtkAreaLayoutStrategy.h>
@@ -90,46 +89,40 @@
 #include <QBoxLayout>
 #include <QTimer>
 #include <QTreeView>
+#include <QPointer>
 
 ////////////////////////////////////////////////////////////////////////////////////
-// ClientHierarchyView::command
+// ClientTreeAreaView::command
 
-class ClientHierarchyView::command : public vtkCommand
+class ClientTreeAreaView::command : public vtkCommand
 {
 public:
-  command(ClientHierarchyView& view) : Target(view) { }
+  command(ClientTreeAreaView& view) : Target(view) { }
   virtual void Execute(vtkObject*, unsigned long, void*)
   {
     Target.selectionChanged();
   }
-  ClientHierarchyView& Target;
+  ClientTreeAreaView& Target;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
-// ClientHierarchyView::implementation
+// ClientTreeAreaView::implementation
 
-class ClientHierarchyView::implementation
+class ClientTreeAreaView::implementation
 {
 public:
   implementation() :
+    Widget(new QVTKWidget()),
     TreeRepresentation(0),
     GraphRepresentation(0),
     UpdateFlags(0)
   {
-    this->Widgets.setupUi(&this->Widget);
-    this->Widgets.horizontalSplitter->setSizes(QList<int>() << 100 << 400);
-    this->Widgets.graphView->setVisible(false);
+    new QVBoxLayout(this->Widget);
+    this->Widget->GetInteractor()->EnableRenderOff();
 
     this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateMellowTheme());
-    
-    this->TreeView = vtkSmartPointer<vtkQtTreeView>::New();
-    this->TreeWidget = qobject_cast<QTreeView*>(this->TreeView->GetWidget());
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(this->TreeWidget);
-    this->Widgets.treeFrame->setLayout(layout);
-
     this->HierarchicalGraphView = vtkSmartPointer<vtkTreeAreaView>::New();
-    this->Widgets.hierarchicalGraphView->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
+    this->Widget->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
     this->HierarchicalGraphView->ApplyViewTheme(this->HierarchicalGraphTheme);
     this->HierarchicalGraphView->SetEdgeColorToSplineFraction();
     //this->HierarchicalGraphView->SetUseRectangularCoordinates(true);
@@ -146,14 +139,9 @@ public:
   pqRepresentation* TreeRepresentation;
   pqRepresentation* GraphRepresentation;
 
-  vtkSmartPointer<vtkQtTreeView> TreeView;
-  QTreeView* TreeWidget;
-
-  QWidget Widget;
-  Ui::ClientHierarchyView Widgets;
+  const QPointer<QVTKWidget> Widget;
  
   vtkSmartPointer<vtkViewTheme> HierarchicalGraphTheme; 
-
   vtkSmartPointer<vtkTreeAreaView> HierarchicalGraphView;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkRenderedTreeAreaRepresentation> TreeAreaRepresentation;
@@ -176,9 +164,9 @@ enum
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-// ClientHierarchyView
+// ClientTreeAreaView
 
-ClientHierarchyView::ClientHierarchyView(
+ClientTreeAreaView::ClientTreeAreaView(
     const QString& viewmoduletype, 
     const QString& group, 
     const QString& name, 
@@ -197,9 +185,6 @@ ClientHierarchyView::ClientHierarchyView(
     this->Implementation->TreeAreaRepresentation->SetAnnotationLink(link);
     }
 
-  QObject::connect(this->Implementation->TreeWidget, SIGNAL(expanded(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
-  QObject::connect(this->Implementation->TreeWidget, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(treeVisibilityChanged()));
-
   QObject::connect(&this->Implementation->UpdateTimer, SIGNAL(timeout()), this, SLOT(synchronizeViews()));
 
   // Listen to all views that may fire progress events during updating.
@@ -209,21 +194,21 @@ ClientHierarchyView::ClientHierarchyView(
 
   this->Implementation->HierarchicalGraphView->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
-  this->Implementation->TreeView->AddObserver(
-    vtkCommand::SelectionChangedEvent, this->Command);
 
   this->Implementation->VTKConnect->Connect(
-    this->Implementation->Widgets.hierarchicalGraphView->GetInteractor(), vtkCommand::RenderEvent,
+    this->Implementation->HierarchicalGraphView->GetInteractor(), vtkCommand::RenderEvent,
     this, SLOT(forceRender()));
+
+  this->Implementation->HierarchicalGraphView->Render();
 }
 
-ClientHierarchyView::~ClientHierarchyView()
+ClientTreeAreaView::~ClientTreeAreaView()
 {
   delete this->Implementation;
   this->Command->Delete();
 }
 
-void ClientHierarchyView::selectionChanged()
+void ClientTreeAreaView::selectionChanged()
 {
   // Get the representaion's source
   pqDataRepresentation* pqRepr =
@@ -259,12 +244,12 @@ void ClientHierarchyView::selectionChanged()
     }
 }
 
-QWidget* ClientHierarchyView::getWidget()
+QWidget* ClientTreeAreaView::getWidget()
 {
-  return &this->Implementation->Widget;
+  return this->Implementation->Widget;
 }
 
-bool ClientHierarchyView::canDisplay(pqOutputPort* output_port) const
+bool ClientTreeAreaView::canDisplay(pqOutputPort* output_port) const
 {
   if(!output_port)
     return false;
@@ -299,7 +284,7 @@ bool ClientHierarchyView::canDisplay(pqOutputPort* output_port) const
   return false;
 }
 
-void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
+void ClientTreeAreaView::showRepresentation(pqRepresentation* representation)
 {
   vtkSMClientDeliveryRepresentationProxy* const proxy = vtkSMClientDeliveryRepresentationProxy::SafeDownCast(representation->getProxy());
   proxy->Update();
@@ -311,19 +296,10 @@ void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
      this->Implementation->TreeAreaRepresentation->GetNumberOfInputConnections(0) == 0)
     {
     this->Implementation->TreeRepresentation = representation;
-
-    vtkDataRepresentation* qttree_rep = this->Implementation->TreeView->
-      SetRepresentationFromInputConnection(output->GetProducerPort());
-    qttree_rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-
     this->Implementation->TreeAreaRepresentation->SetInput(tree);
     this->Implementation->HierarchicalGraphView->SetRepresentation(this->Implementation->TreeAreaRepresentation);
 
-    // Set tree selection link.
-    vtkAnnotationLink *link = this->Implementation->TreeAreaRepresentation->GetAnnotationLink();
-    qttree_rep->SetAnnotationLink(link);
-
-    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_TREE_VIEW | UPDATE_HGRAPH_VIEW );
+    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
   else if(graph)
     {
@@ -334,8 +310,9 @@ void ClientHierarchyView::showRepresentation(pqRepresentation* representation)
     }
 }
 
-void ClientHierarchyView::updateRepresentation(pqRepresentation* representation)
+void ClientTreeAreaView::updateRepresentation(pqRepresentation* representation)
 {
+/*
   if(this->Implementation->TreeRepresentation == representation)
     {
     this->scheduleSynchronization(DELIVER_TREE | RESET_HGRAPH_CAMERA | UPDATE_TREE_VIEW | UPDATE_HGRAPH_VIEW);
@@ -344,9 +321,10 @@ void ClientHierarchyView::updateRepresentation(pqRepresentation* representation)
     {
     this->scheduleSynchronization(DELIVER_GRAPH | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
+    */
 }
 
-void ClientHierarchyView::hideRepresentation(pqRepresentation* representation)
+void ClientTreeAreaView::hideRepresentation(pqRepresentation* representation)
 {
   if(this->Implementation->TreeRepresentation == representation)
     {
@@ -362,23 +340,18 @@ void ClientHierarchyView::hideRepresentation(pqRepresentation* representation)
     }
 }
 
-void ClientHierarchyView::renderInternal()
+void ClientTreeAreaView::renderInternal()
 {
   this->scheduleSynchronization(DELIVER_GRAPH | DELIVER_TREE | SYNC_ATTRIBUTES | UPDATE_HGRAPH_VIEW );
 }
 
-void ClientHierarchyView::treeVisibilityChanged()
-{
-  this->scheduleSynchronization(UPDATE_HGRAPH_VIEW);
-}
-
-void ClientHierarchyView::scheduleSynchronization(int update_flags)
+void ClientTreeAreaView::scheduleSynchronization(int update_flags)
 {
   this->Implementation->UpdateFlags |= update_flags;
   this->Implementation->UpdateTimer.start();
 }
 
-void ClientHierarchyView::synchronizeViews()
+void ClientTreeAreaView::synchronizeViews()
 {
   // Enable progress handling.
   emit this->beginProgress();
@@ -407,8 +380,6 @@ void ClientHierarchyView::synchronizeViews()
 
   if(tree_proxy && graph_proxy)
     {
-    vtkAnnotationLink* graph_link = this->Implementation->TreeAreaRepresentation->
-      GetAnnotationLink();
     vtkAnnotationLink* tree_link = this->Implementation->TreeAreaRepresentation->
       GetAnnotationLink();
 
@@ -416,14 +387,10 @@ void ClientHierarchyView::synchronizeViews()
     tree_proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       tree_proxy->GetSelectionRepresentation()->GetOutput());
-    graph_link->SetCurrentSelection(sel);
     tree_link->SetCurrentSelection(sel);
-    this->Implementation->TreeView->Update();
-    this->Implementation->HierarchicalGraphView->Update();
 
     // Set the current domain map
     int useDomainMap = vtkSMPropertyHelper(tree_proxy, "UseDomainMap").GetAsInt();
-    graph_link->RemoveAllDomainMaps();
     tree_link->RemoveAllDomainMaps();
     if (useDomainMap)
       {
@@ -445,7 +412,6 @@ void ClientHierarchyView::synchronizeViews()
         vtkTable* output = vtkTable::SafeDownCast(delivery->GetOutput());
         if (output)
           {
-          graph_link->AddDomainMap(output);
           tree_link->AddDomainMap(output);
           }
         }
@@ -480,7 +446,7 @@ void ClientHierarchyView::synchronizeViews()
           vtkSMPropertyHelper(tree_proxy, "AreaColor").GetAsDouble(1),
           vtkSMPropertyHelper(tree_proxy, "AreaColor").GetAsDouble(2));
         }
-/*
+
       QObjectList ifaces =
         pqApplicationCore::instance()->getPluginManager()->interfaces();
       foreach(QObject* iface, ifaces)
@@ -494,6 +460,7 @@ void ClientHierarchyView::synchronizeViews()
           if( strcmp(layout->GetClassName(), this->Implementation->HierarchicalGraphView->GetLayoutStrategy()->GetClassName()) != 0 )
             this->Implementation->UpdateFlags |= RESET_HGRAPH_CAMERA;
           layout->SetShrinkPercentage(vtkSMPropertyHelper(tree_proxy, "ShrinkPercentage").GetAsDouble());
+/*
           if(vtkBoxLayoutStrategy::SafeDownCast(layout) ||
             vtkSliceAndDiceLayoutStrategy::SafeDownCast(layout) ||
             vtkSquarifyLayoutStrategy::SafeDownCast(layout))
@@ -502,12 +469,13 @@ void ClientHierarchyView::synchronizeViews()
               vtkSmartPointer<vtkLabeledTreeMapDataMapper>::New();
             this->Implementation->HierarchicalGraphView->SetAreaLabelMapper(mapper);
             }
-          if(vtkStackedTreeLayoutStrategy::SafeDownCast(layout))
+*/
+          vtkStackedTreeLayoutStrategy* stLayout = vtkStackedTreeLayoutStrategy::SafeDownCast(layout);
+          if(stLayout)
             {
-            vtkStackedTreeLayoutStrategy* stLayout = vtkStackedTreeLayoutStrategy::SafeDownCast(layout);
-            stLayout->SetUseRectangularCoordinates(true);
-            stLayout->SetRootStartAngle(0.0);
-            stLayout->SetRootEndAngle(15.0);
+            //stLayout->SetUseRectangularCoordinates(true);
+            //stLayout->SetRootStartAngle(0.0);
+            //stLayout->SetRootEndAngle(15.0);
             stLayout->SetReverse(true);
             }
 
@@ -515,7 +483,7 @@ void ClientHierarchyView::synchronizeViews()
           break;
           }
         }
-*/
+
       this->Implementation->HierarchicalGraphView->SetEdgeLabelVisibility(vtkSMPropertyHelper(tree_proxy, "EdgeLabels").GetAsInt());
       this->Implementation->HierarchicalGraphView->SetEdgeLabelArrayName(vtkSMPropertyHelper(tree_proxy, "EdgeLabelArray").GetAsString());
       this->Implementation->HierarchicalGraphView->SetEdgeLabelFontSize(static_cast<int>(vtkSMPropertyHelper(tree_proxy, "EdgeLabelFontSize").GetAsDouble()));
@@ -547,15 +515,6 @@ void ClientHierarchyView::synchronizeViews()
     this->Implementation->HierarchicalGraphView->ResetCamera();
     }
 
-  // Update the tree view ...
-  if(this->Implementation->UpdateFlags & UPDATE_TREE_VIEW)
-    {
-    this->Implementation->TreeView->Update();
-    this->Implementation->TreeWidget->expandToDepth(2);
-    this->Implementation->TreeWidget->resizeColumnToContents(0);
-    this->Implementation->TreeWidget->resizeColumnToContents(1);
-    }
-
   // Update the hierarchical graph view ...
   if(this->Implementation->UpdateFlags & UPDATE_HGRAPH_VIEW)
     {
@@ -569,7 +528,7 @@ void ClientHierarchyView::synchronizeViews()
 }
 
 
-vtkImageData* ClientHierarchyView::captureImage(int magnification)
+vtkImageData* ClientTreeAreaView::captureImage(int magnification)
 {
 
   // Offscreen rendering is not functioning properly on the mac.
@@ -624,7 +583,7 @@ vtkImageData* ClientHierarchyView::captureImage(int magnification)
   return capture;
 }
 
-void ClientHierarchyView::onViewProgressEvent(vtkObject*, 
+void ClientTreeAreaView::onViewProgressEvent(vtkObject*, 
   unsigned long vtk_event, void*, void* call_data)
 {
   if (vtk_event == vtkCommand::ViewProgressEvent)

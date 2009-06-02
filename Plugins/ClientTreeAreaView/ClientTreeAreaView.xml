@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
  <ProxyGroup name="representations">
-   <SelectionDeliveryRepresentationProxy name="ClientHierarchyDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
+   <SelectionDeliveryRepresentationProxy name="ClientTreeAreaDisplay" base_proxygroup="representations" base_proxyname="SelectionDeliveryRepresentation">
 
       <StringVectorProperty name="LayoutStrategy" number_of_elements="1" default_values="StackedTree">
         <Hints>
@@ -103,7 +103,7 @@
 
       <DoubleVectorProperty name="EdgeBundlingStrength" number_of_elements="1" default_values="0.5"/>
 
-      <DoubleVectorProperty name="ShrinkPercentage" number_of_elements="1" default_values="0.25"/>
+      <DoubleVectorProperty name="ShrinkPercentage" number_of_elements="1" default_values="0.05"/>
      
       <Hints>
         <InheritRepresentationProperties>
@@ -132,7 +132,7 @@
  </ProxyGroup>
 
  <ProxyGroup name="views">
-   <ViewProxy name="ClientHierarchyView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientHierarchyDisplay">
+   <ViewProxy name="ClientTreeAreaView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientTreeAreaDisplay">
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

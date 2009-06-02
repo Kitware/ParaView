@@ -25,8 +25,8 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "ClientHierarchyDisplay.h"
-#include "ui_ClientHierarchyDisplay.h"
+#include "ClientTreeAreaDisplay.h"
+#include "ui_ClientTreeAreaDisplay.h"
 
 #include "IconDialog.h"
 
@@ -50,7 +50,7 @@
 
 #include <iostream>
 
-class ClientHierarchyDisplay::implementation
+class ClientTreeAreaDisplay::implementation
 {
 public:
   implementation() :
@@ -66,7 +66,7 @@ public:
     delete this->AreaColorAdaptor;
   }
 
-  Ui::ClientHierarchyDisplay Widgets;
+  Ui::ClientTreeAreaDisplay Widgets;
 
   pqPropertyLinks Links;
   pqSignalAdaptorColor* AreaColorAdaptor;
@@ -74,7 +74,7 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
-ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation, QWidget* p) :
+ClientTreeAreaDisplay::ClientTreeAreaDisplay(pqRepresentation* representation, QWidget* p) :
   pqDisplayPanel(representation, p),
   Implementation(new implementation())
 {
@@ -354,12 +354,12 @@ ClientHierarchyDisplay::ClientHierarchyDisplay(pqRepresentation* representation,
     this, SLOT(updateAllViews()));
 }
 
-ClientHierarchyDisplay::~ClientHierarchyDisplay()
+ClientTreeAreaDisplay::~ClientTreeAreaDisplay()
 {
   delete this->Implementation;
 }
 
-void ClientHierarchyDisplay::onProxyDomainMapChanged()
+void ClientTreeAreaDisplay::onProxyDomainMapChanged()
 {
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(this->getRepresentation()->getProxy());
   if (vtkSMPropertyHelper(proxy, "DomainMap").GetNumberOfElements() > 0)
@@ -373,7 +373,7 @@ void ClientHierarchyDisplay::onProxyDomainMapChanged()
     }
 }
 
-void ClientHierarchyDisplay::onComboBoxDomainMapChanged()
+void ClientTreeAreaDisplay::onComboBoxDomainMapChanged()
 {
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(this->getRepresentation()->getProxy());
   pqPipelineSource* const pqsource = this->Implementation->Widgets.domainMap->currentSource();

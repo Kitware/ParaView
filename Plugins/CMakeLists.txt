@@ -24,7 +24,6 @@ paraview_build_optional_plugin(Array "Array" Array OFF)
 paraview_build_optional_plugin(ClientGeoView "ClientGeoView" ClientGeoView OFF)
 paraview_build_optional_plugin(ClientGeoView2D "ClientGeoView2D" ClientGeoView2D OFF)
 paraview_build_optional_plugin(ClientGraphView "ClientGraphView" ClientGraphView OFF)
-paraview_build_optional_plugin(ClientHierarchyView "ClientHierarchyView" ClientHierarchyView OFF)
 paraview_build_optional_plugin(ClientRecordView "ClientRecordView" ClientRecordView OFF)
 paraview_build_optional_plugin(ClientRichTextView "ClientRichTextView" ClientRichTextView OFF)
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
@@ -46,4 +45,5 @@ paraview_build_optional_plugin(TableToGraphPanel "TableToGraphPanel" TableToGrap
 paraview_build_optional_plugin(TableToSparseArrayPanel "TableToSparseArrayPanel" TableToSparseArrayPanel OFF) 
 paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
 paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF) 
+paraview_build_optional_plugin(ClientTreeAreaView "ClientTreeAreaView" ClientTreeAreaView OFF) 
 

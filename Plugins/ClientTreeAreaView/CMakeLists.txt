@@ -1,13 +1,12 @@
 INCLUDE(${QT_USE_FILE})
 
 QT4_WRAP_CPP(MOC_SRCS
-  ClientHierarchyDisplay.h
-  ClientHierarchyView.h
+  ClientTreeAreaDisplay.h
+  ClientTreeAreaView.h
   )
 
 SET(UI_FORMS
-  ClientHierarchyDisplay.ui
-  ClientHierarchyView.ui
+  ClientTreeAreaDisplay.ui
   )
 
 QT4_WRAP_UI(
@@ -16,8 +15,8 @@ QT4_WRAP_UI(
   )
 
 SET(SOURCES
-  ClientHierarchyDisplay.cxx
-  ClientHierarchyView.cxx
+  ClientTreeAreaDisplay.cxx
+  ClientTreeAreaView.cxx
   )
 
 INCLUDE_DIRECTORIES(
@@ -38,21 +37,21 @@ INCLUDE_DIRECTORIES(
 
 ADD_PARAVIEW_VIEW_MODULE(
   IFACES IFACE_SRCS
-  VIEW_TYPE ClientHierarchyView
-  VIEW_NAME "Hierarchy View"
+  VIEW_TYPE ClientTreeAreaView
+  VIEW_NAME "TreeArea View"
   VIEW_XML_GROUP views
-  DISPLAY_XML ClientHierarchyDisplay
-  DISPLAY_PANEL ClientHierarchyDisplay)
+  DISPLAY_XML ClientTreeAreaDisplay
+  DISPLAY_PANEL ClientTreeAreaDisplay)
 
 ADD_PARAVIEW_PLUGIN(
-  ClientHierarchyViewPlugin "1.0"
+  ClientTreeAreaViewPlugin "1.0"
   GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
   SOURCES ${SOURCES} ${MOC_SRCS} ${UI_BUILT_SOURCES} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS}
-  SERVER_MANAGER_XML ClientHierarchyView.xml
+  SERVER_MANAGER_XML ClientTreeAreaView.xml
   )
 
 TARGET_LINK_LIBRARIES(
-  ClientHierarchyViewPlugin
+  ClientTreeAreaViewPlugin
   OverViewCore
   )
 
