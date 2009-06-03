@@ -1711,6 +1711,7 @@
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type">
           <DataType value="vtkAnnotationLayers"/>
+          <DataType value="vtkSelection"/>
         </DataTypeDomain>
       </InputProperty>
 
