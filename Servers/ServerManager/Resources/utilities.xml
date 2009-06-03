@@ -1703,9 +1703,21 @@
     </Proxy>
 
     <SourceProxy name="AnnotationLink" class="vtkAnnotationLink">
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkAnnotationLayers"/>
+        </DataTypeDomain>
+      </InputProperty>
+
       <OutputPort name="Annotations" index="0"/>
       <OutputPort name="Domain Maps" index="1"/>
       <OutputPort name="Selection" index="2"/>
+
     </SourceProxy>
 
   </ProxyGroup>
