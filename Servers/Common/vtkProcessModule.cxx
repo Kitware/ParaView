@@ -26,6 +26,7 @@
 #include "vtkDataObject.h"
 #include "vtkInstantiator.h"
 #include "vtkKWProcessStatistics.h"
+#include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiThreader.h"
 #include "vtkObjectFactory.h"
@@ -136,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.92");
+vtkCxxRevisionMacro(vtkProcessModule, "1.92.2.1");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -191,6 +192,9 @@ vtkProcessModule::vtkProcessModule()
   // bufferring issues with send on some implementations.
   vtkMPIController::SetUseSsendForRMI(1);
 #endif
+
+  vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
+  vtkMapper::SetResolveCoincidentTopologyZShift(2.0e-3);
 }
 
 //-----------------------------------------------------------------------------
