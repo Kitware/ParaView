@@ -37,6 +37,7 @@
 #include <vtkDataObjectTypes.h>
 #include <vtkDataRepresentation.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkEventQtSlotConnect.h>
 #include <vtkGraph.h>
 #include <vtkIdTypeArray.h>
 #include <vtkIntArray.h>
@@ -92,6 +93,7 @@ public:
     layout->setContentsMargins(0,0,0,0);
     this->AttributeType = -1;
     this->LastSelectionMTime = 0;
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   }
 
   ~implementation()
@@ -105,6 +107,7 @@ public:
   int AttributeType;
   vtkSmartPointer<vtkQtRichTextView> View;
   QPointer<QWidget> Widget;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +126,11 @@ ClientRichTextView::ClientRichTextView(
 {
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
+
+  // Listen to all views that may fire progress events during updating.
+  this->Implementation->VTKConnect->Connect(
+    this->Implementation->View, vtkCommand::ViewProgressEvent,
+    this, SLOT(onViewProgressEvent(vtkObject*, unsigned long, void*, void*)));
 
 //  new ClientRichTextViewDecorator(this);
 }
@@ -201,6 +209,19 @@ bool ClientRichTextView::canDisplay(pqOutputPort* output_port) const
     }
 
   return false;
+}
+
+void ClientRichTextView::onViewProgressEvent(vtkObject*,
+  unsigned long vtk_event, void*, void* call_data)
+{
+  if (vtk_event == vtkCommand::ViewProgressEvent)
+    {
+    const vtkView::ViewProgressEventCallData* data = 
+      reinterpret_cast<const vtkView::ViewProgressEventCallData*>(call_data);
+
+    emit this->progress(QString(data->GetProgressMessage()), 
+      static_cast<int>(data->GetProgress()*100.0));
+    }
 }
 
 void ClientRichTextView::updateRepresentation(pqRepresentation* repr)

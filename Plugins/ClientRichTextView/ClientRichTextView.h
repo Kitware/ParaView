@@ -31,6 +31,7 @@
 #include <pqSingleInputView.h>
 
 class QItemSelection;
+class vtkObject;
 class vtkSelection;
 
 class ClientRichTextView : public pqSingleInputView
@@ -54,6 +55,10 @@ public:
 protected:
   /// Implement this to perform the actual rendering.
   virtual void renderInternal();
+
+private slots:
+  void onViewProgressEvent(vtkObject*,
+    unsigned long vtk_event, void*, void* call_data);
 
 private:
   void showRepresentation(pqRepresentation*);
