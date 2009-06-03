@@ -40,10 +40,12 @@ public:
   bool Process_3_0_To_3_2(vtkPVXMLElement* root);
   bool Process_3_2_To_3_4(vtkPVXMLElement* root);
   bool Process_3_4_to_3_6(vtkPVXMLElement* root);
+  bool Process_3_6_to_3_8(vtkPVXMLElement* root);
 
 //BTX
   bool ConvertViewModulesToViews(vtkPVXMLElement* parent);
   bool ConvertLegacyReader(vtkPVXMLElement* parent);
+  bool ConvertStreamTracer(vtkPVXMLElement* parent);
   bool ConvertPVAnimationSceneToAnimationScene(vtkPVXMLElement* parent);
 protected:
   vtkSMStateVersionController();

@@ -22,7 +22,7 @@
 #include "vtksys/ios/sstream"
 
 vtkStandardNewMacro(vtkSMStateVersionController);
-vtkCxxRevisionMacro(vtkSMStateVersionController, "1.15");
+vtkCxxRevisionMacro(vtkSMStateVersionController, "1.16");
 //----------------------------------------------------------------------------
 vtkSMStateVersionController::vtkSMStateVersionController()
 {
@@ -71,7 +71,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
       }
     status = status && this->Process_3_0_To_3_2(root) ;
 
-    // Since now the state file has been update to version 3.2.0, we must update
+    // Since now the state file has been updated to version 3.2.0, we must update
     // the version number to reflect that.
     int updated_version[3] = {3, 2, 0};
     this->UpdateVersion(version, updated_version);
@@ -82,7 +82,7 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     {
     status = status && this->Process_3_2_To_3_4(root) ;
 
-    // Since now the state file has been update to version 3.4.0, we must update
+    // Since now the state file has been updated to version 3.4.0, we must update
     // the version number to reflect that.
     int updated_version[3] = {3, 4, 0};
     this->UpdateVersion(version, updated_version);
@@ -92,17 +92,27 @@ bool vtkSMStateVersionController::Process(vtkPVXMLElement* root)
     this->GetMinor(version) < 6)
     {
     status = status && this->Process_3_4_to_3_6(root);
-    // Since now the state file has been update to version 3.6.0, we must update
+    // Since now the state file has been updated to version 3.6.0, we must update
     // the version number to reflect that.
     int updated_version[3] = {3, 6, 0};
     this->UpdateVersion(version, updated_version);
+    }
+    
+  if ( this->GetMajor( version ) == 3 && this->GetMinor( version ) < 8 )
+    {
+    status = status && this->Process_3_6_to_3_8( root );
+    // Since now the state file has been updated to version 3.8.0, we must update
+    // the version number to reflect that.
+    int updated_version[3] = { 3, 8, 0 };
+    this->UpdateVersion( version, updated_version );
     }
 
   return status;
 }
 
-namespace
+namespace // namespace begin
 {
+
 //----------------------------------------------------------------------------
 bool ConvertViewModulesToViews(
   vtkPVXMLElement* root, void* callData)
@@ -316,8 +326,17 @@ bool ConvertPVAnimationSceneToAnimationScene(
     vtkSMStateVersionController*>(callData);
   return self->ConvertPVAnimationSceneToAnimationScene(root);
 }
+
+//----------------------------------------------------------------------------
+bool ConvertStreamTracer( vtkPVXMLElement * root, void * callData )
+{
+  vtkSMStateVersionController * self 
+    = reinterpret_cast< vtkSMStateVersionController * >( callData );
+  return self->ConvertStreamTracer( root );
 }
-;
+
+}; // namespace end
+
 //----------------------------------------------------------------------------
 bool vtkSMStateVersionController::Process_3_0_To_3_2(vtkPVXMLElement* root)
 {
@@ -771,6 +790,51 @@ bool vtkSMStateVersionController::Process_3_4_to_3_6(vtkPVXMLElement* root)
     this->SelectAndSetAttributes(root, "Proxy", attrs, newAttrs);
     }
 
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::ConvertStreamTracer(vtkPVXMLElement* parent)
+{
+  // Replace property "InitialIntegrationStepUnit" with property 
+  // "IntegrationStepUnit", ignoring properties "MinimumIntegrationStepUnit",
+  // "MaximumIntegrationStepUnit", and "MaximumPropagationUnit".
+  const char* attrs[]    = { "name", "InitialIntegrationStepUnit", 0 };
+  const char* newAttrs[] = { "name", "IntegrationStepUnit",        0 };
+  this->SelectAndSetAttributes( parent, "Property", attrs, newAttrs );
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMStateVersionController::Process_3_6_to_3_8( vtkPVXMLElement * root )
+{
+    {
+    // Upon any occurrence of StreamTracer or ArbitrarySourceStreamTracer, a
+    // warning message pops up, indicating the changes to vtkStreamTracer
+    bool found0 = false;
+    bool found1 = false;
+    const char * attrs0[] = { "type", "StreamTracer",                0 };
+    const char * attrs1[] = { "type", "ArbitrarySourceStreamTracer", 0 };
+    this->Select( root, "Proxy", attrs0, &::ElementFound, &found0 );
+    this->Select( root, "Proxy", attrs1, &::ElementFound, &found1 );
+    
+    if ( found0 || found1 )
+      {
+      vtkWarningMacro( "Your state file uses (vtk)StreamTracer. "
+        "vtkStreamTracer has undergone considerable changes in 3.8 and it's"
+        " possible that the state may not be loaded correctly or some of"
+        " the settings may be converted to values other than specified." );
+      }
+    }
+    
+    {
+    // Replace abandoned properties of vtkStreamTracer with new ones
+    const char* attrs0[] = { "type", "StreamTracer",                0 };
+    const char* attrs1[] = { "type", "ArbitrarySourceStreamTracer", 0 };
+    this->Select( root, "Proxy", attrs0, &::ConvertStreamTracer, this );
+    this->Select( root, "Proxy", attrs1, &::ConvertStreamTracer, this );
+    }
+    
   return true;
 }
 
