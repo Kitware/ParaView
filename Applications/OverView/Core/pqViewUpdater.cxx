@@ -82,5 +82,7 @@ void pqViewUpdater::AddLink(pqProxy* annotation_link)
   command->SetClientData(this->Internal);
 
   client_annotation_link->AddObserver(vtkCommand::AnnotationChangedEvent, command);
+
+  command->Delete();
 }
 
