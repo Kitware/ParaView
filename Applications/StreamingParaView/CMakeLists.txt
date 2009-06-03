@@ -6,6 +6,8 @@ SET(QT_USE_QTNETWORK TRUE) # QtAssistant depends on it (only for linking)
 SET(QT_USE_QTUITOOLS TRUE)
 INCLUDE(${QT_USE_FILE})
 
+add_subdirectory(Plugin)
+
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)

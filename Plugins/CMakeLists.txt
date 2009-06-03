@@ -12,12 +12,6 @@ MACRO(paraview_build_optional_plugin name comment subdirectory default)
   ENDIF(PARAVIEW_BUILD_PLUGIN_${name})
 ENDMACRO(paraview_build_optional_plugin)
 
-if (PARAVIEW_BUILD_StreamingParaView)
-  add_subdirectory(Streaming)
-else (PARAVIEW_BUILD_StreamingParaView)
-  paraview_build_optional_plugin(Streaming "Streaming Plugin" Streaming OFF)
-endif (PARAVIEW_BUILD_StreamingParaView)
-
 paraview_build_optional_plugin(Array "Array" Array OFF)
 #paraview_build_optional_plugin(ChartViewFrame "ChartViewFrame" ChartViewFrame OFF)
 #paraview_build_optional_plugin(ClientChartView "ClientChartView" ClientChartView OFF)
