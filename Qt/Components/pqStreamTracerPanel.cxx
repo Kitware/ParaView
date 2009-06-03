@@ -18,7 +18,7 @@
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR 
 A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
 CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
 EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
@@ -404,9 +404,7 @@ void pqStreamTracerPanel::onIntegratorTypeChanged(int index)
     {
     enabled = true;
     }
-  this->Implementation->UI.MinimumIntegrationStepUnit->setEnabled(enabled);
-  this->Implementation->UI.MinimumIntegrationStep->setEnabled(enabled);
-  this->Implementation->UI.MaximumIntegrationStepUnit->setEnabled(enabled);
+  this->Implementation->UI.MinimumIntegrationStep->setEnabled(enabled); 
   this->Implementation->UI.MaximumIntegrationStep->setEnabled(enabled);
   this->Implementation->UI.MaximumError->setEnabled(enabled);
 }

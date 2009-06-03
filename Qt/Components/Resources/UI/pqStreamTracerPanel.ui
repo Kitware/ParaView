@@ -1,11 +1,14 @@
 <ui version="4.0" >
  <class>pqStreamTracerPanel</class>
  <widget class="QWidget" name="pqStreamTracerPanel" >
+  <property name="enabled" >
+   <bool>true</bool>
+  </property>
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
+    <width>316</width>
     <height>623</height>
    </rect>
   </property>
@@ -52,29 +55,6 @@
       <property name="verticalSpacing" >
        <number>6</number>
       </property>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Max. Propagation</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="MaximumPropagationUnit" />
-      </item>
-      <item row="7" column="0" >
-       <widget class="QLabel" name="label_9" >
-        <property name="text" >
-         <string>Minimum Step Length</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label_7" >
         <property name="text" >
@@ -82,57 +62,20 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="InitialIntegrationStepUnit" />
-      </item>
-      <item row="5" column="1" >
-       <widget class="QLineEdit" name="TerminalSpeed" />
-      </item>
-      <item row="8" column="1" >
-       <widget class="QComboBox" name="MaximumIntegrationStepUnit" />
-      </item>
-      <item row="7" column="1" >
-       <widget class="QComboBox" name="MinimumIntegrationStepUnit" />
-      </item>
-      <item row="1" column="2" >
-       <widget class="QLineEdit" name="MaximumPropagation" />
-      </item>
       <item row="0" column="1" >
        <widget class="QComboBox" name="SelectInputVectors" />
       </item>
+      <item row="3" column="0" >
+       <widget class="QLabel" name="label_12" >
+        <property name="text" >
+         <string>Integration Step Unit</string>
+        </property>
+       </widget>
+      </item>
       <item row="3" column="1" >
-       <widget class="QComboBox" name="IntegrationDirection" />
+       <widget class="QComboBox" name="IntegrationStepUnit" />
       </item>
       <item row="4" column="0" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>Max. Steps</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0" >
-       <widget class="QLabel" name="label_6" >
-        <property name="text" >
-         <string>Integrator Type</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="2" >
-       <widget class="QLineEdit" name="MaximumIntegrationStep" />
-      </item>
-      <item row="2" column="2" >
-       <widget class="QLineEdit" name="InitialIntegrationStep" />
-      </item>
-      <item row="9" column="1" >
-       <widget class="QLineEdit" name="MaximumError" />
-      </item>
-      <item row="7" column="2" >
-       <widget class="QLineEdit" name="MinimumIntegrationStep" />
-      </item>
-      <item row="2" column="0" >
        <widget class="QLabel" name="label_2" >
         <property name="text" >
          <string>Initial Step Length</string>
@@ -142,46 +85,89 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="1" >
-       <widget class="QComboBox" name="IntegratorType" />
-      </item>
-      <item row="5" column="0" >
-       <widget class="QLabel" name="label_5" >
-        <property name="text" >
-         <string>Term. Speed</string>
-        </property>
-       </widget>
+      <item row="4" column="1" >
+       <widget class="QLineEdit" name="InitialIntegrationStep" />
       </item>
       <item row="8" column="0" >
-       <widget class="QLabel" name="label_10" >
+       <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>Maximum Step Length</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
+         <string>Maximum Steps</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>Integration Direction</string>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" >
+      <item row="8" column="1" >
        <widget class="QLineEdit" name="MaximumNumberOfSteps" />
       </item>
-      <item row="9" column="0" >
+      <item row="10" column="0" >
+       <widget class="QLabel" name="label_5" >
+        <property name="text" >
+         <string>Terminal Speed</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1" >
+       <widget class="QLineEdit" name="TerminalSpeed" />
+      </item>
+      <item row="13" column="0" >
        <widget class="QLabel" name="label_8" >
         <property name="text" >
          <string>Maximum Error</string>
         </property>
         <property name="wordWrap" >
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="1" >
+       <widget class="QLineEdit" name="MaximumError" />
+      </item>
+      <item row="5" column="0" >
+       <widget class="QLabel" name="label_9" >
+        <property name="text" >
+         <string>Minimum Step Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1" >
+       <widget class="QLineEdit" name="MinimumIntegrationStep" />
+      </item>
+      <item row="6" column="0" >
+       <widget class="QLabel" name="label_10" >
+        <property name="text" >
+         <string>Maximum Step Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1" >
+       <widget class="QLineEdit" name="MaximumIntegrationStep" />
+      </item>
+      <item row="2" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>Integrator Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" >
+       <widget class="QComboBox" name="IntegratorType" />
+      </item>
+      <item row="9" column="1" >
+       <widget class="QLineEdit" name="MaximumPropagation" />
+      </item>
+      <item row="9" column="0" >
+       <widget class="QLabel" name="label" >
+        <property name="text" >
+         <string>Maximum Streamline Length</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QComboBox" name="IntegrationDirection" />
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_3" >
+        <property name="text" >
+         <string>Integration Direction</string>
         </property>
        </widget>
       </item>
@@ -236,7 +222,7 @@
       <item row="1" column="0" colspan="2" >
        <widget class="QStackedWidget" name="stackedWidget" >
         <property name="currentIndex" >
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pointSource" />
         <widget class="QWidget" name="lineSource" />
@@ -268,23 +254,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>SelectInputVectors</tabstop>
-  <tabstop>MaximumPropagationUnit</tabstop>
-  <tabstop>MaximumPropagation</tabstop>
-  <tabstop>InitialIntegrationStepUnit</tabstop>
-  <tabstop>InitialIntegrationStep</tabstop>
-  <tabstop>IntegrationDirection</tabstop>
-  <tabstop>MaximumNumberOfSteps</tabstop>
-  <tabstop>TerminalSpeed</tabstop>
-  <tabstop>IntegratorType</tabstop>
-  <tabstop>MinimumIntegrationStepUnit</tabstop>
-  <tabstop>MinimumIntegrationStep</tabstop>
-  <tabstop>MaximumIntegrationStepUnit</tabstop>
-  <tabstop>MaximumIntegrationStep</tabstop>
-  <tabstop>MaximumError</tabstop>
-  <tabstop>seedType</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>
