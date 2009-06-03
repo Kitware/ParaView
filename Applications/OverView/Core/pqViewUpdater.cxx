@@ -20,9 +20,11 @@
 
 #include "pqViewUpdater.h"
 
+#include <vtkAbstractArray.h>
 #include <vtkAnnotationLink.h>
 #include <vtkCallbackCommand.h>
 #include <vtkSelection.h>
+#include <vtkSelectionNode.h>
 #include <vtkSMProxy.h>
 
 #include <pqView.h>
@@ -45,7 +47,21 @@ public:
   {
     if(this->Debugging)
       {
-      vtkAnnotationLink::SafeDownCast(object)->GetCurrentSelection()->Print(cerr);
+      cerr << "New selection:" << endl;
+      if(vtkSelection* const selection = vtkAnnotationLink::SafeDownCast(object)->GetCurrentSelection())
+        {
+        selection->Print(cerr);
+        if(vtkSelectionNode* const selection_node = selection->GetNumberOfNodes() ? selection->GetNode(0) : 0)
+          {
+          if(vtkAbstractArray* const selection_array = selection_node->GetSelectionList())
+            {
+            for(vtkIdType i = 0; i != selection_array->GetNumberOfTuples(); ++i)
+              {
+              cerr << selection_array->GetVariantValue(i).ToString() << endl;
+              }
+            }
+          }
+        }
       }
     
     if(!this->View)
