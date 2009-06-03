@@ -44,6 +44,8 @@ public:
   void SetView(pqView* const view);
   void AddLink(pqProxy* annnotation_link);
 
+  void EnableDebugging(int enabled);
+
 //BTX
 private:
   pqViewUpdater(const pqViewUpdater&);  // Not implemented.

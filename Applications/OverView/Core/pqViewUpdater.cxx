@@ -22,6 +22,7 @@
 
 #include <vtkAnnotationLink.h>
 #include <vtkCallbackCommand.h>
+#include <vtkSelection.h>
 #include <vtkSMProxy.h>
 
 #include <pqView.h>
@@ -30,7 +31,8 @@ class pqViewUpdater::Implementation
 {
 public:
   Implementation() :
-    View(0)
+    View(0),
+    Debugging(0)
   {
   }
 
@@ -41,16 +43,21 @@ public:
 
   virtual void Execute(vtkObject* object, unsigned long event, void* call_data)
   {
+    if(this->Debugging)
+      {
+      vtkAnnotationLink::SafeDownCast(object)->GetCurrentSelection()->Print(cerr);
+      }
+    
     if(!this->View)
       {
       vtkGenericWarningMacro(<< "View not set.");
       return;
       }
-
     this->View->render();
   }
 
   pqView* View;
+  int Debugging;
 };
 
 pqViewUpdater::pqViewUpdater()
@@ -84,5 +91,10 @@ void pqViewUpdater::AddLink(pqProxy* annotation_link)
   client_annotation_link->AddObserver(vtkCommand::AnnotationChangedEvent, command);
 
   command->Delete();
+}
+
+void pqViewUpdater::EnableDebugging(int enabled)
+{
+  this->Internal->Debugging = enabled;
 }
 
