@@ -5097,12 +5097,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
       </InputProperty>
 
      <StringVectorProperty 
-        name="SelectInputVectors" 
-        command="SetInputArrayToProcess"
-        number_of_elements="5"
-        element_types="0 0 0 0 2"
-        animateable="0"
-        label="Vectors">
+       name="SelectInputVectors" 
+       command="SetInputArrayToProcess"
+       number_of_elements="5"
+       element_types="0 0 0 0 2"
+       animateable="0"
+       label="Vectors">
            <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -5114,190 +5114,143 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
      </StringVectorProperty>
 
      <IntVectorProperty
-        name="NumberOfPoints"
-        number_of_elements="1"
-        default_values="100"
-        information_only="1"/>
-
+       name="NumberOfPoints"
+       number_of_elements="1"
+       default_values="100"
+       information_only="1"/>
+       
      <IntVectorProperty 
-        name="MaximumPropagationUnit" 
-        label="Max. Propagation Unit"
-        command="SetMaximumPropagationUnit" 
-        number_of_elements="1"
-        default_values="1" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property indicates the unit for specifying the maximum streamline length. The Time (0) unit is the time a particle would travel with steady flow. The Length (1) unit is specified in the dataset's spatial coordinates.
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="MaximumPropagation"
-        label="Max. Propagation"
-        command="SetMaximumPropagation"
-        number_of_elements="1"
-        default_values="1.0" >
-       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
-         <RequiredProperties>
-            <Property name="Input" function="Input"/>
-         </RequiredProperties>
-       </BoundsDomain>
-       <Documentation>
-         The value of this property specifies the maximum streamline length. If the streamline length goes beyond this value, integration of that strealine terminates.
-       </Documentation>       
-     </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="InitialIntegrationStepUnit" 
-        label="Initial Step Unit"
-        command="SetInitialIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property indicates the unit for specifying the initial integration step. The Time (0) and Length (1) units have the same meaning as that specified in the MaximumPropagationUnit property. The Cell Length (2) unit specifies the step length as a number of cells.
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="InitialIntegrationStep"
-        label="Initial Step Length"
-        command="SetInitialIntegrationStep"
-        number_of_elements="1"
-        default_values="0.5" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         The value of this property specifies the initial integration step. For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="IntegrationDirection" 
-        command="SetIntegrationDirection" 
-        number_of_elements="1"
-        default_values="2" >
+       name="IntegrationDirection" 
+       command="SetIntegrationDirection" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="FORWARD"/>
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
        </EnumerationDomain>
        <Documentation>
-         This property determines in which direction(s) the stream trace will be generated.
+         This property determines in which direction(s) a streamline is generated.
        </Documentation>
      </IntVectorProperty>
-
+       
      <IntVectorProperty 
-        name="IntegratorType" 
-        command="SetIntegratorType" 
-        number_of_elements="1"
-        default_values="0" >
+       name="IntegratorType" 
+       command="SetIntegratorType" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="Runge-Kutta 2"/>
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
        </EnumerationDomain>
        <Documentation>
-         This property determines which calculation to use for integration.
+         This property determines which integrator (with increasing accuracy) to use for creating streamlines.
        </Documentation>
      </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="MaximumError"
-        command="SetMaximumError"
-        number_of_elements="1"
-        default_values="0.000001" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         This property specifies the maximum error allowed in the integration. The meaning of this value depends on the integrator chosen. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of this property.
-       </Documentation>
-     </DoubleVectorProperty>
-
+             
      <IntVectorProperty 
-        name="MinimumIntegrationStepUnit" 
-        label="Minimum Step Unit"
-        command="SetMinimumIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
+       name="IntegrationStepUnit"
+       label="Integration Step Unit"
+       command="SetIntegrationStepUnit" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
        <Documentation>
-         If the Runge-Kutta 4-5 integrator is selected (IntegratorType property), this property determines the unit to use for specifying the minimum integration step. Time (0), Length (1), and Cell Length (2) have the same meanings as those indicated for the InitialIntegrationStepUnit property.
+           This property indicates the unit for specifying the Minimum/Initial/Maximum integration step. The Time unit specifies the time interval a particle is allowed to travel/advect in a steady flow. The Cell Length unit specifies the step length as a number of cells.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty>  
 
      <DoubleVectorProperty
-        name="MinimumIntegrationStep"
-        label="Minimum Step Length"
-        command="SetMinimumIntegrationStep"
-        number_of_elements="1"
-        default_values="0.01" >
+       name="InitialIntegrationStep"
+       label="Initial Step Length"
+       command="SetInitialIntegrationStep"
+       number_of_elements="1"
+       default_values="0.2" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If using the Runge-Kutta 4-5 ingrator (IntegratorType property), this property specifies the minimum integration step.
+         This property specifies the initial integration step. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), the step size is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies.
+       </Documentation>
+     </DoubleVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MinimumIntegrationStep"
+       label="Minimum Step Length"
+       command="SetMinimumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step.
        </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="MaximumIntegrationStepUnit" 
-        label="Maximum Step Unit"
-        command="SetMaximumIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         If the Runge-Kutta 4-5 integrator is selected (IntegratorType property), this property determines the unit to use for specifying the maximum integration step. Time (0), Length (1), and Cell Length (2) have the same meanings as those indicated for the InitialIntegrationStepUnit property.
-       </Documentation>
-     </IntVectorProperty>
-
      <DoubleVectorProperty
-        name="MaximumIntegrationStep"
-        label="Maximum Step Length"
-        command="SetMaximumIntegrationStep"
-        number_of_elements="1"
-        default_values="0.5" >
+       name="MaximumIntegrationStep"
+       label="Maximum Step Length"
+       command="SetMaximumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.5" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If using the Runge-Kutta 4-5 ingrator (IntegratorType property), this property specifies the minimum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step.
        </Documentation>
-     </DoubleVectorProperty>
+     </DoubleVectorProperty>  
 
      <IntVectorProperty 
-        name="MaximumNumberOfSteps" 
-        label="Max. Steps"
-        command="SetMaximumNumberOfSteps" 
-        number_of_elements="1"
-        default_values="2000" >
+       name="MaximumNumberOfSteps" 
+       label="Maximum Steps"
+       command="SetMaximumNumberOfSteps" 
+       number_of_elements="1"
+       default_values="2000" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         If the integration takes more steps to complete than indicated by this property, the integration terminates.
+         This property specifies the maximum number of steps, beyond which streamline integration is terminated.
        </Documentation>
      </IntVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MaximumPropagation"
+       label="Maximum Streamline Length"
+       command="SetMaximumPropagation"
+       number_of_elements="1"
+       default_values="1.0" >
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+       <Documentation>
+         This property specifies the maximum streamline length (i.e., physical arc length), beyond which integration is terminated.
+       </Documentation>       
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty
-        name="TerminalSpeed"
-        label="Term. Speed"
-        command="SetTerminalSpeed"
-        number_of_elements="1"
-        default_values="0.000000000001" >
+       name="TerminalSpeed"
+       label="Terminal Speed"
+       command="SetTerminalSpeed"
+       number_of_elements="1"
+       default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If at any point the speed is below the value of this property, the integration is terminated.
+         This property specifies the terminal speed, below which a particle stops advection/integration.
        </Documentation>
      </DoubleVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MaximumError"
+       command="SetMaximumError"
+       number_of_elements="1"
+       default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the maximum error (for Runge-Kutta 4-5) allowed in the integration. The Runge-Kutta 4-5 integrator tries to adjust the step size so that the estimated error is less than this threshold.
+       </Documentation>
+     </DoubleVectorProperty>
+       
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
@@ -5368,184 +5321,137 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         information_only="1"/>
 
      <IntVectorProperty 
-        name="MaximumPropagationUnit" 
-        label="Max. Propagation Unit"
-        command="SetMaximumPropagationUnit" 
-        number_of_elements="1"
-        default_values="1" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property indicates the unit for specifying the maximum streamline length. The Time (0) unit is the time a particle would travel with steady flow. The Length (1) unit is specified in the dataset's spatial coordinates.
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="MaximumPropagation"
-        label="Max. Propagation"
-        command="SetMaximumPropagation"
-        number_of_elements="1"
-        default_values="1.0" >
-       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
-         <RequiredProperties>
-            <Property name="Input" function="Input"/>
-         </RequiredProperties>
-       </BoundsDomain>
-       <Documentation>
-         The value of this property specifies the maximum streamline length. If the streamline length goes beyond this value, integration of that strealine terminates.
-       </Documentation>       
-     </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="InitialIntegrationStepUnit" 
-        label="Initial Step Unit"
-        command="SetInitialIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         This property indicates the unit for specifying the initial integration step. The Time (0) and Length (1) units have the same meaning as that specified in the MaximumPropagationUnit property. The Cell Length (2) unit specifies the step length as a number of cells.
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="InitialIntegrationStep"
-        label="Initial Step Length"
-        command="SetInitialIntegrationStep"
-        number_of_elements="1"
-        default_values="0.5" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         The value of this property specifies the initial integration step. For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.
-       </Documentation>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="IntegrationDirection" 
-        command="SetIntegrationDirection" 
-        number_of_elements="1"
-        default_values="2" >
+       name="IntegrationDirection" 
+       command="SetIntegrationDirection" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="FORWARD"/>
          <Entry value="1" text="BACKWARD"/>
          <Entry value="2" text="BOTH"/>
        </EnumerationDomain>
        <Documentation>
-         This property determines in which direction(s) the stream trace will be generated.
+         This property determines in which direction(s) a streamline is generated.
        </Documentation>
      </IntVectorProperty>
-
+       
      <IntVectorProperty 
-        name="IntegratorType" 
-        command="SetIntegratorType" 
-        number_of_elements="1"
-        default_values="0" >
+       name="IntegratorType" 
+       command="SetIntegratorType" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="Runge-Kutta 2"/>
          <Entry value="1" text="Runge-Kutta 4"/>
          <Entry value="2" text="Runge-Kutta 4-5"/>
        </EnumerationDomain>
        <Documentation>
-         This property determines which calculation to use for integration.
+         This property determines which integrator (with increasing accuracy) to use for creating streamlines.
        </Documentation>
      </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="MaximumError"
-        command="SetMaximumError"
-        number_of_elements="1"
-        default_values="0.000001" >
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         This property specifies the maximum error allowed in the integration. The meaning of this value depends on the integrator chosen. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of this property.
-       </Documentation>
-     </DoubleVectorProperty>
-
+             
      <IntVectorProperty 
-        name="MinimumIntegrationStepUnit" 
-        label="Minimum Step Unit"
-        command="SetMinimumIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
+       name="IntegrationStepUnit"
+       label="Integration Step Unit"
+       command="SetIntegrationStepUnit" 
+       number_of_elements="1"
+       default_values="2" >
        <EnumerationDomain name="enum">
          <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
        <Documentation>
-         If the Runge-Kutta 4-5 integrator is selected (IntegratorType property), this property determines the unit to use for specifying the minimum integration step. Time (0), Length (1), and Cell Length (2) have the same meanings as those indicated for the InitialIntegrationStepUnit property.
+           This property indicates the unit for specifying the Minimum/Initial/Maximum integration step. The Time unit specifies the time interval a particle is allowed to travel/advect in a steady flow. The Cell Length unit specifies the step length as a number of cells.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty>  
 
      <DoubleVectorProperty
-        name="MinimumIntegrationStep"
-        label="Minimum Step Length"
-        command="SetMinimumIntegrationStep"
-        number_of_elements="1"
-        default_values="0.01" >
+       name="InitialIntegrationStep"
+       label="Initial Step Length"
+       command="SetInitialIntegrationStep"
+       number_of_elements="1"
+       default_values="0.2" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If using the Runge-Kutta 4-5 ingrator (IntegratorType property), this property specifies the minimum integration step.
+         This property specifies the initial integration step. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), the step size is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies.
+       </Documentation>
+     </DoubleVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MinimumIntegrationStep"
+       label="Minimum Step Length"
+       command="SetMinimumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step.
        </Documentation>
      </DoubleVectorProperty>
 
-     <IntVectorProperty 
-        name="MaximumIntegrationStepUnit" 
-        label="Maximum Step Unit"
-        command="SetMaximumIntegrationStepUnit" 
-        number_of_elements="1"
-        default_values="2" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
-         <Entry value="1" text="Length"/>
-         <Entry value="2" text="Cell Length"/>
-       </EnumerationDomain>
-       <Documentation>
-         If the Runge-Kutta 4-5 integrator is selected (IntegratorType property), this property determines the unit to use for specifying the maximum integration step. Time (0), Length (1), and Cell Length (2) have the same meanings as those indicated for the InitialIntegrationStepUnit property.
-       </Documentation>
-     </IntVectorProperty>
-
      <DoubleVectorProperty
-        name="MaximumIntegrationStep"
-        label="Maximum Step Length"
-        command="SetMaximumIntegrationStep"
-        number_of_elements="1"
-        default_values="0.01" >
+       name="MaximumIntegrationStep"
+       label="Maximum Step Length"
+       command="SetMaximumIntegrationStep"
+       number_of_elements="1"
+       default_values="0.5" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If using the Runge-Kutta 4-5 ingrator (IntegratorType property), this property specifies the minimum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step.
        </Documentation>
-     </DoubleVectorProperty>
+     </DoubleVectorProperty>  
 
      <IntVectorProperty 
-        name="MaximumNumberOfSteps" 
-        label="Max. Steps"
-        command="SetMaximumNumberOfSteps" 
-        number_of_elements="1"
-        default_values="2000" >
+       name="MaximumNumberOfSteps" 
+       label="Maximum Steps"
+       command="SetMaximumNumberOfSteps" 
+       number_of_elements="1"
+       default_values="2000" >
        <IntRangeDomain name="range"/>
        <Documentation>
-         If the integration takes more steps to complete than indicated by this property, the integration terminates.
+         This property specifies the maximum number of steps, beyond which streamline integration is terminated.
        </Documentation>
      </IntVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MaximumPropagation"
+       label="Maximum Streamline Length"
+       command="SetMaximumPropagation"
+       number_of_elements="1"
+       default_values="1.0" >
+       <BoundsDomain name="bounds" mode="scaled_extent" scale_factor="1.0">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+       <Documentation>
+         This property specifies the maximum streamline length (i.e., physical arc length), beyond which integration is terminated.
+       </Documentation>       
+     </DoubleVectorProperty>
 
      <DoubleVectorProperty
-        name="TerminalSpeed"
-        label="Term. Speed"
-        command="SetTerminalSpeed"
-        number_of_elements="1"
-        default_values="0.000000000001" >
+       name="TerminalSpeed"
+       label="Terminal Speed"
+       command="SetTerminalSpeed"
+       number_of_elements="1"
+       default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         If at any point the speed is below the value of this property, the integration is terminated.
+         This property specifies the terminal speed, below which a particle stops advection/integration.
        </Documentation>
      </DoubleVectorProperty>
+       
+     <DoubleVectorProperty
+       name="MaximumError"
+       command="SetMaximumError"
+       number_of_elements="1"
+       default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         This property specifies the maximum error (for Runge-Kutta 4-5) allowed in the integration. The Runge-Kutta 4-5 integrator tries to adjust the step size so that the estimated error is less than this threshold.
+       </Documentation>
+     </DoubleVectorProperty>
+       
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
