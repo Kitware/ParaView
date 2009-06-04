@@ -17,9 +17,9 @@ object6 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/M
 QtTesting.playCommand(object6, 'activate', '')
 object7 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton'
 QtTesting.playCommand(object7, 'activate', '')
-object8 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton'
+object8 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/CloseButton'
 QtTesting.playCommand(object8, 'activate', '')
-object9 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/1/MultiViewFrameMenu/SplitHorizontalButton'
+object9 = 'pqClientMainWindow/MultiViewManager/SplitterFrame/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton'
 QtTesting.playCommand(object9, 'activate', '')
 object10 = 'pqClientMainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView'
 QtTesting.playCommand(object10, 'currentChanged', '/0/2|0')
