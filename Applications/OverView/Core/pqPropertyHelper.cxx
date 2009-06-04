@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqPropertyHelper.h"
+#include "vtkStdString.h"
 
 ////////////////////////////////////////////////////////////////////
 // pqPropertyHelper
@@ -38,6 +39,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqPropertyHelper::pqPropertyHelper(vtkSMProxy* proxy, const char* name) :
   vtkSMPropertyHelper(proxy, name)
 {
+}
+
+void pqPropertyHelper::Set(const vtkStdString& value)
+{
+  vtkSMPropertyHelper::Set(0, value.c_str());
+}
+
+void pqPropertyHelper::Set(unsigned int index, const vtkStdString& value)
+{
+  vtkSMPropertyHelper::Set(index, value.c_str());
 }
 
 void pqPropertyHelper::Set(const QString& value)

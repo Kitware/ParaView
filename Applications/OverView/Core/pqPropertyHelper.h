@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 
+class vtkStdString;
+
 /// Helper object to simplify working with properties
 class OVERVIEW_CORE_EXPORT pqPropertyHelper :
   public vtkSMPropertyHelper
@@ -48,6 +50,9 @@ public:
   // Include all the superclass's Set methods into this subclass.
   // Without this, all the other Set overrides are hidden.
   using vtkSMPropertyHelper::Set;
+
+  void Set(const vtkStdString& value);
+  void Set(unsigned int index, const vtkStdString& value);
 
   void Set(const QString& value);
   void Set(unsigned int index, const QString& value);
