@@ -133,6 +133,14 @@ void pqMultiView::Index::setFromString(const QString& str)
 pqMultiView::pqMultiView(QWidget* p)
   : QStackedWidget(p)
 {
+  QObject::connect(this, SIGNAL(frameAdded(pqMultiViewFrame*)),
+    this, SLOT(updateFrameNames()));
+  QObject::connect(this, SIGNAL(frameRemoved(pqMultiViewFrame*)),
+    this, SLOT(updateFrameNames()));
+  QObject::connect(this, SIGNAL(afterSplitView(const Index&, 
+    Qt::Orientation, float, const Index&)),
+    this, SLOT(updateFrameNames()));
+
   this->SplitterFrame= new QFrame(this);
   this->SplitterFrame->setObjectName("SplitterFrame");
   this->addWidget(this->SplitterFrame);
@@ -163,6 +171,7 @@ pqMultiView::pqMultiView(QWidget* p)
   this->CurrentMaximizedFrame=0;
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::init()
 {
   QWidget *w = this->SplitterFrame->layout()->itemAt(0)->widget();
@@ -404,21 +413,13 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     {
     // insert new below or on right of existing one
     newFrame = new pqMultiViewFrame;
-    
-    
     QList<int> sizes_old = splitter->sizes();
-
-
     splitter->insertWidget(splitter->indexOf(w)+1, newFrame);
-    
-
     QList<int> sizes = splitter->sizes();
-
     sizes[splitter->indexOf(w)] = static_cast<int>(
       sizes_old[splitter->indexOf(w)]*(1.0-percent));
     sizes[splitter->indexOf(w)+1] = static_cast<int>(
       sizes_old[splitter->indexOf(w)]*percent);
-
     splitter->setSizes(sizes);
     }
     
@@ -918,16 +919,9 @@ void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 void pqMultiView::setup(pqMultiViewFrame* frame)
 {
   Q_ASSERT(frame != NULL);
-  if(!frame)
-    return;
-
-  // Give the frame a name.
-  QString name;
-  pqMultiView::Index index=this->indexOf(frame);
-  if(!index.isEmpty())
+  if (!frame)
     {
-    name.setNum(index.front());
-    frame->setObjectName(name);
+    return;
     }
 
   QSignalMapper* CloseSignalMapper = new QSignalMapper(frame);
@@ -1129,4 +1123,23 @@ QSize pqMultiView::computeSize(QSize client_size) const
   QSize outerSize = this->size();
   QSize padding = outerSize-innerSize;
   return client_size + padding;
+}
+
+//-----------------------------------------------------------------------------
+void pqMultiView::updateFrameNames()
+{
+  static int name_uniquer=0;
+  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+  foreach (pqMultiViewFrame* frame, frames)
+    {
+    QSplitter* parentWdg = qobject_cast<QSplitter*>(frame->parentWidget());
+    if (parentWdg)
+      {
+      frame->setObjectName(QString::number(parentWdg->indexOf(frame)));
+      }
+    else
+      {
+      frame->setObjectName(QString("orphan%1").arg(name_uniquer++));
+      }
+    }
 }

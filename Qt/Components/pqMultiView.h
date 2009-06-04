@@ -141,9 +141,13 @@ protected slots:
   virtual void maximizeWidget(QWidget*);
   virtual void restoreWidget(QWidget*);
 
+  /// As frames are added/removed/moved around, we may end up with duplicate
+  /// frame names. We don't want to simply use a static int for uniquifying the
+  /// names since then writing tests becomes really hard. So, whenever frames
+  /// are added/removed, we ensure that they have valid names.
+  void updateFrameNames();
 
 protected:
-
  // bool eventFilter(QObject*, QEvent* e);
   pqMultiViewFrame* splitWidget(QWidget*, Qt::Orientation);
   void setup(pqMultiViewFrame*);
