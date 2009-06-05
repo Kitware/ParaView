@@ -30,8 +30,8 @@
 #include "pqPointSpriteTextureComboBox.h"
 #include "vtkPointSpriteProperty.h"
 
-pqPointSpriteTextureComboBox::pqPointSpriteTextureComboBox(QWidget* parent)
-  : Superclass(parent)
+pqPointSpriteTextureComboBox::pqPointSpriteTextureComboBox(QWidget* parentObject)
+  : Superclass(parentObject)
 {
   this->RenderMode = vtkPointSpriteProperty::TexturedSprite;
   this->CachedTextureIndex = -1;

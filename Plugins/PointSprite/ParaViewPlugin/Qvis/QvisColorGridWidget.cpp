@@ -48,7 +48,7 @@
 //   Constructor for the QvisColorGridWidget class.
 //
 // Arguments:
-//   parent : The parent widget to this object.
+//   parentObject : The parentObject widget to this object.
 //   name   : The name of this object.
 //   f      : The window flags. These control how window decorations are done.
 //
@@ -61,8 +61,8 @@
 //
 // ****************************************************************************
 
-QvisColorGridWidget::QvisColorGridWidget(QWidget *parent, const char* /*name*/)
-: QWidget(parent)
+QvisColorGridWidget::QvisColorGridWidget(QWidget *parentObject, const char* /*name*/)
+: QWidget(parentObject)
 {
     numRows = 1;
     numColumns = 1;
@@ -291,9 +291,9 @@ QvisColorGridWidget::setPaletteColor(const QColor &color, int index)
                 region = drawHighlightedColor(0, index);
             else
             {
-                int x, y, w, h;
-                getColorRect(index, x, y, w, h);
-                region = QRegion(x, y, w, h);
+                int _x, _y, w, h;
+                getColorRect(index, _x, _y, w, h);
+                region = QRegion(_x, _y, w, h);
 
                 if(drawPixmap)
                 {
@@ -968,13 +968,13 @@ QvisColorGridWidget::resizeEvent(QResizeEvent *)
 // Method: QvisColorGridWidget::getColorIndex
 //
 // Purpose:
-//   Computes a color index given an x,y location in the widget.
+//   Computes a color index given an _x,_y location in the widget.
 //
 // Arguments:
-//   x : The x location.
-//   y : The y location.
+//   _x : The x location.
+//   _y : The _y location.
 //
-// Returns:   The color index given at the x,y location in the widget.
+// Returns:   The color index given at the _x,_y location in the widget.
 //
 // Note:
 //
@@ -986,18 +986,18 @@ QvisColorGridWidget::resizeEvent(QResizeEvent *)
 // ****************************************************************************
 
 int
-QvisColorGridWidget::getColorIndex(int x, int y) const
+QvisColorGridWidget::getColorIndex(int _x, int _y) const
 {
     int index = -1;
 
-    // See if the x,y coordinate is in the widget.
-    if(QRect(0, 0, width(), height()).contains(QPoint(x, y)))
+    // See if the _x,_y coordinate is in the widget.
+    if(QRect(0, 0, width(), height()).contains(QPoint(_x, _y)))
     {
         int boxWidth  = (width()  - boxPaddingValue) / numColumns;
         int boxHeight = (height() - boxPaddingValue) / numRows;
 
-        int column = (x - boxPaddingValue) / boxWidth;
-        int row = (y - boxPaddingValue) / boxHeight;
+        int column = (_x - boxPaddingValue) / boxWidth;
+        int row = (_y - boxPaddingValue) / boxHeight;
         index = getIndex(row, column);
     }
 
@@ -1069,8 +1069,8 @@ QvisColorGridWidget::getRowColumnFromIndex(int index, int &row, int &column) con
 //
 // Arguments:
 //   index : The color index for which we want geometry.
-//   x : A reference to an int in which we'll store the x value.
-//   y : A reference to an int in which we'll store the y value.
+//   _x : A reference to an int in which we'll store the _x value.
+//   _y : A reference to an int in which we'll store the _y value.
 //   w : A reference to an int in which we'll store the width value.
 //   h : A reference to an int in which we'll store the height value.
 //
@@ -1082,7 +1082,7 @@ QvisColorGridWidget::getRowColumnFromIndex(int index, int &row, int &column) con
 // ****************************************************************************
 
 void
-QvisColorGridWidget::getColorRect(int index, int &x, int &y,
+QvisColorGridWidget::getColorRect(int index, int &_x, int &_y,
     int &w, int &h)
 {
     int column = index % numColumns;
@@ -1091,9 +1091,9 @@ QvisColorGridWidget::getColorRect(int index, int &x, int &y,
     int boxWidth  = (width() - boxPaddingValue) / numColumns;
     int boxHeight = (height() -  boxPaddingValue) / numRows;
 
-    // Figure out the x,y location.
-    x = column * boxWidth + boxPaddingValue;
-    y = row * boxHeight + boxPaddingValue;
+    // Figure out the _x,_y location.
+    _x = column * boxWidth + boxPaddingValue;
+    _y = row * boxHeight + boxPaddingValue;
 
     // Figure out the width, height.
     w = boxWidth - boxPaddingValue;
@@ -1238,12 +1238,12 @@ QvisColorGridWidget::drawColor(QPainter &paint, int index)
     if(index >= 0)
     {
         // Get the location of the index'th color box.
-        int x, y, boxWidth, boxHeight;
-        getColorRect(index, x, y, boxWidth, boxHeight);
+        int _x, _y, boxWidth, boxHeight;
+        getColorRect(index, _x, _y, boxWidth, boxHeight);
 
         paint.setPen(palette().dark().color());
-        paint.drawRect(x, y, boxWidth, boxHeight);
-        paint.fillRect(x + 1, y + 1, boxWidth - 2, boxHeight - 2,
+        paint.drawRect(_x, _y, boxWidth, boxHeight);
+        paint.fillRect(_x + 1, _y + 1, boxWidth - 2, boxHeight - 2,
                        paletteColors[index]);
     }
 }
@@ -1278,10 +1278,10 @@ QvisColorGridWidget::drawHighlightedColor(QPainter *paint, int index)
     if(drawPixmap && index >= 0)
     {
         // Get the location of the index'th color box.
-        int x, y, boxWidth, boxHeight;
-        getColorRect(index, x, y, boxWidth, boxHeight);
+        int _x, _y, boxWidth, boxHeight;
+        getColorRect(index, _x, _y, boxWidth, boxHeight);
 
-        QRect r(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+        QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
                 boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
 
         // Draw the button and the color over the button.
@@ -1300,7 +1300,7 @@ QvisColorGridWidget::drawHighlightedColor(QPainter *paint, int index)
         }
 
         // return the region that we drew on.
-        retval = QRegion(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
             boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
     }
 
@@ -1345,8 +1345,8 @@ QvisColorGridWidget::drawUnHighlightedColor(QPainter *paint, int index)
     if(drawPixmap && index >= 0)
     {
         // Get the location of the index'th color box.
-        int x, y, boxWidth, boxHeight;
-        getColorRect(index, x, y, boxWidth, boxHeight);
+        int _x, _y, boxWidth, boxHeight;
+        getColorRect(index, _x, _y, boxWidth, boxHeight);
 
 #ifdef Q_WS_MACX
         QBrush brush(palette().brush(QPalette::Background));
@@ -1358,21 +1358,21 @@ QvisColorGridWidget::drawUnHighlightedColor(QPainter *paint, int index)
         if(paint == 0)
         {
             QPainter p2(drawPixmap);
-            p2.fillRect(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+            p2.fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
                         boxWidth + boxPaddingValue, boxHeight + boxPaddingValue,
                         brush);
             drawColor(p2, index);
         }
         else
         {
-            paint->fillRect(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+            paint->fillRect(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
                             boxWidth + boxPaddingValue, boxHeight + boxPaddingValue,
                             brush);
             drawColor(*paint, index);
         }
 
         // return the region that we drew on.
-        retval = QRegion(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
             boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
     }
 
@@ -1412,10 +1412,10 @@ QvisColorGridWidget::drawSelectedColor(QPainter *paint, int index)
     if(drawPixmap && index >= 0)
     {
         // Get the location of the index'th color box.
-        int x, y, boxWidth, boxHeight;
-        getColorRect(index, x, y, boxWidth, boxHeight);
+        int _x, _y, boxWidth, boxHeight;
+        getColorRect(index, _x, _y, boxWidth, boxHeight);
 
-        QRect r(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+        QRect r(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
                 boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
 
         if(paint == 0)
@@ -1437,7 +1437,7 @@ QvisColorGridWidget::drawSelectedColor(QPainter *paint, int index)
         }
 
         // return the region that we drew on.
-        retval = QRegion(x - boxPaddingValue / 2, y - boxPaddingValue / 2,
+        retval = QRegion(_x - boxPaddingValue / 2, _y - boxPaddingValue / 2,
             boxWidth + boxPaddingValue, boxHeight + boxPaddingValue);
     }
 

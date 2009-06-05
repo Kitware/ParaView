@@ -59,8 +59,8 @@
 //
 // ****************************************************************************
 
-QvisGaussianOpacityBar::QvisGaussianOpacityBar(QWidget *parent, const char *name)
-    : QvisAbstractOpacityBar(parent, name)
+QvisGaussianOpacityBar::QvisGaussianOpacityBar(QWidget *parentObject, const char *name)
+    : QvisAbstractOpacityBar(parentObject, name)
 {
     setFrameStyle( QFrame::Panel | QFrame::Sunken );
     setLineWidth( 2 );
@@ -117,16 +117,16 @@ QvisGaussianOpacityBar::drawControlPoints(QPainter &painter)
     QPolygon pts;
     for (int p=0; p<ngaussian; p++)
     {
-        int x  = int(float(gaussian[p].x+gaussian[p].bx)*float(pw));
+        int _x  = int(float(gaussian[p].x+gaussian[p].bx)*float(pw));
         int xr = int(float(gaussian[p].x+gaussian[p].w)*float(pw));
         int xl = int(float(gaussian[p].x-gaussian[p].w)*float(pw));
-        int y  = int(float(1-gaussian[p].h)*float(ph));
+        int _y  = int(float(1-gaussian[p].h)*float(ph));
         int y0 = int(float(1-0)*float(ph));
         int yb = int(float(1-gaussian[p].h/4. - gaussian[p].by*gaussian[p].h/4.)*float(ph));
 
         // lines:
         painter.setPen(graypen);
-        painter.drawLine(x,y0-2, x,y);
+        painter.drawLine(_x,y0-2, _x,_y);
         painter.drawLine(xl,y0-2, xr,y0-2);
 
         // square: position
@@ -139,7 +139,7 @@ QvisGaussianOpacityBar::drawControlPoints(QPainter &painter)
         }
         else
             painter.setPen(bluepen);
-        pts.setPoints(4, x-4,y0, x-4,y0-4, x+4,y0-4, x+4,y0);
+        pts.setPoints(4, _x-4,y0, _x-4,y0-4, _x+4,y0-4, _x+4,y0);
         painter.drawPolyline(pts);
 
         // diamond: bias (horizontal and vertical)
@@ -154,33 +154,33 @@ QvisGaussianOpacityBar::drawControlPoints(QPainter &painter)
             painter.setPen(bluepen);
         float bx = gaussian[p].bx;
         float by = gaussian[p].by;
-        painter.drawLine(x,yb, x,yb+5);
+        painter.drawLine(_x,yb, _x,yb+5);
         if (bx > 0)
         {
-            painter.drawLine(x,yb-5, x+5,yb);
-            painter.drawLine(x,yb+5, x+5,yb);
+            painter.drawLine(_x,yb-5, _x+5,yb);
+            painter.drawLine(_x,yb+5, _x+5,yb);
         }
         else
         {
-            painter.drawLine(x,yb, x+5,yb);
+            painter.drawLine(_x,yb, _x+5,yb);
         }
         if (bx < 0)
         {
-            painter.drawLine(x,yb-5, x-5,yb);
-            painter.drawLine(x,yb+5, x-5,yb);
+            painter.drawLine(_x,yb-5, _x-5,yb);
+            painter.drawLine(_x,yb+5, _x-5,yb);
         }
         else
         {
-            painter.drawLine(x-5,yb, x,yb);
+            painter.drawLine(_x-5,yb, _x,yb);
         }
         if (by > 0)
         {
-            painter.drawLine(x,yb-5, x-5,yb);
-            painter.drawLine(x,yb-5, x+5,yb);
+            painter.drawLine(_x,yb-5, _x-5,yb);
+            painter.drawLine(_x,yb-5, _x+5,yb);
         }
         else
         {
-            painter.drawLine(x,yb-5, x,yb);
+            painter.drawLine(_x,yb-5, _x,yb);
         }
 
         // up triangle: height
@@ -193,7 +193,7 @@ QvisGaussianOpacityBar::drawControlPoints(QPainter &painter)
         }
         else
             painter.setPen(bluepen);
-        pts.setPoints(4, x+5,y, x,y-5, x-5,y, x+5,y);
+        pts.setPoints(4, _x+5,_y, _x,_y-5, _x-5,_y, _x+5,_y);
         painter.drawPolyline(pts);
 
         // triangle: width (R)
@@ -249,17 +249,17 @@ QvisGaussianOpacityBar::paintToPixmap(int w,int h)
   this->paintBackground(painter,w,h);
 
   float dy = 1.0/float(h-1);
-  for (int x=0; x<w; x++)
+  for (int _x=0; _x<w; _x++)
   {
-    float yval1 = values[x];
-    float yval2 = values[x+1];
+    float yval1 = values[_x];
+    float yval2 = values[_x+1];
     painter.setPen(whitepen);
-    for (int y=0; y<h; y++)
+    for (int _y=0; _y<h; _y++)
     {
-      float yvalc = 1 - float(y)/float(h-1);
+      float yvalc = 1 - float(_y)/float(h-1);
       if (yvalc >= qMin(yval1,yval2)-dy && yvalc < qMax(yval1,yval2))
       {
-        painter.drawPoint(x,y);
+        painter.drawPoint(_x,_y);
       }
     }
   }
@@ -282,12 +282,12 @@ QvisGaussianOpacityBar::paintToPixmap(int w,int h)
 void
 QvisGaussianOpacityBar::mousePressEvent(QMouseEvent *e)
 {
-    int x = e->x();
-    int y = e->y();
+    int _x = e->x();
+    int _y = e->y();
 
     if (e->button() == Qt::RightButton)
     {
-        if (findGaussianControlPoint(x,y, &currentGaussian, &currentMode))
+        if (findGaussianControlPoint(_x,_y, &currentGaussian, &currentMode))
         {
             if (getNumberOfGaussians()>minimumNumberOfGaussians)
             {
@@ -297,18 +297,18 @@ QvisGaussianOpacityBar::mousePressEvent(QMouseEvent *e)
     }
     else if (e->button() == Qt::LeftButton)
     {
-        if (! findGaussianControlPoint(x,y,
+        if (! findGaussianControlPoint(_x,_y,
                                        &currentGaussian, &currentMode))
         {
             currentGaussian = ngaussian;
             currentMode     = modeW;
             if (maximumNumberOfGaussians==-1 || getNumberOfGaussians()<maximumNumberOfGaussians)
             {
-                addGaussian(x2val(x), y2val(y), 0.001f, 0,0);
+                addGaussian(x2val(_x), y2val(_y), 0.001f, 0,0);
             }
         }
-        lastx = x;
-        lasty = y;
+        lastx = _x;
+        lasty = _y;
         mousedown = true;
     }
 
@@ -333,14 +333,14 @@ QvisGaussianOpacityBar::mousePressEvent(QMouseEvent *e)
 void
 QvisGaussianOpacityBar::mouseMoveEvent(QMouseEvent *e)
 {
-    int x = e->x();
-    int y = e->y();
+    int _x = e->x();
+    int _y = e->y();
 
     if (!mousedown)
     {
         int  oldGaussian = currentGaussian;
         Mode oldMode     = currentMode;
-        findGaussianControlPoint(x,y, &currentGaussian, &currentMode);
+        findGaussianControlPoint(_x,_y, &currentGaussian, &currentMode);
         if (oldGaussian != currentGaussian ||
             oldMode     != currentMode)
         {
@@ -355,26 +355,26 @@ QvisGaussianOpacityBar::mouseMoveEvent(QMouseEvent *e)
     switch (currentMode)
     {
       case modeX:
-        gaussian[currentGaussian].x = x2val(x) - gaussian[currentGaussian].bx;
+        gaussian[currentGaussian].x = x2val(_x) - gaussian[currentGaussian].bx;
         break;
       case modeH:
-        gaussian[currentGaussian].h = y2val(y);
+        gaussian[currentGaussian].h = y2val(_y);
         break;
       case modeW:
-        gaussian[currentGaussian].w = qMax((float)fabs(x2val(x) - gaussian[currentGaussian].x),(float)0.01);
+        gaussian[currentGaussian].w = qMax((float)fabs(x2val(_x) - gaussian[currentGaussian].x),(float)0.01);
         break;
       case modeWR:
-        gaussian[currentGaussian].w = qMax((float)(x2val(x) - gaussian[currentGaussian].x),(float)0.01);
+        gaussian[currentGaussian].w = qMax((float)(x2val(_x) - gaussian[currentGaussian].x),(float)0.01);
         if (gaussian[currentGaussian].w < fabs(gaussian[currentGaussian].bx))
             gaussian[currentGaussian].w = fabs(gaussian[currentGaussian].bx);
         break;
       case modeWL:
-        gaussian[currentGaussian].w = qMax((float)(gaussian[currentGaussian].x - x2val(x)),(float)0.01);
+        gaussian[currentGaussian].w = qMax((float)(gaussian[currentGaussian].x - x2val(_x)),(float)0.01);
         if (gaussian[currentGaussian].w < fabs(gaussian[currentGaussian].bx))
             gaussian[currentGaussian].w = fabs(gaussian[currentGaussian].bx);
         break;
       case modeB:
-        gaussian[currentGaussian].bx = x2val(x) - gaussian[currentGaussian].x;
+        gaussian[currentGaussian].bx = x2val(_x) - gaussian[currentGaussian].x;
         if (gaussian[currentGaussian].bx > gaussian[currentGaussian].w)
             gaussian[currentGaussian].bx = gaussian[currentGaussian].w;
         if (gaussian[currentGaussian].bx < -gaussian[currentGaussian].w)
@@ -382,7 +382,7 @@ QvisGaussianOpacityBar::mouseMoveEvent(QMouseEvent *e)
         if (fabs(gaussian[currentGaussian].bx) < .001)
             gaussian[currentGaussian].bx = 0;
 
-        gaussian[currentGaussian].by = 4*(y2val(y) - gaussian[currentGaussian].h/4.)/gaussian[currentGaussian].h;
+        gaussian[currentGaussian].by = 4*(y2val(_y) - gaussian[currentGaussian].h/4.)/gaussian[currentGaussian].h;
         if (gaussian[currentGaussian].by > 2)
             gaussian[currentGaussian].by = 2;
         if (gaussian[currentGaussian].by < 0)
@@ -391,8 +391,8 @@ QvisGaussianOpacityBar::mouseMoveEvent(QMouseEvent *e)
       default:
         break;
     }
-    lastx = x;
-    lasty = y;
+    lastx = _x;
+    lasty = _y;
 
 //    this->paintToPixmap(contentsRect().width(), contentsRect().height());
     this->repaint();
@@ -444,49 +444,49 @@ QvisGaussianOpacityBar::getRawOpacities(int n, float *opacity)
 
     for (int p=0; p<ngaussian; p++)
     {
-        float pos    = gaussian[p].x;
-        float width  = gaussian[p].w;
-        float height = gaussian[p].h;
+        float _pos    = gaussian[p].x;
+        float _width  = gaussian[p].w;
+        float _height = gaussian[p].h;
         float xbias  = gaussian[p].bx;
         float ybias  = gaussian[p].by;
         for (int i=0; i<n/*+1*/; i++)
         {
-            float x = float(i)/float(n-1);
+            float _x = float(i)/float(n-1);
 
-            // clamp non-zero values to pos +/- width
-            if (x > pos+width || x < pos-width)
+            // clamp non-zero values to _pos +/- _width
+            if (_x > _pos+_width || _x < _pos-_width)
             {
                 opacity[i] = qMax(opacity[i],(float)0);
                 continue;
             }
 
-            // non-zero width
-            if (width == 0)
-                width = .00001f;
+            // non-zero _width
+            if (_width == 0)
+                _width = .00001f;
 
             // translate the original x to a new x based on the xbias
             float x0;
-            if (xbias==0 || x == pos+xbias)
+            if (xbias==0 || _x == _pos+xbias)
             {
-                x0 = x;
+                x0 = _x;
             }
-            else if (x > pos+xbias)
+            else if (_x > _pos+xbias)
             {
-                if (width == xbias)
-                    x0 = pos;
+                if (_width == xbias)
+                    x0 = _pos;
                 else
-                    x0 = pos+(x-pos-xbias)*(width/(width-xbias));
+                    x0 = _pos+(_x-_pos-xbias)*(_width/(_width-xbias));
             }
-            else // (x < pos+xbias)
+            else // (_x < _pos+xbias)
             {
-                if (-width == xbias)
-                    x0 = pos;
+                if (-_width == xbias)
+                    x0 = _pos;
                 else
-                    x0 = pos-(x-pos-xbias)*(width/(width+xbias));
+                    x0 = _pos-(_x-_pos-xbias)*(_width/(_width+xbias));
             }
 
             // center around 0 and normalize to -1,1
-            float x1 = (x0-pos)/width;
+            float x1 = (x0-_pos)/_width;
 
             // do a linear interpolation between:
             //    a gaussian and a parabola        if 0<ybias<1
@@ -499,7 +499,7 @@ QvisGaussianOpacityBar::getRawOpacities(int n, float *opacity)
                 h1 = ybias*h0b + (1-ybias)*h0a;
             else
                 h1 = (2-ybias)*h0b + (ybias-1)*h0c;
-            float h2 = height * h1;
+            float h2 = _height * h1;
 
             // perform the MAX over different guassians, not the sum
             opacity[i] = qMax(opacity[i], h2);
@@ -519,9 +519,9 @@ QvisGaussianOpacityBar::getRawOpacities(int n, float *opacity)
 //
 // ****************************************************************************
 void
-QvisGaussianOpacityBar::addGaussian(float x,float h,float w,float bx,float by)
+QvisGaussianOpacityBar::addGaussian(float _x,float h,float w,float bx,float by)
 {
-    gaussian[ngaussian++] = Gaussian(x,h,w,bx,by);
+    gaussian[ngaussian++] = Gaussian(_x,h,w,bx,by);
 }
 
 
@@ -587,7 +587,7 @@ QvisGaussianOpacityBar::setMinimumNumberOfGaussians(int n)
 //
 // ****************************************************************************
 bool
-QvisGaussianOpacityBar::findGaussianControlPoint(int x,int y,
+QvisGaussianOpacityBar::findGaussianControlPoint(int _x,int _y,
                                              int *newgaussian, Mode *newmode)
 {
     *newgaussian = -1;
@@ -603,11 +603,11 @@ QvisGaussianOpacityBar::findGaussianControlPoint(int x,int y,
         int y0 = val2y(0);
         int yb = val2y(gaussian[p].h/4. + gaussian[p].by*gaussian[p].h/4.);
 
-        float d1 = dist2(x,y, xc,y0);
-        float d2 = dist2(x,y, xc,yc);
-        float d3 = dist2(x,y, xr,y0);
-        float d4 = dist2(x,y, xl,y0);
-        float d5 = dist2(x,y, xc,yb);
+        float d1 = dist2(_x,_y, xc,y0);
+        float d2 = dist2(_x,_y, xc,yc);
+        float d3 = dist2(_x,_y, xr,y0);
+        float d4 = dist2(_x,_y, xl,y0);
+        float d5 = dist2(_x,_y, xc,yb);
 
         float rad = 8*8;
 
@@ -681,13 +681,13 @@ QvisGaussianOpacityBar::getNumberOfGaussians()
 // ****************************************************************************
 void
 QvisGaussianOpacityBar::getGaussian(int i,
-                                float *x,
+                                float *_x,
                                 float *h,
                                 float *w,
                                 float *bx,
                                 float *by)
 {
-    *x  = gaussian[i].x;
+    *_x  = gaussian[i].x;
     *h  = gaussian[i].h;
     *w  = gaussian[i].w;
     *bx = gaussian[i].bx;
@@ -706,13 +706,13 @@ QvisGaussianOpacityBar::getGaussian(int i,
 // ****************************************************************************
 void
 QvisGaussianOpacityBar::setGaussian(int i,
-                                float *x,
+                                float *_x,
                                 float *h,
                                 float *w,
                                 float *bx,
                                 float *by)
 {
-    gaussian[i].x = *x;
+    gaussian[i].x = *_x;
     gaussian[i].h = *h;
     gaussian[i].w = *w;
     gaussian[i].bx = *bx;

@@ -1842,7 +1842,7 @@ VolumeAttributes::GetGaussianOpacities(unsigned char *alphas) const
         float height = pt.GetHeight();
         float xbias  = pt.GetXBias();
         float ybias  = pt.GetYBias();
-        for (int i=0; i<256; i++)
+        for (i=0; i<256; i++)
         {
             float x = float(i)/float(256-1);
 

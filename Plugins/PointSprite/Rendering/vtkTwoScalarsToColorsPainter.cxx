@@ -36,18 +36,16 @@
 #include "vtkPointData.h"
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtk1DTransferFunction.h"
 #include "vtkLookupTable.h"
 #include "vtkAbstractMapper.h"
 #include "vtkFloatArray.h"
 #include "vtkActor.h"
 #include "vtkProperty.h"
 #include "vtkImageData.h"
-#include "vtk1DTransferFunctionChooser.h"
 #include "vtkOpenGL.h"
 #include "vtkMapper.h"
 
-vtkCxxRevisionMacro(vtkTwoScalarsToColorsPainter, "1.1")
+vtkCxxRevisionMacro(vtkTwoScalarsToColorsPainter, "1.2")
 vtkStandardNewMacro(vtkTwoScalarsToColorsPainter)
 
 vtkTwoScalarsToColorsPainter::vtkTwoScalarsToColorsPainter()

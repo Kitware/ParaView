@@ -59,9 +59,9 @@
 //
 // ****************************************************************************
 
-QvisAbstractOpacityBar::QvisAbstractOpacityBar(QWidget *parent,
+QvisAbstractOpacityBar::QvisAbstractOpacityBar(QWidget *parentObject,
   const char* /*name*/)
-    : QFrame(parent)
+    : QFrame(parentObject)
 {
     setFrameStyle( QFrame::Panel | QFrame::Sunken );
     setLineWidth( 2 );
@@ -95,9 +95,9 @@ QvisAbstractOpacityBar::~QvisAbstractOpacityBar()
     showBackgroundPixmap = false;
 }
 
-void QvisAbstractOpacityBar::SetShowBackgroundPixmap(bool show)
+void QvisAbstractOpacityBar::SetShowBackgroundPixmap(bool showFlag)
 {
-    showBackgroundPixmap = show;;
+    showBackgroundPixmap = showFlag;
 }
 
 // ****************************************************************************
@@ -172,9 +172,9 @@ QvisAbstractOpacityBar::val2x(float val)
     QRect c = contentsRect();
     int w = c.width();
     int l = c.left();
-    int x = int(val*float(w) + l);
-    x = qMax(l, qMin(l+w, x));
-    return x;
+    int _x = int(val*float(w) + l);
+    _x = qMax(l, qMin(l+w, _x));
+    return _x;
 }
 
 
@@ -189,12 +189,12 @@ QvisAbstractOpacityBar::val2x(float val)
 //
 // ****************************************************************************
 float
-QvisAbstractOpacityBar::x2val(int x)
+QvisAbstractOpacityBar::x2val(int _x)
 {
     QRect c = contentsRect();
     int w = c.width();
     int l = c.left();
-    float val = float(x-l)/float(w);
+    float val = float(_x-l)/float(w);
     val = qMax((float)0, qMin((float)1, val));
     return val;
 }
@@ -216,9 +216,9 @@ QvisAbstractOpacityBar::val2y(float val)
     QRect c = contentsRect();
     int h = c.height();
     int t = c.top();
-    int y = int((1-val)*float(h) + t);
-    y = qMax(t, qMin(t+h, y));
-    return y;
+    int _y = int((1-val)*float(h) + t);
+    _y = qMax(t, qMin(t+h, _y));
+    return _y;
 }
 
 
@@ -233,12 +233,12 @@ QvisAbstractOpacityBar::val2y(float val)
 //
 // ****************************************************************************
 float
-QvisAbstractOpacityBar::y2val(int y)
+QvisAbstractOpacityBar::y2val(int _y)
 {
     QRect c = contentsRect();
     int h = c.height();
     int t = c.top();
-    float val = float(y-t)/float(h);
+    float val = float(_y-t)/float(h);
     val = qMax((float)0, qMin((float)1, ((float)1-val)));
     return val;
 }
