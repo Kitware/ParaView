@@ -50,7 +50,16 @@ SIMPLE_TEST(struct tm tm; tm.tm_zone);
 
 #ifdef HAVE_ATTRIBUTE
 
-SIMPLE_TEST(int __attribute__((unused)) x);
+static void test int __attribute((unused)) var)
+{
+  int __attribute__((unused)) x = var;
+}
+
+int main(void)
+{
+  test(19);
+}
+
 
 #endif /* HAVE_ATTRIBUTE */
 
