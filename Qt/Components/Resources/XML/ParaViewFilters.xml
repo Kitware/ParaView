@@ -28,6 +28,8 @@
     <Filter name="ProbePoint" 
             icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
     <Filter name="PlotAttributes" />
+    <Filter name="PlotOnSortedLines" />
+    <Filter name="PlotOnIntersectionCurves" />
     <Filter name="ProgrammableFilter" 
             icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
@@ -98,11 +100,11 @@
   <Filter name="OctreeDepthScalars" />
   <Filter name="OutlineCornerFilter" />
   <Filter name="OutlineFilter" />
-  <Filter name="ParticleTracer" />
   <Filter name="ParticlePathLines" />
+  <Filter name="ParticleTracer" />
   <Filter name="PlotAttributes" />
-  <Filter name="PlotEdges" />
-  <Filter name="PlotEdgesByPlaneIntersect" />
+  <Filter name="PlotOnIntersectionCurves" />
+  <Filter name="PlotOnSortedLines" />
   <Filter name="PointDataToCellData" />
   <Filter name="PolyDataNormals" />
   <Filter name="Probe" />
@@ -110,8 +112,8 @@
   <Filter name="ProbePoint" />
   <Filter name="ProcessIdScalars" />
   <Filter name="ProgrammableFilter" />
-  <Filter name="PythonCalculator" />
   <Filter name="PVConnectivityFilter" />
+  <Filter name="PythonCalculator" />
   <Filter name="QuadraturePointInterpolator" />
   <Filter name="QuadraturePointsGenerator" />
   <Filter name="QuadraturePointStatistics" />

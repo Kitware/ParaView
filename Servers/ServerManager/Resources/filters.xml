@@ -3369,8 +3369,8 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="PlotEdges" class="vtkPlotEdges"
-    label="Plot Edges">
+   <SourceProxy name="PlotOnSortedLines" class="vtkPlotEdges"
+    label="Plot On Sorted Lines">
     <Documentation
        long_help=""
        short_help="">
@@ -3400,7 +3400,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <CompoundSourceProxy name="PlotEdgesByPlaneIntersect" label="Plot Edges by Plane Intersect">
+   <CompoundSourceProxy name="PlotOnIntersectionCurves" label="Plot On Intersection Curves">
      <Documentation
         short_help="Extracts the edges in a 2D plane and plots them"
         long_help="Extracts the edges in a 2D plane and plots them" >
@@ -3422,7 +3422,7 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
          <Domain name="bool" id="374.PieceInvariant.bool"/>
        </Property>
      </Proxy>
-     <Proxy group="filters" type="PlotEdges" id="971" servers="1" compound_name="PlotEdges1">
+     <Proxy group="filters" type="PlotOnSortedLines" id="971" servers="1" compound_name="PlotEdges1">
        <Property name="Input" id="971.Input" number_of_elements="1">
          <Proxy value="667" output_port="0"/>
          <Domain name="groups" id="971.Input.groups">
