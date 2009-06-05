@@ -27,7 +27,8 @@
   <pqevent object="pqClientMainWindow/cameraToolbar/1QToolButton4" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/CutFunction/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="PlotEdges" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical"
+  command="activate" arguments="PlotOnSortedLines" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_tabbar" command="set_tab" arguments="1" />
   <pqevent object="pqClientMainWindow/objectInspectorDock/1pqProxyTabWidget0/qt_tabwidget_stackedwidget/1QScrollArea0/qt_scrollarea_viewport/1pqDisplayProxyEditorWidget0/pqLineChartDisplayPanel/SeriesGroup/SeriesList/1pqCheckableHeaderView0" command="mousePress" arguments="1,1,0,0,0,0" />
