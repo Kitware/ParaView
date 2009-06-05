@@ -279,7 +279,9 @@ GET_TARGET_PROPERTY(VTK_WRAP_ClientServer_EXE_CONFIG vtkWrapClientServer LOCATIO
 SET(PARAVIEW_LIBRARY_DIRS 
   ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 
-SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/Qt/Widgets
+SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+                              ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
+                              ${ParaView_SOURCE_DIR}/Qt/Widgets
                               ${ParaView_BINARY_DIR}/Qt/Widgets
                               ${ParaView_SOURCE_DIR}/Qt/Chart
                               ${ParaView_BINARY_DIR}/Qt/Chart
