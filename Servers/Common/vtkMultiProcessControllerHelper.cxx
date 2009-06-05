@@ -19,7 +19,7 @@
 #include "vtkMultiProcessStream.h"
 
 vtkStandardNewMacro(vtkMultiProcessControllerHelper);
-vtkCxxRevisionMacro(vtkMultiProcessControllerHelper, "1.1");
+vtkCxxRevisionMacro(vtkMultiProcessControllerHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkMultiProcessControllerHelper::vtkMultiProcessControllerHelper()
 {
@@ -41,8 +41,9 @@ int vtkMultiProcessControllerHelper::ReduceToAll(
   int numProcs = controller->GetNumberOfProcesses();
   int children[2] = {2*myid + 1, 2*myid + 2};
   int parent = myid > 0? (myid-1)/2 : -1;
+  int childno = 0;
 
-  for (int childno = 0; childno < 2; childno++)
+  for (childno = 0; childno < 2; childno++)
     {
     int childid = children[childno];
     if (childid >= numProcs)
@@ -63,7 +64,7 @@ int vtkMultiProcessControllerHelper::ReduceToAll(
     controller->Receive(data, parent, tag);
     }
 
-  for (int childno = 0; childno < 2; childno++)
+  for (childno = 0; childno < 2; childno++)
     {
     int childid = children[childno];
     if (childid >= numProcs)
