@@ -1,0 +1,342 @@
+<ui version="4.0" >
+ <class>pqTransferFunctionEditor</class>
+ <widget class="QWidget" name="pqTransferFunctionEditor" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>523</width>
+    <height>416</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5" >
+   <item>
+    <layout class="QGridLayout" name="gridLayout" >
+     <item row="0" column="0" colspan="2" >
+      <widget class="QRadioButton" name="freeform" >
+       <property name="text" >
+        <string>Free Form</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2" colspan="2" >
+      <widget class="QRadioButton" name="gaussian" >
+       <property name="text" >
+        <string>Gaussian</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="4" >
+      <widget class="QStackedWidget" name="titleStack" >
+       <property name="currentIndex" >
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="scalePage" >
+        <layout class="QVBoxLayout" name="verticalLayout_4" >
+         <item>
+          <widget class="QLabel" name="scaleLabel" >
+           <property name="text" >
+            <string>Radius Range</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="noTitlePage" >
+        <layout class="QVBoxLayout" name="verticalLayout_3" />
+       </widget>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="4" >
+      <widget class="QFrame" name="editor" >
+       <property name="sizePolicy" >
+        <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape" >
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow" >
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <item>
+         <widget class="QStackedWidget" name="editorStack" >
+          <property name="currentIndex" >
+           <number>1</number>
+          </property>
+          <widget class="QvisScribbleOpacityBar" name="scribbleEditor" />
+          <widget class="QvisGaussianOpacityBar" name="gaussianEditor" />
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="4" >
+      <widget class="QStackedWidget" name="legendStack" >
+       <property name="currentIndex" >
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="radiusLegend" >
+        <layout class="QVBoxLayout" name="verticalLayout" >
+         <item>
+          <widget class="pqDoubleEdit" name="scaleMax" >
+           <property name="focusPolicy" >
+            <enum>Qt::ClickFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2" >
+           <property name="orientation" >
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="pqDoubleEdit" name="scaleMin" />
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="opacityLegend" >
+        <layout class="QVBoxLayout" name="verticalLayout_2" >
+         <item>
+          <widget class="QLabel" name="label_2" >
+           <property name="text" >
+            <string>Opaque</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3" >
+           <property name="orientation" >
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0" >
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3" >
+           <property name="text" >
+            <string>Transparent</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item row="2" column="0" >
+      <widget class="pqDoubleEdit" name="scalarMin" />
+     </item>
+     <item row="2" column="3" >
+      <widget class="pqDoubleEdit" name="scalarMax" />
+     </item>
+     <item row="4" column="0" colspan="2" >
+      <widget class="QCheckBox" name="propBox" >
+       <property name="text" >
+        <string>Proportionnal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="5" >
+      <widget class="QCheckBox" name="useScalarRange" >
+       <property name="text" >
+        <string>Use Scalar Range</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3" >
+      <widget class="QLabel" name="label" >
+       <property name="text" >
+        <string>Multiplier</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="4" >
+      <widget class="pqDoubleEdit" name="propEdit" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" >
+     <item>
+      <widget class="QPushButton" name="zeroButton" >
+       <property name="text" >
+        <string>zero</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="rampButton" >
+       <property name="text" >
+        <string>ramp</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="oneButton" >
+       <property name="text" >
+        <string>one</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="iRampButton" >
+       <property name="text" >
+        <string>inverse</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer" >
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0" >
+      <size>
+       <width>20</width>
+       <height>30</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pqDoubleEdit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QvisScribbleOpacityBar</class>
+   <extends>QFrame</extends>
+   <header>QvisScribbleOpacityBar.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QvisGaussianOpacityBar</class>
+   <extends>QFrame</extends>
+   <header>QvisGaussianOpacityBar.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>legendStack</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>titleStack</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>476</x>
+     <y>122</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>476</x>
+     <y>30</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>titleStack</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>legendStack</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>476</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>476</x>
+     <y>122</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useScalarRange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scalarMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>250</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>50</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useScalarRange</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scalarMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>250</x>
+     <y>236</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>313</x>
+     <y>203</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>propBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scaleMin</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>448</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>propBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>scaleMax</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>96</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>448</x>
+     <y>51</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

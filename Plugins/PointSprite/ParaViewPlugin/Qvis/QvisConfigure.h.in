@@ -1,0 +1,11 @@
+
+#if defined(WIN32) && defined(@PROJECT_NAME@_SHARED)
+ #if defined(Qvis_EXPORTS)
+  #define Qvis_EXPORT __declspec( dllexport ) 
+ #else
+  #define Qvis_EXPORT __declspec( dllimport ) 
+ #endif
+#else
+  #define Qvis_EXPORT 
+#endif
+
