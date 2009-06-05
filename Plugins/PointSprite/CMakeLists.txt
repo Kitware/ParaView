@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 project(PointSpritePlugin)
 
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
+#CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 # -----------------------------------------------------------------------------
 # Set cmake policy CMP0003 to NEW. This means cmake will not break up linked
