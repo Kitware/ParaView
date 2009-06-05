@@ -27,7 +27,7 @@ using vtkstd::string;
 #include <cstdlib>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.10");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.11");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -184,17 +184,8 @@ void vtkPVPluginLoader::SetFileName(const char* file)
           ldLibPath+=LIB_PATH_SEP;
           }
         ldLibPath+=thisPluginsPath;
-#if defined(_WIN32) && !defined(__CYGWIN__)
-        // Note: POSIX putenv does a pointer copy not a string copy.
-        // POSIX setenv does a string copy (the right thing), but unavailable
-        // on windows :( .
-        size_t n=ldLibPath.size()+1;
-        char *newLdLibPath=static_cast<char *>(malloc(n));
-        strncpy(newLdLibPath,ldLibPath.c_str(),n);
-        putenv(newLdLibPath);
-#else
-        setenv(LIB_PATH_NAME,ldLibPath.c_str(),1);
-#endif
+
+        vtksys::SystemTools::PutEnv(ldLibPath.c_str());
         }
 
       // old SM xml, new plugins don't have this method
