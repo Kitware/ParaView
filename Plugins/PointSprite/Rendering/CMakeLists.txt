@@ -60,6 +60,8 @@ set(KIT_LIBS
   vtkRendering
   vtkImaging
   )
+  
+INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_DIR})
 
 # -----------------------------------------------------------------------------
 # Create the library
