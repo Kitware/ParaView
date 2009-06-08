@@ -1,237 +1,16 @@
-# Install optional dependencies ...
-#OPTION(OVERVIEW_INSTALL_MYSQL "Include MySQL client libraries in the OverView installer" ON)
-#OPTION(OVERVIEW_INSTALL_ORACLE "Include Oracle client libraries in the OverView installer" OFF)
-#OPTION(OVERVIEW_INSTALL_QT_MYSQL "Include Qt MySQL database drivers in the OverView installer" ON)
-#OPTION(OVERVIEW_INSTALL_QT_ORACLE "Include Qt Oracle database drivers in the OverView installer" OFF)
-#OPTION(OVERVIEW_INSTALL_QT_POSTGRESQL "Include Qt PostgreSQL database drivers in the OverView installer" ON)
+# Prepare to automatically install binary dependencies ...
+SET(OVERVIEW_BINARY_LOCATIONS )
 
-# Optionally install the MySQL client libraries ...
-IF(VTK_USE_MYSQL)
-
-  INSTALL(PROGRAMS
-    ${MYSQL_LIBRARY}
-    ${MYSQL_EXTRA_LIBRARIES}
-    DESTINATION lib 
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    )
-
-ENDIF(VTK_USE_MYSQL)
-
-IF(VTK_USE_POSTGRES)
-
-  INSTALL(PROGRAMS
-    ${POSTGRES_LIBRARIES}
-    DESTINATION lib
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    )
-
-ENDIF(VTK_USE_POSTGRES)
-
-
-# Optionally install the Oracle client libraries ...
-IF(OVERVIEW_INSTALL_ORACLE)
-
-  FIND_PATH(OVERVIEW_ORACLE_LIBS_DIR oci.dll
-    "c:/oracle"
-    DOC "Directory containing the Oracle client interface library (oci.dll)"
-    )
-
-  INSTALL(PROGRAMS
-    ${OVERVIEW_ORACLE_LIBS_DIR}/oci.dll
-    ${OVERVIEW_ORACLE_LIBS_DIR}/ocijdbc10.dll
-    ${OVERVIEW_ORACLE_LIBS_DIR}/ociw32.dll
-    ${OVERVIEW_ORACLE_LIBS_DIR}/orannzsbb10.dll
-    ${OVERVIEW_ORACLE_LIBS_DIR}/oraocci10.dll
-    ${OVERVIEW_ORACLE_LIBS_DIR}/oraociei10.dll
-    DESTINATION bin
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    )
-
-ENDIF(OVERVIEW_INSTALL_ORACLE)
-
-# Optionally install the Qt MySQL driver ...
-IF(OVERVIEW_INSTALL_QT_MYSQL)
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqlmysqld4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Debug
-    )
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqlmysql4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Release
-    )
-
-ENDIF(OVERVIEW_INSTALL_QT_MYSQL)
-
-# Optionally install the Qt Oracle driver ...
-IF(OVERVIEW_INSTALL_QT_ORACLE)
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqlocid4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Debug
-    )
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqloci4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Release
-    )
-
-ENDIF(OVERVIEW_INSTALL_QT_ORACLE)
-
-# Optionally install the Qt PostgreSQL driver ...
-IF(OVERVIEW_INSTALL_QT_POSTGRESQL)
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqlpsqld4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Debug
-    )
-
-  INSTALL(PROGRAMS
-    "@QT_PLUGINS_DIR@/sqldrivers/qsqlpsql4.dll"
-    DESTINATION bin/qtplugins/sqldrivers
-    COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-    CONFIGURATIONS Release
-    )
-
-ENDIF(OVERVIEW_INSTALL_QT_POSTGRESQL)
-
-# Install Qt libraries required by OverView ...
+# Install the branded OverView binary ...
 INSTALL(PROGRAMS
-  "@QT_LIBRARY_DIR@/QtAssistant.framework/Versions/4/QtAssistant"
-  "@QT_LIBRARY_DIR@/QtCore.framework/Versions/4/QtCore"
-  "@QT_LIBRARY_DIR@/QtGui.framework/Versions/4/QtGui"
-  "@QT_LIBRARY_DIR@/QtNetwork.framework/Versions/4/QtNetwork"
-  "@QT_LIBRARY_DIR@/QtSql.framework/Versions/4/QtSql"
-  "@QT_LIBRARY_DIR@/QtSVG.framework/Versions/4/QtSVG"
-  "@QT_LIBRARY_DIR@/QtXml.framework/Versions/4/QtXml"
-  DESTINATION lib
+  "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS/${OVERVIEW_BRANDED_APPLICATION_TITLE}"
+  DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   )
 
+LIST(APPEND OVERVIEW_BINARY_LOCATIONS "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS/${OVERVIEW_BRANDED_APPLICATION_TITLE}")
 
-#Install Qt plugins required by OverView ...
-INSTALL(PROGRAMS
-  "@QT_PLUGINS_DIR@/imageformats/libqjpeg.dylib"
-  "@QT_PLUGINS_DIR@/imageformats/libqmng.dylib"
-  "@QT_PLUGINS_DIR@/imageformats/libqsvg.dylib"
-  DESTINATION lib/qtplugins/imageformats
-  COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-  )
-
-# Install VTK/ParaView libraries required by OverView ...
-INSTALL(PROGRAMS
-  "@ParaView_BINARY_DIR@/bin/libKWCommon.dylib"
-  "@ParaView_BINARY_DIR@/bin/libOverViewCore.dylib"
-  "@ParaView_BINARY_DIR@/bin/libQVTK.dylib"
-  "@ParaView_BINARY_DIR@/bin/libQVTK.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libQtChart.dylib"
-  "@ParaView_BINARY_DIR@/bin/libQtTesting.dylib"
-  "@ParaView_BINARY_DIR@/bin/libXdmf.dylib"
-  "@ParaView_BINARY_DIR@/bin/libpqComponents.dylib"
-  "@ParaView_BINARY_DIR@/bin/libpqCore.dylib"
-  "@ParaView_BINARY_DIR@/bin/libpqWidgets.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkClientServer.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkCommon.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkCommon.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkCommonCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkDICOMParser.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkDICOMParser.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkFiltering.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkFiltering.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkFilteringCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGenericFiltering.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGenericFiltering.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGenericFilteringCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGeovis.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGeovis.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGraphics.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGraphics.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkGraphicsCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkHybrid.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkHybrid.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkHybridCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkIO.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkIO.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkIOCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkImaging.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkImaging.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkImagingCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkInfovis.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkInfovis.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkInfovisCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkNetCDF.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkNetCDF.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVCommandOptions.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVFilters.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVFiltersCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVServerCommon.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVServerCommonCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkPVServerManager.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkParallel.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkParallel.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkParallelCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkQtChart.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkQtChart.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkRendering.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkRendering.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkRenderingCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkViews.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkViews.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkViewsCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkVolumeRendering.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkVolumeRendering.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkVolumeRenderingCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkWidgets.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkWidgets.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkWidgetsCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkXdmf.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkXdmfCS.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkalglib.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkalglib.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkexoIIc.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkexpat.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkexpat.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkfreetype.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkfreetype.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkftgl.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkftgl.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkhdf5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkjpeg.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkjpeg.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtklibxml2.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtklibxml2.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkmetaio.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkmetaio.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkpng.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkpng.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkproj4.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkproj4.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtksqlite.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtksqlite.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtksys.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtksys.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtktiff.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtktiff.pv3.5.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkverdict.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkverdict.vtk5.5.0.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkzlib.dylib"
-  "@ParaView_BINARY_DIR@/bin/libvtkzlib.pv3.5.dylib"
-  DESTINATION lib 
-  COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-  )
-
-# Install required plugins ...
+# Install required brand plugins ...
 LIST(LENGTH OVERVIEW_STARTUP_PLUGIN_FILES PLUGIN_COUNT)
 
 SET(PLUGIN 0)
@@ -242,20 +21,19 @@ WHILE(PLUGIN LESS ${PLUGIN_COUNT})
 
   INSTALL(PROGRAMS
     "${PLUGIN_DIRECTORY}/${PLUGIN_FILE}"
-    DESTINATION lib 
+    DESTINATION bin/${OVERVIEW_BRANDED_APPLICATION_TITLE}-startup 
     COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
     )
+
+  LIST(APPEND OVERVIEW_BINARY_LOCATIONS "${PLUGIN_DIRECTORY}/${PLUGIN_FILE}")
 
   MATH(EXPR PLUGIN "${PLUGIN} + 1")
 
 ENDWHILE()
 
-# Install OverView binaries ...
-INSTALL(PROGRAMS
-  "${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/MacOS/${OVERVIEW_BRANDED_APPLICATION_TITLE}"
-  DESTINATION bin
-  COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-  )
+# Install library dependencies ...
+CONFIGURE_FILE( "@OverViewCore_SOURCE_DIR@/dependencies.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake" @ONLY)
+INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake" COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE})
 
 # Add some custom targets that install just OverView ...
 ADD_CUSTOM_TARGET(Install-${OVERVIEW_BRANDED_APPLICATION_TITLE}
@@ -266,7 +44,7 @@ ADD_CUSTOM_TARGET(Install-${OVERVIEW_BRANDED_APPLICATION_TITLE}
   )
 
 CONFIGURE_FILE("@OverViewCore_SOURCE_DIR@/BundleStartup.sh.in" "${CMAKE_CURRENT_BINARY_DIR}/BundleStartup.sh" @ONLY)
-#CONFIGURE_FILE("@OverViewCore_SOURCE_DIR@/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY)
+CONFIGURE_FILE("@OverViewCore_SOURCE_DIR@/Info.plist.in" "${CMAKE_CURRENT_BINARY_DIR}/Info.plist" @ONLY)
 
 ADD_CUSTOM_TARGET(Package-${OVERVIEW_BRANDED_APPLICATION_TITLE}
   ${CMAKE_CPACK_COMMAND}
@@ -274,7 +52,7 @@ ADD_CUSTOM_TARGET(Package-${OVERVIEW_BRANDED_APPLICATION_TITLE}
   -D "CPACK_CMAKE_GENERATOR=@CMAKE_GENERATOR@"
   -D "CPACK_BUNDLE_NAME=${OVERVIEW_BRANDED_APPLICATION_TITLE} ${OVERVIEW_BRANDED_VERSION}"
   -D "CPACK_BUNDLE_ICON=${OVERVIEW_BRANDED_APPLICATION_ICON}"
-  -D "CPACK_BUNDLE_PLIST=${EXECUTABLE_OUTPUT_PATH}/${OVERVIEW_BRANDED_APPLICATION_TITLE}.app/Contents/Info.plist"
+  -D "CPACK_BUNDLE_PLIST=${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
   -D "CPACK_BUNDLE_STARTUP_COMMAND=${CMAKE_CURRENT_BINARY_DIR}/BundleStartup.sh"
   -D "CPACK_PACKAGE_ICON=${OVERVIEW_BRANDED_APPLICATION_ICON}"
   -D "CPACK_PACKAGE_FILE_NAME=${OVERVIEW_BRANDED_APPLICATION_TITLE}-Setup-${OVERVIEW_BRANDED_VERSION}"
@@ -287,9 +65,4 @@ ADD_CUSTOM_TARGET(Package-${OVERVIEW_BRANDED_APPLICATION_TITLE}
   -D "CPACK_INSTALL_CMAKE_PROJECTS=${CMAKE_CURRENT_BINARY_DIR}\\;${OVERVIEW_BRANDED_APPLICATION_TITLE} ${OVERVIEW_BRANDED_VERSION}\\;${OVERVIEW_BRANDED_APPLICATION_TITLE}\\;/"
   -D "CPACK_RESOURCE_FILE_LICENSE=@OverViewCore_SOURCE_DIR@/COPYING"
   )
-
-#  -D "CPACK_PACKAGE_EXECUTABLES=${OVERVIEW_BRANDED_APPLICATION_TITLE};${OVERVIEW_BRANDED_APPLICATION_TITLE} ${OVERVIEW_BRANDED_VERSION}"
-#  -D "CPACK_PACKAGE_INSTALL_DIRECTORY=${OVERVIEW_BRANDED_APPLICATION_TITLE} ${OVERVIEW_BRANDED_VERSION}"
-#  -D "CPACK_PACKAGE_INSTALL_REGISTRY_KEY=${OVERVIEW_BRANDED_APPLICATION_TITLE} ${OVERVIEW_BRANDED_VERSION}"
-#  -D "CPACK_PACKAGE_VENDOR=Sandia National Laboratories"
 
