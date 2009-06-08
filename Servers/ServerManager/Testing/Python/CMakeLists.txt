@@ -41,6 +41,9 @@ ENDIF (PVServerManagerTestData)
 SET (PY_TESTS
   SMAnimation
   ProxyPropertyLinks
+  PythonPVSimpleCone
+  PythonPVSimpleExII
+  PythonPVSimpleSphere
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )
