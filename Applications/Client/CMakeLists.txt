@@ -346,6 +346,10 @@ IF(BUILD_TESTING)
   SET (XdmfReadStructuredGridCollection_THRESHOLD 20)
   SET (XdmfReadImageDataCollection_THRESHOLD 20)
 
+  # This test renders points and they are offsetted a bit differently on
+  # different platforms so just increase the threshold
+  SET (SaveCSV_THRESHOLD 40)
+
   # Disable some testing configurations for these tests.
   ## Disable ClientRenderServer tests for FFTOverTime. This is done since
   ## selection is not supported in render server mode esp. when number of render
