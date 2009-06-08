@@ -61,7 +61,7 @@ set(PointSpritePlugin_BUILD_EXAMPLES ON CACHE BOOL "Build the example.")
 if(PointSpritePlugin_BUILD_EXAMPLES)
     add_subdirectory(Examples)
 endif(PointSpritePlugin_BUILD_EXAMPLES)
-
+mark_as_advanced(PointSpritePlugin_BUILD_EXAMPLES)
 # -----------------------------------------------------------------------------
 # Build the Paraview plugins
 # -----------------------------------------------------------------------------
