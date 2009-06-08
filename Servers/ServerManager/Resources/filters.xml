@@ -7237,7 +7237,7 @@ This filter extracts a range of groups from a multiblock dataset
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractHierarchicalDataSets" 
                 class="vtkExtractDataSets"
-                label="Extract Datasets">
+                label="Extract AMR Blocks">
      <Documentation
         long_help="This filter extracts a list of datasets from hierarchical datasets."
         short_help="Extract datasets.">
