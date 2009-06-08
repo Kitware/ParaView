@@ -1,0 +1,16 @@
+#!/bin/sh
+
+BUNDLE="`echo "$0" | sed -e 's/\/Contents\/MacOS\/@OVERVIEW_BRANDED_APPLICATION_TITLE@ @OVERVIEW_BRANDED_VERSION@//'`"
+FRAMEWORKS="$BUNDLE/Contents/Frameworks"
+RESOURCES="$BUNDLE/Contents/Resources"
+
+echo "OverView: Starting $0"
+echo "OverView: BUNDLE: $BUNDLE"
+
+export DYLD_LIBRARY_PATH=$RESOURCES/bin:$RESOURCES/lib
+
+export
+exec "$RESOURCES/bin/@OVERVIEW_BRANDED_APPLICATION_TITLE@"
+
+echo "OverView: Finishing $0"
+
