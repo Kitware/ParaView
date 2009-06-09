@@ -31,9 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqEventTranslator.h"
+
 #include "pqAbstractButtonEventTranslator.h"
 #include "pqAbstractItemViewEventTranslator.h"
 #include "pqAbstractSliderEventTranslator.h"
+#include "pqBasicWidgetEventTranslator.h"
 #include "pqComboBoxEventTranslator.h"
 #include "pqDoubleSpinBoxEventTranslator.h"
 #include "pqLineEditEventTranslator.h"
@@ -41,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectNaming.h"
 #include "pqSpinBoxEventTranslator.h"
 #include "pqTabBarEventTranslator.h"
-#include "pqBasicWidgetEventTranslator.h"
+#include "pqTreeWidgetEventTranslator.h"
 
 #include <QCoreApplication>
 #include <QtDebug>
@@ -104,6 +106,7 @@ void pqEventTranslator::addDefaultWidgetEventTranslators()
   addWidgetEventTranslator(new pqMenuEventTranslator());
   addWidgetEventTranslator(new pqSpinBoxEventTranslator());
   addWidgetEventTranslator(new pqTabBarEventTranslator());
+  addWidgetEventTranslator(new pqTreeWidgetEventTranslator());
 }
 
 void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Translator)

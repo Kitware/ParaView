@@ -62,6 +62,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTestUtility.h
   pqThreadedEventSource.h
   pqTabBarEventTranslator.h
+  pqTreeWidgetEventTranslator.h
+  pqTreeWidgetEventPlayer.h
   pqWidgetEventTranslator.h
   ${PYTHON_MOCS}
 )
@@ -131,6 +133,10 @@ ADD_LIBRARY(QtTesting
   pqTestUtility.h
   pqThreadedEventSource.cxx
   pqThreadedEventSource.h
+  pqTreeWidgetEventTranslator.cxx
+  pqTreeWidgetEventTranslator.h
+  pqTreeWidgetEventPlayer.cxx
+  pqTreeWidgetEventPlayer.h
   pqWidgetEventPlayer.cxx
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
