@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetEventPlayer.h"
 
 
-#include <QTreeView>
+#include <QTreeWidget>
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ bool pqTreeWidgetEventPlayer::playEvent(
   QObject* object, const QString& command, 
   const QString& arguments, bool& error)
 {
-  QTreeView* treeWidget = qobject_cast<QTreeView*>(object);
+  QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
   if (!treeWidget)
     {
     return false;
