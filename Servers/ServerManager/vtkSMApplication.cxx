@@ -44,7 +44,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.19");
+vtkCxxRevisionMacro(vtkSMApplication, "1.20");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -72,7 +72,7 @@ void vtkSMApplication::AddConfigurationFile(const char* fname, const char* dir)
 //---------------------------------------------------------------------------
 unsigned int vtkSMApplication::GetNumberOfConfigurationFiles()
 {
-  return this->Internals->Files.size();
+  return static_cast<unsigned int>(this->Internals->Files.size());
 }
 
 //---------------------------------------------------------------------------
