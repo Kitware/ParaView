@@ -6264,19 +6264,9 @@
         -->
         <Proxy name="Property" proxygroup="properties" proxyname="Property" />
         <ExposedProperties>
-          <Property name="Ambient" />
           <Property name="AmbientColor" />
-          <Property name="Diffuse" />
-          <Property name="DiffuseColor" />
-          <Property name="Interpolation" />
           <Property name="LineWidth" />
           <Property name="Opacity" />
-          <Property name="PointSize" />
-          <Property name="Representation" />
-          <Property name="Shading" />
-          <Property name="Specular" />
-          <Property name="SpecularColor" />
-          <Property name="SpecularPower" />
         </ExposedProperties>
       </SubProxy>
 
