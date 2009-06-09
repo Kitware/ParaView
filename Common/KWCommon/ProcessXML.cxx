@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
       << "// Get single string" << endl
       << "char* " << ot.Prefix.c_str() << moduleName.c_str() << argv[4] << "()" << endl
       << "{" << endl
-      << "  int len = ( 0"
+      << "  size_t len = ( 0"
       << lenstr.str()
       << " );" << endl
       << "  char* res = new char[ len + 1];" << endl
