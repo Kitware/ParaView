@@ -267,6 +267,8 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   globalPropertiesManager->SetGlobalPropertyLink(
     "SurfaceColor", repr, "DiffuseColor");
   globalPropertiesManager->SetGlobalPropertyLink(
+    "ForegroundColor", repr, "AmbientColor");
+  globalPropertiesManager->SetGlobalPropertyLink(
     "EdgeColor", repr, "EdgeColor");
   globalPropertiesManager->SetGlobalPropertyLink(
     "SurfaceColor", repr, "BackfaceDiffuseColor");
