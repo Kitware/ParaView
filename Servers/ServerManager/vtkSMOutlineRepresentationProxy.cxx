@@ -15,6 +15,7 @@
 #include "vtkSMOutlineRepresentationProxy.h"
 
 #include "vtkAbstractMapper.h"
+#include "vtkBoundingBox.h"
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -22,18 +23,18 @@
 #include "vtkSelection.h"
 #include "vtkSelectionNode.h"
 #include "vtkSmartPointer.h"
-#include "vtkTransform.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
-#include "vtkBoundingBox.h"
+#include "vtkTransform.h"
 
 vtkStandardNewMacro(vtkSMOutlineRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMOutlineRepresentationProxy, "1.15.4.1");
 //----------------------------------------------------------------------------
 vtkSMOutlineRepresentationProxy::vtkSMOutlineRepresentationProxy()
 {
@@ -125,6 +126,10 @@ bool vtkSMOutlineRepresentationProxy::EndCreateVTKObjects()
     this->OutlineFilter->UpdateProperty("UseOutline");
     }
 
+  vtkSMPropertyHelper(this->Property, "Ambient").Set(1);
+  vtkSMPropertyHelper(this->Property, "Diffuse").Set(0);
+  vtkSMPropertyHelper(this->Property, "Specular").Set(0);
+  this->Property->UpdateVTKObjects();
 
   return this->Superclass::EndCreateVTKObjects();
 }
