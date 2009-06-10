@@ -36,15 +36,14 @@ CONFIGURE_FILE( "@OverViewCore_SOURCE_DIR@/dependencies.cmake.in" "${CMAKE_CURRE
 INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake" COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE})
 
 # Install Qt plugins that can't be identified by automatic dependency generation ...
- INSTALL(
-   DIRECTORY
-    "@QT_PLUGINS_DIR@/codecs"
-    "@QT_PLUGINS_DIR@/imageformats"
-    "@QT_PLUGINS_DIR@/sqldrivers"
-   DESTINATION bin
-   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
-   )
-
+INSTALL(
+ DIRECTORY
+  "@QT_PLUGINS_DIR@/codecs"
+  "@QT_PLUGINS_DIR@/imageformats"
+  "@QT_PLUGINS_DIR@/sqldrivers"
+ DESTINATION bin
+ COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
+ )
 
 # Add a custom target that installs the brand only ...
 ADD_CUSTOM_TARGET(Install-${OVERVIEW_BRANDED_APPLICATION_TITLE}
