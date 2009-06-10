@@ -89,6 +89,7 @@ public:
     this->Links = new pqPropertyLinks;
     this->InterpolationAdaptor = 0;
     this->EdgeColorAdaptor = 0;
+    this->AmbientColorAdaptor = 0;
     this->SliceDirectionAdaptor = 0;
     this->BackfaceRepresentationAdaptor = 0;
     this->SliceDomain = 0;
@@ -103,6 +104,8 @@ public:
     delete this->SliceDirectionAdaptor;
     delete this->BackfaceRepresentationAdaptor;
     delete this->SliceDomain;
+    delete this->AmbientColorAdaptor;
+    delete this->EdgeColorAdaptor;
     }
 
   pqPropertyLinks* Links;
@@ -111,6 +114,7 @@ public:
   QPointer<pqPipelineRepresentation> Representation;
   pqSignalAdaptorComboBox* InterpolationAdaptor;
   pqSignalAdaptorColor*    EdgeColorAdaptor;
+  pqSignalAdaptorColor*    AmbientColorAdaptor;
   pqSignalAdaptorComboBox* SliceDirectionAdaptor;
   pqSignalAdaptorComboBox* SelectedMapperAdaptor;
   pqSignalAdaptorComboBox* BackfaceRepresentationAdaptor;
@@ -416,6 +420,13 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
       reprProxy, prop);
     }
 
+  if ( (prop = reprProxy->GetProperty("AmbientColor")) != 0)
+    {
+    this->Internal->Links->addPropertyLink(this->Internal->AmbientColorAdaptor,
+      "color", SIGNAL(colorChanged(const QVariant&)),
+      reprProxy, prop);
+    }
+
   if (reprProxy->GetProperty("Slice"))
     {
     this->Internal->SliceDomain = new pqWidgetRangeDomain(
@@ -557,6 +568,11 @@ void pqDisplayProxyEditor::setRepresentation(pqPipelineRepresentation* repr)
     new pqStandardColorLinkAdaptor(this->Internal->EdgeColor,
       reprProxy, "EdgeColor");
     }
+  if (reprProxy->GetProperty("AmbientColor"))
+    {
+    new pqStandardColorLinkAdaptor(this->Internal->AmbientColor,
+      reprProxy, "AmbientColor");
+    }
 
   this->DisableSlots = 0;
   QTimer::singleShot(0, this, SLOT(updateEnableState()));
@@ -619,6 +635,19 @@ void pqDisplayProxyEditor::setupGUIConnections()
       SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
     }
 
+  this->Internal->AmbientColorAdaptor = new pqSignalAdaptorColor(
+    this->Internal->AmbientColor, "chosenColor",
+    SIGNAL(chosenColorChanged(const QColor&)), false);
+  this->Internal->AmbientColor->setUndoLabel("Change Ambient Color");
+  if (stack)
+    {
+    QObject::connect(this->Internal->AmbientColor,
+      SIGNAL(beginUndo(const QString&)),
+      stack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(this->Internal->AmbientColor,
+      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+    }
+
   QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(updateMaterial(int)));
 
@@ -658,12 +687,25 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateEnableState()
 {
+  int reprType = this->Internal->Representation->getRepresentationType();
+
   if (this->Internal->ColorBy->getCurrentText() == "Solid Color")
     {
     this->Internal->ColorInterpolateScalars->setEnabled(false);
-    this->Internal->ColorButtonStack->setCurrentWidget(
+    if (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
+      reprType == vtkSMPVRepresentationProxy::POINTS ||
+      reprType == vtkSMPVRepresentationProxy::OUTLINE)
+      {
+      this->Internal->ColorButtonStack->setCurrentWidget(
+        this->Internal->AmbientColorPage);
+      this->Internal->LightingGroup->setEnabled(false);
+      }
+    else
+      {
+      this->Internal->ColorButtonStack->setCurrentWidget(
         this->Internal->SolidColorPage);
-    this->Internal->LightingGroup->setEnabled(true);
+      this->Internal->LightingGroup->setEnabled(true);
+      }
     this->Internal->BackfaceActorColor->setEnabled(true);
     }
   else
@@ -678,7 +720,6 @@ void pqDisplayProxyEditor::updateEnableState()
     this->Internal->BackfaceActorColor->setEnabled(false);
     }
 
-  int reprType = this->Internal->Representation->getRepresentationType();
   
   this->Internal->EdgeStyleGroup->setEnabled(
     reprType == vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES);
@@ -977,9 +1018,6 @@ void pqDisplayProxyEditor::setSolidColor(const QColor& color)
   val.push_back(color.red()/255.0);
   val.push_back(color.green()/255.0);
   val.push_back(color.blue()/255.0);
-
-  pqSMAdaptor::setMultipleElementProperty(
-    this->Internal->Representation->getProxy()->GetProperty("AmbientColor"), val);
   pqSMAdaptor::setMultipleElementProperty(
     this->Internal->Representation->getProxy()->GetProperty("DiffuseColor"), val);
 
