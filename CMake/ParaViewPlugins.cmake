@@ -2,6 +2,17 @@
 
 INCLUDE("${VTK_MAKE_INSTANTIATOR}/vtkMakeInstantiator.cmake")
 
+# Macro to install a plugin that's included in the ParaView source directory.
+# This is a macro internal to ParaView and should not be directly used by
+# external applications. This may change in future without notice.
+MACRO(internal_paraview_install_plugin name)
+  IF (PV_INSTALL_BIN_DIR)
+    INSTALL(TARGETS ${name}
+      DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/${name}"
+      COMPONENT Runtime)
+  ENDIF (PV_INSTALL_BIN_DIR)
+ENDMACRO(internal_paraview_install_plugin)
+
 # helper PV_PLUGIN_LIST_CONTAINS macro
 MACRO(PV_PLUGIN_LIST_CONTAINS var value)
   SET(${var})
@@ -901,6 +912,10 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
       IF(SM_SRCS)
         TARGET_LINK_LIBRARIES(${NAME} vtkPVServerManager)
       ENDIF(SM_SRCS)
+
+      # Add install rules for the plugin. Currently only the plugins in ParaView
+      # source are installed.
+      internal_paraview_install_plugin(${NAME})
 
     ENDIF(GUI_SRCS OR SM_SRCS OR ARG_SOURCES)
   
