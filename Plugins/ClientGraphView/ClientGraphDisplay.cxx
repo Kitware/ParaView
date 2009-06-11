@@ -218,14 +218,14 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     SIGNAL(toggled(bool)),
     proxy,
     proxy->GetProperty("VertexColorByArray"));
-
+/*
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.vertexScalarBar,
     "checked",
     SIGNAL(toggled(bool)),
     proxy,
     proxy->GetProperty("VertexScalarBarVisibility"));
-
+*/
   pqSignalAdaptorComboBox* vertexColorArrayAdaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.vertexColorArray);
   vertexColorArrayAdaptor->setObjectName("ComboBoxAdaptor");
@@ -299,7 +299,7 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     SIGNAL(colorChanged(const QVariant&)),
     proxy,
     proxy->GetProperty("EdgeColor"));
-
+/*
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.flipEdgeColorMap,
     "checked",
@@ -311,21 +311,21 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     SIGNAL(toggled(bool)),
     this->Implementation->Widgets.flipEdgeColorMap, 
     SLOT(setEnabled(bool)));
-
+*/
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.edgeColorByArray,
     "checked",
     SIGNAL(toggled(bool)),
     proxy,
     proxy->GetProperty("EdgeColorByArray"));
-
+/*
   this->Implementation->Links.addPropertyLink(
     this->Implementation->Widgets.edgeScalarBar,
     "checked",
     SIGNAL(toggled(bool)),
     proxy,
     proxy->GetProperty("EdgeScalarBarVisibility"));
-
+*/
   pqSignalAdaptorComboBox* edgeColorArrayAdaptor = 
     new pqSignalAdaptorComboBox(this->Implementation->Widgets.edgeColorArray);
   edgeColorArrayAdaptor->setObjectName("ComboBoxAdaptor");
@@ -404,10 +404,6 @@ ClientGraphDisplay::ClientGraphDisplay(pqRepresentation* representation, QWidget
     proxy,
     proxy->GetProperty("EdgeWeightArray"));
 
-  //QObject::connect(this->Implementation->Widgets.layoutStrategy, 
-  //                SIGNAL(currentIndexChanged(const QString&)),
-  //                this, SLOT(onLayoutStrategyChanged()));
-
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
 
@@ -455,4 +451,3 @@ void ClientGraphDisplay::onComboBoxDomainMapChanged()
     }
   this->updateAllViews();
 }
-

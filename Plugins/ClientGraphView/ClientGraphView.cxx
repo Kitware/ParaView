@@ -48,7 +48,6 @@
 #include <vtkTable.h>
 #include <vtkTexture.h>
 #include <vtkVariantArray.h>
-#include <vtkAttributeClustering2DLayoutStrategy.h>
 #include <vtkViewTheme.h>
 #include <vtkWindowToImageFilter.h>
 
@@ -455,11 +454,6 @@ void ClientGraphView::renderInternal()
           this->Implementation->ResetCamera = true;
         layout->SetWeightEdges(vtkSMPropertyHelper(proxy, "WeightEdges").GetAsInt());
         layout->SetEdgeWeightField(vtkSMPropertyHelper(proxy, "EdgeWeightArray").GetAsString());
-        vtkAttributeClustering2DLayoutStrategy* acls = vtkAttributeClustering2DLayoutStrategy::SafeDownCast(layout);
-        if(acls)
-          {
-          acls->SetVertexAttribute(vtkSMPropertyHelper(proxy, "AttributeClusteringArray").GetAsString());
-          }
         this->Implementation->View->SetLayoutStrategy(layout);
         break;
         }

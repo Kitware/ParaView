@@ -145,7 +145,7 @@
 
       <IntVectorProperty name="ArcEdges" number_of_elements="1" default_values="1">
         <BooleanDomain name="domain"/>
-      </IntVectorProperty>
+      </IntVectorProperty>      
 
       <IntVectorProperty name="UseDomainMap" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
