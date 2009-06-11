@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqObjectBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqSelectionManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqView.h"
@@ -84,7 +85,7 @@ public:
 void AnnotationLinkCommand::Execute(
   vtkObject* caller, unsigned long, void*)
 {
-  this->Target->selectionChanged(vtkSMSourceProxy::SafeDownCast(caller));
+  this->Target->annotationsChanged(vtkSMSourceProxy::SafeDownCast(caller));
 }
 
 //-----------------------------------------------------------------------------
@@ -135,6 +136,7 @@ void AnnotationLink::initialize(pqServer* server)
   this->Internals->Link->SetConnectionID(server->GetConnectionID());
   pxm->RegisterProxy("selection_helpers", "AnnotationLink", this->Internals->Link);
   this->Internals->Link->UpdateVTKObjects();
+  this->Internals->Link->AddObserver(vtkCommand::ModifiedEvent, this->Command);
 }
 
 //-----------------------------------------------------------------------------
@@ -183,8 +185,15 @@ void AnnotationLink::onViewDestroyed(pqView* view)
 }
 
 //-----------------------------------------------------------------------------
-void AnnotationLink::selectionChanged(vtkSMSourceProxy* source)
+void AnnotationLink::annotationsChanged(vtkSMSourceProxy* source)
 {
+  // If its our link that changed, just update the views
+  if(source == this->Internals->Link)
+    {
+    this->updateViews();
+    return;
+    }
+
   // Avoid infinite loops
   if (!this->Internals->InSelectionChanged)
     {
@@ -200,34 +209,10 @@ void AnnotationLink::selectionChanged(vtkSMSourceProxy* source)
         }
       }
 
-    this->updateViews();
-
     this->Internals->InSelectionChanged = false;
     }
 }
-/*
-vtkSelection* AnnotationLink::getSelection()
-{
-  vtksys_stl::set<vtkSmartPointer<vtkSMSourceProxy> >::iterator it, itEnd;
-  it = this->Internals->Sources.begin();
-  if(it == this->Internals->Sources.end())
-    return 0;
-  vtkSMSourceProxy* source = *it;
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMClientDeliveryStrategyProxy* strategy = 
-    vtkSMClientDeliveryStrategyProxy::SafeDownCast(
-      pxm->NewProxy("strategies", "ClientDeliveryStrategy"));
-  strategy->AddInput(source->GetSelectionInput(0), 0);
-  strategy->SetPostGatherHelper("vtkAppendSelection");
-  strategy->Update();
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkAlgorithm* alg = vtkAlgorithm::SafeDownCast(
-    pm->GetObjectFromID(strategy->GetOutput()->GetID()));
-  return vtkSelection::SafeDownCast(alg->GetOutputDataObject(0));
-}
-*/
 void AnnotationLink::updateViews()
 {
   vtksys_stl::set<pqView*>::iterator it, itEnd;

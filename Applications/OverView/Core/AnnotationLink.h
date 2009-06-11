@@ -57,7 +57,7 @@ public:
   
   vtkAnnotationLink* getLink();
   vtkSMSourceProxy* getLinkProxy();
-  
+
   void updateViews();
 
 private slots:
@@ -67,7 +67,7 @@ private slots:
   void onViewDestroyed(pqView*);
 
 protected:
-  void selectionChanged(vtkSMSourceProxy* source);
+  void annotationsChanged(vtkSMSourceProxy* source);
 
 private:
   AnnotationLink();
