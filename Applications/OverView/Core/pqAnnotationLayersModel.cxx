@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkAnnotation.h"
 #include "vtkAnnotationLayers.h"
-#include "vtkAnnotationLink.h"
 #include "vtkInformation.h"
 
 #include <QPixmap>
@@ -57,11 +56,11 @@ pqAnnotationLayersModel::pqAnnotationLayersModel(QObject* parentObject)
 //-----------------------------------------------------------------------------
 pqAnnotationLayersModel::~pqAnnotationLayersModel()
 {
-  this->setAnnotationLink(0);
+  this->setAnnotationLayers(0);
 }
 
 //----------------------------------------------------------------------------
-void pqAnnotationLayersModel::setAnnotationLink(vtkAnnotationLink* t) 
+void pqAnnotationLayersModel::setAnnotationLayers(vtkAnnotationLayers* t) 
 {
   if (this->Annotations != NULL)
     {
@@ -81,7 +80,7 @@ void pqAnnotationLayersModel::setAnnotationLink(vtkAnnotationLink* t)
 }
 
 //-----------------------------------------------------------------------------
-vtkAnnotationLink* pqAnnotationLayersModel::getAnnotationLink() const
+vtkAnnotationLayers* pqAnnotationLayersModel::getAnnotationLayers() const
 {
   return this->Annotations;
 }
@@ -91,7 +90,7 @@ int pqAnnotationLayersModel::rowCount(const QModelIndex &parentIndex) const
 {
   if (!parentIndex.isValid() && this->Annotations)
     {
-    return this->Annotations->GetAnnotationLayers()->GetNumberOfAnnotations();
+    return this->Annotations->GetNumberOfAnnotations();
     }
   return 0;
 }
@@ -256,7 +255,7 @@ void pqAnnotationLayersModel::reload()
 //-----------------------------------------------------------------------------
 const char* pqAnnotationLayersModel::getAnnotationName(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotationLayers()->GetAnnotation(row);
+  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
   return a->GetInformation()->Get(vtkAnnotation::LABEL());
 }
 
@@ -265,8 +264,8 @@ void pqAnnotationLayersModel::setAnnotationEnabled(int row, bool enabled)
 {
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
-    vtkAnnotation* a = this->Annotations->GetAnnotationLayers()->GetAnnotation(row);
-    a->GetInformation()->Set(vtkAnnotation::ENABLED(), enabled);
+    vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+    a->GetInformation()->Set(vtkAnnotation::ENABLE(), enabled);
 
     QModelIndex idx = this->createIndex(row, 0);
     emit this->dataChanged(idx, idx);
@@ -277,8 +276,8 @@ void pqAnnotationLayersModel::setAnnotationEnabled(int row, bool enabled)
 //-----------------------------------------------------------------------------
 bool pqAnnotationLayersModel::getAnnotationEnabled(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotationLayers()->GetAnnotation(row);
-  return a->GetInformation()->Get(vtkAnnotation::ENABLED());
+  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+  return a->GetInformation()->Get(vtkAnnotation::ENABLE());
 }
 
 //-----------------------------------------------------------------------------
@@ -288,7 +287,7 @@ void pqAnnotationLayersModel::setAnnotationColor(int row, const QColor &color)
     {
     double double_color[3];
     color.getRgbF(double_color, double_color+1, double_color+2);
-    vtkAnnotation* a = this->Annotations->GetAnnotationLayers()->GetAnnotation(row);
+    vtkAnnotation* a = this->Annotations->GetAnnotation(row);
     a->GetInformation()->Set(vtkAnnotation::COLOR(),double_color,3);
 
     QModelIndex idx = this->createIndex(row, 1);
@@ -299,7 +298,7 @@ void pqAnnotationLayersModel::setAnnotationColor(int row, const QColor &color)
 //-----------------------------------------------------------------------------
 QColor pqAnnotationLayersModel::getAnnotationColor(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotationLayers()->GetAnnotation(row);
+  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
   if(!a->GetInformation()->Has(vtkAnnotation::COLOR()))
     {
     return QColor(211,211,211);

@@ -32,12 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "AnnotationManagerPanel.h"
 #include "ui_AnnotationManagerPanel.h"
 
-#include "AnnotationLink.h"
-
 #include "vtkAnnotation.h"
 #include "vtkAnnotationLayers.h"
 #include "vtkAnnotationLink.h"
-#include "vtkDataRepresentation.h"
+#include "vtkCommand.h"
+#include "vtkEmptyRepresentation.h"
 #include "vtkEventQtSlotConnect.h"
 #include <vtkInformation.h>
 #include <vtkInformationStringKey.h>
@@ -53,6 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 
+#include "pqAnnotationLayersModel.h"
+#include "pqTreeView.h"
+
+#include <QColorDialog>
 #include <QHeaderView>
 #include <QItemDelegate>
 #include <QMessageBox>
@@ -62,25 +65,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "pqSignalAdaptors.h"
-
-////////////////////////////////////////////////////////////////////////////////////
-// AnnotationManagerPanel::command
-
-class AnnotationManagerPanel::command : public vtkCommand
+class AnnotationManagerPanelCommand : public vtkCommand
 {
 public:
-  static command* New(AnnotationManagerPanel& view)
-  {
-    return new command(view);
-  }
-  command(AnnotationManagerPanel& view) : Target(view) { }
-  virtual void Execute(vtkObject*, unsigned long, void* layers)
-  {
-    Target.annotationChanged(reinterpret_cast<vtkAnnotationLayers*>(layers));
-  }
-  AnnotationManagerPanel& Target;
+  static AnnotationManagerPanelCommand* New()
+    { return new AnnotationManagerPanelCommand(); }
+  void Execute(vtkObject* caller, unsigned long id, void* callData);
+  AnnotationManagerPanel* Target;
 };
+
+void AnnotationManagerPanelCommand::Execute(
+  vtkObject* caller, unsigned long, void*)
+{
+  this->Target->annotationsChanged();
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // AnnotationManagerPanel::pqImplementation
@@ -90,19 +88,23 @@ struct AnnotationManagerPanel::pqImplementation : public Ui::AnnotationManagerPa
 public:
   pqImplementation() 
     {
-    this->View = vtkSmartPointer<vtkQtAnnotationView>::New();
-    this->Representation = vtkSmartPointer<vtkDataRepresentation>::New();
-    this->Representation->SetAnnotationLink(AnnotationLink::instance().getLink());
-    this->View->SetRepresentation(this->Representation);
+    this->Model = 0;
+    this->AnnotationLink = 0;
     }
 
   ~pqImplementation()
     {
+    delete this->Model;
+    this->Model = 0;
+    if (this->AnnotationLink)
+      {
+      this->AnnotationLink->Delete();
+      }
     }
 
-  vtkSmartPointer<vtkQtAnnotationView> View;
-  vtkSmartPointer<vtkDataRepresentation> Representation;
-  pqSignalAdaptorColor* ColorAdapter;
+  pqAnnotationLayersModel *Model;
+  vtkSMSourceProxy* AnnotationLink;
+
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -112,33 +114,33 @@ AnnotationManagerPanel::AnnotationManagerPanel(QWidget *p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  this->Command = command::New(*this);
-  QVBoxLayout* vboxlayout = new QVBoxLayout(this);
-  vboxlayout->setSpacing(0);
-  vboxlayout->setMargin(0);
-  vboxlayout->setObjectName("vboxLayout");
+  this->Command = AnnotationManagerPanelCommand::New();
+  this->Command->Target = this;
 
-  QWidget* container = new QWidget(this);
-  container->setObjectName("scrollWidget");
-  container->setSizePolicy(QSizePolicy::MinimumExpanding,
-    QSizePolicy::MinimumExpanding);
+  this->Implementation->setupUi(this);
 
-  QScrollArea* s = new QScrollArea(this);
-  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  s->setWidgetResizable(true);
-  s->setObjectName("scrollArea");
-  s->setFrameShape(QFrame::NoFrame);
-  s->setWidget(container);
-  vboxlayout->addWidget(s);
+  this->Implementation->Model = new pqAnnotationLayersModel(this);
+  this->Implementation->treeView->setModel(this->Implementation->Model);
 
-  this->Implementation->setupUi(container);
-  this->setupGUI();
-  
-  this->Implementation->View->AddObserver(
-    vtkCommand::AnnotationChangedEvent, this->Command);
+  QObject::connect(this->Implementation->Model,
+    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+    this, SLOT(modelChanged()));
 
-  this->updateEnabledState();
+  QObject::connect(
+    this->Implementation->treeView, SIGNAL(activated(const QModelIndex &)),
+    this, SLOT(activateItem(const QModelIndex &)));
+
+  QObject::connect(this->Implementation->upButton, 
+    SIGNAL(pressed()), this, SLOT(onUpButtonPressed()));
+
+  QObject::connect(this->Implementation->downButton, 
+    SIGNAL(pressed()), this, SLOT(onDownButtonPressed()));
+
+  QObject::connect(this->Implementation->selectButton, 
+    SIGNAL(pressed()), this, SLOT(onSelectButtonPressed()));
+
+  QObject::connect(this->Implementation->deleteButton, 
+    SIGNAL(pressed()), this, SLOT(onDeleteButtonPressed()));
 }
 
 //-----------------------------------------------------------------------------
@@ -149,71 +151,170 @@ AnnotationManagerPanel::~AnnotationManagerPanel()
 }
 
 //-----------------------------------------------------------------------------
-void AnnotationManagerPanel::setupGUI()
+void AnnotationManagerPanel::setAnnotationLink(vtkSMSourceProxy* link)
 {
-  QVBoxLayout *layout = new QVBoxLayout(this->Implementation->viewFrame);
-  layout->addWidget(this->Implementation->View->GetWidget());
-  layout->setSpacing(0);
-  layout->setMargin(0);
-  layout->setObjectName("vboxLayout2");
-
-  QObject::connect(this->Implementation->saveSelection, 
-    SIGNAL(pressed()), this, SLOT(createAnnotationFromCurrentSelection()));
-
-  this->Implementation->ColorAdapter = new pqSignalAdaptorColor(
-    this->Implementation->color,
-    "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)),
-    false);
-
-  QColor col(Qt::red);
-  QList<QVariant> rgb;
-  rgb.append(col.red() / 255.0);
-  rgb.append(col.green() / 255.0);
-  rgb.append(col.blue() / 255.0);
-  this->Implementation->ColorAdapter->setColor(rgb);
+  if (this->Implementation->AnnotationLink != link)
+    {
+    vtkSMSourceProxy* tempSGMacroVar = this->Implementation->AnnotationLink;
+    this->Implementation->AnnotationLink = link;
+    if (this->Implementation->AnnotationLink != NULL) { this->Implementation->AnnotationLink->Register(0); }
+    if (tempSGMacroVar != NULL)
+      {
+      tempSGMacroVar->UnRegister(0);
+      }
+    this->Implementation->AnnotationLink->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+    this->annotationsChanged();
+    }
 }
 
 //-----------------------------------------------------------------------------
-void AnnotationManagerPanel::updateEnabledState()
+vtkSMSourceProxy* AnnotationManagerPanel::getAnnotationLink()
 {
+  return this->Implementation->AnnotationLink;
 }
 
-void AnnotationManagerPanel::annotationChanged(vtkAnnotationLayers* a)
+void AnnotationManagerPanel::modelChanged()
 {
-  AnnotationLink::instance().updateViews();
+  vtkSMSourceProxy* link = this->getAnnotationLink();
+  if (link)
+    {
+    link->RemoveObserver(this->Command);
+
+    link->MarkModified(0);
+
+    link->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+    }
 }
 
-void AnnotationManagerPanel::createAnnotationFromCurrentSelection()
+void AnnotationManagerPanel::annotationsChanged()
 {
-  vtkSelection* sel = AnnotationLink::instance().getLink()->GetCurrentSelection();
-  if(!sel || sel->GetNumberOfNodes()==0)
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
+
+  QObject::disconnect(this->Implementation->Model,
+    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+    this, SLOT(modelChanged()));
+
+  this->Implementation->Model->setAnnotationLayers(link->GetAnnotationLayers());
+
+  QObject::connect(this->Implementation->Model,
+    SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
+    this, SLOT(modelChanged()));
+}
+
+void AnnotationManagerPanel::onUpButtonPressed()
+{
+  if (!this->getAnnotationLink())
     {
     return;
+    }
+
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
+  vtkAnnotationLayers* annotations = link->GetAnnotationLayers();
+  
+  QItemSelectionModel *model = this->Implementation->treeView->selectionModel();
+  QModelIndexList indexes = model->selectedIndexes();
+  if(indexes.size()==0)
+    return;
+  vtkSmartPointer<vtkAnnotationLayers> newAnnotations = vtkSmartPointer<vtkAnnotationLayers>::New();
+  vtkSmartPointer<vtkAnnotation> a = vtkSmartPointer<vtkAnnotation>::New();
+  int removedRow = indexes[0].row();
+  a->DeepCopy(annotations->GetAnnotation(removedRow));
+  annotations->RemoveAnnotation(annotations->GetAnnotation(removedRow));
+  for(int i=0; i<removedRow-1; ++i)
+    {
+    newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
+    }
+  newAnnotations->AddAnnotation(a);
+  for(int i=removedRow; i<annotations->GetNumberOfAnnotations(); ++i)
+    {
+    newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
+    }
+  this->getAnnotationLink()->MarkModified(0);
+}
+
+void AnnotationManagerPanel::onDownButtonPressed()
+{
+  if (!this->getAnnotationLink())
+    {
+    return;
+    }
+
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
+  vtkAnnotationLayers* annotations = link->GetAnnotationLayers();
+  
+  QItemSelectionModel *model = this->Implementation->treeView->selectionModel();
+  QModelIndexList indexes = model->selectedIndexes();
+  if(indexes.size()==0)
+    return;
+  vtkAnnotation* a = annotations->GetAnnotation(indexes[0].row());
+  vtkSmartPointer<vtkAnnotation> na = vtkSmartPointer<vtkAnnotation>::New();
+  na->DeepCopy(a);
+  annotations->RemoveAnnotation(a);
+  annotations->AddAnnotation(na);
+
+  this->getAnnotationLink()->MarkModified(0);
+}
+
+void AnnotationManagerPanel::onSelectButtonPressed()
+{
+  if (!this->getAnnotationLink())
+    {
+    return;
+    }
+
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
+  vtkAnnotationLayers* annotations = link->GetAnnotationLayers();
+  vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New(); 
+  QItemSelectionModel *model = this->Implementation->treeView->selectionModel();
+  QModelIndexList indexes = model->selectedIndexes();
+  foreach (QModelIndex index, indexes)
+    {
+    vtkSmartPointer<vtkSelection> temp = vtkSmartPointer<vtkSelection>::New(); 
+    vtkAnnotation* a = annotations->GetAnnotation(index.row()); 
+    temp->DeepCopy(a->GetSelection());
+    s->Union(temp);
     }
   
-  QString label = this->Implementation->label->text();
-  if(label.isNull() || label.isEmpty())
+  link->SetCurrentSelection(s);
+  this->getAnnotationLink()->MarkModified(0);
+}
+
+void AnnotationManagerPanel::onDeleteButtonPressed()
+{
+  if (!this->getAnnotationLink())
     {
     return;
     }
 
-  vtkSmartPointer<vtkAnnotation> a = vtkSmartPointer<vtkAnnotation>::New();
-  vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New();
-  s->DeepCopy(sel);
-  a->SetSelection(s);
-  vtkInformation* ainfo = a->GetInformation();
-  ainfo->Set(vtkAnnotation::ENABLED(), 0);
-  ainfo->Set(vtkAnnotation::LABEL(),label.toAscii().data());
-  QList<QVariant> rgba = this->Implementation->ColorAdapter->color().toList();
-  double rgb[3];
-  rgb[0] = rgba[0].toDouble();
-  rgb[1] = rgba[1].toDouble();
-  rgb[2] = rgba[2].toDouble();
-  ainfo->Set(vtkAnnotation::COLOR(),rgb,3);
-  vtkAnnotationLayers* annotations = this->Implementation->Representation->GetAnnotationLink()->GetAnnotationLayers();
-  annotations->AddAnnotation(a);
-  this->Implementation->Representation->Update();
-  this->Implementation->View->Update();
-  this->Implementation->label->clear();
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
+  vtkAnnotationLayers* annotations = link->GetAnnotationLayers();
+  QItemSelectionModel *model = this->Implementation->treeView->selectionModel();
+  QModelIndexList indexes = model->selectedIndexes();
+  if(indexes.size()==0)
+    return;
+  vtkAnnotation* a = annotations->GetAnnotation(indexes[0].row());
+  annotations->RemoveAnnotation(a);
+  this->getAnnotationLink()->MarkModified(0);
+}
+
+
+//-----------------------------------------------------------------------------
+void AnnotationManagerPanel::activateItem(const QModelIndex &index)
+{
+  if (!index.isValid() || index.column() != 1)
+    {
+    // We are interested in clicks on the color swab alone.
+    return;
+    }
+
+  // Get current color
+  QColor color = this->Implementation->Model->getAnnotationColor(index.row());
+
+  // Show color selector dialog to get a new color
+  color = QColorDialog::getColor(color, this);
+  if (color.isValid())
+    {
+    // Set the new color
+    this->Implementation->Model->setAnnotationColor(index.row(), color);
+    }
 }

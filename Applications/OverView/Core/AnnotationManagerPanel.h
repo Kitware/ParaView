@@ -36,7 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "OverViewCoreExport.h"
 #include <QWidget>
 
-class vtkAnnotationLayers;
+class QModelIndex;
+class AnnotationManagerPanelCommand;
+class vtkSMSourceProxy;
 
 /// AnnotationManagerPanel is a panel that shows shows the active annotations.
 /// It makes is possible for the user to view/change the active annotation.
@@ -49,23 +51,26 @@ public:
   AnnotationManagerPanel(QWidget* parent);
   ~AnnotationManagerPanel();
 
-public slots:
-  /// Update the enabled state of the panel depending upon the current state of
-  /// application.
-  void updateEnabledState();
-  void createAnnotationFromCurrentSelection();
-  void annotationChanged(vtkAnnotationLayers* a);
+  void setAnnotationLink(vtkSMSourceProxy*);
+  vtkSMSourceProxy* getAnnotationLink();
 
-protected:
-  /// Sets up the GUI by created default signal/slot bindings etc.
-  void setupGUI();
+public slots:
+  void activateItem(const QModelIndex &index);
+  void annotationsChanged();
+  void modelChanged();
+
+private slots:
+  void onUpButtonPressed();
+  void onDownButtonPressed();
+  void onSelectButtonPressed();
+  void onDeleteButtonPressed();
 
 private:
   struct pqImplementation;
   pqImplementation* const Implementation;
 
-  class command;
-  command* Command;
+  friend class AnnotationManagerPanelCommand;
+  AnnotationManagerPanelCommand* Command;
 };
 
 #endif

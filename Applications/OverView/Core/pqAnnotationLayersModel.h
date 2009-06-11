@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QColor>
 #include <QPointer>
 #include "vtkWeakPointer.h"
-#include "vtkAnnotationLink.h"
+#include "vtkAnnotationLayers.h"
 
 /// pqAnnotationLayersModel is a model that can be used to connect to a
 /// Tree or Table view that shows the series that be plotted. It allows the user
@@ -58,8 +58,8 @@ public:
   /// Set the representation for the series editor model.
   /// The model must have a pqDataRepresentation for one of the charting
   /// representations otherwise it will remain empty.
-  void setAnnotationLink(vtkAnnotationLink* a);
-  vtkAnnotationLink* getAnnotationLink() const;
+  void setAnnotationLayers(vtkAnnotationLayers* a);
+  vtkAnnotationLayers* getAnnotationLayers() const;
 
   /// \name QAbstractItemModel Methods
   //@{
@@ -151,7 +151,7 @@ public slots:
   QColor getAnnotationColor(int row) const;
 
 private:
-  vtkAnnotationLink* Annotations;
+  vtkAnnotationLayers* Annotations;
 
 private:
   pqAnnotationLayersModel(const pqAnnotationLayersModel&); // Not implemented.
