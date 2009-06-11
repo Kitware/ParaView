@@ -19,6 +19,7 @@ protected slots:
   void currentIndexChanged(pqOutputPort*);
   void showing(pqDataRepresentation*);
   void dataUpdated();
+  void setShowAllColumns(bool);
 
 protected:
   ClientTableView* View;

@@ -13,13 +13,26 @@
         </InputArrayDomain>
       </InputProperty>
 
-      <StringVectorProperty name="AttributeType" number_of_elements="5"  element_types="0 0 0 0 2">
+      <IntVectorProperty 
+        name="AllColumns" 
+        number_of_elements="1" 
+        default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="Attribute" number_of_elements="5"  element_types="0 0 0 0 2">
+        <ArrayListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
        <FieldDataDomain name="field_list">
          <RequiredProperties>
            <Property name="Input" function="Input"/>
          </RequiredProperties>
        </FieldDataDomain>
-      </StringVectorProperty>
+     </StringVectorProperty>
+
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 
