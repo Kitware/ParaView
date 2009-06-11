@@ -45,17 +45,19 @@ ClientRecordViewDecorator::ClientRecordViewDecorator(ClientRecordView* view):
   
   this->Internal = new pqInternal();
   this->Internal->setupUi(header);
-  this->Internal->Source->setAutoUpdateIndex(false);
-  this->Internal->Source->addCustomEntry("None", NULL);
-  this->Internal->Source->fillExistingPorts();
+  //this->Internal->Source->setAutoUpdateIndex(false);
+  //this->Internal->Source->addCustomEntry("None", NULL);
+  //this->Internal->Source->fillExistingPorts();
   this->Internal->AttributeAdaptor = 0;
   this->Internal->AttributeDomain = 0;
+  this->Internal->Source->hide();
+  this->Internal->label->hide();
 
   QObject::connect(&this->Internal->Links, SIGNAL(smPropertyChanged()),
     this->View, SLOT(render()));
 
-  QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)),
-    this, SLOT(currentIndexChanged(pqOutputPort*)));
+  //QObject::connect(this->Internal->Source, SIGNAL(currentIndexChanged(pqOutputPort*)),
+  //  this, SLOT(currentIndexChanged(pqOutputPort*)));
   QObject::connect(this->View, SIGNAL(showing(pqDataRepresentation*)),
     this, SLOT(showing(pqDataRepresentation*)));
 
@@ -81,7 +83,7 @@ void ClientRecordViewDecorator::showing(pqDataRepresentation* repr)
   if (repr)
     {
     vtkSMProxy* reprProxy = repr->getProxy();
-    this->Internal->Source->setCurrentPort(repr->getOutputPortFromInput());
+    //this->Internal->Source->setCurrentPort(repr->getOutputPortFromInput());
 
     this->Internal->AttributeDomain = new pqComboBoxDomain(
       this->Internal->attribute_mode,
@@ -107,10 +109,10 @@ void ClientRecordViewDecorator::showing(pqDataRepresentation* repr)
     }
   else
     {
-    this->Internal->Source->setCurrentPort(NULL);
+    //this->Internal->Source->setCurrentPort(NULL);
     }
 
-  this->Internal->attribute_mode->setEnabled(repr != 0);
+  //this->Internal->attribute_mode->setEnabled(repr != 0);
 }
 
 //-----------------------------------------------------------------------------
