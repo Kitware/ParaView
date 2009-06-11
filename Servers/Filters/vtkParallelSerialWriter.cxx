@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkParallelSerialWriter);
-vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.6");
+vtkCxxRevisionMacro(vtkParallelSerialWriter, "1.6.4.1");
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, Writer, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkParallelSerialWriter, PostGatherHelper, vtkAlgorithm);
@@ -147,7 +147,9 @@ int vtkParallelSerialWriter::RequestData(
     return 0;
     }
 
-  if (this->WriteAllTimeSteps)
+  bool write_all = (this->WriteAllTimeSteps != 0 && this->NumberOfTimeSteps > 0);
+
+  if (write_all)
     {
     if (this->CurrentTimeIndex == 0)
       {
@@ -165,10 +167,10 @@ int vtkParallelSerialWriter::RequestData(
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   this->WriteATimestep(input);
 
-  if (this->WriteAllTimeSteps)
+  if (write_all)
     {
     this->CurrentTimeIndex++;
-    if (this->CurrentTimeIndex == this->NumberOfTimeSteps)
+    if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
       {
       // Tell the pipeline to stop looping.
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
