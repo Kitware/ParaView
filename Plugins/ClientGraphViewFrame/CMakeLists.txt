@@ -53,5 +53,6 @@ TARGET_LINK_LIBRARIES(
   ClientGraphViewFramePlugin
   pqComponents
   pqCore
+  OverViewCore
   )
 

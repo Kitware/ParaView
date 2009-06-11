@@ -32,6 +32,9 @@
 #include <vtkSMSelectionRepresentationProxy.h>
 #include <vtkSMSourceProxy.h>
 
+#include <vtkAnnotation.h>
+#include <vtkAnnotationLayers.h>
+#include <vtkAnnotationLink.h>
 #include <vtkConvertSelection.h>
 #include <vtkConvertSelectionDomain.h>
 #include <vtkGraph.h>
@@ -100,10 +103,17 @@ bool ClientGraphViewFrameActions::connect(pqMultiViewFrame *frame, pqView *view)
 
   action = new QAction("ExtractSubgraph", this);
   action->setData("ExtractSubgraph");
+  action->setIcon(QIcon(":ClientGraphViewFrame/Icons/copy_16.png"));
+  frame->addTitlebarAction(action);
+  QObject::connect(action, SIGNAL(triggered(bool)),
+    this, SLOT(onCopySubgraph()));
+  
+  action = new QAction("HideSubgraph", this);
+  action->setData("HideSubgraph");
   action->setIcon(QIcon(":ClientGraphViewFrame/Icons/cut_16.png"));
   frame->addTitlebarAction(action);
   QObject::connect(action, SIGNAL(triggered(bool)),
-    this, SLOT(onExtractSubgraph()));
+    this, SLOT(onHideSubgraph()));
 
   return true;
 }
@@ -188,7 +198,34 @@ void ClientGraphViewFrameActions::onZoomToSelection()
   view->render();
 }
 
-void ClientGraphViewFrameActions::onExtractSubgraph()
+void ClientGraphViewFrameActions::onHideSubgraph()
+{
+  pqView *view = pqActiveView::instance().current();
+  if(!view)
+    {
+    return;
+    }
+
+  if(!view->getAnnotationLink())
+    {
+    return;
+    }
+
+  vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(view->getAnnotationLink()->GetClientSideObject());
+  vtkSmartPointer<vtkAnnotation> a = vtkSmartPointer<vtkAnnotation>::New();
+  vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New();
+  s->DeepCopy(link->GetCurrentSelection());
+  a->SetSelection(s);
+  vtkInformation* ainfo = a->GetInformation();
+  ainfo->Set(vtkAnnotation::ENABLE(), 1);
+  ainfo->Set(vtkAnnotation::LABEL(),"Hidden Items");
+  ainfo->Set(vtkAnnotation::HIDE(), 0);
+  link->GetAnnotationLayers()->AddAnnotation(a);
+
+  view->getAnnotationLink()->MarkModified(0);
+}
+
+void ClientGraphViewFrameActions::onCopySubgraph()
 {
   QAction * action = qobject_cast<QAction*>(this->sender());
   if(!action)

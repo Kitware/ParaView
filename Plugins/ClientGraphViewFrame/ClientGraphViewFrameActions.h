@@ -20,7 +20,8 @@ public:
 private slots:
   void onResetCamera();
   void onZoomToSelection();
-  void onExtractSubgraph();
+  void onCopySubgraph();
+  void onHideSubgraph();
   void onExpandSelection();
 
 private:
