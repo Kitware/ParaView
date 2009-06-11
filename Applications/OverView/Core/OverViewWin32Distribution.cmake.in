@@ -1,5 +1,5 @@
 # Install optional dependencies ...
-#OPTION(OVERVIEW_INSTALL_MYSQL "Include MySQL client libraries in the OverView installer" ON)
+OPTION(OVERVIEW_INSTALL_MYSQL "Include MySQL client libraries in the OverView installer" ON)
 #OPTION(OVERVIEW_INSTALL_ORACLE "Include Oracle client libraries in the OverView installer" OFF)
 #OPTION(OVERVIEW_INSTALL_QT_MYSQL "Include Qt MySQL database drivers in the OverView installer" ON)
 #OPTION(OVERVIEW_INSTALL_QT_ORACLE "Include Qt Oracle database drivers in the OverView installer" OFF)
@@ -154,26 +154,40 @@ ENDIF(MSVC80)
 
 # Install Qt libraries required by OverView ...
 INSTALL(PROGRAMS
+  "@QT_LIBRARY_DIR@/../bin/phononD4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtAssistantClientD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtCLucened.dll"
   "@QT_LIBRARY_DIR@/../bin/QtCoreD4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtGuiD4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtNetworkD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtOpenGLD4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtSqlD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtScriptD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtScriptToolsD4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtSVGD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtWebKitd4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtXmlD4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtXmlPatternsD4.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
+  "@QT_LIBRARY_DIR@/../bin/phonon4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtAssistantClient4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtCLucene4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtCore4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtGui4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtNetwork4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtOpenGL4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtSql4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtScript4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtScriptTools4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtSVG4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtWebKit4.dll"
   "@QT_LIBRARY_DIR@/../bin/QtXml4.dll"
+  "@QT_LIBRARY_DIR@/../bin/QtXmlPatterns4.dll"
   DESTINATION bin
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
@@ -181,18 +195,24 @@ INSTALL(PROGRAMS
 
 #Install Qt plugins required by OverView ...
 INSTALL(PROGRAMS
+  "@QT_PLUGINS_DIR@/imageformats/qgifd4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qicod4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qjpegd4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qmngd4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qsvgd4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qtiffd4.dll"
   DESTINATION bin/qtplugins/imageformats
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Debug
   )
 
 INSTALL(PROGRAMS
+  "@QT_PLUGINS_DIR@/imageformats/qgif4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qico4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qjpeg4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qmng4.dll"
   "@QT_PLUGINS_DIR@/imageformats/qsvg4.dll"
+  "@QT_PLUGINS_DIR@/imageformats/qtiff4.dll"
   DESTINATION bin/qtplugins/imageformats
   COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE}
   CONFIGURATIONS Release
