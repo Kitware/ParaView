@@ -265,12 +265,13 @@ void ClientRecordView::renderInternal()
     }
 
   vtkDataRepresentation *rep = this->Implementation->View->GetRepresentation();
-  if(rep && !vtkSMPropertyHelper(proxy, "FreezeContents").GetAsInt())
+  if(rep && !this->getAnnotationLink())
     {
+    // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
     proxy->GetSelectionRepresentation()->Update();
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    rep->GetAnnotationLink()->SetCurrentSelection(sel);  
+    rep->GetAnnotationLink()->SetCurrentSelection(sel);
     }
 
   this->Implementation->View->Update();

@@ -440,10 +440,14 @@ void ClientGeoView2D::renderGeoViewInternal()
         representation->getProxy());
 
     // Update the selection.
-    proxy->GetSelectionRepresentation()->Update();
-    vtkSelection* sel = vtkSelection::SafeDownCast(
-      proxy->GetSelectionRepresentation()->GetOutput());
-    rep->GetAnnotationLink()->SetCurrentSelection(sel);
+    // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+    if(!this->getAnnotationLink())
+      {
+      proxy->GetSelectionRepresentation()->Update();
+      vtkSelection* sel = vtkSelection::SafeDownCast(
+        proxy->GetSelectionRepresentation()->GetOutput());
+      rep->GetAnnotationLink()->SetCurrentSelection(sel);
+      }
 
     // Update the current domain map.
     int useDomainMap = vtkSMPropertyHelper(proxy, "UseDomainMap").GetAsInt();

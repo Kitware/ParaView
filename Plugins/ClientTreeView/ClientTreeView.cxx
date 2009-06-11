@@ -244,7 +244,9 @@ void ClientTreeView::renderInternal()
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
 
-    if(repSource->GetSelectionInput(0) &&
+    // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+    if(!this->getAnnotationLink() && 
+      repSource->GetSelectionInput(0) &&
       repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
       {
       this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();

@@ -290,7 +290,8 @@ void ClientRichTextView::renderInternal()
     this->Implementation->View->SetFieldType(vtkQtTableView::VERTEX_DATA);
     }
 */
-  if(this->Implementation->View->GetRepresentation())
+  // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+  if(this->Implementation->View->GetRepresentation() && !this->getAnnotationLink())
     {
     pqDataRepresentation* pqRepr =
       qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());

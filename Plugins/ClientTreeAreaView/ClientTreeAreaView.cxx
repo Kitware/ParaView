@@ -384,10 +384,14 @@ void ClientTreeAreaView::synchronizeViews()
       GetAnnotationLink();
 
     // Update the selection.
-    tree_proxy->GetSelectionRepresentation()->Update();
-    vtkSelection* sel = vtkSelection::SafeDownCast(
-      tree_proxy->GetSelectionRepresentation()->GetOutput());
-    tree_link->SetCurrentSelection(sel);
+    // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+    if(!this->getAnnotationLink())
+      {
+      tree_proxy->GetSelectionRepresentation()->Update();
+      vtkSelection* sel = vtkSelection::SafeDownCast(
+        tree_proxy->GetSelectionRepresentation()->GetOutput());
+      tree_link->SetCurrentSelection(sel);
+      }
 
     // Set the current domain map
     int useDomainMap = vtkSMPropertyHelper(tree_proxy, "UseDomainMap").GetAsInt();

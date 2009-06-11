@@ -86,6 +86,8 @@ public:
     this->Widget = new QWidget();
     this->View = vtkSmartPointer<vtkQtTableView>::New();
     this->View->SetShowVerticalHeaders(true);
+    this->View->SetSortSelectionToTop(true);
+    this->View->SetApplyRowColors(true);
     QVBoxLayout *layout = new QVBoxLayout(this->Widget);
     layout->addWidget(this->View->GetWidget());
     layout->setContentsMargins(0,0,0,0);
@@ -257,7 +259,7 @@ void ClientTableView::renderInternal()
 
   proxy->Update();
 
-  int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
+  int attributeType = QString(vtkSMPropertyHelper(proxy, "Attribute").GetAsString(3)).toInt();
 
   if (attributeType == vtkDataObject::FIELD_ASSOCIATION_EDGES)
     {
@@ -272,7 +274,11 @@ void ClientTableView::renderInternal()
     this->Implementation->View->SetFieldType(vtkQtTableView::VERTEX_DATA);
     }
 
-  if(this->Implementation->View->GetRepresentation() && this->getAnnotationLink())
+  this->Implementation->View->SetShowAll(vtkSMPropertyHelper(proxy, "AllColumns").GetAsInt());
+  this->Implementation->View->SetColumnName(vtkSMPropertyHelper(proxy, "Attribute").GetAsString(4));
+
+  // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+  if(this->Implementation->View->GetRepresentation() && !this->getAnnotationLink())
     {
     pqDataRepresentation* pqRepr =
       qobject_cast<pqDataRepresentation*>(this->visibleRepresentation());
@@ -284,9 +290,6 @@ void ClientTableView::renderInternal()
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
 
-    //if(repSource->GetSelectionInput(0) &&
-    //  repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
-    //  {
     if (this->getAnnotationLink()->GetMTime() > this->Implementation->LastSelectionMTime)
       {
       this->Implementation->LastSelectionMTime = this->getAnnotationLink()->GetMTime();

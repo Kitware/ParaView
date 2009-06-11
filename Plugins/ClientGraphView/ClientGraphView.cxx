@@ -27,8 +27,6 @@
 
 #include "ClientGraphView.h"
 
-#include <AnnotationLink.h>
-
 #include <QVTKWidget.h>
 #include <vtkAnnotationLayers.h>
 #include <vtkAnnotationLink.h>
@@ -50,6 +48,7 @@
 #include <vtkTable.h>
 #include <vtkTexture.h>
 #include <vtkVariantArray.h>
+#include <vtkAttributeClustering2DLayoutStrategy.h>
 #include <vtkViewTheme.h>
 #include <vtkWindowToImageFilter.h>
 
@@ -369,7 +368,6 @@ void ClientGraphView::showRepresentation(pqRepresentation* representation)
   vtkDataRepresentation* rep =
     this->Implementation->View->SetRepresentationFromInputConnection(proxy->GetOutputPort());
   rep->SetSelectionType(vtkSelectionNode::PEDIGREEIDS);
-
   // If we have an associated annotation link proxy, set the client side
   // object as the annotation link on the representation.
   if (this->getAnnotationLink())
@@ -433,16 +431,15 @@ void ClientGraphView::renderInternal()
       }
 
     // Update the selection.
-    proxy->GetSelectionRepresentation()->Update();
-    vtkSelection* sel = vtkSelection::SafeDownCast(
+    // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
+    if(!this->getAnnotationLink())
+      {
+      proxy->GetSelectionRepresentation()->Update();
+      vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
-    this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
-      SetCurrentSelection(sel);
-
-    // Update the annotations
-    //vtkAnnotationLayers* ann = AnnotationLink::instance().getAnnotationLayers();
-    //this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
-    //  SetAnnotationLayers(ann);
+      this->Implementation->View->GetRepresentation()->GetAnnotationLink()->
+        SetCurrentSelection(sel);
+      }
 
     QObjectList ifaces =
       pqApplicationCore::instance()->getPluginManager()->interfaces();
@@ -458,6 +455,11 @@ void ClientGraphView::renderInternal()
           this->Implementation->ResetCamera = true;
         layout->SetWeightEdges(vtkSMPropertyHelper(proxy, "WeightEdges").GetAsInt());
         layout->SetEdgeWeightField(vtkSMPropertyHelper(proxy, "EdgeWeightArray").GetAsString());
+        vtkAttributeClustering2DLayoutStrategy* acls = vtkAttributeClustering2DLayoutStrategy::SafeDownCast(layout);
+        if(acls)
+          {
+          acls->SetVertexAttribute(vtkSMPropertyHelper(proxy, "AttributeClusteringArray").GetAsString());
+          }
         this->Implementation->View->SetLayoutStrategy(layout);
         break;
         }
