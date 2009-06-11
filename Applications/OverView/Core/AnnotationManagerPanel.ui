@@ -109,7 +109,7 @@
   <customwidget>
    <class>pqTreeView</class>
    <extends>QTreeView</extends>
-   <header>pqtreeview.h</header>
+   <header>pqTreeView.h</header>
   </customwidget>
  </customwidgets>
  <resources>
