@@ -35,7 +35,7 @@
 #include "vtkUnstructuredGrid.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.8.36.2");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.8.36.3");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 class vtkIntegrateAttributes::vtkFieldList :
@@ -424,7 +424,6 @@ int vtkIntegrateAttributes::RequestData(vtkInformation*,
       }
     return 0;
     }
-  cout << "Done ---- " << endl;
 
   // Here is the trick:  The satellites need a point and vertex to
   // marshal the attributes.  Node zero needs to receive first...
