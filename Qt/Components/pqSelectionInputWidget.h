@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// the selection to use on filters that have a selection as input.
 class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
 {
-  Q_OBJECT;
+  Q_OBJECT
   Q_PROPERTY(pqSMProxy selection
              READ selection
              WRITE setSelection

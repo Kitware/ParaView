@@ -49,7 +49,7 @@ class pqKeyFrameTypeWidget;
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameType : 
   public pqSignalAdaptorComboBox
 {
-  Q_OBJECT;
+  Q_OBJECT
 public:
   /// Constructor. 
   /// \c combo is the combo-box that chooses the type, while frame is

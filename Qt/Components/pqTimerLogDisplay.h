@@ -43,7 +43,7 @@ class vtkPVTimerInformation;
 
 class PQCOMPONENTS_EXPORT pqTimerLogDisplay : public QDialog
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   pqTimerLogDisplay(QWidget *p = NULL);

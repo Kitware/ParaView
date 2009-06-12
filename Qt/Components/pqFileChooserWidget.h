@@ -46,13 +46,13 @@ class pqServer;
 /// file will be put in the line edit
 class PQCOMPONENTS_EXPORT pqFileChooserWidget : public QWidget
 {
-  Q_OBJECT;
-  Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true);
-  Q_PROPERTY(QString extension READ extension WRITE setExtension);
+  Q_OBJECT
+  Q_PROPERTY(QStringList filenames READ filenames WRITE setFilenames USER true)
+  Q_PROPERTY(QString extension READ extension WRITE setExtension)
   Q_PROPERTY(bool useDirectoryMode
-             READ useDirectoryMode WRITE setUseDirectoryMode);
+             READ useDirectoryMode WRITE setUseDirectoryMode)
   Q_PROPERTY(bool forceSingleFile
-             READ forceSingleFile WRITE setForceSingleFile);
+             READ forceSingleFile WRITE setForceSingleFile)
 
 public:
   /// constructor

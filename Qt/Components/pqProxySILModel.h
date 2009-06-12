@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqProxySILModel : public QAbstractProxyModel
 {
   Q_OBJECT
   typedef QAbstractProxyModel Superclass;
-  Q_PROPERTY(QList<QVariant> values READ values WRITE setValues);
+  Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
  
 public:
   pqProxySILModel(const QString& hierarchyName, QObject* parent=0);

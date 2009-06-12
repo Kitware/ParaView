@@ -49,8 +49,8 @@ class QTreeWidgetItem;
 /// size requirements mentioned above. 
 class PQCOMPONENTS_EXPORT pqSignalAdaptorTreeWidget : public QObject
 {
-  Q_OBJECT;
-  Q_PROPERTY(QList<QVariant> values READ values WRITE setValues);
+  Q_OBJECT
+  Q_PROPERTY(QList<QVariant> values READ values WRITE setValues)
 
 public:
   /// Constructor.

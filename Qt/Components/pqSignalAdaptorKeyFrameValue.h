@@ -49,7 +49,7 @@ class pqAnimationCue;
 // to contain the value widget (passed as \c parent to the constructor).
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameValue : public QObject
 {
-  Q_OBJECT;
+  Q_OBJECT
   Q_PROPERTY(QList<QVariant> values READ values WRITE setValue);
   Q_PROPERTY(QVariant value READ value WRITE setValue);
 public:

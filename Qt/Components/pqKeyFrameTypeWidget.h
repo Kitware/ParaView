@@ -38,7 +38,7 @@ class QComboBox;
 
 class PQCOMPONENTS_EXPORT pqKeyFrameTypeWidget : public QWidget
 {
-  Q_OBJECT;
+  Q_OBJECT
   Q_PROPERTY(QString type READ type WRITE setType)
   
   Q_PROPERTY(QString base READ base WRITE setBase)

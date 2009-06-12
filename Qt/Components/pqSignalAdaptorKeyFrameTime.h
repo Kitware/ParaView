@@ -45,8 +45,8 @@ class pqAnimationScene;
 /// clock time range.
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameTime : public QObject
 {
-  Q_OBJECT;
-  Q_PROPERTY(double normalizedTime READ normalizedTime WRITE setNormalizedTime);
+  Q_OBJECT
+  Q_PROPERTY(double normalizedTime READ normalizedTime WRITE setNormalizedTime)
 public:
   /// Constructor. \c object is the QObject showing the time in the GUI
   /// \c propertyname is the Qt property to get/set the GUI's time value
