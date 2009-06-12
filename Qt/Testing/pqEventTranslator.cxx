@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectNaming.h"
 #include "pqSpinBoxEventTranslator.h"
 #include "pqTabBarEventTranslator.h"
-#include "pqTreeWidgetEventTranslator.h"
+#include "pqTreeViewEventTranslator.h"
 
 #include <QCoreApplication>
 #include <QtDebug>
@@ -106,7 +106,7 @@ void pqEventTranslator::addDefaultWidgetEventTranslators()
   addWidgetEventTranslator(new pqMenuEventTranslator());
   addWidgetEventTranslator(new pqSpinBoxEventTranslator());
   addWidgetEventTranslator(new pqTabBarEventTranslator());
-  addWidgetEventTranslator(new pqTreeWidgetEventTranslator());
+  addWidgetEventTranslator(new pqTreeViewEventTranslator());
 }
 
 void pqEventTranslator::addWidgetEventTranslator(pqWidgetEventTranslator* Translator)

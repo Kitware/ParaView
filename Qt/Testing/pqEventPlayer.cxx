@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqBasicWidgetEventPlayer.h"
 #include "pqObjectNaming.h"
 #include "pqTabBarEventPlayer.h"
-#include "pqTreeWidgetEventPlayer.h"
+#include "pqTreeViewEventPlayer.h"
 
 #include <QApplication>
 #include <QWidget>
@@ -66,7 +66,7 @@ void pqEventPlayer::addDefaultWidgetEventPlayers()
   addWidgetEventPlayer(new pqAbstractItemViewEventPlayer());
   addWidgetEventPlayer(new pqAbstractStringEventPlayer());
   addWidgetEventPlayer(new pqTabBarEventPlayer());
-  addWidgetEventPlayer(new pqTreeWidgetEventPlayer());
+  addWidgetEventPlayer(new pqTreeViewEventPlayer());
   addWidgetEventPlayer(new pqAbstractMiscellaneousEventPlayer());
 }
 

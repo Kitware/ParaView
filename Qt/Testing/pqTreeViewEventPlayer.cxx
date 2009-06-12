@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeWidgetEventPlayer.cxx
+   Module:    pqTreeViewEventPlayer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,40 +29,46 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqTreeWidgetEventPlayer.h"
+#include "pqTreeViewEventPlayer.h"
 
 
 #include <QTreeWidget>
 #include <QDebug>
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetEventPlayer::pqTreeWidgetEventPlayer(QObject* parentObject)
+pqTreeViewEventPlayer::pqTreeViewEventPlayer(QObject* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetEventPlayer::~pqTreeWidgetEventPlayer()
+pqTreeViewEventPlayer::~pqTreeViewEventPlayer()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool pqTreeWidgetEventPlayer::playEvent(
+bool pqTreeViewEventPlayer::playEvent(
   QObject* object, const QString& command, 
   const QString& arguments, bool& error)
 {
-  QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
-  if (!treeWidget)
+  QTreeView* treeView= qobject_cast<QTreeView*>(object);
+  if (!treeView)
     {
     return false;
     }
   
-  QRegExp regExp("^([\\d\\.]+),(\\d+),(\\d+)$");
-  if (command == "setTreeItemCheckState" && regExp.indexIn(arguments) != -1)
+  QRegExp regExp0("^([\\d\\.]+),(\\d+),(\\d+)$");
+  if (command == "setTreeItemCheckState" && regExp0.indexIn(arguments) != -1)
     {
-    QString str_index = regExp.cap(1);
-    int column = regExp.cap(2).toInt();
-    int check_state = regExp.cap(3).toInt();
+    // legacy command recorded from tree widgets.
+    QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
+    if (!treeWidget)
+      {
+      return false;
+      }
+    QString str_index = regExp0.cap(1);
+    int column = regExp0.cap(2).toInt();
+    int check_state = regExp0.cap(3).toInt();
     
     QStringList indices = str_index.split(".",QString::SkipEmptyParts);
     QTreeWidgetItem* cur_item = NULL;
@@ -86,6 +92,32 @@ bool pqTreeWidgetEventPlayer::playEvent(
         }
       }
     cur_item->setCheckState(column, static_cast<Qt::CheckState>(check_state));
+    return true;
+    }
+
+  QRegExp regExp1("^([\\d\\.]+),(\\d+)$");
+  if (command == "setCheckState" && regExp1.indexIn(arguments) != -1)
+    {
+    QString str_index = regExp1.cap(1);
+    int check_state = regExp1.cap(2).toInt();
+    
+    QStringList indices = str_index.split(".",QString::SkipEmptyParts);
+    QModelIndex index;
+    for (int cc=0; (cc+1) < indices.size(); cc+=2)
+      {
+      index = treeView->model()->index(indices[cc].toInt(), indices[cc+1].toInt(),
+        index);
+      if (!index.isValid())
+        {
+        error=true;
+        qCritical() << "ERROR: Tree view must have changed. "
+          << "Indices recorded in the test are no longer valid. Cannot playback.";
+        return true;
+        }
+      }
+    treeView->model()->setData(index,
+      static_cast<Qt::CheckState>(check_state),
+      Qt::CheckStateRole);
     return true;
     }
   return false;

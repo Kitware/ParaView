@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeWidgetEventTranslator.h
+   Module:    pqTreeViewEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,33 +29,27 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#ifndef __pqTreeWidgetEventTranslator_h 
-#define __pqTreeWidgetEventTranslator_h
+#ifndef __pqTreeViewEventPlayer_h 
+#define __pqTreeViewEventPlayer_h
 
-#include "pqWidgetEventTranslator.h"
+#include "pqWidgetEventPlayer.h"
 
-class QTreeWidgetItem;
-
-/// Event recorder for QTreeWidget. Records the toggling of the check states for
-/// tree widget items. The recorded state can be played back using
-/// pqTreeWidgetEventPlayer.
-class QTTESTING_EXPORT pqTreeWidgetEventTranslator : public pqWidgetEventTranslator
+/// pqTreeViewEventPlayer is a player for QTreeWidget. Plays back the state
+/// recorded using pqTreeViewEventTranslator.
+class QTTESTING_EXPORT pqTreeViewEventPlayer : public pqWidgetEventPlayer
 {
   Q_OBJECT
-  typedef pqWidgetEventTranslator Superclass;
+  typedef pqWidgetEventPlayer Superclass;
 public:
-  pqTreeWidgetEventTranslator(QObject* parent=0);
-  ~pqTreeWidgetEventTranslator();
+  pqTreeViewEventPlayer(QObject* parent=0);
+  ~pqTreeViewEventPlayer();
 
-  /// Overridden to handle events on QColorDialog. 
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
- 
-private slots:
-  void onItemChanged(QTreeWidgetItem* item, int column);
+  bool playEvent(QObject* object, const QString& command, const QString&
+    arguments, bool& error);
 
 private:
-  pqTreeWidgetEventTranslator(const pqTreeWidgetEventTranslator&); // Not implemented.
-  void operator=(const pqTreeWidgetEventTranslator&); // Not implemented.
+  pqTreeViewEventPlayer(const pqTreeViewEventPlayer&); // Not implemented.
+  void operator=(const pqTreeViewEventPlayer&); // Not implemented.
 };
 
 #endif

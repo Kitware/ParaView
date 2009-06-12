@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqTreeWidgetEventTranslator.cxx
+   Module:    pqTreeViewEventTranslator.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,31 +29,31 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
-#include "pqTreeWidgetEventTranslator.h"
+#include "pqTreeViewEventTranslator.h"
 
-#include <QTreeWidget>
+#include <QTreeView>
 #include <QEvent>
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetEventTranslator::pqTreeWidgetEventTranslator(QObject* parentObject)
+pqTreeViewEventTranslator::pqTreeViewEventTranslator(QObject* parentObject)
   : Superclass(parentObject)
 {
 }
 
 //-----------------------------------------------------------------------------
-pqTreeWidgetEventTranslator::~pqTreeWidgetEventTranslator()
+pqTreeViewEventTranslator::~pqTreeViewEventTranslator()
 {
 }
 
 //-----------------------------------------------------------------------------
-bool pqTreeWidgetEventTranslator::translateEvent(
+bool pqTreeViewEventTranslator::translateEvent(
   QObject* object, QEvent* tr_event, bool& /*error*/)
 {
-  QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(object);
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(object);
   if(!treeWidget)
     {
     // mouse events go to the viewport widget
-    treeWidget = qobject_cast<QTreeWidget*>(object->parent());
+    treeWidget = qobject_cast<QTreeView*>(object->parent());
     }
   if(!treeWidget)
     {
@@ -63,38 +63,33 @@ bool pqTreeWidgetEventTranslator::translateEvent(
   if (tr_event->type() == QEvent::FocusIn)
     {
     QObject::disconnect(treeWidget, 0, this, 0);
-    QObject::connect(treeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)),
-      this, SLOT(onItemChanged(QTreeWidgetItem*, int)));
+    QObject::connect(treeWidget, SIGNAL(clicked(const QModelIndex&)),
+      this, SLOT(onItemChanged(const QModelIndex&)));
     }
   return true;
 }
 
 //-----------------------------------------------------------------------------
-void pqTreeWidgetEventTranslator::onItemChanged(
-  QTreeWidgetItem* item, int column)
+void pqTreeViewEventTranslator::onItemChanged(
+  const QModelIndex& index)
 {
-  QTreeWidget* treeWidget = item->treeWidget();
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
 
-  QTreeWidgetItem* cur_item = item;
+  QModelIndex curIndex = index;
   QString str_index;
-  while (cur_item)
+  while (curIndex.isValid())
     {
-    QTreeWidgetItem* parentItem = cur_item->parent();
-    if (parentItem)
-      {
-      str_index.prepend(QString("%1.").arg(parentItem->indexOfChild(cur_item)));
-      }
-    else
-      {
-      str_index.prepend(QString("%1.").arg(treeWidget->indexOfTopLevelItem(cur_item)));
-      }
-    cur_item = parentItem;
+    str_index.prepend(QString("%1.%2.").arg(curIndex.row()).arg(curIndex.column()));
+    curIndex = curIndex.parent();
     }
 
   // remove the last ".".
   str_index.chop(1);
-
-  emit this->recordEvent( treeWidget, "setTreeItemCheckState",
-    QString("%1,%2,%3").arg(str_index).arg(column).arg(
-      static_cast<int>(item->checkState(column))));
+  if ( (index.model()->flags(index) & Qt::ItemIsUserCheckable) != 0)
+    {
+    // record the check state change if the item is user-checkable.
+    emit this->recordEvent( treeWidget, "setCheckState",
+      QString("%1,%3").arg(str_index).arg(
+        index.model()->data(index,Qt::CheckStateRole).toInt()));
+    }
 }
