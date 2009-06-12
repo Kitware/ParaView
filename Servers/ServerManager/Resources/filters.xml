@@ -5156,11 +5156,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        number_of_elements="1"
        default_values="2" >
        <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
        <Documentation>
-           This property indicates the unit for specifying the Minimum/Initial/Maximum integration step. The Time unit specifies the time interval a particle is allowed to travel/advect in a steady flow. The Cell Length unit specifies the step length as a number of cells.
+           This property specifies the unit for Minimum/Initial/Maximum integration step size. The Length unit refers to the arc length that a particle travels/advects within a single step. The Cell Length unit represents the step size as a number of cells.
        </Documentation>
      </IntVectorProperty>  
 
@@ -5172,7 +5172,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.2" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the initial integration step. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), the step size is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies.
+         This property specifies the initial integration step size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), it is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies such that the numerical error is less than a specified threshold.
        </Documentation>
      </DoubleVectorProperty>
        
@@ -5184,7 +5184,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.01" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step size.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -5196,7 +5196,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.5" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step size.
        </Documentation>
      </DoubleVectorProperty>  
 
@@ -5224,7 +5224,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          </RequiredProperties>
        </BoundsDomain>
        <Documentation>
-         This property specifies the maximum streamline length (i.e., physical arc length), beyond which integration is terminated.
+         This property specifies the maximum streamline length (i.e., physical arc length), beyond which line integration is terminated.
        </Documentation>       
      </DoubleVectorProperty>
 
@@ -5236,7 +5236,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the terminal speed, below which a particle stops advection/integration.
+         This property specifies the terminal speed, below which particle advection/integration is terminated.
        </Documentation>
      </DoubleVectorProperty>
        
@@ -5247,7 +5247,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the maximum error (for Runge-Kutta 4-5) allowed in the integration. The Runge-Kutta 4-5 integrator tries to adjust the step size so that the estimated error is less than this threshold.
+         This property specifies the maximum error (for Runge-Kutta 4-5) tolerated throughout streamline integration. The Runge-Kutta 4-5 integrator tries to adjust the step size such that the estimated error is less than this threshold.
        </Documentation>
      </DoubleVectorProperty>
        
@@ -5357,11 +5357,11 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        number_of_elements="1"
        default_values="2" >
        <EnumerationDomain name="enum">
-         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
          <Entry value="2" text="Cell Length"/>
        </EnumerationDomain>
        <Documentation>
-           This property indicates the unit for specifying the Minimum/Initial/Maximum integration step. The Time unit specifies the time interval a particle is allowed to travel/advect in a steady flow. The Cell Length unit specifies the step length as a number of cells.
+           This property specifies the unit for Minimum/Initial/Maximum integration step size. The Length unit refers to the arc length that a particle travels/advects within a single step. The Cell Length unit represents the step size as a number of cells.
        </Documentation>
      </IntVectorProperty>  
 
@@ -5373,7 +5373,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.2" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the initial integration step. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), the step size is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies.
+         This property specifies the initial integration step size. For non-adaptive integrators (Runge-Kutta 2 and Runge-Kutta 4), it is fixed (always equal to this initial value) throughout the integration. For an adaptive integrator (Runge-Kutta 4-5), the actual step size varies such that the numerical error is less than a specified threshold.
        </Documentation>
      </DoubleVectorProperty>
        
@@ -5385,7 +5385,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.01" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the minimum integration step size.
        </Documentation>
      </DoubleVectorProperty>
 
@@ -5397,7 +5397,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.5" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step.
+         When using the Runge-Kutta 4-5 ingrator, this property specifies the maximum integration step size.
        </Documentation>
      </DoubleVectorProperty>  
 
@@ -5425,7 +5425,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
          </RequiredProperties>
        </BoundsDomain>
        <Documentation>
-         This property specifies the maximum streamline length (i.e., physical arc length), beyond which integration is terminated.
+         This property specifies the maximum streamline length (i.e., physical arc length), beyond which line integration is terminated.
        </Documentation>       
      </DoubleVectorProperty>
 
@@ -5437,7 +5437,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.000000000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the terminal speed, below which a particle stops advection/integration.
+         This property specifies the terminal speed, below which particle advection/integration is terminated.
        </Documentation>
      </DoubleVectorProperty>
        
@@ -5448,7 +5448,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        default_values="0.000001" >
        <DoubleRangeDomain name="range"/>
        <Documentation>
-         This property specifies the maximum error (for Runge-Kutta 4-5) allowed in the integration. The Runge-Kutta 4-5 integrator tries to adjust the step size so that the estimated error is less than this threshold.
+         This property specifies the maximum error (for Runge-Kutta 4-5) tolerated throughout streamline integration. The Runge-Kutta 4-5 integrator tries to adjust the step size such that the estimated error is less than this threshold.
        </Documentation>
      </DoubleVectorProperty>
        
