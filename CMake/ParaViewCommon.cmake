@@ -312,7 +312,17 @@ OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
+
+OPTION(PARAVIEW_DISABLE_VTK_TESTING "Disable VTK Testing" OFF)
+MARK_AS_ADVANCED(PARAVIEW_DISABLE_VTK_TESTING)
+IF (PARAVIEW_DISABLE_VTK_TESTING)
+  SET (__pv_build_testing ${BUILD_TESTING})
+  SET (BUILD_TESTING OFF)
+ENDIF (PARAVIEW_DISABLE_VTK_TESTING)
 ADD_SUBDIRECTORY(VTK)
+IF (PARAVIEW_DISABLE_VTK_TESTING)
+  SET (BUILD_TESTING ${__pv_build_testing})
+ENDIF (PARAVIEW_DISABLE_VTK_TESTING)
 
 #########################################################################
 # Set the ICET MPI variables from the VTK ones.
