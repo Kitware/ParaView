@@ -114,7 +114,7 @@ public:
     new QVBoxLayout(this->Widget);
     this->Widget->GetInteractor()->EnableRenderOff();
 
-    this->Theme.TakeReference(vtkViewTheme::CreateMellowTheme());
+    this->Theme.TakeReference(vtkViewTheme::CreateNeonTheme());
     this->View = vtkSmartPointer<vtkGraphLayoutView>::New();
     this->View->SetLayoutStrategyToFast2D();
     this->Widget->SetRenderWindow(this->View->GetRenderWindow());

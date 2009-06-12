@@ -120,7 +120,7 @@ public:
     new QVBoxLayout(this->Widget);
     this->Widget->GetInteractor()->EnableRenderOff();
 
-    this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateMellowTheme());
+    this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateNeonTheme());
     this->HierarchicalGraphView = vtkSmartPointer<vtkTreeAreaView>::New();
     this->Widget->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
     this->HierarchicalGraphView->ApplyViewTheme(this->HierarchicalGraphTheme);
