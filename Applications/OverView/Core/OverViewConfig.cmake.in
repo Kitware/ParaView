@@ -163,5 +163,9 @@ MACRO(overview_build_client)
     INCLUDE("@ParaView_BINARY_DIR@/OverViewWin32Distribution.cmake")
   ENDIF(WIN32)
 
+  # Cleanup our internal variables so they don't cause problems downstream ...
+  SET(RCS_SOURCES "")
+  SET(UI_RESOURCES "")
+
 ENDMACRO(overview_build_client)
 
