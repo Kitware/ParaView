@@ -2171,7 +2171,7 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
         gvd.SetPassThrough(arg1)
 
     else:
-        print "applying operation"
+        #print "applying operation"
         gvd.SetReductionType(6) # CUSTOM
         gvd.SetPreGatherHelper(arg1)
         gvd.SetPostGatherHelper(arg2)
