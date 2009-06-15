@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqTreeViewEventPlayer.h"
-
+#include "pqEventDispatcher.h"
 
 #include <QTreeWidget>
 #include <QDebug>
@@ -92,6 +92,7 @@ bool pqTreeViewEventPlayer::playEvent(
         }
       }
     cur_item->setCheckState(column, static_cast<Qt::CheckState>(check_state));
+    pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
 
@@ -118,6 +119,7 @@ bool pqTreeViewEventPlayer::playEvent(
     treeView->model()->setData(index,
       static_cast<Qt::CheckState>(check_state),
       Qt::CheckStateRole);
+    pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
   return false;
