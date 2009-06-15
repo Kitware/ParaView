@@ -49,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.24");
+vtkCxxRevisionMacro(vtkPVMain, "1.24.2.1");
 
 int vtkPVMain::UseMPI = 1;
 int vtkPVMain::FinalizeMPI = 0;
@@ -188,7 +188,15 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
 
   // Don't prompt the user with startup errors on unix.
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  vtkOutputWindow::GetInstance()->PromptUserOn();
+  if(getenv("DASHBOARD_TEST_FROM_CTEST") ||
+    getenv("DART_TEST_FROM_DART"))
+    {
+    vtkOutputWindow::GetInstance()->PromptUserOff();
+    }
+  else
+    {
+    vtkOutputWindow::GetInstance()->PromptUserOn();
+    }
 #else
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
