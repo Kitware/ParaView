@@ -1,0 +1,104 @@
+<ui version="4.0" >
+ <class>pqTransferFunctionDialog</class>
+ <widget class="QDialog" name="pqTransferFunctionDialog" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>454</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Radius and Opacity Editor</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="1" column="0" >
+    <layout class="QHBoxLayout" >
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <item>
+      <spacer>
+       <property name="orientation" >
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0" >
+        <size>
+         <width>251</width>
+         <height>27</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="CloseButton" >
+       <property name="text" >
+        <string>&amp;Close</string>
+       </property>
+       <property name="default" >
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0" >
+    <widget class="QTabWidget" name="TransferFunctionTabs" >
+     <property name="currentIndex" >
+      <number>1</number>
+     </property>
+     <widget class="pqTransferFunctionEditor" name="RadiusPage" >
+      <attribute name="title" >
+       <string>Radius</string>
+      </attribute>
+     </widget>
+     <widget class="pqTransferFunctionEditor" name="OpacityPage" >
+      <attribute name="title" >
+       <string>Opacity</string>
+      </attribute>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>pqTransferFunctionEditor</class>
+   <extends>QWidget</extends>
+   <header>pqTransferFunctionEditor.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>CloseButton</tabstop>
+  <tabstop>TransferFunctionTabs</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>CloseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>pqTransferFunctionDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>449</x>
+     <y>429</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>249</x>
+     <y>226</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

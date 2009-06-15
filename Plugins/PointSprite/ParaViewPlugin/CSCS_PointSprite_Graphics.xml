@@ -1,0 +1,236 @@
+<ServerManagerConfiguration>
+
+   <!--======================================================================-->
+   <ProxyGroup name="filters">
+
+      <SourceProxy name="CellPointsFilter" class="vtkCellPointsFilter">
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+
+      <IntVectorProperty
+        name="VertexCells"
+        command="SetVertexCells"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If on, the output polygonal dataset will one vertex per input point
+        </Documentation>
+      </IntVectorProperty>
+
+      <!-- End CellPointsFilter -->
+    </SourceProxy>
+    <SourceProxy name="TransferFunctionFilter" class="vtk1DTransferFunctionFilter">
+
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+
+      <StringVectorProperty
+        name="InputArrayToProcess"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        label="Scalars">
+           <ArrayListDomain name="array_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+           <Documentation>
+             The value of this property contains the name of the array to transform through the transfer function.
+           </Documentation>
+      </StringVectorProperty>
+
+      <ProxyProperty
+        name="TransferFunction"
+        command="SetTransferFunction">
+        <Documentation>
+          Set the transfert function used to map scalars to texture.
+        </Documentation>
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables_1D" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty
+        name="Enabled"
+        command="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="OutputArrayName"
+        command="SetOutputArrayName"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          This sets name of the mapped array.
+        </Documentation>
+      </StringVectorProperty>
+
+       <IntVectorProperty
+        name="OutputArrayType"
+        command="SetOutputArrayType"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="VTK_BIT"/>
+          <Entry value="2" text="VTK_CHAR"/>
+          <Entry value="15" text="VTK_SIGNED_CHAR"/>
+          <Entry value="3" text="VTK_UNSIGNED_CHAR"/>
+          <Entry value="4" text="VTK_SHORT"/>
+          <Entry value="5" text="VTK_UNSIGNED_SHORT"/>
+          <Entry value="6" text="VTK_INT"/>
+          <Entry value="7" text="VTK_UNSIGNED_INT"/>
+          <Entry value="8" text="VTK_LONG"/>
+          <Entry value="9" text="VTK_UNSIGNED_LONG"/>
+          <Entry value="10" text="VTK_FLOAT"/>
+          <Entry value="11" text="VTK_DOUBLE"/>
+          <Entry value="12" text="VTK_ID_TYPE"/>
+        </EnumerationDomain>
+        <Documentation>
+          This sets type of the output array, if the ForceSameTypeAsInputArray option is not turned on.
+        </Documentation>
+       </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ForceSameTypeAsInputArray"
+        command="SetForceSameTypeAsInputArray"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          This option forces the output array to be of the same type than the input array.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="ConcatenateOutputNameWithInput"
+        command="SetConcatenateOutputNameWithInput"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool"/>
+        <Documentation>
+          If this option is turned on, the output array name will be concatenated with the input array name.
+        </Documentation>
+      </IntVectorProperty>
+
+    </SourceProxy>
+
+   <!-- End of "filters" -->
+
+   </ProxyGroup>
+
+    <!--======================================================================-->
+   <ProxyGroup name="lookup_tables_1D">
+
+     <Proxy name="TransferFunction1D">
+      <DoubleVectorProperty
+         name="Range"
+         command="SetInputRange"
+         number_of_elements="2"
+         default_values="0 1">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="UseScalarRange"
+         command="SetUseScalarRange"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+       <IntVectorProperty
+         name="VectorComponent"
+         command="SetVectorComponent"
+         number_of_elements="1"
+         default_values="0">
+      </IntVectorProperty>
+     </Proxy>
+
+     <Proxy name="TransferFunctionChooser"
+        class="vtk1DTransferFunctionChooser" base_proxygroup="lookup_tables_1D" base_proxyname="TransferFunction1D">
+
+       <ProxyProperty name="GaussianTransferFunction"
+        command="SetGaussianTransferFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables_1D" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+       <ProxyProperty name="LookupTableTransferFunction"
+        command="SetLookupTableTransferFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables_1D" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <IntVectorProperty
+         name="TransferFunctionMode"
+         command="SetTransferFunctionMode"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="enum">
+          <Entry value="0" text="Table" />
+          <Entry value="1" text="Gaussian" />
+       </EnumerationDomain>
+      </IntVectorProperty>
+
+     </Proxy>
+
+     <Proxy name="GaussianTransferFunction"
+        class="vtk1DGaussianTransferFunction" base_proxygroup="lookup_tables_1D" base_proxyname="TransferFunction1D">
+
+      <DoubleVectorProperty
+        name="GaussianControlPoints"
+        command="SetGaussianControlPoint"
+        set_number_command="SetNumberOfGaussianControlPoints"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="5"
+        clean_command="RemoveAllGaussianControlPoints"
+        use_index="1" />
+
+     </Proxy>
+
+     <Proxy name="LookupTableTransferFunction"
+        class="vtk1DLookupTableTransferFunction" base_proxygroup="lookup_tables_1D" base_proxyname="TransferFunction1D">
+
+      <DoubleVectorProperty
+        name="TableValues"
+        command="SetTableValue"
+        set_number_command="SetNumberOfTableValues"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllTableValues"
+        use_index="1" />
+
+     </Proxy>
+
+   <!-- End of "lookup_tables_1D" -->
+
+   </ProxyGroup>
+
+</ServerManagerConfiguration>
+
