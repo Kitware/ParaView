@@ -315,6 +315,13 @@ OPTION(VTK_USE_TK "Build VTK with Tk support" OFF)
 # Set this to get VTKs FOR LOOP "fix" to apply too all of Paraviews Source.
 SET(VTK_USE_FOR_SCOPE_WORKAROUND TRUE)
 
+# -----------------------------------------------------------------------------
+# Disable deprecation warnings for standard C and STL functions in VS2005 and
+# later (no, we don't need IF(CMAKE_COMPILER_2005) ... )
+# -----------------------------------------------------------------------------
+ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+ADD_DEFINITIONS(-D_SCL_SECURE_NO_DEPRECATE)
+
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 
