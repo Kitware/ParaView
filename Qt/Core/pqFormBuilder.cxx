@@ -41,11 +41,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqFormBuilder::pqFormBuilder(QObject* o) 
   : QUiLoader(o)
 {
-  // search plugins in application directory
-  this->addPluginPath(QCoreApplication::applicationDirPath());
-#ifdef Q_WS_MAC
-  this->addPluginPath(QCoreApplication::applicationDirPath() + "/../../../");
-#endif //Q_WS_MAC
+// If a plugin needs to load a library to locate the UI file, it should have
+// already been loaded. This is loading other plugins the directories specified
+// with weird side-effects.
+//  // search plugins in application directory
+//  this->addPluginPath(QCoreApplication::applicationDirPath());
+//#ifdef Q_WS_MAC
+//  this->addPluginPath(QCoreApplication::applicationDirPath() + "/../../../");
+//#endif //Q_WS_MAC
 }
 
 pqFormBuilder::~pqFormBuilder()
