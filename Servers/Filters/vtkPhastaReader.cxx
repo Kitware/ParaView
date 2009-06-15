@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkDataArray.h"
 #include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSmartPointer.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.10");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.11");
 vtkStandardNewMacro(vtkPhastaReader);
 
 vtkCxxSetObjectMacro(vtkPhastaReader, CachedGrid, vtkUnstructuredGrid);
@@ -137,19 +138,29 @@ size_t vtkPhastaReader::typeSize( const char typestring[] )
 {
   char* ts1 = StringStripper( typestring );
 
-  if ( cscompare( "integer", ts1 ) ) {
-  delete [] ts1;
-  return sizeof(int);
-  } else if ( cscompare( "double", ts1 ) ) { 
-  delete [] ts1;
-  return sizeof( double );
-  } else { 
-  delete [] ts1;
-  fprintf(stderr,"unknown type : %s\n",ts1);
-  return 0;
-  }
+  if ( cscompare( "integer", ts1 ) )
+    {
+    delete [] ts1;
+    return sizeof(int);
+    }
+  else if ( cscompare( "double", ts1 ) )
+    {
+    delete [] ts1;
+    return sizeof( double );
+    }
+  else if ( cscompare( "float", ts1 ) )
+    {
+    delete [] ts1;
+    return sizeof( float );
+    }
+  else
+    {
+    delete [] ts1;
+    fprintf(stderr,"unknown type : %s\n",ts1);
+    return 0;
+    }
 }
-    
+
 int vtkPhastaReader::readHeader( FILE*       fileObject,
                                const char  phrase[],
                                int*        params,
@@ -670,7 +681,7 @@ void vtkPhastaReader::ReadGeomFile(char* geomFileName,
 
   /* read coordinates */
   expect = 2;
-  readheader(&geomfile,"co-ordinates",array,&expect,"integer","binary");
+  readheader(&geomfile,"co-ordinates",array,&expect,"double","binary");
   // TEST *******************
   num_nodes=array[0];
   // TEST *******************
@@ -839,7 +850,7 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
   temperature->SetName("temperature");
 
   expect = 3; 
-  readheader(&fieldfile,"solution",array,&expect,"integer","binary");
+  readheader(&fieldfile,"solution",array,&expect,"double","binary");
   noOfNodes = array[0];
   this->NumberOfVariables = array[1];
 
@@ -907,6 +918,7 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
 
 } //closes ReadFieldFile
 
+
 void vtkPhastaReader::ReadFieldFile(char* fieldFileName, 
                                     int, 
                                     vtkUnstructuredGrid *output, 
@@ -946,12 +958,19 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
     else
       field = output->GetPointData();
 
-    double *data;
+    // void *data;
+    int dtype;  // (0=double, 1=float)
     vtkDataArray *dataArray;
     /* read the field data */
     if(strcmp(dataType,"double")==0)
       {
       dataArray = vtkDoubleArray::New();
+      dtype = 0;
+      }
+    else if(strcmp(dataType,"float")==0)
+      {
+      dataArray = vtkFloatArray::New();
+      dtype=1;
       }
     else
       {
@@ -963,7 +982,7 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
     dataArray->SetNumberOfComponents(numOfComps);
 
     expect = 3; 
-    readheader(&fieldfile,phastaFieldTag,array,&expect,"integer","binary");
+    readheader(&fieldfile,phastaFieldTag,array,&expect,dataType,"binary");
     noOfDatas = array[0];
     this->NumberOfVariables = array[1];
     numOfVars = array[1];
@@ -986,90 +1005,214 @@ void vtkPhastaReader::ReadFieldFile(char* fieldFileName,
       }
 
     item = numOfVars*noOfDatas;
-    data = new double[item];
-    if(data == NULL)
-      {
-      vtkErrorMacro(<<"Unable to allocate memory for field info");
+    if (dtype==0)
+      {  //data is type double
 
-      dataArray->Delete();
+      double *data;
+      data = new double[item];
+
+      if(data == NULL)
+        {
+        vtkErrorMacro(<<"Unable to allocate memory for field info");
+
+        dataArray->Delete();
+        continue;
+        }
+
+      readdatablock(&fieldfile,phastaFieldTag,data,&item,dataType,"binary");
+
+      switch(numOfComps)
+        {
+        case 1 :
+          {
+          int offset = index*noOfDatas;
+
+          if(!activeScalars)
+            field->SetActiveScalars(paraviewFieldTag);
+          else
+            activeScalars = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+            dataArray->SetTuple1(i, data[offset+i]);
+            }
+          }
+          break;
+        case 3 :
+          {
+          int offset[3];
+          for(j=0;j<3;j++)
+            offset[j] = (index+j)*noOfDatas;
+
+          if(!activeScalars)
+            field->SetActiveVectors(paraviewFieldTag);
+          else
+            activeScalars = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+            dataArray->SetTuple3(i, 
+                                 data[offset[0]+i], 
+                                 data[offset[1]+i],
+                                 data[offset[2]+i]);
+            }
+          }
+          break;
+        case 9 :
+          {
+          int offset[9];
+          for(j=0;j<9;j++)
+            offset[j] = (index+j)*noOfDatas;
+
+          if(!activeTensors)
+            field->SetActiveTensors(paraviewFieldTag);
+          else
+            activeTensors = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+            dataArray->SetTuple9(i,
+                                 data[offset[0]+i],
+                                 data[offset[1]+i],
+                                 data[offset[2]+i],
+                                 data[offset[3]+i],
+                                 data[offset[4]+i],
+                                 data[offset[5]+i],
+                                 data[offset[6]+i],
+                                 data[offset[7]+i],
+                                 data[offset[8]+i]);
+            }
+          }
+          break;
+        default:
+          vtkErrorMacro("number of components [" << numOfComps <<"] NOT supported");
+
+          dataArray->Delete();
+          delete [] data;
+          continue;
+        }
+
+      // clean up
+      delete [] data;
+
+      }
+    else if(dtype==1)
+      {  // data is type float
+
+      float *data;
+      data = new float[item];
+
+      if(data == NULL)
+        {
+        vtkErrorMacro(<<"Unable to allocate memory for field info");
+
+        dataArray->Delete();
+        continue;
+        }
+
+      readdatablock(&fieldfile,phastaFieldTag,data,&item,dataType,"binary");
+
+      switch(numOfComps)
+        {
+        case 1 :
+          {
+          int offset = index*noOfDatas;
+
+          if(!activeScalars)
+            field->SetActiveScalars(paraviewFieldTag);
+          else
+            activeScalars = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+      //double tmpval = (double) data[offset+i];
+      //dataArray->SetTuple1(i, tmpval);
+            dataArray->SetTuple1(i, data[offset+i]);
+            }
+          }
+          break;
+        case 3 :
+          {
+          int offset[3];
+          for(j=0;j<3;j++)
+            offset[j] = (index+j)*noOfDatas;
+
+          if(!activeScalars)
+            field->SetActiveVectors(paraviewFieldTag);
+          else
+            activeScalars = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+      //double tmpval[3];
+      //for(j=0;j<3;j++) 
+      //   tmpval[j] = (double) data[offset[j]+i];
+            //dataArray->SetTuple3(i,
+            //                    tmpval[0], tmpval[1], tmpval[3]);
+            dataArray->SetTuple3(i,
+                                 data[offset[0]+i],
+                                 data[offset[1]+i],
+                                 data[offset[2]+i]);
+            }
+          }
+          break;
+        case 9 :
+          {
+          int offset[9];
+          for(j=0;j<9;j++)
+            offset[j] = (index+j)*noOfDatas;
+
+          if(!activeTensors)
+            field->SetActiveTensors(paraviewFieldTag);
+          else
+            activeTensors = 1;
+          for(i=0;i<noOfDatas;i++)
+            {
+            //double tmpval[9];
+            //for(j=0;j<9;j++)
+            //   tmpval[j] = (double) data[offset[j]+i];
+            //dataArray->SetTuple9(i,
+            //                     tmpval[0],
+            //                     tmpval[1],
+            //                     tmpval[2],
+            //                     tmpval[3],
+            //                     tmpval[4],
+            //                     tmpval[5],
+            //                     tmpval[6],
+            //                     tmpval[7],
+            //                     tmpval[8]);
+            dataArray->SetTuple9(i,
+                                 data[offset[0]+i],
+                                 data[offset[1]+i],
+                                 data[offset[2]+i],
+                                 data[offset[3]+i],
+                                 data[offset[4]+i],
+                                 data[offset[5]+i],
+                                 data[offset[6]+i],
+                                 data[offset[7]+i],
+                                 data[offset[8]+i]);
+            }
+          }
+          break;
+        default:
+          vtkErrorMacro("number of components [" << numOfComps <<"] NOT supported");
+
+          dataArray->Delete();
+          delete [] data;
+          continue;
+        }
+
+      // clean up
+      delete [] data;
+
+      }
+    else
+      {
+      vtkErrorMacro("Data type [" << dataType <<"] NOT supported");
       continue;
       }
 
-    readdatablock(&fieldfile,phastaFieldTag,data,&item,dataType,"binary");
-
-    switch(numOfComps)
-      {
-      case 1 :
-        {
-        int offset = index*noOfDatas;
-
-        if(!activeScalars)
-          field->SetActiveScalars(paraviewFieldTag);
-        else
-          activeScalars = 1;
-        for(i=0;i<noOfDatas;i++)
-          {
-          dataArray->SetTuple1(i, data[offset+i]);
-          }
-        }
-        break;
-      case 3 :
-        {
-        int offset[3];
-        for(j=0;j<3;j++)
-          offset[j] = (index+j)*noOfDatas;
-
-        if(!activeScalars)
-          field->SetActiveVectors(paraviewFieldTag);
-        else
-          activeScalars = 1;
-        for(i=0;i<noOfDatas;i++)
-          {
-          dataArray->SetTuple3(i, 
-                               data[offset[0]+i], 
-                               data[offset[1]+i],
-                               data[offset[2]+i]);
-          }
-        }
-        break;
-      case 9 :
-        {
-        int offset[9];
-        for(j=0;j<9;j++)
-          offset[j] = (index+j)*noOfDatas;
-
-        if(!activeTensors)
-          field->SetActiveTensors(paraviewFieldTag);
-        else
-          activeTensors = 1;
-        for(i=0;i<noOfDatas;i++)
-          {
-          dataArray->SetTuple9(i,
-                               data[offset[0]+i],
-                               data[offset[1]+i],
-                               data[offset[2]+i],
-                               data[offset[3]+i],
-                               data[offset[4]+i],
-                               data[offset[5]+i],
-                               data[offset[6]+i],
-                               data[offset[7]+i],
-                               data[offset[8]+i]);
-          }
-        }
-        break;
-      default:
-        vtkErrorMacro("number of components [" << numOfComps <<"] NOT supported");
-
-        dataArray->Delete();
-        delete [] data;
-        continue;
-      }
 
     field->AddArray(dataArray);
 
     // clean up
     dataArray->Delete();
-    delete [] data;
+    //delete [] data;
     }
 
   // close up
