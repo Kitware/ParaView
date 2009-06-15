@@ -673,7 +673,7 @@ void pqTransferFunctionEditor::onAutoScalarRange(bool autoRange)
 //----------------------------------------------------------------------------
 void pqTransferFunctionEditor::SetProxyValue(const char *name,
     QList<QVariant> val,
-    bool update)
+    bool updateFlag)
 {
   vtkSMProxy
       *reprProxy =
@@ -686,7 +686,7 @@ void pqTransferFunctionEditor::SetProxyValue(const char *name,
 
   vtkSMProperty* Property = reprProxy->GetProperty(name);
   pqSMAdaptor::setMultipleElementProperty(Property, val);
-  if (update && !this->Internals->BlockSignals)
+  if (updateFlag && !this->Internals->BlockSignals)
     {
     reprProxy->UpdateVTKObjects();
     this->updateAllViews();

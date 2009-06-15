@@ -51,7 +51,7 @@
 class pqDisplayArrayWidget::pqInternal
 {
 public:
-  pqInternal(QWidget* vtkNotUsed(parent))
+  pqInternal(QWidget* vtkNotUsed(parentObject))
   {
     this->CellDataIcon = new QIcon(
         ":/pqWidgets/Icons/pqCellData16.png");
@@ -92,7 +92,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqDisplayArrayWidget::pqDisplayArrayWidget(QWidget *parent) : QWidget(parent)
+pqDisplayArrayWidget::pqDisplayArrayWidget(QWidget *parentObject) : QWidget(parentObject)
 {
   this->Internal = new pqInternal(this);
 

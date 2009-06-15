@@ -31,8 +31,8 @@
 
 #include <QDoubleValidator>
 
-pqDoubleEdit::pqDoubleEdit(QWidget* parent) :
-  QLineEdit(parent)
+pqDoubleEdit::pqDoubleEdit(QWidget* parentObject) :
+  QLineEdit(parentObject)
 {
   this->connect(this, SIGNAL(textChanged(const QString&)), this,
       SLOT(valueEdited(const QString&)));
@@ -47,8 +47,8 @@ double pqDoubleEdit::value()
 {
   QString currentText = this->text();
   int currentPos = this->cursorPosition();
-  QDoubleValidator validator(NULL);
-  QValidator::State state = validator.validate(currentText, currentPos);
+  QDoubleValidator dvalidator(NULL);
+  QValidator::State state = dvalidator.validate(currentText, currentPos);
   if (state == QValidator::Acceptable || state == QValidator::Intermediate)
     {
     return currentText.toDouble();
@@ -59,21 +59,22 @@ double pqDoubleEdit::value()
     }
 }
 
-void pqDoubleEdit::setValue(double value)
+void pqDoubleEdit::setValue(double dvalue)
 {
   // we do not want to modify the text when the text is Intermediate. Otherwise,
   // it erase the incomplete entries : 1. becomes 1, and it
   // is impossible to enter decimals
   QString currentText = this->text();
   int currentPos = this->cursorPosition();
-  QDoubleValidator* validator = new QDoubleValidator(NULL);
-  QValidator::State state = validator->validate(currentText, currentPos);
+  QDoubleValidator *dvalidator = new QDoubleValidator(NULL);
+  QValidator::State state = dvalidator->validate(currentText, currentPos);
+  delete dvalidator;
   if (state == QValidator::Acceptable)
     {
     double v = this->text().toDouble();
-    if (v != value)
+    if (v != dvalue)
       {
-      this->setText(QString::number(value));
+      this->setText(QString::number(dvalue));
       }
     }
   else if (state == QValidator::Intermediate && currentPos > 0)
@@ -82,21 +83,20 @@ void pqDoubleEdit::setValue(double value)
     }
   else
     {
-    this->setText(QString::number(value));
+    this->setText(QString::number(dvalue));
     }
-  delete validator;
 }
 
 void pqDoubleEdit::valueEdited(const QString& /*text*/)
 {
   QString currentText = this->text();
   int currentPos = this->cursorPosition();
-  QDoubleValidator* validator = new QDoubleValidator(NULL);
-  QValidator::State state = validator->validate(currentText, currentPos);
+  QDoubleValidator* dvalidator = new QDoubleValidator(NULL);
+  QValidator::State state = dvalidator->validate(currentText, currentPos);
+  delete dvalidator;
   if (state == QValidator::Acceptable)
     {
-    double value = this->text().toDouble();
-    emit valueChanged(value);
+    double dvalue = this->text().toDouble();
+    emit valueChanged(dvalue);
     }
-  delete validator;
 }

@@ -96,7 +96,7 @@ public:
     ~ControlPointList();
     void  Add(const ControlPoint *cpt);
     bool  CanBeEdited() const;
-    int   ChangeSelectedIndex(float pos, float width, int equal);
+    int   ChangeSelectedIndex(float _pos, float width, int equal);
     void  Clear();
     float ColorValue(int index) const;
     void  DeleteHighestRank();
@@ -108,7 +108,7 @@ public:
     void  SetColor(int index, float r, float g, float b);
     void  SetColorValues(const float *cv, int n);
     void  SetEditMode(bool val);
-    void  SetPosition(int index, float pos);
+    void  SetPosition(int index, float _pos);
     void  Sort();
 
     const ControlPoint &operator [](int index) const;
@@ -138,7 +138,7 @@ private:
 //   Constructor for the QvisSpectrumBar class.
 //
 // Arguments:
-//   parent : The widget's parent.
+//   parentObject : The widget's parentObject.
 //   name   : The name of the widget instance.
 //
 // Programmer: Brad Whitlock
@@ -153,8 +153,8 @@ private:
 //
 // ****************************************************************************
 
-QvisSpectrumBar::QvisSpectrumBar(QWidget *parent, const char* /*name*/) :
-    QWidget(parent)
+QvisSpectrumBar::QvisSpectrumBar(QWidget *parentObject, const char* /*name*/) :
+    QWidget(parentObject)
 {
     pixmap = 0;
 
@@ -655,7 +655,7 @@ QvisSpectrumBar::alignControlPoints()
 
     // Set the position in all of the control points.
     int i;
-    float pos = 0.;
+    float _pos = 0.;
     float delta = 1. /(float)(controlPoints->NumControlPoints() - 1);
     float *oldPos = new float[controlPoints->NumControlPoints()];
     for(i = 0; i < controlPoints->NumControlPoints(); ++i)
@@ -664,8 +664,8 @@ QvisSpectrumBar::alignControlPoints()
         oldPos[i] = controlPoints->Position(i);
 
         // Set the new position
-        controlPoints->SetPosition(i, pos);
-        pos += delta;
+        controlPoints->SetPosition(i, _pos);
+        _pos += delta;
     }
 
     // Redraw the entire widget
@@ -1014,12 +1014,12 @@ QvisSpectrumBar::drawControls()
         QPoint cpLocation(controlPointLocation(index));
 
         // Create a QColor to use to draw the color in the control point.
-        QColor controlPointColor((int)(controlPoints->operator[](index).color[0] * 255.),
+        QColor _controlPointColor((int)(controlPoints->operator[](index).color[0] * 255.),
                                  (int)(controlPoints->operator[](index).color[1] * 255.),
                                  (int)(controlPoints->operator[](index).color[2] * 255.));
 
         // Hard code the select color to yellow for now.
-        QColor selectColor(255, 255, 0);
+        QColor _selectColor(255, 255, 0);
 
         // Draw the control point.
         drawControlPoint(&paint,
@@ -1030,8 +1030,8 @@ QvisSpectrumBar::drawControls()
 #else
                          palette().button(),
 #endif
-                         selectColor,
-                         controlPointColor,
+                         _selectColor,
+                         _controlPointColor,
                          cpLocation.x(), cpLocation.y(),
                          slider.width(), slider.height(),
                          2,
@@ -1040,9 +1040,9 @@ QvisSpectrumBar::drawControls()
 
     // Make pixmap the background pixmap.
 //    setBackgroundPixmap(*pixmap);
-     QPalette palette;
-     palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
-     this->setPalette(palette);
+     QPalette _palette;
+     _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
+     this->setPalette(_palette);
 
 }
 
@@ -1069,15 +1069,15 @@ QvisSpectrumBar::drawControls()
 QPoint
 QvisSpectrumBar::controlPointLocation(int index) const
 {
-    int   offset, x, y;
-    float pos;
+    int   offset, _x, _y;
+    float _pos;
 
     // Figure out the position where the control point should be drawn.
     // This ignores position information in equal spacing mode.
     if(equalSpacing())
     {
         // Figure out the offset
-        pos = (float)index /(float)(controlPoints->NumControlPoints() - 1);
+        _pos = (float)index /(float)(controlPoints->NumControlPoints() - 1);
         if(orientation == HorizontalTop || orientation == HorizontalBottom)
             offset = spectrumArea.width() / controlPoints->NumControlPoints();
         else
@@ -1085,23 +1085,23 @@ QvisSpectrumBar::controlPointLocation(int index) const
     }
     else
     {
-        pos = controlPoints->operator[](index).position;
+        _pos = controlPoints->operator[](index).position;
         offset = 0;
     }
 
-    // Figure the x,y location of where to draw the control point.
+    // Figure the x,_y location of where to draw the control point.
     if(orientation == HorizontalTop || orientation == HorizontalBottom)
     {
-        x = (int)(pos *(spectrumArea.width() - offset)) + offset/2 + margin;
-        y = controlsArea.y();
+        _x = (int)(_pos *(spectrumArea.width() - offset)) + offset/2 + margin;
+        _y = controlsArea.y();
     }
     else
     {
-        x = controlsArea.x();
-        y = (int)(pos *(spectrumArea.height() - offset)) + offset/2;
+        _x = controlsArea.x();
+        _y = (int)(_pos *(spectrumArea.height() - offset)) + offset/2;
     }
 
-    return QPoint(x, y);
+    return QPoint(_x, _y);
 }
 
 // ****************************************************************************
@@ -1117,8 +1117,8 @@ QvisSpectrumBar::controlPointLocation(int index) const
 //   fore   : The button color used for the control point.
 //   sel    : The selection color.
 //   cpt    : The control point color.
-//   x      : The leftmost x value.
-//   y      : The topmost y value.
+//   _x      : The leftmost x value.
+//   _y      : The topmost y value.
 //   w      : The width of the control point.
 //   h      : The height of the control point.
 //   shadhow_thick : The shadow thickness.
@@ -1137,7 +1137,7 @@ QvisSpectrumBar::controlPointLocation(int index) const
 void
 QvisSpectrumBar::drawControlPoint(QPainter *paint, const QBrush &top,
     const QBrush &bottom, const QBrush &fore, const QColor &sel,
-    const QColor &cpt, int x, int y, int w, int h, int shadow_thick,
+    const QColor &cpt, int _x, int _y, int w, int h, int shadow_thick,
     ControlOrientation orient, bool selected)
 {
     int wd2 = w >> 1;
@@ -1153,23 +1153,23 @@ QvisSpectrumBar::drawControlPoint(QPainter *paint, const QBrush &top,
 #define COPY_POINT(DI,SI) poly.setPoint((DI), X[SI], Y[SI])
 
     // Fill the vertices.
-    X[0] = x + wd2;              Y[0] = y + h;
-    X[1] = x + w;                Y[1] = y + h - h1;
-    X[2] = x + w;                Y[2] = y;
-    X[3] = x;                    Y[3] = y;
-    X[4] = x;                    Y[4] = y + h - h1;
-    X[5] = x + wd2;              Y[5] = y + h - h2;
-    X[6] = x + w - shadow_thick; Y[6] = y + h - h2 - h3;
-    X[7] = x + w - shadow_thick; Y[7] = y + shadow_thick;
-    X[8] = x + shadow_thick;     Y[8] = y + shadow_thick;
-    X[9] = x + shadow_thick;     Y[9] = y + h - h2 - h3;
-    X[10] = x + w - s2;          Y[10] = y + h - h2 - h3;
-    X[11] = x + w - s2;          Y[11] = y + s2;
-    X[12] = x + s2;              Y[12] = y + s2;
-    X[13] = x + s2;              Y[13] = y + h - h2 - h3;
-    X[14] = x + wd2;             Y[14] = y + h - h2 - int(h3 * 0.15);
-    X[15] = x + wd2 + w2;        Y[15] = y + h - h2 - int(0.85 * h3);
-    X[16] = x + wd2 - w2;        Y[16] = y + h - h2 - int(0.85 * h3);
+    X[0] = _x + wd2;              Y[0] = _y + h;
+    X[1] = _x + w;                Y[1] = _y + h - h1;
+    X[2] = _x + w;                Y[2] = _y;
+    X[3] = _x;                    Y[3] = _y;
+    X[4] = _x;                    Y[4] = _y + h - h1;
+    X[5] = _x + wd2;              Y[5] = _y + h - h2;
+    X[6] = _x + w - shadow_thick; Y[6] = _y + h - h2 - h3;
+    X[7] = _x + w - shadow_thick; Y[7] = _y + shadow_thick;
+    X[8] = _x + shadow_thick;     Y[8] = _y + shadow_thick;
+    X[9] = _x + shadow_thick;     Y[9] = _y + h - h2 - h3;
+    X[10] = _x + w - s2;          Y[10] = _y + h - h2 - h3;
+    X[11] = _x + w - s2;          Y[11] = _y + s2;
+    X[12] = _x + s2;              Y[12] = _y + s2;
+    X[13] = _x + s2;              Y[13] = _y + h - h2 - h3;
+    X[14] = _x + wd2;             Y[14] = _y + h - h2 - int(h3 * 0.15);
+    X[15] = _x + wd2 + w2;        Y[15] = _y + h - h2 - int(0.85 * h3);
+    X[16] = _x + wd2 - w2;        Y[16] = _y + h - h2 - int(0.85 * h3);
 
     paint->setPen(Qt::NoPen);            // do not draw outline
 
@@ -1326,7 +1326,7 @@ QvisSpectrumBar::drawBox(QPainter *paint, const QRect &r,
 // ****************************************************************************
 
 void
-QvisSpectrumBar::drawArrow(QPainter *p, bool down, int x, int y, int w, int h,
+QvisSpectrumBar::drawArrow(QPainter *p, bool down, int _x, int _y, int w, int h,
     const QPalette &g)
 {
     QPolygon bFill;            // fill polygon
@@ -1346,12 +1346,12 @@ QvisSpectrumBar::drawArrow(QPainter *p, bool down, int x, int y, int w, int h,
     // adjust size and center(to fix rotation below)
     if(w >  dim)
     {
-        x += (w-dim)/2;
+        _x += (w-dim)/2;
         w = dim;
     }
     if(h > dim)
     {
-        y += (h-dim)/2;
+        _y += (h-dim)/2;
         h = dim;
     }
 
@@ -1404,7 +1404,7 @@ QvisSpectrumBar::drawArrow(QPainter *p, bool down, int x, int y, int w, int h,
 
     if(orientation == HorizontalBottom || orientation == VerticalRight)
     {
-        matrix.translate(x, y);
+        matrix.translate(_x, _y);
         if(vertical)
         {
             matrix.translate(0, h - 1);
@@ -1423,7 +1423,7 @@ QvisSpectrumBar::drawArrow(QPainter *p, bool down, int x, int y, int w, int h,
     }
     else
     {
-        matrix.translate(x, y);
+        matrix.translate(_x, _y);
         if(vertical)
         {
             matrix.translate(w-1, 0);
@@ -1571,9 +1571,9 @@ QvisSpectrumBar::drawSpectrum()
 
     // Make pixmap the background pixmap.
 //    setBackgroundPixmap(*pixmap);
-     QPalette palette;
-     palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
-     this->setPalette(palette);
+     QPalette _palette;
+     _palette.setBrush(this->backgroundRole(), QBrush(*pixmap));
+     this->setPalette(_palette);
 }
 
 // ****************************************************************************
@@ -2362,7 +2362,7 @@ QvisSpectrumBar::updateControlPoints()
 //
 // Arguments:
 //   index          : The index of the control point to move.
-//   pos            : The new control point position.
+//   _pos            : The new control point position.
 //   redrawSpectrum : Whether or not to redraw the spectrum.
 //
 // Programmer: Brad Whitlock
@@ -2378,13 +2378,13 @@ QvisSpectrumBar::updateControlPoints()
 // ****************************************************************************
 
 void
-QvisSpectrumBar::moveControlPointRedraw(int index, float pos, bool redrawSpectrum)
+QvisSpectrumBar::moveControlPointRedraw(int index, float _pos, bool redrawSpectrum)
 {
     // Get the current location of the control point.
     QPoint oldLocation(controlPointLocation(index));
 
     // Set the new position and draw the controls.
-    controlPoints->SetPosition(index, pos);
+    controlPoints->SetPosition(index, _pos);
 
     // If we're suppressing updates, delete the pixmaps and return.
     if(b_suppressUpdates)
@@ -2699,7 +2699,7 @@ ControlPointList::Position(int index) const
 //
 // Arguments:
 //   index : The index of the control point to change.
-//   pos   : The control point's new position.
+//   _pos   : The control point's new position.
 //
 // Programmer: Brad Whitlock
 // Creation:   Wed Jan 3 11:34:02 PDT 2001
@@ -2709,10 +2709,10 @@ ControlPointList::Position(int index) const
 // ****************************************************************************
 
 void
-ControlPointList::SetPosition(int index, float pos)
+ControlPointList::SetPosition(int index, float _pos)
 {
     if(nels != 0 && list != NULL && index >= 0 && index < nels)
-        list[index].position = pos;
+        list[index].position = _pos;
 }
 
 // ****************************************************************************
@@ -2981,7 +2981,7 @@ ControlPointList::DeleteHighestRank()
 //   Finds the control point that is being selected.
 //
 // Arguments:
-//    pos   : A float value in the range [0,1] that represents the center of
+//    _pos   : A float value in the range [0,1] that represents the center of
 //            a control point.
 //    width : The width of a control point in terms of a number(0,1).
 //    equal : Whether or not the control points are equally spaced.
@@ -2997,7 +2997,7 @@ ControlPointList::DeleteHighestRank()
 // ****************************************************************************
 
 int
-ControlPointList::ChangeSelectedIndex(float pos, float width, int equal)
+ControlPointList::ChangeSelectedIndex(float _pos, float width, int equal)
 {
     int   i, index, retval = -1;
     float position, offset, wd2 = width * 0.6;
@@ -3019,7 +3019,7 @@ ControlPointList::ChangeSelectedIndex(float pos, float width, int equal)
             position = list[index].position;
 
         /* See if the position is in the control point. */
-        if((pos - wd2 <= position) &&(position <= pos + wd2))
+        if((_pos - wd2 <= position) &&(position <= _pos + wd2))
         {
             retval = index;
             break;

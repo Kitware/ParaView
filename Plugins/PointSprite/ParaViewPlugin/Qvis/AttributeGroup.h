@@ -216,7 +216,7 @@ protected:
     void DeclareVectorAttributeGroup();
     void DeclareVectorBool();
 private:
-    class PQCOMPONENTS_EXPORT typeInfo
+    class typeInfo
     {
     public:
         typeInfo();

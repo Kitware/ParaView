@@ -37,7 +37,7 @@ class pqTransferFunctionDialog::pqInternals: public Ui::pqTransferFunctionDialog
 
 };
 
-pqTransferFunctionDialog::pqTransferFunctionDialog(QWidget* parent) : QDialog(parent)
+pqTransferFunctionDialog::pqTransferFunctionDialog(QWidget* parentObject) : QDialog(parentObject)
 {
   this->Internals = new pqTransferFunctionDialog::pqInternals();
   this->Internals->setupUi(this);

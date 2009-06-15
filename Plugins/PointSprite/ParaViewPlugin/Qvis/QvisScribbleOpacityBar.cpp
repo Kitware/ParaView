@@ -63,8 +63,8 @@
 //
 // ****************************************************************************
 
-QvisScribbleOpacityBar::QvisScribbleOpacityBar(QWidget *parent, const char *name)
-    : QvisAbstractOpacityBar(parent, name)
+QvisScribbleOpacityBar::QvisScribbleOpacityBar(QWidget *parentObject, const char *name)
+    : QvisAbstractOpacityBar(parentObject, name)
 {
     setFrameStyle( QFrame::Panel | QFrame::Sunken );
     setLineWidth( 2 );
@@ -141,10 +141,10 @@ QvisScribbleOpacityBar::paintToPixmap(int w, int h)
   this->paintBackground(painter,w,h);
 
   painter.setPen(whitepen);
-  for (int x=0; x<w; x++)
+  for (int _x=0; _x<w; _x++)
   {
-      float yval = values[x];
-      painter.drawLine(x, h-1, x, int((h-1) - float(yval)*(h-1)));
+      float yval = values[_x];
+      painter.drawLine(_x, h-1, _x, int((h-1) - float(yval)*(h-1)));
   }
 }
 
@@ -162,11 +162,11 @@ QvisScribbleOpacityBar::paintToPixmap(int w, int h)
 void
 QvisScribbleOpacityBar::mousePressEvent(QMouseEvent *e)
 {
-    int x = e->x();
-    int y = e->y();
-    setValue(x2val(x), y2val(y));
-    lastx = x;
-    lasty = y;
+    int _x = e->x();
+    int _y = e->y();
+    setValue(x2val(_x), y2val(_y));
+    lastx = _x;
+    lasty = _y;
     mousedown = true;
 
     this->repaint();
@@ -189,11 +189,11 @@ QvisScribbleOpacityBar::mouseMoveEvent(QMouseEvent *e)
     if (!mousedown)
         return;
 
-    int x = e->x();
-    int y = e->y();
-    setValues(lastx, lasty, x, y);
-    lastx = x;
-    lasty = y;
+    int _x = e->x();
+    int _y = e->y();
+    setValues(lastx, lasty, _x, _y);
+    lastx = _x;
+    lasty = _y;
 
     this->repaint();
     emit mouseMoved();
@@ -213,9 +213,9 @@ QvisScribbleOpacityBar::mouseMoveEvent(QMouseEvent *e)
 void
 QvisScribbleOpacityBar::mouseReleaseEvent(QMouseEvent *e)
 {
-    int x = e->x();
-    int y = e->y();
-    setValues(lastx, lasty, x, y);
+    int _x = e->x();
+    int _y = e->y();
+    setValues(lastx, lasty, _x, _y);
     mousedown = false;
 
     this->repaint();
@@ -265,8 +265,8 @@ QvisScribbleOpacityBar::setValues(int x1, int y1, int x2, int y2)
 void
 QvisScribbleOpacityBar::setValue(float xval, float yval)
 {
-    int x = int(xval * float(nvalues-1));
-    values[x] = yval;
+    int _x = int(xval * float(nvalues-1));
+    values[_x] = yval;
 }
 
 
