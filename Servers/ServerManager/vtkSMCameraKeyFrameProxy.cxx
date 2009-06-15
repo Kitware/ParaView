@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.6");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()
@@ -108,6 +108,12 @@ void vtkSMCameraKeyFrameProxy::UpdateValue(double currenttime,
       }
     }
   vtkSMProxy* cameraProxy = cueProxy->GetAnimatedProxy();
+  if (!cameraProxy)
+    {
+    vtkErrorMacro("Don't know what to animate. "
+      "Please set the AnimatedProxy on the animation cue.");
+    return;
+    }
   
   vtkCamera* camera = vtkCamera::New();
   camera->SetPosition(this->Camera->GetPosition());
