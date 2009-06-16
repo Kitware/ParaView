@@ -32,8 +32,8 @@ WHILE(PLUGIN LESS ${PLUGIN_COUNT})
 ENDWHILE()
 
 # Install library dependencies ...
-CONFIGURE_FILE( "@OverViewCore_SOURCE_DIR@/dependencies.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake" @ONLY)
-INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/dependencies.cmake" COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE})
+CONFIGURE_FILE( "@OverViewCore_SOURCE_DIR@/OverViewOSXDependencies.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/OverViewOSXDependencies.cmake" @ONLY)
+INSTALL(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/OverViewOSXDependencies.cmake" COMPONENT ${OVERVIEW_BRANDED_APPLICATION_TITLE})
 
 # Install Qt plugins that can't be identified by automatic dependency generation ...
 INSTALL(
