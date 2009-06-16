@@ -80,7 +80,7 @@
      <Documentation
        short_help="Read legacy VTK files."
        long_help="Read files stored in VTK's legacy file format.">
-       The Legacy VTK reader loads files stored in VTK's legacy file format (before VTK 4.2, although still supported). The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
+       The Legacy VTK reader loads files stored in VTK's legacy file format. The expected file extension is .vtk. The type of the dataset may be structured grid, uniform rectilinear grid (image/volume), non-uniform rectiinear grid, unstructured grid, or polygonal.
      </Documentation>
      <StringVectorProperty
         name="FileName"
