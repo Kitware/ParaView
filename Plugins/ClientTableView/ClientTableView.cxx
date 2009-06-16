@@ -167,10 +167,11 @@ void ClientTableView::selectionChanged()
   if (this->getAnnotationLink())
     {
     this->getAnnotationLink()->MarkModified(0);
-    this->Implementation->LastSelectionMTime = this->getAnnotationLink()->GetMTime();
     }
-
-  //this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
+  else
+    {
+    this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
+    }
 }
 
 bool ClientTableView::canDisplay(pqOutputPort* output_port) const
@@ -290,9 +291,10 @@ void ClientTableView::renderInternal()
     vtkSelection* sel = vtkSelection::SafeDownCast(
       proxy->GetSelectionRepresentation()->GetOutput());
 
-    if (this->getAnnotationLink()->GetMTime() > this->Implementation->LastSelectionMTime)
+    if(repSource->GetSelectionInput(0) &&
+      repSource->GetSelectionInput(0)->GetMTime() > this->Implementation->LastSelectionMTime)
       {
-      this->Implementation->LastSelectionMTime = this->getAnnotationLink()->GetMTime();
+      this->Implementation->LastSelectionMTime = repSource->GetSelectionInput(0)->GetMTime();
       this->Implementation->View->GetRepresentation()->GetAnnotationLink()->SetCurrentSelection(sel);
       this->Implementation->View->GetRepresentation()->Update();
       }
