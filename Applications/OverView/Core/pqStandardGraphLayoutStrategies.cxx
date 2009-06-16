@@ -40,18 +40,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkFast2DLayoutStrategy.h"
 #include "vtkCircularLayoutStrategy.h"
 #include "vtkPassThroughLayoutStrategy.h"
+#include "vtkTreeLayoutStrategy.h"
 
 pqStandardGraphLayoutStrategies::pqStandardGraphLayoutStrategies(QObject* o)
   : QObject(o)
 {
   this->RandomStrategy         = vtkSmartPointer<vtkRandomLayoutStrategy>::New();
   this->Simple2DStrategy       = vtkSmartPointer<vtkSimple2DLayoutStrategy>::New();
+  this->Simple2DStrategy->SetMaxNumberOfIterations(500);
+  this->Simple2DStrategy->SetInitialTemperature(10);
   this->Clustering2DStrategy   = vtkSmartPointer<vtkClustering2DLayoutStrategy>::New();
   this->Community2DStrategy    = vtkSmartPointer<vtkCommunity2DLayoutStrategy>::New();
   this->Fast2DStrategy         = vtkSmartPointer<vtkFast2DLayoutStrategy>::New();
   this->ForceDirectedStrategy  = vtkSmartPointer<vtkForceDirectedLayoutStrategy>::New();
   this->CircularStrategy       = vtkSmartPointer<vtkCircularLayoutStrategy>::New();
   this->PassThroughStrategy    = vtkSmartPointer<vtkPassThroughLayoutStrategy>::New();
+  this->TreeStrategy           = vtkSmartPointer<vtkTreeLayoutStrategy>::New();
 }
 
 pqStandardGraphLayoutStrategies::~pqStandardGraphLayoutStrategies()
@@ -68,6 +72,7 @@ QStringList pqStandardGraphLayoutStrategies::graphLayoutStrategies() const
   "Community2D" <<
   "Fast2D" <<
   "Circular" <<
+  "Tree" <<
   "None"
   ;
 }
@@ -101,6 +106,10 @@ vtkGraphLayoutStrategy* pqStandardGraphLayoutStrategies::getGraphLayoutStrategy(
   else if(layoutStrategy == "Circular")
     {
     return this->CircularStrategy;
+    }
+  else if(layoutStrategy == "Tree")
+    {
+    return this->TreeStrategy;
     }
   else if(layoutStrategy == "None")
     {

@@ -48,6 +48,7 @@ class vtkForceDirectedLayoutStrategy;
 class vtkRandomLayoutStrategy;
 class vtkSimple2DLayoutStrategy;
 class vtkPassThroughLayoutStrategy;
+class vtkTreeLayoutStrategy;
 
 /// interface class for plugins that create graph layout strategies
 class OVERVIEW_CORE_EXPORT pqStandardGraphLayoutStrategies :
@@ -79,6 +80,7 @@ protected:
   vtkSmartPointer<vtkFast2DLayoutStrategy>         Fast2DStrategy;
   vtkSmartPointer<vtkCircularLayoutStrategy>       CircularStrategy;
   vtkSmartPointer<vtkPassThroughLayoutStrategy>    PassThroughStrategy;
+  vtkSmartPointer<vtkTreeLayoutStrategy>           TreeStrategy;
 
 };
 
