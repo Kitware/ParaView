@@ -115,7 +115,8 @@ public:
     Widget(new QVTKWidget()),
     TreeRepresentation(0),
     GraphRepresentation(0),
-    UpdateFlags(0)
+    UpdateFlags(0),
+    VisibleMTime(0)
   {
     new QVBoxLayout(this->Widget);
     this->Widget->GetInteractor()->EnableRenderOff();
@@ -150,6 +151,8 @@ public:
   QTimer UpdateTimer;
   /// Used to store operations to be performed by the next update
   int UpdateFlags;
+
+  unsigned long VisibleMTime;
 };
 
 enum
@@ -299,14 +302,14 @@ void ClientTreeAreaView::showRepresentation(pqRepresentation* representation)
     this->Implementation->TreeAreaRepresentation->SetInput(tree);
     this->Implementation->HierarchicalGraphView->SetRepresentation(this->Implementation->TreeAreaRepresentation);
 
-    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
+    this->scheduleSynchronization(DELIVER_TREE | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
   else if(graph)
     {
     this->Implementation->GraphRepresentation = representation;
     this->Implementation->TreeAreaRepresentation->AddInput(1, graph);
 
-    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
+    this->scheduleSynchronization(DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
 }
 
@@ -365,7 +368,15 @@ void ClientTreeAreaView::synchronizeViews()
   if(tree_proxy)
     {
     tree_proxy->Update();
+
+    // Force a camera reset if the input data has been modified ...
+    if(tree_proxy->GetOutput()->GetMTime() > this->Implementation->VisibleMTime)
+      {
+      this->Implementation->VisibleMTime = tree_proxy->GetOutput()->GetMTime();
+      this->Implementation->UpdateFlags |= RESET_HGRAPH_CAMERA;
+      }
     }
+
 
   // Deliver graph data from the server ...
   vtkSMSelectionDeliveryRepresentationProxy* const graph_proxy = this->Implementation->GraphRepresentation
@@ -376,6 +387,13 @@ void ClientTreeAreaView::synchronizeViews()
   if(graph_proxy)
     {
     graph_proxy->Update();
+
+    // Force a camera reset if the input data has been modified ...
+    if(graph_proxy->GetOutput()->GetMTime() > this->Implementation->VisibleMTime)
+      {
+      this->Implementation->VisibleMTime = graph_proxy->GetOutput()->GetMTime();
+      this->Implementation->UpdateFlags |= RESET_HGRAPH_CAMERA;
+      }
     }
 
   if(tree_proxy && graph_proxy)
