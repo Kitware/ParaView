@@ -358,32 +358,30 @@ void pqDisplayArrayWidget::setRepresentation(pqPipelineRepresentation* display)
     vtkSMProxy* repr = this->Internal->Representation->getProxy();
 
     // if the domain has been modified, we need to reload the combo boxes
-    this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayName.toAscii()),
-        vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
-        Qt::QueuedConnection);
-
-    this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayComponent.toAscii()),
-        vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
-        Qt::QueuedConnection);
-
-    // if the values have been modified, we need to refresh the current selected values
-    this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayName.toAscii()),
-        vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
-        Qt::QueuedConnection);
-
-    this->Internal->VTKConnect->Connect(repr->GetProperty(
-        this->Internal->PropertyArrayComponent.toAscii()),
-        vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
-        Qt::QueuedConnection);
-
-    if (repr->GetProperty("Representation"))
+    if(repr->GetProperty(this->Internal->PropertyArrayName.toAscii()) != NULL)
       {
-      /*this->Internal->VTKConnect->Connect(repr->GetProperty("Representation"),
-          vtkCommand::ModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
-          Qt::QueuedConnection);*/
+      this->Internal->VTKConnect->Connect(repr->GetProperty(
+        this->Internal->PropertyArrayName.toAscii()),
+        vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
+        Qt::QueuedConnection);
+
+      this->Internal->VTKConnect->Connect(repr->GetProperty(
+        this->Internal->PropertyArrayName.toAscii()),
+        vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
+        Qt::QueuedConnection);
+      }
+
+    if(repr->GetProperty(this->Internal->PropertyArrayComponent.toAscii()) != NULL)
+      {
+      this->Internal->VTKConnect->Connect(repr->GetProperty(
+        this->Internal->PropertyArrayComponent.toAscii()),
+        vtkCommand::DomainModifiedEvent, this, SLOT(needReloadGUI()), NULL, 0.0,
+        Qt::QueuedConnection);
+
+      this->Internal->VTKConnect->Connect(repr->GetProperty(
+        this->Internal->PropertyArrayComponent.toAscii()),
+        vtkCommand::ModifiedEvent, this, SLOT(updateGUI()), NULL, 0.0,
+        Qt::QueuedConnection);
       }
 
     // Every time the display updates, it is possible that the arrays available for
@@ -506,8 +504,15 @@ const QString pqDisplayArrayWidget::getArrayName() const
     return this->Internal->ConstantVariableName;
     }
 
-  QString array = pqSMAdaptor::getMultipleElementProperty(repr->GetProperty(
-      this->Internal->PropertyArrayName.toAscii().data()))[4].toString();
+  QList<QVariant> list = pqSMAdaptor::getMultipleElementProperty(repr->GetProperty(
+      this->Internal->PropertyArrayName.toAscii().data()));
+
+  if(list.size() < 4)
+    {
+    return this->Internal->ConstantVariableName;
+    }
+
+  QString array = list[4].toString();
 
   if (array == "")
     {
