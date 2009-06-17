@@ -29,7 +29,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.36");
+vtkCxxRevisionMacro(vtkTransferFunctionEditorWidgetSimple1D, "1.37");
 vtkStandardNewMacro(vtkTransferFunctionEditorWidgetSimple1D);
 
 // The vtkNodeList is a PIMPLed list<T>.
@@ -1144,7 +1144,7 @@ void vtkTransferFunctionEditorWidgetSimple1D::SetElementHSVColor(
 void vtkTransferFunctionEditorWidgetSimple1D::SetElementScalar(
   unsigned int idx, double value)
 {
-  unsigned int size = this->Nodes->size();
+  unsigned int size = static_cast<unsigned int>(this->Nodes->size());
   if (idx >= this->Nodes->size())
     {
     return;

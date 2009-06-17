@@ -52,7 +52,7 @@
 #define MY_ABS(x)       ((x) < 0 ? -(x) : (x))
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.11");
+vtkCxxRevisionMacro(vtkPVScalarBarActor, "1.12");
 vtkStandardNewMacro(vtkPVScalarBarActor);
 
 //=============================================================================
@@ -326,7 +326,7 @@ int vtkPVScalarBarActor::CreateLabel(double value,
   this->LabelMappers.push_back(textMapper);
   this->LabelActors.push_back(textActor);
 
-  return this->LabelActors.size() - 1;
+  return static_cast<int>(this->LabelActors.size()) - 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -421,7 +421,7 @@ vtkstd::vector<double> vtkPVScalarBarActor::LinearTickMarks(
       {
       ticks.push_back(tick);
       }
-    int nticks = ticks.size();
+    int nticks = static_cast<int>(ticks.size());
 
     // If we have not exceeded limit, then we are done.
     if ((maxTicks <= 0) || (nticks <= maxTicks))
@@ -764,7 +764,7 @@ void vtkPVScalarBarActor::AllocateAndPositionLabels(int *propSize,
         }
       ticks.insert(ticks.begin(), fakeMin);
       ticks.insert(ticks.end(), fakeMax);
-      numTicks = ticks.size();
+      numTicks = static_cast<int>(ticks.size());
 
       for (int i = 0; i < numTicks-1; i++)
         {
