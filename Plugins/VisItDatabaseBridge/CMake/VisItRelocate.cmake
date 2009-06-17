@@ -17,7 +17,11 @@
 #
 
 set(_configureVisItDeps)
-set(VISIT_LOCAL "${PROJECT_BINARY_DIR}/${PLUGIN_BUILD_TYPE}")
+#set(VISIT_LOCAL "${PROJECT_BINARY_DIR}/${PLUGIN_BUILD_TYPE}")
+set(VISIT_LOCAL "${ParaView_BINARY_DIR}/bin")
+
+set (_visit_database_files)
+set (_visit_avt_files)
 
 if (UNIX OR CYGWIN)
   # +------------------+
@@ -35,6 +39,7 @@ if (UNIX OR CYGWIN)
       DEPENDS ${_src}
       COMMENT "Copying ${_lib} to local VisIt.")
     set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/${_lib}")
+    set(_visit_avt_files ${_visit_avt_files} "${VISIT_LOCAL}/${_lib}")
   endforeach (_dash_l)
   # Gather the database plugins that currently exist.
   add_custom_command(
@@ -55,6 +60,7 @@ if (UNIX OR CYGWIN)
       DEPENDS ${_dbPath}
       COMMENT "Copying ${_db} to local VisIt databases.")
     set(_configureVisItDeps ${_configureVisItDeps} ${VISIT_LOCAL}/databases/${_db})
+    set(_visit_database_files ${_visit_database_files} ${VISIT_LOCAL}/databases/${_db})
   endforeach (_dbPath)
   # Gather VisIt's third party deps.
   # We don't do this on Linux because it makes more sense for the user to have
@@ -76,6 +82,7 @@ else (UNIX OR CYGWIN)
       DEPENDS ${_dlsrc}
       COMMENT "Copying ${_dlib} to local VisIt.")
     set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/${_dlib}")
+    set(_visit_avt_files ${_visit_avt_files} "${VISIT_LOCAL}/${_dlib}")
     # lib's
     set(_slib "${_dash_l}.lib")
     set(_slsrc "${VISIT_LIB_PATH}/${PLUGIN_BUILD_TYPE}/${_slib}")
@@ -86,6 +93,7 @@ else (UNIX OR CYGWIN)
       DEPENDS ${_slsrc}
       COMMENT "Copying ${_slib} to local VisIt.")
     set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/${_slib}")
+    set(_visit_avt_files ${_visit_avt_files} "${VISIT_LOCAL}/${_slib}")
   endforeach (_dash_l)
   # Gather the database plugins that currently exist.
   add_custom_command(
@@ -106,6 +114,7 @@ else (UNIX OR CYGWIN)
       DEPENDS ${_dbPath}
       COMMENT "Copying ${_db} to local VisIt databases.")
     set(_configureVisItDeps ${_configureVisItDeps} ${VISIT_LOCAL}/databases/${_db})
+    set(_visit_database_files ${_visit_database_files} ${VISIT_LOCAL}/databases/${_db})
   endforeach (_dbPath)
   # Gather VisIt's third party deps, They come pre-built in the Windows project.
   # dll's
@@ -140,3 +149,5 @@ endif (UNIX OR CYGWIN)
 
 #
 add_custom_target(configureVisItBin DEPENDS ${_configureVisItDeps})
+set (VISIT_FILES_TO_INSTALL_AVT "${_visit_avt_files}" CACHE INTERNAL "Visit AVT Files")
+set (VISIT_FILES_TO_INSTALL_DATABASES "${_visit_database_files}" CACHE INTERNAL "Visit Database Files")

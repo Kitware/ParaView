@@ -45,5 +45,6 @@ paraview_build_optional_plugin(StatisticsToolbar "StatisticsToolbar" StatisticsT
 paraview_build_optional_plugin(TableToGraphPanel "TableToGraphPanel" TableToGraphPanel OFF) 
 paraview_build_optional_plugin(TableToSparseArrayPanel "TableToSparseArrayPanel" TableToSparseArrayPanel OFF) 
 paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
-paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF) 
+paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF)
+paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
 

@@ -24,4 +24,6 @@ if (VISIT_WITH_MPI)
   set_source_files_properties(vtkVisItDatabase COMPILE_FLAGS ${COMPILE_FLAGS} "-DMPI")
 endif (VISIT_WITH_MPI)
 
-install(TARGETS vtkVisItDatabase DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(TARGETS vtkVisItDatabase
+  DESTINATION "${PV_INSTALL_LIB_DIR}"
+  COMPONENT Runtime)

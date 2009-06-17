@@ -47,6 +47,7 @@ if (BOOTSTRAP)
   include("CMake/BootstrapConfig.cmake")            # Build configuration tools.
   # TODO generate make install for local copy of VisIt.
 elseif(NOT BOOTSTRAP)
+  include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
   include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
   include("CMake/vtkVisItDatabaseBridge.cmake")     # Build the VTK source.
   include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
