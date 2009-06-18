@@ -195,6 +195,7 @@
   </ProxyGroup>
   
   <!-- FILTERS GROUP -->
+  <ProxyGroup name="filters">
     <SourceProxy name="MergeTables" class="vtkMergeTables">
       <!-- Table 1 Input -->
       <InputProperty name="Input1" command="SetInputConnection" port_index="0">
