@@ -117,6 +117,7 @@ public:
     this->Theme.TakeReference(vtkViewTheme::CreateNeonTheme());
     this->View = vtkSmartPointer<vtkGraphLayoutView>::New();
     this->View->SetLayoutStrategyToFast2D();
+    this->View->SetInteractor(this->Widget->GetInteractor());
     this->Widget->SetRenderWindow(this->View->GetRenderWindow());
     this->View->ApplyViewTheme(this->Theme);
     

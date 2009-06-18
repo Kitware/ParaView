@@ -123,6 +123,7 @@ public:
 
     this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateNeonTheme());
     this->HierarchicalGraphView = vtkSmartPointer<vtkTreeAreaView>::New();
+    this->HierarchicalGraphView->SetInteractor(this->Widget->GetInteractor());
     this->Widget->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
     this->HierarchicalGraphView->ApplyViewTheme(this->HierarchicalGraphTheme);
     this->HierarchicalGraphView->SetEdgeColorToSplineFraction();
