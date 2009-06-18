@@ -18,8 +18,6 @@ ADD_PARAVIEW_PLUGIN(
   SERVER_MANAGER_SOURCES
     ${ParaView_SOURCE_DIR}/Servers/Filters/vtkPVTextSource.h
     ${VTK_SOURCE_DIR}/Geovis/vtkGeoRandomGraphSource.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkArrayNorm.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkBoostLogWeighting.h
     ${VTK_SOURCE_DIR}/Infovis/vtkCircularLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkClustering2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkCollapseGraph.h

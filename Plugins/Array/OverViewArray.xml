@@ -101,7 +101,7 @@
       <IntVectorProperty name="Index" command="SetIndex" number_of_elements="1" default_values="0"/> 
     </SourceProxy>
  
-    <SourceProxy name="LogWeighting" class="vtkBoostLogWeighting" label="Log Weighting">
+    <SourceProxy name="BoostLogWeighting" class="vtkBoostLogWeighting" label="Boost Log Weighting">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -111,6 +111,7 @@
           <DataType value="vtkArrayData"/>
         </DataTypeDomain>
       </InputProperty>
+      <IntVectorProperty name="Base" command="SetBase" number_of_elements="1" default_values="0"/>
     </SourceProxy>
  
     <SourceProxy name="MatricizeArray" class="vtkMatricizeArray" label="Matricize Array">
