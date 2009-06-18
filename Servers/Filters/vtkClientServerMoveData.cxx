@@ -36,7 +36,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.14");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.15");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -156,7 +156,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
         vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
 
         // Send the size of the string.
-        int size = res.str().size();
+        int size = static_cast<int>(res.str().size());
         controller->Send(&size, 1, 1, 
                          vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
         // Send the XML string.

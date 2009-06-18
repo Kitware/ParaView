@@ -188,7 +188,7 @@ public:
     }
   const char* GetXMLData(int &length)
     {
-    length = this->XMLData.length();
+    length = static_cast<int>(this->XMLData.length());
     return this->XMLData.c_str();
     }
   void SetConnection(vtkClientConnection* con)
@@ -210,11 +210,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.13");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.14");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.13");
+vtkCxxRevisionMacro(vtkClientConnection, "1.14");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -403,7 +403,7 @@ void vtkClientConnection::SendInformation(vtkClientServerStream& stream)
     size_t length;
     const unsigned char* data;
     css.GetData(&data, &length);
-    int len = length;
+    int len = static_cast<int>(length);
     this->GetSocketController()->Send(&len, 1, 1,
       vtkRemoteConnection::ROOT_INFORMATION_LENGTH_TAG);
     this->GetSocketController()->Send(const_cast<unsigned char*>(data),
@@ -468,7 +468,7 @@ void vtkClientConnection::RedoRMI()
 void vtkClientConnection::SendUndoXML(const char* xml)
 {
   vtkSocketController* controller = this->GetSocketController();
-  int len = strlen(xml);
+  int len = static_cast<int>(strlen(xml));
   controller->Send(&len, 1, 1, vtkRemoteConnection::UNDO_XML_TAG);
   if (len > 0)
     {
@@ -481,7 +481,7 @@ void vtkClientConnection::SendUndoXML(const char* xml)
 void vtkClientConnection::SendRedoXML(const char* xml)
 {
   vtkSocketController* controller = this->GetSocketController();
-  int len = strlen(xml);
+  int len = static_cast<int>(strlen(xml));
   controller->Send(&len, 1, 1, vtkRemoteConnection::REDO_XML_TAG);
   if (len > 0)
     {

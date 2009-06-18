@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.18");
+vtkCxxRevisionMacro(vtkServerConnection, "1.19");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -198,7 +198,7 @@ int vtkServerConnection::SendStreamToServer(vtkSocketController* controller,
   const unsigned char* data;
   size_t len;
   stream.GetData(&data, &len);
-  controller->TriggerRMI(1, (void*)data, len, 
+  controller->TriggerRMI(1, (void*)data, static_cast<int>(len), 
     vtkRemoteConnection::CLIENT_SERVER_RMI_TAG);
   return 0;
 }
@@ -210,7 +210,7 @@ int vtkServerConnection::SendStreamToRoot(vtkSocketController* controller,
   const unsigned char* data;
   size_t len;
   stream.GetData(&data, &len);
-  controller->TriggerRMI(1, (void*)data, len, 
+  controller->TriggerRMI(1, (void*)data, static_cast<int>(len), 
     vtkRemoteConnection::CLIENT_SERVER_ROOT_RMI_TAG);
   return 0;
 }
@@ -334,7 +334,7 @@ void vtkServerConnection::GatherInformationFromController(vtkSocketController* c
   const unsigned char* data;
   size_t length;
   stream.GetData(&data, &length);
-  controller->TriggerRMI(1, (void*)(data), length,
+  controller->TriggerRMI(1, (void*)(data), static_cast<int>(length),
     vtkRemoteConnection::CLIENT_SERVER_GATHER_INFORMATION_RMI_TAG);
   
   int length2 = 0;
@@ -669,7 +669,7 @@ void vtkServerConnection::PushUndo(const char* label, vtkPVXMLElement* uelem)
   size_t len;
   stream.GetData(&data, &len);
   
-  controller->TriggerRMI(1, (void*)(data), len, 
+  controller->TriggerRMI(1, (void*)(data), static_cast<int>(len), 
     vtkRemoteConnection::CLIENT_SERVER_PUSH_UNDO_XML_TAG);
 }
 

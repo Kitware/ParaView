@@ -43,7 +43,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkReductionFilter);
-vtkCxxRevisionMacro(vtkReductionFilter, "1.20");
+vtkCxxRevisionMacro(vtkReductionFilter, "1.21");
 vtkCxxSetObjectMacro(vtkReductionFilter, Controller, vtkMultiProcessController);
 vtkCxxSetObjectMacro(vtkReductionFilter, PreGatherHelper, vtkAlgorithm);
 vtkCxxSetObjectMacro(vtkReductionFilter, PostGatherHelper, vtkAlgorithm);
@@ -376,7 +376,8 @@ void vtkReductionFilter::Reduce(vtkDataObject* input, vtkDataObject* output)
   // Now run the PostGatherHelper.
   // If myId==0, data_sets has datasets collected from all satellites otherwise
   // it contains the current process's result.
-  this->PostProcess(output, &data_sets[0], data_sets.size());
+  this->PostProcess(output, &data_sets[0],
+    static_cast<unsigned int>(data_sets.size()));
 }
 
 //-----------------------------------------------------------------------------
@@ -390,7 +391,7 @@ void vtkReductionFilter::Send(int receiver, vtkDataObject* data)
     vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
     res << ends;
     // Send the size of the string.
-    int size = res.str().size();
+    int size = static_cast<int>(res.str().size());
     this->Controller->Send(&size, 1, receiver,
       vtkReductionFilter::TRANSMIT_DATA_OBJECT);
     // Send the XML string.

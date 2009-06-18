@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.30");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.31");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -774,7 +774,7 @@ void vtkProcessModuleConnectionManager::DropConnection(
 //-----------------------------------------------------------------------------
 unsigned int vtkProcessModuleConnectionManager::GetNumberOfConnections()
 {
-  return this->Internals->IDToConnectionMap.size();
+  return static_cast<unsigned int>(this->Internals->IDToConnectionMap.size());
 }
 
 //-----------------------------------------------------------------------------
