@@ -29,7 +29,7 @@
 #include "vtkIntArray.h"
 
 vtkStandardNewMacro(vtkAttributeDataToTableFilter);
-vtkCxxRevisionMacro(vtkAttributeDataToTableFilter, "1.3");
+vtkCxxRevisionMacro(vtkAttributeDataToTableFilter, "1.4");
 //----------------------------------------------------------------------------
 vtkAttributeDataToTableFilter::vtkAttributeDataToTableFilter()
 {
@@ -71,7 +71,17 @@ int vtkAttributeDataToTableFilter::RequestData(
   if (fieldData)
     {
     vtkTable* output = vtkTable::GetData(outputVector);
-    output->GetRowData()->ShallowCopy(fieldData);
+    if (this->FieldAssociation == 
+      vtkDataObject::FIELD_ASSOCIATION_NONE)
+      {
+      // Field data can have different length arrays, so we need to create
+      // output vtkTable big enough to fit the largest array.
+      this->PassFieldData(output->GetRowData(), fieldData);
+      }
+    else
+      {
+      output->GetRowData()->ShallowCopy(fieldData);
+      }
 
     // Clear any attribute markings from the output. This resolves the problem
     // that GlobalNodeIds were not showing up in spreadsheet view.
@@ -81,12 +91,58 @@ int vtkAttributeDataToTableFilter::RequestData(
       {
       output->GetRowData()->SetActiveAttribute(-1, cc);
       }
-    if (this->AddMetaData)
+
+    if (this->AddMetaData &&
+      this->FieldAssociation != 
+      vtkDataObject::FIELD_ASSOCIATION_NONE)
       {
       this->Decorate(output, input);
       }
     }
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkAttributeDataToTableFilter::PassFieldData(vtkFieldData* output, 
+  vtkFieldData* input)
+{
+  output->DeepCopy(input);
+  // Now resize arrays to match the longest one.
+  vtkIdType max_Tuples = 0;
+  int cc;
+  for (cc=0; cc < output->GetNumberOfArrays(); cc++)
+    {
+    vtkAbstractArray* arr = output->GetAbstractArray(cc);
+    if (arr && arr->GetNumberOfTuples() > max_Tuples)
+      {
+      max_Tuples = arr->GetNumberOfTuples();
+      }
+    }
+  for (cc=0; cc < output->GetNumberOfArrays(); cc++)
+    {
+    vtkAbstractArray* arr = output->GetAbstractArray(cc);
+    vtkIdType numTuples = arr->GetNumberOfTuples();
+    if (numTuples != max_Tuples)
+      {
+      arr->Resize(max_Tuples);
+      arr->SetNumberOfTuples(max_Tuples);
+      int num_comps = arr->GetNumberOfComponents();
+
+      vtkDataArray* da = vtkDataArray::SafeDownCast(arr);
+      if (da)
+        {
+        double *tuple = new double[num_comps+1];
+        for (int kk=0; kk < num_comps+1; kk++)
+          {
+          tuple[kk] = 0;
+          }
+        for (vtkIdType jj=numTuples; jj < max_Tuples; jj++)
+          {
+          da->SetTuple(jj, tuple);
+          }
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

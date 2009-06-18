@@ -86,6 +86,8 @@ protected:
   // Called when AddMetaData is true. Adds meta-data to the output.
   void Decorate(vtkTable* output, vtkDataObject* input);
 
+  void PassFieldData(vtkFieldData* output, vtkFieldData* input);
+
   int FieldAssociation;
   bool AddMetaData;
 private:
