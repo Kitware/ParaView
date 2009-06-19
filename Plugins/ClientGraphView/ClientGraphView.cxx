@@ -475,6 +475,9 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->SetVertexLabelArrayName(
       vtkSMPropertyHelper(proxy, "VertexLabelArray").GetAsString());
 
+     this->Implementation->View->SetGlyphType(
+      vtkSMPropertyHelper(proxy, "GlyphType").GetAsInt());
+
     bool iconVisibility = vtkSMPropertyHelper(proxy, "IconVisibility").GetAsInt();
 
     this->Implementation->View->SetIconVisibility(

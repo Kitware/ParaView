@@ -44,6 +44,9 @@
         </ArrayListDomain>
       </StringVectorProperty>
 
+     
+      <IntVectorProperty name="GlyphType" number_of_elements="1" default_values="1"/>
+
       <IntVectorProperty name="IconVisibility" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>
@@ -186,6 +189,7 @@
           <Property name="EdgeScalarBarVisibility" />
           <Property name="FlipEdgeColorMap" />
           <Property name="EdgeColorArray" />
+          <Property name="GlyphType" />
           <Property name="ArcEdges" />
           <Property name="UseDomainMap" />
           <Property name="DomainMap" />
