@@ -262,6 +262,8 @@ void ClientTreeView::renderInternal()
     vtkSMPropertyHelper(this->getProxy(),"ShowRootNode").GetAsInt());
   this->Implementation->View->SetAlternatingRowColors(
     vtkSMPropertyHelper(this->getProxy(),"AlternatingRowColors").GetAsInt());
+  this->Implementation->View->SetEnableDragDrop(
+    vtkSMPropertyHelper(this->getProxy(),"EnableDragDrop").GetAsInt());
 
   this->Implementation->View->Update();
 
