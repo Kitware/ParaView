@@ -23,7 +23,7 @@
 
 #include "vtkSMObject.h"
 
-class vtkSMPythonTraceObserverCommand;
+class vtkSMPythonTraceObserverCommandHelper;
 class vtkSMProxy;
 
 class VTK_EXPORT vtkSMPythonTraceObserver : public vtkSMObject
@@ -47,7 +47,7 @@ protected:
   vtkSMPythonTraceObserver();
   ~vtkSMPythonTraceObserver();
 
-  friend class vtkSMPythonTraceObserverCommand;
+  friend class vtkSMPythonTraceObserverCommandHelper;
 
   // Description:
   // Event handler
@@ -58,7 +58,7 @@ private:
   class vtkInternal;
   vtkInternal* Internal;
 
-  vtkSMPythonTraceObserverCommand* Observer;
+  vtkSMPythonTraceObserverCommandHelper* Observer;
 
   vtkSMPythonTraceObserver(const vtkSMPythonTraceObserver&); // Not implemented.
   void operator=(const vtkSMPythonTraceObserver&); // Not implemented.

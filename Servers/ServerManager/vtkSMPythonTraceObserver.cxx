@@ -18,12 +18,12 @@
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
-class vtkSMPythonTraceObserverCommand : public vtkCommand
+class vtkSMPythonTraceObserverCommandHelper : public vtkCommand
 {
 public:
-  static vtkSMPythonTraceObserverCommand* New()
+  static vtkSMPythonTraceObserverCommandHelper* New()
     { 
-    return new vtkSMPythonTraceObserverCommand; 
+    return new vtkSMPythonTraceObserverCommandHelper; 
     }
   
   void SetTarget(vtkSMPythonTraceObserver* t)
@@ -40,7 +40,7 @@ public:
     }
 
 private:
-  vtkSMPythonTraceObserverCommand()
+  vtkSMPythonTraceObserverCommandHelper()
     {
     this->Target = 0;
     }
@@ -59,14 +59,14 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPythonTraceObserver);
-vtkCxxRevisionMacro(vtkSMPythonTraceObserver, "1.2");
+vtkCxxRevisionMacro(vtkSMPythonTraceObserver, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
 {
   this->Internal = new vtkInternal;
 
-  this->Observer = vtkSMPythonTraceObserverCommand::New();
+  this->Observer = vtkSMPythonTraceObserverCommandHelper::New();
   this->Observer->SetTarget(this);
 
   // Get the proxy manager
