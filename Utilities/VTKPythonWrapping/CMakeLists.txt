@@ -93,6 +93,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     util
     benchmark
     simple
+    smtrace
     )
 
   # Now copy these files if necessary.

@@ -2432,6 +2432,8 @@ def _make_name_valid(name):
         return None
     name = name.replace(' ','')
     name = name.replace('-','')
+    name = name.replace(':','')
+    name = name.replace('.','')
     if not name[0].isalpha():
         name = 'a' + name
     return name

@@ -258,17 +258,45 @@ def Delete(proxy=None):
                 SetActiveView(GetRenderViews()[0])
             else:
                 SetActiveView(None)
+
+def CreateLookupTable(**params):
+    """Create and return a lookup table.  Optionally, parameters can be given
+    to assign to the lookup table.
+    """
+    lt = servermanager.rendering.PVLookupTable()
+    servermanager.Register(lt)
+    SetProperties(lt, **params)
+    return lt
+
+def CreateScalarBar(**params):
+    """Create and return a scalar bar widget.  The returned widget may
+    be added to a render view by appending it to the view's representations
+    The widget must have a valid lookup table before it is added to a view.
+    It is possible to pass the lookup table (and other properties) as arguments
+    to this method:
     
+    lt = MakeBlueToRedLt(3.5, 7.5)
+    bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
+    GetRenderView().Representations.append(bar)
+    
+    By default the returned widget is selectable and resizable.
+    """
+    sb = servermanager.rendering.ScalarBarWidgetRepresentation()
+    servermanager.Register(sb)
+    sb.Selectable = 1
+    sb.Resizable = 1
+    sb.Enabled = 1
+    sb.Title = "Scalars"
+    SetProperties(sb, **params)
+    return sb
+
 # TODO: Change this to take the array name and number of components. Register 
 # the lt under the name ncomp.array_name
 def MakeBlueToRedLT(min, max):
-    lt = servermanager.rendering.PVLookupTable()
-    servermanager.Register(lt)
-    # Add to RGB points. These are tuples of 4 values. First one is
+    # Define RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values. 
-    lt.RGBPoints = [min, 0, 0, 1, max, 1, 0, 0]
-    lt.ColorSpace = "HSV"
-    return lt
+    rgbPoints = [min, 0, 0, 1, max, 1, 0, 0]
+    return CreateLookupTable(RGBPoints=rgbPoints, ColorSpace="HSV")
     
 def _find_writer(filename):
     "Internal function."
@@ -460,6 +488,25 @@ def LoadPlugin(filename, ns=None):
         ns = globals()
     servermanager.LoadPlugin(filename)
     _add_functions(ns)
+
+
+def StartTrace(CaptureAllProperties=False, Verbose=False):
+  """Imports the smtrace module and begins trace."""
+  import smtrace
+  smtrace.start_trace(CaptureAllProperties, Verbose)
+
+def ClearTrace():
+  import smtrace
+  smtrace.clear_trace()
+
+def PrintTrace():
+  import smtrace
+  smtrace.print_trace()
+
+def SaveTrace(fileName):
+  import smtrace
+  smtrace.save_trace(fileName)
+
 
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
