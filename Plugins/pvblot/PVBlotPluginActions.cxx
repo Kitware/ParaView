@@ -74,12 +74,6 @@ void PVBlotPluginActions::startPVBlot()
                                            filter);
   fdialog->setAttribute(Qt::WA_DeleteOnClose);
   fdialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(fdialog, SIGNAL(fileAccepted(const QString &)),
-                   this, SLOT(startPVBlot(const QString &)));
-  // If you want to catch double-clicks on files as accepting, you also have to
-  // receive a filesSelected signal.  IMHO, this is stupid.  We just want the
-  // file the user chose.  We don't care whether they double-clicked on it or
-  // hit the accept button.
   QObject::connect(fdialog, SIGNAL(filesSelected(const QStringList &)),
                    this, SLOT(startPVBlot(const QStringList &)));
   fdialog->show();
