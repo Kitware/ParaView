@@ -59,7 +59,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPythonTraceObserver);
-vtkCxxRevisionMacro(vtkSMPythonTraceObserver, "1.1");
+vtkCxxRevisionMacro(vtkSMPythonTraceObserver, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkSMPythonTraceObserver::vtkSMPythonTraceObserver()
@@ -101,7 +101,7 @@ vtkSMPythonTraceObserver::~vtkSMPythonTraceObserver()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPythonTraceObserver::ExecuteEvent(vtkObject* caller, 
+void vtkSMPythonTraceObserver::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
   unsigned long eventid, void* data)
 {
   switch (eventid)
