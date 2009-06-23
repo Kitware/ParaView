@@ -1792,6 +1792,7 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
    <!-- End DataObjectGenerator -->
    </SourceProxy>
 
+   <!-- ==================================================================== -->
    <NetworkImageSourceProxy name="NetworkImageSource"
      class="vtkNetworkImageSource">
      <StringVectorProperty name="FileName"
@@ -1821,6 +1822,7 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
      <!-- End of NetworkImageSource -->
    </NetworkImageSourceProxy>
 
+   <!-- ==================================================================== -->
    <SourceProxy name="SplineSource"
     class="vtkParametricFunctionSource">
     <Documentation
@@ -1838,6 +1840,11 @@ third contains a vtkMultiBlockDataSet, which in this case is empty.
         <Proxy group="parametric_functions" name="Spline" />
       </ProxyListDomain>
     </ProxyProperty>
+   </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy name="TrivialProducer" 
+                class="vtkPVTrivialProducer">
    </SourceProxy>
 
   </ProxyGroup>
