@@ -27,7 +27,6 @@ paraview_build_optional_plugin(CosmoFilters "Cosmology Filters" CosmoFilters OFF
 paraview_build_optional_plugin(GraphLayoutFilterPanel "GraphLayoutFilterPanel" GraphLayoutFilterPanel OFF)
 paraview_build_optional_plugin(Infovis "Infovis" Infovis OFF)
 paraview_build_optional_plugin(Moments, "Filters for Flux and Circulation Fields" Moments ON)
-paraview_build_optional_plugin(netCDFReaders "netCDFReaders" netCDFReaders OFF)
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON) 
 paraview_build_optional_plugin(pvblot "pvblot" pvblot OFF)

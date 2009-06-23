@@ -213,7 +213,12 @@
 
   <Reader name="SLACReader"
           extensions="ncdf nc"
-          file_description="SLAC Files">
+          file_description="SLAC Mesh Files">
+  </Reader>
+
+  <Reader name="SLACParticleReader"
+          extensions="ncdf netcdf"
+          file_description="SLAC Particle Files">
   </Reader>
 
 </ParaViewReaders>
