@@ -148,7 +148,7 @@ public:
 
   /// The annotation link used on representations to share the selection
   /// and annotations. This is only used in views aware of this link.
-  void setAnnotationLink(vtkSMSourceProxy* link);
+  virtual void setAnnotationLink(vtkSMSourceProxy* link);
   vtkSMSourceProxy* getAnnotationLink();
 
 signals:
