@@ -390,13 +390,22 @@ def _create_func(key, module):
             if len(input) > 0:
                 raise RuntimeError, "This function does not expect an input."
 
+        registrationName = None
+        if 'registrationName' in params:
+            registrationName = params['registrationName']
+            del params['registrationName']
+
         # Pass all the named arguments as property,value pairs
         for param in params.keys():
             setattr(px, param, params[param])
 
         try:
             # Register the proxy with the proxy manager.
-            group, name = servermanager.Register(px)
+            if registrationName:
+                group, name = servermanager.Register(px, registrationName=registrationName)
+            else:
+                group, name = servermanager.Register(px)
+
 
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
