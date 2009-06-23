@@ -2335,6 +2335,8 @@ def _findClassForProxy(xmlName, xmlGroup):
     """Given the xmlName for a proxy, returns a Proxy class. Note
     that if there are duplicates, the first one is returned."""
     global sources, filters, rendering, animation, implicit_functions, writers, extended_sources, misc
+    if not xmlName:
+        return None
     if xmlGroup == "sources":
         return sources.__dict__[xmlName]
     elif xmlGroup == "filters":
