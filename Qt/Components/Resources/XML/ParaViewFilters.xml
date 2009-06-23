@@ -108,7 +108,9 @@
   <Filter name="ProbePoint" />
   <Filter name="ProcessIdScalars" />
   <Filter name="ProgrammableFilter" />
+  <!--
   <Filter name="PythonCalculator" />
+  -->
   <Filter name="PVConnectivityFilter" />
   <Filter name="QuadraturePointInterpolator" />
   <Filter name="QuadraturePointsGenerator" />
