@@ -164,7 +164,7 @@
          <StringVectorProperty 
             name="InformationScript" 
             command="SetInformationScript"
-            label="Script (RequestInformation)"
+            label="RequestInformation Script"
             number_of_elements="1">
            <Hints>
              <Widget type="multi_line"/>
