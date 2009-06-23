@@ -5763,6 +5763,9 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
         ID. This is intended to handle the output of a filter such as the
         TemporalStreamTracer.
       </Documentation>
+
+      <OutputPort name="Pathlines" index="0" />
+      <OutputPort name="Particles" index="1" />
       
       <InputProperty
          name="Input"
