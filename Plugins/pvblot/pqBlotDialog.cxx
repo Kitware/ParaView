@@ -22,8 +22,11 @@
 #include "pqBlotDialog.h"
 
 #include "pqApplicationCore.h"
+#include "pqFileDialog.h"
 #include "pqSettings.h"
 
+#include <QFile>
+#include <QtDebug>
 #include <QToolBar>
 
 #include "ui_pqBlotDialog.h"
@@ -43,6 +46,8 @@ pqBlotDialog::pqBlotDialog(QWidget *p) : QDialog(p)
   toolbar->addAction(this->ui->actionWireframe);
   toolbar->addAction(this->ui->actionSolid);
 
+  QObject::connect(this->ui->runScript, SIGNAL(clicked()),
+                   this, SLOT(runScript()));
   QObject::connect(this->ui->close, SIGNAL(clicked()),
                    this, SLOT(accept()));
 
@@ -89,6 +94,38 @@ void pqBlotDialog::open(const QString &filename)
 void pqBlotDialog::open(const QStringList &filenames)
 {
   this->open(filenames[0]);
+}
+
+//-----------------------------------------------------------------------------
+void pqBlotDialog::runScript()
+{
+  QString filters = tr("BLOT Script (*.blot *.bl);;All files (*)");
+  pqFileDialog *const dialog = new pqFileDialog(NULL, this,
+                                                tr("Run BLOT Script"),
+                                                QString(), filters);
+
+  dialog->setObjectName("BLOTShellRunScriptDialog");
+  dialog->setFileMode(pqFileDialog::ExistingFiles);
+  QObject::connect(dialog, SIGNAL(filesSelected(const QStringList &)),
+                   this, SLOT(runScript(const QStringList &)));
+  dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqBlotDialog::runScript(const QStringList &files)
+{
+  foreach (QString filename, files)
+    {
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly))
+      {
+      this->ui->shellWidget->executeBlotScript(file.readAll().data());
+      }
+    else
+      {
+      qWarning() << "Error opening " << filename;
+      }
+    }
 }
 
 //=============================================================================

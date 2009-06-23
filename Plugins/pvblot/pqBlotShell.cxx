@@ -158,6 +158,15 @@ void pqBlotShell::echoExecuteBlotCommand(const QString &command)
 }
 
 //-----------------------------------------------------------------------------
+void pqBlotShell::executeBlotScript(const QString &script)
+{
+  foreach (QString command, script.split("\n"))
+    {
+    this->echoExecuteBlotCommand(command);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqBlotShell::printStderr(vtkObject *, unsigned long, void *,
                               void *calldata)
 {
