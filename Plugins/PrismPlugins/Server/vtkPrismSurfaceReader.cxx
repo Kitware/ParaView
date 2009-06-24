@@ -32,7 +32,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.4");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.5");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -271,8 +271,8 @@ bool vtkPrismSurfaceReader::GetVariableRange (const char *varName,vtkDoubleArray
         for(int i=0;i<numArrays;i++)
             {
             vtkStdString name=this->Internal->RectGridGeometry->GetOutput()->GetPointData()->GetArrayName(i);
-            int pos=name.find_first_of(":");
-            if(pos!=-1)
+            vtkStdString::size_type pos=name.find_first_of(":");
+            if(pos!= vtkStdString::npos)
                 {
                 name.erase(0,pos+2);
                 }
@@ -405,7 +405,7 @@ vtkStringArray* vtkPrismSurfaceReader::GetAxisVarNames()
     for(int i=0;i<numberArrayNames;i++)
         {
         vtkStdString str=this->Internal->Reader->GetTableArrayName(i);
-        int pos=str.find_first_of(":");
+        vtkStdString::size_type pos=str.find_first_of(":");
         str.erase(0,pos+2);
         this->Internal->ArrayNames->InsertNextValue(str);
 
@@ -713,8 +713,8 @@ int vtkPrismSurfaceReader::RequestData(
     for(int i=0;i<numArrays;i++)
         {
         vtkStdString name=localOutput->GetPointData()->GetArrayName(i);
-        int pos=name.find_first_of(":");
-        if(pos!=-1)
+        vtkStdString::size_type pos=name.find_first_of(":");
+        if(pos!=vtkStdString::npos)
             {
             name.erase(0,pos+2);
             }
@@ -865,8 +865,8 @@ int vtkPrismSurfaceReader::RequestData(
         for(int i=0;i<numArrays;i++)
             {
             vtkStdString name=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArrayName(i);
-            int pos=name.find_first_of(":");
-            if(pos!=-1)
+            vtkStdString::size_type pos=name.find_first_of(":");
+            if(pos!=vtkStdString::npos)
                 {
                 name.erase(0,pos+2);
                 }
