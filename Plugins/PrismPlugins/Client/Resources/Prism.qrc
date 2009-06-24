@@ -2,6 +2,7 @@
     <qresource prefix="/Prism" >
         <file>Icons/CreateSESAME.png</file>
         <file>Icons/PrismSmall.png</file>
+        <file>UI/PrismSurfacePanelWidget.ui</file>
     </qresource>
     <qresource prefix="/ParaViewResources" >
         <file>PrismReader.xml</file>

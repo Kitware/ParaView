@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    PrismDisplayPanelsImplementation.cxx
+Program: ParaView
+Module:    PrismDisplayPanelsImplementation.cxx
 
 =========================================================================*/
 
@@ -10,55 +10,58 @@
 #include "pqDataRepresentation.h"
 #include "PrismDisplayProxyEditor.h"
 #include "pqPipelineSource.h"
+#include "PrismSurfacePanel.h"
 
 
 PrismDisplayPanelsImplementation::PrismDisplayPanelsImplementation(QObject* p):
- QObject(p)
-{
-}
+QObject(p)
+    {
+    }
 
 bool PrismDisplayPanelsImplementation::canCreatePanel(pqRepresentation* repr) const
     {
     if(!repr || !repr->getProxy())
-      {
-      return false;
-      }
+        {
+        return false;
+        }
 
-   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
-   if(dataRepr)
-     {
-     pqPipelineSource* input = dataRepr->getInput(); 
-     QString name=input->getProxy()->GetXMLName();
-     if(name=="PrismFilter")
-       {
-       return true;
-       }
-     }
+    pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
+    if(dataRepr)
+        {
+        pqPipelineSource* input = dataRepr->getInput(); 
+        QString name=input->getProxy()->GetXMLName();
+        if(name=="PrismFilter")
+            {
+            return true;
+            }
+
+        }
 
     return false;
     }
-  /// Creates a panel for the given proxy
+/// Creates a panel for the given proxy
 pqDisplayPanel* PrismDisplayPanelsImplementation::createPanel(pqRepresentation* repr, QWidget* p)
     {
     if(!repr || !repr->getProxy())
-      {
-      return NULL;
-      }
+        {
+        return NULL;
+        }
 
 
-   pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
-   if(dataRepr)
-     {
-     pqPipelineSource* input = dataRepr->getInput(); 
-     QString name=input->getProxy()->GetXMLName();
-     if(name=="PrismFilter")
-       {
+    pqDataRepresentation* dataRepr = qobject_cast<pqDataRepresentation*>(repr);
+    if(dataRepr)
+        {
+        pqPipelineSource* input = dataRepr->getInput(); 
+        QString name=input->getProxy()->GetXMLName();
+        if(name=="PrismFilter")
+            {
 
-       pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);
+            pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);
 
-       return new PrismDisplayProxyEditor(pd,p);
-       }
-     }
+            return new PrismDisplayProxyEditor(pd,p);
+            }
+
+        }
     return NULL;
     }
 

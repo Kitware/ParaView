@@ -441,7 +441,7 @@
      </StringVectorProperty>
 
      <StringVectorProperty 
-        name="XAxisVariableName" 
+        name="AssociateWithXAxis" 
         command="SetXAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -452,7 +452,7 @@
            </ArrayListDomain>
      </StringVectorProperty>
      <StringVectorProperty 
-        name="YAxisVariableName" 
+        name="AssociateWithYAxis" 
         command="SetYAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -463,7 +463,7 @@
            </ArrayListDomain>
      </StringVectorProperty>
      <StringVectorProperty 
-        name="ZAxisVariableName" 
+        name="AssociateWithZAxis" 
         command="SetZAxisVarName"
           number_of_elements="1"
           element_types="2">
@@ -507,7 +507,340 @@
          information_only="1">
          <ArraySelectionInformationHelper attribute_name="Table"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="AxisVarNameInfo"
+        command="GetAxisVarNames"
+        information_only="1">
+        <StringArrayHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="XAxisVariableName" 
+        command="SetXAxisVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="XArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="YAxisVariableName" 
+        command="SetYAxisVarName"
+        number_of_elements="1"
+        default_values="Temperature">
+        <StringListDomain name="YArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ZAxisVariableName" 
+        command="SetZAxisVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="ZArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ContourVariableName" 
+        command="SetContourVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="CArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="XAxisVarNameInfo"
+        command="GetXAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="YAxisVarNameInfo"
+        command="GetYAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ZAxisVarNameInfo"
+        command="GetZAxisVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+     <StringVectorProperty 
+        name="ContourVarNameInfo"
+        command="GetContourVarName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+     <IntVectorProperty name="WarpSurface"
+                        command="SetWarpSurface"
+                        number_of_elements="1"
+                        default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="DisplayContours"
+                        command="SetDisplayContours"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="XLogScaling"
+                        command="SetXLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="YLogScaling"
+                        command="SetYLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ZLogScaling"
+                        command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+      <IntVectorProperty
+         name="NumberOfContours"
+         command="SetNumberOfContours"
+         number_of_elements="1"
+         default_values="1" >
+        <IntRangeDomain name="range" min="1" max="1000" />
+      </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="XAxisRange"
+        command="GetXRange"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="YAxisRange"
+        command="GetYRange"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdXBetweenInfo"
+        command="GetXThresholdBetween"
+        information_only="1">
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdXBetween" 
+        command="SetThresholdXBetween"
+        number_of_elements="2"
+        default_values="0 0"
+        information_property="XAxisRange" >
+       <PrismDoubleRangeDomain name="XRange">
+         <RequiredProperties>
+            <Property name="XAxisRange" function="GetXRange"/>
+          </RequiredProperties>
+       </PrismDoubleRangeDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdYBetweenInfo"
+        command="GetYThresholdBetween"
+        information_only="1">
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="ThresholdYBetween" 
+        command="SetThresholdYBetween"
+        number_of_elements="2"
+        default_values="0 0"
+        information_property="YAxisRange">
+       <PrismDoubleRangeDomain name="YRange" >
+         <RequiredProperties>
+            <Property name="YAxisRange" function="GetYRange"/>
+          </RequiredProperties>
+       </PrismDoubleRangeDomain>
+     </DoubleVectorProperty>
+
+
+
      <!-- End PrismSurface -->
     </SourceProxy>
  </ProxyGroup>
+
+ <ProxyGroup name="misc">
+    <Proxy name="SESAMEReaderHelper" class="">
+      <Documentation>
+        This proxy helps apps with the interaction of
+        interdependent properties in the SESAMEReader 
+      </Documentation>
+     
+     <StringVectorProperty 
+        name="AxisVarNameInfo"
+        command="GetAxisVarNames"
+        information_only="1">
+        <StringArrayHelper/>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+         name="TableId"
+         command="SetTable"
+         number_of_elements="1"
+         default_values="-1">
+         <EnumerationDomain name="enum">
+           <RequiredProperties>
+             <Property name="TableIds" function="Enumeration"/>
+          </RequiredProperties>
+         </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+         name="TableIds"
+         command="GetTableIdsAsArray"
+         information_only="1">
+         <IntArrayInformationHelper />
+     </IntVectorProperty>
+     <StringVectorProperty
+         name="TableArrayInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Table"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="XAxisVariableName" 
+        command="SetXAxisVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="XArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="YAxisVariableName" 
+        command="SetYAxisVarName"
+        number_of_elements="1"
+        default_values="Temperature">
+        <StringListDomain name="YArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ZAxisVariableName" 
+        command="SetZAxisVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="ZArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ContourVariableName" 
+        command="SetContourVarName"
+        number_of_elements="1"
+        default_values="Density">
+        <StringListDomain name="CArray_list">
+          <RequiredProperties>
+             <Property name="AxisVarNameInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdXBetweenInfo"
+        command="GetXThresholdBetween"
+        information_only="1">
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdXBetween" 
+        command="SetThresholdXBetween"
+        number_of_elements="2"
+        default_values="0 0"
+        information_property="XAxisRange" >
+       <PrismDoubleRangeDomain name="XRange">
+         <RequiredProperties>
+            <Property name="XAxisRange" function="GetXRange"/>
+          </RequiredProperties>
+       </PrismDoubleRangeDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdYBetweenInfo"
+        command="GetYThresholdBetween"
+        information_only="1">
+     </DoubleVectorProperty>
+     <DoubleVectorProperty 
+        name="ThresholdYBetween" 
+        command="SetThresholdYBetween"
+        number_of_elements="2"
+        default_values="0 0"
+        information_property="YAxisRange">
+       <PrismDoubleRangeDomain name="YRange">
+         <RequiredProperties>
+            <Property name="YAxisRange" function="GetYRange"/>
+          </RequiredProperties>
+       </PrismDoubleRangeDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="XAxisRange"
+        command="GetXRange"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="YAxisRange"
+        command="GetYRange"
+        information_only="1">
+        <DoubleArrayInformationHelper/>
+     </DoubleVectorProperty>
+     <IntVectorProperty name="XLogScaling"
+                        command="SetXLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="YLogScaling"
+                        command="SetYLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     <IntVectorProperty name="ZLogScaling"
+                        command="SetZLogScaling"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+    </Proxy>
+ </ProxyGroup>
+
 </ServerManagerConfiguration>

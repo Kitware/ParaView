@@ -11,6 +11,7 @@
 #define __vtkPrismSurfaceReader
 
 #include "vtkPolyDataAlgorithm.h"
+#include "vtkStringArray.h"
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 
@@ -82,6 +83,48 @@ public:
   vtkGetVectorMacro(Scale,double,3);
   vtkGetVectorMacro(Range,double,6);
 
+  void SetXAxisVarName( const char *name );
+  void SetYAxisVarName( const char *name );
+  void SetZAxisVarName( const char *name );
+  const char *GetXAxisVarName();
+  const char *GetYAxisVarName(); 
+  const char *GetZAxisVarName(); 
+
+  void SetXLogScaling(bool);
+  void SetYLogScaling(bool);
+  void SetZLogScaling(bool);
+  bool GetXLogScaling();
+  bool GetYLogScaling();
+  bool GetZLogScaling();
+
+
+ 
+  vtkDoubleArray* GetXRange();
+  vtkDoubleArray* GetYRange();
+
+  void SetThresholdXBetween(double lower, double upper);
+  void SetThresholdYBetween(double lower, double upper);
+
+ virtual double *GetXThresholdBetween();
+ virtual void GetXThresholdBetween (double &_arg1, double &_arg2);
+ virtual void GetXThresholdBetween (double _arg[2]);
+
+  vtkGetVector2Macro(YThresholdBetween,double);
+
+
+
+
+  void SetWarpSurface(bool);
+  void SetDisplayContours(bool);
+  void SetContourVarName( const char *name );
+  const char *GetContourVarName(); 
+
+
+  void SetNumberOfContours(int);
+
+
+  vtkStringArray* GetAxisVarNames();
+
 
 protected:
   vtkPrismSurfaceReader();
@@ -90,13 +133,16 @@ protected:
 
   double Scale[3];
   double Range[6];
+  double VariableRange[2];
+  double XThresholdBetween[2];
+  double YThresholdBetween[2];
 
 
+  bool GetVariableRange (const char *name,vtkDoubleArray*);
   //BTX 
   class MyInternal;
   MyInternal* Internal;
   //ETX 
-
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);

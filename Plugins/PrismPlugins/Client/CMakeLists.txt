@@ -47,7 +47,10 @@ VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator PrismInstantiator_SRCS
 
 
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h)
+QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h)
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+    Resources/UI/PrismSurfacePanelWidget.ui)
 
 SET(UI_RESOURCES
   Resources/Prism.qrc
@@ -74,9 +77,24 @@ ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActio
                           GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
 ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
-                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels
+                    GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels 
                     SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx
-                    GUI_SOURCES PrismToolBarActions.cxx PrismCore.cxx PrismMenuActions.cxx PrismDisplayProxyEditor.cxx PrismDisplayPanelsImplementation.cxx  ${PrismInstantiator_SRCS} ${RCS_SOURCES} ${MOC_SRCS} ${TOOLBAR_IFACE_SRCS} ${MENU_IFACE_SRCS})
+                    GUI_SOURCES 
+                    PrismToolBarActions.cxx 
+                    PrismCore.cxx 
+                    PrismMenuActions.cxx 
+                    PrismDisplayProxyEditor.cxx 
+                    PrismDisplayPanelsImplementation.cxx 
+                    PrismObjectPanelsImplementation.cxx 
+                    PrismSurfacePanel.cxx  
+                    ${PrismInstantiator_SRCS} 
+                    ${RCS_SOURCES} 
+                    ${MOC_SRCS} 
+                    ${TOOLBAR_IFACE_SRCS} 
+                    ${MENU_IFACE_SRCS}
+                    ${UI_BUILT_SOURCES}
+    
+)
   
 
 ENDIF(QT4_FOUND)
