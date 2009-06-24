@@ -364,7 +364,6 @@ PrismSurfacePanel::PrismSurfacePanel(pqProxy* object_proxy, QWidget* p) :
         vtkSMProperty* xVariableProperty =this->UI->PanelHelper->GetProperty("XAxisVariableName");
         QVariant str = pqSMAdaptor::getEnumerationProperty(xVariableProperty);
 
-        QString temp=str.toString();
         if(str.toString().isEmpty())
             {
             // initialize our helper to whatever item is current
@@ -383,7 +382,6 @@ PrismSurfacePanel::PrismSurfacePanel(pqProxy* object_proxy, QWidget* p) :
             if(index==-1)
                 {
                 xVariables->setCurrentIndex(0);
-                QString temp=xVariables->currentText();
                 pqSMAdaptor::setElementProperty(
                     this->UI->PanelHelper->GetProperty("XAxisVariableName"),
                     xVariables->currentText());

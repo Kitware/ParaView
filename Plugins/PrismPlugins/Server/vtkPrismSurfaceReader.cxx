@@ -32,7 +32,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.5");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.6");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -859,10 +859,10 @@ int vtkPrismSurfaceReader::RequestData(
 
     if(this->Internal->DisplayContours)
         {
-        vtkIdType numArrays=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetNumberOfArrays();
+        vtkIdType numberArrays=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetNumberOfArrays();
 
         vtkSmartPointer<vtkFloatArray> cArray;
-        for(int i=0;i<numArrays;i++)
+        for(int i=0;i<numberArrays;i++)
             {
             vtkStdString name=this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArrayName(i);
             vtkStdString::size_type pos=name.find_first_of(":");
