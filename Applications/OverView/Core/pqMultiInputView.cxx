@@ -98,6 +98,12 @@ void pqMultiInputView::onRepresentationAdded(pqRepresentation* representation)
 
 void pqMultiInputView::onRepresentationVisibilityChanged(pqRepresentation *rep, bool visible)
 {
+  // Nothing to do if visibility is the same
+  if(rep->isVisible() == visible)
+    {
+    return;
+    }
+
   if(visible)
     this->showRepresentation(rep);
   else
