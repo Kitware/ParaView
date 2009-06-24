@@ -4582,6 +4582,9 @@
         several conventions to form an unstructured grid of elements.
       </Documentation>
 
+      <OutputPort name="External Surface" index="0" />
+      <OutputPort name="Entire Volume" index="1" />
+
       <StringVectorProperty name="MeshFileName"
                             command="SetMeshFileName"
                             animateable="0"
