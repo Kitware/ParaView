@@ -303,14 +303,14 @@ void ClientTreeAreaView::showRepresentation(pqRepresentation* representation)
     this->Implementation->TreeAreaRepresentation->SetInput(tree);
     this->Implementation->HierarchicalGraphView->SetRepresentation(this->Implementation->TreeAreaRepresentation);
 
-    this->scheduleSynchronization(DELIVER_TREE | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
+    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
   else if(graph)
     {
     this->Implementation->GraphRepresentation = representation;
     this->Implementation->TreeAreaRepresentation->AddInput(1, graph);
 
-    this->scheduleSynchronization(DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
+    this->scheduleSynchronization(DELIVER_TREE | DELIVER_GRAPH | SYNC_ATTRIBUTES | RESET_HGRAPH_CAMERA | UPDATE_HGRAPH_VIEW );
     }
 }
 
@@ -449,7 +449,7 @@ void ClientTreeAreaView::synchronizeViews()
       {
       this->Implementation->HierarchicalGraphView->SetAreaLabelVisibility(vtkSMPropertyHelper(tree_proxy, "AreaLabels").GetAsInt());
       this->Implementation->HierarchicalGraphView->SetAreaLabelArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelArray").GetAsString());
-
+      this->Implementation->HierarchicalGraphView->SetLabelRenderMode(vtkSMPropertyHelper(this->getProxy(), "LabelRenderMode").GetAsInt());
       this->Implementation->HierarchicalGraphView->SetLabelPriorityArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelPriorityArray").GetAsString());
       this->Implementation->HierarchicalGraphView->SetAreaHoverArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelHoverArray").GetAsString());
       //this->Implementation->HierarchicalGraphView->SetAreaSizeArrayName(vtkSMPropertyHelper(tree_proxy, "AreaSizeArray").GetAsString());
