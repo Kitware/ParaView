@@ -23,6 +23,7 @@
 
 #include "pqSLACDataLoadManager.h"
 
+#include "pqActiveView.h"
 #include "pqApplicationCore.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -104,6 +105,22 @@ QWidget *pqSLACManager::mainWindow()
     if (qobject_cast<QMainWindow*>(topWidget)) return topWidget;
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqView *pqSLACManager::view3D()
+{
+  pqView *view = pqActiveView::instance().current();
+  // TODO: Check to make sure the active view is 3D.  If not, find one.  This
+  // can be done by getting a pqServerManagerModel (from pqAppliationCore)
+  // and querying pqView.  If no view is valid, create one.  Probably look
+  // at pqDisplayPolicy::createPreferredRepresentation for that one.
+  //
+  // On second thought, since I have to be able to query for the mesh file
+  // anyway, perhaps I should just find that and return a view in which that
+  // is defined.  Then let pqSLACDataLoadManager create a necessary view on
+  // creating the mesh reader if necessary.
+  return view;
 }
 
 //-----------------------------------------------------------------------------

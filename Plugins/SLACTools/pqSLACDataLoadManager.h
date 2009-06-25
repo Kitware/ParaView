@@ -24,6 +24,8 @@
 
 #include <QDialog>
 
+class pqServer;
+
 /// This dialog box provides an easy way to set up the readers in the pipeline
 /// and to ready them for the rest of the SLAC tools.
 class pqSLACDataLoadManager : public QDialog
@@ -35,6 +37,10 @@ public:
 
 public slots:
   virtual void checkInputValid();
+  virtual void setupPipeline();
+
+protected:
+  pqServer *Server;
 
 private:
   pqSLACDataLoadManager(const pqSLACDataLoadManager &); // Not implemented

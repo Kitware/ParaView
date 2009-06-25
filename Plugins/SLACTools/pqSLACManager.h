@@ -27,6 +27,7 @@
 class QAction;
 
 class pqServer;
+class pqView;
 
 /// This singleton class manages the state associated with the packaged
 /// visualizations provided by the SLAC tools.
@@ -46,6 +47,9 @@ public:
 
   /// Convenience function for getting the main window.
   QWidget *mainWindow();
+
+  /// Get the window to use for 3D rendering.
+  pqView *view3D();
 
 public slots:
   void showDataLoadManager();
