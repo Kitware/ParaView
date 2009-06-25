@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/SLACTools">
+    <file>Icons/DataLoadManager.png</file>
+  </qresource>
+</RCC>

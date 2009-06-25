@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqSLACActionHolder</class>
+ <widget class="QWidget" name="pqSLACActionHolder">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <action name="actionDataLoadManager">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/DataLoadManager.png</normaloff>:/SLACTools/Icons/DataLoadManager.png</iconset>
+   </property>
+   <property name="text">
+    <string>Data Load Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Show a Dialog to Manage Loaded Data</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="SLACTools.qrc"/>
+ </resources>
+ <connections/>
+</ui>
