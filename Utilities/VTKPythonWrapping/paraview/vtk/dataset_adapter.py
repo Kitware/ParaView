@@ -28,10 +28,6 @@ def MakeObserver(numpy_array):
 def vtkDataArrayToVTKArray(array, dataset=None):
     "Given a vtkDataArray and a dataset owning it, returns a VTKArray."
     narray = numpy_support.vtk_to_numpy(array)
-    # The numpy_support convention of returning an array of snape (n,)
-    # causes problems. Change it to (n,1)
-    if len(narray.shape) == 1:
-        narray = narray.reshape(narray.shape[0], 1)
     return VTKArray(narray, array=array, dataset=dataset)
     
 def numpyTovtkDataArray(array, name="numpy_array"):
@@ -47,7 +43,7 @@ def numpyTovtkDataArray(array, name="numpy_array"):
     vtkarray.AddObserver('DeleteEvent', MakeObserver(array))
     return vtkarray
     
-class VTKArray(numpy.ndarray):
+class VTKArray(numpy.matrix):
     """This is a sub-class of numpy ndarray that stores a
     reference to a vtk array as well as the owning dataset.
     The numpy array and vtk array should point to the same
@@ -57,6 +53,8 @@ class VTKArray(numpy.ndarray):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
         obj = numpy.asarray(input_array).view(cls)
+        if len(obj.shape) == 1:
+            obj = obj.reshape(obj.shape[0], 1)
         # add the new attributes to the created instance
         obj.VTKObject = array
         obj.DataSet = dataset
@@ -75,7 +73,15 @@ class VTKArray(numpy.ndarray):
             raise AttributeError("class has no attribute %s" % name)
             return None
         return getattr(self.VTKObject, name)
+        
+    def __mul__(self, other):
+        return numpy.multiply(self, other)
 
+    def __rmul__(self, other):
+        return numpy.multiply(self, other)
+
+    def __pow__(self, other):
+        return numpy.power(self, other)
 
 class DataSetAttributes(VTKObjectWrapper):
     """This is a python friendly wrapper of vtkDataSetAttributes. It
