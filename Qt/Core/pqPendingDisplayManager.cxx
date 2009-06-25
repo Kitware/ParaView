@@ -171,6 +171,8 @@ void pqPendingDisplayManager::createPendingDisplays(
       continue;
       }
 
+    vtkPVXMLElement *hints = source->getHints();
+
     // Create representations for all output ports.
     for (int cc=0; cc < source->getNumberOfOutputPorts(); cc++)
       {
@@ -179,6 +181,33 @@ void pqPendingDisplayManager::createPendingDisplays(
       if (!repr || !repr->getView())
         {
         continue;
+        }
+
+      // Process hints for this output port.
+      if (hints)
+        {
+        for (unsigned int hintIdx = 0;
+             hintIdx < hints->GetNumberOfNestedElements(); hintIdx++)
+          {
+          vtkPVXMLElement *h = hints->GetNestedElement(hintIdx);
+          if (strcmp(h->GetName(), "OutputPort") == 0)
+            {
+            int port;
+            if (!h->GetScalarAttribute("index", &port))
+              {
+              qWarning() << "Missing attribute 'index' in OutputPort Hint "
+                         << "for source " << source->getSMName();
+              }
+            if (port == cc)
+              {
+              int visible;
+              if (h->GetScalarAttribute("visible", &visible))
+                {
+                repr->setVisible(visible!=0);
+                }
+              }
+            }
+          }
         }
 
       pqView* view = repr->getView(); 

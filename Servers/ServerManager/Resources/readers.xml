@@ -4681,6 +4681,12 @@
         </Documentation>
       </DoubleVectorProperty>
 
+      <Hints>
+        <!-- Usually you want to look at the external surface, but the
+             volume is there for visualizing the internal fields. -->
+        <OutputPort index="1" visible="0" />
+      </Hints>
+
     </SourceProxy> <!-- SLACReader -->
 
     <FileSeriesReaderProxy name="SLACParticleReader"
