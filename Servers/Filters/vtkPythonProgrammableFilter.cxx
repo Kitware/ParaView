@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.36");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.37");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -73,8 +73,9 @@ vtkPVPythonInterpretor* vtkPythonProgrammableFilter::GetGlobalPipelineInterpreto
       GetOptions()->GetArgv0();
     vtkPythonProgrammableFilter::GlobalPipelineInterpretor->InitializeSubInterpretor(
       1, (char**)&argv0);
-    vtkProcessModule::GetProcessModule()->AddObserver(vtkCommand::ExitEvent,
-      new vtkPythonProgrammableFilterObserver);
+    vtkPythonProgrammableFilterObserver* obs = new vtkPythonProgrammableFilterObserver;
+    vtkProcessModule::GetProcessModule()->AddObserver(vtkCommand::ExitEvent, obs);
+    obs->UnRegister(0);
     }
   return vtkPythonProgrammableFilter::GlobalPipelineInterpretor;
 }
