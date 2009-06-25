@@ -133,7 +133,9 @@
 
  <ProxyGroup name="views">
    <ViewProxy name="ClientTreeAreaView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientTreeAreaDisplay">
-      <IntVectorProperty name="LabelRenderMode" number_of_elements="1" default_values="1">
+      <IntVectorProperty name="LabelRenderMode" number_of_elements="1" default_values="0">
+      </IntVectorProperty>
+      <IntVectorProperty name="LabelPlacementMode" number_of_elements="1" default_values="1">
       </IntVectorProperty>
    </ViewProxy>
  </ProxyGroup>

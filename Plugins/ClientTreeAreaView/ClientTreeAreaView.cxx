@@ -447,9 +447,12 @@ void ClientTreeAreaView::synchronizeViews()
     // Sync hgraph attributes
     if(this->Implementation->TreeRepresentation && this->Implementation->GraphRepresentation)
       {
+      this->Implementation->HierarchicalGraphView->SetLabelPlacementMode(vtkSMPropertyHelper(this->getProxy(), "LabelPlacementMode").GetAsInt());
+      this->Implementation->HierarchicalGraphView->SetLabelRenderMode(vtkSMPropertyHelper(this->getProxy(), "LabelRenderMode").GetAsInt());
+
       this->Implementation->HierarchicalGraphView->SetAreaLabelVisibility(vtkSMPropertyHelper(tree_proxy, "AreaLabels").GetAsInt());
       this->Implementation->HierarchicalGraphView->SetAreaLabelArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelArray").GetAsString());
-      this->Implementation->HierarchicalGraphView->SetLabelRenderMode(vtkSMPropertyHelper(this->getProxy(), "LabelRenderMode").GetAsInt());
+
       this->Implementation->HierarchicalGraphView->SetLabelPriorityArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelPriorityArray").GetAsString());
       this->Implementation->HierarchicalGraphView->SetAreaHoverArrayName(vtkSMPropertyHelper(tree_proxy, "AreaLabelHoverArray").GetAsString());
       //this->Implementation->HierarchicalGraphView->SetAreaSizeArrayName(vtkSMPropertyHelper(tree_proxy, "AreaSizeArray").GetAsString());
