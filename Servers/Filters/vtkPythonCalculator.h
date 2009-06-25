@@ -32,8 +32,6 @@
 
 #include "vtkProgrammableFilter.h"
 
-class vtkPythonCalculatorImplementation;
-
 class VTK_EXPORT vtkPythonCalculator : public vtkProgrammableFilter
 {
 public:
@@ -98,10 +96,6 @@ protected:
 private:
   vtkPythonCalculator(const vtkPythonCalculator&);  // Not implemented.
   void operator=(const vtkPythonCalculator&);  // Not implemented.
-
-//BTX
-  vtkPythonCalculatorImplementation* const Implementation;
-//ETX
 };
 
 #endif

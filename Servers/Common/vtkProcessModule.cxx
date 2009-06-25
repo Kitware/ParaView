@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.93");
+vtkCxxRevisionMacro(vtkProcessModule, "1.94");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -900,6 +900,7 @@ void vtkProcessModule::Finalize()
     this->ConnectionManager->Finalize();
     }
   this->FinalizeInterpreter();
+  this->InvokeEvent(vtkCommand::ExitEvent);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,6 +23,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVPythonInterpretor.h"
 #include "vtkPointData.h"
+#include "vtkPythonProgrammableFilter.h"
 #include "vtkCellData.h"
 #include "vtkProcessModule.h"
 
@@ -31,43 +32,13 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonCalculator, "1.3");
+vtkCxxRevisionMacro(vtkPythonCalculator, "1.4");
 vtkStandardNewMacro(vtkPythonCalculator);
 
 //----------------------------------------------------------------------------
 
-typedef vtkstd::map<vtkstd::string, vtkstd::string> ParametersT;
-
-class vtkPythonCalculatorImplementation
-{
-public:
-  vtkPythonCalculatorImplementation() :
-    Interpretor(NULL)
-  {
-  }
-
-  void DestroyInterpretor()
-    {
-      if (this->Interpretor)
-        {
-        // The following is necessary because the Delete() may
-        // cause the destruction of vtkPythonCalculator
-        // which calls DestroyInterpretor() in its destructor.
-        // If this->Interpretor is not set to 0, it will be
-        // deleted a second time causing segmentation fault.
-        vtkPVPythonInterpretor* interp = this->Interpretor;
-        this->Interpretor = 0;
-        interp->Delete();
-        }
-    }
-
-  vtkPVPythonInterpretor* Interpretor;
-  
-};
-
 //----------------------------------------------------------------------------
-vtkPythonCalculator::vtkPythonCalculator() :
-  Implementation(new vtkPythonCalculatorImplementation())
+vtkPythonCalculator::vtkPythonCalculator()
 {
   this->Expression = NULL;
   this->ArrayName = NULL;
@@ -82,9 +53,6 @@ vtkPythonCalculator::~vtkPythonCalculator()
 {
   this->SetExpression(NULL);
   this->SetArrayName(NULL);
-
-  this->Implementation->DestroyInterpretor();
-  delete this->Implementation;
 }
 
 //----------------------------------------------------------------------------
@@ -159,16 +127,6 @@ void vtkPythonCalculator::Exec(const char* expression,
     {
     vtkErrorMacro("Unexpected association value.");
     return;
-    }
-
-  if (this->Implementation->Interpretor == NULL)
-    {
-    this->Implementation->Interpretor = vtkPVPythonInterpretor::New();
-    this->Implementation->Interpretor->SetCaptureStreams(true);
-    const char* argv0 = vtkProcessModule::GetProcessModule()->
-      GetOptions()->GetArgv0();
-    this->Implementation->Interpretor->InitializeSubInterpretor(
-      1, (char**)&argv0);
     }
 
   // Replace tabs with two spaces
@@ -258,7 +216,7 @@ void vtkPythonCalculator::Exec(const char* expression,
     fscript += "  return None\n";
     }
   
-  this->Implementation->Interpretor->RunSimpleString(fscript.c_str());
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
 
   vtkstd::string runscript;
   runscript += "from paraview import vtk\n";
@@ -322,9 +280,8 @@ void vtkPythonCalculator::Exec(const char* expression,
   runscript += "del retVal\n";
   runscript += "del output\n";
   
-  this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
-
-  this->Implementation->Interpretor->FlushMessages();
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(runscript.c_str());
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();
 }
 
 //----------------------------------------------------------------------------

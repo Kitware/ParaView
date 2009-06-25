@@ -44,6 +44,8 @@
 
 #include "vtkProgrammableFilter.h"
 
+class vtkPVPythonInterpretor;
+
 class vtkPythonProgrammableFilterImplementation;
 
 class VTK_EXPORT vtkPythonProgrammableFilter : public vtkProgrammableFilter
@@ -88,6 +90,13 @@ public:
   vtkSetStringMacro(PythonPath);
   vtkGetStringMacro(PythonPath);
 
+  // Description:
+  // Returns the Python interp that should be used by all pipeline objects.
+  // The interp is created this first time this function is called and it
+  // is destroyed when vtkProcessModule invokes the ConnectionClosedEvent
+  // event.
+  static vtkPVPythonInterpretor* GetGlobalPipelineInterpretor();
+
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
@@ -120,7 +129,10 @@ private:
   vtkPythonProgrammableFilter(const vtkPythonProgrammableFilter&);  // Not implemented.
   void operator=(const vtkPythonProgrammableFilter&);  // Not implemented.
 
+  static vtkPVPythonInterpretor* GlobalPipelineInterpretor;
+
 //BTX
+  friend class vtkPythonProgrammableFilterObserver;
   vtkPythonProgrammableFilterImplementation* const Implementation;
 //ETX
 };

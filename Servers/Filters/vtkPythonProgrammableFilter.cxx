@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPythonProgrammableFilter.h"
 
+#include "vtkCommand.h"
 #include "vtkDataObject.h"
 #include "vtkDataObjectTypes.h"
 #include "vtkDataSet.h"
@@ -31,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.35");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.36");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -41,32 +42,42 @@ typedef vtkstd::map<vtkstd::string, vtkstd::string> ParametersT;
 class vtkPythonProgrammableFilterImplementation
 {
 public:
-  vtkPythonProgrammableFilterImplementation() :
-    Interpretor(NULL)
-  {
-  }
-
-  void DestroyInterpretor()
-    {
-      if (this->Interpretor)
-        {
-        // The following is necessary because the Delete() may
-        // cause the destruction of vtkPythonProgrammableFilter
-        // which calls DestroyInterpretor() in its destructor.
-        // If this->Interpretor is not set to 0, it will be
-        // deleted a second time causing segmentation fault.
-        vtkPVPythonInterpretor* interp = this->Interpretor;
-        this->Interpretor = 0;
-        interp->Delete();
-        }
-    }
-
-  vtkPVPythonInterpretor* Interpretor;
-  
   // Stores name-value parameters that will be passed to running scripts
   ParametersT Parameters;
-
 };
+
+vtkPVPythonInterpretor* vtkPythonProgrammableFilter::GlobalPipelineInterpretor = 0;
+
+// Upon disconnect, remove the global interp
+class vtkPythonProgrammableFilterObserver : public vtkCommand
+{
+public:
+  virtual void Execute(vtkObject*, unsigned long, void*)
+    {
+    if (vtkPythonProgrammableFilter::GlobalPipelineInterpretor)
+      {
+      vtkPythonProgrammableFilter::GlobalPipelineInterpretor->Delete();
+      vtkPythonProgrammableFilter::GlobalPipelineInterpretor = 0;
+      }
+    }
+};
+
+//----------------------------------------------------------------------------
+vtkPVPythonInterpretor* vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()
+{
+  if (!GlobalPipelineInterpretor)
+    {
+    vtkPythonProgrammableFilter::GlobalPipelineInterpretor = vtkPVPythonInterpretor::New();
+    vtkPythonProgrammableFilter::GlobalPipelineInterpretor->SetCaptureStreams(true);
+    const char* argv0 = vtkProcessModule::GetProcessModule()->
+      GetOptions()->GetArgv0();
+    vtkPythonProgrammableFilter::GlobalPipelineInterpretor->InitializeSubInterpretor(
+      1, (char**)&argv0);
+    vtkProcessModule::GetProcessModule()->AddObserver(vtkCommand::ExitEvent,
+      new vtkPythonProgrammableFilterObserver);
+    }
+  return vtkPythonProgrammableFilter::GlobalPipelineInterpretor;
+}
 
 //----------------------------------------------------------------------------
 vtkPythonProgrammableFilter::vtkPythonProgrammableFilter() :
@@ -86,7 +97,6 @@ vtkPythonProgrammableFilter::~vtkPythonProgrammableFilter()
   this->SetInformationScript(NULL);
   this->SetPythonPath(0);
 
-  this->Implementation->DestroyInterpretor();
   delete this->Implementation;
 }
 
@@ -161,9 +171,6 @@ int vtkPythonProgrammableFilter::RequestInformation(
   vtkInformationVector**, 
   vtkInformationVector* outputVector)
 {
-  // Start with a new interpretor
-  this->Implementation->DestroyInterpretor();
-
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
   // Setup ExtentTranslator so that all downstream piece requests are
@@ -230,21 +237,25 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
     return;
     }
 
-  if (this->Implementation->Interpretor == NULL)
+
+  // Prepend the paths defined in PythonPath to sys.path
+  if (this->PythonPath)
     {
-    this->Implementation->Interpretor = vtkPVPythonInterpretor::New();
-    this->Implementation->Interpretor->SetCaptureStreams(true);
-    const char* argv0 = vtkProcessModule::GetProcessModule()->
-      GetOptions()->GetArgv0();
-    this->Implementation->Interpretor->InitializeSubInterpretor(
-      1, (char**)&argv0);
-    if (this->PythonPath)
+    vtkstd::string pathscript;
+    pathscript += "import sys\n";
+    vtkstd::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(
+      this->PythonPath, ';');
+    for (unsigned int cc=0; cc < static_cast<unsigned int>(paths.size()); cc++)
       {
-      vtkstd::vector<vtksys::String> paths = vtksys::SystemTools::SplitString(
-        this->PythonPath, ';');
-      for (unsigned int cc=0; cc < static_cast<unsigned int>(paths.size()); cc++)
+      if (!paths[cc].empty())
         {
-        this->Implementation->Interpretor->AddPythonPath(paths[cc].c_str());
+        pathscript += "if not ";
+        pathscript += paths[cc];
+        pathscript += " in sys.path:\n";
+        pathscript += "  sys.path.insert(0, ";
+        pathscript += paths[cc];
+        pathscript += ")\n";
+        vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(pathscript.c_str());
         }
       }
     }
@@ -296,7 +307,7 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
       }
     }
   fscript += "\n";
-  this->Implementation->Interpretor->RunSimpleString(fscript.c_str());
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(fscript.c_str());
 
   vtkstd::string runscript;
 
@@ -350,9 +361,8 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   runscript += "del output\n";
   runscript += "del myarg\n";
 
-  this->Implementation->Interpretor->RunSimpleString(runscript.c_str());
-
-  this->Implementation->Interpretor->FlushMessages();
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(runscript.c_str());
+  vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();
 }
 
 //----------------------------------------------------------------------------

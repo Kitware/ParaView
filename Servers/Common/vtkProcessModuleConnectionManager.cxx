@@ -78,7 +78,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.31");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.32");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -153,14 +153,13 @@ void vtkProcessModuleConnectionManager::Finalize()
   // Close open server sockets.
   this->StopAcceptingAllConnections();
 
-  vtkConnectionIterator* iter = this->NewIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  while (!this->Internals->IDToConnectionMap.empty())
     {
-    vtkProcessModuleConnection* conn = iter->GetCurrentConnection();
+    vtkProcessModuleConnection* conn =
+      this->Internals->IDToConnectionMap.begin()->second;
     conn->Finalize();
+    this->DropConnection(conn);
     }
-  iter->Delete();
-
 }
 
 //-----------------------------------------------------------------------------
