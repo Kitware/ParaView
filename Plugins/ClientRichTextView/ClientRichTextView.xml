@@ -25,7 +25,22 @@
  </ProxyGroup>
 -->
  <ProxyGroup name="views">
-   <ViewProxy name="ClientRichTextView" base_proxygroup="views" base_proxyname="ViewBase" representation_name="ClientTableDisplay">
+   <ViewProxy name="ClientRichTextView" 
+              base_proxygroup="views" 
+              base_proxyname="ViewBase" 
+              representation_name="ClientTableDisplay">
+      <StringVectorProperty name="ProxyURL"
+                            label="Proxy URL"
+                            command="SetProxyURL"
+                            number_of_elements="1"
+                            element_types="2">          
+      </StringVectorProperty>
+      <IntVectorProperty name="ProxyPort" 
+                         label="Proxy Port"
+                         command="SetProxyPort" 
+                         number_of_elements="1" 
+                         element_types="0">
+      </IntVectorProperty>
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>
