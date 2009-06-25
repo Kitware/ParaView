@@ -97,7 +97,7 @@ public:
   /// Converts between a list of file names and delimited string of filenames
   /// (which is shown in the line edit box).
   static QStringList splitFilenames(const QString &filesString) {
-    return filesString.split(";");
+    return filesString.split(";", QString::SkipEmptyParts);
   }
   static QString joinFilenames(const QStringList &filesList) {
     return filesList.join(";");
