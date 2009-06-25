@@ -26,6 +26,7 @@
 
 class QAction;
 
+class pqPipelineSource;
 class pqServer;
 class pqView;
 
@@ -51,8 +52,15 @@ public:
   /// Get the window to use for 3D rendering.
   pqView *view3D();
 
+  /// Get the reader objects.  Returns NULL if that reader was never created.
+  pqPipelineSource *meshReader();
+  pqPipelineSource *particlesReader();
+
 public slots:
   void showDataLoadManager();
+
+protected:
+  pqPipelineSource *findPipelineSource(const char *SMName);
 
 private:
   pqSLACManager(QObject *p);

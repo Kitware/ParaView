@@ -23,8 +23,11 @@
 
 #include "pqSLACDataLoadManager.h"
 
+#include "vtkSMProxy.h"
+
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 
@@ -121,6 +124,32 @@ pqView *pqSLACManager::view3D()
   // is defined.  Then let pqSLACDataLoadManager create a necessary view on
   // creating the mesh reader if necessary.
   return view;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource *pqSLACManager::findPipelineSource(const char *SMName)
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqServerManagerModel *smModel = core->getServerManagerModel();
+
+  QList<pqPipelineSource*> sources
+    = smModel->findItems<pqPipelineSource*>(this->activeServer());
+  foreach(pqPipelineSource *s, sources)
+    {
+    if (strcmp(s->getProxy()->GetXMLName(), SMName) == 0) return s;
+    }
+
+  return NULL;
+}
+
+pqPipelineSource *pqSLACManager::meshReader()
+{
+  return this->findPipelineSource("SLACReader");
+}
+
+pqPipelineSource *pqSLACManager::particlesReader()
+{
+  return this->findPipelineSource("SLACParticleReader");
 }
 
 //-----------------------------------------------------------------------------

@@ -62,6 +62,26 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget *p,
   this->ui->modeFile->setExtension("SLAC Mode Files (*.mod *.m?)");
   this->ui->particlesFile->setExtension("SLAC Particle Files (*.ncdf *.netcdf)");
 
+  pqPipelineSource *meshReader = manager->meshReader();
+  pqPipelineSource *particlesReader = manager->particlesReader();
+  if (meshReader)
+    {
+    vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+    vtkSMProperty *meshFileName = meshReaderProxy->GetProperty("MeshFileName");
+    vtkSMProperty *modeFileName = meshReaderProxy->GetProperty("ModeFileName");
+    this->ui->meshFile->setFilenames(
+                                pqSMAdaptor::getFileListProperty(meshFileName));
+    this->ui->modeFile->setFilenames(
+                                pqSMAdaptor::getFileListProperty(modeFileName));
+    }
+  if (particlesReader)
+    {
+    vtkSMProxy *particlesReaderProxy = particlesReader->getProxy();
+    vtkSMProperty *fileName = particlesReaderProxy->GetProperty("FileName");
+    this->ui->particlesFile->setFilenames(
+                                    pqSMAdaptor::getFileListProperty(fileName));
+    }
+
   QObject::connect(
               this->ui->meshFile, SIGNAL(filenamesChanged(const QStringList &)),
               this, SLOT(checkInputValid()));
@@ -99,13 +119,26 @@ void pqSLACDataLoadManager::setupPipeline()
 
   if (stack) stack->beginUndoSet("SLAC Data Load");
 
+  // Delete existing pipeline objects.  We will replace them.
+  pqPipelineSource *meshReader = manager->meshReader();
+  if (meshReader) builder->destroy(meshReader);
+
+  pqPipelineSource *particlesReader = manager->particlesReader();
+  if (particlesReader) builder->destroy(particlesReader);
+
   QStringList meshFiles = this->ui->meshFile->filenames();
   // This should never really be not empty.
   if (!meshFiles.isEmpty())
     {
-    pqPipelineSource *meshReader
-      = builder->createReader("sources", "SLACReader", meshFiles, this->Server);
+    meshReader = builder->createReader("sources", "SLACReader",
+                                       meshFiles, this->Server);
+
     vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+
+    // Set up mode (if any).
+    QStringList modeFiles = this->ui->modeFile->filenames();
+    pqSMAdaptor::setFileListProperty(
+                       meshReaderProxy->GetProperty("ModeFileName"), modeFiles);
 
     // Make representations.
     pqView *view = manager->view3D();
@@ -117,11 +150,6 @@ void pqSLACDataLoadManager::setupPipeline()
                                      meshReader->getOutputPort(1), view, false);
     repr->setVisible(false);
 
-    // Set up mode (if any).
-    QStringList modeFiles = this->ui->modeFile->filenames();
-    pqSMAdaptor::setFileListProperty(
-                       meshReaderProxy->GetProperty("ModeFileName"), modeFiles);
-
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.
     meshReader->setModifiedState(pqProxy::UNMODIFIED);
@@ -130,9 +158,8 @@ void pqSLACDataLoadManager::setupPipeline()
   QStringList particlesFiles = this->ui->particlesFile->filenames();
   if (!particlesFiles.isEmpty())
     {
-    pqPipelineSource *particlesReader
-      = builder->createReader("sources", "SLACParticleReader",
-                              particlesFiles, this->Server);
+    particlesReader = builder->createReader("sources", "SLACParticleReader",
+                                            particlesFiles, this->Server);
 
     // Make representations.
     pqView *view = manager->view3D();
