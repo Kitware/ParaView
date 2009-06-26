@@ -312,6 +312,12 @@ void ClientRichTextView::renderInternal()
       }
     }
 
+  // Set parameters on the view
+  this->Implementation->View->SetProxyURL(
+    vtkSMPropertyHelper(this->getProxy(), "ProxyURL").GetAsString());
+  this->Implementation->View->SetProxyPort(
+    vtkSMPropertyHelper(this->getProxy(), "ProxyPort").GetAsInt());
+
   this->Implementation->View->Update();
 }
 
