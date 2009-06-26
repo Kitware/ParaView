@@ -140,6 +140,10 @@ void pqSLACDataLoadManager::setupPipeline()
     pqSMAdaptor::setFileListProperty(
                        meshReaderProxy->GetProperty("ModeFileName"), modeFiles);
 
+    // Push changes to server so that when the representation gets updated,
+    // it uses the property values we set.
+    meshReaderProxy->UpdateVTKObjects();
+
     // Make representations.
     pqView *view = manager->view3D();
     pqDataRepresentation *repr;
@@ -174,4 +178,6 @@ void pqSLACDataLoadManager::setupPipeline()
     }
 
   if (stack) stack->endUndoSet();
+
+  emit this->createdPipeline();
 }

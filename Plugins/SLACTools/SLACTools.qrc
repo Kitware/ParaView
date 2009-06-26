@@ -1,5 +1,7 @@
 <RCC>
-  <qresource prefix="/SLACTools">
+  <qresource prefix="/SLACTools" >
     <file>Icons/DataLoadManager.png</file>
+    <file>Icons/EField.png</file>
+    <file>Icons/BField.png</file>
   </qresource>
 </RCC>

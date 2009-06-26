@@ -23,10 +23,14 @@
 
 #include "pqSLACDataLoadManager.h"
 
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMProxy.h"
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -77,6 +81,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
+
+  this->checkFieldActionStatus();
 }
 
 pqSLACManager::~pqSLACManager()
@@ -89,6 +95,16 @@ pqSLACManager::~pqSLACManager()
 QAction *pqSLACManager::actionDataLoadManager()
 {
   return this->Internal->Actions.actionDataLoadManager;
+}
+
+QAction *pqSLACManager::actionShowEField()
+{
+  return this->Internal->Actions.actionShowEField;
+}
+
+QAction *pqSLACManager::actionShowBField()
+{
+  return this->Internal->Actions.actionShowBField;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,5 +173,30 @@ void pqSLACManager::showDataLoadManager()
 {
   pqSLACDataLoadManager *dialog = new pqSLACDataLoadManager(this->mainWindow());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+  QObject::connect(dialog, SIGNAL(createdPipeline()),
+                   this, SLOT(checkFieldActionStatus()));
   dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::checkFieldActionStatus()
+{
+  pqPipelineSource *reader = this->meshReader();
+
+  if (!reader)
+    {
+    this->actionShowEField()->setEnabled(false);
+    this->actionShowBField()->setEnabled(false);
+    return;
+    }
+
+  pqOutputPort *outputPort = reader->getOutputPort(0);
+  vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
+  vtkPVDataSetAttributesInformation *pointFields
+    = dataInfo->GetPointDataInformation();
+
+  this->actionShowEField()->setEnabled(
+                            pointFields->GetArrayInformation("efield") != NULL);
+  this->actionShowBField()->setEnabled(
+                            pointFields->GetArrayInformation("bfield") != NULL);
 }

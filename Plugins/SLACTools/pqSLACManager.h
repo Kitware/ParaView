@@ -42,6 +42,8 @@ public:
 
   /// Get the action for the respective operation.
   QAction *actionDataLoadManager();
+  QAction *actionShowEField();
+  QAction *actionShowBField();
 
   /// Convenience function for getting the current server.
   pqServer *activeServer();
@@ -58,6 +60,7 @@ public:
 
 public slots:
   void showDataLoadManager();
+  void checkFieldActionStatus();
 
 protected:
   pqPipelineSource *findPipelineSource(const char *SMName);

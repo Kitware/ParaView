@@ -25,6 +25,30 @@
     <string>Show a Dialog to Manage Loaded Data</string>
    </property>
   </action>
+  <action name="actionShowEField">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/EField.png</normaloff>:/SLACTools/Icons/EField.png</iconset>
+   </property>
+   <property name="text">
+    <string>e field</string>
+   </property>
+   <property name="toolTip">
+    <string>Show e field</string>
+   </property>
+  </action>
+  <action name="actionShowBField">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/BField.png</normaloff>:/SLACTools/Icons/BField.png</iconset>
+   </property>
+   <property name="text">
+    <string>b field</string>
+   </property>
+   <property name="toolTip">
+    <string>Show b field</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>

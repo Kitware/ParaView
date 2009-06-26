@@ -39,6 +39,9 @@ public slots:
   virtual void checkInputValid();
   virtual void setupPipeline();
 
+signals:
+  void createdPipeline();
+
 protected:
   pqServer *Server;
 
