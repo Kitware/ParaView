@@ -41,6 +41,7 @@
 #include <vtkIdTypeArray.h>
 #include <vtkProcessModule.h>
 #include <vtkPVDataInformation.h>
+#include <vtkRenderedGraphRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSelection.h>
@@ -505,6 +506,12 @@ void ClientGraphView::renderInternal()
 
       this->Implementation->View->SetIconArrayName(
         vtkSMPropertyHelper(proxy, "IconArray").GetAsString());
+
+      vtkRenderedGraphRepresentation* rep =
+        vtkRenderedGraphRepresentation::SafeDownCast(
+          this->Implementation->View->GetRepresentation());
+      rep->SetVertexSelectedIcon(vtkSMPropertyHelper(proxy, "SelectedIcon").GetAsInt());
+      rep->SetVertexIconSelectionMode(vtkSMPropertyHelper(proxy, "IconSelectionMode").GetAsInt());
       }
 
     this->Implementation->View->SetVertexLabelFontSize(

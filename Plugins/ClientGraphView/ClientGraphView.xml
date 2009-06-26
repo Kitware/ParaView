@@ -78,6 +78,10 @@
 
       <IntVectorProperty name="IconAlignment" number_of_elements="1" default_values="4"/>
 
+      <IntVectorProperty name="SelectedIcon" number_of_elements="1" default_values="0"/>
+
+      <IntVectorProperty name="IconSelectionMode" number_of_elements="1" default_values="3"/>
+
       <DoubleVectorProperty name="VertexLabelFontSize" number_of_elements="1" default_values="12"/>
       
       <DoubleVectorProperty name="VertexSize" number_of_elements="1" default_values="5"/>
