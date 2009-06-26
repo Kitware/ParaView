@@ -61,6 +61,9 @@ public:
 public slots:
   void showDataLoadManager();
   void checkFieldActionStatus();
+  void showField(const char *name);
+  void showEField();
+  void showBField();
 
 protected:
   pqPipelineSource *findPipelineSource(const char *SMName);

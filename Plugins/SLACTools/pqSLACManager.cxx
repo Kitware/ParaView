@@ -30,10 +30,12 @@
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 
 #include <QMainWindow>
 #include <QPointer>
@@ -81,6 +83,10 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
+  QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)),
+                   this, SLOT(showEField()));
+  QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)),
+                   this, SLOT(showBField()));
 
   this->checkFieldActionStatus();
 }
@@ -199,4 +205,33 @@ void pqSLACManager::checkFieldActionStatus()
                             pointFields->GetArrayInformation("efield") != NULL);
   this->actionShowBField()->setEnabled(
                             pointFields->GetArrayInformation("bfield") != NULL);
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::showField(const char *name)
+{
+  pqPipelineSource *reader = this->meshReader();
+  if (!reader) return;
+
+  pqView *view = this->view3D();
+  if (!view) return;
+
+  pqDataRepresentation *repr = reader->getRepresentation(0, view);
+  vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqSMAdaptor::setEnumerationProperty(
+                    reprProxy->GetProperty("ColorAttributeType"), "POINT_DATA");
+  pqSMAdaptor::setElementProperty(
+                                reprProxy->GetProperty("ColorArrayName"), name);
+  reprProxy->UpdateVTKObjects();
+}
+
+void pqSLACManager::showEField()
+{
+  this->showField("efield");
+}
+
+void pqSLACManager::showBField()
+{
+  this->showField("bfield");
 }
