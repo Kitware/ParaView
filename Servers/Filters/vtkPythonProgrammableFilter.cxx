@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.37");
+vtkCxxRevisionMacro(vtkPythonProgrammableFilter, "1.38");
 vtkStandardNewMacro(vtkPythonProgrammableFilter);
 
 //----------------------------------------------------------------------------
@@ -361,6 +361,8 @@ void vtkPythonProgrammableFilter::Exec(const char* script,
   runscript += "del inputs\n";
   runscript += "del output\n";
   runscript += "del myarg\n";
+  runscript += "import gc\n";
+  runscript += "gc.collect()\n";
 
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->RunSimpleString(runscript.c_str());
   vtkPythonProgrammableFilter::GetGlobalPipelineInterpretor()->FlushMessages();

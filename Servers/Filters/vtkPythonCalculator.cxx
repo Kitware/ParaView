@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPythonCalculator, "1.4");
+vtkCxxRevisionMacro(vtkPythonCalculator, "1.5");
 vtkStandardNewMacro(vtkPythonCalculator);
 
 //----------------------------------------------------------------------------
@@ -105,6 +105,11 @@ void vtkPythonCalculator::ExecuteScript(void *arg)
 void vtkPythonCalculator::Exec(const char* expression,
                                const char* funcname)
 {
+  if (!expression)
+    {
+    return;
+    }
+
   vtkDataObject* firstInput = this->GetInputDataObject(0, 0);
   vtkFieldData* fd = 0;
   if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
@@ -175,9 +180,9 @@ void vtkPythonCalculator::Exec(const char* expression,
       fscript += aname;
       fscript += "']\n";
       fscript += "  except: pass\n";
-      fscript += "  arrays[";
+      fscript += "  arrays['";
       fscript += aname;
-      fscript += "] = inputs[0].";
+      fscript += "'] = inputs[0].";
       if (this->ArrayAssociation == vtkDataObject::FIELD_ASSOCIATION_POINTS)
         {
         fscript += "PointData['";

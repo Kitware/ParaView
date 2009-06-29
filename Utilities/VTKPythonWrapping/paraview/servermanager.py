@@ -2186,7 +2186,11 @@ def Fetch(input, arg1=None, arg2=None, idx=0):
     #go!
     gvd.UpdateVTKObjects()
     gvd.Update()
-    return gvd.GetOutput()
+    op = gvd.GetOutput()
+    opc = gvd.GetOutput().NewInstance()
+    opc.ShallowCopy(op)
+    opc.UnRegister(None)
+    return opc
 
 def AnimateReader(reader, view, filename=None):
     """This is a utility function that, given a reader and a view
