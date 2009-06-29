@@ -28,6 +28,16 @@ def MakeObserver(numpy_array):
 def vtkDataArrayToVTKArray(array, dataset=None):
     "Given a vtkDataArray and a dataset owning it, returns a VTKArray."
     narray = numpy_support.vtk_to_numpy(array)
+
+    # Make arrays of 9 components into matrices. Also transpose
+    # as VTK store matrices in Fortran order
+    shape = narray.shape
+    if shape[1] == 9:
+        narray = narray.reshape((shape[0], 3, 3)).transpose(0, 2, 1)
+
+    return narray
+
+
     return VTKArray(narray, array=array, dataset=dataset)
     
 def numpyTovtkDataArray(array, name="numpy_array"):
@@ -124,8 +134,27 @@ class DataSetAttributes(VTKObjectWrapper):
 
     def append(self, narray, name):
         """Appends a new array to the dataset attributes."""
+
+        shape = narray.shape
+
+        if len(shape) == 3:
+            # Array of matrices. We need to make sure the order is right.
+
+            # If column order (c order), transpose. VTK wants row order (fortran
+            # order)
+            # The deep copy later will make sure that the array is contiguous
+            size = narray.dtype.itemsize
+            if narray.strides[1]/size == 3 and narray.strides[2]/size == 1:
+                narray  = narray.transpose(0, 2, 1)
+
+        # If array is not contiguous, make a deep copy that is contiguous
         if not narray.flags.contiguous:
             narray = narray.copy()
+
+        # Flatten array of matrices to array of vectors
+        if len(shape) == 3:
+            narray = narray.reshape(shape[0], shape[1]*shape[2])
+
         arr = numpyTovtkDataArray(narray, name)
         self.VTKObject.AddArray(arr)
 
