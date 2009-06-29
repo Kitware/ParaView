@@ -421,8 +421,14 @@ class SourceProxy(Proxy):
         self.UpdatePipeline()
         return FieldDataInformation(self.SMProxy, self.Port, "CellData")
 
+    def GetFieldDataInformation(self):
+        """Returns the associated cell data information."""
+        self.UpdatePipeline()
+        return FieldDataInformation(self.SMProxy, self.Port, "FieldData")
+
     PointData = property(GetPointDataInformation, None, None, "Returns point data information")
     CellData = property(GetCellDataInformation, None, None, "Returns cell data information")
+    FieldData = property(GetFieldDataInformation, None, None, "Returns field data information")
 
 
 class ExodusIIReaderProxy(SourceProxy):
@@ -1337,7 +1343,7 @@ class FieldDataInformation(object):
         kys = []
         narrays = self.GetNumberOfArrays()
         for i in range(narrays):
-            kys.append(ai.GetName())
+            kys.append(self.GetArray(i).GetName())
         return kys
 
     def values(self):
