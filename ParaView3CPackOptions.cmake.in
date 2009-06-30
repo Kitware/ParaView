@@ -1,0 +1,21 @@
+# This file is only included when building packagers via CPack.
+#
+# It is *not* included during a "make install" but it is included by cpack during
+# "make package"...
+#
+# Set an environment variable so that the bundle create scripts know the installation
+# is being driven by CPack. To avoid using $DESTDIR/Applications as a prefix...
+#
+set(ENV{ParaView_CPACK_GENERATOR} "${CPACK_GENERATOR}")
+
+if(CPACK_GENERATOR STREQUAL "DragNDrop")
+  # When using CPack with the DragNDrop generator, only the ParaView "Bundle" component
+  # is installed.
+  #
+  set(CPACK_INSTALL_CMAKE_PROJECTS "@ParaView_BINARY_DIR@;ParaView Mac Bundle;Bundle;/")
+else()
+  # When using CPack with any other CPack generator, the standard set of ParaView components
+  # are installed: Runtime, RuntimeLibraries and RuntimeExecutables.
+  #
+  set(CPACK_INSTALL_CMAKE_PROJECTS "@ParaView_BINARY_DIR@;ParaView;Runtime;/;@ParaView_BINARY_DIR@;VTK Runtime Libs;RuntimeLibraries;/;@ParaView_BINARY_DIR@;VTK Executables;RuntimeExecutables;/")
+endif()

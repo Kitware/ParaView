@@ -1,11 +1,18 @@
 #!/bin/sh
 
-InstallPrefix="$DESTDIR/Applications"
+# InstallPrefix environment variable may be set by caller...
+# If not, default to "$DESTDIR/Applications"
+#
+if [ "x$InstallPrefix" = "x" ]; then
+  InstallPrefix="$DESTDIR/Applications"
+  echo "info: Using default InstallPrefix value:"
+  echo "      $InstallPrefix"
+fi
+
 ParaViewBinaryDir="@ParaView_BINARY_DIR@"
 ParaViewExeName="@PV_EXE_NAME@"
 ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
 Qt4BinDir="$(dirname @QT_MOC_EXECUTABLE@)"
-
 
 # Remove the previous app package so we start with a clean bundle
 #

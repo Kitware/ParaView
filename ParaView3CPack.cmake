@@ -11,7 +11,26 @@ IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
     COMPONENT Runtime)
 ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
-SET(CPACK_INSTALL_CMAKE_PROJECTS "${ParaView_BINARY_DIR};ParaView;Runtime;/;${ParaView_BINARY_DIR};VTK Runtime Libs;RuntimeLibraries;/;${ParaView_BINARY_DIR};VTK Executables;RuntimeExecutables;/")
+# Set up a CPack project config file so that we can build either the paraview command
+# line tools .tar.gz file or the client application (bundle) .dmg file on the Mac.
+# CPACK_INSTALL_CMAKE_PROJECTS is set in the CPACK_PROJECT_CONFIG_FILE file based
+# on which CPack generator is used...
+#
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/ParaView3CPackOptions.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/ParaView3CPackOptions.cmake" @ONLY)
+SET(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_BINARY_DIR}/ParaView3CPackOptions.cmake")
+
+# Change the default ON/OFF settings for these CPack generators on the Mac so that a
+# plain old "cpack" or "make package" invocation on the Mac builds both the command
+# line tools .tar.gz and the bundle .dmg file all at once... but nothing else.
+#
+IF(APPLE)
+  SET(CPACK_BINARY_TBZ2 OFF)
+  SET(CPACK_BINARY_DRAGNDROP ON)
+  SET(CPACK_BINARY_PACKAGEMAKER OFF)
+  SET(CPACK_BINARY_STGZ OFF)
+ENDIF(APPLE)
+
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ParaView is a scientific visualization tool")
 SET(CPACK_PACKAGE_VENDOR "Kitware Inc.")
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/License_v1.2.txt")
