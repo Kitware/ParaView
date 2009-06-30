@@ -51,11 +51,14 @@ def numpyTovtkDataArray(array, name="numpy_array"):
     return vtkarray
 
 def make_tensor_array_contiguous(array):
+    if array == None:
+        return None
     if array.flags.contiguous:
         return array
     array = numpy.asarray(array)
     size = array.dtype.itemsize
-    if array.strides[1]/size == 1 and array.strides[2]/size == 3:
+    strides = array.strides
+    if len(strides) == 3 and strides[1]/size == 1 and strides[2]/size == 3:
         return array.transpose(0, 2, 1)
     return array
 
