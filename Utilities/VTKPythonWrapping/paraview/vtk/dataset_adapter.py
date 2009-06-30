@@ -49,7 +49,16 @@ def numpyTovtkDataArray(array, name="numpy_array"):
     # This makes the VTK array carry a reference to the numpy array.
     vtkarray.AddObserver('DeleteEvent', MakeObserver(array))
     return vtkarray
-    
+
+def make_tensor_array_contiguous(array):
+    if array.flags.contiguous:
+        return array
+    array = numpy.asarray(array)
+    size = array.dtype.itemsize
+    if array.strides[1]/size == 1 and array.strides[2]/size == 3:
+        return array.transpose(0, 2, 1)
+    return array
+
 class VTKArray(numpy.matrix):
     """This is a sub-class of numpy ndarray that stores a
     reference to a vtk array as well as the owning dataset.
@@ -64,13 +73,18 @@ class VTKArray(numpy.matrix):
             obj = obj.reshape(obj.shape[0], 1)
         # add the new attributes to the created instance
         obj.VTKObject = array
-        obj.DataSet = dataset
+        if dataset:
+            import weakref
+            obj.DataSet = weakref.ref(dataset)
         # Finally, we must return the newly created object:
         return obj
 
     def __array_finalize__(self,obj):
         # Copy the VTK array only if the two share data
-        if self.data == obj.data:
+        slf = make_tensor_array_contiguous(self)
+        obj2 = make_tensor_array_contiguous(obj)
+        if hasattr(slf, 'data') and hasattr(obj2, 'data') and \
+          slf.data == obj2.data:
             self.VTKObject = getattr(obj, 'VTKObject', None)
         else:
             self.VTKObject = None
@@ -78,9 +92,8 @@ class VTKArray(numpy.matrix):
 
     def __getattr__(self, name):
         "Forwards unknown attribute requests to VTK array."
-        if not self.VTKObject:
+        if not hasattr(self, "VTKObject") or not self.VTKObject:
             raise AttributeError("class has no attribute %s" % name)
-            return None
         return getattr(self.VTKObject, name)
         
     def __mul__(self, other):
@@ -98,7 +111,8 @@ class DataSetAttributes(VTKObjectWrapper):
     
     def __init__(self, vtkobject, dataset):
         self.VTKObject = vtkobject
-        self.DataSet = dataset
+        import weakref
+        self.DataSet = weakref.ref(dataset)
 
     def __getitem__(self, idx):
         """Implements the [] operator. Accepts an array name."""
@@ -109,7 +123,7 @@ class DataSetAttributes(VTKObjectWrapper):
         vtkarray = self.VTKObject.GetArray(idx)
         if not vtkarray:
             return None
-        return vtkDataArrayToVTKArray(vtkarray, self.DataSet)
+        return vtkDataArrayToVTKArray(vtkarray, self.DataSet())
 
     def keys(self):
         """Returns the names of the arrays as a list."""

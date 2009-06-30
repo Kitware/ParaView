@@ -29,7 +29,7 @@ def global_max(narray):
 def dot(a1, a2):
     m = a1*a2
     va = dataset_adapter.VTKArray(numpy.add.reduce(m, 1))
-    if a1.DataSet == a2.DataSet:
+    if a1.DataSet() == a2.DataSet():
         va.DataSet = a1.DataSet
     return va
 
@@ -47,7 +47,7 @@ def max(narray):
 
 def divergence(narray, dataset=None):
     if not dataset:
-        dataset = narray.DataSet
+        dataset = narray.DataSet()
     ncomp = narray.shape[1]
     if ncomp != 3:
         raise RuntimeError, 'Divergence only works with 3 component vectors'
@@ -100,7 +100,7 @@ def _cell_derivatives(narray, dataset, attribute_type, filter):
 def curl(narray, dataset=None):
 
     if not dataset:
-        dataset = narray.DataSet
+        dataset = narray.DataSet()
 
     cd = vtk.vtkCellDerivatives()
     cd.SetVectorModeToComputeVorticity()
@@ -118,7 +118,7 @@ def vorticity(narray, dataset=None):
 def strain(narray, dataset=None):
 
     if not dataset:
-        dataset = narray.DataSet
+        dataset = narray.DataSet()
 
     cd = vtk.vtkCellDerivatives()
     cd.SetTensorModeToComputeStrain()
@@ -133,7 +133,7 @@ def strain(narray, dataset=None):
 def gradient(narray, dataset=None):
     "Computes the gradient of a point-centered scalar array over a given dataset."
     if not dataset:
-        dataset = narray.DataSet
+        dataset = narray.DataSet()
     if not dataset:
         raise RuntimeError, 'Need a dataset to compute gradients'
     ncomp = narray.shape[1]
