@@ -35,9 +35,6 @@ def vtkDataArrayToVTKArray(array, dataset=None):
     if shape[1] == 9:
         narray = narray.reshape((shape[0], 3, 3)).transpose(0, 2, 1)
 
-    return narray
-
-
     return VTKArray(narray, array=array, dataset=dataset)
     
 def numpyTovtkDataArray(array, name="numpy_array"):
@@ -138,13 +135,15 @@ class DataSetAttributes(VTKObjectWrapper):
         shape = narray.shape
 
         if len(shape) == 3:
-            # Array of matrices. We need to make sure the order is right.
-
+            # Array of matrices. We need to make sure the order  in memory is right.
             # If column order (c order), transpose. VTK wants row order (fortran
-            # order)
-            # The deep copy later will make sure that the array is contiguous
+            # order). The deep copy later will make sure that the array is contiguous.
+            # If row order but not contiguous, transpose so that the deep copy below
+            # does not happen.
             size = narray.dtype.itemsize
-            if narray.strides[1]/size == 3 and narray.strides[2]/size == 1:
+            if (narray.strides[1]/size == 3 and narray.strides[2]/size == 1) or \
+                (narray.strides[1]/size == 1 and narray.strides[2]/size == 3 and \
+                 not narray.flags.contiguous):
                 narray  = narray.transpose(0, 2, 1)
 
         # If array is not contiguous, make a deep copy that is contiguous
