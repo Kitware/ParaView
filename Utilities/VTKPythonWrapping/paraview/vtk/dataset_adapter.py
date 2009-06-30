@@ -69,10 +69,12 @@ class VTKArray(numpy.matrix):
         return obj
 
     def __array_finalize__(self,obj):
-        # reset the attributes from passed original object
-        self.VTKObject = getattr(obj, 'VTKObject', None)
+        # Copy the VTK array only if the two share data
+        if self.data == obj.data:
+            self.VTKObject = getattr(obj, 'VTKObject', None)
+        else:
+            self.VTKObject = None
         self.DataSet = getattr(obj, 'DataSet', None)
-        # We do not need to return anything
 
     def __getattr__(self, name):
         "Forwards unknown attribute requests to VTK array."
