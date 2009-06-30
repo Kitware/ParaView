@@ -2440,15 +2440,7 @@ class PVModule(object):
     pass
 
 def _make_name_valid(name):
-    if name.find('(') >= 0 or name.find(')') >=0:
-        return None
-    name = name.replace(' ','')
-    name = name.replace('-','')
-    name = name.replace(':','')
-    name = name.replace('.','')
-    if not name[0].isalpha():
-        name = 'a' + name
-    return name
+    return paraview.make_name_valid(name)
 
 def createModule(groupName, mdl=None):
     """Populates a module with proxy classes defined in the given group.
