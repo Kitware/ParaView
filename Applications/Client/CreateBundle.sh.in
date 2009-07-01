@@ -12,7 +12,6 @@ fi
 ParaViewBinaryDir="@ParaView_BINARY_DIR@"
 ParaViewExeName="@PV_EXE_NAME@"
 ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
-Qt4BinDir="$(dirname @QT_MOC_EXECUTABLE@)"
 
 # Remove the previous app package so we start with a clean bundle
 #
@@ -64,18 +63,18 @@ cp -Rp "${ParaViewBinaryDir}/Utilities/VTKPythonWrapping/paraview" "$PythonDir/"
 # Copy the Qt Assistant application into the Support directory
 #
 echo "Embed copy of the QtAssistant in bundle"
-cp -RpL "$Qt4BinDir/Assistant_adp.app" "$SupportDir/"
+cp -RpL "@QT_ASSISTANT_DOTAPP_BUNDLE@" "$SupportDir/"
 
 # Create an empty qt.conf file in the Assistant_adp app package
 # to stop plugin loading by Assistant.
 #
-touch "$SupportDir/Assistant_adp.app/Contents/Resources/qt.conf"
+touch "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents/Resources/qt.conf"
 
 # Create symlinks so that the Assistant.app bundle can use the same
 # copy of Qt Frameworks/Libraries as the paraview executable, yet still
 # refer to them via a string like "@executable_path/../Frameworks"...
 #
-pushd "$SupportDir/Assistant_adp.app/Contents"
+pushd "$SupportDir/@QT_ASSISTANT_DOTAPP_BUNDLE_NAME@/Contents"
 ln -s "../../../Libraries" "Libraries"
 ln -s "../../../Frameworks" "Frameworks"
 popd

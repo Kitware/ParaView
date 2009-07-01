@@ -1030,7 +1030,11 @@ void pqClientMainWindow::makeAssistant()
   if(assistantExe.isEmpty())
     {
 #if defined(Q_WS_MAC)
+# if QT_VERSION >= 0x040300 && QT_VERSION < 0x040400
+    assistantExe = QCoreApplication::applicationDirPath() + "/../Support/assistant";
+# else
     assistantExe = QCoreApplication::applicationDirPath() + "/../Support/Assistant_adp";
+# endif
 #else
     assistantExe = ::Locate(assistantName);
 #endif
