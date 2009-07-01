@@ -208,6 +208,13 @@ else (UNIX OR CYGWIN)
   # +------------------+
   set(VISIT_BUILD_COMPILER "MSVC8.Net" CACHE STRING "Set VisIt's compiler type. (eg. MSVC8.Net)")
   #
+  
+  #set(VISIT_LIB_PATH "${VISIT_BASE}/windowsbuild/lib/${VISIT_BUILD_COMPILER}/${PLUGIN_BUILD_TYPE}")
+  #set(VISIT_BIN_PATH "${VISIT_BASE}/windowsbuild/bin/${VISIT_BUILD_COMPILER}/${PLUGIN_BUILD_TYPE}")
+  #set(VISIT_PLUGIN_BIN "${VISIT_BIN_PATH}")
+  #set(VISIT_THIRD_PARTY_BIN "${VISIT_BASE}/windowsbuild/bin/${VISIT_BUILD_COMPILER}/ThirdParty")
+  #set(VISIT_THIRD_PARTY_LIB "${VISIT_BASE}/windowsbuild/lib/${VISIT_BUILD_COMPILER}/ThirdParty")
+  
   set(VISIT_LIB_PATH "${VISIT_BASE}/windowsbuild/lib/${VISIT_BUILD_COMPILER}")
   set(VISIT_BIN_PATH "${VISIT_BASE}/windowsbuild/bin/${VISIT_BUILD_COMPILER}")
   set(VISIT_PLUGIN_BIN "${VISIT_BIN_PATH}/${PLUGIN_BUILD_TYPE}")

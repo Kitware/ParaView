@@ -36,6 +36,7 @@ ADD_PARAVIEW_PLUGIN(
   SERVER_MANAGER_XML vtkVisItDatabaseBridgeServerManager.xml
   GUI_RESOURCE_FILES vtkVisItDatabaseBridgeClient.xml
   SOURCES pqVisItDatabaseBridgePanel.cxx ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS})
+
 target_link_libraries(VisItReaderPlugin ${VISIT_LIBS} vtkCommon vtkFiltering vtkGraphics vtkParallel vtkVisItDatabase)
 
 # Platform
@@ -58,3 +59,7 @@ install (TARGETS VisItReaderPlugin
   DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
   COMPONENT Runtime)
 
+#install(TARGETS VisItReaderPlugin DESTINATION ${CMAKE_INSTALL_PREFIX})
+install (TARGETS VisItReaderPlugin
+  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
+  COMPONENT Runtime)

@@ -166,7 +166,7 @@ int RectilinearToUniformGrid(
 
 
 
-vtkCxxRevisionMacro(vtkVisItDatabase, "1.2");
+vtkCxxRevisionMacro(vtkVisItDatabase, "1.2.2.1");
 vtkStandardNewMacro(vtkVisItDatabase);
 
 //-----------------------------------------------------------------------------
@@ -306,6 +306,7 @@ int vtkVisItDatabase::LoadVisitLibraries()
 //-----------------------------------------------------------------------------
 int vtkVisItDatabase::LoadPlugin()
 {
+  this->SetPluginPath("C:\\Kitware\\ParaView-3-6\\bin\\bin\\Release");
   if (!this->PluginPath || !this->PluginId)
     {
     vtkWarningMacro("Failed to load plugin. "

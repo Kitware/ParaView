@@ -4,9 +4,16 @@
 # |                                                                           |
 # +---------------------------------------------------------------------------+
 
+
 install(FILES ${VISIT_FILES_TO_INSTALL_AVT} 
-  DESTINATION "${PV_INSTALL_LIB_DIR}"
+  DESTINATION "${PV_INSTALL_BIN_DIR}"
   COMPONENT Runtime)
+ 
+install(FILES ${VISIT_FILES_TO_INSTALL_THIRD_PARTY}
+  DESTINATION "${PV_INSTALL_BIN_DIR}"
+  COMPONENT Runtime)
+
+#install databases
 install(FILES ${VISIT_FILES_TO_INSTALL_DATABASES}
   DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin/databases"
   COMPONENT Runtime)
@@ -21,3 +28,4 @@ install(FILES ${VISIT_FILES_TO_INSTALL_DATABASES}
 #
 #install(FILES ${_libs} DESTINATION ${CMAKE_INSTALL_PREFIX})
 #install(FILES ${_databases} DESTINATION ${CMAKE_INSTALL_PREFIX}/databases)
+
