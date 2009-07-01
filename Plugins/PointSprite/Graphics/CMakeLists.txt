@@ -24,6 +24,20 @@ set(KIT_LIBS
 add_library(CSCS_PointSprite_Graphics ${KIT_SRCS})
 target_link_libraries(CSCS_PointSprite_Graphics ${KIT_LIBS})
 
+if (PV_INSTALL_BIN_DIR)
+  install(TARGETS CSCS_PointSprite_Graphics
+    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_BIN_DIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR}
+    )
+else (PV_INSTALL_BIN_DIR)
+  install(TARGETS CSCS_PointSprite_Graphics
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    )
+endif (PV_INSTALL_BIN_DIR)
+
 # -----------------------------------------------------------------------------
 # This make it easy for other projects to get the list of files etc. in this
 # kit.
