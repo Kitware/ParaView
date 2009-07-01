@@ -1,0 +1,192 @@
+############################################################################
+##
+## Copyright (C) 2006-2007 University of Utah. All rights reserved.
+##
+## This file is part of VisTrails.
+##
+## This file may be used under the terms of the GNU General Public
+## License version 2.0 as published by the Free Software Foundation
+## and appearing in the file LICENSE.GPL included in the packaging of
+## this file.  Please review the following to ensure GNU General Public
+## Licensing requirements will be met:
+## http://www.opensource.org/licenses/gpl-license.php
+##
+## If you are unsure which license is appropriate for your use (for
+## instance, you are interested in developing a commercial derivative
+## of VisTrails), please contact us at vistrails@sci.utah.edu.
+##
+## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+##
+############################################################################
+
+# Vistrails initialization file
+##############################################################################
+
+##############################################################################
+# Basic configuration
+
+# Comment this to use the logging mechanism (which is being 
+# overhauled, so right now it's also broken)
+configuration.nologger = True
+
+# Uncomment this to prevent VisTrails's splash screen from appearing
+# configuration.showSplash = False
+
+# Uncomment this to enable VisTrails's python shell by default
+# configuration.pythonPrompt = True
+
+# Uncomment this to switch to the non-caching execution model
+# configuration.useCache = False
+
+# Uncomment this to start VisTrails with maximized windows
+# configuration.maximizeWindows = True
+
+# Uncomment this if you run multiple monitors, to start VisTrails
+# with different windows in different monitors
+# configuration.multiHeads = True
+
+# Set verbosenessLevel to 1 or 2 to enable dumping of non-critical warnings
+# and information messages to stderr.
+# configuration.verbosenessLevel = 1 # 2
+
+##############################################################################
+# VisTrails packages.
+
+# VisTrails packages are collections of modules that provide user-specified
+# functionality to VisTrails. Use addPackage to let VisTrails know which 
+# packages you want enabled.
+
+# Interpackage dependencies must currently be handled manually by the user.
+
+# For example, the spreadsheet package depends on VTK for some functionality,
+# so if you want that functionality, you should add the vtk package before
+# the spreadsheet package.
+
+# the vtk package is the main visualization package for VisTrails
+# addPackage('vtk')
+
+# pythonCalc is an example package intended simply to demonstrate how to
+# create new packages
+# addPackage('pythonCalc')
+
+# ImageMagick uses the ImageMagick command-line suite to perform various
+# tasks on images (conversion, filtering, etc).
+#addPackage('ImageMagick')
+
+# The spreadsheet package enables the Visualization Spreadsheet
+# addPackage('spreadsheet')
+
+# The HTTP package provides an easy way to access files from http and use
+# them as regular files in VisTrails pipelines.
+# addPackage('HTTP')
+
+# The pylab (matplotlib) package for plotting and histograms
+# addPackage('pylab')
+
+
+################################################################################
+# Hooks
+
+# Currently, there is only one hook in VisTrails: the startup hook. By adding
+# arbitrary callables to the startup hook, it is possible to run user-defined
+# code after all packages have been initialized, but before VisTrails runs.
+
+# This is intended to show that it is possible to have user-defined code
+# in specific places in VisTrails. If you think you need a hook somewhere that
+# we haven't allowed yet, please let us know, and we'll include it in a future
+# release.
+
+def testHook():
+    """Prints the Module class hierarchy to stdout."""
+    def printTree(n, indent = 0):
+        def iprint(str):
+            print '%s%s' % (" " * indent, str)
+        iprint('Class: %s' % n.descriptor.name)
+        for c in n.children:
+            printTree(c, indent+4)
+            
+    import modules
+    import modules.module_registry
+    t = modules.module_registry.registry.classTree
+    printTree(t)
+
+# Uncomment this line to install the startup hook
+# addStartupHook(testHook)
+
+
+##############################################################################
+# If you have an appropriate Qt license, you can install signal inspectors,
+# which might make debugging a whole lot easier. To do that, uncomment the
+# following lines.
+
+
+# import qt
+# connections = {}
+# def connectHandler(*args):
+#     """This handler writes all signal connections to /tmp/signalslotnames.txt"""
+#     emitter = args[0].__class__.__name__
+#     signal = args[1]
+#     f = signal.find('(')
+#     if f == -1:
+#         signal = signal[1:]
+#     else:
+#         signal = signal[1:f]
+#     try:
+#         receiver = args[2].im_class.__name__
+#         slot = args[2].im_func.__name__
+#     except AttributeError:
+#         receiver = args[2].__self__.__class__.__name__
+#         slot = args[2].__class__.__name__
+#     entry = (emitter, signal, receiver, slot)
+#     print entry
+#     global connections
+#     try:
+#         connections[emitter].add((signal, receiver, slot))
+#     except:
+#         connections[emitter] = set(((signal, receiver, slot),))
+#     signals = {}
+#     slots = {}
+#     sig_count = 1
+#     slot_count = 1
+#     f = file('/tmp/connections.txt', 'w')
+#     f.write('digraph {\n')
+#     for (k, v) in connections.iteritems():
+#         print k, v
+#         recs = {}
+#         for (sig, rec, sl) in v:
+#             if not signals.has_key(sig):
+#                 signals[sig] = sig_count
+#                 sig_count += 1
+#             if not slots.has_key(sl):
+#                 slots[sl] = slot_count
+#                 slot_count += 1
+#             try:
+#                 recs[rec].append( str(signals[sig]) + ':' + str(slots[sl]))
+#             except:
+#                 recs[rec] = [str(signals[sig]) + ':' + str(slots[sl])]
+#         for rec, sigslotlist in recs.iteritems():
+#             f.write('%s -> %s [label = "%s"];\n' % (k, rec, ";".join(sigslotlist)))
+# #     if not entry in connections:
+# #         f = file('/tmp/connections.txt', 'a')
+# #         f.write("%s %s %s\n" % emi)
+# #         f.close()
+# #     connections.add(entry)
+#     f.write('}\n')
+#     f.close()
+#     f = file('/tmp/signalslotnames.txt', 'w')
+#     sigs = [(v, k) for (k, v) in signals.items()]
+#     sigs.sort()
+#     sls = [(v, k) for (k, v) in slots.items()]
+#     sls.sort()
+#     f.write('signals: \n')
+#     for (k,v) in sigs:
+#         f.write('%s: %s\n' % (k, v))
+#     f.write('slots: \n')
+#     for (k,v) in sls:
+#         f.write('%s: %s\n' % (k, v))
+
+
+# This line hooks connectHandler to Qt's signals. You can use user-defined
+# code here.
+# qt.enableSignalDebugging(connectCall = connectHandler)

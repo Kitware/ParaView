@@ -1,0 +1,51 @@
+<object name="module_exec">
+  <layout>
+    <xml name="moduleExec" nodeType="xs:element"/>
+    <sql table="module_exec"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="ts_start" type="datetime">
+    <xml name="tsStart" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="ts_end" type="datetime">
+    <xml name="tsEnd" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="module_id" type="long" foreignKey="true" object="module">
+    <xml name="moduleId" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="module_name" type="str">
+    <xml name="moduleName" nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property ref="true" object="machine" name="machine_id" type="long" 
+      mapping="many-to-one" inverse="true">
+    <sql column="machine_id" type="int"/>
+  </property>
+
+  <property ref="true" object="annotation" type="list" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="workflow_exec" type="long" mapping="many-to-one" 
+      inverse="true">
+    <sql column="wf_exec_id" type="int"/>
+  </property>
+
+  <property name="vistrailId" type="long" inverse="true"
+      foreignKey="true" object="vistrail">
+    <sql column="vt_id" type="int"/>
+  </property>
+
+</object>

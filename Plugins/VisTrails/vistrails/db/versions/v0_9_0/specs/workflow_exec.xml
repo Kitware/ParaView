@@ -1,0 +1,74 @@
+<object name="workflow_exec">
+  <layout>
+    <xml name="workflowExec" nodeType="xs:element"/>
+    <sql table="workflow_exec"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="user" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="ip" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="vt_version" type="str">
+    <xml name="vtVersion" nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="ts_start" type="datetime">
+    <xml name="tsStart" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="ts_end" type="datetime">
+    <xml name="tsEnd" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="parent_id" type="long">
+    <xml name="parentId" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="parent_type" type="str">
+    <xml name="parentType" nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="parent_version" type="long">
+    <xml name="parentVersion" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+  
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property ref="true" object="log" type="long" mapping="many-to-one" 
+      inverse="true">
+    <sql column="log_id" type="int"/>
+  </property>
+
+  <property ref="true" object="module_exec" type="list" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property name="entity_id" type="long" inverse="true">
+    <sql type="int"/>
+  </property>
+
+  <property name="entity_type" type="str" inverse="true">
+    <sql type="char(16)"/>
+  </property>
+
+</object>

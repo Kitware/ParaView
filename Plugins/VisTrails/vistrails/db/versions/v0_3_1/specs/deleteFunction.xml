@@ -1,0 +1,13 @@
+<object name="deleteFunction">
+  <layout>
+    <xml name="function" nodeType="xs:element"/>
+  </layout>
+  
+  <property name="moduleId" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+  </property>
+
+  <property name="functionId" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+  </property>
+</object>

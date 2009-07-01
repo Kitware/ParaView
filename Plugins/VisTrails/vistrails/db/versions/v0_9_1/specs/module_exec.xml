@@ -1,0 +1,74 @@
+<object name="module_exec">
+  <layout>
+    <xml name="moduleExec" nodeType="xs:element"/>
+    <sql table="module_exec"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="ts_start" type="datetime">
+    <xml name="tsStart" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="ts_end" type="datetime">
+    <xml name="tsEnd" nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+
+  <property name="cached" type="int">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql nodeType="int"/>
+  </property>
+
+  <property name="module_id" type="long" foreignKey="true" object="module">
+    <xml name="moduleId" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="module_name" type="str">
+    <xml name="moduleName" nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="completed" type="int">
+    <xml name="completed" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="abstraction_id" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="abstraction_version" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="machine_id" type="long" foreignKey="true" object="machine">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property ref="true" object="annotation" type="list" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="workflow_exec" type="long" mapping="many-to-one" 
+      inverse="true">
+    <sql column="wf_exec_id" type="int"/>
+  </property>
+
+  <property name="entity_id" type="long" inverse="true">
+    <sql type="int"/>
+  </property>
+
+  <property name="entity_type" type="str" inverse="true">
+    <sql type="char(16)"/>
+  </property>
+
+</object>

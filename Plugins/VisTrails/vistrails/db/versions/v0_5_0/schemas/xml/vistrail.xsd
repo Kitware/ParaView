@@ -1,0 +1,200 @@
+############################################################################
+##
+## Copyright (C) 2006-2007 University of Utah. All rights reserved.
+##
+## This file is part of VisTrails.
+##
+## This file may be used under the terms of the GNU General Public
+## License version 2.0 as published by the Free Software Foundation
+## and appearing in the file LICENSE.GPL included in the packaging of
+## this file.  Please review the following to ensure GNU General Public
+## Licensing requirements will be met:
+## http://www.opensource.org/licenses/gpl-license.php
+##
+## If you are unsure which license is appropriate for your use (for
+## instance, you are interested in developing a commercial derivative
+## of VisTrails), please contact us at vistrails@sci.utah.edu.
+##
+## This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+## WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+##
+############################################################################
+
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:element name="vistrail">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="tag" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="macro" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="version" type="xs:string"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="dbHost" type="xs:string"/>
+      <xs:attribute name="dbPort" type="xs:int"/>
+      <xs:attribute name="dbName" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="action">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="add" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="delete" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="change" minOccurs="0" maxOccurs="1"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="prevId" type="xs:int"/>
+      <xs:attribute name="date" type="xs:dateTime"/>
+      <xs:attribute name="user" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tag">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="time" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="macro">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="action" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="descrptn" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="add">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="module" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="location" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="annotation" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="function" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="connection" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="port" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="parameter" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="portSpec" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="other" minOccurs="0" maxOccurs="1"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="what" type="xs:string"/>
+      <xs:attribute name="objectId" type="xs:int"/>
+      <xs:attribute name="parentObjId" type="xs:int"/>
+      <xs:attribute name="parentObjType" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="delete">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="what" type="xs:string"/>
+      <xs:attribute name="objectId" type="xs:int"/>
+      <xs:attribute name="parentObjId" type="xs:int"/>
+      <xs:attribute name="parentObjType" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="change">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="module" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="location" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="annotation" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="function" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="connection" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="port" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="parameter" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="portSpec" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="other" minOccurs="0" maxOccurs="1"/>
+      </xs:choice>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="what" type="xs:string"/>
+      <xs:attribute name="oldObjId" type="xs:int"/>
+      <xs:attribute name="newObjId" type="xs:int"/>
+      <xs:attribute name="parentObjId" type="xs:int"/>
+      <xs:attribute name="parentObjType" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="module">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="location" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="function" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="annotation" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element ref="portSpec" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="cache" type="xs:int"/>
+      <xs:attribute name="name" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="location">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="x" type="xs:float"/>
+      <xs:attribute name="y" type="xs:float"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="annotation">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="key" type="xs:string"/>
+      <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="function">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="pos" type="xs:int"/>
+      <xs:attribute name="name" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="connection">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="port" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="port">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="moduleId" type="xs:int"/>
+      <xs:attribute name="moduleName" type="xs:string"/>
+      <xs:attribute name="sig" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="pos" type="xs:int"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="val" type="xs:string"/>
+      <xs:attribute name="alias" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="portSpec">
+    <xs:complexType>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="name" type="xs:string"/>
+      <xs:attribute name="type" type="xs:string"/>
+      <xs:attribute name="spec" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="other">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="value" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:int"/>
+      <xs:attribute name="key" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

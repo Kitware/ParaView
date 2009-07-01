@@ -1,0 +1,37 @@
+<object name="macro">
+  <layout>
+    <xml name="macro" nodeType="xs:element"/>
+    <sql table="macro"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="descrptn" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property ref="true" object="action" type="hash" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="vistrail" type="long" mapping="many-to-one" 
+      inverse="true">
+  </property>
+
+  <property name="vistrailId" type="long" inverse="true"
+      foreignKey="true" object="vistrail">
+    <sql column="vt_id" type="int"/>
+  </property>
+
+</object>
+
+  

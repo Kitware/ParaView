@@ -1,0 +1,25 @@
+<object name="addModule">
+  <layout>
+    <xml name="object" nodeType="xs:element"/>
+  </layout>
+  
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+  </property>
+
+  <property name="cache" type="int">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+  </property>
+
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+  </property>
+
+  <property name="x" type="float">
+    <xml nodeType="xs:attribute" type="xs:float"/>
+  </property>
+
+  <property name="y" type="float">
+    <xml nodeType="xs:attribute" type="xs:float"/>
+  </property>
+</object>

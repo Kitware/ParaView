@@ -1,0 +1,69 @@
+<object name="action">
+  <layout>
+    <xml name="action" nodeType="xs:element"/>
+    <sql table="action"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="prevId" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql column="prev_id" type="int"/>
+  </property>
+
+  <property name="date" type="datetime">
+    <xml nodeType="xs:attribute" type="xs:dateTime"/>
+    <sql type="datetime"/>
+  </property>
+  
+  <property name="user" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+<!--
+  <property name="actionType" type="str">
+    <xml inferred="true" choice="operation"/>
+    <sql column="action_type" type="char(16)"/>
+  </property>
+
+discriminator="actionType"
+-->
+
+  <choice name="operation" type="list" mapping="one-to-many">
+    <property name="add" ref="true" object="add">
+      <xml nodeType="xs:element"/>
+    </property>
+
+    <property name="delete" ref="true" object="delete">
+      <xml nodeType="xs:element"/>
+    </property>
+
+    <property name="change" ref="true" object="change">
+      <xml nodeType="xs:element"/>
+    </property>
+  </choice>
+    
+  <property name="parentType" type="str" inverse="true">
+    <sql column="parent_type" type="char(16)"/>
+  </property>
+
+  <choice name="parent" discriminator="parentType" inverse="true" 
+    mapping="many-to-one">
+    <property ref="true" type="long" object="vistrail">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" type="long" object="macro">
+      <sql column="parent_id" type="int"/>
+    </property>
+  </choice>
+
+  <property name="vistrailId" type="long" inverse="true"
+      foreignKey="true" object="vistrail">
+    <sql column="vt_id" type="int"/>
+  </property>
+
+</object>

@@ -1,0 +1,17 @@
+<object name="deleteModulePort">
+  <layout>
+    <xml name="deletePort" nodeType="xs:element"/>
+  </layout>
+  
+  <property name="moduleId" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+  </property>
+
+  <property name="portType" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+  </property>
+
+  <property name="portName" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+  </property>
+</object>

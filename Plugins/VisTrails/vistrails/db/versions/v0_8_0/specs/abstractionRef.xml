@@ -1,0 +1,65 @@
+<object name="abstractionRef">
+  <layout>
+    <xml name="abstractionRef" nodeType="xs:element"/>
+    <sql table="abstraction_ref"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+  
+  <property name="name" type="str" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(1023)"/>
+  </property>
+
+  <property name="cache" type="int">
+    <xml name="cache" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="abstraction_id" type="long">
+    <xml name="abstractionId" nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="version" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property ref="true" object="location" type="object" mapping="one-to-one">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="function" type="list"  mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="annotation" type="list" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property name="parentType" type="str" inverse="true">
+    <sql column="parent_type" type="char(16)"/>
+  </property>
+
+  <choice name="parent" type="long" discriminator="parentType" inverse="true" 
+    mapping="many-to-one">
+    <property ref="true" object="workflow">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" object="add">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" object="change">
+      <sql column="parent_id" type="int"/>
+    </property>
+  </choice>
+
+  <property name="vistrailId" type="long" inverse="true"
+      foreignKey="true" object="vistrail">
+    <sql column="vt_id" type="int"/>
+  </property>
+</object>

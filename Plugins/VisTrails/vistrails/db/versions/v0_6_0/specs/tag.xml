@@ -1,0 +1,36 @@
+<object name="tag">
+  <layout>
+    <xml name="tag" nodeType="xs:element"/>
+    <sql table="tag"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true" foreignKey="true" 
+      object="action">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="parentType" type="str" inverse="true">
+    <sql column="parent_type" type="char(16)"/>
+  </property>
+
+  <choice name="parent" discriminator="parentType" type="long" inverse="true" 
+    mapping="many-to-one">
+    <property ref="true" type="long" object="vistrail">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" type="long" object="abstraction">
+      <sql column="parent_id" type="int"/>
+    </property>
+  </choice>
+  
+  <property name="vistrailId" type="long" inverse="true"
+      foreignKey="true" object="vistrail">
+    <sql column="vt_id" type="int"/>
+  </property>
+</object>

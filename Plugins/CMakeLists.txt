@@ -40,4 +40,5 @@ paraview_build_optional_plugin(TableToSparseArrayPanel "TableToSparseArrayPanel"
 paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" ThresholdTablePanel OFF) 
 paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF) 
 paraview_build_optional_plugin(ClientTreeAreaView "ClientTreeAreaView" ClientTreeAreaView OFF) 
-
+paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
+paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails OFF) 

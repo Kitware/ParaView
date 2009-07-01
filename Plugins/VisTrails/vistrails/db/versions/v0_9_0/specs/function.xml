@@ -1,0 +1,54 @@
+<object name="function">
+  <layout>
+    <xml name="function" nodeType="xs:element"/>
+    <sql table="function"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="pos" type="long">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property ref="true" object="parameter" type="list" mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property name="parentType" type="str" inverse="true">
+    <sql column="parent_type" type="char(16)"/>
+  </property>
+
+  <choice name="parent" type="long" discriminator="parentType" inverse="true" 
+    mapping="many-to-one">
+    <property ref="true" object="module">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" object="abstractionRef">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" object="add">
+      <sql column="parent_id" type="int"/>
+    </property>
+    <property ref="true" object="change">
+      <sql column="parent_id" type="int"/>
+    </property>
+  </choice>
+
+  <property name="entity_id" type="long" inverse="true">
+    <sql type="int"/>
+  </property>
+
+  <property name="entity_type" type="str" inverse="true">
+    <sql type="char(16)"/>
+  </property>
+
+</object>

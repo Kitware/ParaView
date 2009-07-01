@@ -1,0 +1,45 @@
+<object name="log">
+  <layout>
+    <xml name="log" nodeType="xs:element"/>
+    <sql table="log_tbl"/>
+  </layout>
+
+  <property name="id" type="long" primaryKey="true">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int" autoInc="true" global="true" globalName="entity_id"/>
+  </property>
+
+  <property name="entity_type" type="str">
+    <sql type="char(16)" global="true" globalName="entity_type"/>
+  </property>
+
+  <property name="version" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="char(16)"/>
+  </property>
+
+  <property name="name" type="str">
+    <xml nodeType="xs:attribute" type="xs:string"/>
+    <sql type="varchar(255)"/>
+  </property>
+
+  <property name="last_modified" type="datetime">
+    <sql type="datetime"/>
+  </property>
+
+  <property ref="true" object="workflow_exec" cascade="false" type="list" 
+      mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property ref="true" object="machine" cascade="false" type="list" 
+      mapping="one-to-many">
+    <xml nodeType="xs:element"/>
+  </property>
+
+  <property name="vistrail_id" type="long" foreignKey="true" object="vistrail">
+    <xml nodeType="xs:attribute" type="xs:int"/>
+    <sql type="int"/>
+  </property>
+
+</object>
