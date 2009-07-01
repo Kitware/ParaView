@@ -1,0 +1,6 @@
+  <visTrail version="0.3.1">
+    <action date="15 Mar 2007 16:53:42" parent="0" time="1" user="cscheid" what="addModule">
+      <object cache="0" id="0" name="TestDynamicModuleError" x="-7.0" y="18.0"/>
+    </action>
+    <tag name="test" time="1"/>
+  </visTrail>

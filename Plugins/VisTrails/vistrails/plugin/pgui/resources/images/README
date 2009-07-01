@@ -1,0 +1,17 @@
+All icons are owned by VisTrails, Inc., except the following that are
+ownd by Qt and can be used with acknowledgment:
+
+- SELECT_CURSOR: QtCore.Qt.ArrowCursor 
+- OPEN_HAND_CURSOR: QtCore.Qt.OpenHandCursor
+- CLOSED_HAND_CURSOR: QtCore.Qt.ClosedHandCursor
+- ZOOM_CURSOR: QtCore.Qt.SizeVerCursor
+- CLOSE_ICON (mac): qt/src/gui/styles/images/standardbutton-close-16.png
+- CLOSE_ICON (others): qt/tools/assistant/compat/images/close.png 
+
+
+Creating an image resource file:
+pyrcc4 images.qrc -o images_rc.py
+
+pyrcc4 is installed in Maya.app in the python framework by pyqt
+
+

@@ -1,0 +1,25 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/arrow.png</file>
+    <file>images/back.png</file>
+    <file>images/close.png</file>
+    <file>images/empty.png</file>
+    <file>images/find.png</file>
+    <file>images/find_arrow.png</file>
+    <file>images/forward.png</file>
+    <file>images/logo.png</file>
+    <file>images/mac_close.png</file>
+    <file>images/new.png</file>
+    <file>images/open.png</file>
+    <file>images/pan.png</file>
+    <file>images/pause.png</file>
+    <file>images/pickversions.png</file>
+    <file>images/play.png</file>
+    <file>images/playback.png</file>
+    <file>images/redo.png</file>
+    <file>images/save.png</file>
+    <file>images/stop.png</file>
+    <file>images/undo.png</file>
+    <file>images/zoom.png</file>
+</qresource>
+</RCC>

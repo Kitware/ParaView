@@ -1,0 +1,142 @@
+  <visTrail version="0.3.0">
+    <action date="22 Feb 2007 16:47:32" parent="0" time="1" user="manu" what="addModule">
+      <notes>
+        None
+      </notes>
+      <object cache="0" id="0" name="Float" x="-119.0" y="150.0"/>
+    </action>
+    <action date="22 Feb 2007 16:47:50" parent="1" time="2" user="manu" what="addModule">
+      <notes>
+        None
+      </notes>
+      <object cache="0" id="1" name="PythonSource" x="-98.0" y="11.0"/>
+    </action>
+    <action date="22 Feb 2007 16:47:55" parent="2" time="3" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="6.0" dy="41.0" id="1"/>
+    </action>
+    <action date="22 Feb 2007 16:47:55" parent="3" time="4" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="0.0"/>
+    </action>
+    <action date="22 Feb 2007 16:48:02" parent="4" time="5" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="2.0"/>
+    </action>
+    <action date="22 Feb 2007 16:48:03" parent="5" time="6" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="2.0"/>
+    </action>
+    <action date="22 Feb 2007 16:48:11" parent="6" time="7" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="v1" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="2.0"/>
+    </action>
+    <action date="22 Feb 2007 16:51:14" parent="7" time="8" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="-21.0" dy="37.0" id="0"/>
+    </action>
+    <action date="22 Feb 2007 16:51:14" parent="8" time="9" user="manu" what="addModulePort">
+      <notes>
+        None
+      </notes>
+      <addPort moduleId="1" portName="v1" portSpec="(Float)" portType="input"/>
+    </action>
+    <action date="22 Feb 2007 16:51:14" parent="9" time="10" user="manu" what="addModulePort">
+      <notes>
+        None
+      </notes>
+      <addPort moduleId="1" portName="v2" portSpec="(Float)" portType="input"/>
+    </action>
+    <action date="22 Feb 2007 16:51:15" parent="10" time="11" user="manu" what="addModulePort">
+      <notes>
+        None
+      </notes>
+      <addPort moduleId="1" portName="res" portSpec="(Float)" portType="output"/>
+    </action>
+    <action date="22 Feb 2007 16:51:15" parent="11" time="12" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="" function="source" functionId="0" moduleId="1" parameter="&lt;no description&gt;" parameterId="0" type="String" value="v1%20%3D%20self.getInputFromPort%28%22v1%22%29%0Av2%20%3D%20self.getInputFromPort%28%22v2%22%29%0A%0Aself.setResult%28%22res%22%2C%20v1%2Bv2%29"/>
+    </action>
+    <action date="22 Feb 2007 16:51:21" parent="12" time="13" user="manu" what="addConnection">
+      <notes>
+        None
+      </notes>
+      <connect destinationId="1" destinationModule="PythonSource" destinationPort="v1(Float)" id="0" sourceId="0" sourceModule="Float" sourcePort="value(Float)"/>
+    </action>
+    <action date="22 Feb 2007 16:51:32" parent="13" time="14" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="-17.0" dy="-20.0" id="0"/>
+    </action>
+    <action date="22 Feb 2007 16:51:32" parent="14" time="15" user="manu" what="addModule">
+      <notes>
+        None
+      </notes>
+      <object cache="0" id="2" name="Float" x="-130.0" y="197.0"/>
+    </action>
+    <action date="22 Feb 2007 16:51:32" parent="15" time="16" user="manu" what="changeParameter">
+      <notes>
+        None
+      </notes>
+      <set alias="" function="value" functionId="0" moduleId="2" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="2.0"/>
+    </action>
+    <action date="22 Feb 2007 16:51:32" parent="16" time="17" user="manu" what="changeAnnotation">
+      <notes>
+        None
+      </notes>
+      <set key="" moduleId="2" value=""/>
+    </action>
+    <action date="22 Feb 2007 16:52:21" parent="17" time="18" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="67.0" dy="-28.0" id="2"/>
+    </action>
+    <action date="22 Feb 2007 16:52:21" parent="18" time="19" user="manu" what="addConnection">
+      <notes>
+        None
+      </notes>
+      <connect destinationId="1" destinationModule="PythonSource" destinationPort="v2(Float)" id="1" sourceId="2" sourceModule="Float" sourcePort="value(Float)"/>
+    </action>
+    <action date="22 Feb 2007 16:52:41" parent="19" time="20" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="0.0" dy="-1.0" id="0"/>
+      <move dx="0.0" dy="-2.0" id="2"/>
+    </action>
+    <action date="22 Feb 2007 16:52:41" parent="20" time="21" user="manu" what="addModule">
+      <notes>
+        None
+      </notes>
+      <object cache="0" id="3" name="Float" x="-93.0" y="-85.0"/>
+    </action>
+    <action date="22 Feb 2007 16:52:45" parent="21" time="22" user="manu" what="moveModule">
+      <notes>
+        None
+      </notes>
+      <move dx="47.0" dy="52.0" id="3"/>
+    </action>
+    <action date="22 Feb 2007 16:52:45" parent="22" time="23" user="manu" what="addConnection">
+      <notes>
+        None
+      </notes>
+      <connect destinationId="3" destinationModule="Float" destinationPort="value(Float)" id="2" sourceId="1" sourceModule="PythonSource" sourcePort="res(Float)"/>
+    </action>
+    <tag name="alias" time="23"/>
+  </visTrail>

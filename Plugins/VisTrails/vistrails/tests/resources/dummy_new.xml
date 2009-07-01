@@ -1,0 +1,307 @@
+<?xml version="1.0" ?>
+<vistrail dbHost="" dbName="" dbPort="" id="" name="" version="0.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vistrails.org/vistrail.xsd">
+  <action date="2006-11-09 11:11:45" id="2" prevId="0" user="cscheid">
+    <add id="0" objectId="0" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="0" name="File"/>
+    </add>
+    <add id="1" objectId="0" parentObjId="0" parentObjType="module" what="location">
+      <location id="0" x="-0.405904047613" y="0.590405904059"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:11:49" id="3" prevId="2" user="cscheid">
+    <add id="2" objectId="1" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="1" name="String"/>
+    </add>
+    <add id="3" objectId="1" parentObjId="1" parentObjType="module" what="location">
+      <location id="1" x="-79.7416969521" y="113.505537534"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:11:52" id="4" prevId="3" user="cscheid">
+    <add id="4" objectId="0" parentObjId="" parentObjType="" what="connection">
+      <connection id="0"/>
+    </add>
+    <add id="5" objectId="0" parentObjId="0" parentObjType="connection" what="port">
+      <port id="0" moduleId="1" moduleName="String" sig="value(String)" type="source"/>
+    </add>
+    <add id="6" objectId="1" parentObjId="0" parentObjType="connection" what="port">
+      <port id="1" moduleId="0" moduleName="File" sig="name(String)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:01" id="5" prevId="4" user="cscheid">
+    <add id="7" objectId="2" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="2" name="FileSink"/>
+    </add>
+    <add id="8" objectId="2" parentObjId="2" parentObjType="module" what="location">
+      <location id="2" x="-25.1291511435" y="-88.7084891257"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:04" id="6" prevId="5" user="cscheid">
+    <add id="9" objectId="1" parentObjId="" parentObjType="" what="connection">
+      <connection id="1"/>
+    </add>
+    <add id="10" objectId="2" parentObjId="1" parentObjType="connection" what="port">
+      <port id="2" moduleId="0" moduleName="File" sig="self(File)" type="source"/>
+    </add>
+    <add id="11" objectId="3" parentObjId="1" parentObjType="connection" what="port">
+      <port id="3" moduleId="2" moduleName="FileSink" sig="file(File)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:06" id="7" prevId="6" user="cscheid">
+    <change id="12" newObjId="3" oldObjId="2" parentObjId="2" parentObjType="module" what="location">
+      <location id="3" x="63.4317339516" y="-116.014762799"/>
+    </change>
+  </action>
+  <action date="2006-11-09 11:12:06" id="8" prevId="7" user="cscheid">
+    <add id="13" objectId="3" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="3" name="String"/>
+    </add>
+    <add id="14" objectId="4" parentObjId="3" parentObjType="module" what="location">
+      <location id="4" x="135.756456779" y="-26.7158678139"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:09" id="9" prevId="8" user="cscheid">
+    <add id="15" objectId="2" parentObjId="" parentObjType="" what="connection">
+      <connection id="2"/>
+    </add>
+    <add id="16" objectId="4" parentObjId="2" parentObjType="connection" what="port">
+      <port id="4" moduleId="3" moduleName="String" sig="value(String)" type="source"/>
+    </add>
+    <add id="17" objectId="5" parentObjId="2" parentObjType="connection" what="port">
+      <port id="5" moduleId="2" moduleName="FileSink" sig="outputName(String)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:12" id="10" prevId="9" user="cscheid">
+    <add id="18" objectId="0" parentObjId="3" parentObjType="module" what="function">
+      <function id="0" name="value" pos="0"/>
+    </add>
+    <add id="19" objectId="0" parentObjId="0" parentObjType="function" what="parameter">
+      <parameter alias="" id="0" name="&lt;no description&gt;" pos="0" type="String" val=""/>
+    </add>
+  </action>
+  <action date="2006-11-09 11:12:23" id="11" prevId="10" user="cscheid">
+    <change id="20" newObjId="1" oldObjId="0" parentObjId="0" parentObjType="function" what="parameter">
+      <parameter alias="" id="1" name="&lt;no description&gt;" pos="0" type="String" val="/tmp/unimportant.tmp"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:10:52" id="12" prevId="0" user="emanuele">
+    <add id="21" objectId="4" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="4" name="Float"/>
+    </add>
+    <add id="22" objectId="5" parentObjId="4" parentObjType="module" what="location">
+      <location id="5" x="-11.8561695459" y="98.7737701549"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:11:01" id="13" prevId="12" user="emanuele">
+    <change id="23" newObjId="6" oldObjId="5" parentObjId="4" parentObjType="module" what="location">
+      <location id="6" x="-5.13030019463" y="136.606785107"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:11:02" id="14" prevId="13" user="emanuele">
+    <add id="24" objectId="5" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="5" name="Float"/>
+    </add>
+    <add id="25" objectId="7" parentObjId="5" parentObjType="module" what="location">
+      <location id="7" x="100.802142088" y="40.7631472281"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:11:06" id="15" prevId="14" user="emanuele">
+    <change id="26" newObjId="8" oldObjId="7" parentObjId="5" parentObjType="module" what="location">
+      <location id="8" x="76.4208656896" y="14.7004035944"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:11:06" id="16" prevId="15" user="emanuele">
+    <add id="27" objectId="3" parentObjId="" parentObjType="" what="connection">
+      <connection id="3"/>
+    </add>
+    <add id="28" objectId="6" parentObjId="3" parentObjType="connection" what="port">
+      <port id="6" moduleId="4" moduleName="Float" sig="value(Float)" type="source"/>
+    </add>
+    <add id="29" objectId="7" parentObjId="3" parentObjType="connection" what="port">
+      <port id="7" moduleId="5" moduleName="Float" sig="value(Float)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:11:16" id="17" prevId="16" user="emanuele">
+    <change id="30" newObjId="9" oldObjId="8" parentObjId="5" parentObjType="module" what="location">
+      <location id="9" x="82.306001372" y="8.81526793517"/>
+    </change>
+    <change id="31" newObjId="10" oldObjId="6" parentObjId="4" parentObjType="module" what="location">
+      <location id="10" x="-59.7779886737" y="142.491920766"/>
+    </change>
+    <change id="32" newObjId="11" oldObjId="9" parentObjId="5" parentObjType="module" what="location">
+      <location id="11" x="66.3320616627" y="63.4629561995"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:11:16" id="18" prevId="17" user="emanuele">
+    <add id="33" objectId="6" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="6" name="Float"/>
+    </add>
+    <add id="34" objectId="12" parentObjId="6" parentObjType="module" what="location">
+      <location id="12" x="156.290564236" y="-60.1248926444"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:11:18" id="19" prevId="18" user="emanuele">
+    <add id="35" objectId="4" parentObjId="" parentObjType="" what="connection">
+      <connection id="4"/>
+    </add>
+    <add id="36" objectId="8" parentObjId="4" parentObjType="connection" what="port">
+      <port id="8" moduleId="5" moduleName="Float" sig="value(Float)" type="source"/>
+    </add>
+    <add id="37" objectId="9" parentObjId="4" parentObjType="connection" what="port">
+      <port id="9" moduleId="6" moduleName="Float" sig="value(Float)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:06" id="20" prevId="19" user="emanuele">
+    <add id="38" objectId="7" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="7" name="Integer"/>
+    </add>
+    <add id="39" objectId="13" parentObjId="7" parentObjType="module" what="location">
+      <location id="13" x="-74.0704610451" y="2.93013227592"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:10" id="21" prevId="20" user="emanuele">
+    <change id="40" newObjId="14" oldObjId="13" parentObjId="7" parentObjType="module" what="location">
+      <location id="14" x="-90.0444007544" y="19.744805588"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:12:10" id="22" prevId="21" user="emanuele">
+    <add id="41" objectId="8" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="8" name="Integer"/>
+    </add>
+    <add id="42" objectId="15" parentObjId="8" parentObjType="module" what="location">
+      <location id="15" x="24.2953782172" y="-86.1876362782"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:14" id="23" prevId="22" user="emanuele">
+    <add id="43" objectId="5" parentObjId="" parentObjType="" what="connection">
+      <connection id="5"/>
+    </add>
+    <add id="44" objectId="10" parentObjId="5" parentObjType="connection" what="port">
+      <port id="10" moduleId="7" moduleName="Integer" sig="value(Integer)" type="source"/>
+    </add>
+    <add id="45" objectId="11" parentObjId="5" parentObjType="connection" what="port">
+      <port id="11" moduleId="8" moduleName="Integer" sig="value(Integer)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:20" id="24" prevId="23" user="emanuele">
+    <change id="46" newObjId="16" oldObjId="15" parentObjId="8" parentObjType="module" what="location">
+      <location id="16" x="-15.2191042215" y="-94.5949729342"/>
+    </change>
+    <change id="47" newObjId="17" oldObjId="14" parentObjId="7" parentObjType="module" what="location">
+      <location id="17" x="-85.8407324099" y="31.5150769065"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:12:21" id="25" prevId="24" user="emanuele">
+    <delete id="48" objectId="6" parentObjId="3" parentObjType="connection" what="port"/>
+    <delete id="49" objectId="7" parentObjId="3" parentObjType="connection" what="port"/>
+    <delete id="50" objectId="3" parentObjId="" parentObjType="" what="connection"/>
+  </action>
+  <action date="2006-11-21 22:12:21" id="26" prevId="25" user="emanuele">
+    <delete id="51" objectId="10" parentObjId="4" parentObjType="module" what="location"/>
+    <delete id="52" objectId="4" parentObjId="" parentObjType="" what="module"/>
+  </action>
+  <action date="2006-11-21 22:12:23" id="27" prevId="26" user="emanuele">
+    <delete id="53" objectId="8" parentObjId="4" parentObjType="connection" what="port"/>
+    <delete id="54" objectId="9" parentObjId="4" parentObjType="connection" what="port"/>
+    <delete id="55" objectId="4" parentObjId="" parentObjType="" what="connection"/>
+  </action>
+  <action date="2006-11-21 22:12:23" id="28" prevId="27" user="emanuele">
+    <delete id="56" objectId="11" parentObjId="5" parentObjType="module" what="location"/>
+    <delete id="57" objectId="5" parentObjId="" parentObjType="" what="module"/>
+  </action>
+  <action date="2006-11-21 22:12:26" id="29" prevId="28" user="emanuele"/>
+  <action date="2006-11-21 22:12:26" id="30" prevId="29" user="emanuele">
+    <delete id="58" objectId="12" parentObjId="6" parentObjType="module" what="location"/>
+    <delete id="59" objectId="6" parentObjId="" parentObjType="" what="module"/>
+  </action>
+  <action date="2006-11-21 22:12:41" id="31" prevId="30" user="emanuele">
+    <change id="60" newObjId="18" oldObjId="16" parentObjId="8" parentObjType="module" what="location">
+      <location id="18" x="70.5357300072" y="-53.3990233196"/>
+    </change>
+    <change id="61" newObjId="19" oldObjId="17" parentObjId="7" parentObjType="module" what="location">
+      <location id="19" x="-21.9449735728" y="83.640564174"/>
+    </change>
+    <change id="62" newObjId="20" oldObjId="18" parentObjId="8" parentObjType="module" what="location">
+      <location id="20" x="81.465267703" y="-12.203073705"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:12:41" id="32" prevId="31" user="emanuele">
+    <add id="63" objectId="9" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="9" name="StandardOutput"/>
+    </add>
+    <add id="64" objectId="21" parentObjId="9" parentObjType="module" what="location">
+      <location id="21" x="112.572413453" y="-161.853666183"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:44" id="33" prevId="32" user="emanuele">
+    <add id="65" objectId="6" parentObjId="" parentObjType="" what="connection">
+      <connection id="6"/>
+    </add>
+    <add id="66" objectId="12" parentObjId="6" parentObjType="connection" what="port">
+      <port id="12" moduleId="8" moduleName="Integer" sig="value(Integer)" type="source"/>
+    </add>
+    <add id="67" objectId="13" parentObjId="6" parentObjType="connection" what="port">
+      <port id="13" moduleId="9" moduleName="StandardOutput" sig="value(Module)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:49" id="34" prevId="33" user="emanuele">
+    <add id="68" objectId="1" parentObjId="7" parentObjType="module" what="function">
+      <function id="1" name="value" pos="0"/>
+    </add>
+    <add id="69" objectId="2" parentObjId="1" parentObjType="function" what="parameter">
+      <parameter alias="" id="2" name="&lt;no description&gt;" pos="0" type="Integer" val="0"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:12:53" id="35" prevId="34" user="emanuele">
+    <change id="70" newObjId="3" oldObjId="2" parentObjId="1" parentObjType="function" what="parameter">
+      <parameter alias="" id="3" name="&lt;no description&gt;" pos="0" type="Integer" val="2"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:13:08" id="36" prevId="35" user="emanuele">
+    <change id="71" newObjId="22" oldObjId="21" parentObjId="9" parentObjType="module" what="location">
+      <location id="22" x="57.9247249739" y="-112.250379912"/>
+    </change>
+    <change id="72" newObjId="23" oldObjId="20" parentObjId="8" parentObjType="module" what="location">
+      <location id="23" x="56.2432576357" y="-6.31793804582"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:13:23" id="37" prevId="19" user="emanuele">
+    <add id="73" objectId="2" parentObjId="4" parentObjType="module" what="function">
+      <function id="2" name="value" pos="0"/>
+    </add>
+    <add id="74" objectId="4" parentObjId="2" parentObjType="function" what="parameter">
+      <parameter alias="" id="4" name="&lt;no description&gt;" pos="0" type="Float" val="0.0"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:13:27" id="38" prevId="37" user="emanuele">
+    <change id="75" newObjId="5" oldObjId="4" parentObjId="2" parentObjType="function" what="parameter">
+      <parameter alias="" id="5" name="&lt;no description&gt;" pos="0" type="Float" val="1.2"/>
+    </change>
+  </action>
+  <action date="2006-11-21 22:13:33" id="39" prevId="38" user="emanuele">
+    <add id="76" objectId="10" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="10" name="StandardOutput"/>
+    </add>
+    <add id="77" objectId="24" parentObjId="10" parentObjType="module" what="location">
+      <location id="24" x="73.8986646828" y="-196.323746472"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:13:36" id="40" prevId="39" user="emanuele">
+    <add id="78" objectId="7" parentObjId="" parentObjType="" what="connection">
+      <connection id="7"/>
+    </add>
+    <add id="79" objectId="14" parentObjId="7" parentObjType="connection" what="port">
+      <port id="14" moduleId="6" moduleName="Float" sig="value(Float)" type="source"/>
+    </add>
+    <add id="80" objectId="15" parentObjId="7" parentObjType="connection" what="port">
+      <port id="15" moduleId="10" moduleName="StandardOutput" sig="value(Module)" type="destination"/>
+    </add>
+  </action>
+  <action date="2006-11-21 22:13:42" id="41" prevId="40" user="emanuele">
+    <change id="81" newObjId="25" oldObjId="24" parentObjId="10" parentObjType="module" what="location">
+      <location id="25" x="62.1283933181" y="-165.216600845"/>
+    </change>
+  </action>
+  <tag name="int chain" time="36"/>
+  <tag name="float chain" time="41"/>
+  <tag name="final" time="11"/>
+</vistrail>

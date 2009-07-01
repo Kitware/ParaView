@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<vistrail dbHost="" dbName="" dbPort="" id="" name="" version="0.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vistrails.org/vistrail.xsd">
+  <action date="2007-07-23 15:57:26" id="1" prevId="0" user="cscheid">
+    <add id="0" objectId="0" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="0" name="different name"/>
+    </add>
+    <add id="1" objectId="0" parentObjId="0" parentObjType="module" what="location">
+      <location id="0" x="-30.0" y="-12.0"/>
+    </add>
+  </action>
+</vistrail>

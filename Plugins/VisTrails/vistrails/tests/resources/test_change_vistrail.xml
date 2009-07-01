@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<vistrail dbHost="" dbName="" dbPort="" id="" name="" version="0.5.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vistrails.org/vistrail.xsd">
+  <action date="2007-07-16 15:56:55" id="1" prevId="0" user="cscheid">
+    <add id="0" objectId="0" parentObjId="" parentObjType="" what="module">
+      <module cache="1" id="0" name="TestChangeVistrail"/>
+    </add>
+    <add id="1" objectId="0" parentObjId="0" parentObjType="module" what="location">
+      <location id="0" x="-12.0" y="36.0"/>
+    </add>
+  </action>
+  <action date="2007-07-16 15:57:04" id="2" prevId="1" user="cscheid">
+    <add id="2" objectId="0" parentObjId="0" parentObjType="module" what="function">
+      <function id="0" name="foo" pos="0"/>
+    </add>
+    <add id="3" objectId="0" parentObjId="0" parentObjType="function" what="parameter">
+      <parameter alias="" id="0" name="&lt;no description&gt;" pos="0" type="Integer" val=""/>
+    </add>
+  </action>
+  <action date="2007-07-16 15:57:05" id="3" prevId="2" user="cscheid">
+    <change id="4" newObjId="1" oldObjId="0" parentObjId="0" parentObjType="function" what="parameter">
+      <parameter alias="" id="1" name="&lt;no description&gt;" pos="0" type="Integer" val="10"/>
+    </change>
+  </action>
+  <action date="2007-07-19 16:38:29" id="4" prevId="3" user="cscheid">
+    <delete id="5" objectId="1" parentObjId="0" parentObjType="function" what="parameter"/>
+    <delete id="6" objectId="0" parentObjId="0" parentObjType="module" what="function"/>
+  </action>
+  <tag name="v1" time="3"/>
+  <tag name="v2" time="4"/>
+</vistrail>

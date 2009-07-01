@@ -1,0 +1,129 @@
+  <visTrail version="0.3.0">
+    <action date="09 Nov 2006 11:11:45" parent="0" time="2" user="cscheid" what="addModule">
+      <object cache="0" id="0" name="File" x="-0.405904047613" y="0.590405904059"/>
+    </action>
+    <action date="09 Nov 2006 11:11:49" parent="2" time="3" user="cscheid" what="addModule">
+      <object cache="0" id="1" name="String" x="-79.7416969521" y="113.505537534"/>
+    </action>
+    <action date="09 Nov 2006 11:11:52" parent="3" time="4" user="cscheid" what="addConnection">
+      <connect destinationId="0" destinationModule="File" destinationPort="name(String)" id="0" sourceId="1" sourceModule="String" sourcePort="value(String)"/>
+    </action>
+    <action date="09 Nov 2006 11:12:01" parent="4" time="5" user="cscheid" what="addModule">
+      <object cache="0" id="2" name="FileSink" x="-25.1291511435" y="-88.7084891257"/>
+    </action>
+    <action date="09 Nov 2006 11:12:04" parent="5" time="6" user="cscheid" what="addConnection">
+      <connect destinationId="2" destinationModule="FileSink" destinationPort="file(File)" id="1" sourceId="0" sourceModule="File" sourcePort="self(File)"/>
+    </action>
+    <action date="09 Nov 2006 11:12:06" parent="6" time="7" user="cscheid" what="moveModule">
+      <move dx="88.5608850951" dy="-27.3062736731" id="2"/>
+    </action>
+    <action date="09 Nov 2006 11:12:06" parent="7" time="8" user="cscheid" what="addModule">
+      <object cache="0" id="3" name="String" x="135.756456779" y="-26.7158678139"/>
+    </action>
+    <action date="09 Nov 2006 11:12:09" parent="8" time="9" user="cscheid" what="addConnection">
+      <connect destinationId="2" destinationModule="FileSink" destinationPort="outputName(String)" id="2" sourceId="3" sourceModule="String" sourcePort="value(String)"/>
+    </action>
+    <action date="09 Nov 2006 11:12:12" parent="9" time="10" user="cscheid" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="3" parameter="&lt;no description&gt;" parameterId="0" type="String" value=""/>
+    </action>
+    <action date="09 Nov 2006 11:12:23" parent="10" time="11" user="cscheid" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="3" parameter="&lt;no description&gt;" parameterId="0" type="String" value="/tmp/unimportant.tmp"/>
+    </action>
+    <action date="21 Nov 2006 22:10:52" parent="0" time="12" user="emanuele" what="addModule">
+      <object cache="0" id="0" name="Float" x="-11.8561695459" y="98.7737701549"/>
+    </action>
+    <action date="21 Nov 2006 22:11:01" parent="12" time="13" user="emanuele" what="moveModule">
+      <move dx="6.72586935127" dy="37.8330149522" id="0"/>
+    </action>
+    <action date="21 Nov 2006 22:11:02" parent="13" time="14" user="emanuele" what="addModule">
+      <object cache="0" id="1" name="Float" x="100.802142088" y="40.7631472281"/>
+    </action>
+    <action date="21 Nov 2006 22:11:06" parent="14" time="15" user="emanuele" what="moveModule">
+      <move dx="-24.3812763984" dy="-26.0627436337" id="1"/>
+    </action>
+    <action date="21 Nov 2006 22:11:06" parent="15" time="16" user="emanuele" what="addConnection">
+      <connect destinationId="1" destinationModule="Float" destinationPort="value(Float)" id="0" sourceId="0" sourceModule="Float" sourcePort="value(Float)"/>
+    </action>
+    <action date="21 Nov 2006 22:11:16" parent="16" time="17" user="emanuele" what="moveModule">
+      <move dx="5.88513568236" dy="-5.88513565923" id="1"/>
+      <move dx="-54.6476884791" dy="5.88513565923" id="0"/>
+      <move dx="-15.9739397093" dy="54.6476882643" id="1"/>
+    </action>
+    <action date="21 Nov 2006 22:11:16" parent="17" time="18" user="emanuele" what="addModule">
+      <object cache="0" id="2" name="Float" x="156.290564236" y="-60.1248926444"/>
+    </action>
+    <action date="21 Nov 2006 22:11:18" parent="18" time="19" user="emanuele" what="addConnection">
+      <connect destinationId="2" destinationModule="Float" destinationPort="value(Float)" id="1" sourceId="1" sourceModule="Float" sourcePort="value(Float)"/>
+    </action>
+    <action date="21 Nov 2006 22:12:06" parent="19" time="20" user="emanuele" what="addModule">
+      <object cache="0" id="3" name="Integer" x="-74.0704610451" y="2.93013227592"/>
+    </action>
+    <action date="21 Nov 2006 22:12:10" parent="20" time="21" user="emanuele" what="moveModule">
+      <move dx="-15.9739397093" dy="16.8146733121" id="3"/>
+    </action>
+    <action date="21 Nov 2006 22:12:10" parent="21" time="22" user="emanuele" what="addModule">
+      <object cache="0" id="4" name="Integer" x="24.2953782172" y="-86.1876362782"/>
+    </action>
+    <action date="21 Nov 2006 22:12:14" parent="22" time="23" user="emanuele" what="addConnection">
+      <connect destinationId="4" destinationModule="Integer" destinationPort="value(Integer)" id="2" sourceId="3" sourceModule="Integer" sourcePort="value(Integer)"/>
+    </action>
+    <action date="21 Nov 2006 22:12:20" parent="23" time="24" user="emanuele" what="moveModule">
+      <move dx="-39.5144824387" dy="-8.40733665605" id="4"/>
+      <move dx="4.20366834454" dy="11.7702713185" id="3"/>
+    </action>
+    <action date="21 Nov 2006 22:12:21" parent="24" time="25" user="emanuele" what="deleteConnection">
+      <connection connectionId="0"/>
+    </action>
+    <action date="21 Nov 2006 22:12:21" parent="25" time="26" user="emanuele" what="deleteModule">
+      <module moduleId="0"/>
+    </action>
+    <action date="21 Nov 2006 22:12:23" parent="26" time="27" user="emanuele" what="deleteConnection">
+      <connection connectionId="1"/>
+    </action>
+    <action date="21 Nov 2006 22:12:23" parent="27" time="28" user="emanuele" what="deleteModule">
+      <module moduleId="1"/>
+    </action>
+    <action date="21 Nov 2006 22:12:26" parent="28" time="29" user="emanuele" what="deleteConnection"/>
+    <action date="21 Nov 2006 22:12:26" parent="29" time="30" user="emanuele" what="deleteModule">
+      <module moduleId="2"/>
+    </action>
+    <action date="21 Nov 2006 22:12:41" parent="30" time="31" user="emanuele" what="moveModule">
+      <move dx="85.7548342287" dy="41.1959496146" id="4"/>
+      <move dx="63.8957588371" dy="52.1254872675" id="3"/>
+      <move dx="10.9295376958" dy="41.1959496146" id="4"/>
+    </action>
+    <action date="21 Nov 2006 22:12:41" parent="31" time="32" user="emanuele" what="addModule">
+      <object cache="0" id="0" name="StandardOutput" x="112.572413453" y="-161.853666183"/>
+    </action>
+    <action date="21 Nov 2006 22:12:44" parent="32" time="33" user="emanuele" what="addConnection">
+      <connect destinationId="0" destinationModule="StandardOutput" destinationPort="value(Module)" id="0" sourceId="4" sourceModule="Integer" sourcePort="value(Integer)"/>
+    </action>
+    <action date="21 Nov 2006 22:12:49" parent="33" time="34" user="emanuele" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="3" parameter="&lt;no description&gt;" parameterId="0" type="Integer" value="0"/>
+    </action>
+    <action date="21 Nov 2006 22:12:53" parent="34" time="35" user="emanuele" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="3" parameter="&lt;no description&gt;" parameterId="0" type="Integer" value="2"/>
+    </action>
+    <action date="21 Nov 2006 22:13:08" parent="35" time="36" user="emanuele" what="moveModule">
+      <move dx="-54.6476884791" dy="49.6032862707" id="0"/>
+      <move dx="-25.2220100673" dy="5.88513565923" id="4"/>
+    </action>
+    <action date="21 Nov 2006 22:13:23" parent="19" time="37" user="emanuele" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="0.0"/>
+    </action>
+    <action date="21 Nov 2006 22:13:27" parent="37" time="38" user="emanuele" what="changeParameter">
+      <set alias="" function="value" functionId="0" moduleId="0" parameter="&lt;no description&gt;" parameterId="0" type="Float" value="1.2"/>
+    </action>
+    <action date="21 Nov 2006 22:13:33" parent="38" time="39" user="emanuele" what="addModule">
+      <object cache="0" id="3" name="StandardOutput" x="73.8986646828" y="-196.323746472"/>
+    </action>
+    <action date="21 Nov 2006 22:13:36" parent="39" time="40" user="emanuele" what="addConnection">
+      <connect destinationId="3" destinationModule="StandardOutput" destinationPort="value(Module)" id="2" sourceId="2" sourceModule="Float" sourcePort="value(Float)"/>
+    </action>
+    <action date="21 Nov 2006 22:13:42" parent="40" time="41" user="emanuele" what="moveModule">
+      <move dx="-11.7702713647" dy="31.1071456274" id="3"/>
+    </action>
+    <tag name="int chain" time="36"/>
+    <tag name="float chain" time="41"/>
+    <tag name="final" time="11"/>
+  </visTrail>
