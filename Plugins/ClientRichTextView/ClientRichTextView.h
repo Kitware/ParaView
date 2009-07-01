@@ -48,6 +48,7 @@ public:
     QObject* p);
   ~ClientRichTextView();
 
+  vtkView* getClientSideView() const;
   QWidget* getWidget();
 
   bool canDisplay(pqOutputPort* opPort) const;

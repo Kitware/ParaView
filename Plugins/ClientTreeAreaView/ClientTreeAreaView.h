@@ -45,6 +45,7 @@ public:
     QObject* p);
   ~ClientTreeAreaView();
 
+  vtkView* getClientSideView() const;
   QWidget* getWidget();
   bool canDisplay(pqOutputPort* opPort) const;
 

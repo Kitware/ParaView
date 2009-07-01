@@ -248,6 +248,11 @@ void ClientTreeAreaView::selectionChanged()
     }
 }
 
+vtkView* ClientTreeAreaView::getClientSideView() const
+{
+  return this->Implementation->HierarchicalGraphView;
+}
+
 QWidget* ClientTreeAreaView::getWidget()
 {
   return this->Implementation->Widget;

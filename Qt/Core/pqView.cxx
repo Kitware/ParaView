@@ -164,6 +164,11 @@ vtkSMViewProxy* pqView::getViewProxy() const
   return vtkSMViewProxy::SafeDownCast(this->getProxy());
 }
 
+vtkView* pqView::getClientSideView() const
+{
+  return 0;
+}
+
 //-----------------------------------------------------------------------------
 void pqView::initialize()
 {

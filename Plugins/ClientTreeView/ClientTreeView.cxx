@@ -107,6 +107,11 @@ ClientTreeView::~ClientTreeView()
   this->Command->Delete();
 }
 
+vtkView* ClientTreeView::getClientSideView() const
+{
+  return this->Implementation->View;
+}
+
 QWidget* ClientTreeView::getWidget()
 {
   return this->Implementation->Widget;

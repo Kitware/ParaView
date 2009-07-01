@@ -46,6 +46,7 @@ class QWidget;
 class vtkImageData;
 class vtkSMSourceProxy;
 class vtkSMViewProxy;
+class vtkView;
 
 /// This is a PQ abstraction of a generic view module. Subclasses can be
 /// specific for different types of view such as render view, histogram view
@@ -59,6 +60,10 @@ public:
 
   /// Returns the internal render Module proxy associated with this object.
   vtkSMViewProxy* getViewProxy() const;
+
+  /// Return the client-side vtkView encapsulated by this view (if any),
+  /// or return NULL.
+  virtual vtkView* getClientSideView() const;
 
   /// Return a widget associated with this view
   virtual QWidget* getWidget() = 0;

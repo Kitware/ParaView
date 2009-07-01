@@ -141,6 +141,11 @@ ClientRichTextView::~ClientRichTextView()
   this->Command->Delete();
 }
 
+vtkView* ClientRichTextView::getClientSideView() const
+{
+  return this->Implementation->View;
+}
+
 QWidget* ClientRichTextView::getWidget()
 {
   return this->Implementation->Widget;

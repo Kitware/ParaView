@@ -207,6 +207,11 @@ void ClientGraphView::selectionChanged()
     }
 }
 
+vtkView* ClientGraphView::getClientSideView() const
+{
+  return this->Implementation->View;
+}
+
 QWidget* ClientGraphView::getWidget()
 {
   return this->Implementation->Widget;
