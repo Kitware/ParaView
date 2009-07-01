@@ -503,7 +503,7 @@ void ClientGraphView::renderInternal()
 
       vtkSMStringVectorProperty *iconTypes = vtkSMStringVectorProperty::SafeDownCast(proxy->GetProperty("IconTypes"));
       vtkSMIntVectorProperty *iconIndices = vtkSMIntVectorProperty::SafeDownCast(proxy->GetProperty("IconIndices"));
-      this->Implementation->View->ClearIconTypes();
+      //this->Implementation->View->ClearIconTypes();
       for(unsigned int i=0; i<iconTypes->GetNumberOfElements(); i++)
         {
         this->Implementation->View->AddIconType((char*)iconTypes->GetElement(i), iconIndices->GetElement(i));
