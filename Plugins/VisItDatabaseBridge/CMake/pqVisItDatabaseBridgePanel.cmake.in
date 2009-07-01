@@ -1,5 +1,15 @@
 # +---------------------------------------------------------------------------+
 # |                                                                           |
+# |                          vtk VisIt Database Bridge                        |
+# |                                                                           |
+# +---------------------------------------------------------------------------+
+
+# Pipeline Bridge Target 
+link_directories(VisItReaderPlugin ${VISIT_LIB_PATH})
+include_directories(VisItReaderPlugin ${VISIT_INCLUDE_PATH})
+
+# +---------------------------------------------------------------------------+
+# |                                                                           |
 # |                   VisIt Database Bridge PQ Panel                          |
 # |                                                                           |
 # +---------------------------------------------------------------------------+
@@ -20,8 +30,36 @@ ADD_PARAVIEW_OBJECT_PANEL(
   XML_GROUP sources)
 
 ADD_PARAVIEW_PLUGIN(
-  vtkVisItDatabaseBridgePanel "1.0"
+  VisItReaderPlugin "1.0"
   GUI_INTERFACES ${IFACES}
+  SERVER_MANAGER_SOURCES vtkVisItDatabaseBridge.cxx 
+  SERVER_MANAGER_XML vtkVisItDatabaseBridgeServerManager.xml
+  GUI_RESOURCE_FILES vtkVisItDatabaseBridgeClient.xml
   SOURCES pqVisItDatabaseBridgePanel.cxx ${MOC_SRCS} ${UI_SRCS} ${IFACE_SRCS})
 
-install(TARGETS vtkVisItDatabaseBridgePanel DESTINATION ${CMAKE_INSTALL_PREFIX})
+target_link_libraries(VisItReaderPlugin ${VISIT_LIBS} vtkCommon vtkFiltering vtkGraphics vtkParallel vtkVisItDatabase)
+
+# Platform
+if (UNIX OR CYGWIN)
+  message(STATUS "Configuring vtkVisItDatabase for use on Linux.")
+  set_source_files_properties(VisItReaderPlugin COMPILE_FLAGS ${COMPILE_FLAGS} "-DUNIX")
+  #set_target_properties(vtkVisItDatabase PROPERTIES LINK_FLAGS -Wl,--rpath,${VISIT_LIB_PATH})
+  #set_target_properties(vtkVisItDatabase PROPERTIES LINK_FLAGS -Wl,--export-dynamic)
+else (UNIX OR CYGWIN)
+  message(STATUS "Configuring  vtkVisItDatabase for use on Windows.")
+endif (UNIX OR CYGWIN)
+# MPI
+if (VISIT_WITH_MPI)
+  message(STATUS "Configure vtkVisItDatabase for VisIt built with MPI.")
+  set_source_files_properties(VisItReaderPlugin COMPILE_FLAGS ${COMPILE_FLAGS} "-DMPI")
+endif (VISIT_WITH_MPI)
+
+#install(TARGETS VisItReaderPlugin DESTINATION ${CMAKE_INSTALL_PREFIX})
+install (TARGETS VisItReaderPlugin
+  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
+  COMPONENT Runtime)
+
+#install(TARGETS VisItReaderPlugin DESTINATION ${CMAKE_INSTALL_PREFIX})
+install (TARGETS VisItReaderPlugin
+  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin"
+  COMPONENT Runtime)

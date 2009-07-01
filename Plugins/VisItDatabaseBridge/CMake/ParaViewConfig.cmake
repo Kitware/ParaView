@@ -4,28 +4,21 @@
 # |                                                                           |
 # +---------------------------------------------------------------------------+
 #ParaView3
-if (UNIX OR CYGWIN)
-  # +------------------+
-  # | Unix/Linux/Cygwin|
-  # +------------------+
-  set(ParaView_DIR 
-    /home/burlen/ext/kitware_cvs/PV3-VisIt
-    CACHE FILEPATH
-    "Path to ParaView build.")
-else (UNIX OR CYGWIN)
-  # +------------------+
-  # |     Windows      |
-  # +------------------+
-  set(ParaView_DIR 
-    C:/PV3
-    CACHE FILEPATH
-    "Path to ParaView build.")
-endif (UNIX OR CYGWIN)
 
-if (NOT EXISTS ${ParaView_DIR})
-  MESSAGE( FATAL_ERROR 
-  "Set ParaView_DIR to the path to your local ParaView3 out of source build." )
-endif (NOT EXISTS ${ParaView_DIR})
+set(ParaView_DIR 
+  ${ParaView_BINARY_DIR}
+  CACHE FILEPATH
+  "Path to ParaView build.")
 
-find_package(ParaView REQUIRED)
-include(${PARAVIEW_USE_FILE})
+INCLUDE(${QT_USE_FILE})
+INCLUDE_DIRECTORIES(
+    ${VTK_INCLUDE_DIR}
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+    ${pqCore_SOURCE_DIR}
+    ${pqCore_BINARY_DIR}
+    ${pqComponents_SOURCE_DIR}
+    ${pqComponents_BINARY_DIR}
+    ${QtWidgets_SOURCE_DIR}
+    ${QtWidgets_BINARY_DIR}
+    )

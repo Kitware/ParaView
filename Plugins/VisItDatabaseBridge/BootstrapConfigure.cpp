@@ -23,12 +23,12 @@ const char SOURCE_PROXY_XML_TEMPLATE[]="\
 <SourceProxy\n\
     name=\"@NAME@VisItDatabaseBridge\"\n\
     class=\"vtkVisItDatabaseBridge\"\n\
-    label=\"VisIt @NAME@ Database Bridge.\"\n\
+    label=\"VisIt @NAME@ Database Bridge\"\n\
     base_proxyname=\"VisItDatabaseBridgeUI\"\n\
     base_proxygroup=\"sources\">\n\
   <Documentation\n\
-      short_help=\"@NAME@ Reader.\">\n\
-      long_help=\"@NAME@ Reader. @DESCRIPTION@\"\n\
+      short_help=\"@NAME@ Reader.\"\n\
+      long_help=\"@NAME@ Reader. @DESCRIPTION@\">\n\
   </Documentation>\n\
   <!-- Id of Visit plugin to be used. -->\n\
   <StringVectorProperty\n\
@@ -47,7 +47,7 @@ const char PQ_READER_XML_TEMPLATE[]="\
 <Reader\n\
     name=\"@NAME@VisItDatabaseBridge\"\n\
     extensions=\"@FILE_EXT@\"\n\
-    file_description=\"@NAME@ VisIt DatabaseBridge\">\n\
+    file_description=\"@NAME@ Files (beta)\">\n\
 </Reader>\
 ";
 
@@ -197,6 +197,12 @@ int main(int argc, char **argv)
   // The server manager configuration file has been provided as
   // the second command tail argument. We will configure this file
   // and write the results.
+
+  cerr << "Arg1 pluginPath: " << pluginPath << endl;
+  cerr << "Arg2 runTimePath: " << runTimePluginPath << endl;
+  cerr << "Arg3: " << argv[3] << endl;
+  cerr << "Arg4: " << argv[4] << endl;
+  cerr << "Arg5: " << argv[5] << endl;
   string smConfigFileIn(argv[3]);
   string smConfigText;
   if (!LoadText(smConfigFileIn,smConfigText))
@@ -268,9 +274,12 @@ int main(int argc, char **argv)
     {
     // Pre-load all of the plugins. Loop over each and write an
     // Server Manager XML descriptor.
+    // DatabasePluginManager expects the database dlls to be in
+    // pluginPath\databases
     DatabasePluginManager dbm;
     dbm.Initialize(PluginManager::MDServer, false, pluginPath);
     int nPlugins=dbm.GetNAllPlugins();
+    cerr << "nPlugins: " << nPlugins << endl;
     dbm.LoadPluginsNow();
     for (int i=0; i<nPlugins; ++i)
       {
