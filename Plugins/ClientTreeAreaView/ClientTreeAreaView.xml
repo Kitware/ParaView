@@ -65,7 +65,9 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
-      
+
+      <DoubleVectorProperty name="EdgeWidth" number_of_elements="1" default_values="2"/>
+
       <IntVectorProperty name="EdgeLabels" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>

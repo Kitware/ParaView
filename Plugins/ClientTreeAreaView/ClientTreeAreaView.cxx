@@ -447,6 +447,8 @@ void ClientTreeAreaView::synchronizeViews()
     // Sync hgraph attributes
     if(this->Implementation->TreeRepresentation && this->Implementation->GraphRepresentation)
       {
+      this->Implementation->HierarchicalGraphTheme->SetLineWidth(vtkSMPropertyHelper(tree_proxy, "EdgeWidth").GetAsDouble());
+
       this->Implementation->HierarchicalGraphView->SetLabelPlacementMode(vtkSMPropertyHelper(this->getProxy(), "LabelPlacementMode").GetAsInt());
       this->Implementation->HierarchicalGraphView->SetLabelRenderMode(vtkSMPropertyHelper(this->getProxy(), "LabelRenderMode").GetAsInt());
 
