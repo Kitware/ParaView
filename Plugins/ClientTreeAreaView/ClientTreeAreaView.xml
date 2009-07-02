@@ -124,6 +124,7 @@
           <Property name="EdgeColor" />
           <Property name="EdgeColorByArray" />
           <Property name="EdgeColorArray" />
+          <Property name="EdgeWidth" />
           <Property name="EdgeBundlingStrength" />
           <Property name="ShrinkPercentage" />
           <Property name="UseDomainMap" />
