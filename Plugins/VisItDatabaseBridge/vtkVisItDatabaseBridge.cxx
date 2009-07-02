@@ -37,7 +37,7 @@ using vtkstd::string;
 using vtkstd::vector;
 
 
-vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.2.2.1");
+vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.2.2.2");
 vtkStandardNewMacro(vtkVisItDatabaseBridge);
 
 // Never try to print a null pointer to a string.

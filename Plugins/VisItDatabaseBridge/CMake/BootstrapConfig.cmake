@@ -44,11 +44,6 @@ add_custom_command(
     ${_configIn}
     ${BOOTSTRAP_CONFIGURE_EXLUDES}
   COMMENT "Configuring vtkVisItDatabaseBridge build.")
-  #message("Visit_Local: ${VISIT_LOCAL}")
-  #message("Visit_Runtime: ${VISIT_RUN_TIME}")
-  #message("_configIn: ${_configIn}")
-  #message("BOOTSTRAP_CONFIGURE_EXLUDES: ${BOOTSTRAP_CONFIGURE_EXLUDES}")
-  #message("PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}")
 
 set_property(
   DIRECTORY ${PROJECT_SOURCE_DIR}
