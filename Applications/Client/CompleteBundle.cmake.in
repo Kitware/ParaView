@@ -74,7 +74,6 @@ endif()
 set(ENV{InstallPrefix} "${InstallPrefix}")
 
 execute_process(COMMAND "@OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT@")
-
 set(bundle "${InstallPrefix}/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app")
 
 if(NOT EXISTS "${bundle}")
@@ -96,10 +95,21 @@ file(READ "@ParaView_BINARY_DIR@/PluginList.txt" PluginList)
 #
 file(GLOB PythonModules "@LIBRARY_OUTPUT_PATH@/*Python.so")
 
+# Additional libs may be found in:
+#
+set(libs_path "@LIBRARY_OUTPUT_PATH@")
+
+set(FFMPEG_avcodec_LIBRARY "@FFMPEG_avcodec_LIBRARY@")
+if(FFMPEG_avcodec_LIBRARY)
+  get_filename_component(ffmpeg_lib_path "${FFMPEG_avcodec_LIBRARY}" PATH)
+  set(libs_path ${libs_path} ${ffmpeg_lib_path})
+endif()
+
+
 # Fix it!
 #
 fixup_bundle(
   "${bundle}"
   "${PythonModules};${PluginList}"
-  "@LIBRARY_OUTPUT_PATH@"
+  "${libs_path}"
   )
