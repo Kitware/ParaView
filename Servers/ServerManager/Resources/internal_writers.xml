@@ -176,6 +176,30 @@
           binary.
         </Documentation>
       </IntVectorProperty>
+
+      <IntVectorProperty name="EncodeAppendedData"
+        command="SetEncodeAppendedData"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" /> 
+        <Documentation>
+        When EncodeAppendedData is turned ON, the writer uses base64 encoding
+        when writing binary data (only if appended mode is selected).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompressorType"
+        command="SetCompressorType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="None" />
+          <Entry value="1" text="ZLib" />
+        </EnumerationDomain>
+        <Documentation>
+          The compression algorithm used to compress binary data (appended mode only).
+        </Documentation>
+      </IntVectorProperty>
       <!-- End of XMLDataSetWriterCore -->
     </Proxy>
 

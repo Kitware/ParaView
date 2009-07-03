@@ -23,6 +23,45 @@
           files.
         </Documentation>
       </InputProperty>
+
+      <IntVectorProperty name="DataMode"
+        command="SetDataMode"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Ascii" />
+          <Entry value="1" text="Binary" />
+          <Entry value="2" text="Appended" />
+        </EnumerationDomain>
+        <Documentation>
+          The mode uses for writing the file's data i.e. ascii, binary, appended
+          binary.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="EncodeAppendedData"
+        command="SetEncodeAppendedData"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" /> 
+        <Documentation>
+        When EncodeAppendedData is turned ON, the writer uses base64 encoding
+        when writing binary data (only if appended mode is selected).
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="CompressorType"
+        command="SetCompressorType"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="None" />
+          <Entry value="1" text="ZLib" />
+        </EnumerationDomain>
+        <Documentation>
+          The compression algorithm used to compress binary data (appended mode only).
+        </Documentation>
+      </IntVectorProperty>
       <Hints>
         <Property name="Input" show="0"/>
         <Property name="FileName" show="0"/>
@@ -45,6 +84,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -217,6 +258,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -255,6 +298,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -293,6 +338,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -331,6 +378,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -369,6 +418,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -409,6 +460,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -417,7 +470,7 @@
         <Property name="FileName" show="0"/>
       </Hints>
 
-      <!-- End of XMLPMultiBlockDataWriter -->
+      <!-- End of XMLMultiBlockDataWriter -->
     </WriterProxy>
 
     <!-- ================================================================= -->
@@ -450,6 +503,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="DataMode" />
+          <Property name="EncodeAppendedData" />
+          <Property name="CompressorType" />
         </ExposedProperties>
       </SubProxy>
 
