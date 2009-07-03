@@ -1,9 +1,0 @@
-<object name="deleteConnection">
-  <layout>
-    <xml name="connection" nodeType="xs:element"/>
-  </layout>
-  
-  <property name="connectionId" type="long" primaryKey="true">
-    <xml nodeType="xs:attribute" type="xs:int"/>
-  </property>
-</object>
