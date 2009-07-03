@@ -35,6 +35,8 @@ class compatibility:
 
 def make_name_valid(name):
     "Make a string into a valid Python variable name"
+    if not name:
+        return None
     if name.find('(') >= 0 or name.find(')') >=0:
         return None
     name = name.replace(' ','')
