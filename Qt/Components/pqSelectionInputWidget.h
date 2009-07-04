@@ -46,7 +46,7 @@ class PQCOMPONENTS_EXPORT pqSelectionInputWidget : public QWidget
   Q_PROPERTY(pqSMProxy selection
              READ selection
              WRITE setSelection
-             USER true);
+             USER true)
   typedef QWidget Superclass;
 public:
   pqSelectionInputWidget(QWidget* parent=0);

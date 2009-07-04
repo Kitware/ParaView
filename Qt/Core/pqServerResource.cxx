@@ -116,7 +116,7 @@ public:
     }
   }
 
-  const bool operator==(const pqImplementation& rhs)
+  bool operator==(const pqImplementation& rhs)
   {
     return this->Scheme == rhs.Scheme
       && this->Host == rhs.Host
@@ -129,12 +129,12 @@ public:
       && this->SessionServer == rhs.SessionServer;
   }
   
-  const bool operator!=(const pqImplementation& rhs)
+  bool operator!=(const pqImplementation& rhs)
   {
     return !(*this == rhs);
   }
   
-  const bool operator<(const pqImplementation& rhs)
+  bool operator<(const pqImplementation& rhs)
   {
     if(this->Scheme != rhs.Scheme)
       return this->Scheme < rhs.Scheme;

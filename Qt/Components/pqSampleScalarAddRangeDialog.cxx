@@ -96,7 +96,7 @@ pqSampleScalarAddRangeDialog::~pqSampleScalarAddRangeDialog()
   delete this->Implementation;
 }
 
-const double pqSampleScalarAddRangeDialog::from() const
+double pqSampleScalarAddRangeDialog::from() const
 {
   return this->Implementation->Ui.from->text().toDouble();
 }
@@ -106,7 +106,7 @@ void pqSampleScalarAddRangeDialog::setFrom(double value)
   this->Implementation->Ui.from->setText(QString::number(value));
 }
 
-const double pqSampleScalarAddRangeDialog::to() const
+double pqSampleScalarAddRangeDialog::to() const
 {
   return this->Implementation->Ui.to->text().toDouble();
 }
@@ -116,7 +116,7 @@ void pqSampleScalarAddRangeDialog::setTo(double value)
   this->Implementation->Ui.to->setText(QString::number(value));
 }
 
-const unsigned long pqSampleScalarAddRangeDialog::steps() const
+unsigned long pqSampleScalarAddRangeDialog::steps() const
 {
   return this->Implementation->Ui.steps->text().toInt();
 }
@@ -126,7 +126,7 @@ void pqSampleScalarAddRangeDialog::setSteps(unsigned long number)
   this->Implementation->Ui.steps->setText(QString::number(number));
 }
 
-const bool pqSampleScalarAddRangeDialog::logarithmic() const
+bool pqSampleScalarAddRangeDialog::logarithmic() const
 {
   return this->Implementation->Ui.log->isChecked();
 }

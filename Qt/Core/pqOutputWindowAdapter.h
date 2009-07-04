@@ -57,13 +57,13 @@ public:
   vtkTypeRevisionMacro(pqOutputWindowAdapter, vtkOutputWindow);
 
   /// Returns the number of text messages received
-  const unsigned int getTextCount();
+  unsigned int getTextCount();
   /// Returns the number of error messages received
-  const unsigned int getErrorCount();
+  unsigned int getErrorCount();
   /// Returns the number of warning messages received
-  const unsigned int getWarningCount();
+  unsigned int getWarningCount();
   /// Returns the number of generic warning messages received
-  const unsigned int getGenericWarningCount();
+  unsigned int getGenericWarningCount();
   /// If active signals are emitted on messages.
   void setActive(bool active);
 

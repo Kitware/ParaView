@@ -50,8 +50,8 @@ class pqAnimationCue;
 class PQCOMPONENTS_EXPORT pqSignalAdaptorKeyFrameValue : public QObject
 {
   Q_OBJECT
-  Q_PROPERTY(QList<QVariant> values READ values WRITE setValue);
-  Q_PROPERTY(QVariant value READ value WRITE setValue);
+  Q_PROPERTY(QList<QVariant> values READ values WRITE setValue)
+  Q_PROPERTY(QVariant value READ value WRITE setValue)
 public:
   // Constructor. 
   // \c lparent is the frame which can be used to pack large widgets

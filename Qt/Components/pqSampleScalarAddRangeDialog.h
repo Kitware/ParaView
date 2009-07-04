@@ -55,13 +55,13 @@ public:
     QWidget* parent = 0);
   ~pqSampleScalarAddRangeDialog();
 
-  const double from() const;
+  double from() const;
   void setFrom(double value);
-  const double to() const;
+  double to() const;
   void setTo(double value);
-  const unsigned long steps() const;
+  unsigned long steps() const;
   void setSteps(unsigned long number);
-  const bool logarithmic() const;
+  bool logarithmic() const;
   void setLogarithmic(bool useLog);
 
   void setLogRangeStrict(bool on);

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.3");
+vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.4");
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
 pqOutputWindowAdapter::pqOutputWindowAdapter() :
@@ -50,22 +50,22 @@ pqOutputWindowAdapter::~pqOutputWindowAdapter()
 {
 }
 
-const unsigned int pqOutputWindowAdapter::getTextCount()
+unsigned int pqOutputWindowAdapter::getTextCount()
 {
   return this->TextCount;
 }
 
-const unsigned int pqOutputWindowAdapter::getErrorCount()
+unsigned int pqOutputWindowAdapter::getErrorCount()
 {
   return this->ErrorCount;
 }
 
-const unsigned int pqOutputWindowAdapter::getWarningCount()
+unsigned int pqOutputWindowAdapter::getWarningCount()
 {
   return this->WarningCount;
 }
 
-const unsigned int pqOutputWindowAdapter::getGenericWarningCount()
+unsigned int pqOutputWindowAdapter::getGenericWarningCount()
 {
   return this->GenericWarningCount;
 }
