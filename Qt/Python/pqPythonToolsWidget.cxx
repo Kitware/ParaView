@@ -556,8 +556,8 @@ void pqPythonToolsWidget::onAddToMacrosClicked()
 void pqPythonToolsWidget::onChooseDirectoryClicked()
 {
   QString defaultDir = this->scriptDirectory();
-  QString windowTitle = "Choose script directory...";
-  QString dir = QFileDialog::getExistingDirectory (this->parentWidget(), windowTitle, defaultDir);
+  QString dir = QFileDialog::getExistingDirectory (this->parentWidget(),
+    tr("Choose script directory..."), defaultDir);
   if (dir.length())
     {
     this->Internal->ScriptDirectoryEntry->setText(dir);
