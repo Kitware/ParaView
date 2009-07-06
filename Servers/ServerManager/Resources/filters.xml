@@ -2680,7 +2680,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
    <!-- End PointDataToCellData -->
    </SourceProxy>
   
-  <!-- ############################################################################ -->
+  <!--
   <SourceProxy 
       name="QuadraturePointStatistics"
       class="vtkQuadraturePointStatistics"
@@ -2706,6 +2706,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       </DataTypeDomain>
     </InputProperty>
   </SourceProxy>
+   ############################################################################ -->
    <!-- ############################################################################ -->
   <SourceProxy 
       name="QuadraturePointInterpolator"

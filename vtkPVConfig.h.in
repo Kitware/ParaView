@@ -24,6 +24,7 @@
 #cmakedefine PARAVIEW_BUILD_DEVELOPMENT
 #cmakedefine PARAVIEW_BLT_LIBRARY
 #cmakedefine PARAVIEW_ENABLE_PYTHON
+#cmakedefine PARAVIEW_MINIMAL_BUILD
 
 // Indicates the Qt support is enabled in VTK.
 #cmakedefine VTK_USE_QVTK

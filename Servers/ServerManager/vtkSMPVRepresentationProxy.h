@@ -27,7 +27,7 @@
 
 #include "vtkSMPropRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMPVRepresentationProxy : 
+class VTK_EXPORT vtkSMPVRepresentationProxy :
   public vtkSMPropRepresentationProxy
 {
 public:
@@ -36,7 +36,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the type of representation. 
+  // Set the type of representation.
   virtual void SetRepresentation(int type);
   vtkGetMacro(Representation, int);
 
@@ -51,8 +51,8 @@ public:
   virtual void SetVisibility(int visible);
 
   // Description:
-  // Called to update the Representation. 
-  // Overridden to forward the update request to the strategy if any. 
+  // Called to update the Representation.
+  // Overridden to forward the update request to the strategy if any.
   // If subclasses don't use any strategy, they may want to override this
   // method.
   // Fires vtkCommand:StartEvent and vtkCommand:EndEvent and start and end of
@@ -67,7 +67,7 @@ public:
   virtual bool UpdateRequired();
 
   // Description:
-  // Get the information about the data shown by this representation. 
+  // Get the information about the data shown by this representation.
   // Some representations use some pre-processing before displaying the data eg.
   // apply a geometry filter. This is the data information after that
   // pre-processing stage. If \c update is set to false, the pipeline is not
@@ -98,16 +98,18 @@ public:
   // Description:
   // Fill the activeStrategies collection with strategies that are currently
   // active i.e. being used.
+//BTX
   virtual void GetActiveStrategies(
     vtkSMRepresentationStrategyVector& activeStrategies);
+//ETX
 
   // Description:
   // Views typically support a mechanism to create a selection in the view
   // itself, eg. by click-and-dragging over a region in the view. The view
   // passes this selection to each of the representations and asks them to
-  // convert it to a proxy for a selection which can be set on the view. 
+  // convert it to a proxy for a selection which can be set on the view.
   // It a representation does not support selection creation, it should simply
-  // return NULL.  On success, this method returns a new vtkSMProxy instance 
+  // return NULL.  On success, this method returns a new vtkSMProxy instance
   // which the caller must free after use.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* input);
 
@@ -146,7 +148,7 @@ public:
 
   // Description:
   // Overridden to make the Strategy modified as well.
-  // The strategy is not marked dirty if the modifiedProxy == this, 
+  // The strategy is not marked dirty if the modifiedProxy == this,
   // thus if the changes to representation itself invalidates the data pipelines
   // it must explicity mark the strategy invalid.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -172,12 +174,12 @@ protected:
   ~vtkSMPVRepresentationProxy();
 
   // Description:
-  // This method is called after CreateVTKObjects(). 
+  // This method is called after CreateVTKObjects().
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  // Called when a representation is added to a view. 
+  // Called when a representation is added to a view.
   // Returns true on success.
   // Currently a representation can be added to only one view.
   virtual bool AddToView(vtkSMViewProxy* view);
@@ -186,7 +188,7 @@ protected:
   // Called to remove a representation from a view.
   // Returns true on success.
   // Currently a representation can be added to only one view.
-  virtual bool RemoveFromView(vtkSMViewProxy* view); 
+  virtual bool RemoveFromView(vtkSMViewProxy* view);
 
   // Description:
   // Read attributes from an XML element.

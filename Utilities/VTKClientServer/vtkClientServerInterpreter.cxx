@@ -26,13 +26,14 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.17");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.18");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
 {
 public:
-  typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+//   typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+  typedef vtkstd::map<vtkstd::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
   typedef vtkstd::map<vtkstd::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
@@ -304,6 +305,7 @@ vtkClientServerInterpreter
 
     // Find a NewInstance function that knows about the class.
     int created = 0;
+#if 0
     for(vtkClientServerInterpreterInternals::NewInstanceFunctionsType::iterator
           it = this->Internal->NewInstanceFunctions.begin();
         !created && it != this->Internal->NewInstanceFunctions.end(); ++it)
@@ -313,6 +315,12 @@ vtkClientServerInterpreter
         {
         created = 1;
         }
+      }
+#endif
+    if(vtkClientServerNewInstanceFunction n = this->Internal->NewInstanceFunctions[cname])
+      {
+      this->NewInstance(n(),id);
+      created =1;
       }
     if(created)
       {
@@ -738,11 +746,20 @@ vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
 }
 
 //----------------------------------------------------------------------------
+#if 0
 void
 vtkClientServerInterpreter
 ::AddNewInstanceFunction(vtkClientServerNewInstanceFunction f)
 {
   this->Internal->NewInstanceFunctions.push_back(f);
+}
+#endif
+
+void
+vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
+                                                   vtkClientServerNewInstanceFunction f)
+{
+  this->Internal->NewInstanceFunctions[name]=f;
 }
 
 //----------------------------------------------------------------------------

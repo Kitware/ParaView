@@ -322,9 +322,13 @@ SET(KIT_WRAP_DEPS "")
 SET(VTK_KITS_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities")
 PV_PRE_WRAP_VTK_CS("vtk${KIT}" "${KIT}" "${KIT_UPCASE}" "${KIT_WRAP_DEPS}")
 
+# tryint to include the MINI init somewhere -nix
+SET(MINI_INIT vtkParaviewMINIInit.cxx)
+
 # Create the library.
 ADD_LIBRARY(vtk${KIT}
-  ${ServerManager_SRCS} 
+  ${ServerManager_SRCS}
+  ${MINI_INIT}
   ${CMInstantiator_SRCS} 
   ${vtkPVServerManagerCS_SRCS} 
   ${KitInstantiator_SRCS}
@@ -406,6 +410,17 @@ ADD_CUSTOM_COMMAND(
   ${resourceFiles}
   COMMENT "generating modules")
 
+# Adding new command to create vtkParaviewMINIInit.cxx -nix
+ADD_CUSTOM_COMMAND(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT}
+  DEPENDS ${resourceFiles}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ClassExtract.py
+  COMMAND python
+  ARGS ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ClassExtract.py ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT}
+   # /home/nikhil/pv/Servers/ServerManager/Resources/filters.xml
+   ${resourceFiles}
+  COMMENT "generating vtkParaviewMINIInit.cxx")
+
 SET(GUI_CONFIG_FILES
   ParaViewSources
   ParaViewFilters
@@ -480,6 +495,10 @@ SET (dynamicHeaders
 
 SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
+
+# including MINI_INIT -nix
+# SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
+#   ${CMAKE_CURRENT_BINARY_DIR}/${MINI_INIT})
 
 # Install
 #----------------------------------------------------------------------------------------------------

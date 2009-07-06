@@ -8,7 +8,8 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
   SET (CXX_CONTENTS)
   SET (CXX_CONTENTS2)
   SET (CXX_CONTENTS3) 
-
+  SET (CXX_CONTENTS4)
+  
   # VS 6 does not like needing to run a huge number of custom commands
   # when building a single target.  Generate some extra custom targets
   # that run the custom commands before the main target is built.  This
@@ -70,6 +71,13 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
         
         SET (CXX_CONTENTS3 
           "${CXX_CONTENTS3}    if (!strcmp(\"${TMP_FILENAME}\",type))\n      {\n      vtkObjectBase *ptr = ${TMP_FILENAME}ClientServerNewCommand();\n      arlu->NewInstance(ptr,id);\n      return 1;\n      }\n")
+
+        SET (CXX_CONTENTS4 
+          "${CXX_CONTENTS4}extern void ${TMP_FILENAME}_Init(vtkClientServerInterpreter* csi);\n")
+        
+        SET (CXX_CONTENTS5 
+          "${CXX_CONTENTS5}  ${TMP_FILENAME}_Init(csi);\n")
+       
       ENDIF (TMP_ABSTRACT)
       
       # new source file is nameClientServer.cxx, add to resulting list
