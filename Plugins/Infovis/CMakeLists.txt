@@ -23,6 +23,7 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkCollapseGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkDelimitedTextReader.h
     ${VTK_SOURCE_DIR}/Infovis/vtkExpandSelectedGraph.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkExtractSelectedRows.h
     ${VTK_SOURCE_DIR}/Infovis/vtkFast2DLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkForceDirectedLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkGenerateIndexArray.h
@@ -39,8 +40,8 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToTreeFilter.h
     ${VTK_SOURCE_DIR}/Infovis/vtkThresholdTable.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTreeLayoutStrategy.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkTreeOrbitLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTreeLevelsFilter.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkTreeOrbitLayoutStrategy.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTulipReader.h
     ${VTK_SOURCE_DIR}/Infovis/vtkXMLTreeReader.h
   GUI_RESOURCE_FILES

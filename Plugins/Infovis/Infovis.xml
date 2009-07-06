@@ -276,6 +276,30 @@
       </Hints>
     </SourceProxy>
 
+    <SourceProxy name="ExtractSelectedRows" class="vtkExtractSelectedRows">
+      <InputProperty name="Input" command="SetInputConnection" port_index="0">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkTable"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty name="Selection" command="SetInputConnection" port_index="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkSelection"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <Hints>
+        <View type="ClientTableView"/>
+      </Hints>
+    </SourceProxy>
+
     <SourceProxy name="ExpandSelectedGraph" class="vtkExpandSelectedGraph">
       <!-- Graph Input -->
       <InputProperty name="Input" command="SetInputConnection">
