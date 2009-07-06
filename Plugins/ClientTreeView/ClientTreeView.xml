@@ -34,6 +34,11 @@
         default_values="-1">
      </IntVectorProperty>
     <IntVectorProperty
+        name="UseColumnView"
+        number_of_elements="1"
+        default_values="0">
+     </IntVectorProperty>
+    <IntVectorProperty
         name="EnableDragDrop"
         number_of_elements="1"
         default_values="0">
