@@ -29,6 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include <vtkPython.h> // Python first
+#include "QtPythonConfig.h"
+
 #include "pqPythonToolsWidget.h"
 #include "ui_pqPythonToolsWidget.h"
 #include "pqPythonMacroSupervisor.h"
@@ -38,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonManager.h"
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
-#include "vtkPython.h"
 
 #include <QMessageBox>
 #include <QScrollArea>
