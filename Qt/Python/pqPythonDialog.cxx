@@ -29,17 +29,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqPythonDialog.h"
 #include "ui_pqPythonDialog.h"
-
+#include "pqApplicationCore.h"
 #include "pqFileDialog.h"
+#include "pqSettings.h"
 
-#include <pqApplicationCore.h>
-#include <pqSettings.h>
-
-#include <QFile>
+#include <QCloseEvent>
 #include <QtDebug>
+#include <QFile>
 
 //////////////////////////////////////////////////////////////////////
 // pqPythonDialog::pqImplementation
@@ -50,18 +48,24 @@ struct pqPythonDialog::pqImplementation
 };
 
 pqPythonDialog::pqPythonDialog(QWidget* Parent) :
-  QDialog(Parent),
+  Superclass(Parent),
   Implementation(new pqImplementation())
 {
   this->Implementation->Ui.setupUi(this);
   this->setObjectName("pythonDialog");
   this->setWindowTitle(tr("Python Shell"));
-  
+
   QObject::connect(
     this->Implementation->Ui.clear,
     SIGNAL(clicked()),
     this,
     SLOT(clearConsole()));
+
+  QObject::connect(
+    this->Implementation->Ui.close,
+    SIGNAL(clicked()),
+    this,
+    SLOT(close()));
     
   QObject::connect(
     this->Implementation->Ui.runScript,
@@ -98,8 +102,39 @@ pqPythonDialog::pqPythonDialog(QWidget* Parent) :
 
 pqPythonDialog::~pqPythonDialog()
 {
-  pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
+  pqApplicationCore::instance()->settings()->setValue(
+    "PythonDialog/splitter", this->Implementation->Ui.splitter->saveState());
+
+  // Only save geometry state if visible.  If not visible, the dialog reports
+  // its position to be [0,0].  If not visible, then we have already saved
+  // the correct geometry state in closeEvent().
+  if (this->isVisible())
+    {
+    pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
+    }
   delete Implementation;
+}
+
+void pqPythonDialog::restoreSplitterState()
+{
+  this->Implementation->Ui.splitter->restoreState(
+    pqApplicationCore::instance()->settings()->value("PythonDialog/splitter").toByteArray());
+}
+
+void pqPythonDialog::closeEvent(QCloseEvent *event)
+{
+  pqApplicationCore::instance()->settings()->saveState(*this, "PythonDialog");
+  event->accept();
+}
+
+pqPythonShell* pqPythonDialog::shell()
+{
+  return this->Implementation->Ui.shellWidget;
+}
+
+QSplitter* pqPythonDialog::splitter()
+{
+  return this->Implementation->Ui.splitter;
 }
 
 void pqPythonDialog::runScript()

@@ -209,6 +209,15 @@ void pqPythonShell::clear()
   this->Implementation->promptForInput();
 }
 
+void pqPythonShell::makeCurrent()
+{
+  this->Implementation->Interpreter->MakeCurrent();
+}
+void pqPythonShell::releaseControl()
+{
+  this->Implementation->Interpreter->ReleaseControl();
+}
+
 void pqPythonShell::executeScript(const QString& script)
 {
   this->printStdout("\n");

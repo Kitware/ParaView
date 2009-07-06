@@ -43,14 +43,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
   \sa pqPythonShell, pqConsoleWidget
 */
-
-class QTPYTHON_EXPORT pqPythonDialog :
-  public QDialog
+class pqPythonShell;
+class QCloseEvent;
+class QSplitter;
+class QTPYTHON_EXPORT pqPythonDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  pqPythonDialog(QWidget* Parent);
+  typedef QDialog Superclass;
+  pqPythonDialog(QWidget* Parent = 0);
+  ~pqPythonDialog();
+
+  /// Returns pointer to the splitter that contains the python shell within
+  // this dialog
+  QSplitter* splitter();
+
+  /// Restores the splitter state from the last time it was saved.
+  /// Splitter state is saved whenever the dialog is closed.
+  void restoreSplitterState();
 
 public slots:
   /// Execute a commond in the python shell.
@@ -63,16 +74,27 @@ public slots:
   /// Simply prints some text onto the shell. Note that this does not treat it
   /// as a python script and hence doesn't execute it.
   void print(const QString& msg);
+
+  /// Treats each string in the given stringlist as a filename and tries to
+  /// execute the file as a python script.
+  void runScript(const QStringList&);
+
+  /// Return a pointer to the pqPythonShell widget used by this dialog.
+  pqPythonShell* shell();
+
 signals:
   void interpreterInitialized();
 
+protected:
+
+  /// Overloaded to save window geometry on close events.
+  void closeEvent(QCloseEvent *event);
+
 private slots:
   void runScript();
-  void runScript(const QStringList&);
   void clearConsole();
  
 private:
-  ~pqPythonDialog();
   pqPythonDialog(const pqPythonDialog&);
   pqPythonDialog& operator=(const pqPythonDialog&);
   

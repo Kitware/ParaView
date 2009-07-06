@@ -109,6 +109,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProcessModuleGUIHelper.h"
 #include "pqProgressManager.h"
 #include "pqProxyTabWidget.h"
+
+#ifdef PARAVIEW_ENABLE_PYTHON
+#include "pqPythonManager.h"
+#include "pqPythonDialog.h"
+#endif // PARAVIEW_ENABLE_PYTHON
+
 #include "pqReaderFactory.h"
 #include "pqRenderView.h"
 #include "pqRubberBandHelper.h"
@@ -157,10 +163,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqUndoStack.h>
 #include <pqWriterDialog.h>
 #include "QtTestingConfigure.h"
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-#include <pqPythonDialog.h>
-#endif // PARAVIEW_ENABLE_PYTHON
 
 #include <QVTKWidget.h>
 
@@ -226,9 +228,6 @@ public:
     TimerLog(0), 
     QuickLaunchDialog(parent)
   {
-#ifdef PARAVIEW_ENABLE_PYTHON
-  this->PythonDialog = 0;
-#endif // PARAVIEW_ENABLE_PYTHON
   this->MultiViewManager.setObjectName("MultiViewManager");
   this->CameraDialog = 0;
   }
@@ -255,6 +254,9 @@ public:
   pqViewManager MultiViewManager;
   pqVCRController VCRController;
   pqSelectionManager SelectionManager;
+#ifdef PARAVIEW_ENABLE_PYTHON
+  pqPythonManager PythonManager;
+#endif // PARAVIEW_ENABLE_PYTHON
   pqLookmarkManagerModel* LookmarkManagerModel;
   pqLookmarkBrowser* LookmarkBrowser;
   pqLookmarkInspector* LookmarkInspector;
@@ -297,11 +299,6 @@ public:
   QPointer<pqAnimationManager> AnimationManager;
   QPointer<pqLinksManager> LinksManager;
   QPointer<pqTimerLogDisplay> TimerLog;
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-  QPointer<pqPythonDialog> PythonDialog;
-#endif // PARAVIEW_ENABLE_PYTHON
-  
   QPointer<pqApplicationOptionsDialog> ApplicationSettings;
 
   pqCoreTestUtility TestUtility;
@@ -348,6 +345,9 @@ void pqMainWindowCore::constructorHelper(QWidget *parent_widget)
   core->registerManager("SELECTION_MANAGER",
     &this->Implementation->SelectionManager);
 
+#ifdef PARAVIEW_ENABLE_PYTHON
+  this->Implementation->PythonManager.setParentForPythonDialog(parent_widget);
+#endif // PARAVIEW_ENABLE_PYTHON
 
   // Set up the context menu manager.
   this->getViewContextMenuManager();
@@ -2478,57 +2478,13 @@ void pqMainWindowCore::onToolsOutputWindow()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::initPythonInterpretor()
-{
-#ifdef PARAVIEW_ENABLE_PYTHON
-  // Since paraview application always has a server connection,
-  // intialize the paraview.ActiveConnection to point to the currently
-  // existsing connection, so that the user can directly start creating
-  // proxies etc.
-  pqServer* activeServer = this->getActiveServer();
-  if (activeServer)
-    {
-    int cid = static_cast<int>(activeServer->GetConnectionID());
-    QString initStr = QString(
-      "import paraview\n"
-      "paraview.compatibility.major = 3\n"
-      "paraview.compatibility.minor = 5\n"
-      "from paraview import servermanager\n"
-      "servermanager.ActiveConnection = servermanager.Connection(%1)\n"
-      "servermanager.ActiveConnection.SetHost(\"%2\", 0)\n"
-      "servermanager.ToggleProgressPrinting()\n"
-      "servermanager.fromGUI = True\n"
-      "from paraview.simple import *\n"
-      "active_objects.view = servermanager.GetRenderView()")
-      .arg(cid)
-      .arg(activeServer->getResource().toURI());
-    this->Implementation->PythonDialog->print(
-      "from paraview.simple import *");
-    this->Implementation->PythonDialog->runString(initStr);
-    }
-
-  this->Implementation->PythonDialog->setAttribute(Qt::WA_QuitOnClose, false);
-#endif
-}
-
-//-----------------------------------------------------------------------------
 void pqMainWindowCore::onToolsPythonShell()
 {
 #ifdef PARAVIEW_ENABLE_PYTHON
-  if (!this->Implementation->PythonDialog)
-    {
-    this->Implementation->PythonDialog = 
-      new pqPythonDialog(this->Implementation->Parent);
-    QObject::connect(this->Implementation->PythonDialog,
-                     SIGNAL(interpreterInitialized()),
-                     this, SLOT(initPythonInterpretor()));
-    this->Implementation->PythonDialog->initializeInterpretor();
-    }
-
-  this->Implementation->PythonDialog->show();
-  this->Implementation->PythonDialog->raise();
-  this->Implementation->PythonDialog->activateWindow();
- 
+  pqPythonDialog* dialog = this->Implementation->PythonManager.pythonShellDialog();
+  dialog->show();
+  dialog->raise();
+  dialog->activateWindow();
 #else // PARAVIEW_ENABLE_PYTHON
   QMessageBox::information(NULL, "ParaView", "Python Shell not available");
 #endif // PARAVIEW_ENABLE_PYTHON
@@ -2868,14 +2824,6 @@ void pqMainWindowCore::onServerCreationFinished(pqServer *server)
   core->getSelectionModel()->setCurrentItem(server,
       pqServerManagerSelectionModel::ClearAndSelect);
 
-#ifdef PARAVIEW_ENABLE_PYTHON
-  // Initialize interpretor using the new server connection.
-  if (this->Implementation->PythonDialog)
-    {
-    this->initPythonInterpretor();
-    }
-#endif // PARAVIEW_ENABLE_PYTHON
-
   this->Implementation->UndoStack->clear();
 }
 
@@ -2911,16 +2859,6 @@ void pqMainWindowCore::onRemovingServer(pqServer *server)
     }
 
   this->Implementation->ActiveServer.setCurrent(0);
-
-#ifdef PARAVIEW_ENABLE_PYTHON
-  // Initialize interpretor using the new server connection.
-  if (this->Implementation->PythonDialog)
-    {
-    // ensure that the interpretor is destroyed before the server connection is
-    // closed.
-    this->Implementation->PythonDialog->initializeInterpretor();
-    }
-#endif // PARAVIEW_ENABLE_PYTHON
 }
 
 //-----------------------------------------------------------------------------
@@ -3648,11 +3586,8 @@ void pqMainWindowCore::addPluginInterface(QObject* iface)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
+QMainWindow* pqMainWindowCore::findMainWindow()
 {
-  QString name = iface->groupName();
-  QStringList splitName = name.split('/', QString::SkipEmptyParts);
-
   QMainWindow* mw = qobject_cast<QMainWindow*>(this->Implementation->Parent);
   if(!mw)
     {
@@ -3663,7 +3598,16 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
       mw = qobject_cast<QMainWindow*>(*iter);
       }
     }
+  return mw;
+}
 
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
+{
+  QString name = iface->groupName();
+  QStringList splitName = name.split('/', QString::SkipEmptyParts);
+
+  QMainWindow* mw = this->findMainWindow();
   if(!mw)
     {
     qWarning("Could not find MainWindow for actions group");
@@ -3735,17 +3679,7 @@ void pqMainWindowCore::addPluginActions(pqActionGroupInterface* iface)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::addPluginDockWindow(pqDockWindowInterface* iface)
 {
-  QMainWindow* mw = qobject_cast<QMainWindow*>(this->Implementation->Parent);
-  if(!mw)
-    {
-    QWidgetList allWidgets = QApplication::topLevelWidgets();
-    QWidgetList::iterator iter;
-    for(iter = allWidgets.begin(); !mw && iter != allWidgets.end(); ++iter)
-      {
-      mw = qobject_cast<QMainWindow*>(*iter);
-      }
-    }
-
+  QMainWindow* mw = this->findMainWindow();
   if(!mw)
     {
     qWarning("Could not find MainWindow for dock window");

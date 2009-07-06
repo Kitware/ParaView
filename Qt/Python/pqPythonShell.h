@@ -62,6 +62,12 @@ public:
   /// Prints some text on the shell.
   void printMessage(const QString&);
 
+  /// Calls MakeCurrent in the internal vtkPVPythonInteractiveInterpretor instance
+  void makeCurrent();
+
+  /// Calls ReleaseControl in the internal vtkPVPythonInteractiveInterpretor instance
+  void releaseControl();
+
 signals:
   void executing(bool);
 

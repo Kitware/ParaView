@@ -79,6 +79,7 @@ class QAction;
 class QDockWidget;
 class QIcon;
 class QImage;
+class QMainWindow;
 class QMenu;
 class QPoint;
 class QSize;
@@ -245,6 +246,9 @@ public:
 
   /// Gets the color scale editor manager.
   pqColorScaleToolbar* getColorScaleEditorManager();
+
+  /// Lookup the parent mainwindow if one exists.  Return null if not found.
+  QMainWindow* findMainWindow();
 
   /// Asks the user to make a new server connection, if none exists.
   bool makeServerConnectionIfNoneExists();
@@ -484,8 +488,6 @@ protected slots:
   /// Shows message boxes for server timeout warnings.
   void fiveMinuteTimeoutWarning();
   void finalTimeoutWarning();
-  
-  void initPythonInterpretor();
 
   /// Called when a new view is created by the GUI (not undo/redo or python).
   /// If a spreadsheet view has been created, we show the current source in it

@@ -1,0 +1,5 @@
+Sphere()
+Shrink()
+Show()
+Render()
+

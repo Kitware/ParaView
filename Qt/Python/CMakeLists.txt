@@ -24,11 +24,16 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(QtPython_MOC_BUILT_SOURCES
   pqPythonDialog.h
+  pqPythonMacroSupervisor.h
+  pqPythonManager.h
+  pqPythonScriptEditor.h
   pqPythonShell.h
+  pqPythonToolsWidget.h
 )
 
 QT4_WRAP_UI(QtPython_UI_BUILT_SOURCES
   pqPythonDialog.ui
+  pqPythonToolsWidget.ui
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -36,8 +41,16 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 ADD_LIBRARY(QtPython
   pqPythonDialog.cxx
   pqPythonDialog.h
+  pqPythonMacroSupervisor.cxx
+  pqPythonMacroSupervisor.h
+  pqPythonManager.cxx
+  pqPythonManager.h
+  pqPythonScriptEditor.cxx
+  pqPythonScriptEditor.h
   pqPythonShell.cxx
   pqPythonShell.h
+  pqPythonToolsWidget.cxx
+  pqPythonToolsWidget.h
   QtPythonExport.h
   ${QtPython_MOC_BUILT_SOURCES}
   ${QtPython_UI_BUILT_SOURCES}

@@ -71,8 +71,10 @@ def CreateRenderView():
     return view
 
 def GetRenderView():
-    "Returns the first render view."
-    return servermanager.GetRenderView()
+    "Returns the active view if there is one. Else creates and returns a new view."
+    view = active_objects.view
+    if not view: view = CreateRenderView()
+    return view
 
 def GetRenderViews():
     "Returns all render views as a list."
@@ -497,25 +499,6 @@ def LoadPlugin(filename, ns=None):
         ns = globals()
     servermanager.LoadPlugin(filename)
     _add_functions(ns)
-
-
-def StartTrace(CaptureAllProperties=False, Verbose=False):
-  """Imports the smtrace module and begins trace."""
-  import smtrace
-  smtrace.start_trace(CaptureAllProperties, Verbose)
-
-def ClearTrace():
-  import smtrace
-  smtrace.clear_trace()
-
-def PrintTrace():
-  import smtrace
-  smtrace.print_trace()
-
-def SaveTrace(fileName):
-  import smtrace
-  smtrace.save_trace(fileName)
-
 
 class ActiveObjects(object):
     """This class manages the active objects (source and view). The active
