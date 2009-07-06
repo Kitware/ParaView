@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqSettings.h"
 
+#include <QCompleter>
 #include <QMessageBox>
 #include <QScrollArea>
 #include <QDirModel>
@@ -105,6 +106,10 @@ pqPythonToolsWidget::pqPythonToolsWidget(QWidget* p) : Superclass(p)
     this, SLOT(itemActivated(const QModelIndex&)));
   this->setScriptDirectory(scriptDir);
 
+  // Setup a directory completer
+  QCompleter *completer = new QCompleter(this);
+  completer->setModel(&this->Internal->Model);
+  this->Internal->ScriptDirectoryEntry->setCompleter(completer);
 
   // Trace buttons
   QObject::connect(this->Internal->StartTraceButton, SIGNAL(clicked()),
