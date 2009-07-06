@@ -84,6 +84,10 @@ public:
   // taskbar entry."
   void setParentForPythonDialog(QWidget* parent = 0);
 
+signals:
+
+  void paraviewPythonModulesImported();
+
 protected slots:
 
   // Description:
