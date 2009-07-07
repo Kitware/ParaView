@@ -236,6 +236,9 @@ void ClientTreeView::renderInternal()
 
   proxy->Update();
 
+  // Make sure the view type is set (either column or tree)
+  this->Implementation->View->SetUseColumnView(
+    vtkSMPropertyHelper(this->getProxy(),"UseColumnView").GetAsInt());
 
   if(this->Implementation->View->GetRepresentation())
     {
