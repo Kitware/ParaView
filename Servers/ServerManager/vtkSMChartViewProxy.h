@@ -39,9 +39,7 @@ public:
 
   // Description:
   // Provides access to the line chart view.
-//BTX
   vtkQtChartView* GetChartView();
-//ETX
 
 //BTX
 protected:
@@ -57,7 +55,7 @@ protected:
 
   // Description:
   // Performs the actual rendering. This method is called by
-  // both InteractiveRender() and StillRender().
+  // both InteractiveRender() and StillRender(). 
   // Default implementation is empty.
   virtual void PerformRender();
 

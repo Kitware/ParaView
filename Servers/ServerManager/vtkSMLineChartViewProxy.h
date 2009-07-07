@@ -33,9 +33,7 @@ public:
 
   // Description:
   // Provides access to the line chart view.
-//BTX
   vtkQtLineChartView* GetLineChartView();
-//ETX
 
   // Description:
   // Sets the bar chart help format.

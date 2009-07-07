@@ -20,36 +20,36 @@
 // This is the connection used to communicate with all the MPI processes
 // of this node. All other connections (if any), are client-server connections
 // using sockets. SendStream() on ConnectionManager ensures that the stream
-// is sent to the right connection.
+// is sent to the right connection. 
 // ConnectionManager also provides mechanism to monitor all the client-server
 // connections in the collection for activity simultaneously.
-//
+// 
 // ConnectionManager can be configured to accept connections. In this case,
-// it sets up a server socket (vtkServerSocket) at the given port. As and when
-// new connections arrive on this socket, a new connection object
+// it sets up a server socket (vtkServerSocket) at the given port. As and when 
+// new connections arrive on this socket, a new connection object 
 // (vtkProcessModuleConnection) is created and validated. Once validated,
 // it gets added to the internal collection of connections.
 //
 // ConnectionManager can be simply told to open a connection with a remote host
-// socket. In that case, it set up a socket (vtkClientSocket) and attempts to
+// socket. In that case, it set up a socket (vtkClientSocket) and attempts to 
 // connect the given host, If successfully connected and authenticated, it will
 // add the connection to the internal store.
-//
+// 
 // Every connection is assigned an unique connection Id. Special connection Ids
 // are available to represent a particular type of connection. eg.
-// \li SelfConnectionID - represents the connection between the root node and
+// \li SelfConnectionID - represents the connection between the root node and 
 //     the satellites.
 // \li AllConnectionsID - represents all the connections present including
 //     the SelfConnection and any Remote Connections.
-// \li RootServerConnectionID - represents the first \b server connection.
-//     What connection qualifies a  server depends on the mode of operation.
-//     When in ParaView mode (with or without MPI), the SelfConnection is
-//     indeed a ServerConnection. When running in client mode (where it
-//     connects/accepts connections from remote data (and render) servers),
-//     SelfConnection is not a ServerConnection. Only remote connections are
-//     ServerConnections in such a case. Providing this ID makes this decision
+// \li RootServerConnectionID - represents the first \b server connection. 
+//     What connection qualifies a  server depends on the mode of operation. 
+//     When in ParaView mode (with or without MPI), the SelfConnection is 
+//     indeed a ServerConnection. When running in client mode (where it 
+//     connects/accepts connections from remote data (and render) servers), 
+//     SelfConnection is not a ServerConnection. Only remote connections are 
+//     ServerConnections in such a case. Providing this ID makes this decision 
 //     completely transparent to the ServerManager.
-// \li AllServerConnectionsID - represents all \b server connections. Refer to
+// \li AllServerConnectionsID - represents all \b server connections. Refer to 
 //     description of RootServerConnectionID for details about what qualifies
 //     as a \b server connection.
 
@@ -82,68 +82,68 @@ public:
 
   // Description:
   // Used for invalid/null connections.
-  static vtkIdType GetNullConnectionID()
-    {
-    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::NullConnectionID);
+  static vtkIdType GetNullConnectionID() 
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::NullConnectionID); 
     }
 
   // Description:
   // The ID used for SelfConnection.
-  static vtkIdType GetSelfConnectionID()
-    {
-    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::SelfConnectionID);
+  static vtkIdType GetSelfConnectionID() 
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::SelfConnectionID); 
     }
 
   // The ID used for All Connections.
-  static vtkIdType GetAllConnectionsID()
-    {
-    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllConnectionsID);
+  static vtkIdType GetAllConnectionsID() 
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllConnectionsID); 
     }
 
-  // The ID used for Connection to all Servers. What connection qualifies a
-  // server depends on the mode of operation. When in ParaView mode (with or
-  // without MPI), the SelfConnection is indeed a ServerConnection. When
-  // running in client mode (where it connects/accepts connections from remote
-  // data (and render) servers), SelfConnection is not a ServerConnection.
-  // Only remote connections are ServerConnections in such a case. Providing
+  // The ID used for Connection to all Servers. What connection qualifies a 
+  // server depends on the mode of operation. When in ParaView mode (with or 
+  // without MPI), the SelfConnection is indeed a ServerConnection. When 
+  // running in client mode (where it connects/accepts connections from remote 
+  // data (and render) servers), SelfConnection is not a ServerConnection. 
+  // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision complete transparent to the ServerManager.
-  static vtkIdType GetAllServerConnectionsID()
-    {
-    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllServerConnectionID);
+  static vtkIdType GetAllServerConnectionsID() 
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllServerConnectionID); 
     }
 
-  // This ID represents the first server connection. What connection qualifies a
-  // server depends on the mode of operation. When in ParaView mode (with or
-  // without MPI), the SelfConnection is indeed a ServerConnection. When
-  // running in client mode (where it connects/accepts connections from remote
-  // data (and render) servers), SelfConnection is not a ServerConnection.
-  // Only remote connections are ServerConnections in such a case. Providing
+  // This ID represents the first server connection. What connection qualifies a 
+  // server depends on the mode of operation. When in ParaView mode (with or 
+  // without MPI), the SelfConnection is indeed a ServerConnection. When 
+  // running in client mode (where it connects/accepts connections from remote 
+  // data (and render) servers), SelfConnection is not a ServerConnection. 
+  // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision completely transparent to the ServerManager.
   static vtkIdType GetRootServerConnectionID()
-    {
-    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::RootServerConnectionID);
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::RootServerConnectionID); 
     }
 
-//ETX
+//ETX  
   // Description:
   // Initializes the manager. Among other things, this setsup
   // the first connection i.e. the SelfConnection.
   // Returns 1 on error; 0 on success.
-  // clientMode must be set when vtkProcessModuleConnectionManager
+  // clientMode must be set when vtkProcessModuleConnectionManager 
   // is being initialized on a client, else must be set to 0.
   // The partitionId (which can be used to determined if we are a server
   // satellite) is returned in the given pointer.
   int Initialize(int argc, char** argv, int clientMode, int *partitionId);
-
+ 
   // Description:
   // Finalizes the manager. This will trigger closing of all the connections,
   // breaking RMI loops etc. After this call, no connections are valid.
   // This also closes the server sockets, if any.
   void Finalize();
-
+  
 //BTX
   // ServerSocket Types.
-  enum
+  enum 
     {
     RENDER_SERVER = 0x01,
     DATA_SERVER = 0x02,
@@ -151,7 +151,7 @@ public:
     };
 
   // Description:
-  // This obtains a root connection for the connection.
+  // This obtains a root connection for the connection. 
   static inline vtkIdType GetRootConnection(vtkIdType connection)
     {
     if (connection == vtkProcessModuleConnectionManager::GetAllConnectionsID())
@@ -166,7 +166,7 @@ public:
     }
 //ETX
   // Description:
-  // Configures a server socket on a given port and adds it to the
+  // Configures a server socket on a given port and adds it to the 
   // internal socket store. This call does not wait for any connection.
   // New connection will be processed during MonitorConnections().
   // It is possible to set up more than 1 server socket. On success,
@@ -191,7 +191,7 @@ public:
 
   // Description:
   // Connects to a remote host. If connection is successful
-  // it is added to the store of managed connections. Returns the
+  // it is added to the store of managed connections. Returns the 
   // ConnectionID for the connection if success, -1 otherwise.
   vtkIdType OpenConnection(const char* hostname, int port);
 
@@ -228,8 +228,8 @@ public:
 
 
   // Description:
-  // If a processes uses MonitorConnections(), aborted remote connections
-  // are caught and cleaned up. However, the paraview client doesn't use
+  // If a processes uses MonitorConnections(), aborted remote connections 
+  // are caught and cleaned up. However, the paraview client doesn't use 
   // MonitorConnections() since the client is not listening for activity from
   // the server. Hence, if the server connection is aborted due to communication
   // error, altough it's flagged aborted, the connection is not cleanedup.
@@ -240,9 +240,7 @@ public:
 
   // Description:
   // Get a connection iterator.
-//BTX
   vtkConnectionIterator* NewIterator();
-//ETX
 
 //BTX
   // Description:
@@ -263,16 +261,16 @@ public:
   // Returns -1 if the connectionID is invalid, 0 otherwise.
   int SendStream(vtkIdType connectionID, vtkTypeUInt32 serverFlags,
     vtkClientServerStream& stream, int reset);
-
+  
   // Description:
   // Called to gather information.
-  void GatherInformation(vtkIdType connectionID,
+  void GatherInformation(vtkIdType connectionID, 
     vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id);
 
   // Description:
   // Return the last result for the specified server.  In this case,
   // the server should be exactly one of the ServerFlags, and not a
-  // combination of servers.
+  // combination of servers.  
   virtual const vtkClientServerStream& GetLastResult(
     vtkIdType connectionID, vtkTypeUInt32 server);
 
@@ -292,8 +290,8 @@ public:
 
   // Description:
   // Get the number of processes from a given connection.
-  // When SelfConnection, it indicates the number of mpi processes
-  // of Self. When vtkServerConnection, implies the number of
+  // When SelfConnection, it indicates the number of mpi processes 
+  // of Self. When vtkServerConnection, implies the number of 
   // data server processes on the server.
   // vtkClientConnection does not support this call, returns 1.
   int GetNumberOfPartitions(vtkIdType id);
@@ -304,18 +302,18 @@ public:
 
   // Description:
   // Get the next undo  xml from the connection.
-  // This method allocates  a new vtkPVXMLElement. It is the responsibility
-  // of caller to \c Delete it.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
   vtkPVXMLElement* NewNextUndo(vtkIdType id);
-
+ 
   // Description:
   // Get the next redo  xml from the connection.
-  // This method allocates  a new vtkPVXMLElement. It is the responsibility
-  // of caller to \c Delete it.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
   vtkPVXMLElement* NewNextRedo(vtkIdType id);
-
+ 
   // Description:
   // Get the number of connections open.
   unsigned int GetNumberOfConnections();
@@ -331,19 +329,19 @@ protected:
   ~vtkProcessModuleConnectionManager();
 
   // Description:
-  // Add a socket to be managed. conn is the connection is any,
+  // Add a socket to be managed. conn is the connection is any, 
   // associated with the socket.
   void AddManagedSocket(vtkSocket* soc, vtkProcessModuleConnection* conn);
 
   // Description:
   // Remove a socket from being managed.
   void RemoveManagedSocket(vtkSocket* soc);
-
+  
   // Description:
-  // Given a socket, this method returns the Connection that is
+  // Given a socket, this method returns the Connection that is 
   // active on that socket.
   vtkProcessModuleConnection* GetManagedConnection(vtkSocket* soc);
-
+  
   // Description:
   // Instantiates a vtkRemoteConnection() subclass.
   // The actual class instantiated depends on this->ClientMode.
@@ -355,7 +353,7 @@ protected:
   // and start managing it.
   vtkIdType CreateConnection(vtkClientSocket* cs,
     vtkClientSocket* renderserver_socket);
-
+  
   // Description:
   // Returns a unique connection ID.
   vtkIdType GetUniqueConnectionID();
@@ -363,7 +361,7 @@ protected:
   // Description:
   // Set the connection for a particular id.
   void SetConnection(vtkIdType id, vtkProcessModuleConnection* conn);
-
+  
   // Description:
   // Drops a connection from the Manager.
   void DropConnection(vtkProcessModuleConnection* conn);
@@ -371,7 +369,7 @@ protected:
   // Description:
   // Determines if this process waits for connections or connects to remote hosts.
   int ShouldWaitForConnection();
-
+  
   // Description:
   // Connect to a remote server or client already waiting for us.
   void ConnectToRemote();
@@ -379,12 +377,12 @@ protected:
   // Description:
   // Setup a wait connection that is waiting for a remote process to
   // connect to it.  This can be either the client or the server.
-  void SetupWaitForConnection();
+  void SetupWaitForConnection(); 
 
   // Description:
   // This method is only of use for the Client ServerManager.
   // Given a connection ID, this method tells if the connection is a Server
-  // Connection. When client is running with MPI, SelfConnection qualifies as
+  // Connection. When client is running with MPI, SelfConnection qualifies as 
   // a server connection. When running in client-server mode, only remote
   // connections qualify as server connections.
   int IsServerConnection(vtkIdType connection);
@@ -396,7 +394,7 @@ protected:
   // A collection of all open sockets.
   vtkSocketCollection* SocketCollection;
   vtkProcessModuleConnectionManagerInternals* Internals;
-
+  
   vtkIdType UniqueConnectionID;
   int UniqueServerSocketID;
   int ClientMode;
@@ -408,7 +406,7 @@ protected:
   enum ConnectionID {
     NullConnectionID = 0,
     SelfConnectionID,
-    AllConnectionsID,
+    AllConnectionsID, 
     AllServerConnectionID,
     RootServerConnectionID
   };

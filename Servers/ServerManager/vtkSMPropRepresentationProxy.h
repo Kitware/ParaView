@@ -41,7 +41,7 @@ public:
   virtual void SetViewInformation(vtkInformation*);
 
   // Description:
-  // Called to update the Representation.
+  // Called to update the Representation. 
   // Overridden to ensure that SelectionRepresentation visibility is updated
   // correctly.
   virtual void Update(vtkSMViewProxy* view);
@@ -63,10 +63,8 @@ public:
 
   // Description:
   // Overridden to fill with strategies from SelectionRepresentation.
-//BTX
   virtual void GetActiveStrategies(
     vtkSMRepresentationStrategyVector& activeStrategies);
-//ETX
 
   // Description:
   // Set the visibility for this representation.
@@ -95,13 +93,13 @@ protected:
   virtual bool BeginCreateVTKObjects();
 
   // Description:
-  // This method is called after CreateVTKObjects().
+  // This method is called after CreateVTKObjects(). 
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
   virtual bool EndCreateVTKObjects();
 
   // Description:
-  // Called when a representation is added to a view.
+  // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
   virtual bool AddToView(vtkSMViewProxy* view);

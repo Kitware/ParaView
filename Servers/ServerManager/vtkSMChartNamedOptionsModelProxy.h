@@ -31,9 +31,8 @@ public:
   static vtkSMChartNamedOptionsModelProxy* New();
   vtkTypeRevisionMacro(vtkSMChartNamedOptionsModelProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-//BTX
+
   vtkQtChartNamedSeriesOptionsModel* GetOptionsModel();
-//ETX
 
   // Description:
   // Get/Set series visibility for the series with the given name.

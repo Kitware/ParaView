@@ -63,7 +63,7 @@ public:
   // Given a group and proxy name, create and return a proxy instance.
   // The user has to delete the proxy when done.
   // NOTE: If this method is called from a scripting language, it may
-  // not be possible to delete the returned object with Delete.
+  // not be possible to delete the returned object with Delete. 
   // The VTK wrappers handle New and Delete specially and may not allow
   // the deletion of object created through other methods. Use
   // UnRegister instead.
@@ -74,17 +74,17 @@ public:
   // for the proxy with given name and group name. Note that the name and group
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
-  vtkSMDocumentation* GetProxyDocumentation(const char* groupName,
+  vtkSMDocumentation* GetProxyDocumentation(const char* groupName, 
     const char* proxyName);
 
   // Description:
   // Returns a vtkSMDocumentation object with the documentation
-  // for the given property of the proxy with given name and group name.
+  // for the given property of the proxy with given name and group name. 
   // Note that the name and group
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
   // Also, the property name is the name of an exposed property.
-  vtkSMDocumentation* GetPropertyDocumentation(const char* groupName,
+  vtkSMDocumentation* GetPropertyDocumentation(const char* groupName, 
     const char* proxyName, const char* propertyName);
 
   // Description:
@@ -101,7 +101,7 @@ public:
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
 
   // Description:
-  // Given its name (and group) returns a proxy. If not a managed proxy,
+  // Given its name (and group) returns a proxy. If not a managed proxy, 
   // returns 0.
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
@@ -123,11 +123,11 @@ public:
   //BTX
   vtkSMProxy* GetProxy(const char* groupname, vtkClientServerID id);
   //ETX
-
+  
   // Description:
   // Returns all proxies registered under the given group with the given name.
   // The collection is cleared before the proxies are added to it.
-  void GetProxies(const char* groupname, const char* name,
+  void GetProxies(const char* groupname, const char* name, 
     vtkCollection* collection);
 
   // Description:
@@ -150,15 +150,15 @@ public:
   // name, use GetProxyNames() to obtain the list of names for the proxy.
   // NOTE: This operation is slow.
   const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
-
+ 
   // Description:
   // Given a group and a proxy, return all its names. This clears the
-  // \c names list before populating it with the names for the proxy under
+  // \c names list before populating it with the names for the proxy under 
   // the group.
-  // NOTE: This operation is slow.
-  void GetProxyNames(const char* groupname, vtkSMProxy* proxy,
+  // NOTE: This operation is slow. 
+  void GetProxyNames(const char* groupname, vtkSMProxy* proxy, 
     vtkStringList* names);
-
+  
   // Description:
   // Is the proxy is in the given group, return it's name, otherwise
   // return null. NOTE: Any following call to proxy manager might make
@@ -167,7 +167,7 @@ public:
 
   // Description:
   // Given its name, unregisters a proxy and remove it from the list
-  // of managed proxies.
+  // of managed proxies. 
   void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
   void UnRegisterProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* name);
@@ -187,7 +187,7 @@ public:
 
   // Description:
   // Calls UpdateVTKObjects() on all managed proxies.
-  // If modified_only flag is set, then UpdateVTKObjects will be called
+  // If modified_only flag is set, then UpdateVTKObjects will be called 
   // only those proxies that have any properties that were modifed i.e.
   // not pushed to the VTK objects.
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
@@ -196,12 +196,12 @@ public:
   // Description:
   // Updates all registered proxies in order, respecting dependencies
   // among each other. This is used after loading state or after instantiating
-  // a compound proxy. This uses the "UpdateInputProxies" flag which
+  // a compound proxy. This uses the "UpdateInputProxies" flag which 
   // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
   // proxies as well if the flag is set.
   void UpdateRegisteredProxiesInOrder(int modified_only=1);
   void UpdateProxyInOrder(vtkSMProxy* proxy);
-
+  
   // Description:
   // Get the number of registered links with the server manager.
   int GetNumberOfLinks();
@@ -223,13 +223,13 @@ public:
   // Get the link registered with the given name. If no such link exists,
   // returns NULL.
   vtkSMLink* GetRegisteredLink(const char* linkname);
-
+ 
   // Description:
   // Unregister all registered proxy/property links.
   void UnRegisterAllLinks();
-
+  
   // Description:
-  // Register a custom proxy definition with the proxy manager.
+  // Register a custom proxy definition with the proxy manager. 
   // This can be a compound proxy definition (look at
   // vtkSMCompoundSourceProxy.h) or a regular proxy definition.
   // For all practical purposes, there's no difference between a proxy
@@ -253,7 +253,7 @@ public:
   void UnRegisterCustomProxyDefinitions();
 
   // Description:
-  // Returns a registered proxy definition.
+  // Returns a registered proxy definition. 
   vtkPVXMLElement* GetProxyDefinition(const char* group, const char* name);
 
   // Description:
@@ -271,23 +271,23 @@ public:
   // If loader is not specified, a vtkSMStateLoader instance is used.
   void LoadState(const char* filename, vtkSMStateLoader* loader=NULL);
   void LoadState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
-
+  
   // Description:
   // Load the state for a particular connection.
   // If loader is not specified, a vtkSMStateLoader instance is used.
-  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
+  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id, 
     vtkSMStateLoader* loader=NULL);
-  void LoadState(const char* filename, vtkIdType id,
+  void LoadState(const char* filename, vtkIdType id, 
     vtkSMStateLoader* loader=NULL);
 
   // Description:
   // Save the state of the server manager in XML format in a file.
-  // This saves the state of all proxies and properties.
+  // This saves the state of all proxies and properties. 
   void SaveState(const char* filename);
 
   // Description:
-  // Saves the state of the server manager as XML, and returns the
-  // vtkPVXMLElement for the root of the state.
+  // Saves the state of the server manager as XML, and returns the 
+  // vtkPVXMLElement for the root of the state. 
   // Note this this method allocates a new vtkPVXMLElement object,
   // it's the caller's responsibility to free it by calling Delete().
   vtkPVXMLElement* SaveState();
@@ -295,7 +295,7 @@ public:
   // Description:
   // Saves the state of all proxies registered with the proxy manager
   // that are on the connection with given \c connectionID
-  // as XML, and returns the vtkPVXMLElement for the root of the state.
+  // as XML, and returns the vtkPVXMLElement for the root of the state. 
   // If connectionID = NullConnectionID, then state of all registered
   // proxies will be saved.
   // Note this this method allocates a new vtkPVXMLElement object,
@@ -305,7 +305,7 @@ public:
   // Description:
   // Saves the server manager state for the collection of proxies
   // mentioned. If \c save_referred_proxies is true, state for
-  // proxies on any proxy property of the proxies in the collection
+  // proxies on any proxy property of the proxies in the collection 
   // will also be saved. Note that for the state of any proxy
   // to be saved, it has to be registered with the proxy manager.
   vtkPVXMLElement* SaveState(vtkCollection* proxies, bool save_referred_proxies);
@@ -316,7 +316,7 @@ public:
   // state that can be reloaded by the proxy manager.
   // Revival states are useful to revive a proxy using already present
   // server side objects.
-  // RevivalState includes the entire state saved by calling
+  // RevivalState includes the entire state saved by calling 
   // SaveState() as well as additional information such as server side
   // object IDs. This makes it possible to restore the servermanager state
   // while reusing server side object ids.
@@ -363,7 +363,7 @@ public:
     vtkSMProxy* Proxy;
     const char* GroupName;
     const char* ProxyName;
-    // Set when the register/unregister event if fired for registration of
+    // Set when the register/unregister event if fired for registration of 
     // a compound proxy definition.
     unsigned int Type;
 
@@ -396,46 +396,44 @@ public:
   // to the server manager XML.  Returns the XML element for the hints
   // associated with this proxy/property, if any, otherwise returns NULL.
   vtkPVXMLElement* GetProxyHints(const char* xmlgroup, const char* xmlname);
-  vtkPVXMLElement* GetPropertyHints(const char* groupName,
+  vtkPVXMLElement* GetPropertyHints(const char* groupName, 
                                     const char* proxyName,
                                     const char* propertyName);
 
   // Description:
   // Check if UpdateInputProxies flag is set.
   // This is used after loading state or after instantiating
-  // a compound proxy. This uses the "UpdateInputProxies" flag which
+  // a compound proxy. This uses the "UpdateInputProxies" flag which 
   // vtkSMProxy checks in UpdateVTKObjects() to call UpdateVTKObjects() on the input
   // proxies as well if the flag is set.
   vtkGetMacro(UpdateInputProxies, int);
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
-  // Returns the major version number eg. if version is 2.9.1
+  // Returns the major version number eg. if version is 2.9.1 
   // this method will return 2.
   int GetVersionMajor();
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
-  // Returns the minor version number eg. if version is 2.9.1
+  // Returns the minor version number eg. if version is 2.9.1 
   // this method will return 9.
   int GetVersionMinor();
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
-  // Returns the patch version number eg. if version is 2.9.1
+  // Returns the patch version number eg. if version is 2.9.1 
   // this method will return 1.
   int GetVersionPatch();
 
   // Description:
   // Register a proxy manager extension. Returns true if the registration is
   // successful.
-//BTX
   bool RegisterExtension(vtkSMProxyManagerExtension* ext);
-
+  
   // Description:
   // Unregister a previously register extension.
   void UnRegisterExtension(vtkSMProxyManagerExtension* ext);
-//ETX
 
   // Description:
   // Register/UnRegister a selection model. A selection model can be typically
@@ -483,9 +481,9 @@ protected:
   friend class vtkSMXMLParser;
 
   // Description:
-  // Given an XML element and group name create a proxy
+  // Given an XML element and group name create a proxy 
   // and all of it's properties.
-  vtkSMProxy* NewProxy(vtkPVXMLElement* element,
+  vtkSMProxy* NewProxy(vtkPVXMLElement* element, 
     const char* groupname, const char* proxyname);
 
   // Description:
@@ -513,13 +511,13 @@ protected:
 
   // Description:
   // Internal method to save server manager state in an XML
-  // and return a new vtkPVXMLElement for it. The caller has
+  // and return a new vtkPVXMLElement for it. The caller has 
   // the responsibility of freeing the vtkPVXMLElement returned.
-  vtkPVXMLElement* SaveStateInternal(vtkIdType connectionID,
+  vtkPVXMLElement* SaveStateInternal(vtkIdType connectionID, 
     vtkSMProxyManagerProxySet* setOfProxies, int revival);
 
   // Recursively collects all proxies referred by the proxy in the set.
-  void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies,
+  void CollectReferredProxies(vtkSMProxyManagerProxySet& setOfProxies, 
     vtkSMProxy* proxy);
 
   int UpdateInputProxies;

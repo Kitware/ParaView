@@ -45,15 +45,9 @@ typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*,
 // The type of a new-instance function.  One such function is
 // generated per library of wrappers.  It knows how to create
 // instances of any of the classes included in the library.
-// typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
-//                                                   const char* name,
-//                                                   vtkClientServerID id);
-
-// Description: -nix
-// This is a modification of the above code to implement a new
-// hash-map implementation. There only the function returning
-// the new instance will be registered.
-typedef vtkObjectBase* (*vtkClientServerNewInstanceFunction)();
+typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
+                                                  const char* name,
+                                                  vtkClientServerID id);
 
 // Description:
 // A pointer to this struct is sent as call data when an ErrorEvent is
@@ -132,9 +126,7 @@ public:
 
   // Description:
   // Add a function used to create new objects.
-  //void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f);
-  void AddNewInstanceFunction(const char*cname,
-                              vtkClientServerNewInstanceFunction f);
+  void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f);
 
   // Description:
   // The callback data structure passed to observers looking for VTK

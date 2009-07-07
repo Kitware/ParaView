@@ -13,16 +13,15 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkInitializationHelper.h"
-#include "vtkPVConfig.h"
+
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
  * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
  * anyway.  The instantiators will add no more code for the linker to
  * collect.
  */
-
 #include "vtkCommonInstantiator.h"
-#include "vtkFilteringInstantiator.h" // MANDATORY gives rutime problems otherwise
+#include "vtkFilteringInstantiator.h"
 #include "vtkGenericFilteringInstantiator.h"
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"
@@ -47,13 +46,12 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkInitializationHelper, "1.5");
+vtkCxxRevisionMacro(vtkInitializationHelper, "1.6");
 
 static void vtkInitializationHelperInit(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
-extern "C" void vtkParaviewMINI_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
@@ -135,20 +133,9 @@ void vtkInitializationHelper::Finalize()
   vtkProcessModule::SetProcessModule(0);
 }
 
-//-----------------------------------------------------------------------------
-/*
- * PARAVIEW_MINIMIUM if enabled, initializes only required set of classes.
- * The mechanism is specified in the Servers/ServerManager/CMakeList.txt
- * Otherwise the entire vtk+paraview class list will be included.
- *
- * @param pm IN used to pass the interpreter for every *_Initialize function.
- */
+//----------------------------------------------------------------------------
 void vtkInitializationHelperInit(vtkProcessModule* pm)
 {
-
-#ifdef PARAVIEW_MINIMAL_BUILD
-  vtkParaviewMINI_Initialize(pm->GetInterpreter());
-#else
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());
   vtkFilteringCS_Initialize(pm->GetInterpreter());
@@ -165,15 +152,9 @@ void vtkInitializationHelperInit(vtkProcessModule* pm)
   vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
   vtkXdmfCS_Initialize(pm->GetInterpreter());
-#endif
 }
 
 //----------------------------------------------------------------------------
-/*
- * The primary interface used to Initialize all the kits.
- *
- * @param pm IN process module is passed to vtkInitilizationHelperInit function
- */
 void vtkInitializationHelper::InitializeInterpretor(vtkProcessModule* pm)
 {
   ::vtkInitializationHelperInit(pm);

@@ -36,12 +36,10 @@ public:
 
   // Description:
   // Provides access to the underlying VTK representation.
-//BTX
   vtkGetObjectMacro(VTKRepresentation, vtkQtChartRepresentation);
-//ETX
 
   // Description:
-  // Called when a representation is added to a view.
+  // Called when a representation is added to a view. 
   // Returns true on success.
   // Currently a representation can be added to only one view.
   // Don't call this directly, it is called by the View.
