@@ -237,9 +237,8 @@ void ComputePointSizeAndPositionInClipCoordEllipsoid()
   float sy = abs( ybc[ 0 ] - ybc[ 1 ]  ) * .5 * viewport.y;
 
 //  gl_PointSize =  ceil( pointScaling * max( sx, sy ) );
-
-  gl_PointSize =  ceil( max( sx, sy ) );
-  pointSize = gl_PointSize;
+  pointSize = ceil( max( sx, sy ) );
+  gl_PointSize = pointSize;
 #ifdef CORRECT_POINT_Z
   // gl_Position has to be precomputed before getting here
   // the reason for which we want the z coordinate to be correct is for debugging
@@ -426,6 +425,17 @@ void ComputePointSizeAndPositionWithProjection()
 float GetRadius();
 #endif
 
+void  ComputePointSizeAndPosition()
+{
+#if defined( ELLIPSOID )
+  ComputePointSizeAndPositionInClipCoordEllipsoid();
+#elif defined( CYLINDER ) || defined( CONE ) || defined( HYPERBOLOID1 ) || defined( HYPERBOLOID2 )  || defined( PARABOLOID )
+  ComputePointSizeAndPositionInClipCoord();
+#else
+  ComputePointSizeAndPositionWithProjection();
+#endif
+}
+
 //------------------------------------------------------------------------------
 // MAIN
 void propFuncVS()
@@ -468,13 +478,7 @@ void propFuncVS()
 
   // compute point size and gl_Position; uses Ti and T which have to be
   // computed before calling the function
-#if defined( ELLIPSOID )
-  ComputePointSizeAndPositionInClipCoordEllipsoid();
-#elif defined( CYLINDER ) || defined( CONE ) || defined( HYPERBOLOID1 ) || defined( HYPERBOLOID2 )  || defined( PARABOLOID )
-  ComputePointSizeAndPositionInClipCoord();
-#else
-  ComputePointSizeAndPositionWithProjection();
-#endif
+  ComputePointSizeAndPosition();
 
   if(pointSize > MaxPixelSize)
     {
@@ -491,7 +495,8 @@ void propFuncVS()
                 0., realIRadius, 0., 0.,
                 0., 0., realIRadius, 0.,
                 -gl_Vertex.x*realIRadius, -gl_Vertex.y*realIRadius, -gl_Vertex.z*realIRadius, 1.0 );
-
+    
+    ComputePointSizeAndPosition();
     }
   // if pixel size valid set quadric's coefficients
   if( pointSize > pointSizeThreshold )
