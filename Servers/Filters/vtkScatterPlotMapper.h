@@ -27,12 +27,12 @@
 #define __vtkScatterPlotMapper_h
 
 #include "vtkMapper.h"
-#include "vtkGlyph3D.h" // for the constants (VTK_SCALE_BY_SCALAR, ...).
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include <iostream>
+
 class vtkScatterPlotMapperArray; // pimp
 class vtkPainterPolyDataMapper;
 class vtkScalarsToColorsPainter;
+class vtkPolyData;
 
 class VTK_EXPORT vtkScatterPlotMapper : public vtkMapper
 {
@@ -228,7 +228,7 @@ public:
   
   // Description:
   // Get a pointer to a source object at a specified table location.
-  vtkPolyData *GetGlyphSource(int id = 0);
+  vtkPolyData* GetGlyphSource(int id = 0);
 
   // Description:
   // Enable/disable indexing into table of the glyph sources. When disabled,

@@ -39,6 +39,9 @@
 #include "vtkTransform.h"
 #include "vtkHardwareSelectionPolyDataPainter.h"
 #include "vtkInformationIntegerKey.h"
+#include "vtkDataSet.h"
+#include "vtkPointSet.h"
+#include "vtkPolyData.h"
 
 #include "vtkgl.h"
 #include "vtkCompositeDataSet.h"
@@ -52,7 +55,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.2");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.3");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
