@@ -1,0 +1,559 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkSMScatterPlotRepresentationProxy.cxx
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "vtkSMScatterPlotRepresentationProxy.h"
+
+#include "vtkAbstractMapper.h"
+#include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMRepresentationStrategy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMViewProxy.h"
+#include "vtkSMRenderViewProxy.h"
+#include "vtkClientServerStream.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+
+#include "vtkScatterPlotMapper.h"
+
+#include "vtkSMScatterPlotViewProxy.h"
+
+#include <vtksys/ios/sstream>
+
+inline void vtkSMScatterPlotRepresentationProxySetString(
+  vtkSMProxy* proxy, const char* pname, const char* pval)
+{
+  vtkSMStringVectorProperty* ivp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty(pname));
+  if (ivp)
+    {
+    ivp->SetElement(0, pval);
+    proxy->UpdateProperty(pname);
+    }
+}
+
+vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.1");
+//-----------------------------------------------------------------------------
+vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
+{
+//  this->ScatterPlot = 0;
+  this->Mapper = 0;
+  this->LODMapper = 0;
+  this->Prop3D = 0;
+  this->Property = 0;
+  this->ScatterPlotView = 0;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMScatterPlotRepresentationProxy::~vtkSMScatterPlotRepresentationProxy()
+{
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::BeginCreateVTKObjects()
+{
+  if (!this->Superclass::BeginCreateVTKObjects())
+    {
+    return false;
+    }
+
+  // Setup pointers to subproxies  for easy access and set server flags. 
+  //this->ScatterPlot = vtkSMSourceProxy::SafeDownCast(
+  //  this->GetSubProxy("ScatterPlot"));
+  this->Mapper = this->GetSubProxy("Mapper");
+  this->LODMapper = this->GetSubProxy("LODMapper");
+  this->Prop3D = this->GetSubProxy("Prop3D");
+  this->Property = this->GetSubProxy("Property");
+
+  //this->ScatterPlot->SetServers(vtkProcessModule::DATA_SERVER);
+  this->Mapper->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  /*
+  this->Mapper->SetArrayIndex(vtkScatterPlotMapper::X_COORDS, 
+                              vtkDataSetAttributes::SCALARS, 0);
+  this->Mapper->SetArrayIndex(vtkScatterPlotMapper::Y_COORDS, 
+                              vtkDataSetAttributes::SCALARS, 1);
+  */
+  if(this->LODMapper)
+    {
+    this->LODMapper->SetServers(
+      vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    }
+  this->Prop3D->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->Property->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::EndCreateVTKObjects()
+{
+  this->Connect(this->Mapper, this->Prop3D, "Mapper");
+//  this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
+  this->Connect(this->Property, this->Prop3D, "Property");
+
+  return this->Superclass::EndCreateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::InitializeStrategy(vtkSMViewProxy* view)
+{
+  // We know the input data type: it has to be a vtkImageData. Hence we can
+  // simply ask the view for the correct strategy.
+  vtkSmartPointer<vtkSMRepresentationStrategy> strategy;
+  //strategy.TakeReference(view->NewStrategy(VTK_DATA_OBJECT));
+  strategy.TakeReference(view->NewStrategy(VTK_POLY_DATA));
+  if (!strategy.GetPointer())
+    {
+    vtkErrorMacro("View could not provide a strategy to use."
+      "Cannot be rendered in this view of type: " << view->GetClassName());
+    return false;
+    }
+
+  // Now initialize the data pipelines involving this strategy.
+  // Since representations are not added to views unless their input is set, we
+  // can assume that the objects for this proxy have been created.
+  // (Look at vtkSMDataRepresentationProxy::AddToView()).
+
+  // TODO: For now, I am not going to worry about the LOD pipeline.
+  strategy->SetEnableLOD(false);
+  
+  strategy->SetConnectionID(this->ConnectionID);
+  
+  //this->Connect(this->GetInputProxy(), this->ScatterPlot,
+  //              "Input", this->OutputPort);
+  //this->Connect(this->ScatterPlot, strategy);
+
+  this->Connect(this->GetInputProxy(), strategy,
+    "Input", this->OutputPort);
+
+  this->Connect(strategy->GetOutput(), this->Mapper);
+  // this->Connect(strategy->GetLODOutput(), this->LODMapper);
+
+  // Creates the strategy objects.
+  strategy->UpdateVTKObjects();
+
+  this->AddStrategy(strategy);
+
+  return this->Superclass::InitializeStrategy(view);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::AddToView(vtkSMViewProxy* view)
+{
+  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
+  if (!renderView)
+    {
+    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
+    return false;
+    }
+
+  if (!this->Superclass::AddToView(view))
+    {
+    return false;
+    }
+  this->ScatterPlotView = vtkSMScatterPlotViewProxy::SafeDownCast(view);
+  renderView->AddPropToRenderer(this->Prop3D);
+
+/*
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << renderView->GetRendererProxy()->GetID()
+          << "GetActiveCamera"
+          << vtkClientServerStream::End;
+  stream  << vtkClientServerStream::Invoke
+          << this->CubeAxesActor->GetID()
+          << "SetCamera"
+          << vtkClientServerStream::LastResult
+          << vtkClientServerStream::End;
+
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+    stream);
+*/
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
+{
+  vtkSMRenderViewProxy* renderView = vtkSMRenderViewProxy::SafeDownCast(view);
+  if (!renderView)
+    {
+    vtkErrorMacro("View must be a vtkSMRenderViewProxy.");
+    return false;
+    }
+
+  renderView->RemovePropFromRenderer(this->Prop3D);
+  this->ScatterPlotView = NULL;
+/*
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->CubeAxesActor->GetID()
+          << "SetCamera" << 0
+          << vtkClientServerStream::End;
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+    stream);
+*/
+  //this->Strategy = 0;
+  return this->Superclass::RemoveFromView(view);
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::SetColorAttributeType(int type)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ScalarMode"));
+  switch (type)
+    {
+  case POINT_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_POINT_FIELD_DATA); 
+    break;
+
+  case CELL_DATA:
+    ivp->SetElement(0, VTK_SCALAR_MODE_USE_CELL_FIELD_DATA);
+    break;
+
+  default:
+    vtkWarningMacro("Incorrect Color attribute type.");
+    ivp->SetElement(0,  VTK_SCALAR_MODE_DEFAULT);
+    }
+  this->Mapper->UpdateVTKObjects();
+  //this->LODMapper->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+/*
+void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ColorArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+
+  this->Mapper->UpdateVTKObjects();
+  //this->LODMapper->UpdateVTKObjects();
+}
+*/
+//-----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
+{
+  if (!this->Superclass::GetBounds(bounds))
+    {
+    return false;
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::Update(vtkSMViewProxy* view)
+{
+  this->Superclass::Update(view);
+//  this->VTKRepresentation->SetInputConnection(
+//    this->GetOutput()->GetProducerPort());
+//  this->VTKRepresentation->Update();
+  this->UpdatePropertyInformation();
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetXAxisArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("XCoordsArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+  if(this->ScatterPlotView)
+    {
+    //vtkSMScatterPlotRepresentationProxySetString(this->ScatterPlotView,
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetYAxisArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("YCoordsArray"));
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetZAxisArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ZCoordsArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("ColorizeArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetGlyphScalingArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphXScalingArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+  svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphYScalingArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+  svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphZScalingArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetGlyphMultiSourceArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphSourceArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+void vtkSMScatterPlotRepresentationProxy::SetGlyphOrientationArrayName(const char* name)
+{
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphXOrientationArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+  svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphYOrientationArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+  svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Mapper->GetProperty("GlyphZOrientationArray"));
+
+  if (name && name[0])
+    {
+    svp->SetElement(0, name);
+    }
+  else
+    {
+    svp->SetElement(0, "");
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkSMScatterPlotRepresentationProxy::GetNumberOfSeries()
+{
+  int count = 0;
+  vtkPVDataInformation* dataInformation = 
+    this->GetInputProxy()->GetDataInformation();
+  if(!dataInformation)
+    {
+    return count;
+    }
+  if(dataInformation->GetPointArrayInformation())
+    {
+    count += dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
+    }
+  if(dataInformation->GetPointDataInformation())
+    {                                                   
+    int numberOfArrays = dataInformation->GetPointDataInformation()
+      ->GetNumberOfArrays();
+    for(int i = 0; i < numberOfArrays; ++i)
+      {
+      count += dataInformation->GetPointDataInformation()
+        ->GetArrayInformation(i)->GetNumberOfComponents();
+      }
+    }
+  if(dataInformation->GetCellDataInformation())
+    {                                                   
+    int numberOfArrays = dataInformation->GetCellDataInformation()
+      ->GetNumberOfArrays();
+    for(int i = 0; i < numberOfArrays; ++i)
+      {
+      count += dataInformation->GetCellDataInformation()
+        ->GetArrayInformation(i)->GetNumberOfComponents();
+      }
+    }
+  //todo handles other arrays
+  return count;
+}
+
+//----------------------------------------------------------------------------
+//const char* vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
+vtkStdString vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
+{
+  vtkPVDataInformation* dataInformation = 
+    this->GetInputProxy()->GetDataInformation();
+  if(!dataInformation)
+    {
+    return NULL;
+    }
+
+  if(dataInformation->GetPointArrayInformation())
+    {
+    int numberOfComponents = 
+      dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
+    if(series < numberOfComponents)
+      {
+      vtksys_ios::stringstream str;
+      str << dataInformation->GetPointArrayInformation()->GetName();
+      if(numberOfComponents > 1)
+        {
+        str << "(" << series << ")";
+        }
+      return str.str();//.c_str();
+      }
+    series -= numberOfComponents;
+    }
+  if(dataInformation->GetPointDataInformation())
+    {
+    int numberOfArrays= dataInformation->GetPointDataInformation()->GetNumberOfArrays();
+    for(int i=0; i < numberOfArrays;++i)
+      {
+      int numberOfComponents = dataInformation->GetPointDataInformation()
+        ->GetArrayInformation(i)->GetNumberOfComponents();
+      if(series < numberOfComponents)
+        {
+        vtksys_ios::stringstream str;
+        str << dataInformation->GetPointDataInformation()
+          ->GetArrayInformation(i)->GetName();
+        if(numberOfComponents > 1)
+          {
+          str << "(" << series << ")";
+          }
+        return str.str();//.c_str();
+        }
+      else
+        {
+        series -= numberOfComponents;
+        }
+      }
+    }
+  if(dataInformation->GetCellDataInformation())
+    {                                                   
+    int numberOfArrays= dataInformation->GetCellDataInformation()->GetNumberOfArrays();
+    for(int i=0; i < numberOfArrays;++i)
+      {
+      int numberOfComponents = dataInformation->GetCellDataInformation()
+        ->GetArrayInformation(i)->GetNumberOfComponents();
+      if(series < numberOfComponents)
+        {
+        vtksys_ios::stringstream str;
+        str << dataInformation->GetCellDataInformation()
+          ->GetArrayInformation(i)->GetName();
+        if(numberOfComponents > 1)
+          {
+          str << "(" << series << ")";
+          }
+        return str.str();//.c_str();
+        }
+      else
+        {
+        series -= numberOfComponents;
+        }
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+}
