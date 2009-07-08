@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTableView.h"
 #include "pqTextRepresentation.h"
 #include "pqTwoDRenderView.h"
+#include "pqScatterPlotView.h"
 #include "vtkSMChartViewProxy.h"
 #include "vtkSMComparativeViewProxy.h"
 #include "vtkSMProxyManager.h"
@@ -69,7 +70,8 @@ QStringList pqStandardViewModules::viewTypes() const
     pqComparativeRenderView::comparativeRenderViewType() <<
     pqComparativeBarChartView::comparativeBarChartViewType() <<
     pqComparativeLineChartView::comparativeLineChartViewType() <<
-    pqSpreadSheetView::spreadsheetViewType();
+    pqSpreadSheetView::spreadsheetViewType() <<
+    pqScatterPlotView::scatterPlotViewType();
 }
 
 QStringList pqStandardViewModules::displayTypes() const
@@ -117,6 +119,10 @@ QString pqStandardViewModules::viewTypeName(const QString& type) const
   else if  (type == pqTwoDRenderView::twoDRenderViewType())
     {
     return pqTwoDRenderView::twoDRenderViewTypeName();
+    }
+  else if  (type == pqScatterPlotView::scatterPlotViewType())
+    {
+    return pqScatterPlotView::scatterPlotViewTypeName();
     }
 
   return QString();
@@ -168,6 +174,10 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     {
     root_xmlname = "SpreadSheetView";
     }
+  else if (viewtype == pqScatterPlotView::scatterPlotViewType())
+    {
+    root_xmlname = "ScatterPlotView";
+    }
 
   if (root_xmlname)
     {
@@ -213,7 +223,8 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqSpreadSheetView(
       group, viewname, viewmodule, server, p);
     }
-  else if (viewmodule->IsA("vtkSMRenderViewProxy"))
+  else if (viewmodule->IsA("vtkSMRenderViewProxy") &&
+           !viewmodule->IsA("vtkSMScatterPlotViewProxy"))
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
     }
@@ -240,7 +251,13 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqTwoDRenderView(
       group, viewname, viewmodule, server, p); 
     }
-
+  else if (viewmodule->IsA("vtkSMScatterPlotViewProxy"))
+    {
+    return new pqScatterPlotView(
+      group, viewname, viewmodule, server, p); 
+    }
+  
+  
   return NULL;
 }
 

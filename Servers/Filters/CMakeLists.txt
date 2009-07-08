@@ -122,6 +122,7 @@ SET(Filters_SRCS
   vtkPVHardwareSelector.cxx
   vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
+  vtkScatterPlotMapper.cxx
   vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx

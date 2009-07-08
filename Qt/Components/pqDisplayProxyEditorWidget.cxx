@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqPropertyLinks.h"
+#include "pqScatterPlotDisplayPanel.h"
 #include "pqSpreadSheetDisplayEditor.h"
 #include "pqTextDisplayPropertiesWidget.h"
 #include "pqTextRepresentation.h"
@@ -78,7 +79,8 @@ public:
     if (type == "XYPlotRepresentation" ||
        type == "BarChartRepresentation" ||
        type == "SpreadSheetRepresentation" ||
-       qobject_cast<pqTextRepresentation*>(proxy))
+       qobject_cast<pqTextRepresentation*>(proxy)||
+        type == "ScatterPlotRepresentation")
       {
       return true;
       }
@@ -111,6 +113,10 @@ public:
     if (qobject_cast<pqTextRepresentation*>(proxy))
       {
       return new pqTextDisplayPropertiesWidget(proxy, p);
+      }
+    if (type == "ScatterPlotRepresentation")
+      {
+      return new pqScatterPlotDisplayPanel(proxy, p);
       }
     return NULL;
     }

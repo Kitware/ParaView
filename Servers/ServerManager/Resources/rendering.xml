@@ -1044,6 +1044,214 @@
 
     <!-- End of ImageSliceMapper -->
     </SourceProxy>
+
+    <SourceProxy name="ScatterPlotMapper" class="vtkScatterPlotMapper"
+                 base_proxygroup="mappers" base_proxyname="MapperBase">
+      <InputProperty
+        name="Input"
+        command="SetInputConnection"
+        multiple_input="1">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+      </InputProperty>
+      <InputProperty
+        name="GlyphSource"
+        command="SetGlyphSourceConnection"
+        multiple_input="1">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty name="XCoordsArray"
+        command="SetXCoordsArray"
+        number_of_elements="1"
+        default_values="Points(0)">
+        <Documentation>
+          Set the array for the X coords array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="YCoordsArray"
+        command="SetYCoordsArray"
+        number_of_elements="1"
+        default_values="Points(1)">
+        <Documentation>
+          Set the array for the Y coords array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ZCoordsArray"
+        command="SetZCoordsArray"
+        number_of_elements="1"
+        default_values="Points(2)">
+        <Documentation>
+          Set the array for the Z coords array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="ColorizeArray"
+        command="SetColorArray"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array for the color array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphXScalingArray"
+        command="SetGlyphXScalingArray"
+        number_of_elements="1"
+        default_values="Points(0)">
+        <Documentation>
+          Set the array for the glyph x scaling array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphYScalingArray"
+        command="SetGlyphYScalingArray"
+        number_of_elements="1"
+        default_values="Points(1)">
+        <Documentation>
+          Set the array for the glyph y scaling array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphZScalingArray"
+        command="SetGlyphZScalingArray"
+        number_of_elements="1"
+        default_values="Points(2)">
+        <Documentation>
+          Set the array for the glyph z scaling array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphSourceArray"
+        command="SetGlyphSourceArray"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array for the glyph source array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphXOrientationArray"
+        command="SetGlyphXOrientationArray"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array for the glyph x orientation array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphYOrientationArray"
+        command="SetGlyphYOrientationArray"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array for the glyph y orientation array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphZOrientationArray"
+        command="SetGlyphZOrientationArray"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array for the glyph z orientation array.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ThreeDMode"
+        command="SetThreeDMode"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="Colorize"
+        command="SetColorize"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="GlyphMode"
+        command="SetGlyphMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <IntRangeDomain name="range" min="0" max="15" />
+<!--        
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="NoGlyph"/>
+          <Entry value="1" text="UseGlyph"/>
+          <Entry value="2" text="ScaledGlyph"/>
+          <Entry value="4" text="UseMultiGlyph"/>
+          <Entry value="8" text="OrientedGlyph"/>
+        </EnumerationDomain>
+-->
+      </IntVectorProperty>
+ 
+     <IntVectorProperty
+        name="ScalingArrayMode"
+        command="SetScalingArrayMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Xc_Yc_Zc"/>
+          <Entry value="1" text="Xc0_Xc1_Xc2"/>
+          <Entry value="2" text="Xc_Xc_Xc"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ScaleMode"
+        command="SetScaleMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="SCALE_BY_MAGNITUDE"/>
+          <Entry value="1" text="SCALE_BY_COMPONENTS"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+ 
+     <DoubleVectorProperty 
+        name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.">
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="OrientationMode"
+        command="SetOrientationMode"
+        default_values="0"
+        number_of_elements="1"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="DIRECTION"/>
+          <Entry value="1" text="ROTATION"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="NestedDisplayLists"
+        command="SetNestedDisplayLists"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      
+    </SourceProxy>
+
   <!-- End of "mappers" -->  
   </ProxyGroup>
 
@@ -2406,7 +2614,34 @@
         default_values="1.0">
         <DoubleRangeDomain name="range" min="1.0" max="5.0" />
       </DoubleVectorProperty>
+      
+      <IntVectorProperty name="RightAxisVisibility"
+        command="SetRightAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
 
+      <IntVectorProperty name="TopAxisVisibility"
+        command="SetTopAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="LeftAxisVisibility"
+        command="SetLeftAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BottomAxisVisibility"
+        command="SetBottomAxisVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of LegendScaleActor -->
     </Proxy>
 
@@ -5600,7 +5835,35 @@
       <!-- End of 2DClientServerRenderView -->
     </TwoDRenderViewProxy>
 
-    <!-- End if group "views" -->
+    <ScatterPlotViewProxy name="ScatterPlotView"
+                          base_proxygroup="views" base_proxyname="RenderView">
+      <Documentation>
+        Scatter Plot View.
+      </Documentation>
+      <SubProxy>
+        <!-- SubProxy used to axes annotation -->
+        <Proxy name="CubeAxesActor"
+          proxygroup="props" proxyname="CubeAxesActor" />
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="AxesVisibility" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <!-- SubProxy used to axes annotation -->
+        <Proxy name="LegendScaleActor"
+          proxygroup="props" proxyname="LegendScaleActor" />
+        <ExposedProperties>
+          <Property name="Visibility" exposed_name="LegendScaleAxesVisibility" />
+          <Property name="LegendVisibility" />
+          <Property name="LabelMode" />
+          <Property name="RightAxisVisibility" />
+          <Property name="TopAxisVisibility" />
+          <Property name="LeftAxisVisibility" />
+          <Property name="BottomAxisVisibility" />
+        </ExposedProperties>
+      </SubProxy>
+    </ScatterPlotViewProxy>
+    <!-- End of group "views" -->
   </ProxyGroup>
 
   <ProxyGroup name="representations">
@@ -8479,7 +8742,284 @@
       
       <!-- End of CubeAxesRepresentation -->
     </CubeAxesRepresentationProxy>
-    
+
+    <ScatterPlotRepresentationProxy name="ScatterPlotRepresentation">
+      <Documentation>
+        Representation to scatter plots. The plot can be in 2D or 3D.
+      </Documentation>
+
+      <InputProperty name="Input" 
+        command="not-used">
+        <Documentation>
+          Set the input to the representation. Can be any vtkDataObject producer.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty name="UpdateTime"
+        command="SetUpdateTime"
+        update_self="1"
+        is_internal="1"
+        immediate_update="1"
+        number_of_elements="1"
+        default_values="none">
+        <DoubleRangeDomain name="range" />
+        <Documentation>
+          This time is not used unless UseViewUpdateTime is off.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <StringVectorProperty name="SeriesNamesInfo"
+        number_of_elements_per_command="1"
+        element_types="2"
+        update_self="1"
+        information_only="1">
+        <Documentation>
+          Property providing list of available series that can be plotted.
+        </Documentation>
+        <ScatterPlotArraysInformationHelper />
+      </StringVectorProperty>
+
+      <StringVectorProperty name="XArrayName"
+        command="SetXAxisArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on X axis.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+
+      <StringVectorProperty name="YArrayName"
+        command="SetYAxisArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on Y axis.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+
+      <StringVectorProperty name="ZArrayName"
+        command="SetZAxisArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use on Z axis.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use for color.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphScalingArrayName"
+        command="SetGlyphScalingArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use for scaling the glyphs.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphMultiSourceArrayName"
+        command="SetGlyphMultiSourceArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use for choosing the right glyph to display.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="GlyphOrientationArrayName"
+        command="SetGlyphOrientationArrayName"
+        update_self="1"
+        number_of_elements="1"
+        default_values="">
+        <Documentation>
+          Set the array to use for orienting the glyphs.
+        </Documentation>
+        <StringListDomain name="array_list" >
+          <RequiredProperties>
+             <Property name="SeriesNamesInfo" function="ArrayList"/>
+          </RequiredProperties>
+        </StringListDomain>
+      </StringVectorProperty>
+
+
+      <!--
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <BooleanDomain name="bool" />
+        <Documentation>
+          Set the visibility for this representation.
+        </Documentation>
+      </IntVectorProperty>
+      
+      <IntVectorProperty name="ColorAttributeType"
+        command="SetColorAttributeType"
+        number_of_elements="1"
+        default_values="1"
+        update_self="1">
+        <Documentation>
+          Select the attribute type from where the scalars array is used. The
+          scalar array name is specified using ColorArrayName. Note that if the
+          indicated scalar array is not available, then the image data scalars
+          are used.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="POINT_DATA" />
+          <Entry value="1" text="CELL_DATA" />
+          <Entry value="2" text="FIELD_DATA" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArrayName"
+        command="SetColorArrayName"
+        number_of_elements="1"
+        default_values=""
+        update_self="1">
+        <Documentation>
+          Set the array name to color by.
+          If no array name is set, or choosen array is not available, then the
+          image scalars are used by default.
+        </Documentation>
+        <ArrayListDomain name="array_list" attribute_type="Scalars"
+          input_domain_name="input_array_any">
+          <RequiredProperties>
+            <Property name="Input" function="Input" />
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      -->
+      <!--
+      <SubProxy>
+        <SourceProxy name="ScatterPlot" class="vtkScatterPlotFilter">
+          <InputProperty
+            name="Input"
+            command="SetInputConnection">
+            <DataTypeDomain name="input_type">
+              <DataType value="vtkDataSet"/>
+            </DataTypeDomain>
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+      -->
+
+      <SubProxy>
+        <!-- Mapper for high-res image -->
+        <Proxy name="Mapper" 
+          proxygroup="mappers" proxyname="ScatterPlotMapper" />
+
+        <ExposedProperties>
+
+          <Property name="LookupTable" />
+          <Property name="MapScalars" />
+
+          <Property name="ImmediateModeRendering" />
+          <Property name="StaticMode" />
+          <Property name="ThreeDMode" />
+          <Property name="Colorize" />
+          <Property name="GlyphMode" />
+        </ExposedProperties>
+
+      </SubProxy>
+
+    <!-- Mapper for low-res image
+      <SubProxy>
+        
+        <Proxy name="LODMapper" 
+          proxygroup="mappers" proxyname="PolyDataMapper" />
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+-->
+      <SubProxy>
+        <!-- Prop3D that gets added to the 3D renderer -->
+        <Proxy name="Prop3D" proxygroup="props" proxyname="Actor" />
+        <ExposedProperties>
+          <Property name="Orientation" />
+          <Property name="Origin" />
+          <Property name="Pickable" />
+          <Property name="Position" />
+          <Property name="Scale" />
+          <Property name="Texture" />
+          <Property name="Visibility" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- Property for the vtkProp.  -->
+        <Proxy name="Property" proxygroup="properties" proxyname="Property" />
+        <ExposedProperties>
+          <Property name="Opacity" />
+          <Property name="Shading" />
+
+          <!--
+          <Property name="SpecularColor" />
+          <Property name="SpecularPower" />
+          <Property name="PointSize" />
+          <Property name="LineWidth" />
+          <Property name="Interpolation" />
+          <Property name="AmbientColor" />
+          <Property name="DiffuseColor" />
+          <Property name="EdgeColor" />
+          -->
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of ScatterPlotRepresentation -->
+    </ScatterPlotRepresentationProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="options">

@@ -114,6 +114,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqTextRepresentation.h
   pqTimeKeeper.h
   pqTwoDRenderView.h
+  pqScatterPlotView.h
   pqUndoStack.h
   pqView.h
   pqViewExporterManager.h
@@ -332,6 +333,8 @@ ADD_LIBRARY(pqCore
   pqTimeKeeper.h
   pqTwoDRenderView.cxx
   pqTwoDRenderView.h
+  pqScatterPlotView.cxx
+  pqScatterPlotView.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqView.cxx
