@@ -70,7 +70,6 @@ public:
   //ETX
 
 
-  virtual void SetInputConnection(int port, vtkAlgorithmOutput* input);
   // Description:
   // Set the name of the point array to use as a mask for generating the glyphs.
   // This is a convenience method. The same effect can be achieved by using
@@ -506,7 +505,7 @@ protected:
   // It is called before the Render is initiated on the Painter.
   virtual void UpdatePainterInformation();
 
-  int ThreeDMode;
+  bool ThreeDMode;
   bool Colorize;
   int GlyphMode;
 

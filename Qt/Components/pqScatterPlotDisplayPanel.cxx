@@ -820,8 +820,7 @@ QVariant pqScatterPlotDisplayPanel::specularColor() const
 
   vtkSMProxy* proxy = this->Internal->ScatterPlotRepresentation;
   return pqSMAdaptor::getMultipleElementProperty(
-       this->Internal->ScatterPlotRepresentation
-       ->GetProperty("DiffuseColor"));
+    proxy->GetProperty("DiffuseColor"));
 }
 
 //-----------------------------------------------------------------------------
@@ -946,7 +945,7 @@ void pqScatterPlotDisplayPanel::setCurrentSeriesEnabled(int state)
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::setCurrentSeriesColor(const QColor &color)
+void pqScatterPlotDisplayPanel::setCurrentSeriesColor(const QColor &vtkNotUsed(color))
 {
 /*  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if(model)
@@ -966,7 +965,7 @@ void pqScatterPlotDisplayPanel::setCurrentSeriesColor(const QColor &color)
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::setCurrentSeriesThickness(int thickness)
+void pqScatterPlotDisplayPanel::setCurrentSeriesThickness(int vtkNotUsed(thickness))
 {
 /*  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if (model)
@@ -986,7 +985,7 @@ void pqScatterPlotDisplayPanel::setCurrentSeriesThickness(int thickness)
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::setCurrentSeriesStyle(int listIndex)
+void pqScatterPlotDisplayPanel::setCurrentSeriesStyle(int vtkNotUsed(listIndex))
 {
 /*  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if(model)
@@ -1006,7 +1005,7 @@ void pqScatterPlotDisplayPanel::setCurrentSeriesStyle(int listIndex)
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::setCurrentSeriesMarkerStyle(int listIndex)
+void pqScatterPlotDisplayPanel::setCurrentSeriesMarkerStyle(int vtkNotUsed(listIndex))
 {
 /*  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if(model)
@@ -1026,7 +1025,7 @@ void pqScatterPlotDisplayPanel::setCurrentSeriesMarkerStyle(int listIndex)
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::setCurrentSeriesAxes(int listIndex)
+void pqScatterPlotDisplayPanel::setCurrentSeriesAxes(int vtkNotUsed(listIndex))
 {
 /*  QItemSelectionModel *model = this->Internal->SeriesList->selectionModel();
   if(model)
@@ -1078,13 +1077,13 @@ Qt::CheckState pqScatterPlotDisplayPanel::getEnabledState() const
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::useArrayIndexToggled(bool toggle)
+void pqScatterPlotDisplayPanel::useArrayIndexToggled(bool vtkNotUsed(toggle))
 {
   //this->Internal->UseDataArray->setChecked(!toggle);
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotDisplayPanel::useDataArrayToggled(bool toggle)
+void pqScatterPlotDisplayPanel::useDataArrayToggled(bool vtkNotUsed(toggle))
 {
   //this->Internal->UseArrayIndex->setChecked(!toggle);
 }
