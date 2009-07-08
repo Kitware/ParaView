@@ -23,7 +23,7 @@
 //#include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkStdString.h" // needed for vtkStdString.
-#include "vtkWeakPointer.h"
+
 class vtkSMScatterPlotViewProxy;
 
 class VTK_EXPORT vtkSMScatterPlotRepresentationProxy : public vtkSMDataRepresentationProxy
@@ -115,8 +115,7 @@ protected:
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
-  //vtkSMSourceProxy* ScatterPlot;
-  vtkWeakPointer<vtkSMScatterPlotViewProxy> ScatterPlotView;
+  vtkSMScatterPlotViewProxy* ScatterPlotView;
 
 private:
   vtkSMScatterPlotRepresentationProxy(const vtkSMScatterPlotRepresentationProxy&); // Not implemented

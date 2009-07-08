@@ -28,7 +28,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
@@ -52,6 +52,14 @@ vtkSMScatterPlotViewProxy::~vtkSMScatterPlotViewProxy()
     stream);
   */
 }
+
+//----------------------------------------------------------------------------
+void vtkSMScatterPlotViewProxy::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "LegendScaleActor: " << this->LegendScaleActor << endl;
+}
+
 
 //----------------------------------------------------------------------------
 bool vtkSMScatterPlotViewProxy::BeginCreateVTKObjects()

@@ -26,6 +26,7 @@ class VTK_EXPORT vtkSMScatterPlotViewProxy : public vtkSMRenderViewProxy
 public:
   static vtkSMScatterPlotViewProxy* New();
   vtkTypeRevisionMacro(vtkSMScatterPlotViewProxy, vtkSMRenderViewProxy);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a default representation for the given source proxy.
