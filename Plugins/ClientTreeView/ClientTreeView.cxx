@@ -27,6 +27,7 @@
 #include <vtkSMViewProxy.h>
 #include <vtkTree.h>
 #include <vtkVariantArray.h>
+#include <vtkViewTheme.h>
 
 #include <pqDataRepresentation.h>
 #include <pqOutputPort.h>
@@ -68,6 +69,9 @@ public:
     layout->setContentsMargins(0,0,0,0);
     this->AttributeType = -1;
     this->LastSelectionMTime = 0;
+
+    this->Theme.TakeReference(vtkViewTheme::CreateNeonTheme());
+    this->View->ApplyViewTheme(this->Theme);
   }
 
   ~implementation()
@@ -79,6 +83,7 @@ public:
 
   unsigned long LastSelectionMTime;
   int AttributeType;
+  vtkSmartPointer<vtkViewTheme> Theme;
   vtkSmartPointer<vtkQtTreeView> View;
   QPointer<QWidget> Widget;
 };
@@ -272,6 +277,14 @@ void ClientTreeView::renderInternal()
     vtkSMPropertyHelper(this->getProxy(),"AlternatingRowColors").GetAsInt());
   this->Implementation->View->SetEnableDragDrop(
     vtkSMPropertyHelper(this->getProxy(),"EnableDragDrop").GetAsInt());
+
+  if(vtkSMPropertyHelper(proxy, "ColorByArray").GetAsInt())
+    {
+    this->Implementation->View->SetColorByArray(true);
+
+    this->Implementation->View->SetColorArrayName(
+      vtkSMPropertyHelper(proxy, "ColorArray").GetAsString());
+    }
 
   this->Implementation->View->Update();
 

@@ -6,7 +6,21 @@
          <Group name="sources"/>
          <Group name="filters"/>
        </ProxyGroupDomain>
+       <InputArrayDomain name="vertex_arrays" attribute_type="vertex"/>
        </InputProperty>
+
+      <IntVectorProperty name="ColorByArray" number_of_elements="1" default_values="0">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty name="ColorArray" number_of_elements="1">
+        <ArrayListDomain name="array_list" input_domain_name="vertex_arrays">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+      </StringVectorProperty>
+      
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 
