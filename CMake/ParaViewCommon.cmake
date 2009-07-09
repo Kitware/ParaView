@@ -414,6 +414,12 @@ IF(PARAVIEW_ENABLE_PYTHON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 #########################################################################
+# Configure mpi4py
+IF(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
+  ADD_SUBDIRECTORY(Utilities/mpi4py)
+ENDIF(PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
+
+#########################################################################
 # Configure HDF5
 OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
 MARK_AS_ADVANCED(PARAVIEW_USE_SYSTEM_HDF5)

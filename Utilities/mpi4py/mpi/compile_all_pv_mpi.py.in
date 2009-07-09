@@ -1,0 +1,4 @@
+import compileall
+compileall.compile_dir('@PV_MPI_PYTHON_MODULE_BINARY_DIR@')
+file = open('@PV_MPI_PYTHON_MODULE_BINARY_DIR@/pv_mpi_compile_complete', 'w')
+file.write('Done')

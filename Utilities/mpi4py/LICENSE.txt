@@ -1,0 +1,12 @@
+=======================
+LICENSE: MPI for Python
+=======================
+
+:Author:       Lisandro Dalcin
+:Organization: CIMEC <http://www.cimec.org.ar>
+:Address:      PTLC, 3000 Santa Fe, Argentina
+:Contact:      dalcinl@gmail.com
+:Web Site:     http://mpi4py.googlecode.com/
+
+
+This package has been placed in the public domain.
