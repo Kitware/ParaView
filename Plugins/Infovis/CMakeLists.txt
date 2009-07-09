@@ -35,6 +35,7 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkSQLDatabaseGraphSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkSQLDatabaseTableSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkSimple2DLayoutStrategy.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkSparseArrayToTable.h
     ${VTK_SOURCE_DIR}/Infovis/vtkStringToNumeric.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToGraph.h
     ${VTK_SOURCE_DIR}/Infovis/vtkTableToTreeFilter.h

@@ -196,6 +196,21 @@
   
   <!-- FILTERS GROUP -->
   <ProxyGroup name="filters">
+    <SourceProxy name="SparseArrayToTable" class="vtkSparseArrayToTable">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkArrayData"/>
+        </DataTypeDomain>
+      </InputProperty>
+
+      <StringVectorProperty name="ValueColumn" command="SetValueColumn" number_of_elements="1" default_values="index" label="Value Column"/>
+
+    </SourceProxy>
+
     <SourceProxy name="MergeTables" class="vtkMergeTables">
       <!-- Table 1 Input -->
       <InputProperty name="Input1" command="SetInputConnection" port_index="0">
