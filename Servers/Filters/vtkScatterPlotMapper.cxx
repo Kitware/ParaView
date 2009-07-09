@@ -55,7 +55,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.3");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.4");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -926,7 +926,8 @@ double *vtkScatterPlotMapper::GetBounds()
     double zScaleRange[2] = {1.0, 1.0};
     double x0ScaleRange[2] = {1.0, 1.0};
     double x1ScaleRange[2] = {1.0, 1.0};
-    double x2ScaleRange[2] = {1.0, 1.0};    
+    double x2ScaleRange[2] = {1.0, 1.0};
+    double range[3];
     switch(this->ScaleMode)
       {
       case SCALE_BY_MAGNITUDE:
@@ -939,27 +940,39 @@ double *vtkScatterPlotMapper::GetBounds()
               yScaleRange, this->GetArrayComponent(GLYPH_Y_SCALE));
             glyphZScaleArray->GetRange(
               zScaleRange, this->GetArrayComponent(GLYPH_Z_SCALE));
-            maxScale[0] = xScaleRange[1];
-            maxScale[1] = yScaleRange[1];
-            maxScale[2] = zScaleRange[1];
-            maxScale[0] = maxScale[1] = maxScale[2] = vtkMath::Norm(maxScale);
+            range[0] = xScaleRange[1];
+            range[1] = yScaleRange[1];
+            range[2] = zScaleRange[1];
+            maxScale[1] = vtkMath::Norm(range);
+            range[0] = xScaleRange[0];
+            range[1] = yScaleRange[0];
+            range[2] = zScaleRange[0];
+            maxScale[0] = vtkMath::Norm(range);
             break;
           case Xc0_Xc1_Xc2:
             glyphXScaleArray->GetRange(x0ScaleRange, 0);
             glyphXScaleArray->GetRange(x1ScaleRange, 1);
             glyphXScaleArray->GetRange(x2ScaleRange, 2);
-            maxScale[0] = x0ScaleRange[1];
-            maxScale[1] = x1ScaleRange[1];
-            maxScale[2] = x2ScaleRange[1];
-            maxScale[0] = maxScale[1] = maxScale[2] = vtkMath::Norm(maxScale, 3);
+            range[0] = x0ScaleRange[1];
+            range[1] = x1ScaleRange[1];
+            range[2] = x2ScaleRange[1];
+            maxScale[1] = vtkMath::Norm(range, 3);
+            range[0] = x0ScaleRange[0];
+            range[1] = x1ScaleRange[0];
+            range[2] = x2ScaleRange[0];
+            maxScale[0] = vtkMath::Norm(range, 3);
             break;
           case Xc_Xc_Xc:
             glyphXScaleArray->GetRange(
               xScaleRange, this->GetArrayComponent(GLYPH_X_SCALE));
-            maxScale[0] = xScaleRange[1];
-            maxScale[1] = xScaleRange[1];
-            maxScale[2] = xScaleRange[1];
-            maxScale[0] = maxScale[1] = maxScale[2] = vtkMath::Norm(maxScale, 3);
+            range[0] = xScaleRange[1];
+            range[1] = xScaleRange[1];
+            range[2] = xScaleRange[1];
+            maxScale[1] = vtkMath::Norm(range, 3);
+            range[0] = xScaleRange[0];
+            range[1] = xScaleRange[0];
+            range[2] = xScaleRange[0];
+            maxScale[0] = vtkMath::Norm(range, 3);
             break;
           default:
             vtkErrorMacro("Wrong ScalingArray mode");
@@ -976,24 +989,27 @@ double *vtkScatterPlotMapper::GetBounds()
               yScaleRange, this->GetArrayComponent(GLYPH_Y_SCALE));
             glyphZScaleArray->GetRange(
               zScaleRange, this->GetArrayComponent(GLYPH_Z_SCALE));
-            maxScale[0] = xScaleRange[1];
-            maxScale[1] = yScaleRange[1];
-            maxScale[2] = zScaleRange[1];
+            maxScale[0] = min(xScaleRange[0],yScaleRange[0]);
+            maxScale[0] = min(maxScale[0],zScaleRange[0]);
+            maxScale[1] = max(xScaleRange[1],yScaleRange[1]);
+            maxScale[1] = max(maxScale[1],zScaleRange[1]);
             break;
           case Xc0_Xc1_Xc2:
             glyphXScaleArray->GetRange(x0ScaleRange, 0);
             glyphXScaleArray->GetRange(x1ScaleRange, 1);
             glyphXScaleArray->GetRange(x2ScaleRange, 2);
-            maxScale[0] = x0ScaleRange[1];
-            maxScale[1] = x1ScaleRange[1];
-            maxScale[2] = x2ScaleRange[1];
+            maxScale[0] = min(x0ScaleRange[0], x1ScaleRange[0]);
+            maxScale[0] = min(maxScale[0], x2ScaleRange[0]);
+            maxScale[1] = max(x0ScaleRange[1], x1ScaleRange[1]);
+            maxScale[1] = max(maxScale[1], x2ScaleRange[1]);
             break;
           case Xc_Xc_Xc:
             glyphXScaleArray->GetRange(
               xScaleRange, this->GetArrayComponent(GLYPH_X_SCALE));
-            maxScale[0] = xScaleRange[1];
-            maxScale[1] = xScaleRange[1];
-            maxScale[2] = xScaleRange[1];
+            maxScale[0] = min(xScaleRange[0], xScaleRange[0]);
+            maxScale[0] = min(maxScale[0], xScaleRange[0]);
+            maxScale[1] = max(xScaleRange[1], xScaleRange[1]);
+            maxScale[1] = max(maxScale[1], xScaleRange[1]);
             break;
           default:
             vtkErrorMacro("Wrong ScalingArray mode");
