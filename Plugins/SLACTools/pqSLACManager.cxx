@@ -93,8 +93,14 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
                    this, SLOT(showBField()));
   QObject::connect(this->actionShowParticles(), SIGNAL(toggled(bool)),
                    this, SLOT(showParticles(bool)));
+  QObject::connect(this->actionSolidMesh(), SIGNAL(triggered(bool)),
+                   this, SLOT(showSolidMesh()));
+  QObject::connect(this->actionWireframeSolidMesh(), SIGNAL(triggered(bool)),
+                   this, SLOT(showWireframeSolidMesh()));
+  QObject::connect(this->actionWireframeAndBackMesh(), SIGNAL(triggered(bool)),
+                   this, SLOT(showWireframeAndBackMesh()));
 
-  this->checkFieldActionStatus();
+  this->checkActionEnabled();
 }
 
 pqSLACManager::~pqSLACManager()
@@ -122,6 +128,21 @@ QAction *pqSLACManager::actionShowBField()
 QAction *pqSLACManager::actionShowParticles()
 {
   return this->Internal->Actions.actionShowParticles;
+}
+
+QAction *pqSLACManager::actionSolidMesh()
+{
+  return this->Internal->Actions.actionSolidMesh;
+}
+
+QAction *pqSLACManager::actionWireframeSolidMesh()
+{
+  return this->Internal->Actions.actionWireframeSolidMesh;
+}
+
+QAction *pqSLACManager::actionWireframeAndBackMesh()
+{
+  return this->Internal->Actions.actionWireframeAndBackMesh;
 }
 
 //-----------------------------------------------------------------------------
@@ -191,17 +212,20 @@ void pqSLACManager::showDataLoadManager()
   pqSLACDataLoadManager *dialog = new pqSLACDataLoadManager(this->mainWindow());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   QObject::connect(dialog, SIGNAL(createdPipeline()),
-                   this, SLOT(checkFieldActionStatus()));
+                   this, SLOT(checkActionEnabled()));
   dialog->show();
 }
 
 //-----------------------------------------------------------------------------
-void pqSLACManager::checkFieldActionStatus()
+void pqSLACManager::checkActionEnabled()
 {
   if (!this->meshReader())
     {
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
+    this->actionSolidMesh()->setEnabled(false);
+    this->actionWireframeSolidMesh()->setEnabled(false);
+    this->actionWireframeAndBackMesh()->setEnabled(false);
     }
   else
     {
@@ -214,6 +238,10 @@ void pqSLACManager::checkFieldActionStatus()
                             pointFields->GetArrayInformation("efield") != NULL);
     this->actionShowBField()->setEnabled(
                             pointFields->GetArrayInformation("bfield") != NULL);
+
+    this->actionSolidMesh()->setEnabled(true);
+    this->actionWireframeSolidMesh()->setEnabled(true);
+    this->actionWireframeAndBackMesh()->setEnabled(true);
     }
 
   this->actionShowParticles()->setEnabled(this->particlesReader() != NULL);
@@ -290,4 +318,17 @@ void pqSLACManager::showParticles(bool show)
 
   pqDataRepresentation *repr = reader->getRepresentation(view);
   repr->setVisible(show);
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::showSolidMesh()
+{
+}
+
+void pqSLACManager::showWireframeSolidMesh()
+{
+}
+
+void pqSLACManager::showWireframeAndBackMesh()
+{
 }

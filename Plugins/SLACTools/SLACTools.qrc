@@ -4,5 +4,8 @@
     <file>Icons/EField.png</file>
     <file>Icons/BField.png</file>
     <file>Icons/ShowParticles.png</file>
+    <file>Icons/ShowSolid.png</file>
+    <file>Icons/ShowWireframeSolid.png</file>
+    <file>Icons/ShowWireframeAndBack.png</file>
   </qresource>
 </RCC>

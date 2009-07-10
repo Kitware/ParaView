@@ -45,6 +45,9 @@ public:
   QAction *actionShowEField();
   QAction *actionShowBField();
   QAction *actionShowParticles();
+  QAction *actionSolidMesh();
+  QAction *actionWireframeSolidMesh();
+  QAction *actionWireframeAndBackMesh();
 
   /// Convenience function for getting the current server.
   pqServer *activeServer();
@@ -61,11 +64,14 @@ public:
 
 public slots:
   void showDataLoadManager();
-  void checkFieldActionStatus();
+  void checkActionEnabled();
   void showField(const char *name);
   void showEField();
   void showBField();
   void showParticles(bool show);
+  void showSolidMesh();
+  void showWireframeSolidMesh();
+  void showWireframeAndBackMesh();
 
 protected:
   pqPipelineSource *findPipelineSource(const char *SMName);

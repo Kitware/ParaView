@@ -64,6 +64,42 @@
     <string>Toggle Show Particles</string>
    </property>
   </action>
+  <action name="actionSolidMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowSolid.png</normaloff>:/SLACTools/Icons/ShowSolid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Solid Mesh</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Mesh as Solid Surface</string>
+   </property>
+  </action>
+  <action name="actionWireframeSolidMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowWireframeSolid.png</normaloff>:/SLACTools/Icons/ShowWireframeSolid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Solid Mesh</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Mesh as Solid with Wireframe</string>
+   </property>
+  </action>
+  <action name="actionWireframeAndBackMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowWireframeAndBack.png</normaloff>:/SLACTools/Icons/ShowWireframeAndBack.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Front and Solid Back</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Wireframe Front and Solid Back</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>
