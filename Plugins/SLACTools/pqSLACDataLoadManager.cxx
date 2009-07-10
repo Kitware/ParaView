@@ -181,7 +181,7 @@ void pqSLACDataLoadManager::setupPipeline()
     pqDataRepresentation *repr
       = displayPolicy->createPreferredRepresentation(
                                 particlesReader->getOutputPort(0), view, false);
-    repr->setVisible(true);
+    repr->setVisible(manager->actionShowParticles()->isChecked());
 
     // We have already made the representations and pushed everything to the
     // server manager.  Thus, there is no state left to be modified.

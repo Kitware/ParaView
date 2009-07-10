@@ -44,6 +44,7 @@ public:
   QAction *actionDataLoadManager();
   QAction *actionShowEField();
   QAction *actionShowBField();
+  QAction *actionShowParticles();
 
   /// Convenience function for getting the current server.
   pqServer *activeServer();
@@ -64,6 +65,7 @@ public slots:
   void showField(const char *name);
   void showEField();
   void showBField();
+  void showParticles(bool show);
 
 protected:
   pqPipelineSource *findPipelineSource(const char *SMName);

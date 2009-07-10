@@ -83,12 +83,16 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
   this->Internal->ActionPlaceholder = new QWidget(NULL);
   this->Internal->Actions.setupUi(this->Internal->ActionPlaceholder);
 
+  this->actionShowParticles()->setChecked(true);
+
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
   QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)),
                    this, SLOT(showEField()));
   QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)),
                    this, SLOT(showBField()));
+  QObject::connect(this->actionShowParticles(), SIGNAL(toggled(bool)),
+                   this, SLOT(showParticles(bool)));
 
   this->checkFieldActionStatus();
 }
@@ -113,6 +117,11 @@ QAction *pqSLACManager::actionShowEField()
 QAction *pqSLACManager::actionShowBField()
 {
   return this->Internal->Actions.actionShowBField;
+}
+
+QAction *pqSLACManager::actionShowParticles()
+{
+  return this->Internal->Actions.actionShowParticles;
 }
 
 //-----------------------------------------------------------------------------
@@ -189,24 +198,25 @@ void pqSLACManager::showDataLoadManager()
 //-----------------------------------------------------------------------------
 void pqSLACManager::checkFieldActionStatus()
 {
-  pqPipelineSource *reader = this->meshReader();
-
-  if (!reader)
+  if (!this->meshReader())
     {
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
-    return;
+    }
+  else
+    {
+    pqOutputPort *outputPort = this->meshReader()->getOutputPort(0);
+    vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
+    vtkPVDataSetAttributesInformation *pointFields
+      = dataInfo->GetPointDataInformation();
+
+    this->actionShowEField()->setEnabled(
+                            pointFields->GetArrayInformation("efield") != NULL);
+    this->actionShowBField()->setEnabled(
+                            pointFields->GetArrayInformation("bfield") != NULL);
     }
 
-  pqOutputPort *outputPort = reader->getOutputPort(0);
-  vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
-  vtkPVDataSetAttributesInformation *pointFields
-    = dataInfo->GetPointDataInformation();
-
-  this->actionShowEField()->setEnabled(
-                            pointFields->GetArrayInformation("efield") != NULL);
-  this->actionShowBField()->setEnabled(
-                            pointFields->GetArrayInformation("bfield") != NULL);
+  this->actionShowParticles()->setEnabled(this->particlesReader() != NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -267,4 +277,17 @@ void pqSLACManager::showEField()
 void pqSLACManager::showBField()
 {
   this->showField("bfield");
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::showParticles(bool show)
+{
+  pqPipelineSource *reader = this->particlesReader();
+  if (!reader) return;
+
+  pqView *view = this->view3D();
+  if (!view) return;
+
+  pqDataRepresentation *repr = reader->getRepresentation(view);
+  repr->setVisible(show);
 }

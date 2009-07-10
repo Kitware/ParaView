@@ -3,5 +3,6 @@
     <file>Icons/DataLoadManager.png</file>
     <file>Icons/EField.png</file>
     <file>Icons/BField.png</file>
+    <file>Icons/ShowParticles.png</file>
   </qresource>
 </RCC>
