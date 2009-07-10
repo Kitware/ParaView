@@ -30,9 +30,10 @@
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
-#include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
+#include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
@@ -217,14 +218,43 @@ void pqSLACManager::showField(const char *name)
   pqView *view = this->view3D();
   if (!view) return;
 
-  pqDataRepresentation *repr = reader->getRepresentation(0, view);
-  vtkSMProxy *reprProxy = repr->getProxy();
+  // Get the (downcasted) representation.
+  pqDataRepresentation *_repr = reader->getRepresentation(0, view);
+  pqPipelineRepresentation *repr
+    = qobject_cast<pqPipelineRepresentation*>(_repr);
+  if (!repr)
+    {
+    qWarning() << "Could not find representation object.";
+    return;
+    }
 
-  pqSMAdaptor::setEnumerationProperty(
-                    reprProxy->GetProperty("ColorAttributeType"), "POINT_DATA");
-  pqSMAdaptor::setElementProperty(
-                                reprProxy->GetProperty("ColorArrayName"), name);
-  reprProxy->UpdateVTKObjects();
+  // Set the field to color by.
+  repr->setColorField(QString("%1 (point)").arg(name));
+
+  // Adjust the color map to be rainbow.
+  pqScalarsToColors *lut = repr->getLookupTable();
+  vtkSMProxy *lutProxy = lut->getProxy();
+
+  pqSMAdaptor::setEnumerationProperty(lutProxy->GetProperty("ColorSpace"),
+                                      "HSV");
+
+  // Control points are 4-tuples comprising scalar value + RGB
+  QList<QVariant> RGBPoints;
+  RGBPoints << 0.0 << 0.0 << 0.0 << 1.0;
+  RGBPoints << 1.0 << 1.0 << 0.0 << 0.0;
+  pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"),
+                                          RGBPoints);
+
+  // Set the range of the scalars to the current range of the field.
+  double range[2];
+  vtkPVDataInformation *dataInfo = repr->getInputDataInformation();
+  vtkPVDataSetAttributesInformation *pointInfo
+    = dataInfo->GetPointDataInformation();
+  vtkPVArrayInformation *arrayInfo = pointInfo->GetArrayInformation(name);
+  arrayInfo->GetComponentRange(-1, range);
+  lut->setScalarRange(range[0], range[1]);
+
+  lutProxy->UpdateVTKObjects();
 
   view->render();
 }
