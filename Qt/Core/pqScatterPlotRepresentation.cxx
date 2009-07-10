@@ -214,8 +214,7 @@ pqScalarOpacityFunction* pqScatterPlotRepresentation::getScalarOpacityFunction()
 //-----------------------------------------------------------------------------
 void pqScatterPlotRepresentation::createHelperProxies()
 {
-  vtkSMProxy* proxy = this->getProxy();
-  /*
+  /*vtkSMProxy* proxy = this->getProxy();
   if (proxy->GetProperty("ScalarOpacityFunction"))
     {
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
@@ -288,9 +287,9 @@ void pqScatterPlotRepresentation::setDefaultPropertyValues()
   
   vtkPVDataInformation* inGeomInfo = 0;
   vtkPVDataInformation* geomInfo = 0;
-  vtkPVDataSetAttributesInformation* inAttrInfo = 0;
-  vtkPVDataSetAttributesInformation* attrInfo;
-  vtkPVArrayInformation* arrayInfo;
+  //vtkPVDataSetAttributesInformation* inAttrInfo = 0;
+  //vtkPVDataSetAttributesInformation* attrInfo;
+  //vtkPVArrayInformation* arrayInfo;
 
   // Get the time that this representation is going to use.
   vtkPVDataInformation* dataInfo = 0;
@@ -394,14 +393,14 @@ void pqScatterPlotRepresentation::setDefaultPropertyValues()
     inGeomInfo = upstreamDisplay->getRepresentationProxy()->
       GetRepresentedDataInformation();
     }
-
+/*
   vtkPVArrayInformation* chosenArrayInfo = 0;
   int chosenFieldType = 0;
 
   // Look for a new point array.
   // I do not think the logic is exactly as describerd in this methods
   // comment.  I believe this method only looks at "Scalars".
-/*
+
   if (geomInfo)
     {
     attrInfo = geomInfo->GetPointDataInformation();
@@ -778,14 +777,14 @@ int pqScatterPlotRepresentation::getColorFieldNumberOfComponents(const QString& 
     {
     return 0;
     }
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right(static_cast<int>(strlen(" (cell)"))) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop(static_cast<int>(strlen(" (cell)")));
     fieldType = vtkSMDataRepresentationProxy::CELL_DATA;
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right(static_cast<int>(strlen(" (point)"))) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop(static_cast<int>(strlen(" (point)")));
     fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
     }
 
@@ -814,14 +813,14 @@ pqScatterPlotRepresentation::getColorFieldRange(const QString& array, int compon
     {
     return ret;
     }
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right(static_cast<int>(strlen(" (cell)"))) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop(static_cast<int>(strlen(" (cell)")));
     fieldType = vtkSMDataRepresentationProxy::CELL_DATA;
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right(static_cast<int>(strlen(" (point)"))) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop(static_cast<int>(strlen(" (point)")));
     fieldType = vtkSMDataRepresentationProxy::POINT_DATA;
     }
 
@@ -907,15 +906,15 @@ void pqScatterPlotRepresentation::setColorField(const QString& value)
     }
 
   QString field = value;
-  if(field.right(strlen(" (cell)")) == " (cell)")
+  if(field.right(static_cast<int>(strlen(" (cell)"))) == " (cell)")
     {
-    field.chop(strlen(" (cell)"));
+    field.chop(static_cast<int>(strlen(" (cell)")));
     this->colorByArray(field.toAscii().data(), 
                        vtkSMDataRepresentationProxy::CELL_DATA);
     }
-  else if(field.right(strlen(" (point)")) == " (point)")
+  else if(field.right(static_cast<int>(strlen(" (point)"))) == " (point)")
     {
-    field.chop(strlen(" (point)"));
+    field.chop(static_cast<int>(strlen(" (point)")));
     this->colorByArray(field.toAscii().data(), 
                        vtkSMDataRepresentationProxy::POINT_DATA);
     }
