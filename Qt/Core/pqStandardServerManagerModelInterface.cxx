@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMPVRepresentationProxy.h"
+#include "vtkSMScatterPlotRepresentationProxy.h"
 // Qt Includes.
 #include <QtDebug>
 
@@ -49,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqScalarOpacityFunction.h"
+#include "pqScatterPlotRepresentation.h"
 #include "pqTimeKeeper.h"
 #include "pqViewModuleInterface.h"
 
@@ -130,6 +132,11 @@ pqProxy* pqStandardServerManagerModelInterface::createPQProxy(
       {
       return new pqPipelineRepresentation(group, name, 
         vtkSMPropRepresentationProxy::SafeDownCast(proxy), server, 0);
+      }
+    if (proxy->IsA("vtkSMScatterPlotRepresentationProxy"))
+      {
+      return new pqScatterPlotRepresentation(group, name,
+        vtkSMScatterPlotRepresentationProxy::SafeDownCast(proxy), server, 0);
       }
     if (proxy->IsA("vtkSMDataRepresentationProxy"))
       {

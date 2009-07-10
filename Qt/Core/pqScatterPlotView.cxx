@@ -66,15 +66,30 @@ pqScatterPlotView::ManipulatorType pqScatterPlotView::TwoDManipulatorTypes[9] =
     { 3, 0, 1, "Pan"},
 };
 
+pqScatterPlotView::ManipulatorType pqScatterPlotView::ThreeDManipulatorTypes[] = 
+{
+    { 1, 0, 0, "Rotate"},
+    { 2, 0, 0, "Pan"},
+    { 3, 0, 0, "Zoom"},
+    { 1, 1, 0, "Roll"},
+    { 2, 1, 0, "Rotate"},
+    { 3, 1, 0, "Pan"},
+    { 1, 0, 1, "Zoom"},
+    { 2, 0, 1, "Rotate"},
+    { 3, 0, 1, "Zoom"},
+};
+
 class pqScatterPlotView::pqInternal
 {
 public:
   QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  bool ThreeDMode;
 
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    ThreeDMode = false;
     }
 };
 
@@ -254,3 +269,26 @@ void adjustImageExtent(vtkImageData * image, int topLeftX, int topLeftY)
 }
 
 */
+
+void pqScatterPlotView::set3DMode(bool enable)
+{
+  if(enable == this->Internal->ThreeDMode)
+    {
+    return;
+    }
+  this->Internal->ThreeDMode = enable;
+  this->initializeInteractors();
+}
+
+bool pqScatterPlotView::get3DMode()const
+{
+  return this->Internal->ThreeDMode;
+}
+
+const pqScatterPlotView::ManipulatorType* pqScatterPlotView
+::getDefaultManipulatorTypesInternal()
+{ 
+  return this->Internal->ThreeDMode ? 
+    pqScatterPlotView::ThreeDManipulatorTypes:
+    pqScatterPlotView::TwoDManipulatorTypes; 
+}

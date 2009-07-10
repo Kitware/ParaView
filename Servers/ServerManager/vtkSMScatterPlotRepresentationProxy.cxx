@@ -48,7 +48,7 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -240,6 +240,7 @@ void vtkSMScatterPlotRepresentationProxy::SetColorAttributeType(int type)
     }
   this->Mapper->UpdateVTKObjects();
   //this->LODMapper->UpdateVTKObjects();
+  //this->UpdateShadingParameters();
 }
 
 //-----------------------------------------------------------------------------

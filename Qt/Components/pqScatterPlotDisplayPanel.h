@@ -55,6 +55,8 @@ signals:
 protected slots:
   void zoomToData();
   
+  void update3DMode();
+
   void openColorMapEditor();
 
   void rescaleToDataRange();

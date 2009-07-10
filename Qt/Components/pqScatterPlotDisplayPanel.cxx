@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardColorButton.h"
 #include "pqUndoStack.h"
 #include "pqRenderView.h"
+#include "pqScatterPlotView.h"
 #include "pqColorScaleToolbar.h"
 //#include "pqChartSeriesEditorModel.h"
 #include "pqComboBoxDomain.h"
@@ -71,6 +72,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 #include "vtkScatterPlotMapper.h"
 #include "pqPipelineRepresentation.h"
+#include "pqScatterPlotRepresentation.h"
+#include "vtkCamera.h"
 
 #include <assert.h>
 
@@ -200,7 +203,7 @@ public:
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
   //vtkSMScatterPlotRepresentationProxy* ScatterPlotRepresentation;
   vtkWeakPointer<vtkSMScatterPlotRepresentationProxy> ScatterPlotRepresentation;
-  QPointer<pqDataRepresentation> Representation;
+  QPointer<pqScatterPlotRepresentation> Representation;
 
   //pqChartSeriesEditorModel *Model;
 
@@ -315,17 +318,18 @@ void pqScatterPlotDisplayPanel::setupGUIConnections()
   //  this->Internal->StyleInterpolation);
   //this->Internal->InterpolationAdaptor->setObjectName(
   //  "StyleInterpolationAdapator");
-
+  /*
   QObject::connect(this->Internal->ColorActorColor,
     SIGNAL(chosenColorChanged(const QColor&)),
     this, SLOT(setSolidColor(const QColor&)));
-
+  */
   /// Set up signal-slot connections to create a single undo-set for all the
   /// changes that happen when the solid color is changed.
   /// We need to do this for both solid and edge color since we want to make
   /// sure that the undo-element for setting up of the "global property" link
   /// gets added in the same set in which the solid/edge color is changed.
-  this->Internal->ColorActorColor->setUndoLabel("Change Solid Color");
+  //this->Internal->ColorActorColor->setUndoLabel("Change Solid Color");
+  /*
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   if (stack)
     {
@@ -335,7 +339,7 @@ void pqScatterPlotDisplayPanel::setupGUIConnections()
     QObject::connect(this->Internal->ColorActorColor,
       SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
     }
-
+  */
 //   this->Internal->EdgeColorAdaptor = new pqSignalAdaptorColor(
 //     this->Internal->EdgeColor, "chosenColor",
 //     SIGNAL(chosenColorChanged(const QColor&)), false);
@@ -348,19 +352,19 @@ void pqScatterPlotDisplayPanel::setupGUIConnections()
 //     QObject::connect(this->Internal->EdgeColor,
 //       SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
 //     }
-
-  this->Internal->AmbientColorAdaptor = new pqSignalAdaptorColor(
-    this->Internal->AmbientColor, "chosenColor",
-    SIGNAL(chosenColorChanged(const QColor&)), false);
-  this->Internal->AmbientColor->setUndoLabel("Change Ambient Color");
-  if (stack)
-    {
-    QObject::connect(this->Internal->AmbientColor,
-      SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this->Internal->AmbientColor,
-      SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    }
+  
+  // this->Internal->AmbientColorAdaptor = new pqSignalAdaptorColor(
+//     this->Internal->AmbientColor, "chosenColor",
+//     SIGNAL(chosenColorChanged(const QColor&)), false);
+//   this->Internal->AmbientColor->setUndoLabel("Change Ambient Color");
+//   if (stack)
+//     {
+//     QObject::connect(this->Internal->AmbientColor,
+//       SIGNAL(beginUndo(const QString&)),
+//       stack, SLOT(beginUndoSet(const QString&)));
+//     QObject::connect(this->Internal->AmbientColor,
+//       SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
+//     }
 
   //QObject::connect(this->Internal->StyleMaterial, SIGNAL(currentIndexChanged(int)),
   //                 this, SLOT(updateMaterial(int)));
@@ -435,7 +439,7 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
   // Give the representation to our series editor model
   //this->Internal->Model->setRepresentation(
   //  qobject_cast<pqDataRepresentation*>(disp));
-  this->Internal->Representation = qobject_cast<pqDataRepresentation*>(disp);
+  this->Internal->Representation = qobject_cast<pqScatterPlotRepresentation*>(disp);
 
   this->setEnabled(true);
 
@@ -448,22 +452,10 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
     "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Visibility"));
 
-  //this->Internal->Links->addPropertyLink(this->Internal->Selectable,
-  //  "checked", SIGNAL(stateChanged(int)),
-  //  reprProxy, reprProxy->GetProperty("Pickable"));
-  /*
-  QList<QVariant> sliceModes = 
-    pqSMAdaptor::getEnumerationPropertyDomain(
-      reprProxy->GetProperty("SliceMode"));
-  foreach(QVariant item, sliceModes)
-    {
-    this->Internal->SliceDirection->addItem(item.toString());
-    }
-  this->Internal->Links->addPropertyLink(
-    this->Internal->SliceDirectionAdaptor,
-    "currentText", SIGNAL(currentTextChanged(const QString&)),
-    reprProxy, reprProxy->GetProperty("SliceMode"));
-  */
+  this->Internal->Links.addPropertyLink(this->Internal->Selectable,
+    "checked", SIGNAL(stateChanged(int)),
+    proxy, proxy->GetProperty("Pickable"));
+
   vtkSMProperty* prop = 0;
   // setup cube axes visibility.
   if ((prop = proxy->GetProperty("CubeAxesVisibility")) != 0)
@@ -509,10 +501,10 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
       proxy, proxy->GetProperty("InterpolateScalarsBeforeMapping"));
     }
 
-  this->Internal->ColorBy->setRepresentation(this->Internal->Representation);
-  QObject::connect(this->Internal->ColorBy,
-    SIGNAL(modified()),
-    this, SLOT(updateEnableState()), Qt::QueuedConnection);
+  // this->Internal->ColorBy->setRepresentation(this->Internal->Representation);
+//   QObject::connect(this->Internal->ColorBy,
+//     SIGNAL(modified()),
+//     this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
 //   this->Internal->StyleRepresentation->setRepresentation(repr);
 //   QObject::connect(this->Internal->StyleRepresentation,
@@ -523,7 +515,7 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
 //     SIGNAL(currentTextChanged(const QString&)),
 //     this, SLOT(updateEnableState()), Qt::QueuedConnection);
 
-  this->Internal->Texture->setRepresentation(this->Internal->Representation);
+  //this->Internal->Texture->setRepresentation(this->Internal->Representation);
 
 
   if (proxy->GetProperty("ExtractedBlockIndex"))
@@ -666,6 +658,10 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
   QObject::connect(this->Internal->GlyphOrientationCheckBox,
                    SIGNAL(stateChanged(int)),
                    this, SLOT(updateGlyphMode()), Qt::QueuedConnection);
+  
+  QObject::connect(this->Internal->ZCoordsCheckBox,
+                   SIGNAL(stateChanged(int)),
+                   this, SLOT(update3DMode()), Qt::QueuedConnection);
 
   // Request a render when any GUI widget is changed by the user.
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
@@ -697,6 +693,24 @@ void pqScatterPlotDisplayPanel::zoomToData()
     }
 }
 
+void pqScatterPlotDisplayPanel::update3DMode()
+{
+  pqScatterPlotView* renModule = qobject_cast<pqScatterPlotView*>(
+    this->Internal->Representation->getView());
+  if(!renModule)
+    {
+    return;
+    }
+  renModule->getRenderViewProxy()->GetActiveCamera()
+    ->SetPosition(0., 0., 1.);
+  renModule->getRenderViewProxy()->GetActiveCamera()
+    ->SetFocalPoint(0., 0., 0.);
+  renModule->getRenderViewProxy()->GetActiveCamera()
+    ->SetViewUp(0., 1., 0.);
+  renModule->set3DMode(this->Internal->ZCoordsCheckBox->isChecked());
+  this->zoomToData();
+}
+
 //-----------------------------------------------------------------------------
 void pqScatterPlotDisplayPanel::openColorMapEditor()
 {
@@ -716,27 +730,7 @@ void pqScatterPlotDisplayPanel::rescaleToDataRange()
     {
     return;
     }
-  //this->Internal->Representation->resetLookupTableScalarRange();
-  //
-  /*
-  pqScalarsToColors* lut = this->Internal->Representation->getLookupTable();
-  //QString colorField = this->getColorField();
-  if (lut )// && colorField != "" && 
-           //  colorField != pqPipelineRepresentation::solidColor())
-    {
-    QPair<double,double> range = this->getColorFieldRange();
-    lut->setScalarRange(range.first, range.second);
-
-    // scalar opacity is treated as slave to the lookup table.
-    pqScalarOpacityFunction* opacity = this->getScalarOpacityFunction();
-    if(opacity)
-      {
-      opacity->setScalarRange(range.first, range.second);
-      }
-    }
-  //
-  this->updateAllViews();
-  */
+  this->Internal->Representation->resetLookupTableScalarRange();
 }
 
 /*
@@ -1092,8 +1086,8 @@ void pqScatterPlotDisplayPanel::useDataArrayToggled(bool vtkNotUsed(toggle))
 void pqScatterPlotDisplayPanel::updateEnableState()
 {
   this->Internal->ColorInterpolateScalars->setEnabled(true);
-  this->Internal->ColorButtonStack->setCurrentWidget(
-    this->Internal->ColorMapPage);
+  //this->Internal->ColorButtonStack->setCurrentWidget(
+  //  this->Internal->ColorMapPage);
   //this->Internal->BackfaceActorColor->setEnabled(false);
   /*
   int reprType = this->Internal->Representation->getRepresentationType();

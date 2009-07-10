@@ -96,6 +96,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqScalarBarVisibilityAdaptor.h
   pqScalarOpacityFunction.h
   pqScalarsToColors.h
+  pqScatterPlotRepresentation.h
   pqServer.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
@@ -294,6 +295,8 @@ ADD_LIBRARY(pqCore
   pqScalarOpacityFunction.h
   pqScalarsToColors.cxx
   pqScalarsToColors.h
+  pqScatterPlotRepresentation.cxx
+  pqScatterPlotRepresentation.h
   pqServer.cxx
   pqServer.h
   pqServerManagerModel.cxx

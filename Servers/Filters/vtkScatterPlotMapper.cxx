@@ -55,7 +55,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.4");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.5");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -682,10 +682,12 @@ void vtkScatterPlotMapper::Render(vtkRenderer *ren, vtkActor *actor)
       this->GetMTime() > this->BuildTime ||
       ren->GetRenderWindow() != this->LastWindow.GetPointer();
     }
-//   cout << " ImmediateMode: " << immediateMode << endl;
-//   cout << " Create Display List: " << createDisplayList << endl;
+  //cout << " ImmediateMode: " << immediateMode << endl;
+  //cout << " this->ImmediateMode: " << this->ImmediateModeRendering << endl;
+  //cout << " Create Display List: " << createDisplayList << endl;
   if(immediateMode || createDisplayList)
     {
+    //cout << __FUNCTION__ << endl;
     this->PrepareForRendering(ren,actor);
     
     if(createDisplayList)

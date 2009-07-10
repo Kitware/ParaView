@@ -8903,7 +8903,8 @@
           Set the visibility for this representation.
         </Documentation>
       </IntVectorProperty>
-      
+      -->
+<!--
       <IntVectorProperty name="ColorAttributeType"
         command="SetColorAttributeType"
         number_of_elements="1"
@@ -8921,7 +8922,7 @@
           <Entry value="2" text="FIELD_DATA" />
         </EnumerationDomain>
       </IntVectorProperty>
-
+-->
       <StringVectorProperty name="ColorArrayName"
         command="SetColorArrayName"
         number_of_elements="1"
@@ -8939,7 +8940,7 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
-      -->
+      
       <!--
       <SubProxy>
         <SourceProxy name="ScatterPlot" class="vtkScatterPlotFilter">
@@ -8973,7 +8974,7 @@
 
       </SubProxy>
 
-    <!-- Mapper for low-res image
+      <!-- Mapper for low-res image
       <SubProxy>
         
         <Proxy name="LODMapper" 
@@ -8982,7 +8983,7 @@
           <Exception name="Input" />
         </ShareProperties>
       </SubProxy>
--->
+      -->
       <SubProxy>
         <!-- Prop3D that gets added to the 3D renderer -->
         <Proxy name="Prop3D" proxygroup="props" proxyname="Actor" />

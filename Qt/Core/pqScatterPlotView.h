@@ -66,6 +66,8 @@ public:
   /// Returns the view proxy.
   //vtkSMComparativeViewProxy* getScatterPlotViewProxy() const;
   //vtkSMScatterPlotViewProxy* getScatterPlotViewProxy() const;
+  void set3DMode(bool);
+  bool get3DMode()const;
 
   /// Sets default values for the underlying proxy. 
   /// This is during the initialization stage of the pqProxy 
@@ -94,8 +96,8 @@ protected:
     { return "scatterPlotModule/InteractorStyle"; }
 
   /// Must be overridden to return the default manipulator types.
-  virtual const ManipulatorType* getDefaultManipulatorTypesInternal()
-    { return pqScatterPlotView::getDefaultManipulatorTypes(); }  
+  virtual const ManipulatorType* getDefaultManipulatorTypesInternal();
+  //{ return pqScatterPlotView::getDefaultManipulatorTypes(); }
 
   /// Setups up RenderModule and QVTKWidget binding.
   /// This method is called for all pqRenderView objects irrespective
@@ -107,6 +109,7 @@ private:
   void operator=(const pqScatterPlotView&); // Not implemented.
 
   static ManipulatorType TwoDManipulatorTypes[9];
+  static ManipulatorType ThreeDManipulatorTypes[9];
 
   class pqInternal;
   pqInternal* Internal;
