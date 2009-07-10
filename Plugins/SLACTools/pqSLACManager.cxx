@@ -36,6 +36,7 @@
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqView.h"
 
 #include <QMainWindow>
 #include <QPointer>
@@ -224,6 +225,8 @@ void pqSLACManager::showField(const char *name)
   pqSMAdaptor::setElementProperty(
                                 reprProxy->GetProperty("ColorArrayName"), name);
   reprProxy->UpdateVTKObjects();
+
+  view->render();
 }
 
 void pqSLACManager::showEField()
