@@ -481,11 +481,30 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
     {
     this->Internal->StylePointSize->setEnabled(false);
     }
-
-  // setup for opacity
-  this->Internal->Links.addPropertyLink(this->Internal->Opacity,
-    "value", SIGNAL(editingFinished()),
-    proxy, proxy->GetProperty("Opacity"));
+  // setup for line width
+  if ((prop = proxy->GetProperty("LineWidth")) != 0)
+    {
+    this->Internal->Links.addPropertyLink(this->Internal->StyleLineWidth,
+      "value", SIGNAL(editingFinished()),
+      proxy, proxy->GetProperty("LineWidth"));
+    this->Internal->StyleLineWidth->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->StyleLineWidth->setEnabled(false);
+    }
+  // setup for opacity  
+  if ((prop = proxy->GetProperty("Opacity")) != 0)
+    {
+    this->Internal->Links.addPropertyLink(this->Internal->Opacity,
+      "value", SIGNAL(editingFinished()),
+      proxy, proxy->GetProperty("Opacity"));
+    this->Internal->Opacity->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->Opacity->setEnabled(false);
+    }
 
   // setup for map scalars
 

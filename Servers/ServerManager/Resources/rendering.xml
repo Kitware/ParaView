@@ -9005,11 +9005,11 @@
           <Property name="Opacity" />
           <Property name="Shading" />
 
+          <Property name="PointSize" />
+          <Property name="LineWidth" />
           <!--
           <Property name="SpecularColor" />
           <Property name="SpecularPower" />
-          <Property name="PointSize" />
-          <Property name="LineWidth" />
           <Property name="Interpolation" />
           <Property name="AmbientColor" />
           <Property name="DiffuseColor" />
