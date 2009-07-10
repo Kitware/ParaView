@@ -151,6 +151,7 @@ MARK_AS_ADVANCED(VTK_USE_INFOVIS)
 #########################################################################
 #
 MARK_AS_ADVANCED(VTK_USE_N_WAY_ARRAYS)
+MARK_AS_ADVANCED(VTK_USE_TEXT_ANALYSIS)
 
 #########################################################################
 # Configure Testing
