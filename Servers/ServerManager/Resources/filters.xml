@@ -3728,7 +3728,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
    </SourceProxy>
 
    <!-- ==================================================================== -->
-   <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Generate Tubes">
+   <SourceProxy name="TubeFilter" class="vtkTubeFilter" label="Tube">
     <Documentation
        long_help="Convert lines into tubes. Normals are used to avoid cracks between tube segments."
        short_help="Convert lines into tubes.">
