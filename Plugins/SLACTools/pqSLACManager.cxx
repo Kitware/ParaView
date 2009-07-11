@@ -323,12 +323,60 @@ void pqSLACManager::showParticles(bool show)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showSolidMesh()
 {
+  pqPipelineSource *reader = this->meshReader();
+  if (!reader) return;
+
+  pqView *view = this->view3D();
+  if (!view) return;
+
+  pqDataRepresentation *repr = reader->getRepresentation(0, view);
+  if (!repr) return;
+  vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqSMAdaptor::setEnumerationProperty(
+                           reprProxy->GetProperty("Representation"), "Surface");
+  pqSMAdaptor::setEnumerationProperty(
+          reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
+
+  reprProxy->UpdateVTKObjects();
 }
 
 void pqSLACManager::showWireframeSolidMesh()
 {
+  pqPipelineSource *reader = this->meshReader();
+  if (!reader) return;
+
+  pqView *view = this->view3D();
+  if (!view) return;
+
+  pqDataRepresentation *repr = reader->getRepresentation(0, view);
+  if (!repr) return;
+  vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqSMAdaptor::setEnumerationProperty(
+                reprProxy->GetProperty("Representation"), "Surface With Edges");
+  pqSMAdaptor::setEnumerationProperty(
+          reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
+
+  reprProxy->UpdateVTKObjects();
 }
 
 void pqSLACManager::showWireframeAndBackMesh()
 {
+  pqPipelineSource *reader = this->meshReader();
+  if (!reader) return;
+
+  pqView *view = this->view3D();
+  if (!view) return;
+
+  pqDataRepresentation *repr = reader->getRepresentation(0, view);
+  if (!repr) return;
+  vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqSMAdaptor::setEnumerationProperty(
+                         reprProxy->GetProperty("Representation"), "Wireframe");
+  pqSMAdaptor::setEnumerationProperty(
+                   reprProxy->GetProperty("BackfaceRepresentation"), "Surface");
+
+  reprProxy->UpdateVTKObjects();
 }
