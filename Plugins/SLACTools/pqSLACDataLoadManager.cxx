@@ -121,18 +121,15 @@ void pqSLACDataLoadManager::setupPipeline()
   if (stack) stack->beginUndoSet("SLAC Data Load");
 
   // Delete existing pipeline objects.  We will replace them.
-  pqPipelineSource *meshReader = manager->meshReader();
-  if (meshReader) builder->destroy(meshReader);
-
-  pqPipelineSource *particlesReader = manager->particlesReader();
-  if (particlesReader) builder->destroy(particlesReader);
+  manager->destroyPipelineSourceAndConsumers(manager->meshReader());
+  manager->destroyPipelineSourceAndConsumers(manager->particlesReader());
 
   QStringList meshFiles = this->ui->meshFile->filenames();
   // This should never really be not empty.
   if (!meshFiles.isEmpty())
     {
-    meshReader = builder->createReader("sources", "SLACReader",
-                                       meshFiles, this->Server);
+    pqPipelineSource *meshReader
+      = builder->createReader("sources", "SLACReader", meshFiles, this->Server);
 
     vtkSMProxy *meshReaderProxy = meshReader->getProxy();
 
@@ -173,8 +170,9 @@ void pqSLACDataLoadManager::setupPipeline()
   QStringList particlesFiles = this->ui->particlesFile->filenames();
   if (!particlesFiles.isEmpty())
     {
-    particlesReader = builder->createReader("sources", "SLACParticleReader",
-                                            particlesFiles, this->Server);
+    pqPipelineSource *particlesReader
+      = builder->createReader("sources", "SLACParticleReader",
+                              particlesFiles, this->Server);
 
     // Make representations.
     pqView *view = manager->view3D();

@@ -30,6 +30,7 @@
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
@@ -204,6 +205,29 @@ pqPipelineSource *pqSLACManager::meshReader()
 pqPipelineSource *pqSLACManager::particlesReader()
 {
   return this->findPipelineSource("SLACParticleReader");
+}
+
+//-----------------------------------------------------------------------------
+static void destroyPortConsumers(pqOutputPort *port)
+{
+  foreach (pqPipelineSource *consumer, port->getConsumers())
+    {
+    pqSLACManager::destroyPipelineSourceAndConsumers(consumer);
+    }
+}
+
+void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource *source)
+{
+  if (!source) return;
+
+  foreach (pqOutputPort *port, source->getOutputPorts())
+    {
+    destroyPortConsumers(port);
+    }
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqObjectBuilder *builder = core->getObjectBuilder();
+  builder->destroy(source);
 }
 
 //-----------------------------------------------------------------------------

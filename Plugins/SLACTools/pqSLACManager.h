@@ -62,6 +62,10 @@ public:
   pqPipelineSource *meshReader();
   pqPipelineSource *particlesReader();
 
+  /// Convenience function for destroying a pipeline object and all of its
+  /// consumers.
+  static void destroyPipelineSourceAndConsumers(pqPipelineSource *source);
+
 public slots:
   void showDataLoadManager();
   void checkActionEnabled();
