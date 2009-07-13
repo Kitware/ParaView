@@ -86,8 +86,18 @@ public slots:
   void createPlotOverZ();
 
 protected:
-  pqPipelineSource *findPipelineSource(const char *SMName);
-  pqView *findView(pqPipelineSource *source, int port, const QString &viewType);
+  /// Finds a pipeline source with the given SM XML name.  If there is more than
+  /// one, the first is returned.
+  virtual pqPipelineSource *findPipelineSource(const char *SMName);
+
+  /// Finds a view appropriate for the data of the source and port given,
+  /// constrained to those views with the given type.
+  virtual pqView *findView(pqPipelineSource *source, int port,
+                           const QString &viewType);
+
+  /// Updates the plot view (if it is created) with the field shown in the
+  /// mesh view.
+  virtual void updatePlotField();
 
 private:
   pqSLACManager(QObject *p);

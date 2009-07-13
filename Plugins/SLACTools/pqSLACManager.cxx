@@ -36,6 +36,7 @@
 #include "pqOutputPort.h"
 #include "pqPendingDisplayManager.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
 #include "pqScalarsToColors.h"
@@ -379,6 +380,8 @@ void pqSLACManager::showField(const char *name)
 
   lutProxy->UpdateVTKObjects();
 
+  this->updatePlotField();
+
   if (stack) stack->endUndoSet();
 
   view->render();
@@ -392,6 +395,88 @@ void pqSLACManager::showEField()
 void pqSLACManager::showBField()
 {
   this->showField("bfield");
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::updatePlotField()
+{
+  // Get the plot source, view, and representation.
+  pqPipelineSource *plotFilter = this->getPlotFilter();
+  if (!plotFilter) return;
+
+  pqView *plotView = this->getPlotView();
+  if (!plotView) return;
+
+  pqDataRepresentation *repr = plotFilter->getRepresentation(plotView);
+  if (!repr) return;
+  vtkSMProxy *reprProxy = repr->getProxy();
+
+  // Get the name of the field used in drawing the mesh.
+  pqPipelineSource *meshReader = this->getMeshReader();
+  if (!meshReader) return;
+  pqView *meshView = this->getMeshView();
+  if (!meshView) return;
+  pqPipelineRepresentation *meshRepr
+    = qobject_cast<pqPipelineRepresentation *>(
+                                    meshReader->getRepresentation(0, meshView));
+  if (!meshRepr) return;
+  QString fieldName = meshRepr->getColorField(true);
+
+  if (fieldName == "Solid Color") fieldName = "efield";
+
+  // Get the information property that lists all the available series (as well
+  // as their current visibility).
+  QList<QVariant> visibilityInfo = pqSMAdaptor::getMultipleElementProperty(
+                                reprProxy->GetProperty("SeriesVisibilityInfo"));
+
+  // Iterate over all the series.  Turn them all off except the one associated
+  // with the viewed mesh.
+  QList<QVariant> visibility;
+  for (int i = 0; i < visibilityInfo.size(); i += 2)
+    {
+    QString seriesName = visibilityInfo[i].toString();
+    if ((fieldName == seriesName) || (fieldName + " (Magnitude)" == seriesName))
+      {
+      fieldName = seriesName;
+      visibility << seriesName << 1;
+
+      QList<QVariant> color;
+      color << seriesName << 0.0 << 0.0 << 0.0;
+      pqSMAdaptor::setMultipleElementProperty(
+                                  reprProxy->GetProperty("SeriesColor"), color);
+
+      QList<QVariant> lineThickness;
+      lineThickness << seriesName << 1;
+      pqSMAdaptor::setMultipleElementProperty(
+                  reprProxy->GetProperty("SeriesLineThickness"), lineThickness);
+
+      QList<QVariant> lineStyle;
+      lineStyle << seriesName << 1;
+      pqSMAdaptor::setMultipleElementProperty(
+                          reprProxy->GetProperty("SeriesLineStyle"), lineStyle);
+      }
+    else
+      {
+      visibility << seriesName << 0;
+      }
+    }
+  pqSMAdaptor::setMultipleElementProperty(
+                        reprProxy->GetProperty("SeriesVisibility"), visibility);
+  reprProxy->UpdateVTKObjects();
+
+  // Update the view options.
+  vtkSMProxy *viewProxy = plotView->getProxy();
+
+  pqSMAdaptor::setElementProperty(viewProxy->GetProperty("ShowLegend"), 0);
+
+  QList<QVariant> axisTitles;
+  axisTitles << fieldName << "" << "" << "";
+  pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisTitle"),
+                                          axisTitles);
+
+  viewProxy->UpdateVTKObjects();
+
+  plotView->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -520,6 +605,13 @@ void pqSLACManager::createPlotOverZ()
   pqSMAdaptor::setElementProperty(
                       meshReaderProxy->GetProperty("ReadInternalVolume"), true);
   meshReaderProxy->UpdateVTKObjects();
+  meshReader->updatePipeline();
+
+  // Get the mesh data bounds (which we will use later to set up the plot).
+  vtkPVDataInformation *dataInfo
+    = meshReader->getOutputPort(1)->getDataInformation();
+  double bounds[6];
+  dataInfo->GetBounds(bounds);
 
   // Create the plot filter.
   QMap<QString, QList<pqOutputPort*> > namedInputs;
@@ -530,10 +622,37 @@ void pqSLACManager::createPlotOverZ()
                                                        namedInputs,
                                                        this->getActiveServer());
 
+  // Set up the line for the plot.  The line is one of the inputs to the filter
+  // which is implicitly set up through a proxy list domain.
+  vtkSMProxy *plotProxy = plotFilter->getProxy();
+  pqSMProxy lineProxy
+    = pqSMAdaptor::getProxyProperty(plotProxy->GetProperty("Source"));
+  if (!lineProxy)
+    {
+    qWarning() << "Could not retrieve plot line source.  "
+               << "Plot not set up correctly.";
+    }
+  else
+    {
+    QList<QVariant> minPoint;
+    minPoint << 0.0 << 0.0 << bounds[4];
+    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point1"),
+                                            minPoint);
+    QList<QVariant> maxPoint;
+    maxPoint << 0.0 << 0.0 << bounds[5];
+    pqSMAdaptor::setMultipleElementProperty(lineProxy->GetProperty("Point2"),
+                                            maxPoint);
+    pqSMAdaptor::setElementProperty(lineProxy->GetProperty("Resolution"), 1000);
+    lineProxy->UpdateVTKObjects();
+    }
+
   // Make representation
   pqDataRepresentation *repr;
   repr = displayPolicy->createPreferredRepresentation(
                                  plotFilter->getOutputPort(0), plotView, false);
+  repr->setVisible(true);
+
+  this->updatePlotField();
 
   // We have already made the representations and pushed everything to the
   // server manager.  Thus, there is no state left to be modified.
