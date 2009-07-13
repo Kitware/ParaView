@@ -46,7 +46,7 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget *p,
   : QDialog(p, f)
 {
   pqSLACManager *manager = pqSLACManager::instance();
-  this->Server = manager->activeServer();
+  this->Server = manager->getActiveServer();
 
   this->ui = new pqSLACDataLoadManager::pqUI;
   this->ui->setupUi(this);
@@ -63,8 +63,8 @@ pqSLACDataLoadManager::pqSLACDataLoadManager(QWidget *p,
   this->ui->modeFile->setExtension("SLAC Mode Files (*.mod *.m?)");
   this->ui->particlesFile->setExtension("SLAC Particle Files (*.ncdf *.netcdf)");
 
-  pqPipelineSource *meshReader = manager->meshReader();
-  pqPipelineSource *particlesReader = manager->particlesReader();
+  pqPipelineSource *meshReader = manager->getMeshReader();
+  pqPipelineSource *particlesReader = manager->getParticlesReader();
   if (meshReader)
     {
     vtkSMProxy *meshReaderProxy = meshReader->getProxy();
@@ -120,9 +120,12 @@ void pqSLACDataLoadManager::setupPipeline()
 
   if (stack) stack->beginUndoSet("SLAC Data Load");
 
+  // Determine the views.  Do this before deleting existing pipeline objects.
+  pqView *meshView = manager->getMeshView();
+
   // Delete existing pipeline objects.  We will replace them.
-  manager->destroyPipelineSourceAndConsumers(manager->meshReader());
-  manager->destroyPipelineSourceAndConsumers(manager->particlesReader());
+  manager->destroyPipelineSourceAndConsumers(manager->getMeshReader());
+  manager->destroyPipelineSourceAndConsumers(manager->getParticlesReader());
 
   QStringList meshFiles = this->ui->meshFile->filenames();
   // This should never really be not empty.
@@ -143,13 +146,12 @@ void pqSLACDataLoadManager::setupPipeline()
     meshReaderProxy->UpdateVTKObjects();
 
     // Make representations.
-    pqView *view = manager->view3D();
     pqDataRepresentation *repr;
     repr = displayPolicy->createPreferredRepresentation(
-                                     meshReader->getOutputPort(0), view, false);
+                                 meshReader->getOutputPort(0), meshView, false);
     repr->setVisible(true);
     repr = displayPolicy->createPreferredRepresentation(
-                                     meshReader->getOutputPort(1), view, false);
+                                 meshReader->getOutputPort(1), meshView, false);
     repr->setVisible(false);
 
     // We have already made the representations and pushed everything to the
@@ -175,10 +177,9 @@ void pqSLACDataLoadManager::setupPipeline()
                               particlesFiles, this->Server);
 
     // Make representations.
-    pqView *view = manager->view3D();
     pqDataRepresentation *repr
       = displayPolicy->createPreferredRepresentation(
-                                particlesReader->getOutputPort(0), view, false);
+                            particlesReader->getOutputPort(0), meshView, false);
     repr->setVisible(manager->actionShowParticles()->isChecked());
 
     // We have already made the representations and pushed everything to the

@@ -48,19 +48,26 @@ public:
   QAction *actionSolidMesh();
   QAction *actionWireframeSolidMesh();
   QAction *actionWireframeAndBackMesh();
+  QAction *actionPlotOverZ();
 
   /// Convenience function for getting the current server.
-  pqServer *activeServer();
+  pqServer *getActiveServer();
 
   /// Convenience function for getting the main window.
-  QWidget *mainWindow();
+  QWidget *getMainWindow();
 
-  /// Get the window to use for 3D rendering.
-  pqView *view3D();
+  /// Get the window used for viewing the mesh.
+  pqView *getMeshView();
+
+  /// Get the window used for viewing plots.
+  pqView *getPlotView();
 
   /// Get the reader objects.  Returns NULL if that reader was never created.
-  pqPipelineSource *meshReader();
-  pqPipelineSource *particlesReader();
+  pqPipelineSource *getMeshReader();
+  pqPipelineSource *getParticlesReader();
+
+  /// Get plotting object.  Returns NULL if that object was never created.
+  pqPipelineSource *getPlotFilter();
 
   /// Convenience function for destroying a pipeline object and all of its
   /// consumers.
@@ -76,9 +83,11 @@ public slots:
   void showSolidMesh();
   void showWireframeSolidMesh();
   void showWireframeAndBackMesh();
+  void createPlotOverZ();
 
 protected:
   pqPipelineSource *findPipelineSource(const char *SMName);
+  pqView *findView(pqPipelineSource *source, int port, const QString &viewType);
 
 private:
   pqSLACManager(QObject *p);

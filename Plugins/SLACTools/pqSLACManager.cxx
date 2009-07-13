@@ -30,14 +30,19 @@
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
+#include "pqDisplayPolicy.h"
+#include "pqLineChartView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
+#include "pqPendingDisplayManager.h"
 #include "pqPipelineRepresentation.h"
 #include "pqPipelineSource.h"
+#include "pqRenderView.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 
 #include <QMainWindow>
@@ -100,6 +105,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
                    this, SLOT(showWireframeSolidMesh()));
   QObject::connect(this->actionWireframeAndBackMesh(), SIGNAL(triggered(bool)),
                    this, SLOT(showWireframeAndBackMesh()));
+  QObject::connect(this->actionPlotOverZ(), SIGNAL(triggered(bool)),
+                   this, SLOT(createPlotOverZ()));
 
   this->checkActionEnabled();
 }
@@ -146,8 +153,13 @@ QAction *pqSLACManager::actionWireframeAndBackMesh()
   return this->Internal->Actions.actionWireframeAndBackMesh;
 }
 
+QAction *pqSLACManager::actionPlotOverZ()
+{
+  return this->Internal->Actions.actionPlotOverZ;
+}
+
 //-----------------------------------------------------------------------------
-pqServer *pqSLACManager::activeServer()
+pqServer *pqSLACManager::getActiveServer()
 {
   pqApplicationCore *app = pqApplicationCore::instance();
   pqServerManagerModel *smModel = app->getServerManagerModel();
@@ -156,7 +168,7 @@ pqServer *pqSLACManager::activeServer()
 }
 
 //-----------------------------------------------------------------------------
-QWidget *pqSLACManager::mainWindow()
+QWidget *pqSLACManager::getMainWindow()
 {
   foreach(QWidget *topWidget, QApplication::topLevelWidgets())
     {
@@ -166,19 +178,50 @@ QWidget *pqSLACManager::mainWindow()
 }
 
 //-----------------------------------------------------------------------------
-pqView *pqSLACManager::view3D()
+pqView *pqSLACManager::findView(pqPipelineSource *source, int port,
+                                const QString &viewType)
 {
+  // Step 1, try to find a view in which the source is already shown.
+  if (source)
+    {
+    foreach (pqView *view, source->getViews())
+      {
+      pqDataRepresentation *repr = source->getRepresentation(port, view);
+      if (repr && repr->isVisible()) return view;
+      }
+    }
+
+  // Step 2, check to see if the active view is the right type.
   pqView *view = pqActiveView::instance().current();
-  // TODO: Check to make sure the active view is 3D.  If not, find one.  This
-  // can be done by getting a pqServerManagerModel (from pqAppliationCore)
-  // and querying pqView.  If no view is valid, create one.  Probably look
-  // at pqDisplayPolicy::createPreferredRepresentation for that one.
-  //
-  // On second thought, since I have to be able to query for the mesh file
-  // anyway, perhaps I should just find that and return a view in which that
-  // is defined.  Then let pqSLACDataLoadManager create a necessary view on
-  // creating the mesh reader if necessary.
-  return view;
+  if (view->getViewType() == viewType) return view;
+
+  // Step 3, check all the views and see if one is the right type and not
+  // showing anything.
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqServerManagerModel *smModel = core->getServerManagerModel();
+  foreach (view, smModel->findItems<pqView*>())
+    {
+    if (   view && (view->getViewType() == viewType)
+        && (view->getNumberOfVisibleRepresentations() < 1) )
+      {
+      return view;
+      }
+    }
+
+  // Give up.  A new view needs to be created.
+  return NULL;
+}
+
+pqView *pqSLACManager::getMeshView()
+{
+  return this->findView(this->getMeshReader(), 0,
+                        pqRenderView::renderViewType());
+}
+
+pqView *pqSLACManager::getPlotView()
+{
+  return this->findView(this->getPlotFilter(), 0,
+                        pqLineChartView::lineChartViewType());
 }
 
 //-----------------------------------------------------------------------------
@@ -188,7 +231,7 @@ pqPipelineSource *pqSLACManager::findPipelineSource(const char *SMName)
   pqServerManagerModel *smModel = core->getServerManagerModel();
 
   QList<pqPipelineSource*> sources
-    = smModel->findItems<pqPipelineSource*>(this->activeServer());
+    = smModel->findItems<pqPipelineSource*>(this->getActiveServer());
   foreach(pqPipelineSource *s, sources)
     {
     if (strcmp(s->getProxy()->GetXMLName(), SMName) == 0) return s;
@@ -197,14 +240,19 @@ pqPipelineSource *pqSLACManager::findPipelineSource(const char *SMName)
   return NULL;
 }
 
-pqPipelineSource *pqSLACManager::meshReader()
+pqPipelineSource *pqSLACManager::getMeshReader()
 {
   return this->findPipelineSource("SLACReader");
 }
 
-pqPipelineSource *pqSLACManager::particlesReader()
+pqPipelineSource *pqSLACManager::getParticlesReader()
 {
   return this->findPipelineSource("SLACParticleReader");
+}
+
+pqPipelineSource *pqSLACManager::getPlotFilter()
+{
+  return this->findPipelineSource("ProbeLine");
 }
 
 //-----------------------------------------------------------------------------
@@ -233,7 +281,8 @@ void pqSLACManager::destroyPipelineSourceAndConsumers(pqPipelineSource *source)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showDataLoadManager()
 {
-  pqSLACDataLoadManager *dialog = new pqSLACDataLoadManager(this->mainWindow());
+  pqSLACDataLoadManager *dialog
+    = new pqSLACDataLoadManager(this->getMainWindow());
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   QObject::connect(dialog, SIGNAL(createdPipeline()),
                    this, SLOT(checkActionEnabled()));
@@ -243,17 +292,21 @@ void pqSLACManager::showDataLoadManager()
 //-----------------------------------------------------------------------------
 void pqSLACManager::checkActionEnabled()
 {
-  if (!this->meshReader())
+  pqPipelineSource *meshReader = this->getMeshReader();
+  pqPipelineSource *particlesReader = this->getParticlesReader();
+
+  if (!meshReader)
     {
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
     this->actionSolidMesh()->setEnabled(false);
     this->actionWireframeSolidMesh()->setEnabled(false);
     this->actionWireframeAndBackMesh()->setEnabled(false);
+    this->actionPlotOverZ()->setEnabled(false);
     }
   else
     {
-    pqOutputPort *outputPort = this->meshReader()->getOutputPort(0);
+    pqOutputPort *outputPort = meshReader->getOutputPort(0);
     vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
     vtkPVDataSetAttributesInformation *pointFields
       = dataInfo->GetPointDataInformation();
@@ -266,18 +319,24 @@ void pqSLACManager::checkActionEnabled()
     this->actionSolidMesh()->setEnabled(true);
     this->actionWireframeSolidMesh()->setEnabled(true);
     this->actionWireframeAndBackMesh()->setEnabled(true);
+
+    this->actionPlotOverZ()->setEnabled(
+                            pointFields->GetArrayInformation("efield") != NULL);
     }
 
-  this->actionShowParticles()->setEnabled(this->particlesReader() != NULL);
+  this->actionShowParticles()->setEnabled(particlesReader != NULL);
 }
 
 //-----------------------------------------------------------------------------
 void pqSLACManager::showField(const char *name)
 {
-  pqPipelineSource *reader = this->meshReader();
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqUndoStack *stack = core->getUndoStack();
+
+  pqPipelineSource *reader = this->getMeshReader();
   if (!reader) return;
 
-  pqView *view = this->view3D();
+  pqView *view = this->getMeshView();
   if (!view) return;
 
   // Get the (downcasted) representation.
@@ -289,6 +348,8 @@ void pqSLACManager::showField(const char *name)
     qWarning() << "Could not find representation object.";
     return;
     }
+
+  if (stack) stack->beginUndoSet(QString("Show field %1").arg(name));
 
   // Set the field to color by.
   repr->setColorField(QString("%1 (point)").arg(name));
@@ -318,6 +379,8 @@ void pqSLACManager::showField(const char *name)
 
   lutProxy->UpdateVTKObjects();
 
+  if (stack) stack->endUndoSet();
+
   view->render();
 }
 
@@ -334,10 +397,10 @@ void pqSLACManager::showBField()
 //-----------------------------------------------------------------------------
 void pqSLACManager::showParticles(bool show)
 {
-  pqPipelineSource *reader = this->particlesReader();
+  pqPipelineSource *reader = this->getParticlesReader();
   if (!reader) return;
 
-  pqView *view = this->view3D();
+  pqView *view = this->getMeshView();
   if (!view) return;
 
   pqDataRepresentation *repr = reader->getRepresentation(view);
@@ -347,15 +410,20 @@ void pqSLACManager::showParticles(bool show)
 //-----------------------------------------------------------------------------
 void pqSLACManager::showSolidMesh()
 {
-  pqPipelineSource *reader = this->meshReader();
+  pqPipelineSource *reader = this->getMeshReader();
   if (!reader) return;
 
-  pqView *view = this->view3D();
+  pqView *view = this->getMeshView();
   if (!view) return;
 
   pqDataRepresentation *repr = reader->getRepresentation(0, view);
   if (!repr) return;
   vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqUndoStack *stack = core->getUndoStack();
+
+  if (stack) stack->beginUndoSet("Show Solid Mesh");
 
   pqSMAdaptor::setEnumerationProperty(
                            reprProxy->GetProperty("Representation"), "Surface");
@@ -363,19 +431,28 @@ void pqSLACManager::showSolidMesh()
           reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
 
   reprProxy->UpdateVTKObjects();
+
+  if (stack) stack->endUndoSet();
+
+  view->render();
 }
 
 void pqSLACManager::showWireframeSolidMesh()
 {
-  pqPipelineSource *reader = this->meshReader();
+  pqPipelineSource *reader = this->getMeshReader();
   if (!reader) return;
 
-  pqView *view = this->view3D();
+  pqView *view = this->getMeshView();
   if (!view) return;
 
   pqDataRepresentation *repr = reader->getRepresentation(0, view);
   if (!repr) return;
   vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqUndoStack *stack = core->getUndoStack();
+
+  if (stack) stack->beginUndoSet("Show Wireframe Mesh");
 
   pqSMAdaptor::setEnumerationProperty(
                 reprProxy->GetProperty("Representation"), "Surface With Edges");
@@ -383,19 +460,28 @@ void pqSLACManager::showWireframeSolidMesh()
           reprProxy->GetProperty("BackfaceRepresentation"), "Follow Frontface");
 
   reprProxy->UpdateVTKObjects();
+
+  if (stack) stack->endUndoSet();
+
+  view->render();
 }
 
 void pqSLACManager::showWireframeAndBackMesh()
 {
-  pqPipelineSource *reader = this->meshReader();
+  pqPipelineSource *reader = this->getMeshReader();
   if (!reader) return;
 
-  pqView *view = this->view3D();
+  pqView *view = this->getMeshView();
   if (!view) return;
 
   pqDataRepresentation *repr = reader->getRepresentation(0, view);
   if (!repr) return;
   vtkSMProxy *reprProxy = repr->getProxy();
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqUndoStack *stack = core->getUndoStack();
+
+  if (stack) stack->beginUndoSet("Show Wireframe Front and Solid Back");
 
   pqSMAdaptor::setEnumerationProperty(
                          reprProxy->GetProperty("Representation"), "Wireframe");
@@ -403,4 +489,66 @@ void pqSLACManager::showWireframeAndBackMesh()
                    reprProxy->GetProperty("BackfaceRepresentation"), "Surface");
 
   reprProxy->UpdateVTKObjects();
+
+  if (stack) stack->endUndoSet();
+
+  view->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::createPlotOverZ()
+{
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqObjectBuilder *builder = core->getObjectBuilder();
+  pqUndoStack *stack = core->getUndoStack();
+  pqDisplayPolicy *displayPolicy = core->getDisplayPolicy();
+
+  pqPipelineSource *meshReader = this->getMeshReader();
+  if (!meshReader) return;
+
+  if (stack) stack->beginUndoSet("Plot Over Z");
+
+  // Determine view.  Do this before deleting existing pipeline objects.
+  pqView *plotView = this->getPlotView();
+
+  // Delete existing plot objects.  We will replace them.
+  this->destroyPipelineSourceAndConsumers(this->getPlotFilter());
+
+  // Turn on reading the internal volume, which is necessary for plotting
+  // through the volume.
+  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+  pqSMAdaptor::setElementProperty(
+                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
+  meshReaderProxy->UpdateVTKObjects();
+
+  // Create the plot filter.
+  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QList<pqOutputPort *> inputs;
+  inputs.push_back(meshReader->getOutputPort(1));
+  namedInputs["Input"] = inputs;
+  pqPipelineSource *plotFilter = builder->createFilter("filters", "ProbeLine",
+                                                       namedInputs,
+                                                       this->getActiveServer());
+
+  // Make representation
+  pqDataRepresentation *repr;
+  repr = displayPolicy->createPreferredRepresentation(
+                                 plotFilter->getOutputPort(0), plotView, false);
+
+  // We have already made the representations and pushed everything to the
+  // server manager.  Thus, there is no state left to be modified.
+  meshReader->setModifiedState(pqProxy::UNMODIFIED);
+  plotFilter->setModifiedState(pqProxy::UNMODIFIED);
+
+  // This is something of a hack to make the pending display manager to
+  // realize that I have already created all necessary displays.  This should
+  // go away soon.
+  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
+                                      core->manager("PENDING_DISPLAY_MANAGER"));
+  if (pdmanager)
+    {
+    pdmanager->removePendingDisplayForSource(plotFilter);
+    }
+
+  if (stack) stack->endUndoSet();
 }

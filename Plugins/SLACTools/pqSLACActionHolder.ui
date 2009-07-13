@@ -100,6 +100,18 @@
     <string>Show Wireframe Front and Solid Back</string>
    </property>
   </action>
+  <action name="actionPlotOverZ">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/PlotOverZ.png</normaloff>:/SLACTools/Icons/PlotOverZ.png</iconset>
+   </property>
+   <property name="text">
+    <string>Plot Over Z Axis</string>
+   </property>
+   <property name="toolTip">
+    <string>Make a Plot of a Field Along the Z Axis</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>

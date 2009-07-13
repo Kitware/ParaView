@@ -7,5 +7,6 @@
     <file>Icons/ShowSolid.png</file>
     <file>Icons/ShowWireframeSolid.png</file>
     <file>Icons/ShowWireframeAndBack.png</file>
+    <file>Icons/PlotOverZ.png</file>
   </qresource>
 </RCC>
