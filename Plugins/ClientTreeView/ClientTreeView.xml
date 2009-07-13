@@ -21,6 +21,12 @@
         </ArrayListDomain>
       </StringVectorProperty>
       
+      <ProxyProperty name="LookupTable" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 

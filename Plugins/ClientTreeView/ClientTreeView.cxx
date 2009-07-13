@@ -18,10 +18,12 @@
 #include <vtkIntArray.h>
 #include <vtkPVDataInformation.h>
 #include <vtkQtTreeView.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkSmartPointer.h>
 #include <vtkSMPropertyHelper.h>
+#include <vtkSMProxyProperty.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMViewProxy.h>
@@ -284,6 +286,16 @@ void ClientTreeView::renderInternal()
 
     this->Implementation->View->SetColorArrayName(
       vtkSMPropertyHelper(proxy, "ColorArray").GetAsString());
+
+    vtkSMProxyProperty* lutProp = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("LookupTable"));
+    if (lutProp->GetNumberOfProxies() > 0)
+      {
+      vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
+        lutProp->GetProxy(0)->GetClientSideObject());
+      vtkSmartPointer<vtkViewTheme> theme = vtkSmartPointer<vtkViewTheme>::New();
+      theme->SetPointLookupTable(lut);
+      this->Implementation->View->ApplyViewTheme(theme);
+      }
     }
 
   this->Implementation->View->Update();
