@@ -56,7 +56,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.7");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.8");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -1394,7 +1394,7 @@ void vtkScatterPlotMapper::RenderGlyphs(vtkRenderer *ren, vtkActor *actor)
   double camRot[4];
   cam->GetViewTransformObject()->GetOrientationWXYZ(camRot);
   vtkTransform* camTrans = vtkTransform::New();
-  camTrans->RotateWXYZ(camRot[0], camRot[1], camrot[2], camRot[3]);
+  camTrans->RotateWXYZ(camRot[0], camRot[1], camRot[2], camRot[3]);
   camTrans->Inverse();
 
   vtkTransform *trans = vtkTransform::New();
