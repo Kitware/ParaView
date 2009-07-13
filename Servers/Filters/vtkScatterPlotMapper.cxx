@@ -42,6 +42,7 @@
 #include "vtkDataSet.h"
 #include "vtkPointSet.h"
 #include "vtkPolyData.h"
+#include "vtkCamera.h"
 
 #include "vtkgl.h"
 #include "vtkCompositeDataSet.h"
@@ -55,7 +56,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.6");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.7");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -1389,6 +1390,13 @@ void vtkScatterPlotMapper::RenderGlyphs(vtkRenderer *ren, vtkActor *actor)
   //      COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR COLOR 
   vtkUnsignedCharArray* colors = this->Colorize? this->GetColors() : NULL;
 
+  vtkCamera* cam = ren->GetActiveCamera();
+  double camRot[4];
+  cam->GetViewTransformObject()->GetOrientationWXYZ(camRot);
+  vtkTransform* camTrans = vtkTransform::New();
+  camTrans->RotateWXYZ(camRot[0], camRot[1], camrot[2], camRot[3]);
+  camTrans->Inverse();
+
   vtkTransform *trans = vtkTransform::New();
 
   //vtkIdType numPts = input->GetNumberOfPoints();
@@ -1578,8 +1586,15 @@ void vtkScatterPlotMapper::RenderGlyphs(vtkRenderer *ren, vtkActor *actor)
 
     // Now begin copying/transforming glyph
     trans->Identity();
+    
     // TRANSLATION
     trans->Translate(point);
+
+    // Get the 2D glyphs parallel to the camera
+    if(this->ThreeDMode)
+      {
+      trans->Concatenate(camTrans);
+      }
 
     // ORIENTATION
     if(this->GlyphMode & OrientedGlyph)
@@ -1660,8 +1675,9 @@ void vtkScatterPlotMapper::RenderGlyphs(vtkRenderer *ren, vtkActor *actor)
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     }
+
   trans->Delete();
-  
+  camTrans->Delete();
  }
 
 void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor, 

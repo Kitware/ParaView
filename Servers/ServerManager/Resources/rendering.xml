@@ -8786,7 +8786,7 @@
         command="SetXAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="">
+        default_values="Points(0)">
         <Documentation>
           Set the array to use on X axis.
         </Documentation>
@@ -8802,7 +8802,7 @@
         command="SetYAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="">
+        default_values="Points(1)">
         <Documentation>
           Set the array to use on Y axis.
         </Documentation>
@@ -8818,7 +8818,7 @@
         command="SetZAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="">
+        default_values="Points(2)">
         <Documentation>
           Set the array to use on Z axis.
         </Documentation>
