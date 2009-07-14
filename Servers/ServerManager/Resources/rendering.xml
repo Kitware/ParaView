@@ -2329,6 +2329,73 @@
 
       <!-- End of SplineRepresentation -->
     </Proxy>
+    
+    <Proxy name="ContourRepresentationBase" class="not-used">
+      <Documentation>
+        Defines interface defined by vtkContourRepresentation. Don't instantiate directly.
+      </Documentation>
+
+      <IntVectorProperty name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0.01" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ClosedLoop"
+        command="SetClosedLoop"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      
+      <ProxyProperty
+        name="PointPlacer"
+        command="SetPointPlacer">
+        <ProxyGroupDomain name="groups">
+          <Group name="point_placers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <ProxyProperty
+        name="LineInterpolator"
+        command="SetLineInterpolator">
+        <ProxyGroupDomain name="groups">
+          <Group name="contour_line_interpolators" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <Property name="ClearAllNodes" command="ClearAllNodes" />
+
+      <!-- End of ContourRepresentationBase -->
+    </Proxy>
+    
+    <Proxy name="OrientedGlyphContourRepresentation" class="vtkOrientedGlyphContourRepresentation"
+           base_proxygroup="props" base_proxyname="ContourRepresentationBase">
+      <Documentation>
+        Proxy for vtkOrientedGlyphContourRepresentation. Don't use directly since it's not
+        coupled with the widget. Use "ContourWidgetRepresentation" instead which
+        include this representation as well as the widget to modify the
+        representation.
+      </Documentation>
+      <!-- End of OrientedGlyphContourRepresentation -->
+    </Proxy>
 
     <Proxy name="CubeAxesActor" class="vtkCubeAxesActor">
       <Documentation>
@@ -8319,7 +8386,39 @@
 
       <!-- End of SplineWidgetRepresentation -->
     </NewWidgetRepresentationProxy>
+    
+    <NewWidgetRepresentationProxy name="ContourWidgetRepresentation">
+      <Documentation>
+        Representation proxy for the the Contour widget. This includes the
+        widget/representation proxies for the sphere 3D widget.
+      </Documentation>
 
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="OrientedGlyphContourRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="PlaceWidget" />
+          <Property name="Visibility" />
+          <Property name="PointPlacer" />
+          <Property name="LineInterpolator" />
+          <Property name="ClosedLoop" />
+          <Property name="ClearAllNodes" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="ContourWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of ContourWidgetRepresentation -->
+    </NewWidgetRepresentationProxy>
+    
     <ScalarBarWidgetRepresentationProxy name="ScalarBarWidgetRepresentation" class="vtkScalarBarWidget">
       <IntVectorProperty name="Enabled"
                          command="SetEnabled"

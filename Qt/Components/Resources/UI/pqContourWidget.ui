@@ -1,0 +1,85 @@
+<ui version="4.0" >
+ <class>ContourWidget</class>
+ <widget class="QWidget" name="ContourWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>311</width>
+    <height>290</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <item>
+    <widget class="QCheckBox" name="Visibility" >
+     <property name="text" >
+      <string>Show Widget</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="Closed" >
+     <property name="text" >
+      <string>Close Contour</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="Delete" >
+     <property name="text" >
+      <string>Delete All Nodes</string>
+     </property>
+     <property name="icon" >
+      <iconset resource="../../../Widgets/Resources/QtWidgets.qrc" >:/QtWidgets/Icons/pqDelete16.png</iconset>
+     </property>
+     <property name="toolButtonStyle" >
+      <enum>Qt::ToolButtonTextBesideIcon</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt;">&lt;span style=" font-weight:600;">Note:&lt;/span>&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">&lt;span style=" font-style:italic;">Left Click &lt;/span>to add new nodes.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">&lt;span style=" font-style:italic;">Left Click &lt;/span>on the line to insert new nodes.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">&lt;span style=" font-style:italic;">Delete Key &lt;/span>to remove last added node.&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">&lt;span style=" font-style:italic;">Right Click &lt;/span>to finish contour drawing,&lt;/p>
+&lt;p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600; font-style:italic;">&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">After&lt;span style=" font-style:italic;"> &lt;/span>finish contour drawing, &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">move mouse over a node, the node will&lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">become active, drag it to change its &lt;/p>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Helvetica'; font-size:9pt; font-weight:600;">location, or use &lt;span style=" font-style:italic;">Delete Key &lt;/span>to remove it.&lt;span style=" font-style:italic;"> &lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <widget class="QPushButton" name="pushButton" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="visible" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Copy Active Selection</string>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../pqComponents.qrc" />
+  <include location="../../../Widgets/Resources/QtWidgets.qrc" />
+ </resources>
+ <connections/>
+</ui>

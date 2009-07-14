@@ -564,6 +564,10 @@
     <Proxy name="SplineWidget2" class="vtkSplineWidget2"
       base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
     </Proxy>
+    
+    <Proxy name="ContourWidget" class="vtkContourWidget"
+      base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
+    </Proxy>
 
     <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
       base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
@@ -2912,6 +2916,59 @@
     </RenderViewExporterProxy>
 
     <!-- End of "exporters" -->
+  </ProxyGroup>
+  
+  <ProxyGroup name="point_placers">
+    <Proxy name="PointPlacerBase" class="not-used">
+      <Documentation>
+        Base API definition for all point placers.
+      </Documentation>
+      <!-- End of "PointPlacerBase" -->
+    </Proxy>
+    
+    <Proxy name="FocalPlanePointPlacer" class="vtkFocalPlanePointPlacer"
+      base_proxygroup="point_placers" base_proxyname="PointPlacerBase">
+    </Proxy>
+    <Proxy name="BoundedPlanePointPlacer" class="vtkBoundedPlanePointPlacer"
+      base_proxygroup="point_placers" base_proxyname="PointPlacerBase">
+
+      <ProxyProperty name="BoundingPlanes"
+        command="AddBoundingPlane"
+        clean_command="RemoveAllBoundingPlanes"
+        repeat_command="1"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions" />
+        </ProxyGroupDomain>
+        <ProxyListDomain name="proxy_list">
+          <Proxy group="implicit_functions" name="Plane" />
+          <Proxy group="implicit_functions" name="Box" />
+        </ProxyListDomain>
+      </ProxyProperty>
+
+    </Proxy>
+    <Proxy name="PolygonalSurfacePointPlacer" class="vtkPolygonalSurfacePointPlacer"
+      base_proxygroup="point_placers" base_proxyname="PointPlacerBase">
+    </Proxy>
+  </ProxyGroup>
+  
+  <ProxyGroup name="contour_line_interpolators">
+    <Proxy name="ContourLineInterpolatorBase" class="not-used">
+      <Documentation>
+        Base API definition for all contour line interpolators.
+      </Documentation>
+      <!-- End of "ContourLineInterpolatorBase" -->
+    </Proxy>
+    
+    <Proxy name="BezierContourLineInterpolator" class="vtkBezierContourLineInterpolator"
+      base_proxygroup="contour_line_interpolators" base_proxyname="ContourLineInterpolatorBase">
+    </Proxy>
+    <Proxy name="PolyDataContourLineInterpolator" class="vtkPolyDataContourLineInterpolator"
+      base_proxygroup="contour_line_interpolators" base_proxyname="ContourLineInterpolatorBase">
+    </Proxy>
+    <Proxy name="PolygonalSurfaceContourLineInterpolator" class="vtkPolygonalSurfaceContourLineInterpolator"
+      base_proxygroup="contour_line_interpolators" base_proxyname="ContourLineInterpolatorBase">
+    </Proxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

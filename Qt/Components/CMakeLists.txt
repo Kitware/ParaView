@@ -94,6 +94,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComparativeTracksWidget.h
   pqComparativeVisPanel.h
   pqContourPanel.h
+  pqContourWidget.h
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.h
   pqCurrentTimeToolbar.h
@@ -249,6 +250,7 @@ SET(UI_FORMS
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
   Resources/UI/pqContourControls.ui
+  Resources/UI/pqContourWidget.ui
   Resources/UI/pqCreateServerStartupDialog.ui
   Resources/UI/pqCustomFilterDefinitionWizard.ui
   Resources/UI/pqCustomFilterManager.ui
@@ -450,6 +452,8 @@ ADD_LIBRARY(pqComponents
   pqComponentsInit.h
   pqContourPanel.cxx
   pqContourPanel.h
+  pqContourWidget.cxx
+  pqContourWidget.h
   pqCreateServerStartupDialog.cxx
   pqCreateServerStartupDialog.h
   pqCubeAxesEditorDialog.cxx
