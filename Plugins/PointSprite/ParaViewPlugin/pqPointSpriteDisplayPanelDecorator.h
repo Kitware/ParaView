@@ -31,7 +31,7 @@
 #define __pqPointSpriteDisplayPanelDecorator_h
 
 #include <QGroupBox>
-class pqDisplayProxyEditor;
+class pqDisplayPanel;
 class pqPipelineRepresentation;
 class pqWidgetRangeDomain;
 class vtkSMProperty;
@@ -43,7 +43,7 @@ class pqPointSpriteDisplayPanelDecorator : public QGroupBox
   Q_OBJECT
   typedef QGroupBox Superclass;
 public:
-  pqPointSpriteDisplayPanelDecorator(pqDisplayProxyEditor* panel);
+  pqPointSpriteDisplayPanelDecorator(pqDisplayPanel* panel);
   ~pqPointSpriteDisplayPanelDecorator();
 
 protected slots:

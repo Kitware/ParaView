@@ -11,9 +11,6 @@
         <Proxy name="PointSpriteRepresentation"
           proxygroup="representations" proxyname="PointSpriteRepresentation" />
           
-         <InputProperty name="Input" command="NotUsed">
-         </InputProperty>
-
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
           </ShareProperties>
@@ -65,9 +62,6 @@
         <Proxy name="PointSpriteRepresentation"
           proxygroup="representations" proxyname="PointSpriteRepresentation" />
           
-         <InputProperty name="Input" command="NotUsed">
-         </InputProperty>
-
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
           </ShareProperties>
@@ -119,9 +113,6 @@
         <Proxy name="PointSpriteRepresentation"
           proxygroup="representations" proxyname="PointSpriteRepresentation" />
           
-         <InputProperty name="Input" command="NotUsed">
-         </InputProperty>
-
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
           </ShareProperties>

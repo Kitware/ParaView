@@ -44,10 +44,6 @@ qt4_wrap_cpp(QVIS_MOC_SRCS
   
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Qvis)
 
-set(IFACES
-  pqPointSpriteDisplayPanelDecorator
-)
-
 set(UI_FORMS
   Resources/pqPointSpriteDisplayPanelDecorator.ui
   Resources/pqTransferFunctionEditor.ui
@@ -60,7 +56,6 @@ qt4_wrap_ui(UI_SRCS
    
 qt4_wrap_cpp(MOC_SRCS 
   pqPointSpriteDisplayPanelDecorator.h
-  pqPointSpriteDisplayPanelDecoratorImplementation.h
   pqDisplayArrayWidget.h
   pqTransferFunctionDialog.h
   pqTransferFunctionEditor.h
@@ -69,7 +64,6 @@ qt4_wrap_cpp(MOC_SRCS
   )
    
 set(Plugin_SRCS
-  pqPointSpriteDisplayPanelDecoratorImplementation.cxx
   pqPointSpriteDisplayPanelDecorator.cxx
   pqDisplayArrayWidget.cxx
   pqTransferFunctionDialog.cxx
@@ -110,6 +104,12 @@ include_directories(${QT_INCLUDES} ${PARAVIEW_GUI_INCLUDE_DIRS}
   ${PARAVIEW_INCLUDE_DIRS}
   ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+add_paraview_display_panel_decorator(
+  IFACES
+  IFACE_SRCS
+  CLASS_NAME pqPointSpriteDisplayPanelDecorator
+  PANEL_TYPES pqDisplayProxyEditor)
 
 add_paraview_plugin(${PLUGIN_NAME} "1.0"
   SERVER_MANAGER_SOURCES 

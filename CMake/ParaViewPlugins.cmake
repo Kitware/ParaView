@@ -624,7 +624,7 @@ ENDMACRO(ADD_PARAVIEW_AUTO_START)
 
 # Create implementation for a custom display panel decorator interface.
 # Decorators are used to add additional decorations to display panels.
-# ADD_PARAVIEW_DISPLAY_PANEL(
+# ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR(
 #    OUTIFACES
 #    OUTSRCS
 #    CLASS_NAME classname

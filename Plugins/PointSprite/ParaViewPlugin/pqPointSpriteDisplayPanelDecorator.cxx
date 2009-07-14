@@ -86,9 +86,11 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(pqDisplayProxyEditor* panel) :
-  Superclass(panel)
+pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
+  pqDisplayPanel* disp_panel) :
+  Superclass(disp_panel)
 {
+  pqDisplayProxyEditor* panel = qobject_cast<pqDisplayProxyEditor*>(disp_panel);
   pqRepresentation* repr = panel->getRepresentation();
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
   // vtkSMProperty* prop;
