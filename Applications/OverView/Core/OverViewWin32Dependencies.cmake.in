@@ -8,7 +8,12 @@ ENDIF()
 
 SET(SKIP_DEPENDENCIES
   "^C:/WINDOWS/system32"
+  "^C:/Windows/system32"
   "^gdiplus.dll$"
+  "^GdiPlus.dll$"
+  "^GPSVC.dll$"
+  "^python"
+  "^mpich"   
   "^msjava.dll$"
   )
 
