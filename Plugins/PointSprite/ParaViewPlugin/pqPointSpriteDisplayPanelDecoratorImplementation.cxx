@@ -35,7 +35,6 @@
 // ParaView Includes.
 #include "pqDisplayProxyEditor.h"
 #include "pqPointSpriteDisplayPanelDecorator.h"
-#include "vtkProxyManagerExtension.h"
 #include "vtkSMProxyManager.h"
 
 #include <iostream>
@@ -44,10 +43,6 @@
 pqPointSpriteDisplayPanelDecoratorImplementation::
   pqPointSpriteDisplayPanelDecoratorImplementation(QObject* p): QObject(p)
 {
-  vtkProxyManagerExtension* ext = vtkProxyManagerExtension::New();
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->RegisterExtension(ext);
-  ext->Delete();
 }
 
 //-----------------------------------------------------------------------------

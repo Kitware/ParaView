@@ -69,7 +69,6 @@ qt4_wrap_cpp(MOC_SRCS
   )
    
 set(Plugin_SRCS
-  vtkProxyManagerExtension.cxx
   pqPointSpriteDisplayPanelDecoratorImplementation.cxx
   pqPointSpriteDisplayPanelDecorator.cxx
   pqDisplayArrayWidget.cxx
@@ -86,15 +85,11 @@ set(SM_SOURCES
 
 set(SM_XMLS_Rendering
   CSCS_PointSprite_Rendering.xml
+  CSCS_PointSpriteRepresentation.xml
   )
   
 set(SM_XMLS_Graphics
   CSCS_PointSprite_Graphics.xml
-  )
-
-generate_server_manager_xml_header(XML_EXTENSION_HEADERS
-  CSCS_PointSpriteRepresentation
-  CSCS_PointSpriteRepresentation.xml
   )
 
 set(PLUGIN_NAME CSCS_PointSprite_GUIPlugin)
@@ -128,7 +123,6 @@ add_paraview_plugin(${PLUGIN_NAME} "1.0"
     ${QVIS_SRCS} 
     ${QVIS_MOC_SRCS} 
     ${MOC_SRCS} 
-    ${XML_EXTENSION_HEADERS} 
     ${UI_SRCS} 
     ${IFACE_SRCS}
 )

@@ -133,7 +133,6 @@ SET(Kit_SRCS
   vtkSMProxyListDomain.cxx
   vtkSMProxyLocator.cxx
   vtkSMProxyManager.cxx
-  vtkSMProxyManagerExtension.cxx
   vtkSMProxyManagerReviver.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
@@ -272,7 +271,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
   vtkSMPropertyHelper.cxx
-  vtkSMProxyManagerExtension.cxx
   vtkSMExporterProxy.cxx
   ABSTRACT
   )
@@ -280,7 +278,6 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMRenderViewHelper.cxx
   vtkSMPropertyHelper.cxx
-  vtkSMProxyManagerExtension.cxx
   WRAP_EXCLUDE)
 
 

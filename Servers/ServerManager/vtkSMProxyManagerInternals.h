@@ -21,7 +21,6 @@
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMLink.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyManagerExtension.h"
 #include "vtkSMProxySelectionModel.h"
 
 #include <vtkstd/map>
@@ -205,10 +204,6 @@ struct vtkSMProxyManagerInternals
     LinkType;
   LinkType RegisteredLinkMap;
 
-  // Data structure for proxy manager extensions.
-  typedef vtkstd::vector<vtkSmartPointer<vtkSMProxyManagerExtension> > ExtensionsType;
-  ExtensionsType Extensions;
-
   // Data structure for selection models.
   typedef vtkstd::map<vtkstd::string, vtkSmartPointer<vtkSMProxySelectionModel> >
     SelectionModelsType;
@@ -242,14 +237,6 @@ struct vtkSMProxyManagerInternals
         {
         element = it2->second.GetPointer();
         }
-      }
-
-    vtkSMProxyManagerInternals::ExtensionsType::iterator extensionsIter;
-    for (extensionsIter = this->Extensions.begin();
-      extensionsIter != this->Extensions.end(); ++extensionsIter)
-      {
-      element = extensionsIter->GetPointer()->GetProxyElement(
-        groupName, proxyName, element);
       }
 
     return element;
