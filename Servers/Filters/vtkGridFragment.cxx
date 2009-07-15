@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridFragment, "1.1");
+vtkCxxRevisionMacro(vtkGridFragment, "1.2");
 vtkStandardNewMacro(vtkGridFragment);
 
 
@@ -616,7 +616,7 @@ int vtkGridFragment::RequestData(vtkInformation*,
     numberOfInputs = 0;
     while (!iter->IsDoneWithTraversal())
       {
-      vtkUnstructuredGrid* ugInput =  vtkUnstructuredGrid::SafeDownCast(iter->GetCurrentDataObject());
+      ugInput =  vtkUnstructuredGrid::SafeDownCast(iter->GetCurrentDataObject());
       if (ugInput && this->CheckInput(ugInput))
         {
         ++numberOfInputs;
@@ -630,7 +630,7 @@ int vtkGridFragment::RequestData(vtkInformation*,
     while (!iter->IsDoneWithTraversal())
       {
       vtkDataObject* dobj = iter->GetCurrentDataObject();
-      vtkUnstructuredGrid* ugInput =  vtkUnstructuredGrid::SafeDownCast(dobj);
+      ugInput =  vtkUnstructuredGrid::SafeDownCast(dobj);
       if (ugInput && this->CheckInput(ugInput))
         {
         inputs[inputIdx++] = ugInput;
@@ -1390,6 +1390,7 @@ double vtkGridFragment::IntegrateVoxel(vtkCell* voxel)
 //-----------------------------------------------------------------------------
 double vtkGridFragment::IntegrateGeneral3DCell(vtkCell *cell)
 {
+  cell = cell;
   /*
   vtkIdType nPnts = ptIds->GetNumberOfIds();
   // There should be a number of points that is a multiple of 4

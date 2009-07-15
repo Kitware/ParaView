@@ -38,7 +38,7 @@ class VTK_GRAPHICS_EXPORT vtkFaceHash : public vtkObject
 {
 public:
   static vtkFaceHash *New();
-  vtkTypeRevisionMacro(vtkFaceHash,vtkPolyDataAlgorithm);
+  vtkTypeRevisionMacro(vtkFaceHash,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void Initialize(vtkIdType numberOfPoints);

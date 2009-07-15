@@ -21,7 +21,8 @@
 #define __vtkEquivalenceSet_h
 
 #include "vtkObject.h"
-#include "vtkIntArray.h"
+class vtkIntArray;
+
 
 class VTK_EXPORT vtkEquivalenceSet : public vtkObject
 {
@@ -35,7 +36,7 @@ public:
 
   // The length of the equivalent array...
   // The Domain of the equivalance map is [0, numberOfMembers).
-  int GetNumberOfMembers() { return this->EquivalenceArray->GetNumberOfTuples();}
+  int GetNumberOfMembers();
 
   // Valid only after set is resolved.
   // The range of the map is [0 numberOfResolvedSets)
@@ -54,13 +55,13 @@ public:
   // Needed for sending the set over MPI.
   // Be very careful with the pointer.  
   // I guess this means do not write to the memory.
-  int* GetPointer() { return this->EquivalenceArray->GetPointer(0);}
+  int* GetPointer();
 
   // Free unused memory
-  void Squeeze(){ this->EquivalenceArray->Squeeze(); }
+  void Squeeze();
 
   // Report used memory
-  vtkIdType Capacity(){ return this->EquivalenceArray->Capacity(); }
+  vtkIdType Capacity();
 
   // We should fix the pointer API and hide this ivar.
   int Resolved;
