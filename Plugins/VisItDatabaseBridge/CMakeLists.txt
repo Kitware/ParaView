@@ -33,19 +33,37 @@ cmake_policy(SET CMP0003 NEW)
 #
 Project(vtkVisItDatabaseBridge)
 
+
+OPTION(BOOTSTRAP "Build configuration or PV3 Plugin." ON)
+
 if (WIN32)
   set(PLUGIN_BUILD_TYPE "Release" CACHE STRING "Build type for windows builds (Release or Debug).")
 endif (WIN32)
 
 file(MAKE_DIRECTORY "${ParaView_BINARY_DIR}/bin/${PLUGIN_BUILD_TYPE}")
 
-include("CMake/ParaViewConfig.cmake")             # Locate ParaView.
-include("CMake/VisItConfig.cmake")                # Locate VisIt.
-include("CMake/VisItRelocate.cmake")              # Construct a local copy of VisIt.
-include("CMake/BootstrapConfig.cmake")            # Build configuration tools.
+#include("CMake/ParaViewConfig.cmake")             # Locate ParaView.
+#include("CMake/VisItConfig.cmake")                # Locate VisIt.
+#include("CMake/VisItRelocate.cmake")              # Construct a local copy of VisIt.
+#include("CMake/BootstrapConfig.cmake")            # Build configuration tools.
 
-include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
-include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
-include("CMake/vtkVisItDatabaseBridge.cmake")     # Build the VTK source.
-include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
-include("CMake/install.cmake")                    # Install plugins and VisIt databases.
+#include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
+#include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
+#include("CMake/vtkVisItDatabaseBridge.cmake")     # Build the VTK source.
+#include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
+#include("CMake/install.cmake")                    # Install plugins and VisIt databases.
+
+include("CMake/ParaViewConfig.cmake")               # Locate ParaView.
+include("CMake/VisItConfig.cmake")                  # Locate VisIt.
+
+if (BOOTSTRAP)
+  include("CMake/VisItRelocate.cmake")              # Construct a local copy of VisIt.
+  include("CMake/BootstrapConfig.cmake")            # Build configuration tools.
+  # TODO generate make install for local copy of VisIt.
+elseif(NOT BOOTSTRAP)
+  include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
+  include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
+  include("${PROJECT_BINARY_DIR}/CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
+  include("CMake/install.cmake")                    # Install plugins and VisIt databases.
+  # TODO include make install generated above.
+endif (BOOTSTRAP)

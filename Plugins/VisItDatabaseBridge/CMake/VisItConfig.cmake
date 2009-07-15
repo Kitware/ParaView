@@ -21,11 +21,11 @@
 # Point to the location of the VisIt sources and VisIt library build.
 if (UNIX OR CYGWIN)
 # Unix/Linux/Cygwin
-set(VISIT_BASE /home/burlen/ext2/v3/visit1.10.0 CACHE FIELPATH
+set(VISIT_BASE /home/burlen/ext2/v3/visit1.10.0 CACHE PATH
     "Path to VisIt1.10.0 source.")
 else (UNIX OR CYGWIN)
 # Windows
-set(VISIT_BASE C:/VisItDev1.10.0.X CACHE FIELPATH
+set(VISIT_BASE C:/VisItDev1.10.0.X CACHE PATH
     "Path to VisIt1.10.0 source.")
 endif (UNIX OR CYGWIN)
 

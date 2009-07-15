@@ -172,7 +172,7 @@ int WriteText(string &fileName, string &text)
 int main(int argc, char **argv)
 {
   // Command line usage:
-  if (argc<5)
+  if (argc<9)
     {
     cerr << "VisIt database bridge plugin configuration generator." << endl
          << "Usage:" << endl
@@ -203,7 +203,12 @@ int main(int argc, char **argv)
   cerr << "Arg3: " << argv[3] << endl;
   cerr << "Arg4: " << argv[4] << endl;
   cerr << "Arg5: " << argv[5] << endl;
+  cerr << "Arg6: " << argv[6] << endl;
+  cerr << "Arg7: " << argv[7] << endl;
+  cerr << "Arg8: " << argv[8] << endl;
+  cerr << "Arg9: " << argv[9] << endl;
   string smConfigFileIn(argv[3]);
+  string smConfigFileOut(argv[6]);
   string smConfigText;
   if (!LoadText(smConfigFileIn,smConfigText))
     {
@@ -218,6 +223,7 @@ int main(int argc, char **argv)
   // provided as the third command tail argument. We will configure
   // this file and write the results.
   string pqReadersConfigFileIn(argv[4]);
+  string pqReadersConfigFileOut(argv[7]);
   string pqReadersConfigText;
   if (!LoadText(pqReadersConfigFileIn,pqReadersConfigText))
     {
@@ -232,6 +238,7 @@ int main(int argc, char **argv)
   // fourth command tail argument. We will configure this file and
   // write the results.
   string cmakeConfigFileIn(argv[5]);
+  string cmakeConfigFileOut(argv[8]);
   string cmakeConfigText;
   if (!LoadText(cmakeConfigFileIn,cmakeConfigText))
     {
@@ -246,9 +253,9 @@ int main(int argc, char **argv)
   // fifth command tail  argument. The format of this file is 
   // expected to be one plugin name per line.
   vector<string> skipSet;
-  if (argc>6)
+  if (argc>9)
     {
-    LoadLines(argv[6],skipSet);
+    LoadLines(argv[9],skipSet);
     }
   // A flag that indicates we should use a path relative to the 
   // paraview binary.
@@ -366,9 +373,9 @@ int main(int argc, char **argv)
     {
     // Write the configuration back to disk, using the filename with
     // the ".in" extension stripped.
-    string smConfigFile=smConfigFileIn.substr(0,extStart);
-    WriteText(smConfigFile,smConfigText);
-    cerr << "Wrote server manager configuration to " << smConfigFile << "." << endl;
+    //string smConfigFile=smConfigFileIn.substr(0,extStart);
+    WriteText(smConfigFileOut,smConfigText);
+    cerr << "Wrote server manager configuration to " << smConfigFileOut << "." << endl;
     }
   // ... and the PQ readers xml....
   SearchAndReplace("@PQ_READERS@",pqReaders.str(),pqReadersConfigText);
@@ -385,9 +392,9 @@ int main(int argc, char **argv)
     {
     // Write the configuration back to disk, using the filename with
     // the ".in" extension stripped.
-    string pqReadersConfigFile=pqReadersConfigFileIn.substr(0,extStart);
-    WriteText(pqReadersConfigFile,pqReadersConfigText);
-    cerr << "Wrote pq readers configuration to " << pqReadersConfigFile << "." << endl;
+    //string pqReadersConfigFile=pqReadersConfigFileIn.substr(0,extStart);
+    WriteText(pqReadersConfigFileOut,pqReadersConfigText);
+    cerr << "Wrote pq readers configuration to " << pqReadersConfigFileOut << "." << endl;
     }
   // ... and the CMakeFile.
   SearchAndReplace("@PANEL_ASSOCIATIONS@",panelAssociations.str(),cmakeConfigText);
@@ -404,9 +411,9 @@ int main(int argc, char **argv)
     {
     // Write the configuration back to disk, using the filename with
     // the ".in" extension stripped.
-    string cmakeConfigFile=cmakeConfigFileIn.substr(0,extStart);
-    WriteText(cmakeConfigFile,cmakeConfigText);
-    cerr << "Wrote cmake configuration to " << cmakeConfigFile << "." << endl;
+    //string cmakeConfigFile=cmakeConfigFileIn.substr(0,extStart);
+    WriteText(cmakeConfigFileOut,cmakeConfigText);
+    cerr << "Wrote cmake configuration to " << cmakeConfigFileOut << "." << endl;
     }
 
 
