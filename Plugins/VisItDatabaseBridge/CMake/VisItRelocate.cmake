@@ -38,7 +38,8 @@ if (UNIX OR CYGWIN)
     set(_lib "lib${_dash_l}.so")
     set(_src "${VISIT_LIB_PATH}/${_lib}")
     
-    execute_process(${CMAKE_COMMAND} -E copy ${_src} "${VISIT_LOCAL}")
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E copy ${_src} "${VISIT_LOCAL}")
     set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/${_lib}")
     set(_visit_avt_files ${_visit_avt_files} "${VISIT_LOCAL}/${_lib}")
   endforeach (_dash_l)
