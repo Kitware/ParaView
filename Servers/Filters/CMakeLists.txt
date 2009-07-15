@@ -39,12 +39,14 @@ SET(Filters_SRCS
   vtkDataSetToRectilinearGrid.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
+  vtkEquivalenceSet.cxx
   vtkExodusFileSeriesReader.cxx
   vtkExtractHistogram.cxx
   vtkExtractScatterPlot.cxx
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkHierarchicalFractal.cxx
+  vtkGridFragment.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
   vtkIntegrateAttributes.cxx
