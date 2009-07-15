@@ -14,18 +14,19 @@
 =========================================================================*/
 #include "vtkSMPVRepresentationProxy.h"
 
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkProp3D.h"
 #include "vtkProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMSurfaceRepresentationProxy.h"
-#include "vtkCollection.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -82,7 +83,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMPVRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.25");
+vtkCxxRevisionMacro(vtkSMPVRepresentationProxy, "1.26");
 //----------------------------------------------------------------------------
 vtkSMPVRepresentationProxy::vtkSMPVRepresentationProxy()
 {
@@ -736,7 +737,7 @@ int vtkSMPVRepresentationProxy::LoadState(
       // representation type the user wanted and then set it on the property.
       const char* repr_text = 0;
 
-      vtkCollection* entries = vtkCollection::New();
+      vtkSmartPointer<vtkCollection> entries = vtkSmartPointer<vtkCollection>::New();
       currentElement->FindNestedElementByName("Domain")->GetElementsByName(
         "Entry", entries);
       for (int kk=0; kk < entries->GetNumberOfItems() && !repr_text; kk++)
