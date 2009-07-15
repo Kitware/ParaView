@@ -151,6 +151,11 @@ public:
   // it must explicity mark the strategy invalid.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
 
+  // Description:
+  // Overridden to setup the "Representation" property's value correctly since
+  // it changes based on plugins loaded at run-time.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMProxyLocator* locator);
+
 //BTX
   enum RepresentationType
     {
@@ -190,7 +195,8 @@ protected:
 
   // Description:
   // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
+    vtkPVXMLElement *element);
 
   // Description:
   // Returns true if the active representation is of a surface type.

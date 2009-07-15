@@ -4,8 +4,10 @@
       <!-- This is added to the "GeometryRepresentation" proxy xml defined in the
            standard ParaView servermanager xml 
       -->
-      <Option representation="105" subproxy="PointSpriteRepresentation" value="0"
-              text="Point Sprite" />
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0" />
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"
@@ -13,6 +15,7 @@
           
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
+            <Exception name="Representation" />
           </ShareProperties>
           
           <ExposedProperties>
@@ -55,8 +58,10 @@
       <!-- This is added to the "UnstructuredGridRepresentation" proxy xml defined in the
            standard ParaView servermanager xml 
       -->
-      <Option representation="105" subproxy="PointSpriteRepresentation" value="0"
-              text="Point Sprite" />
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0" />
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"
@@ -64,6 +69,7 @@
           
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
+            <Exception name="Representation" />
           </ShareProperties>
           <ExposedProperties>
             <Property name="RenderMode"/>
@@ -106,8 +112,10 @@
       <!-- This is added to the "UniformGridRepresentation" proxy xml defined in the
            standard ParaView servermanager xml 
       -->
-      <Option representation="105" subproxy="PointSpriteRepresentation" value="0"
-              text="Point Sprite" />
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="PointSpriteRepresentation" text="Point Sprite"
+        subtype="0"/>
 
       <SubProxy>
         <Proxy name="PointSpriteRepresentation"
@@ -115,6 +123,7 @@
           
           <ShareProperties subproxy="SurfaceRepresentation">
             <Exception name="Visibility" />
+            <Exception name="Representation" />
           </ShareProperties>
           <ExposedProperties>
             <Property name="RenderMode"/>

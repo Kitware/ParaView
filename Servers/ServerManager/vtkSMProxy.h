@@ -742,7 +742,7 @@ protected:
   // override this method to perform special tasks.
   virtual void UpdatePropertyInformationInternal(vtkSMProperty*);
  
-  int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
+  virtual int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);
 
   char* Name;

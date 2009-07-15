@@ -6921,6 +6921,10 @@
     </UnstructuredGridVolumeRepresentationProxy>
 
     <PVRepresentationProxy name="PVRepresentationBase">
+      <Documentation>
+        Base-API definition for all representations shown in the default 3D view
+        in ParaView i.e. (views, RenderView).
+      </Documentation>
 
       <IntVectorProperty
         name="Visibility"
@@ -6967,6 +6971,57 @@
         <Documentation>
           Set the visibility for the cube axes.
         </Documentation>
+      </IntVectorProperty>
+
+      <RepresentationType 
+        subproxy="OutlineRepresentation" text="Outline"/>
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Points" subtype="0" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Wireframe" subtype="1" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface" subtype="2" />
+      <RepresentationType
+        subproxy="SurfaceRepresentation" text="Surface With Edges" subtype="3" />
+
+      <IntVectorProperty
+        name="Representation"
+        command="SetRepresentation"
+        number_of_elements="1"
+        default_values="2"
+        update_self="1">
+        <Documentation>
+          Choose the type for the representation.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <!-- this domain is automatically populated using RepresentationType
+               elements in the definition for this proxy. 
+          <Entry value="3" text="Outline" />
+          <Entry value="0" text="Points" />
+          <Entry value="1" text="Wireframe" />
+          <Entry value="2" text="Surface" />
+          <Entry value="5" text="Surface With Edges" />
+          -->
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="BackfaceRepresentation"
+        command="SetBackfaceRepresentation"
+        number_of_elements="1"
+        default_values="400"
+        update_self="1">
+        <Documentation>
+          Choose the representation type for the backface.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry value="400" text="Follow Frontface" />
+          <Entry value="401" text="Cull Backface" />
+          <Entry value="402" text="Cull Frontface" />
+          <Entry value="0"   text="Points" />
+          <Entry value="1"   text="Wireframe" />
+          <Entry value="2"   text="Surface" />
+          <Entry value="5"   text="Surface With Edges" />
+        </EnumerationDomain>
       </IntVectorProperty>
 
       <SubProxy>
@@ -7133,12 +7188,7 @@
         This representation is used to show geometry as
         Surface/Outline/Points/Wireframe.
       </Documentation>
-      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
-      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
-      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
-      <Option representation="3" subproxy="OutlineRepresentation" />
-      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
-
+      
       <InputProperty 
         name="Input"
         command="NotUsed">
@@ -7149,37 +7199,6 @@
           Set the input to the representation.
         </Documentation>
       </InputProperty>
-
-      <IntVectorProperty
-        name="Representation"
-        command="SetRepresentation"
-        number_of_elements="1"
-        default_values="2"
-        update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="3" text="Outline" />
-          <Entry value="0" text="Points" />
-          <Entry value="1" text="Wireframe" />
-          <Entry value="2" text="Surface" />
-          <Entry value="5" text="Surface With Edges" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="BackfaceRepresentation"
-                         command="SetBackfaceRepresentation"
-                         number_of_elements="1"
-                         default_values="400"
-                         update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="400" text="Follow Frontface" />
-          <Entry value="401" text="Cull Backface" />
-          <Entry value="402" text="Cull Frontface" />
-          <Entry value="0"   text="Points" />
-          <Entry value="1"   text="Wireframe" />
-          <Entry value="2"   text="Surface" />
-          <Entry value="5"   text="Surface With Edges" />
-        </EnumerationDomain>
-      </IntVectorProperty>
 
       <Hints>
         <InheritRepresentationProperties>
@@ -7253,12 +7272,9 @@
         This representation is used to show unstructured grid as
         Surface/Outline/Points/Wireframe/Volume
       </Documentation>
-      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
-      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
-      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
-      <Option representation="3" subproxy="OutlineRepresentation" />
-      <Option representation="4" subproxy="VolumeRepresentation" />
-      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
+     
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
 
       <InputProperty 
         name="Input"
@@ -7271,38 +7287,6 @@
           Set the input to the representation.
         </Documentation>
       </InputProperty>
-
-      <IntVectorProperty
-        name="Representation"
-        command="SetRepresentation"
-        number_of_elements="1"
-        default_values="2"
-        update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="3" text="Outline" />
-          <Entry value="0" text="Points" />
-          <Entry value="1" text="Wireframe" />
-          <Entry value="2" text="Surface" />
-          <Entry value="5" text="Surface With Edges" />
-          <Entry value="4" text="Volume" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="BackfaceRepresentation"
-                         command="SetBackfaceRepresentation"
-                         number_of_elements="1"
-                         default_values="400"
-                         update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="400" text="Follow Frontface" />
-          <Entry value="401" text="Cull Backface" />
-          <Entry value="402" text="Cull Frontface" />
-          <Entry value="0"   text="Points" />
-          <Entry value="1"   text="Wireframe" />
-          <Entry value="2"   text="Surface" />
-          <Entry value="5"   text="Surface With Edges" />
-        </EnumerationDomain>
-      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="VolumeRepresentation"
@@ -7392,13 +7376,10 @@
         This representation is used to show image data as
         Surface/Outline/Points/Wireframe/Volume/Slice.
       </Documentation>
-      <Option representation="0" subproxy="SurfaceRepresentation" value="0" />
-      <Option representation="1" subproxy="SurfaceRepresentation" value="1" />
-      <Option representation="2" subproxy="SurfaceRepresentation" value="2" />
-      <Option representation="3" subproxy="OutlineRepresentation" />
-      <Option representation="4" subproxy="VolumeRepresentation" />
-      <Option representation="5" subproxy="SurfaceRepresentation" value="3" />
-      <Option representation="6" subproxy="SliceRepresentation" />
+
+      <!-- this adds to the types already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="VolumeRepresentation" text="Volume"/>
+      <RepresentationType subproxy="SliceRepresentation" text="Slice"/>
 
       <InputProperty 
         name="Input"
@@ -7411,39 +7392,6 @@
           Set the input to the representation.
         </Documentation>
       </InputProperty>
-
-      <IntVectorProperty
-        name="Representation"
-        command="SetRepresentation"
-        number_of_elements="1"
-        default_values="6"
-        update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="3" text="Outline" />
-          <Entry value="0" text="Points" />
-          <Entry value="1" text="Wireframe" />
-          <Entry value="2" text="Surface" />
-          <Entry value="5" text="Surface With Edges" />
-          <Entry value="4" text="Volume" />
-          <Entry value="6" text="Slice" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-
-      <IntVectorProperty name="BackfaceRepresentation"
-                         command="SetBackfaceRepresentation"
-                         number_of_elements="1"
-                         default_values="400"
-                         update_self="1">
-        <EnumerationDomain name="enum">
-          <Entry value="400" text="Follow Frontface" />
-          <Entry value="401" text="Cull Backface" />
-          <Entry value="402" text="Cull Frontface" />
-          <Entry value="0"   text="Points" />
-          <Entry value="1"   text="Wireframe" />
-          <Entry value="2"   text="Surface" />
-          <Entry value="5"   text="Surface With Edges" />
-        </EnumerationDomain>
-      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="VolumeRepresentation"
