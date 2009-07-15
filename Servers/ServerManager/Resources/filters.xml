@@ -1978,6 +1978,32 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
    <!-- End Gradient -->
    </SourceProxy>
 
+  <!-- ==================================================================== -->
+   <SourceProxy name="GridFragment" class="vtkGridFragment"
+      label="Grid Fragment">
+     <Documentation
+       short_help="Parallel connectivity and integration."
+       long_help="Mass properties of connected fragments for unstructured grids.">
+This filter works on multiblock unstructured grid inputs and also works in 
+parallel.  It Ignores any cells with a cell data Status value of 0.  
+It performs connectivity to distict fragments separately.  It then integrates
+attributes of the fragments.
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkUnstructuredGrid"/>
+             <DataType value="vtkCompositeDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End Grid Fragment -->
+   </SourceProxy>
+
    <!-- ==================================================================== -->
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter"
     label="Linear Extrusion">
