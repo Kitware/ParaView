@@ -37,14 +37,14 @@ if (UNIX OR CYGWIN)
   foreach (_dash_l ${VISIT_LIBS})
     set(_lib "lib${_dash_l}.so")
     set(_src "${VISIT_LIB_PATH}/${_lib}")
-    
     execute_process(
       COMMAND ${CMAKE_COMMAND} -E copy ${_src} "${VISIT_LOCAL}")
     set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/${_lib}")
     set(_visit_avt_files ${_visit_avt_files} "${VISIT_LOCAL}/${_lib}")
   endforeach (_dash_l)
   # Gather the database plugins that currently exist.
-  execute_process(${CMAKE_COMMAND} -E make_directory "${VISIT_LOCAL}/databases")
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${VISIT_LOCAL}/databases")
   set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/databases")
   file(GLOB 
     VISIT_DATABASE_PLUGINS
