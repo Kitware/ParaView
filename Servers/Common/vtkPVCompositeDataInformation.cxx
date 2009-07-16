@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.15");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.16");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -125,7 +125,7 @@ unsigned int vtkPVCompositeDataInformation::GetNumberOfChildren()
 {
   return this->DataIsMultiPiece?
     this->NumberOfPieces : 
-    this->Internal->ChildrenInformation.size();
+    static_cast<int>(this->Internal->ChildrenInformation.size());
 }
 
 //----------------------------------------------------------------------------
@@ -243,15 +243,15 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
     return;
     }
 
-  unsigned int otherNumChildren = info->Internal->ChildrenInformation.size();
-  unsigned int numChildren = this->Internal->ChildrenInformation.size();
+  size_t otherNumChildren = info->Internal->ChildrenInformation.size();
+  size_t numChildren = this->Internal->ChildrenInformation.size();
   if ( otherNumChildren > numChildren)
     {
     numChildren = otherNumChildren;
     this->Internal->ChildrenInformation.resize(numChildren);
     }
 
-  for (unsigned int i=0; i < otherNumChildren; i++)
+  for (size_t i=0; i < otherNumChildren; i++)
     {
     vtkPVDataInformation* otherInfo = info->Internal->ChildrenInformation[i].Info;
     vtkPVDataInformation* localInfo = this->Internal->ChildrenInformation[i].Info;
@@ -295,7 +295,8 @@ void vtkPVCompositeDataInformation::CopyToStream(
         << this->DataIsMultiPiece
         << this->NumberOfPieces;
 
-  unsigned int numChildren = this->Internal->ChildrenInformation.size();
+  unsigned int numChildren = static_cast<unsigned int>(
+    this->Internal->ChildrenInformation.size());
   *css << numChildren;
   
   // If data is a vtkHierarchicalBoxDataSet or sub-class, do not get the
@@ -314,7 +315,8 @@ void vtkPVCompositeDataInformation::CopyToStream(
       size_t length;
       const unsigned char* data;
       dcss.GetData(&data, &length);
-      *css << vtkClientServerStream::InsertArray(data, length);
+      *css << vtkClientServerStream::InsertArray(data,
+        static_cast<int>(length));
       }
     }
   *css << numChildren; // DONE marker

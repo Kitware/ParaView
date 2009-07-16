@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.5");
 
 
 
@@ -71,7 +71,7 @@ void vtkPVTimerInformation::InsertLog(int id, const char* log)
     delete [] this->Logs[id];
     this->Logs[id] = NULL;
     }
-  int len = strlen(log);
+  size_t len = strlen(log);
   char* str = new char[len+1];
   strcpy(str, log);
   this->Logs[id] = str;
@@ -148,7 +148,7 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
 void vtkPVTimerInformation::CopyFromMessage(unsigned char* msg)
 {
   int endianMarker;
-  int length, num, idx;
+  int num, idx;
 
   memcpy((unsigned char*)&endianMarker, msg, sizeof(int));
   if (endianMarker != 1)
@@ -170,7 +170,7 @@ void vtkPVTimerInformation::CopyFromMessage(unsigned char* msg)
   for (idx = 0; idx < num; ++idx)
     {
     char* log;
-    length = strlen((const char*)msg);
+    size_t length = strlen((const char*)msg);
     log = new char[length+1];
     memcpy(log, msg, length+1);
     this->InsertLog(idx, log);
@@ -186,7 +186,6 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
   int num, idx;
   vtkPVTimerInformation* pdInfo;
   char* log;
-  int length;
   char* copyLog;
 
   pdInfo = vtkPVTimerInformation::SafeDownCast(info);
@@ -203,7 +202,7 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
     log = pdInfo->GetLog(idx);
     if (log)
       {
-      length = strlen(log);
+      size_t length = strlen(log);
       copyLog = new char[length+1];
       memcpy(copyLog, log, length+1);
       this->InsertLog((idx+oldNum), copyLog);

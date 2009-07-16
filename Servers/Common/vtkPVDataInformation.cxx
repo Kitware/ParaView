@@ -50,7 +50,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.60");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -1003,37 +1003,37 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 
   this->PointArrayInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->PointDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->CellDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->VertexDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->EdgeDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->RowDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   *css << this->CompositeDataClassName;
   *css << this->CompositeDataSetType;
@@ -1042,13 +1042,13 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 
   this->CompositeDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   dcss.Reset();
 
   this->FieldDataInformation->CopyToStream(&dcss);
   dcss.GetData(&data, &length);
-  *css << vtkClientServerStream::InsertArray(data, length);
+  *css << vtkClientServerStream::InsertArray(data, static_cast<int>(length));
 
   *css << vtkClientServerStream::InsertArray(this->TimeSpan, 2);
 

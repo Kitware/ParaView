@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
-vtkCxxRevisionMacro(vtkPVServerOptions, "1.6");
+vtkCxxRevisionMacro(vtkPVServerOptions, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::vtkPVServerOptions()
@@ -114,7 +114,8 @@ int vtkPVServerOptions::ParseExtraXMLTag(const char* name, const char** atts)
 //----------------------------------------------------------------------------
 unsigned int vtkPVServerOptions::GetNumberOfMachines()
 {
-  return this->Internals->MachineInformationVector.size();
+  return static_cast<unsigned int>(
+    this->Internals->MachineInformationVector.size());
 }
 
 //----------------------------------------------------------------------------

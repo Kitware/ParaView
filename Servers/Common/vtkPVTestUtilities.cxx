@@ -27,7 +27,7 @@
 using vtkstd::string;
 using vtkstd::vector;
 
-vtkCxxRevisionMacro(vtkPVTestUtilities, "1.6");
+vtkCxxRevisionMacro(vtkPVTestUtilities, "1.7");
 vtkStandardNewMacro(vtkPVTestUtilities);
 
 //-----------------------------------------------------------------------------
@@ -101,8 +101,8 @@ char *vtkPVTestUtilities::GetFilePath(
         const char *base,
         const char *name)
 {
-  int baseLen=strlen(base);
-  int nameLen=strlen(name);
+  int baseLen=static_cast<int>(strlen(base));
+  int nameLen=static_cast<int>(strlen(name));
   int pathLen=baseLen+1+nameLen+1;
   char *filePath=new char[pathLen];
   int i=0;

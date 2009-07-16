@@ -32,7 +32,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.21");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.22");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -443,7 +443,7 @@ int vtkXMLCollectionReader::RequestInformation(
 {
   vtkInformation* info = outputVector->GetInformationObject(0);
 
-  int nBlocks = this->Internal->Readers.size();
+  size_t nBlocks = this->Internal->Readers.size();
   if (nBlocks == 1 && !this->ForceOutputTypeToMultiBlock)
     {
     this->Internal->Readers[0]->CopyOutputInformation(
@@ -523,9 +523,10 @@ void vtkXMLCollectionReader::ReadXMLDataImpl()
     {
     vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::GetData(outInfo);
   
-    int nBlocks = this->Internal->Readers.size();
+    unsigned int nBlocks = static_cast<unsigned int>(
+      this->Internal->Readers.size());
     output->SetNumberOfBlocks(nBlocks);
-    for(int i=0; i < nBlocks; ++i)
+    for(unsigned int i=0; i < nBlocks; ++i)
       {
       vtkMultiBlockDataSet* block = vtkMultiBlockDataSet::SafeDownCast(
         output->GetBlock(i));

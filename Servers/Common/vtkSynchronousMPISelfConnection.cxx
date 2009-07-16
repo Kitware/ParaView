@@ -20,7 +20,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSynchronousMPISelfConnection);
-vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.2");
+vtkCxxRevisionMacro(vtkSynchronousMPISelfConnection, "1.3");
 //----------------------------------------------------------------------------
 vtkSynchronousMPISelfConnection::vtkSynchronousMPISelfConnection()
 {
@@ -99,7 +99,7 @@ void vtkSynchronousMPISelfConnection::GatherInformation(vtkTypeUInt32 serverFlag
       size_t length;
       const unsigned char* data;
       css.GetData(&data, &length);
-      int len = length;
+      int len = static_cast<int>(length);
       this->Controller->Broadcast(&len, 1, 0);
       this->Controller->Broadcast(const_cast<unsigned char*>(data),
         length, 0);

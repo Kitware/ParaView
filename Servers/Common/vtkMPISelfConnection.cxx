@@ -52,7 +52,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.7");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.8");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -235,7 +235,8 @@ void vtkMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
     {
     if (length != 0)
       {
-      this->Controller->TriggerRMIOnAllChildren((void*)data, length,
+      this->Controller->TriggerRMIOnAllChildren((void*)data,
+        static_cast<int>(length),
         vtkMPISelfConnection::ROOT_SATELLITE_RMI_TAG);
       }
     // Process stream locally as well.
@@ -249,7 +250,8 @@ void vtkMPISelfConnection::SendStreamToServerNodeInternal(int remoteId,
     {
     if (length != 0)
       {
-      this->Controller->TriggerRMI(remoteId, (void*)data, length,
+      this->Controller->TriggerRMI(remoteId, (void*)data,
+        static_cast<int>(length),
         vtkMPISelfConnection::ROOT_SATELLITE_RMI_TAG);
       }
     }
@@ -287,7 +289,8 @@ void vtkMPISelfConnection::GatherInformationRoot(vtkPVInformation* info,
   size_t slength;
   stream.GetData(&sdata, &slength);
   
-  this->Controller->TriggerRMIOnAllChildren((void*)sdata, slength,
+  this->Controller->TriggerRMIOnAllChildren((void*)sdata,
+    static_cast<int>(slength),
     vtkMPISelfConnection::ROOT_SATELLITE_GATHER_INFORMATION_RMI_TAG);
 
   // Now, we must collect information from the satellites.
@@ -376,7 +379,7 @@ void vtkMPISelfConnection::CollectInformation(vtkPVInformation* info)
       size_t length;
       const unsigned char* data;
       css.GetData(&data, &length);
-      int len = length;
+      int len = static_cast<int>(length);
       this->Controller->Send(&len, 1, parent,
         vtkMPISelfConnection::ROOT_SATELLITE_INFO_LENGTH_TAG);
       this->Controller->Send(const_cast<unsigned char*>(data),
