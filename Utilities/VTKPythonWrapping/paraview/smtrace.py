@@ -10,28 +10,34 @@ def reset_trace_observer():
 def reset_trace_globals():
   trace_globals.capture_all_properties = False
   trace_globals.verbose = False
+  trace_globals.active_source_at_start = None
+  trace_globals.active_view_at_start = None
   trace_globals.last_active_view = None
   trace_globals.last_active_source = None
   trace_globals.last_registered_proxies = []
   trace_globals.registered_proxies = []
   trace_globals.trace_output = ["try: paraview.simple\nexcept: from paraview.simple import *\n"]
-  trace_globals.traced_proxy_groups = ["sources", "representations", "views", "lookup_tables", "scalar_bars"]
-  trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "Representations"]
+  trace_globals.traced_proxy_groups = ["sources", "representations", "views", \
+                                       "lookup_tables", "scalar_bars"]
+  trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
+                                           "ViewTime", "Representations"]
   trace_globals.ignored_representation_properties = ["Input"]
   reset_trace_observer()
 reset_trace_globals()
 
-
+def pyvariable_from_proxy_name(proxy_name):
+  return servermanager._make_name_valid(proxy_name.replace(".", "_"))
 
 class proxy_trace_info():
   def __init__(self, proxy, proxyGroup, proxyName):
     self.Proxy = proxy
     self.Group = proxyGroup
     self.ProxyName = proxyName
-    self.PyVariable = servermanager._make_name_valid(proxyName).replace(".", "_")
+    self.PyVariable = pyvariable_from_proxy_name(proxyName)
     self.Props = dict()
     self.CurrentProps = dict()
     self.ModifiedProps = dict()
+    self.ignore_next_unregister = False
 
 class prop_trace_info():
   def __init__(self, proxyTraceInfo, prop):
@@ -69,7 +75,7 @@ def track_existing_sources():
 def track_existing_source_proxy(proxy, proxy_name):
     proxy_info = proxy_trace_info(proxy, "sources", proxy_name)
     trace_globals.registered_proxies.append(proxy_info)
-    if proxy == simple.GetActiveSource():
+    if not trace_globals.last_active_source and proxy == trace_globals.active_source_at_start:
       trace_globals.last_active_source = proxy
       trace_globals.trace_output.append("%s = GetActiveSource()" % proxy_info.PyVariable)
     else:
@@ -79,7 +85,7 @@ def track_existing_source_proxy(proxy, proxy_name):
 def track_existing_view_proxy(proxy, proxy_name):
     proxy_info = proxy_trace_info(proxy, "views", proxy_name)
     trace_globals.registered_proxies.append(proxy_info)
-    if not trace_globals.last_active_view and proxy == simple.GetActiveView():
+    if not trace_globals.last_active_view and proxy == trace_globals.active_view_at_start:
       trace_globals.last_active_view = proxy
       trace_globals.trace_output.append("%s = GetRenderView()" % proxy_info.PyVariable)
     else:
@@ -115,7 +121,11 @@ def track_existing_proxy(proxy):
     return track_existing_view_proxy(proxy, proxy_name)
   return None
 
-def get_proxy_info(p):
+def get_proxy_info(p, search_existing=True):
+  """Lookup the proxy_trace_info object for the given proxy or pyvariable.
+  If no proxy_trace_info object is found, and search_existing is True
+  (the default) then a new proxy_trace_info will be created if the proxy can
+  be found in the list of existing servermanager source proxies."""
   for info in trace_globals.last_registered_proxies:
     if info.Proxy == p: return info
     if info.PyVariable == p: return info
@@ -123,7 +133,7 @@ def get_proxy_info(p):
     if info.Proxy == p: return info
     if info.PyVariable == p: return info
   # It must be a proxy that existed before trace started
-  return track_existing_proxy(p)
+  if search_existing: return track_existing_proxy(p)
 
   return None
 
@@ -153,11 +163,13 @@ def get_view_proxy_info_for_rep(rep_info):
     proxy_trace_info for the view proxy that the representation belongs to.
     If one is not found, returns None."""
     for p in trace_globals.registered_proxies + trace_globals.last_registered_proxies:
-        # If the proxy is a view and 'Representations' is in its current properties dict:
-        if p.Group == "views" and "Representations" in p.CurrentProps:
-            # If the view's 'Representations' property contains this representation:
-            if p.CurrentProps["Representations"].find(rep_info.PyVariable) >= 0:
-                return p
+        # If the proxy is a view, check for rep_info.Proxy in the
+        # view's 'Representation' property
+        if p.Group == "views":
+          rep_prop = p.Proxy.GetProperty("Representations")
+          if rep_prop:
+            for i in xrange(rep_prop.GetNumberOfProxies()):
+              if rep_info.Proxy == rep_prop.GetProxy(i): return p
     return None
 
 
@@ -229,7 +241,6 @@ def proxy_smproperty_tostring(proxyInfo, propInfo):
     inputProxy = prop.GetProxy(i)
     info = get_proxy_info(inputProxy)
     if info != None and info.PyVariable != None: nameList.append(info.PyVariable)
-
   if len(nameList) == 0: return "[]"
   if len(nameList) == 1: return nameList[0]
   if len(nameList) > 1:
@@ -411,7 +422,15 @@ def on_proxy_registered(o, e):
   pGroup = o.GetLastProxyRegisteredGroup()
   pName = o.GetLastProxyRegisteredName()
   if p and pGroup and pName:
-    trace_proxy_registered(p, pGroup, pName)
+    proxy_info = get_proxy_info(p, search_existing=False)
+    if proxy_info:
+      old_pyvariable = proxy_info.PyVariable
+      proxy_info.PyVariable = pyvariable_from_proxy_name(pName)
+      proxy_info.ignore_next_unregister = True
+      trace_globals.trace_output.append("%s = %s" % (proxy_info.PyVariable, old_pyvariable))
+      trace_globals.trace_output.append("del %s" % old_pyvariable)
+    else:
+      trace_proxy_registered(p, pGroup, pName)
 
 def on_proxy_unregistered(o, e):
   '''Called when a proxy is registered with the proxy manager'''
@@ -421,6 +440,9 @@ def on_proxy_unregistered(o, e):
   if p and pGroup and pName:
     proxy_info = get_proxy_info(p)
     if proxy_info:
+      if proxy_info.ignore_next_unregister:
+        proxy_info.ignore_next_unregister = False
+        return
       trace_globals.trace_output.append("Delete(%s)" % proxy_info.PyVariable)
       if proxy_info in trace_globals.last_registered_proxies:
         trace_globals.last_registered_proxies.remove(proxy_info)
@@ -438,7 +460,7 @@ def on_property_modified(o, e):
     # small hack here: some view properties are modified before the view
     # is registered.  We don't want to call get_proxy_info until after
     # the view is registered, so for now lets ignore these properties:
-    if propName in ["ViewSize", "GUISize", "ViewPosition", "ViewTime"]: return
+    if propName in ignoredViewProperties(): return
 
     info = get_proxy_info(proxy)
     if info and prop:
@@ -472,7 +494,8 @@ def stop_trace():
 def start_trace(CaptureAllProperties=False, Verbose=False):
   clear_trace()
   add_observers()
-  #track_existing_sources()
+  trace_globals.active_source_at_start = simple.GetActiveSource()
+  trace_globals.active_view_at_start = simple.GetActiveView()
   trace_globals.capture_all_properties = CaptureAllProperties
   trace_globals.verbose = Verbose 
 
