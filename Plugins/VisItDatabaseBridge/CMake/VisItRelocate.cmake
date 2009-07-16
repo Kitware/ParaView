@@ -45,19 +45,15 @@ if (UNIX OR CYGWIN)
   # Gather the database plugins that currently exist.
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory "${VISIT_LOCAL}/databases")
-  set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/databases")
+  #set(_configureVisItDeps ${_configureVisItDeps} "${VISIT_LOCAL}/databases")
   file(GLOB 
     VISIT_DATABASE_PLUGINS
     "${VISIT_PLUGIN_BIN}/databases/*.so")
   foreach (_dbPath ${VISIT_DATABASE_PLUGINS})
     get_filename_component(_db ${_dbPath} NAME)
-    add_custom_command(
-      OUTPUT "${VISIT_LOCAL}/databases/${_db}"
-      COMMAND ${CMAKE_COMMAND}
-      ARGS -E copy ${_dbPath} "${VISIT_LOCAL}/databases"
-      DEPENDS ${_dbPath}
-      COMMENT "Copying ${_db} to local VisIt databases.")
-    set(_configureVisItDeps ${_configureVisItDeps} ${VISIT_LOCAL}/databases/${_db})
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E copy ${_dbPath} "${VISIT_LOCAL}/databases")
+    #set(_configureVisItDeps ${_configureVisItDeps} ${VISIT_LOCAL}/databases/${_db})
     set(_visit_database_files ${_visit_database_files} ${VISIT_LOCAL}/databases/${_db})
   endforeach (_dbPath)
   # Gather VisIt's third party deps.
