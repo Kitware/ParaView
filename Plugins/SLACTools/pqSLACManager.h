@@ -49,6 +49,7 @@ public:
   QAction *actionWireframeSolidMesh();
   QAction *actionWireframeAndBackMesh();
   QAction *actionPlotOverZ();
+  QAction *actionToggleBackgroundBW();
 
   /// Convenience function for getting the current server.
   pqServer *getActiveServer();
@@ -84,6 +85,7 @@ public slots:
   void showWireframeSolidMesh();
   void showWireframeAndBackMesh();
   void createPlotOverZ();
+  void toggleBackgroundBW();
 
 protected:
   /// Finds a pipeline source with the given SM XML name.  If there is more than

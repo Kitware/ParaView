@@ -112,6 +112,18 @@
     <string>Make a Plot of a Field Along the Z Axis</string>
    </property>
   </action>
+  <action name="actionToggleBackgroundBW">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/BackgroundBW.png</normaloff>:/SLACTools/Icons/BackgroundBW.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Background B/W</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle the Background Between Black and White</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>

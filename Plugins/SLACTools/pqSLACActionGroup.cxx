@@ -41,6 +41,7 @@ pqSLACActionGroup::pqSLACActionGroup(QObject *p) : QActionGroup(p)
   this->addAction(manager->actionWireframeSolidMesh());
   this->addAction(manager->actionWireframeAndBackMesh());
   this->addAction(manager->actionPlotOverZ());
+  this->addAction(manager->actionToggleBackgroundBW());
 
   // Action groups are usually used to establish radio-button like
   // functionality.  We don't really want that, so turn it off.

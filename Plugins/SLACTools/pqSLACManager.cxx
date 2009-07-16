@@ -108,6 +108,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
                    this, SLOT(showWireframeAndBackMesh()));
   QObject::connect(this->actionPlotOverZ(), SIGNAL(triggered(bool)),
                    this, SLOT(createPlotOverZ()));
+  QObject::connect(this->actionToggleBackgroundBW(), SIGNAL(triggered(bool)),
+                   this, SLOT(toggleBackgroundBW()));
 
   this->checkActionEnabled();
 }
@@ -157,6 +159,11 @@ QAction *pqSLACManager::actionWireframeAndBackMesh()
 QAction *pqSLACManager::actionPlotOverZ()
 {
   return this->Internal->Actions.actionPlotOverZ;
+}
+
+QAction *pqSLACManager::actionToggleBackgroundBW()
+{
+  return this->Internal->Actions.actionToggleBackgroundBW;
 }
 
 //-----------------------------------------------------------------------------
@@ -670,4 +677,34 @@ void pqSLACManager::createPlotOverZ()
     }
 
   if (stack) stack->endUndoSet();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::toggleBackgroundBW()
+{
+  pqView *view = this->getMeshView();
+  if (!view) return;
+  vtkSMProxy *viewProxy = view->getProxy();
+
+  QList<QVariant> oldBackground;
+  QList<QVariant> newBackground;
+
+  oldBackground = pqSMAdaptor::getMultipleElementProperty(
+                                          viewProxy->GetProperty("Background"));
+  if (   (oldBackground[0].toDouble() == 0.0)
+      && (oldBackground[1].toDouble() == 0.0)
+      && (oldBackground[2].toDouble() == 0.0) )
+    {
+    newBackground << 1.0 << 1.0 << 1.0;
+    }
+  else
+    {
+    newBackground << 0.0 << 0.0 << 0.0;
+    }
+
+  pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("Background"),
+                                          newBackground);
+
+  viewProxy->UpdateVTKObjects();
+  view->render();
 }
