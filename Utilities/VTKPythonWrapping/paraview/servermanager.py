@@ -1986,8 +1986,9 @@ def CreateRenderView(connection=None, **extraArgs):
 
 def GetRepresentation(aProxy, view):
     for rep in view.Representations:
-        if rep.Input == aProxy:
-            return rep
+        try: isRep = rep.Input == aProxy
+        except: isRep = False
+        if isRep: return rep
     return None
 
 def CreateRepresentation(aProxy, view, **extraArgs):
