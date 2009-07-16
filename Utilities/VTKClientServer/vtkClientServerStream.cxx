@@ -1575,8 +1575,9 @@ int vtkClientServerStream::GetNumberOfValues(int message) const
       {
       // Requested message is not the last message.  Use the beginning
       // of the next message to find its length.
-      return (this->Internal->MessageIndexes[message+1] -
-              this->Internal->MessageIndexes[message]);
+      return static_cast<int>
+        (this->Internal->MessageIndexes[message+1] -
+         this->Internal->MessageIndexes[message]);
       }
     else if(this->Internal->StartIndex !=
             vtkClientServerStreamInternals::InvalidStartIndex)
@@ -1584,14 +1585,15 @@ int vtkClientServerStream::GetNumberOfValues(int message) const
       // Requested message is the last completed message, but there is
       // a partial message in progress.  Use the beginning of the next
       // partial message to find this message's length.
-      return (this->Internal->StartIndex -
-              this->Internal->MessageIndexes[message]);
+      return static_cast<int>
+        (this->Internal->StartIndex -
+         this->Internal->MessageIndexes[message]);
       }
     else
       {
       // Requested message is the last message.  Use the length of the
       // value indices array to find the message's length.
-      return (this->Internal->ValueOffsets.size() -
+      return static_cast<int>(this->Internal->ValueOffsets.size() -
               this->Internal->MessageIndexes[message]);
       }
     }

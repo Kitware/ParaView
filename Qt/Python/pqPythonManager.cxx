@@ -208,7 +208,7 @@ void pqPythonManager::executeScript(const QString & filename)
 }
 
 //-----------------------------------------------------------------------------
-void pqPythonManager::onRemovingServer(pqServer* server)
+void pqPythonManager::onRemovingServer(pqServer* /*server*/)
 {
   // Clear our stored pointer to the active server.
   this->Internal->ActiveServer = 0;

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.23");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.24");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -149,8 +149,8 @@ void vtkPVXMLElement::SetAttribute(const char* attrName,
     }
   
   // iterate over the names, and find if the attribute name exists.
-  unsigned int numAttributes = this->Internal->AttributeNames.size();
-  unsigned int i;
+  size_t numAttributes = this->Internal->AttributeNames.size();
+  size_t i;
   for(i=0; i < numAttributes; ++i)
     {
     if(strcmp(this->Internal->AttributeNames[i].c_str(), attrName) == 0)
@@ -272,7 +272,7 @@ void vtkPVXMLElement::PrintXML(ostream& os, vtkIndent indent)
     os << " " << (aName?aName:"NoName")
        << "=\"" << (aValue?sanitizedValue.c_str():"NoValue") << "\"";
     }
-  unsigned int numberOfNestedElements = this->Internal->NestedElements.size();
+  size_t numberOfNestedElements = this->Internal->NestedElements.size();
   if(numberOfNestedElements > 0)
     {
     os << ">\n";
@@ -304,7 +304,7 @@ vtkPVXMLElement* vtkPVXMLElement::GetParent()
 //----------------------------------------------------------------------------
 unsigned int vtkPVXMLElement::GetNumberOfNestedElements()
 {
-  return this->Internal->NestedElements.size();
+  return static_cast<unsigned int>(this->Internal->NestedElements.size());
 }
 
 //----------------------------------------------------------------------------
@@ -326,8 +326,8 @@ vtkPVXMLElement* vtkPVXMLElement::LookupElement(const char* id)
 //----------------------------------------------------------------------------
 vtkPVXMLElement* vtkPVXMLElement::FindNestedElement(const char* id)
 {
-  unsigned int numberOfNestedElements = this->Internal->NestedElements.size();
-  unsigned int i;
+  size_t numberOfNestedElements = this->Internal->NestedElements.size();
+  size_t i;
   for(i=0;i < numberOfNestedElements;++i)
     {
     const char* nid = this->Internal->NestedElements[i]->GetId();
@@ -603,13 +603,13 @@ void vtkPVXMLElement::Merge(vtkPVXMLElement* element, const char* attributeName)
     }
   
   // add attributes from element to this, or override attribute values on this
-  unsigned int numAttributes = element->Internal->AttributeNames.size();
-  unsigned int numAttributes2 = this->Internal->AttributeNames.size();
+  size_t numAttributes = element->Internal->AttributeNames.size();
+  size_t numAttributes2 = this->Internal->AttributeNames.size();
 
-  for(unsigned int i=0; i < numAttributes; ++i)
+  for(size_t i=0; i < numAttributes; ++i)
     {
     bool found = false;
-    for(unsigned int j=0; !found && j < numAttributes2; ++j)
+    for(size_t j=0; !found && j < numAttributes2; ++j)
       {
       if(element->Internal->AttributeNames[i] ==
         this->Internal->AttributeNames[j])
