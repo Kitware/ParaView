@@ -27,7 +27,7 @@ using vtkstd::string;
 #include <cstdlib>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.11");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.12");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -120,6 +120,52 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
     }
 }
 
+void vtkPVPluginLoaderSetupEnvironment(const char* file)
+{
+  // BUG # 0008673
+  // Tell the platform to look in the plugin's directory for 
+  // its dependencies. This isn't the right thing to do. A better
+  // solution would be to let the plugin tell us where to look so
+  // that a list of locations could be added.
+  const char LIB_PATH_SEP = ':';
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  const char *LIB_PATH_NAME="PATH";
+  const char LIB_PATH_SEP = ';';
+#elif defined (__APPLE__)
+  const char *LIB_PATH_NAME="DYLD_LIBRARY_PATH";
+#else
+  const char *LIB_PATH_NAME="LD_LIBRARY_PATH";
+#endif
+
+
+  // Trim the plugin name from the end of its path.
+  vtkstd::string directory = vtksys::SystemTools::GetFilenamePath(file);
+
+  vtkstd::string currentPath;
+  if (vtksys::SystemTools::GetEnv(LIB_PATH_NAME, currentPath))
+    {
+    vtkstd::vector<vtkstd::string> parts;
+    vtksys::SystemTools::Split(currentPath.c_str(), parts, LIB_PATH_SEP);
+    for (size_t cc=0; cc < parts.size(); cc++)
+      {
+      if (parts[cc] == directory)
+        {
+        // be smart to not add the path is already present.
+        return;
+        }
+      }
+    }
+
+  vtkstd::string ldLibPath;
+  ldLibPath = LIB_PATH_NAME;
+  ldLibPath += '=';
+  ldLibPath += directory;
+  ldLibPath += LIB_PATH_SEP;
+  ldLibPath += currentPath;
+  cout << "PutEnv: " << ldLibPath.c_str() << endl;
+  vtksys::SystemTools::PutEnv(ldLibPath.c_str());
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::SetFileName(const char* file)
 {
@@ -141,53 +187,10 @@ void vtkPVPluginLoader::SetFileName(const char* file)
 
   if(!this->Loaded && FileName && FileName[0] != '\0')
     {
+    vtkPVPluginLoaderSetupEnvironment(this->FileName);
     vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(FileName);
     if(lib)
       {
-      // BUG # 0008673
-      // Tell the platform to look in the plugin's directory for 
-      // its dependencies. This isn't the right thing to do. A better
-      // solution would be to let the plugin tell us where to look so
-      // that a list of locations could be added.
-      string ldLibPath;
-#if defined(_WIN32) && !defined(__CYGWIN__)
-      const char LIB_PATH_SEP=';';
-      const char PATH_SEP='\\';
-      const char *LIB_PATH_NAME="PATH";
-      ldLibPath=LIB_PATH_NAME;
-      ldLibPath+='=';
-#elif defined (__APPLE__)
-      const char LIB_PATH_SEP=':';
-      const char PATH_SEP='/';
-      const char *LIB_PATH_NAME="DYLD_LIBRARY_PATH";
-#else
-      const char LIB_PATH_SEP=':';
-      const char PATH_SEP='/';
-      const char *LIB_PATH_NAME="LD_LIBRARY_PATH";
-#endif
-      // Trim the plugin name from the end of its path.
-      string thisPluginsPath(file);
-      size_t eop=thisPluginsPath.rfind(PATH_SEP);
-      thisPluginsPath=thisPluginsPath.substr(0,eop);
-      // Load the shared libarary search path.
-      const char *pLdLibPath=getenv(LIB_PATH_NAME);
-      bool pluginPathPresent
-        = pLdLibPath==NULL?false:strstr(pLdLibPath,thisPluginsPath.c_str())!=NULL;
-      // Update it.
-      if (!pluginPathPresent)
-        {
-        // Make sure we are only adding it once, because there can
-        // be multiple plugins in the same folder.
-        if (pLdLibPath)
-          {
-          ldLibPath+=pLdLibPath;
-          ldLibPath+=LIB_PATH_SEP;
-          }
-        ldLibPath+=thisPluginsPath;
-
-        vtksys::SystemTools::PutEnv(ldLibPath.c_str());
-        }
-
       // old SM xml, new plugins don't have this method
       PluginXML1 xml1 = 
         (PluginXML1)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginXML");

@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.33");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.34");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -170,7 +170,7 @@ static bool getNetworkSubdirs(const vtkstd::string& path,
     RESOURCEDISPLAYTYPE_SHARE
     };
 
-  int tokenIndex = pathtokens.size()-1;
+  int tokenIndex = static_cast<int>(pathtokens.size())-1;
 
   if(tokenIndex >= MaxTokens)
     return false;
