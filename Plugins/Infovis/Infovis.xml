@@ -804,7 +804,7 @@
 
       <IntVectorProperty 
         name="Learn" 
-        command="SetLearn" 
+        command="SetLearnOption" 
         label="Learn Model" 
         number_of_elements="1" 
         default_values="1">
@@ -813,7 +813,7 @@
 
       <IntVectorProperty 
         name="Assess" 
-        command="SetAssess" 
+        command="SetAssessOption" 
         label="Assess Data" 
         number_of_elements="1" 
         default_values="1">
@@ -891,7 +891,7 @@
 
       <IntVectorProperty 
         name="Learn" 
-        command="SetLearn" 
+        command="SetLearnOption" 
         label="Learn Model" 
         number_of_elements="1" 
         default_values="1">
@@ -900,7 +900,7 @@
 
       <IntVectorProperty 
         name="Assess" 
-        command="SetAssess" 
+        command="SetAssessOption" 
         label="Assess Data" 
         number_of_elements="1" 
         default_values="1">
@@ -970,7 +970,7 @@
 
       <IntVectorProperty
         name="Learn"
-        command="SetLearn"
+        command="SetLearnOption"
         label="Learn Model"
         number_of_elements="1" 
         default_values="1">
@@ -979,7 +979,7 @@
 
       <IntVectorProperty
         name="Assess"
-        command="SetAssess"
+        command="SetAssessOption"
         label="Assess Data"
         number_of_elements="1"
         default_values="1">
@@ -1049,7 +1049,7 @@
 
       <IntVectorProperty 
         name="Learn" 
-        command="SetLearn"
+        command="SetLearnOption"
         label="Learn Model"
         number_of_elements="1"
         default_values="1">
@@ -1058,7 +1058,7 @@
 
       <IntVectorProperty 
         name="Assess"
-        command="SetAssess"
+        command="SetAssessOption"
         label="Assess Data"
         number_of_elements="1"
         default_values="1">
@@ -1128,7 +1128,7 @@
 
       <IntVectorProperty 
         name="Learn"
-        command="SetLearn"
+        command="SetLearnOption"
         label="Learn Model"
         number_of_elements="1"
         default_values="1">
@@ -1137,7 +1137,7 @@
 
       <IntVectorProperty
         name="Assess"
-        command="SetAssess"
+        command="SetAssessOption"
         label="Assess Data"
         number_of_elements="1"
         default_values="1">
