@@ -175,6 +175,15 @@ def SetViewProperties(view=None, **params):
         view = active_objects.view
     SetProperties(view, **params)
 
+def RenameSource(proxy, newName):
+    """Rename the given source proxy.  If the given proxy is not registered
+    in the sources group this method will have no effect."""
+    pxm = servermanager.ProxyManager()
+    oldName = pxm.GetProxyName("sources", proxy)
+    if oldName:
+      pxm.RegisterProxy("sources", newName, proxy)
+      pxm.UnRegisterProxy("sources", oldName, proxy)
+
 def FindSource(name):
     return servermanager.ProxyManager().GetProxy("sources", name)
 
