@@ -294,6 +294,8 @@ void pqSLACManager::showDataLoadManager()
   dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   QObject::connect(dialog, SIGNAL(createdPipeline()),
                    this, SLOT(checkActionEnabled()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()),
+                   this, SLOT(showEField()));
   dialog->show();
 }
 
@@ -341,14 +343,14 @@ void pqSLACManager::showField(const char *name)
   pqApplicationCore *core = pqApplicationCore::instance();
   pqUndoStack *stack = core->getUndoStack();
 
-  pqPipelineSource *reader = this->getMeshReader();
-  if (!reader) return;
+  pqPipelineSource *meshReader = this->getMeshReader();
+  if (!meshReader) return;
 
   pqView *view = this->getMeshView();
   if (!view) return;
 
   // Get the (downcasted) representation.
-  pqDataRepresentation *_repr = reader->getRepresentation(0, view);
+  pqDataRepresentation *_repr = meshReader->getRepresentation(0, view);
   pqPipelineRepresentation *repr
     = qobject_cast<pqPipelineRepresentation*>(_repr);
   if (!repr)
@@ -356,6 +358,13 @@ void pqSLACManager::showField(const char *name)
     qWarning() << "Could not find representation object.";
     return;
     }
+
+  // Get information about the field we are supposed to be showing.
+  vtkPVDataInformation *dataInfo = repr->getInputDataInformation();
+  vtkPVDataSetAttributesInformation *pointInfo
+    = dataInfo->GetPointDataInformation();
+  vtkPVArrayInformation *arrayInfo = pointInfo->GetArrayInformation(name);
+  if (!arrayInfo) return;
 
   if (stack) stack->beginUndoSet(QString("Show field %1").arg(name));
 
@@ -378,10 +387,6 @@ void pqSLACManager::showField(const char *name)
 
   // Set the range of the scalars to the current range of the field.
   double range[2];
-  vtkPVDataInformation *dataInfo = repr->getInputDataInformation();
-  vtkPVDataSetAttributesInformation *pointInfo
-    = dataInfo->GetPointDataInformation();
-  vtkPVArrayInformation *arrayInfo = pointInfo->GetArrayInformation(name);
   arrayInfo->GetComponentRange(-1, range);
   lut->setScalarRange(range[0], range[1]);
 
