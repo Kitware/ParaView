@@ -657,6 +657,36 @@ MACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR OUTIFACES OUTSRCS)
 ENDMACRO(ADD_PARAVIEW_DISPLAY_PANEL_DECORATOR)
 
 
+# Creates implementation for a pq3DWidgetInterface to add new 3D widgets to
+# ParaView.
+# ADD_3DWIDGET(OUTIFACES OUTSRCS
+#   CLASS_NAME <pq3DWidget subclass being added>
+#   WIDGET_TYPE <string identifying the 3DWidget typically used in the <Hints/>
+#               for the proxy when specifying the PropertyGroup.
+#   )
+MACRO(ADD_3DWIDGET OUTIFACES OUTSRCS)
+  PV_PLUGIN_PARSE_ARGUMENTS(ARG "CLASS_NAME;WIDGET_TYPE" "" ${ARGN})
+
+  SET(${OUTIFACES} ${ARG_CLASS_NAME})
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pq3DWidgetImplementation.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Qt/Components/pq3DWidgetImplementation.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx @ONLY)
+
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${QT_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS}")
+  SET(ACTION_MOC_SRCS)
+  QT4_WRAP_CPP(ACTION_MOC_SRCS ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+
+  SET(${OUTSRCS} 
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.cxx
+      ${CMAKE_CURRENT_BINARY_DIR}/${ARG_CLASS_NAME}Implementation.h
+      ${ACTION_MOC_SRCS}
+      )
+ENDMACRO(ADD_3DWIDGET)
+
+
 #  Macro for a GraphLayoutStrategy plugin
 #  STRATEGY_TYPE = "MyStrategy"
 MACRO(ADD_PARAVIEW_GRAPH_LAYOUT_STRATEGY OUTIFACES OUTSRCS)

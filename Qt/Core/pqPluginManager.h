@@ -68,7 +68,22 @@ public:
   void loadExtensions(const QString& path, pqServer* server);
   
   /// return all GUI interfaces that have been loaded
-  QObjectList interfaces();
+  QObjectList interfaces() const;
+
+  template <class T>
+    QList<T> findInterfaces() const
+      {
+      QList<T> list;
+      QObjectList objList = this->interfaces();
+      foreach (QObject* object, objList)
+        {
+        if (object && qobject_cast<T>(object))
+          {
+          list.push_back(qobject_cast<T>(object));
+          }
+        }
+      return list;
+      }
 
   /// return all the plugins loaded on a server, or locally if NULL is passed in
   QStringList loadedExtensions(pqServer*);
@@ -110,7 +125,6 @@ protected slots:
   void onServerDisconnected(pqServer*);
   
 private:
-
   QObjectList Interfaces;
   QMultiMap<pqServer*, QString> Extensions;
   QObjectList ExtraInterfaces;

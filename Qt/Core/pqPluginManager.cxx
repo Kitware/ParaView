@@ -102,7 +102,7 @@ pqPluginManager::~pqPluginManager()
 }
 
 //-----------------------------------------------------------------------------
-QObjectList pqPluginManager::interfaces()
+QObjectList pqPluginManager::interfaces() const
 {
   return this->Interfaces + this->ExtraInterfaces;
 }
@@ -578,5 +578,4 @@ void pqPluginManager::addExtension(pqServer* server, const QString& lib)
     this->Extensions.insert(server, lib);
     }
 }
-
 

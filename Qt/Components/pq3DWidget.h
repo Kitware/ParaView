@@ -209,6 +209,8 @@ private:
   pq3DWidgetInternal* const Internal;
 
   bool UseSelectionDataBounds;
+
+  class pqStandardWidgets;
 };
 
 #endif

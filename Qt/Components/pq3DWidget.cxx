@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QShortcut>
 
 // ParaView GUI includes.
+#include "pq3DWidgetInterface.h"
 #include "pqApplicationCore.h"
 #include "pqBoxWidget.h"
 #include "pqDistanceWidget.h"
@@ -60,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPickHelper.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
+#include "pqPluginManager.h"
 #include "pqPointSourceWidget.h"
 #include "pqProxy.h"
 #include "pqRenderViewBase.h"
@@ -68,6 +70,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSphereWidget.h"
 #include "pqSplineWidget.h"
 
+//-----------------------------------------------------------------------------
+class pq3DWidget::pqStandardWidgets : public pq3DWidgetInterface
+{
+public:
+  pq3DWidget* newWidget(const QString& name,
+    vtkSMProxy* referenceProxy,
+    vtkSMProxy* controlledProxy)
+    {
+    pq3DWidget *widget = 0;
+    if (name == "Plane")
+      {
+      widget = new pqImplicitPlaneWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Box")
+      {
+      widget = new pqBoxWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Handle")
+      {
+      widget = new pqHandleWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "PointSource")
+      {
+      widget = new pqPointSourceWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "LineSource")
+      {
+      widget = new pqLineSourceWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Line")
+      {
+      widget = new pqLineWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Distance")
+      {
+      widget = new pqDistanceWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Sphere")
+      {
+      widget = new pqSphereWidget(referenceProxy, controlledProxy, 0);
+      }
+    else if (name == "Spline")
+      {
+      widget = new pqSplineWidget(referenceProxy, controlledProxy, 0);
+      }
+    return widget;
+    }
+};
+
+//-----------------------------------------------------------------------------
 class pq3DWidgetInternal
 {
 public:
@@ -132,6 +184,9 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
 {
   QList<pq3DWidget*> widgets;
 
+  QList<pq3DWidgetInterface*> interfaces =
+    pqApplicationCore::instance()->getPluginManager()->findInterfaces<pq3DWidgetInterface*>();
+
   vtkPVXMLElement* hints = pxy->GetHints();
   unsigned int max = hints->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
@@ -141,43 +196,22 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* refProxy, vtkSMProxy* p
       {
       QString widgetType = element->GetAttribute("type");
       pq3DWidget *widget = 0;
-      if (widgetType == "Plane")
-        {
-        widget = new pqImplicitPlaneWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Box")
-        {
-        widget = new pqBoxWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Handle")
-        {
-        widget = new pqHandleWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "PointSource")
-        {
-        widget = new pqPointSourceWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "LineSource")
-        {
-        widget = new pqLineSourceWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Line")
-        {
-        widget = new pqLineWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Distance")
-        {
-        widget = new pqDistanceWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Sphere")
-        {
-        widget = new pqSphereWidget(refProxy, pxy, 0);
-        }
-      else if (widgetType == "Spline")
-        {
-        widget = new pqSplineWidget(refProxy, pxy, 0);
-        }
 
+      // Create the widget from plugins.
+      foreach (pq3DWidgetInterface* iface, interfaces)
+        {
+        widget = iface->newWidget(widgetType, refProxy, pxy);
+        if (widget)
+          {
+          break;
+          }
+        }
+      if (!widget)
+        {
+        // try to create the standard widget if the plugins fail.
+        pqStandardWidgets standardWidgets;
+        widget = standardWidgets.newWidget(widgetType, refProxy, pxy);
+        }
       if (widget)
         {
         widget->setHints(element);
