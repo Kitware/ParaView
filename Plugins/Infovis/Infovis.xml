@@ -1231,6 +1231,44 @@
       </Hints>
     </SourceProxy>
 
+    <SourceProxy name="PassArrays" class="vtkPassArrays" label="Pass Arrays">
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+      <StringVectorProperty
+        name="Arrays"
+        command="AddArray"
+        clean_command="ClearArrays"
+        number_of_elements="2"
+        repeat_command="1"
+        element_types="0 2">
+      </StringVectorProperty>
+      <IntVectorProperty
+        name="FieldTypes"
+        command="AddFieldType"
+        clean_command="ClearFieldTypes"
+        number_of_elements="1"
+        repeat_command="1">
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="UseFieldTypes"
+        command="SetUseFieldTypes"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="RemoveArrays"
+        command="SetRemoveArrays"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+    </SourceProxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="representations">
