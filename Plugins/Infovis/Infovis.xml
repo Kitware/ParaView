@@ -699,8 +699,8 @@
      </StringVectorProperty>
 
       <IntVectorProperty 
-        name="Learn" 
-        command="SetLearn" 
+        name="LearnOption" 
+        command="SetLearnOption" 
         label="Learn Model" 
         number_of_elements="1" 
         default_values="1">
@@ -708,8 +708,8 @@
       </IntVectorProperty>
 
       <IntVectorProperty 
-        name="Assess" 
-        command="SetAssess" 
+        name="AssessOption" 
+        command="SetAssessOption" 
         label="Assess Data" 
         number_of_elements="1" 
         default_values="1">
@@ -960,7 +960,7 @@
 
         <CheckableArrayListInformationHelper list_domain_name="array_list" />
 
-        <ArrayListDomain name="array_list" 
+        <ArrayListDomain name="array_list"
           input_domain_name="row_arrays">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -968,20 +968,20 @@
         </ArrayListDomain>
      </StringVectorProperty>
 
-      <IntVectorProperty 
-        name="Learn" 
-        command="SetLearn" 
-        label="Learn Model" 
+      <IntVectorProperty
+        name="Learn"
+        command="SetLearn"
+        label="Learn Model"
         number_of_elements="1" 
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty 
-        name="Assess" 
-        command="SetAssess" 
-        label="Assess Data" 
-        number_of_elements="1" 
+      <IntVectorProperty
+        name="Assess"
+        command="SetAssess"
+        label="Assess Data"
+        number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -1022,7 +1022,7 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="ColumnInfo" >
+        information_property="ColumnInfo">
         <ArraySelectionDomain name="array_list" >
           <RequiredProperties>
              <Property name="ColumnInfo" function="ArrayList"/>
@@ -1049,18 +1049,18 @@
 
       <IntVectorProperty 
         name="Learn" 
-        command="SetLearn" 
-        label="Learn Model" 
-        number_of_elements="1" 
+        command="SetLearn"
+        label="Learn Model"
+        number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
       <IntVectorProperty 
-        name="Assess" 
-        command="SetAssess" 
-        label="Assess Data" 
-        number_of_elements="1" 
+        name="Assess"
+        command="SetAssess"
+        label="Assess Data"
+        number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -1127,19 +1127,19 @@
      </StringVectorProperty>
 
       <IntVectorProperty 
-        name="Learn" 
-        command="SetLearn" 
-        label="Learn Model" 
-        number_of_elements="1" 
+        name="Learn"
+        command="SetLearn"
+        label="Learn Model"
+        number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <IntVectorProperty 
-        name="Assess" 
-        command="SetAssess" 
-        label="Assess Data" 
-        number_of_elements="1" 
+      <IntVectorProperty
+        name="Assess"
+        command="SetAssess"
+        label="Assess Data"
+        number_of_elements="1"
         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -1158,11 +1158,11 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <IntVectorProperty 
-        name="BasisScheme" 
-        command="SetBasisScheme" 
-        label="Basis Scheme" 
-        number_of_elements="1" 
+      <IntVectorProperty
+        name="BasisScheme"
+        command="SetBasisScheme"
+        label="Basis Scheme"
+        number_of_elements="1"
         default_values="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Full Basis"/>
@@ -1171,7 +1171,7 @@
         </EnumerationDomain>
       </IntVectorProperty>
 
-      <IntVectorProperty 
+      <IntVectorProperty
         name="FixedBasisSize"
         command="SetFixedBasisSize"
         label="Fixed Basis Size"
