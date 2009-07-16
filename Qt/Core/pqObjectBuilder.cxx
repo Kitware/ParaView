@@ -112,18 +112,6 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
 
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqObjectBuilder::createFilter(
-  const QString& group, const QString& name, pqPipelineSource* input)
-{
-  QMap<QString, QList<pqOutputPort*> > namedInputs;
-  QList<pqOutputPort*> inputs;
-  inputs.push_back(input->getOutputPort(0));
-  namedInputs["Input"] = inputs;
-
-  return this->createFilter(group, name, namedInputs, input->getServer());
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqObjectBuilder::createFilter(
   const QString& group, const QString& name,
   QMap<QString, QList<pqOutputPort*> > namedInputs,
   pqServer* server)
@@ -175,6 +163,18 @@ pqPipelineSource* pqObjectBuilder::createFilter(
   emit this->filterCreated(filter);
   emit this->proxyCreated(filter);
   return filter;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqObjectBuilder::createFilter(
+  const QString& group, const QString& name, pqPipelineSource* input, int output_port)
+{
+  QMap<QString, QList<pqOutputPort*> > namedInputs;
+  QList<pqOutputPort*> inputs;
+  inputs.push_back(input->getOutputPort(output_port));
+  namedInputs["Input"] = inputs;
+
+  return this->createFilter(group, name, namedInputs, input->getServer());
 }
 
 inline QString pqObjectBuilderGetPath(const QString& filename, bool use_dir)

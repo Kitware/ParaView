@@ -95,7 +95,7 @@ public:
   /// Convenience method that takes a single input source.
   virtual pqPipelineSource* createFilter(
     const QString& group, const QString& name,
-    pqPipelineSource* input);
+    pqPipelineSource* input, int output_port = 0);
 
   /// Creates a reader of the given server manager group (\c sm_group) and 
   /// name (\c sm_name) on the given \c server. On success, returns the
