@@ -380,6 +380,9 @@
       </IntVectorProperty>
 
       <StringVectorProperty name="ReferenceArrayName" command="SetReferenceArrayName" number_of_elements="1" default_values="" label="Reference Array Name"/>
+
+      <IntVectorProperty name="PedigreeID" command="SetPedigreeID" number_of_elements="1" default_values="0"/>
+
     </SourceProxy>
 
     <SourceProxy name="GroupLeafVertices" class="vtkGroupLeafVertices">
