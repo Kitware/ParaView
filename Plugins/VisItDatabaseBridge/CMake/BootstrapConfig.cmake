@@ -33,6 +33,9 @@ set(VISIT_RUN_TIME
   ${VISIT_LOCAL} 
   CACHE FILEPATH
   "Path that is used by the PluginManager to load database plugins at runtime.")
+  
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/CMake")
 
 add_custom_command(
   OUTPUT ${_configOut}
