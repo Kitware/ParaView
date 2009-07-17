@@ -40,14 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <QScrollBar>
 
-
 pqTreeView::pqTreeView(QWidget *widgetParent)
   : QTreeView(widgetParent)
 {
   this->ScrollPadding = 0;
 
   // Change the default header view to a checkable one.
-  pqCheckableHeaderView *checkable = new pqCheckableHeaderView(Qt::Horizontal);
+  pqCheckableHeaderView *checkable = 
+    new pqCheckableHeaderView(Qt::Horizontal,this);
   this->setHeader(checkable);
   this->installEventFilter(checkable);
   checkable->setClickable(true);
@@ -156,6 +156,9 @@ void pqTreeView::invalidateLayout()
     {
     w->layout()->invalidate();
     }
+  // invalidate() is not enough, we need to reset the cache of the 
+  // QWidgetItemV2, so sizeHint() could be recomputed.
+  this->updateGeometry();
 }
 
 
