@@ -325,6 +325,9 @@ void pqTreeWidget::invalidateLayout()
     {
     w->layout()->invalidate();
     }
+  // invalidate() is not enough, we need to reset the cache of the 
+  // QWidgetItemV2, so sizeHint() could be recomputed.
+  this->updateGeometry();
 }
 
 //-----------------------------------------------------------------------------
