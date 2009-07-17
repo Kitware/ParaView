@@ -6,15 +6,21 @@ ELSE()
   MESSAGE(ERROR "Unknown build type: ${BUILD_TYPE}")
 ENDIF()
 
+# Note that the "IF( ... MATCHES ... ) checks below are case-sensitive
 SET(SKIP_DEPENDENCIES
   "^C:/WINDOWS/system32"
   "^C:/Windows/system32"
+  "^C:/Windows/System32" 
+  "^dbghelp.dll$"
+  "^DbgHelp.dll$"
   "^gdiplus.dll$"
   "^GdiPlus.dll$"
   "^GPSVC.dll$"
   "^python"
   "^mpich"   
   "^msjava.dll$"
+  "^ieshims"
+  "^IESHIMS"
   )
 
 INCLUDE(GetPrerequisites)
@@ -25,15 +31,25 @@ FOREACH(LOCATION ${OVERVIEW_BINARY_LOCATIONS})
   GET_PREREQUISITES(${LOCATION} DEPENDENCIES 1 1 "" "")
 
   FOREACH(DEPENDENCY ${DEPENDENCIES})
+   
     SET(INSTALL_DEPENDENCY 1)
 
-    GP_RESOLVE_ITEM("${LOCATION}" "${DEPENDENCY}" "" "" DEPENDENCY)
-
+    # Check unresolved dependencies for exclusion
     FOREACH(SKIP_DEPENDENCY ${SKIP_DEPENDENCIES})
       IF(DEPENDENCY MATCHES "${SKIP_DEPENDENCY}")
         SET(INSTALL_DEPENDENCY 0)
       ENDIF()
     ENDFOREACH()
+
+    IF(INSTALL_DEPENDENCY)
+      GP_RESOLVE_ITEM("${LOCATION}" "${DEPENDENCY}" "" "" DEPENDENCY)
+      # Check resolved dependencies for exclusion
+      FOREACH(SKIP_DEPENDENCY ${SKIP_DEPENDENCIES})
+        IF(DEPENDENCY MATCHES "${SKIP_DEPENDENCY}")
+          SET(INSTALL_DEPENDENCY 0)
+        ENDIF()
+    ENDFOREACH()
+    ENDIF()
 
     IF(INSTALL_DEPENDENCY)
       FILE(INSTALL
