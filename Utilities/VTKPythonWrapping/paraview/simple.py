@@ -175,9 +175,12 @@ def SetViewProperties(view=None, **params):
         view = active_objects.view
     SetProperties(view, **params)
 
-def RenameSource(proxy, newName):
-    """Rename the given source proxy.  If the given proxy is not registered
-    in the sources group this method will have no effect."""
+def RenameSource(newName, proxy=None):
+    """Renames the given source.  If the given proxy is not registered
+    in the sources group this method will have no effect.  If no source is
+    provided, the active source is used."""
+    if not proxy:
+        proxy = active_objects.source
     pxm = servermanager.ProxyManager()
     oldName = pxm.GetProxyName("sources", proxy)
     if oldName:
@@ -197,7 +200,7 @@ def GetRepresentations():
 
 def UpdatePipeline(time=None, proxy=None):
     """Updates (executes) the given pipeline object for the given time as
-    necessary (i.e. if it did not already execute). If not source is provided,
+    necessary (i.e. if it did not already execute). If no source is provided,
     the active source is used instead."""
     if not proxy:
         proxy = active_objects.source

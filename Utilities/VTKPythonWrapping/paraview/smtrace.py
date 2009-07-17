@@ -428,7 +428,7 @@ def on_proxy_registered(o, e):
       proxy_info.PyVariable = pyvariable_from_proxy_name(pName)
       proxy_info.ignore_next_unregister = True
       pName = pName.replace("\"", "")
-      trace_globals.trace_output.append("RenameSource(%s, \"%s\")" % (old_pyvariable, pName))
+      trace_globals.trace_output.append("RenameSource(\"%s\", %s)" % (pName, old_pyvariable))
       trace_globals.trace_output.append("%s = %s" % (proxy_info.PyVariable, old_pyvariable))
       trace_globals.trace_output.append("del %s" % old_pyvariable)
     else:
