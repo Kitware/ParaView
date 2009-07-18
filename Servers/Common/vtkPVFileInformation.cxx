@@ -51,7 +51,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVFileInformation);
-vtkCxxRevisionMacro(vtkPVFileInformation, "1.34");
+vtkCxxRevisionMacro(vtkPVFileInformation, "1.35");
 
 inline void vtkPVFileInformationAddTerminatingSlash(vtkstd::string& name)
 {
@@ -993,7 +993,7 @@ void vtkPVFileInformation::OrganizeCollection(vtkPVFileInformationSet& info_set)
 
   // fallback: any sequence with a number in the middle (taking the last number
   // if multiple exist).
-  vtksys::RegularExpression reg_ex_last("^(.*[^0-9])([0-9]+)([^0-9]+)");
+  vtksys::RegularExpression reg_ex_last("^(.*[^0-9])([0-9]+)([^0-9]+)$");
 
   for (vtkPVFileInformationSet::iterator iter = info_set.begin();
     iter != info_set.end(); )
