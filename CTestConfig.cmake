@@ -4,7 +4,7 @@
 ## # The following are required to uses Dart and the Cdash dashboard
 ##   ENABLE_TESTING()
 ##   INCLUDE(Dart)
-set(CTEST_PROJECT_NAME "ParaView3")
+set(CTEST_PROJECT_NAME "ParaView")
 set(CTEST_NIGHTLY_START_TIME "21:00:00 EDT")
 
 set(CTEST_DROP_METHOD "http")
