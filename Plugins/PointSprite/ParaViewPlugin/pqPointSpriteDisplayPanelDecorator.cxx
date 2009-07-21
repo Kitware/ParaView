@@ -41,6 +41,7 @@
 #include "vtkSMPointSpriteRepresentationProxy.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMEnumerationDomain.h"
 
 // Qt Includes.
 #include <QVBoxLayout>
@@ -87,10 +88,11 @@ public:
 
 //-----------------------------------------------------------------------------
 pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
-  pqDisplayPanel* disp_panel) :
+    pqDisplayPanel* disp_panel) :
   Superclass(disp_panel)
 {
-  pqDisplayProxyEditor* panel = qobject_cast<pqDisplayProxyEditor*>(disp_panel);
+  pqDisplayProxyEditor* panel =
+      qobject_cast<pqDisplayProxyEditor*> (disp_panel);
   pqRepresentation* repr = panel->getRepresentation();
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
   // vtkSMProperty* prop;
@@ -160,28 +162,44 @@ void pqPointSpriteDisplayPanelDecorator::representationTypeChanged()
 {
   if (this->Internals)
     {
-    int reprType = vtkSMPropertyHelper(this->Internals->RepresentationProxy,
-        "Representation").GetAsInt();
-    if (reprType == vtkSMPVRepresentationProxy::USER_DEFINED + 5)
+    vtkSMEnumerationDomain* enumDomain = (this->Internals->RepresentationProxy ?
+        vtkSMEnumerationDomain::SafeDownCast(
+            this->Internals->RepresentationProxy->GetProperty("Representation")->GetDomain("enum")) : 0);
+    if (enumDomain)
       {
-      this->setEnabled(true);
-      vtkSMPropertyHelper(this->Internals->RepresentationProxy,
-          "InterpolateScalarsBeforeMapping").Set(0);
-      if (this->Internals->PipelineRepresentation)
+      int found = 0;
+      int entry;
+      for(entry = 0; entry < enumDomain->GetNumberOfEntries(); entry++)
         {
-        this->Internals->TextureCombo->setRenderMode(
-            this->Internals->RenderMode->currentIndex());
+        const char* text = enumDomain->GetEntryText(entry);
+        if(strcmp(text , "Point Sprite") == 0)
+          {
+          found = 1;
+          break;
+          }
         }
-      this->Internals->RepresentationProxy->UpdateVTKObjects();
-      }
-    else
-      {
-      if (this->Internals->PipelineRepresentation)
+      int reprType = vtkSMPropertyHelper(this->Internals->RepresentationProxy, "Representation").GetAsInt();
+      if (found && reprType == enumDomain->GetEntryValue(entry))
         {
-        this->Internals->TextureCombo->setRenderMode(-1);
+        this->setEnabled(true);
+        vtkSMPropertyHelper(this->Internals->RepresentationProxy,
+            "InterpolateScalarsBeforeMapping").Set(0);
+        if (this->Internals->PipelineRepresentation)
+          {
+          this->Internals->TextureCombo->setRenderMode(
+              this->Internals->RenderMode->currentIndex());
+          }
+        this->Internals->RepresentationProxy->UpdateVTKObjects();
         }
-      this->Internals->TransferFunctionDialog->hide();
-      this->setEnabled(false);
+      else
+        {
+        if (this->Internals->PipelineRepresentation)
+          {
+          this->Internals->TextureCombo->setRenderMode(-1);
+          }
+        this->Internals->TransferFunctionDialog->hide();
+        this->setEnabled(false);
+        }
       }
     }
 }
@@ -211,7 +229,8 @@ void pqPointSpriteDisplayPanelDecorator::setupGUIConnections()
 
 }
 
-void pqPointSpriteDisplayPanelDecorator::setRepresentation(pqPipelineRepresentation* repr)
+void pqPointSpriteDisplayPanelDecorator::setRepresentation(
+    pqPipelineRepresentation* repr)
 {
   if (this->Internals->PipelineRepresentation == repr)
     {
@@ -284,10 +303,9 @@ void pqPointSpriteDisplayPanelDecorator::setRepresentation(pqPipelineRepresentat
   representationTypeChanged();
 }
 
-void pqPointSpriteDisplayPanelDecorator::LinkWithRange(  QWidget* widget,
-                                                        const char* signal,
-                                                        vtkSMProperty* prop,
-                                                        pqWidgetRangeDomain*& widgetRangeDomain)
+void pqPointSpriteDisplayPanelDecorator::LinkWithRange(QWidget* widget,
+    const char* signal, vtkSMProperty* prop,
+    pqWidgetRangeDomain*& widgetRangeDomain)
 {
   if (!prop || !widget)
     return;
@@ -335,8 +353,8 @@ void pqPointSpriteDisplayPanelDecorator::reloadGUI()
 
 }
 
-void pqPointSpriteDisplayPanelDecorator::onRadiusArrayChanged(pqVariableType type,
-                                                              const QString& name)
+void pqPointSpriteDisplayPanelDecorator::onRadiusArrayChanged(
+    pqVariableType type, const QString& name)
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
@@ -375,8 +393,8 @@ void pqPointSpriteDisplayPanelDecorator::onRadiusArrayChanged(pqVariableType typ
   this->updateAllViews();
 }
 
-void pqPointSpriteDisplayPanelDecorator::onOpacityArrayChanged(  pqVariableType type,
-                                                                const QString& name)
+void pqPointSpriteDisplayPanelDecorator::onOpacityArrayChanged(
+    pqVariableType type, const QString& name)
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
@@ -424,8 +442,8 @@ void pqPointSpriteDisplayPanelDecorator::onOpacityArrayChanged(  pqVariableType 
   this->updateAllViews();
 }
 
-void pqPointSpriteDisplayPanelDecorator::onRadiusComponentChanged(int vectorMode,
-                                                                  int comp)
+void pqPointSpriteDisplayPanelDecorator::onRadiusComponentChanged(
+    int vectorMode, int comp)
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
@@ -446,8 +464,8 @@ void pqPointSpriteDisplayPanelDecorator::onRadiusComponentChanged(int vectorMode
   this->updateAllViews();
 }
 
-void pqPointSpriteDisplayPanelDecorator::onOpacityComponentChanged(  int vectorMode,
-                                                                    int comp)
+void pqPointSpriteDisplayPanelDecorator::onOpacityComponentChanged(
+    int vectorMode, int comp)
 {
   pqPipelineRepresentation* repr = this->Internals->PipelineRepresentation;
   vtkSMProxy* reprProxy = (repr) ? repr->getProxy() : NULL;
