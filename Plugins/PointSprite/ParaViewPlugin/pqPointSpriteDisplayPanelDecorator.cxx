@@ -168,7 +168,7 @@ void pqPointSpriteDisplayPanelDecorator::representationTypeChanged()
     if (enumDomain)
       {
       int found = 0;
-      int entry;
+      unsigned int entry;
       for(entry = 0; entry < enumDomain->GetNumberOfEntries(); entry++)
         {
         const char* text = enumDomain->GetEntryText(entry);
