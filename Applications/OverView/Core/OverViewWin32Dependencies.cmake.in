@@ -19,6 +19,7 @@ SET(SKIP_DEPENDENCIES
   "^python"
   "^mpich"   
   "^msjava.dll$"
+  "jvm.dll"
   "^ieshims"
   "^IESHIMS"
   )
