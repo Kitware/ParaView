@@ -16,7 +16,6 @@ SET(SKIP_DEPENDENCIES
   "^gdiplus.dll$"
   "^GdiPlus.dll$"
   "^GPSVC.dll$"
-  "^python"
   "^mpich"   
   "^msjava.dll$"
   "jvm.dll"
