@@ -5120,9 +5120,7 @@
       <!-- End of ComparativeClientServerRenderView -->
     </ComparativeViewProxy>
 
-
-
-
+#ifdef VTK_USE_QVTK
     <ComparativeViewProxy name="ComparativeXYPlotView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
@@ -5169,7 +5167,9 @@
 
       <!-- End of ComparativeXYPlotView -->
     </ComparativeViewProxy>
+#endif
 
+#ifdef VTK_USE_QVTK
     <ComparativeViewProxy name="ComparativeBarChartView"
       base_proxygroup="views" base_proxyname="ComparativeViewBase">
       <Documentation>
@@ -5219,6 +5219,7 @@
 
       <!-- End of ComparativeBarChartView -->
     </ComparativeViewProxy>
+#endif
 
     <TwoDRenderViewProxy name="2DRenderViewBase"
       base_proxygroup="views" base_proxyname="ViewBase">
