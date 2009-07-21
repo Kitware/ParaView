@@ -211,7 +211,7 @@ const mat4 D  = mat4( 1.,  0.,  0.,  0.,
 mat4 T;
 varying mat4 Ti;
 
-const float FEPS = 0.00001;
+const float FEPS = 0.000001;
 
 const float DEF_Z = 1. - FEPS;
 
@@ -236,7 +236,6 @@ void ComputePointSizeAndPositionInClipCoordEllipsoid()
   ybc[ 1 ] = ( -B + sqrt( B * B - 4. * A * C ) ) / ( 2.0 * A );
   float sy = abs( ybc[ 0 ] - ybc[ 1 ]  ) * .5 * viewport.y;
 
-//  gl_PointSize =  ceil( pointScaling * max( sx, sy ) );
   pointSize = ceil( max( sx, sy ) );
   gl_PointSize = pointSize;
 #ifdef CORRECT_POINT_Z
@@ -323,9 +322,8 @@ void ComputePointSizeAndPositionInClipCoord()
   float sx = ( xbc[ 1 ] - xbc[ 0 ] ) * .5 * viewport.x;
   float sy = ( ybc[ 1 ] - ybc[ 0 ] ) * .5 * viewport.y;
 
-//  gl_PointSize =  ceil( pointScaling * max( sx, sy ) );
-  gl_PointSize =  ceil( max( sx, sy ) );
-  pointSize = gl_PointSize;
+  pointSize =  ceil( max( sx, sy ) );
+  gl_PointSize = pointSize;
 
 #ifdef CORRECT_POINT_Z
   // gl_Position has to be precomputed before getting here
@@ -408,8 +406,8 @@ void ComputePointSizeAndPositionWithProjection()
   float sy = ( ymax - ymin ) * 0.5 * viewport.y;
 
 //  gl_PointSize =  ceil( pointScaling * max( sx, sy ) );
-  gl_PointSize =  ceil( max( sx, sy ) );
-  pointSize = gl_PointSize;
+  pointSize =  ceil( max( sx, sy ) );
+  gl_PointSize = pointSize;
 #ifdef CORRECT_POINT_Z
   // gl_Position has to be precomputed before getting here
   // the reason for which we want the z coordinate to be correct is for debugging
@@ -428,7 +426,8 @@ float GetRadius();
 void  ComputePointSizeAndPosition()
 {
 #if defined( ELLIPSOID )
-  ComputePointSizeAndPositionInClipCoordEllipsoid();
+  ComputePointSizeAndPositionWithProjection();
+  //ComputePointSizeAndPositionInClipCoordEllipsoid();
 #elif defined( CYLINDER ) || defined( CONE ) || defined( HYPERBOLOID1 ) || defined( HYPERBOLOID2 )  || defined( PARABOLOID )
   ComputePointSizeAndPositionInClipCoord();
 #else
@@ -439,7 +438,7 @@ void  ComputePointSizeAndPosition()
 //------------------------------------------------------------------------------
 // MAIN
 void propFuncVS()
-{
+{  
   color = gl_Color;
 
   // compute position, this is required only when displaying the point quad

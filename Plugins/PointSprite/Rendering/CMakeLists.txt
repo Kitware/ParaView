@@ -7,6 +7,7 @@ set(KIT_SRCS
   vtkTwoScalarsToColorsPainter.cxx
   vtkPointSpriteProperty.cxx
   vtkImageSpriteSource.cxx
+  vtkPointSpriteCoincidentTopologyResolutionPainter.cxx
   )
 
 set(KIT_EXTRA_SRCS
