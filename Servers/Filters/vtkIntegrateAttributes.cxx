@@ -35,7 +35,7 @@
 #include "vtkUnstructuredGrid.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.8.36.3");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.8.36.4");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 class vtkIntegrateAttributes::vtkFieldList :
@@ -290,7 +290,7 @@ void vtkIntegrateAttributes::ExecuteBlock(
 
   this->PointFieldList = NULL;
   this->CellFieldList = NULL;
-  this->FieldListIndex = NULL;
+  this->FieldListIndex = 0;
 }
 
 //-----------------------------------------------------------------------------
