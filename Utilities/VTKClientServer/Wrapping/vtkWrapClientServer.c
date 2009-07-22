@@ -1357,7 +1357,8 @@ int uniqueClasses(char *classes[],int total,char *classSelfName)
     if(isUniqueString(classes[i],&classes[0],i) &&
        strcmp(classes[i],classSelfName) &&
        // hack
-       strcmp(classes[i],"vtkClientServerStream")!=0 )
+       strcmp(classes[i],"vtkClientServerStream")!=0 &&
+       strcmp(classes[i],"vtkObjectBase")!=0 )
       {
       temp[j]=classes[i];
       ++j;
