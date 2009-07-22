@@ -1355,10 +1355,10 @@ int uniqueClasses(char *classes[],int total,char *classSelfName)
   char *temp[1000];
   for (i = total-1; i>0; --i)
     if(isUniqueString(classes[i],&classes[0],i) &&
-       strcmp(classes[i],classSelfName) &&
+       strcmp(classes[i],classSelfName)!=0 &&
        // hack
-       strcmp(classes[i],"vtkClientServerStream")!=0 &&
-       strcmp(classes[i],"vtkObjectBase")!=0 )
+       strcmp(classes[i],"vtkClientServerStream")!=0)// &&
+       //strcmp(classes[i],"vtkObjectBase")!=0 )
       {
       temp[j]=classes[i];
       ++j;
