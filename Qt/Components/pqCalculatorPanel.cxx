@@ -154,7 +154,7 @@ pqCalculatorPanel::pqCalculatorPanel(pqProxy* pxy, QWidget* p) :
 
   // mark panel modified if the following are changed 
   QObject::connect(this->Internal->Function,
-                   SIGNAL(textEdited(const QString&)),
+                   SIGNAL(returnPressed()),
                    this,
                    SLOT(setModified()));
   QObject::connect(this->Internal->ResultArrayName,
