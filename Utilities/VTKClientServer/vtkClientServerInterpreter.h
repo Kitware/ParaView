@@ -172,12 +172,12 @@ public:
   // Description:
   // Introspection access to the list of classes. Returns total number
   // of classes in the list
-  int GetClasses(const char *classList[]);
+  int GetClasses (const char *classList[]);
 
   // Description:
   // Introspection access to the list of methods in a class.
   // Returns the total number of methods found
-  ClassInfo &GetClassInfo(const char* className);
+  //ClassInfo& GetClassInfo (const char* className);
 
 
 protected:

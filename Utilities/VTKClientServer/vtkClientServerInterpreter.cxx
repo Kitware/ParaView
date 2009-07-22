@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.20");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -975,8 +975,8 @@ int vtkClientServerInterpreter::GetClasses(const char *classList[])
  * @return The class Info structure which can be read to extract
  *         relevant information.
  */
-ClassInfo & vtkClientServerInterpreter::GetClassInfo(const char* className)
-{
-  return this->Internal->MetaObjectInfoMap[className]();
-}
+// ClassInfo& vtkClientServerInterpreter::GetClassInfo (const char* className)
+// {
+//   return this->Internal->MetaObjectInfoMap[className]();
+// }
 
