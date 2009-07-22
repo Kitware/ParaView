@@ -85,6 +85,10 @@ SET(Kit_SRCS
     vtkMPIMToNSocketConnection.cxx
     vtkMPIMToNSocketConnectionPortInformation.cxx
     vtkPVServerSocket.cxx )
+  
+IF (VTK_USE_N_WAY_ARRAYS)
+
+ENDIF (VTK_USE_N_WAY_ARRAYS)
 
 IF (VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
