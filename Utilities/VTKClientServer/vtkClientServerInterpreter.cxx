@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.21");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -36,11 +36,11 @@ public:
   typedef vtkstd::map<vtkstd::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
   typedef vtkstd::map<vtkstd::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
-  typedef vtkstd::map<vtkstd::string, vtkMetaObjectInfoFunction> MetaObjectInfoMapType;
+  //typedef vtkstd::map<vtkstd::string, vtkMetaObjectInfoFunction> MetaObjectInfoMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
   ClassToFunctionMapType ClassToFunctionMap;
   IDToMessageMapType IDToMessageMap;
-  MetaObjectInfoMapType MetaObjectInfoMap;
+  //MetaObjectInfoMapType MetaObjectInfoMap;
 };
 
 //----------------------------------------------------------------------------
@@ -725,11 +725,11 @@ vtkClientServerInterpreter
 }
 
 //-------------------------------------------------------------------------nix
-void vtkClientServerInterpreter
-::AddMetaObjectInfoFunction(const char* cname, vtkMetaObjectInfoFunction func)
-{
-  this->Internal->MetaObjectInfoMap[cname] = func;
-}
+// void vtkClientServerInterpreter
+// ::AddMetaObjectInfoFunction(const char* cname, vtkMetaObjectInfoFunction func)
+// {
+//   this->Internal->MetaObjectInfoMap[cname] = func;
+// }
 
 //----------------------------------------------------------------------------
 vtkClientServerCommandFunction
@@ -943,26 +943,26 @@ void vtkClientServerInterpreter::ClearLastResult()
  *
  * @return Total number of elements in the classList
  */
-int vtkClientServerInterpreter::GetClasses(const char *classList[])
-{
-  static int once;
-  static const char **classes = new const char* [this->Internal->MetaObjectInfoMap.size()];
+// int vtkClientServerInterpreter::GetClasses(const char *classList[])
+// {
+//   static int once;
+//   static const char **classes = new const char* [this->Internal->MetaObjectInfoMap.size()];
 
-  // This code is only executed once. This is for speed.
-  if(!once)
-    {
-    int i;
-    once = once;
-    vtkClientServerInterpreterInternals::MetaObjectInfoMapType::const_iterator iter;
-    for (i =0, iter = this->Internal->MetaObjectInfoMap.begin();
-         iter!= this->Internal->MetaObjectInfoMap.end();
-         ++iter,++i)
-      {
-      classes[i] = iter->first.c_str();
-      }
-    }
-  classList = classes;
-}
+//   // This code is only executed once. This is for speed.
+//   if(!once)
+//     {
+//     int i;
+//     once = once;
+//     vtkClientServerInterpreterInternals::MetaObjectInfoMapType::const_iterator iter;
+//     for (i =0, iter = this->Internal->MetaObjectInfoMap.begin();
+//          iter!= this->Internal->MetaObjectInfoMap.end();
+//          ++iter,++i)
+//       {
+//       classes[i] = iter->first.c_str();
+//       }
+//     }
+//   classList = classes;
+// }
 
 //--------------------------------------------------------------------------nix
 /*

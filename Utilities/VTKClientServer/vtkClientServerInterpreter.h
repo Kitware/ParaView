@@ -60,7 +60,7 @@ typedef vtkObjectBase* (*vtkClientServerNewInstanceFunction)();
 // This is a modification of the above code to implement a new
 // hash-map implementation. There only the function returning
 // the new instance will be registered.
-typedef ClassInfo& (*vtkMetaObjectInfoFunction)();
+//typedef ClassInfo& (*vtkMetaObjectInfoFunction)();
 
 // Description:
 // A pointer to this struct is sent as call data when an ErrorEvent is
@@ -135,8 +135,8 @@ public:
 
   // Description:
   // Add a meta-object-info function for a class.
-  void AddMetaObjectInfoFunction(const char* cname,
-                                 vtkMetaObjectInfoFunction func);
+  // void AddMetaObjectInfoFunction(const char* cname,
+//                                  vtkMetaObjectInfoFunction func);
 
   // Description:
   // Get the command function for an object's class.
@@ -172,7 +172,7 @@ public:
   // Description:
   // Introspection access to the list of classes. Returns total number
   // of classes in the list
-  int GetClasses (const char *classList[]);
+  //int GetClasses (const char *classList[]);
 
   // Description:
   // Introspection access to the list of methods in a class.
