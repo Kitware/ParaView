@@ -21,7 +21,7 @@
 
 #include "vtkCoincidentTopologyResolutionPainter.h"
 
-class VTK_RENDERING_EXPORT vtkPointSpriteCoincidentTopologyResolutionPainter :
+class VTK_EXPORT vtkPointSpriteCoincidentTopologyResolutionPainter :
   public vtkCoincidentTopologyResolutionPainter
 {
 public:
