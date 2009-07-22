@@ -1348,15 +1348,16 @@ int isUniqueString(char* main, char *list[], int total)
  * 
  * @return the total list of unique classes
  */
-int uniqueClasses(char *classes[],int total)
+int uniqueClasses(char *classes[],int total,char *classSelfName)
 {
 
   int i,j=0;
   char *temp[1000];
   for (i = total-1; i>0; --i)
     if(isUniqueString(classes[i],&classes[0],i) &&
+       strcmp(classes[i],classSelfName) &&
        // hack
-       strcmp(classes[i],"vtkClientServerStream")!=0)
+       strcmp(classes[i],"vtkClientServerStream")!=0 )
       {
       temp[j]=classes[i];
       ++j;
@@ -1407,7 +1408,7 @@ int extractOtherClassesUsed(ClassInfo *data, char * classes[])
         ++count;
         }
       }
-  return uniqueClasses(classes,count);
+  return uniqueClasses(classes,count,data->ClassName);
 }
 
 //--------------------------------------------------------------------------nix
