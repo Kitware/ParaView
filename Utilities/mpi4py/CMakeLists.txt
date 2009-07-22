@@ -51,7 +51,7 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
   ENDFOREACH(file)
 
   # Compile and create MPI.so in PV_MPI_PYTHON_MODULE_BINARY_DIR
-  ADD_SUBDIRECTORY("${CMAKE_CURRENT_SOURCE_DIR}/Executable")
+  ADD_SUBDIRECTORY("${CMAKE_CURRENT_SOURCE_DIR}/Library")
   
   # Byte compile the Python files.
   CONFIGURE_FILE(${PV_MPI_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv_mpi.py.in
@@ -63,14 +63,12 @@ IF (PARAVIEW_ENABLE_PYTHON AND PARAVIEW_USE_MPI)
     COMMAND ${PYTHON_EXECUTABLE}
     ARGS compile_all_pv_mpi.py
     DEPENDS ${PV_MPI_PYTHON_SOURCE_FILES} ${PV_MPI_PYTHON_MODULE_BINARY_DIR}/compile_all_pv_mpi.py
-    ${PV_MPI_PYTHON_OUTPUT_FILES} ${PV_MPI_PYTHON_MODULE_BINARY_DIR}/MPI.so
+    ${PV_MPI_PYTHON_OUTPUT_FILES} #MPI.so
     OUTPUT "${PV_MPI_PYTHON_MODULE_BINARY_DIR}/pv_mpi_compile_complete"
     )
   
   ADD_CUSTOM_TARGET(paraview_mpi_pyc ALL 
     DEPENDS "${PV_MPI_PYTHON_MODULE_BINARY_DIR}/pv_mpi_compile_complete")
-
-  ADD_DEPENDENCIES(paraview_mpi_pyc paraview_mpi4py_pyc)
   
   # Install the paraview module files.
   IF (NOT PV_INSTALL_NO_LIBRARIES)
