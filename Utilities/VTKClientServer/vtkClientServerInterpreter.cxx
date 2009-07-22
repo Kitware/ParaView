@@ -26,18 +26,21 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.19");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
 {
 public:
-  typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+//   typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+  typedef vtkstd::map<vtkstd::string, vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
   typedef vtkstd::map<vtkstd::string, vtkClientServerCommandFunction> ClassToFunctionMapType;
   typedef vtkstd::map<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
+  typedef vtkstd::map<vtkstd::string, vtkMetaObjectInfoFunction> MetaObjectInfoMapType;
   NewInstanceFunctionsType NewInstanceFunctions;
   ClassToFunctionMapType ClassToFunctionMap;
   IDToMessageMapType IDToMessageMap;
+  MetaObjectInfoMapType MetaObjectInfoMap;
 };
 
 //----------------------------------------------------------------------------
@@ -304,6 +307,7 @@ vtkClientServerInterpreter
 
     // Find a NewInstance function that knows about the class.
     int created = 0;
+#if 0
     for(vtkClientServerInterpreterInternals::NewInstanceFunctionsType::iterator
           it = this->Internal->NewInstanceFunctions.begin();
         !created && it != this->Internal->NewInstanceFunctions.end(); ++it)
@@ -313,6 +317,12 @@ vtkClientServerInterpreter
         {
         created = 1;
         }
+      }
+#endif
+    if(vtkClientServerNewInstanceFunction n = this->Internal->NewInstanceFunctions[cname])
+      {
+      this->NewInstance(n(),id);
+      created =1;
       }
     if(created)
       {
@@ -714,6 +724,13 @@ vtkClientServerInterpreter
   this->Internal->ClassToFunctionMap[cname] = func;
 }
 
+//-------------------------------------------------------------------------nix
+void vtkClientServerInterpreter
+::AddMetaObjectInfoFunction(const char* cname, vtkMetaObjectInfoFunction func)
+{
+  this->Internal->MetaObjectInfoMap[cname] = func;
+}
+
 //----------------------------------------------------------------------------
 vtkClientServerCommandFunction
 vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
@@ -738,11 +755,20 @@ vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
 }
 
 //----------------------------------------------------------------------------
+#if 0
 void
 vtkClientServerInterpreter
 ::AddNewInstanceFunction(vtkClientServerNewInstanceFunction f)
 {
   this->Internal->NewInstanceFunctions.push_back(f);
+}
+#endif
+
+void
+vtkClientServerInterpreter::AddNewInstanceFunction(const char* name,
+                                                   vtkClientServerNewInstanceFunction f)
+{
+  this->Internal->NewInstanceFunctions[name]=f;
 }
 
 //----------------------------------------------------------------------------
@@ -906,3 +932,51 @@ void vtkClientServerInterpreter::ClearLastResult()
 {
   this->LastResultMessage->Reset();
 }
+
+//--------------------------------------------------------------------------nix
+/*
+ * Used to access the list of class present in VTK/Paraview wrapper
+ * code. The classes are stored in a map and the code returna all the
+ * keys in the map.
+ *
+ * @param classList OUT Used to extract the list of classes.
+ *
+ * @return Total number of elements in the classList
+ */
+int vtkClientServerInterpreter::GetClasses(const char *classList[])
+{
+  static int once;
+  static const char **classes = new const char* [this->Internal->MetaObjectInfoMap.size()];
+
+  // This code is only executed once. This is for speed.
+  if(!once)
+    {
+    int i;
+    once = once;
+    vtkClientServerInterpreterInternals::MetaObjectInfoMapType::const_iterator iter;
+    for (i =0, iter = this->Internal->MetaObjectInfoMap.begin();
+         iter!= this->Internal->MetaObjectInfoMap.end();
+         ++iter,++i)
+      {
+      classes[i] = iter->first.c_str();
+      }
+    }
+  classList = classes;
+}
+
+//--------------------------------------------------------------------------nix
+/*
+ * This function return us the ClassInfo structure. This structure has
+ * all the meta information to generate binding and implement other
+ * functionality needed from an introspection object.
+ *
+ * @param className IN The class-name who's data we wanna extract.
+ *
+ * @return The class Info structure which can be read to extract
+ *         relevant information.
+ */
+ClassInfo & vtkClientServerInterpreter::GetClassInfo(const char* className)
+{
+  return this->Internal->MetaObjectInfoMap[className]();
+}
+

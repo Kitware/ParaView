@@ -74,8 +74,9 @@ ADD_LIBRARY(vtkClientServer
   vtkClientServerInterpreter.cxx
   vtkClientServerInterpreter.h
   vtkClientServerStream.cxx
-  vtkClientServerStream.h
-  )
+  vtkClientServerStream.h)
+
+
 TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
 
 IF(NOT PV_INSTALL_NO_DEVELOPMENT)
@@ -85,6 +86,7 @@ IF(NOT PV_INSTALL_NO_DEVELOPMENT)
      "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerInterpreter.h"
      "${CMAKE_CURRENT_SOURCE_DIR}/vtkClientServerStream.h"
      "${CMAKE_CURRENT_BINARY_DIR}/vtkClientServerConfigure.h")
+   
   INSTALL(
       FILES ${sourceFiles}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}

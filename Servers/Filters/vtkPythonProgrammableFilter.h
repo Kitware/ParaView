@@ -12,14 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPythonProgrammableFilter - Executes a user supplied python script 
+// .NAME vtkPythonProgrammableFilter - Executes a user supplied python script
 // on its input dataset to produce an output dataset.
 // .SECTION Description
 // This filter will execute a python script to produce an output dataset.
 // An new interpretor is created at the beginning of RequestInformation().
 // The state of the python interpretor is preserved until the
 // next execution of RequestInformation().
-// After the interpretor is creates the vtk module is imported with 
+// After the interpretor is creates the vtk module is imported with
 // "from paraview import vtk".
 //
 // Then the interpretor runs the InformationScript during RequestInformation().
@@ -55,12 +55,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPythonProgrammableFilter *New();
 
-  // Description: 
+  // Description:
   // Set the text of the python script to execute.
   vtkSetStringMacro(Script)
   vtkGetStringMacro(Script)
 
-  // Description: 
+  // Description:
   // Set the text of the python script to execute in RequestInformation().
   vtkSetStringMacro(InformationScript)
   vtkGetStringMacro(InformationScript)
@@ -74,7 +74,7 @@ public:
   // Clear all name-value parameters
   void ClearParameters();
 
-  // Description: 
+  // Description:
   // For internal use only.
   static void ExecuteScript(void *);
 
@@ -95,8 +95,9 @@ public:
   // The interp is created this first time this function is called and it
   // is destroyed when vtkProcessModule invokes the ConnectionClosedEvent
   // event.
+//BTX
   static vtkPVPythonInterpretor* GetGlobalPipelineInterpretor();
-
+//ETX
 protected:
   vtkPythonProgrammableFilter();
   ~vtkPythonProgrammableFilter();
@@ -112,12 +113,12 @@ protected:
 
   // Description:
   // Creates whatever output data set type is selected.
-  virtual int RequestDataObject(vtkInformation* request, 
-                                vtkInformationVector** inputVector, 
+  virtual int RequestDataObject(vtkInformation* request,
+                                vtkInformationVector** inputVector,
                                 vtkInformationVector* outputVector);
 
-  virtual int RequestInformation(vtkInformation* request, 
-                                 vtkInformationVector** inputVector, 
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector);
 
   char *Script;

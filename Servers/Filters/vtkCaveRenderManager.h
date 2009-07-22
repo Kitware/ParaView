@@ -55,12 +55,12 @@ public:
   // Description:
   // Callbacks that initialize and finish the compositing.
   virtual void ClientEndRender();
-  
+
   // Description:
   // If the user wants to handle the event loop, then they must call this
   // method to initialize the RMIs.
   virtual void InitializeRMIs();
-  
+
   // Description:
   // Set/Get the controller use in compositing (set to
   // the global controller by default)
@@ -102,11 +102,13 @@ public:
   // Description:
   // Always uses the clients zbuffer value. (for picking).
   float GetZBufferValue(int x, int y);
-  
+
   // Description:
   // Internal, but public for RMI/Callbacks.
   void ClientStartRender();
+//BTX
   void RootStartRenderRMI(vtkPVCaveClientInfo *info);
+//ETX
   void SatelliteStartRenderRMI();
 
 protected:
@@ -117,18 +119,18 @@ protected:
   void ComputeCamera(vtkPVCaveClientInfo *info, vtkCamera* cam);
 
   int ClientFlag;
-  
+
   vtkSocketController* SocketController;
 
   void SetupCamera(int tileIdx, int reduction);
 
   unsigned long StartTag;
   unsigned long EndTag;
-  
+
   void PreRenderProcessing() {}
   void PostRenderProcessing() {}
   void InternalSatelliteStartRender(vtkPVCaveClientInfo *info);
-  
+
   // Definition of the display on this node.
   double DisplayOrigin[4];
   double DisplayX[4];

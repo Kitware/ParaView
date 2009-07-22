@@ -22,7 +22,7 @@
 // for representations to show selections on the input data. If a subclass does
 // not support selection then \c SelectionSupported flag should be false.
 // If selection is supported, the representation should be able to "render" a
-// proxy for a vtkSelection in the view. By default \c SelectionSupported is 
+// proxy for a vtkSelection in the view. By default \c SelectionSupported is
 // false.
 //
 // When dealing with data inputs, often times some data pipeline is needed to
@@ -31,7 +31,7 @@
 // representations have to fulfill. These depend on the type of view that the
 // representation gets added to. These data-distribution/delivery pipelines are
 // abstracted in what we call \c {Representation Strategies}.
-// 
+//
 // When a representation is added to a view, this class class
 // InitializeStrategy() which gives subclasses an opportunity to get different
 // types of strategies from the view and set them up it their data pipelines.
@@ -40,7 +40,7 @@
 // to provide implementations for Update(), UpdateRequired(),
 // MarkDirty(), SetUpdateTimeInternal(), GetRepresentedDataInformation(),
 // GetFullResMemorySize(), GetDisplayedMemorySize(), GetLODMemorySize().
-// This class provides default implementation for these methods for 
+// This class provides default implementation for these methods for
 // representations using a collection of strategies. If these startegies are
 // used conditionally, then the subclass must override the above mentioned
 // methods are provide its own implementations.
@@ -65,11 +65,11 @@ class vtkSMRepresentationStrategy;
 class vtkSMRepresentationStrategyVector;
 class vtkSMSourceProxy;
 
-class VTK_EXPORT vtkSMDataRepresentationProxy : 
+class VTK_EXPORT vtkSMDataRepresentationProxy :
   public vtkSMRepresentationProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMDataRepresentationProxy, 
+  vtkTypeRevisionMacro(vtkSMDataRepresentationProxy,
     vtkSMRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -88,7 +88,7 @@ public:
   }
 
   // Description:
-  // Get the information about the data shown by this representation. 
+  // Get the information about the data shown by this representation.
   // Some representations use some pre-processing before displaying the data eg.
   // apply a geometry filter. This is the data information after that
   // pre-processing stage. If \c update is set to false, the pipeline is not
@@ -101,8 +101,8 @@ public:
   virtual vtkPVDataInformation* GetRepresentedDataInformation(bool update=true);
 
   // Description:
-  // Called to update the Representation. 
-  // Overridden to forward the update request to the strategy if any. 
+  // Called to update the Representation.
+  // Overridden to forward the update request to the strategy if any.
   // If subclasses don't use any strategy, they may want to override this
   // method.
   // Fires vtkCommand:StartEvent and vtkCommand:EndEvent and start and end of
@@ -120,7 +120,7 @@ public:
   // Set the time used during update requests.
   // Default implementation passes the time to the strategy, if any. If
   // subclasses don't use any stratgy, they may want to override this method.
-  // The representation should respect the update time set only when 
+  // The representation should respect the update time set only when
   // UseViewUpdateTime is false. If UseViewUpdateTime is true, then the
   // representation's UpdateTime is ignored, instead the ViewUpdateTime passed
   // on by the view is used.
@@ -137,16 +137,17 @@ public:
   // Description:
   // Fill the activeStrategies collection with strategies that are currently
   // active i.e. being used.
+//BTX
   virtual void GetActiveStrategies(
     vtkSMRepresentationStrategyVector& activeStrategies);
-
+//ETX
   // Description:
   // Views typically support a mechanism to create a selection in the view
   // itself, eg. by click-and-dragging over a region in the view. The view
   // passes this selection to each of the representations and asks them to
-  // convert it to a proxy for a selection which can be set on the view. 
+  // convert it to a proxy for a selection which can be set on the view.
   // It a representation does not support selection creation, it should simply
-  // return NULL.  On success, this method returns a new vtkSMProxy instance 
+  // return NULL.  On success, this method returns a new vtkSMProxy instance
   // which the caller must free after use.
   virtual vtkSMProxy* ConvertSelection(vtkSelection* vtkNotUsed(input))
     { return 0; }
@@ -161,7 +162,7 @@ public:
 //BTX
 
   // Description:
-  // Called when a representation is added to a view. 
+  // Called when a representation is added to a view.
   // Returns true on success.
   // Added to call InitializeStrategy() to give subclassess the opportunity to
   // set up pipelines involving compositing strategy it they support it.
@@ -199,7 +200,7 @@ public:
 
   // Description:
   // Overridden to make the Strategy modified as well.
-  // The strategy is not marked modified if the modifiedProxy == this, 
+  // The strategy is not marked modified if the modifiedProxy == this,
   // thus if the changes to representation itself invalidates the data pipelines
   // it must explicity mark the strategy invalid.
   virtual void MarkDirty(vtkSMProxy* modifiedProxy);
@@ -216,7 +217,7 @@ protected:
   virtual bool BeginCreateVTKObjects();
 
   // Description:
-  // This method is called after CreateVTKObjects(). 
+  // This method is called after CreateVTKObjects().
   // This gives subclasses an opportunity to do some post-creation
   // initialization.
   // Overridden to setup view time link.
@@ -255,7 +256,7 @@ protected:
   // the update time correctly.
   virtual void SetUpdateTimeInternal(double time);
 
-  // These are the representation strategies used for data display. 
+  // These are the representation strategies used for data display.
   vtkSMRepresentationStrategyVector* RepresentationStrategies;
 
   double UpdateTime;

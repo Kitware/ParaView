@@ -24,6 +24,7 @@
 #include "vtkObject.h"
 
 #include "vtkClientServerID.h" // Needed for vtkClientServerID.
+#include "vtkParse.h" // Needed for meta object info
 
 class vtkClientServerInterpreter;
 class vtkClientServerInterpreterCommand;
@@ -45,9 +46,21 @@ typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*,
 // The type of a new-instance function.  One such function is
 // generated per library of wrappers.  It knows how to create
 // instances of any of the classes included in the library.
-typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
-                                                  const char* name,
-                                                  vtkClientServerID id);
+// typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
+//                                                   const char* name,
+//                                                   vtkClientServerID id);
+
+// Description: -nix
+// This is a modification of the above code to implement a new
+// hash-map implementation. There only the function returning
+// the new instance will be registered.
+typedef vtkObjectBase* (*vtkClientServerNewInstanceFunction)();
+
+// Description: -nix
+// This is a modification of the above code to implement a new
+// hash-map implementation. There only the function returning
+// the new instance will be registered.
+typedef ClassInfo& (*vtkMetaObjectInfoFunction)();
 
 // Description:
 // A pointer to this struct is sent as call data when an ErrorEvent is
@@ -121,12 +134,21 @@ public:
                           vtkClientServerCommandFunction func);
 
   // Description:
+  // Add a meta-object-info function for a class.
+  void AddMetaObjectInfoFunction(const char* cname,
+                                 vtkMetaObjectInfoFunction func);
+
+  // Description:
   // Get the command function for an object's class.
   vtkClientServerCommandFunction GetCommandFunction(vtkObjectBase* obj);
 
   // Description:
   // Add a function used to create new objects.
-  void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f);
+  //void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f);
+  void AddNewInstanceFunction(const char*cname,
+                              vtkClientServerNewInstanceFunction f);
+
+
 
   // Description:
   // The callback data structure passed to observers looking for VTK
@@ -146,6 +168,18 @@ public:
   // 1 for success and 0 for failure.
   int Load(const char* moduleName);
   int Load(const char* moduleName, const char*const* optionalPaths);
+
+  // Description:
+  // Introspection access to the list of classes. Returns total number
+  // of classes in the list
+  int GetClasses(const char *classList[]);
+
+  // Description:
+  // Introspection access to the list of methods in a class.
+  // Returns the total number of methods found
+  ClassInfo &GetClassInfo(const char* className);
+
+
 protected:
   // constructor and destructor
   vtkClientServerInterpreter();

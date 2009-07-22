@@ -3014,37 +3014,6 @@
    <!-- End XdmfReader -->
    </SourceProxy>
    
-#ifdef PARAVIEW_USE_SILO
-   <SourceProxy name="SiloReader" 
-                class="vtkSiloReader"
-                label="Silo Reader">
-     <Documentation
-        short_help="Read a Silo data file."
-        long_help="Reads a Silo data file and generates multi block dataset.">
-        The Silo reader loads Silo files and produces multi block data set output.  The default file extension is .silo.
-     </Documentation>
-     <StringVectorProperty
-         name="FileName"
-         animateable="0"
-         command="SetFileName"
-         number_of_elements="1">
-        <FileListDomain name="files"/>
-        <Documentation>
-           This property specifies the file name for the Silo reader.
-        </Documentation>
-     </StringVectorProperty>
-     <StringVectorProperty
-         name="TOCString"
-         command="GetTOCString"
-         information_only="1">
-        <Documentation>
-           This property is a string representation of the table of contents.
-        </Documentation>
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-   <!-- End SiloReader -->
-   </SourceProxy>
-#endif
 
    <SourceProxy name="ExodusIIReader" 
                 class="vtkPExodusIIReader">

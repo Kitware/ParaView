@@ -32,7 +32,7 @@ class vtkProcessModule;
 
 class VTK_EXPORT vtkInitializationHelper : public vtkObject
 {
-public: 
+public:
   vtkTypeRevisionMacro(vtkInitializationHelper,vtkObject);
 
   // Description:
