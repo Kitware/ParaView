@@ -1444,8 +1444,8 @@ void output_InitFunction(FILE *fp, ClassInfo *data)
             data->ClassName,data->ClassName);
   fprintf(fp,"    csi->AddCommandFunction(\"%s\", %sCommand);\n",
           data->ClassName,data->ClassName);
-  fprintf(fp,"    csi->AddMetaObjectInfoFunction(\"%s\", %sMetaInfo);\n",
-          data->ClassName,data->ClassName);
+  //fprintf(fp,"    csi->AddMetaObjectInfoFunction(\"%s\", %sMetaInfo);\n",
+  //        data->ClassName,data->ClassName);
   fprintf(fp, "    }\n}\n");
 }
 
