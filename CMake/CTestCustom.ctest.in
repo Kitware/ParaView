@@ -96,6 +96,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "warning LNK4098"
   "include/mpicxx.h"
   "mpi4py"
+  "ClientServer.cxx"
   "vtkexodus2.*conversion from 'size_t' to 'int', possible loss of data"
   )
 
