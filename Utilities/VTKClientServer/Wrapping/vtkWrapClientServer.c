@@ -1457,7 +1457,7 @@ void output_InitFunction(FILE *fp, ClassInfo *data)
   totalClasses=  extractOtherClassesUsed(data,classes);
   for (i=0; i < totalClasses; ++i)
     {
-    fprintf(fp,"void VTK_EXPORT %s_Init(vtkClientServerInterpreter* csi);\n",classes[i]);
+    fprintf(fp,"void %s_Init(vtkClientServerInterpreter* csi);\n",classes[i]);
     }
   fprintf(fp,
           "\n"
