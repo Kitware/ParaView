@@ -827,7 +827,7 @@ void printFunction_BEGIN(FILE *fp, char * funName, char * className)
   fprintf(fp,
           "//------------------------------------------------------------------------auto\n"
           "int %s_%s(const vtkClientServerStream& msg, %s *op, vtkClientServerStream& resultStream)\n"
-          "{\n",
+          "{\n  (void)resultStream;\n",
           className,
           funName,
           className);
@@ -1407,14 +1407,20 @@ int extractOtherClassesUsed(ClassInfo *data, char * classes[])
         {
         if(data->Functions[i].Function[j].ArgTypes[k] % 16 ==9)
           {
-          classes[count]=data->Functions[i].Function[j].ArgClasses[k];
-          ++count;
+          if (data->Functions[i].Function[j].ArgExternals[k] == 0)
+            {
+            classes[count]=data->Functions[i].Function[j].ArgClasses[k];
+            ++count;
+            }
           }
         }
       if(data->Functions[i].Function[j].ReturnType % 16 == 9)
         {
-        classes[count]=data->Functions[i].Function[j].ReturnClass;
-        ++count;
+        if (data->Functions[i].Function[j].ReturnExternal == 0)
+          {
+          classes[count]=data->Functions[i].Function[j].ReturnClass;
+          ++count;
+          }
         }
       }
   return uniqueClasses(classes,count,data->ClassName);
