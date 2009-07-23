@@ -858,7 +858,6 @@ void printFunction_END(FILE *fp)
 void outputMappableFunction(FILE *fp, UniqueFunctionInfo *data,char* ClassName)
 {
   int i,j;
-  int once =1;
   FunctionInfo *currentFunction;
   printFunction_BEGIN(fp,data->Name,ClassName);
   for (j=0; j<data->TotalPolymorphTypes; ++j)
@@ -936,25 +935,6 @@ static int funCmp(const void  *fun1, const void *fun2)
 {
   FunctionInfo *a = (FunctionInfo*)fun1;
   FunctionInfo *b = (FunctionInfo*)fun2;
-  return strcmp(a->Name,b->Name);
-}
-
-//--------------------------------------------------------------------------nix
-/*
- * funCmp is used to compare the function names of two FunInfo data.
- * This is used as a utility to the sort function.
- * 
- * @param fun1 first function data which is compared
- * @param fun2 second function data which is compared
- * 
- * @return values returned by strcmp
- */
-
-static int funCmpDebug(const void  *fun1, const void *fun2)
-{
-  FunctionInfo *a = (FunctionInfo*)fun1;
-  FunctionInfo *b = (FunctionInfo*)fun2;
-  printf("          (cmp %s %s) => %d\n",a->Name,b->Name,strcmp(a->Name,b->Name));
   return strcmp(a->Name,b->Name);
 }
 
@@ -1223,7 +1203,7 @@ void outputMetaInfoExtractFunction(FILE *fp, ClassInfo *data)
  */
 void getClassInfo(FileInfo *data, ClassInfo* classData)
 {
-  int i,j;
+  int i;
   int TotalUniqueFunctions=0;
   int TotalFunctions;
   FunctionInfo tempFun[1000];
