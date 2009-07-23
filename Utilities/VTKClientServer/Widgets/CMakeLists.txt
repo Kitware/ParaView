@@ -1,2 +1,2 @@
-SET(KIT_WRAP_DEPS Rendering)
+SET(KIT_WRAP_DEPS Rendering Hybrid)
 PV_WRAP_VTK_CS(Widgets WIDGETS "${KIT_WRAP_DEPS}")
