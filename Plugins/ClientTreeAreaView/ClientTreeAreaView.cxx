@@ -181,14 +181,6 @@ ClientTreeAreaView::ClientTreeAreaView(
   Implementation(new implementation()),
   Command(new command(*this))
 {
-  // If we have an associated annotation link proxy, set the client side
-  // object as the annotation link on the representation.
-  if (this->getAnnotationLink())
-    {
-    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
-    this->Implementation->TreeAreaRepresentation->SetAnnotationLink(link);
-    }
-
   QObject::connect(&this->Implementation->UpdateTimer, SIGNAL(timeout()), this, SLOT(synchronizeViews()));
 
   // Listen to all views that may fire progress events during updating.
@@ -295,6 +287,14 @@ bool ClientTreeAreaView::canDisplay(pqOutputPort* output_port) const
 
 void ClientTreeAreaView::showRepresentation(pqRepresentation* representation)
 {
+  // If we have an associated annotation link proxy, set the client side
+  // object as the annotation link on the representation.
+  if (this->getAnnotationLink())
+    {
+    vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->getAnnotationLink()->GetClientSideObject());
+    this->Implementation->TreeAreaRepresentation->SetAnnotationLink(link);
+    }
+
   vtkSMClientDeliveryRepresentationProxy* const proxy = vtkSMClientDeliveryRepresentationProxy::SafeDownCast(representation->getProxy());
   proxy->Update();
   vtkDataObject* output = proxy->GetOutput();
