@@ -1350,6 +1350,33 @@ int isUniqueString(char* main, char *list[], int total)
  */
 int uniqueClasses(char *classes[],int total,char *classSelfName)
 {
+  int i,j=0;
+  char *temp[1000];
+  char* current_class_name;
+  for (i = total-1; i>=0; --i)
+  {
+    current_class_name = classes[i];
+    if (strcmp(current_class_name,classSelfName)!=0  &&
+         // hack
+       strcmp(current_class_name,"vtkClientServerStream")!=0 &&
+       isUniqueString(current_class_name,&temp[0],j) //&&
+       //strcmp(classes[i],"vtkObjectBase")!=0 )
+       )
+      {
+      temp[j]= current_class_name;
+      ++j;
+      }
+  }
+  for(i=0;i<j;++i)
+    {
+    classes[i]=temp[i];
+    }
+  return j;
+}
+
+#if 0
+int uniqueClasses(char *classes[],int total,char *classSelfName)
+{
 
   int i,j=0;
   char *temp[1000];
@@ -1369,6 +1396,7 @@ int uniqueClasses(char *classes[],int total,char *classSelfName)
     classes[i]=temp[i];
   return j;
 }
+#endif
 
 //--------------------------------------------------------------------------nix
 /*
