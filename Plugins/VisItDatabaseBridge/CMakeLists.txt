@@ -63,7 +63,7 @@ if (BOOTSTRAP)
 elseif(NOT BOOTSTRAP)
   include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
   include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
-  include("${PROJECT_BINARY_DIR}/CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
+  include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
   include("CMake/install.cmake")                    # Install plugins and VisIt databases.
   # TODO include make install generated above.
 endif (BOOTSTRAP)

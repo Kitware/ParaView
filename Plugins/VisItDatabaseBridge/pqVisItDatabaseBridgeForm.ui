@@ -194,6 +194,7 @@
    </item>
    <item row="2" column="0" >
     <layout class="QGridLayout" >
+<!--
      <item row="0" column="0" >
       <widget class="QLabel" name="label" >
        <property name="font" >
@@ -214,6 +215,7 @@
        </property>
       </widget>
      </item>
+-->
      <item row="1" column="0" >
       <widget class="QLabel" name="label_2" >
        <property name="font" >

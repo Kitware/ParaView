@@ -100,16 +100,6 @@
     This property specifies the file name for the reader.
   </Documentation>
   </StringVectorProperty>
-  <!-- Path to available Visit plugins -->
-  <StringVectorProperty
-    name="PluginPath"
-    command="SetPluginPath"
-    number_of_elements="1"
-    default_values="@PLUGIN_PATH@">
-    <Documentation>
-      The plugin id.
-    </Documentation>
-  </StringVectorProperty>
 </Proxy>
 
 @SOURCE_PROXIES@

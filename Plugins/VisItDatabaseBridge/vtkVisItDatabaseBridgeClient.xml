@@ -1,0 +1,469 @@
+
+<ParaViewReaders>
+
+<!--
+========================================================================ANALYZE -->
+<Reader
+    name="ANALYZEVisItDatabaseBridge"
+    extensions="img hdr"
+    file_description="ANALYZE Files (beta)">
+</Reader>
+<!--
+========================================================================ANSYS -->
+<Reader
+    name="ANSYSVisItDatabaseBridge"
+    extensions="inp"
+    file_description="ANSYS Files (beta)">
+</Reader>
+<!--
+========================================================================AUXFile -->
+<Reader
+    name="AUXFileVisItDatabaseBridge"
+    extensions="aux"
+    file_description="AUXFile Files (beta)">
+</Reader>
+<!--
+========================================================================AugDecomp -->
+<Reader
+    name="AugDecompVisItDatabaseBridge"
+    extensions="augd"
+    file_description="AugDecomp Files (beta)">
+</Reader>
+<!--
+========================================================================BOV -->
+<Reader
+    name="BOVVisItDatabaseBridge"
+    extensions="bov"
+    file_description="BOV Files (beta)">
+</Reader>
+<!--
+========================================================================BOW -->
+<Reader
+    name="BOWVisItDatabaseBridge"
+    extensions="txt"
+    file_description="BOW Files (beta)">
+</Reader>
+<!--
+========================================================================Boxlib2D -->
+<Reader
+    name="Boxlib2DVisItDatabaseBridge"
+    extensions="boxlib2d boxlib2D"
+    file_description="Boxlib2D Files (beta)">
+</Reader>
+<!--
+========================================================================Boxlib3D -->
+<Reader
+    name="Boxlib3DVisItDatabaseBridge"
+    extensions="boxlib3d boxlib3D"
+    file_description="Boxlib3D Files (beta)">
+</Reader>
+<!--
+========================================================================CEAucd -->
+<Reader
+    name="CEAucdVisItDatabaseBridge"
+    extensions="inp"
+    file_description="CEAucd Files (beta)">
+</Reader>
+<!--
+========================================================================CGNS -->
+<Reader
+    name="CGNSVisItDatabaseBridge"
+    extensions="cgns"
+    file_description="CGNS Files (beta)">
+</Reader>
+<!--
+========================================================================CMAT -->
+<Reader
+    name="CMATVisItDatabaseBridge"
+    extensions="cmat"
+    file_description="CMAT Files (beta)">
+</Reader>
+<!--
+========================================================================CTRL -->
+<Reader
+    name="CTRLVisItDatabaseBridge"
+    extensions="ctrl CTRL"
+    file_description="CTRL Files (beta)">
+</Reader>
+<!--
+========================================================================Cale -->
+<Reader
+    name="CaleVisItDatabaseBridge"
+    extensions="pdb cale"
+    file_description="Cale Files (beta)">
+</Reader>
+<!--
+========================================================================Chombo -->
+<Reader
+    name="ChomboVisItDatabaseBridge"
+    extensions="hdf5 h5"
+    file_description="Chombo Files (beta)">
+</Reader>
+<!--
+========================================================================Claw -->
+<Reader
+    name="ClawVisItDatabaseBridge"
+    extensions="claw"
+    file_description="Claw Files (beta)">
+</Reader>
+<!--
+========================================================================Cosmos -->
+<Reader
+    name="CosmosVisItDatabaseBridge"
+    extensions="cosmos"
+    file_description="Cosmos Files (beta)">
+</Reader>
+<!--
+========================================================================CosmosPP -->
+<Reader
+    name="CosmosPPVisItDatabaseBridge"
+    extensions="cosmospp cosmos++"
+    file_description="CosmosPP Files (beta)">
+</Reader>
+<!--
+========================================================================Curve2D -->
+<Reader
+    name="Curve2DVisItDatabaseBridge"
+    extensions="curve ultra ult u"
+    file_description="Curve2D Files (beta)">
+</Reader>
+<!--
+========================================================================DDCMD -->
+<Reader
+    name="DDCMDVisItDatabaseBridge"
+    extensions="ddcMD ddcmd DDCMD"
+    file_description="DDCMD Files (beta)">
+</Reader>
+<!--
+========================================================================Dune -->
+<Reader
+    name="DuneVisItDatabaseBridge"
+    extensions="Dat"
+    file_description="Dune Files (beta)">
+</Reader>
+<!--
+========================================================================Dyna3D -->
+<Reader
+    name="Dyna3DVisItDatabaseBridge"
+    extensions="dyn"
+    file_description="Dyna3D Files (beta)">
+</Reader>
+<!--
+========================================================================Enzo -->
+<Reader
+    name="EnzoVisItDatabaseBridge"
+    extensions="hierarchy boundary"
+    file_description="Enzo Files (beta)">
+</Reader>
+<!--
+========================================================================ExtrudedVol -->
+<Reader
+    name="ExtrudedVolVisItDatabaseBridge"
+    extensions="exvol"
+    file_description="ExtrudedVol Files (beta)">
+</Reader>
+<!--
+========================================================================FITS -->
+<Reader
+    name="FITSVisItDatabaseBridge"
+    extensions="fit fits imh"
+    file_description="FITS Files (beta)">
+</Reader>
+<!--
+========================================================================FLASH -->
+<Reader
+    name="FLASHVisItDatabaseBridge"
+    extensions=""
+    file_description="FLASH Files (beta)">
+</Reader>
+<!--
+========================================================================GGCM -->
+<Reader
+    name="GGCMVisItDatabaseBridge"
+    extensions="3df"
+    file_description="GGCM Files (beta)">
+</Reader>
+<!--
+========================================================================GTC -->
+<Reader
+    name="GTCVisItDatabaseBridge"
+    extensions="h5"
+    file_description="GTC Files (beta)">
+</Reader>
+<!--
+========================================================================H5Nimrod -->
+<Reader
+    name="H5NimrodVisItDatabaseBridge"
+    extensions=".h5nimrod"
+    file_description="H5Nimrod Files (beta)">
+</Reader>
+<!--
+========================================================================H5Part -->
+<Reader
+    name="H5PartVisItDatabaseBridge"
+    extensions="h5part"
+    file_description="H5Part Files (beta)">
+</Reader>
+<!--
+========================================================================Hex -->
+<Reader
+    name="HexVisItDatabaseBridge"
+    extensions="hex"
+    file_description="Hex Files (beta)">
+</Reader>
+<!--
+========================================================================KullLite -->
+<Reader
+    name="KullLiteVisItDatabaseBridge"
+    extensions="pdb mkf"
+    file_description="KullLite Files (beta)">
+</Reader>
+<!--
+========================================================================Lines -->
+<Reader
+    name="LinesVisItDatabaseBridge"
+    extensions=""
+    file_description="Lines Files (beta)">
+</Reader>
+<!--
+========================================================================M3D -->
+<Reader
+    name="M3DVisItDatabaseBridge"
+    extensions="m3d"
+    file_description="M3D Files (beta)">
+</Reader>
+<!--
+========================================================================MM5 -->
+<Reader
+    name="MM5VisItDatabaseBridge"
+    extensions="mm5"
+    file_description="MM5 Files (beta)">
+</Reader>
+<!--
+========================================================================Miranda -->
+<Reader
+    name="MirandaVisItDatabaseBridge"
+    extensions="mir raw"
+    file_description="Miranda Files (beta)">
+</Reader>
+<!--
+========================================================================NASTRAN -->
+<Reader
+    name="NASTRANVisItDatabaseBridge"
+    extensions="nas f06"
+    file_description="NASTRAN Files (beta)">
+</Reader>
+<!--
+========================================================================NETCDF -->
+<Reader
+    name="NETCDFVisItDatabaseBridge"
+    extensions="nc cdf elev ncd"
+    file_description="NETCDF Files (beta)">
+</Reader>
+<!--
+========================================================================Nek3D -->
+<Reader
+    name="Nek3DVisItDatabaseBridge"
+    extensions="nek3d nek2d nek"
+    file_description="Nek3D Files (beta)">
+</Reader>
+<!--
+========================================================================PATRAN -->
+<Reader
+    name="PATRANVisItDatabaseBridge"
+    extensions="neu"
+    file_description="PATRAN Files (beta)">
+</Reader>
+<!--
+========================================================================PDB -->
+<Reader
+    name="PDBVisItDatabaseBridge"
+    extensions="pdb r0000"
+    file_description="PDB Files (beta)">
+</Reader>
+<!--
+========================================================================PFLOTRAN -->
+<Reader
+    name="PFLOTRANVisItDatabaseBridge"
+    extensions="h5"
+    file_description="PFLOTRAN Files (beta)">
+</Reader>
+<!--
+========================================================================PLOT2D -->
+<Reader
+    name="PLOT2DVisItDatabaseBridge"
+    extensions="p2d"
+    file_description="PLOT2D Files (beta)">
+</Reader>
+<!--
+========================================================================Pixie -->
+<Reader
+    name="PixieVisItDatabaseBridge"
+    extensions="h5"
+    file_description="Pixie Files (beta)">
+</Reader>
+<!--
+========================================================================PlainText -->
+<Reader
+    name="PlainTextVisItDatabaseBridge"
+    extensions=""
+    file_description="PlainText Files (beta)">
+</Reader>
+<!--
+========================================================================Point3D -->
+<Reader
+    name="Point3DVisItDatabaseBridge"
+    extensions=".3D"
+    file_description="Point3D Files (beta)">
+</Reader>
+<!--
+========================================================================Rect -->
+<Reader
+    name="RectVisItDatabaseBridge"
+    extensions="rect"
+    file_description="Rect Files (beta)">
+</Reader>
+<!--
+========================================================================S3D -->
+<Reader
+    name="S3DVisItDatabaseBridge"
+    extensions="s3d"
+    file_description="S3D Files (beta)">
+</Reader>
+<!--
+========================================================================SAMI -->
+<Reader
+    name="SAMIVisItDatabaseBridge"
+    extensions="sami"
+    file_description="SAMI Files (beta)">
+</Reader>
+<!--
+========================================================================SAMRAI -->
+<Reader
+    name="SAMRAIVisItDatabaseBridge"
+    extensions="samrai"
+    file_description="SAMRAI Files (beta)">
+</Reader>
+<!--
+========================================================================SAR -->
+<Reader
+    name="SARVisItDatabaseBridge"
+    extensions="sar SAR"
+    file_description="SAR Files (beta)">
+</Reader>
+<!--
+========================================================================SAS -->
+<Reader
+    name="SASVisItDatabaseBridge"
+    extensions="sasgeom sasdata sas"
+    file_description="SAS Files (beta)">
+</Reader>
+<!--
+========================================================================Shapefile -->
+<Reader
+    name="ShapefileVisItDatabaseBridge"
+    extensions="shp shx dbf"
+    file_description="Shapefile Files (beta)">
+</Reader>
+<!--
+========================================================================Silo -->
+<Reader
+    name="SiloVisItDatabaseBridge"
+    extensions="silo pdb"
+    file_description="Silo Files (beta)">
+</Reader>
+<!--
+========================================================================Spheral -->
+<Reader
+    name="SpheralVisItDatabaseBridge"
+    extensions="sv spheral"
+    file_description="Spheral Files (beta)">
+</Reader>
+<!--
+========================================================================TFT -->
+<Reader
+    name="TFTVisItDatabaseBridge"
+    extensions="dat DAT Dat tft TFT Tft"
+    file_description="TFT Files (beta)">
+</Reader>
+<!--
+========================================================================TSurf -->
+<Reader
+    name="TSurfVisItDatabaseBridge"
+    extensions="ts_deg83"
+    file_description="TSurf Files (beta)">
+</Reader>
+<!--
+========================================================================Tecplot -->
+<Reader
+    name="TecplotVisItDatabaseBridge"
+    extensions="tp plt tec"
+    file_description="Tecplot Files (beta)">
+</Reader>
+<!--
+========================================================================Tetrad -->
+<Reader
+    name="TetradVisItDatabaseBridge"
+    extensions="h5 hdf5"
+    file_description="Tetrad Files (beta)">
+</Reader>
+<!--
+========================================================================UNIC -->
+<Reader
+    name="UNICVisItDatabaseBridge"
+    extensions="h5"
+    file_description="UNIC Files (beta)">
+</Reader>
+<!--
+========================================================================VASP -->
+<Reader
+    name="VASPVisItDatabaseBridge"
+    extensions="vasp VASP"
+    file_description="VASP Files (beta)">
+</Reader>
+<!--
+========================================================================VLI -->
+<Reader
+    name="VLIVisItDatabaseBridge"
+    extensions=""
+    file_description="VLI Files (beta)">
+</Reader>
+<!--
+========================================================================Vis5D -->
+<Reader
+    name="Vis5DVisItDatabaseBridge"
+    extensions="v5d"
+    file_description="Vis5D Files (beta)">
+</Reader>
+<!--
+========================================================================Vista -->
+<Reader
+    name="VistaVisItDatabaseBridge"
+    extensions="vista"
+    file_description="Vista Files (beta)">
+</Reader>
+<!--
+========================================================================Xmdv -->
+<Reader
+    name="XmdvVisItDatabaseBridge"
+    extensions="okc"
+    file_description="Xmdv Files (beta)">
+</Reader>
+<!--
+========================================================================ZeusMP -->
+<Reader
+    name="ZeusMPVisItDatabaseBridge"
+    extensions="zeus"
+    file_description="ZeusMP Files (beta)">
+</Reader>
+<!--
+========================================================================ZipWrapper -->
+<Reader
+    name="ZipWrapperVisItDatabaseBridge"
+    extensions="gz bz2 zip"
+    file_description="ZipWrapper Files (beta)">
+</Reader>
+
+
+</ParaViewReaders>
+

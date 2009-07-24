@@ -16,28 +16,33 @@
 #include "vtkVisItDatabase.h"
 #include "vtkVisItDatabaseBridgeTypes.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkStructuredGrid.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkMultiBlockDataSet.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkDataArraySelection.h"
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
-#include "vtkPointData.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkCompositeDataPipeline.h"
-#include "vtkCallbackCommand.h"
-#include "vtkDataArraySelection.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkMutableDirectedGraph.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkProcessModule.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStructuredGrid.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkProcessModule.h"
+#include "vtkPVOptions.h"
 
+#include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
+
 using vtkstd::string;
 #include <vtkstd/vector>
 using vtkstd::vector;
 
 
-vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.3");
+vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.4");
 vtkStandardNewMacro(vtkVisItDatabaseBridge);
 
 // Never try to print a null pointer to a string.
@@ -68,6 +73,12 @@ vtkVisItDatabaseBridge::vtkVisItDatabaseBridge()
   this->FileName=0;
   this->PluginId=0;
   this->PluginPath=0;
+
+  const char* executable_path = vtkProcessModule::GetProcessModule()->
+    GetOptions()->GetArgv0();
+  this->SetPluginPath(
+    vtksys::SystemTools::GetFilenamePath(executable_path).c_str());
+cout << "PluginPath: " << this->PluginPath<< endl;
 
   this->Clear();
   this->VisitSource=vtkVisItDatabase::New();
@@ -153,7 +164,7 @@ void vtkVisItDatabaseBridge::Clear()
 {
   this->SetFileName(0);
   this->SetPluginId(0);
-  this->SetPluginPath(0);
+  //this->SetPluginPath(0);
 
   this->UpdatePlugin=1;
   this->UpdateDatabase=1;
