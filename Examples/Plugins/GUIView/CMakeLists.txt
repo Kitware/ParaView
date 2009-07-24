@@ -29,13 +29,10 @@ ADD_PARAVIEW_VIEW_MODULE(
 ADD_PARAVIEW_VIEW_OPTIONS(OPTIONS_IFACE OPTIONS_IFACE_SRCS
                           VIEW_TYPE MyView ACTIVE_VIEW_OPTIONS MyViewActiveOptions)
 
-# create a GUI side plugin with the GUI side code
-ADD_PARAVIEW_PLUGIN(GUIMyView "1.0" GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
-                    GUI_SOURCES MyView.cxx MyDisplay.cxx MyViewActiveOptions.cxx MyViewOptions.cxx
-                    ${MOC_SRCS} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS})
-
-# create a server side plugin with the server side code
-ADD_PARAVIEW_PLUGIN(SMMyView "1.0" SERVER_MANAGER_XML MyViewSM.xml)
-
-# one could combine the two plugins into one if desired
-
+# Create a plugin with the new view and its options.
+ADD_PARAVIEW_PLUGIN(MyView "1.0"
+  SERVER_MANAGER_XML MyViewSM.xml
+  GUI_INTERFACES ${IFACES} ${OPTIONS_IFACE}
+  GUI_SOURCES MyView.cxx MyDisplay.cxx MyViewActiveOptions.cxx MyViewOptions.cxx
+  ${MOC_SRCS} ${IFACE_SRCS} ${OPTIONS_IFACE_SRCS}
+  )
