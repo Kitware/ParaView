@@ -1233,7 +1233,7 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
   int i;
   int TotalUniqueFunctions=0;
   int TotalFunctions;
-  FunctionInfo tempFun[1000];
+  FunctionInfo *tempFun =(FunctionInfo*) malloc (sizeof(FunctionInfo)*1000);
 
   /* Collect all the information */
   classData->HasDelete = data->HasDelete;
@@ -1278,6 +1278,7 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
 /*     } */
   
   classData->NumberOfFunctions = TotalUniqueFunctions;
+  free(tempFun);
 }
 
 //--------------------------------------------------------------------------nix
