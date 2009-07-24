@@ -1260,22 +1260,22 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
   /* Sort the function data. */
   //qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
   
-  for(i=0;i<TotalFunctions;i++)
-    {
-    printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments);
-    }
+/*   for(i=0;i<TotalFunctions;i++) */
+/*     { */
+/*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
+/*     } */
 
-  printf("START\n");  
+//  printf("START\n");  
   /* Collect unique and group polymorphed functions in UniqueFunctionInfo */
   TotalUniqueFunctions = collectUniqueFunctionInfo(tempFun,
                                                    TotalFunctions,
                                                    classData->Functions);
-  printf("END\n");
+//  printf("END\n");
   
-  for(i=0;i<TotalUniqueFunctions;i++)
-    {
-    printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments);
-    }
+ /*  for(i=0;i<TotalUniqueFunctions;i++) */
+/*     { */
+/*     printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments); */
+/*     } */
   
   classData->NumberOfFunctions = TotalUniqueFunctions;
 }
