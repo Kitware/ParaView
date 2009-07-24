@@ -9,6 +9,14 @@ IF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
     DESTINATION ${PV_EXE_INSTALL}
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
     COMPONENT Runtime)
+
+  # Install the runtimes to the lib dir as well since python modules are
+  # installed in that directory and the manifest files need to present there as
+  # well.
+  INSTALL(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+    DESTINATION ${PV_INSTALL_LIB_DIR}
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+    COMPONENT Runtime)
 ENDIF (CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
 # Set up a CPack project config file so that we can build either the paraview command
