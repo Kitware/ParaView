@@ -1005,6 +1005,39 @@ int extractWrappable(FunctionInfo* from,
  */
 int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
 {
+  int i,j,k;
+  i=0;
+  j=0;
+  for (i=0; i < srcSize; ++i)
+    {
+    dest[i].Name = src[i].Name;
+    dest[i].TotalPolymorphTypes = 1;
+    dest[i].Function[0]= src[i];
+    for(j=i+1; j<srcSize;j++)
+      {
+      if(funCmp(&dest[i],&src[j])==0)
+        {
+        printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
+        printf("    > [SAME]\n");
+        dest[i].Function[dest[i].TotalPolymorphTypes]=src[j];
+        ++dest[i].TotalPolymorphTypes;
+        for(k=j; k<srcSize-1;k++)
+          {
+          printf("remaining = %s\n",src[k].Name);
+          src[k]=src[k+1];
+          }
+        j--;
+        srcSize--;
+        }
+      
+      }
+    }
+  return srcSize;
+}
+
+#if 0
+int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo *dest)
+{
   int i,j;
   i=0;
   j=0;
@@ -1013,18 +1046,11 @@ int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo
     dest[j].Name = src[i].Name;
     dest[j].TotalPolymorphTypes = 1;
     dest[j].Function[0]= src[i];
-//    printf("(%d,%d) %s[0] <= %s\n",j,i,dest[j].Name,src[i].Name);
     if(i+1 < srcSize)
       {
       while(funCmp(&dest[j],&src[i+1])==0)
         {
-//        printf("**************** %s\n",dest[j].Name);
         dest[j].Function[dest[j].TotalPolymorphTypes]=src[i+1];
-//        printf("(%d,%d) %s[%d]  <=  %s\n",
-//               j,i+1,
-//               dest[j].Name,
-//               dest[j].TotalPolymorphTypes,
-//               src[i+1].Name);
         i++;
         ++dest[j].TotalPolymorphTypes;
         if(i+1 < srcSize) continue;
@@ -1034,6 +1060,7 @@ int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo
     }
   return j;
 }
+#endif
 
 //--------------------------------------------------------------------------nix
 /* 
@@ -1231,17 +1258,25 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
                                     tempFun,
                                     data->ClassName);
   /* Sort the function data. */
-  qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
+  //qsort(tempFun,TotalFunctions,sizeof(FunctionInfo),funCmp);
+  
+  for(i=0;i<TotalFunctions;i++)
+    {
+    printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments);
+    }
 
-/*   for(i=0;i<TotalFunctions;i++) */
-/*     { */
-/*     printf("(funargs %s %d)",tempFun[i].Name,tempFun[i].NumberOfArguments); */
-/*     } */
-    
+  printf("START\n");  
   /* Collect unique and group polymorphed functions in UniqueFunctionInfo */
   TotalUniqueFunctions = collectUniqueFunctionInfo(tempFun,
                                                    TotalFunctions,
                                                    classData->Functions);
+  printf("END\n");
+  
+  for(i=0;i<TotalUniqueFunctions;i++)
+    {
+    printf("(funargs %s %d)\n",tempFun[i].Name,tempFun[i].NumberOfArguments);
+    }
+  
   classData->NumberOfFunctions = TotalUniqueFunctions;
 }
 
