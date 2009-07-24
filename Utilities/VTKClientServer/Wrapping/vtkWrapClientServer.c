@@ -1017,13 +1017,13 @@ int collectUniqueFunctionInfo(FunctionInfo *src, int srcSize, UniqueFunctionInfo
       {
       if(funCmp(&dest[i],&src[j])==0)
         {
-        printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
-        printf("    > [SAME]\n");
+        //printf("%d [%d]> dest = %s :: src = %s\n",i,srcSize, dest[i].Name,src[j].Name);
+        //printf("    > [SAME]\n");
         dest[i].Function[dest[i].TotalPolymorphTypes]=src[j];
         ++dest[i].TotalPolymorphTypes;
         for(k=j; k<srcSize-1;k++)
           {
-          printf("remaining = %s\n",src[k].Name);
+          //printf("remaining = %s\n",src[k].Name);
           src[k]=src[k+1];
           }
         j--;
