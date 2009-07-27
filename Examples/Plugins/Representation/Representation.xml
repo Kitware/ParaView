@@ -1,0 +1,78 @@
+<ServerManaerConfiguration>
+  <ProxyGroup name="mappers">
+    <SourceProxy name="MySpecialPolyDataMapper"
+      class="vtkMySpecialPolyDataMapper"
+      base_proxygroup="mappers" base_proxyname="PolyDataMapper">
+      <!-- And any extra properties for this mapper -->
+    </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="representations">
+    <SurfaceRepresentationProxy name="MySpecialRepresentation" 
+      base_proxygroup="representations"
+      base_proxyname="SurfaceRepresentation">
+      <Documentation>
+        This is the new representation type we are adding. This is identical to
+        the SurfaceRepresentation except that we are overriding the mapper with
+        our mapper.
+      </Documentation>
+      
+      <InputProperty name="Input" 
+        command="NotUsed">
+        <InputArrayDomain name="input_array_any"
+          attribute_type="any">
+        </InputArrayDomain>
+      </InputProperty>
+
+      <SubProxy>
+        <Proxy name="Mapper" proxygroup="mappers"
+               proxyname="MySpecialPolyDataMapper"
+               override="1" />
+        <ExposedProperties>
+          <Property name="LookupTable" />
+          <Property name="MapScalars" />
+          <Property name="ImmediateModeRendering" />
+          <Property name="InterpolateScalarsBeforeMapping" />
+          <Property name="UseLookupTableScalarRange" />
+          <Property name="ClippingPlanes" />
+          <Property name="NumberOfSubPieces" />
+          <Property name="StaticMode" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="LODMapper" 
+          proxygroup="mappers"
+          proxyname="MySpecialPolyDataMapper" override="1"/>
+        <ShareProperties subproxy="Mapper" >
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+
+    <!-- End of SurfaceRepresentation -->
+    </SurfaceRepresentationProxy>
+
+    <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        MySpecialRepresentation as a new type of representation.
+      </Documentation>
+
+      <!-- this adds to what is already defined in PVRepresentationBase -->
+      <RepresentationType subproxy="MySpecialRepresentation"
+        text="Special Mapper" subtype="1" />
+
+      <SubProxy>
+        <Proxy name="MySpecialRepresentation"
+          proxygroup="representations" proxyname="MySpecialRepresentation">
+        </Proxy>
+        <ShareProperties subproxy="SurfaceRepresentation">
+          <Exception name="Input" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+      </SubProxy>
+    </Extension>
+  </ProxyGroup>
+
+</ServerManaerConfiguration>

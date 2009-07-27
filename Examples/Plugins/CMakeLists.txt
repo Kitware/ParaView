@@ -1,5 +1,11 @@
 
-SUBDIRS(Filter ParametricSource SMProxy)
+SUBDIRS (
+  Filter
+  ParametricSource
+  SMProxy
+  Representation
+  HiddenLinesRemoval
+)
 
 IF(PARAVIEW_BUILD_QT_GUI)
   SUBDIRS(
