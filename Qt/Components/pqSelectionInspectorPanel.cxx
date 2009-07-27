@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMSelectionHelper.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <QHeaderView>
@@ -420,7 +421,8 @@ void pqSelectionInspectorPanel::setSelectionManager(pqSelectionManager* mgr)
     {
     QObject::connect(
       mgr, SIGNAL(selectionChanged(pqOutputPort*)),
-      this, SLOT(select(pqOutputPort* /*, bool*/)));
+      //this, SLOT(select(pqOutputPort* /*, bool*/)));
+      this, SLOT(onSelectionManagerChanged(pqOutputPort*)));
     }
 }
 
@@ -431,6 +433,16 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
     {
     QObject::disconnect(this->Implementation->InputPort->getSource(), 0, this, 0);
     }
+
+  if(!this->hasGlobalIDs(this->Implementation->InputPort) &&
+      this->hasGlobalIDs(opport))
+    {
+    this->Implementation->InputPort = opport;
+    this->updateSelectionTypesAvailable();
+    this->setGlobalIDs();
+    return;
+    }
+
   this->Implementation->InputPort = opport;
 
   QString selectedObjectLabel = "<b>[none]</b>";
@@ -803,6 +815,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
 
 
   bool prev = this->Implementation->comboLabelMode_Point->blockSignals(true);
+  // the domain is updated only when the labels are visible for the first time.
   this->Implementation->PointLabelArrayDomain = new pqComboBoxDomain(
     this->Implementation->comboLabelMode_Point,
     reprProxy->GetProperty("SelectionPointFieldDataArrayName"));
@@ -811,6 +824,7 @@ void pqSelectionInspectorPanel::updateDisplayStyleGUI()
   this->Implementation->comboLabelMode_Point->blockSignals(prev);
 
   prev = this->Implementation->comboLabelMode_Cell->blockSignals(true);
+  // the domain is updated only when the labels are visible for the first time.
   this->Implementation->CellLabelArrayDomain = new pqComboBoxDomain(
     this->Implementation->comboLabelMode_Cell,
     reprProxy->GetProperty("SelectionCellFieldDataArrayName"));
@@ -1370,6 +1384,12 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 }
 
 //-----------------------------------------------------------------------------
+void pqSelectionInspectorPanel::onSelectionManagerChanged(pqOutputPort* opport)
+{
+  this->select(opport,true);
+}
+
+//-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::createSelectionForCurrentObject()
 {
   pqOutputPort* port = this->Implementation->currentObject->currentPort();
@@ -1386,7 +1406,7 @@ void pqSelectionInspectorPanel::createSelectionForCurrentObject()
     this->Implementation->InputPort->setSelectionInput(0, 0);
     }
 
-  this->select(port, true);
+  this->select(port, true);  
   port->renderAllViews();
 }
 
@@ -1726,28 +1746,16 @@ void pqSelectionInspectorPanel::updateFrustumInternal(bool showFrustum)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
 {
-  if (!this->Implementation->InputPort)
-    {
-    return;
-    }
+  this->updateSelectionTypesAvailable(this->Implementation->InputPort);
+}
 
-  vtkPVDataInformation* info = this->Implementation->InputPort->getDataInformation(false);
-  vtkPVDataSetAttributesInformation* attrInfo = 0;
-
-  if (this->Implementation->comboFieldType->currentText() == QString("POINT"))
-    {
-    attrInfo = info->GetPointDataInformation();
-    }
-  else
-    {
-    attrInfo = info->GetCellDataInformation();
-    }
-
+void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port)
+{
   int cur_index = this->Implementation->comboSelectionType->currentIndex();
   
   // If currently we are showing a GlobalID based selection and the global IDs
   // disappear from under us, we don't remove them from the combo.
-  bool has_gids = attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS) || 
+  bool has_gids = this->hasGlobalIDs(port)|| 
     (cur_index == pqImplementation::GLOBALIDS);
 
   bool prev = this->Implementation->comboSelectionType->blockSignals(true);
@@ -1765,9 +1773,100 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable()
   this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
 }
 
+bool pqSelectionInspectorPanel::hasGlobalIDs(pqOutputPort* port)
+{
+  if (!port)
+    {
+    return false;
+    }
+
+  vtkPVDataInformation* info = port->getDataInformation(false);
+  vtkPVDataSetAttributesInformation* attrInfo = 0;
+
+  if (this->Implementation->comboFieldType->currentText() == QString("POINT"))
+    {
+    attrInfo = info->GetPointDataInformation();
+    }
+  else
+    {
+    attrInfo = info->GetCellDataInformation();
+    }
+  return attrInfo->GetAttributeInformation(vtkDataSetAttributes::GLOBALIDS);
+}
+
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onSelectionColorChanged(const QColor& color)
 {
   pqSettings* settings = pqApplicationCore::instance()->settings();
   settings->setValue("GlobalProperties/SelectionColor", color);
+}
+
+void pqSelectionInspectorPanel::setGlobalIDs()
+{
+  this->Implementation->comboSelectionType->setCurrentIndex(
+    pqImplementation::GLOBALIDS); // Global IDs
+  // the celllabelarraydomain and pointlabelarraydomain are valid only when
+  // the user turn the visibility to ON.
+  if(!this->Implementation->comboLabelMode_Cell->count())
+    {
+    vtkSMProxy* reprProxy = this->Implementation->getSelectionRepresentation()
+      ->getProxy();
+    this->Implementation->VTKConnectRep->Connect(
+      reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain("vtkSMDomain"),
+      vtkCommand::DomainModifiedEvent, this, 
+      SLOT(forceLabelGlobalId(vtkObject*)),
+      NULL, 0.0,//reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain("vtkSMDomain"), 0.0,
+      Qt::QueuedConnection);
+    this->Implementation->VTKConnectRep->Connect(
+      reprProxy->GetProperty("SelectionCellFieldDataArrayName")->FindDomain("vtkSMDomain"),
+      vtkCommand::DomainModifiedEvent, this, 
+      SLOT(forceLabelGlobalId(vtkObject*)),
+      NULL, 0.0,//reprProxy->GetProperty("SelectionCellFieldDataArrayName")->FindDomain("vtkSMDomain"), 0.0,
+      Qt::QueuedConnection);
+    }
+  else
+    {
+    this->Implementation->comboLabelMode_Cell->setCurrentIndex(
+      this->Implementation->comboLabelMode_Cell->findText("Global",
+                                                          Qt::MatchStartsWith));
+    this->Implementation->comboLabelMode_Point->setCurrentIndex(
+      this->Implementation->comboLabelMode_Point->findText("Global",
+                                                           Qt::MatchStartsWith));
+    }
+}
+
+void pqSelectionInspectorPanel::forceLabelGlobalId(vtkObject* object)
+{
+  pqDataRepresentation* repr = this->Implementation->getSelectionRepresentation();
+  vtkSMProxy* reprProxy = repr? repr->getProxy() : 0;
+  if (!reprProxy)
+    {
+    return;
+    }
+
+  if( dynamic_cast<vtkSMDomain*>(object) == 
+      reprProxy->GetProperty("SelectionCellFieldDataArrayName")
+      ->FindDomain("vtkSMDomain") )
+    {
+    this->Implementation->comboLabelMode_Cell->setCurrentIndex(
+      this->Implementation->comboLabelMode_Cell->findText("Global",
+                                                          Qt::MatchStartsWith));
+    // one shot forcing
+    this->Implementation->VTKConnectRep->Disconnect(
+      reprProxy->GetProperty("SelectionCellFieldDataArrayName")
+      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
+      this, SLOT(forceLabelGlobalId(vtkObject*)));
+    
+    }
+  else //== reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain..
+    {
+    this->Implementation->comboLabelMode_Point->setCurrentIndex(
+      this->Implementation->comboLabelMode_Point->findText("Global",
+                                                           Qt::MatchStartsWith));
+    // one shot forcing
+    this->Implementation->VTKConnectRep->Disconnect(
+      reprProxy->GetProperty("SelectionPointFieldDataArrayName")
+      ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
+      this, SLOT(forceLabelGlobalId(vtkObject*)));
+    }
 }

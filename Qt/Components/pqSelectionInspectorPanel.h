@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include <QWidget>
 
+class vtkObject;
 class pqDataRepresentation;
 class pqOutputPort;
 class pqPipelineSource;
@@ -81,6 +82,9 @@ protected slots:
 
   /// Called when the "Selection Type" combo-box is changed.
   void onSelectionTypeChanged(const QString&);
+
+  /// Called when the SelectionManager is changed.
+  void onSelectionManagerChanged(pqOutputPort* opport);
 
   /// Called when "Field Type" combo-box changes. This updates the enabled state
   /// of the "Containing Cells" combo-box, since that combo-box only makes sense
@@ -134,6 +138,8 @@ protected slots:
   /// Called when selection color is changed, we save the selection color in
   /// settings so that it's preserved across sessions.
   void onSelectionColorChanged(const QColor& color);
+
+  void forceLabelGlobalId(vtkObject* caller);
 protected:
   /// Sets up the GUI by created default signal/slot bindings etc.
   void setupGUI();
@@ -178,6 +184,14 @@ protected:
   void allocateWidgets(unsigned int numWidgets);
 
   void updateFrustumInternal(bool);
+  
+  /// Called to update the types of selections available.
+  void updateSelectionTypesAvailable(pqOutputPort* opport);
+
+  /// Returns true if the port has GlobalIDs
+  bool hasGlobalIDs(pqOutputPort*);
+
+  void setGlobalIDs();
 private:
   struct pqImplementation;
   pqImplementation* const Implementation;

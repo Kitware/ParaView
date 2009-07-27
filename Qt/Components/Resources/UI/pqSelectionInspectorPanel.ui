@@ -132,11 +132,6 @@
           </item>
           <item>
            <property name="text" >
-            <string>Global IDs</string>
-           </property>
-          </item>
-          <item>
-           <property name="text" >
             <string>Frustum</string>
            </property>
           </item>
