@@ -81,6 +81,31 @@ MACRO(GENERATE_SERVER_MANAGER_XML_HEADER OUT_XML_HEADER Name XMLFile)
   ENDIF(PARAVIEW_PROCESS_XML_EXECUTABLE)
 ENDMACRO(GENERATE_SERVER_MANAGER_XML_HEADER)
 
+# Macro to encode any file(s) as a string. This creates a new cxx file with a
+# declaration of a "const char*" string with the same name as the file.
+# Example:
+# encode_files_as_strings(cxx_files
+#  vtkLightingHelper_s.glsl
+#  vtkColorMaterialHelper_vs.glsl
+#  )
+# Will create 2 cxx files with 2 strings: const char* vtkLightingHelper_s and
+# const char* vtkColorMaterialHelper_vs.
+MACRO(ENCODE_FILES_AS_STRINGS OUT_SRCS)
+  foreach(file ${ARGN})
+    GET_FILENAME_COMPONENT(file "${file}" ABSOLUTE)
+    GET_FILENAME_COMPONENT(file_name "${file}" NAME_WE)
+    set(src ${file})
+    set(res ${CMAKE_CURRENT_BINARY_DIR}/${file_name}.cxx)
+    add_custom_command(
+      OUTPUT ${res}
+      DEPENDS ${src}
+      COMMAND ${VTK_ENCODESTRING_EXE}
+      ARGS ${res} ${src} ${file_name}
+      )
+    set(${OUT_SRCS} ${${OUT_SRCS}} ${res})
+  endforeach(file)
+ENDMACRO(ENCODE_FILES_AS_STRINGS)
+
 # create plugin glue code for a server manager extension
 # consisting of server manager XML and VTK classes
 # sets OUTSRCS with the generated code
