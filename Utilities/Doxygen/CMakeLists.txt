@@ -31,7 +31,6 @@ IF (BUILD_DOCUMENTATION)
        "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf2/vtk\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
-        \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
@@ -51,7 +50,6 @@ IF (BUILD_DOCUMENTATION)
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf2/vtk\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/VTKPythonWrapping/Executable\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
-        \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
