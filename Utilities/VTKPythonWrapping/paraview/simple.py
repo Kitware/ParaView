@@ -334,6 +334,23 @@ def _find_writer(filename):
     else:
         raise RuntimeError, "Cannot infer filetype from extension:", extension
 
+def AddCameraLink(viewProxy, viewProxyOther, linkName):
+    """Create a camera link between two view proxies.  A name must be given
+    so that the link can be referred to by name.  If a link with the given
+    name already exists it will be removed first."""
+    if not viewProxyOther: viewProxyOther = GetActiveView()
+    link = servermanager.vtkSMCameraLink()
+    link.AddLinkedProxy(viewProxy.SMProxy, 1)
+    link.AddLinkedProxy(viewProxyOther.SMProxy, 2)
+    link.AddLinkedProxy(viewProxyOther.SMProxy, 1)
+    link.AddLinkedProxy(viewProxy.SMProxy, 2)
+    RemoveCameraLink(linkName)
+    servermanager.ProxyManager().RegisterLink(linkName, link)
+
+def RemoveCameraLink(linkName):
+    """Remove a camera link with the given name."""
+    servermanager.ProxyManager().UnRegisterLink(linkName)
+
 def WriteImage(filename, view=None, **params):
     """Saves the given view (or the active one if none is given) as an
     image. Optionally, you can specify the writer and the magnification
@@ -405,9 +422,10 @@ def _create_func(key, module):
                 raise RuntimeError, "This function does not expect an input."
 
         registrationName = None
-        if 'registrationName' in params:
-            registrationName = params['registrationName']
-            del params['registrationName']
+        for nameParam in ['registrationName', 'guiName']:
+          if nameParam in params:
+              registrationName = params[nameParam]
+              del params[nameParam]
 
         # Pass all the named arguments as property,value pairs
         for param in params.keys():

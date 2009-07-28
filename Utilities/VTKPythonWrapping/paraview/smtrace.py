@@ -9,6 +9,7 @@ def reset_trace_observer():
   trace_globals.observer_active = False
 def reset_trace_globals():
   trace_globals.capture_all_properties = False
+  trace_globals.use_gui_name = False
   trace_globals.verbose = False
   trace_globals.active_source_at_start = None
   trace_globals.active_view_at_start = None
@@ -247,6 +248,17 @@ def proxy_smproperty_tostring(proxyInfo, propInfo):
     nameListStr = make_comma_separated_string(nameList)
     return "[%s]" % nameListStr
 
+def trace_proxy_rename(proxy_info, new_name):
+  """ Handle renaming an existing source proxy."""
+  if not proxy_info or proxY_info.Group != "sources": return
+  old_pyvariable = proxy_info.PyVariable
+  proxy_info.PyVariable = pyvariable_from_proxy_name(new_name)
+  proxy_info.ignore_next_unregister = True
+  name_to_set = new_name.replace("\"", "")
+  trace_globals.trace_output.append("RenameSource(\"%s\", %s)" % (name_to_set, old_pyvariable))
+  trace_globals.trace_output.append("%s = %s" % (proxy_info.PyVariable, old_pyvariable))
+  trace_globals.trace_output.append("del %s" % old_pyvariable)
+
 def trace_proxy_registered(proxy, proxyGroup, proxyName):
   """Creates a new proxy_trace_info object if the proxy type is one that is
   followed for trace (not all proxy types are).  Returns the new object or None."""
@@ -337,6 +349,9 @@ def append_trace():
       if info.Group == "sources":
         # track it as the last active source now
         trace_globals.last_active_source = info.Proxy
+        # maybe append the guiName property
+        if trace_globals.use_gui_name:
+          ctorArgs.append("guiName=\"%s\"" % info.ProxyName)
 
       if info.Group == "representations":
         ctorMethod = "Show"
@@ -423,14 +438,9 @@ def on_proxy_registered(o, e):
   pName = o.GetLastProxyRegisteredName()
   if p and pGroup and pName:
     proxy_info = get_proxy_info(p, search_existing=False)
+    # handle source proxy rename, no-op if proxy isn't a source
     if proxy_info:
-      old_pyvariable = proxy_info.PyVariable
-      proxy_info.PyVariable = pyvariable_from_proxy_name(pName)
-      proxy_info.ignore_next_unregister = True
-      pName = pName.replace("\"", "")
-      trace_globals.trace_output.append("RenameSource(\"%s\", %s)" % (pName, old_pyvariable))
-      trace_globals.trace_output.append("%s = %s" % (proxy_info.PyVariable, old_pyvariable))
-      trace_globals.trace_output.append("del %s" % old_pyvariable)
+      trace_proxy_rename(proxy_info, pName)
     else:
       trace_proxy_registered(p, pGroup, pName)
 
@@ -493,12 +503,13 @@ def stop_trace():
   reset_trace_observer()
 
 # clear trace globals and initialize trace observer
-def start_trace(CaptureAllProperties=False, Verbose=False):
+def start_trace(CaptureAllProperties=False, UseGuiName=False, Verbose=False):
   clear_trace()
   add_observers()
   trace_globals.active_source_at_start = simple.GetActiveSource()
   trace_globals.active_view_at_start = simple.GetActiveView()
   trace_globals.capture_all_properties = CaptureAllProperties
-  trace_globals.verbose = Verbose 
+  trace_globals.use_gui_name = UseGuiName
+  trace_globals.verbose = Verbose
 
 
