@@ -39,7 +39,6 @@ public:
     {
     if (this->Target)
       {
-      this->Target->InvokeEvent(event, data);
       if (event == vtkCommand::StartInteractionEvent)
         {
         this->Target->SetInteractiveRenderEnabled(1);
@@ -66,7 +65,7 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.7");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.8");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
