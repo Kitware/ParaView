@@ -399,18 +399,6 @@ ELSE(VTK_USE_SYSTEM_ZLIB)
     )
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
-IF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_SOURCE_DIR}/GUISupport/Qt)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_DIR}/GUISupport/Qt)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_SOURCE_DIR}/GUISupport/Qt/Chart)
-  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
-    ${VTK_DIR}/GUISupport/Qt/Chart)
-ENDIF (VTK_USE_QT AND VTK_USE_GUISUPPORT)
-
-
 #########################################################################
 # Configure Python wrapping
 IF(PARAVIEW_ENABLE_PYTHON)

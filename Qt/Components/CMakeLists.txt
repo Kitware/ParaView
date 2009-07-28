@@ -36,6 +36,12 @@ INCLUDE_DIRECTORIES(
   ${pqCore_SOURCE_DIR}
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart
+  ${QtChart_SOURCE_DIR}
+  ${QtChart_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
@@ -739,6 +745,11 @@ ADD_LIBRARY(pqComponents
 
 TARGET_LINK_LIBRARIES(pqComponents
   pqCore
+  QtChart
+  QtTesting
+  pqWidgets
+  QVTK
+  vtkPVServerManager
   ${PYTHON_LINK_LIBRARIES}
   ${QT_QTASSISTANT_LIBRARY}
   ${QT_QTNETWORK_LIBRARY}
