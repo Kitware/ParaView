@@ -544,6 +544,11 @@ void pqKeyFrameEditor::writeKeyFrameData()
     stack->beginUndoSet("Edit Keyframes");
     }
 
+  if(camera)
+    {
+    this->Internal->Cue->setKeyFrameType("CameraKeyFrame");
+    }
+
   bool prev = this->Internal->Cue->blockSignals(true);
   for(int i=0; i<oldNumber-newNumber; i++)
     {
