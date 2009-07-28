@@ -102,7 +102,7 @@ public:
   ///   Creates a chart value to store a float.
   /// \param value The value to store.
   pqChartValue(double value);
-  ~pqChartValue() {}
+  ~pqChartValue();
 
   /// \brief
   ///   Gets the type of value stored.

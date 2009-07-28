@@ -48,6 +48,10 @@ pqChartValue::pqChartValue()
   this->Value.Int = 0;
 }
 
+pqChartValue::~pqChartValue()
+{
+}
+
 pqChartValue::pqChartValue(const pqChartValue &value)
 {
   this->Type = value.Type;
