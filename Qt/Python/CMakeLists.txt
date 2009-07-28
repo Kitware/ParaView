@@ -14,7 +14,6 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
   ${PARAVIEW_INCLUDE_DIRS}
   ${VTKPythonWrapping_SOURCE_DIR}/Executable
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
 )
 
 # Reduce the number of dirs that get included on moc command line

@@ -59,7 +59,6 @@ INCLUDE(${QT_USE_FILE})
 # Include Qt dependent code.
 ADD_SUBDIRECTORY(Testing)
 ADD_SUBDIRECTORY(Widgets)
-ADD_SUBDIRECTORY(Chart)
 
 # Include Qt, VTK & Server Manager dependent code.
 ADD_SUBDIRECTORY(Core)
