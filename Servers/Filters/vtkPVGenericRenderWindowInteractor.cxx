@@ -35,7 +35,8 @@ public:
     this->Target = target;
     }
 
-  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void* data)
+  virtual void Execute(vtkObject* vtkNotUsed(caller), unsigned long event, void*
+    vtkNotUsed(data))
     {
     if (this->Target)
       {
@@ -65,7 +66,7 @@ protected:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.8");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.9");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
