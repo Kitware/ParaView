@@ -60,7 +60,8 @@ def _wrap_property(proxy, smproperty):
     appropriate python object.
     """
     property = None
-    if smproperty.IsA("vtkSMStringVectorProperty"):
+    if paraview.compatibility.GetVersion() >= 3.5 and \
+      smproperty.IsA("vtkSMStringVectorProperty"):
         al = smproperty.GetDomain("array_list")
         if  al and al.IsA("vtkSMArraySelectionDomain") and \
             smproperty.GetRepeatable():
@@ -2477,9 +2478,10 @@ def createModule(groupName, mdl=None):
         # Add all properties as python properties.
         for prop in iter:
             propName = iter.GetKey()
-            if (prop.GetInformationOnly() and propName != "TimestepValues" ) \
-                or prop.GetIsInternal() :
-                continue
+            if paraview.compatibility.GetVersion() >= 3.5:
+                if (prop.GetInformationOnly() and propName != "TimestepValues" ) \
+                  or prop.GetIsInternal():
+                    continue
             names = [propName]
             if paraview.compatibility.GetVersion() >= 3.5:
                 names = [iter.PropertyLabel]
