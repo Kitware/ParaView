@@ -116,8 +116,8 @@ EqualVal<T>::EqualVector(void *a1_, void *a2_)
        return true;
     vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
     vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 != l2)
         return false;
     else
@@ -153,8 +153,8 @@ EqualVal<AttributeGroup*>::EqualVector(void *a1_, void *a2_)
        return true;
     AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
     AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 != l2)
        return false;
     for (int i=0; i<l1; i++)

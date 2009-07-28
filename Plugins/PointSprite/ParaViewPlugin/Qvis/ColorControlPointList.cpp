@@ -497,9 +497,9 @@ ColorControlPointList::SetFromNode(DataNode *parentNode)
     {
         const unsignedCharVector &colors = compactColorNode->AsUnsignedCharVector();
         const floatVector &positions = compactPositionNode->AsFloatVector();
-        unsigned int npts = colors.size() / 4;
-        if(npts > positions.size())
-            npts = positions.size();
+        unsigned int npts = static_cast<unsigned int>(colors.size() / 4);
+        if(npts > static_cast<unsigned int>(positions.size()))
+            npts = static_cast<unsigned int>(positions.size());
         if(npts > 0)
         {
             for(unsigned int i = 0; i < npts; ++i)
@@ -733,7 +733,7 @@ ColorControlPointList::RemoveControlPoints(int index)
 int
 ColorControlPointList::GetNumControlPoints() const
 {
-    return controlPoints.size();
+    return static_cast<int>(controlPoints.size());
 }
 
 // ****************************************************************************

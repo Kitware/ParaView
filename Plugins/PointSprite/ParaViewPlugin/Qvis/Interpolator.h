@@ -139,8 +139,8 @@ ConstInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
     vtkstd::vector<T> &out = *(vtkstd::vector<T>*)out_;
     vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
     vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
         out = a1;
     else
@@ -186,8 +186,8 @@ ConstInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, dou
     AttributeGroupVector &out= *(AttributeGroupVector*)out_;
     AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
     AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
     {
         for (int i=l2; i<l1; i++)
@@ -256,8 +256,8 @@ LinInterp<T>::InterpVector(void *out_, void *a1_, void *a2_, double f)
     vtkstd::vector<T> &out = *(vtkstd::vector<T>*)out_;
     vtkstd::vector<T> &a1  = *(vtkstd::vector<T>*)a1_;
     vtkstd::vector<T> &a2  = *(vtkstd::vector<T>*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
         out = a1;
     else
@@ -317,8 +317,8 @@ LinInterp<int>::InterpVector(void *out_, void *a1_, void *a2_, double f)
     vtkstd::vector<int> &out = *(vtkstd::vector<int>*)out_;
     vtkstd::vector<int> &a1  = *(vtkstd::vector<int>*)a1_;
     vtkstd::vector<int> &a2  = *(vtkstd::vector<int>*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
         out = a1;
     else
@@ -359,8 +359,8 @@ LinInterp<AttributeGroup*>::InterpVector(void *out_, void *a1_, void *a2_, doubl
     AttributeGroupVector &out= *(AttributeGroupVector*)out_;
     AttributeGroupVector &a1 = *(AttributeGroupVector*)a1_;
     AttributeGroupVector &a2 = *(AttributeGroupVector*)a2_;
-    int l1 = a1.size();
-    int l2 = a2.size();
+    int l1 = static_cast<int>(a1.size());
+    int l2 = static_cast<int>(a2.size());
     if (l1 > l2)
     {
         for (int i=l2; i<l1; i++)
