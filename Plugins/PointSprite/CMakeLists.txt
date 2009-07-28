@@ -26,7 +26,6 @@ add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
 # Find and Use ParaView
 #--------------------------------------------------
 IF (ParaView_SOURCE_DIR)
-  INCLUDE(${QT_USE_FILE}) 
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
     ${PARAVIEW_GUI_INCLUDE_DIRS}
