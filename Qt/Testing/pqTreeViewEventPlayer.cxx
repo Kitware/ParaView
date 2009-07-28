@@ -46,6 +46,26 @@ pqTreeViewEventPlayer::~pqTreeViewEventPlayer()
 {
 }
 
+QModelIndex pqTreeViewEventPlayerGetIndex(const QString& str_index,
+  QTreeView* treeView, bool &error)
+{
+  QStringList indices = str_index.split(".",QString::SkipEmptyParts);
+  QModelIndex index;
+  for (int cc=0; (cc+1) < indices.size(); cc+=2)
+    {
+    index = treeView->model()->index(indices[cc].toInt(), indices[cc+1].toInt(),
+      index);
+    if (!index.isValid())
+      {
+      error=true;
+      qCritical() << "ERROR: Tree view must have changed. "
+        << "Indices recorded in the test are no longer valid. Cannot playback.";
+      break;
+      }
+    }
+  return index;
+}
+
 //-----------------------------------------------------------------------------
 bool pqTreeViewEventPlayer::playEvent(
   QObject* object, const QString& command, 
@@ -102,23 +122,26 @@ bool pqTreeViewEventPlayer::playEvent(
     QString str_index = regExp1.cap(1);
     int check_state = regExp1.cap(2).toInt();
     
-    QStringList indices = str_index.split(".",QString::SkipEmptyParts);
-    QModelIndex index;
-    for (int cc=0; (cc+1) < indices.size(); cc+=2)
+    QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
+    if (error)
       {
-      index = treeView->model()->index(indices[cc].toInt(), indices[cc+1].toInt(),
-        index);
-      if (!index.isValid())
-        {
-        error=true;
-        qCritical() << "ERROR: Tree view must have changed. "
-          << "Indices recorded in the test are no longer valid. Cannot playback.";
-        return true;
-        }
+      return true;
       }
     treeView->model()->setData(index,
       static_cast<Qt::CheckState>(check_state),
       Qt::CheckStateRole);
+    pqEventDispatcher::processEventsAndWait(10);
+    return true;
+    }
+  else if (command == "expand" || command == "collapse")
+    {
+    QString str_index = arguments;
+    QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
+    if (error)
+      {
+      return true;
+      }
+    treeView->setExpanded(index, (command=="expand"));
     pqEventDispatcher::processEventsAndWait(10);
     return true;
     }

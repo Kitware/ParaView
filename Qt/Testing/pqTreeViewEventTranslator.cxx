@@ -65,6 +65,11 @@ bool pqTreeViewEventTranslator::translateEvent(
     QObject::disconnect(treeWidget, 0, this, 0);
     QObject::connect(treeWidget, SIGNAL(clicked(const QModelIndex&)),
       this, SLOT(onItemChanged(const QModelIndex&)));
+    QObject::connect(treeWidget, SIGNAL(expanded(const QModelIndex&)),
+      this, SLOT(onExpanded(const QModelIndex&)));
+    QObject::connect(treeWidget, SIGNAL(collapsed(const QModelIndex&)),
+      this, SLOT(onCollapsed(const QModelIndex&)));
+
     }
   return true;
 }
@@ -93,3 +98,42 @@ void pqTreeViewEventTranslator::onItemChanged(
         index.model()->data(index,Qt::CheckStateRole).toInt()));
     }
 }
+
+//-----------------------------------------------------------------------------
+void pqTreeViewEventTranslator::onExpanded(const QModelIndex& index)
+{
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
+
+  QModelIndex curIndex = index;
+  QString str_index;
+  while (curIndex.isValid())
+    {
+    str_index.prepend(QString("%1.%2.").arg(curIndex.row()).arg(curIndex.column()));
+    curIndex = curIndex.parent();
+    }
+
+  // remove the last ".".
+  str_index.chop(1);
+  // record the check state change if the item is user-checkable.
+  emit this->recordEvent( treeWidget, "expand", str_index);
+}
+
+//-----------------------------------------------------------------------------
+void pqTreeViewEventTranslator::onCollapsed(const QModelIndex& index)
+{
+  QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
+
+  QModelIndex curIndex = index;
+  QString str_index;
+  while (curIndex.isValid())
+    {
+    str_index.prepend(QString("%1.%2.").arg(curIndex.row()).arg(curIndex.column()));
+    curIndex = curIndex.parent();
+    }
+
+  // remove the last ".".
+  str_index.chop(1);
+  // record the check state change if the item is user-checkable.
+  emit this->recordEvent( treeWidget, "collapse", str_index);
+}
+

@@ -52,6 +52,8 @@ public:
  
 private slots:
   void onItemChanged(const QModelIndex&);
+  void onExpanded(const QModelIndex&);
+  void onCollapsed(const QModelIndex&);
 
 private:
   pqTreeViewEventTranslator(const pqTreeViewEventTranslator&); // Not implemented.
