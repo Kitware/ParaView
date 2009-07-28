@@ -123,7 +123,6 @@ TARGET_LINK_LIBRARIES(${PV_EXE_NAME}
   pqComponents
   pqCore
   pqWidgets
-  QtChart
   QtTesting
   ${QT_LIBRARIES}
 )

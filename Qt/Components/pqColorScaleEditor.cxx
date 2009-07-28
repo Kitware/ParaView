@@ -38,9 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqChartValue.h"
-#include "pqColorMapColorChanger.h"
 #include "pqColorMapModel.h"
-#include "pqColorMapWidget.h"
 #include "pqColorPresetManager.h"
 #include "pqColorPresetModel.h"
 #include "pqDataRepresentation.h"
@@ -96,7 +94,6 @@ public:
   pqSignalAdaptorComboBox *TitleFontAdaptor;
   pqSignalAdaptorComboBox *LabelFontAdaptor;
   vtkEventQtSlotConnect *Listener;
-  pqColorMapWidget *Gradient;
   pqColorPresetManager *Presets;
   QPointer<pqDataRepresentation> CurrentDisplay;
   int CurrentIndex;
@@ -118,7 +115,6 @@ pqColorScaleEditorForm::pqColorScaleEditorForm()
   this->TitleFontAdaptor = 0;
   this->LabelFontAdaptor = 0;
   this->Listener = 0;
-  this->Gradient = 0;
   this->Presets = 0;
   this->CurrentIndex = -1;
   this->InSetColors = false;

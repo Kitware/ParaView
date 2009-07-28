@@ -23,8 +23,6 @@ INCLUDE_DIRECTORIES(
   ${pqCore_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
-  ${QtChart_SOURCE_DIR}
-  ${QtChart_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtPython_SOURCE_DIR}

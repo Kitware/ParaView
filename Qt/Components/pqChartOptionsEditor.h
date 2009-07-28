@@ -39,10 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqComponentsExport.h"
 #include "pqOptionsContainer.h"
-#include "pqChartArea.h" // Needed for enum
-#include "pqChartAxis.h" // Needed for enum
-#include "pqChartAxisOptions.h" // Needed for enum
-#include "pqChartLegend.h" // Needed for enum
+#include "vtkQtChartAxisLayer.h" // Needed for enum
+#include "vtkQtChartAxis.h" // Needed for enum
+#include "vtkQtChartAxisOptions.h" // Needed for enum
+#include "vtkQtChartLegend.h" // Needed for enum
+#include "pqChartValue.h"
 
 class pqChartOptionsEditorForm;
 class pqChartValue;
@@ -89,84 +90,84 @@ public:
   //@{
   bool isLegendShowing() const;
   void setLegendShowing(bool legendShowing);
-  pqChartLegend::LegendLocation getLegendLocation() const;
-  void setLegendLocation(pqChartLegend::LegendLocation location);
-  pqChartLegend::ItemFlow getLegendFlow() const;
-  void setLegendFlow(pqChartLegend::ItemFlow flow);
+  vtkQtChartLegend::LegendLocation getLegendLocation() const;
+  void setLegendLocation(vtkQtChartLegend::LegendLocation location);
+  vtkQtChartLegend::ItemFlow getLegendFlow() const;
+  void setLegendFlow(vtkQtChartLegend::ItemFlow flow);
   //@}
 
   /// \name General Axis Parameters
   //@{
-  bool isAxisShowing(pqChartAxis::AxisLocation location) const;
-  void setAxisShowing(pqChartAxis::AxisLocation location, bool axisShowing);
-  bool isAxisGridShowing(pqChartAxis::AxisLocation location) const;
-  void setAxisGridShowing(pqChartAxis::AxisLocation location,
+  bool isAxisShowing(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisShowing(vtkQtChartAxis::AxisLocation location, bool axisShowing);
+  bool isAxisGridShowing(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisGridShowing(vtkQtChartAxis::AxisLocation location,
       bool gridShowing);
-  pqChartAxisOptions::AxisGridColor getAxisGridType(
-      pqChartAxis::AxisLocation location) const;
-  void setAxisGridType(pqChartAxis::AxisLocation location,
-      pqChartAxisOptions::AxisGridColor color);
-  const QColor &getAxisColor(pqChartAxis::AxisLocation location) const;
-  void setAxisColor(pqChartAxis::AxisLocation location, const QColor &color);
-  const QColor &getAxisGridColor(pqChartAxis::AxisLocation location) const;
-  void setAxisGridColor(pqChartAxis::AxisLocation location,
+  vtkQtChartAxisOptions::AxisGridColor getAxisGridType(
+      vtkQtChartAxis::AxisLocation location) const;
+  void setAxisGridType(vtkQtChartAxis::AxisLocation location,
+      vtkQtChartAxisOptions::AxisGridColor color);
+  const QColor &getAxisColor(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisColor(vtkQtChartAxis::AxisLocation location, const QColor &color);
+  const QColor &getAxisGridColor(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisGridColor(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
   //@}
 
   /// \name Axis Label Parameters
   //@{
-  bool areAxisLabelsShowing(pqChartAxis::AxisLocation location) const;
-  void setAxisLabelsShowing(pqChartAxis::AxisLocation location,
+  bool areAxisLabelsShowing(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisLabelsShowing(vtkQtChartAxis::AxisLocation location,
       bool labelsShowing);
-  const QFont &getAxisLabelFont(pqChartAxis::AxisLocation location) const;
-  void setAxisLabelFont(pqChartAxis::AxisLocation location,
+  const QFont &getAxisLabelFont(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisLabelFont(vtkQtChartAxis::AxisLocation location,
       const QFont &newFont);
-  const QColor &getAxisLabelColor(pqChartAxis::AxisLocation location) const;
-  void setAxisLabelColor(pqChartAxis::AxisLocation location,
+  const QColor &getAxisLabelColor(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisLabelColor(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
   pqChartValue::NotationType getAxisLabelNotation(
-      pqChartAxis::AxisLocation location) const;
-  void setAxisLabelNotation(pqChartAxis::AxisLocation location,
+      vtkQtChartAxis::AxisLocation location) const;
+  void setAxisLabelNotation(vtkQtChartAxis::AxisLocation location,
       pqChartValue::NotationType notation);
-  int getAxisLabelPrecision(pqChartAxis::AxisLocation location) const;
-  void setAxisLabelPrecision(pqChartAxis::AxisLocation location,
+  int getAxisLabelPrecision(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisLabelPrecision(vtkQtChartAxis::AxisLocation location,
       int precision);
   //@}
 
   /// \name Axis Layout Parameters
   //@{
-  bool isUsingLogScale(pqChartAxis::AxisLocation location) const;
-  void setAxisScale(pqChartAxis::AxisLocation location, bool useLogScale);
-  pqChartArea::AxisBehavior getAxisBehavior(
-      pqChartAxis::AxisLocation location) const;
-  void setAxisBehavior(pqChartAxis::AxisLocation location,
-      pqChartArea::AxisBehavior behavior);
-  void getAxisMinimum(pqChartAxis::AxisLocation location,
+  bool isUsingLogScale(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisScale(vtkQtChartAxis::AxisLocation location, bool useLogScale);
+  vtkQtChartAxisLayer::AxisBehavior getAxisBehavior(
+      vtkQtChartAxis::AxisLocation location) const;
+  void setAxisBehavior(vtkQtChartAxis::AxisLocation location,
+      vtkQtChartAxisLayer::AxisBehavior behavior);
+  void getAxisMinimum(vtkQtChartAxis::AxisLocation location,
       pqChartValue &minimum) const;
-  void setAxisMinimum(pqChartAxis::AxisLocation location,
+  void setAxisMinimum(vtkQtChartAxis::AxisLocation location,
       const pqChartValue &minimum);
-  void getAxisMaximum(pqChartAxis::AxisLocation location,
+  void getAxisMaximum(vtkQtChartAxis::AxisLocation location,
       pqChartValue &maximum) const;
-  void setAxisMaximum(pqChartAxis::AxisLocation location,
+  void setAxisMaximum(vtkQtChartAxis::AxisLocation location,
       const pqChartValue &maximum);
-  void getAxisLabels(pqChartAxis::AxisLocation location,
+  void getAxisLabels(vtkQtChartAxis::AxisLocation location,
       QStringList &list) const;
-  void setAxisLabels(pqChartAxis::AxisLocation location,
+  void setAxisLabels(vtkQtChartAxis::AxisLocation location,
       const QStringList &list);
   //@}
 
   /// \name Axis Title Parameters
   //@{
-  const QString &getAxisTitle(pqChartAxis::AxisLocation location) const;
-  void setAxisTitle(pqChartAxis::AxisLocation location, const QString &title);
-  const QFont &getAxisTitleFont(pqChartAxis::AxisLocation location) const;
-  void setAxisTitleFont(pqChartAxis::AxisLocation location,
+  const QString &getAxisTitle(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisTitle(vtkQtChartAxis::AxisLocation location, const QString &title);
+  const QFont &getAxisTitleFont(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisTitleFont(vtkQtChartAxis::AxisLocation location,
       const QFont &newFont);
-  const QColor &getAxisTitleColor(pqChartAxis::AxisLocation location) const;
-  void setAxisTitleColor(pqChartAxis::AxisLocation location,
+  const QColor &getAxisTitleColor(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisTitleColor(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
-  int getAxisTitleAlignment(pqChartAxis::AxisLocation location) const;
-  void setAxisTitleAlignment(pqChartAxis::AxisLocation location,
+  int getAxisTitleAlignment(vtkQtChartAxis::AxisLocation location) const;
+  void setAxisTitleAlignment(vtkQtChartAxis::AxisLocation location,
       int alignment);
   //@}
 
@@ -182,59 +183,59 @@ signals:
   /// \name Chart Legend Changes
   //@{
   void showLegendChanged(bool legendShowing);
-  void legendLocationChanged(pqChartLegend::LegendLocation location);
-  void legendFlowChanged(pqChartLegend::ItemFlow flow);
+  void legendLocationChanged(vtkQtChartLegend::LegendLocation location);
+  void legendFlowChanged(vtkQtChartLegend::ItemFlow flow);
   //@}
 
   /// \name General Axis Changes
   //@{
-  void showAxisChanged(pqChartAxis::AxisLocation location, bool axisShowing);
-  void showAxisGridChanged(pqChartAxis::AxisLocation location,
+  void showAxisChanged(vtkQtChartAxis::AxisLocation location, bool axisShowing);
+  void showAxisGridChanged(vtkQtChartAxis::AxisLocation location,
       bool gridShowing);
-  void axisGridTypeChanged(pqChartAxis::AxisLocation location,
-      pqChartAxisOptions::AxisGridColor color);
-  void axisColorChanged(pqChartAxis::AxisLocation location,
+  void axisGridTypeChanged(vtkQtChartAxis::AxisLocation location,
+      vtkQtChartAxisOptions::AxisGridColor color);
+  void axisColorChanged(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
-  void axisGridColorChanged(pqChartAxis::AxisLocation location,
+  void axisGridColorChanged(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
   //@}
 
   /// \name Axis Label Changes
   //@{
-  void showAxisLabelsChanged(pqChartAxis::AxisLocation location,
+  void showAxisLabelsChanged(vtkQtChartAxis::AxisLocation location,
       bool labelsShowing);
-  void axisLabelFontChanged(pqChartAxis::AxisLocation location,
+  void axisLabelFontChanged(vtkQtChartAxis::AxisLocation location,
       const QFont &newFont);
-  void axisLabelColorChanged(pqChartAxis::AxisLocation location,
+  void axisLabelColorChanged(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
-  void axisLabelNotationChanged(pqChartAxis::AxisLocation location,
+  void axisLabelNotationChanged(vtkQtChartAxis::AxisLocation location,
       pqChartValue::NotationType notation);
-  void axisLabelPrecisionChanged(pqChartAxis::AxisLocation location,
+  void axisLabelPrecisionChanged(vtkQtChartAxis::AxisLocation location,
       int precision);
   //@}
 
   /// \name Axis Layout Changes
   //@{
-  void axisScaleChanged(pqChartAxis::AxisLocation location, bool useLogScale);
-  void axisBehaviorChanged(pqChartAxis::AxisLocation location,
-      pqChartArea::AxisBehavior behavior);
-  void axisMinimumChanged(pqChartAxis::AxisLocation location,
+  void axisScaleChanged(vtkQtChartAxis::AxisLocation location, bool useLogScale);
+  void axisBehaviorChanged(vtkQtChartAxis::AxisLocation location,
+      vtkQtChartAxisLayer::AxisBehavior behavior);
+  void axisMinimumChanged(vtkQtChartAxis::AxisLocation location,
       const pqChartValue &minimum);
-  void axisMaximumChanged(pqChartAxis::AxisLocation location,
+  void axisMaximumChanged(vtkQtChartAxis::AxisLocation location,
       const pqChartValue &maximum);
-  void axisLabelsChanged(pqChartAxis::AxisLocation location,
+  void axisLabelsChanged(vtkQtChartAxis::AxisLocation location,
       const QStringList &list);
   //@}
 
   /// \name Axis Title Changes
   //@{
-  void axisTitleChanged(pqChartAxis::AxisLocation location,
+  void axisTitleChanged(vtkQtChartAxis::AxisLocation location,
       const QString &title);
-  void axisTitleFontChanged(pqChartAxis::AxisLocation location,
+  void axisTitleFontChanged(vtkQtChartAxis::AxisLocation location,
       const QFont &newFont);
-  void axisTitleColorChanged(pqChartAxis::AxisLocation location,
+  void axisTitleColorChanged(vtkQtChartAxis::AxisLocation location,
       const QColor &color);
-  void axisTitleAlignmentChanged(pqChartAxis::AxisLocation location,
+  void axisTitleAlignmentChanged(vtkQtChartAxis::AxisLocation location,
       int alignment);
   //@}
 

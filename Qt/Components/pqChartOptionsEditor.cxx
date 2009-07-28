@@ -86,12 +86,12 @@ public:
   ~pqChartOptionsEditorForm();
 
   void setCurrentAxis(const QString &name);
-  int getIndexForLocation(pqChartAxis::AxisLocation location) const;
+  int getIndexForLocation(vtkQtChartAxis::AxisLocation location) const;
 
   QString CurrentPage;
   QFont TitleFont;
   pqChartOptionsEditorAxis *AxisData[4];
-  pqChartAxis::AxisLocation CurrentAxis;
+  vtkQtChartAxis::AxisLocation CurrentAxis;
   int AxisIndex;
   pqSampleScalarAddRangeDialog *RangeDialog;
 };
@@ -119,7 +119,7 @@ pqChartOptionsEditorAxis::pqChartOptionsEditorAxis()
 pqChartOptionsEditorForm::pqChartOptionsEditorForm()
   : Ui::pqChartOptionsWidget(), CurrentPage(), TitleFont()
 {
-  this->CurrentAxis = pqChartAxis::Left;
+  this->CurrentAxis = vtkQtChartAxis::Left;
   this->AxisIndex = -1;
   this->RangeDialog = 0;
 
@@ -143,49 +143,49 @@ void pqChartOptionsEditorForm::setCurrentAxis(const QString &name)
 {
   if(name == "Left Axis")
     {
-    this->CurrentAxis = pqChartAxis::Left;
+    this->CurrentAxis = vtkQtChartAxis::Left;
     this->AxisIndex = 0;
     }
   else if(name == "Bottom Axis")
     {
-    this->CurrentAxis = pqChartAxis::Bottom;
+    this->CurrentAxis = vtkQtChartAxis::Bottom;
     this->AxisIndex = 1;
     }
   else if(name == "Right Axis")
     {
-    this->CurrentAxis = pqChartAxis::Right;
+    this->CurrentAxis = vtkQtChartAxis::Right;
     this->AxisIndex = 2;
     }
   else if(name == "Top Axis")
     {
-    this->CurrentAxis = pqChartAxis::Top;
+    this->CurrentAxis = vtkQtChartAxis::Top;
     this->AxisIndex = 3;
     }
   else
     {
-    this->CurrentAxis = pqChartAxis::Left;
+    this->CurrentAxis = vtkQtChartAxis::Left;
     this->AxisIndex = -1;
     }
 }
 
 int pqChartOptionsEditorForm::getIndexForLocation(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   switch(location)
     {
-    case pqChartAxis::Bottom:
+    case vtkQtChartAxis::Bottom:
       {
       return 1;
       }
-    case pqChartAxis::Right:
+    case vtkQtChartAxis::Right:
       {
       return 2;
       }
-    case pqChartAxis::Top:
+    case vtkQtChartAxis::Top:
       {
       return 3;
       }
-    case pqChartAxis::Left:
+    case vtkQtChartAxis::Left:
     default:
       {
       return 0;
@@ -429,51 +429,51 @@ void pqChartOptionsEditor::setLegendShowing(bool legendShowing)
   this->Form->ShowLegend->setChecked(legendShowing);
 }
 
-pqChartLegend::LegendLocation pqChartOptionsEditor::getLegendLocation() const
+vtkQtChartLegend::LegendLocation pqChartOptionsEditor::getLegendLocation() const
 {
   switch(this->Form->LegendLocation->currentIndex())
     {
     case 0:
       {
-      return pqChartLegend::Left;
+      return vtkQtChartLegend::Left;
       }
     case 1:
       {
-      return pqChartLegend::Top;
+      return vtkQtChartLegend::Top;
       }
     case 2:
     default:
       {
-      return pqChartLegend::Right;
+      return vtkQtChartLegend::Right;
       }
     case 3:
       {
-      return pqChartLegend::Bottom;
+      return vtkQtChartLegend::Bottom;
       }
     }
 }
 
 void pqChartOptionsEditor::setLegendLocation(
-    pqChartLegend::LegendLocation location)
+    vtkQtChartLegend::LegendLocation location)
 {
   switch(location)
     {
-    case pqChartLegend::Left:
+    case vtkQtChartLegend::Left:
       {
       this->Form->LegendLocation->setCurrentIndex(0);
       break;
       }
-    case pqChartLegend::Top:
+    case vtkQtChartLegend::Top:
       {
       this->Form->LegendLocation->setCurrentIndex(1);
       break;
       }
-    case pqChartLegend::Right:
+    case vtkQtChartLegend::Right:
       {
       this->Form->LegendLocation->setCurrentIndex(2);
       break;
       }
-    case pqChartLegend::Bottom:
+    case vtkQtChartLegend::Bottom:
       {
       this->Form->LegendLocation->setCurrentIndex(3);
       break;
@@ -481,19 +481,19 @@ void pqChartOptionsEditor::setLegendLocation(
     }
 }
 
-pqChartLegend::ItemFlow pqChartOptionsEditor::getLegendFlow() const
+vtkQtChartLegend::ItemFlow pqChartOptionsEditor::getLegendFlow() const
 {
   if(this->Form->LegendFlow->currentIndex() == 0)
     {
-    return pqChartLegend::LeftToRight;
+    return vtkQtChartLegend::LeftToRight;
     }
 
-  return pqChartLegend::TopToBottom;
+  return vtkQtChartLegend::TopToBottom;
 }
 
-void pqChartOptionsEditor::setLegendFlow(pqChartLegend::ItemFlow flow)
+void pqChartOptionsEditor::setLegendFlow(vtkQtChartLegend::ItemFlow flow)
 {
-  if(flow == pqChartLegend::LeftToRight)
+  if(flow == vtkQtChartLegend::LeftToRight)
     {
     this->Form->LegendFlow->setCurrentIndex(0);
     }
@@ -504,13 +504,13 @@ void pqChartOptionsEditor::setLegendFlow(pqChartLegend::ItemFlow flow)
 }
 
 bool pqChartOptionsEditor::isAxisShowing(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->ShowAxis;
 }
 
-void pqChartOptionsEditor::setAxisShowing(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisShowing(vtkQtChartAxis::AxisLocation location,
     bool axisShowing)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -529,14 +529,14 @@ void pqChartOptionsEditor::setAxisShowing(pqChartAxis::AxisLocation location,
 }
 
 bool pqChartOptionsEditor::isAxisGridShowing(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->ShowGrid;
 }
 
 void pqChartOptionsEditor::setAxisGridShowing(
-    pqChartAxis::AxisLocation location, bool gridShowing)
+    vtkQtChartAxis::AxisLocation location, bool gridShowing)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->ShowGrid != gridShowing)
@@ -553,23 +553,23 @@ void pqChartOptionsEditor::setAxisGridShowing(
     }
 }
 
-pqChartAxisOptions::AxisGridColor pqChartOptionsEditor::getAxisGridType(
-    pqChartAxis::AxisLocation location) const
+vtkQtChartAxisOptions::AxisGridColor pqChartOptionsEditor::getAxisGridType(
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->GridType == 0)
     {
-    return pqChartAxisOptions::Lighter;
+    return vtkQtChartAxisOptions::Lighter;
     }
 
-  return pqChartAxisOptions::Specified;
+  return vtkQtChartAxisOptions::Specified;
 }
 
-void pqChartOptionsEditor::setAxisGridType(pqChartAxis::AxisLocation location,
-    pqChartAxisOptions::AxisGridColor color)
+void pqChartOptionsEditor::setAxisGridType(vtkQtChartAxis::AxisLocation location,
+    vtkQtChartAxisOptions::AxisGridColor color)
 {
   int index = this->Form->getIndexForLocation(location);
-  int gridType = color == pqChartAxisOptions::Lighter ? 0 : 1;
+  int gridType = color == vtkQtChartAxisOptions::Lighter ? 0 : 1;
   if(this->Form->AxisData[index]->GridType != gridType)
     {
     this->Form->AxisData[index]->GridType = gridType;
@@ -585,13 +585,13 @@ void pqChartOptionsEditor::setAxisGridType(pqChartAxis::AxisLocation location,
 }
 
 const QColor &pqChartOptionsEditor::getAxisColor(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->AxisColor;
 }
 
-void pqChartOptionsEditor::setAxisColor(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisColor(vtkQtChartAxis::AxisLocation location,
     const QColor &color)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -610,13 +610,13 @@ void pqChartOptionsEditor::setAxisColor(pqChartAxis::AxisLocation location,
 }
 
 const QColor &pqChartOptionsEditor::getAxisGridColor(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->GridColor;
 }
 
-void pqChartOptionsEditor::setAxisGridColor(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisGridColor(vtkQtChartAxis::AxisLocation location,
     const QColor &color)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -635,14 +635,14 @@ void pqChartOptionsEditor::setAxisGridColor(pqChartAxis::AxisLocation location,
 }
 
 bool pqChartOptionsEditor::areAxisLabelsShowing(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->ShowLabels;
 }
 
 void pqChartOptionsEditor::setAxisLabelsShowing(
-    pqChartAxis::AxisLocation location, bool labelsShowing)
+    vtkQtChartAxis::AxisLocation location, bool labelsShowing)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->ShowLabels != labelsShowing)
@@ -660,13 +660,13 @@ void pqChartOptionsEditor::setAxisLabelsShowing(
 }
 
 const QFont &pqChartOptionsEditor::getAxisLabelFont(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->LabelFont;
 }
 
-void pqChartOptionsEditor::setAxisLabelFont(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisLabelFont(vtkQtChartAxis::AxisLocation location,
     const QFont &newFont)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -679,14 +679,14 @@ void pqChartOptionsEditor::setAxisLabelFont(pqChartAxis::AxisLocation location,
 }
 
 const QColor &pqChartOptionsEditor::getAxisLabelColor(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->LabelColor;
 }
 
 void pqChartOptionsEditor::setAxisLabelColor(
-    pqChartAxis::AxisLocation location, const QColor &color)
+    vtkQtChartAxis::AxisLocation location, const QColor &color)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->LabelColor != color)
@@ -704,7 +704,7 @@ void pqChartOptionsEditor::setAxisLabelColor(
 }
 
 pqChartValue::NotationType pqChartOptionsEditor::getAxisLabelNotation(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   switch(this->Form->AxisData[index]->Notation)
@@ -730,7 +730,7 @@ pqChartValue::NotationType pqChartOptionsEditor::getAxisLabelNotation(
 }
 
 void pqChartOptionsEditor::setAxisLabelNotation(
-    pqChartAxis::AxisLocation location, pqChartValue::NotationType notation)
+    vtkQtChartAxis::AxisLocation location, pqChartValue::NotationType notation)
 {
   int i = this->Form->getIndexForLocation(location);
   int index = 3;
@@ -762,14 +762,14 @@ void pqChartOptionsEditor::setAxisLabelNotation(
 }
 
 int pqChartOptionsEditor::getAxisLabelPrecision(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->Precision;
 }
 
 void pqChartOptionsEditor::setAxisLabelPrecision(
-    pqChartAxis::AxisLocation location, int precision)
+    vtkQtChartAxis::AxisLocation location, int precision)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->Precision != precision)
@@ -787,13 +787,13 @@ void pqChartOptionsEditor::setAxisLabelPrecision(
 }
 
 bool pqChartOptionsEditor::isUsingLogScale(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->UseLogScale;
 }
 
-void pqChartOptionsEditor::setAxisScale(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisScale(vtkQtChartAxis::AxisLocation location,
     bool useLogScale)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -811,32 +811,32 @@ void pqChartOptionsEditor::setAxisScale(pqChartAxis::AxisLocation location,
     }
 }
 
-pqChartArea::AxisBehavior pqChartOptionsEditor::getAxisBehavior(
-    pqChartAxis::AxisLocation location) const
+vtkQtChartAxisLayer::AxisBehavior pqChartOptionsEditor::getAxisBehavior(
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->AxisLayout == 1)
     {
-    return pqChartArea::BestFit;
+    return vtkQtChartAxisLayer::BestFit;
     }
   else if(this->Form->AxisData[index]->AxisLayout == 2)
     {
-    return pqChartArea::FixedInterval;
+    return vtkQtChartAxisLayer::FixedInterval;
     }
 
-  return pqChartArea::ChartSelect;
+  return vtkQtChartAxisLayer::ChartSelect;
 }
 
-void pqChartOptionsEditor::setAxisBehavior(pqChartAxis::AxisLocation location,
-    pqChartArea::AxisBehavior behavior)
+void pqChartOptionsEditor::setAxisBehavior(vtkQtChartAxis::AxisLocation location,
+    vtkQtChartAxisLayer::AxisBehavior behavior)
 {
   int index = this->Form->getIndexForLocation(location);
   int axisLayout = 0;
-  if(behavior == pqChartArea::BestFit)
+  if(behavior == vtkQtChartAxisLayer::BestFit)
     {
     axisLayout = 1;
     }
-  else if(behavior == pqChartArea::FixedInterval)
+  else if(behavior == vtkQtChartAxisLayer::FixedInterval)
     {
     axisLayout = 2;
     }
@@ -846,15 +846,15 @@ void pqChartOptionsEditor::setAxisBehavior(pqChartAxis::AxisLocation location,
     this->Form->AxisData[index]->AxisLayout = axisLayout;
     if(index == this->Form->AxisIndex)
       {
-      if(behavior == pqChartArea::ChartSelect)
+      if(behavior == vtkQtChartAxisLayer::ChartSelect)
         {
         this->Form->UseChartSelect->setChecked(true);
         }
-      else if(behavior == pqChartArea::BestFit)
+      else if(behavior == vtkQtChartAxisLayer::BestFit)
         {
         this->Form->UseBestFit->setChecked(true);
         }
-      else if(behavior == pqChartArea::FixedInterval)
+      else if(behavior == vtkQtChartAxisLayer::FixedInterval)
         {
         this->Form->UseFixedInterval->setChecked(true);
         }
@@ -866,14 +866,14 @@ void pqChartOptionsEditor::setAxisBehavior(pqChartAxis::AxisLocation location,
     }
 }
 
-void pqChartOptionsEditor::getAxisMinimum(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::getAxisMinimum(vtkQtChartAxis::AxisLocation location,
     pqChartValue &minimum) const
 {
   int index = this->Form->getIndexForLocation(location);
   minimum = this->Form->AxisData[index]->Minimum.toDouble();
 }
 
-void pqChartOptionsEditor::setAxisMinimum(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisMinimum(vtkQtChartAxis::AxisLocation location,
     const pqChartValue &minimum)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -893,14 +893,14 @@ void pqChartOptionsEditor::setAxisMinimum(pqChartAxis::AxisLocation location,
     }
 }
 
-void pqChartOptionsEditor::getAxisMaximum(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::getAxisMaximum(vtkQtChartAxis::AxisLocation location,
     pqChartValue &maximum) const
 {
   int index = this->Form->getIndexForLocation(location);
   maximum = this->Form->AxisData[index]->Maximum.toDouble();
 }
 
-void pqChartOptionsEditor::setAxisMaximum(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisMaximum(vtkQtChartAxis::AxisLocation location,
     const pqChartValue &maximum)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -920,14 +920,14 @@ void pqChartOptionsEditor::setAxisMaximum(pqChartAxis::AxisLocation location,
     }
 }
 
-void pqChartOptionsEditor::getAxisLabels(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::getAxisLabels(vtkQtChartAxis::AxisLocation location,
     QStringList &list) const
 {
   int index = this->Form->getIndexForLocation(location);
   list = this->Form->AxisData[index]->Labels.stringList();
 }
 
-void pqChartOptionsEditor::setAxisLabels(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisLabels(vtkQtChartAxis::AxisLocation location,
     const QStringList &list)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -936,13 +936,13 @@ void pqChartOptionsEditor::setAxisLabels(pqChartAxis::AxisLocation location,
 }
 
 const QString &pqChartOptionsEditor::getAxisTitle(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->Title;
 }
 
-void pqChartOptionsEditor::setAxisTitle(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisTitle(vtkQtChartAxis::AxisLocation location,
     const QString &title)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -961,13 +961,13 @@ void pqChartOptionsEditor::setAxisTitle(pqChartAxis::AxisLocation location,
 }
 
 const QFont &pqChartOptionsEditor::getAxisTitleFont(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->TitleFont;
 }
 
-void pqChartOptionsEditor::setAxisTitleFont(pqChartAxis::AxisLocation location,
+void pqChartOptionsEditor::setAxisTitleFont(vtkQtChartAxis::AxisLocation location,
     const QFont &newFont)
 {
   int index = this->Form->getIndexForLocation(location);
@@ -980,14 +980,14 @@ void pqChartOptionsEditor::setAxisTitleFont(pqChartAxis::AxisLocation location,
 }
 
 const QColor &pqChartOptionsEditor::getAxisTitleColor(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->TitleColor;
 }
 
 void pqChartOptionsEditor::setAxisTitleColor(
-    pqChartAxis::AxisLocation location, const QColor &color)
+    vtkQtChartAxis::AxisLocation location, const QColor &color)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->TitleColor != color)
@@ -1005,14 +1005,14 @@ void pqChartOptionsEditor::setAxisTitleColor(
 }
 
 int pqChartOptionsEditor::getAxisTitleAlignment(
-    pqChartAxis::AxisLocation location) const
+    vtkQtChartAxis::AxisLocation location) const
 {
   int index = this->Form->getIndexForLocation(location);
   return this->Form->AxisData[index]->TitleAlignment;
 }
 
 void pqChartOptionsEditor::setAxisTitleAlignment(
-    pqChartAxis::AxisLocation location, int alignment)
+    vtkQtChartAxis::AxisLocation location, int alignment)
 {
   int index = this->Form->getIndexForLocation(location);
   if(this->Form->AxisData[index]->TitleAlignment != alignment)
@@ -1080,12 +1080,12 @@ void pqChartOptionsEditor::setGridColorType(int index)
     if(index == 0)
       {
       emit this->axisGridTypeChanged(this->Form->CurrentAxis,
-          pqChartAxisOptions::Lighter);
+          vtkQtChartAxisOptions::Lighter);
       }
     else
       {
       emit this->axisGridTypeChanged(this->Form->CurrentAxis,
-          pqChartAxisOptions::Specified);
+          vtkQtChartAxisOptions::Specified);
       }
     }
 }
@@ -1209,21 +1209,21 @@ void pqChartOptionsEditor::changeLayoutPage(bool checked)
       this->Form->AxisLayoutPages->setCurrentWidget(this->Form->RangePage);
       axis->AxisLayout = 1;
       emit this->axisBehaviorChanged(this->Form->CurrentAxis,
-          pqChartArea::BestFit);
+          vtkQtChartAxisLayer::BestFit);
       }
     else if(this->Form->UseFixedInterval->isChecked())
       {
       this->Form->AxisLayoutPages->setCurrentWidget(this->Form->ListPage);
       axis->AxisLayout = 2;
       emit this->axisBehaviorChanged(this->Form->CurrentAxis,
-          pqChartArea::FixedInterval);
+          vtkQtChartAxisLayer::FixedInterval);
       }
     else
       {
       this->Form->AxisLayoutPages->setCurrentWidget(this->Form->BlankPage);
       axis->AxisLayout = 0;
       emit this->axisBehaviorChanged(this->Form->CurrentAxis,
-          pqChartArea::ChartSelect);
+          vtkQtChartAxisLayer::ChartSelect);
       }
     }
 }

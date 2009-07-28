@@ -112,66 +112,66 @@ void pqActiveChartOptions::showOptions(pqView *view, const QString &page,
     this->connect(options, SIGNAL(showLegendChanged(bool)),
         this, SLOT(setShowLegendModified()));
     this->connect(options,
-        SIGNAL(legendLocationChanged(pqChartLegend::LegendLocation)),
+        SIGNAL(legendLocationChanged(vtkQtChartLegend::LegendLocation)),
         this, SLOT(setLegendLocationModified()));
-    this->connect(options, SIGNAL(legendFlowChanged(pqChartLegend::ItemFlow)),
+    this->connect(options, SIGNAL(legendFlowChanged(vtkQtChartLegend::ItemFlow)),
         this, SLOT(setLegendFlowModified()));
     this->connect(options,
-        SIGNAL(showAxisChanged(pqChartAxis::AxisLocation, bool)),
+        SIGNAL(showAxisChanged(vtkQtChartAxis::AxisLocation, bool)),
         this, SLOT(setShowAxisModified()));
     this->connect(options,
-        SIGNAL(showAxisGridChanged(pqChartAxis::AxisLocation, bool)),
+        SIGNAL(showAxisGridChanged(vtkQtChartAxis::AxisLocation, bool)),
         this, SLOT(setShowAxisGridModified()));
     this->connect(options,
-        SIGNAL(axisGridTypeChanged(pqChartAxis::AxisLocation, pqChartAxisOptions::AxisGridColor)),
+        SIGNAL(axisGridTypeChanged(vtkQtChartAxis::AxisLocation, vtkQtChartAxisOptions::AxisGridColor)),
         this, SLOT(setAxisGridTypeModified()));
     this->connect(options,
-        SIGNAL(axisColorChanged(pqChartAxis::AxisLocation, const QColor &)),
+        SIGNAL(axisColorChanged(vtkQtChartAxis::AxisLocation, const QColor &)),
         this, SLOT(setAxisColorModified()));
     this->connect(options,
-        SIGNAL(axisGridColorChanged(pqChartAxis::AxisLocation, const QColor &)),
+        SIGNAL(axisGridColorChanged(vtkQtChartAxis::AxisLocation, const QColor &)),
         this, SLOT(setAxisGridColorModified()));
     this->connect(options,
-        SIGNAL(showAxisLabelsChanged(pqChartAxis::AxisLocation, bool)),
+        SIGNAL(showAxisLabelsChanged(vtkQtChartAxis::AxisLocation, bool)),
         this, SLOT(setShowAxisLabelsModified()));
     this->connect(options,
-        SIGNAL(axisLabelFontChanged(pqChartAxis::AxisLocation, const QFont &)),
+        SIGNAL(axisLabelFontChanged(vtkQtChartAxis::AxisLocation, const QFont &)),
         this, SLOT(setAxisLabelFontModified()));
     this->connect(options,
-        SIGNAL(axisLabelColorChanged(pqChartAxis::AxisLocation, const QColor &)),
+        SIGNAL(axisLabelColorChanged(vtkQtChartAxis::AxisLocation, const QColor &)),
         this, SLOT(setAxisLabelColorModified()));
     this->connect(options,
-        SIGNAL(axisLabelNotationChanged(pqChartAxis::AxisLocation, pqChartValue::NotationType)),
+        SIGNAL(axisLabelNotationChanged(vtkQtChartAxis::AxisLocation, pqChartValue::NotationType)),
         this, SLOT(setAxisLabelNotationModified()));
     this->connect(options,
-        SIGNAL(axisLabelPrecisionChanged(pqChartAxis::AxisLocation, int)),
+        SIGNAL(axisLabelPrecisionChanged(vtkQtChartAxis::AxisLocation, int)),
         this, SLOT(setAxisLabelPrecisionModified()));
     this->connect(options,
-        SIGNAL(axisScaleChanged(pqChartAxis::AxisLocation, bool)),
+        SIGNAL(axisScaleChanged(vtkQtChartAxis::AxisLocation, bool)),
         this, SLOT(setAxisScaleModified()));
     this->connect(options,
-        SIGNAL(axisBehaviorChanged(pqChartAxis::AxisLocation, pqChartArea::AxisBehavior)),
+        SIGNAL(axisBehaviorChanged(vtkQtChartAxis::AxisLocation, vtkQtChartAxisLayer::AxisBehavior)),
         this, SLOT(setAxisBehaviorModified()));
     this->connect(options,
-        SIGNAL(axisMinimumChanged(pqChartAxis::AxisLocation, const pqChartValue &)),
+        SIGNAL(axisMinimumChanged(vtkQtChartAxis::AxisLocation, const pqChartValue &)),
         this, SLOT(setAxisMinimumModified()));
     this->connect(options,
-        SIGNAL(axisMaximumChanged(pqChartAxis::AxisLocation, const pqChartValue &)),
+        SIGNAL(axisMaximumChanged(vtkQtChartAxis::AxisLocation, const pqChartValue &)),
         this, SLOT(setAxisMaximumModified()));
     this->connect(options,
-        SIGNAL(axisLabelsChanged(pqChartAxis::AxisLocation, const QStringList &)),
+        SIGNAL(axisLabelsChanged(vtkQtChartAxis::AxisLocation, const QStringList &)),
         this, SLOT(setAxisLabelsModified()));
     this->connect(options,
-        SIGNAL(axisTitleChanged(pqChartAxis::AxisLocation, const QString &)),
+        SIGNAL(axisTitleChanged(vtkQtChartAxis::AxisLocation, const QString &)),
         this, SLOT(setAxisTitleModified()));
     this->connect(options,
-        SIGNAL(axisTitleFontChanged(pqChartAxis::AxisLocation, const QFont &)),
+        SIGNAL(axisTitleFontChanged(vtkQtChartAxis::AxisLocation, const QFont &)),
         this, SLOT(setAxisTitleFontModified()));
     this->connect(options,
-        SIGNAL(axisTitleColorChanged(pqChartAxis::AxisLocation, const QColor &)),
+        SIGNAL(axisTitleColorChanged(vtkQtChartAxis::AxisLocation, const QColor &)),
         this, SLOT(setAxisTitleColorModified()));
     this->connect(options,
-        SIGNAL(axisTitleAlignmentChanged(pqChartAxis::AxisLocation, int)),
+        SIGNAL(axisTitleAlignmentChanged(vtkQtChartAxis::AxisLocation, int)),
         this, SLOT(setAxisTitleAlignmentModified()));
     }
 

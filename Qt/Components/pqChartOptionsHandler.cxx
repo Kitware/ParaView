@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqView.h"
 
-#include "pqChartArea.h"
-#include "pqChartAxis.h"
-#include "pqChartAxisOptions.h"
-#include "pqChartLegend.h"
+#include "vtkQtChartAxisLayer.h"
+#include "vtkQtChartAxis.h"
+#include "vtkQtChartAxisOptions.h"
+#include "vtkQtChartLegend.h"
 #include "vtkSMProxy.h"
 
 #include <QVariant>
@@ -82,12 +82,12 @@ void pqChartOptionsHandler::applyChanges()
     }
 
   int i = 0;
-  pqChartAxis::AxisLocation axes[] =
+  vtkQtChartAxis::AxisLocation axes[] =
     {
-    pqChartAxis::Left,
-    pqChartAxis::Bottom,
-    pqChartAxis::Right,
-    pqChartAxis::Top
+    vtkQtChartAxis::Left,
+    vtkQtChartAxis::Bottom,
+    vtkQtChartAxis::Right,
+    vtkQtChartAxis::Top
     };
 
   const char *labelProperties[] =
@@ -429,12 +429,12 @@ void pqChartOptionsHandler::initializeOptions()
     }
 
   int i, j;
-  pqChartAxis::AxisLocation axes[] =
+  vtkQtChartAxis::AxisLocation axes[] =
     {
-    pqChartAxis::Left,
-    pqChartAxis::Bottom,
-    pqChartAxis::Right,
-    pqChartAxis::Top
+    vtkQtChartAxis::Left,
+    vtkQtChartAxis::Bottom,
+    vtkQtChartAxis::Right,
+    vtkQtChartAxis::Top
     };
 
   const char *labelProperties[] =
@@ -476,10 +476,10 @@ void pqChartOptionsHandler::initializeOptions()
   // Get the legend parameters.
   this->Options->setLegendShowing(pqSMAdaptor::getElementProperty(
       proxy->GetProperty("ShowLegend")).toInt() != 0);
-  this->Options->setLegendLocation((pqChartLegend::LegendLocation)
+  this->Options->setLegendLocation((vtkQtChartLegend::LegendLocation)
       pqSMAdaptor::getElementProperty(proxy->GetProperty(
       "LegendLocation")).toInt());
-  this->Options->setLegendFlow((pqChartLegend::ItemFlow)
+  this->Options->setLegendFlow((vtkQtChartLegend::ItemFlow)
       pqSMAdaptor::getElementProperty(proxy->GetProperty(
       "LegendFlow")).toInt());
 
@@ -503,7 +503,7 @@ void pqChartOptionsHandler::initializeOptions()
   for(i = 0; i < 4 && i < values.size(); i++)
     {
     this->Options->setAxisGridType(axes[i],
-        (pqChartAxisOptions::AxisGridColor)values[i].toInt());
+        (vtkQtChartAxisOptions::AxisGridColor)values[i].toInt());
     }
 
   values = pqSMAdaptor::getMultipleElementProperty(
@@ -578,7 +578,7 @@ void pqChartOptionsHandler::initializeOptions()
   for(i = 0; i < 4 && i < values.size(); i++)
     {
     this->Options->setAxisBehavior(axes[i],
-        (pqChartArea::AxisBehavior)values[i].toInt());
+        (vtkQtChartAxisLayer::AxisBehavior)values[i].toInt());
     }
 
   values = pqSMAdaptor::getMultipleElementProperty(
