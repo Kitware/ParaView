@@ -597,7 +597,7 @@ GaussianControlPointList::RemoveControlPoints(int index)
 int
 GaussianControlPointList::GetNumControlPoints() const
 {
-    return controlPoints.size();
+    return static_cast<int>(controlPoints.size());
 }
 
 // ****************************************************************************
