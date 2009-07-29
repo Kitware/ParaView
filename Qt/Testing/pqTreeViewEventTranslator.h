@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqTreeViewEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
+#include <QPointer>
 
 class QModelIndex;
+class QTreeView;
 
 /// Event recorder for QTreeView. Records the toggling of the check states for
 /// tree widget items. The recorded state can be played back using
@@ -54,7 +56,12 @@ private slots:
   void onItemChanged(const QModelIndex&);
   void onExpanded(const QModelIndex&);
   void onCollapsed(const QModelIndex&);
+  void onCurrentChanged(const QModelIndex&);
 
+private:
+  QString getIndexAsString(const QModelIndex&);
+
+  QPointer<QTreeView> TreeView;
 private:
   pqTreeViewEventTranslator(const pqTreeViewEventTranslator&); // Not implemented.
   void operator=(const pqTreeViewEventTranslator&); // Not implemented.

@@ -69,7 +69,10 @@ bool pqTreeViewEventTranslator::translateEvent(
       this, SLOT(onExpanded(const QModelIndex&)));
     QObject::connect(treeWidget, SIGNAL(collapsed(const QModelIndex&)),
       this, SLOT(onCollapsed(const QModelIndex&)));
-
+    QObject::connect(treeWidget->selectionModel(),
+      SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+      this, SLOT(onCurrentChanged(const QModelIndex&)));
+    this->TreeView = treeWidget;
     }
   return true;
 }
@@ -79,17 +82,7 @@ void pqTreeViewEventTranslator::onItemChanged(
   const QModelIndex& index)
 {
   QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
-
-  QModelIndex curIndex = index;
-  QString str_index;
-  while (curIndex.isValid())
-    {
-    str_index.prepend(QString("%1.%2.").arg(curIndex.row()).arg(curIndex.column()));
-    curIndex = curIndex.parent();
-    }
-
-  // remove the last ".".
-  str_index.chop(1);
+  QString str_index = this->getIndexAsString(index);
   if ( (index.model()->flags(index) & Qt::ItemIsUserCheckable) != 0)
     {
     // record the check state change if the item is user-checkable.
@@ -104,18 +97,9 @@ void pqTreeViewEventTranslator::onExpanded(const QModelIndex& index)
 {
   QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
 
-  QModelIndex curIndex = index;
-  QString str_index;
-  while (curIndex.isValid())
-    {
-    str_index.prepend(QString("%1.%2.").arg(curIndex.row()).arg(curIndex.column()));
-    curIndex = curIndex.parent();
-    }
-
-  // remove the last ".".
-  str_index.chop(1);
   // record the check state change if the item is user-checkable.
-  emit this->recordEvent( treeWidget, "expand", str_index);
+  emit this->recordEvent( treeWidget, "expand",
+    this->getIndexAsString(index));
 }
 
 //-----------------------------------------------------------------------------
@@ -123,6 +107,14 @@ void pqTreeViewEventTranslator::onCollapsed(const QModelIndex& index)
 {
   QTreeView* treeWidget = qobject_cast<QTreeView*>(this->sender()); 
 
+  // record the check state change if the item is user-checkable.
+  emit this->recordEvent( treeWidget, "collapse", 
+    this->getIndexAsString(index));
+}
+
+//-----------------------------------------------------------------------------
+QString pqTreeViewEventTranslator::getIndexAsString(const QModelIndex& index)
+{
   QModelIndex curIndex = index;
   QString str_index;
   while (curIndex.isValid())
@@ -133,7 +125,17 @@ void pqTreeViewEventTranslator::onCollapsed(const QModelIndex& index)
 
   // remove the last ".".
   str_index.chop(1);
-  // record the check state change if the item is user-checkable.
-  emit this->recordEvent( treeWidget, "collapse", str_index);
+  return str_index;
 }
 
+//-----------------------------------------------------------------------------
+void pqTreeViewEventTranslator::onCurrentChanged(const QModelIndex& index)
+{
+  QTreeView* treeWidget = this->TreeView; 
+  if (treeWidget)
+    {
+    // record the check state change if the item is user-checkable.
+    emit this->recordEvent(treeWidget,
+      "setCurrent", this->getIndexAsString(index));
+    }
+}

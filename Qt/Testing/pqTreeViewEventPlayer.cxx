@@ -149,6 +149,18 @@ bool pqTreeViewEventPlayer::playEvent(
     pqEventDispatcher::processEventsAndWait(10);
     return true;
     }
+  else if (command == "setCurrent")
+    {
+    QString str_index = arguments;
+    QModelIndex index = ::pqTreeViewEventPlayerGetIndex(str_index, treeView, error);
+    if (error)
+      {
+      return true;
+      }
+    treeView->setCurrentIndex(index);
+    pqEventDispatcher::processEventsAndWait(10);
+    return true;
+    }
   return false;
 }
 
