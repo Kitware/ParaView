@@ -1,7 +1,7 @@
 <ServerManagerConfiguration>
 
    <!--======================================================================-->
-   <ProxyGroup name="filters">
+   <ProxyGroup name="internal_filters">
 
       <SourceProxy name="CellPointsFilter" class="vtkCellPointsFilter">
 
