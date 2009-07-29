@@ -127,10 +127,14 @@ bool pqTreeViewEventPlayer::playEvent(
       {
       return true;
       }
-    treeView->model()->setData(index,
-      static_cast<Qt::CheckState>(check_state),
-      Qt::CheckStateRole);
-    pqEventDispatcher::processEventsAndWait(10);
+    if (treeView->model()->data(index,
+      Qt::CheckStateRole).toInt() != check_state)
+      {
+      treeView->model()->setData(index,
+        static_cast<Qt::CheckState>(check_state),
+        Qt::CheckStateRole);
+      pqEventDispatcher::processEventsAndWait(10);
+      }
     return true;
     }
   else if (command == "expand" || command == "collapse")
