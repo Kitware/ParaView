@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqSLACActionHolder</class>
+ <widget class="QWidget" name="pqSLACActionHolder">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <action name="actionDataLoadManager">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/DataLoadManager.png</normaloff>:/SLACTools/Icons/DataLoadManager.png</iconset>
+   </property>
+   <property name="text">
+    <string>Data Load Manager</string>
+   </property>
+   <property name="toolTip">
+    <string>Show a Dialog to Manage Loaded Data</string>
+   </property>
+  </action>
+  <action name="actionShowEField">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/EField.png</normaloff>:/SLACTools/Icons/EField.png</iconset>
+   </property>
+   <property name="text">
+    <string>e field</string>
+   </property>
+   <property name="toolTip">
+    <string>Show e field</string>
+   </property>
+  </action>
+  <action name="actionShowBField">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/BField.png</normaloff>:/SLACTools/Icons/BField.png</iconset>
+   </property>
+   <property name="text">
+    <string>b field</string>
+   </property>
+   <property name="toolTip">
+    <string>Show b field</string>
+   </property>
+  </action>
+  <action name="actionShowParticles">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowParticles.png</normaloff>:/SLACTools/Icons/ShowParticles.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Particles</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Show Particles</string>
+   </property>
+  </action>
+  <action name="actionSolidMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowSolid.png</normaloff>:/SLACTools/Icons/ShowSolid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Solid Mesh</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Mesh as Solid Surface</string>
+   </property>
+  </action>
+  <action name="actionWireframeSolidMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowWireframeSolid.png</normaloff>:/SLACTools/Icons/ShowWireframeSolid.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Solid Mesh</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Mesh as Solid with Wireframe</string>
+   </property>
+  </action>
+  <action name="actionWireframeAndBackMesh">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ShowWireframeAndBack.png</normaloff>:/SLACTools/Icons/ShowWireframeAndBack.png</iconset>
+   </property>
+   <property name="text">
+    <string>Wireframe Front and Solid Back</string>
+   </property>
+   <property name="toolTip">
+    <string>Show Wireframe Front and Solid Back</string>
+   </property>
+  </action>
+  <action name="actionPlotOverZ">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/PlotOverZ.png</normaloff>:/SLACTools/Icons/PlotOverZ.png</iconset>
+   </property>
+   <property name="text">
+    <string>Plot Over Z Axis</string>
+   </property>
+   <property name="toolTip">
+    <string>Make a Plot of a Field Along the Z Axis</string>
+   </property>
+  </action>
+  <action name="actionToggleBackgroundBW">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/BackgroundBW.png</normaloff>:/SLACTools/Icons/BackgroundBW.png</iconset>
+   </property>
+   <property name="text">
+    <string>Toggle Background B/W</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle the Background Between Black and White</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="SLACTools.qrc"/>
+ </resources>
+ <connections/>
+</ui>

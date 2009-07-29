@@ -202,13 +202,23 @@
   </Reader>
 
   <Reader name="ExodusIIReader"
-          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii h"
           file_description="ExodusII">
   </Reader>
 
   <Reader name="ExodusRestartReader"
           extensions="ex-timeseries"
           file_description="Metafile for restarted exodus outputs">
+  </Reader>
+
+  <Reader name="SLACReader"
+          extensions="ncdf nc"
+          file_description="SLAC Mesh Files">
+  </Reader>
+
+  <Reader name="SLACParticleReader"
+          extensions="ncdf netcdf"
+          file_description="SLAC Particle Files">
   </Reader>
 
 </ParaViewReaders>

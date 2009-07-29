@@ -1,7 +1,8 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
 
-    <SourceProxy name="SamplePlaneSource" class="vtkSamplePlaneSource">
+    <SourceProxy name="SamplePlaneSource" class="vtkSamplePlaneSource"
+                 label="Sample Plane Source">
       <Documentation long_help="Internal filter for creating planes with even samping."
                      short_help="Plane for sampling other data.">
         Internal for creating planes to use for probing.
