@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include <QTextCharFormat>
+#include <QCompleter>
+
+class pqConsoleWidgetCompleter;
 
 /**
   Qt widget that provides an interactive console - you can send text to the
@@ -45,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
   \sa pqPythonShell, pqOutputWindow
 */
-  
 class QTWIDGETS_EXPORT pqConsoleWidget :
   public QWidget
 {
@@ -59,6 +61,9 @@ public:
   QTextCharFormat getFormat();
   /// Sets formatting that will be used by printString
   void setFormat(const QTextCharFormat& Format);
+
+  /// Set a completer for this console widget
+  void setCompleter(pqConsoleWidgetCompleter* completer);
   
 signals:
   /// Signal emitted whenever the user enters a command
@@ -80,6 +85,12 @@ public slots:
   /// an input prompt since this call ensures that the prompt is shown on a new
   /// line.
   void prompt(const QString& text);
+
+  /// Inserts the given completion string at the cursor.  This will replace
+  /// the current word that the cursor is touching with the given text.
+  /// Determines the word using QTextCursor::StartOfWord, EndOfWord.
+  void insertCompletion(const QString& text);
+
 private:
   pqConsoleWidget(const pqConsoleWidget&);
   pqConsoleWidget& operator=(const pqConsoleWidget&);
@@ -90,6 +101,18 @@ private:
   pqImplementation* const Implementation;
   friend class pqImplementation;
 };
+
+
+class QTWIDGETS_EXPORT pqConsoleWidgetCompleter : public QCompleter
+{
+public:
+
+  /// Update the completion model given a string.  The given string
+  /// is the current console text between the cursor and the start of
+  /// the line.
+  virtual void updateCompletionModel(const QString& str) = 0;
+};
+
 
 #endif // !_pqConsoleWidget_h
 
