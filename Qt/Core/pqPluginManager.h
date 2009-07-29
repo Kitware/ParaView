@@ -128,6 +128,13 @@ private:
   QObjectList Interfaces;
   QMultiMap<pqServer*, QString> Extensions;
   QObjectList ExtraInterfaces;
+
+  /// List of plugin names for which the server manager XML has been loaded to
+  /// avoid duplicate loading of the XMLS.
+  QStringList LoadedServerManagerXMLs;
+
+  /// Temporary function to return the plugin name from the library name.
+  QString getPluginName(const QString& library);
 };
 
 #endif

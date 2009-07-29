@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVEnvironmentInformationHelper.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
-#include "vtkSMXMLParser.h"
 #include "vtkStringArray.h"
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
@@ -108,6 +107,18 @@ QObjectList pqPluginManager::interfaces() const
 }
 
 //-----------------------------------------------------------------------------
+QString pqPluginManager::getPluginName(const QString& library)
+{
+  QFileInfo info(library);
+  QString name = info.baseName(); // remove the path and the extension.
+  if (name.startsWith("lib"))
+    {
+    name = name.mid(3); // remove "lib" from the name.
+    }
+  return name;
+}
+
+//-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* server, const QString& lib,
                                        QString& error)
 {
@@ -131,12 +142,16 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
       if(success == LOADED)
         {
         prop = pxy->GetProperty("ServerManagerXML");
-        QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
-        foreach(QVariant xml, xmls)
+        QString pluginName = this->getPluginName(lib);
+        if (!this->LoadedServerManagerXMLs.contains(pluginName))
           {
-          VTK_CREATE(vtkSMXMLParser, parser);
-          parser->Parse(xml.toString().toAscii().data());
-          parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
+          QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
+          foreach(QVariant xml, xmls)
+            {
+            vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
+              xml.toString().toAscii().data());
+            }
+          this->LoadedServerManagerXMLs.push_back(pluginName);
           }
 
 #ifdef VTK_WRAP_PYTHON
@@ -172,13 +187,17 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* serve
     if(success == LOADED)
       {
       int i;
-      vtkStringArray* xmls = loader->GetServerManagerXML();
-      for(i=0; i<xmls->GetNumberOfValues(); i++)
-        {
-        VTK_CREATE(vtkSMXMLParser, parser);
-        parser->Parse(xmls->GetValue(i).c_str());
-        parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
-        }
+      QString pluginName = this->getPluginName(lib);
+       if (!this->LoadedServerManagerXMLs.contains(pluginName))
+         {
+         vtkStringArray* xmls = loader->GetServerManagerXML();
+         for(i=0; i<xmls->GetNumberOfValues(); i++)
+           {
+           vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
+             xmls->GetValue(i).c_str());
+           }
+         this->LoadedServerManagerXMLs.push_back(pluginName);
+         }
 
 #ifdef VTK_WRAP_PYTHON
       vtkStringArray *names = loader->GetPythonModuleNames();
@@ -234,10 +253,8 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
     if(f.open(QIODevice::ReadOnly))
       {
       QByteArray dat = f.readAll();
-      vtkSMXMLParser* parser = vtkSMXMLParser::New();
-      parser->Parse(dat.data());
-      parser->ProcessConfiguration(vtkSMObject::GetProxyManager());
-      parser->Delete();
+      vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
+        dat.data());
       this->addExtension(NULL, lib);
       success = LOADED;
       emit this->serverManagerExtensionLoaded();

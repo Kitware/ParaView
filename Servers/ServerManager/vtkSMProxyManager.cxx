@@ -35,6 +35,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
+#include "vtkSMXMLParser.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
 
@@ -95,7 +96,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.82");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.83");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -1783,6 +1784,19 @@ vtkSMGlobalPropertiesManager* vtkSMProxyManager::GetGlobalPropertiesManager(
     }
 
   return NULL;
+}
+
+//---------------------------------------------------------------------------
+bool vtkSMProxyManager::LoadConfigurationXML(const char* xml)
+{
+  vtkSmartPointer<vtkSMXMLParser> parser =
+    vtkSmartPointer<vtkSMXMLParser>::New();
+  if (xml && parser->Parse(xml))
+    {
+    parser->ProcessConfiguration(this);
+    return true;
+    }
+  return false;
 }
 
 //---------------------------------------------------------------------------

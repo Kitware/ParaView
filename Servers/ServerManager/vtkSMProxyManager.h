@@ -452,6 +452,10 @@ public:
   vtkSMGlobalPropertiesManager* GetGlobalPropertiesManager(const char* name);
   const char* GetGlobalPropertiesManagerName(vtkSMGlobalPropertiesManager*);
 
+  // Description:
+  // Loads server-manager configuration xml.
+  bool LoadConfigurationXML(const char* xmlcontents);
+
 //BTX
 protected:
   vtkSMProxyManager();
