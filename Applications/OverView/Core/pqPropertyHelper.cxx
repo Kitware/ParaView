@@ -53,19 +53,19 @@ void pqPropertyHelper::Set(unsigned int index, const vtkStdString& value)
 
 void pqPropertyHelper::Set(const QString& value)
 {
-  vtkSMPropertyHelper::Set(0, value.toAscii().data());
+  vtkSMPropertyHelper::Set(0, value.toUtf8().data());
 }
 
 void pqPropertyHelper::Set(unsigned int index, const QString& value)
 {
-  vtkSMPropertyHelper::Set(index, value.toAscii().data());
+  vtkSMPropertyHelper::Set(index, value.toUtf8().data());
 }
 
 void pqPropertyHelper::Set(const QStringList& value)
 {
   this->SetNumberOfElements(value.size());
   for(int i = 0; i != value.size(); ++i)
-    vtkSMPropertyHelper::Set(i, value.at(i).toAscii().data());
+    vtkSMPropertyHelper::Set(i, value.at(i).toUtf8().data());
 }
 
 const QString pqPropertyHelper::GetAsString(unsigned int index)
