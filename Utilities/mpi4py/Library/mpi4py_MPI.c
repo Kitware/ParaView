@@ -71137,7 +71137,7 @@ static void __pyx_init_filenames(void); /*proto*/
 #if PY_MAJOR_VERSION >= 3
 static struct PyModuleDef __pyx_moduledef = {
     PyModuleDef_HEAD_INIT,
-    __Pyx_NAMESTR("MPI"),
+    __Pyx_NAMESTR("MPIPython"),
     0, /* m_doc */
     -1, /* m_size */
     __pyx_methods /* m_methods */,
@@ -71772,11 +71772,11 @@ static int __Pyx_InitGlobals(void) {
 }
 
 #if PY_MAJOR_VERSION < 3
-PyMODINIT_FUNC initMPI(void); /*proto*/
-PyMODINIT_FUNC initMPI(void)
+PyMODINIT_FUNC initMPIPython(void); /*proto*/
+PyMODINIT_FUNC initMPIPython(void)
 #else
-PyMODINIT_FUNC PyInit_MPI(void); /*proto*/
-PyMODINIT_FUNC PyInit_MPI(void)
+PyMODINIT_FUNC PyInit_MPIPython(void); /*proto*/
+PyMODINIT_FUNC PyInit_MPIPython(void)
 #endif
 {
   PyObject *__pyx_1 = 0;
@@ -71816,7 +71816,7 @@ PyMODINIT_FUNC PyInit_MPI(void)
       if (!__Pyx_Refnanny)
           Py_FatalError("failed to import refnanny module");
   }
-  __pyx_refchk = __Pyx_Refnanny->NewContext("PyMODINIT_FUNC PyInit_MPI(void)", __LINE__, __FILE__);
+  __pyx_refchk = __Pyx_Refnanny->NewContext("PyMODINIT_FUNC PyInit_MPIPython(void)", __LINE__, __FILE__);
   #endif
   __pyx_empty_tuple = PyTuple_New(0); if (unlikely(!__pyx_empty_tuple)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   /*--- Library function declarations ---*/
@@ -71825,7 +71825,7 @@ PyMODINIT_FUNC PyInit_MPI(void)
   if (unlikely(__Pyx_InitGlobals() < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   /*--- Module creation code ---*/
   #if PY_MAJOR_VERSION < 3
-  __pyx_m = Py_InitModule4(__Pyx_NAMESTR("MPI"), __pyx_methods, 0, 0, PYTHON_API_VERSION);
+  __pyx_m = Py_InitModule4(__Pyx_NAMESTR("MPIPython"), __pyx_methods, 0, 0, PYTHON_API_VERSION);
   #else
   __pyx_m = PyModule_Create(&__pyx_moduledef);
   #endif
