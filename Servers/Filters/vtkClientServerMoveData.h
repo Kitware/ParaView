@@ -84,6 +84,9 @@ protected:
                                  vtkInformationVector** inputVector, 
                                  vtkInformationVector* outputVector);
 
+  virtual int SendData(vtkDataObject*, vtkSocketController*);
+  virtual vtkDataObject* ReceiveData(vtkSocketController*);
+
 
   vtkProcessModuleConnection* ProcessModuleConnection;
   //BTX

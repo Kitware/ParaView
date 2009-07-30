@@ -36,7 +36,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkClientServerMoveData);
-vtkCxxRevisionMacro(vtkClientServerMoveData, "1.15");
+vtkCxxRevisionMacro(vtkClientServerMoveData, "1.16");
 vtkCxxSetObjectMacro(vtkClientServerMoveData, ProcessModuleConnection, 
   vtkProcessModuleConnection);
 
@@ -145,29 +145,7 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
     if (rc->IsA("vtkClientConnection"))
       {
       vtkDebugMacro("Server Root: Send input data to client.");
-      // This is a server root node.
-      // If it is a selection, use the XML serializer.
-      // Otherwise, use the communicator.
-      if (vtkSelection::SafeDownCast(input) != NULL)
-        {
-        // Convert to XML.
-        vtkSelection* sel = vtkSelection::SafeDownCast(input);
-        vtksys_ios::ostringstream res;
-        vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
-
-        // Send the size of the string.
-        int size = static_cast<int>(res.str().size());
-        controller->Send(&size, 1, 1, 
-                         vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        // Send the XML string.
-        return controller->Send(res.str().c_str(), size, 1, 
-                                vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        }
-      else
-        {
-        return controller->Send(input, 1,
-                                vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        }
+      return this->SendData(input, controller);
       }
     else if (rc->IsA("vtkServerConnection"))
       {
@@ -175,31 +153,8 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
       // This is a client node.
       // If it is a selection, use the XML serializer.
       // Otherwise, use the communicator.
-      vtkDataObject* data = NULL; 
-      if (this->OutputDataType == VTK_SELECTION)
-        {
-        // Get the size of the string.
-        int size = 0;
-        controller->Receive(&size, 1, 1,
-                            vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        char* xml = new char[size+1];
-        // Get the string itself.
-        controller->Receive(xml, size, 1,
-                            vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        xml[size] = 0;
 
-        // Parse the XML.
-        vtkSelection* sel = vtkSelection::New();
-        vtkSelectionSerializer::Parse(xml, sel);
-        delete[] xml;
-        data = sel;
-        }
-      else
-        {
-        data = 
-          controller->ReceiveDataObject(
-            1, vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
-        }
+      vtkDataObject* data = this->ReceiveData(controller);
       if (data)
         {
         if (output->IsA(data->GetClassName()))
@@ -221,6 +176,63 @@ int vtkClientServerMoveData::RequestData(vtkInformation*,
   // act as a pass through filter.
   output->ShallowCopy(input);
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+int vtkClientServerMoveData::SendData(vtkDataObject* input,
+  vtkSocketController* controller)
+{
+  // This is a server root node.
+  // If it is a selection, use the XML serializer.
+  // Otherwise, use the communicator.
+  if (vtkSelection::SafeDownCast(input) != NULL)
+    {
+    // Convert to XML.
+    vtkSelection* sel = vtkSelection::SafeDownCast(input);
+    vtksys_ios::ostringstream res;
+    vtkSelectionSerializer::PrintXML(res, vtkIndent(), 1, sel);
+
+    // Send the size of the string.
+    int size = static_cast<int>(res.str().size());
+    controller->Send(&size, 1, 1, 
+      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    // Send the XML string.
+    return controller->Send(res.str().c_str(), size, 1, 
+      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    }
+
+  return controller->Send(input, 1,
+    vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+}
+
+//-----------------------------------------------------------------------------
+vtkDataObject* vtkClientServerMoveData::ReceiveData(vtkSocketController* controller)
+{
+  vtkDataObject* data = NULL; 
+  if (this->OutputDataType == VTK_SELECTION)
+    {
+    // Get the size of the string.
+    int size = 0;
+    controller->Receive(&size, 1, 1,
+      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    char* xml = new char[size+1];
+    // Get the string itself.
+    controller->Receive(xml, size, 1,
+      vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    xml[size] = 0;
+
+    // Parse the XML.
+    vtkSelection* sel = vtkSelection::New();
+    vtkSelectionSerializer::Parse(xml, sel);
+    delete[] xml;
+    data = sel;
+    }
+  else
+    {
+    data = controller->ReceiveDataObject(
+      1, vtkClientServerMoveData::TRANSMIT_DATA_OBJECT);
+    }
+  return data;
 }
 
 //-----------------------------------------------------------------------------
