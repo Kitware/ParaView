@@ -1233,7 +1233,8 @@ void getClassInfo(FileInfo *data, ClassInfo* classData)
   int i;
   int TotalUniqueFunctions=0;
   int TotalFunctions;
-  FunctionInfo *tempFun =(FunctionInfo*) malloc (sizeof(FunctionInfo)*1000);
+  FunctionInfo *tempFun =(FunctionInfo*) malloc
+    (sizeof(FunctionInfo)*data->NumberOfFunctions);
 
   /* Collect all the information */
   classData->HasDelete = data->HasDelete;
@@ -1506,7 +1507,7 @@ void output_InitFunction(FILE *fp, ClassInfo *data)
 void vtkParseOutput(FILE *fp, FileInfo *data)
 {
   int i;
-  ClassInfo classData;
+  ClassInfo *classData = (ClassInfo*)malloc(sizeof(ClassInfo));
   
   fprintf(fp,"// ************ AUTO GENERATED ****************\n");
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->ClassName);
@@ -1522,11 +1523,11 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
     fprintf(fp,"#include \"vtkParse.h\"\n\n");
 
-    getClassInfo(data,&classData);
-    outputMappableFunctions(fp,&classData);
-    outputMethodMapFunction(fp,&classData);
-    outputMetaInfoExtractFunction(fp,&classData);
-//    output_InitFunction(fp,&classData);
+    getClassInfo(data,classData);
+    outputMappableFunctions(fp,classData);
+    outputMethodMapFunction(fp,classData);
+    outputMetaInfoExtractFunction(fp,classData);
+//    output_InitFunction(fp,classData);
     
 
 #if 0
@@ -1598,7 +1599,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "  if(funPtr f = %sMethodMap()[method])\n"
             "  if(f(msg,op,resultStream))\n"
             "    return 1;\n\n",
-            classData.ClassName
+            classData->ClassName
             );
 
 #else
@@ -1666,6 +1667,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "  return 0;\n"
             "}\n\n");
     
-    output_InitFunction(fp,&classData);
+    output_InitFunction(fp,classData);
+    free(classData);
 }
 
