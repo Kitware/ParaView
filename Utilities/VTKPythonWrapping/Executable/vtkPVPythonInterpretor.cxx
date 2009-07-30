@@ -75,20 +75,16 @@ static void vtkPythonAppInitPrependPythonPath(const char* dir)
 }
 
 //----------------------------------------------------------------------------
-static void vtkPythonAppInitPrependPath(const char* self_dir)
+static bool vtkPythonAppInitPrependPath2(const vtkstd::string& prefix, 
+  const vtkstd::string& path)
 {
-  // Try to put the VTK python module location in sys.path.
-  vtkstd::string pkg_prefix = self_dir;
-#if defined(CMAKE_INTDIR)
-  pkg_prefix += "/..";
-#endif
   vtkstd::string package_dir;
-  package_dir = pkg_prefix + "/../Utilities/VTKPythonWrapping";
+  package_dir = prefix + "/../" + path;
   package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
   if (!vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
     {
     // This is the right path for app bundles on OS X
-    package_dir = pkg_prefix + "/../../../../Utilities/VTKPythonWrapping";
+    package_dir = prefix + "/../../../../" + path;
     package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
     }
   if(vtksys::SystemTools::FileIsDirectory(package_dir.c_str()))
@@ -96,6 +92,23 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // This executable is running from the build tree.  Prepend the
     // library directory and package directory to the search path.
     vtkPythonAppInitPrependPythonPath(package_dir.c_str());
+    return true;
+    }
+  return false;
+}
+//----------------------------------------------------------------------------
+static void vtkPythonAppInitPrependPath(const char* self_dir)
+{
+  // Try to put the VTK python module location in sys.path.
+  vtkstd::string pkg_prefix = self_dir;
+#if defined(CMAKE_INTDIR)
+  pkg_prefix += "/..";
+#endif
+  vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/mpi4py");
+  if (vtkPythonAppInitPrependPath2(pkg_prefix, "Utilities/VTKPythonWrapping"))
+    {
+    // This executable is running from the build tree.  Prepend the
+    // library directory to the search path.
     vtkPythonAppInitPrependPythonPath(VTK_PYTHON_LIBRARY_DIR);
     }
   else
@@ -132,6 +145,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
 #endif
     for(const char** dir = inst_dirs; *dir; ++dir)
       {
+      vtkstd::string package_dir;
       package_dir = prefix;
       package_dir += *dir;
       package_dir = vtksys::SystemTools::CollapseFullPath(package_dir.c_str());
@@ -229,7 +243,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.26");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.27");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
