@@ -38,6 +38,7 @@
 #include <pqPropertyManager.h>
 #include <pqServerManagerModel.h>
 #include <pqSignalAdaptors.h>
+#include <pqSignalAdaptorSelectionTreeWidget.h>
 
 #include <vtkDataSetAttributes.h>
 #include <vtkGraph.h>
@@ -73,8 +74,9 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
   this->Implementation->PropertyManager = new pqPropertyManager(this);
 
   vtkSMProxy* const proxy = vtkSMProxy::SafeDownCast(representation->getProxy());
-/*
+
   this->Implementation->Widgets.setupUi(this);
+/*
 
   int attributeType = QString(vtkSMPropertyHelper(proxy, "AttributeType").GetAsString(3)).toInt();
 
@@ -107,6 +109,30 @@ ClientTableDisplay::ClientTableDisplay(pqRepresentation* representation, QWidget
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()));
   */
+
+  vtkSMClientDeliveryRepresentationProxy* const repProxy = representation?
+    vtkSMClientDeliveryRepresentationProxy::SafeDownCast(proxy) : NULL;
+  repProxy->Update();
+
+  proxy->UpdatePropertyInformation();
+
+  pqSignalAdaptorSelectionTreeWidget* edgeFieldAdaptor = 
+    new pqSignalAdaptorSelectionTreeWidget(this->Implementation->Widgets.columns, proxy->GetProperty("ColumnStatus"));
+  edgeFieldAdaptor->setObjectName("SelectionTreeWidgetAdaptor1");
+
+  this->Implementation->PropertyManager->registerLink(
+    edgeFieldAdaptor, "values", SIGNAL(valuesChanged()),
+    proxy, proxy->GetProperty("ColumnStatus"));
+
+  this->Implementation->Links.addPropertyLink(
+    edgeFieldAdaptor,
+    "values",
+    SIGNAL(valuesChanged()),
+    proxy,
+    proxy->GetProperty("ColumnStatus"));
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(updateAllViews()));
 }
 
 ClientTableDisplay::~ClientTableDisplay()

@@ -125,7 +125,7 @@ ClientTableView::ClientTableView(
   this->Implementation->View->AddObserver(
     vtkCommand::SelectionChangedEvent, this->Command);
 
-  new ClientTableViewDecorator(this);
+  //new ClientTableViewDecorator(this);
 }
 
 ClientTableView::~ClientTableView()
@@ -275,8 +275,15 @@ void ClientTableView::renderInternal()
     this->Implementation->View->SetFieldType(vtkQtTableView::VERTEX_DATA);
     }
 
-  this->Implementation->View->SetShowAll(vtkSMPropertyHelper(proxy, "AllColumns").GetAsInt());
-  this->Implementation->View->SetColumnName(vtkSMPropertyHelper(proxy, "Attribute").GetAsString(4));
+  //this->Implementation->View->SetShowAll(vtkSMPropertyHelper(proxy, "AllColumns").GetAsInt());
+  //this->Implementation->View->SetColumnName(vtkSMPropertyHelper(proxy, "Attribute").GetAsString(4));
+
+  vtkSMPropertyHelper edgeFieldHelper(proxy, "ColumnStatus");
+  for(unsigned int i=0; i<edgeFieldHelper.GetNumberOfElements(); i+=2)
+    {
+    bool status = QVariant(edgeFieldHelper.GetAsString(i+1)).toBool();
+    this->Implementation->View->SetColumnVisibility(edgeFieldHelper.GetAsString(i), status);
+    }
 
   // Only use the source proxy's selection if we're not using vtkAnnotationLink directly
   if(this->Implementation->View->GetRepresentation() && !this->getAnnotationLink())

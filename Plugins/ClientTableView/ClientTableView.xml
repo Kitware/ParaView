@@ -6,32 +6,40 @@
          <Group name="sources"/>
          <Group name="filters"/>
        </ProxyGroupDomain>
-        <InputArrayDomain name="input_array" number_of_components="1">
-         <RequiredProperties>
-           <Property name="AttributeType" function="FieldDataSelection"/>
-         </RequiredProperties>
-        </InputArrayDomain>
+         <InputArrayDomain name="row_arrays" attribute_type="row"/>
       </InputProperty>
 
-      <IntVectorProperty 
-        name="AllColumns" 
-        number_of_elements="1" 
-        default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
+          <StringVectorProperty name="ColumnStatus"
+             repeat_command="1"
+             number_of_elements="2"
+             number_of_elements_per_command="2"
+             element_types="2 0" 
+             information_property="ColumnInfo">
+             <ArraySelectionDomain name="array_list">
+               <RequiredProperties>
+                 <Property name="ColumnInfo" function="ArrayList"/>
+               </RequiredProperties>
+             </ArraySelectionDomain>
+          </StringVectorProperty>
 
-      <StringVectorProperty name="Attribute" number_of_elements="5"  element_types="0 0 0 0 2">
-        <ArrayListDomain name="array_list" attribute_type="Scalars">
-          <RequiredProperties>
-            <Property name="Input" function="Input"/>
-          </RequiredProperties>
-        </ArrayListDomain>
-       <FieldDataDomain name="field_list">
-         <RequiredProperties>
-           <Property name="Input" function="Input"/>
-         </RequiredProperties>
-       </FieldDataDomain>
-     </StringVectorProperty>
+          <StringVectorProperty 
+             name="ColumnInfo"
+             update_self="1"
+             number_of_elements_per_command="1"
+             element_types="2"
+             information_only="1">
+
+             <CheckableArrayListInformationHelper
+               list_domain_name="row_array_list" />
+
+             <ArrayListDomain name="row_array_list" 
+               input_domain_name="row_arrays">
+               <RequiredProperties>
+                  <Property name="Input" function="Input"/>
+               </RequiredProperties>
+             </ArrayListDomain>
+
+          </StringVectorProperty>
 
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
