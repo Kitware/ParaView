@@ -166,7 +166,7 @@ AttributeGroup::~AttributeGroup()
 int
 AttributeGroup::NumAttributes() const
 {
-    return typeMap.size();
+    return static_cast<int>(typeMap.size());
 }
 
 // ****************************************************************************
@@ -353,9 +353,9 @@ AttributeGroup::InterpolateConst(const AttributeGroup *atts1,
                 AttributeGroupVector &out=*(AttributeGroupVector*)addrOut;
                 AttributeGroupVector &a1 =*(AttributeGroupVector*)addr1;
                 AttributeGroupVector &a2 =*(AttributeGroupVector*)addr2;
-                int l0 = out.size();
-                int l1 = a1.size();
-                int l2 = a2.size();
+                int l0 = static_cast<int>(out.size());
+                int l1 = static_cast<int>(a1.size());
+                int l2 = static_cast<int>(a2.size());
                 int lmax = (l1 > l2) ? l1 : l2;
                 out.resize(lmax);
                 if (lmax > l0)
@@ -510,9 +510,9 @@ AttributeGroup::InterpolateLinear(const AttributeGroup *atts1,
                 AttributeGroupVector &out=*(AttributeGroupVector*)addrOut;
                 AttributeGroupVector &a1 =*(AttributeGroupVector*)addr1;
                 AttributeGroupVector &a2 =*(AttributeGroupVector*)addr2;
-                int l0 = out.size();
-                int l1 = a1.size();
-                int l2 = a2.size();
+                int l0 = static_cast<int>(out.size());
+                int l1 = static_cast<int>(a1.size());
+                int l2 = static_cast<int>(a2.size());
                 int lmax = (l1 > l2) ? l1 : l2;
                 out.resize(lmax);
                 if (lmax > l0)
@@ -1642,7 +1642,7 @@ AttributeGroup::VersionLessThan(const char *configVersion, const char *version)
         strncpy(buf, versionStrings[i], 30);
 
         // Indicate whether the version number has a beta in it.
-        int len = strlen(buf);
+        int len = static_cast<int>(strlen(buf));
         if(len > 0)
             betas[i] = (buf[len-1] == 'b') ? 0 : 1;
         else
@@ -2228,7 +2228,7 @@ AttributeGroup::CreateTypeMap(const char *formatString)
         return;
 
     // If the formatString was empty, get out of here.
-    int nDeclares = strlen(formatString);
+    int nDeclares = static_cast<int>(strlen(formatString));
     if(nDeclares < 1)
         return;
 

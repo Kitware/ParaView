@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 project(PointSpritePlugin)
 
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
+#CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 # -----------------------------------------------------------------------------
 # Set cmake policy CMP0003 to NEW. This means cmake will not break up linked
@@ -26,7 +26,6 @@ add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
 # Find and Use ParaView
 #--------------------------------------------------
 IF (ParaView_SOURCE_DIR)
-  INCLUDE(${QT_USE_FILE}) 
   INCLUDE_DIRECTORIES(
     ${PARAVIEW_INCLUDE_DIRS}
     ${PARAVIEW_GUI_INCLUDE_DIRS}
@@ -61,7 +60,7 @@ set(PointSpritePlugin_BUILD_EXAMPLES ON CACHE BOOL "Build the example.")
 if(PointSpritePlugin_BUILD_EXAMPLES)
     add_subdirectory(Examples)
 endif(PointSpritePlugin_BUILD_EXAMPLES)
-
+mark_as_advanced(PointSpritePlugin_BUILD_EXAMPLES)
 # -----------------------------------------------------------------------------
 # Build the Paraview plugins
 # -----------------------------------------------------------------------------

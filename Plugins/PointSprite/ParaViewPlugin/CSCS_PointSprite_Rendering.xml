@@ -19,14 +19,14 @@
 
       <SubProxy>
         <Proxy name="GeometryFilter"
-               proxygroup="filters"
+               proxygroup="internal_filters"
                proxyname="CellPointsFilter"
                override="1"/>
       </SubProxy>
 
       <SubProxy>
         <Proxy name="ArrayToRadiusFilter"
-               proxygroup="filters"
+               proxygroup="internal_filters"
                proxyname="TransferFunctionFilter"/>
         <ExposedProperties>
           <Property name="Enabled" exposed_name="RadiusTransferFunctionEnabled"/>
@@ -36,14 +36,14 @@
 
       <SubProxy>
         <Proxy name="LODArrayToRadiusFilter"
-               proxygroup="filters"
+               proxygroup="internal_filters"
                proxyname="TransferFunctionFilter"/>
         <ShareProperties subproxy="ArrayToRadiusFilter" />
       </SubProxy>
 
       <SubProxy>
         <Proxy name="ArrayToOpacityFilter"
-               proxygroup="filters"
+               proxygroup="internal_filters"
                proxyname="TransferFunctionFilter"/>
         <ExposedProperties>
           <Property name="Enabled" exposed_name="OpacityTransferFunctionEnabled"/>
@@ -53,7 +53,7 @@
 
       <SubProxy>
         <Proxy name="LODArrayToOpacityFilter"
-               proxygroup="filters"
+               proxygroup="internal_filters"
                proxyname="TransferFunctionFilter"/>
         <ShareProperties subproxy="ArrayToOpacityFilter" />
       </SubProxy>
@@ -351,12 +351,6 @@
   </ProxyGroup>
 
    <!--======================================================================-->
-   <ProxyGroup name="filters">
-
-
-
-  <!-- End of "filters" -->
-   </ProxyGroup>
 
    <ProxyGroup name="sources">
      <SourceProxy name="ImageSpriteSource" class="vtkImageSpriteSource"

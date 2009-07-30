@@ -232,7 +232,7 @@ vec4 ComputeColor(vec4 color, vec3 n, vec3 P)
 // MAIN
 void propFuncFS(void)
 {
-	if (pointSize < pointSizeThreshold)
+	if (pointSize < pointSizeThreshold || color.a <= 0.0)
 		discard;
 	vec3 fc = gl_FragCoord.xyz;
 	fc.xy /= viewport;

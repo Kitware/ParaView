@@ -47,12 +47,13 @@
 #include "vtkType.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMProxyIterator.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 
-#include "pqSMAdaptor.h"
-#include <QList>
+using vtkstd::string;
 
 vtkStandardNewMacro(vtkSMPointSpriteRepresentationProxy)
-vtkCxxRevisionMacro(vtkSMPointSpriteRepresentationProxy, "1.1.2.3")
+vtkCxxRevisionMacro(vtkSMPointSpriteRepresentationProxy, "1.1.2.4")
 //----------------------------------------------------------------------------
 vtkSMPointSpriteRepresentationProxy::vtkSMPointSpriteRepresentationProxy()
 {
@@ -302,34 +303,30 @@ bool vtkSMPointSpriteRepresentationProxy::InitializeStrategy(vtkSMViewProxy* vie
 void vtkSMPointSpriteRepresentationProxy::InitializeDefaultValues()
 {
   // Initialize the default radius if needed.
-  bool radiusInitialized = pqSMAdaptor::getElementProperty(this->GetProperty(
-      "RadiusInitialized")).toBool();
+  bool radiusInitialized = vtkSMIntVectorProperty::SafeDownCast(this->GetProperty(
+      "RadiusInitialized"))->GetElement(0) != 0;
 
   if (!radiusInitialized)
     {
     double radius = this->ComputeInitialRadius(
         this->GetRepresentedDataInformation());
-    pqSMAdaptor::setElementProperty(this->GetProperty("ConstantRadius"), radius);
-    QList<QVariant> radiusRange;
-    radiusRange.append(QVariant(0.0));
-    radiusRange.append(QVariant(radius));
-    pqSMAdaptor::setMultipleElementProperty(this->GetProperty("RadiusRange"),
-        radiusRange);
-    pqSMAdaptor::setElementProperty(this->GetProperty("RadiusInitialized"), 1);
-
+    vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty(
+          "ConstantRadius"))->SetElements1(radius);
+    vtkSMDoubleVectorProperty::SafeDownCast(this->GetProperty(
+          "RadiusRange"))->SetElements2(0.0, radius);
+    vtkSMIntVectorProperty::SafeDownCast(this->GetProperty(
+          "RadiusInitialized"))->SetElements1(1);
     }
 
   // Initialize the Transfer functions if needed
-  QList<QVariant> opacityTableValues = pqSMAdaptor::getMultipleElementProperty(
-      this->GetProperty("OpacityTableValues"));
-  if (opacityTableValues.size() == 0)
+  int nop = vtkSMVectorProperty::SafeDownCast(this->GetProperty("OpacityTableValues"))->GetNumberOfElements();
+  if (nop == 0)
     {
     InitializeTableValues(this->GetProperty("OpacityTableValues"));
     }
 
-  QList<QVariant> radiusTableValues = pqSMAdaptor::getMultipleElementProperty(
-      this->GetProperty("RadiusTableValues"));
-  if (opacityTableValues.size() == 0)
+  int nrad = vtkSMVectorProperty::SafeDownCast(this->GetProperty("RadiusTableValues"))->GetNumberOfElements();
+  if (nrad == 0)
     {
     InitializeTableValues(this->GetProperty("RadiusTableValues"));
     }
@@ -349,7 +346,7 @@ double vtkSMPointSpriteRepresentationProxy::ComputeInitialRadius(vtkPVDataInform
       + (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) + (bounds[5]
       - bounds[4]) * (bounds[5] - bounds[4])) / 3.0);
 
-  double nn = pow(static_cast<double>(npts), 1.0 / 3.0) - 1.0;
+  double nn = pow(npts, 1.0 / 3.0) - 1.0;
   if (nn < 1.0)
     nn = 1.0;
 
@@ -358,22 +355,28 @@ double vtkSMPointSpriteRepresentationProxy::ComputeInitialRadius(vtkPVDataInform
 
 void vtkSMPointSpriteRepresentationProxy::InitializeTableValues(vtkSMProperty* prop)
 {
-  QList<QVariant> values;
+  vtkSMDoubleVectorProperty* tableprop = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+  tableprop->SetNumberOfElements(256);
+  double values[256];
   for (int i = 0; i < 256; i++)
     {
-    values.append(QVariant(((double) i) / 256.0));
+    values[i] = ((double) i) / 255.0;
     }
-  pqSMAdaptor::setMultipleElementProperty(prop, values);
+  tableprop->SetElements(values);
 }
 
 void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures()
 {
   vtkSMProxyIterator* proxyIter;
-  QString texName;
+  string texName;
   bool created;
-  QMap<QString, int> countMap;
-  QList<QVariant> extent;
   vtkSMProxy* texture;
+  int extent[6] = {0, 65, 0, 65, 0, 0};
+  vtkSMIntVectorProperty* extentprop;
+  vtkSMIntVectorProperty* maxprop;
+  vtkSMDoubleVectorProperty* devprop;
+  vtkSMIntVectorProperty* alphamethodprop;
+  vtkSMIntVectorProperty* alphathresholdprop;
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
@@ -383,7 +386,7 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures()
   proxyIter->SetModeToOneGroup();
   for (proxyIter->Begin("textures"); !proxyIter->IsAtEnd(); proxyIter->Next())
     {
-    QString name = proxyIter->GetKey();
+    string name = proxyIter->GetKey();
     if (name == texName)
       {
       created = true;
@@ -399,30 +402,28 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures()
     texture->SetConnectionID(this->GetConnectionID());
     texture->SetServers(vtkProcessModule::CLIENT
         | vtkProcessModule::RENDER_SERVER);
-    pxm->RegisterProxy("textures", texName.toAscii().data(), texture);
+    pxm->RegisterProxy("textures", texName.c_str(), texture);
     texture->Delete();
 
     // set the texture parameters
-    extent.clear();
-    extent.append(0.0);
-    extent.append(65.0);
-    extent.append(0.0);
-    extent.append(65.0);
-    extent.append(0.0);
-    extent.append(0.0);
-    pqSMAdaptor::setMultipleElementProperty(texture->GetProperty("WholeExtent"), extent);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("Maximum"), 255);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("StandardDeviation"), 0.3);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("AlphaMethod"), 2);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("AlphaThreshold"), 63);
+    extentprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("WholeExtent"));
+    extentprop->SetNumberOfElements(6);
+    extentprop->SetElements(extent);
+    maxprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("Maximum"));
+    maxprop->SetElements1(255);
+    devprop = vtkSMDoubleVectorProperty::SafeDownCast(texture->GetProperty("StandardDeviation"));
+    devprop->SetElements1(0.3);
+    alphamethodprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaMethod"));
+    alphamethodprop->SetElements1(2);
+    alphathresholdprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaThreshold"));
+    alphathresholdprop->SetElements1(63);
     texture->UpdateVTKObjects();
 
-    vtkSMProperty* textureProperty = this->GetProperty("Texture");
-
-    if(pqSMAdaptor::getProxyProperty(textureProperty) == NULL)
+    vtkSMProxyProperty* textureProperty = vtkSMProxyProperty::SafeDownCast(this->GetProperty("Texture"));
+    if(textureProperty->GetNumberOfProxies() == 0)
       {
       // set this texture as default texture
-      pqSMAdaptor::setProxyProperty(textureProperty, texture);
+      textureProperty->SetProxy(0, texture);
       this->UpdateVTKObjects();
       }
     }
@@ -433,7 +434,7 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures()
   proxyIter->SetModeToOneGroup();
   for (proxyIter->Begin("textures"); !proxyIter->IsAtEnd(); proxyIter->Next())
     {
-    QString name = proxyIter->GetKey();
+    string name = proxyIter->GetKey();
     if (name == texName)
       {
       created = true;
@@ -444,24 +445,22 @@ void vtkSMPointSpriteRepresentationProxy::InitializeSpriteTextures()
   if (!created)
     {
     // create the texture proxy
-    // create the texture proxy
     texture = pxm->NewProxy("textures", "SpriteTexture");
     texture->SetConnectionID(this->GetConnectionID());
     texture->SetServers(vtkProcessModule::CLIENT
         | vtkProcessModule::RENDER_SERVER);
-    pxm->RegisterProxy("textures", texName.toAscii().data(), texture);
+    pxm->RegisterProxy("textures", texName.c_str(), texture);
 
-    extent.clear();
-    extent.append(0.0);
-    extent.append(65.0);
-    extent.append(0.0);
-    extent.append(65.0);
-    extent.append(0.0);
-    extent.append(0.0);
-    pqSMAdaptor::setMultipleElementProperty(texture->GetProperty("WholeExtent"), extent);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("Maximum"), 255);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("StandardDeviation"), 0.2);
-    pqSMAdaptor::setElementProperty(texture->GetProperty("AlphaMethod"), 1);
+    // set the texture parameters
+    extentprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("WholeExtent"));
+    extentprop->SetNumberOfElements(6);
+    extentprop->SetElements(extent);
+    maxprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("Maximum"));
+    maxprop->SetElements1(255);
+    devprop = vtkSMDoubleVectorProperty::SafeDownCast(texture->GetProperty("StandardDeviation"));
+    devprop->SetElements1(0.2);
+    alphamethodprop = vtkSMIntVectorProperty::SafeDownCast(texture->GetProperty("AlphaMethod"));
+    alphamethodprop->SetElements1(1);
 
     texture->UpdateVTKObjects();
 

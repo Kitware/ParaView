@@ -54,4 +54,3 @@ vtk_export_kit2(
   ${CMAKE_CURRENT_BINARY_DIR} 
   "${KIT_SRCS}"
 )
-

@@ -7,6 +7,7 @@ set(KIT_SRCS
   vtkTwoScalarsToColorsPainter.cxx
   vtkPointSpriteProperty.cxx
   vtkImageSpriteSource.cxx
+  vtkPointSpriteCoincidentTopologyResolutionPainter.cxx
   )
 
 set(KIT_EXTRA_SRCS
@@ -97,4 +98,3 @@ vtk_export_kit2(
   ${CMAKE_CURRENT_BINARY_DIR} 
   "${KIT_SRCS}"
 )
-

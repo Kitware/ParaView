@@ -597,7 +597,7 @@ GaussianControlPointList::RemoveControlPoints(int index)
 int
 GaussianControlPointList::GetNumControlPoints() const
 {
-    return controlPoints.size();
+    return static_cast<int>(controlPoints.size());
 }
 
 // ****************************************************************************
@@ -733,8 +733,8 @@ GaussianControlPointList::GetFieldType(int index) const
 {
     switch (index)
     {
-        case 0:  return FieldType_attVector;
-        default:  return FieldType_unknown;
+        case 0:  return AttributeGroup::FieldType_attVector;
+        default:  return AttributeGroup::FieldType_unknown;
     }
 }
 
