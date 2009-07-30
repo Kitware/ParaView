@@ -243,7 +243,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonInterpretor);
-vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.27");
+vtkCxxRevisionMacro(vtkPVPythonInterpretor, "1.28");
 
 //-----------------------------------------------------------------------------
 vtkPVPythonInterpretor::vtkPVPythonInterpretor()
@@ -356,6 +356,13 @@ void vtkPVPythonInterpretor::InitializeInternal()
 
   if (this->CaptureStreams)
     {
+    // HACK: Calling PyRun_SimpleString for the first time for some reason results in
+    // a "\n" message being generated which is causing the error dialog to
+    // popup. So we flush that message out of the system before setting up the
+    // callbacks.
+    // The cast is necessary because PyRun_SimpleString() hasn't always been
+    // const-correct.
+    PyRun_SimpleString(const_cast<char*>(""));
     vtkPVPythonInterpretorWrapper* wrapperOut = vtkWrapInterpretor(this);
     wrapperOut->DumpToError = false;
 
