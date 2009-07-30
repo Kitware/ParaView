@@ -157,12 +157,18 @@ void AnnotationManagerPanel::setAnnotationLink(vtkSMSourceProxy* link)
     {
     vtkSMSourceProxy* tempSGMacroVar = this->Implementation->AnnotationLink;
     this->Implementation->AnnotationLink = link;
-    if (this->Implementation->AnnotationLink != NULL) { this->Implementation->AnnotationLink->Register(0); }
+    if (this->Implementation->AnnotationLink != NULL) 
+      { 
+      this->Implementation->AnnotationLink->Register(0); 
+      vtkAnnotationLink* clientLink = static_cast<vtkAnnotationLink*>(link->GetClientSideObject());
+      this->Implementation->Model->setAnnotationLink(clientLink);
+      }
     if (tempSGMacroVar != NULL)
       {
       tempSGMacroVar->UnRegister(0);
       }
     this->Implementation->AnnotationLink->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+    this->Implementation->AnnotationLink->AddObserver(vtkCommand::UpdateDataEvent, this->Command);
     this->annotationsChanged();
     }
 }
@@ -176,14 +182,17 @@ vtkSMSourceProxy* AnnotationManagerPanel::getAnnotationLink()
 void AnnotationManagerPanel::modelChanged()
 {
   vtkSMSourceProxy* link = this->getAnnotationLink();
-  if (link)
+  if (!link)
     {
-    link->RemoveObserver(this->Command);
-
-    link->MarkModified(0);
-
-    link->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+    return;
     }
+
+  link->RemoveObserver(this->Command);
+
+  link->MarkModified(0);
+
+  link->AddObserver(vtkCommand::ModifiedEvent, this->Command);
+  link->AddObserver(vtkCommand::UpdateDataEvent, this->Command);
 }
 
 void AnnotationManagerPanel::annotationsChanged()
@@ -194,7 +203,8 @@ void AnnotationManagerPanel::annotationsChanged()
     SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),
     this, SLOT(modelChanged()));
 
-  this->Implementation->Model->setAnnotationLayers(link->GetAnnotationLayers());
+  //this->Implementation->Model->setAnnotationLayers(link->GetAnnotationLayers());
+  this->Implementation->Model->setAnnotationLink(link);
 
   QObject::connect(this->Implementation->Model,
     SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)),

@@ -31,9 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqAnnotationLayersModel.h"
 
+#include "vtkAbstractArray.h"
 #include "vtkAnnotation.h"
 #include "vtkAnnotationLayers.h"
+#include "vtkAnnotationLink.h"
 #include "vtkInformation.h"
+#include "vtkSelection.h"
+#include "vtkSelectionNode.h"
+#include "vtkSmartPointer.h"
 
 #include <QPixmap>
 
@@ -56,11 +61,11 @@ pqAnnotationLayersModel::pqAnnotationLayersModel(QObject* parentObject)
 //-----------------------------------------------------------------------------
 pqAnnotationLayersModel::~pqAnnotationLayersModel()
 {
-  this->setAnnotationLayers(0);
+  this->setAnnotationLink(0);
 }
 
 //----------------------------------------------------------------------------
-void pqAnnotationLayersModel::setAnnotationLayers(vtkAnnotationLayers* t) 
+void pqAnnotationLayersModel::setAnnotationLink(vtkAnnotationLink* t) 
 {
   if (this->Annotations != NULL)
     {
@@ -80,7 +85,7 @@ void pqAnnotationLayersModel::setAnnotationLayers(vtkAnnotationLayers* t)
 }
 
 //-----------------------------------------------------------------------------
-vtkAnnotationLayers* pqAnnotationLayersModel::getAnnotationLayers() const
+vtkAnnotationLink* pqAnnotationLayersModel::getAnnotationLink() const
 {
   return this->Annotations;
 }
@@ -88,9 +93,14 @@ vtkAnnotationLayers* pqAnnotationLayersModel::getAnnotationLayers() const
 //-----------------------------------------------------------------------------
 int pqAnnotationLayersModel::rowCount(const QModelIndex &parentIndex) const
 {
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return 0;
+    }
+
   if (!parentIndex.isValid() && this->Annotations)
     {
-    return this->Annotations->GetNumberOfAnnotations();
+    return vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetNumberOfAnnotations();
     }
   return 0;
 }
@@ -98,7 +108,7 @@ int pqAnnotationLayersModel::rowCount(const QModelIndex &parentIndex) const
 //-----------------------------------------------------------------------------
 int pqAnnotationLayersModel::columnCount(const QModelIndex &) const
 {
-  return 2;
+  return 3;
 }
 
 //-----------------------------------------------------------------------------
@@ -111,7 +121,7 @@ bool pqAnnotationLayersModel::hasChildren(const QModelIndex &parentIndex) const
 QModelIndex pqAnnotationLayersModel::index(int row, int column,
   const QModelIndex &parentIndex) const
 {
-  if(!parentIndex.isValid() && column >= 0 && column < 2 &&
+  if(!parentIndex.isValid() && column >= 0 && column < 3 &&
     row >= 0 && row < this->rowCount(parentIndex))
     {
     return this->createIndex(row, column);
@@ -139,12 +149,11 @@ QVariant pqAnnotationLayersModel::data(const QModelIndex &idx, int role) const
         QString arrayName = this->getAnnotationName(idx.row());
         return QVariant(arrayName);
         }
-      //else if (idx.column() == 1)
-      //  {
-        // FIXME
-      //  QString legendName = this->getAnnotationName(idx.row());
-      //  return QVariant(legendName);
-      //  }
+      else if (idx.column() == 2)
+        {
+        int numItems = this->getAnnotationSize(idx.row());
+        return QVariant(numItems);
+        }
       }
     else if (role == Qt::CheckStateRole)
       {
@@ -236,6 +245,10 @@ QVariant pqAnnotationLayersModel::headerData(int section,
       {
       return QVariant(QString("Color"));
       }
+    else if(section == 2)
+      {
+      return QVariant(QString("# Items"));
+      }
     }
   else
     {
@@ -255,39 +268,85 @@ void pqAnnotationLayersModel::reload()
 //-----------------------------------------------------------------------------
 const char* pqAnnotationLayersModel::getAnnotationName(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return 0;
+    }
+
+  vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
   return a->GetInformation()->Get(vtkAnnotation::LABEL());
+}
+
+//-----------------------------------------------------------------------------
+int pqAnnotationLayersModel::getAnnotationSize(int row) const
+{
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return 0;
+    }
+
+  vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
+  int count = 0;
+  for(int i=0; i<a->GetSelection()->GetNumberOfNodes(); ++i)
+    {
+    count += a->GetSelection()->GetNode(i)->GetSelectionList()->GetNumberOfTuples();
+    }
+  return count;
 }
 
 //-----------------------------------------------------------------------------
 void pqAnnotationLayersModel::setAnnotationEnabled(int row, bool enabled)
 {
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return;
+    }
+
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
-    vtkAnnotation* a = this->Annotations->GetAnnotation(row);
-    a->GetInformation()->Set(vtkAnnotation::ENABLE(), enabled);
+    vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
+    bool e = a->GetInformation()->Get(vtkAnnotation::ENABLE());
+    if(e != enabled)
+      {
+      a->GetInformation()->Set(vtkAnnotation::ENABLE(), enabled);
+      //HACK
+      vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New();
+      s->DeepCopy(a->GetSelection());
+      a->SetSelection(0);
+      a->SetSelection(s);
 
-    QModelIndex idx = this->createIndex(row, 0);
-    emit this->dataChanged(idx, idx);
-    this->updateCheckState(0, Qt::Horizontal);
+      QModelIndex idx = this->createIndex(row, 0);
+      emit this->dataChanged(idx, idx);
+      this->updateCheckState(0, Qt::Horizontal);
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
 bool pqAnnotationLayersModel::getAnnotationEnabled(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return false;
+    }
+
+  vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
   return a->GetInformation()->Get(vtkAnnotation::ENABLE());
 }
 
 //-----------------------------------------------------------------------------
 void pqAnnotationLayersModel::setAnnotationColor(int row, const QColor &color)
 {
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return;
+    }
+
   if (row >= 0 && row < this->rowCount(QModelIndex()))
     {
     double double_color[3];
     color.getRgbF(double_color, double_color+1, double_color+2);
-    vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+    vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
     a->GetInformation()->Set(vtkAnnotation::COLOR(),double_color,3);
 
     QModelIndex idx = this->createIndex(row, 1);
@@ -298,7 +357,12 @@ void pqAnnotationLayersModel::setAnnotationColor(int row, const QColor &color)
 //-----------------------------------------------------------------------------
 QColor pqAnnotationLayersModel::getAnnotationColor(int row) const
 {
-  vtkAnnotation* a = this->Annotations->GetAnnotation(row);
+  if(!this->Annotations || !this->Annotations->GetOutput())
+    {
+    return QColor();
+    }
+
+  vtkAnnotation* a = vtkAnnotationLayers::SafeDownCast(this->Annotations->GetOutput())->GetAnnotation(row);
   if(!a->GetInformation()->Has(vtkAnnotation::COLOR()))
     {
     return QColor(211,211,211);
