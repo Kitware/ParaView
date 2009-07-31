@@ -887,4 +887,5 @@ void pqObjectBuilder::initializeInheritedProperties(pqDataRepresentation* repr)
         }
       }
     }
+  reprProxy->UpdateVTKObjects();
 }
