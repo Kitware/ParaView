@@ -97,6 +97,18 @@ IF (VTK_USE_MPI)
   SET_SOURCE_FILES_PROPERTIES(
     vtkPVMPICommunicator.cxx
     WRAP_EXCLUDE)
+  IF (MPI_LIBRARIES)
+    SET(KIT_LIBS ${KIT_LIBS} "${MPI_LIBRARIES}")
+  ELSE (MPI_LIBRARIES)
+    IF (MPI_LIBRARY) 
+      SET(KIT_LIBS ${KIT_LIBS} "${MPI_LIBRARY}")   
+    ELSE (MPI_LIBRARY)   
+      MESSAGE("Could not find the required MPI libraries")
+    ENDIF (MPI_LIBRARY)   
+    IF (MPI_EXTRA_LIBRARY)   
+      SET(KIT_LIBS ${KIT_LIBS} "${MPI_EXTRA_LIBRARY}")   
+    ENDIF (MPI_EXTRA_LIBRARY) 
+  ENDIF (MPI_LIBRARIES)
 ENDIF (VTK_USE_MPI)
 
 # Abstract and Wrap exclude
@@ -181,6 +193,7 @@ ADD_LIBRARY(vtk${KIT}
 TARGET_LINK_LIBRARIES(vtk${KIT}
   vtkHybridCS vtkParallelCS vtkInfovisCS KWCommon vtksys
   ${PARAVIEW_HDF5_LIBRARIES}
+  ${KIT_LIBS}
   vtkClientServer
   vtkPVCommandOptions)
 
