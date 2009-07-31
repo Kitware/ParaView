@@ -8225,12 +8225,6 @@ This property controls how the filter works to generate tensor cell data. You ca
           </Domain>
           <Domain name="proxy_list" id="2429.Source.proxy_list">
             <Proxy value="2432"/>
-            <Proxy value="2433"/>
-            <Proxy value="2434"/>
-            <Proxy value="2435"/>
-            <Proxy value="2436"/>
-            <Proxy value="2437"/>
-            <Proxy value="2438"/>
           </Domain>
         </Property>
         <Property name="UseMaskPoints" id="2429.UseMaskPoints" number_of_elements="1">
@@ -8238,7 +8232,7 @@ This property controls how the filter works to generate tensor cell data. You ca
           <Domain name="bool" id="2429.UseMaskPoints.bool"/>
         </Property>
       </Proxy>
-      <Proxy group="sources" type="ArrowSource" id="2432" servers="1" compound_name="auto_2432">
+      <Proxy group="sources" type="ArrowSource" id="2432" servers="1" compound_name="ArrowSource">
         <Property name="ShaftRadius" id="2432.ShaftRadius" number_of_elements="1">
           <Element index="0" value="0.03"/>
           <Domain name="range" id="2432.ShaftRadius.range">
@@ -8280,6 +8274,7 @@ This property controls how the filter works to generate tensor cell data. You ca
         <Property name="RandomMode" proxy_name="Glyph1" exposed_name="Glyph Random Mode"/>
         <Property name="SetScaleFactor" proxy_name="Glyph1" exposed_name="Glyph Scale Factor"/>
         <Property name="Input" proxy_name="ExtractSurface2" exposed_name="Input"/>
+        <Property name="Invert" proxy_name="ArrowSource" exposed_name="InvertArrow"/>
       </ExposedProperties>
       <OutputPort name="Output" proxy="Glyph1" port_index="0"/>
       <Hints>

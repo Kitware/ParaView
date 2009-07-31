@@ -137,6 +137,18 @@ The Arrow source appends a cylinder to a cone to form a 3D arrow. The length of 
           This property specifies the radius of the shaft of the arrow (the cylinder).
         </Documentation>
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="Invert"
+         command="SetInvert"
+         number_of_elements="1"
+         default_values="0">
+         <BooleanDomain name="bool" />
+         <Documentation>
+           Inverts the arrow direction.
+         </Documentation>
+       </IntVectorProperty>
+       
    <!-- End Arrow -->
    </SourceProxy>
 
