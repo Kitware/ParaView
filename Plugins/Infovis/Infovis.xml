@@ -1254,7 +1254,8 @@
         command="AddFieldType"
         clean_command="ClearFieldTypes"
         number_of_elements="1"
-        repeat_command="1">
+        repeat_command="1"
+        default_values="none">
       </IntVectorProperty>
       <IntVectorProperty
         name="UseFieldTypes"
