@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationScene.h"
 #include "pqApplicationCore.h"
+#include "pqChartRepresentation.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqPluginManager.h"
 #include "pqRenderView.h"
@@ -151,6 +152,19 @@ pqApplicationOptions::pqApplicationOptions(QWidget *widgetParent)
                    this->Internal->AnimationCacheLimitLabel,
                    SLOT(setEnabled(bool)));
 
+  QObject::connect(this->Internal->ChartHiddenSeries,
+                   SIGNAL(itemChanged(QListWidgetItem*)),
+                   this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->ChartNewHiddenSeries, SIGNAL(clicked(bool)),
+                   this, SLOT(onChartNewHiddenSeries()));
+  QObject::connect(this->Internal->ChartDeleteHiddenSeries,
+                   SIGNAL(clicked(bool)),
+                   this, SLOT(onChartDeleteHiddenSeries()));
+  QObject::connect(this->Internal->ChartResetHiddenSeries,
+                   SIGNAL(clicked(bool)),
+                   this, SLOT(onChartResetHiddenSeries()));
+
   QMenu* paletteMenu = new QMenu(this->Internal->Palette)
     << pqSetName("paletteMenu");
   this->Internal->Palette->setMenu(paletteMenu);
@@ -241,6 +255,13 @@ void pqApplicationOptions::applyChanges()
   pqAnimationScene::setCacheLimitSetting(
                                   this->Internal->AnimationCacheLimit->value());
 
+  QStringList hidden;
+  for (int i = 0; i < this->Internal->ChartHiddenSeries->count(); i++)
+    {
+    hidden << this->Internal->ChartHiddenSeries->item(i)->text();
+    }
+  pqChartRepresentation::setHiddenSeriesSetting(hidden);
+
   pqApplicationCore::instance()->loadGlobalPropertiesFromSettings();
 
   // render all views.
@@ -290,6 +311,17 @@ void pqApplicationOptions::resetChanges()
                                    pqAnimationScene::getCacheGeometrySetting());
   this->Internal->AnimationCacheLimit->setValue(
                                       pqAnimationScene::getCacheLimitSetting());
+
+  while (this->Internal->ChartHiddenSeries->count() > 0)
+    {
+    delete this->Internal->ChartHiddenSeries->takeItem(0);
+    }
+  foreach (QString hidden, pqChartRepresentation::getHiddenSeriesSetting())
+    {
+    QListWidgetItem *item
+      = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
+    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -345,4 +377,45 @@ void pqApplicationOptions::loadPalette(const QString& paletteName)
 void pqApplicationOptions::onPalette(QAction* action)
 {
   this->loadPalette(action->objectName());
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::onChartNewHiddenSeries()
+{
+  QListWidgetItem *item = new QListWidgetItem("");
+  item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
+  this->Internal->ChartHiddenSeries->insertItem(0, item);
+  this->Internal->ChartHiddenSeries->editItem(item);
+
+  emit this->changesAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::onChartDeleteHiddenSeries()
+{
+  foreach (QListWidgetItem *item,
+           this->Internal->ChartHiddenSeries->selectedItems())
+    {
+    int row = this->Internal->ChartHiddenSeries->row(item);
+    delete this->Internal->ChartHiddenSeries->takeItem(row);
+    }
+
+  emit this->changesAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationOptions::onChartResetHiddenSeries()
+{
+  while (this->Internal->ChartHiddenSeries->count() > 0)
+    {
+    delete this->Internal->ChartHiddenSeries->takeItem(0);
+    }
+  foreach (QString hidden, pqChartRepresentation::defaultHiddenSeriesSetting())
+    {
+    QListWidgetItem *item
+      = new QListWidgetItem(hidden, this->Internal->ChartHiddenSeries);
+    item->setFlags(Qt::ItemIsSelectable|Qt::ItemIsEditable|Qt::ItemIsEnabled);
+    }
+
+  emit this->changesAvailable();
 }

@@ -65,6 +65,9 @@ public slots:
 protected slots:
   void resetColorsToDefault();
   void onPalette(QAction*);
+  void onChartNewHiddenSeries();
+  void onChartDeleteHiddenSeries();
+  void onChartResetHiddenSeries();
 
 private:
   class pqInternal;

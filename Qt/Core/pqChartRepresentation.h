@@ -57,6 +57,16 @@ public:
   /// of the proxy and sets them to default values.
   virtual void setDefaultPropertyValues();
 
+  /// Get/set the application setting that is a list of regular expressions to
+  /// match chart series that should not initially be visible.
+  static void setHiddenSeriesSetting(QStringList list);
+  static QStringList getHiddenSeriesSetting();
+  static QStringList defaultHiddenSeriesSetting();
+
+  /// Convenience method that determines if a series of the given name should
+  /// be hidden by default.
+  static bool queryHideSeries(QString array);
+
 private:
   pqChartRepresentation(const pqChartRepresentation&); // Not implemented.
   void operator=(const pqChartRepresentation&); // Not implemented.
