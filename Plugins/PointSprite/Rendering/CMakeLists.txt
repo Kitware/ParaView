@@ -60,6 +60,7 @@ set(KIT_LIBS
   vtkHybrid
   vtkRendering
   vtkImaging
+  ${OPENGL_gl_LIBRARY}
   )
 
 # -----------------------------------------------------------------------------
