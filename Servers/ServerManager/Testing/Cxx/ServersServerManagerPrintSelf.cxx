@@ -67,7 +67,6 @@
 #include "vtkSMMaterialLoaderProxy.h"
 #include "vtkSMNullProxy.h"
 #include "vtkSMNumberOfGroupsDomain.h"
-#include "vtkSMNumberOfPartsDomain.h"
 #include "vtkSMObject.h"
 #include "vtkSMOrderedPropertyIterator.h"
 #include "vtkSMOutputPort.h"
@@ -205,7 +204,6 @@ int main(int , char *[])
   c = vtkSMMaterialLoaderProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNullProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNumberOfGroupsDomain::New(); c->Print( cout ); c->Delete();
-  c = vtkSMNumberOfPartsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMObject::New(); c->Print( cout ); c->Delete();
   c = vtkSMOrderedPropertyIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMOutputPort::New(); c->Print( cout ); c->Delete();

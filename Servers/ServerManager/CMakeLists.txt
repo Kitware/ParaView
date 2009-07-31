@@ -110,7 +110,6 @@ SET(Kit_SRCS
   vtkSMNullProxy.cxx
   vtkSMNumberOfComponentsDomain.cxx
   vtkSMNumberOfGroupsDomain.cxx
-  vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMOrderedPropertyIterator.cxx
   vtkSMOutlineRepresentationProxy.cxx

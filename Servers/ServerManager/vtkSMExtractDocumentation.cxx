@@ -16,7 +16,6 @@
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNumberOfGroupsDomain.h"
-#include "vtkSMNumberOfPartsDomain.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyGroupDomain.h"
@@ -553,23 +552,6 @@ bool WriteDomain(vtkSMDomain *dom, ostream &docFile)
       case vtkSMNumberOfGroupsDomain::MULTIPLE:
         domainWritten = true;
         docFile << "Multi-group datasets must contain more than one group.";
-        break;
-      }
-    docFile << endl;
-    }
-  else if (!strcmp("vtkSMNumberOfPartsDomain", className))
-    {
-    vtkSMNumberOfPartsDomain *nopd =
-      vtkSMNumberOfPartsDomain::SafeDownCast(dom);
-    switch (nopd->GetOutputPortMultiplicity())
-      {
-      case vtkSMNumberOfPartsDomain::SINGLE:
-        domainWritten = true;
-        docFile << "Multi-part datasets must have only one part.";
-        break;
-      case vtkSMNumberOfPartsDomain::MULTIPLE:
-        domainWritten = true;
-        docFile << "Multi-part datasets must have more than one part.";
         break;
       }
     docFile << endl;

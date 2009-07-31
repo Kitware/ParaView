@@ -53,7 +53,6 @@
             <DataType value="vtkDataSet"/>
             <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
           <Documentation>
             This property specifies the dataset from which to obtain probe values.
@@ -4974,7 +4973,6 @@ The Probe filter samples the data set attributes of the current data set at the 
             <DataType value="vtkDataSet"/>
             <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
           <Documentation>
             This property specifies the dataset from which to obtain probe values.
@@ -5053,7 +5051,6 @@ Probe is a filter that computes point attributes at specified point positions. T
             <DataType value="vtkDataSet"/>
             <DataType value="vtkCompositeDataSet"/>
           </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
           <InputArrayDomain name="input_array"/>
           <Documentation>
             This property specifies the dataset from which to obtain probe values.
