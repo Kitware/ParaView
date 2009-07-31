@@ -731,3 +731,85 @@ bool vtkSMPropertyHelper::GetStatus(const char* key, double *values, int num_val
 
   return false;
 }
+
+//----------------------------------------------------------------------------
+void vtkSMPropertyHelper::SetStatus(const char* key, const char* value)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return;
+    }
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+  if (svp->GetNumberOfElementsPerCommand() != 2)
+    {
+    vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
+    return;
+    }
+
+  if (!svp->GetRepeatCommand())
+    {
+    vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
+    return;
+    }
+
+  for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+    {
+    if (strcmp(svp->GetElement(cc), key) == 0)
+      {
+      svp->SetElement(cc+1, value);
+      return;
+      }
+    }
+
+  vtkStringList* list = vtkStringList::New();
+  svp->GetElements(list);
+  list->AddString(key);
+  list->AddString(value);
+  svp->SetElements(list);
+  list->Delete();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMPropertyHelper::GetStatus(const char* key, const char* default_value)
+{
+  if (this->Type != vtkSMPropertyHelper::STRING)
+    {
+    vtkSMPropertyHelperWarningMacro("Status properties can only be vtkSMStringVectorProperty.");
+    return default_value;
+    }
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->Property);
+  while (svp)
+    {
+    if (svp->GetNumberOfElementsPerCommand() != 2)
+      {
+      vtkSMPropertyHelperWarningMacro("NumberOfElementsPerCommand != 2");
+      return default_value;
+      }
+
+    if (!svp->GetRepeatCommand())
+      {
+      vtkSMPropertyHelperWarningMacro("Property is non-repeatable.");
+      return default_value;
+      }
+
+    for (unsigned int cc=0; (cc+1) < svp->GetNumberOfElements(); cc+=2)
+      {
+      if (strcmp(svp->GetElement(cc), key) == 0)
+        {
+        return svp->GetElement(cc+1);
+        }
+      }
+
+    // Now check if the information_property has the value.
+    svp = svp->GetInformationOnly() == 0? 
+      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty()) : 0;
+    }
+
+  return default_value;
+}
+
