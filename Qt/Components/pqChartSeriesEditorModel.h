@@ -150,6 +150,7 @@ public slots:
   void setSeriesStyle(int row, int style);
   void setSeriesAxisCorner(int row, int axiscorner);
   void setSeriesMarkerStyle(int row, int style);
+  void setSeriesLabel(int row, const QString& label);
 
   // Description:
   // API to get series properties.
@@ -160,6 +161,7 @@ public slots:
   int getSeriesStyle(int row) const;
   int getSeriesAxisCorner(int row) const;
   int getSeriesMarkerStyle(int row) const;
+  QString getSeriesLabel(int row) const;
 
 private slots:
   /// When ever an option changes, we want to fire data-changed signal.

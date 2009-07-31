@@ -170,6 +170,13 @@ public:
   void SetStatus(const char* key, double *values, int num_values);
   bool GetStatus(const char* key, double *values, int num_values);
 
+  // Description:
+  // This API is useful for setting values on vtkSMStringVectorProperty that is
+  // used for status where the first value is the name of the array (for
+  // example) and the second value is it's status (as a string)
+  void SetStatus(const char* key, const char* value);
+  const char* GetStatus(const char* key, const char* default_value);
+
 //BTX
 private:
   vtkSMPropertyHelper(const vtkSMPropertyHelper&); // Not implemented

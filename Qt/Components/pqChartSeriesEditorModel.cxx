@@ -156,8 +156,7 @@ QVariant pqChartSeriesEditorModel::data(const QModelIndex &idx, int role) const
         }
       else if (idx.column() == 1)
         {
-        // FIXME
-        QString legendName = this->getSeriesName(idx.row());
+        QString legendName = this->getSeriesLabel(idx.row());
         return QVariant(legendName);
         }
       }
@@ -211,20 +210,11 @@ bool pqChartSeriesEditorModel::setData(const QModelIndex &idx,
     {
     if (idx.column() == 1 && (role == Qt::DisplayRole || role == Qt::EditRole))
       {
-      // FIXME
-      //QString name = value.toString();
-      //if (!name.isEmpty())
-      //  {
-      //  result = true;
-      //  if (name != item->LegendName)
-      //    {
-      //    item->LegendName = name;
-      //    // TODO Set series label name
-      //    //this->Display->setSeriesLabel(idx.row(), item->LegendName);
-      //    this->PQDisplay->renderViewEventually();
-      //    emit this->dataChanged(idx, idx);
-      //    }
-      //  }
+      QString name = value.toString();
+      if (!name.isEmpty())
+        {
+        this->setSeriesLabel(idx.row(), name);
+        }
       }
     else if(idx.column() == 0 && role == Qt::CheckStateRole)
       {
@@ -403,6 +393,27 @@ int pqChartSeriesEditorModel::getSeriesMarkerStyle(int row) const
   return vtkSMPropertyHelper(this->RepresentationProxy,
     "SeriesMarkerStyle").GetStatus(
     this->getSeriesName(row), 0); // None by default.
+}
+
+//-----------------------------------------------------------------------------
+void pqChartSeriesEditorModel::setSeriesLabel(int row, const QString& label)
+{
+  if (row >= 0 && row < this->rowCount(QModelIndex()))
+    {
+    vtkSMPropertyHelper(this->RepresentationProxy,
+      "SeriesLabel").SetStatus(
+      this->getSeriesName(row), label.toAscii().data());
+    this->RepresentationProxy->UpdateVTKObjects();
+    }
+}
+
+//-----------------------------------------------------------------------------
+QString pqChartSeriesEditorModel::getSeriesLabel(int row) const
+{
+  QString name = this->getSeriesName(row);
+  return vtkSMPropertyHelper(this->RepresentationProxy,
+    "SeriesLabel").GetStatus(name.toStdString().c_str(),
+    name.toStdString().c_str()); // name by default.
 }
 
 //-----------------------------------------------------------------------------

@@ -44,7 +44,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkSMChartNamedOptionsModelProxy);
-vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMChartNamedOptionsModelProxy, "1.5.2.1");
 //----------------------------------------------------------------------------
 vtkSMChartNamedOptionsModelProxy::vtkSMChartNamedOptionsModelProxy()
 {
@@ -103,6 +103,13 @@ void vtkSMChartNamedOptionsModelProxy::UpdatePropertyInformationInternal(
         new_values->AddString(name.toAscii().data());
         new_values->AddString(
           QString::number(options->isVisible()? 1 : 0).toAscii().data());
+        }
+      else if (strcmp(propname, "LabelInfo") == 0)
+        {
+        new_values->AddString(name.toAscii().data());
+        new_values->AddString(
+          options->getLabel().isNull()? name.toAscii().data() :
+          options->getLabel().toAscii().data());
         }
       else if (strcmp(propname, "LineThicknessInfo") == 0)
         {
@@ -230,6 +237,14 @@ void vtkSMChartNamedOptionsModelProxy::SetPenColor(
   QPen pen = options->getPen();
   pen.setColor(QColor::fromRgbF(r, g, b));
   options->setPen(pen);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMChartNamedOptionsModelProxy::SetLabel(
+  const char* name, const char* label)
+{
+  vtkQtChartSeriesOptions* options = this->GetOptions(name);
+  options->setLabel(label);
 }
 
 //----------------------------------------------------------------------------

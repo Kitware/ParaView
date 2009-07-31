@@ -43,6 +43,7 @@ public:
   void SetPenColor(const char* name, double r, double g, double b);
   void SetAxisCorner(const char* name, int corner);
   void SetMarkerStyle(const char* name, int style);
+  void SetLabel(const char* name, const char* label);
 
 //BTX
 protected:
