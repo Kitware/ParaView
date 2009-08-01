@@ -308,6 +308,7 @@ TARGET_LINK_LIBRARIES(vtkPVFilters
   vtkWidgetsCS
   KWCommon
   vtksys
+  ${OPENGL_gl_LIBRARY}
   ${PARAVIEW_ADDITIONAL_LIBRARIES}
   )
 
