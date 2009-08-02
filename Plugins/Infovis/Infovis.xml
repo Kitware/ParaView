@@ -356,6 +356,31 @@
       </Hints>
     </SourceProxy>
 
+   <CompoundSourceProxy name="DataObjectToTableCompound" label="Entity View Pipeline">
+     <Proxy group="filters" type="DataObjectToTable" id="374" servers="1" compound_name="DataObjectToTable1">
+       <Property name="Input" id="374.Input" number_of_elements="1">
+       </Property>
+       <Property name="FieldType" id="374.FieldType" number_of_elements="1">
+         <Element index="0" value="3"/>
+         <Domain name="enum" id="374.FieldType.enum">
+            <Entry value="0" text="Field Data"/>
+            <Entry value="1" text="Point Data"/>
+            <Entry value="2" text="Cell Data"/>
+            <Entry value="3" text="Vertex Data"/>
+            <Entry value="4" text="Edge Data"/>
+          </Domain>
+       </Property>
+     </Proxy>
+     <ExposedProperties>
+       <Property name="Input" proxy_name="DataObjectToTable1" exposed_name="Input"/>
+       <Property name="FieldType" proxy_name="DataObjectToTable1" exposed_name="Attribute Type"/>
+     </ExposedProperties>
+     <OutputPort name="Output" proxy="DataObjectToTable1" port_index="0"/>
+      <Hints>
+        <View type="ClientGraphView"/>
+      </Hints>
+   </CompoundSourceProxy>
+
     <SourceProxy name="GenerateIndexArray" class="vtkGenerateIndexArray">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
@@ -412,6 +437,8 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty> 
+
+      <StringVectorProperty name="GroupDomain" command="SetGroupDomain" number_of_elements="1"/> 
 
       <Hints>
         <View type="ClientGraphView"/>
