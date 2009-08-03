@@ -27,7 +27,7 @@
 
 class vtkShaderProgram2;
 
-class VTK_RENDERING_EXPORT vtkPVLightingHelper : public vtkObject
+class VTK_EXPORT vtkPVLightingHelper : public vtkObject
 {
 public:
   static vtkPVLightingHelper* New();

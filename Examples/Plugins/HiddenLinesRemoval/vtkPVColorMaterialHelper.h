@@ -26,7 +26,7 @@
 
 class vtkShaderProgram2;
 
-class VTK_RENDERING_EXPORT vtkPVColorMaterialHelper : public vtkObject
+class VTK_EXPORT vtkPVColorMaterialHelper : public vtkObject
 {
 public:
   static vtkPVColorMaterialHelper* New();
