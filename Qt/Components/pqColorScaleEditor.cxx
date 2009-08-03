@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarOpacityFunction.h"
 #include "pqScalarsToColors.h"
+#include "pqScatterPlotRepresentation.h"
 #include "pqSignalAdaptors.h"
 #include "pqStandardColorLinkAdaptor.h"
 #include "pqSMAdaptor.h"
@@ -821,6 +822,8 @@ void pqColorScaleEditor::rescaleToDataRange()
       qobject_cast<pqPipelineRepresentation *>(this->Display);
   //pqBarChartRepresentation *histogram =
   //    qobject_cast<pqBarChartRepresentation *>(this->Display);
+  pqScatterPlotRepresentation* scatterPlot =
+    qobject_cast<pqScatterPlotRepresentation *>(this->Display);
   if(pipeline)
     {
     pipeline->resetLookupTableScalarRange();
@@ -831,6 +834,11 @@ void pqColorScaleEditor::rescaleToDataRange()
   //  histogram->resetLookupTableScalarRange();
   //  histogram->renderViewEventually();
   //  }
+  else if(scatterPlot)
+    {
+    scatterPlot->resetLookupTableScalarRange();
+    scatterPlot->renderViewEventually();
+    }
 }
 
 void pqColorScaleEditor::setUseDiscreteColors(bool on)

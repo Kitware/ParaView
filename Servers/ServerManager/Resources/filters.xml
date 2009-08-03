@@ -6916,6 +6916,25 @@ Tessellate a higher-order dataset.
     </SourceProxy>
 
    <!-- ==================================================================== -->
+    <SourceProxy name="FlattenFilter" class="vtkMergeCompositeDataSet">
+      <InputProperty
+        name="Input"
+        command="SetInputConnection">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPointSet"/>
+            <DataType value="vtkGraph"/>
+            <DataType value="vtkCompositeDataSet"/>
+          </DataTypeDomain>
+          <Documentation>
+            Set the input to the Flatten Filter.
+          </Documentation>
+      </InputProperty>
+    </SourceProxy>
+   <!-- ==================================================================== -->
     <SourceProxy name="OrderedCompositeDistributor"
                  class="vtkOrderedCompositeDistributor">
       <InputProperty name="Input" command="SetInputConnection">

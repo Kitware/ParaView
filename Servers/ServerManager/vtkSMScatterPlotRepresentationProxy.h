@@ -33,6 +33,11 @@ public:
   vtkTypeRevisionMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+
   // Description:
   // Called when a representation is added to a view. 
   // Returns true on success.
@@ -86,6 +91,8 @@ public:
   //const char* GetSeriesName(int series);
   vtkStdString GetSeriesName(int series);
 
+  int GetSeriesType(int series);
+
 //BTX
 protected:
   vtkSMScatterPlotRepresentationProxy();
@@ -111,6 +118,8 @@ protected:
 
   void SetArray(int array, const char* arrayName);
 
+  //vtkSMProxy* GeometryFilter;
+  vtkSMSourceProxy* FlattenFilter;
   vtkSMProxy* Mapper;
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;

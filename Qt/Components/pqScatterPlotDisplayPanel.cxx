@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkWeakPointer.h"
+#include "vtkSMScatterPlotViewProxy.h"
 
 #include <QColorDialog>
 #include <QHeaderView>
@@ -129,6 +130,148 @@ protected:
 } // End anonymous namespace
 
 
+// Protect the qt model classes in an anonymous namespace
+namespace {
+  //-----------------------------------------------------------------------------
+  class pqComboBoxDecoratedDomain : public pqComboBoxDomain
+  {
+  typedef pqComboBoxDomain Superclass;
+public:
+    pqComboBoxDecoratedDomain(QComboBox* comboBox, vtkSMProperty* property, 
+                              const QString& domainName = QString())
+    : Superclass(comboBox, property, domainName) 
+    {
+    this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
+    this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
+    this->domainChanged();
+    }
+  virtual ~pqComboBoxDecoratedDomain() 
+    {
+    delete this->CellDataIcon;
+    delete this->PointDataIcon;
+    }
+  QString convertDataToText(const QString& data)const
+    {
+    int textPos = data.indexOf(',') + 1;
+    if(textPos == 0)
+      {
+      return data;
+      }
+    else
+      {
+      return data.mid(textPos, data.indexOf(',',textPos));
+      }
+    }
+  QIcon* convertDataToIcon(const QString& data)const 
+    {
+    int textPos = data.indexOf(',');
+    if(textPos < 0)
+      {
+      return NULL;
+      }
+    if(data.left( textPos ) == "point")
+      {
+      return this->PointDataIcon;
+      }
+    else if(data.left( textPos ) == "cell")
+      {
+      return this->CellDataIcon;      
+      }
+    return NULL;
+    }
+protected slots:
+  virtual void internalDomainChanged()
+    {
+    QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
+    Q_ASSERT(combo != NULL);
+    if(!combo)
+      {
+      return;
+      }
+
+    QList<QString> texts;
+    QList<QVariant> data;
+    QList<QIcon*> icons;
+
+    pqSMAdaptor::PropertyType type;
+
+    type = pqSMAdaptor::getPropertyType(this->getProperty());
+    if(!(type == pqSMAdaptor::ENUMERATION && 
+         QString(this->getDomain()->GetXMLName()) == "array_list"))
+      {
+      this->pqComboBoxDomain::internalDomainChanged();
+      return;
+      }
+    QList<QVariant> enums;
+    enums = pqSMAdaptor::getEnumerationPropertyDomain(this->getProperty());
+    foreach(QVariant var, enums)
+      {
+      texts.append(this->convertDataToText(var.toString()));
+      data.append(var.toString());
+      icons.append(this->convertDataToIcon(var.toString()));
+      }
+ 
+    foreach (QString userStr, this->getUserStrings())
+      {
+      if (!data.contains(userStr))
+        {
+        texts.push_front(this->convertDataToText(userStr));
+        data.push_front(userStr);
+        icons.push_front(this->convertDataToIcon(userStr));
+        }
+      }
+
+    // texts and data must be of the same size.
+    assert(texts.size() == data.size() && data.size() == icons.size());
+
+    // check if the texts didn't change
+    QList<QVariant> oldData;
+    QList<QString>  oldTexts;
+
+    for(int i = 0; i < combo->count(); i++)
+      {
+      oldTexts.append(combo->itemText(i));
+      oldData.append(combo->itemData(i));
+      }
+
+    if (oldData != data || oldTexts != texts)
+      {
+      // save previous value to put back
+      QVariant old = combo->itemData(combo->currentIndex());
+      bool prev = combo->blockSignals(true);
+      combo->clear();
+      for (int cc=0; cc < data.size(); cc++)
+        {
+        if(icons[cc])
+          {
+          combo->addItem(*icons[cc],texts[cc], data[cc]);
+          }
+        else
+          {
+          combo->addItem(texts[cc], data[cc]);
+          }
+        }
+      combo->setCurrentIndex(-1);
+      combo->blockSignals(prev);
+      int foundOld = combo->findData(old);
+      if (foundOld >= 0)
+        {
+        combo->setCurrentIndex(foundOld);
+        }
+      else
+        {
+        combo->setCurrentIndex(0);
+        }
+      }
+    this->markForUpdate(false);
+    }
+  protected:
+    QIcon* CellDataIcon;
+    QIcon* PointDataIcon;
+    QIcon* SolidColorIcon;
+  };
+}
+
 //-----------------------------------------------------------------------------
 class pqScatterPlotDisplayPanel::pqInternal : public Ui::pqScatterPlotDisplayPanel
 {
@@ -190,13 +333,13 @@ public:
   pqSignalAdaptorComboBox* GlyphOrientationArrayAdaptor;
   pqSignalAdaptorComboBox* AttributeModeAdaptor;
 
-  pqComboBoxDomain* XAxisArrayDomain;
-  pqComboBoxDomain* YAxisArrayDomain;
-  pqComboBoxDomain* ZAxisArrayDomain;
-  pqComboBoxDomain* ColorArrayDomain;
-  pqComboBoxDomain* GlyphScalingArrayDomain;
-  pqComboBoxDomain* GlyphMultiSourceArrayDomain;
-  pqComboBoxDomain* GlyphOrientationArrayDomain;
+  pqComboBoxDecoratedDomain* XAxisArrayDomain;
+  pqComboBoxDecoratedDomain* YAxisArrayDomain;
+  pqComboBoxDecoratedDomain* ZAxisArrayDomain;
+  pqComboBoxDecoratedDomain* ColorArrayDomain;
+  pqComboBoxDecoratedDomain* GlyphScalingArrayDomain;
+  pqComboBoxDecoratedDomain* GlyphMultiSourceArrayDomain;
+  pqComboBoxDecoratedDomain* GlyphOrientationArrayDomain;
 
   pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
   pqSignalAdaptorColor*    AmbientColorAdaptor;
@@ -588,54 +731,54 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
 */
   // Connect to the new properties.pqComboBoxDomain will ensure that
   // when ever the domain changes the widget is updated as well.
-  this->Internal->XAxisArrayDomain = new pqComboBoxDomain(
-      this->Internal->XCoordsComboBox, proxy->GetProperty("XArrayName"));
-  this->Internal->XAxisArrayDomain->forceDomainChanged(); // init list
+  this->Internal->XAxisArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->XCoordsComboBox, proxy->GetProperty("XArrayName"));
+  //this->Internal->XAxisArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->XAxisArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("XArrayName"));
-
-  this->Internal->YAxisArrayDomain = new pqComboBoxDomain(
-      this->Internal->YCoordsComboBox, proxy->GetProperty("YArrayName"));
-  this->Internal->YAxisArrayDomain->forceDomainChanged(); // init list
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("XArrayName"));
+  
+  this->Internal->YAxisArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->YCoordsComboBox, proxy->GetProperty("YArrayName"));
+  //this->Internal->YAxisArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->YAxisArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("YArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("YArrayName"));
 
-  this->Internal->ZAxisArrayDomain = new pqComboBoxDomain(
-      this->Internal->ZCoordsComboBox, proxy->GetProperty("ZArrayName"));
+  this->Internal->ZAxisArrayDomain = new pqComboBoxDecoratedDomain(
+     this->Internal->ZCoordsComboBox, proxy->GetProperty("ZArrayName"));
   this->Internal->ZAxisArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->ZAxisArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("ZArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("ZArrayName"));
 
-  this->Internal->ColorArrayDomain = new pqComboBoxDomain(
-      this->Internal->ColorComboBox, proxy->GetProperty("ColorArrayName"));
+  this->Internal->ColorArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->ColorComboBox, proxy->GetProperty("ColorArrayName"));
   this->Internal->ColorArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->ColorArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("ColorArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("ColorArrayName"));
 
-  this->Internal->GlyphScalingArrayDomain = new pqComboBoxDomain(
-      this->Internal->GlyphScalingComboBox, proxy->GetProperty("GlyphScalingArrayName"));
+  this->Internal->GlyphScalingArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->GlyphScalingComboBox, proxy->GetProperty("GlyphScalingArrayName"));
   this->Internal->GlyphScalingArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->GlyphScalingArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("GlyphScalingArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("GlyphScalingArrayName"));
 
-  this->Internal->GlyphMultiSourceArrayDomain = new pqComboBoxDomain(
-      this->Internal->GlyphMultiSourceComboBox, proxy->GetProperty("GlyphMultiSourceArrayName"));
+  this->Internal->GlyphMultiSourceArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->GlyphMultiSourceComboBox, proxy->GetProperty("GlyphMultiSourceArrayName"));
   this->Internal->GlyphMultiSourceArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->GlyphMultiSourceArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("GlyphMultiSourceArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("GlyphMultiSourceArrayName"));
 
-  this->Internal->GlyphOrientationArrayDomain = new pqComboBoxDomain(
-      this->Internal->GlyphOrientationComboBox, proxy->GetProperty("GlyphOrientationArrayName"));
+  this->Internal->GlyphOrientationArrayDomain = new pqComboBoxDecoratedDomain(
+    this->Internal->GlyphOrientationComboBox, proxy->GetProperty("GlyphOrientationArrayName"));
   this->Internal->GlyphOrientationArrayDomain->forceDomainChanged(); // init list
   this->Internal->Links.addPropertyLink(this->Internal->GlyphOrientationArrayAdaptor,
-      "currentText", SIGNAL(currentTextChanged(const QString&)),
-      proxy, proxy->GetProperty("GlyphOrientationArrayName"));
+    "currentData", SIGNAL(currentIndexChanged(int)),
+    proxy, proxy->GetProperty("GlyphOrientationArrayName"));
   
   // setup for ThreeDMode
   this->Internal->Links.addPropertyLink(
@@ -709,6 +852,15 @@ void pqScatterPlotDisplayPanel::zoomToData()
       rm->ResetCamera(bounds);
       renModule->render();
       }
+    pqScatterPlotView* scatterPlotModule = qobject_cast<pqScatterPlotView*>(
+      this->Internal->Representation->getView());
+    if (scatterPlotModule)
+      {
+      vtkSMScatterPlotViewProxy* rm = 
+        scatterPlotModule->getScatterPlotViewProxy();
+      rm->GetRenderView()->ResetCamera(bounds);
+      scatterPlotModule->render();
+      }
     }
 }
 
@@ -720,11 +872,11 @@ void pqScatterPlotDisplayPanel::update3DMode()
     {
     return;
     }
-  renModule->getRenderViewProxy()->GetActiveCamera()
+  renModule->getScatterPlotViewProxy()->GetRenderView()->GetActiveCamera()
     ->SetPosition(0., 0., 1.);
-  renModule->getRenderViewProxy()->GetActiveCamera()
+  renModule->getScatterPlotViewProxy()->GetRenderView()->GetActiveCamera()
     ->SetFocalPoint(0., 0., 0.);
-  renModule->getRenderViewProxy()->GetActiveCamera()
+  renModule->getScatterPlotViewProxy()->GetRenderView()->GetActiveCamera()
     ->SetViewUp(0., 1., 0.);
   renModule->set3DMode(this->Internal->ZCoordsCheckBox->isChecked());
   this->zoomToData();

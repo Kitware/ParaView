@@ -384,6 +384,9 @@ void pqScatterPlotRepresentation::setDefaultPropertyValues()
 
   geomInfo = repr->GetRepresentedDataInformation(/*update=*/true);
 
+  // The pipeline has been updated, make sure the properties are up to date now
+  repr->UpdatePropertyInformation();
+
   // Locate input display.
   pqScatterPlotRepresentation* upstreamDisplay = 
     qobject_cast<pqScatterPlotRepresentation*>(

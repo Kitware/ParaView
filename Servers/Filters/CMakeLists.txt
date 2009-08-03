@@ -55,6 +55,7 @@ SET(Filters_SRCS
   vtkKdTreeGenerator.cxx
   vtkKdTreeManager.cxx
   vtkMergeArrays.cxx
+  vtkMergeCompositeDataSet.cxx
   vtkMinMax.cxx
   vtkMPICompositeManager.cxx
   vtkMPIMoveData.cxx
@@ -125,6 +126,7 @@ SET(Filters_SRCS
   vtkRealtimeAnimationPlayer.cxx
   vtkReductionFilter.cxx
   vtkScatterPlotMapper.cxx
+  vtkScatterPlotPainter.cxx
   vtkSelectionStreamer.cxx
   vtkSequenceAnimationPlayer.cxx
   vtkSpyPlotBlock.cxx

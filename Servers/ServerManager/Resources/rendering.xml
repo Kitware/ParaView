@@ -5903,10 +5903,10 @@
       <!-- End of 2DClientServerRenderView -->
     </TwoDRenderViewProxy>
 
-    <ScatterPlotViewProxy name="ScatterPlotView"
-                          base_proxygroup="views" base_proxyname="RenderView">
+    <ScatterPlotViewProxy name="ScatterPlotRenderViewBase"
+                          base_proxygroup="views" base_proxyname="ViewBase">
       <Documentation>
-        Scatter Plot View.
+        Defines base API for ScatterPlotView and subtypes. Don't use directly.
       </Documentation>
       <SubProxy>
         <!-- SubProxy used to axes annotation -->
@@ -5931,6 +5931,360 @@
         </ExposedProperties>
       </SubProxy>
     </ScatterPlotViewProxy>
+
+
+    <ScatterPlotViewProxy name="ScatterPlotRenderView"
+      base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
+      <Documentation>
+        Simplest ScatterPlot render view without compositing/client-server support.
+        Currently this view can only show image slices.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView"
+          proxygroup="views" proxyname="RenderView" >
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of ScatterPlotRenderView -->
+    </ScatterPlotViewProxy>
+
+    <ScatterPlotViewProxy name="ScatterPlotIceTCompositeView"
+      base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
+      <Documentation>
+        IceT based ScatterPlot render view. 
+        Currently this view can only show image slices.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView" 
+          proxygroup="views" proxyname="IceTCompositeView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="ImageReductionFactor" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RenderView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ScatterPlotIceTDesktopRenderView -->
+    </ScatterPlotViewProxy>
+
+    <ScatterPlotViewProxy name="ScatterPlotIceTDesktopRenderView"
+      base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
+      <Documentation>
+        IceT based ScatterPlot render view. 
+        Currently this view can only show image slices.
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView" 
+          proxygroup="views" proxyname="IceTDesktopRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RenderView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ScatterPlotIceTDesktopRenderView -->
+    </ScatterPlotViewProxy>
+
+    <ScatterPlotViewProxy name="ScatterPlotIceTMultiDisplayRenderView"
+      base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
+      <Documentation>
+        This is a ScatterPlot view comprising of a
+        "IceTMultiDisplayRenderView" proxy (used in case of Tile displays).
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView" 
+          proxygroup="views" proxyname="IceTMultiDisplayRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- Tiles -->
+          <Property name="CollectGeometryThreshold" />
+          <Property name="StillRenderImageReductionFactor" />
+          <Property name="TileDisplayCompositeThreshold" />
+          <Property name="ImageReductionFactor" />
+          <Property name="SquirtLevel" />
+          <Property name="DisableOrderedCompositing" />
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RenderView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ScatterPlotIceTMultiDisplayRenderView -->
+    </ScatterPlotViewProxy>
+
+    <ScatterPlotViewProxy name="ScatterPlotClientServerRenderView"
+      base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
+      <Documentation>
+        ScatterPlot view used in client-server mode without IceT (single node server).
+      </Documentation>
+
+      <SubProxy>
+        <Proxy name="RenderView" 
+          proxygroup="views" proxyname="ClientServerRenderView">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="LODThreshold" />
+          <Property name="LODResolution" />
+          <Property name="UseTriangleStrips" />
+          <Property name="UseImmediateMode" />
+          <Property name="RenderInterruptsEnabled" />
+          <Property name="ResetCamera" />
+          <Property name="UseLight" />
+          <!-- Light -->
+          <Property name="LightAmbientColor" />
+          <Property name="LightDiffuseColor" />
+          <Property name="LightSpecularColor" />
+          <Property name="LightIntensity" />
+          <Property name="LightSwitch" />
+          <!-- LightKit -->
+          <Property name="KeyLightWarmth" />
+          <Property name="KeyLightIntensity" />
+          <Property name="KeyLightElevation" />
+          <Property name="KeyLightAzimuth" />
+          <Property name="FillLightWarmth" />
+          <Property name="FillLightK:F Ratio" />
+          <Property name="FillLightElevation" />
+          <Property name="FillLightAzimuth" />
+          <Property name="BackLightWarmth" />
+          <Property name="BackLightK:B Ratio" />
+          <Property name="BackLightElevation" />
+          <Property name="BackLightAzimuth" />
+          <Property name="HeadLightWarmth" />
+          <Property name="HeadLightK:H Ratio" />
+          <Property name="MaintainLuminance" />
+          <!-- ActiveCamera -->
+          <Property name="CameraPositionInfo" />
+          <Property name="CameraPosition" />
+          <Property name="CameraFocalPointInfo" />
+          <Property name="CameraFocalPoint" />
+          <Property name="CameraViewUpInfo" />
+          <Property name="CameraViewUp" />
+          <Property name="CameraViewAngle" />
+          <Property name="CameraClippingRangeInfo" />
+          <Property name="CameraClippingRange" />
+          <Property name="CameraParallelScale" />
+          <Property name="CameraParallelScaleInfo" />
+          <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
+          <!-- Interactor -->
+          <Property name="CameraManipulators" />
+          <Property name="CenterOfRotation" />
+          <!-- Renderer -->
+          <Property name="Background" />
+          <!-- RenderWindow -->
+          <Property name="RemoteRenderThreshold" />
+        </ExposedProperties>
+        <!-- End of "RenderView" subproxy -->
+      </SubProxy>
+
+      <!-- End of ScatterPlotClientServerRenderView -->
+    </ScatterPlotViewProxy>
+
     <!-- End of group "views" -->
   </ProxyGroup>
 
@@ -8822,6 +9176,28 @@
           This time is not used unless UseViewUpdateTime is off.
         </Documentation>
       </DoubleVectorProperty>
+
+      <SubProxy>
+        <!-- 
+          Geometry filter is used to conver non-polydata input to polydata.
+          It is also used to convert poly data to triangle strips when
+          requested.
+        -->
+        <Proxy name="GeometryFilter"
+          proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="UseStrips" />
+          <Property name="ForceStrips" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <!-- 
+          Geometry filter is used to conver non-polydata input to polydata.
+          -->
+        <Proxy name="FlattenFilter"
+          proxygroup="filters" proxyname="FlattenFilter" />
+      </SubProxy>
 
       <StringVectorProperty name="SeriesNamesInfo"
         number_of_elements_per_command="1"

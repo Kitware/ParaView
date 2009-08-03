@@ -32,18 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqScatterPlotView_h 
 #define __pqScatterPlotView_h
 
-#include "pqRenderView.h"
+#include "pqRenderViewBase.h"
 
 class vtkSMComparativeViewProxy;
+class vtkSMScatterPlotViewProxy;
+class ManipulatorType;
 
 /// RenderView used for comparative visualization (or film-strip visualization).
-class PQCORE_EXPORT pqScatterPlotView : public pqRenderView
+class PQCORE_EXPORT pqScatterPlotView : public pqRenderViewBase
 {
   Q_OBJECT
-  typedef pqRenderView Superclass;
+  typedef pqRenderViewBase Superclass;
 public:
-  static QString scatterPlotViewType() { return "ScatterPlotView"; }
-  static QString scatterPlotViewTypeName() { return "Scatter Plot"; }
+  static QString scatterPlotViewType() { return "ScatterPlotRenderView"; }
+  static QString scatterPlotViewTypeName() { return "Scatter Plot View"; }
 
   // Constructor:
   // \c group :- SManager registration group name.
@@ -57,11 +59,25 @@ public:
                 pqServer* server, 
                 QObject* parent=NULL);
   virtual ~pqScatterPlotView();
-
+  
+  /// Returns the render view proxy associated with this object.
+  virtual vtkSMScatterPlotViewProxy* getScatterPlotViewProxy() const;
+    
   /// Returns a array of 9 ManipulatorType objects defining
   /// default set of camera manipulators used by this type of view.
   static const ManipulatorType* getDefaultManipulatorTypes()
     { return pqScatterPlotView::TwoDManipulatorTypes; }
+
+  /// Resets the camera to include all visible data.
+  /// It is essential to call this resetCamera, to ensure that the reset camera
+  /// action gets pushed on the interaction undo stack.
+  virtual void resetCamera();
+  
+  /// Capture the view image into a new vtkImageData with the given magnification
+  /// and returns it.
+  virtual vtkImageData* captureImage(int magnification);
+  virtual vtkImageData* captureImage(const QSize& size)
+    { return this->Superclass::captureImage(size); }
 
   /// Returns the view proxy.
   //vtkSMComparativeViewProxy* getScatterPlotViewProxy() const;
@@ -81,6 +97,16 @@ protected slots:
   //void onComparativeVisLayoutChanged();
 
 protected:
+  /// Return the name of the group used for global settings (except interactor
+  /// style).
+  virtual const char* globalSettingsGroup() const
+    { return "renderModule"; }
+
+  /// Return the name of the group used for view-sepecific settings such as
+  /// background color, lighting.
+  virtual const char* viewSettingsGroup() const
+    { return "renderModule2D"; }
+
   /// Creates a new instance of the QWidget subclass to be used to show this
   /// view. Default implementation creates a QVTKWidget.
   //virtual QWidget* createWidget();
@@ -104,6 +130,8 @@ protected:
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
   /// don't change any render module properties here.
   virtual void initializeWidgets();
+
+  void setOrientationAxesVisibility(bool visible);
 private:
   pqScatterPlotView(const pqScatterPlotView&); // Not implemented.
   void operator=(const pqScatterPlotView&); // Not implemented.

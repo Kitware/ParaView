@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QComboBox;
 class vtkSMProperty;
-
+class vtkSMDomain;
 /// combo box domain 
 /// observers the domain for a combo box and updates accordingly
 /// the list of values in the combo box is automatically 
@@ -53,7 +53,7 @@ public:
   /// needs to be watched
   pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop,
                    const QString& domainName = QString());
-  ~pqComboBoxDomain();
+  virtual ~pqComboBoxDomain();
 
   // explicitly trigger a domain change.
   // simply calls internalDomainChanged();
@@ -64,11 +64,19 @@ public:
   /// irrespective of what the domain tells us.
   void addString(const QString&);
   void removeAllStrings();
+                         
+  vtkSMProperty* getProperty()const;
+  vtkSMDomain* getDomain()const;
+  const QString& getDomainName()const;
+  const QStringList& getUserStrings()const;
+
 public slots:
   void domainChanged();
 protected slots:
-  void internalDomainChanged();
+  virtual void internalDomainChanged();
 protected:
+  void markForUpdate(bool mark);
+
   class pqInternal;
   pqInternal* Internal;
 };

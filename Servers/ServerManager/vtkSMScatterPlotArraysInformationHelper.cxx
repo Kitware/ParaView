@@ -18,9 +18,10 @@
 
 #include "vtkSMScatterPlotRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkDataObject.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotArraysInformationHelper);
-vtkCxxRevisionMacro(vtkSMScatterPlotArraysInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMScatterPlotArraysInformationHelper, "1.2");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotArraysInformationHelper::vtkSMScatterPlotArraysInformationHelper()
 {
@@ -60,7 +61,21 @@ void vtkSMScatterPlotArraysInformationHelper::UpdateProperty(
   svp->SetNumberOfElements(num_series);
   for (int cc=0; cc < num_series; cc++)
     {
-    svp->SetElement(cc, cr->GetSeriesName(cc) );
+    vtkStdString name = cr->GetSeriesName(cc);
+    switch(cr->GetSeriesType(cc))
+      {
+      case vtkDataObject::FIELD_ASSOCIATION_POINTS:
+        name = "point," + name;
+        break;
+      case vtkDataObject::FIELD_ASSOCIATION_CELLS:
+        name = "cell," + name;
+        break;
+      case vtkDataObject::NUMBER_OF_ASSOCIATIONS:
+      default:
+        name = "coord," + name;
+        break;
+      }
+    svp->SetElement(cc, name );
     }
 }
 

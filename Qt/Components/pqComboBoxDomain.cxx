@@ -134,6 +134,26 @@ void pqComboBoxDomain::removeAllStrings()
   this->domainChanged();
 }
 
+vtkSMProperty* pqComboBoxDomain::getProperty()const
+{
+  return this->Internal->Property;
+}
+
+vtkSMDomain* pqComboBoxDomain::getDomain()const
+{
+  return this->Internal->Domain;  
+}
+
+const QString& pqComboBoxDomain::getDomainName()const
+{
+  return this->Internal->DomainName;
+}
+
+const QStringList& pqComboBoxDomain::getUserStrings()const
+{
+  return this->Internal->UserStrings;
+}
+
 void pqComboBoxDomain::domainChanged()
 {
   if(this->Internal->MarkedForUpdate)
@@ -141,7 +161,7 @@ void pqComboBoxDomain::domainChanged()
     return;
     }
 
-  this->Internal->MarkedForUpdate = true;
+  this->markForUpdate(true);
   QTimer::singleShot(0, this, SLOT(internalDomainChanged()));
 }
 
@@ -252,7 +272,10 @@ void pqComboBoxDomain::internalDomainChanged()
       combo->setCurrentIndex(0);
       }
     }
-  this->Internal->MarkedForUpdate = false;
+  this->markForUpdate(false);
 }
 
-
+void pqComboBoxDomain::markForUpdate(bool mark)
+{
+  this->Internal->MarkedForUpdate = mark;
+}

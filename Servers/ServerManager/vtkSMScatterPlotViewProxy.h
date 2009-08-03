@@ -19,20 +19,67 @@
 #ifndef __vtkSMScatterPlotViewProxy_h
 #define __vtkSMScatterPlotViewProxy_h
 
-#include "vtkSMRenderViewProxy.h"
+#include "vtkSMViewProxy.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
-class VTK_EXPORT vtkSMScatterPlotViewProxy : public vtkSMRenderViewProxy
+class vtkSMRenderViewProxy;
+
+class VTK_EXPORT vtkSMScatterPlotViewProxy : public vtkSMViewProxy
 {
 public:
   static vtkSMScatterPlotViewProxy* New();
-  vtkTypeRevisionMacro(vtkSMScatterPlotViewProxy, vtkSMRenderViewProxy);
+  vtkTypeRevisionMacro(vtkSMScatterPlotViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a default representation for the given source proxy.
-  // Returns a new proxy.
-  // Overridden to forward the call to the internal root view proxy.
+  // Forwards the call to internal view.
+  virtual void AddRepresentation(vtkSMRepresentationProxy*);
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void RemoveRepresentation(vtkSMRepresentationProxy*);
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void RemoveAllRepresentations();
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void StillRender();
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void InteractiveRender();
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void SetViewUpdateTime(double time);
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void SetCacheTime(double time);
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void SetUseCache(int);
+
+  // Description:
+  // Forwards the call to internal view.
   virtual vtkSMRepresentationProxy* CreateDefaultRepresentation(vtkSMProxy*, int);
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void SetViewPosition(int x, int y);
+  virtual void SetViewPosition(int xy[2])
+    { this->Superclass::SetViewPosition(xy); }
+
+  // Description:
+  // Forwards the call to internal view.
+  virtual void SetGUISize(int x, int y);
+  virtual void SetGUISize(int xy[2])
+    { this->Superclass::SetGUISize(xy); }
+
+  vtkGetObjectMacro(RenderView, vtkSMRenderViewProxy);
 
   // Description:
   // Generally each view type is different class of view eg. bar char view, line
@@ -57,8 +104,12 @@ protected:
   virtual bool BeginCreateVTKObjects();
   virtual void EndCreateVTKObjects();
 
+  vtkSMRenderViewProxy* RenderView;
+  vtkStdString SuggestedViewType;
+
   vtkSMProxy* CubeAxesActor;
   vtkSMProxy* LegendScaleActor;
+
 private:
   vtkSMScatterPlotViewProxy(const vtkSMScatterPlotViewProxy&); // Not implemented
   void operator=(const vtkSMScatterPlotViewProxy&); // Not implemented

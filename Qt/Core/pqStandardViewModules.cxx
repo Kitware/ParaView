@@ -176,7 +176,7 @@ vtkSMProxy* pqStandardViewModules::createViewProxy(const QString& viewtype,
     }
   else if (viewtype == pqScatterPlotView::scatterPlotViewType())
     {
-    root_xmlname = "ScatterPlotView";
+    root_xmlname = "ScatterPlotRenderView";
     }
 
   if (root_xmlname)
@@ -223,8 +223,7 @@ pqView* pqStandardViewModules::createView(const QString& viewtype,
     return new pqSpreadSheetView(
       group, viewname, viewmodule, server, p);
     }
-  else if (viewmodule->IsA("vtkSMRenderViewProxy") &&
-           !viewmodule->IsA("vtkSMScatterPlotViewProxy"))
+  else if (viewmodule->IsA("vtkSMRenderViewProxy"))
     {
     return new pqRenderView(group, viewname, viewmodule, server, p);
     }

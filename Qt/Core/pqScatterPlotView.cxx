@@ -39,9 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVServerInformation.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMAnimationSceneImageWriter.h"
-//#include "vtkSMScatterPlotViewProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMRenderViewProxy.h"
+#include "vtkSMScatterPlotViewProxy.h"
+#include "vtkPVAxesWidget.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 
 // Qt Includes.
 #include <QMap>
@@ -83,13 +85,16 @@ class pqScatterPlotView::pqInternal
 {
 public:
   QMap<vtkSMViewProxy*, QPointer<QVTKWidget> > RenderWidgets;
+  vtkSmartPointer<vtkPVAxesWidget> OrientationAxesWidget;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   bool ThreeDMode;
-
+  bool InitializedWidgets;
   pqInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-    ThreeDMode = false;
+    this->ThreeDMode = false;
+    this->InitializedWidgets = false;
+    this->OrientationAxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
     }
 };
 
@@ -117,6 +122,26 @@ pqScatterPlotView::~pqScatterPlotView()
     }
 
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMScatterPlotViewProxy* pqScatterPlotView::getScatterPlotViewProxy() const
+{
+  return vtkSMScatterPlotViewProxy::SafeDownCast(this->getViewProxy());
+}
+
+//-----------------------------------------------------------------------------
+/// Resets the camera to include all visible data.
+/// It is essential to call this resetCamera, to ensure that the reset camera
+/// action gets pushed on the interaction undo stack.
+void pqScatterPlotView::resetCamera()
+{
+  vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+    this->getProxy());
+
+  vtkSMRenderViewProxy* renModule = view->GetRenderView();
+  renModule->ResetCamera();
+  this->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -154,11 +179,70 @@ void pqScatterPlotView::setDefaultPropertyValues()
   return widget;
 }
 */
+/*
 void pqScatterPlotView::initializeWidgets()
 {
   this->Superclass::initializeWidgets();
   this->setOrientationAxesVisibility(false);
 }
+*/
+//-----------------------------------------------------------------------------
+// This method is called for all pqTwoDRenderView objects irrespective
+// of whether it is created from state/undo-redo/python or by the GUI. Hence
+// don't change any render module properties here.
+void pqScatterPlotView::initializeWidgets()
+{
+  if (this->Internal->InitializedWidgets)
+    {
+    return;
+    }
+
+  this->Internal->InitializedWidgets = true;
+
+  vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+    this->getProxy());
+
+  vtkSMRenderViewProxy* renModule = view->GetRenderView();
+  QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
+  if (vtkwidget)
+    {
+    vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
+    }
+  
+  vtkPVGenericRenderWindowInteractor* iren = renModule->GetInteractor();
+
+  // Init axes actor.
+  // FIXME: Convert OrientationAxesWidget to a first class representation.
+  this->Internal->OrientationAxesWidget->SetParentRenderer(
+    renModule->GetRenderer());
+  this->Internal->OrientationAxesWidget->SetViewport(0, 0, 0.25, 0.25);
+  this->Internal->OrientationAxesWidget->SetInteractor(iren);
+  this->Internal->OrientationAxesWidget->SetEnabled(0);
+  this->Internal->OrientationAxesWidget->SetInteractive(0);
+}
+
+//-----------------------------------------------------------------------------
+void pqScatterPlotView::setOrientationAxesVisibility(bool visible)
+{
+  this->Internal->OrientationAxesWidget->SetEnabled(visible? 1: 0);
+}
+
+//-----------------------------------------------------------------------------
+vtkImageData* pqScatterPlotView::captureImage(int magnification)
+{
+  if (this->getWidget()->isVisible())
+    {
+    vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
+      this->getProxy());
+
+    vtkSMRenderViewProxy* renModule = view->GetRenderView();
+    return renModule->CaptureWindow(magnification);
+    }
+
+  // Don't return any image when the view is not visible.
+  return NULL;
+}
+
 
 /// Must be overridden to return the default manipulator types.
 /*
