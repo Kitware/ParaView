@@ -56,11 +56,13 @@ public:
     FlushCount(0)
   {
     this->Timer.setSingleShot(true);
+    this->QueueTimer.setSingleShot(true);
   }
   
   pqEventSource* Source;
   pqEventPlayer* Player;
   QTimer Timer;
+  QTimer QueueTimer;
   enum EventStates
     {
     FlushEvents,
@@ -72,6 +74,9 @@ public:
 
   static int WaitTime;
 };
+
+// #include <iostream>
+// using namespace std;
 
 static int MaxFlushCount = 2;
 int pqEventDispatcher::pqImplementation::WaitTime = 0;
@@ -87,13 +92,21 @@ pqEventDispatcher::pqEventDispatcher() :
 
   QObject::connect(&this->Implementation->Timer, SIGNAL(timeout()),
                    this, SLOT(checkPlayNextEvent()));
+
+  // QueueTimer is only used to continue processing of events when blocking
+  // actions such as opening of modal dialogs are executed.
+  QObject::connect(&this->Implementation->QueueTimer, SIGNAL(timeout()),
+    this, SLOT(checkPlayNextEvent()));
+
 }
 
+//-----------------------------------------------------------------------------
 pqEventDispatcher::~pqEventDispatcher()
 {
   delete this->Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
 {
   if(this->Implementation->Source)
@@ -113,6 +126,7 @@ void pqEventDispatcher::playEvents(pqEventSource& source, pqEventPlayer& player)
   this->Implementation->WaitTime = 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqEventDispatcher::checkPlayNextEvent()
 {
   if(this->Implementation->EventState == pqImplementation::Done)
@@ -128,14 +142,12 @@ void pqEventDispatcher::checkPlayNextEvent()
     {
     this->Implementation->FlushCount = 0;
     this->Implementation->Timer.setInterval(this->Implementation->WaitTime);
-    this->Implementation->Timer.start();
     }
   else if(this->Implementation->EventState == pqImplementation::DoEvent)
     {
     this->Implementation->FlushCount = 0;
     this->Implementation->EventState = pqImplementation::FlushEvents;
     pqEventDispatcher::processEventsAndWait(1);
-    this->Implementation->Timer.start();
     emit this->readyPlayNextEvent();
     }
   else if(this->Implementation->EventState == pqImplementation::FlushEvents)
@@ -144,17 +156,30 @@ void pqEventDispatcher::checkPlayNextEvent()
       QAbstractEventDispatcher::instance()->hasPendingEvents())
       {
       this->Implementation->FlushCount++;
-      this->Implementation->Timer.start();
       }
     else
       {
       this->Implementation->EventState = pqImplementation::DoEvent;
-      this->Implementation->Timer.start();
       }
     }
+  this->Implementation->Timer.start();
 }
 
-  
+//-----------------------------------------------------------------------------
+void pqEventDispatcher::queueNextEvent()
+{
+  // cout << "About To Block -- queue, next event" << endl;
+  // This has a longer delay, so as to take into consideration the time needed
+  // to handle the normal event. If the normal processing completes within this
+  // time, then the timer is stopped and we continue with the regular execution.
+  this->Implementation->QueueTimer.setInterval(1000);
+  this->Implementation->QueueTimer.start();
+  QObject::disconnect(QAbstractEventDispatcher::instance(),
+    SIGNAL(aboutToBlock()),
+    this, SLOT(queueNextEvent()));
+}
+
+//-----------------------------------------------------------------------------
 void pqEventDispatcher::playNextEvent()
 {
 
@@ -188,7 +213,19 @@ void pqEventDispatcher::playNextEvent()
     }
     
   bool error = false;
+  // cout << "Start Play"  << endl;
+  // When modal dialogs are being popped up, we want to ensure that the
+  // command-queue processing still continues. Hence we listen to this
+  // aboutToBlock() signal and then continue with the event processing.
+  QObject::connect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
+    this, SLOT(queueNextEvent()));
   this->Implementation->Player->playEvent(object, command, arguments, error);
+  QObject::disconnect(QAbstractEventDispatcher::instance(), SIGNAL(aboutToBlock()),
+    this, SLOT(queueNextEvent()));
+  // We are done with normal processing so no need to processing the event queue
+  // using this modal-dialog mechanism.
+  this->Implementation->QueueTimer.stop();
+  // cout << "End Play"  << endl;
   if(error)
     {
     this->stopPlayback();
@@ -197,6 +234,7 @@ void pqEventDispatcher::playNextEvent()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqEventDispatcher::stopPlayback()
 {
   this->Implementation->Timer.stop();
@@ -211,6 +249,7 @@ void pqEventDispatcher::stopPlayback()
   QCoreApplication::processEvents();
 }
 
+//-----------------------------------------------------------------------------
 void pqEventDispatcher::processEventsAndWait(int ms)
 {
   if(QThread::currentThread() == qApp->thread())

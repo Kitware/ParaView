@@ -16,6 +16,9 @@ QtTesting.setProperty(object5, 'samples', '120;130;140;150')
 QtTesting.playCommand(object2, 'activate', '')
 object1 = 'pqClientMainWindow/menubar/menuEdit'
 QtTesting.playCommand(object1, 'activate', 'actionEditUndo')
+# Need to wait a moment to allow the GUI to update.
+import time
+time.sleep(1)
 val = QtTesting.getProperty(object5, 'samples')
 
 if val != "120":

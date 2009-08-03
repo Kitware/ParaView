@@ -69,6 +69,7 @@ signals:
 private slots:
   void playNextEvent();
   void checkPlayNextEvent();
+  void queueNextEvent();
 
 private:
   void stopPlayback();
