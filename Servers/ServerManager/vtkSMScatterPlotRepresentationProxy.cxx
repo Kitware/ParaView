@@ -48,7 +48,7 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -68,7 +68,7 @@ vtkSMScatterPlotRepresentationProxy::~vtkSMScatterPlotRepresentationProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMScatterPlotRepresentationProxy::AddInput(unsigned int inputPort,
+/*void vtkSMScatterPlotRepresentationProxy::AddInput(unsigned int inputPort,
                                                    vtkSMSourceProxy* input,
                                                    unsigned int outputPort,
                                                    const char* method)
@@ -76,6 +76,7 @@ void vtkSMScatterPlotRepresentationProxy::AddInput(unsigned int inputPort,
   this->vtkSMDataRepresentationProxy::AddInput(inputPort,input,outputPort,method);
   this->UpdatePropertyInformation();
 }
+*/
 //-----------------------------------------------------------------------------
 bool vtkSMScatterPlotRepresentationProxy::BeginCreateVTKObjects()
 {

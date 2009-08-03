@@ -137,9 +137,9 @@ namespace {
   {
   typedef pqComboBoxDomain Superclass;
 public:
-    pqComboBoxDecoratedDomain(QComboBox* comboBox, vtkSMProperty* property, 
+    pqComboBoxDecoratedDomain(QComboBox* comboBox, vtkSMProperty* prop, 
                               const QString& domainName = QString())
-    : Superclass(comboBox, property, domainName) 
+    : Superclass(comboBox, prop, domainName) 
     {
     this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
     this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");

@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.1");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.2");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -165,7 +165,7 @@ vtkDataArray* vtkScatterPlotPainter::GetArray(int idx)
 {
   vtkDataObject* object = this->GetInput();
   
-  vtkInformation* array = this->GetInputArrayInformation(idx);
+  //vtkInformation* array = this->GetInputArrayInformation(idx);
   //vtkDataObject* object = 
   //  this->GetInputDataObject(INPUTS_PORT, array->Get(INPUT_CONNECTION()));
   /*
@@ -776,11 +776,11 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
     // Make sure we're not indexing into empty glyph
     if(source!=0)
       {
-      double bounds[6];
-      source->GetBounds(bounds);// can be invalid/uninitialized
-      if(vtkMath::AreBoundsInitialized(bounds))
+      double sourcebounds[6];
+      source->GetBounds(sourcebounds);// can be invalid/uninitialized
+      if(vtkMath::AreBoundsInitialized(sourcebounds))
         {
-        bbox.AddBounds(bounds);
+        bbox.AddBounds(sourcebounds);
         }
       }
     }
@@ -877,7 +877,7 @@ void vtkScatterPlotPainter::PrepareForRendering(vtkRenderer *ren,
 {
   // Get the color ready
   this->UpdatePainterInformation();
-  vtkInformation* array = this->GetInputArrayInformation(vtkScatterPlotMapper::COLOR);
+  //vtkInformation* array = this->GetInputArrayInformation(vtkScatterPlotMapper::COLOR);
   //vtkDataObject* object = this->GetInputDataObject(
   //  INPUTS_PORT,array->Get(INPUT_CONNECTION()));
   
@@ -943,9 +943,9 @@ void vtkScatterPlotPainter::RenderInternal(vtkRenderer *ren, vtkActor *actor,
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     }
 */
-  bool immediateMode = //this->ImmediateModeRendering ||
+  //bool immediateMode = //this->ImmediateModeRendering ||
     //vtkMapper::GetGlobalImmediateModeRendering();
-  this->Information->Get(vtkDisplayListPainter::IMMEDIATE_MODE_RENDERING());
+  //this->Information->Get(vtkDisplayListPainter::IMMEDIATE_MODE_RENDERING());
     //|| selecting_points;
 /*
   bool createDisplayList = false;
@@ -1045,7 +1045,8 @@ void vtkScatterPlotPainter::RenderInternal(vtkRenderer *ren, vtkActor *actor,
 }
 
 //-----------------------------------------------------------------------------
-void vtkScatterPlotPainter::RenderPoints(vtkRenderer *ren, vtkActor *actor,
+void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren), 
+                                         vtkActor *vtkNotUsed(actor),
                                          unsigned long vtkNotUsed(typeflags), 
                                          bool vtkNotUsed(forceCompileOnly))
 {

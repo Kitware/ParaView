@@ -33,11 +33,11 @@ public:
   vtkTypeRevisionMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void AddInput(unsigned int inputPort,
-                        vtkSMSourceProxy* input,
-                        unsigned int outputPort,
-                        const char* method);
-
+  // virtual void AddInput(unsigned int inputPort,
+//                         vtkSMSourceProxy* input,
+//                         unsigned int outputPort,
+//                         const char* method);
+  
   // Description:
   // Called when a representation is added to a view. 
   // Returns true on success.
