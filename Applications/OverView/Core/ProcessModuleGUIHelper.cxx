@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.11");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.12");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -59,7 +59,7 @@ ProcessModuleGUIHelper::ProcessModuleGUIHelper()
     this->Splash = new QSplashScreen(pix);
     this->Splash->setMask(pix.createMaskFromColor(QColor(Qt::transparent)));
     this->Splash->setAttribute(Qt::WA_DeleteOnClose);
-    this->Splash->setWindowFlags(Qt::WindowStaysOnTopHint);
+    this->Splash->setWindowFlags(Qt::SplashScreen|Qt::WindowStaysOnTopHint);
     this->Splash->setFont(QFont("Helvetica", 12, QFont::Bold));
     this->Splash->showMessage(
       QString("%1 %2").arg(OverView::GetBrandedApplicationTitle()).arg(OverView::GetBrandedFullVersion()),
