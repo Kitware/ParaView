@@ -118,6 +118,8 @@
     <addaction name="actionPickCenter" />
     <addaction name="actionScalarBarVisibility" />
     <addaction name="separator" />
+    <addaction name="actionFullScreen" />
+    <addaction name="separator" />
     <addaction name="menuToolbars" />
     <addaction name="separator" />
    </widget>
@@ -1111,6 +1113,17 @@
    </property>
    <property name="statusTip" >
     <string>Show/Hide center of rotation</string>
+   </property>
+  </action>
+  <action name="actionFullScreen" >
+   <property name="text" >
+    <string>Full Screen</string>
+   </property>
+   <property name="statusTip" >
+    <string>Switch to full screen mode. Hit Esc to return to normal mode.</string>
+   </property>
+   <property name="shortcut" >
+    <string>F11</string>
    </property>
   </action>
   <action name="actionResetCenter" >

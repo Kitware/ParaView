@@ -474,6 +474,11 @@ void pqClientMainWindow::constructorHelper()
     this->Implementation->UI.actionNegativeZ, SIGNAL(triggered()),
     this->Implementation->Core, SLOT(resetViewDirectionNegZ()));
 
+  connect(
+    this->Implementation->UI.actionFullScreen, SIGNAL(triggered()),
+    &this->Implementation->Core->multiViewManager(),
+    SLOT(toggleFullScreen()));
+
 
   // Setup the 'modes' so that they are exclusively selected
   QActionGroup *modeGroup = new QActionGroup(this);
