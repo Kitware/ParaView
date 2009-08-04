@@ -903,6 +903,7 @@ void pqScatterPlotDisplayPanel::rescaleToDataRange()
     return;
     }
   this->Internal->Representation->resetLookupTableScalarRange();
+  this->Internal->Representation->renderViewEventually();
 }
 
 /*
