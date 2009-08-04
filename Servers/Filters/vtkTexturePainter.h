@@ -131,6 +131,8 @@ public:
     };
   //ETX
 
+  virtual void ReleaseGraphicsResources (vtkWindow *);
+
 //BTX
 protected:
   vtkTexturePainter();

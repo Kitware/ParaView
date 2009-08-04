@@ -33,7 +33,7 @@
 #include "vtkTexture.h"
 
 vtkStandardNewMacro(vtkTexturePainter);
-vtkCxxRevisionMacro(vtkTexturePainter, "1.5");
+vtkCxxRevisionMacro(vtkTexturePainter, "1.6");
 vtkCxxSetObjectMacro(vtkTexturePainter, LookupTable, vtkScalarsToColors);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE, Integer);
 vtkInformationKeyMacro(vtkTexturePainter, SLICE_MODE, Integer);
@@ -68,6 +68,13 @@ vtkTexturePainter::~vtkTexturePainter()
   this->Texture->Delete();
   this->SetLookupTable(0);
   this->SetScalarArrayName(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkTexturePainter::ReleaseGraphicsResources (vtkWindow *win)
+{
+  this->Texture->ReleaseGraphicsResources(win);
+  this->Superclass::ReleaseGraphicsResources(win);
 }
 
 //----------------------------------------------------------------------------

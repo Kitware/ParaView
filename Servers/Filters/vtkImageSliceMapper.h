@@ -46,6 +46,8 @@ public:
   // This calls RenderPiece (in a for loop is streaming is necessary).
   virtual void Render(vtkRenderer *ren, vtkActor *act);
 
+  virtual void ReleaseGraphicsResources (vtkWindow *);
+
   // Description:
   // Get/Set the painter that does the actual rendering.
   void SetPainter(vtkPainter*);

@@ -47,7 +47,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkImageSliceMapper);
-vtkCxxRevisionMacro(vtkImageSliceMapper, "1.5");
+vtkCxxRevisionMacro(vtkImageSliceMapper, "1.6");
 //----------------------------------------------------------------------------
 vtkImageSliceMapper::vtkImageSliceMapper()
 {
@@ -94,6 +94,13 @@ void vtkImageSliceMapper::SetPainter(vtkPainter* p)
     this->Painter->AddObserver(vtkCommand::ProgressEvent, this->Observer);
     this->Painter->SetInformation(this->PainterInformation);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkImageSliceMapper::ReleaseGraphicsResources (vtkWindow *win)
+{
+  this->Painter->ReleaseGraphicsResources(win);
+  this->Superclass::ReleaseGraphicsResources(win);
 }
 
 //----------------------------------------------------------------------------
