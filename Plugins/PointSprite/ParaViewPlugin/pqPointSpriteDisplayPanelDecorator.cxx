@@ -98,44 +98,49 @@ pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
   // vtkSMProperty* prop;
   this->Internals = NULL;
 
-  if (reprProxy)
+  if (!reprProxy || 
+    !reprProxy->GetXMLName() ||
+    (strcmp(reprProxy->GetXMLName(), "GeometryRepresentation") != 0  &&
+     strcmp(reprProxy->GetXMLName(), "UnstructuredGridRepresentation") != 0  &&
+     strcmp(reprProxy->GetXMLName(), "UniformGridRepresentation") != 0))
     {
-
-    this->Internals = new pqInternals(this);
-    QVBoxLayout* vlayout = dynamic_cast<QVBoxLayout*> (panel->layout());
-    if (vlayout)
-      {
-      vlayout->insertWidget(2, this);
-      }
-    else
-      {
-      panel->layout()->addWidget(this);
-      }
-    this->Internals->setupUi(this);
-    this->Internals->RepresentationProxy = reprProxy;
-
-    // setup the scaleBy and radiusBy menus
-    this->Internals->ScaleBy->setConstantVariableName("Constant Radius");
-    this->Internals->ScaleBy->setPropertyArrayName("RadiusArray");
-    this->Internals->ScaleBy->setPropertyArrayComponent("RadiusVectorComponent");
-    this->Internals->ScaleBy->setToolTip(
-        "select method for scaling the point sprites.");
-
-    this->Internals->OpacityBy->setConstantVariableName("Constant Opacity");
-    this->Internals->OpacityBy->setPropertyArrayName("OpacityArray");
-    this->Internals->OpacityBy->setPropertyArrayComponent(
-        "OpacityVectorComponent");
-    this->Internals->OpacityBy->setToolTip(
-        "select method for setting the opacity of the point sprites.");
-
-    this->Internals->ScaleBy->reloadGUI();
-    this->Internals->OpacityBy->reloadGUI();
-
-    this->setupGUIConnections();
-
-    this->setRepresentation(
-        static_cast<pqPipelineRepresentation*> (panel->getRepresentation()));
+    return;
     }
+
+  this->Internals = new pqInternals(this);
+  QVBoxLayout* vlayout = dynamic_cast<QVBoxLayout*> (panel->layout());
+  if (vlayout)
+    {
+    vlayout->insertWidget(2, this);
+    }
+  else
+    {
+    panel->layout()->addWidget(this);
+    }
+  this->Internals->setupUi(this);
+  this->Internals->RepresentationProxy = reprProxy;
+
+  // setup the scaleBy and radiusBy menus
+  this->Internals->ScaleBy->setConstantVariableName("Constant Radius");
+  this->Internals->ScaleBy->setPropertyArrayName("RadiusArray");
+  this->Internals->ScaleBy->setPropertyArrayComponent("RadiusVectorComponent");
+  this->Internals->ScaleBy->setToolTip(
+    "select method for scaling the point sprites.");
+
+  this->Internals->OpacityBy->setConstantVariableName("Constant Opacity");
+  this->Internals->OpacityBy->setPropertyArrayName("OpacityArray");
+  this->Internals->OpacityBy->setPropertyArrayComponent(
+    "OpacityVectorComponent");
+  this->Internals->OpacityBy->setToolTip(
+    "select method for setting the opacity of the point sprites.");
+
+  this->Internals->ScaleBy->reloadGUI();
+  this->Internals->OpacityBy->reloadGUI();
+
+  this->setupGUIConnections();
+
+  this->setRepresentation(
+    static_cast<pqPipelineRepresentation*> (panel->getRepresentation()));
   QObject::connect(&this->Internals->Links, SIGNAL(smPropertyChanged()), panel,
       SLOT(updateAllViews()), Qt::QueuedConnection);
 
@@ -155,6 +160,8 @@ pqPointSpriteDisplayPanelDecorator::pqPointSpriteDisplayPanelDecorator(
 //-----------------------------------------------------------------------------
 pqPointSpriteDisplayPanelDecorator::~pqPointSpriteDisplayPanelDecorator()
 {
+  delete this->Internals;
+  this->Internals = 0;
 }
 
 //-----------------------------------------------------------------------------
