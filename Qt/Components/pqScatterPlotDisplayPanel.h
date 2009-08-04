@@ -63,6 +63,8 @@ protected slots:
   
   void updateGlyphMode();
   
+  void onColorChanged();
+  
   void setSolidColor(const QColor& color);
   
   QVariant specularColor() const;

@@ -826,6 +826,11 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
                    SIGNAL(stateChanged(int)),
                    this, SLOT(update3DMode()), Qt::QueuedConnection);
 
+  QObject::connect(this->Internal->ColorComboBox, 
+                   SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(onColorChanged()), Qt::QueuedConnection);
+
+
   // Request a render when any GUI widget is changed by the user.
   QObject::connect(&this->Internal->Links, SIGNAL(qtWidgetChanged()),
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
@@ -955,6 +960,14 @@ void pqScatterPlotDisplayPanel::updateGlyphMode()
   this->Internal->ScatterPlotRepresentation->UpdateProperty("GlyphMode");
   this->Internal->ScatterPlotRepresentation->UpdateVTKObjects();
   this->updateAllViews();
+}
+
+
+//-----------------------------------------------------------------------------
+void pqScatterPlotDisplayPanel::onColorChanged()
+{
+  this->Internal->Representation->resetLookupTableScalarRange();
+  this->Internal->Representation->renderViewEventually();
 }
 
 //-----------------------------------------------------------------------------
