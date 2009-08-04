@@ -419,6 +419,8 @@ void pqAnimationModel::enabledChanged()
       this->CheckBoxPixMaps->getPixmap(Qt::Checked, false):
       this->CheckBoxPixMaps->getPixmap(Qt::Unchecked, false),
       Qt::DecorationRole);
+    this->EnabledHeader.setHeaderData(i+1, Qt::Vertical,
+      "Enable/Disable Track", Qt::ToolTipRole);
     }
 }
 
