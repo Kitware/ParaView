@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqAnimationTrack;
 class pqAnimationKeyFrame;
 class QGraphicsView;
+class pqCheckBoxPixMaps;
 
 // a model that represents a collection of animation tracks
 class QTWIDGETS_EXPORT pqAnimationModel : public QGraphicsScene
@@ -96,6 +97,8 @@ public:
   bool interactive() const;
 
   QAbstractItemModel* header();
+  QAbstractItemModel* enabledHeader();
+
   void setRowHeight(int);
   int rowHeight() const;
 
@@ -129,6 +132,7 @@ protected slots:
 
   void resizeTracks();
   void trackNameChanged();
+  void enabledChanged();
 
 protected:
   QPolygonF timeBarPoly(double time);
@@ -176,6 +180,11 @@ private:
 
   // model that provides names of tracks
   QStandardItemModel Header;
+
+  // model that provides enabled state for the tracks.
+  QStandardItemModel EnabledHeader;
+
+  pqCheckBoxPixMaps* CheckBoxPixMaps;
 
 };
 

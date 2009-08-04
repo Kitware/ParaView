@@ -32,11 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationWidget.h"
 
-#include <QResizeEvent>
 #include <QGraphicsView>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QResizeEvent>
 #include <QScrollBar>
+#include <QStyle>
+#include <QStyleOptionButton>
 
 #include "pqAnimationModel.h"
 #include "pqAnimationTrack.h"
@@ -62,6 +64,15 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
                               QSizePolicy::MinimumExpanding);
   this->CreateDeleteHeader->setResizeMode(QHeaderView::Fixed);
   this->CreateDeleteHeader->setModel(&this->CreateDeleteModel);
+
+  this->EnabledHeader = new QHeaderView(Qt::Vertical, this);
+  this->EnabledHeader->setObjectName("EnabledHeader");
+  this->EnabledHeader->viewport()->setBackgroundRole(QPalette::Window);
+  this->EnabledHeader->setClickable(true);
+  this->EnabledHeader->setSizePolicy(QSizePolicy::Preferred,
+    QSizePolicy::MinimumExpanding);
+  this->EnabledHeader->setResizeMode(QHeaderView::Fixed);
+  this->EnabledHeader->setModel(this->Model->enabledHeader());
 
   this->Header = new QHeaderView(Qt::Vertical, this);
   this->Header->viewport()->setBackgroundRole(QPalette::Window);
@@ -96,6 +107,9 @@ pqAnimationWidget::pqAnimationWidget(QWidget* p)
   QObject::connect(this->CreateDeleteHeader,
                    SIGNAL(sectionClicked(int)),
                    this, SLOT(headerDeleteClicked(int)));
+  QObject::connect(this->EnabledHeader,
+                   SIGNAL(sectionClicked(int)),
+                   this, SLOT(headerEnabledClicked(int)));
 }
 
 pqAnimationWidget::~pqAnimationWidget()
@@ -110,6 +124,11 @@ pqAnimationModel* pqAnimationWidget::animationModel() const
 QHeaderView* pqAnimationWidget::createDeleteHeader() const
 {
   return this->CreateDeleteHeader;
+}
+
+QHeaderView* pqAnimationWidget::enabledHeader() const
+{
+  return this->EnabledHeader;
 }
 
 QWidget* pqAnimationWidget::createDeleteWidget() const
@@ -150,11 +169,12 @@ void pqAnimationWidget::headerDblClicked(int which)
     emit this->trackSelected(this->Model->track(which-1));
     }
 }
-  
+
 void pqAnimationWidget::updateGeometries()
 {
   int width1 = 0;
   int width2 = 0;
+  int width3 = 0;
   
   if(!this->CreateDeleteHeader->isHidden())
     {
@@ -168,12 +188,22 @@ void pqAnimationWidget::updateGeometries()
                  this->Header->sizeHint().width());
     width2 = qMin(tmp, this->Header->maximumWidth());
     }
+  if (!this->EnabledHeader->isHidden())
+    {
+    // get the size of a checkbox in pixels. That's the width we want 
+    // (+ padding) for the EnabledHeader.
+    QStyleOptionButton option;
+    QRect r = this->style()->subElementRect(
+      QStyle::SE_CheckBoxIndicator, &option, this);
+    width3 = r.width()+8;
+    }
 
-  this->setViewportMargins(width1 + width2, 0, 0, 0);
+  this->setViewportMargins(width1 + width2 + width3, 0, 0, 0);
 
   QRect vg = this->contentsRect();
   this->CreateDeleteHeader->setGeometry(vg.left(), vg.top(), width1, vg.height());
-  this->Header->setGeometry(vg.left() + width1, vg.top(), width2, vg.height());
+  this->EnabledHeader->setGeometry(vg.left()+width1, vg.top(), width3, vg.height());
+  this->Header->setGeometry(vg.left() + width1 + width3, vg.top(), width2, vg.height());
 
   this->updateScrollBars();
 }
@@ -184,6 +214,7 @@ void pqAnimationWidget::scrollContentsBy(int dx, int dy)
     {
     this->CreateDeleteHeader->setOffset(this->verticalScrollBar()->value());
     this->Header->setOffset(this->verticalScrollBar()->value());
+    this->EnabledHeader->setOffset(this->verticalScrollBar()->value());
     }
   this->updateWidgetPosition();
   QAbstractScrollArea::scrollContentsBy(dx, dy);
@@ -197,6 +228,10 @@ void pqAnimationWidget::updateScrollBars()
   if(this->CreateDeleteHeader->isVisible())
     {
     h = qMax(h, this->CreateDeleteHeader->length());
+    }
+  if (this->EnabledHeader->isVisible())
+    {
+    h = qMax(h, this->EnabledHeader->length());
     }
   if(this->Header->isVisible())
     {
@@ -269,6 +304,18 @@ void pqAnimationWidget::headerDeleteClicked(int which)
         {
         emit this->deleteTrackClicked(t);
         }
+      }
+    }
+}
+
+void pqAnimationWidget::headerEnabledClicked(int which)
+{
+  if (which > 0)
+    {
+    pqAnimationTrack* track = this->Model->track(which-1);
+    if (track)
+      {
+      emit this->enableTrackClicked(track);
       }
     }
 }

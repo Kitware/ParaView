@@ -69,6 +69,7 @@ public:
     {
     this->AnimationWidget = new pqAnimationWidget(parent);
     this->AnimationWidget->createDeleteHeader()->hide();
+    this->AnimationWidget->enabledHeader()->hide();
     this->VTKConnect = vtkEventQtSlotConnect::New();
     }
 

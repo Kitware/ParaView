@@ -75,8 +75,15 @@ public slots:
 
   void setBoundingRect(const QRectF& r);
 
+  void setEnabled(bool enable)
+    {
+    this->QGraphicsItem::setEnabled(enable);
+    emit this->enabledChanged();
+    }
+
 signals:
   void propertyChanged();
+  void enabledChanged();
 
 protected:
 

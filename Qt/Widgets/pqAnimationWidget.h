@@ -52,6 +52,9 @@ public:
 
   pqAnimationModel* animationModel() const;
 
+  /// Enabled header is used to show if the track is enabled.
+  QHeaderView* enabledHeader() const;
+
   QHeaderView* createDeleteHeader() const;
   QWidget* createDeleteWidget() const;
 
@@ -61,10 +64,14 @@ signals:
   void deleteTrackClicked(pqAnimationTrack*);
   void createTrackClicked();
 
+  /// request enable/disabling of the track.
+  void enableTrackClicked(pqAnimationTrack*);
+
 protected slots:
   void updateSizes();
   void headerDblClicked(int);
   void headerDeleteClicked(int);
+  void headerEnabledClicked(int which);
 
 protected:
   void updateGeometries();
@@ -77,6 +84,7 @@ protected:
 private:
   QGraphicsView* View;
   QHeaderView* CreateDeleteHeader;
+  QHeaderView* EnabledHeader;
   QStandardItemModel CreateDeleteModel;
   QHeaderView* Header;
   QWidget* CreateDeleteWidget;

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGraphicsView>
 #include "pqAnimationTrack.h"
 
+//-----------------------------------------------------------------------------
 pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
   : QObject(p), QGraphicsItem(p,s),
   NormalizedStartTime(0), NormalizedEndTime(1),
@@ -45,66 +46,89 @@ pqAnimationKeyFrame::pqAnimationKeyFrame(pqAnimationTrack* p, QGraphicsScene* s)
 {
 }
 
+//-----------------------------------------------------------------------------
 pqAnimationKeyFrame::~pqAnimationKeyFrame()
 {
 }
 
+//-----------------------------------------------------------------------------
+pqAnimationTrack* pqAnimationKeyFrame::parentTrack() const
+{
+  return qobject_cast<pqAnimationTrack*>(this->QObject::parent());
+}
+
+//-----------------------------------------------------------------------------
 QVariant pqAnimationKeyFrame::startValue() const
 {
   return this->StartValue;
 }
+
+//-----------------------------------------------------------------------------
 QVariant pqAnimationKeyFrame::endValue() const
 {
   return this->EndValue;
 }
 
+//-----------------------------------------------------------------------------
 QIcon pqAnimationKeyFrame::icon() const
 {
   return this->Icon;
 }
 
+//-----------------------------------------------------------------------------
 double pqAnimationKeyFrame::normalizedStartTime() const
 {
   return this->NormalizedStartTime;
 }
+
+//-----------------------------------------------------------------------------
 double pqAnimationKeyFrame::normalizedEndTime() const
 {
   return this->NormalizedEndTime;
 }
+
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setNormalizedStartTime(double t)
 {
   this->NormalizedStartTime = t;
   this->adjustRect();
 }
+
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setNormalizedEndTime(double t)
 {
   this->NormalizedEndTime = t;
   this->adjustRect();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setStartValue(const QVariant& v)
 {
   this->StartValue = v;
   this->update();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setEndValue(const QVariant& v)
 {
   this->EndValue = v;
   this->update();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setIcon(const QIcon& i)
 {
   this->Icon = i;
   this->update();
 }
   
+//-----------------------------------------------------------------------------
 QRectF pqAnimationKeyFrame::boundingRect() const
 { 
   return this->Rect;
 }
   
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
 {
   this->removeFromIndex();
@@ -113,6 +137,7 @@ void pqAnimationKeyFrame::setBoundingRect(const QRectF& r)
   this->update();
 }
 
+//-----------------------------------------------------------------------------
 void pqAnimationKeyFrame::adjustRect()
 {
   pqAnimationTrack* track = qobject_cast<pqAnimationTrack*>(this->parent());
@@ -127,17 +152,22 @@ void pqAnimationKeyFrame::adjustRect()
 }
 
 
-void pqAnimationKeyFrame::paint(QPainter* p,
+//-----------------------------------------------------------------------------
+void pqAnimationKeyFrame::paint(QPainter* painter,
                    const QStyleOptionGraphicsItem *,
                    QWidget * widget)
 {
-  p->save();
-  p->setBrush(QBrush(QColor(255,255,255)));
+  painter->save();
+  if (this->parentTrack()->isEnabled())
+    {
+    // change brush only when parent track is enabled.
+    painter->setBrush(QBrush(QColor(255,255,255)));
+    }
   QPen pen(QColor(0,0,0));
   pen.setWidth(0);
-  p->setPen(pen);
+  painter->setPen(pen);
   QRectF keyFrameRect(this->boundingRect());
-  p->drawRect(keyFrameRect);
+  painter->drawRect(keyFrameRect);
 
   QFontMetrics metrics(widget->font());
   double halfWidth = keyFrameRect.width()/2.0 - 5;
@@ -148,22 +178,22 @@ void pqAnimationKeyFrame::paint(QPainter* p,
     qRound(halfWidth));
   QPointF pt(keyFrameRect.left()+3.0, 
             keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
-  p->drawText(pt, label);
+  painter->drawText(pt, label);
   iconWidth -= metrics.width(label);
   
   label = metrics.elidedText(endValue().toString(), Qt::ElideRight,
     qRound(halfWidth));
   pt = QPointF(keyFrameRect.right() - metrics.width(label) - 3.0, 
             keyFrameRect.top() + 0.5*keyFrameRect.height() + metrics.height() / 2.0 - 1.0);
-  p->drawText(pt, label);
+  painter->drawText(pt, label);
   iconWidth -= metrics.width(label);
 
   if(iconWidth >= 16)
     {
     QPixmap pix = this->Icon.pixmap(16);
-    p->drawPixmap(keyFrameRect.center() - QPointF(8.0,8.0), pix);
+    painter->drawPixmap(keyFrameRect.center() - QPointF(8.0,8.0), pix);
     }
 
-  p->restore();
+  painter->restore();
 }
 

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \date 8/17/2007
 
 #include "pqCheckableHeaderView.h"
+#include "pqCheckBoxPixMaps.h"
 
 #include <QAbstractItemModel>
 #include <QApplication>
@@ -61,28 +62,11 @@ public:
 class pqCheckableHeaderViewInternal
 {
 public:
-  enum PixmapStateIndex
-    {
-    Checked                 = 0,
-    PartiallyChecked        = 1,
-    UnChecked               = 2,
-    
-    // All active states in lower half
-    Checked_Active          = 3,
-    PartiallyChecked_Active = 4,
-    UnChecked_Active        = 5,
-   
-    PixmapCount             = 6
-    };
-
-public:
   pqCheckableHeaderViewInternal();
   ~pqCheckableHeaderViewInternal();
 
-  QPixmap getPixmap(int state, bool active) const;
-
+  pqCheckBoxPixMaps* CheckBoxPixMaps;
   QList<pqCheckableHeaderViewItem> Items;
-  QPixmap **Pixmaps;
   bool IgnoreChange;
 };
 
@@ -114,41 +98,14 @@ pqCheckableHeaderViewItem &pqCheckableHeaderViewItem::operator=(
 pqCheckableHeaderViewInternal::pqCheckableHeaderViewInternal()
   : Items()
 {
-  this->Pixmaps = new QPixmap*[PixmapCount];
   this->IgnoreChange = false;
+  this->CheckBoxPixMaps = 0;
 }
 
 pqCheckableHeaderViewInternal::~pqCheckableHeaderViewInternal()
 {
-  for(int i = 0; i < PixmapCount; i++)
-    {
-    delete this->Pixmaps[i];
-    }
-
-  delete [] this->Pixmaps;
+  delete this->CheckBoxPixMaps;
 }
-
-QPixmap pqCheckableHeaderViewInternal::getPixmap(int state, bool active) const
-{
-  int offset = active ? 3 : 0;
-  switch(state)
-    {
-    case Qt::Checked:
-      {
-      return *this->Pixmaps[offset + Checked];
-      }
-    case Qt::Unchecked:
-      {
-      return *this->Pixmaps[offset + UnChecked];
-      }
-    case Qt::PartiallyChecked:
-      {
-      return *this->Pixmaps[offset + PartiallyChecked];
-      }
-    }
-  return QPixmap();
-}
-
 
 //----------------------------------------------------------------------------
 pqCheckableHeaderView::pqCheckableHeaderView(Qt::Orientation orient,
@@ -156,33 +113,7 @@ pqCheckableHeaderView::pqCheckableHeaderView(Qt::Orientation orient,
   : QHeaderView(orient, widgetParent)
 {
   this->Internal = new pqCheckableHeaderViewInternal();
-
-  // Initialize the pixmaps. The following style array should
-  // correspond to the PixmapStateIndex enum.
-  const QStyle::State PixmapStyle[] =
-    {
-    QStyle::State_On | QStyle::State_Enabled,
-    QStyle::State_NoChange | QStyle::State_Enabled,
-    QStyle::State_Off | QStyle::State_Enabled,
-    QStyle::State_On | QStyle::State_Enabled | QStyle::State_Active,
-    QStyle::State_NoChange | QStyle::State_Enabled | QStyle::State_Active,
-    QStyle::State_Off | QStyle::State_Enabled | QStyle::State_Active
-    };
-
-  QStyleOptionButton option;
-  QRect r = this->style()->subElementRect(
-      QStyle::SE_CheckBoxIndicator, &option, this);
-  option.rect = QRect(QPoint(0,0), r.size());
-  for(int i = 0; i < pqCheckableHeaderViewInternal::PixmapCount; i++)
-    {
-    this->Internal->Pixmaps[i] = new QPixmap(r.size());
-    this->Internal->Pixmaps[i]->fill(QColor(0, 0, 0, 0));
-    QPainter painter(this->Internal->Pixmaps[i]);
-    option.state = PixmapStyle[i];
-    
-    this->style()->drawPrimitive(
-        QStyle::PE_IndicatorCheckBox, &option, &painter, this);
-    }
+  this->Internal->CheckBoxPixMaps = new pqCheckBoxPixMaps(this);
 
   // Listen for user clicks.
   this->connect(this, SIGNAL(sectionClicked(int)),
@@ -214,7 +145,7 @@ bool pqCheckableHeaderView::eventFilter(QObject *, QEvent *e)
         if(item->Checkable)
           {
           current->setHeaderData(i, this->orientation(),
-              this->Internal->getPixmap(item->State, active),
+              this->Internal->CheckBoxPixMaps->getPixmap(item->State, active),
               Qt::DecorationRole);
           }
         }
@@ -315,7 +246,7 @@ void pqCheckableHeaderView::initializeIcons()
       if(checkable)
         {
         current->setHeaderData(i, this->orientation(),
-            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
+            this->Internal->CheckBoxPixMaps->getPixmap(cs, active), Qt::DecorationRole);
         }
       else
         {
@@ -366,7 +297,7 @@ void pqCheckableHeaderView::updateHeaderData(Qt::Orientation orient,
         {
         item->State = cs;
         current->setHeaderData(i, orient,
-            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
+            this->Internal->CheckBoxPixMaps->getPixmap(cs, active), Qt::DecorationRole);
         }
       }
     }
@@ -406,7 +337,7 @@ void pqCheckableHeaderView::insertHeaderSection(const QModelIndex &parentIndex,
       if(checkable)
         {
         current->setHeaderData(i, this->orientation(),
-            this->Internal->getPixmap(cs, active), Qt::DecorationRole);
+            this->Internal->CheckBoxPixMaps->getPixmap(cs, active), Qt::DecorationRole);
         }
       }
 

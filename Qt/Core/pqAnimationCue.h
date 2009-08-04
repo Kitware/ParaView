@@ -101,7 +101,11 @@ public:
   /// modifications have been made to the cue/key frames.
   void triggerKeyFramesModified()
     { emit this->keyframesModified(); }
-    
+   
+  /// Get/Set the enabled state for the cue.
+  void setEnabled(bool enable);
+  bool isEnabled() const;
+
 signals:
   // emitted when something about the keyframes changes.
   void keyframesModified();
@@ -110,9 +114,15 @@ signals:
   // changes.
   void modified();
 
+  /// Fired when the enabled-state of the cue changes.
+  void enabled(bool);
+
 private slots:
-  // Called when the "Manipulator" property is changed.
+  /// Called when the "Manipulator" property is changed.
   void onManipulatorModified();
+
+  /// Called when the "Enabled" property is changed.
+  void onEnabledModified();
 
 private:
   pqAnimationCue(const pqAnimationCue&); // Not implemented.

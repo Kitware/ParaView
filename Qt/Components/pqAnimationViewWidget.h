@@ -81,6 +81,9 @@ protected slots:
   // called when play mode changes
   void updatePlayMode();
 
+  /// Called to toggle a track's enabled state.
+  void toggleTrackEnabled(pqAnimationTrack* track);
+
   // called when deleting a track
   void deleteTrack(pqAnimationTrack* track);
   // called when creating a track

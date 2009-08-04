@@ -87,6 +87,8 @@ signals:
   void iconChanged();
 
 protected:
+  /// Returns the parent pqAnimationTrack.
+  pqAnimationTrack* parentTrack() const;
 
   virtual void paint(QPainter* p,
                      const QStyleOptionGraphicsItem * option,

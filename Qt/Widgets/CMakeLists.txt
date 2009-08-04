@@ -26,6 +26,8 @@ SET(QtWidgets_SRCS
   pqCheckableHeaderModel.h
   pqCheckableHeaderView.cxx
   pqCheckableHeaderView.h
+  pqCheckBoxPixMaps.cxx
+  pqCheckBoxPixMaps.h
   pqCollapsedGroup.cxx
   pqCollapsedGroup.h
   pqColorChooserButton.cxx
@@ -108,6 +110,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqChartPrintSave.h
   pqCheckableHeaderModel.h
   pqCheckableHeaderView.h
+  pqCheckBoxPixMaps.h
   pqCollapsedGroup.h
   pqColorChooserButton.h
   pqColorTableModel.h

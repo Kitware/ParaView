@@ -82,6 +82,10 @@ pqAnimationCue::pqAnimationCue(const QString& group, const QString& name,
     proxy->GetProperty("AnimatedElement"), vtkCommand::ModifiedEvent,
     this, SIGNAL(modified()));
 
+  this->Internal->VTKConnect->Connect(
+    proxy->GetProperty("Enabled"), vtkCommand::ModifiedEvent,
+    this, SLOT(onEnabledModified()));
+
   this->onManipulatorModified();
 }
 
@@ -154,6 +158,27 @@ void pqAnimationCue::setDefaultPropertyValues()
   pqSMAdaptor::setEnumerationProperty(proxy->GetProperty("TimeMode"),
     "Normalized");
   proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationCue::setEnabled(bool enable)
+{
+  pqSMAdaptor::setElementProperty(this->getProxy()->GetProperty("Enabled"),
+    enable? 1 : 0);
+  this->getProxy()->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+bool pqAnimationCue::isEnabled() const
+{
+  return pqSMAdaptor::getElementProperty(
+    this->getProxy()->GetProperty("Enabled")).toBool();
+}
+
+//-----------------------------------------------------------------------------
+void pqAnimationCue::onEnabledModified()
+{
+  emit this->enabled(this->isEnabled());
 }
 
 //-----------------------------------------------------------------------------

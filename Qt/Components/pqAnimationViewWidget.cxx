@@ -318,8 +318,8 @@ pqAnimationViewWidget::pqAnimationViewWidget(QWidget* _parent) : QWidget(_parent
                    SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
                    this, SLOT(deleteTrack(pqAnimationTrack*)));
   QObject::connect(this->Internal->AnimationWidget,
-                   SIGNAL(deleteTrackClicked(pqAnimationTrack*)),
-                   this, SLOT(deleteTrack(pqAnimationTrack*)));
+                   SIGNAL(enableTrackClicked(pqAnimationTrack*)),
+                   this, SLOT(toggleTrackEnabled(pqAnimationTrack*)));
   QObject::connect(this->Internal->AnimationWidget,
                    SIGNAL(createTrackClicked()),
                    this, SLOT(createTrack()));
@@ -448,17 +448,24 @@ void pqAnimationViewWidget::onSceneCuesChanged()
 
     if(iter == this->Internal->TrackMap.end())
       {
-      pqAnimationTrack* t = animModel->addTrack();
+      pqAnimationTrack* track = animModel->addTrack();
       if(completeName.startsWith("TimeKeeper"))
         {
-        t->setDeletable(false);
+        track->setDeletable(false);
         }
-      this->Internal->TrackMap.insert(cue, t);
-      t->setProperty(completeName);
+      this->Internal->TrackMap.insert(cue, track);
+      track->setProperty(completeName);
       this->Internal->KeyFramesChanged.setMapping(cue, cue);
       QObject::connect(cue, SIGNAL(keyframesModified()),
         &this->Internal->KeyFramesChanged,
         SLOT(map()));
+      QObject::connect(cue, SIGNAL(enabled(bool)),
+        track, SLOT(setEnabled(bool)));
+      track->setEnabled(cue->isEnabled());
+
+      // this ensures that the already present keyframes are loaded currently
+      // (which happens when loading state files).
+      this->keyFramesChanged(cue);
       }
     else
       {
@@ -716,6 +723,27 @@ void pqAnimationViewWidget::updateTicks()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqAnimationViewWidget::toggleTrackEnabled(pqAnimationTrack* track)
+{
+  pqAnimationCue* cue = this->Internal->findCue(track);
+  if(!cue)
+    {
+    return;
+    }
+  pqUndoStack* undo = pqApplicationCore::instance()->getUndoStack();
+  if(undo)
+    {
+    undo->beginUndoSet("Toggle Animation Track");
+    }
+  cue->setEnabled(!track->isEnabled());
+  if(undo)
+    {
+    undo->endUndoSet();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqAnimationViewWidget::deleteTrack(pqAnimationTrack* track)
 {
   pqAnimationCue* cue = this->Internal->findCue(track);

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAnimationTrack.h"
 #include "pqAnimationKeyFrame.h"
+#include "pqCheckBoxPixMaps.h"
 
 pqAnimationModel::pqAnimationModel(QGraphicsView* p)
   : QGraphicsScene(QRectF(0,0,400,16*6), p),
@@ -56,6 +57,10 @@ pqAnimationModel::pqAnimationModel(QGraphicsView* p)
   this->Header.appendRow(new QStandardItem());
   this->Header.setHeaderData(0, Qt::Vertical, "Time", Qt::DisplayRole);
 
+  this->EnabledHeader.appendRow(new QStandardItem());
+  this->EnabledHeader.setHeaderData(0, Qt::Vertical, "  ", Qt::DisplayRole);
+
+  this->CheckBoxPixMaps = new pqCheckBoxPixMaps(p);
 }
 
 pqAnimationModel::~pqAnimationModel()
@@ -64,11 +69,18 @@ pqAnimationModel::~pqAnimationModel()
     {
     this->removeTrack(this->Tracks[0]);
     }
+  delete this->CheckBoxPixMaps;
+  this->CheckBoxPixMaps = 0;
 }
 
 QAbstractItemModel* pqAnimationModel::header()
 {
   return &this->Header;
+}
+
+QAbstractItemModel* pqAnimationModel::enabledHeader()
+{
+  return &this->EnabledHeader;
 }
 
 int pqAnimationModel::count()
@@ -92,9 +104,12 @@ pqAnimationTrack* pqAnimationModel::addTrack()
   this->resizeTracks();
 
   this->Header.appendRow(new QStandardItem());
+  this->EnabledHeader.appendRow(new QStandardItem());
   QObject::connect(t, SIGNAL(propertyChanged()),
                    this, SLOT(trackNameChanged()));
-  
+
+  QObject::connect(t, SIGNAL(enabledChanged()),
+                   this, SLOT(enabledChanged()));
   return t;
 }
 
@@ -392,6 +407,18 @@ void pqAnimationModel::trackNameChanged()
     {
     this->Header.setHeaderData(i+1, Qt::Vertical, this->Tracks[i]->property(),
                                Qt::DisplayRole);
+    }
+}
+
+void pqAnimationModel::enabledChanged()
+{
+  for(int i=0; i<this->Tracks.size(); i++)
+    {
+    this->EnabledHeader.setHeaderData(i+1, Qt::Vertical, 
+      this->Tracks[i]->isEnabled()?
+      this->CheckBoxPixMaps->getPixmap(Qt::Checked, false):
+      this->CheckBoxPixMaps->getPixmap(Qt::Unchecked, false),
+      Qt::DecorationRole);
     }
 }
 
