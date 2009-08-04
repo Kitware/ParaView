@@ -28,7 +28,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
@@ -280,7 +280,7 @@ bool vtkSMScatterPlotViewProxy::BeginCreateVTKObjects()
 void vtkSMScatterPlotViewProxy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
-  this->RenderView->AddPropToRenderer(this->CubeAxesActor);
+  //this->RenderView->AddPropToRenderer(this->CubeAxesActor);
   this->RenderView->AddPropToRenderer2D(this->LegendScaleActor);
 
 
