@@ -48,7 +48,7 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -742,7 +742,7 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesNumberOfComponents(int series)
     this->FlattenFilter->GetDataInformation();
   if(!dataInformation)
     {
-    return NULL;
+    return 0;
     }
 
   // COORDINATES
@@ -794,7 +794,7 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesNumberOfComponents(int series)
         }
       }
     }
-  return NULL;
+  return 0;
 }
 //-----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)

@@ -31,7 +31,7 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-vtkCxxRevisionMacro(vtkMergeCompositeDataSet, "1.2");
+vtkCxxRevisionMacro(vtkMergeCompositeDataSet, "1.3");
 vtkStandardNewMacro(vtkMergeCompositeDataSet);
 
 //-----------------------------------------------------------------------------
@@ -190,17 +190,11 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
           pointData->AddArray(data);
           data->Delete();
           data->SetNumberOfTuples(cdsInput->GetNumberOfPoints());
-          double* emptyTuple = new double[data->GetNumberOfComponents()];
-          for( int c = 0; c < data->GetNumberOfComponents(); ++c)
-            {
-            emptyTuple = 0;
-            }
-          for( int i = 0; i < curId; ++i)
+          for( int j = 0; j < curId; ++j)
             {
             //data->SetTuple(i, emptyTuple);
-            memset(data->GetVoidPointer(i), 0, data->GetNumberOfComponents()*data->GetElementComponentSize());
+            memset(data->GetVoidPointer(j), 0, data->GetNumberOfComponents()*data->GetElementComponentSize());
             }
-          delete [] emptyTuple;
           }
         }
       //pointData->CopyStructure(inputPtData);
@@ -211,11 +205,6 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
         vtkAbstractArray* inputPtArray = inputPtData->GetAbstractArray( 
           pointData->GetArrayName(k) );
 
-        double* emptyTuple = new double[outputArray->GetNumberOfComponents()];
-        for( int c = 0; c < outputArray->GetNumberOfComponents(); ++c)
-          {
-          emptyTuple = 0;
-          }
         if( inputPtArray )
           {
           for( int i = 0; i < inputPtData->GetNumberOfTuples(); ++i)
@@ -232,7 +221,6 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
             memset(outputArray->GetVoidPointer(i), 0, outputArray->GetNumberOfComponents()*outputArray->GetElementComponentSize());
             }
           }
-        delete [] emptyTuple;
         }
       curId += psNumberOfPoints;
       }
