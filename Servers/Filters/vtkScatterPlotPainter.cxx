@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.3");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.4");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -248,10 +248,9 @@ vtkDataArray* vtkScatterPlotPainter::GetArray(int idx, vtkDataSet* input)
     }
   else
     {
-    if(vtkPointSet::SafeDownCast(input))
-      {
-      array = vtkPointSet::SafeDownCast(input)->GetPoints()->GetData();
-      }
+    vtkPointSet* pointSet = vtkPointSet::SafeDownCast(input);
+    vtkPoints*   points = pointSet ? pointSet->GetPoints() : NULL;
+    array = points ? points->GetData() : NULL;
     }
   return array;
 }
@@ -540,6 +539,7 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
   // do we have an input
   if(!this->GetInput())
     {
+    //cout << __FUNCTION__ << " no input" << endl;
     return;
     }
 /*
@@ -586,7 +586,7 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
   
   if(!this->GlyphMode)
     {
-    // cout << "Bounds: "
+    // cout << __FUNCTION__ << " bounds: "
 //          << bounds[0] << " " << bounds[1] << " "
 //          << bounds[2] << " " << bounds[3] << " "
 //          << bounds[4] << " " << bounds[5] << endl;

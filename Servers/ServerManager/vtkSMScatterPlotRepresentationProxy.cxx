@@ -48,7 +48,7 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -299,11 +299,30 @@ void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
 //-----------------------------------------------------------------------------
 bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
 {
+  /*
   if (!this->Superclass::GetBounds(bounds))
     {
     return false;
     }
 
+  return true;
+  */
+  vtkClientServerStream stream;
+  stream  << vtkClientServerStream::Invoke
+          << this->Mapper->GetID()
+          << "GetBounds"
+          << vtkClientServerStream::End;
+  
+  vtkProcessModule::GetProcessModule()->SendStream(
+    this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+  const vtkClientServerStream& res = 
+    vtkProcessModule::GetProcessModule()->GetLastResult(
+      this->ConnectionID,
+      vtkProcessModule::RENDER_SERVER);
+  if(!res.GetArgument(0, 0, bounds, 6))
+    {
+    return this->Superclass::GetBounds(bounds);
+    }
   return true;
 }
 
