@@ -31,12 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqChartRepresentation.h"
 
+#include "pqApplicationCore.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 
 #include <QString>
+#include <QStringList>
 #include <QRegExp>
 
 //-----------------------------------------------------------------------------
@@ -102,40 +105,24 @@ void pqChartRepresentation::setDefaultPropertyValues()
     vtkSMPropertyHelper(proxy, "UseIndexForXAxis").Set(0);
     }
 
-  // * Turn off Y-series that don't make much sense to show by default.
+  // * Turn off Y-series that don't make much sense to show by default
   if (proxy->GetProperty("SeriesVisibility"))
     {
     vtkSMPropertyHelper helper(proxy, "SeriesVisibility");
     foreach (QVariant varray, series_arrays)
       {
       QString array = varray.toString();
-      if (!y_array.isNull() && array != y_array)
+      if (!y_array.isNull() && (array != y_array))
         {
         // when y_array is set, the only visible array is the y-array.
         helper.SetStatus(array.toAscii().data(), 0);
         }
-      else if (array.contains(QRegExp("\\(\\d+\\)$")))
+      else if (!x_array.isNull() && (array == x_array))
         {
-        // by default only "vector magnitudes" are plotted, not the components.
+        // No point in plotting the series used as the x-array.
         helper.SetStatus(array.toAscii().data(), 0);
         }
-      else if (array == "vtkValidPointMask")
-        {
-        helper.SetStatus(array.toAscii().data(), 0);
-        }
-      else if (array == "arc_length")
-        {
-        helper.SetStatus(array.toAscii().data(), 0);
-        }
-      else if (array.contains(QRegExp("^Points")))
-        {
-        helper.SetStatus(array.toAscii().data(), 0);
-        }
-      else if (array == "Time")
-        {
-        helper.SetStatus(array.toAscii().data(), 0);
-        }
-      else if (array.contains(QRegExp("^Pedigree")))
+      else if (this->queryHideSeries(array))
         {
         helper.SetStatus(array.toAscii().data(), 0);
         }
@@ -144,4 +131,51 @@ void pqChartRepresentation::setDefaultPropertyValues()
     }
   
   proxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void pqChartRepresentation::setHiddenSeriesSetting(QStringList list)
+{
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  settings->setValue("Charting/HiddenSeries", list);
+}
+
+QStringList pqChartRepresentation::getHiddenSeriesSetting()
+{
+  pqSettings *settings = pqApplicationCore::instance()->settings();
+  QVariant hiddenSeries = settings->value("Charting/HiddenSeries",
+                           pqChartRepresentation::defaultHiddenSeriesSetting());
+  return hiddenSeries.toStringList();
+}
+
+QStringList pqChartRepresentation::defaultHiddenSeriesSetting()
+{
+  QStringList hiddenSeries;
+
+  // Arrays of special meaning that typically are not plotted.
+  hiddenSeries << "Time";
+  hiddenSeries << "arc_length";
+  hiddenSeries << "Points.*";
+  hiddenSeries << "vtkValidPointMask";
+  hiddenSeries << "Pedigree.*";
+
+  // Typical arrays of types that have no need to be plotted.
+  hiddenSeries << "ObjectId";
+  hiddenSeries << "FileId";
+
+  // Show only the vector magnitudes.  Hide the components.
+  hiddenSeries << ".*\\(\\d+\\)";
+
+  return hiddenSeries;
+}
+
+//-----------------------------------------------------------------------------
+bool pqChartRepresentation::queryHideSeries(QString array)
+{
+  foreach (QString hideExpr, pqChartRepresentation::getHiddenSeriesSetting())
+    {
+    if (QRegExp(hideExpr).exactMatch(array)) return true;
+    }
+
+  return false;
 }
