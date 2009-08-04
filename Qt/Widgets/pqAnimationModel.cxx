@@ -121,6 +121,7 @@ void pqAnimationModel::removeTrack(pqAnimationTrack* t)
     this->Tracks.removeAt(idx);
     this->removeItem(t);
     this->Header.removeRow(idx+1);  // off by one for time header item
+    this->EnabledHeader.removeRow(idx+1);
     delete t;
     this->resizeTracks();
     }
