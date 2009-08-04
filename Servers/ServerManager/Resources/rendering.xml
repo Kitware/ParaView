@@ -1067,7 +1067,7 @@
       <StringVectorProperty name="XCoordsArray"
         command="SetXCoordsArray"
         number_of_elements="1"
-        default_values="Points(0)">
+        default_values="coord,Points,0">
         <Documentation>
           Set the array for the X coords array.
         </Documentation>
@@ -1076,7 +1076,7 @@
       <StringVectorProperty name="YCoordsArray"
         command="SetYCoordsArray"
         number_of_elements="1"
-        default_values="Points(1)">
+        default_values="coord,Points,1">
         <Documentation>
           Set the array for the Y coords array.
         </Documentation>
@@ -1085,7 +1085,7 @@
       <StringVectorProperty name="ZCoordsArray"
         command="SetZCoordsArray"
         number_of_elements="1"
-        default_values="Points(2)">
+        default_values="coord,Points,2">
         <Documentation>
           Set the array for the Z coords array.
         </Documentation>
@@ -1103,7 +1103,7 @@
       <StringVectorProperty name="GlyphXScalingArray"
         command="SetGlyphXScalingArray"
         number_of_elements="1"
-        default_values="Points(0)">
+        default_values="coord,Points,0">
         <Documentation>
           Set the array for the glyph x scaling array.
         </Documentation>
@@ -1112,7 +1112,7 @@
       <StringVectorProperty name="GlyphYScalingArray"
         command="SetGlyphYScalingArray"
         number_of_elements="1"
-        default_values="Points(1)">
+        default_values="coord,Points,1">
         <Documentation>
           Set the array for the glyph y scaling array.
         </Documentation>
@@ -1121,7 +1121,7 @@
       <StringVectorProperty name="GlyphZScalingArray"
         command="SetGlyphZScalingArray"
         number_of_elements="1"
-        default_values="Points(2)">
+        default_values="coord,Points,2">
         <Documentation>
           Set the array for the glyph z scaling array.
         </Documentation>
@@ -9214,7 +9214,7 @@
         command="SetXAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="Points(0)">
+        default_values="coord,Points,0">
         <Documentation>
           Set the array to use on X axis.
         </Documentation>
@@ -9230,7 +9230,7 @@
         command="SetYAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="Points(1)">
+        default_values="coord,Points,1">
         <Documentation>
           Set the array to use on Y axis.
         </Documentation>
@@ -9246,7 +9246,7 @@
         command="SetZAxisArrayName"
         update_self="1"
         number_of_elements="1"
-        default_values="Points(2)">
+        default_values="coord,Points,2">
         <Documentation>
           Set the array to use on Z axis.
         </Documentation>

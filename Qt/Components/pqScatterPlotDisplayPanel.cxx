@@ -159,7 +159,8 @@ public:
       }
     else
       {
-      return data.mid(textPos, data.indexOf(',',textPos));
+      //return data.mid(textPos, data.indexOf(',',textPos));
+      return data.right(data.length() - textPos);
       }
     }
   QIcon* convertDataToIcon(const QString& data)const 

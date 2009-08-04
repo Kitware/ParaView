@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.2");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.3");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -86,15 +86,15 @@ static T vtkClamp(T val, T min, T max)
 // ---------------------------------------------------------------------------
 vtkScatterPlotPainter::vtkScatterPlotPainter()
 {
-  this->ThreeDMode = false;
-  this->Colorize = false;
+  this->ThreeDMode = 0;
+  this->Colorize = 0;
   this->GlyphMode = vtkScatterPlotMapper::NoGlyph;
   this->ScaleMode = vtkScatterPlotMapper::SCALE_BY_MAGNITUDE;
   this->ScaleFactor = 1.0;
 //   this->Range[0] = 0.0;
 //   this->Range[1] = 1.0;
   this->OrientationMode = vtkScatterPlotMapper::DIRECTION;
-  this->NestedDisplayLists = true;
+  this->NestedDisplayLists = 1;
 
   this->ScalarsToColorsPainter = vtkScalarsToColorsPainter::New();
   this->SourceGlyphMappers = vtkCollection::New();
@@ -894,10 +894,14 @@ void vtkScatterPlotPainter::PrepareForRendering(vtkRenderer *ren,
     else
     {
 */
-  this->ScalarsToColorsPainter->SetInput(object);
+  if(this->Colorize)
+    {
+    this->ScalarsToColorsPainter->SetInput(object);
   /* } */
   
-  this->ScalarsToColorsPainter->Render(ren, actor, 0xff, false);
+    
+    this->ScalarsToColorsPainter->Render(ren, actor, 0xff, true);
+    }
   
   /* done in vtkScatterPlotMapper because it's a pb when using displaylists
   size_t count = this->SourceGlyphMappers ? 

@@ -59,7 +59,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.10");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.11");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -281,16 +281,17 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
   int component = 0;  
   if(arrayComponent.empty())
     {
-    vtkstd::size_t startParenthesis = arrayString.find('(');
-    array = arrayString.substr(0, startParenthesis);
+    array = arrayString;
+    vtkstd::size_t startParenthesis = array.find('(');
+    arrayString = array.substr(0, startParenthesis);
     if(startParenthesis != vtkstd::string::npos)
       {
-      vtkstd::size_t endParenthesis = arrayString.find(')',array.length());
+      vtkstd::size_t endParenthesis = array.find(')',arrayString.length());
       if( endParenthesis != vtkstd::string::npos)
         {
         vtksys_ios::stringstream componentString;
         componentString << 
-          arrayString.substr(array.length(),endParenthesis-array.length());
+          array.substr(arrayString.length(),endParenthesis-arrayString.length());
         char parenthesis;
         componentString >> parenthesis >> component >> parenthesis;
         }
@@ -302,16 +303,17 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
     componentString << arrayComponent ;
     componentString >> component;
     }
-
+//   cout << " SetArray: " << idx << " " << arrayName << endl;
+//  cout << arrayString << " ***** " << arrayType << " ***** " << component << endl;
   if(arrayType == "point")
     {
-    this->SetArrayByFieldName(idx, array.c_str(), 
+    this->SetArrayByFieldName(idx, arrayString.c_str(), 
                               vtkDataObject::FIELD_ASSOCIATION_POINTS, 
                               component);
     }
   else if(arrayType == "cell")
     {
-    this->SetArrayByFieldName(idx, array.c_str(), 
+    this->SetArrayByFieldName(idx, arrayString.c_str(), 
                               vtkDataObject::FIELD_ASSOCIATION_CELLS, 
                               component);    
     }
@@ -497,6 +499,9 @@ void vtkScatterPlotMapper::ComputeBounds()
     if(vtkMath::AreBoundsInitialized(this->Bounds))
       {
       this->Painter->UpdateBounds(bounds);
+      cout << "UpBounds: " << bounds[0] << " " << bounds[1] 
+           << " " << bounds[2] << " " << bounds[3]
+           << " " << bounds[4] << " " << bounds[5] << endl;
       for(i=0; i<3; i++)
         {
         this->Bounds[i*2] = 
@@ -510,6 +515,9 @@ void vtkScatterPlotMapper::ComputeBounds()
     else
       {
       this->Painter->UpdateBounds(this->Bounds);
+      cout << "Bounds: " << bounds[0] << " " << bounds[1] 
+           << " " << bounds[2] << " " << bounds[3]
+           << " " << bounds[4] << " " << bounds[5] << endl;
       }
       
     iter->GoToNextItem();
@@ -607,8 +615,8 @@ void vtkScatterPlotMapper::CopyInformationToSubMapper(
   // ResolveCoincidentTopologyPolygonOffsetParameters is static
   mapper->SetResolveCoincidentTopologyPolygonOffsetFaces(
     this->GetResolveCoincidentTopologyPolygonOffsetFaces());
-  mapper->SetImmediateModeRendering(this->ImmediateModeRendering
-                                     || vtkMapper::GetGlobalImmediateModeRendering());// ||
+  mapper->SetImmediateModeRendering(this->NestedDisplayLists);//this->ImmediateModeRendering
+                                    // || vtkMapper::GetGlobalImmediateModeRendering());// ||
                                     //!this->NestedDisplayLists);
 }
 
@@ -646,6 +654,27 @@ void vtkScatterPlotMapper::UpdatePainterInformation()
   vtkInformation* info = this->PainterInformation;
   this->Superclass::UpdatePainterInformation();
   
+  for(int idx = 0; idx < vtkScatterPlotMapper::NUMBER_OF_ARRAYS; ++idx)
+    {
+    vtkInformationVector *inArrayVec = 
+      info->Get(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS());
+    if (!inArrayVec)
+      {
+      inArrayVec = vtkInformationVector::New();
+      info->Set(vtkAlgorithm::INPUT_ARRAYS_TO_PROCESS(),inArrayVec);
+      inArrayVec->Delete();
+      }
+    vtkInformation *inArrayInfo = inArrayVec->GetInformationObject(idx);
+    if (!inArrayInfo)
+      {
+      inArrayInfo = vtkInformation::New();
+      inArrayVec->SetInformationObject(idx,inArrayInfo);
+      inArrayInfo->Delete();
+      }
+    vtkInformation *arrayInfo = this->GetInputArrayInformation(idx);
+    inArrayInfo->Copy(arrayInfo,1);
+    }
+
   info->Set(vtkScatterPlotPainter::THREED_MODE(), this->ThreeDMode);
   info->Set(vtkScatterPlotPainter::COLORIZE(), this->Colorize);
   info->Set(vtkScatterPlotPainter::GLYPH_MODE(), this->GlyphMode);

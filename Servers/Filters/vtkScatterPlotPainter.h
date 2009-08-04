@@ -68,17 +68,17 @@ protected:
   // Enable or not the third (z) coordinate for 3D rendering (instead of 2D).
   // Note:
   // To work, the Z_Coords index array must be given.
-  vtkSetMacro(ThreeDMode,bool);
-  vtkGetMacro(ThreeDMode,bool);
-  vtkBooleanMacro(ThreeDMode,bool);
+  vtkSetMacro(ThreeDMode,int);
+  vtkGetMacro(ThreeDMode,int);
+  vtkBooleanMacro(ThreeDMode,int);
 
   // Description:
   // Enable or not the color painting at each point.
   // Note:
   // To work, the Color index array must be given.
-  vtkSetMacro(Colorize,bool);
-  vtkGetMacro(Colorize,bool);
-  vtkBooleanMacro(Colorize,bool);
+  vtkSetMacro(Colorize, int);
+  vtkGetMacro(Colorize, int);
+  vtkBooleanMacro(Colorize, int);
 
   // Description:
   // Enable or not the Glyph representation at each point.
@@ -118,9 +118,9 @@ protected:
   // in a parent display list.
   // Not relevant if immediate mode is on.
   // For debugging/profiling purpose. Initial value is true.
-  vtkSetMacro(NestedDisplayLists, bool);
-  vtkGetMacro(NestedDisplayLists, bool);
-  vtkBooleanMacro(NestedDisplayLists, bool);
+  vtkSetMacro(NestedDisplayLists, int);
+  vtkGetMacro(NestedDisplayLists, int);
+  vtkBooleanMacro(NestedDisplayLists, int);
   
   virtual void SetLookupTable(vtkScalarsToColors*);
   vtkGetObjectMacro(LookupTable, vtkScalarsToColors);
@@ -175,15 +175,15 @@ protected:
   // Release display list used for matrices and color.
   void ReleaseDisplayList();
 
-  bool           ThreeDMode;
-  bool           Colorize;
+  int            ThreeDMode;
+  int            Colorize;
   int            GlyphMode;
 
   double         ScaleFactor; // Scale factor to use to scale geometry
   int            ScaleMode; // Scale by scalar value or vector magnitude
   int            ScalingArrayMode;
   int            OrientationMode;
-  bool           NestedDisplayLists; // boolean
+  int            NestedDisplayLists; // boolean
   unsigned int   DisplayListId; // GLuint
 
   

@@ -48,7 +48,7 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -482,6 +482,7 @@ int vtkSMScatterPlotRepresentationProxy::GetNumberOfSeries()
     {
     return count;
     }
+/*
   if(dataInformation->GetPointArrayInformation())
     {
     count += dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
@@ -506,6 +507,12 @@ int vtkSMScatterPlotRepresentationProxy::GetNumberOfSeries()
         ->GetArrayInformation(i)->GetNumberOfComponents();
       }
     }
+*/
+  count = (dataInformation->GetPointArrayInformation()? 1 :0) + // coordinates
+    (dataInformation->GetPointDataInformation() ? 
+     dataInformation->GetPointDataInformation()->GetNumberOfArrays() : 0) +
+    (dataInformation->GetCellDataInformation() ? 
+     dataInformation->GetCellDataInformation()->GetNumberOfArrays() : 0);
   //todo handles other arrays
   return count;
 }
@@ -524,8 +531,10 @@ vtkStdString vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
     return NULL;
     }
 
+  // COORDINATES
   if(dataInformation->GetPointArrayInformation())
     {
+    /*
     int numberOfComponents = 
       dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
     if(series < numberOfComponents)
@@ -539,12 +548,25 @@ vtkStdString vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
       return str.str();//.c_str();
       }
     series -= numberOfComponents;
+    */
+    if (series == 0)
+      {
+      return dataInformation->GetPointArrayInformation()->GetName();
+      }
+    else
+      {
+      --series;
+      }
     }
+
+  // POINT DATA
   if(dataInformation->GetPointDataInformation())
     {
-    int numberOfArrays= dataInformation->GetPointDataInformation()->GetNumberOfArrays();
-    for(int i=0; i < numberOfArrays;++i)
+    int numberOfArrays = 
+      dataInformation->GetPointDataInformation()->GetNumberOfArrays();
+    for(int i=0; i < numberOfArrays; ++i)
       {
+      /*
       int numberOfComponents = dataInformation->GetPointDataInformation()
         ->GetArrayInformation(i)->GetNumberOfComponents();
       if(series < numberOfComponents)
@@ -562,13 +584,26 @@ vtkStdString vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
         {
         series -= numberOfComponents;
         }
+      */
+      if( series == 0 )
+        {
+        return dataInformation->GetPointDataInformation()
+          ->GetArrayInformation(i)->GetName();
+        }
+      else
+        {
+        --series;
+        }
       }
     }
+
+  // CELL DATA
   if(dataInformation->GetCellDataInformation())
     {                                                   
     int numberOfArrays= dataInformation->GetCellDataInformation()->GetNumberOfArrays();
     for(int i=0; i < numberOfArrays;++i)
       {
+      /*
       int numberOfComponents = dataInformation->GetCellDataInformation()
         ->GetArrayInformation(i)->GetNumberOfComponents();
       if(series < numberOfComponents)
@@ -586,10 +621,22 @@ vtkStdString vtkSMScatterPlotRepresentationProxy::GetSeriesName(int series)
         {
         series -= numberOfComponents;
         }
+      */
+      if (series == 0)
+        {
+        return dataInformation->GetCellDataInformation()
+          ->GetArrayInformation(i)->GetName();
+        }
+      else
+        {
+        --series;
+        }
       }
     }
   return NULL;
 }
+
+//----------------------------------------------------------------------------
 int vtkSMScatterPlotRepresentationProxy::GetSeriesType(int series)
 {
   //cout << "GetSeriesType: " << this->GetInputProxy()->GetVTKClassName() 
@@ -610,6 +657,7 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesType(int series)
 
   if(dataInformation->GetPointArrayInformation())
     {
+    /*
     int numberOfComponents = 
       dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
     if(series < numberOfComponents)
@@ -617,10 +665,20 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesType(int series)
       return vtkDataObject::NUMBER_OF_ASSOCIATIONS;
       }
     series -= numberOfComponents;
+    */ 
+    if (series == 0)
+      {
+      return vtkDataObject::NUMBER_OF_ASSOCIATIONS;
+      }
+    else
+      {
+      --series;
+      }
     }
   if(dataInformation->GetPointDataInformation())
     {
     int numberOfArrays= dataInformation->GetPointDataInformation()->GetNumberOfArrays();
+    /*
     for(int i=0; i < numberOfArrays;++i)
       {
       int numberOfComponents = dataInformation->GetPointDataInformation()
@@ -634,10 +692,20 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesType(int series)
         series -= numberOfComponents;
         }
       }
+    */
+    if (series < numberOfArrays)
+        {
+        return vtkDataObject::FIELD_ASSOCIATION_POINTS;
+        }
+      else
+        {
+        series -= numberOfArrays;
+        }
     }
   if(dataInformation->GetCellDataInformation())
     {                                                   
     int numberOfArrays= dataInformation->GetCellDataInformation()->GetNumberOfArrays();
+    /*
     for(int i=0; i < numberOfArrays;++i)
       {
       int numberOfComponents = dataInformation->GetCellDataInformation()
@@ -651,10 +719,83 @@ int vtkSMScatterPlotRepresentationProxy::GetSeriesType(int series)
         series -= numberOfComponents;
         }
       }
+    */
+    if (series < numberOfArrays)
+      {
+      return vtkDataObject::FIELD_ASSOCIATION_CELLS;
+      }
+    else
+      {
+      series -= numberOfArrays;
+      }
     }
   return vtkDataObject::NUMBER_OF_ASSOCIATIONS;
 }
 
+//----------------------------------------------------------------------------
+int vtkSMScatterPlotRepresentationProxy::GetSeriesNumberOfComponents(int series)
+{
+  vtkPVDataInformation* dataInformation = 
+    //this->GetInputProxy()->GetDataInformation();
+    //this->strategy->GetOutputProxy()->GetDataInformation();
+    //activeStrategies.begin()->GetPointer()->GetOutput()->GetDataInformation();
+    this->FlattenFilter->GetDataInformation();
+  if(!dataInformation)
+    {
+    return NULL;
+    }
+
+  // COORDINATES
+  if(dataInformation->GetPointArrayInformation())
+    {
+    if (series == 0)
+      {
+      return dataInformation->GetPointArrayInformation()->GetNumberOfComponents();
+      }
+    else
+      {
+      --series;
+      }
+    }
+
+  // POINT DATA
+  if(dataInformation->GetPointDataInformation())
+    {
+    int numberOfArrays = 
+      dataInformation->GetPointDataInformation()->GetNumberOfArrays();
+    for(int i=0; i < numberOfArrays; ++i)
+      {
+      if( series == 0 )
+        {
+        return dataInformation->GetPointDataInformation()
+          ->GetArrayInformation(i)->GetNumberOfComponents();
+        }
+      else
+        {
+        --series;
+        }
+      }
+    }
+
+  // CELL DATA
+  if(dataInformation->GetCellDataInformation())
+    {                                                   
+    int numberOfArrays= dataInformation->GetCellDataInformation()->GetNumberOfArrays();
+    for(int i=0; i < numberOfArrays;++i)
+      {
+      if (series == 0)
+        {
+        return dataInformation->GetCellDataInformation()
+          ->GetArrayInformation(i)->GetNumberOfComponents();
+        }
+      else
+        {
+        --series;
+        }
+      }
+    }
+  return NULL;
+}
 //-----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

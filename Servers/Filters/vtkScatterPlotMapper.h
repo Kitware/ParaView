@@ -55,7 +55,8 @@ public:
     GLYPH_SOURCE,
     GLYPH_X_ORIENTATION,
     GLYPH_Y_ORIENTATION,
-    GLYPH_Z_ORIENTATION
+    GLYPH_Z_ORIENTATION,
+    NUMBER_OF_ARRAYS
     };
 
   enum GlyphDrawingMode

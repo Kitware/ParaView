@@ -14,14 +14,15 @@
 =========================================================================*/
 #include "vtkSMScatterPlotArraysInformationHelper.h"
 
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
-
 #include "vtkSMScatterPlotRepresentationProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkDataObject.h"
+
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMScatterPlotArraysInformationHelper);
-vtkCxxRevisionMacro(vtkSMScatterPlotArraysInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMScatterPlotArraysInformationHelper, "1.3");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotArraysInformationHelper::vtkSMScatterPlotArraysInformationHelper()
 {
@@ -57,25 +58,57 @@ void vtkSMScatterPlotArraysInformationHelper::UpdateProperty(
     return;
     }
  
-  int num_series = cr->GetNumberOfSeries();
-  svp->SetNumberOfElements(num_series);
-  for (int cc=0; cc < num_series; cc++)
+  int num_arrays = cr->GetNumberOfSeries();
+  
+  int numOfEntries = 0;
+  for (int i = 0; i < num_arrays; ++i)
+    {
+    int numOfComponents = cr->GetSeriesNumberOfComponents(i);
+    numOfEntries += numOfComponents;
+    if (numOfComponents > 1)
+      {
+      ++numOfEntries;
+      }
+    }
+  svp->SetNumberOfElements(numOfEntries);
+
+  int entrie = 0;
+  for (int cc=0; cc < num_arrays; cc++)
     {
     vtkStdString name = cr->GetSeriesName(cc);
+    vtkStdString type = "";
     switch(cr->GetSeriesType(cc))
       {
       case vtkDataObject::FIELD_ASSOCIATION_POINTS:
-        name = "point," + name;
+        type = "point";
         break;
       case vtkDataObject::FIELD_ASSOCIATION_CELLS:
-        name = "cell," + name;
+        type = "cell";
         break;
       case vtkDataObject::NUMBER_OF_ASSOCIATIONS:
       default:
-        name = "coord," + name;
+        type = "coord";
         break;
       }
-    svp->SetElement(cc, name );
+    int numberOfComponents = cr->GetSeriesNumberOfComponents(cc);
+    if (numberOfComponents > 1 )
+      {
+      vtksys_ios::stringstream str;
+      str << type << "," << name << ",-1" ;
+      svp->SetElement(entrie++, str.str().c_str());
+      for( int i=0; i < numberOfComponents; ++i)
+        {
+        vtksys_ios::stringstream str2;
+        str2 << type << "," << name << "," << i ;
+        svp->SetElement(entrie++, str2.str().c_str());
+        }
+      }
+    else
+      {
+      vtksys_ios::stringstream str;
+      str << type << "," << name;
+      svp->SetElement(entrie++, str.str().c_str());
+      }
     }
 }
 

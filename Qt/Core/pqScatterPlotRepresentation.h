@@ -71,10 +71,6 @@ public:
                             QObject* parent=NULL);
   virtual ~pqScatterPlotRepresentation();
 
-  /// The field name used to indicate solid color.
-  //static const char* solidColor() { return "Solid Color"; }
-
-
   // Get the internal display proxy.
   vtkSMScatterPlotRepresentationProxy* getRepresentationProxy() const;
 
@@ -87,37 +83,39 @@ public:
   virtual void setDefaultPropertyValues();
 
   // Call to select the coloring array. 
-  void colorByArray(const char* arrayname, int fieldtype);
+  void colorByArray(const char* array);//name, int fieldtype);
 
-  /// get the data range for a particular component. if component == -1,
+  /// get the data range for a particular array. if the array component == -1,
   /// range for the vector magnitude is returned.
-  QPair<double, double> getColorFieldRange(const QString& array, int component);
+  QPair<double, double> getColorFieldRange(const QString& array);
 
   /// Returns the range for the currently selected color field i.e.
   /// the range for the array component (or magnitude) of the array by which
   /// this display is being colored, if at all.
   QPair<double, double> getColorFieldRange();
 
-  /// Returns if the array (non-qualified array name) is a partial array in the
-  /// indicated fieldType.
-  /// fieldType=vtkSMDataRepresentationProxy::POINT_DATA|CELL_DATA etc.
-  bool isPartial(const QString& array, int fieldType) const;
+  /// Returns if the array is a partial array.
+  bool isPartial(const QString& array)const;
 
-  /// set the array to color the part by
+  /// set the array to color.
+  /// field is a string of format:
+  ///    "({coord|point|cell|field},)<arrayname>(,[0-9]+)".
   void setColorField(const QString& field);
 
   /// get the array the part is colored by
-  /// if raw is true, it will not add (point) or (cell) but simply
-  /// return the array name
-  QString getColorField(bool raw=false);
-
-  /// Returns the number of components for the given field.
-  /// field is a string of format "<arrayname> (cell|point)".
-  int getColorFieldNumberOfComponents(const QString& field);
+  QString getColorField();
 
   /// Get the data bounds for the input of this display.
   /// Returns if the operation was successful.
   bool getDataBounds(double bounds[6]);
+
+  /// Set representation on the proxy.
+  /// If representation is changed to volume, this method ensures that the
+  /// scalar array is initialized.
+  void setRepresentation(int type);
+
+  /// Returns the type of representation currently used: POINTS
+  int getRepresentationType() const;
 
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
@@ -126,15 +124,6 @@ public:
   /// Returns the pqScalarOpacityFunction object for the piecewise
   /// function used to map scalars to opacity.
   virtual pqScalarOpacityFunction* getScalarOpacityFunction();
-
-  /// Set representation on the proxy.
-  /// If representation is changed to volume, this method ensures that the
-  /// scalar array is initialized.
-  void setRepresentation(int type);
-
-  /// Returns the type of representation currently used i.e.
-  //SURFACE/POINTS/VOLUME etc.
-  int getRepresentationType() const;
 
   /// Returns the opacity.
   double getOpacity() const;
@@ -168,14 +157,27 @@ protected slots:
   /// the scalar bar.
   void updateScalarBarVisibility(bool visible);
 protected:
-  /// Creates helper proxies such as as the proxy
-  /// for volume opacity function.
-  void createHelperProxies();
   
-  /// Creates a default proxy for volume opacity function.
-  //vtkSMProxy* createOpacityFunctionProxy(
-  //  vtkSMScatterPlotRepresentationProxy* repr);
-  
+  enum AttributeTypes{ POINT_DATA = 0, 
+                       CELL_DATA = 1, 
+                       FIELD_DATA = 2, 
+                       COORD_DATA = 3 };
+  /// Utility function that extracts the name of the color field:
+  /// Returns <arrayname> from a string of  format:
+  ///    "(coord|point|cell|field),<arrayname>(,[0-9]+)".
+  QString GetArrayName(const QString&)const;
+  /// Utility function that extracts the name of the color field:
+  /// Returns POINT_DATA, CELL_DATA, FIELD_DATA or COORD_DATA from a 
+  /// string of  format: "({coord|point|cell|field},)<arrayname>(,[0-9]+)".
+  /// Returns -1 if none of the type can be found
+  int GetArrayType(const QString&)const;
+  /// Utility function that extracts the component of the color field:
+  /// Returns -1 if there is no component. The string must be of format: 
+  ///    "({coord|point|cell|field},)<arrayname>(,[0-9]+)".
+  int GetArrayComponent(const QString&)const;
+  /// Utility function that retrieve the number of components of an array
+  int GetArrayNumberOfComponents(const QString&)const;
+
 private:
   class pqInternal;
   pqInternal* Internal; 
@@ -184,7 +186,6 @@ private:
     vtkPVDataSetAttributesInformation* inAttrInfo,
     vtkPVArrayInformation*& arrayInfo);
 
-  int getNumberOfComponents(const char* arrayname, int fieldType);
 };
 
 #endif

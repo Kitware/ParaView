@@ -31,7 +31,7 @@
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
-vtkCxxRevisionMacro(vtkMergeCompositeDataSet, "1.1");
+vtkCxxRevisionMacro(vtkMergeCompositeDataSet, "1.2");
 vtkStandardNewMacro(vtkMergeCompositeDataSet);
 
 //-----------------------------------------------------------------------------
@@ -132,6 +132,7 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
         points->SetDataType( ps->GetPoints()->GetDataType() );
         pointsArray->SetNumberOfComponents(psData->GetNumberOfComponents());
         points->SetNumberOfPoints(cdsInput->GetNumberOfPoints());
+        pointData->SetNumberOfTuples(cdsInput->GetNumberOfPoints());
         uninitialized = false;
         }
       else
@@ -161,10 +162,77 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
           continue;
         }
       vtkDataSetAttributes* inputPtData = ps->GetPointData();
+      /*
+      cout << "NB point array: " << inputPtData->GetNumberOfArrays() << endl;
+      for( int i= 0; i < inputPtData->GetNumberOfArrays() ; ++i)
+        {
+        cout << "    " << inputPtData->GetArrayName(i) << endl;
+        }
+      */
+      /*
       pointData->CopyAllocate(inputPtData, psNumberOfPoints);
       for(int i = 0; i < psNumberOfPoints; ++i)
         {
         pointData->CopyData(inputPtData, i, curId + i);
+        }
+      */
+      for( int i= 0; i < inputPtData->GetNumberOfArrays() ; ++i)
+        {
+        if(pointData->GetAbstractArray(inputPtData->GetArrayName(i)) == NULL)
+          {
+          vtkAbstractArray* data = inputPtData->GetAbstractArray(i)->NewInstance();
+          data->SetNumberOfComponents(inputPtData->GetAbstractArray(i)->GetNumberOfComponents());
+          data->SetName(inputPtData->GetAbstractArray(i)->GetName());
+          if (inputPtData->GetAbstractArray(i)->HasInformation())
+            {
+            data->CopyInformation(inputPtData->GetAbstractArray(i)->GetInformation(),/*deep=*/1);
+            }
+          pointData->AddArray(data);
+          data->Delete();
+          data->SetNumberOfTuples(cdsInput->GetNumberOfPoints());
+          double* emptyTuple = new double[data->GetNumberOfComponents()];
+          for( int c = 0; c < data->GetNumberOfComponents(); ++c)
+            {
+            emptyTuple = 0;
+            }
+          for( int i = 0; i < curId; ++i)
+            {
+            //data->SetTuple(i, emptyTuple);
+            memset(data->GetVoidPointer(i), 0, data->GetNumberOfComponents()*data->GetElementComponentSize());
+            }
+          delete [] emptyTuple;
+          }
+        }
+      //pointData->CopyStructure(inputPtData);
+
+      for ( int k=0; k < pointData->GetNumberOfArrays(); k++ )
+        {
+        vtkAbstractArray* outputArray = pointData->GetArray(k);
+        vtkAbstractArray* inputPtArray = inputPtData->GetAbstractArray( 
+          pointData->GetArrayName(k) );
+
+        double* emptyTuple = new double[outputArray->GetNumberOfComponents()];
+        for( int c = 0; c < outputArray->GetNumberOfComponents(); ++c)
+          {
+          emptyTuple = 0;
+          }
+        if( inputPtArray )
+          {
+          for( int i = 0; i < inputPtData->GetNumberOfTuples(); ++i)
+            {
+            //pointData->InsertNextTuple(i, inputPtData);
+            //pointData->SetTuple(i+curId, i, inputPtData);
+            outputArray->SetTuple(i+curId, i, inputPtArray);
+            }
+          }
+        else
+          {
+          for( int i = 0; i < inputPtData->GetNumberOfTuples(); ++i)
+            {
+            memset(outputArray->GetVoidPointer(i), 0, outputArray->GetNumberOfComponents()*outputArray->GetElementComponentSize());
+            }
+          }
+        delete [] emptyTuple;
         }
       curId += psNumberOfPoints;
       }
@@ -182,6 +250,12 @@ int vtkMergeCompositeDataSet::RequestData(vtkInformation *request,
     cells->InsertNextCell(1, &i);
     }
   output->SetVerts(cells);
-
+/*  
+  cout << "res NB point array: " << pointData->GetNumberOfArrays() << endl;
+  for( int i= 0; i < pointData->GetNumberOfArrays() ; ++i)
+    {
+    cout << "    " << pointData->GetArrayName(i) << endl;
+    }
+*/
   return 1;
 }

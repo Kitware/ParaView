@@ -93,6 +93,8 @@ public:
 
   int GetSeriesType(int series);
 
+  int GetSeriesNumberOfComponents(int series);
+
 //BTX
 protected:
   vtkSMScatterPlotRepresentationProxy();
