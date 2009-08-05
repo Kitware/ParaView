@@ -305,5 +305,10 @@ void ClientTreeView::renderInternal()
   // FIXME: This will only hide one column right now
   this->Implementation->View->HideColumn(
     vtkSMPropertyHelper(this->getProxy(),"HideColumn").GetAsInt());
+
+  if(vtkSMPropertyHelper(this->getProxy(), "HideAllButFirstColumn").GetAsInt())
+    {
+    this->Implementation->View->HideAllButFirstColumn();
+    }
 }
 
