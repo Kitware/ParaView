@@ -43,11 +43,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLibraryInfo>
 #include <QtDebug>
 
-class pqHelpWindowTextBrowser : public QTextBrowser
+class pqHelpWindow::pqTextBrowser : public QTextBrowser
 {
 public:
-  pqHelpWindowTextBrowser(QHelpEngine* engine, QWidget * parent = 0)
-    : QTextBrowser(parent)
+  pqTextBrowser(QHelpEngine* engine, QWidget * parentObject = 0)
+    : QTextBrowser(parentObject)
     {
     Q_ASSERT(engine != 0);
     this->Engine = engine;
@@ -91,8 +91,8 @@ pqHelpWindow::pqHelpWindow(
   ui.indexDock->setWidget(this->HelpEngine->indexWidget());
   ui.indexDock->hide();
 
-  pqHelpWindowTextBrowser* browser = 
-    new pqHelpWindowTextBrowser(this->HelpEngine, this);
+  pqHelpWindow::pqTextBrowser* browser = 
+    new pqHelpWindow::pqTextBrowser(this->HelpEngine, this);
   this->Browser = browser;
   this->setCentralWidget(browser);
   QObject::connect(

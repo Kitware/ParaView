@@ -38,6 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QHelpEngine;
 class QTextBrowser;
 
+/// pqHelpWindow provides a assistant-like window  for showing embedded
+/// documentation in any application. It supports showing of Qt compressed help 
+/// files (*.qch files generated from *.qhp files). The qch file can be
+/// either on disk or an embedded qt-resource.
 class QTWIDGETS_EXPORT pqHelpWindow : public QMainWindow
 {
   Q_OBJECT
@@ -49,9 +53,15 @@ public:
 
   /// Register a *.qch documentation file.
   /// This can be a file in the qt-resource space as well.
+  /// Note these are Qt compressed help files i.e. *.qch files generated
+  /// from *.qhp and not the help collection files (*.qhc generated from *.qhcp)
+  /// which have the assistant configuration details.
+  /// Unlike registering the documentation with the Qt assistant, this is not
+  /// remembered across sessions and must be done each time.
   virtual void registerDocumentation(const QString& qchfilename);
 
-  /// Requests showing of a particular page.
+  /// Requests showing of a particular page. The url must begin with "qthelp:"
+  /// scheme when referring to pages from the help files.
   virtual void showPage(const QString& url);
 
 signals:
@@ -64,6 +74,8 @@ protected:
 
 private:
   Q_DISABLE_COPY(pqHelpWindow)
+
+  class pqTextBrowser;
 };
 
 #endif
