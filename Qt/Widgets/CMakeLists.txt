@@ -92,6 +92,8 @@ SET(QtWidgets_SRCS
   pqViewMenu.h
   pqWaitCursor.cxx
   pqWaitCursor.h
+  pqHelpWindow.cxx
+  pqHelpWindow.h
   QtWidgetsExport.h
   QtWidgetsPlugin.cxx
   QtWidgetsPlugin.h
@@ -137,12 +139,14 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqTreeWidgetSelectionHelper.h
   pqTreeViewSelectionHelper.h
   pqViewMenu.h
+  pqHelpWindow.h
 )
 
 ##########################################################################
 ## Add *.ui files to be uic processed.
 SET(QtWidgets_UI_FORMS
   Resources/UI/pqQuickLaunchDialog.ui
+  Resources/UI/pqHelpWindow.ui
 )
 
 QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES

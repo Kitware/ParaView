@@ -84,7 +84,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMSourceProxy.h>
 #include <vtkSMSourceSelectionLink.h>
 
-#include <QAssistantClient>
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
@@ -103,7 +102,6 @@ class MainWindow::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    AssistantClient(0),
     Core(parent),
     RecentFilesMenu(0),
     ViewMenu(0),
@@ -116,14 +114,8 @@ public:
   {
     delete this->ViewMenu;
     delete this->ToolbarsMenu;
-    if(this->AssistantClient)
-      {
-      this->AssistantClient->closeAssistant();
-      delete this->AssistantClient;
-      }
   }
 
-  QPointer<QAssistantClient> AssistantClient;
   Ui::MainWindow UI;
   pqMainWindowCore Core;
   pqRecentFilesMenu* RecentFilesMenu;
@@ -897,132 +889,8 @@ void MainWindow::onHelpAbout()
 }
 
 //-----------------------------------------------------------------------------
-QString Locate(const QString& appName)
-{
-  QString app_dir = QCoreApplication::applicationDirPath();
-  const char* inst_dirs[] = {
-    "/./",
-    "/../bin/",
-    "/../../bin/",
-    0
-  };
-  for (const char** dir = inst_dirs; *dir; ++dir)
-    {
-    QString path = app_dir;
-    path += *dir;
-    path += appName;
-    //cout << "Checking : " << path.toAscii().data() << " ... ";
-    //cout.flush();
-    QFileInfo finfo (path);
-    if (finfo.exists())
-      {
-      //cout << " Success!" << endl;
-      return path;
-      }
-    //cout << " Failed" << endl;
-    }
-  return app_dir + QDir::separator() + appName;
-}
-
-//-----------------------------------------------------------------------------
 void MainWindow::onHelpHelp()
 {
-  if(this->Implementation->AssistantClient)
-    {
-    if(!this->Implementation->AssistantClient->isOpen())
-      {
-      this->Implementation->AssistantClient->openAssistant();
-      }
-      return;
-    }
-
-  QString assistantExe;
-  QString profileFile;
-
-  const char* assistantName = "assistant";
-#if defined(Q_WS_WIN)
-  const char* binDir = "\\";
-  const char* binDir1 = "\\..\\";
-#elif defined(Q_WS_MAC)
-  const char* binDir = "/";
-  const char* binDir1 = "/../../../";
-#else
-  const char* binDir = "/";
-  const char* binDir1 = "/";
-#endif
-  
-  QString helper = QCoreApplication::applicationDirPath() +
-    binDir + QString("pqClientDocFinder.txt");
-  if(!QFile::exists(helper))
-    {
-    helper = QCoreApplication::applicationDirPath() +
-      binDir1 + QString("pqClientDocFinder.txt");
-    }
-  if(QFile::exists(helper))
-    {
-    QFile file(helper);
-    if(file.open(QIODevice::ReadOnly))
-      {
-      assistantExe = file.readLine().trimmed() + assistantName;
-      profileFile = file.readLine().trimmed();
-      }
-    }
-
-  if(assistantExe.isEmpty())
-    {
-    assistantExe = ::Locate(assistantName);
-
-    /*
-    QString assistant = QCoreApplication::applicationDirPath();
-    assistant += QDir::separator();
-    assistant += assistantName;
-    assistantExe = assistant;
-    */
-    }
-
-  this->Implementation->AssistantClient = 
-    new QAssistantClient(assistantExe, this);
-  QObject::connect(this->Implementation->AssistantClient,
-                   SIGNAL(error(const QString&)),
-                   this,
-                   SLOT(assistantError(const QString&)));
-  
-  QStringList args;
-  args.append(QString("-profile"));
-
-  if(profileFile.isEmpty())
-    {
-    // see if help is bundled up with the application
-    QString profile = ::Locate("pqClient.adp");
-      /*QCoreApplication::applicationDirPath() + QDir::separator()
-      + QString("pqClient.adp");*/
-    if(QFile::exists(profile))
-      {
-      profileFile = profile;
-      }
-    }
-
-  if(profileFile.isEmpty() && getenv("PARAVIEW_HELP"))
-    {
-    // not bundled, ask for help
-    args.append(getenv("PARAVIEW_HELP"));
-    }
-  else if(profileFile.isEmpty())
-    {
-    // no help, error out
-    QMessageBox::critical(
-      this, "Help error", "Couldn't find"
-      " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
-      " points to that file");
-    
-    delete this->Implementation->AssistantClient;
-    return;
-    }
-  
-  args.append(profileFile);
-  
-  this->Implementation->AssistantClient->setArguments(args);
-  this->Implementation->AssistantClient->openAssistant();
 }
 
 //-----------------------------------------------------------------------------

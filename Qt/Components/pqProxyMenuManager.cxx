@@ -418,7 +418,10 @@ void pqProxyMenuManager::updateFromXML()
   QStringList files = dir.entryList(QDir::Files);
   foreach(QString file, files)
     {
-    this->updateFromXML(this->FilteringXMLDir + QString("/") + file);
+    if (QFileInfo(file).suffix() == "xml")
+      {
+      this->updateFromXML(this->FilteringXMLDir + QString("/") + file);
+      }
     }
 }
 

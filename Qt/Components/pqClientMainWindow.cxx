@@ -64,13 +64,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqVCRController.h>
 #include <pqViewManager.h>
 #include <pqViewMenu.h>
+#include <pqHelpWindow.h>
+
 
 // Include pqPythonManager when compiled with python support
 #ifdef PARAVIEW_ENABLE_PYTHON
 #include <pqPythonManager.h>
 #endif
 
-#include <QAssistantClient>
 #include <QDir>
 #include <QFileInfo>
 #include <QIcon>
@@ -89,7 +90,7 @@ class pqClientMainWindow::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent, pqMainWindowCore *core=NULL) :
-    AssistantClient(0),
+    HelpWindow(0),
     RecentFilesMenu(0),
     ViewMenu(0),
     ToolbarsMenu(0)
@@ -109,15 +110,11 @@ public:
   {
     delete this->ViewMenu;
     delete this->ToolbarsMenu;
-    if(this->AssistantClient)
-      {
-      this->AssistantClient->closeAssistant();
-      delete this->AssistantClient;
-      }
+    delete this->HelpWindow;
     delete this->Core;
   }
 
-  QPointer<QAssistantClient> AssistantClient;
+  QPointer<pqHelpWindow> HelpWindow;
   Ui::pqClientMainWindow UI;
   pqMainWindowCore *Core;
   pqRecentFilesMenu* RecentFilesMenu;
@@ -995,160 +992,29 @@ void pqClientMainWindow::onHelpAbout()
 }
 
 //-----------------------------------------------------------------------------
-QString Locate(const QString& appName)
-{
-  QString app_dir = QCoreApplication::applicationDirPath();
-  const char* inst_dirs[] = {
-    "/./",
-    "/../bin/",
-    "/../../bin/",
-    0
-  };
-  for (const char** dir = inst_dirs; *dir; ++dir)
-    {
-    QString path = app_dir;
-    path += *dir;
-#if defined (__APPLE__)
-    path += appName + ".app/Contents/MacOS/";
-#endif
-    path += appName;
-    //cout << "Checking : " << path.toAscii().data() << " ... " << endl;
-    QFileInfo finfo (path);
-    if (finfo.exists())
-      {
-      //cout << " Success!" << endl;
-      return path;
-      }
-    //cout << " Failed" << endl;
-    }
-  return app_dir + QDir::separator() + appName;
-}
-
-
-//-----------------------------------------------------------------------------
 void pqClientMainWindow::makeAssistant()
 {
-  if(this->Implementation->AssistantClient)
+  if (!this->Implementation->HelpWindow)
     {
-    return;
+    pqHelpWindow* window = new pqHelpWindow("ParaView Online Help", this);
+    QObject::connect(window, SIGNAL(helpWarnings(const QString&)),
+      this, SLOT(assistantError(const QString&)));
+    window->registerDocumentation(":/ParaViewResources/pqClient.qch");
+    this->Implementation->HelpWindow = window;
+    this->Implementation->HelpWindow->showPage(
+      "qthelp://paraview.org/paraview/Documentation/index.html");
     }
-
-  QString assistantExe;
-  QString profileFile;
-
-  const char* assistantName = "assistant";
-#if defined(Q_WS_WIN)
-  const char* extString = ".exe";
-  const char* binDir = "\\";
-  const char* binDir1 = "\\..\\";
-#elif defined(Q_WS_MAC)
-  const char* extString = "";
-  const char* binDir = "/";
-  const char* binDir1 = "/../../../";
-#else
-  const char* extString = "";
-  const char* binDir = "/";
-  const char* binDir1 = "/";
-#endif
-
-  QString assistantProgName;
-  assistantProgName = assistantProgName + assistantName + extString;
-
-  QString helper = QCoreApplication::applicationDirPath() +
-    binDir + QString("pqClientDocFinder.txt");
-  if(!QFile::exists(helper))
-    {
-    helper = QCoreApplication::applicationDirPath() +
-      binDir1 + QString("pqClientDocFinder.txt");
-    }
-  if(QFile::exists(helper))
-    {
-    QFile file(helper);
-    if(file.open(QIODevice::ReadOnly))
-      {
-      assistantExe = file.readLine().trimmed();
-      profileFile = file.readLine().trimmed();
-      // CMake escapes spaces, we need to unescape those.
-      assistantExe.replace("\\ ", " ");
-      profileFile.replace("\\ ", " ");
-      }
-    }
-
-  if(assistantExe.isEmpty())
-    {
-#if defined(Q_WS_MAC)
-# if QT_VERSION >= 0x040300 && QT_VERSION < 0x040400
-    assistantExe = QCoreApplication::applicationDirPath() + "/../Support/assistant";
-# else
-    assistantExe = QCoreApplication::applicationDirPath() + "/../Support/Assistant_adp";
-# endif
-#else
-    assistantExe = ::Locate(assistantName);
-#endif
-    }
-
-#if defined(Q_WS_MAC)
-  // if assistantExe needs to point to the app, not the internal executable.
-  assistantExe.remove(QRegExp(".app/Contents/MacOS/assistant$"));
-#endif
-  this->Implementation->AssistantClient =
-    new QAssistantClient(assistantExe, this);
-  QObject::connect(this->Implementation->AssistantClient,
-                   SIGNAL(error(const QString&)),
-                   this,
-                   SLOT(assistantError(const QString&)));
-
-  QStringList args;
-  args.append(QString("-profile"));
-
-  if(profileFile.isEmpty())
-    {
-    // see if help is bundled up with the application
-#if defined(Q_WS_MAC)
-    QString profile = QCoreApplication::applicationDirPath() + "/../Support/pqClient.adp";
-#else
-    QString profile = ::Locate("pqClient.adp");
-#endif
-      /*QCoreApplication::applicationDirPath() + QDir::separator()
-      + QString("pqClient.adp");*/
-    if(QFile::exists(profile))
-      {
-      profileFile = profile;
-      }
-    }
-
-  if(profileFile.isEmpty() && getenv("PARAVIEW_HELP"))
-    {
-    // not bundled, ask for help
-    args.append(getenv("PARAVIEW_HELP"));
-    }
-  else if(profileFile.isEmpty())
-    {
-    // no help, error out
-    QMessageBox::critical(
-      this, "Help error", "Couldn't find"
-      " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
-      " points to that file");
-
-    delete this->Implementation->AssistantClient;
-    return;
-    }
-
-  QFileInfo fi(profileFile);
-  this->Implementation->DocumentationDir = fi.absolutePath();
-
-  args.append(profileFile);
-
-  this->Implementation->AssistantClient->setArguments(args);
 }
 
 //-----------------------------------------------------------------------------
 void pqClientMainWindow::onHelpHelp()
 {
   this->makeAssistant();
-  if(this->Implementation->AssistantClient)
+  
+  if(this->Implementation->HelpWindow)
     {
-    this->Implementation->AssistantClient->openAssistant();
+    this->Implementation->HelpWindow->show();
+    this->Implementation->HelpWindow->raise();
     }
 }
 
@@ -1325,13 +1191,13 @@ void pqClientMainWindow::showHelpForProxy(const QString& proxy)
   // make sure assistant is ready
   this->makeAssistant();
 
-  if(this->Implementation->AssistantClient)
+  if (this->Implementation->HelpWindow)
     {
-    this->Implementation->AssistantClient->openAssistant();
-    QString page("%1/Documentation/%2.html");
-    page = page.arg(this->Implementation->DocumentationDir);
-    page = page.arg(proxy);
-    this->Implementation->AssistantClient->showPage(page);
+    QString page = QString(
+      "qthelp://paraview.org/paraview/Documentation/%1.html").arg(proxy);
+    this->Implementation->HelpWindow->showPage(page);
+    this->Implementation->HelpWindow->show();
+    this->Implementation->HelpWindow->raise();
     }
 }
 

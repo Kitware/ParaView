@@ -327,7 +327,10 @@ void pqWriterFactory::loadFileTypes()
   QStringList resources = readersDir.entryList(QDir::Files);
   foreach(QString resource, resources)
     {
-    this->loadFileTypes(readersDirName + QString("/") + resource);
+    if (QFileInfo(resource).suffix() == "xml")
+      {
+      this->loadFileTypes(readersDirName + QString("/") + resource);
+      }
     }
 }
 
