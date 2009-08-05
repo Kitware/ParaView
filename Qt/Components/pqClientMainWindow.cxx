@@ -996,11 +996,11 @@ void pqClientMainWindow::makeAssistant()
 {
   if (!this->Implementation->HelpWindow)
     {
-    pqHelpWindow* window = new pqHelpWindow("ParaView Online Help", this);
-    QObject::connect(window, SIGNAL(helpWarnings(const QString&)),
+    pqHelpWindow* helpWindow = new pqHelpWindow("ParaView Online Help", this);
+    QObject::connect(helpWindow, SIGNAL(helpWarnings(const QString&)),
       this, SLOT(assistantError(const QString&)));
-    window->registerDocumentation(":/ParaViewResources/pqClient.qch");
-    this->Implementation->HelpWindow = window;
+    helpWindow->registerDocumentation(":/ParaViewResources/pqClient.qch");
+    this->Implementation->HelpWindow = helpWindow;
     this->Implementation->HelpWindow->showPage(
       "qthelp://paraview.org/paraview/Documentation/index.html");
     }
