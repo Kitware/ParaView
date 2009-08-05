@@ -78,11 +78,9 @@ pqHelpWindow::pqHelpWindow(
 
   this->setWindowTitle(wtitle);
 
-  QTemporaryFile* tFile = new QTemporaryFile(this);
-  tFile->open();
-  tFile->close();
-  this->HelpEngine = new QHelpEngine(
-    QDir::tempPath() + "/" + tFile->fileName() + ".qhc", this);
+  QTemporaryFile tFile;
+  tFile.open();
+  this->HelpEngine = new QHelpEngine(tFile.fileName() + ".qhc", this);
 
   QObject::connect(this->HelpEngine, SIGNAL(warning(const QString&)),
     this, SIGNAL(helpWarnings(const QString&)));
