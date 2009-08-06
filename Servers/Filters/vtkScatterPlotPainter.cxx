@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.5");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.6");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -853,7 +853,7 @@ void vtkScatterPlotPainter::ReleaseGraphicsResources(vtkWindow *window)
     {
     vtkPainterPolyDataMapper* mapper = 
       vtkPainterPolyDataMapper::SafeDownCast(
-        this->SourceGlyphMappers->GetItemAsObject(i));
+        this->SourceGlyphMappers->GetItemAsObject(static_cast<int>(i)));
     if(mapper)
       {
       mapper->ReleaseGraphicsResources(window);

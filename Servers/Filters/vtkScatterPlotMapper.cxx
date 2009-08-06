@@ -60,7 +60,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.12");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.13");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -739,7 +739,8 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
     // s can be null.
     //if (glyphMappers->Mappers[cc]==0)
     vtkPainterPolyDataMapper* polyDataMapper = 
-      vtkPainterPolyDataMapper::SafeDownCast(glyphMappers->GetItemAsObject(cc));
+      vtkPainterPolyDataMapper::SafeDownCast(
+        glyphMappers->GetItemAsObject(static_cast<int>(cc)));
     if ( polyDataMapper == NULL)
       {
       //glyphMappers->Mappers[cc] = vtkPainterPolyDataMapper::New();
