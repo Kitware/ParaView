@@ -1526,7 +1526,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     getClassInfo(data,classData);
     outputMappableFunctions(fp,classData);
     outputMethodMapFunction(fp,classData);
-    outputMetaInfoExtractFunction(fp,classData);
+    //outputMetaInfoExtractFunction(fp,classData);
 //    output_InitFunction(fp,classData);
     
 
