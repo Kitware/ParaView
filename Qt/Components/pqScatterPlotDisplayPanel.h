@@ -34,11 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqDisplayPanel.h"
 
-#include <QVariant>
 class pqRepresentation;
-class QModelIndex;
 
-/// Editor widget for line chart displays.
+/// Editor widget for scatter plot displays.
 class PQCOMPONENTS_EXPORT pqScatterPlotDisplayPanel : public pqDisplayPanel
 {
   Q_OBJECT
@@ -46,51 +44,32 @@ public:
   pqScatterPlotDisplayPanel(pqRepresentation* display, QWidget* parent=0);
   virtual ~pqScatterPlotDisplayPanel();
 
-public slots:
-  /// Reloads the series list from the display.
-  void reloadSeries();
-signals:
-  void specularColorChanged();
-
 protected slots:
+  /// Reset the camera to the data bounds
   void zoomToData();
   
+  /// Enable/Disable the 3D camera mode. 
+  /// It is controlled by the the Z-Coords checkbox and the "ThreeDMode" 
+  /// property
   void update3DMode();
-
+  
+  /// Open a ColorMap editor dialog to change the LUT.
   void openColorMapEditor();
 
-  void rescaleToDataRange();
-  
-  void updateGlyphMode();
-  
+  /// Retrieve the data range of the color array and set it to the LUT
+  void rescaleColorToDataRange();
+
+  /// When a color array is chosen, the range must be reset
   void onColorChanged();
   
-  void setSolidColor(const QColor& color);
+  /// Enable/Disable the Glyph mode
+  void updateGlyphMode();
   
-  QVariant specularColor() const;
+  /// Refresh the screen when the visibility of the cube axes changes
+  void cubeAxesVisibilityChanged();
 
-  void updateEnableState();
-
-  /// Slot to listen to clicks for changing color.
-  void activateItem(const QModelIndex &index);
-
-  void updateOptionsWidgets();
-
-  void setCurrentSeriesEnabled(int state);
-
-  void setCurrentSeriesColor(const QColor &color);
-
-  void setCurrentSeriesThickness(int thickness);
-
-  void setCurrentSeriesStyle(int listIndex);
-
-  void setCurrentSeriesAxes(int listIndex);
-
-  void setCurrentSeriesMarkerStyle(int listIndex);
-
-  void useArrayIndexToggled(bool);
-
-  void useDataArrayToggled(bool);
+  /// Open a CubeAxes editor dialog to change properties of the cube axes
+  void openCubeAxesEditor();
 
 private:
   pqScatterPlotDisplayPanel(const pqScatterPlotDisplayPanel&); // Not implemented.
@@ -101,8 +80,6 @@ private:
   /// This call will raise an error is the display is not
   /// a ScatterPlotRepresentation proxy.
   void setDisplay(pqRepresentation* display);
-
-  Qt::CheckState getEnabledState() const;
 
   class pqInternal;
   pqInternal* Internal;

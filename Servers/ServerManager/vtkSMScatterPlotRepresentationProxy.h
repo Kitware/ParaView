@@ -37,6 +37,7 @@ public:
 //                         vtkSMSourceProxy* input,
 //                         unsigned int outputPort,
 //                         const char* method);
+  virtual void SetViewInformation(vtkInformation* info);
   
   // Description:
   // Called when a representation is added to a view. 
@@ -52,7 +53,7 @@ public:
 
   // Description:
   // Set the scalar coloring mode
-  void SetColorAttributeType(int type);
+  //void SetColorAttributeType(int type);
 
   // Description:
   // Set the scalar color array name. If array name is 0 or "" then scalar
@@ -62,12 +63,16 @@ public:
   // Description:
   // Get the bounds for the representation.  Returns true if successful.
   // Default implementation returns non-transformed bounds.
-  // Overridden to take "UseXYPlane" property value into consideration.
+  // Reimplemented to use the Mapper bounds instead of the input bounds
   virtual bool GetBounds(double bounds[6]);
 
   virtual void Update() { this->Superclass::Update(); }
   virtual void Update(vtkSMViewProxy* view);
-  
+  virtual bool UpdateRequired();
+
+  virtual void SetVisibility(int visible);
+  virtual void SetCubeAxesVisibility(int visible);
+
   void SetXAxisArrayName(const char* name);
   void SetYAxisArrayName(const char* name);
   void SetZAxisArrayName(const char* name);
@@ -98,7 +103,7 @@ public:
 //BTX
 protected:
   vtkSMScatterPlotRepresentationProxy();
-  ~vtkSMScatterPlotRepresentationProxy();
+  virtual ~vtkSMScatterPlotRepresentationProxy();
 
   // Description:
   // This representation needs a surface compositing strategy.
@@ -127,7 +132,11 @@ protected:
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
   vtkSMScatterPlotViewProxy* ScatterPlotView;
-
+  
+  vtkSMProxy* CubeAxesActor;
+  vtkSMProxy* CubeAxesProperty;
+  //vtkSMDataRepresentationProxy* CubeAxesRepresentation;
+  int         CubeAxesVisibility;
 private:
   vtkSMScatterPlotRepresentationProxy(const vtkSMScatterPlotRepresentationProxy&); // Not implemented
   void operator=(const vtkSMScatterPlotRepresentationProxy&); // Not implemented

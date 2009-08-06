@@ -14,25 +14,26 @@
 =========================================================================*/
 #include "vtkSMScatterPlotRepresentationProxy.h"
 
-#include "vtkAbstractMapper.h"
+//#include "vtkAbstractMapper.h"
+#include "vtkClientServerStream.h"
+#include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkProcessModule.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMOutputPort.h"
+#include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
+#include "vtkSMRepresentationStrategyVector.h"
+#include "vtkSMScatterPlotViewProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkClientServerStream.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkDataObject.h"
-#include "vtkScatterPlotMapper.h"
-#include "vtkSMRepresentationStrategyVector.h"
-#include "vtkSMScatterPlotViewProxy.h"
-#include "vtkSMOutputPort.h"
+#include "vtkSmartPointer.h"
+
 #include <vtksys/ios/sstream>
 
 inline void vtkSMScatterPlotRepresentationProxySetString(
@@ -47,24 +48,48 @@ inline void vtkSMScatterPlotRepresentationProxySetString(
     }
 }
 
+inline void vtkSMScatterPlotRepresentationProxySetInt(
+  vtkSMProxy* proxy, const char* pname, int val)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty(pname));
+  if (ivp)
+    {
+    ivp->SetElement(0, val);
+    proxy->UpdateProperty(pname);
+    }
+}
+
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
-//  this->ScatterPlot = 0;
-  //this->GeometryFilter = 0;
   this->FlattenFilter = 0;
   this->Mapper = 0;
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
   this->ScatterPlotView = 0;
+  this->CubeAxesActor = 0;
+  this->CubeAxesProperty = 0;
+  this->CubeAxesVisibility = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::~vtkSMScatterPlotRepresentationProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::SetViewInformation(
+  vtkInformation* info)
+{
+  this->Superclass::SetViewInformation(info);
+//   if (this->CubeAxesRepresentation)
+//     {
+//     this->CubeAxesRepresentation->SetViewInformation(info);
+//     }
 }
 
 //-----------------------------------------------------------------------------
@@ -96,16 +121,15 @@ bool vtkSMScatterPlotRepresentationProxy::BeginCreateVTKObjects()
   this->Prop3D = this->GetSubProxy("Prop3D");
   this->Property = this->GetSubProxy("Property");
 
-  //this->GeometryFilter->SetServers(vtkProcessModule::DATA_SERVER);
+//  this->CubeAxesRepresentation = vtkSMDataRepresentationProxy::SafeDownCast(
+//    this->GetSubProxy("CubeAxesRepresentation"));
+  this->CubeAxesActor = this->GetSubProxy("CubeAxesActor");
+  this->CubeAxesProperty = this->GetSubProxy("CubeAxesProperty");
+  
   this->FlattenFilter->SetServers(vtkProcessModule::DATA_SERVER);
   this->Mapper->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  /*
-  this->Mapper->SetArrayIndex(vtkScatterPlotMapper::X_COORDS, 
-                              vtkDataSetAttributes::SCALARS, 0);
-  this->Mapper->SetArrayIndex(vtkScatterPlotMapper::Y_COORDS, 
-                              vtkDataSetAttributes::SCALARS, 1);
-  */
+  
   if(this->LODMapper)
     {
     this->LODMapper->SetServers(
@@ -115,7 +139,10 @@ bool vtkSMScatterPlotRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-
+  this->CubeAxesActor->SetServers(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->CubeAxesProperty->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   return true;
 }
 
@@ -126,10 +153,22 @@ bool vtkSMScatterPlotRepresentationProxy::EndCreateVTKObjects()
   //  "Input", this->OutputPort);
   this->Connect(this->GetInputProxy(), this->FlattenFilter, 
                 "Input", this->OutputPort);
+  
   this->Connect(this->Mapper, this->Prop3D, "Mapper");
 //  this->Connect(this->LODMapper, this->Prop3D, "LODMapper");
   this->Connect(this->Property, this->Prop3D, "Property");
+  this->Connect(this->CubeAxesProperty, this->CubeAxesActor, "Property");
   
+  this->SetCubeAxesVisibility(this->CubeAxesVisibility);
+//   if (this->CubeAxesRepresentation)
+//     {
+//     this->Connect(this->Mapper, this->CubeAxesRepresentation);
+//     vtkSMScatterPlotRepresentationProxySetInt(
+//       this->CubeAxesRepresentation, 
+//       "Visibility", 1);
+//     }
+  
+
   /*
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GeometryFilter->GetProperty("PassThroughIds"));
@@ -199,14 +238,21 @@ bool vtkSMScatterPlotRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
+//   if (this->CubeAxesRepresentation)
+//     {
+//     this->CubeAxesRepresentation->AddToView(view);
+//     }
+
   if (!this->Superclass::AddToView(view))
     {
     return false;
     }
   this->ScatterPlotView = vtkSMScatterPlotViewProxy::SafeDownCast(view);
   renderView->AddPropToRenderer(this->Prop3D);
+  
+  renderView->AddPropToRenderer(this->CubeAxesActor);
 
-/*
+
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << renderView->GetRendererProxy()->GetID()
@@ -219,9 +265,10 @@ bool vtkSMScatterPlotRepresentationProxy::AddToView(vtkSMViewProxy* view)
           << vtkClientServerStream::End;
 
   vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+    this->ConnectionID, 
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
     stream);
-*/
+
   return true;
 }
 
@@ -236,8 +283,9 @@ bool vtkSMScatterPlotRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     }
 
   renderView->RemovePropFromRenderer(this->Prop3D);
+  renderView->RemovePropFromRenderer(this->CubeAxesActor);
   this->ScatterPlotView = NULL;
-/*
+
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << this->CubeAxesActor->GetID()
@@ -246,12 +294,84 @@ bool vtkSMScatterPlotRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
   vtkProcessModule::GetProcessModule()->SendStream(
     this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
     stream);
-*/
+
   //this->Strategy = 0;
+
+//   if (this->CubeAxesRepresentation)
+//     {    
+//     this->CubeAxesRepresentation->RemoveFromView(view);
+//     }
+
   return this->Superclass::RemoveFromView(view);
 }
 
+//----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::SetVisibility(int visible)
+{
+//   if (this->CubeAxesRepresentation)
+//     {    
+//     vtkSMScatterPlotRepresentationProxySetInt(
+//       this->CubeAxesRepresentation, "Visibility",
+//       visible && this->CubeAxesVisibility);
+//     this->CubeAxesRepresentation->UpdateVTKObjects();
+//     }
+//   if (this->SelectionRepresentation && !visible)
+//     {
+//     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+//       this->SelectionRepresentation->GetProperty("Visibility"));
+//     ivp->SetElement(0, visible);
+//     this->SelectionRepresentation->UpdateProperty("Visibility");
+//     }
+//  vtkSMProxy* prop3D = this->GetSubProxy("Prop3D");
+  vtkSMProxy* prop2D = this->GetSubProxy("Prop2D");
 
+  if (this->Prop3D)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->Prop3D->GetProperty("Visibility"));
+    ivp->SetElement(0, visible);
+    this->Prop3D->UpdateProperty("Visibility");
+    }
+
+  if (prop2D)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      prop2D->GetProperty("Visibility"));
+    ivp->SetElement(0, visible);
+    prop2D->UpdateProperty("Visibility");
+    }
+
+  if (this->CubeAxesActor)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->CubeAxesActor->GetProperty("Visibility"));
+    ivp->SetElement(0, this->CubeAxesVisibility && visible);
+    this->CubeAxesActor->UpdateProperty("Visibility");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::SetCubeAxesVisibility(int visible)
+{
+//   if (this->CubeAxesRepresentation)
+//     {
+//     this->CubeAxesVisibility = visible;
+//     vtkSMScatterPlotRepresentationProxySetInt(
+//       this->CubeAxesRepresentation, "Visibility",
+//       visible && this->GetVisibility());
+//     this->CubeAxesRepresentation->UpdateVTKObjects();
+//     }
+  if (this->CubeAxesActor)
+    {
+    this->CubeAxesVisibility = visible;
+    vtkSMScatterPlotRepresentationProxySetInt(
+      this->CubeAxesActor, "Visibility",
+      visible && this->GetVisibility());
+    this->CubeAxesActor->UpdateVTKObjects();
+    }
+}
+
+/*
 //-----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::SetColorAttributeType(int type)
 {
@@ -275,6 +395,7 @@ void vtkSMScatterPlotRepresentationProxy::SetColorAttributeType(int type)
   //this->LODMapper->UpdateVTKObjects();
   //this->UpdateShadingParameters();
 }
+*/
 
 //-----------------------------------------------------------------------------
 /*
@@ -307,6 +428,8 @@ bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
 
   return true;
   */
+  //this->Mapper->UpdateVTKObjects();
+
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << this->Mapper->GetID()
@@ -319,17 +442,34 @@ bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
     vtkProcessModule::GetProcessModule()->GetLastResult(
       this->ConnectionID,
       vtkProcessModule::RENDER_SERVER);
+  bool ret = true;
   if(!res.GetArgument(0, 0, bounds, 6))
     {
-    return this->Superclass::GetBounds(bounds);
+    ret = this->Superclass::GetBounds(bounds);
     }
-  return true;
+  
+//   cout << __FUNCTION__ << " bounds: " 
+//        << bounds[0] << " " << bounds[1] << " " << bounds[2] << " " 
+//        << bounds[3] << " " << bounds[4] << " " << bounds[5] << endl;
+  
+  return ret;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   bool update = this->UpdateRequired();
+  //cout << __FUNCTION__ << " "<< update <<endl; 
+  if (this->CubeAxesActor)
+    {    
+    //this->CubeAxesRepresentation->Update(view);
+    double bounds[6];
+    this->GetBounds(bounds);
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->CubeAxesActor->GetProperty("Bounds"));
+    dvp->SetElements(bounds);
+    this->CubeAxesActor->UpdateVTKObjects();
+    }
 
   this->Superclass::Update(view);
 //  this->VTKRepresentation->SetInputConnection(
@@ -340,6 +480,15 @@ void vtkSMScatterPlotRepresentationProxy::Update(vtkSMViewProxy* view)
     this->GetInputProxy()->UpdatePropertyInformation();
     this->UpdatePropertyInformation();
     }
+}
+//----------------------------------------------------------------------------
+bool vtkSMScatterPlotRepresentationProxy::UpdateRequired()
+{
+//   if (this->CubeAxesRepresentation->UpdateRequired())
+//     {
+//     return true;
+//     }
+  return this->Superclass::UpdateRequired();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetXAxisArrayName(const char* name)
@@ -355,6 +504,7 @@ void vtkSMScatterPlotRepresentationProxy::SetXAxisArrayName(const char* name)
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetYAxisArrayName(const char* name)
@@ -369,6 +519,7 @@ void vtkSMScatterPlotRepresentationProxy::SetYAxisArrayName(const char* name)
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetZAxisArrayName(const char* name)
@@ -384,6 +535,7 @@ void vtkSMScatterPlotRepresentationProxy::SetZAxisArrayName(const char* name)
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
@@ -399,6 +551,7 @@ void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetGlyphScalingArrayName(const char* name)
@@ -436,6 +589,7 @@ void vtkSMScatterPlotRepresentationProxy::SetGlyphScalingArrayName(const char* n
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetGlyphMultiSourceArrayName(const char* name)
@@ -451,6 +605,7 @@ void vtkSMScatterPlotRepresentationProxy::SetGlyphMultiSourceArrayName(const cha
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetGlyphOrientationArrayName(const char* name)
@@ -488,6 +643,7 @@ void vtkSMScatterPlotRepresentationProxy::SetGlyphOrientationArrayName(const cha
     {
     svp->SetElement(0, "");
     }
+  this->Mapper->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 #include "vtkCompositeDataIterator.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkCompositeDataSet.h"
+#include "vtkCellArray.h"
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
@@ -59,7 +60,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.11");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.12");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -78,6 +79,7 @@ int GLYPHS_PORT=1;
 vtkScatterPlotMapper::vtkScatterPlotMapper()
 {
   this->SetNumberOfInputPorts(2);
+//  this->SetNumberOfOutputPorts(1);
   vtkScatterPlotPainter* painter = vtkScatterPlotPainter::New();
   this->Painter->SetDelegatePainter(painter);
   painter->Delete();
@@ -494,8 +496,15 @@ void vtkScatterPlotMapper::ComputeBounds()
   
   while (!iter->IsDoneWithTraversal())
     {
-//    vtkPolyData *pd = vtkPolyData::SafeDownCast(iter->GetCurrentDataObject());    
     this->GetScatterPlotPainter()->SetInput(iter->GetCurrentDataObject());
+    
+    // Update Painter information if obsolete.
+    if (this->PainterUpdateTime < this->GetMTime())
+      {
+      this->UpdatePainterInformation();
+      this->PainterUpdateTime.Modified();
+      }
+
     if(vtkMath::AreBoundsInitialized(this->Bounds))
       {
       this->Painter->UpdateBounds(bounds);
@@ -587,6 +596,15 @@ int vtkScatterPlotMapper::FillInputPortInformation(int port,
   return 0;
 }
 
+/*
+// ---------------------------------------------------------------------------
+int vtkScatterPlotMapper::FillOutputPortInformation(int vtkNotUsed(port),
+  vtkInformation *info)
+{
+  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+  return 0;
+}
+*/
 // ---------------------------------------------------------------------------
 // Description:
 // Send mapper ivars to sub-mapper.

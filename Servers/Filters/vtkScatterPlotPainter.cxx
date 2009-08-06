@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.4");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.5");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -542,6 +542,18 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
     //cout << __FUNCTION__ << " no input" << endl;
     return;
     }
+  
+  if (this->InformationProcessTime < this->Information->GetMTime())
+    {
+    // If the information object was modified, some subclass may
+    // want to get the modified information. 
+    // Using ProcessInformation avoids the need to access the Information
+    // object during each UpdateBounds, thus reducing unnecessary
+    // expensive information key accesses.
+    this->ProcessInformation(this->Information);
+    this->InformationProcessTime.Modified();
+    }
+  
 /*
   if (!this->Static)
     {
@@ -580,13 +592,13 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
     }
   else
     {
-    bounds[4] = -1.;
-    bounds[5] = 1.;
+    bounds[4] = 0.;
+    bounds[5] = 0.;
     }
   
   if(!this->GlyphMode)
     {
-    // cout << __FUNCTION__ << " bounds: "
+//     cout << __FUNCTION__ << " bounds: "
 //          << bounds[0] << " " << bounds[1] << " "
 //          << bounds[2] << " " << bounds[3] << " "
 //          << bounds[4] << " " << bounds[5] << endl;

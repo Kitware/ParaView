@@ -28,13 +28,13 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.6");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
   this->RenderView = 0;
   this->LegendScaleActor = 0;
-  this->CubeAxesActor = 0;
+  //this->CubeAxesActor = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -58,10 +58,10 @@ vtkSMScatterPlotViewProxy::~vtkSMScatterPlotViewProxy()
     {
     this->RenderView->RemovePropFromRenderer2D(this->LegendScaleActor);
     }
-  if (this->RenderView && this->CubeAxesActor)
-    {
-    this->RenderView->RemovePropFromRenderer(this->CubeAxesActor);
-    }
+//   if (this->RenderView && this->CubeAxesActor)
+//     {
+//     this->RenderView->RemovePropFromRenderer(this->CubeAxesActor);
+//     }
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void vtkSMScatterPlotViewProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RenderView: " << this->RenderView << endl;
   os << indent << "LegendScaleActor: " << this->LegendScaleActor << endl;
-  os << indent << "CubeAxesActor: " << this->CubeAxesActor << endl;
+//  os << indent << "CubeAxesActor: " << this->CubeAxesActor << endl;
 }
 
 
@@ -234,17 +234,17 @@ bool vtkSMScatterPlotViewProxy::BeginCreateVTKObjects()
     vtkErrorMacro("Missing \"RenderView\" subproxy.");
     return false;
     }
-  
+  /*
   this->CubeAxesActor = this->GetSubProxy("CubeAxesActor");
   if (!this->CubeAxesActor)
     {
     vtkErrorMacro("Missing \"CubeAxesActor\" subproxy.");
     return false;
     }
-
+  
   this->CubeAxesActor->SetServers(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-
+  */
   this->LegendScaleActor = this->GetSubProxy("LegendScaleActor");
   if (!this->LegendScaleActor)
     {
@@ -281,22 +281,21 @@ void vtkSMScatterPlotViewProxy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
   //this->RenderView->AddPropToRenderer(this->CubeAxesActor);
-  this->RenderView->AddPropToRenderer2D(this->LegendScaleActor);
+  //this->RenderView->AddPropToRenderer2D(this->LegendScaleActor);
 
-
-  vtkClientServerStream stream;
-  stream  << vtkClientServerStream::Invoke
-          << this->RenderView->GetRendererProxy()->GetID()
-          << "GetActiveCamera"
-          << vtkClientServerStream::End;
-  stream  << vtkClientServerStream::Invoke
-          << this->CubeAxesActor->GetID()
-          << "SetCamera"
-          << vtkClientServerStream::LastResult
-          << vtkClientServerStream::End;
-  vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
-    stream);
+//   vtkClientServerStream stream;
+//   stream  << vtkClientServerStream::Invoke
+//           << this->RenderView->GetRendererProxy()->GetID()
+//           << "GetActiveCamera"
+//           << vtkClientServerStream::End;
+//   stream  << vtkClientServerStream::Invoke
+//           << this->CubeAxesActor->GetID()
+//           << "SetCamera"
+//           << vtkClientServerStream::LastResult
+//           << vtkClientServerStream::End;
+//  vtkProcessModule::GetProcessModule()->SendStream(
+//     this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+//    stream);
 
 }
 
