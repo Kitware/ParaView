@@ -46,7 +46,7 @@ SET(Filters_SRCS
   vtkFileSeriesReader.cxx
   vtkFileSeriesWriter.cxx
   vtkHierarchicalFractal.cxx
-  vtkGridFragment.cxx
+  vtkGridConnectivity.cxx
   vtkImageCompressor.cxx
   vtkImageSliceMapper.cxx
   vtkIntegrateAttributes.cxx

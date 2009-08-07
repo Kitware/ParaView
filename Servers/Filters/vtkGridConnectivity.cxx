@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkGridFragment.cxx
+  Module:    vtkGridConnectivity.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkGridFragment.h"
+#include "vtkGridConnectivity.h"
 
 #include "vtkCellData.h"
 #include "vtkCellType.h"
@@ -81,8 +81,8 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridFragment, "1.2");
-vtkStandardNewMacro(vtkGridFragment);
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.1");
+vtkStandardNewMacro(vtkGridConnectivity);
 
 
 
@@ -98,7 +98,7 @@ vtkStandardNewMacro(vtkGridFragment);
 // This class is getting a little chunky.
 // The surface should be much smaller than the input volume,
 // so the memory should not be an issue.
-class vtkGridFragmentFace
+class vtkGridConnectivityFace
 {
 public:
 
@@ -120,7 +120,7 @@ public:
   vtkIdType MarshalId;
   
   // Linked list.
-  vtkGridFragmentFace* NextFace;
+  vtkGridConnectivityFace* NextFace;
 
   // The three smallest ids for indexing the face.
   // First id is implicit in the hash.  These are global point ids.
@@ -131,15 +131,15 @@ public:
 
 //=============================================================================
 
-class vtkGridFragmentFaceHeap
+class vtkGridConnectivityFaceHeap
 {
 public:
-  vtkGridFragmentFaceHeap();
-  ~vtkGridFragmentFaceHeap();
+  vtkGridConnectivityFaceHeap();
+  ~vtkGridConnectivityFaceHeap();
 
-  vtkGridFragmentFace* NewFace();
+  vtkGridConnectivityFace* NewFace();
   // The face will be valid until NewFace is called or the heap destructs.
-  void RecycleFace(vtkGridFragmentFace* face);
+  void RecycleFace(vtkGridConnectivityFace* face);
 
 private:
 
@@ -152,8 +152,8 @@ private:
 
   // Ivars that allow fast allocation of face objects.
   // They are allocated a few hundred at a time, and reused.
-  vtkGridFragmentFace* RecycleBin;
-  vtkGridFragmentFace* Heap;
+  vtkGridConnectivityFace* RecycleBin;
+  vtkGridConnectivityFace* Heap;
   int HeapLength;
   // Which heap face is next in line.
   int NextFaceIndex;
@@ -161,10 +161,10 @@ private:
   // The faces are allocated in arrays/heaps, so they need to be
   // deleted in arrays.  The first face from every array is reserved
   // and saved in a linked list so we can delete the arrays later.
-  vtkGridFragmentFace* Heaps;
+  vtkGridConnectivityFace* Heaps;
 };
 
-vtkGridFragmentFaceHeap::vtkGridFragmentFaceHeap()
+vtkGridConnectivityFaceHeap::vtkGridConnectivityFaceHeap()
 {
   this->NumberOfFacesPerAllocation = 1000;
   this->RecycleBin = 0;
@@ -174,21 +174,21 @@ vtkGridFragmentFaceHeap::vtkGridFragmentFaceHeap()
   this->Heaps = 0;
 }
 
-vtkGridFragmentFaceHeap::~vtkGridFragmentFaceHeap()
+vtkGridConnectivityFaceHeap::~vtkGridConnectivityFaceHeap()
 {
   this->NumberOfFacesPerAllocation = 0;
   this->RecycleBin = 0;
   while (this->Heaps)
     {
-    vtkGridFragmentFace* next = this->Heaps->NextFace;
+    vtkGridConnectivityFace* next = this->Heaps->NextFace;
     delete [] this->Heaps;
     this->Heaps = next;
     }
 }
 
-void vtkGridFragmentFaceHeap::Allocate()
+void vtkGridConnectivityFaceHeap::Allocate()
 {
-  vtkGridFragmentFace* newHeap = new vtkGridFragmentFace[this->NumberOfFacesPerAllocation];
+  vtkGridConnectivityFace* newHeap = new vtkGridConnectivityFace[this->NumberOfFacesPerAllocation];
   // Use the first element to construct a lined list of arrays/heaps.
   newHeap[0].NextFace = this->Heaps;
   this->Heaps = newHeap;
@@ -199,7 +199,7 @@ void vtkGridFragmentFaceHeap::Allocate()
 }
 
 // The face will be valid until NewFace is called or the heap destructs.
-void vtkGridFragmentFaceHeap::RecycleFace(vtkGridFragmentFace* face)
+void vtkGridConnectivityFaceHeap::RecycleFace(vtkGridConnectivityFace* face)
 {
   // I do not initialize the face values because the face will be reference
   // even after it is recycled.  Actually, only the fragment pointer is actually referenced.
@@ -209,9 +209,9 @@ void vtkGridFragmentFaceHeap::RecycleFace(vtkGridFragmentFace* face)
   this->RecycleBin = face;
 }
 
-vtkGridFragmentFace* vtkGridFragmentFaceHeap::NewFace()
+vtkGridConnectivityFace* vtkGridConnectivityFaceHeap::NewFace()
 {
-  vtkGridFragmentFace* face;
+  vtkGridConnectivityFace* face;
 
   // First look for faces to use in the recycle bin.
   if (this->RecycleBin)
@@ -245,11 +245,11 @@ vtkGridFragmentFace* vtkGridFragmentFaceHeap::NewFace()
 
 
 //=============================================================================
-class vtkGridFragmentFaceHash
+class vtkGridConnectivityFaceHash
 {
 public:
-  vtkGridFragmentFaceHash();
-  ~vtkGridFragmentFaceHash();
+  vtkGridConnectivityFaceHash();
+  ~vtkGridConnectivityFaceHash();
 
   // Returns the number of faces in the hash (faces returned by iteration).
   vtkIdType GetNumberOfFaces() {return this->NumberOfFaces;}
@@ -266,14 +266,14 @@ public:
   // and is returned.  The face is automatically recycled, but is valid until
   // this method is called again.
   // Note: I will assume that the ptIds are unique (i.e. pt1 != pt2 ...)
-  vtkGridFragmentFace* AddFace(vtkIdType pt1, vtkIdType pt2, vtkIdType pt3);
-  vtkGridFragmentFace* AddFace(vtkIdType pt1, vtkIdType pt2, 
+  vtkGridConnectivityFace* AddFace(vtkIdType pt1, vtkIdType pt2, vtkIdType pt3);
+  vtkGridConnectivityFace* AddFace(vtkIdType pt1, vtkIdType pt2, 
                                vtkIdType pt3, vtkIdType pt4);
 
   // A way to iterate over the faces in the hash.
   void InitTraversal();
   // Return 0 when finished.
-  vtkGridFragmentFace* GetNextFace();
+  vtkGridConnectivityFace* GetNextFace();
   // Since the face does not store the first point id explicitley,
   // this returns the id from the iterator state.
   vtkIdType GetFirstPointIndex() {return this->IteratorIndex;}
@@ -286,29 +286,29 @@ private:
 
   // Array indexed by faces smallest corner id.
   // Each element is a linked list of faces that share the point.
-  vtkGridFragmentFace** Hash;
+  vtkGridConnectivityFace** Hash;
   vtkIdType NumberOfPoints;
 
   // Allocates faces efficiently.
-  vtkGridFragmentFaceHeap* Heap;
+  vtkGridConnectivityFaceHeap* Heap;
   
   // This class is too simple and internal for a separate iterator object.
   vtkIdType IteratorIndex;
-  vtkGridFragmentFace* IteratorCurrent;
+  vtkGridConnectivityFace* IteratorCurrent;
 };
 
-vtkGridFragmentFaceHash::vtkGridFragmentFaceHash()
+vtkGridConnectivityFaceHash::vtkGridConnectivityFaceHash()
 {
   this->Hash = 0;
   this->NumberOfPoints = 0;
-  this->Heap = new vtkGridFragmentFaceHeap;
+  this->Heap = new vtkGridConnectivityFaceHeap;
   
   this->IteratorIndex = -1;
   this->IteratorCurrent = 0;
   this->NumberOfFaces = 0;
 }
 
-vtkGridFragmentFaceHash::~vtkGridFragmentFaceHash()
+vtkGridConnectivityFaceHash::~vtkGridConnectivityFaceHash()
 {
   if (this->Hash)
     {
@@ -322,7 +322,7 @@ vtkGridFragmentFaceHash::~vtkGridFragmentFaceHash()
   this->NumberOfFaces = 0;
 }
 
-void vtkGridFragmentFaceHash::InitTraversal()
+void vtkGridConnectivityFaceHash::InitTraversal()
 {
   // I had a decision: current points to the last or next face.
   // I chose last because it simplifies InitTraveral.
@@ -332,7 +332,7 @@ void vtkGridFragmentFaceHash::InitTraversal()
   this->IteratorCurrent = 0;
 }
 
-vtkGridFragmentFace* vtkGridFragmentFaceHash::GetNextFace()
+vtkGridConnectivityFace* vtkGridConnectivityFaceHash::GetNextFace()
 {
   if (this->IteratorIndex >= this->NumberOfPoints)
     { // Past the end of the hash.  User must not have initialized.
@@ -358,19 +358,19 @@ vtkGridFragmentFace* vtkGridFragmentFaceHash::GetNextFace()
   return this->IteratorCurrent;
 }
 
-void vtkGridFragmentFaceHash::Initialize(vtkIdType numberOfPoints)
+void vtkGridConnectivityFaceHash::Initialize(vtkIdType numberOfPoints)
 {
   if (this->Hash)
     {
     vtkGenericWarningMacro("You can only initialize once.\n");
     return;
     }
-  this->Hash = new vtkGridFragmentFace*[numberOfPoints];
+  this->Hash = new vtkGridConnectivityFace*[numberOfPoints];
   this->NumberOfPoints = numberOfPoints;
-  memset(this->Hash, 0, sizeof(vtkGridFragmentFace*)*numberOfPoints);
+  memset(this->Hash, 0, sizeof(vtkGridConnectivityFace*)*numberOfPoints);
 }
 
-vtkGridFragmentFace* vtkGridFragmentFaceHash::AddFace(
+vtkGridConnectivityFace* vtkGridConnectivityFaceHash::AddFace(
   vtkIdType pt1,
   vtkIdType pt2,
   vtkIdType pt3,
@@ -392,7 +392,7 @@ vtkGridFragmentFace* vtkGridFragmentFaceHash::AddFace(
   return this->AddFace(pt1, pt2, pt3);
 }
 
-vtkGridFragmentFace* vtkGridFragmentFaceHash::AddFace(
+vtkGridConnectivityFace* vtkGridConnectivityFaceHash::AddFace(
   vtkIdType pt1,
   vtkIdType pt2,
   vtkIdType pt3)
@@ -421,8 +421,8 @@ vtkGridFragmentFace* vtkGridFragmentFaceHash::AddFace(
   // Note: We do not check if the point index is out of bounds.
 
   // Now look for the face in the hash.
-  vtkGridFragmentFace** ref = this->Hash + pt1; // Keep old ref for editing.
-  vtkGridFragmentFace* face = *ref;
+  vtkGridConnectivityFace** ref = this->Hash + pt1; // Keep old ref for editing.
+  vtkGridConnectivityFace* face = *ref;
   while (face)
     {
     if (face->CornerId2 == pt2 && face->CornerId3 == pt3)
@@ -468,7 +468,7 @@ vtkGridFragmentFace* vtkGridFragmentFaceHash::AddFace(
 
 
 //-----------------------------------------------------------------------------
-vtkGridFragment::vtkGridFragment()
+vtkGridConnectivity::vtkGridConnectivity()
 {
   this->EquivalenceSet = 0;
   this->FragmentVolumes = 0;
@@ -478,25 +478,25 @@ vtkGridFragment::vtkGridFragment()
 }
 
 //-----------------------------------------------------------------------------
-vtkGridFragment::~vtkGridFragment()
+vtkGridConnectivity::~vtkGridConnectivity()
 {
   this->Controller = 0;
 }
 
 //----------------------------------------------------------------------------
-vtkExecutive* vtkGridFragment::CreateDefaultExecutive()
+vtkExecutive* vtkGridConnectivity::CreateDefaultExecutive()
 {
   return vtkCompositeDataPipeline::New();
 }
 
 //-----------------------------------------------------------------------------
-void vtkGridFragment::PrintSelf(ostream& os, vtkIndent indent)
+void vtkGridConnectivity::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
 //----------------------------------------------------------------------------
-int vtkGridFragment::FillInputPortInformation(
+int vtkGridConnectivity::FillInputPortInformation(
   int port,
   vtkInformation* info)
 {
@@ -510,8 +510,9 @@ int vtkGridFragment::FillInputPortInformation(
 
 //-----------------------------------------------------------------------------
 // Returns 1/true if the input has all of the needed arrays.
-int vtkGridFragment::CheckInput(vtkUnstructuredGrid* input)
+int vtkGridConnectivity::CheckInput(vtkUnstructuredGrid* input)
 {
+  vtkDataArray* a = input->GetPointData()->GetGlobalIds();
   vtkIdTypeArray* gloablPtIds = vtkIdTypeArray::SafeDownCast(
                        input->GetPointData()->GetArray("GlobalNodeId"));
 
@@ -524,7 +525,7 @@ int vtkGridFragment::CheckInput(vtkUnstructuredGrid* input)
 }
 
 //-----------------------------------------------------------------------------
-void vtkGridFragment::InitializeFaceHash(
+void vtkGridConnectivity::InitializeFaceHash(
   vtkUnstructuredGrid** inputs, 
   int numberOfInputs)
 {
@@ -567,12 +568,12 @@ void vtkGridFragment::InitializeFaceHash(
     }
 
   if (this->FaceHash) { delete this->FaceHash;}
-  this->FaceHash = new vtkGridFragmentFaceHash;
+  this->FaceHash = new vtkGridConnectivityFaceHash;
   this->FaceHash->Initialize(maxId + 1);
 }
 
 //-----------------------------------------------------------------------------
-int vtkGridFragment::RequestData(vtkInformation*,
+int vtkGridConnectivity::RequestData(vtkInformation*,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector)
 {
@@ -699,7 +700,7 @@ int vtkGridFragment::RequestData(vtkInformation*,
 
 //----------------------------------------------------------------------------
 // Use the face hash and integration data to generate the output surface.
-void vtkGridFragment::GenerateOutput(
+void vtkGridConnectivity::GenerateOutput(
   vtkPolyData* output, 
   vtkUnstructuredGrid* inputs[])
 {
@@ -707,7 +708,7 @@ void vtkGridFragment::GenerateOutput(
   // Only outside faces will be left in the hash because all faces attached
   // to two cells were removed.
   this->FaceHash->InitTraversal();
-  vtkGridFragmentFace* face;
+  vtkGridConnectivityFace* face;
   vtkIntArray* cellFragmentIdArray = vtkIntArray::New();
   cellFragmentIdArray->SetName("FragmentId");
   vtkDoubleArray* volumeArray = vtkDoubleArray::New();
@@ -789,7 +790,7 @@ void vtkGridFragment::GenerateOutput(
 // of partial fragments will be close to the number of final fragments.
 // The equivalence set will be used to merge partial fragments that touch.
 // This method also integrates arrays for partial fragments.
-void vtkGridFragment::ExecuteProcess(
+void vtkGridConnectivity::ExecuteProcess(
   vtkUnstructuredGrid* inputs[], 
   int numberOfInputs)
 {
@@ -832,13 +833,13 @@ void vtkGridFragment::ExecuteProcess(
         // This might be an performance bottle neck. (cell api)
         vtkCell* cell = inputs[ii]->GetCell(jj);
         int numFaces = cell->GetNumberOfFaces();
-        vtkGridFragmentFace* newFaces[VTK_MAX_FACES_PER_CELL];
+        vtkGridConnectivityFace* newFaces[VTK_MAX_FACES_PER_CELL];
         int numNewFaces = 0;
         // As we create / find faces, keep track of the smallest fragment id.
         int minFragmentId = nextFragmentId;
         for (int kk = 0; kk < numFaces; ++kk)
           {
-          vtkGridFragmentFace* face;
+          vtkGridConnectivityFace* face;
           vtkCell* faceCell = cell->GetFace(kk);
           vtkIdType numPoints = faceCell->GetNumberOfPoints();
           if (numPoints == 3)
@@ -935,7 +936,7 @@ void vtkGridFragment::ExecuteProcess(
 // The fragmentIdOffsets is an empty array allocated byu the caller.
 // The function that maps the local fragment ids to global fragment ids
 // is returned in the array.
-void vtkGridFragment::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
+void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
 {
   vtkIdType msg1[2];
   vtkIdType numFaces;
@@ -944,7 +945,7 @@ void vtkGridFragment::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
   vtkIdType* msgPtr;
   vtkIdType corner1, corner2, corner3;
   vtkIdType blockId, faceId, cellId, fragmentId;
-  vtkGridFragmentFace* face;
+  vtkGridConnectivityFace* face;
   int numberOfFragments;
   
   if (this->Controller->GetLocalProcessId() != 0)
@@ -960,25 +961,28 @@ void vtkGridFragment::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
     msg1[0] = numFragments;
     msg1[1] = numFaces;
     this->Controller->Send(msg1, 2, 0, 9890831);
-    // Lets put everything into a single vtkIdType array
-    msgLength = numFaces * 7;
-    msg2 = new vtkIdType[msgLength];
-    msgPtr = msg2;
-    this->FaceHash->InitTraversal();
-    while ( (face = this->FaceHash->GetNextFace()) )
+    if (numFaces > 0)
       {
-      *msgPtr++ = this->FaceHash->GetFirstPointIndex();
-      *msgPtr++ = face->CornerId2;
-      *msgPtr++ = face->CornerId3;
-      *msgPtr++ = face->BlockId;
-      *msgPtr++ = face->CellId;
-      *msgPtr++ = face->FaceId;
-      *msgPtr++ = face->FragmentId;
-      }
-    this->Controller->Send(msg2, msgLength, 0, 1344897);
-    delete [] msg2;
-    // Now send the integration arrays (volume).
-    this->Controller->Send(this->FragmentVolumes->GetPointer(0), numFragments, 0, 5634780);
+      // Lets put everything into a single vtkIdType array
+      msgLength = numFaces * 7;
+      msg2 = new vtkIdType[msgLength];
+      msgPtr = msg2;
+      this->FaceHash->InitTraversal();
+      while ( (face = this->FaceHash->GetNextFace()) )
+        {
+        *msgPtr++ = this->FaceHash->GetFirstPointIndex();
+        *msgPtr++ = face->CornerId2;
+        *msgPtr++ = face->CornerId3;
+        *msgPtr++ = face->BlockId;
+        *msgPtr++ = face->CellId;
+        *msgPtr++ = face->FaceId;
+        *msgPtr++ = face->FragmentId;
+        }
+      this->Controller->Send(msg2, msgLength, 0, 1344897);
+      delete [] msg2;
+      // Now send the integration arrays (volume).
+      this->Controller->Send(this->FragmentVolumes->GetPointer(0), numFragments, 0, 5634780);
+      } // endif numFaces > 0
     } // end if not process 0
   else
     { // Process is 0
@@ -994,54 +998,57 @@ void vtkGridFragment::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
       numFaces = msg1[1];
       // Create a map to assign global fragment ids.
       fragmentIdOffsets[procIdx+1] = fragmentIdOffsets[procIdx] + numFaces;
-      // Receive faces from a remote process.
-      msgLength = numFaces * 7;
-      msg2 = new vtkIdType[msgLength];
-      this->Controller->Receive(msg2,msgLength,procIdx,1344897);
-      msgPtr = msg2;
-      for (int faceIdx = 0; faceIdx < numFaces; ++faceIdx)
+      if (numFaces > 0)
         {
-        corner1 = *msgPtr++;
-        corner2 = *msgPtr++;
-        corner3 = *msgPtr++;
-        blockId = *msgPtr++;
-        cellId = *msgPtr++;
-        faceId = *msgPtr++;
-        fragmentId = *msgPtr++;
-        // Translate the fragmentId to global value.
-        fragmentId +=fragmentIdOffsets[procIdx];
-        // Add the face to the hash.
-        face = this->FaceHash->AddFace(corner1, corner2, corner3);
-        if (face->FragmentId > 0)
-          { // face is attached to another cell.
-          // It has been removed from the hash because it is internal.
-          // It is valid until we create another face. (recycle bin)
-          // This cell connects two fragments, we need
-          // to make the fragment ids equivalent.
-          this->EquivalenceSet->AddEquivalence(fragmentId,
-                                               face->FragmentId);
-          }
-        else
-          { // Face is new.  Add our cell info.
-          // These are needed to create the surface in the second stage.
-          face->ProcessId = procIdx;
-          face->BlockId = blockId;
-          face->CellId = cellId;
-          face->FaceId = faceId;
-          face->FragmentId = fragmentId;
-          face->MarshalId = faceIdx;
-          } // end if face is new or shared.
-        } // end loop over faces in messages
-      // Now receive the integration arrays and add them to ours.
-      this->FragmentVolumes->Resize(fragmentIdOffsets[procIdx+1]);
-      // I hope the vtkDataArray allocates more than we ask.
-      this->FragmentVolumes->SetNumberOfTuples(fragmentIdOffsets[procIdx+1]);
-      // Read the array right into the end of our array.
-      this->Controller->Receive(
-        this->FragmentVolumes->GetPointer(fragmentIdOffsets[procIdx]), 
-        numberOfFragments, 
-        procIdx,
-        5634780);
+        // Receive faces from a remote process.
+        msgLength = numFaces * 7;
+        msg2 = new vtkIdType[msgLength];
+        this->Controller->Receive(msg2,msgLength,procIdx,1344897);
+        msgPtr = msg2;
+        for (int faceIdx = 0; faceIdx < numFaces; ++faceIdx)
+          {
+          corner1 = *msgPtr++;
+          corner2 = *msgPtr++;
+          corner3 = *msgPtr++;
+          blockId = *msgPtr++;
+          cellId = *msgPtr++;
+          faceId = *msgPtr++;
+          fragmentId = *msgPtr++;
+          // Translate the fragmentId to global value.
+          fragmentId +=fragmentIdOffsets[procIdx];
+          // Add the face to the hash.
+          face = this->FaceHash->AddFace(corner1, corner2, corner3);
+          if (face->FragmentId > 0)
+            { // face is attached to another cell.
+            // It has been removed from the hash because it is internal.
+            // It is valid until we create another face. (recycle bin)
+            // This cell connects two fragments, we need
+            // to make the fragment ids equivalent.
+            this->EquivalenceSet->AddEquivalence(fragmentId,
+                                                 face->FragmentId);
+            }
+          else
+            { // Face is new.  Add our cell info.
+            // These are needed to create the surface in the second stage.
+            face->ProcessId = procIdx;
+            face->BlockId = blockId;
+            face->CellId = cellId;
+            face->FaceId = faceId;
+            face->FragmentId = fragmentId;
+            face->MarshalId = faceIdx;
+            } // end if face is new or shared.
+          } // end loop over faces in messages
+        // Now receive the integration arrays and add them to ours.
+        this->FragmentVolumes->Resize(fragmentIdOffsets[procIdx+1]);
+        // I hope the vtkDataArray allocates more than we ask.
+        this->FragmentVolumes->SetNumberOfTuples(fragmentIdOffsets[procIdx+1]);
+        // Read the array right into the end of our array.
+        this->Controller->Receive(
+          this->FragmentVolumes->GetPointer(fragmentIdOffsets[procIdx]), 
+          numberOfFragments, 
+          procIdx,
+          5634780);
+        } // endif numFace > 0
       } // end loop over processes
     // Resolve all the fragments, faces and arrays for all processes.
     this->ResolveEquivalentFragments();
@@ -1067,7 +1074,7 @@ void vtkGridFragment::CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets)
 // construct the mask.
 // For resolving integration arrays, Each process needs:
 // A full map of localFragmentIds,procOwner to globalFragId,procOwner.
-void vtkGridFragment::ResolveProcessesFaces()
+void vtkGridConnectivity::ResolveProcessesFaces()
 {
   vtkIdType numFaces;
   int numProcs = this->Controller->GetNumberOfProcesses();
@@ -1087,25 +1094,25 @@ void vtkGridFragment::ResolveProcessesFaces()
     if (numFaces)
       {
       this->Controller->Receive(fragmentIds, numFaces, 0, 2034301);
-      }
-    // Get rid of faces shared by multiple processe and
-    // set the resolved fragment ids.
-    this->FaceHash->InitTraversal();
-    vtkGridFragmentFace* face;
-    while ( (face = this->FaceHash->GetNextFace()) )
-      {
-      // I do not want to remove the face from the hash because
-      // we are in the middle of traversing the hash.
-      // It would not work the way the iterator is implemented.
-      // The invalid fragment id (value 0) will be enough to skip faces.
-      face->FragmentId = *fragmentIdPtr++;
-      }
-    delete [] fragmentIds;
-    vtkIdType numFragments;
-    this->Controller->Receive(&numFragments, 1, 0, 909034);
-    this->FragmentVolumes->SetNumberOfTuples(numFragments);
-    this->Controller->Receive(this->FragmentVolumes->GetPointer(0), 
-                              numFragments, 0, 909035);
+      // Get rid of faces shared by multiple processe and
+      // set the resolved fragment ids.
+      this->FaceHash->InitTraversal();
+      vtkGridConnectivityFace* face;
+      while ( (face = this->FaceHash->GetNextFace()) )
+        {
+        // I do not want to remove the face from the hash because
+        // we are in the middle of traversing the hash.
+        // It would not work the way the iterator is implemented.
+        // The invalid fragment id (value 0) will be enough to skip faces.
+        face->FragmentId = *fragmentIdPtr++;
+        }
+      delete [] fragmentIds;
+      vtkIdType numFragments;
+      this->Controller->Receive(&numFragments, 1, 0, 909034);
+      this->FragmentVolumes->SetNumberOfTuples(numFragments);
+      this->Controller->Receive(this->FragmentVolumes->GetPointer(0), 
+                                numFragments, 0, 909035);
+      } // endif numFaces != 0
     } // endif remote process.
   else
     { // if process 0 (root)
@@ -1118,7 +1125,7 @@ void vtkGridFragment::ResolveProcessesFaces()
     for (int procIdx = 1; procIdx < numProcs; ++procIdx)
       {
       // decode the number of faces from the offsets.
-      vtkGridFragmentFace* face;
+      vtkGridConnectivityFace* face;
       numFaces = fragmentIdOffsets[procIdx+1] - fragmentIdOffsets[procIdx];
       if (numFaces)
         { // just in case new or MPI does not like 0 length arrays.
@@ -1181,7 +1188,7 @@ void vtkGridFragment::ResolveProcessesFaces()
 // This method resolves the fragments, changes the fragment ids in the faces
 // and merges entries in the volume array for merged fragments.  The new
 // volume array is indexed by the resolved fragments.
-void vtkGridFragment::ResolveEquivalentFragments()
+void vtkGridConnectivity::ResolveEquivalentFragments()
 {
   this->EquivalenceSet->ResolveEquivalences();
   this->ResolveIntegrationArrays();
@@ -1198,7 +1205,7 @@ void vtkGridFragment::ResolveEquivalentFragments()
 //
 // Create a new fragment volume array indexed by the resolved fragment ids.
 // Merge intermediate fagment volume array to get final values.
-void vtkGridFragment::ResolveIntegrationArrays()
+void vtkGridConnectivity::ResolveIntegrationArrays()
 {
   if ( ! this->EquivalenceSet->Resolved)
     {
@@ -1237,9 +1244,9 @@ void vtkGridFragment::ResolveIntegrationArrays()
 // but the faces in the has still have partial fragment ids.
 // At the end of this method, all the face fragment ids have been passed
 // through the equivalence set so that they point to the reolved fragments.
-void vtkGridFragment::ResolveFaceFragmentIds()
+void vtkGridConnectivity::ResolveFaceFragmentIds()
 {
-  vtkGridFragmentFace* face;
+  vtkGridConnectivityFace* face;
   this->FaceHash->InitTraversal();
   while ( (face = this->FaceHash->GetNextFace()) )
     {
@@ -1252,7 +1259,7 @@ void vtkGridFragment::ResolveFaceFragmentIds()
 //----------------------------------------------------------------------------
 // Compute the volume for this cell and add it to the fragment volume arrray.
 // Initialize or extend the array if necessary.
-void vtkGridFragment::IntegrateCellVolume(vtkCell* cell, int fragmentId)
+void vtkGridConnectivity::IntegrateCellVolume(vtkCell* cell, int fragmentId)
 {
   double* volumePtr;
   
@@ -1302,7 +1309,7 @@ void vtkGridFragment::IntegrateCellVolume(vtkCell* cell, int fragmentId)
 
 
 //-----------------------------------------------------------------------------
-double vtkGridFragment::ComputeTetrahedronVolume(
+double vtkGridConnectivity::ComputeTetrahedronVolume(
   double* pts0, double* pts1,
   double* pts2, double* pts3)
 {
@@ -1323,7 +1330,7 @@ double vtkGridFragment::ComputeTetrahedronVolume(
 }
 
 //-----------------------------------------------------------------------------
-double vtkGridFragment::IntegrateTetrahedron(vtkCell* tetra)
+double vtkGridConnectivity::IntegrateTetrahedron(vtkCell* tetra)
 {
   double pts[4][3];
   vtkPoints* points = tetra->GetPoints();
@@ -1337,7 +1344,7 @@ double vtkGridFragment::IntegrateTetrahedron(vtkCell* tetra)
 
 //-----------------------------------------------------------------------------
 // For axis alligned hexahedral cells
-double vtkGridFragment::IntegrateHex(vtkCell* hex)
+double vtkGridConnectivity::IntegrateHex(vtkCell* hex)
 {
   vtkPoints* points = hex->GetPoints();
   double pts[8][3];
@@ -1363,7 +1370,7 @@ double vtkGridFragment::IntegrateHex(vtkCell* hex)
 
 //-----------------------------------------------------------------------------
 // For axis alligned hexahedral cells
-double vtkGridFragment::IntegrateVoxel(vtkCell* voxel)
+double vtkGridConnectivity::IntegrateVoxel(vtkCell* voxel)
 {
   vtkPoints* points = voxel->GetPoints();
   double pts[8][3];
@@ -1388,7 +1395,7 @@ double vtkGridFragment::IntegrateVoxel(vtkCell* voxel)
 }
 
 //-----------------------------------------------------------------------------
-double vtkGridFragment::IntegrateGeneral3DCell(vtkCell *cell)
+double vtkGridConnectivity::IntegrateGeneral3DCell(vtkCell *cell)
 {
   cell = cell;
   /*

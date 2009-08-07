@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkGridFragment.h
+  Module:    vtkGridConnectivity.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkGridFragment - Integrates lines, surfaces and volume.
+// .NAME vtkGridConnectivity - Integrates lines, surfaces and volume.
 // .SECTION Description
 // Integrates all point and cell data attributes while computing
 // length, area or volume.  Works for 1D, 2D or 3D.  Only one dimensionality
@@ -22,8 +22,8 @@
 // for this point and cell will contain the integration results
 // for the corresponding input attributes.
 
-#ifndef __vtkGridFragment_h
-#define __vtkGridFragment_h
+#ifndef __vtkGridConnectivity_h
+#define __vtkGridConnectivity_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
@@ -34,21 +34,21 @@ class vtkIdList;
 class vtkInformation;
 class vtkInformationVector;
 class vtkMultiProcessController;
-class vtkGridFragmentFaceHash;
+class vtkGridConnectivityFaceHash;
 class vtkEquivalenceSet;
 class vtkUnstructuredGrid;
 class vtkPolyData;
 
-class VTK_EXPORT vtkGridFragment : public vtkMultiBlockDataSetAlgorithm
+class VTK_EXPORT vtkGridConnectivity : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkGridFragment,vtkMultiBlockDataSetAlgorithm);
+  vtkTypeRevisionMacro(vtkGridConnectivity,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-  static vtkGridFragment *New();
+  static vtkGridConnectivity *New();
   
 protected:
-  vtkGridFragment();
-  ~vtkGridFragment();
+  vtkGridConnectivity();
+  ~vtkGridConnectivity();
 
   vtkMultiProcessController* Controller;
 
@@ -71,7 +71,7 @@ protected:
 
   // Find the maximum global point id and allocate the hash.
   void InitializeFaceHash(vtkUnstructuredGrid** inputs, int numberOfInputs);
-  vtkGridFragmentFaceHash* FaceHash;
+  vtkGridConnectivityFaceHash* FaceHash;
 
   vtkEquivalenceSet *EquivalenceSet;
   vtkDoubleArray* FragmentVolumes;
@@ -96,8 +96,8 @@ protected:
   void CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets);
 
 private:
-  vtkGridFragment(const vtkGridFragment&);  // Not implemented.
-  void operator=(const vtkGridFragment&);  // Not implemented.
+  vtkGridConnectivity(const vtkGridConnectivity&);  // Not implemented.
+  void operator=(const vtkGridConnectivity&);  // Not implemented.
 };
 
 #endif
