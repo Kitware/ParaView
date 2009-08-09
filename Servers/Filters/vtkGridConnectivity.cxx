@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.2");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.3");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -590,7 +590,7 @@ int vtkGridConnectivity::RequestData(vtkInformation*,
   // Create a simple array of input blocks.
   //  This will simplify creating faces from the hash.
   int numberOfInputs = 0;
-  vtkUnstructuredGrid** inputs;
+  vtkUnstructuredGrid** inputs = 0;
   // We need this to allocate the fragment array.
   vtkIdType totalNumberOfCellsInProcess = 0;
 
