@@ -60,7 +60,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.1");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.2");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -71,6 +71,40 @@ vtkSMPluginManager::vtkSMPluginManager()
 vtkSMPluginManager::~vtkSMPluginManager()
 { 
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(const char* filename)
+{
+  if(!filename || !(*filename))
+    {
+    return NULL;
+    }
+
+  const char* serverURI = "builtin:";
+  vtkPVPluginInformation* pluginInfo = this->FindPluginByFileName(
+    serverURI, filename);
+  if(pluginInfo && pluginInfo->GetLoaded())
+    {
+    this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, pluginInfo);
+    return pluginInfo;
+    }
+    
+  vtkSmartPointer<vtkPVPluginLoader> loader = vtkSmartPointer<vtkPVPluginLoader>::New();
+  loader->SetFileName(filename);
+  pluginInfo = loader->GetPluginInfo();
+  vtkPVPluginInformation* localInfo = vtkPVPluginInformation::New();
+  localInfo->DeepCopy(pluginInfo);
+  localInfo->SetServerURI(serverURI);
+  if(localInfo->GetLoaded())
+    {
+    this->ProcessPluginInfo(loader);
+    }
+    
+  this->UpdatePluginMap(serverURI, localInfo);   
+  this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, localInfo);
+
+  return localInfo;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,22 +148,29 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
       {
       this->ProcessPluginInfo(pxy);
       }
-    vtkSMPluginManagerInternals::ServerPluginsMap::iterator it = 
-      this->Internal->Server2PluginsMap.find(serverURI);
-    if(it != this->Internal->Server2PluginsMap.end())
-      {
-      it->second.push_back(localInfo);
-      }
-    else
-      {
-      this->Internal->Server2PluginsMap[serverURI].push_back(localInfo);
-      } 
+    this->UpdatePluginMap(serverURI, localInfo);
     pxy->UnRegister(NULL);
     this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, localInfo);
     pluginInfo = localInfo;
     }
 
   return pluginInfo;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPluginManager::UpdatePluginMap(
+  const char* serverURI, vtkPVPluginInformation* localInfo)
+{
+  vtkSMPluginManagerInternals::ServerPluginsMap::iterator it = 
+    this->Internal->Server2PluginsMap.find(serverURI);
+  if(it != this->Internal->Server2PluginsMap.end())
+    {
+    it->second.push_back(localInfo);
+    }
+  else
+    {
+    this->Internal->Server2PluginsMap[serverURI].push_back(localInfo);
+    } 
 }
 
 //---------------------------------------------------------------------------
@@ -188,6 +229,32 @@ void vtkSMPluginManager::ProcessPluginInfo(vtkSMPluginProxy* pluginProxy)
                                 pluginProxy->GetPythonPackageFlags());
 #endif //VTK_WRAP_PYTHON
 }
+
+//---------------------------------------------------------------------------
+void vtkSMPluginManager::ProcessPluginInfo(vtkPVPluginLoader* pluginLoader)
+  {
+  if(!pluginLoader)
+    {
+    return;
+    }
+  vtkstd::string loadedxml = pluginLoader->GetPluginInfo()->GetPluginName();
+  if(this->Internal->LoadedServerManagerXMLs.find(loadedxml) != 
+    this->Internal->LoadedServerManagerXMLs.end())
+    {
+    // already processed;
+    return;
+    }
+    
+  this->ProcessPluginSMXML(pluginLoader->GetServerManagerXML());  
+
+  this->Internal->LoadedServerManagerXMLs.insert(loadedxml);  
+
+#ifdef VTK_WRAP_PYTHON
+  this->ProcessPluginPythonInfo(pluginLoader->GetPythonModuleNames(),
+    pluginLoader->GetPythonModuleSources(),
+    pluginLoader->GetPythonPackageFlags());
+#endif //VTK_WRAP_PYTHON
+  }
 
 //---------------------------------------------------------------------------
 void vtkSMPluginManager::ProcessPluginSMXML(vtkStringArray* smXMLArray)

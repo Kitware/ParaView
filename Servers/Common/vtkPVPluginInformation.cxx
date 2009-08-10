@@ -22,7 +22,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkPVPluginLoader.h"
 
 vtkStandardNewMacro(vtkPVPluginInformation);
-vtkCxxRevisionMacro(vtkPVPluginInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVPluginInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVPluginInformation::vtkPVPluginInformation()
@@ -240,16 +240,23 @@ void vtkPVPluginInformation::CopyFromStream(const vtkClientServerStream* css)
 void vtkPVPluginInformation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "FileName: " 
+    << (this->FileName? this->FileName : "(none)") << endl;
+  os << indent << "PluginName: " 
+    << (this->PluginName? this->PluginName : "(none)") << endl;
+  os << indent << "PluginVersion: " 
+    << (this->PluginVersion? this->PluginVersion : "(none)") << endl;
   os << indent << "ServerURI: "
     << (this->ServerURI? this->ServerURI : "(none)") << endl;  
   os << indent << "Loaded: " << this->Loaded << endl;
-  os << indent << "Error: "
-    << (this->Error? this->Error : "(none)") << endl;
   os << indent << "SearchPaths: " << (this->SearchPaths ? 
     this->SearchPaths : "(none)") << endl;
-  os << indent << "PluginName: " 
-    << (this->PluginName? this->PluginName : "(none)") << endl;
-  os << indent << "FileName: " 
-    << (this->FileName? this->FileName : "(none)") << endl;
-  os << indent << "PluginVersion: " << this->PluginVersion << endl;
+  os << indent << "RequiredPlugins: " << (this->RequiredPlugins ? 
+    this->RequiredPlugins : "(none)") << endl;
+  os << indent << "AutoLoad: " << this->AutoLoad << endl;
+  os << indent << "RequiredOnClient: " << this->RequiredOnClient << endl;
+  os << indent << "RequiredOnServer: " << this->RequiredOnServer << endl;
+  os << indent << "Error: "
+    << (this->Error? this->Error : "(none)") << endl;
+  
 }

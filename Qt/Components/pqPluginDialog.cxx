@@ -110,6 +110,8 @@ pqPluginDialog::pqPluginDialog(pqServer* server, QWidget* p)
   
   QObject::connect(pm, SIGNAL(serverManagerExtensionLoaded()),
     this, SLOT(refresh()));
+  QObject::connect(pm, SIGNAL(pluginInfoUpdated()),
+    this, SLOT(refresh()));
     
   // get remembered plugins
   pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -363,7 +365,7 @@ void pqPluginDialog::addInfoNodes(
     }
   else if(!plInfo->GetLoaded() && !plInfo->GetError() )
     {
-    pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginYellow.png"));
+    pluginNode->setIcon(ValueCol, QIcon(":/pqWidgets/Icons/PluginGray.png"));
     }
   else
     {

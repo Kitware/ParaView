@@ -131,6 +131,9 @@ signals:
   /// come from a plugin or an xml file
   void serverManagerExtensionLoaded();
 
+  /// notification when plugin information is updated
+  void pluginInfoUpdated();
+
 protected:
   LoadStatus loadServerExtension(pqServer* server, const QString& lib, 
     vtkPVPluginInformation* pluginInfo, bool remote);

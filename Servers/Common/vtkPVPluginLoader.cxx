@@ -29,7 +29,7 @@ using vtkstd::string;
 #include <cstdlib>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.14");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.15");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -119,6 +119,8 @@ void vtkPVPluginLoader::SetFileName(const char* file)
   if(file && file[0] != '\0')
     {   
     this->PluginInfo->SetFileName(file);
+    vtkstd::string defaultname = vtksys::SystemTools::GetFilenameWithoutExtension(file);
+    this->PluginInfo->SetPluginName(defaultname.c_str());
     vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
     if(lib)
       {

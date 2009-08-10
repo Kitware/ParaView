@@ -37,7 +37,8 @@ public:
   
   // Description:
   // Method to load a plugin in server manager.
-  // filename, the full path to the plugin
+  // filename, the full path to the plugin; if only filename is passed in,
+  //           we assume the server as "builtin" server.
   // connectionId, the connection ID of the connection to the server
   // serverURI, the server URI in the format of "scheme://host:port"
   //            for buildin server, it will be "builtin:"
@@ -47,6 +48,7 @@ public:
   vtkPVPluginInformation* LoadPlugin(
     const char* filename, vtkIdType connectionId, const char* serverURI,
     bool loadRemote = true );
+  vtkPVPluginInformation* LoadPlugin(const char* filename);
   
   // Description:
   // Get the plugin path that specified through some environmental varaibles.
@@ -55,6 +57,7 @@ public:
   // Description:
   // Process the plugin information if it is loaded.
   void ProcessPluginInfo(vtkSMPluginProxy* pluginProxy);  
+  void ProcessPluginInfo(vtkPVPluginLoader* pluginLoader);  
 
   // Description:
   // Update the "Loaded" info of the plugin
@@ -75,12 +78,12 @@ protected:
   vtkSMPluginManager();
   ~vtkSMPluginManager();
 
-  friend class vtkSMPluginManagerObserver;
-
   // Description:
   // Check if the plugin is already loaded, given the file name 
   virtual vtkPVPluginInformation* FindPluginByFileName(
     const char* filename, const char* serverURI);
+  void UpdatePluginMap(
+    const char* serverURI, vtkPVPluginInformation* localInfo);    
   
 private:
   vtkSMPluginManager(const vtkSMPluginManager&); // Not implemented
