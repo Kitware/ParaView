@@ -97,10 +97,10 @@ public:
   pqServerResource(const pqServerResource&);
   pqServerResource& operator=(const pqServerResource&);
   ~pqServerResource();
-//BTX
+
   /// Returns a compact string representation of the resource in URI format
-  const QString toURI(bool ignoreScheme = false) const;
-//ETX 
+  const QString toURI() const;
+ 
   /// Returns a compact string representation of the resource including extra
   /// data
   const QString serializeString() const;

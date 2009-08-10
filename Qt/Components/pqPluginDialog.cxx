@@ -260,7 +260,8 @@ void pqPluginDialog::refresh()
 void pqPluginDialog::refreshLocal()
 {
   pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
-  this->populatePluginTree(this->localPlugins, pm->loadedExtensions(NULL), false);
+  QList< vtkPVPluginInformation* > extensions = pm->loadedExtensions(NULL);
+  this->populatePluginTree(this->localPlugins, extensions, false);
   this->localPlugins->resizeColumnToContents(ValueCol);  
 }
 
@@ -269,8 +270,9 @@ void pqPluginDialog::refreshRemote()
   if(this->Server && this->Server->isRemote())
     {
     pqPluginManager* pm = pqApplicationCore::instance()->getPluginManager();
+    QList< vtkPVPluginInformation* > extensions = pm->loadedExtensions(this->Server);
     this->populatePluginTree(this->remotePlugins, 
-      pm->loadedExtensions(this->Server), true);
+      extensions, true);
     this->remotePlugins->resizeColumnToContents(ValueCol);  
     }
 }

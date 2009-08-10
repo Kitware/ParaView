@@ -198,13 +198,10 @@ pqServerResource::~pqServerResource()
   delete this->Implementation;
 }
 
-const QString pqServerResource::toURI(bool ignoreScheme) const
+const QString pqServerResource::toURI() const
 {
   QString result;
-  if(!ignoreScheme)
-    {
-    result += this->Implementation->Scheme + ":";
-    }
+  result += this->Implementation->Scheme + ":";
   
   if(this->Implementation->Scheme == "builtin")
     {
