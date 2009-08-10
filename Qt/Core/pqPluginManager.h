@@ -34,11 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPluginManager_h
 
 #include <QObject>
-#include <QMultiMap>
 #include <QStringList>
+#include "vtkSmartPointer.h"
 #include "pqCoreExport.h"
 
 class pqServer;
+class vtkObject;
+class vtkPVPluginInformation;
+class pqPluginManagerInternal;
 
 /// extension manager takes care of loading plugins, xml files, and binary qrc files
 /// the plugins may also contain xml files and qrc files
@@ -56,7 +59,8 @@ public:
   /// return status on success, if NOTLOADED was returned, the error is reported
   /// If errorMsg is non-null, then errors are not reported, but the error
   /// message is put in the errorMsg string
-  LoadStatus loadExtension(pqServer* server, const QString& lib, QString* errorMsg=0);
+  LoadStatus loadExtension(pqServer* server, const QString& lib, 
+    QString* errorMsg=0, bool remote=true);
   
   /// attempt to load all available plugins on a server, 
   /// or client plugins if NULL
@@ -86,8 +90,9 @@ public:
       }
 
   /// return all the plugins loaded on a server, or locally if NULL is passed in
-  QStringList loadedExtensions(pqServer*);
-
+  QList< vtkPVPluginInformation* > loadedExtensions(pqServer*);
+  QList< vtkPVPluginInformation* > loadedExtensions(QString extensionKey);
+ 
   /// add an extra interface.
   /// these interfaces are appended to the ones loaded from plugins
   void addInterface(QObject* iface);
@@ -97,6 +102,22 @@ public:
 
   /// Return all the paths that plugins will be searched for.
   QStringList pluginPaths(pqServer*);
+
+  /// Get the pluginInfo that may already exist in this manager by the file name or plugin name.
+  vtkPVPluginInformation* getExistingExtensionByFileName(pqServer*, const QString& lib);
+  vtkPVPluginInformation* getExistingExtensionByFileName(QString extensionKey, const QString& lib);
+  vtkPVPluginInformation* getExistingExtensionByPluginName(pqServer*, const QString& name);
+  vtkPVPluginInformation* getExistingExtensionByPluginName(QString extensionKey, const QString& name);
+  
+  /// Update the plugin AutoLoad state.
+  void updatePluginAutoLoadState(vtkPVPluginInformation* plInfo, int autoLoad);
+
+  // load plugin settings
+  void addPluginFromSettings();
+  // save plugin settings
+  void savePluginSettings(bool clearFirst = true);
+  // check whether the plugin is ready to run.
+  bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
 
 signals:
   /// signal for when an interface is loaded
@@ -111,30 +132,43 @@ signals:
   void serverManagerExtensionLoaded();
 
 protected:
-  LoadStatus loadClientExtension(const QString& lib, QString& error);
-  LoadStatus loadServerExtension(pqServer* server, const QString& lib, QString& error);
+  LoadStatus loadServerExtension(pqServer* server, const QString& lib, 
+    vtkPVPluginInformation* pluginInfo, bool remote);
+  LoadStatus loadClientExtension(const QString& lib,
+    vtkPVPluginInformation* pluginInfo);
 
   // add to the list if it isn't already there
-  void addExtension(pqServer* server, const QString& lib);
-
+  void addExtension(pqServer* server, vtkPVPluginInformation* pluginInfo);
+  void addExtension(QString extensionKey, vtkPVPluginInformation* pluginInfo);
+  
   /// Handles pqAutoStartInterface plugins.
   void handleAutoStartPlugins(QObject* iface, bool startup);
-
+  
+  // check whether the required plugins are functional.
+  bool areRequiredPluginsFunctional(vtkPVPluginInformation* plInfo, bool remote);
+  
 protected slots:
   void onServerConnected(pqServer*);
   void onServerDisconnected(pqServer*);
+  void onSMLoadPluginInvoked(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
   
 private:
+  
+  pqPluginManagerInternal* Internal;
+  // return the extension key for identifying the server, 
+  // used for mapping from server to plugins.
+  QString getServerURIKey(pqServer* server);
+  // return the settings key for the plugin, 
+  // used for saving the plugin settings ,
+  // "[serverURI]###[filename]###[AutoLoad]"
+  QString getPluginSettingsKey(vtkPVPluginInformation*);
+  void processPluginSettings(QString& plSettingKey);
+  // load the Auto Load plugins on that server
+  void loadAutoLoadPlugins(pqServer* server);    
+  
   QObjectList Interfaces;
-  QMultiMap<pqServer*, QString> Extensions;
   QObjectList ExtraInterfaces;
 
-  /// List of plugin names for which the server manager XML has been loaded to
-  /// avoid duplicate loading of the XMLS.
-  QStringList LoadedServerManagerXMLs;
-
-  /// Temporary function to return the plugin name from the library name.
-  QString getPluginName(const QString& library);
 };
 
 #endif

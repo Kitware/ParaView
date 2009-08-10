@@ -57,5 +57,37 @@ QObjectList @PLUGIN_NAME@Plugin::interfaces()
   return this->Interfaces;
 }
 
+// entry point to get Plugin name a string
+char* @PLUGIN_NAME@Plugin::ParaViewPluginName()
+{
+  return "@PLUGIN_NAME@";
+}
+
+// entry point to get Plugin version as a string
+char* @PLUGIN_NAME@Plugin::ParaViewPluginVersion()
+{
+  return "@PLUGIN_VERSION@";
+}
+
+// entry point to get PluginRequiredOnServer as an int 
+int @PLUGIN_NAME@Plugin::ParaViewPluginRequiredOnServer()
+{
+  return @PLUGIN_REQUIRED_ON_SERVER@;
+}
+
+// entry point to get PluginRequiredOnClient as an int 
+int @PLUGIN_NAME@Plugin::ParaViewPluginRequiredOnClient()
+{
+  return @PLUGIN_REQUIRED_ON_CLIENT@;
+}
+
+#if @HAVE_REQUIRED_PLUGINS@
+// entry point to get Plugin-Depended-Plugins as a string
+char* @PLUGIN_NAME@Plugin::ParaViewPluginRequiredPlugins()
+{
+  return "@PLUGIN_REQUIRED_PLUGINS@";
+}
+#endif
+
 Q_EXPORT_PLUGIN2(@PLUGIN_NAME@Plugin, @PLUGIN_NAME@Plugin)
 

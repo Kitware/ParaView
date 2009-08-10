@@ -23,7 +23,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkPVServerArrayHelper);
-vtkCxxRevisionMacro(vtkPVServerArrayHelper, "1.2");
+vtkCxxRevisionMacro(vtkPVServerArrayHelper, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVServerArrayHelper::vtkPVServerArrayHelper()
 {
@@ -76,13 +76,16 @@ vtkPVServerArrayHelper::GetArray(vtkObject* object,
     << command
     << vtkClientServerStream::End;
   interp->ProcessStream(commandStream);
-  vtkDataArray* dataArray;
+  vtkDataArray* dataArray = NULL;
   if (!interp->GetLastResult().GetArgument(0, 0, (vtkObjectBase**)&dataArray))
     {
     vtkErrorMacro("Error getting return value of command: " << command);
     return this->EmptyResult();
     }
-
+  if(!dataArray)
+    {
+    return this->EmptyResult();
+    }
   vtkArrayIterator* iter = dataArray->NewIterator();
   *this->Result << vtkClientServerStream::Reply;
   switch (dataArray->GetDataType())

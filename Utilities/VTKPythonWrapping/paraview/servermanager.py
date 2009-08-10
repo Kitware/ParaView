@@ -1762,6 +1762,10 @@ class Connection(object):
         return "Connection data(%s:%d), render(%s:%d)" % \
             (self.Hostname, self.Port, self.RSHostname, self.RSPort)
 
+    def GetURI(self):
+        """Get URI of the connection"""
+        return "%s" % (self.Hostname)
+
     def IsRemote(self):
         """Returns True if the connection to a remote server, False if
         it is local (built-in)"""
@@ -2057,7 +2061,7 @@ def LoadXML(xmlstring):
     # Update the modules
     updateModules()
 
-def LoadPlugin(filename, connection=None):
+def LoadPlugin(filename,  remote=True, connection=None):
     """ Given a filename and a connection (optional, otherwise uses
     ActiveConnection), loads a plugin. It then updates the sources,
     filters and rendering modules."""
@@ -2068,42 +2072,17 @@ def LoadPlugin(filename, connection=None):
         raise RuntimeError, "Cannot load a plugin without a connection."
 
     pxm=ProxyManager()
-    pld = CreateProxy("misc", "PluginLoader")
-    pld.SetServers(0x10) #vtkProcessModule.h::CLIENT
-    pld.GetProperty("FileName").SetElement(0, filename)
-    pld.UpdateVTKObjects()
-    pld = CreateProxy("misc", "PluginLoader")
-    pld.GetProperty("FileName").SetElement(0, filename)
-    pld.UpdateVTKObjects()
-    pld.UpdatePropertyInformation()
-    # Make sure that the plugin was loaded successfully
-    if pld.GetProperty("Loaded").GetElement(0):
-        # Get the XML, parse it and load it
-        xmlproperty = pld.GetProperty("ServerManagerXML")
-        for i in xrange(xmlproperty.GetNumberOfElements()):
-            xmlstring = xmlproperty.GetElement(i)
-            if xmlstring:
-                try:
-                    LoadXML(xmlstring)
-                except RuntimeError:
-                    raise RuntimeError, "Error parsing the XML configuration in the plugin."
-        # Get the python modules and load them
-        pynameproperty = pld.GetProperty("PythonModuleNames");
-        pysrcproperty = pld.GetProperty("PythonModuleSources");
-        pypackageflagproperty = pld.GetProperty("PythonPackageFlags");
-        if pynameproperty.GetNumberOfElements() > 0:
-            import sys
-            # Check to see if the importer facility we use is available
-            try: sys.meta_path
-            except: raise RuntimeError, "meta_path importer does not exist.  You need Python 2.3 or later to load plugins with python modules."
-
-            for i in xrange(pynameproperty.GetNumberOfElements()):
-                moduleInfo = vtkPVPythonModule()
-                moduleInfo.SetFullName(pynameproperty.GetElement(i))
-                moduleInfo.SetSource(pysrcproperty.GetElement(i))
-                moduleInfo.SetIsPackage(pypackageflagproperty.GetElement(i))
-                vtkPVPythonModule.RegisterModule(moduleInfo)
+    plm=pxm.GetApplication().GetPluginManager()
+    
+    """ Load the plugin on server. """
+    if remote:
+      serverURI = connection.GetURI()
     else:
+      serverURI = "builtin:"
+      
+    plinfo = plm.LoadPlugin(filename, connection.ID, serverURI, remote)
+    
+    if not plinfo.GetLoaded():
         # Assume that it is an xml file
         f = open(filename, 'r')
         try:

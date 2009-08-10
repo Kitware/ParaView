@@ -1,40 +1,47 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>pqPluginDialog</class>
- <widget class="QDialog" name="pqPluginDialog" >
-  <property name="geometry" >
+ <widget class="QDialog" name="pqPluginDialog">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>550</width>
-    <height>350</height>
+    <width>662</width>
+    <height>390</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Plugin Manager</string>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" colspan="2" >
-    <widget class="QLabel" name="HelpText" >
-     <property name="text" >
+  <layout class="QGridLayout">
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="HelpText">
+     <property name="text">
       <string>TextLabel</string>
      </property>
-     <property name="wordWrap" >
+     <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
-    <widget class="QGroupBox" name="remoteGroup" >
-     <property name="title" >
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="remoteGroup">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
       <string>Remote Plugins</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="1" column="0" >
+     <layout class="QGridLayout">
+      <item row="2" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -42,42 +49,59 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" >
-       <widget class="QPushButton" name="loadRemote" >
-        <property name="text" >
-         <string>Load</string>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="loadRemote">
+        <property name="text">
+         <string>Load Remote Plugin ...</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QListWidget" name="remotePlugins" >
-        <property name="textElideMode" >
-         <enum>Qt::ElideMiddle</enum>
+      <item row="0" column="0" rowspan="2" colspan="2">
+       <widget class="QTreeWidget" name="remotePlugins">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
         </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <column>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QComboBox" name="RecentRemoteCombo">
+        <item>
+         <property name="text">
+          <string>Recent Remote Plugins...</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="1" column="1" >
-    <widget class="QGroupBox" name="localGroup" >
-     <property name="title" >
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="localGroup">
+     <property name="title">
       <string>Local Plugins</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="1" column="1" >
-       <widget class="QPushButton" name="loadLocal" >
-        <property name="text" >
-         <string>Load</string>
+     <layout class="QGridLayout">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="loadLocal">
+        <property name="text">
+         <string>Load Local Plugin ...</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
+      <item row="2" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>40</width>
           <height>20</height>
@@ -85,45 +109,54 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" colspan="2" >
-       <widget class="QListWidget" name="localPlugins" >
-        <property name="textElideMode" >
-         <enum>Qt::ElideMiddle</enum>
+      <item row="0" column="0" rowspan="2" colspan="2">
+       <widget class="QTreeWidget" name="localPlugins">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
         </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <column>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QComboBox" name="RecentLocalCombo">
+        <item>
+         <property name="text">
+          <string>Recent Local Plugins...</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QComboBox" name="RecentRemoteCombo" >
-     <item>
-      <property name="text" >
-       <string>Recent Remote Plugins...</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="RecentLocalCombo" >
-     <item>
-      <property name="text" >
-       <string>Recent Local Plugins...</string>
-      </property>
-     </item>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QDialogButtonBox" name="buttonBox" >
-     <property name="orientation" >
+   <item row="2" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons" >
+     <property name="standardButtons">
       <set>QDialogButtonBox::Close</set>
      </property>
     </widget>
    </item>
   </layout>
+  <action name="actionReload_Remote_Plugin">
+   <property name="text">
+    <string>Reload Selected Plugin</string>
+   </property>
+  </action>
+  <action name="actionReload_Local_Plugin">
+   <property name="text">
+    <string>Reload Selected Plugin</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -133,11 +166,11 @@
    <receiver>pqPluginDialog</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -149,11 +182,11 @@
    <receiver>pqPluginDialog</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

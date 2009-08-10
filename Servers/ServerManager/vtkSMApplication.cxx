@@ -15,11 +15,17 @@
 #include "vtkSMApplication.h"
 
 #include "vtkPVConfig.h" // To get PARAVIEW_USE_*
+#include "vtkPVEnvironmentInformation.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkDirectory.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLParser.h"
 
 #include "vtkProcessModule.h"
@@ -41,15 +47,18 @@ struct vtkSMApplicationInternals
   };
 
   vtkstd::vector<ConfFile> Files;
+  vtkSmartPointer<vtkPVEnvironmentInformation> EnvInfo ;
+  vtkSmartPointer<vtkSMPluginManager> PluginManager ;
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.20");
+vtkCxxRevisionMacro(vtkSMApplication, "1.21");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
 {
   this->Internals = new vtkSMApplicationInternals;
+  this->Internals->EnvInfo = vtkSmartPointer<vtkPVEnvironmentInformation>::New();
 }
 
 //---------------------------------------------------------------------------
@@ -104,6 +113,8 @@ void vtkSMApplication::Initialize()
   this->SetProxyManager(proxyM);
   this->SetApplication(this);
 
+  this->Internals->PluginManager = vtkSmartPointer<vtkSMPluginManager>::New();
+  
   // Load the generated modules
 #include "vtkParaViewIncludeModulesToSMApplication.h"
 
@@ -192,6 +203,46 @@ void vtkSMApplication::Finalize()
   //this->GetProcessModule()->FinalizeInterpreter();
   this->SetProxyManager(0);
 
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMApplication::GetSettingsRoot(
+  vtkIdType connectionId)
+{
+  vtkSMProxyManager* pxm = this->GetProxyManager();
+  if (!pxm)
+    {
+    vtkErrorMacro("No global proxy manager defined. Can not parse file");
+    return 0;
+    }
+  vtkSMProxy* helper = pxm->NewProxy("misc", "EnvironmentInformationHelper");
+  helper->SetConnectionID(connectionId);
+  helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    helper->GetProperty("Variable"));
+  if(!svp)
+    {
+    helper->UnRegister(NULL);
+    return NULL;
+    }  
+#ifdef _WIN32
+  svp->SetElement(0,"APPDATA");
+#else
+  svp->SetElement(0,"HOME");
+#endif
+  helper->UpdateVTKObjects();
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(helper->GetConnectionID(),
+    vtkProcessModule::DATA_SERVER, this->Internals->EnvInfo, helper->GetID());
+  helper->UnRegister(NULL);
+  return this->Internals->EnvInfo->GetVariable();
+}
+
+//---------------------------------------------------------------------------
+vtkSMPluginManager* vtkSMApplication::GetPluginManager()
+{
+  return this->Internals->PluginManager;
 }
 
 //---------------------------------------------------------------------------

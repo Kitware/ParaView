@@ -29,6 +29,38 @@
 #define C_EXPORT extern "C"
 #endif
 
+// entry point to get Plugin name a string
+C_EXPORT char* C_DECL ParaViewPluginName()
+{
+  return "@PLUGIN_NAME@";
+}
+
+// entry point to get Plugin version as a string
+C_EXPORT char* C_DECL ParaViewPluginVersion()
+{
+  return "@PLUGIN_VERSION@";
+}
+
+// entry point to get PluginRequiredOnServer as an int 
+C_EXPORT int ParaViewPluginRequiredOnServer()
+{
+  return @PLUGIN_REQUIRED_ON_SERVER@;
+}
+
+// entry point to get PluginRequiredOnClient as an int 
+C_EXPORT int ParaViewPluginRequiredOnClient()
+{
+  return @PLUGIN_REQUIRED_ON_CLIENT@;
+}
+
+#if @HAVE_REQUIRED_PLUGINS@
+// entry point to get Plugin-Depended-Plugins as a string
+C_EXPORT char* ParaViewPluginRequiredPlugins()
+{
+  return "@PLUGIN_REQUIRED_PLUGINS@";
+}
+#endif
+
 #if @HAVE_XML@
 
 namespace {
@@ -73,7 +105,7 @@ C_EXPORT void C_DECL ParaViewPluginXMLList(int& num, char** & xml)
 #include "vtkProcessModule.h"
 #include "vtkClientServerInterpreter.h"
 
-extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
 namespace {
   class StaticInitSMWrappings
@@ -85,13 +117,13 @@ namespace {
       // process module has been initialized. Otherwise, it will register the
       // callback with the process module so that when it gets intialized, the
       // callback will be called. 
-      // This removes the need for calling the @MODULE_NAME@_Initialize function
+      // This removes the need for calling the @PLUGIN_NAME@_Initialize function
       // explicitly if an application is linking against the plugin directly.
       vtkProcessModule::InitializeInterpreter(initfunc);
       }
     };
 }
-static StaticInitSMWrappings InitSMWrappings(@MODULE_NAME@_Initialize);
+static StaticInitSMWrappings InitSMWrappings(@PLUGIN_NAME@_Initialize);
 
 #endif // HAVE_SRCS
 

@@ -117,6 +117,9 @@ SET(Kit_SRCS
   vtkSMNetworkImageSourceProxy.cxx
   vtkSMPQStateLoader.cxx
   vtkSMPSWriterProxy.cxx
+  vtkSMPluginManager.cxx
+  vtkSMPluginProxy.cxx
+#  vtkSMPluginInformationHelper.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMProperty.cxx
   vtkSMPropertyHelper.cxx
@@ -180,6 +183,7 @@ SET(Kit_SRCS
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
   vtkSMSurfaceRepresentationProxy.cxx
+#  vtkSMTemporalInputDomain.cxx
   vtkSMTesting.cxx
   vtkSMTextSourceRepresentationProxy.cxx
   vtkSMTextWidgetRepresentationProxy.cxx

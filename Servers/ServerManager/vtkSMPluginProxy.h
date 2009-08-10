@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVPluginLoader.h
+  Module:    vtkSMPluginProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,35 +12,41 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPluginLoader - Object that can
-// be used to load plugins in the server manager.
+// .NAME vtkSMPluginProxy - proxy for vtkPVPluginLoader
 // .SECTION Description
-// vtkPVPluginLoader can be used to load plugins into the server manager.
 
-#ifndef __vtkPVPluginLoader_h
-#define __vtkPVPluginLoader_h
+#ifndef __vtkSMPluginProxy_h
+#define __vtkSMPluginProxy_h
 
-#include "vtkObject.h"
-#include "vtkPVPluginInformation.h"
-
+#include "vtkSMProxy.h"
+class vtkPVPluginInformation;
 class vtkStringArray;
 class vtkIntArray;
+class vtkAbstractArray;
+class vtkSMProperty;
+class vtkClientServerStream;
 
-class VTK_EXPORT vtkPVPluginLoader : public vtkObject
+class VTK_EXPORT vtkSMPluginProxy : public vtkSMProxy
 {
 public:
-  static vtkPVPluginLoader* New();
-  vtkTypeRevisionMacro(vtkPVPluginLoader, vtkObject);
+  static vtkSMPluginProxy* New();
+  vtkTypeRevisionMacro(vtkSMPluginProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // set/get the filename and load the plugin
-  void SetFileName(const char* file);
-  const char* GetFileName()
-    {return this->GetPluginInfo()->GetFileName();}
+  // Updates all property informations by calling UpdateInformation()
+  // and populating the values. It also calls UpdateDependentDomains()
+  // on all properties to make sure that domains that depend on the
+  // information are updated.
+  virtual void UpdatePropertyInformation();
+
+  // Description:
+  // Calling server PVPluginLoader to load the given plugin. 
+  // return 1 on success; 0 on failure
+  virtual vtkPVPluginInformation* Load(const char* filename);
   
   // Description:
-  // Get the Server Manager PluginInformation object
+  // Get the plugin information object
   vtkGetObjectMacro(PluginInfo, vtkPVPluginInformation);
   
   // Description:
@@ -67,49 +73,31 @@ public:
   // arrays.
   vtkGetObjectMacro(PythonPackageFlags, vtkIntArray);
     
-  // Description:
-  // Get the plugin name string
-  const char* GetPluginName()
-    {return this->GetPluginInfo()->GetPluginName();}
-  
-  // Description:
-  // Get the plugin version string
-  const char* GetPluginVersion()
-    {return this->GetPluginInfo()->GetPluginVersion();}
- 
-  // Description:
-  // Get whether the plugin is loaded
-  int GetLoaded()
-    {return this->GetPluginInfo()->GetLoaded();}
-  
-  // Description:
-  // Get the error string if the plugin failed to load
-  const char* GetError()
-    {return this->GetPluginInfo()->GetError();}
-  
-  // Description:
-  // Get a string of standard search paths (path1;path2;path3)
-  // search paths are based on PV_PLUGIN_PATH,
-  // plugin dir relative to executable.
-  const char* GetSearchPaths()
-    {return this->GetPluginInfo()->GetSearchPaths();}
-
 protected:
-  vtkPVPluginLoader();
-  ~vtkPVPluginLoader();
+  vtkSMPluginProxy();
+  ~vtkSMPluginProxy();
+
+private:
+  vtkSMPluginProxy(const vtkSMPluginProxy&); // Not implemented
+  void operator=(const vtkSMPluginProxy&); // Not implemented
   
   vtkPVPluginInformation* PluginInfo;
-
+  
   vtkStringArray* ServerManagerXML;
   vtkStringArray* PythonModuleNames;
   vtkStringArray* PythonModuleSources;
   vtkIntArray*    PythonPackageFlags;
-
-private:
-  vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.
-  void operator=(const vtkPVPluginLoader&); // Not implemented.
+  
+  //return 1 on success, and 0 on failure
+  int GetPropertyArray(vtkIdType connectionId,
+    int serverIds, vtkClientServerID objectId, vtkSMProperty* prop,
+    vtkAbstractArray* valuearray);
+  int GetArrayStream(vtkIdType connectionId,
+    int serverIds, vtkClientServerID objectId, const char* serverCmd,
+    vtkClientServerStream* valuelist, 
+    const char* streamobjectname, const char* streamobjectcmd);
+    
 };
-
 
 #endif
 

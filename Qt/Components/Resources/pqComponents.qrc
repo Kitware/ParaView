@@ -117,6 +117,10 @@
         <file>Icons/pqPlotCellOverTime24.png</file>
         <file>Icons/pqPlotLineOverTime24.png</file>
         <file>Icons/pqPlotPointOverTime24.png</file>
+        <file>Icons/PluginGray.png</file>
+        <file>Icons/PluginGreen.png</file>
+        <file>Icons/PluginRed.png</file>
+        <file>Icons/PluginYellow.png</file>
         <file>Icons/pqPointData16.png</file>
         <file>Icons/pqPolydata16.png</file>
         <file>Icons/pqPrint22.png</file>

@@ -33,6 +33,18 @@
 #endif
 
 
+// entry point to get Plugin name a string
+C_EXPORT char* C_DECL ParaViewPluginName()
+{
+  return "@PLUGIN_NAME@";
+}
+
+// entry point to get Plugin version as a string
+C_EXPORT char* C_DECL ParaViewPluginVersion()
+{
+  return "@PLUGIN_VERSION@";
+}
+
 namespace {
   class StaticInitPythonSource
   {

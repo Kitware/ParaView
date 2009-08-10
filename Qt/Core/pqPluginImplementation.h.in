@@ -43,10 +43,19 @@ class @PLUGIN_NAME@Plugin : public QObject, public pqPlugin
 {
   Q_OBJECT
   Q_INTERFACES(pqPlugin)
+
 public:
   @PLUGIN_NAME@Plugin();
   ~@PLUGIN_NAME@Plugin();
   virtual QObjectList interfaces();
+  virtual char* ParaViewPluginName();
+  virtual char* ParaViewPluginVersion();  
+  virtual int ParaViewPluginRequiredOnServer();
+  virtual int ParaViewPluginRequiredOnClient();
+#if @HAVE_REQUIRED_PLUGINS@  
+  virtual char* ParaViewPluginRequiredPlugins();
+#endif
+  
 private:
   QObjectList Interfaces;
 };

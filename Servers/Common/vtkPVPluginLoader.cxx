@@ -20,6 +20,8 @@
 #include "vtkDynamicLoader.h"
 #include "vtkIntArray.h"
 #include "vtkPVOptions.h"
+#include "vtkPVPluginInformation.h"
+#include "vtkSmartPointer.h"
 #include "vtkStringArray.h"
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
@@ -27,7 +29,7 @@ using vtkstd::string;
 #include <cstdlib>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.13");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.14");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -36,21 +38,21 @@ vtkCxxRevisionMacro(vtkPVPluginLoader, "1.13");
 #define C_DECL
 #endif
 
+typedef const char* (C_DECL *PluginNameFunc)();
+typedef const char* (C_DECL *PluginVersionFunc)();
+typedef int (C_DECL *PluginRequiredOnServerFunc)();
+typedef int (C_DECL *PluginRequiredOnClientFunc)();
+typedef const char* (C_DECL *PluginRequiredPluginsFunc)();
 typedef const char* (C_DECL *PluginXML1)();
 typedef void (C_DECL *PluginXML2)(int&, char**&);
 typedef void (C_DECL *PluginPython)(int&, const char **&, const char **&,
                                     const int *&);
 typedef void (C_DECL *PluginInit)(vtkClientServerInterpreter*);
 
-
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
-  this->Loaded = 0;
-  this->FileName = 0;
-  this->Error = NULL;
-  this->SearchPaths = NULL;
-  
+  this->PluginInfo = vtkPVPluginInformation::New();
   this->ServerManagerXML = vtkStringArray::New();
   this->PythonModuleNames = vtkStringArray::New();
   this->PythonModuleSources = vtkStringArray::New();
@@ -80,8 +82,7 @@ vtkPVPluginLoader::vtkPVPluginLoader()
       }
     }
 
-  this->SearchPaths = new char[paths.size() + 1];
-  strcpy(this->SearchPaths, paths.c_str());
+  this->PluginInfo->SetSearchPaths(paths.c_str());
 }
 
 //-----------------------------------------------------------------------------
@@ -104,46 +105,63 @@ vtkPVPluginLoader::~vtkPVPluginLoader()
     this->PythonPackageFlags->Delete();
     }
 
-  if(this->Error)
-    {
-    delete [] this->Error;
-    }
-  
-  if(this->SearchPaths)
-    {
-    delete [] this->SearchPaths;
-    }
-  
-  if(this->FileName)
-    {
-    delete [] this->FileName;
-    }
+  this->PluginInfo->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::SetFileName(const char* file)
 {
-  if(this->Loaded)
+  if(this->PluginInfo->GetLoaded())
     {
     return;
     }
-  if(this->FileName)
-    {
-    delete [] this->FileName;
-    this->FileName = NULL;
-    }
-  if(file && file[0] != '\0')
-    {
-    size_t len = strlen(file);
-    this->FileName = new char[len+1];
-    strcpy(this->FileName, file);
-    }
 
-  if(!this->Loaded && FileName && FileName[0] != '\0')
-    {
-    vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(FileName);
+  if(file && file[0] != '\0')
+    {   
+    this->PluginInfo->SetFileName(file);
+    vtkLibHandle lib = vtkDynamicLoader::OpenLibrary(file);
     if(lib)
       {
+      // plugin name
+      PluginNameFunc pluginName = 
+        (PluginNameFunc)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginName");
+      // plugin version
+      PluginVersionFunc pluginVersion = 
+        (PluginVersionFunc)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginVersion");
+      if(pluginName && pluginVersion)
+        {
+        vtkstd::string pluginNameString = (*pluginName)();
+        this->PluginInfo->SetPluginName(pluginNameString.c_str());
+
+        vtkstd::string pluginVersionString = (*pluginVersion)();
+        this->PluginInfo->SetPluginVersion(pluginVersionString.c_str());
+        }
+      // plugin RequiredOnServer flag
+      PluginRequiredOnServerFunc pluginServerRequired = 
+        (PluginRequiredOnServerFunc)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginRequiredOnServer");
+      // plugin RequiredOnClient flag
+      PluginRequiredOnClientFunc pluginClientRequired = 
+        (PluginRequiredOnClientFunc)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginRequiredOnClient");
+      if(pluginServerRequired && pluginClientRequired)
+        {
+        int serverRequired = pluginServerRequired();
+        int clientRequired = pluginClientRequired();
+        this->PluginInfo->SetRequiredOnServer(serverRequired);
+        this->PluginInfo->SetRequiredOnClient(clientRequired);
+        }
+        
+      // plugin required-plugins
+      PluginRequiredPluginsFunc pluginRequiredPlugins = 
+        (PluginRequiredPluginsFunc)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginRequiredPlugins");
+      if(pluginRequiredPlugins)
+        {
+        const char* requiredPlugins = (*pluginRequiredPlugins)();
+        if(requiredPlugins)
+          {
+          this->PluginInfo->SetRequiredPlugins(requiredPlugins);
+          }
+        }
+        
       // BUG # 0008673
       // Tell the platform to look in the plugin's directory for 
       // its dependencies. This isn't the right thing to do. A better
@@ -169,7 +187,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       string thisPluginsPath(file);
       size_t eop=thisPluginsPath.rfind(PATH_SEP);
       thisPluginsPath=thisPluginsPath.substr(0,eop);
-      // Load the shared libarary search path.
+      // Load the shared library search path.
       const char *pLdLibPath=getenv(LIB_PATH_NAME);
       bool pluginPathPresent
         = pLdLibPath==NULL?false:strstr(pLdLibPath,thisPluginsPath.c_str())!=NULL;
@@ -203,7 +221,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
         (PluginInit)vtkDynamicLoader::GetSymbolAddress(lib, "ParaViewPluginInit");
       if(xml1 || xml2 || python || init)
         {
-        this->Loaded = 1;
+        this->PluginInfo->SetLoaded(1);
         if(init)
           {
           (*init)(vtkProcessModule::GetProcessModule()->GetInterpreter());
@@ -251,12 +269,16 @@ void vtkPVPluginLoader::SetFileName(const char* file)
         {
         // toss it out if it isn't a server manager plugin
         vtkDynamicLoader::CloseLibrary(lib);
-        this->SetError("This is not a ParaView plugin.");
+        if(this->PluginInfo->GetRequiredOnServer() && 
+          !this->PluginInfo->GetRequiredOnClient())
+          {
+          this->PluginInfo->SetError("There are no server manager components in this plugin.");
+          }
         }
       }
     else
       {
-      this->SetError(vtkDynamicLoader::LastError());
+      this->PluginInfo->SetError(vtkDynamicLoader::LastError());
       }
     }
 }
@@ -264,15 +286,17 @@ void vtkPVPluginLoader::SetFileName(const char* file)
 //-----------------------------------------------------------------------------
 void vtkPVPluginLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
+  vtkIndent i2 = indent.GetNextIndent();
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Loaded: " << this->Loaded << endl;
-  os << indent << "FileName: " 
-    << (this->FileName? this->FileName : "(none)") << endl;
   os << indent << "ServerManagerXML: " 
     << (this->ServerManagerXML ? "(exists)" : "(none)") << endl;
-  os << indent << "Error: " 
-    << (this->Error? this->Error : "(none)") << endl;
-  os << indent << "SearchPaths: " << (this->SearchPaths ? 
-    this->SearchPaths : "(none)") << endl;
+  os << indent << "PythonModuleNames: " 
+    << (this->PythonModuleNames ? "(exists)" : "(none)") << endl;
+  os << indent << "PythonModuleSources: " 
+    << (this->PythonModuleSources ? "(exists)" : "(none)") << endl;
+  os << indent << "PythonPackageFlags: " 
+    << (this->PythonPackageFlags ? "(exists)" : "(none)") << endl;
+  os << indent << "PluginInfo: "  << endl;
+  this->PluginInfo->PrintSelf(os, i2);
 }
 

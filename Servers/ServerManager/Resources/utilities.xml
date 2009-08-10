@@ -2358,7 +2358,7 @@
       <!-- End of TimeKeeper -->
     </TimeKeeperProxy>
     
-    <Proxy name="PluginLoader" class="vtkPVPluginLoader">
+    <PluginProxy name="PluginLoader" class="vtkPVPluginLoader">
       <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -2417,7 +2417,7 @@
       </IntVectorProperty>
 
       <!-- End of PluginLoader -->
-    </Proxy>
+    </PluginProxy>
     
     <Proxy name="XdmfReaderHelper" class="">
       <Documentation>

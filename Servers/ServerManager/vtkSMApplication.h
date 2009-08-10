@@ -25,6 +25,7 @@
 //BTX
 struct vtkSMApplicationInternals;
 //ETX
+class vtkSMPluginManager;
 
 class VTK_EXPORT vtkSMApplication : public vtkSMObject
 {
@@ -64,6 +65,14 @@ public:
 
   // Description:
   void ParseConfigurationFiles();
+  
+  // Description:
+  // Get the root for Settings, given the server connection ID.
+  const char* GetSettingsRoot(vtkIdType connectionId);    
+ 
+  // Description:
+  // Plugin manager managing all server manager plugins.
+  vtkSMPluginManager* GetPluginManager();
 
 protected:
   vtkSMApplication();

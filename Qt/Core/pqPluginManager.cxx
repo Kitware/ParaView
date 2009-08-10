@@ -32,214 +32,179 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPluginManager.h"
 
-#include <QLibrary>
-#include <QPluginLoader>
-#include <QFileInfo>
-#include <QMessageBox>
 #include <QCoreApplication>
 #include <QDir>
+#include <QFileInfo>
+#include <QLibrary>
+#include <QMessageBox>
+#include <QMultiMap>
+#include <QPluginLoader>
 #include <QResource>
 
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
 #include "vtkIntArray.h"
 #include "vtkProcessModule.h"
 #include "vtkPVEnvironmentInformation.h"
 #include "vtkPVEnvironmentInformationHelper.h"
+#include "vtkPVPluginInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
 #include "vtkStringArray.h"
+#include "vtkSMApplication.h"
 #include "vtkSMObject.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
 #include "vtkToolkits.h"
 
 #include "vtksys/SystemTools.hxx"
 
-#include "vtkSmartPointer.h"
 #define VTK_CREATE(type, name) \
   vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 #include "pqApplicationCore.h"
 #include "pqAutoStartInterface.h"
 #include "pqFileDialogModel.h"
+#include "pqObjectBuilder.h"
 #include "pqPlugin.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSettings.h"
 #include "pqSMAdaptor.h"
+
+
+//-----------------------------------------------------------------------------
+class pqPluginManagerInternal
+{
+public:
+  pqPluginManagerInternal()
+    {
+    this->IsCurrentServerRemote = false;
+    }
+  ~pqPluginManagerInternal()
+    {    
+    foreach (QObject* iface, this->Interfaces)
+      {
+      pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
+      if (asi)
+        {
+        asi->shutdown();
+        }
+      }
+
+    foreach (QObject* iface, this->ExtraInterfaces)
+      {
+      pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
+      if (asi)
+        {
+        asi->shutdown();
+        }
+      }
+      
+    foreach(QString serverURI,  this->Extensions.uniqueKeys())
+      {
+      //Local
+      foreach(vtkPVPluginInformation* plInfo, this->Extensions.values(serverURI))
+        {
+        if(plInfo)
+          {
+          plInfo->Delete();
+          }
+        }
+      }
+    }
+  QObjectList Interfaces;
+  QMultiMap<QString, vtkPVPluginInformation* > Extensions;
+  QObjectList ExtraInterfaces;
+  
+  vtkSmartPointer<vtkSMPluginManager> SMPluginMananger;
+  vtkSmartPointer<vtkEventQtSlotConnect> SMPluginManangerConnect;
+  bool IsCurrentServerRemote;
+};
 
 //-----------------------------------------------------------------------------
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
 {
-  pqServerManagerModel* sm =
-    pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(sm, SIGNAL(serverAdded(pqServer*)),
-                   this, SLOT(onServerConnected(pqServer*)));
-  QObject::connect(sm, SIGNAL(serverRemoved(pqServer*)),
-                   this, SLOT(onServerDisconnected(pqServer*)));
+  this->Internal = new pqPluginManagerInternal();
+  this->Internal->SMPluginMananger = 
+    vtkSMObject::GetApplication()->GetPluginManager();
+  this->Internal->SMPluginManangerConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->SMPluginManangerConnect->Connect(
+      this->Internal->SMPluginMananger, vtkSMPluginManager::LoadPluginInvoked,
+      this, 
+      SLOT(onSMLoadPluginInvoked(vtkObject*, unsigned long, void*, void*)));
+  
+  QObject::connect(pqApplicationCore::instance()->getObjectBuilder(), 
+    SIGNAL(finishedAddingServer(pqServer*)),
+    this, SLOT(onServerConnected(pqServer*)));
+  
+  QObject::connect(pqApplicationCore::instance()->getServerManagerModel(), 
+    SIGNAL(serverRemoved(pqServer*)),
+    this, SLOT(onServerDisconnected(pqServer*)));
+  
+//  this->addPluginFromSettings();
 }
 
 //-----------------------------------------------------------------------------
 pqPluginManager::~pqPluginManager()
 {
-  foreach (QObject* iface, this->Interfaces)
-    {
-    pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
-    if (asi)
-      {
-      asi->shutdown();
-      }
-    }
-
-  foreach (QObject* iface, this->ExtraInterfaces)
-    {
-    pqAutoStartInterface* asi = qobject_cast<pqAutoStartInterface*>(iface);
-    if (asi)
-      {
-      asi->shutdown();
-      }
-    }
+  this->savePluginSettings();
+  this->Internal->SMPluginManangerConnect->Disconnect();
+  // this->Internal->SMPluginManangerConnect->Delete();
+  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 QObjectList pqPluginManager::interfaces() const
 {
-  return this->Interfaces + this->ExtraInterfaces;
+  return this->Internal->Interfaces + this->Internal->ExtraInterfaces;
 }
 
 //-----------------------------------------------------------------------------
-QString pqPluginManager::getPluginName(const QString& library)
-{
-  QFileInfo info(library);
-  QString name = info.baseName(); // remove the path and the extension.
-  if (name.startsWith("lib"))
-    {
-    name = name.mid(3); // remove "lib" from the name.
-    }
-  return name;
-}
 
-//-----------------------------------------------------------------------------
-pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(pqServer* server, const QString& lib,
-                                       QString& error)
+pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
+  pqServer* server, const QString& lib, 
+  vtkPVPluginInformation* pluginInfo, bool remote)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
-
   if(server)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
-    if(pxy && !lib.isEmpty())
+    vtkPVPluginInformation* smPluginInfo = 
+      this->Internal->SMPluginMananger->LoadPlugin(
+      lib.toAscii().constData(), 
+      server->GetConnectionID(),
+      this->getServerURIKey(remote ? server : NULL).toAscii().constData(), remote);
+    if(smPluginInfo)
       {
-      pxy->SetConnectionID(server->GetConnectionID());
-      // data & render servers
-      pxy->SetServers(vtkProcessModule::SERVERS);
-      vtkSMProperty* prop = pxy->GetProperty("FileName");
-      pqSMAdaptor::setElementProperty(prop, lib);
-      pxy->UpdateVTKObjects();
-      pxy->UpdatePropertyInformation();
-      prop = pxy->GetProperty("Loaded");
-      success = pqSMAdaptor::getElementProperty(prop).toInt() ? LOADED : NOTLOADED;
-      if(success == LOADED)
-        {
-        prop = pxy->GetProperty("ServerManagerXML");
-        QString pluginName = this->getPluginName(lib);
-        if (!this->LoadedServerManagerXMLs.contains(pluginName))
-          {
-          QList<QVariant> xmls = pqSMAdaptor::getMultipleElementProperty(prop);
-          foreach(QVariant xml, xmls)
-            {
-            vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
-              xml.toString().toAscii().data());
-            }
-          this->LoadedServerManagerXMLs.push_back(pluginName);
-          }
+      pluginInfo->DeepCopy(smPluginInfo);
+      }
 
-#ifdef VTK_WRAP_PYTHON
-        prop = pxy->GetProperty("PythonModuleNames");
-        QList<QVariant> names = pqSMAdaptor::getMultipleElementProperty(prop);
-        prop = pxy->GetProperty("PythonModuleSources");
-        QList<QVariant> sources = pqSMAdaptor::getMultipleElementProperty(prop);
-        prop = pxy->GetProperty("PythonPackageFlags");
-        QList<QVariant> pflags = pqSMAdaptor::getMultipleElementProperty(prop);
-        for (int i = 0; i < names.size(); i++)
-          {
-          VTK_CREATE(vtkPVPythonModule, module);
-          module->SetFullName(names[i].toString().toAscii().data());
-          module->SetSource(sources[i].toString().toAscii().data());
-          module->SetIsPackage(pflags[i].toInt());
-          vtkPVPythonModule::RegisterModule(module);
-          }
-#endif //VTK_WRAP_PYTHON
-        }
-      else
-        {
-        error =
-          pqSMAdaptor::getElementProperty(pxy->GetProperty("Error")).toString();
-        }
-      pxy->UnRegister(NULL);
+    if(pluginInfo->GetLoaded())
+      {
+      success = LOADED;
       }
     }
-  else
-    {
-    VTK_CREATE(vtkPVPluginLoader, loader);
-    loader->SetFileName(lib.toAscii().data());
-    success = loader->GetLoaded() ? LOADED : NOTLOADED;
-    if(success == LOADED)
-      {
-      int i;
-      QString pluginName = this->getPluginName(lib);
-       if (!this->LoadedServerManagerXMLs.contains(pluginName))
-         {
-         vtkStringArray* xmls = loader->GetServerManagerXML();
-         for(i=0; i<xmls->GetNumberOfValues(); i++)
-           {
-           vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
-             xmls->GetValue(i).c_str());
-           }
-         this->LoadedServerManagerXMLs.push_back(pluginName);
-         }
-
-#ifdef VTK_WRAP_PYTHON
-      vtkStringArray *names = loader->GetPythonModuleNames();
-      vtkStringArray *sources = loader->GetPythonModuleSources();
-      vtkIntArray *pflags = loader->GetPythonPackageFlags();
-      for (i = 0; i < names->GetNumberOfValues(); i++)
-        {
-        VTK_CREATE(vtkPVPythonModule, module);
-        module->SetFullName(names->GetValue(i).c_str());
-        module->SetSource(sources->GetValue(i).c_str());
-        module->SetIsPackage(pflags->GetValue(i));
-        vtkPVPythonModule::RegisterModule(module);
-        }
-#endif //VTK_WRAP_PYTHON
-      }
-    else
-      {
-      error = loader->GetError();
-      }
-    }
-
-  if(success == LOADED)
-    {
-    this->addExtension(server, lib);
-    emit this->serverManagerExtensionLoaded();
-    }
-
   return success;
 }
 
 //-----------------------------------------------------------------------------
-pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& lib, QString& error)
+pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
+  const QString& lib, vtkPVPluginInformation* pluginInfo)
 {
   pqPluginManager::LoadStatus success = NOTLOADED;
 
   QFileInfo fi(lib);
+  QString error;
   if(fi.suffix() == "bqrc")
     {
     if(QResource::registerResource(lib))
       {
       success = LOADED;
-      this->addExtension(NULL, lib);
+//      pluginInfo->SetFileName(lib.toAscii().constData());
+      pluginInfo->SetLoaded(1);
+      this->addExtension(NULL, pluginInfo);
       emit this->guiExtensionLoaded();
       }
     else
@@ -253,9 +218,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
     if(f.open(QIODevice::ReadOnly))
       {
       QByteArray dat = f.readAll();
+  
       vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
         dat.data());
-      this->addExtension(NULL, lib);
+      pluginInfo->SetLoaded(1);
+      this->addExtension(NULL, pluginInfo);
       success = LOADED;
       emit this->serverManagerExtensionLoaded();
       }
@@ -275,12 +242,14 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
         {
         pqpluginObject->setParent(this);  // take ownership to clean up later
         success = LOADED;
-        this->addExtension(NULL, lib);
+        pluginInfo->SetFileName(lib.toAscii().constData());
+        pluginInfo->SetLoaded(1);
+        this->addExtension(NULL, pluginInfo);
         emit this->guiExtensionLoaded();
         QObjectList ifaces = pqplugin->interfaces();
         foreach(QObject* iface, ifaces)
           {
-          this->Interfaces.append(iface);
+          this->Internal->Interfaces.append(iface);
           this->handleAutoStartPlugins(iface, true);
           emit this->guiInterfaceLoaded(iface);
           }
@@ -297,6 +266,15 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(const QString& 
       }
     }
 
+  if(!pluginInfo->GetLoaded() && !error.isEmpty())
+    {
+    QString loadError(error);
+    if(pluginInfo->GetError())
+      {
+      loadError.append("\n").append(pluginInfo->GetError());
+      }
+    pluginInfo->SetError(loadError.toAscii().constData());
+    }
   return success;
 }
 
@@ -333,9 +311,8 @@ static QStringList getLibraries(const QString& path, pqServer* server)
 
 //-----------------------------------------------------------------------------
 void pqPluginManager::loadExtensions(pqServer* server)
-{
+{ 
   QStringList plugin_paths = this->pluginPaths(server);
-
   foreach(QString path, plugin_paths)
     {
     this->loadExtensions(path, server);
@@ -355,31 +332,29 @@ void pqPluginManager::loadExtensions(const QString& path, pqServer* server)
 
 //-----------------------------------------------------------------------------
 pqPluginManager::LoadStatus pqPluginManager::loadExtension(
-  pqServer* server, const QString& lib, QString* errorReturn)
+  pqServer* server, const QString& lib, QString* errorReturn, bool remote)
 {
   LoadStatus success1 = NOTLOADED;
   LoadStatus success2 = NOTLOADED;
-  QString error;
-
-  // treat builtin server as null
-  if(server && !server->isRemote())
-    {
-    server = NULL;
-    }
 
   // check if it is already loaded
-  if(this->loadedExtensions(server).contains(lib))
+  vtkPVPluginInformation* existingPlugin = 
+    this->getExistingExtensionByFileName(remote ? server : NULL, lib);
+  if(existingPlugin && existingPlugin->GetLoaded())
     {
     return ALREADYLOADED;
     }
 
   // always look for SM/VTK stuff in the plugin
-  success1 = pqPluginManager::loadServerExtension(server, lib, error);
-
-  if(!server)
+  VTK_CREATE(vtkPVPluginInformation, pluginInfo);
+  
+  success1 = this->loadServerExtension(
+    server, lib, pluginInfo, remote);
+     
+  if(!remote)
     {
     // check if this plugin has gui stuff in it
-    success2 = loadClientExtension(lib, error);
+    success2 = loadClientExtension(lib, pluginInfo);
     }
 
   // return an error if it failed to load
@@ -387,39 +362,40 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
     {
     if(!errorReturn)
       {
-      QMessageBox::information(NULL, "Extension Load Failed", error);
+      QMessageBox::information(NULL, "Extension Load Failed", pluginInfo->GetError());
       }
     else
       {
-      *errorReturn = error;
+      *errorReturn = pluginInfo->GetError();
       }
+    return NOTLOADED;
     }
-
-  // return success if any client or server stuff was found in it
-  if(success1 == LOADED || success2 == LOADED)
+  else
     {
     return LOADED;
     }
-
-  return NOTLOADED;
 }
 
 //-----------------------------------------------------------------------------
-QStringList pqPluginManager::loadedExtensions(pqServer* server)
+QList< vtkPVPluginInformation* > pqPluginManager::loadedExtensions(
+  pqServer* server) 
 {
-  if(server && !server->isRemote())
-    {
-    server = NULL;
-    }
-  return this->Extensions.values(server);
+  return this->loadedExtensions(this->getServerURIKey(server));
+}
+
+//-----------------------------------------------------------------------------
+QList< vtkPVPluginInformation* > pqPluginManager::loadedExtensions(
+  QString extensionKey) 
+{
+  return this->Internal->Extensions.values(extensionKey);
 }
 
 //-----------------------------------------------------------------------------
 void pqPluginManager::addInterface(QObject* iface)
 {
-  if(!this->ExtraInterfaces.contains(iface))
+  if(!this->Internal->ExtraInterfaces.contains(iface))
     {
-    this->ExtraInterfaces.append(iface);
+    this->Internal->ExtraInterfaces.append(iface);
     this->handleAutoStartPlugins(iface, true);
     }
 }
@@ -427,17 +403,24 @@ void pqPluginManager::addInterface(QObject* iface)
 //-----------------------------------------------------------------------------
 void pqPluginManager::removeInterface(QObject* iface)
 {
-  int idx = this->ExtraInterfaces.indexOf(iface);
+  int idx = this->Internal->ExtraInterfaces.indexOf(iface);
   if(idx != -1)
     {
-    this->ExtraInterfaces.removeAt(idx);
+    this->Internal->ExtraInterfaces.removeAt(idx);
     this->handleAutoStartPlugins(iface, false);
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqPluginManager::onServerConnected(pqServer* server)
-{
+{ 
+  this->Internal->IsCurrentServerRemote = 
+    server && server->isRemote() ? true : false;
+  if(this->Internal->Extensions.size()==0)
+    {
+    this->addPluginFromSettings();
+    }  
+  this->loadAutoLoadPlugins(server);
   this->loadExtensions(server);
 }
 
@@ -445,7 +428,19 @@ void pqPluginManager::onServerConnected(pqServer* server)
 void pqPluginManager::onServerDisconnected(pqServer* server)
 {
   // remove referenced plugins
-  this->Extensions.remove(server);
+  // this->Internal->Extensions.remove(server);
+  // 
+  if(server && this->Internal->IsCurrentServerRemote)
+    {
+    foreach(vtkPVPluginInformation* plInfo, 
+      this->Internal->Extensions.values(this->getServerURIKey(server)))
+      {
+      plInfo->SetLoaded(0);
+      this->Internal->SMPluginMananger->UpdatePluginLoadInfo(
+        plInfo->GetFileName(),
+        this->getServerURIKey(server).toAscii().constData(), 0);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -478,7 +473,7 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
 
   QString pv_plugin_path;
 
-  if(!server)
+  if(!server || !this->Internal->IsCurrentServerRemote)
     {
     pv_plugin_path = vtksys::SystemTools::GetEnv("PV_PLUGIN_PATH");
     if(!pv_plugin_path.isEmpty())
@@ -499,39 +494,18 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
     }
   else
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* pxy = pxm->NewProxy("misc", "PluginLoader");
-    pxy->SetConnectionID(server->GetConnectionID());
-    pxy->UpdateVTKObjects();
-    pxy->UpdatePropertyInformation();
-    pv_plugin_path =
-      pqSMAdaptor::getElementProperty(pxy->GetProperty("SearchPaths")).toString();
-    pxy->UnRegister(NULL);
+    pv_plugin_path = this->Internal->SMPluginMananger->GetPluginPath(
+      server->GetConnectionID(),
+      this->getServerURIKey(server).toAscii().constData());
     }
 
     // add $APPDATA/<organization>/<appname>/Plugins  or
     // $HOME/.config/<organization>/<appname>/Plugins
 
   QString settingsRoot;
-  if(server)
+  if(server && this->Internal->IsCurrentServerRemote)
     {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    vtkSMProxy* helper = pxm->NewProxy("misc", "EnvironmentInformationHelper");
-    helper->SetConnectionID(server->GetConnectionID());
-    helper->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
-#if defined(Q_OS_WIN)
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"), "APPDATA");
-#else
-    pqSMAdaptor::setElementProperty(helper->GetProperty("Variable"), "HOME");
-#endif
-    helper->UpdateVTKObjects();
-    vtkPVEnvironmentInformation* info = vtkPVEnvironmentInformation::New();
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(helper->GetConnectionID(),
-      vtkProcessModule::DATA_SERVER, info, helper->GetID());
-    settingsRoot = info->GetVariable();
-    info->Delete();
-    helper->UnRegister(NULL);
+    settingsRoot = vtkSMObject::GetApplication()->GetSettingsRoot(server->GetConnectionID());
     }
   else
     {
@@ -588,11 +562,280 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
   return plugin_paths;
 }
 
-void pqPluginManager::addExtension(pqServer* server, const QString& lib)
+//-----------------------------------------------------------------------------
+void pqPluginManager::addExtension(pqServer* server, 
+  vtkPVPluginInformation* pluginInfo)
 {
-  if(!this->Extensions.values(server).contains(lib))
+  if(!pluginInfo)
     {
-    this->Extensions.insert(server, lib);
+    return;
+    }
+  this->addExtension(this->getServerURIKey(server), pluginInfo);
+ }
+ 
+//-----------------------------------------------------------------------------
+void pqPluginManager::addExtension(QString extensionKey, 
+  vtkPVPluginInformation* pluginInfo)
+{
+  vtkPVPluginInformation* plInfo = 
+    this->getExistingExtensionByFileName(extensionKey, pluginInfo->GetFileName());
+  if(!plInfo)
+    {
+    vtkPVPluginInformation* localInfo = vtkPVPluginInformation::New();
+    localInfo->DeepCopy(pluginInfo);
+    this->Internal->Extensions.insert(extensionKey, localInfo);
+    }
+  else
+    {
+    int autoLoad = plInfo->GetAutoLoad();
+    plInfo->DeepCopy(pluginInfo);
+    plInfo->SetAutoLoad(autoLoad);
     }
 }
 
+//-----------------------------------------------------------------------------
+vtkPVPluginInformation* pqPluginManager::getExistingExtensionByFileName(
+ pqServer* server, const QString& lib)
+{
+  return this->getExistingExtensionByFileName(this->getServerURIKey(server), lib);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVPluginInformation* pqPluginManager::getExistingExtensionByFileName(
+  QString extensionKey, const QString& lib)
+{
+  foreach(vtkPVPluginInformation* plInfo, this->loadedExtensions(extensionKey))
+    {
+    if(QString(plInfo->GetFileName()) == lib)
+      {
+      return plInfo;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVPluginInformation* pqPluginManager::getExistingExtensionByPluginName(
+  pqServer* server, const QString& name)
+{
+  return this->getExistingExtensionByFileName(this->getServerURIKey(server), name);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVPluginInformation* pqPluginManager::getExistingExtensionByPluginName(
+  QString extensionKey, const QString& name)
+{
+  foreach(vtkPVPluginInformation* plInfo, this->loadedExtensions(extensionKey))
+    {
+    if(QString(plInfo->GetPluginName()) == name)
+      {
+      return plInfo;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+QString pqPluginManager::getServerURIKey(pqServer* server) 
+{
+  return  server && this->Internal->IsCurrentServerRemote ? 
+          server->getResource().schemeHostsPorts().toURI() : 
+          QString("builtin:");
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::updatePluginAutoLoadState(
+  vtkPVPluginInformation* plInfo, int autoLoad)
+{
+  if(vtkPVPluginInformation* existingInfo =
+      this->getExistingExtensionByFileName(QString(plInfo->GetServerURI()), 
+        QString(plInfo->GetFileName())))
+    {
+    existingInfo->SetAutoLoad(autoLoad);  
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::onSMLoadPluginInvoked(
+  vtkObject* caller, unsigned long ulEvent, void* client_data, void* call_data)
+{
+  vtkPVPluginInformation* plInfo = 
+    static_cast<vtkPVPluginInformation*>(call_data);
+  if(!plInfo || ulEvent != vtkSMPluginManager::LoadPluginInvoked)
+    {
+    return;
+    }
+
+  this->addExtension(plInfo->GetServerURI(), plInfo);  
+  
+  if(plInfo->GetLoaded())
+    {
+    emit this->serverManagerExtensionLoaded();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::addPluginFromSettings()
+{
+  // get remembered plugins
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QStringList pluginlist = settings->value("/AutoLoadPlugins").toStringList();
+  foreach(QString pluginSettingKey, pluginlist)
+    {
+    this->processPluginSettings(pluginSettingKey);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::savePluginSettings(bool clearFirst)
+{
+  pqSettings* settings = pqApplicationCore::instance()->settings();
+  QStringList pluginlist = settings->value("/AutoLoadPlugins").toStringList();
+  if(clearFirst)
+    {
+    pluginlist.clear();
+    }
+  
+  foreach(QString serverURI,  this->Internal->Extensions.uniqueKeys())
+    {
+    //Local
+    foreach(vtkPVPluginInformation* plInfo, this->loadedExtensions(serverURI))
+      {
+      if(plInfo->GetAutoLoad())
+        {
+        QString settingKey = this->getPluginSettingsKey(plInfo);
+        if(!pluginlist.contains(settingKey))
+          {
+          pluginlist.push_back(settingKey);
+          }
+        }
+      }
+    }
+  settings->setValue("/AutoLoadPlugins", pluginlist);
+}
+
+//-----------------------------------------------------------------------------
+QString pqPluginManager::getPluginSettingsKey(vtkPVPluginInformation* plInfo)
+{
+  QString plSettingKey;
+  if(plInfo)
+    {
+    plSettingKey = plInfo->GetServerURI() ? plInfo->GetServerURI() : "builtin:";
+    plSettingKey.append("###").append(plInfo->GetFileName()).append("###").append(
+      QString::number(plInfo->GetAutoLoad()));
+    }
+  
+  return plSettingKey;
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::processPluginSettings(QString& plSettingKey)
+{
+  QRegExp rx("(.+)###(.+)###(\\d)$");
+  if(rx.indexIn(plSettingKey)==0)
+    {
+    QString serverURI = rx.cap(1);
+    QString fileName = rx.cap(2);
+    int autoLoad = rx.cap(3).toInt();
+    
+    VTK_CREATE(vtkPVPluginInformation, pluginInfo);
+    pluginInfo->SetServerURI(serverURI.toAscii().constData());
+    pluginInfo->SetFileName(fileName.toAscii().constData());
+    pluginInfo->SetAutoLoad(autoLoad>0 ? 1 : 0);
+    this->addExtension(pluginInfo->GetServerURI(), pluginInfo);
+    } 
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::loadAutoLoadPlugins(pqServer* server)
+{
+  foreach(vtkPVPluginInformation* plInfo, this->loadedExtensions(server))
+    {
+    if(plInfo->GetAutoLoad() && !plInfo->GetLoaded())
+      {
+      QString dummy;
+      this->loadExtension(server, plInfo->GetFileName(), &dummy, 
+        this->Internal->IsCurrentServerRemote);
+      }
+    }
+}
+//----------------------------------------------------------------------------
+bool pqPluginManager::areRequiredPluginsFunctional(
+  vtkPVPluginInformation* plInfo, bool remote)
+{
+  if(!plInfo->GetRequiredPlugins())
+    {
+    return true;
+    }
+    
+  QString strDepends = plInfo->GetRequiredPlugins();
+  if(strDepends.isEmpty())
+    {
+    return true;
+    }
+  
+  QStringList list = strDepends.split(";");
+  foreach(QString pluginName, list)
+    {
+    if(pluginName.isEmpty())
+      {
+      continue;
+      }
+    vtkPVPluginInformation* pluginInfo = 
+      this->getExistingExtensionByPluginName(NULL, pluginName);
+    if(!pluginInfo && this->Internal->IsCurrentServerRemote)
+      {
+      pluginInfo = this->getExistingExtensionByPluginName(
+        pqApplicationCore::instance()->getActiveServer(), pluginName);
+      }
+    if(!this->isPluginFuntional(pluginInfo, remote))
+      {
+      return false;
+      }
+    }
+  return true;  
+}
+
+//----------------------------------------------------------------------------
+bool pqPluginManager::isPluginFuntional(
+  vtkPVPluginInformation* plInfo, bool remote)
+{
+  if(!plInfo || !plInfo->GetLoaded())
+    {
+    return false;
+    }
+    
+  if(this->Internal->IsCurrentServerRemote)
+    {
+    if(remote && plInfo->GetRequiredOnClient())
+      {
+      vtkPVPluginInformation* clientPlugin = 
+        this->getExistingExtensionByFileName(
+          NULL, QString(plInfo->GetFileName()));
+      if(!clientPlugin || !clientPlugin->GetLoaded())
+        {
+        plInfo->SetError("Required on Client!");
+        return false;
+        }
+      }
+    if(!remote && plInfo->GetRequiredOnServer())
+      {
+      vtkPVPluginInformation* serverPlugin = 
+        this->getExistingExtensionByFileName(
+          pqApplicationCore::instance()->getActiveServer(), 
+          QString(plInfo->GetFileName()));
+      if(!serverPlugin || !serverPlugin->GetLoaded())
+        {
+        plInfo->SetError("Required on Server!");
+        return false;
+        }
+      }
+    }
+    
+  if(!this->areRequiredPluginsFunctional(plInfo, remote))
+    {
+    plInfo->SetError("Missing depended plugins!");
+    return false;
+    }
+  return true;    
+}
