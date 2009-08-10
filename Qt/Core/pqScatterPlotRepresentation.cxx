@@ -186,20 +186,22 @@ vtkSMScatterPlotRepresentationProxy* pqScatterPlotRepresentation::getRepresentat
 }
 
 //-----------------------------------------------------------------------------
+/*
 vtkSMProxy* pqScatterPlotRepresentation::getScalarOpacityFunctionProxy()
 {
-  /* Something for the volume rendering
+  // Something for the volume rendering
   // We may want to create a new proxy is none exists.
   return pqSMAdaptor::getProxyProperty(
     this->getProxy()->GetProperty("ScalarOpacityFunction"));
-  */
+  
   return 0;
 }
-
+*/
 //-----------------------------------------------------------------------------
+/*
 pqScalarOpacityFunction* pqScatterPlotRepresentation::getScalarOpacityFunction()
 {
-/*
+
   if(this->getRepresentationType() == vtkSMPVRepresentationProxy::VOLUME)
     {
     pqServerManagerModel* smmodel = 
@@ -208,10 +210,9 @@ pqScalarOpacityFunction* pqScatterPlotRepresentation::getScalarOpacityFunction()
 
     return (opf? smmodel->findItem<pqScalarOpacityFunction*>(opf): 0);
     }
-*/
   return 0;
 }
-
+*/
 //-----------------------------------------------------------------------------
 void pqScatterPlotRepresentation::setDefaultPropertyValues()
 {
@@ -440,33 +441,13 @@ void pqScatterPlotRepresentation::colorByArray(const char* array)
 }
 
 //-----------------------------------------------------------------------------
-int pqScatterPlotRepresentation::getRepresentationType() const
-{
-  vtkSMProxy* repr = this->getRepresentationProxy();
-  vtkSMPVRepresentationProxy* pvRepr = 
-    vtkSMPVRepresentationProxy::SafeDownCast(repr);
-  if (pvRepr)
-    {
-    return pvRepr->GetRepresentation();
-    }
-
-  const char* xmlname = repr->GetXMLName();
-  if (strcmp(xmlname, "ScatterPlotRepresentation") == 0)
-    {
-    return vtkSMPVRepresentationProxy::POINTS;
-    }
-
-  qCritical() << "pqScatterPlotRepresentation created for a incorrect proxy : " << xmlname;
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
+/*
 double pqScatterPlotRepresentation::getOpacity() const
 {
   vtkSMProperty* prop = this->getProxy()->GetProperty("Opacity");
   return (prop? pqSMAdaptor::getElementProperty(prop).toDouble() : 1.0);
 }
-
+*/
 //-----------------------------------------------------------------------------
 void pqScatterPlotRepresentation::resetLookupTableScalarRange()
 {
@@ -519,35 +500,7 @@ void pqScatterPlotRepresentation::updateLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
-void pqScatterPlotRepresentation::getColorArray(
-  vtkPVDataSetAttributesInformation* attrInfo,
-  vtkPVDataSetAttributesInformation* inAttrInfo,
-  vtkPVArrayInformation*& arrayInfo)
-{  
-  arrayInfo = NULL;
-
-  // Check for new point scalars.
-  vtkPVArrayInformation* tmp =
-    attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-  vtkPVArrayInformation* inArrayInfo = 0;
-  if (tmp)
-    {
-    if (inAttrInfo)
-      {
-      inArrayInfo = inAttrInfo->GetAttributeInformation(
-        vtkDataSetAttributes::SCALARS);
-      }
-    if (inArrayInfo == 0 ||
-      strcmp(tmp->GetName(),inArrayInfo->GetName()) != 0)
-      { 
-      // No input or different scalars: use the new scalars.
-      arrayInfo = tmp;
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-bool pqScatterPlotRepresentation::isPartial(const QString& array) const//, int fieldType) const
+bool pqScatterPlotRepresentation::isPartial(const QString& array) const
 {
   QString arrayName = this->GetArrayName(array);
   int fieldType = this->GetArrayType(array);
@@ -563,7 +516,7 @@ bool pqScatterPlotRepresentation::isPartial(const QString& array) const//, int f
 
 //-----------------------------------------------------------------------------
 QPair<double, double> 
-pqScatterPlotRepresentation::getColorFieldRange(const QString& array)
+pqScatterPlotRepresentation::getColorFieldRange(const QString& array)const
 {
   QPair<double,double>ret(0.0, 1.0);
 
@@ -606,11 +559,11 @@ pqScatterPlotRepresentation::getColorFieldRange(const QString& array)
 }
 
 //-----------------------------------------------------------------------------
-QPair<double, double> pqScatterPlotRepresentation::getColorFieldRange()
+QPair<double, double> pqScatterPlotRepresentation::getColorFieldRange()const
 {
-  pqScalarsToColors* lut = this->getLookupTable();
+  //pqScalarsToColors* lut = this->getLookupTable();
   QString colorField = this->getColorField();
-  if (lut && colorField != "")
+  if (colorField != "")
     {
     /*int component = -1;
     QRegExp rx("(.+)\\((\\d+)\\)( \\((cell|point)\\))?$");
@@ -656,7 +609,7 @@ void pqScatterPlotRepresentation::setColorField(const QString& value)
 
 
 //-----------------------------------------------------------------------------
-QString pqScatterPlotRepresentation::getColorField()
+QString pqScatterPlotRepresentation::getColorField()const
 {
   vtkSMScatterPlotRepresentationProxy* repr = this->getRepresentationProxy();
   if (!repr)
@@ -669,7 +622,7 @@ QString pqScatterPlotRepresentation::getColorField()
 }
 
 //-----------------------------------------------------------------------------
-bool pqScatterPlotRepresentation::getDataBounds(double bounds[6])
+bool pqScatterPlotRepresentation::getDataBounds(double bounds[6])const
 {
   vtkSMScatterPlotRepresentationProxy* repr = 
     this->getRepresentationProxy();
@@ -682,16 +635,6 @@ bool pqScatterPlotRepresentation::getDataBounds(double bounds[6])
     }
   info->GetBounds(bounds);
   return true;
-}
-
-//-----------------------------------------------------------------------------
-void pqScatterPlotRepresentation::setRepresentation(int representation)
-{
-  vtkSMScatterPlotRepresentationProxy* repr = this->getRepresentationProxy();
-  pqSMAdaptor::setElementProperty(
-    repr->GetProperty("Representation"), representation);
-  repr->UpdateVTKObjects();
-  this->onColorArrayNameChanged();
 }
 
 //-----------------------------------------------------------------------------

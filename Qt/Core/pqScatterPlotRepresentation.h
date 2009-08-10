@@ -51,7 +51,7 @@ class vtkSMScatterPlotRepresentationProxy;
 
 /// This is PQ representation for a single display. A pqRepresentation represents
 /// a single vtkSMScatterPlotRepresentationProxy. The display can be added to
-/// only one render module or more (ofcouse on the same server, this class
+/// only one render module or more (of course on the same server, this class
 /// doesn't worry about that.
 class PQCORE_EXPORT pqScatterPlotRepresentation : public pqDataRepresentation
 {
@@ -65,68 +65,65 @@ public:
   // \c server:- server on which the proxy is created.
   // \c parent:- QObject parent.
   pqScatterPlotRepresentation( const QString& group, 
-                            const QString& name,
-                            vtkSMProxy* repr, 
-                            pqServer* server,
-                            QObject* parent=NULL);
+                               const QString& name,
+                               vtkSMProxy* repr, 
+                               pqServer* server,
+                               QObject* parent=NULL);
   virtual ~pqScatterPlotRepresentation();
 
   // Get the internal display proxy.
   vtkSMScatterPlotRepresentationProxy* getRepresentationProxy() const;
 
-  // Sets the default color mapping for the display.
-  // The rules are:
-  // If the source created a NEW point scalar array, use it.
-  // Else if the source created a NEW cell scalar array, use it.
-  // Else if the input color by array exists in this source, use it.
-  // Else color by property.
+  /// Sets the default color mapping for the display. The ColorArrayName 
+  /// property is used to color the data. The name contains the type (point, 
+  /// cell, coord), and the element to use to map the colors. If no element
+  /// is given or if element == -1, the magnitude of the array is used.
+  /// ColorArrayName = ({coord|point|cell},)<arrayname>(,<element>)
   virtual void setDefaultPropertyValues();
 
-  // Call to select the coloring array. 
-  void colorByArray(const char* array);//name, int fieldtype);
-
-  /// get the data range for a particular array. if the array component == -1,
-  /// range for the vector magnitude is returned.
-  QPair<double, double> getColorFieldRange(const QString& array);
+  /// Utility function that returns the data range for a particular array. 
+  /// The array must match the expression: 
+  /// ({coord|point|cell},)<arrayname>(,<element>).
+  /// If the array component == -1, range for the vector magnitude is returned.
+  QPair<double, double> getColorFieldRange(const QString& array)const;
 
   /// Returns the range for the currently selected color field i.e.
   /// the range for the array component (or magnitude) of the array by which
   /// this display is being colored, if at all.
-  QPair<double, double> getColorFieldRange();
+  /// Returns 0,1 if no array is selected or the current array is invalid.
+  QPair<double, double> getColorFieldRange()const;
 
-  /// Returns if the array is a partial array.
+  /// Utility function that returns if the array is a partial array or not.
+  /// The array must match the expression: 
+  /// ({coord|point|cell},)<arrayname>(,<element>).
   bool isPartial(const QString& array)const;
 
-  /// set the array to color.
+  /// Set the array to color.
   /// field is a string of format:
   ///    "({coord|point|cell|field},)<arrayname>(,[0-9]+)".
+  /// Dangerous, please set the Property "ColorArrayName" instead.
   void setColorField(const QString& field);
 
-  /// get the array the part is colored by
-  QString getColorField();
+  /// get the array the part is colored by. 
+  /// Warning: the returned array matches the format: 
+  ///   ({coord|point|cell|field},)<arrayname>(,[0-9]+)
+  QString getColorField()const;
 
   /// Get the data bounds for the input of this display.
   /// Returns if the operation was successful.
-  bool getDataBounds(double bounds[6]);
-
-  /// Set representation on the proxy.
-  /// If representation is changed to volume, this method ensures that the
-  /// scalar array is initialized.
-  void setRepresentation(int type);
-
-  /// Returns the type of representation currently used: POINTS
-  int getRepresentationType() const;
+  /// It propagates the computation to the vtkSMRepresentationProxy
+  bool getDataBounds(double bounds[6])const;
 
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
-  virtual vtkSMProxy* getScalarOpacityFunctionProxy();
+  //virtual vtkSMProxy* getScalarOpacityFunctionProxy();
 
   /// Returns the pqScalarOpacityFunction object for the piecewise
   /// function used to map scalars to opacity.
-  virtual pqScalarOpacityFunction* getScalarOpacityFunction();
+  //virtual pqScalarOpacityFunction* getScalarOpacityFunction();
 
   /// Returns the opacity.
-  double getOpacity() const;
+  //double getOpacity() const;
 
 signals:
   /// This is fire when any property that affects the color
@@ -162,6 +159,12 @@ protected:
                        CELL_DATA = 1, 
                        FIELD_DATA = 2, 
                        COORD_DATA = 3 };
+
+  /// Call to select the coloring array. 
+  /// The user indirectly calls this function by changing the ColorArrayName
+  /// property
+  void colorByArray(const char* array);
+
   /// Utility function that extracts the name of the color field:
   /// Returns <arrayname> from a string of  format:
   ///    "(coord|point|cell|field),<arrayname>(,[0-9]+)".
@@ -181,11 +184,13 @@ protected:
 private:
   class pqInternal;
   pqInternal* Internal; 
+  
+  /*
   static void getColorArray(
     vtkPVDataSetAttributesInformation* attrInfo,
     vtkPVDataSetAttributesInformation* inAttrInfo,
     vtkPVArrayInformation*& arrayInfo);
-
+  */
 };
 
 #endif

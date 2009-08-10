@@ -28,7 +28,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
@@ -212,7 +212,7 @@ vtkSMRepresentationProxy* vtkSMScatterPlotViewProxy::CreateDefaultRepresentation
     }
 
   // Currently only images can be shown 
-  vtkErrorMacro("This view only supports surface representation.");
+  vtkErrorMacro("This view only supports dataset representation.");
   return 0;
 }
 
