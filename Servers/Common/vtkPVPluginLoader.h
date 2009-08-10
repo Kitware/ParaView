@@ -21,8 +21,8 @@
 #define __vtkPVPluginLoader_h
 
 #include "vtkObject.h"
-#include "vtkPVPluginInformation.h"
 
+class vtkPVPluginInformation;
 class vtkStringArray;
 class vtkIntArray;
 
@@ -36,8 +36,7 @@ public:
   // Description:
   // set/get the filename and load the plugin
   void SetFileName(const char* file);
-  const char* GetFileName()
-    {return this->GetPluginInfo()->GetFileName();}
+  const char* GetFileName();
   
   // Description:
   // Get the Server Manager PluginInformation object
@@ -69,30 +68,25 @@ public:
     
   // Description:
   // Get the plugin name string
-  const char* GetPluginName()
-    {return this->GetPluginInfo()->GetPluginName();}
-  
+  const char* GetPluginName();
+    
   // Description:
   // Get the plugin version string
-  const char* GetPluginVersion()
-    {return this->GetPluginInfo()->GetPluginVersion();}
- 
-  // Description:
-  // Get whether the plugin is loaded
-  int GetLoaded()
-    {return this->GetPluginInfo()->GetLoaded();}
+  const char* GetPluginVersion();
   
   // Description:
+  // Get whether the plugin is loaded
+  int GetLoaded(); 
+   
+  // Description:
   // Get the error string if the plugin failed to load
-  const char* GetError()
-    {return this->GetPluginInfo()->GetError();}
+  const char* GetError();
   
   // Description:
   // Get a string of standard search paths (path1;path2;path3)
   // search paths are based on PV_PLUGIN_PATH,
   // plugin dir relative to executable.
-  const char* GetSearchPaths()
-    {return this->GetPluginInfo()->GetSearchPaths();}
+  const char* GetSearchPaths();
 
 protected:
   vtkPVPluginLoader();

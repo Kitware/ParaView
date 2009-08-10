@@ -116,7 +116,7 @@ protected:
   
   // Check and compare string
   // return true if the two string are not null and equal; else, return 0;
-  bool CompareString(const char* str1, const char* str2);
+  bool CompareInfoString(const char* str1, const char* str2);
   
   char *PluginName;
   char *FileName;

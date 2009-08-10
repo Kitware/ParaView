@@ -103,15 +103,11 @@ public:
         }
       }
       
-    foreach(QString serverURI,  this->Extensions.uniqueKeys())
+    foreach(vtkPVPluginInformation* plInfo, this->Extensions.values())
       {
-      //Local
-      foreach(vtkPVPluginInformation* plInfo, this->Extensions.values(serverURI))
+      if(plInfo)
         {
-        if(plInfo)
-          {
-          plInfo->Delete();
-          }
+        plInfo->Delete();
         }
       }
     }
@@ -683,7 +679,7 @@ void pqPluginManager::updatePluginAutoLoadState(
 
 //-----------------------------------------------------------------------------
 void pqPluginManager::onSMLoadPluginInvoked(
-  vtkObject* caller, unsigned long ulEvent, void* client_data, void* call_data)
+  vtkObject*, unsigned long ulEvent, void*, void* call_data)
 {
   vtkPVPluginInformation* plInfo = 
     static_cast<vtkPVPluginInformation*>(call_data);
@@ -722,19 +718,16 @@ void pqPluginManager::savePluginSettings(bool clearFirst)
     pluginlist.clear();
     }
   
-  foreach(QString serverURI,  this->Internal->Extensions.uniqueKeys())
+  for(int i=0; i<this->Internal->Extensions.uniqueKeys().count(); i++)
     {
-    //Local
+    QString serverURI = this->Internal->Extensions.uniqueKeys().value(i);
     foreach(vtkPVPluginInformation* plInfo, this->loadedExtensions(serverURI))
       {
-//      if(plInfo->GetAutoLoad())
-//        {
         QString settingKey = this->getPluginSettingsKey(plInfo);
         if(!pluginlist.contains(settingKey))
           {
           pluginlist.push_back(settingKey);
           }
-//        }
       }
     }
   settings->setValue("/AutoLoadPlugins", pluginlist);

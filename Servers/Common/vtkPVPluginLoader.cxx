@@ -29,7 +29,7 @@ using vtkstd::string;
 #include <cstdlib>
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.15");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.16");
 
 #ifdef _WIN32
 // __cdecl gives an unmangled name
@@ -283,6 +283,42 @@ void vtkPVPluginLoader::SetFileName(const char* file)
       this->PluginInfo->SetError(vtkDynamicLoader::LastError());
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVPluginLoader::GetFileName()
+{
+  return this->GetPluginInfo()->GetFileName();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVPluginLoader::GetPluginName()
+{
+  return this->GetPluginInfo()->GetPluginName();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVPluginLoader::GetPluginVersion()
+{
+  return this->GetPluginInfo()->GetPluginVersion();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVPluginLoader::GetLoaded()
+{
+  return this->GetPluginInfo()->GetLoaded();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVPluginLoader::GetError()
+{
+  return this->GetPluginInfo()->GetError();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVPluginLoader::GetSearchPaths()
+{
+  return this->GetPluginInfo()->GetSearchPaths();
 }
 
 //-----------------------------------------------------------------------------

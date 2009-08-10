@@ -39,6 +39,8 @@ public:
   // on all properties to make sure that domains that depend on the
   // information are updated.
   virtual void UpdatePropertyInformation();
+  virtual void UpdatePropertyInformation(vtkSMProperty* prop)
+    { this->Superclass::UpdatePropertyInformation(prop); }
 
   // Description:
   // Calling server PVPluginLoader to load the given plugin. 

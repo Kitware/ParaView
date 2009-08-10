@@ -22,7 +22,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkPVPluginLoader.h"
 
 vtkStandardNewMacro(vtkPVPluginInformation);
-vtkCxxRevisionMacro(vtkPVPluginInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVPluginInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVPluginInformation::vtkPVPluginInformation()
@@ -92,10 +92,10 @@ int vtkPVPluginInformation::Compare(vtkPVPluginInformation *info)
     {
     return 0;
     }
-  if (this->CompareString(info->GetServerURI(), this->ServerURI) &&
-      this->CompareString(info->GetFileName(), this->FileName) &&
-      this->CompareString(info->GetPluginName(), this->PluginName) &&
-      this->CompareString(info->GetPluginVersion(), this->PluginVersion))
+  if (this->CompareInfoString(info->GetServerURI(), this->ServerURI) &&
+      this->CompareInfoString(info->GetFileName(), this->FileName) &&
+      this->CompareInfoString(info->GetPluginName(), this->PluginName) &&
+      this->CompareInfoString(info->GetPluginVersion(), this->PluginVersion))
     {
     return 1;
     }
@@ -121,7 +121,7 @@ void vtkPVPluginInformation::CopyFromObject(vtkObject* obj)
 }
 
 //----------------------------------------------------------------------------
-bool vtkPVPluginInformation::CompareString(
+bool vtkPVPluginInformation::CompareInfoString(
   const char* str1, const char* str2)
 {
   return (str1 && *str1 && str2 && *str2 && !strcmp(str1,str2)) ? true : false;
