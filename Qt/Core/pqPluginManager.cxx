@@ -367,7 +367,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   success1 = this->loadServerExtension(
     server, lib, pluginInfo, remote);
      
-  if(!server || !remote)
+  if(!server || !(server->isRemote()) || !remote)
     {
     // check if this plugin has gui stuff in it
     success2 = loadClientExtension(lib, pluginInfo);
