@@ -128,6 +128,22 @@ void pqComboBoxDomain::addString(const QString& str)
   this->domainChanged();
 }
 
+void pqComboBoxDomain::insertString(int index, const QString& str)
+{
+  this->Internal->UserStrings.insert(index, str);
+  this->domainChanged();
+}
+
+void pqComboBoxDomain::removeString(const QString& str)
+{
+  int index = this->Internal->UserStrings.indexOf(str);
+  if (index >= 0)
+    {
+    this->Internal->UserStrings.removeAt(index);
+    this->domainChanged();
+    }
+}
+
 void pqComboBoxDomain::removeAllStrings()
 {
   this->Internal->UserStrings.clear();

@@ -63,6 +63,8 @@ public:
   /// Provides a mechanism to always add a set of strings to the combo box
   /// irrespective of what the domain tells us.
   void addString(const QString&);
+  void insertString(int,const QString&);
+  void removeString(const QString&);
   void removeAllStrings();
                          
   vtkSMProperty* getProperty()const;

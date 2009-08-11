@@ -256,15 +256,23 @@ public:
     GLOBALIDS = 5 // GLOBALIDS has to be last 
     };
 
-  static const char* getText(int val)
+  static const char* getText(int val, int type)
     {
+      //type == 0 -> CELL, type == 1 -> POINT
     switch (val)
       {
     case IDS:
       return "IDs";
       
     case GLOBALIDS:
-      return "Global IDs";
+      if (type == 0)
+        {
+        return "Global Element IDs";
+        }
+      else
+        {
+        return "Global Node IDs";
+        }
 
     case FRUSTUM:
       return "Frustum";
@@ -434,15 +442,26 @@ void pqSelectionInspectorPanel::select(pqOutputPort* opport, bool createNew)
     QObject::disconnect(this->Implementation->InputPort->getSource(), 0, this, 0);
     }
 
-  if(!this->hasGlobalIDs(this->Implementation->InputPort) &&
-      this->hasGlobalIDs(opport))
+  if(this->hasGlobalIDs(opport))
     {
-    this->Implementation->InputPort = opport;
-    this->updateSelectionTypesAvailable();
-    this->setGlobalIDs();
-    return;
+    if(opport->getSelectionInput() &&
+       opport->getSelectionInput()->GetXMLName() == 
+       QString("CompositeDataIDSelectionSource"))
+      {
+      if (!this->hasGlobalIDs(this->Implementation->InputPort))
+        {
+        this->Implementation->InputPort = opport;
+        this->updateSelectionTypesAvailable();
+        this->setGlobalIDs();
+        return;
+        }
+      else
+        {
+        createNew = true;
+        }
+      }
     }
-
+  
   this->Implementation->InputPort = opport;
 
   QString selectedObjectLabel = "<b>[none]</b>";
@@ -1386,7 +1405,7 @@ void pqSelectionInspectorPanel::onSelectionTypeChanged(const QString&)
 //-----------------------------------------------------------------------------
 void pqSelectionInspectorPanel::onSelectionManagerChanged(pqOutputPort* opport)
 {
-  this->select(opport,true);
+  this->select(opport, false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1767,7 +1786,9 @@ void pqSelectionInspectorPanel::updateSelectionTypesAvailable(pqOutputPort* port
       continue;
       }
     this->Implementation->comboSelectionType->addItem(
-      pqImplementation::getText(cc));
+      pqImplementation::getText(cc,
+        this->Implementation->comboFieldType->currentText() == 
+          QString("POINT")? 1 : 0));
     }
   this->Implementation->comboSelectionType->blockSignals(prev);
   this->Implementation->comboSelectionType->setCurrentIndex(cur_index);
@@ -1807,8 +1828,21 @@ void pqSelectionInspectorPanel::setGlobalIDs()
     pqImplementation::GLOBALIDS); // Global IDs
   // the celllabelarraydomain and pointlabelarraydomain are valid only when
   // the user turn the visibility to ON.
+  // Hence we connect to the event when the domain is valid to select the 
+  // Global {Element|node} Id array.
+  // But before this event, we artificially add a "Global {Element|Node} Id" 
+  // entrie in the combobox (that will be cleared when the domain is updated)
   if(!this->Implementation->comboLabelMode_Cell->count())
     {
+    this->Implementation->CellLabelArrayDomain->addString("GlobalElementId");
+    this->Implementation->PointLabelArrayDomain->addString("GlobalNodeId");
+  
+    this->Implementation->comboLabelMode_Cell->addItem("GlobalElementId", QString("GlobalElementId"));
+    this->Implementation->comboLabelMode_Cell->setCurrentIndex(
+      this->Implementation->comboLabelMode_Cell->count()-1);
+    this->Implementation->comboLabelMode_Point->addItem("GlobalNodeId", QString("GlobalNodeId"));
+    this->Implementation->comboLabelMode_Point->setCurrentIndex(
+      this->Implementation->comboLabelMode_Point->count()-1);
     vtkSMProxy* reprProxy = this->Implementation->getSelectionRepresentation()
       ->getProxy();
     this->Implementation->VTKConnectRep->Connect(
@@ -1849,24 +1883,25 @@ void pqSelectionInspectorPanel::forceLabelGlobalId(vtkObject* object)
       ->FindDomain("vtkSMDomain") )
     {
     this->Implementation->comboLabelMode_Cell->setCurrentIndex(
-      this->Implementation->comboLabelMode_Cell->findText("Global",
+      this->Implementation->comboLabelMode_Cell->findText("GlobalElementId",
                                                           Qt::MatchStartsWith));
     // one shot forcing
     this->Implementation->VTKConnectRep->Disconnect(
       reprProxy->GetProperty("SelectionCellFieldDataArrayName")
       ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
       this, SLOT(forceLabelGlobalId(vtkObject*)));
-    
+    this->Implementation->CellLabelArrayDomain->removeString("GlobalElementId");
     }
   else //== reprProxy->GetProperty("SelectionPointFieldDataArrayName")->FindDomain..
     {
     this->Implementation->comboLabelMode_Point->setCurrentIndex(
-      this->Implementation->comboLabelMode_Point->findText("Global",
+      this->Implementation->comboLabelMode_Point->findText("GlobalNodeId",
                                                            Qt::MatchStartsWith));
     // one shot forcing
     this->Implementation->VTKConnectRep->Disconnect(
       reprProxy->GetProperty("SelectionPointFieldDataArrayName")
       ->FindDomain("vtkSMDomain"), vtkCommand::DomainModifiedEvent, 
       this, SLOT(forceLabelGlobalId(vtkObject*)));
+    this->Implementation->PointLabelArrayDomain->removeString("GlobalNodeId");
     }
 }
