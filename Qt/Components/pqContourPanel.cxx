@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqSampleScalarWidget.h"
+#include "pqProxySelectionWidget.h"
 
 #include "ui_pqContourControls.h"
 
@@ -80,6 +81,34 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   QVBoxLayout* l = new QVBoxLayout(group1);
   this->Implementation->ControlsContainer.layout()->setMargin(0);
   l->addWidget(&this->Implementation->ControlsContainer);
+  
+  // begin: the locator --- a proxy property (incremental_point_locators)
+  // 
+  // make the locator a sibling of the contour sub-panel and a child of 'this'
+  pqProxySelectionWidget* locator = new pqProxySelectionWidget
+    ( object_proxy->getProxy(), "Locator",
+      this->proxy()->GetProperty( "Locator" )->GetXMLLabel(), this );
+  locator->layout()->setMargin( 0 );      
+  locator->setObjectName( "Locator" );
+  
+  // link this proxy (the GUI element) with "Locator" (the underlying property
+  // of the contour filter)
+  this->propertyManager()
+      ->registerLink( locator, "proxy", SIGNAL(proxyChanged(pqSMProxy)),
+                      this->proxy(), this->proxy()->GetProperty("Locator") );
+  
+  // exchange signals beween the contour and the locator
+  QObject::connect( this, SIGNAL(viewChanged(pqView*) ),
+                    locator, SLOT(setView(pqView*)) );
+  QObject::connect( this, SIGNAL(onaccept()), locator, SLOT(accept()) );
+  QObject::connect( this, SIGNAL(onreset()),  locator, SLOT(reset())  );
+  QObject::connect( this, SIGNAL(onselect()), locator, SLOT(select()) );
+  QObject::connect( this, SIGNAL(ondeselect()), locator, SLOT(deselect()) );
+  QObject::connect( locator, SIGNAL(modified()), this, SLOT(setModified()) );
+  QObject::connect( locator, SIGNAL(proxyChanged(pqSMProxy)), 
+                    this,    SLOT(setModified()) );
+  //
+  // end: the locator --- a proxy property (incremental_point_locators) 
 
   pqCollapsedGroup* const group2 = new pqCollapsedGroup(this);
   group2->setTitle(tr(this->proxy()->GetProperty("ContourValues")->GetXMLLabel()));
@@ -90,6 +119,7 @@ pqContourPanel::pqContourPanel(pqProxy* object_proxy, QWidget* p) :
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
   panel_layout->addWidget(group1);
   panel_layout->addWidget(group2);
+  panel_layout->addWidget(locator);
   panel_layout->addStretch();
 
   connect(this->propertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));

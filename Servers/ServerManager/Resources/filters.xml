@@ -4500,6 +4500,22 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
+     
+     <!-- incremental point locator begin -->
+     <ProxyProperty name="Locator" command="SetLocator"
+       label="Point Merge Method">
+       <ProxyGroupDomain name="groups">
+         <Group name="incremental_point_locators" />
+       </ProxyGroupDomain>
+       <ProxyListDomain name="proxy_list">
+         <Proxy group="incremental_point_locators" name="MergePoints" />
+         <Proxy group="incremental_point_locators" name="IncrementalOctreeMergePoints" />
+       </ProxyListDomain>
+       <Documentation>
+         This property specifies an incremental point locator for merging duplicate / coincident points.
+       </Documentation>
+     </ProxyProperty>
+     <!-- incremental point locator end -->
    <!-- End Contour -->
    </SourceProxy>
 
