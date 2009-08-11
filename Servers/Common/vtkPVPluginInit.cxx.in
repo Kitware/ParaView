@@ -32,13 +32,13 @@
 // entry point to get Plugin name a string
 C_EXPORT char* C_DECL ParaViewPluginName()
 {
-  return "@PLUGIN_NAME@";
+  return (char*)"@PLUGIN_NAME@";
 }
 
 // entry point to get Plugin version as a string
 C_EXPORT char* C_DECL ParaViewPluginVersion()
 {
-  return "@PLUGIN_VERSION@";
+  return (char*)"@PLUGIN_VERSION@";
 }
 
 // entry point to get PluginRequiredOnServer as an int 
@@ -57,7 +57,7 @@ C_EXPORT int ParaViewPluginRequiredOnClient()
 // entry point to get Plugin-Depended-Plugins as a string
 C_EXPORT char* ParaViewPluginRequiredPlugins()
 {
-  return "@PLUGIN_REQUIRED_PLUGINS@";
+  return (char*)"@PLUGIN_REQUIRED_PLUGINS@";
 }
 #endif
 
