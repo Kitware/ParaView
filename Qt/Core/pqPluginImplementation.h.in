@@ -48,12 +48,12 @@ public:
   @PLUGIN_NAME@Plugin();
   ~@PLUGIN_NAME@Plugin();
   virtual QObjectList interfaces();
-  virtual char* ParaViewPluginName();
-  virtual char* ParaViewPluginVersion();  
+  virtual const char* ParaViewPluginName();
+  virtual const char* ParaViewPluginVersion();  
   virtual int ParaViewPluginRequiredOnServer();
   virtual int ParaViewPluginRequiredOnClient();
 #if @HAVE_REQUIRED_PLUGINS@  
-  virtual char* ParaViewPluginRequiredPlugins();
+  virtual const char* ParaViewPluginRequiredPlugins();
 #endif
   
 private:

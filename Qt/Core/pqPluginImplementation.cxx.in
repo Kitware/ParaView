@@ -58,15 +58,15 @@ QObjectList @PLUGIN_NAME@Plugin::interfaces()
 }
 
 // entry point to get Plugin name a string
-char* @PLUGIN_NAME@Plugin::ParaViewPluginName()
+const char* @PLUGIN_NAME@Plugin::ParaViewPluginName()
 {
-  return (char*)"@PLUGIN_NAME@";
+  return "@PLUGIN_NAME@";
 }
 
 // entry point to get Plugin version as a string
-char* @PLUGIN_NAME@Plugin::ParaViewPluginVersion()
+const char* @PLUGIN_NAME@Plugin::ParaViewPluginVersion() 
 {
-  return (char*)"@PLUGIN_VERSION@";
+  return "@PLUGIN_VERSION@";
 }
 
 // entry point to get PluginRequiredOnServer as an int 
@@ -83,9 +83,9 @@ int @PLUGIN_NAME@Plugin::ParaViewPluginRequiredOnClient()
 
 #if @HAVE_REQUIRED_PLUGINS@
 // entry point to get Plugin-Depended-Plugins as a string
-char* @PLUGIN_NAME@Plugin::ParaViewPluginRequiredPlugins()
+const char* @PLUGIN_NAME@Plugin::ParaViewPluginRequiredPlugins()
 {
-  return (char*)"@PLUGIN_REQUIRED_PLUGINS@";
+  return "@PLUGIN_REQUIRED_PLUGINS@";
 }
 #endif
 
