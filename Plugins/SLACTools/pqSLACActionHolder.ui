@@ -124,6 +124,18 @@
     <string>Toggle the Background Between Black and White</string>
    </property>
   </action>
+  <action name="actionShowStandardViewpoint">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/XPlusSideways.png</normaloff>:/SLACTools/Icons/XPlusSideways.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Standard Viewpoint</string>
+   </property>
+   <property name="toolTip">
+    <string>Position the camera in a position convienient to see the entire mesh.</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>

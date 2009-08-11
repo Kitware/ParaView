@@ -110,6 +110,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
                    this, SLOT(createPlotOverZ()));
   QObject::connect(this->actionToggleBackgroundBW(), SIGNAL(triggered(bool)),
                    this, SLOT(toggleBackgroundBW()));
+  QObject::connect(this->actionShowStandardViewpoint(), SIGNAL(triggered(bool)),
+                   this, SLOT(showStandardViewpoint()));
 
   this->checkActionEnabled();
 }
@@ -164,6 +166,11 @@ QAction *pqSLACManager::actionPlotOverZ()
 QAction *pqSLACManager::actionToggleBackgroundBW()
 {
   return this->Internal->Actions.actionToggleBackgroundBW;
+}
+
+QAction *pqSLACManager::actionShowStandardViewpoint()
+{
+  return this->Internal->Actions.actionShowStandardViewpoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -296,6 +303,8 @@ void pqSLACManager::showDataLoadManager()
                    this, SLOT(checkActionEnabled()));
   QObject::connect(dialog, SIGNAL(createdPipeline()),
                    this, SLOT(showEField()));
+  QObject::connect(dialog, SIGNAL(createdPipeline()),
+                   this, SLOT(showStandardViewpoint()));
   dialog->show();
 }
 
@@ -712,4 +721,15 @@ void pqSLACManager::toggleBackgroundBW()
 
   viewProxy->UpdateVTKObjects();
   view->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::showStandardViewpoint()
+{
+  pqRenderView *view = qobject_cast<pqRenderView*>(this->getMeshView());
+  if (view)
+    {
+    view->resetViewDirection(1, 0, 0,
+                             0, 1, 0);
+    }
 }
