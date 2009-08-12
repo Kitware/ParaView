@@ -32,18 +32,37 @@
 #define C_EXPORT extern "C"
 #endif
 
-
 // entry point to get Plugin name a string
-C_EXPORT char* C_DECL ParaViewPluginName()
+C_EXPORT const char* C_DECL ParaViewPluginName()
 {
   return "@PLUGIN_NAME@";
 }
 
 // entry point to get Plugin version as a string
-C_EXPORT char* C_DECL ParaViewPluginVersion()
+C_EXPORT const char* C_DECL ParaViewPluginVersion()
 {
   return "@PLUGIN_VERSION@";
 }
+
+// entry point to get PluginRequiredOnServer as an int 
+C_EXPORT int ParaViewPluginRequiredOnServer()
+{
+  return @PLUGIN_REQUIRED_ON_SERVER@;
+}
+
+// entry point to get PluginRequiredOnClient as an int 
+C_EXPORT int ParaViewPluginRequiredOnClient()
+{
+  return @PLUGIN_REQUIRED_ON_CLIENT@;
+}
+
+#if @HAVE_REQUIRED_PLUGINS@
+// entry point to get Plugin-Depended-Plugins as a string
+C_EXPORT const char* ParaViewPluginRequiredPlugins()
+{
+  return "@PLUGIN_REQUIRED_PLUGINS@";
+}
+#endif
 
 namespace {
   class StaticInitPythonSource
