@@ -741,7 +741,8 @@ QString pqPluginManager::getPluginSettingsKey(vtkPVPluginInformation* plInfo)
     {
     plSettingKey = plInfo->GetServerURI() ? plInfo->GetServerURI() : "builtin:";
     plSettingKey.append("###").append(plInfo->GetFileName()).append("###").append(
-      QString::number(plInfo->GetAutoLoad()));
+      QString::number(plInfo->GetAutoLoad())).append("###").append(
+      plInfo->GetPluginName()).append("###").append(plInfo->GetPluginVersion());
     }
   
   return plSettingKey;
@@ -750,18 +751,22 @@ QString pqPluginManager::getPluginSettingsKey(vtkPVPluginInformation* plInfo)
 //-----------------------------------------------------------------------------
 void pqPluginManager::processPluginSettings(QString& plSettingKey)
 {
-  QRegExp rx("(.+)###(.+)###(\\d)$");
+  QRegExp rx("(.+)###(.+)###(\\d)###(.+)###(.+)$");
   if(rx.indexIn(plSettingKey)==0)
     {
     QString serverURI = rx.cap(1);
     QString fileName = rx.cap(2);
     int autoLoad = rx.cap(3).toInt();
+    QString pluginName = rx.cap(4);
+    QString pluginVersion = rx.cap(5);
     if(!this->getExistingExtensionByFileName(serverURI, fileName))
       {
       VTK_CREATE(vtkPVPluginInformation, pluginInfo);
       pluginInfo->SetServerURI(serverURI.toAscii().constData());
       pluginInfo->SetFileName(fileName.toAscii().constData());
       pluginInfo->SetAutoLoad(autoLoad>0 ? 1 : 0);
+      pluginInfo->SetPluginName(pluginName.toAscii().constData());
+      pluginInfo->SetPluginVersion(pluginVersion.toAscii().constData());
       this->addExtension(pluginInfo->GetServerURI(), pluginInfo);
       }
     } 
