@@ -130,5 +130,32 @@
 
     </SourceProxy> <!-- PlaneGlyphs -->
 
+    <SourceProxy name="TemporalRanges" class="vtkTemporalRanges"
+                 label="Temporal Ranges">
+      <Documentation long_help="Internal filter for finding information about ranges over time."
+                     short_help="Find ranges for all time.">
+        Internal filter for computing the ranges of fields over all time steps.
+      </Documentation>
+
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+        <Documentation>
+          The input, which should be defined over time to make things
+          interesting.
+        </Documentation>
+      </InputProperty>
+
+      <Hints>
+        <View type="SpreadSheetView" />
+      </Hints>
+
+    </SourceProxy> <!-- TemporalRanges -->
+
   </ProxyGroup> <!-- filters -->
 </ServerManagerConfiguration>
