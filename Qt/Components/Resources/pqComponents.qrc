@@ -240,5 +240,6 @@
         <file>Icons/pqZoomToSelection24.png</file>
         <file>Icons/SplitViewHorizontal.png</file>
         <file>Icons/SplitViewVertical.png</file>
+        <file>Icons/warning.png</file>
     </qresource>
 </RCC>

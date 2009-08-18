@@ -118,7 +118,10 @@ public:
   void savePluginSettings(bool clearFirst = true);
   // check whether the plugin is ready to run.
   bool isPluginFuntional(vtkPVPluginInformation* plInfo, bool remote);
-
+  // exclude an extension from being saved with settings.
+  void removePlugin(pqServer* server, const QString& lib, 
+    bool remote=true);
+  
 signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);

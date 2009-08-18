@@ -34,12 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPluginDialog_h
 
 #include <QDialog>
+#include <QPointer>
 #include "pqComponentsExport.h"
 #include "ui_pqPluginDialog.h"
-#include "vtkSmartPointer.h"
 
 class QTreeWidget;
 class QTreeWidgetItem;
+class QPushButton;
 class pqServer;
 class vtkPVPluginInformation;
 
@@ -59,12 +60,13 @@ public slots:
   void loadRemotePlugin();
   
 protected slots:
-  void loadRecentRemotePlugin(int idx);
-  void loadRecentLocalPlugin(int idx);
   void onPluginItemChanged(QTreeWidgetItem*, int);
+  void onRefresh();
   void refresh();
   void onLoadSelectedRemotePlugin();
   void onLoadSelectedLocalPlugin();
+  void onRemoveSelectedRemotePlugin();
+  void onRemoveSelectedLocalPlugin();
   void onRemoteSelectionChanged();
   void onLocalSelectionChanged();
   void resizeColumn(QTreeWidgetItem*);
@@ -74,6 +76,7 @@ protected:
   void refreshRemote();
   QString loadPlugin(pqServer* server, bool remote);
   QString loadPlugin(pqServer* server, const QString& file, bool remote);
+  void removePlugin(pqServer* server, const QString& file, bool remote);
   
   void setupTreeWidget(QTreeWidget* pluginTree);
   void populatePluginTree(QTreeWidget* pluginTree,
@@ -84,13 +87,17 @@ protected:
   void addInfoNodes(
     QTreeWidgetItem* pluginNode, vtkPVPluginInformation* plInfo, bool remote);
   vtkPVPluginInformation* getPluginInfo(QTreeWidgetItem* pluginNode)    ;
-  void updateContextAction(QTreeWidget*, QAction* loadAction);
+  void updateEnableState(QTreeWidget*, QPushButton* removeButton, QPushButton* loadButton);
   void loadSelectedPlugins(QList<QTreeWidgetItem*> selItems,
     pqServer* server, bool remote);
+  void removeSelectedPlugins(QList<QTreeWidgetItem*> selItems,
+    pqServer* server, bool remote);
   QString getStatusText(vtkPVPluginInformation* plInfo);
-      
-  pqServer* Server;
 
+private:      
+  
+  pqServer* Server;
+  bool LoadingMultiplePlugins;
 };
 
 #endif

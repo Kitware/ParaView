@@ -60,7 +60,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.2");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.3");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -99,6 +99,12 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(const char* filename)
   if(localInfo->GetLoaded())
     {
     this->ProcessPluginInfo(loader);
+    }
+  else if(!localInfo->GetError())
+    {
+    vtkstd::string loadError = filename;
+    loadError.append(", is not a Paraview server manager plugin!");
+    localInfo->SetError(loadError.c_str());
     }
     
   this->UpdatePluginMap(serverURI, localInfo);   
@@ -147,6 +153,12 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
     if(localInfo->GetLoaded())
       {
       this->ProcessPluginInfo(pxy);
+      }
+    else if(!localInfo->GetError())
+      {
+      vtkstd::string loadError = filename;
+      loadError.append(", is not a Paraview server manager plugin!");
+      localInfo->SetError(loadError.c_str());
       }
     this->UpdatePluginMap(serverURI, localInfo);
     pxy->UnRegister(NULL);

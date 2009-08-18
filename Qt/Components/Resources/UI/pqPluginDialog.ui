@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>662</width>
-    <height>390</height>
+    <width>675</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,10 @@
       <string>Remote Plugins</string>
      </property>
      <layout class="QGridLayout">
-      <item row="2" column="0">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <item row="2" column="2">
        <spacer>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -49,20 +52,16 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="loadRemote">
-        <property name="text">
-         <string>Load Remote Plugin ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" rowspan="2" colspan="2">
+      <item row="0" column="0" rowspan="2" colspan="5">
        <widget class="QTreeWidget" name="remotePlugins">
         <property name="contextMenuPolicy">
-         <enum>Qt::ActionsContextMenu</enum>
+         <enum>Qt::NoContextMenu</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <column>
          <property name="text">
@@ -71,13 +70,31 @@
         </column>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QComboBox" name="RecentRemoteCombo">
-        <item>
-         <property name="text">
-          <string>Recent Remote Plugins...</string>
-         </property>
-        </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="loadRemote">
+        <property name="text">
+         <string>Load New ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="removeRemote">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QPushButton" name="loadSelected_Remote">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Load Selected</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -89,14 +106,10 @@
       <string>Local Plugins</string>
      </property>
      <layout class="QGridLayout">
-      <item row="2" column="1">
-       <widget class="QPushButton" name="loadLocal">
-        <property name="text">
-         <string>Load Local Plugin ...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <item row="3" column="2">
        <spacer>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -109,13 +122,16 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0" rowspan="2" colspan="2">
+      <item row="0" column="0" rowspan="2" colspan="4">
        <widget class="QTreeWidget" name="localPlugins">
         <property name="contextMenuPolicy">
-         <enum>Qt::ActionsContextMenu</enum>
+         <enum>Qt::NoContextMenu</enum>
         </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::ExtendedSelection</enum>
         </property>
         <column>
          <property name="text">
@@ -124,13 +140,31 @@
         </column>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QComboBox" name="RecentLocalCombo">
-        <item>
-         <property name="text">
-          <string>Recent Local Plugins...</string>
-         </property>
-        </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="removeLocal">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QPushButton" name="loadLocal">
+        <property name="text">
+         <string>Load New ...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="loadSelected_Local">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Load Selected</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -147,16 +181,6 @@
     </widget>
    </item>
   </layout>
-  <action name="actionReload_Remote_Plugin">
-   <property name="text">
-    <string>Reload Selected Plugin</string>
-   </property>
-  </action>
-  <action name="actionReload_Local_Plugin">
-   <property name="text">
-    <string>Reload Selected Plugin</string>
-   </property>
-  </action>
  </widget>
  <resources/>
  <connections>

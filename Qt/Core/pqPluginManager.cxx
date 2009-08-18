@@ -110,11 +110,12 @@ public:
         plInfo->Delete();
         }
       }
+    this->Extensions.clear();
     }
   QObjectList Interfaces;
+  // Map <ServerURI, PluginInfo> for all the plugins loaded or unloaded
   QMultiMap<QString, vtkPVPluginInformation* > Extensions;
   QObjectList ExtraInterfaces;
-  
   vtkSmartPointer<vtkSMPluginManager> SMPluginMananger;
   vtkSmartPointer<vtkEventQtSlotConnect> SMPluginManangerConnect;
   bool IsCurrentServerRemote;
@@ -189,7 +190,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
     {
     success = LOADED;
     }
-    
+
   return success;
 }
 
@@ -206,14 +207,13 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
     if(QResource::registerResource(lib))
       {
       success = LOADED;
-//      pluginInfo->SetFileName(lib.toAscii().constData());
       pluginInfo->SetLoaded(1);
       this->addExtension(NULL, pluginInfo);
       emit this->guiExtensionLoaded();
       }
     else
       {
-      error = "Unable to register resource";
+      error = "Unable to register resource on client.";
       }
     }
   else if(fi.suffix() == "xml")
@@ -225,6 +225,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
   
       vtkSMProxyManager::GetProxyManager()->LoadConfigurationXML(
         dat.data());
+      //        pluginInfo->SetFileName(lib.toAscii().constData());
       pluginInfo->SetLoaded(1);
       this->addExtension(NULL, pluginInfo);
       success = LOADED;
@@ -232,7 +233,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
       }
     else
       {
-      error = "Unable to open " + lib;
+      error = "Unable to open client plugin, " + lib;
       }
     }
   else
@@ -246,7 +247,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
         {
         pqpluginObject->setParent(this);  // take ownership to clean up later
         success = LOADED;
-        pluginInfo->SetFileName(lib.toAscii().constData());
+//        pluginInfo->SetFileName(lib.toAscii().constData());
         pluginInfo->SetLoaded(1);
         this->addExtension(NULL, pluginInfo);
         emit this->guiExtensionLoaded();
@@ -260,7 +261,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
         }
       else
         {
-        error = "This is not a ParaView Client Plugin.";
+        error = lib + ", is not a ParaView Client Plugin.";
         qplugin.unload();
         }
       }
@@ -270,6 +271,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
       }
     }
 
+  // We still want the plugin info even the plugin can
   if(!pluginInfo->GetLoaded() && !error.isEmpty())
     {
     QString loadError(error);
@@ -278,7 +280,10 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
       loadError.append("\n").append(pluginInfo->GetError());
       }
     pluginInfo->SetError(loadError.toAscii().constData());
+    this->addExtension(NULL, pluginInfo);
+    emit this->pluginInfoUpdated();
     }
+
   return success;
 }
 
@@ -353,9 +358,11 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   LoadStatus success1 = NOTLOADED;
   LoadStatus success2 = NOTLOADED;
 
+  pqServer* realServer = server && server->isRemote() ? server : NULL;
+  
   // check if it is already loaded
   vtkPVPluginInformation* existingPlugin = 
-    this->getExistingExtensionByFileName(remote ? server : NULL, lib);
+    this->getExistingExtensionByFileName(remote ? realServer : NULL, lib);
   if(existingPlugin && existingPlugin->GetLoaded())
     {
     return ALREADYLOADED;
@@ -365,9 +372,9 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   VTK_CREATE(vtkPVPluginInformation, pluginInfo);
   
   success1 = this->loadServerExtension(
-    server, lib, pluginInfo, remote);
+    realServer, lib, pluginInfo, remote);
      
-  if(!server || !(server->isRemote()) || !remote)
+  if(!realServer || !remote)
     {
     // check if this plugin has gui stuff in it
     success2 = loadClientExtension(lib, pluginInfo);
@@ -389,6 +396,20 @@ pqPluginManager::LoadStatus pqPluginManager::loadExtension(
   else
     {
     return LOADED;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::removePlugin(
+  pqServer* server, const QString& lib, bool remote)
+{
+  vtkPVPluginInformation* existingPlugin = 
+  this->getExistingExtensionByFileName(remote ? server : NULL, lib);
+  if(existingPlugin)
+    {
+    this->Internal->Extensions.remove(
+      QString(existingPlugin->GetServerURI()), existingPlugin);
+    existingPlugin->Delete();
     }
 }
 
@@ -694,6 +715,10 @@ void pqPluginManager::onSMLoadPluginInvoked(
     {
     emit this->serverManagerExtensionLoaded();
     }
+  else
+    {
+    emit this->pluginInfoUpdated();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -839,7 +864,7 @@ bool pqPluginManager::isPluginFuntional(
           NULL, QString(plInfo->GetFileName()));
       if(!clientPlugin || !clientPlugin->GetLoaded())
         {
-        plInfo->SetError("Required on Client!");
+        plInfo->SetError("warning: it is also required on client! \n Note for developers: If this plugin is only required on server, add REQUIRED_ON_SERVER as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");
         return false;
         }
       }
@@ -851,7 +876,7 @@ bool pqPluginManager::isPluginFuntional(
           QString(plInfo->GetFileName()));
       if(!serverPlugin || !serverPlugin->GetLoaded())
         {
-        plInfo->SetError("Required on Server!");
+        plInfo->SetError("warning: it is also required on server! \n Note for developers: If this plugin is only required on client, add REQUIRED_ON_CLIENT as an argument when calling ADD_PARAVIEW_PLUGIN in CMakelist.txt");
         return false;
         }
       }
@@ -859,7 +884,7 @@ bool pqPluginManager::isPluginFuntional(
     
   if(!this->areRequiredPluginsFunctional(plInfo, remote))
     {
-    plInfo->SetError("Missing depended plugins!");
+    plInfo->SetError("Missing required plugins!");
     return false;
     }
   return true;    
