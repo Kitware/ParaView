@@ -2089,7 +2089,8 @@ def LoadPlugin(filename,  remote=True, connection=None):
             LoadXML(f.read())
         except RuntimeError:
             raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
-
+    else:
+        updateModules()
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """

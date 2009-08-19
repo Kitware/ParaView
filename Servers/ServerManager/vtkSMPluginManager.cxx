@@ -32,6 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLParser.h"
 #include <vtkstd/set>
+#include <vtkstd/vector>
 
 class vtkSMPluginManager::vtkSMPluginManagerInternals
 {
@@ -60,7 +61,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.4");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.5");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -167,6 +168,42 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
     }
 
   return pluginInfo;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPluginManager::RemovePlugin(
+  const char* serverURI, const char* filename)
+{
+  if(!serverURI || !(*serverURI) || !filename || !(*filename))
+    {
+    return;
+    }
+
+  vtkSMPluginManagerInternals::ServerPluginsMap::iterator it = 
+     this->Internal->Server2PluginsMap.find(serverURI);
+  if( it != this->Internal->Server2PluginsMap.end())
+    {
+    if(filename && *filename)
+      {
+      bool found = false;
+      vtkstd::vector<vtkPVPluginInformation* >::iterator infoIt = 
+        it->second.begin();
+      for(; infoIt != it->second.end(); infoIt++)
+        {
+        if((*infoIt)->GetFileName() && !strcmp(filename, (*infoIt)->GetFileName()))
+          {
+          found = true;
+          break;
+          }
+        }
+
+      if(found)
+        {
+        (*infoIt)->Delete();
+        it->second.erase(infoIt);
+        }
+      }
+    }
 }
 
 //---------------------------------------------------------------------------

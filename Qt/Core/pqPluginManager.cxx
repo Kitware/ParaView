@@ -82,6 +82,8 @@ public:
     {
     this->IsCurrentServerRemote = false;
     this->NeedUpdatePluginInfo = false;
+    this->SMPluginMananger = NULL;
+    this->SMPluginManangerConnect = NULL;
     }
   ~pqPluginManagerInternal()
     {    
@@ -116,8 +118,8 @@ public:
   // Map <ServerURI, PluginInfo> for all the plugins loaded or unloaded
   QMultiMap<QString, vtkPVPluginInformation* > Extensions;
   QObjectList ExtraInterfaces;
-  vtkSmartPointer<vtkSMPluginManager> SMPluginMananger;
-  vtkSmartPointer<vtkEventQtSlotConnect> SMPluginManangerConnect;
+  vtkSMPluginManager* SMPluginMananger;
+  vtkEventQtSlotConnect* SMPluginManangerConnect;
   bool IsCurrentServerRemote;
   bool NeedUpdatePluginInfo;
 };
@@ -129,7 +131,7 @@ pqPluginManager::pqPluginManager(QObject* p)
   this->Internal = new pqPluginManagerInternal();
   this->Internal->SMPluginMananger = 
     vtkSMObject::GetApplication()->GetPluginManager();
-  this->Internal->SMPluginManangerConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->SMPluginManangerConnect = vtkEventQtSlotConnect::New();
   this->Internal->SMPluginManangerConnect->Connect(
       this->Internal->SMPluginMananger, vtkSMPluginManager::LoadPluginInvoked,
       this, 
@@ -151,7 +153,7 @@ pqPluginManager::~pqPluginManager()
 {
   this->savePluginSettings();
   this->Internal->SMPluginManangerConnect->Disconnect();
-  // this->Internal->SMPluginManangerConnect->Delete();
+  this->Internal->SMPluginManangerConnect->Delete();
   delete this->Internal;
 }
 
@@ -409,6 +411,8 @@ void pqPluginManager::removePlugin(
     {
     this->Internal->Extensions.remove(
       QString(existingPlugin->GetServerURI()), existingPlugin);
+    this->Internal->SMPluginMananger->RemovePlugin(
+      existingPlugin->GetServerURI(), existingPlugin->GetFileName());
     existingPlugin->Delete();
     }
 }
