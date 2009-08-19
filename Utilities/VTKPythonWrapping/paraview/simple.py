@@ -521,10 +521,15 @@ def LoadXML(xmlstring, ns=None):
 
 def LoadPlugin(filename, remote=True, ns=None):
     """Loads a ParaView plugin and updates this module with new constructors
-    if any. If you loaded the simple module with from paraview.simple import *,
-    make sure to pass globals() as the second arguments:
-    LoadPlugin("myplugin", globals())
+    if any. The remote argument (default to True) is to specify whether 
+    the plugin will be loaded on client (remote=False) or on server (remote=True).
+    If you loaded the simple module with from paraview.simple import *,
+    make sure to pass globals() as an argument:
+    LoadPlugin("myplugin", False, globals()), to load on client;
+    LoadPlugin("myplugin", True, globals()), to load on server; 
+    LoadPlugin("myplugin", ns=globals()), to load on server.
     Otherwise, the new functions will not appear in the global namespace."""
+    
     if not ns:
         ns = globals()
     servermanager.LoadPlugin(filename, remote)

@@ -60,7 +60,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.3");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.4");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -74,7 +74,7 @@ vtkSMPluginManager::~vtkSMPluginManager()
 }
 
 //-----------------------------------------------------------------------------
-vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(const char* filename)
+vtkPVPluginInformation* vtkSMPluginManager::LoadLocalPlugin(const char* filename)
 {
   if(!filename || !(*filename))
     {

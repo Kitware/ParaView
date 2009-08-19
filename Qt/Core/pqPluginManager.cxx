@@ -178,7 +178,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadServerExtension(
     }
   else
     {
-    smPluginInfo = this->Internal->SMPluginMananger->LoadPlugin(lib.toAscii().constData());
+    smPluginInfo = this->Internal->SMPluginMananger->LoadLocalPlugin(lib.toAscii().constData());
     }
     
   if(smPluginInfo)
