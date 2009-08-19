@@ -63,7 +63,17 @@ protected:
   vtkTemporalRanges();
   ~vtkTemporalRanges();
 
+  int CurrentTimeIndex;
+
   virtual int FillInputPortInformation(int port, vtkInformation *info);
+
+  virtual int RequestInformation(vtkInformation *,
+                                 vtkInformationVector **,
+                                 vtkInformationVector*);
+
+  virtual int RequestUpdateExtent(vtkInformation *,
+                                  vtkInformationVector **,
+                                  vtkInformationVector *);
 
   virtual int RequestData(vtkInformation *,
                           vtkInformationVector **,
@@ -76,6 +86,8 @@ protected:
   virtual void AccumulateDataSet(vtkDataSet *input, vtkTable *output);
   virtual void AccumulateFields(vtkFieldData *fields, vtkTable *output);
   virtual void AccumulateArray(vtkDataArray *field, vtkTable *output);
+
+  virtual void AccumulateTable(vtkTable *source, vtkTable *target);
 
   virtual vtkDoubleArray *GetColumn(vtkTable *table, const char *name,
                                     int component);

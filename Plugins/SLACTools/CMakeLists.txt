@@ -15,6 +15,7 @@ SET(SM_XML
   )
 
 SET(SM_SRC
+  vtkPTemporalRanges.cxx
   vtkSLACPlaneGlyphs.cxx
   vtkSamplePlaneSource.cxx
   vtkTemporalRanges.cxx

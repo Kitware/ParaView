@@ -130,7 +130,7 @@
 
     </SourceProxy> <!-- PlaneGlyphs -->
 
-    <SourceProxy name="TemporalRanges" class="vtkTemporalRanges"
+    <SourceProxy name="TemporalRanges" class="vtkPTemporalRanges"
                  label="Temporal Ranges">
       <Documentation long_help="Internal filter for finding information about ranges over time."
                      short_help="Find ranges for all time.">
