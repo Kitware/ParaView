@@ -94,6 +94,10 @@ public:
   int Compare(vtkPVPluginInformation *info);
 
   // Description:
+  // Merge another information object.
+  virtual void AddInformation(vtkPVInformation*);
+
+  // Description:
   // Make a deep copy of the info object.
   void DeepCopy(vtkPVPluginInformation *info);
 
