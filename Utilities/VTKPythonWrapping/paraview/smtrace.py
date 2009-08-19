@@ -3,7 +3,7 @@ import simple
 import servermanager
 
 
-class trace_globals(): pass
+class trace_globals: pass
 def reset_trace_observer():
   trace_globals.observer = servermanager.vtkSMPythonTraceObserver()
   trace_globals.observer_active = False
@@ -29,7 +29,7 @@ reset_trace_globals()
 def pyvariable_from_proxy_name(proxy_name):
   return servermanager._make_name_valid(proxy_name.replace(".", "_"))
 
-class proxy_trace_info():
+class proxy_trace_info:
   def __init__(self, proxy, proxyGroup, proxyName):
     self.Proxy = proxy
     self.Group = proxyGroup
@@ -40,7 +40,7 @@ class proxy_trace_info():
     self.ModifiedProps = dict()
     self.ignore_next_unregister = False
 
-class prop_trace_info():
+class prop_trace_info:
   def __init__(self, proxyTraceInfo, prop):
 
     self.Prop = prop
