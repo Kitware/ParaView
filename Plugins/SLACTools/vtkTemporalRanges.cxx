@@ -44,6 +44,20 @@
 #include <math.h>
 
 //=============================================================================
+// This is not super portable.  We really should be using vtkMath::IsNan.  The
+// only reason we are not is so that we can copy this code to the 3.6 branch of
+// ParaView where that method does not yet exist.  Once we move past that, this
+// section should go away and all instances of isnan should be replaced with
+// vtkMath::IsNan.
+#ifndef isnan
+// This is compiler specific not platform specific: MinGW doesn't need that.
+# if defined(_MSC_VER) || defined(__BORLANDC__)
+#  include <float.h>
+#  define isnan(x) _isnan(x)
+# endif
+#endif
+
+//=============================================================================
 namespace vtkTemporalRangesNamespace{
   const int AVERAGE_ROW = vtkTemporalRanges::AVERAGE_ROW;
   const int MINIMUM_ROW = vtkTemporalRanges::MINIMUM_ROW;
@@ -64,18 +78,15 @@ namespace vtkTemporalRangesNamespace{
 
   inline void AccumulateValue(vtkDoubleArray *column, double value)
   {
-    column->SetValue(AVERAGE_ROW, value + column->GetValue(AVERAGE_ROW));
-    // Note that the condition is set up such that a value of NAN never becomes
-    // minimum or maximum.
-    if (value < column->GetValue(MINIMUM_ROW))
+    if (!isnan(value))
       {
-      column->SetValue(MINIMUM_ROW, value);
+      column->SetValue(AVERAGE_ROW, value + column->GetValue(AVERAGE_ROW));
+      column->SetValue(MINIMUM_ROW, vtkstd::min(column->GetValue(MINIMUM_ROW),
+                                                value));
+      column->SetValue(MAXIMUM_ROW, vtkstd::max(column->GetValue(MAXIMUM_ROW),
+                                                value));
+      column->SetValue(COUNT_ROW, column->GetValue(COUNT_ROW) + 1);
       }
-    if (value > column->GetValue(MAXIMUM_ROW))
-      {
-      column->SetValue(MAXIMUM_ROW, value);
-      }
-    column->SetValue(COUNT_ROW, column->GetValue(COUNT_ROW) + 1);
   }
 
   inline void AccumulateColumns(vtkDoubleArray *target,
@@ -97,7 +108,7 @@ namespace vtkTemporalRangesNamespace{
 using namespace vtkTemporalRangesNamespace;
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkTemporalRanges, "1.1");
+vtkCxxRevisionMacro(vtkTemporalRanges, "1.2");
 vtkStandardNewMacro(vtkTemporalRanges);
 
 //-----------------------------------------------------------------------------
