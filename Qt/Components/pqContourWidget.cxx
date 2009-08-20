@@ -56,7 +56,6 @@ class pqContourWidget::pqInternals : public Ui::ContourWidget
 {
 public:
   pqPropertyLinks Links;
-//  pqSignalAdaptorTreeWidget* PointsAdaptor;
 };
 
 //-----------------------------------------------------------------------------
@@ -66,8 +65,6 @@ pqContourWidget::pqContourWidget(
 {
   this->Internals = new pqInternals();
   this->Internals->setupUi(this);
-  //this->Internals->PointsAdaptor = new pqSignalAdaptorTreeWidget(
-  //  this->Internals->NodePositions, true);
 
   this->Internals->Visibility->setChecked(this->widgetVisible());
   QObject::connect(this, SIGNAL(widgetVisibilityChanged(bool)),
@@ -84,8 +81,6 @@ pqContourWidget::pqContourWidget(
     SIGNAL(qtWidgetChanged()),
     this, SLOT(render()));
 
-  //QObject::connect(this->Internals->AddPoint, SIGNAL(clicked()),
-  //  this, SLOT(addPoint()));
   QObject::connect(this->Internals->Delete, SIGNAL(clicked()),
     this, SLOT(removeAllNodes()));
 
@@ -117,10 +112,6 @@ void pqContourWidget::createWidget(pqServer* server)
     SIGNAL(toggled(bool)),
     widget, widget->GetProperty("ClosedLoop"));
 
-  //this->Internals->Links.addPropertyLink(
-  //  this->Internals->PointsAdaptor, "values",
-  //  SIGNAL(valuesChanged()),
-  //  widget, widget->GetProperty("NodePositions"));
 }
 
 //-----------------------------------------------------------------------------
@@ -136,24 +127,12 @@ void pqContourWidget::cleanupWidget()
   this->setWidgetProxy(0);
 }
 
-/*
-//-----------------------------------------------------------------------------
-void pqContourWidget::addPoint()
-{
-  QTreeWidgetItem* newItem = this->Internals->PointsAdaptor->growTable();
-  QTreeWidget* tree = this->Internals->NodePositions;
-  tree->setCurrentItem(newItem);
-  // edit the first column.
-  tree->editItem(newItem, 0);
-}
-*/
-
 //-----------------------------------------------------------------------------
 void pqContourWidget::select()
   {
   this->setWidgetVisible(true);
   this->setVisible(true);
-//  this->setLineColor(QColor::fromRgbF(1.0,0.0,1.0));
+  this->setLineColor(QColor::fromRgbF(1.0,0.0,1.0));
   this->Superclass::select();
   this->Superclass::updatePickShortcut(true);
   }
@@ -169,7 +148,7 @@ void pqContourWidget::deselect()
   {
   // this->Superclass::deselect();
   this->setVisible(0);
-//  this->setLineColor(QColor::fromRgbF(1.0,1.0,1.0));
+  this->setLineColor(QColor::fromRgbF(1.0,1.0,1.0));
   this->Superclass::updatePickShortcut(false);
   }
 
