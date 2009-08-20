@@ -1737,26 +1737,35 @@ class Connection(object):
         """Default constructor. Creates a Connection with the given
         ID, all other data members initialized to None."""
         self.ID = connectionId
-        self.Hostname = ""
-        self.Port = 0
+        self.Hostname = None
+        self.Port = None
         self.RSHostname = None
         self.RSPort = None
+        self.Reverse = False
         return
 
     def __eq__(self, other):
         "Returns true if the connection ids are the same."
         return self.ID == other.ID
 
-    def SetHost(self, ds_host, ds_port, rs_host=None, rs_port=None):
-        """Set the hostname of a given connection. Used by Connect()."""
+    def SetHost(self, ds_host=None, ds_port=None, rs_host=None, rs_port=None,
+      reverse=False):
+        """
+          Set the hostname of a given connection. Used by Connect().
+          If all args are None, it's assumed to be a built-in connection i.e.
+          connection scheme = builtin.
+        """
         self.Hostname = ds_host
         self.Port = ds_port
         self.RSHostname = rs_host
         self.RSPort = rs_port
+        self.Reversed = reverse
         return
 
     def __repr__(self):
         """User friendly string representation"""
+        if not self.Hostname:
+           return "Connection (builtin[%d]:)" % self.ID
         if not self.RSHostname:
             return "Connection (%s:%d)" % (self.Hostname, self.Port)
         return "Connection data(%s:%d), render(%s:%d)" % \
@@ -1764,7 +1773,17 @@ class Connection(object):
 
     def GetURI(self):
         """Get URI of the connection"""
-        return "%s" % (self.Hostname)
+        if not self.Hostname or self.Hostname == "builtin":
+            return "builtin:"
+        if self.Reversed:
+            if not self.RSHostname:
+                return "csrc://%s:%d" % (self.Hostname, self.Port)
+            return "cdsrsrc://%s:%d//%s:%d" % (self.Hostname, self.Port,
+              self.RSHostname, self.RSPort)
+        if not self.RSHostname:
+            return "cs://%s:%d" % (self.Hostname, self.Port)
+        return "cdsrs://%s:%d//%s:%d" % (self.Hostname, self.Port,
+          self.RSHostname, self.RSPort)
 
     def IsRemote(self):
         """Returns True if the connection to a remote server, False if
@@ -1803,7 +1822,7 @@ def _connectServer(host, port, rc=False):
                 conn = Connection(cid)
                 break
         pm.StopAcceptingAllConnections()
-    conn.SetHost(host, port)
+    conn.SetHost(host, port, None, None, rc)
     return conn
 
 def _connectDsRs(ds_host, ds_port, rs_host, rs_port):
@@ -2079,10 +2098,10 @@ def LoadPlugin(filename,  remote=True, connection=None):
       serverURI = connection.GetURI()
     else:
       serverURI = "builtin:"
-      
+    
     plinfo = plm.LoadPlugin(filename, connection.ID, serverURI, remote)
     
-    if not plinfo.GetLoaded():
+    if not plinfo or not plinfo.GetLoaded():
         # Assume that it is an xml file
         f = open(filename, 'r')
         try:
@@ -2091,6 +2110,7 @@ def LoadPlugin(filename,  remote=True, connection=None):
             raise RuntimeError, "Problem loading plugin %s: %s" % (filename, pld.GetProperty("Error").GetElement(0))
     else:
         updateModules()
+
 
 def Fetch(input, arg1=None, arg2=None, idx=0):
     """
