@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMNewWidgetRepresentationProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 
@@ -148,6 +149,39 @@ void pqContourWidget::addPoint()
 */
 
 //-----------------------------------------------------------------------------
+void pqContourWidget::select()
+  {
+  this->setWidgetVisible(true);
+  this->setVisible(true);
+//  this->setLineColor(QColor::fromRgbF(1.0,0.0,1.0));
+  this->Superclass::select();
+  this->Superclass::updatePickShortcut(true);
+  }
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::getBounds(double bounds[6]) const
+  {
+  this->getWidgetProxy()->GetBounds(bounds);
+  }
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::deselect()
+  {
+  // this->Superclass::deselect();
+  this->setVisible(0);
+//  this->setLineColor(QColor::fromRgbF(1.0,1.0,1.0));
+  this->Superclass::updatePickShortcut(false);
+  }
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::updateWidgetVisibility()
+{
+  const bool widget_visible = this->widgetVisible();
+  const bool widget_enabled = this->widgetSelected();
+  this->updateWidgetState(widget_visible,  widget_enabled);
+}
+
+//-----------------------------------------------------------------------------
 void pqContourWidget::removeAllNodes()
 {
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
@@ -169,6 +203,19 @@ void pqContourWidget::setPointPlacer(vtkSMProxy* placerProxy)
 void pqContourWidget::setLineInterpolator(vtkSMProxy* interpProxy)
 {
   this->updateRepProperty(interpProxy, "LineInterpolator");
+}
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::setLineColor(const QColor& color)
+{
+  vtkSMProxy* widget = this->getWidgetProxy();
+  vtkSMPropertyHelper(widget,
+    "LineColor").Set(0, color.redF());
+  vtkSMPropertyHelper(widget,
+    "LineColor").Set(1,color.greenF());
+  vtkSMPropertyHelper(widget,
+    "LineColor").Set(2 , color.blueF());
+  widget->UpdateVTKObjects(); 
 }
 
 //-----------------------------------------------------------------------------

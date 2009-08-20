@@ -61,6 +61,17 @@ public:
   // Set the point placer/line interpolator    
   virtual void setPointPlacer(vtkSMProxy*);
   virtual void setLineInterpolator(vtkSMProxy*);
+  
+  /// Activates the widget. Respects the visibility flag.
+  virtual void select();
+  /// Deactivates the widget.
+  virtual void deselect();
+
+  /// Get the bounds of the representation
+  virtual void getBounds(double bounds[6]) const;
+  
+  /// Set the line color
+  virtual void setLineColor(const QColor& color);
 
 protected slots:
   void removeAllNodes();
@@ -68,6 +79,9 @@ protected slots:
 protected:
   /// Internal method to create the widget.
   void createWidget(pqServer*);
+  
+  /// Update the widget visibility according to the WidgetVisible and Selected flags
+  virtual void updateWidgetVisibility();
   
   /// Internal method to cleanup widget.
   void cleanupWidget();

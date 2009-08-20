@@ -2394,6 +2394,14 @@
         include this representation as well as the widget to modify the
         representation.
       </Documentation>
+
+      <DoubleVectorProperty name="LineColor"
+        command="SetLineColor"
+        number_of_elements="3"
+        default_values="1.0 1.0 1.0">
+        <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
+      </DoubleVectorProperty>
+
       <!-- End of OrientedGlyphContourRepresentation -->
     </Proxy>
 
@@ -8711,6 +8719,7 @@
           <Property name="LineInterpolator" />
           <Property name="ClosedLoop" />
           <Property name="ClearAllNodes" />
+          <Property name="LineColor" />
         </ExposedProperties>
       </SubProxy>
 
