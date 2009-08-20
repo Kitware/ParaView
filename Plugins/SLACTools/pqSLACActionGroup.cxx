@@ -34,6 +34,7 @@ pqSLACActionGroup::pqSLACActionGroup(QObject *p) : QActionGroup(p)
     }
 
   this->addAction(manager->actionDataLoadManager());
+  this->addAction(manager->actionTemporalResetRange());
   this->addAction(manager->actionShowEField());
   this->addAction(manager->actionShowBField());
   this->addAction(manager->actionShowParticles());

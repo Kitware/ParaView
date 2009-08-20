@@ -42,6 +42,7 @@ public:
 
   /// Get the action for the respective operation.
   QAction *actionDataLoadManager();
+  QAction *actionTemporalResetRange();
   QAction *actionShowEField();
   QAction *actionShowBField();
   QAction *actionShowParticles();
@@ -71,6 +72,10 @@ public:
   /// Get plotting object.  Returns NULL if that object was never created.
   pqPipelineSource *getPlotFilter();
 
+  /// Get object that computes ranges over time.  Returns NULL if that object
+  /// was never created.
+  pqPipelineSource *getTemporalRanges();
+
   /// Convenience function for destroying a pipeline object and all of its
   /// consumers.
   static void destroyPipelineSourceAndConsumers(pqPipelineSource *source);
@@ -78,6 +83,8 @@ public:
 public slots:
   void showDataLoadManager();
   void checkActionEnabled();
+  void resetRangeTemporal();
+  void showField(QString name);
   void showField(const char *name);
   void showEField();
   void showBField();
@@ -102,6 +109,12 @@ protected:
   /// Updates the plot view (if it is created) with the field shown in the
   /// mesh view.
   virtual void updatePlotField();
+
+  /// Information about currently shown field.
+  QString CurrentFieldName;
+  bool CurrentFieldRangeKnown;
+  double CurrentFieldRange[2];
+  double CurrentFieldAverage;
 
 private:
   pqSLACManager(QObject *p);

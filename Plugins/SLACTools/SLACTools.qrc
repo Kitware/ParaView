@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="/SLACTools" >
     <file>Icons/DataLoadManager.png</file>
+    <file>Icons/ResetRangeTemporal.png</file>
     <file>Icons/EField.png</file>
     <file>Icons/BField.png</file>
     <file>Icons/ShowParticles.png</file>

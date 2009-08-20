@@ -22,11 +22,17 @@
 #include "pqSLACManager.h"
 
 #include "pqSLACDataLoadManager.h"
+#include "vtkTemporalRanges.h"
+
+#include "vtkAlgorithm.h"
+#include "vtkTable.h"
 
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRepresentationStrategy.h"
+#include "vtkSMSourceProxy.h"
 
 #include "pqActiveView.h"
 #include "pqApplicationCore.h"
@@ -94,6 +100,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
+  QObject::connect(this->actionTemporalResetRange(), SIGNAL(triggered(bool)),
+                   this, SLOT(resetRangeTemporal()));
   QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)),
                    this, SLOT(showEField()));
   QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)),
@@ -126,6 +134,11 @@ pqSLACManager::~pqSLACManager()
 QAction *pqSLACManager::actionDataLoadManager()
 {
   return this->Internal->Actions.actionDataLoadManager;
+}
+
+QAction *pqSLACManager::actionTemporalResetRange()
+{
+  return this->Internal->Actions.actionTemporalResetRange;
 }
 
 QAction *pqSLACManager::actionShowEField()
@@ -270,6 +283,11 @@ pqPipelineSource *pqSLACManager::getPlotFilter()
   return this->findPipelineSource("ProbeLine");
 }
 
+pqPipelineSource *pqSLACManager::getTemporalRanges()
+{
+  return this->findPipelineSource("TemporalRanges");
+}
+
 //-----------------------------------------------------------------------------
 static void destroyPortConsumers(pqOutputPort *port)
 {
@@ -316,6 +334,7 @@ void pqSLACManager::checkActionEnabled()
 
   if (!meshReader)
     {
+    this->actionTemporalResetRange()->setEnabled(false);
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
     this->actionSolidMesh()->setEnabled(false);
@@ -325,6 +344,8 @@ void pqSLACManager::checkActionEnabled()
     }
   else
     {
+    this->actionTemporalResetRange()->setEnabled(true);
+
     pqOutputPort *outputPort = meshReader->getOutputPort(0);
     vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
     vtkPVDataSetAttributesInformation *pointFields
@@ -347,6 +368,60 @@ void pqSLACManager::checkActionEnabled()
 }
 
 //-----------------------------------------------------------------------------
+void pqSLACManager::resetRangeTemporal()
+{
+  // Check to see if the ranges are already computed.
+  if (this->getTemporalRanges()) return;
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqObjectBuilder *builder = core->getObjectBuilder();
+  pqUndoStack *stack = core->getUndoStack();
+
+  pqPipelineSource *meshReader = this->getMeshReader();
+  if (!meshReader) return;
+
+  if (stack) stack->beginUndoSet("Compute Ranges Over Time");
+
+  // Turn on reading the internal volume, which is necessary for plotting
+  // through the volume.
+  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+  pqSMAdaptor::setElementProperty(
+                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
+  meshReaderProxy->UpdateVTKObjects();
+  meshReader->updatePipeline();
+
+  // Create the temporal ranges filter.
+  pqPipelineSource *rangeFilter = builder->createFilter("filters",
+                                                        "TemporalRanges",
+                                                        meshReader, 1);
+
+  this->showField(this->CurrentFieldName);
+
+  // We have already pushed everything to the server manager, and I don't want
+  // to bother making representations.  Thus, it is unnecessary to make any
+  // further modifications.
+  meshReader->setModifiedState(pqProxy::UNMODIFIED);
+  rangeFilter->setModifiedState(pqProxy::UNMODIFIED);
+
+  // This is something of a hack to make the pending display manager to realize
+  // that I have already created all necessary displays (actually, I might not
+  // have, but I don't care).  This should go away soon.
+  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
+                                      core->manager("PENDING_DISPLAY_MANAGER"));
+  if (pdmanager)
+    {
+    pdmanager->removePendingDisplayForSource(rangeFilter);
+    }
+
+  if (stack) stack->endUndoSet();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::showField(QString name)
+{
+  this->showField(name.toAscii().data());
+}
+
 void pqSLACManager::showField(const char *name)
 {
   pqApplicationCore *core = pqApplicationCore::instance();
@@ -377,6 +452,8 @@ void pqSLACManager::showField(const char *name)
 
   if (stack) stack->beginUndoSet(QString("Show field %1").arg(name));
 
+  this->CurrentFieldName = name;
+
   // Set the field to color by.
   repr->setColorField(QString("%1 (point)").arg(name));
 
@@ -394,10 +471,49 @@ void pqSLACManager::showField(const char *name)
   pqSMAdaptor::setMultipleElementProperty(lutProxy->GetProperty("RGBPoints"),
                                           RGBPoints);
 
-  // Set the range of the scalars to the current range of the field.
-  double range[2];
-  arrayInfo->GetComponentRange(-1, range);
-  lut->setScalarRange(range[0], range[1]);
+  // Set up range of scalars to best we know of.
+  pqPipelineSource *temporalRanges = this->getTemporalRanges();
+  this->CurrentFieldRangeKnown = (temporalRanges != NULL);
+  if (this->CurrentFieldRangeKnown)
+    {
+    // Retrieve the ranges of data over all time.
+    vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+    vtkSMRepresentationStrategy *delivery
+      = vtkSMRepresentationStrategy::SafeDownCast(
+                          pm->NewProxy("strategies", "ClientDeliveryStrategy"));
+    vtkSMSourceProxy *temporalRangesProxy
+      = vtkSMSourceProxy::SafeDownCast(temporalRanges->getProxy());
+    delivery->AddInput(temporalRangesProxy, NULL);
+    delivery->Update();
+    vtkAlgorithm *alg = vtkAlgorithm::SafeDownCast(
+                                  delivery->GetOutput()->GetClientSideObject());
+    vtkTable *ranges = vtkTable::SafeDownCast(alg->GetOutputDataObject(0));
+    vtkAbstractArray *rangeData = ranges->GetColumnByName(name);
+    if (!rangeData)
+      {
+      QString magName = QString("%1_M").arg(name);
+      rangeData = ranges->GetColumnByName(magName.toAscii().data());
+      }
+
+    this->CurrentFieldRange[0]
+      = rangeData->GetVariantValue(vtkTemporalRanges::MINIMUM_ROW).ToDouble();
+    this->CurrentFieldRange[1]
+      = rangeData->GetVariantValue(vtkTemporalRanges::MAXIMUM_ROW).ToDouble();
+    this->CurrentFieldAverage
+      = rangeData->GetVariantValue(vtkTemporalRanges::AVERAGE_ROW).ToDouble();
+
+    lut->setScalarRange(0.0, 2.0*this->CurrentFieldAverage);
+
+    // Cleanup.
+    delivery->Delete();
+    }
+  else
+    {
+    // Set the range of the scalars to the current range of the field.
+    double range[2];
+    arrayInfo->GetComponentRange(-1, range);
+    lut->setScalarRange(range[0], range[1]);
+    }
 
   lutProxy->UpdateVTKObjects();
 
@@ -432,16 +548,7 @@ void pqSLACManager::updatePlotField()
   if (!repr) return;
   vtkSMProxy *reprProxy = repr->getProxy();
 
-  // Get the name of the field used in drawing the mesh.
-  pqPipelineSource *meshReader = this->getMeshReader();
-  if (!meshReader) return;
-  pqView *meshView = this->getMeshView();
-  if (!meshView) return;
-  pqPipelineRepresentation *meshRepr
-    = qobject_cast<pqPipelineRepresentation *>(
-                                    meshReader->getRepresentation(0, meshView));
-  if (!meshRepr) return;
-  QString fieldName = meshRepr->getColorField(true);
+  QString fieldName = this->CurrentFieldName;
 
   if (fieldName == "Solid Color") fieldName = "efield";
 
@@ -494,6 +601,19 @@ void pqSLACManager::updatePlotField()
   axisTitles << fieldName << "" << "" << "";
   pqSMAdaptor::setMultipleElementProperty(viewProxy->GetProperty("AxisTitle"),
                                           axisTitles);
+
+  if (this->CurrentFieldRangeKnown)
+    {
+    // TODO: fix the y axis by setting its AxisBehavior to 1 and setting up the
+    // appropriate range.
+    }
+  else
+    {
+    QList<QVariant> axisBehavior;
+    axisBehavior << 0 << 0 << 0 << 0;
+    pqSMAdaptor::setMultipleElementProperty(
+                          viewProxy->GetProperty("AxisBehavior"), axisBehavior);
+    }
 
   viewProxy->UpdateVTKObjects();
 

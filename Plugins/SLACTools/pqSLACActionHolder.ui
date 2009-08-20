@@ -25,6 +25,18 @@
     <string>Show a Dialog to Manage Loaded Data</string>
    </property>
   </action>
+  <action name="actionTemporalResetRange">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ResetRangeTemporal.png</normaloff>:/SLACTools/Icons/ResetRangeTemporal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Temporal Reset Range</string>
+   </property>
+   <property name="toolTip">
+    <string>Reads in all the data over all time and uses the information to fix the scaling of the fields to a range that makes sense for all time steps.</string>
+   </property>
+  </action>
   <action name="actionShowEField">
    <property name="icon">
     <iconset resource="SLACTools.qrc">
