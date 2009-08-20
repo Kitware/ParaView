@@ -44,9 +44,11 @@
 #include <vtkRenderedGraphRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSelection.h>
 #include <vtkSelectionNode.h>
 #include <vtkTable.h>
+#include <vtkTextProperty.h>
 #include <vtkTexture.h>
 #include <vtkVariantArray.h>
 #include <vtkViewTheme.h>
@@ -466,6 +468,15 @@ void ClientGraphView::renderInternal()
         }
       }
 
+    this->Implementation->Theme->SetBackgroundColor(
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(0),
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(1),
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(2));
+    this->Implementation->Theme->SetBackgroundColor2(
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(0),
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(1),
+      vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(2));
+
     // Don't reset the camera if the layout is set to PassThrough. 
     // The user may have fixed the layout upstream and doesn't want 
     // a camera reset to occur even if the input data has changed.
@@ -519,7 +530,7 @@ void ClientGraphView::renderInternal()
       rep->SetVertexIconSelectionMode(vtkSMPropertyHelper(proxy, "IconSelectionMode").GetAsInt());
       }
 
-    this->Implementation->View->SetVertexLabelFontSize(
+    this->Implementation->Theme->GetPointTextProperty()->SetFontSize(
       static_cast<int>(vtkSMPropertyHelper(proxy, "VertexLabelFontSize").GetAsDouble()));
 
     this->Implementation->Theme->SetPointSize(
@@ -559,7 +570,7 @@ void ClientGraphView::renderInternal()
     this->Implementation->View->SetEdgeLabelArrayName(
       vtkSMPropertyHelper(proxy, "EdgeLabelArray").GetAsString());
 
-    this->Implementation->View->SetEdgeLabelFontSize(
+    this->Implementation->Theme->GetCellTextProperty()->SetFontSize(
       static_cast<int>(vtkSMPropertyHelper(proxy, "EdgeLabelFontSize").GetAsDouble()));
 
     this->Implementation->Theme->SetLineWidth(
@@ -567,6 +578,40 @@ void ClientGraphView::renderInternal()
 
     this->Implementation->Theme->SetCellOpacity(
       vtkSMPropertyHelper(proxy, "EdgeOpacity").GetAsDouble());
+
+    vtkSMProxyProperty* vlutProp = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("VertexLookupTable"));
+    if (vlutProp->GetNumberOfProxies() > 0)
+      {
+      vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
+        vlutProp->GetProxy(0)->GetClientSideObject());
+      this->Implementation->Theme->SetPointLookupTable(lut);
+      }
+    this->Implementation->Theme->SetScalePointLookupTable(vtkSMPropertyHelper(proxy, "ScaleVertexLookupTable").GetAsInt());
+
+    vtkSMProxyProperty* elutProp = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("EdgeLookupTable"));
+    if (elutProp->GetNumberOfProxies() > 0)
+      {
+      vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
+        elutProp->GetProxy(0)->GetClientSideObject());
+      this->Implementation->Theme->SetCellLookupTable(lut);
+      }
+    this->Implementation->Theme->SetScaleCellLookupTable(vtkSMPropertyHelper(proxy, "ScaleEdgeLookupTable").GetAsInt());
+
+    vtkSMProxyProperty* vtprop = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("VertexTextProperty"));
+    if (vtprop->GetNumberOfProxies() > 0)
+      {
+      vtkTextProperty* tprop = vtkTextProperty::SafeDownCast(
+        vtprop->GetProxy(0)->GetClientSideObject());
+      this->Implementation->Theme->SetPointTextProperty(tprop);
+      }
+
+    vtkSMProxyProperty* etprop = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("EdgeTextProperty"));
+    if (etprop->GetNumberOfProxies() > 0)
+      {
+      vtkTextProperty* tprop = vtkTextProperty::SafeDownCast(
+        etprop->GetProxy(0)->GetClientSideObject());
+      this->Implementation->Theme->SetCellTextProperty(tprop);
+      }
 
     if(vtkSMPropertyHelper(proxy, "EdgeColorByArray").GetAsInt())
       {
@@ -621,6 +666,23 @@ void ClientGraphView::renderInternal()
     }
 
   this->Implementation->View->ApplyViewTheme(this->Implementation->Theme);
+
+  vtkRenderedGraphRepresentation* rep = vtkRenderedGraphRepresentation::SafeDownCast(
+    this->Implementation->View->GetRepresentation());
+
+  // Force the label to hover directly over the vertex point
+  // (or icon if visible).
+  double fontSize = rep->GetVertexLabelTextProperty()->GetFontSize();
+  if (rep->GetVertexIconVisibility())
+    {
+    double iconSize = this->Implementation->View->GetIconSize()[1];
+    rep->GetVertexLabelTextProperty()->SetLineOffset(-iconSize/2 - fontSize/2);
+    }
+  else
+    {
+    double pointSize = this->Implementation->Theme->GetPointSize();
+    rep->GetVertexLabelTextProperty()->SetLineOffset(-pointSize/2 - fontSize/2);
+    }
 
   if(vtkSMPropertyHelper(this->getProxy(),"ZoomToSelection").GetAsInt())
     {

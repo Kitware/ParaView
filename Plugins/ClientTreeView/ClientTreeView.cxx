@@ -288,14 +288,15 @@ void ClientTreeView::renderInternal()
       vtkSMPropertyHelper(proxy, "ColorArray").GetAsString());
 
     vtkSMProxyProperty* lutProp = vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("LookupTable"));
+    vtkSmartPointer<vtkViewTheme> theme = vtkSmartPointer<vtkViewTheme>::New();
     if (lutProp->GetNumberOfProxies() > 0)
       {
       vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
         lutProp->GetProxy(0)->GetClientSideObject());
-      vtkSmartPointer<vtkViewTheme> theme = vtkSmartPointer<vtkViewTheme>::New();
       theme->SetPointLookupTable(lut);
-      this->Implementation->View->ApplyViewTheme(theme);
       }
+    theme->SetScalePointLookupTable(vtkSMPropertyHelper(proxy, "ScaleLookupTable").GetAsInt());
+    this->Implementation->View->ApplyViewTheme(theme);
     }
 
   this->Implementation->View->Update();

@@ -2800,6 +2800,13 @@
         animateable="0">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty name="LineOffset"
+        command="SetLineOffset"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+      </DoubleVectorProperty>
+
       <IntVectorProperty name="Justification"
         command="SetJustification"
         number_of_elements="1"
@@ -2809,6 +2816,18 @@
           <Entry value="0" text="Left"/>
           <Entry value="1" text="Center"/>
           <Entry value="2" text="Right"/>
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="VerticalJustification"
+        command="SetVerticalJustification"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Bottom"/>
+          <Entry value="1" text="Center"/>
+          <Entry value="2" text="Top"/>
         </EnumerationDomain>
       </IntVectorProperty>
 

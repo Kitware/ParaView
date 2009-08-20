@@ -81,10 +81,22 @@
       </StringVectorProperty>
       
       <DoubleVectorProperty name="EdgeLabelFontSize" number_of_elements="1" default_values="10"/>
+      
+      <ProxyProperty name="EdgeTextProperty" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+            
+      <ProxyProperty name="AreaTextProperty" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>      
 
       <DoubleVectorProperty name="EdgeColor" number_of_elements="3" default_values="0 0 0"/>
       <DoubleVectorProperty name="AreaColor" number_of_elements="3" default_values="0 0 0"/>
-
+      
       <IntVectorProperty name="EdgeColorByArray" number_of_elements="1" default_values="0">
         <BooleanDomain name="domain"/>
       </IntVectorProperty>
@@ -107,6 +119,26 @@
 
       <DoubleVectorProperty name="ShrinkPercentage" number_of_elements="1" default_values="0.05"/>
      
+      <ProxyProperty name="AreaLookupTable" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <ProxyProperty name="EdgeLookupTable" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty name="ScaleAreaLookupTable" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScaleEdgeLookupTable" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
       <Hints>
         <InheritRepresentationProperties>
           <Property name="LayoutStrategy" />
@@ -140,6 +172,8 @@
       </IntVectorProperty>
       <IntVectorProperty name="LabelPlacementMode" number_of_elements="1" default_values="1">
       </IntVectorProperty>
+      <DoubleVectorProperty name="BackgroundColor" number_of_elements="3" default_values="0.2 0.2 0.4"/>
+      <DoubleVectorProperty name="BackgroundColor2" number_of_elements="3" default_values="0.1 0.1 0.2"/>
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

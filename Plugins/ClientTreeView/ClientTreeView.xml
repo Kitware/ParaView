@@ -27,6 +27,10 @@
         </ProxyGroupDomain>
       </ProxyProperty>
       
+      <IntVectorProperty name="ScaleLookupTable" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
    </SelectionDeliveryRepresentationProxy>
  </ProxyGroup>
 

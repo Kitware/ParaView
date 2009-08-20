@@ -160,6 +160,38 @@
 
       <ProxyProperty name="DomainMap"/>
      
+      <ProxyProperty name="VertexLookupTable" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <ProxyProperty name="EdgeLookupTable" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="lookup_tables"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      
+      <IntVectorProperty name="ScaleVertexLookupTable" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ScaleEdgeLookupTable" number_of_elements="1" default_values="1">
+        <BooleanDomain name="domain"/>
+      </IntVectorProperty>
+
+      <ProxyProperty name="VertexTextProperty" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>      
+
+      <ProxyProperty name="EdgeTextProperty" number_of_elements="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+            
       <Hints>
         <InheritRepresentationProperties>
           <Property name="LayoutStrategy" />
@@ -214,6 +246,8 @@
         number_of_elements="1"
         default_values="0">
       </IntVectorProperty>
+      <DoubleVectorProperty name="BackgroundColor" number_of_elements="3" default_values="0.2 0.2 0.4"/>
+      <DoubleVectorProperty name="BackgroundColor2" number_of_elements="3" default_values="0.1 0.1 0.2"/>
    </ViewProxy>
  </ProxyGroup>
 </ServerManagerConfiguration>

@@ -49,8 +49,10 @@
 #include <vtkPVUpdateSuppressor.h>
 #include <vtkQtTreeModelAdapter.h>
 #include <vtkQtTreeView.h>
+#include <vtkRenderedTreeAreaRepresentation.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkScalarsToColors.h>
 #include <vtkSelectionNode.h>
 #include <vtkSelectionSource.h>
 #include <vtkSliceAndDiceLayoutStrategy.h>
@@ -59,6 +61,7 @@
 #include <vtkSMIdTypeVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyManager.h>
+#include <vtkSMProxyProperty.h>
 #include <vtkSMSelectionDeliveryRepresentationProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
@@ -66,9 +69,9 @@
 #include <vtkSquarifyLayoutStrategy.h>
 #include <vtkStackedTreeLayoutStrategy.h>
 #include <vtkTable.h>
+#include <vtkTextProperty.h>
 #include <vtkTexture.h>
 #include <vtkTree.h>
-#include <vtkRenderedTreeAreaRepresentation.h>
 #include <vtkTreeAreaView.h>
 #include <vtkTreeMapToPolyData.h>
 #include <vtkVariantArray.h>
@@ -122,6 +125,7 @@ public:
     this->Widget->GetInteractor()->EnableRenderOff();
 
     this->HierarchicalGraphTheme.TakeReference(vtkViewTheme::CreateNeonTheme());
+
     this->HierarchicalGraphView = vtkSmartPointer<vtkTreeAreaView>::New();
     this->HierarchicalGraphView->SetInteractor(this->Widget->GetInteractor());
     this->Widget->SetRenderWindow(this->HierarchicalGraphView->GetRenderWindow());
@@ -521,6 +525,15 @@ void ClientTreeAreaView::synchronizeViews()
       this->Implementation->HierarchicalGraphView->SetEdgeLabelArrayName(vtkSMPropertyHelper(tree_proxy, "EdgeLabelArray").GetAsString());
       this->Implementation->HierarchicalGraphView->SetEdgeLabelFontSize(static_cast<int>(vtkSMPropertyHelper(tree_proxy, "EdgeLabelFontSize").GetAsDouble()));
 
+      this->Implementation->HierarchicalGraphTheme->SetBackgroundColor(
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(0),
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(1),
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor").GetAsDouble(2));
+      this->Implementation->HierarchicalGraphTheme->SetBackgroundColor2(
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(0),
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(1),
+        vtkSMPropertyHelper(this->getProxy(), "BackgroundColor2").GetAsDouble(2));
+
       if(vtkSMPropertyHelper(tree_proxy, "EdgeColorByArray").GetAsInt())
         {
         this->Implementation->HierarchicalGraphView->SetColorEdges(true);
@@ -537,6 +550,40 @@ void ClientTreeAreaView::synchronizeViews()
         }
 
       this->Implementation->HierarchicalGraphView->SetBundlingStrength(vtkSMPropertyHelper(tree_proxy, "EdgeBundlingStrength").GetAsDouble());
+
+      vtkSMProxyProperty* vlutProp = vtkSMProxyProperty::SafeDownCast(tree_proxy->GetProperty("AreaLookupTable"));
+      if (vlutProp->GetNumberOfProxies() > 0)
+        {
+        vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
+          vlutProp->GetProxy(0)->GetClientSideObject());
+        this->Implementation->HierarchicalGraphTheme->SetPointLookupTable(lut);
+        }
+      this->Implementation->HierarchicalGraphTheme->SetScalePointLookupTable(vtkSMPropertyHelper(tree_proxy, "ScaleAreaLookupTable").GetAsInt());
+
+      vtkSMProxyProperty* elutProp = vtkSMProxyProperty::SafeDownCast(tree_proxy->GetProperty("EdgeLookupTable"));
+      if (elutProp->GetNumberOfProxies() > 0)
+        {
+        vtkScalarsToColors* lut = vtkScalarsToColors::SafeDownCast(
+          elutProp->GetProxy(0)->GetClientSideObject());
+        this->Implementation->HierarchicalGraphTheme->SetCellLookupTable(lut);
+        }
+      this->Implementation->HierarchicalGraphTheme->SetScaleCellLookupTable(vtkSMPropertyHelper(tree_proxy, "ScaleEdgeLookupTable").GetAsInt());
+
+      vtkSMProxyProperty* vtprop = vtkSMProxyProperty::SafeDownCast(tree_proxy->GetProperty("AreaTextProperty"));
+      if (vtprop->GetNumberOfProxies() > 0)
+        {
+        vtkTextProperty* tprop = vtkTextProperty::SafeDownCast(
+          vtprop->GetProxy(0)->GetClientSideObject());
+        this->Implementation->HierarchicalGraphTheme->SetPointTextProperty(tprop);
+        }
+
+      vtkSMProxyProperty* etprop = vtkSMProxyProperty::SafeDownCast(tree_proxy->GetProperty("EdgeTextProperty"));
+      if (etprop->GetNumberOfProxies() > 0)
+        {
+        vtkTextProperty* tprop = vtkTextProperty::SafeDownCast(
+          etprop->GetProxy(0)->GetClientSideObject());
+        this->Implementation->HierarchicalGraphTheme->SetCellTextProperty(tprop);
+        }
 
       this->Implementation->HierarchicalGraphView->ApplyViewTheme(this->Implementation->HierarchicalGraphTheme);
       }
