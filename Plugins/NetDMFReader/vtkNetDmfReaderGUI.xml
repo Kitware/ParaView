@@ -1,0 +1,4 @@
+<ParaViewReaders>
+  <Reader name="NetDmfReader" extensions="xmn" file_description="NetDMF files">
+  </Reader>
+</ParaViewReaders>

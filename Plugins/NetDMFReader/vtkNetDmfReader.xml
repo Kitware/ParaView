@@ -1,0 +1,54 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+    <SourceProxy name="NetDmfReader" 
+                class="vtkNetDmfReader"
+                label="NETDMF Reader">
+     <Documentation
+       short_help="Read NetDMF data files."
+       long_help="Read NetDMF (Networking Data Model and Format) files.">
+       The NetDMF reader reads files in NetDMF format. The expected file extension is .netdmf. Metadata is stored in the NetDMF file using an XML format, and large attribute arrays are stored in a corresponding HDF5 file. The output may be a directed graph or undirectedgraph.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the NetDMF reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     <DoubleVectorProperty 
+        name="TimestepValues"
+        information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0"
+        information_property="TimestepValues">
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Set the current timestep.
+       </Documentation>
+     </IntVectorProperty>
+     
+   <!-- End NetDmfReader -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

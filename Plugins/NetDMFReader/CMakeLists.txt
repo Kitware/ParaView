@@ -1,0 +1,49 @@
+PROJECT(NetDMFReaderPlugin)
+
+#--------------------------------------------------
+# Find and Use ParaView
+#--------------------------------------------------
+IF (ParaView_SOURCE_DIR)
+  INCLUDE_DIRECTORIES(
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${PARAVIEW_GUI_INCLUDE_DIRS}
+    ${PARAVIEW_KWSYS_INCLUDE_DIRS}
+  )
+ELSE (ParaView_SOURCE_DIR)
+  FIND_PACKAGE(ParaView REQUIRED)
+  INCLUDE(${PARAVIEW_USE_FILE})
+ENDIF (ParaView_SOURCE_DIR)
+
+INCLUDE(${QT_USE_FILE})
+
+# Must Have NetDMF
+FIND_PACKAGE(NetDMF NO_MODULE REQUIRED)
+IF(NetDMF_FOUND)
+
+  INCLUDE_DIRECTORIES(
+    ${VTK_INCLUDE_DIR}
+    ${PARAVIEW_INCLUDE_DIRS}
+    ${NETDMF_INCLUDE_DIRS}
+    )
+  IF(NETDMF_BUILD_MPI)
+    INCLUDE_DIRECTORIES(
+      ${NETDMF_MPI_INCLUDE_PATH})
+  ENDIF(NETDMF_BUILD_MPI)
+
+  LINK_DIRECTORIES(${NETDMF_LIBRARY_DIRS})
+
+  SET( NetDmf_SRCS
+    vtkNetDmfReader.cxx
+    )
+
+  ADD_PARAVIEW_PLUGIN(NetDMFReaderPlugin "1.0"
+    SERVER_MANAGER_XML vtkNetDmfReader.xml 
+    SERVER_MANAGER_SOURCES vtkNetDmfReader.cxx
+    GUI_RESOURCE_FILES vtkNetDmfReaderGUI.xml)
+  
+  TARGET_LINK_LIBRARIES(
+    NetDMFReaderPlugin
+    NetDMF
+    )
+
+ENDIF(NetDMF_FOUND)
