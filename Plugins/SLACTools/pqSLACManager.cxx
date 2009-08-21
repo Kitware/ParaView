@@ -323,6 +323,10 @@ void pqSLACManager::showDataLoadManager()
                    this, SLOT(showEField()));
   QObject::connect(dialog, SIGNAL(createdPipeline()),
                    this, SLOT(showStandardViewpoint()));
+#ifdef AUTO_FIND_TEMPORAL_RANGE
+  QObject::connect(dialog, SIGNAL(createdPipeline()),
+                   this, SLOT(resetRangeTemporal()));
+#endif
   dialog->show();
 }
 

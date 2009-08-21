@@ -34,7 +34,9 @@ pqSLACActionGroup::pqSLACActionGroup(QObject *p) : QActionGroup(p)
     }
 
   this->addAction(manager->actionDataLoadManager());
+#ifndef AUTO_FIND_TEMPORAL_RANGE
   this->addAction(manager->actionTemporalResetRange());
+#endif
   this->addAction(manager->actionShowEField());
   this->addAction(manager->actionShowBField());
   this->addAction(manager->actionShowParticles());
