@@ -604,8 +604,16 @@ void pqSLACManager::updatePlotField()
 
   if (this->CurrentFieldRangeKnown)
     {
-    // TODO: fix the y axis by setting its AxisBehavior to 1 and setting up the
-    // appropriate range.
+    QList<QVariant> axisBehavior;
+    axisBehavior << 1 << 0 << 0 << 0;
+    pqSMAdaptor::setMultipleElementProperty(
+                          viewProxy->GetProperty("AxisBehavior"), axisBehavior);
+
+    QList<QVariant> axisRange;
+    axisRange << this->CurrentFieldRange[0] << this->CurrentFieldRange[1]
+              << 0.0 << 0.0 << 0.0 << 0.0 << 0.0 << 0.0;
+    pqSMAdaptor::setMultipleElementProperty(
+                                viewProxy->GetProperty("AxisRange"), axisRange);
     }
   else
     {
