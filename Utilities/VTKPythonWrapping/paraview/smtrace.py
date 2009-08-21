@@ -250,7 +250,7 @@ def proxy_smproperty_tostring(proxyInfo, propInfo):
 
 def trace_proxy_rename(proxy_info, new_name):
   """ Handle renaming an existing source proxy."""
-  if not proxy_info or proxY_info.Group != "sources": return
+  if not proxy_info or proxy_info.Group != "sources": return
   old_pyvariable = proxy_info.PyVariable
   proxy_info.PyVariable = pyvariable_from_proxy_name(new_name)
   proxy_info.ignore_next_unregister = True
