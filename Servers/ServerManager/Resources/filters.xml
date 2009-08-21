@@ -1989,7 +1989,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
 
   <!-- ==================================================================== -->
    <SourceProxy name="GridConnectivity" class="vtkGridConnectivity"
-      label="Grid Fragment">
+      label="Grid Connectivity">
      <Documentation
        short_help="Parallel connectivity and integration."
        long_help="Mass properties of connected fragments for unstructured grids.">
