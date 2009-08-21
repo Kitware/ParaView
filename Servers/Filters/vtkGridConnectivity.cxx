@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.4");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.5");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -929,7 +929,7 @@ void vtkGridConnectivity::GenerateOutput(
   volumeArray->SetName("Volume");
 
   // Create all of the integration arrays.
-  numArrays = this->CellAttributesIntegration.size();
+  numArrays = static_cast<int>(this->CellAttributesIntegration.size());
   for (int ii = 0; ii < numArrays; ++ii)
     {
     da = this->CellAttributesIntegration[ii];
@@ -1070,7 +1070,7 @@ void vtkGridConnectivity::IntegrateCellVolume(
       *volumePtr++ = 0.0;
       }
     // Resize all of the integration arrays to be the same.
-    int numArrays = this->CellAttributesIntegration.size();
+    int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
     for (int ii = 0; ii < numArrays; ++ii)
       {
       vtkDoubleArray *da = this->CellAttributesIntegration[ii];
@@ -1108,7 +1108,7 @@ void vtkGridConnectivity::IntegrateCellVolume(
     }
 
   // Integrate all of the cell arrays.
-  int numArrays = this->CellAttributesIntegration.size();
+  int numArrays = static_cast<int>(this->CellAttributesIntegration.size());
   for (int ii = 0; ii < numArrays; ++ii)
     {
     vtkDoubleArray* da = this->CellAttributesIntegration[ii];
