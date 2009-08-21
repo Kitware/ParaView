@@ -26,6 +26,8 @@
 #define __vtkGridConnectivity_h
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
+#include "vtkSmartPointer.h" // For ivars
+#include <vtkstd/vector>     // For ivars
 
 class vtkCell;
 class vtkPoints;
@@ -45,7 +47,14 @@ public:
   vtkTypeRevisionMacro(vtkGridConnectivity,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkGridConnectivity *New();
-  
+
+  // Public so templated function can access this method.
+  void IntegrateCellVolume(
+    vtkCell* cell,
+    int fragmentId,
+    vtkUnstructuredGrid* input,
+    vtkIdType cellIndex);
+
 protected:
   vtkGridConnectivity();
   ~vtkGridConnectivity();
@@ -56,8 +65,9 @@ protected:
                           vtkInformationVector** inputVector,
                           vtkInformationVector* outputVector);
 
-  void ExecuteProcess(vtkUnstructuredGrid* inputs[], 
-                      int numberOfInputs);
+  // I had to make this templated for global pointIds.
+  //void ExecuteProcess(vtkUnstructuredGrid* inputs[], 
+  //                    int numberOfInputs);
 
   void GenerateOutput(vtkPolyData* output, vtkUnstructuredGrid* inputs[]);
 
@@ -73,9 +83,16 @@ protected:
   void InitializeFaceHash(vtkUnstructuredGrid** inputs, int numberOfInputs);
   vtkGridConnectivityFaceHash* FaceHash;
 
+  void InitializeIntegrationArrays(
+          vtkUnstructuredGrid** inputs,
+          int numberOfInputs);
+
+
   vtkEquivalenceSet *EquivalenceSet;
   vtkDoubleArray* FragmentVolumes;
-  void IntegrateCellVolume(vtkCell* cell, int fragmentId);
+//BTX
+  vtkstd::vector<vtkSmartPointer<vtkDoubleArray> > CellAttributesIntegration;
+//ETX
   // Temporary structures to help integration.
   vtkPoints* CellPoints;
   vtkIdList* CellPointIds;
@@ -90,7 +107,8 @@ protected:
   void ResolveFaceFragmentIds();
 
   short ProcessId;
-
+  int   GlobalPointIdType;
+  
   void ResolveEquivalentFragments();
   void ResolveProcessesFaces();
   void CollectFacesAndArraysToRootProcess(int* fragmentIdOffsets);

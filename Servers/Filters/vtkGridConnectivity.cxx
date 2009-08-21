@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.3");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.4");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -512,17 +512,177 @@ int vtkGridConnectivity::FillInputPortInformation(
 // Returns 1/true if the input has all of the needed arrays.
 int vtkGridConnectivity::CheckInput(vtkUnstructuredGrid* input)
 {
-  //vtkDataArray* a = input->GetPointData()->GetGlobalIds();
-  vtkIdTypeArray* gloablPtIds = vtkIdTypeArray::SafeDownCast(
-                       input->GetPointData()->GetArray("GlobalNodeId"));
-
-  if (gloablPtIds == 0)
+  vtkDataArray* a = input->GetPointData()->GetGlobalIds();
+  if (a && (a->GetDataType() == VTK_ID_TYPE || a->GetDataType() == VTK_INT))
     {
-    vtkWarningMacro("Missing pedigree node array.");
-    return 0;
+    return 1;
     }
-  return 1;
+  vtkWarningMacro("Missing pedigree node array.");
+  return 0;
 }
+
+//----------------------------------------------------------------------------
+// This method computes partial fragments for a local process.
+// Partial fragments are connected cells that are discovered by a simple
+// pass through the cells (looking at neighbors).  I expect that the number
+// of partial fragments will be close to the number of final fragments.
+// The equivalence set will be used to merge partial fragments that touch.
+// This method also integrates arrays for partial fragments.
+template <class T>
+void vtkGridConnectivityExecuteProcess(
+  vtkGridConnectivity* self,
+  vtkUnstructuredGrid* inputs[],
+  int numberOfInputs,
+  int processId,
+  vtkGridConnectivityFaceHash* faceHash,
+  vtkEquivalenceSet* equivalenceSet,
+  T* globalPtIdPtr)
+{
+  // Essentially a count of the fragment ids we have used so far.
+  // We start counting from 1 so 0 can be a special value used to remove faces.
+  int nextFragmentId = 1;
+
+  // I used to allocate a cell array for fragment ids but
+  // THIS ARRAY WAS NOT NECESSARY.  WE JUST KEEP THE FRAGMENT IDS
+  // IN THE FACE STRUCTURES!
+  // The only issue we would have is that we do not assign the fragment id
+  // unitl after all the faces fragemntId pointser have been set.
+  // The pointer sets the face fragment id after the fact.
+  // We could loop over the faces twice.
+  //int* cellFragments = new int[totalNumberOfCellsInProcess];
+  //int* cellFragmentPtr = cellFragments;
+
+  // Loop through all cells of all inputs adding all faces to hash.
+  // Select fragment id for each cell based on neighbors.  We are hoping that
+  // cell order will be spatial and will not be random.
+  for (int ii = 0; ii < numberOfInputs; ++ii)
+    {
+    vtkDataArray* a = inputs[ii]->GetPointData()->GetGlobalIds();
+    void *ptr = a->GetVoidPointer(0);
+    globalPtIdPtr = static_cast<T*>(ptr);
+    vtkIdType numCells = inputs[ii]->GetNumberOfCells();
+    // The status array is a mask that identifies unused cells.
+    vtkDoubleArray* statusArray = vtkDoubleArray::SafeDownCast(
+                     inputs[ii]->GetCellData()->GetArray("STATUS"));
+    double* statusPtr = 0;
+    if (statusArray)
+      {
+      statusPtr = statusArray->GetPointer(0);
+      }
+    for (int jj = 0; jj < numCells; ++jj)
+      {
+      if (statusPtr == 0 || *statusPtr++ == 0.0)
+        {
+        // Loop through faces of the cell.
+        // This might be an performance bottle neck. (cell api)
+        vtkCell* cell = inputs[ii]->GetCell(jj);
+        int numFaces = cell->GetNumberOfFaces();
+        vtkGridConnectivityFace* newFaces[VTK_MAX_FACES_PER_CELL];
+        int numNewFaces = 0;
+        // As we create / find faces, keep track of the smallest fragment id.
+        int minFragmentId = nextFragmentId;
+        for (int kk = 0; kk < numFaces; ++kk)
+          {
+          vtkGridConnectivityFace* face;
+          vtkCell* faceCell = cell->GetFace(kk);
+          vtkIdType numPoints = faceCell->GetNumberOfPoints();
+          if (numPoints == 3)
+            {
+            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
+            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
+            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
+            face = faceHash->AddFace(ptId1, ptId2, ptId3);
+            }
+          else if (numPoints == 4)
+            {
+            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
+            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
+            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
+            vtkIdType ptId4 = globalPtIdPtr[faceCell->GetPointId(3)];
+            face = faceHash->AddFace(ptId1, ptId2, ptId3, ptId4);
+            }
+          else
+            {
+            vtkGenericWarningMacro("Face ignored.");
+            face = 0;
+            }
+          if (face)
+            {
+            if (face->FragmentId > 0)
+              { // face is attached to another cell.
+              // It has been removed from the hash because it is internal.
+              // It is valid until we create another face. (recycle bin)
+              if (face->FragmentId != minFragmentId && minFragmentId < nextFragmentId)
+                {
+                // This cell connects two fragments, we need
+                // to make the fragment ids equivalent.
+                equivalenceSet->AddEquivalence(minFragmentId,
+                                               face->FragmentId);
+                }
+              // Keep track of the smallest fragment id to use for this cell.
+              if (minFragmentId > face->FragmentId)
+                {
+                minFragmentId = face->FragmentId;
+                }
+              } // end if shared face removed from hash.
+            else
+              { // Face is new.  Add our cell info.
+              // These are needed to create the surface in the second stage.
+              face->ProcessId = processId;
+              face->BlockId = ii;
+              face->CellId = jj;
+              face->FaceId = kk;
+              // We need to save all new faces until we know the final fragment id.
+              if (numNewFaces >= VTK_MAX_FACES_PER_CELL)
+                {
+                vtkGenericWarningMacro("Too many faces.");
+                }
+              else
+                {
+                newFaces[numNewFaces++] = face;
+                }
+              } // end if new face added to hash.
+            } // end if valid input face
+          } // Faces
+        // Is this the start of a new fragment?
+        if (minFragmentId == nextFragmentId)
+          { // Cell has no neighbors (traversed yet). New fragment id.
+          // Make sure the equivalence set has the correct number of members.
+          equivalenceSet->AddEquivalence(nextFragmentId,nextFragmentId);
+          nextFragmentId++;
+          }
+        // I do not think that the equivalence set has a more upto date id,
+        // but it cannot hurt to check/
+        minFragmentId = equivalenceSet->GetEquivalentSetId(minFragmentId);
+        // Label the faces with the fragment id we computed.
+        for (int kk = 0; kk < numNewFaces; ++kk)
+          {
+          newFaces[kk]->FragmentId = minFragmentId;
+          }
+        // Integrare volume of cell into fragemnt volume array.
+        self->IntegrateCellVolume(cell, minFragmentId, inputs[ii], jj);
+        } // if status
+      } // for cells
+    } // for input
+}
+
+
+//----------------------------------------------------------------------------
+template <class T>
+T vtkGridConnectivityComputeMax(T* ptr, vtkIdType num)
+{
+  T max = 0;
+  while (num-- > 0)
+    {
+    if (*ptr > max)
+      {
+      max = *ptr;
+      }
+    ++ptr;
+    }
+  return max;
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkGridConnectivity::InitializeFaceHash(
@@ -534,19 +694,21 @@ void vtkGridConnectivity::InitializeFaceHash(
   // We need to find the maximum global point Id to initialize the face hash.
   for (int ii = 0 ; ii < numberOfInputs; ++ii)
     {
-    vtkIdTypeArray* globalPtIds = vtkIdTypeArray::SafeDownCast(
-                         inputs[ii]->GetPointData()->GetArray("GlobalNodeId"));
-    vtkIdType* ptIdPtr = globalPtIds->GetPointer(0);
-    vtkIdType numPoints = inputs[ii]->GetNumberOfPoints();
-    for (vtkIdType ptIdx = 0; ptIdx < numPoints; ++ptIdx)
+    vtkDataArray* a = inputs[ii]->GetPointData()->GetGlobalIds();
+    void *ptr = a->GetVoidPointer(0);
+    vtkIdType numIds = a->GetNumberOfTuples();
+    maxId = 0;
+    this->GlobalPointIdType = a->GetDataType();
+    switch(this->GlobalPointIdType)
       {
-      if (*ptIdPtr > maxId)
-        {
-        maxId = *ptIdPtr;
-        }
-      ++ptIdPtr;
+      vtkTemplateMacro(
+        maxId = vtkGridConnectivityComputeMax(static_cast<VTK_TT*>(ptr), numIds));
+      default:
+        vtkErrorMacro("ThreadedRequestData: Unknown input ScalarType");
+        return;
       }
     }
+
   // Now we need to compute the maximum of all processes.
   int numProcs = this->Controller->GetNumberOfProcesses();
   if (this->Controller->GetLocalProcessId() != 0)
@@ -572,7 +734,44 @@ void vtkGridConnectivity::InitializeFaceHash(
   this->FaceHash->Initialize(maxId + 1);
 }
 
+
 //-----------------------------------------------------------------------------
+// We may want to selectively integrate arrays in the future.
+void vtkGridConnectivity::InitializeIntegrationArrays(
+  vtkUnstructuredGrid** inputs,
+  int numberOfInputs)
+{
+  // The fragment volume array integrates the volume
+  // for each fragment id.
+  this->FragmentVolumes = vtkDoubleArray::New();
+  
+  // This assumes every input has the same arrays.
+  int arrayIndex;
+  if (numberOfInputs <= 0)
+    {
+    return;
+    }
+  int numCellArrays = inputs[0]->GetCellData()->GetNumberOfArrays();
+  for (arrayIndex = 0; arrayIndex < numCellArrays; ++arrayIndex)
+    {
+    // Only double ararys for now.
+    vtkDataArray* tmp = inputs[0]->GetCellData()->GetArray(arrayIndex);
+    vtkDoubleArray* da = vtkDoubleArray::SafeDownCast(tmp);
+    // We do not handle integrating vectors yet.
+    if (da && da->GetNumberOfComponents() == 1 &&
+        strcmp(da->GetName(), "STATUS") != 0)
+      {
+      vtkSmartPointer<vtkDoubleArray> integrationArray;
+      integrationArray = vtkSmartPointer<vtkDoubleArray>::New();
+      integrationArray->SetName(da->GetName());
+      this->CellAttributesIntegration.push_back(integrationArray);
+      }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+// The standard execute method.
 int vtkGridConnectivity::RequestData(vtkInformation*,
                                  vtkInformationVector** inputVector,
                                  vtkInformationVector* outputVector)
@@ -664,14 +863,26 @@ int vtkGridConnectivity::RequestData(vtkInformation*,
   // The equivalenceSet keeps track of fragment ids and which
   // fragment ids need to be combined into a single fragment.
   this->EquivalenceSet = vtkEquivalenceSet::New();
-  // The fragment volume array integrates the volume
-  // for each fragment id.
-  this->FragmentVolumes = vtkDoubleArray::New();
+  // Create the integration arrays that hold the volume and 
+  // integrated values for each attribute.  The arrays
+  // are initialized to 0 and indexed by fragment id.
+  this->InitializeIntegrationArrays(inputs, numberOfInputs);
   // We need to know the maximum globalNodeId (across all processes)
   // to initialize the face hash.  This methods computes it and initializes.
   this->InitializeFaceHash(inputs, numberOfInputs);
 
-  this->ExecuteProcess(inputs, numberOfInputs);
+  switch(this->GlobalPointIdType)
+    {
+    vtkTemplateMacro(
+      vtkGridConnectivityExecuteProcess(this, inputs, numberOfInputs, 
+                                        this->ProcessId,
+                                        this->FaceHash,
+                                        this->EquivalenceSet,
+                                        static_cast<VTK_TT*>(0)));
+    default:
+      vtkErrorMacro("ExecuteProcess: Unknown input ScalarType");
+      return 0;
+    }
 
   // Deal with distributed data. Send all polygons to a single process.
   // Find equivalences in process 0.
@@ -704,6 +915,9 @@ void vtkGridConnectivity::GenerateOutput(
   vtkPolyData* output, 
   vtkUnstructuredGrid* inputs[])
 {
+  int numArrays;
+  vtkDoubleArray* da;
+  vtkDoubleArray* outArray;
   // Use the face hash to create cells in the output.
   // Only outside faces will be left in the hash because all faces attached
   // to two cells were removed.
@@ -714,7 +928,17 @@ void vtkGridConnectivity::GenerateOutput(
   vtkDoubleArray* volumeArray = vtkDoubleArray::New();
   volumeArray->SetName("Volume");
 
-  
+  // Create all of the integration arrays.
+  numArrays = this->CellAttributesIntegration.size();
+  for (int ii = 0; ii < numArrays; ++ii)
+    {
+    da = this->CellAttributesIntegration[ii];
+    outArray = vtkDoubleArray::New();
+    outArray->SetName(da->GetName());
+    output->GetCellData()->AddArray(outArray);
+    outArray->Delete();
+    }
+
   vtkPoints* outPoints = vtkPoints::New();
   output->SetPoints(outPoints);
   vtkCellArray* outCells = vtkCellArray::New();
@@ -751,11 +975,27 @@ void vtkGridConnectivity::GenerateOutput(
       vtkIdType cellId;
       cellId = outCells->InsertNextCell(numFacePts, outCellPtIds);
       cellFragmentIdArray->InsertNextValue(face->FragmentId);
+
       // There is no need to pass the fragment ids though the
       // equivalence set because the faces have been changed when
       // the equivalence set was resolved.
       volumeArray->InsertNextValue(
         this->FragmentVolumes->GetValue(face->FragmentId));
+
+      // Insert values for the integration arrays.
+      for (int ii = 0; ii < numArrays; ++ii)
+        {
+        da = this->CellAttributesIntegration[ii];
+        outArray = vtkDoubleArray::SafeDownCast(output->GetCellData()->GetArray(da->GetName()));
+        if (outArray == 0)
+          {
+          vtkErrorMacro("Missing integration array.");
+          continue;
+          }
+        outArray->InsertNextValue(
+          da->GetValue(face->FragmentId));
+        }
+
       // These arrays are just for debugging.
       blockIdArray->InsertNextValue(face->BlockId);
       cellIdArray->InsertNextValue(face->CellId);
@@ -770,10 +1010,20 @@ void vtkGridConnectivity::GenerateOutput(
   this->FragmentVolumes->SetName("Fragment Volume");
   output->GetFieldData()->AddArray(this->FragmentVolumes);
 
+  // Add all of the integration arrays to field data.
+  // Should we change the names to integrated...?
+  numArrays = this->CellAttributesIntegration.size();
+  for (int ii = 0; ii < numArrays; ++ii)
+    {
+    vtkDataArray *da = this->CellAttributesIntegration[ii];
+    output->GetFieldData()->AddArray(da);
+    }
+    
   cellFragmentIdArray->Delete();
   volumeArray->Delete();
   this->FragmentVolumes->Delete();
   this->FragmentVolumes = 0;
+  this->CellAttributesIntegration.clear();
 
   blockIdArray->Delete();
   cellIdArray->Delete();
@@ -783,144 +1033,103 @@ void vtkGridConnectivity::GenerateOutput(
 
 
 
+
+// To Extend this to integrate all arrays, we will first start with 
+// Cell attributes.
+// We will have to make FragmentVolumes into an array with one entry
+// each attribute.
+// We will have to transmit each array around just like the volumes.
 //----------------------------------------------------------------------------
-// This method computes partial fragments for a local process.
-// Partial fragments are connected cells that are discovered by a simple
-// pass through the cells (looking at neighbors).  I expect that the number
-// of partial fragments will be close to the number of final fragments.
-// The equivalence set will be used to merge partial fragments that touch.
-// This method also integrates arrays for partial fragments.
-void vtkGridConnectivity::ExecuteProcess(
-  vtkUnstructuredGrid* inputs[], 
-  int numberOfInputs)
+// Compute the volume for this cell and add it to the fragment volume arrray.
+// Initialize or extend the array if necessary.
+void vtkGridConnectivity::IntegrateCellVolume(
+  vtkCell* cell,
+  int fragmentId,
+  vtkUnstructuredGrid* input,
+  vtkIdType cellIndex)
 {
-  // Essentially a count of the fragment ids we have used so far.
-  // We start counting from 1 so 0 can be a special value used to remove faces.
-  int nextFragmentId = 1;
-
-  // I used to allocate a cell array for fragment ids but
-  // THIS ARRAY WAS NOT NECESSARY.  WE JUST KEEP THE FRAGMENT IDS
-  // IN THE FACE STRUCTURES!
-  // The only issue we would have is that we do not assign the fragment id
-  // unitl after all the faces fragemntId pointser have been set.
-  // The pointer sets the face fragment id after the fact.
-  // We could loop over the faces twice.
-  //int* cellFragments = new int[totalNumberOfCellsInProcess];
-  //int* cellFragmentPtr = cellFragments;
-
-  // Loop through all cells of all inputs adding all faces to hash.
-  // Select fragment id for each cell based on neighbors.  We are hoping that
-  // cell order will be spatial and will not be random.
-  for (int ii = 0; ii < numberOfInputs; ++ii)
+  double* volumePtr;
+  
+  if (cell->GetCellDimension() != 3)
     {
-    vtkIdTypeArray* globalPtIds = vtkIdTypeArray::SafeDownCast(
-                       inputs[ii]->GetPointData()->GetArray("GlobalNodeId"));
-    vtkIdType* globalPtIdPtr = globalPtIds->GetPointer(0);
-    vtkIdType numCells = inputs[ii]->GetNumberOfCells();
-    // The status array is a mask that identifies unused cells.
-    vtkDoubleArray* statusArray = vtkDoubleArray::SafeDownCast(
-                     inputs[ii]->GetCellData()->GetArray("STATUS"));
-    double* statusPtr = 0;
-    if (statusArray)
+    vtkErrorMacro("Expecting only 3d cells.");
+    return;
+    }
+
+  // Make sure the fragment volume array is big enough.
+  vtkIdType length = this->FragmentVolumes->GetNumberOfTuples();
+  if (length <= fragmentId)
+    {
+    vtkIdType newLength = fragmentId * 2 + 200;
+    this->FragmentVolumes->Resize(newLength);
+    this->FragmentVolumes->SetNumberOfTuples(fragmentId+1);
+    // Initialize new values to 0.0
+    volumePtr = this->FragmentVolumes->GetPointer(length);
+    for (vtkIdType ii = length; ii < newLength; ++ii)
       {
-      statusPtr = statusArray->GetPointer(0);
+      *volumePtr++ = 0.0;
       }
-    for (int jj = 0; jj < numCells; ++jj)
+    // Resize all of the integration arrays to be the same.
+    int numArrays = this->CellAttributesIntegration.size();
+    for (int ii = 0; ii < numArrays; ++ii)
       {
-      if (statusPtr == 0 || *statusPtr++ == 0.0)
+      vtkDoubleArray *da = this->CellAttributesIntegration[ii];
+      da->Resize(newLength);
+      da->SetNumberOfTuples(fragmentId+1);
+      // Initialize new values to 0.0
+      volumePtr = da->GetPointer(length);
+      for (vtkIdType jj = length; jj < newLength; ++jj)
         {
-        // Loop through faces of the cell.
-        // This might be an performance bottle neck. (cell api)
-        vtkCell* cell = inputs[ii]->GetCell(jj);
-        int numFaces = cell->GetNumberOfFaces();
-        vtkGridConnectivityFace* newFaces[VTK_MAX_FACES_PER_CELL];
-        int numNewFaces = 0;
-        // As we create / find faces, keep track of the smallest fragment id.
-        int minFragmentId = nextFragmentId;
-        for (int kk = 0; kk < numFaces; ++kk)
-          {
-          vtkGridConnectivityFace* face;
-          vtkCell* faceCell = cell->GetFace(kk);
-          vtkIdType numPoints = faceCell->GetNumberOfPoints();
-          if (numPoints == 3)
-            {
-            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
-            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
-            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
-            face = this->FaceHash->AddFace(ptId1, ptId2, ptId3);
-            }
-          else if (numPoints == 4)
-            {
-            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
-            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
-            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
-            vtkIdType ptId4 = globalPtIdPtr[faceCell->GetPointId(3)];
-            face = this->FaceHash->AddFace(ptId1, ptId2, ptId3, ptId4);
-            }
-          else
-            {
-            vtkWarningMacro("Face ignored.");
-            face = 0;
-            }
-          if (face)
-            {
-            if (face->FragmentId > 0)
-              { // face is attached to another cell.
-              // It has been removed from the hash because it is internal.
-              // It is valid until we create another face. (recycle bin)
-              if (face->FragmentId != minFragmentId && minFragmentId < nextFragmentId)
-                {
-                // This cell connects two fragments, we need
-                // to make the fragment ids equivalent.
-                this->EquivalenceSet->AddEquivalence(minFragmentId,
-                                                     face->FragmentId);
-                }
-              // Keep track of the smallest fragment id to use for this cell.
-              if (minFragmentId > face->FragmentId)
-                {
-                minFragmentId = face->FragmentId;
-                }
-              } // end if shared face removed from hash.
-            else
-              { // Face is new.  Add our cell info.
-              // These are needed to create the surface in the second stage.
-              face->ProcessId = this->ProcessId;
-              face->BlockId = ii;
-              face->CellId = jj;
-              face->FaceId = kk;
-              // We need to save all new faces until we know the final fragment id.
-              if (numNewFaces >= VTK_MAX_FACES_PER_CELL)
-                {
-                vtkWarningMacro("Too many faces.");
-                }
-              else
-                {
-                newFaces[numNewFaces++] = face;
-                }
-              } // end if new face added to hash.
-            } // end if valid input face
-          } // Faces
-        // Is this the start of a new fragment?
-        if (minFragmentId == nextFragmentId)
-          { // Cell has no neighbors (traversed yet). New fragment id.
-          // Make sure the equivalence set has the correct number of members.
-          this->EquivalenceSet->AddEquivalence(nextFragmentId,nextFragmentId);
-          nextFragmentId++;
-          }
-        // I do not think that the equivalence set has a more upto date id,
-        // but it cannot hurt to check/
-        minFragmentId = this->EquivalenceSet->GetEquivalentSetId(minFragmentId);
-        // Label the faces with the fragment id we computed.
-        for (int kk = 0; kk < numNewFaces; ++kk)
-          {
-          newFaces[kk]->FragmentId = minFragmentId;
-          }
-        // Integrare volume of cell into fragemnt volume array.
-        this->IntegrateCellVolume(cell, minFragmentId);
-        } // if status
-      } // for cells
-    } // for input
+        *volumePtr++ = 0.0;
+        }
+      }
+    }
+  
+  // Now compute the volume of the cell.
+  int cellType = cell->GetCellType();
+  double cellVolume = 0.0;
+  
+  switch (cellType)
+    {
+    case VTK_HEXAHEDRON:
+      cellVolume = this->IntegrateHex(cell);
+      break;
+    case VTK_VOXEL:
+      cellVolume = this->IntegrateVoxel(cell);
+      break;
+    case VTK_TETRA:
+      cellVolume = this->IntegrateTetrahedron(cell);
+      break;
+    default:
+      {
+      cell->Triangulate(1, this->CellPointIds, this->CellPoints);
+      cellVolume = this->IntegrateGeneral3DCell(cell);
+      }
+    }
+
+  // Integrate all of the cell arrays.
+  int numArrays = this->CellAttributesIntegration.size();
+  for (int ii = 0; ii < numArrays; ++ii)
+    {
+    vtkDoubleArray* da = this->CellAttributesIntegration[ii];
+    vtkDoubleArray* inputArray = vtkDoubleArray::SafeDownCast(
+      input->GetCellData()->GetArray(da->GetName()));
+    if (inputArray == 0)
+      {
+      vtkErrorMacro("Missing integration array.");
+      continue;
+      }
+    double *ptr = da->GetPointer(fragmentId);
+    double attributeValue = inputArray->GetValue(cellIndex);
+    *ptr += attributeValue * cellVolume;
+    }
+
+  volumePtr = this->FragmentVolumes->GetPointer(fragmentId);
+  *volumePtr += cellVolume;
 }
+
+
+
 
 
 //----------------------------------------------------------------------------
@@ -957,7 +1166,7 @@ void vtkGridConnectivity::CollectFacesAndArraysToRootProcess(int* fragmentIdOffs
     numFaces = this->FaceHash->GetNumberOfFaces();
     // Number of fragments.  I assuem this is the
     // resolved number of fragments, but it will little difference.
-    vtkIdType numFragments = this->EquivalenceSet->GetNumberOfMembers();
+    vtkIdType numFragments = this->EquivalenceSet->GetNumberOfResolvedSets();
     msg1[0] = numFragments;
     msg1[1] = numFaces;
     this->Controller->Send(msg1, 2, 0, 9890831);
@@ -1137,7 +1346,7 @@ void vtkGridConnectivity::ResolveProcessesFaces()
         memset(faceMask,0,numFaces*sizeof(int));
         // Loop over the faces in the hash.
         this->FaceHash->InitTraversal();
-        while ( (face = this->FaceHash->GetNextFace()));
+        while ( (face = this->FaceHash->GetNextFace()) != 0);
           {
           if (face->ProcessId == procIdx)
             {
@@ -1255,57 +1464,6 @@ void vtkGridConnectivity::ResolveFaceFragmentIds()
     } 
 }
 
-
-//----------------------------------------------------------------------------
-// Compute the volume for this cell and add it to the fragment volume arrray.
-// Initialize or extend the array if necessary.
-void vtkGridConnectivity::IntegrateCellVolume(vtkCell* cell, int fragmentId)
-{
-  double* volumePtr;
-  
-  if (cell->GetCellDimension() != 3)
-    {
-    vtkErrorMacro("Expecting only 3d cells.");
-    return;
-    }
-
-  // Make sure the fragment volume array is big enough.
-  vtkIdType length = this->FragmentVolumes->GetNumberOfTuples();
-  if (length <= fragmentId)
-    {
-    vtkIdType newLength = fragmentId * 2 + 200;
-    this->FragmentVolumes->Resize(newLength);
-    this->FragmentVolumes->SetNumberOfTuples(fragmentId+1);
-    // Initialize new values to 0.0
-    volumePtr = this->FragmentVolumes->GetPointer(length);
-    for (vtkIdType ii = length; ii < newLength; ++ii)
-      {
-      *volumePtr++ = 0.0;
-      }
-    }
-  
-  // Now compute the volume of the cell.
-  int cellType = cell->GetCellType();
-  volumePtr = this->FragmentVolumes->GetPointer(fragmentId);
-
-  switch (cellType)
-    {
-    case VTK_HEXAHEDRON:
-      *volumePtr += this->IntegrateHex(cell);
-      break;
-    case VTK_VOXEL:
-      *volumePtr += this->IntegrateVoxel(cell);
-      break;
-    case VTK_TETRA:
-      *volumePtr += this->IntegrateTetrahedron(cell);
-      break;
-    default:
-      {
-      cell->Triangulate(1, this->CellPointIds, this->CellPoints);
-      *volumePtr += this->IntegrateGeneral3DCell(cell);
-      }
-    } 
-}
 
 
 //-----------------------------------------------------------------------------
