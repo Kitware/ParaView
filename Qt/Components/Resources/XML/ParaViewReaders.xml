@@ -167,7 +167,7 @@
           file_description="Phasta Files">
   </Reader>
   <Reader name="SESAMEReader"
-          extensions="sesame"
+          extensions="sesame asc"
           file_description="SESAME">
   </Reader>
 
