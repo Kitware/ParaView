@@ -421,7 +421,7 @@ bool PrismPanel::pqUI::LoadConversions(QString &fileName)
 
     //First check to make sure file is valid
     ifstream in(fileName.toAscii().constData());
-    bool done=false;
+   // bool done=false;
     const int bufferSize = 4096;
     char buffer[bufferSize];
     in.getline(buffer, bufferSize);
@@ -552,7 +552,7 @@ void PrismPanel::updateConversions()
         {
             QString conversionValueString="1.0";
             SESAMEConversionVariable variableData=*vIter;
-            QString label="Density ";
+            label="Density ";
             this->UI->ConversionVar1_label->setText(label);
 
             label="";
@@ -584,7 +584,7 @@ void PrismPanel::updateConversions()
         else
         {
             QString conversionValueString="1.0";
-            QString label="Density ";
+            label="Density ";
             this->UI->ConversionVar1_label->setText(label);
             this->UI->ConversionVar1_label2->clear();
             this->UI->ConversionVar1->setText(conversionValueString);
@@ -595,7 +595,7 @@ void PrismPanel::updateConversions()
         {
             QString conversionValueString="1.0";
             SESAMEConversionVariable variableData=*vIter;
-            QString label="Temperature ";
+             label="Temperature ";
             this->UI->ConversionVar2_label->setText(label);
             label="";
             if(this->UI->CustomCheckbox->isChecked())
@@ -626,7 +626,7 @@ void PrismPanel::updateConversions()
         else
         {
             QString conversionValueString="1.0";
-            QString label="Temperature ";
+             label="Temperature ";
 
             this->UI->ConversionVar2_label->setText(label);
             this->UI->ConversionVar2_label2->clear();
@@ -638,7 +638,7 @@ void PrismPanel::updateConversions()
         {
             QString conversionValueString="1.0";
             SESAMEConversionVariable variableData=*vIter;
-            QString label="Pressure ";
+             label="Pressure ";
             this->UI->ConversionVar3_label->setText(label);
             label="";
             if(this->UI->CustomCheckbox->isChecked())
@@ -669,7 +669,7 @@ void PrismPanel::updateConversions()
         else
         {
             QString conversionValueString="1.0";
-            QString label="Pressure ";
+             label="Pressure ";
             this->UI->ConversionVar3_label->setText(label);
             this->UI->ConversionVar3_label2->clear();
             this->UI->ConversionVar3->setText(conversionValueString);
@@ -680,7 +680,7 @@ void PrismPanel::updateConversions()
         {
             QString conversionValueString="1.0";
             SESAMEConversionVariable variableData=*vIter;
-            QString label="Energy ";
+             label="Energy ";
             this->UI->ConversionVar4_label->setText(label);
             label="";
 
@@ -712,7 +712,7 @@ void PrismPanel::updateConversions()
         else
         {
             QString conversionValueString="1.0";
-            QString label="Energy ";
+             label="Energy ";
             this->UI->ConversionVar4_label->setText(label);
             this->UI->ConversionVar4_label2->clear();
             this->UI->ConversionVar4->setText(conversionValueString);
@@ -1154,7 +1154,7 @@ void PrismPanel::setupConversions()
       {
           QString conversionValueString="1.0";
           SESAMEConversionVariable variableData=*vIter;
-          QString label="Density ";
+          label="Density ";
           this->UI->ConversionVar1_label->setText(label);
 
           label="";
@@ -1188,7 +1188,7 @@ void PrismPanel::setupConversions()
       else
       {
           QString conversionValueString="1.0";
-          QString label="Density ";
+          label="Density ";
           this->UI->ConversionVar1_label->setText(label);
 
           label="Not Found.";
@@ -1202,7 +1202,7 @@ void PrismPanel::setupConversions()
       {
           QString conversionValueString="1.0";
           SESAMEConversionVariable variableData=*vIter;
-          QString label="Temperature ";
+          label="Temperature ";
           this->UI->ConversionVar2_label->setText(label);
           label="";
           if(this->UI->CustomCheckbox->isChecked())
@@ -1233,7 +1233,7 @@ void PrismPanel::setupConversions()
       }
       else
       {
-          QString label="Temperature ";
+          label="Temperature ";
           QString conversionValueString="1.0";
           this->UI->ConversionVar2_label->setText(label);
           label="Not Found.";
@@ -1247,7 +1247,7 @@ void PrismPanel::setupConversions()
       {
           QString conversionValueString="1.0";
           SESAMEConversionVariable variableData=*vIter;
-          QString label="Pressure ";
+          label="Pressure ";
           this->UI->ConversionVar3_label->setText(label);
           label="";
           if(this->UI->CustomCheckbox->isChecked())
@@ -1279,7 +1279,7 @@ void PrismPanel::setupConversions()
       else
       {
           QString conversionValueString="1.0";
-          QString label="Pressure ";
+          label="Pressure ";
           this->UI->ConversionVar3_label->setText(label);
           label="Not Found.";
           this->UI->ConversionVar3_label2->setText(label);
@@ -1292,7 +1292,7 @@ void PrismPanel::setupConversions()
       {
           QString conversionValueString="1.0";
           SESAMEConversionVariable variableData=*vIter;
-          QString label="Energy ";
+          label="Energy ";
           this->UI->ConversionVar4_label->setText(label);
           label="";
 
@@ -1325,7 +1325,7 @@ void PrismPanel::setupConversions()
       else
       {
           QString conversionValueString="1.0";
-          QString label="Energy ";
+          label="Energy ";
           this->UI->ConversionVar4_label->setText(label);
           label="Not Found.";
           this->UI->ConversionVar4_label2->setText(label);
