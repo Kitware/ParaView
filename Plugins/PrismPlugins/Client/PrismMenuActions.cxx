@@ -7,12 +7,10 @@ PrismMenuActions::PrismMenuActions(QObject* p)
 : QActionGroup(p)
     {
     PrismCore* core=PrismCore::instance();
-    if(!core)
-        {
-        core=new PrismCore(this);
-        }
 
-    QList<QAction*> actionsList= core->actions();
+
+    QList<QAction*> actionsList;
+    core->actions(actionsList);
     foreach(QAction *a,actionsList)
         {
         this->addAction(a);

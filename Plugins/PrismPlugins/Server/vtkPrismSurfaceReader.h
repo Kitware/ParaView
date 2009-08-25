@@ -23,6 +23,7 @@ public:
 
   static vtkPrismSurfaceReader *New();
  
+  unsigned long GetMTime();
 
 
  // Description:
@@ -80,8 +81,8 @@ public:
 
 
   //The calculated values used to scale the surface;
-  vtkGetVectorMacro(Scale,double,3);
-  vtkGetVectorMacro(Range,double,6);
+ // vtkGetVectorMacro(Scale,double,3);
+ // vtkGetVectorMacro(Range,double,6);
 
   void SetXAxisVarName( const char *name );
   void SetYAxisVarName( const char *name );
@@ -89,6 +90,11 @@ public:
   const char *GetXAxisVarName();
   const char *GetYAxisVarName(); 
   const char *GetZAxisVarName(); 
+
+
+  void SetConversions(double xc,double yc,double zc);
+  vtkGetVector3Macro(Conversions,double);
+
 
   void SetXLogScaling(bool);
   void SetYLogScaling(bool);
@@ -101,6 +107,7 @@ public:
  
   vtkDoubleArray* GetXRange();
   vtkDoubleArray* GetYRange();
+  vtkDoubleArray* GetZRange();
 
   void SetThresholdXBetween(double lower, double upper);
   void SetThresholdYBetween(double lower, double upper);
@@ -118,24 +125,32 @@ public:
   void SetDisplayContours(bool);
   void SetContourVarName( const char *name );
   const char *GetContourVarName(); 
+  vtkDoubleArray* GetContourVarRange();
 
+
+  void SetContourValue(int i, double value);
+  double GetContourValue(int i);
+  double *GetContourValues();
+  void GetContourValues(double *contourValues);
 
   void SetNumberOfContours(int);
 
 
   vtkStringArray* GetAxisVarNames();
 
+ void GetRanges(vtkDoubleArray* RangeArray);
 
 protected:
   vtkPrismSurfaceReader();
   ~vtkPrismSurfaceReader() {}
 
 
-  double Scale[3];
-  double Range[6];
+  //double Scale[3];
+  //double Range[6];
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];
+  double Conversions[3];
 
 
   bool GetVariableRange (const char *name,vtkDoubleArray*);

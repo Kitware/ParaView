@@ -32,7 +32,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.6");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.7");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -57,10 +57,15 @@ class vtkPrismSurfaceReader::MyInternal
         vtkstd::string  ContourVarName;
         vtkSmartPointer<vtkDoubleArray> XRangeArray;
         vtkSmartPointer<vtkDoubleArray> YRangeArray;
+        vtkSmartPointer<vtkDoubleArray> ZRangeArray;
+        vtkSmartPointer<vtkDoubleArray> CRangeArray;
 
 
         vtkTimeStamp XRangeTime;
         vtkTimeStamp YRangeTime;
+        vtkTimeStamp ZRangeTime;
+
+        vtkTimeStamp CRangeTime;
 
         void Initialize();
 
@@ -78,12 +83,30 @@ class vtkPrismSurfaceReader::MyInternal
 
             this->XRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
             this->YRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
+             this->ZRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
+           this->CRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
 
             this->XRangeArray->Initialize();
             this->XRangeArray->SetNumberOfComponents(1);
+            this->XRangeArray->InsertNextValue(0.0);
+            this->XRangeArray->InsertNextValue(0.0);
+
 
             this->YRangeArray->Initialize();
             this->YRangeArray->SetNumberOfComponents(1);
+            this->YRangeArray->InsertNextValue(0.0);
+            this->YRangeArray->InsertNextValue(0.0);
+
+            this->ZRangeArray->Initialize();
+            this->ZRangeArray->SetNumberOfComponents(1);
+            this->ZRangeArray->InsertNextValue(0.0);
+            this->ZRangeArray->InsertNextValue(0.0);
+
+
+            this->CRangeArray->Initialize();
+            this->CRangeArray->SetNumberOfComponents(1);
+            this->CRangeArray->InsertNextValue(0.0);
+            this->CRangeArray->InsertNextValue(0.0);
 
             this->ContourFilter=vtkSmartPointer<vtkContourFilter>::New();
 
@@ -101,8 +124,6 @@ class vtkPrismSurfaceReader::MyInternal
             this->ExtractGeometry->ExtractBoundaryCellsOn();
             this->CleanPolyData=vtkSmartPointer<vtkCleanPolyData>::New();
 
-
-
             this->ArrayNames =vtkSmartPointer<vtkStringArray>::New();
             this->ArrayNames->Initialize();
 
@@ -110,11 +131,6 @@ class vtkPrismSurfaceReader::MyInternal
             this->DisplayContours=false;
             this->NumberOfContours=1;
             this->ContourVarName="none";
-
-
-
-
-
             }
         ~MyInternal()
             {
@@ -130,14 +146,11 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
     {
 
     this->Internal = new MyInternal();
+    this->Conversions[0]=1.0;
+    this->Conversions[1]=1.0;
+    this->Conversions[2]=1.0;
 
     this->SetNumberOfInputPorts(0);
-    this->Range[0]=0.0;
-    this->Range[1]=0.0;
-    this->Range[2]=0.0;
-    this->Range[3]=0.0;
-    this->Range[4]=0.0;
-    this->Range[5]=0.0;
     this->SetNumberOfOutputPorts(2);
 
 
@@ -149,6 +162,15 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
 
 
     }
+
+unsigned long vtkPrismSurfaceReader::GetMTime()
+{
+    unsigned long t1 = this->Superclass::GetMTime();
+    unsigned long t2 = this->Internal->Reader->GetMTime();
+    unsigned long t3 = this->Internal->RectGridGeometry->GetMTime();
+    unsigned long ret_time = t1 > t2 ? t1 : t2;
+    return t3 > ret_time ? t3 : ret_time;
+}
 
 void vtkPrismSurfaceReader::MyInternal::Initialize()
     {
@@ -195,6 +217,19 @@ const char *vtkPrismSurfaceReader::GetContourVarName()
 
 
     }
+vtkDoubleArray* vtkPrismSurfaceReader::GetContourVarRange()
+{
+    if(this->Internal->CRangeTime<this->GetMTime())
+    {
+        this->Internal->CRangeTime.Modified();
+        this->GetVariableRange(this->GetContourVarName(),this->Internal->CRangeArray);
+        this->Internal->CRangeArray->SetValue(0,(this->Internal->CRangeArray->GetValue(0)*this->Conversions[2]));
+
+    }
+
+    return this->Internal->CRangeArray;
+}
+
 
 void vtkPrismSurfaceReader::SetNumberOfContours(int i)
     {
@@ -205,6 +240,23 @@ void vtkPrismSurfaceReader::SetNumberOfContours(int i)
         }
     }
 
+void vtkPrismSurfaceReader::SetContourValue(int i, double value)
+{
+    this->Internal->ContourFilter->SetValue(i,value);
+    this->Modified();
+}
+double vtkPrismSurfaceReader::GetContourValue(int i)
+{
+    return this->Internal->ContourFilter->GetValue(i);
+}
+double *vtkPrismSurfaceReader::GetContourValues()
+{
+    return this->Internal->ContourFilter->GetValues();
+}
+void vtkPrismSurfaceReader::GetContourValues(double *contourValues)
+{
+    this->Internal->ContourFilter->GetValues(contourValues);
+}
 
 
 void vtkPrismSurfaceReader::SetXLogScaling(bool b)
@@ -235,8 +287,13 @@ bool vtkPrismSurfaceReader::GetZLogScaling()
     {
     return   this->Internal->ArrayLogScaling[2];
     }
-
-
+void vtkPrismSurfaceReader::SetConversions(double xc,double yc,double zc)
+{
+    this->Conversions[0]=xc;
+    this->Conversions[1]=yc;
+    this->Conversions[2]=zc;
+    this->Modified();
+}
 
 bool vtkPrismSurfaceReader::GetVariableRange (const char *varName,vtkDoubleArray* rangeArray)
     {
@@ -244,6 +301,14 @@ bool vtkPrismSurfaceReader::GetVariableRange (const char *varName,vtkDoubleArray
     rangeArray->SetNumberOfComponents(1);
     rangeArray->SetNumberOfValues(2);
     vtkStdString str=varName;
+
+    if(!this->Internal->Reader->IsValidFile() || this->Internal->Reader->GetTable()==-1)
+    {
+        rangeArray->InsertValue(0,0.0);
+        rangeArray->InsertValue(1,0.0);
+        return false;
+
+    }
     if(str=="Density")
         {
         double bounds[6];
@@ -303,10 +368,18 @@ bool vtkPrismSurfaceReader::GetVariableRange (const char *varName,vtkDoubleArray
 
 vtkDoubleArray* vtkPrismSurfaceReader::GetXRange ()
     {
-    if(this->Internal->XRangeTime<this->GetMTime())
+        if(!this->Internal->Reader->IsValidFile())
+        {
+            return this->Internal->XRangeArray;
+        }   
+        
+        if(this->Internal->XRangeTime<this->GetMTime())
         {
         this->Internal->XRangeTime.Modified();
+
         this->GetVariableRange(this->GetXAxisVarName(),this->Internal->XRangeArray);
+        this->Internal->XRangeArray->SetValue(0,(this->Internal->XRangeArray->GetValue(0)*this->Conversions[0]));
+
         if(this->Internal->ArrayLogScaling[0])
             {
             if(this->Internal->XRangeArray->GetValue(0)>0)
@@ -335,10 +408,20 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetXRange ()
 
 vtkDoubleArray* vtkPrismSurfaceReader::GetYRange ()
     {
+
+        if(!this->Internal->Reader->IsValidFile())
+        {
+            return this->Internal->YRangeArray;
+        }
+
     if(this->Internal->YRangeTime<this->GetMTime())
         {
         this->Internal->YRangeTime.Modified();
         this->GetVariableRange(this->GetYAxisVarName(),this->Internal->YRangeArray);
+       
+        this->Internal->YRangeArray->SetValue(0,(this->Internal->YRangeArray->GetValue(0)*this->Conversions[1]));
+
+        
         if(this->Internal->ArrayLogScaling[1])
             {
             if(this->Internal->YRangeArray->GetValue(0)>0)
@@ -365,6 +448,74 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetYRange ()
     return this->Internal->YRangeArray;
 
     }
+
+
+
+
+vtkDoubleArray* vtkPrismSurfaceReader::GetZRange ()
+    {
+        if(!this->Internal->Reader->IsValidFile())
+        {
+            return this->Internal->XRangeArray;
+        }   
+        
+        if(this->Internal->ZRangeTime<this->GetMTime())
+        {
+        this->Internal->ZRangeTime.Modified();
+
+        this->GetVariableRange(this->GetZAxisVarName(),this->Internal->ZRangeArray);
+        this->Internal->ZRangeArray->SetValue(0,(this->Internal->ZRangeArray->GetValue(0)*this->Conversions[2]));
+
+        if(this->Internal->ArrayLogScaling[2])
+            {
+            if(this->Internal->ZRangeArray->GetValue(0)>0)
+                {
+                this->Internal->ZRangeArray->SetValue(0,log(this->Internal->ZRangeArray->GetValue(0)));
+                }
+            else
+                {
+                this->Internal->ZRangeArray->SetValue(0,0.0);
+                }
+
+
+            if(this->Internal->ZRangeArray->GetValue(1)>0)
+                {
+                this->Internal->ZRangeArray->SetValue(1,log(this->Internal->ZRangeArray->GetValue(1)));
+                }
+            else
+                {
+                this->Internal->ZRangeArray->SetValue(1,0.0);
+                }
+            }
+        }
+
+    return this->Internal->ZRangeArray;
+    }
+
+
+
+
+void vtkPrismSurfaceReader::GetRanges(vtkDoubleArray* RangeArray)
+{
+
+    vtkSmartPointer<vtkDoubleArray> range=vtkSmartPointer<vtkDoubleArray>::New();
+    range->Initialize();
+    range->SetNumberOfComponents(1);
+
+    range=this->GetXRange();
+    RangeArray->InsertValue(0,range->GetValue(0));
+    RangeArray->InsertValue(1,range->GetValue(1));
+    
+    range=this->GetYRange();
+    RangeArray->InsertValue(2,range->GetValue(0));
+    RangeArray->InsertValue(3,range->GetValue(1));
+
+    range=this->GetZRange();
+    RangeArray->InsertValue(4,range->GetValue(0));
+    RangeArray->InsertValue(5,range->GetValue(1));
+}
+
+
 double *vtkPrismSurfaceReader::GetXThresholdBetween() 
     { 
     return this->XThresholdBetween; 
@@ -477,7 +628,8 @@ void vtkPrismSurfaceReader::SetFileName(const char* file)
         }
 
     this->Internal->Reader->SetFileName(file);
-
+  //  this->Internal->Reader->Update();
+    this->Modified();
     }
 
 const char* vtkPrismSurfaceReader::GetFileName()
@@ -790,6 +942,14 @@ int vtkPrismSurfaceReader::RequestData(
             }
 
 
+        coords[0]*=this->Conversions[0];
+        coords[1]*=this->Conversions[1];
+        coords[2]*=this->Conversions[2];
+
+
+
+
+
 
         if(this->GetXLogScaling())
             {
@@ -817,16 +977,15 @@ int vtkPrismSurfaceReader::RequestData(
 
         if(this->GetZLogScaling())
             {
-            if(coords[1]>0)
+            if(coords[2]>0)
                 {
-                coords[1]=log(coords[1]);
+                coords[2]=log(coords[2]);
                 }
             else
                 {
-                coords[1]=0.0;
+                coords[2]=0.0;
                 }
             }
-
 
         newPts->InsertPoint(ptId,coords);
 
@@ -855,6 +1014,7 @@ int vtkPrismSurfaceReader::RequestData(
 
     this->Internal->CleanPolyData->Update();
     surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
+ //surfaceOutput->ShallowCopy(this->Internal->ExtractGeometry->GetOutput());
 
 
     if(this->Internal->DisplayContours)

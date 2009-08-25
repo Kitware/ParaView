@@ -32,7 +32,6 @@ static PrismCore* Instance = 0;
 PrismCore::PrismCore(QObject* p)
 :QObject(p)
     {
-    Instance=this;
     this->ProcessingEvent=false;
     this->VTKConnections = NULL;
 
@@ -85,18 +84,21 @@ PrismCore::~PrismCore()
 //-----------------------------------------------------------------------------
 PrismCore* PrismCore::instance()
     {
+        
+        if(!Instance)
+        {
+            Instance=new PrismCore(NULL);
+        }
     return Instance;
     }
 
 
 
-QList<QAction*> PrismCore::actions()
+void PrismCore::actions(QList<QAction*>& tmp)
     {
-    QList<QAction*> tmp;
+    tmp.clear();
     tmp.push_back(this->SesameViewAction);
     tmp.push_back(this->PrismViewAction);
-
-    return tmp;
     }
 
 pqPipelineSource* PrismCore::getActiveSource() const
@@ -105,6 +107,10 @@ pqPipelineSource* PrismCore::getActiveSource() const
     pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
     pqPipelineSource* source = 0;
     pqServerManagerModelItem* item = 0;
+    if(sels.empty())
+    {
+        return NULL;
+    }
     pqServerManagerSelection::ConstIterator iter = sels.begin();
 
     item = *iter;
@@ -197,7 +203,18 @@ void PrismCore::onSESAMEFileOpen(const QStringList& files)
         stack->beginUndoSet("Open Prism Surface");
         }
 
-    builder->createReader("sources", "PrismSurfaceReader", files, server);
+    pqPipelineSource* filter = 0;
+    filter =  builder->createReader("sources", "PrismSurfaceReader", files, server);
+
+    //filter->getProxy()->UpdateVTKObjects();
+    ////I believe that this is needs to be called twice because there are properties that depend on other properties.
+    ////Calling it once doesn't set all the properties right.
+    //filter->setDefaultPropertyValues();
+    //filter->setDefaultPropertyValues();
+
+
+    if(stack)
+
 
     if(stack)
         {
@@ -207,15 +224,32 @@ void PrismCore::onSESAMEFileOpen(const QStringList& files)
 
 
 void PrismCore::onCreatePrismView()
-    {
+{
     // Get the list of selected sources.
 
-    pqServer* server = this->getActiveServer();
+    pqPipelineSource* source = 0;
+
+    source = this->getActiveSource();   
+
+    if(!source)
+    {
+        QMessageBox::warning(NULL, tr("No Object Selected"),
+            tr("No pipeline object is selected.\n"
+            "Please select a pipeline object from the list on the left."),
+            QMessageBox::Ok );
+
+        return;
+    }   
+       
+
+    pqServer* server = source->getServer();
 
     if(!server)
         {
         qDebug() << "No active server selected.";
+        return;
         }
+
 
 
     QString filters = "All files (*)";
@@ -243,8 +277,23 @@ void PrismCore::onCreatePrismView(const QStringList& files)
 
 
     source = this->getActiveSource();   
-    server = source->getServer();
 
+    if(!source)
+    {
+        QMessageBox::warning(NULL, tr("No Object Selected"),
+            tr("No pipeline object is selected.\n"
+            "Please select a pipeline object from the list on the left."),
+            QMessageBox::Ok );
+
+        return;
+    }
+    server = source->getServer();
+    if(!server)
+        {
+        qDebug() << "No active server selected.";
+        }
+    builder->createView("RenderView",server);
+ 
     inputs.push_back(source->getOutputPort(0));
 
     QMap<QString, QList<pqOutputPort*> > namedInputs;
@@ -263,7 +312,11 @@ void PrismCore::onCreatePrismView(const QStringList& files)
     pqSMAdaptor::setElementProperty(fileNameProperty, files[0]);
 
     filter->getProxy()->UpdateVTKObjects();
-    fileNameProperty->UpdateDependentDomains();
+    //I believe that this is needs to be called twice because there are properties that depend on other properties.
+    //Calling it once doesn't set all the properties right.
+    filter->setDefaultPropertyValues();
+    filter->setDefaultPropertyValues();
+
 
     if(stack)
         {

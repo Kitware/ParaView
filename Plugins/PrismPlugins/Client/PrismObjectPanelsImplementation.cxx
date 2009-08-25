@@ -10,6 +10,7 @@
 #include "pqDataRepresentation.h"
 #include "pqPipelineSource.h"
 #include "PrismSurfacePanel.h"
+#include "PrismPanel.h"
 
 
 PrismObjectPanelsImplementation::PrismObjectPanelsImplementation(QObject* p):
@@ -29,7 +30,10 @@ bool PrismObjectPanelsImplementation::canCreatePanel(pqProxy* proxy ) const
      {
        return true;
      }
-
+     if(name=="PrismFilter")
+     {
+       return true;
+     }
     return false;
    }
   /// Creates a panel for the given proxy
@@ -48,6 +52,13 @@ pqObjectPanel* PrismObjectPanelsImplementation::createPanel(pqProxy* proxy, QWid
        return new PrismSurfacePanel(proxy,p);
 
      }
+     if(name=="PrismFilter")
+     {
+
+       return new PrismPanel(proxy,p);
+
+     }
+
     return NULL;
     }
 

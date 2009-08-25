@@ -1,0 +1,11 @@
+<PRISM_Conversions>
+<Table Id="301">
+<Variable Name="Density" SESAME_Units="Mg/m^3" SESAME_SI="1000" SESAME_SI_Units="kg/m^3" SESAME_cgs="1.0" SESAME_cgs_Units="g/(cm)^3" />
+<Variable Name="Temperature" SESAME_Units="K" SESAME_SI="1" SESAME_SI_Units="K" SESAME_cgs="1.0" SESAME_cgs_Units="K" />
+<Variable Name="Pressure" SESAME_Units="GPa" SESAME_SI="1.0e9" SESAME_SI_Units="Pa" SESAME_cgs="1.0e10" SESAME_cgs_Units="dyne/(cm)^2" />
+<Variable Name="Energy" SESAME_Units="MJ/kg" SESAME_SI="1.0e6" SESAME_SI_Units="J/kg" SESAME_cgs="1.0e10" SESAME_cgs_Units="erg/g" />
+</Table>
+</PRISM_Conversions>
+
+
+

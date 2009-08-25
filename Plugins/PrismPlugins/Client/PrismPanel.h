@@ -1,11 +1,11 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    PrismSurfacePanel.h
+   Module:    PrismPanel.h
 
 =========================================================================*/
-#ifndef _PrismSurfacePanel_h
-#define _PrismSurfacePanel_h
+#ifndef _PrismPanel_h
+#define _PrismPanel_h
 
 #include <QWidget>
 #include <QVariant>
@@ -18,15 +18,15 @@ class QItemSelection;
 
 
 /// Widget which provides an editor for the properties of a display.
-class  PrismSurfacePanel : public pqNamedObjectPanel
+class  PrismPanel : public pqNamedObjectPanel
 {
   Q_OBJECT
   
 public:
   /// constructor
-  PrismSurfacePanel(pqProxy* proxy, QWidget* p = NULL);
+  PrismPanel(pqProxy* proxy, QWidget* p = NULL);
   /// destructor
-  ~PrismSurfacePanel();
+  ~PrismPanel();
 
 
 public slots:
@@ -43,11 +43,11 @@ protected:
   void setupVariables();
   void setupTableWidget();
   void updateVariables();
+  void setupConversions();
+  void updateConversions();
  // void setupLogScaling();
-  void updateXThresholds();
   void setupXThresholds();
 
-  void updateYThresholds();
   void setupYThresholds();
 
   class pqUI;
@@ -63,6 +63,10 @@ protected slots:
   void upperXChanged(double);
   void lowerYChanged(double);
   void upperYChanged(double);
+ 
+  void updateXThresholds();
+  void updateYThresholds();
+
 
   void useXLogScaling(bool);
   void useYLogScaling(bool);
@@ -79,9 +83,17 @@ protected slots:
   void onSelectAll();
   void onScientificNotation(bool);
 
+  void onConversionFileButton();
+  void onConversionTypeChanged(int);
+  void onDensityConversionChanged(const QString & text);
+  void onTemperatureConversionChanged(const QString & text);
+  void onPressureConversionChanged(const QString & text);
+  void onEnergyConversionChanged(const QString & text);
+
 private:
       bool eventFilter(QObject *object, QEvent *e);
   bool getRange(double& range_min, double& range_max);
+  void updateConverstions();
 
 
 
