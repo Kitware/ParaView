@@ -44,7 +44,6 @@ public:
 
   /// Get the action for the respective operation.
   QAction *actionDataLoadManager();
-  QAction *actionTemporalResetRange();
   QAction *actionShowEField();
   QAction *actionShowBField();
   QAction *actionShowParticles();
@@ -54,6 +53,8 @@ public:
   QAction *actionPlotOverZ();
   QAction *actionToggleBackgroundBW();
   QAction *actionShowStandardViewpoint();
+  QAction *actionTemporalResetRange();
+  QAction *actionCurrentTimeResetRange();
 
   /// Convenience function for getting the current server.
   pqServer *getActiveServer();
@@ -85,7 +86,6 @@ public:
 public slots:
   void showDataLoadManager();
   void checkActionEnabled();
-  void resetRangeTemporal();
   void showField(QString name);
   void showField(const char *name);
   void showEField();
@@ -97,6 +97,8 @@ public slots:
   void createPlotOverZ();
   void toggleBackgroundBW();
   void showStandardViewpoint();
+  void resetRangeTemporal();
+  void resetRangeCurrentTime();
 
 protected:
   /// Finds a pipeline source with the given SM XML name.  If there is more than
@@ -117,6 +119,12 @@ protected:
   bool CurrentFieldRangeKnown;
   double CurrentFieldRange[2];
   double CurrentFieldAverage;
+
+  /// If true, scale the fields by the values in the current timestep.  If
+  /// false and the entire field range is known, scale by the range over all
+  /// timesteps.  If the range over all timesteps is not known, fall back to
+  /// using only the range known.
+  bool ScaleFieldsByCurrentTimeStep;
 
 private:
   pqSLACManager(QObject *p);

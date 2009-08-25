@@ -91,6 +91,8 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 {
   this->Internal = new pqSLACManager::pqInternal;
 
+  this->ScaleFieldsByCurrentTimeStep = true;
+
   // This widget serves no real purpose other than initializing the Actions
   // structure created with designer that holds the actions.
   this->Internal->ActionPlaceholder = new QWidget(NULL);
@@ -100,8 +102,6 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
 
   QObject::connect(this->actionDataLoadManager(), SIGNAL(triggered(bool)),
                    this, SLOT(showDataLoadManager()));
-  QObject::connect(this->actionTemporalResetRange(), SIGNAL(triggered(bool)),
-                   this, SLOT(resetRangeTemporal()));
   QObject::connect(this->actionShowEField(), SIGNAL(triggered(bool)),
                    this, SLOT(showEField()));
   QObject::connect(this->actionShowBField(), SIGNAL(triggered(bool)),
@@ -120,6 +120,10 @@ pqSLACManager::pqSLACManager(QObject *p) : QObject(p)
                    this, SLOT(toggleBackgroundBW()));
   QObject::connect(this->actionShowStandardViewpoint(), SIGNAL(triggered(bool)),
                    this, SLOT(showStandardViewpoint()));
+  QObject::connect(this->actionTemporalResetRange(), SIGNAL(triggered(bool)),
+                   this, SLOT(resetRangeTemporal()));
+  QObject::connect(this->actionCurrentTimeResetRange(), SIGNAL(triggered(bool)),
+                   this, SLOT(resetRangeCurrentTime()));
 
   this->checkActionEnabled();
 }
@@ -134,11 +138,6 @@ pqSLACManager::~pqSLACManager()
 QAction *pqSLACManager::actionDataLoadManager()
 {
   return this->Internal->Actions.actionDataLoadManager;
-}
-
-QAction *pqSLACManager::actionTemporalResetRange()
-{
-  return this->Internal->Actions.actionTemporalResetRange;
 }
 
 QAction *pqSLACManager::actionShowEField()
@@ -184,6 +183,16 @@ QAction *pqSLACManager::actionToggleBackgroundBW()
 QAction *pqSLACManager::actionShowStandardViewpoint()
 {
   return this->Internal->Actions.actionShowStandardViewpoint;
+}
+
+QAction *pqSLACManager::actionTemporalResetRange()
+{
+  return this->Internal->Actions.actionTemporalResetRange;
+}
+
+QAction *pqSLACManager::actionCurrentTimeResetRange()
+{
+  return this->Internal->Actions.actionCurrentTimeResetRange;
 }
 
 //-----------------------------------------------------------------------------
@@ -338,18 +347,17 @@ void pqSLACManager::checkActionEnabled()
 
   if (!meshReader)
     {
-    this->actionTemporalResetRange()->setEnabled(false);
     this->actionShowEField()->setEnabled(false);
     this->actionShowBField()->setEnabled(false);
     this->actionSolidMesh()->setEnabled(false);
     this->actionWireframeSolidMesh()->setEnabled(false);
     this->actionWireframeAndBackMesh()->setEnabled(false);
     this->actionPlotOverZ()->setEnabled(false);
+    this->actionTemporalResetRange()->setEnabled(false);
+    this->actionCurrentTimeResetRange()->setEnabled(false);
     }
   else
     {
-    this->actionTemporalResetRange()->setEnabled(true);
-
     pqOutputPort *outputPort = meshReader->getOutputPort(0);
     vtkPVDataInformation *dataInfo = outputPort->getDataInformation();
     vtkPVDataSetAttributesInformation *pointFields
@@ -366,58 +374,12 @@ void pqSLACManager::checkActionEnabled()
 
     this->actionPlotOverZ()->setEnabled(
                             pointFields->GetArrayInformation("efield") != NULL);
+
+    this->actionTemporalResetRange()->setEnabled(true);
+    this->actionCurrentTimeResetRange()->setEnabled(true);
     }
 
   this->actionShowParticles()->setEnabled(particlesReader != NULL);
-}
-
-//-----------------------------------------------------------------------------
-void pqSLACManager::resetRangeTemporal()
-{
-  // Check to see if the ranges are already computed.
-  if (this->getTemporalRanges()) return;
-
-  pqApplicationCore *core = pqApplicationCore::instance();
-  pqObjectBuilder *builder = core->getObjectBuilder();
-  pqUndoStack *stack = core->getUndoStack();
-
-  pqPipelineSource *meshReader = this->getMeshReader();
-  if (!meshReader) return;
-
-  if (stack) stack->beginUndoSet("Compute Ranges Over Time");
-
-  // Turn on reading the internal volume, which is necessary for plotting
-  // through the volume.
-  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
-  pqSMAdaptor::setElementProperty(
-                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
-  meshReaderProxy->UpdateVTKObjects();
-  meshReader->updatePipeline();
-
-  // Create the temporal ranges filter.
-  pqPipelineSource *rangeFilter = builder->createFilter("filters",
-                                                        "TemporalRanges",
-                                                        meshReader, 1);
-
-  this->showField(this->CurrentFieldName);
-
-  // We have already pushed everything to the server manager, and I don't want
-  // to bother making representations.  Thus, it is unnecessary to make any
-  // further modifications.
-  meshReader->setModifiedState(pqProxy::UNMODIFIED);
-  rangeFilter->setModifiedState(pqProxy::UNMODIFIED);
-
-  // This is something of a hack to make the pending display manager to realize
-  // that I have already created all necessary displays (actually, I might not
-  // have, but I don't care).  This should go away soon.
-  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
-                                      core->manager("PENDING_DISPLAY_MANAGER"));
-  if (pdmanager)
-    {
-    pdmanager->removePendingDisplayForSource(rangeFilter);
-    }
-
-  if (stack) stack->endUndoSet();
 }
 
 //-----------------------------------------------------------------------------
@@ -477,8 +439,7 @@ void pqSLACManager::showField(const char *name)
 
   // Set up range of scalars to best we know of.
   pqPipelineSource *temporalRanges = this->getTemporalRanges();
-  this->CurrentFieldRangeKnown = (temporalRanges != NULL);
-  if (this->CurrentFieldRangeKnown)
+  if (temporalRanges)
     {
     // Retrieve the ranges of data over all time.
     vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
@@ -499,6 +460,7 @@ void pqSLACManager::showField(const char *name)
       rangeData = ranges->GetColumnByName(magName.toAscii().data());
       }
 
+    this->CurrentFieldRangeKnown = true;
     this->CurrentFieldRange[0]
       = rangeData->GetVariantValue(vtkTemporalRanges::MINIMUM_ROW).ToDouble();
     this->CurrentFieldRange[1]
@@ -506,17 +468,24 @@ void pqSLACManager::showField(const char *name)
     this->CurrentFieldAverage
       = rangeData->GetVariantValue(vtkTemporalRanges::AVERAGE_ROW).ToDouble();
 
-    lut->setScalarRange(0.0, 2.0*this->CurrentFieldAverage);
-
     // Cleanup.
     delivery->Delete();
     }
   else
     {
+    this->CurrentFieldRangeKnown = false;
+    }
+
+  if (this->ScaleFieldsByCurrentTimeStep || !this->CurrentFieldRangeKnown)
+    {
     // Set the range of the scalars to the current range of the field.
     double range[2];
     arrayInfo->GetComponentRange(-1, range);
     lut->setScalarRange(range[0], range[1]);
+    }
+  else
+    {
+    lut->setScalarRange(0.0, 2.0*this->CurrentFieldAverage);
     }
 
   lutProxy->UpdateVTKObjects();
@@ -864,4 +833,66 @@ void pqSLACManager::showStandardViewpoint()
     view->resetViewDirection(1, 0, 0,
                              0, 1, 0);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::resetRangeTemporal()
+{
+  this->ScaleFieldsByCurrentTimeStep = false;
+
+  // Check to see if the ranges are already computed.
+  if (this->getTemporalRanges())
+    {
+    this->showField(this->CurrentFieldName);
+    return;
+    }
+
+  pqApplicationCore *core = pqApplicationCore::instance();
+  pqObjectBuilder *builder = core->getObjectBuilder();
+  pqUndoStack *stack = core->getUndoStack();
+
+  pqPipelineSource *meshReader = this->getMeshReader();
+  if (!meshReader) return;
+
+  if (stack) stack->beginUndoSet("Compute Ranges Over Time");
+
+  // Turn on reading the internal volume, which is necessary for plotting
+  // through the volume.
+  vtkSMProxy *meshReaderProxy = meshReader->getProxy();
+  pqSMAdaptor::setElementProperty(
+                      meshReaderProxy->GetProperty("ReadInternalVolume"), true);
+  meshReaderProxy->UpdateVTKObjects();
+  meshReader->updatePipeline();
+
+  // Create the temporal ranges filter.
+  pqPipelineSource *rangeFilter = builder->createFilter("filters",
+                                                        "TemporalRanges",
+                                                        meshReader, 1);
+
+  this->showField(this->CurrentFieldName);
+
+  // We have already pushed everything to the server manager, and I don't want
+  // to bother making representations.  Thus, it is unnecessary to make any
+  // further modifications.
+  meshReader->setModifiedState(pqProxy::UNMODIFIED);
+  rangeFilter->setModifiedState(pqProxy::UNMODIFIED);
+
+  // This is something of a hack to make the pending display manager to realize
+  // that I have already created all necessary displays (actually, I might not
+  // have, but I don't care).  This should go away soon.
+  pqPendingDisplayManager* pdmanager = qobject_cast<pqPendingDisplayManager*>(
+                                      core->manager("PENDING_DISPLAY_MANAGER"));
+  if (pdmanager)
+    {
+    pdmanager->removePendingDisplayForSource(rangeFilter);
+    }
+
+  if (stack) stack->endUndoSet();
+}
+
+//-----------------------------------------------------------------------------
+void pqSLACManager::resetRangeCurrentTime()
+{
+  this->ScaleFieldsByCurrentTimeStep = true;
+  this->showField(this->CurrentFieldName);
 }
