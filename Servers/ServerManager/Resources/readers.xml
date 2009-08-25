@@ -3264,11 +3264,9 @@
         name="ElementBlockArrayStatus"
         label="Element Blocks"
         command="SetElementBlockArrayStatus"
-        number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="ElementBlockArrayInfo" >
+        element_types="2 0" >
        <SILDomain name="array_list" subtree="Blocks">
           <RequiredProperties>
              <Property name="ElementBlockArrayInfo" function="ArrayList" />
@@ -3286,7 +3284,6 @@
         name="GlobalResultArrayStatus"
         label="Global Variables"
         command="SetGlobalResultArrayStatus"
-        number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
