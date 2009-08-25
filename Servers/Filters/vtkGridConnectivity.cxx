@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.5");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.6");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -588,9 +588,12 @@ void vtkGridConnectivityExecuteProcess(
           vtkIdType numPoints = faceCell->GetNumberOfPoints();
           if (numPoints == 3)
             {
-            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
-            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
-            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
+            vtkIdType ptId1 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(0)]);
+            vtkIdType ptId2 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(1)]);
+            vtkIdType ptId3 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(2)]);
             face = faceHash->AddFace(ptId1, ptId2, ptId3);
             }
           else if (numPoints == 4)
@@ -1015,7 +1018,7 @@ void vtkGridConnectivity::GenerateOutput(
   numArrays = this->CellAttributesIntegration.size();
   for (int ii = 0; ii < numArrays; ++ii)
     {
-    vtkDataArray *da = this->CellAttributesIntegration[ii];
+    da = this->CellAttributesIntegration[ii];
     output->GetFieldData()->AddArray(da);
     }
     
