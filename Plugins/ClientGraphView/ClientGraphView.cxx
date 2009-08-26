@@ -670,18 +670,21 @@ void ClientGraphView::renderInternal()
   vtkRenderedGraphRepresentation* rep = vtkRenderedGraphRepresentation::SafeDownCast(
     this->Implementation->View->GetRepresentation());
 
-  // Force the label to hover directly over the vertex point
-  // (or icon if visible).
-  double fontSize = rep->GetVertexLabelTextProperty()->GetFontSize();
-  if (rep->GetVertexIconVisibility())
+  if (rep)
     {
-    double iconSize = this->Implementation->View->GetIconSize()[1];
-    rep->GetVertexLabelTextProperty()->SetLineOffset(-iconSize/2 - fontSize/2);
-    }
-  else
-    {
-    double pointSize = this->Implementation->Theme->GetPointSize();
-    rep->GetVertexLabelTextProperty()->SetLineOffset(-pointSize/2 - fontSize/2);
+    // Force the label to hover directly over the vertex point
+    // (or icon if visible).
+    double fontSize = rep->GetVertexLabelTextProperty()->GetFontSize();
+    if (rep->GetVertexIconVisibility())
+      {
+      double iconSize = this->Implementation->View->GetIconSize()[1];
+      rep->GetVertexLabelTextProperty()->SetLineOffset(-iconSize/2 - fontSize/2);
+      }
+    else
+      {
+      double pointSize = this->Implementation->Theme->GetPointSize();
+      rep->GetVertexLabelTextProperty()->SetLineOffset(-pointSize/2 - fontSize/2);
+      }
     }
 
   if(vtkSMPropertyHelper(this->getProxy(),"ZoomToSelection").GetAsInt())
