@@ -31,27 +31,34 @@
 #ifndef __vtkNetDmfReader_h
 #define __vtkNetDmfReader_h
 
-#include "vtkGraphReader.h"
+#include "vtkDirectedGraphAlgorithm.h"
+#include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkDataObject;
 class vtkDataArraySelection;
 class vtkCallbackCommand;
 class vtkMultiProcessController;
+class vtkMutableDirectedGraph;
 class vtkNetDmfReaderInternal;
 class vtkNetDmfReaderGrid;
 
 //BTX
 class XdmfDsmBuffer;
-class XdmfDOM;
+class NetDMFDOM;
+class NetDMFElement;
 //ETX
 
-class VTK_EXPORT vtkNetDmfReader : public vtkGraphReader
+class VTK_EXPORT vtkNetDmfReader : public vtkDirectedGraphAlgorithm
 {
 public:
   static vtkNetDmfReader* New();
-  vtkTypeRevisionMacro(vtkNetDmfReader, vtkGraphReader);
+  vtkTypeRevisionMacro(vtkNetDmfReader, vtkDirectedGraphAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void SetFileName(const vtkStdString& fileName);
+  //const vtkStdString& GetFileName()const;
+  const char* GetFileName()const;
+  
   // Description:
   // Determine if the file can be readed with this reader.
   virtual int CanReadFile(const char* fname);
@@ -68,6 +75,14 @@ public:
 
   vtkGetVector2Macro(TimeStepRange, int);
 
+  vtkSetMacro(ShowEvents, bool);
+  vtkGetMacro(ShowEvents, bool);
+
+  vtkSetMacro(ShowConversations, bool);
+  vtkGetMacro(ShowConversations, bool);
+
+  vtkSetMacro(ShowMovements, bool);
+  vtkGetMacro(ShowMovements, bool);
 protected:
   vtkNetDmfReader();
   ~vtkNetDmfReader();
@@ -78,22 +93,36 @@ protected:
   // only if needed.
   bool ParseXML();
 
-  virtual int RequestDataObject(vtkInformation *request,
-                                vtkInformationVector **inputVector,
-                                vtkInformationVector *outputVector);
+  vtkStdString GetElementName(NetDMFElement* element);
+
+  void AddNetDMFElement(vtkMutableDirectedGraph* graph,
+                        NetDMFElement* element, 
+                        vtkIdType parent = -1);
+
+  //virtual int RequestDataObject(vtkInformation *request,
+  //                              vtkInformationVector **inputVector,
+  //                              vtkInformationVector *outputVector);
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **,
                           vtkInformationVector *);
-  virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
-                                 vtkInformationVector *);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  //virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
+  //                               vtkInformationVector *);
+  //virtual int FillOutputPortInformation(int port, vtkInformation *info);
 
-  vtkNetDmfReaderInternal* Internals;
-  XdmfDOM         *DOM;
+  vtkNetDmfReaderInternal* Internal;
+  NetDMFDOM     *DOM;
 
   unsigned int   ActualTimeStep;
   int            TimeStep;
-  int TimeStepRange[2];
+  int            TimeStepRange[2];
+
+  vtkTimeStamp   ParseTime;
+  vtkStdString   FileName;
+  long int       FileParseTime;
+
+  bool           ShowEvents;
+  bool           ShowConversations;
+  bool           ShowMovements;
 
 private:
   vtkNetDmfReader(const vtkNetDmfReader&); // Not implemented

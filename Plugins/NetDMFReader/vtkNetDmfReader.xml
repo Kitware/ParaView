@@ -47,7 +47,26 @@
          Set the current timestep.
        </Documentation>
      </IntVectorProperty>
-     
+<!--
+     <IntVectorProperty 
+        name="ShowEventsInfo"
+        command="GetShowEvents"
+        number_of_elements="1"
+        default_values="1">
+       <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     <IntVectorProperty 
+        name="Show Events"
+        command="SetShowEvents"
+        number_of_elements="1"
+        default_values="1"
+        information_property="ShowEventsInfo">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Show/Hide the event nodes.
+       </Documentation>
+     </IntVectorProperty>
+    --> 
    <!-- End NetDmfReader -->
    </SourceProxy>
   </ProxyGroup>

@@ -48,8 +48,11 @@
 #include "vtkDataObject.h"
 #include "vtkInformation.h"
 #include "vtkCharArray.h"
+#include "vtkStringArray.h"
 #include "vtkInformationVector.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkVariantArray.h"
 
 #include "XdmfArray.h"
 #include "XdmfAttribute.h"
@@ -66,33 +69,28 @@
 #include <vtkstd/set>
 #include <vtkstd/map>
 #include <vtkstd/string>
+#include <vtksys/ios/sstream>
 #include <vtkstd/vector>
 #include <vtksys/SystemTools.hxx>
 #include <assert.h>
 #include <functional>
 #include <algorithm>
 
-#include "NetDMFScenario.h"
+#include "NetDMFAddressItem.h"
+#include "NetDMFConversation.h"
+#include "NetDMFEvent.h"
 #include "NetDMFNode.h"
+#include "NetDMFResult.h"
+#include "NetDMFScenario.h"
+#include "NetDMFRoot.h"
+#include "NetDMFMovement.h"
 
-#define USE_IMAGE_DATA // otherwise uniformgrid
+#define VTK_CREATE(type,name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkNetDmfReader);
-vtkCxxRevisionMacro(vtkNetDmfReader, "1.1");
-
-#if defined(_WIN32) && (defined(_MSC_VER) || defined(__BORLANDC__))
-#  include <direct.h>
-#  define GETCWD _getcwd
-#else
-#include <unistd.h>
-#  define GETCWD getcwd
-#endif
-
-#define vtkMAX(x, y) (((x)>(y))?(x):(y))
-#define vtkMIN(x, y) (((x)<(y))?(x):(y))
-
-#define PRINT_EXTENT(x) "[" << (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5] << "]" 
+vtkCxxRevisionMacro(vtkNetDmfReader, "1.2");
 
 //============================================================================
 class vtkNetDmfReaderInternal
@@ -122,27 +120,6 @@ public:
     this->InputString = 0;
   }
 
-
-  // Returns the domain node for the domain with given name. If none such domain
-  // exists, returns the 1st domain, if any.
-  XdmfXmlNode GetDomain(const char* domainName)
-    {
-    if (domainName)
-      {
-      vtkstd::map<vtkstd::string, XdmfXmlNode>::iterator iter =
-        this->DomainMap.find(domainName);
-      if (iter != this->DomainMap.end())
-        {
-        return iter->second;
-        }
-      }
-    if (this->DomainList.size() > 0)
-      {
-      return this->GetDomain(this->DomainList[0].c_str());
-      }
-    return 0;
-    }
-
   vtkNetDmfReaderGrid* GetGrid(const char* gridName);
   vtkNetDmfReaderGrid* GetGrid(int idx);
   vtkNetDmfReaderGrid *AddGrid(
@@ -162,10 +139,8 @@ public:
     int isSubBlock,
     double progressS, double progressE);
   
+  vtkstd::map<vtkStdString, int> ElementCount;
  
-  vtkstd::vector<XdmfFloat64> TimeValues;
-  vtkstd::vector<vtkstd::string> DomainList;
-  vtkstd::map<vtkstd::string, XdmfXmlNode> DomainMap;
   // vtkNetDmfReaderGrid *ParallelLevel;
   vtkstd::vector<vtkNetDmfReaderGrid*> ParallelLevels;
   vtkNetDmfReader* Reader;
@@ -214,7 +189,10 @@ public:
   void StartElement(const char* name, const char**)
     {
       this->Done = 1;
-      if(strcmp(name, "Xdenf") == 0)
+      vtkstd::string nameString(name);
+      if (nameString == "Xdenf" || 
+          nameString == "NetDMF" || 
+          nameString == "Xmn")
         {
         this->Valid = 1;
         }
@@ -246,8 +224,8 @@ vtkStandardNewMacro(vtkNetDmfReaderTester);
 //============================================================================
 vtkNetDmfReader::vtkNetDmfReader()
 {  
-  this->Internals = new vtkNetDmfReaderInternal;
-  this->Internals->Reader = this;
+  this->Internal = new vtkNetDmfReaderInternal;
+  this->Internal->Reader = this;
 
   this->DOM = 0;
 
@@ -258,12 +236,17 @@ vtkNetDmfReader::vtkNetDmfReader()
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
   // this->DebugOn();
+  this->SetNumberOfInputPorts(0);
+  
+  this->ShowEvents = false;
+  this->ShowConversations = true;
+  this->ShowMovements = true;
 }
 
 //----------------------------------------------------------------------------
 vtkNetDmfReader::~vtkNetDmfReader()
 {
-  delete this->Internals;
+  delete this->Internal;
 
   if ( this->DOM )
     {
@@ -273,7 +256,21 @@ vtkNetDmfReader::~vtkNetDmfReader()
   H5garbage_collect();
 }
 
-
+void vtkNetDmfReader::SetFileName(const vtkStdString& fileName)
+{
+  this->FileName = fileName;
+  this->Modified();
+}
+/*
+const vtkStdString& vtkNetDmfReader::GetFileName()const
+{
+  return this->FileName;
+}
+*/
+const char* vtkNetDmfReader::GetFileName()const
+{
+  return this->FileName.c_str();
+}
 
 //----------------------------------------------------------------------------
 int vtkNetDmfReader::CanReadFile(const char* fname)
@@ -283,36 +280,18 @@ int vtkNetDmfReader::CanReadFile(const char* fname)
   int res = tester->TestReadFile();
   tester->Delete();
 
-
-  XdmfDOM* Dom = new XdmfDOM();
-  Dom->Parse(fname);
-  cout << "Parsed XML" << endl;
-  XdmfXmlNode scennode = Dom->FindElement("Scenario");
-  NetDMFScenario* scenario = new NetDMFScenario();
-  scenario->SetDOM(Dom);
-  scenario->SetElement(scennode);
-  scenario->UpdateInformation();
-  int nnodes = scenario->GetNumberOfNodes();
-  for( int i = 0 ; i < nnodes ; ++i)
-    {
-    cout << scenario->GetNode(i)->GetName() << " has "
-              << scenario->GetNode(i)->GetNumberOfDevices() << " devices" 
-              << endl;
-    }
-  cout << "Found " << nnodes << " Nodes" << endl;
-
   return res;
 }
 
 //----------------------------------------------------------------------------
-
+/*
 int vtkNetDmfReader::FillOutputPortInformation(int,
                                              vtkInformation *info)
 { 
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkGraph");
   return 1;
 }
-
+*/
 //----------------------------------------------------------------------------
 void vtkNetDmfReader::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -322,98 +301,44 @@ void vtkNetDmfReader::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkNetDmfReader::ParseXML()
 {
-  cout << "Begin Parsing" << endl;
+  cout << __FUNCTION__ << endl;
   // * Ensure that the required objects have been instantiated.
   if (!this->DOM)
     {
-    this->DOM = new XdmfDOM();
+    this->DOM = new NetDMFDOM();
     }
-  if ( !this->Internals->DataItem )
+
+  // * Check if the XML needs to be re-read.
+  bool modified = false;
+  // Parse the file...
+  // First make sure the file exists.  This prevents an empty file
+  // from being created on older compilers.
+  if (this->FileName.empty() || 
+      !vtksys::SystemTools::FileExists(this->FileName))
     {
-    this->Internals->DataItem = new XdmfDataItem();
-    this->Internals->DataItem->SetDOM(this->DOM);
+    vtkErrorMacro("Can't read file: \"" << this->FileName.c_str() << "\"");
+    return false;
     }
-
-  // * Check if the XML file needs to be re-read.
-  bool modified = true;
-  if (this->GetReadFromInputString())
-    {
-    const char* data=0;
-    unsigned int data_length=0;
-    if (this->InputArray)
-      {
-      vtkDebugMacro(<< "Reading from InputArray");
-      data = this->InputArray->GetPointer(0);
-      data_length = static_cast<unsigned int>(
-        this->InputArray->GetNumberOfTuples()*
-        this->InputArray->GetNumberOfComponents());
-      }
-    else if (this->InputString)
-      {
-      data = this->InputString;
-      data_length = this->InputStringLength;
-      }
-    else
-      {
-      vtkErrorMacro("No input string specified");
-      return false;
-      }
-    vtkDebugMacro("Input Text Changed ...  re-parseing");
-    delete [] this->Internals->InputString;
-    this->Internals->InputString = new char[data_length+1];
-    memcpy(this->Internals->InputString, data, data_length);
-    this->Internals->InputString[data_length] = 0; 
-    this->Internals->InputStringLength = data_length;
-
-    this->DOM->SetInputFileName(0);
-    this->DOM->Parse(this->Internals->InputString);
-    }
-  else
-    {
-    // Parse the file...
-    if (!this->FileName )
-      {
-      vtkErrorMacro("File name not set");
-      return false;
-      }
-
-    // First make sure the file exists.  This prevents an empty file
-    // from being created on older compilers.
-    if (!vtksys::SystemTools::FileExists(this->FileName))
-      {
-      vtkErrorMacro("Error opening file " << this->FileName);
-      return false;
-      }
-
-
-    if (this->DOM->GetInputFileName() &&
-      STRCASECMP(this->DOM->GetInputFileName(), this->FileName) == 0)
-      {
-      vtkDebugMacro("Filename Unchanged ... skipping re-parse()");
-      modified = false;
-      }
-    else
-      {
-      vtkDebugMacro("Parsing file: " << this->FileName);
-
-      //Tell the parser what the working directory is.
-      vtkstd::string directory =
-        vtksys::SystemTools::GetFilenamePath(this->FileName) + "/";
-      if (directory == "/")
-        {
-        directory = vtksys::SystemTools::GetCurrentWorkingDirectory() + "/";
-        }
-      //    directory = vtksys::SystemTools::ConvertToOutputPath(directory.c_str());
-      this->DOM->SetWorkingDirectory(directory.c_str());
-      this->DOM->SetInputFileName(this->FileName);
-      this->DOM->Parse(this->FileName);
-      }
-    }
-  cout << "Done Parsing" << endl;
-
+  
+  modified = this->FileName != this->DOM->GetInputFileName() ||
+    vtksys::SystemTools::ModifiedTime(this->FileName) > this->FileParseTime;
+     
   if (modified)
     {
-    cout << "ParseXML" << endl;
+    //Tell the parser what the working directory is.
+    vtkstd::string directory =
+      vtksys::SystemTools::GetFilenamePath(this->FileName) + "/";
+    if (directory == "/")
+      {
+      directory = vtksys::SystemTools::GetCurrentWorkingDirectory() + "/";
+      }
+    //    directory = vtksys::SystemTools::ConvertToOutputPath(directory.c_str());
+    this->DOM->SetWorkingDirectory(directory.c_str());
+    this->DOM->SetInputFileName(this->FileName);
+    this->DOM->Parse(this->FileName);
+    this->FileParseTime = vtksys::SystemTools::ModifiedTime(this->FileName);
+    this->ParseTime.Modified();
+    cout << __FUNCTION__ << " done" << endl;
     // Since the DOM was re-parsed we need to update the cache for domains
     // and re-populate the grids.
     //this->UpdateDomains();
@@ -423,6 +348,7 @@ bool vtkNetDmfReader::ParseXML()
 }
 
 //----------------------------------------------------------------------------
+/*
 int vtkNetDmfReader::RequestDataObject(vtkInformation *vtkNotUsed(request),
                                        vtkInformationVector **vtkNotUsed(inputVector),
                                        vtkInformationVector *outputVector)
@@ -449,8 +375,10 @@ int vtkNetDmfReader::RequestDataObject(vtkInformation *vtkNotUsed(request),
 
   return 1;
 }
+*/
 
 //-----------------------------------------------------------------------------
+/*
 int vtkNetDmfReader::RequestInformation(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
@@ -467,17 +395,7 @@ int vtkNetDmfReader::RequestInformation(
 
   return 1;
 }
-
-//----------------------------------------------------------------------------
-class WithinTolerance: public vtkstd::binary_function<double, double, bool>
-{
-public:
-    result_type operator()(first_argument_type a, second_argument_type b) const
-    {
-      bool result = (fabs(a-b)<=(a*1E-6));
-      return (result_type)result;
-    }
-};
+*/
 
 //----------------------------------------------------------------------------
 int vtkNetDmfReader::RequestData(
@@ -485,16 +403,9 @@ int vtkNetDmfReader::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  if ( !this->GetReadFromInputString() && !this->FileName )
-    {
-    vtkErrorMacro("Not Reading from String and File name not set");
-    return 0;
-    }
-  if ( !this->DOM )
-    {
-    return 0;
-    }
-  
+  // The file has been read in the RequestDataObject method.
+  // Here we create the graph based on the parsed XML.
+  this->ParseXML();
   //long int starttime = this->GetMTime();
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
@@ -505,34 +416,378 @@ int vtkNetDmfReader::RequestData(
     return VTK_ERROR;
     }
 
-  this->Internals->UpdatePiece     = 0;
-  this->Internals->UpdateNumPieces = 1;
+  this->Internal->UpdatePiece     = 0;
+  this->Internal->UpdateNumPieces = 1;
 
   if (outInfo->Has(
         vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()))
     {
-    this->Internals->UpdatePiece = 
+    this->Internal->UpdatePiece = 
       outInfo->Get(
         vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
     }
   if (outInfo->Has(
         vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
     {
-    this->Internals->UpdateNumPieces =
+    this->Internal->UpdateNumPieces =
       outInfo->Get(
         vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
     }
   
-  vtkDebugMacro( << "UpdatePiece " << this->Internals->UpdatePiece << " : UpdateNumPieces " << this->Internals->UpdateNumPieces);
+  vtkDebugMacro( << "UpdatePiece " << this->Internal->UpdatePiece 
+                 << " : UpdateNumPieces " << this->Internal->UpdateNumPieces
+                 );
+  vtkMutableDirectedGraph* output = vtkMutableDirectedGraph::New();
+  // Vertex Attribute Data Set
+  vtkStringArray* names = vtkStringArray::New();
+  names->SetName("Name");
+  output->GetVertexData()->SetPedigreeIds(names);
+  names->Delete();
+  
+  vtkStringArray* types = vtkStringArray::New();
+  types->SetName("Type");
+  output->GetVertexData()->AddArray(types);
+  types->Delete();
 
+  vtkStringArray* classes = vtkStringArray::New();
+  classes->SetName("Class");
+  output->GetVertexData()->AddArray(classes);
+  classes->Delete();
+
+
+  // Edge Attribute Data Set
+  vtkStringArray* conversationType = vtkStringArray::New();
+  conversationType->SetName("ConversationType");
+  output->GetEdgeData()->AddArray(conversationType);
+  conversationType->Delete();
+    
   //
   // Find the correct time step
   //
   this->ActualTimeStep = this->TimeStep;
+  
+//  vtkVariantArray* propertyArr = vtkVariantArray::New();
 
-  this->Internals->FindParallelism();
-
+  // Get the addressItems as vertexs
+/*
+  for (XdmfXmlNode addressNode = this->DOM->FindNextRecursiveElement("AddressItem");
+       addressNode; 
+       addressNode = this->DOM->FindNextRecursiveElement("AddressItem", addressNode))
+    {
+    //cout << " found Address : " << addressNode << endl;
+    NetDMFAddressItem* address = new NetDMFAddressItem();
+    address->SetDOM(this->DOM);
+    address->SetElement(addressNode);
+    address->UpdateInformation();
+    address->Update();
+    
+    int numberOfAddresses = address->GetNumberOfAddresses();
+    for (int j=0; j < numberOfAddresses;++j)
+      {
+      // make sure the address is not already added
+      vtkStdString addressString = address->GetAddress(j);
+      if (output->FindVertex(addressString)!=-1)
+        {
+        continue;
+        }
+      //cout << " Address : " << address->GetAddress(j) << endl;
+      names->InsertNextValue(addressString);
+      types->InsertNextValue(address->GetAddressTypeAsString());
+      classes->InsertNextValue(address->GetClassName());
+      output->AddVertex();
+      }
+    delete address;
+    }
+*/
+  this->Internal->ElementCount.clear();
+  for (XdmfXmlNode rootNode = this->DOM->FindRecursiveElement("NetDMF");
+       rootNode; 
+       rootNode = this->DOM->FindNextRecursiveElement("NetDMF", rootNode))
+    {
+    NetDMFRoot* root = new NetDMFRoot();
+    root->SetDOM(this->DOM);
+    root->SetElement(rootNode);
+    root->UpdateInformation();
+    
+    this->AddNetDMFElement(output, root);
+    //output->AddVertex();
+    delete root;
+    }
   //long int endtime = this->GetMTime();
-
+  vtkDirectedGraph::SafeDownCast(outStructure)->DeepCopy(output);
+  output->Delete();
+  
   return 1;
+}
+
+vtkStdString vtkNetDmfReader::GetElementName(NetDMFElement* element)
+{
+  int index = this->Internal->ElementCount[element->GetClassName()]++;
+  if (element->GetName())
+    {
+    return element->GetName();
+    }
+  vtksys_ios::stringstream uid;
+  uid << element->GetClassName() << index;
+  return uid.str();
+}
+
+void vtkNetDmfReader::AddNetDMFElement(vtkMutableDirectedGraph* graph, 
+                                       NetDMFElement* element, 
+                                       vtkIdType parentVertexId/*=-1*/)
+{
+  
+  VTK_CREATE(vtkVariantArray, properties);
+  VTK_CREATE(vtkVariantArray, edgeProperties);
+  vtkIdType elementVertexId = parentVertexId;
+
+  vtkStdString elementName = this->GetElementName(element);
+
+  // ROOT
+  if (dynamic_cast<NetDMFRoot*>(element) != 0)
+    {
+    NetDMFRoot* root = dynamic_cast<NetDMFRoot*>(element);
+
+    vtksys_ios::stringstream rootVersion;
+    rootVersion << root->GetVersion();
+    vtkStdString rootName(root->GetName()?root->GetName():"");
+    vtkStdString rootType(rootVersion.str());
+
+    properties->InsertNextValue(elementName);          // name
+    properties->InsertNextValue(rootType);             // type
+    properties->InsertNextValue(root->GetClassName()); // class
+    elementVertexId = graph->AddVertex(properties);
+    //elementVertexId = graph->AddVertex();
+
+    // Get the scenario nodes
+    for (XdmfXmlNode scenarioNode = this->DOM->FindNextRecursiveElement("Scenario", root->GetElement());
+         scenarioNode; 
+         scenarioNode = this->DOM->FindNextRecursiveElement("Scenario", scenarioNode, root->GetElement()))
+      {
+      NetDMFScenario* scenario = new NetDMFScenario();
+      scenario->SetDOM(this->DOM);
+      scenario->SetElement(scenarioNode);
+      scenario->UpdateInformation();
+
+      this->AddNetDMFElement(graph, scenario, elementVertexId);
+      delete scenario;
+      }
+
+    // Get the result nodes
+    for (XdmfXmlNode resultNode = this->DOM->FindNextRecursiveElement("Result", root->GetElement());
+         resultNode; 
+         resultNode = this->DOM->FindNextRecursiveElement("Result", resultNode, root->GetElement()))
+      {
+      NetDMFResult* result = new NetDMFResult();
+      result->SetDOM(this->DOM);
+      result->SetElement(resultNode);
+      result->UpdateInformation();
+
+      this->AddNetDMFElement(graph, result, elementVertexId);
+      delete result;
+      }
+
+    }
+  // SCENARIO
+  else if (dynamic_cast<NetDMFScenario*>(element) != 0)
+    {
+    NetDMFScenario* scenario = dynamic_cast<NetDMFScenario*>(element);
+    
+    properties->InsertNextValue(elementName);              // name
+    properties->InsertNextValue("");                       // type
+    properties->InsertNextValue(scenario->GetClassName()); // class
+    elementVertexId = graph->AddVertex(properties);
+
+    int numberOfNodes = scenario->GetNumberOfNodes();
+    for (int i = 0; i < numberOfNodes; ++i)
+      {
+      this->AddNetDMFElement(graph, scenario->GetNode(i), elementVertexId);
+      }
+    }
+  // RESULT
+  else if (dynamic_cast<NetDMFResult*>(element) != 0)
+    {
+    NetDMFResult* result = dynamic_cast<NetDMFResult*>(element);
+    
+    properties->InsertNextValue(elementName);            // name
+    properties->InsertNextValue("");                     // type
+    properties->InsertNextValue(result->GetClassName()); // class
+    elementVertexId = graph->AddVertex(properties);
+
+    int eventNumber = result->GetNumberOfEvents();
+    for (int i = 0; i < eventNumber; ++i)
+      {
+      this->AddNetDMFElement(graph, result->GetEvent(i), elementVertexId);
+      }
+    }
+  // NODE
+  else if (dynamic_cast<NetDMFNode*>(element) != 0)
+    {
+    NetDMFNode* node = dynamic_cast<NetDMFNode*>(element);
+
+    // make sure the name is not already added
+    vtkStdString nodeName = elementName;
+    elementVertexId = graph->FindVertex(nodeName);
+    if (elementVertexId == -1)
+      {
+      vtksys_ios::stringstream nodeId;
+      nodeId << node->GetNodeId();
+      vtkStdString nodeType(nodeId.str());
+
+      properties->InsertNextValue(elementName);          // name
+      properties->InsertNextValue(nodeType);             // type
+      properties->InsertNextValue(node->GetClassName()); // class
+      elementVertexId = graph->AddVertex(properties);
+      }
+
+    int numberOfAddresses = node->GetNumberOfAddresses();
+    for (int j=0; j < numberOfAddresses; ++j)
+      {
+      this->AddNetDMFElement(graph, node->GetAddress(j), elementVertexId);
+      }
+    }
+  // ADDRESSITEM
+  else if (dynamic_cast<NetDMFAddressItem*>(element))
+    {
+    NetDMFAddressItem* address = dynamic_cast<NetDMFAddressItem*>(element);
+    // AddressItem::Update() is necessary. It retrieve the AddressItem data.
+    address->Update();
+    
+    // addressType is typically: ETH, IP...
+    vtkStdString addressType = address->GetAddressTypeAsString();
+    edgeProperties->InsertNextValue(addressType);
+    
+    int numberOfAddresses = address->GetNumberOfAddresses();
+    for (int j=0; j < numberOfAddresses;++j)
+      {
+      // make sure the address is not already added
+      vtkStdString addressName = address->GetAddress(j);
+      elementVertexId = graph->FindVertex(addressName);
+      if (elementVertexId == -1)
+        {
+        //names->InsertNextValue(addressString);
+        //types->InsertNextValue(address->GetAddressTypeAsString());
+        properties->Initialize();
+        properties->InsertNextValue(addressName);             // name
+        properties->InsertNextValue(addressType);             // type
+        properties->InsertNextValue(address->GetClassName()); // class
+        elementVertexId = graph->AddVertex(properties);
+        }
+      if (parentVertexId != -1 && elementVertexId != -1)
+        {
+        graph->AddEdge(parentVertexId, elementVertexId, edgeProperties);
+        }
+      // set to invalid to don't add another edge at the end of the function.
+      elementVertexId = -1;
+      }
+    }
+  // EVENT
+  else if (dynamic_cast<NetDMFEvent*>(element))
+    {
+    NetDMFEvent* event = dynamic_cast<NetDMFEvent*>(element);
+    vtkStdString eventType(event->GetEventTypeAsString());
+    if (this->GetShowEvents())
+      {
+      properties->InsertNextValue(elementName);           // name
+      properties->InsertNextValue(eventType);             // type
+      properties->InsertNextValue(event->GetClassName()); // class
+      elementVertexId = graph->AddVertex(properties);
+      }
+
+    int numberOfAddresses = event->GetNumberOfAddressItems();
+    for (int j=0; j < numberOfAddresses; ++j)
+      {
+      this->AddNetDMFElement(graph, event->GetAddressItem(j), elementVertexId);
+      }
+    
+    int numberOfEvents = event->GetNumberOfChildren();
+    for (int j=0; j < numberOfEvents; ++j)
+      {
+      this->AddNetDMFElement(graph, event->GetChildEvent(j), elementVertexId);
+      }
+    // Conversations must be done after AddressItems and subEvent to make sure 
+    // the addresses already exist.
+    int numberOfConversations = event->GetNumberOfConversations();
+    for (int j=0; j < numberOfConversations; ++j)
+      {
+      this->AddNetDMFElement(graph, event->GetConversation(j), elementVertexId);
+      }
+    int numberOfMovements = event->GetNumberOfMovements();
+    for (int j=0; j < numberOfMovements; ++j)
+      {
+      this->AddNetDMFElement(graph, event->GetMovement(j), elementVertexId);
+      }
+
+    }
+  // CONVERSATION
+  else if (dynamic_cast<NetDMFConversation*>(element))
+    {
+    NetDMFConversation* conversation = dynamic_cast<NetDMFConversation*>(element);
+    
+    vtkStdString conversationType(conversation->GetConversationTypeAsString());
+    if (this->GetShowConversations())
+      {
+      properties->InsertNextValue(elementName);                  // name
+      properties->InsertNextValue(conversationType);             // type
+      properties->InsertNextValue(conversation->GetClassName()); // class
+      elementVertexId = graph->AddVertex(properties);
+      }
+
+    if (graph->FindVertex(conversation->GetEndPointA()) != -1 && 
+        graph->FindVertex(conversation->GetEndPointB()) != -1)
+      {
+      edgeProperties->InsertNextValue(conversationType);
+      if (this->GetShowConversations())
+        {
+        graph->AddEdge(elementVertexId, 
+                       conversation->GetEndPointA(),
+                       edgeProperties);
+        graph->AddEdge(elementVertexId, 
+                       conversation->GetEndPointB(),
+                       edgeProperties);
+        }
+      else
+        {
+        graph->AddEdge(conversation->GetEndPointA(), 
+                       conversation->GetEndPointB(),
+                       edgeProperties);
+        }
+      edgeProperties->Initialize();
+      }
+    }
+  // MOVEMENT
+  else if (dynamic_cast<NetDMFMovement*>(element))
+    {
+    NetDMFMovement* movement = dynamic_cast<NetDMFMovement*>(element);
+    
+    vtkStdString movementType(movement->GetMovementTypeAsString());
+    edgeProperties->InsertNextValue(movementType);    
+
+    if (this->GetShowMovements())
+      {
+      properties->InsertNextValue(elementName);              // name
+      properties->InsertNextValue(movementType);             // type
+      properties->InsertNextValue(movement->GetClassName()); // class
+      elementVertexId = graph->AddVertex(properties);
+      }
+
+    vtkIdType nodeVertexId = graph->GetVertexData()->GetAbstractArray("Type")
+      ->LookupValue(movement->GetNodeId());
+    if (nodeVertexId != -1)
+      {
+      graph->AddEdge(elementVertexId, 
+                     nodeVertexId,
+                     edgeProperties);
+      }
+    }   
+  if (parentVertexId != -1 && 
+      elementVertexId != -1 &&
+      parentVertexId != elementVertexId)
+    {
+    if (edgeProperties->GetNumberOfValues()==0)
+      {
+      edgeProperties->InsertNextValue("");
+      }
+    graph->AddEdge(parentVertexId, elementVertexId, edgeProperties);
+    }
 }
