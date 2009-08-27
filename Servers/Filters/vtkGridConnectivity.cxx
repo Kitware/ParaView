@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.6");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.7");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -598,10 +598,14 @@ void vtkGridConnectivityExecuteProcess(
             }
           else if (numPoints == 4)
             {
-            vtkIdType ptId1 = globalPtIdPtr[faceCell->GetPointId(0)];
-            vtkIdType ptId2 = globalPtIdPtr[faceCell->GetPointId(1)];
-            vtkIdType ptId3 = globalPtIdPtr[faceCell->GetPointId(2)];
-            vtkIdType ptId4 = globalPtIdPtr[faceCell->GetPointId(3)];
+            vtkIdType ptId1 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(0)]);
+            vtkIdType ptId2 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(1)]);
+            vtkIdType ptId3 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(2)]);
+            vtkIdType ptId4 = static_cast<vtkIdType>(
+              globalPtIdPtr[faceCell->GetPointId(3)]);
             face = faceHash->AddFace(ptId1, ptId2, ptId3, ptId4);
             }
           else
