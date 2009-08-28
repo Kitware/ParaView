@@ -81,7 +81,7 @@ Worry aobut this later.  Get something working...
 
 */
 
-vtkCxxRevisionMacro(vtkGridConnectivity, "1.7");
+vtkCxxRevisionMacro(vtkGridConnectivity, "1.8");
 vtkStandardNewMacro(vtkGridConnectivity);
 
 
@@ -676,7 +676,7 @@ void vtkGridConnectivityExecuteProcess(
 
 //----------------------------------------------------------------------------
 template <class T>
-T vtkGridConnectivityComputeMax(T* ptr, vtkIdType num)
+vtkIdType vtkGridConnectivityComputeMax(T* ptr, vtkIdType num)
 {
   T max = 0;
   while (num-- > 0)
@@ -687,7 +687,7 @@ T vtkGridConnectivityComputeMax(T* ptr, vtkIdType num)
       }
     ++ptr;
     }
-  return max;
+  return static_cast<vtkIdType>(max);
 }
 
 
@@ -708,8 +708,8 @@ void vtkGridConnectivity::InitializeFaceHash(
     this->GlobalPointIdType = a->GetDataType();
     switch(this->GlobalPointIdType)
       {
-      vtkTemplateMacro(
-        maxId = vtkGridConnectivityComputeMax(static_cast<VTK_TT*>(ptr), numIds));
+        vtkTemplateMacro(
+          maxId = vtkGridConnectivityComputeMax(static_cast<VTK_TT*>(ptr), numIds));
       default:
         vtkErrorMacro("ThreadedRequestData: Unknown input ScalarType");
         return;
