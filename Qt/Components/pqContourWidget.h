@@ -72,7 +72,10 @@ public:
   
   /// Set the line color
   virtual void setLineColor(const QColor& color);
-
+  
+  /// Close the contour loop
+  virtual void closeLoop();
+  
 protected slots:
   void removeAllNodes();
 

@@ -55,6 +55,10 @@ public:
   // Description:
   // Get the widget for the representation.
   vtkGetObjectMacro(Widget, vtkAbstractWidget);
+  
+  // Description:
+  // Get Representation Proxy.
+  vtkGetObjectMacro(RepresentationProxy, vtkSMProxy);
 
 //BTX
 protected:

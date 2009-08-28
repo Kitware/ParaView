@@ -110,7 +110,8 @@ void pqContourWidget::createWidget(pqServer* server)
   this->Internals->Links.addPropertyLink(
     this->Internals->Closed, "checked",
     SIGNAL(toggled(bool)),
-    widget, widget->GetProperty("ClosedLoop"));
+    widget->GetRepresentationProxy(), 
+    widget->GetRepresentationProxy()->GetProperty("ClosedLoop"));
 
 }
 
@@ -119,38 +120,44 @@ void pqContourWidget::cleanupWidget()
 {
   this->Internals->Links.removeAllPropertyLinks();
   vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  
   if (widget)
     {
+    widget->InvokeCommand("Initialize");
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
+//    vtkSMProxyManager* pxm=vtkSMProxyManager::GetProxyManager();
+//    pxm->UnRegisterProxy(widget);
     }
   this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------
 void pqContourWidget::select()
-  {
+{
   this->setWidgetVisible(true);
   this->setVisible(true);
   this->setLineColor(QColor::fromRgbF(1.0,0.0,1.0));
   this->Superclass::select();
   this->Superclass::updatePickShortcut(true);
-  }
+  this->getWidgetProxy()->SetEnabled(1);
+}
 
 //-----------------------------------------------------------------------------
 void pqContourWidget::getBounds(double bounds[6]) const
-  {
+{
   this->getWidgetProxy()->GetBounds(bounds);
-  }
+}
 
 //-----------------------------------------------------------------------------
 void pqContourWidget::deselect()
-  {
+{
   // this->Superclass::deselect();
   this->setVisible(0);
   this->setLineColor(QColor::fromRgbF(1.0,1.0,1.0));
   this->Superclass::updatePickShortcut(false);
-  }
+  //this->getWidgetProxy()->SetEnabled(0);
+}
 
 //-----------------------------------------------------------------------------
 void pqContourWidget::updateWidgetVisibility()
@@ -167,6 +174,18 @@ void pqContourWidget::removeAllNodes()
   if (widget)
     {
     widget->InvokeCommand("ClearAllNodes");
+    }
+  this->setModified();
+  this->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqContourWidget::closeLoop()
+{
+  vtkSMNewWidgetRepresentationProxy* widget = this->getWidgetProxy();
+  if (widget)
+    {
+    widget->InvokeCommand("CloseLoop");
     }
   this->setModified();
   this->render();

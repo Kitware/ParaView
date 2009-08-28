@@ -702,6 +702,17 @@
     
     <Proxy name="ContourWidget" class="vtkContourWidget"
       base_proxygroup="3d_widgets" base_proxyname="WidgetBase">
+      
+      <Property name="CloseLoop" command="CloseLoop" />
+      <Property name="Initialize" command="Initialize" />
+
+      <IntVectorProperty name="AllowNodePicking"
+        command="SetAllowNodePicking"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      
     </Proxy>
 
     <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
@@ -3076,12 +3087,31 @@
     </Proxy>
     <Proxy name="BoundedPlanePointPlacer" class="vtkBoundedPlanePointPlacer"
       base_proxygroup="point_placers" base_proxyname="PointPlacerBase">
+      
+      <IntVectorProperty
+         name="ProjectionNormal"
+         command="SetProjectionNormal"
+         number_of_elements="1"
+         default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="XAxis" />
+          <Entry value="1" text="YAxis" />
+          <Entry value="2" text="ZAxis" />
+          <Entry value="3" text="Oblique" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+         name="ProjectionPosition"
+         command="SetProjectionPosition"
+         number_of_elements="1"
+         default_values="0.0">
+      </DoubleVectorProperty>
 
       <ProxyProperty name="BoundingPlanes"
         command="AddBoundingPlane"
-        clean_command="RemoveAllBoundingPlanes"
         repeat_command="1"
-        update_self="1">
+        number_of_elements_per_command="1"
+        clean_command="RemoveAllBoundingPlanes">
         <ProxyGroupDomain name="groups">
           <Group name="implicit_functions" />
         </ProxyGroupDomain>
@@ -3090,7 +3120,6 @@
           <Proxy group="implicit_functions" name="Box" />
         </ProxyListDomain>
       </ProxyProperty>
-
     </Proxy>
     <Proxy name="PolygonalSurfacePointPlacer" class="vtkPolygonalSurfacePointPlacer"
       base_proxygroup="point_placers" base_proxyname="PointPlacerBase">

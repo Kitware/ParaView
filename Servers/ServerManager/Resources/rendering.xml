@@ -2380,7 +2380,28 @@
           <Group name="contour_line_interpolators" />
         </ProxyGroupDomain>
       </ProxyProperty>
+
+      <DoubleVectorProperty
+        name="NodePositions"
+        command="AddNodeAtWorldPosition"
+        repeat_command="1"
+        number_of_elements_per_command="3">
+      </DoubleVectorProperty>
       
+      <IntVectorProperty
+        name="SelectNodes"
+        command="SetNthNodeSelected"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+      </IntVectorProperty>
+
+      <IntVectorProperty name="ShowSelectedNodes"
+        command="SetShowSelectedNodes"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <Property name="ClearAllNodes" command="ClearAllNodes" />
 
       <!-- End of ContourRepresentationBase -->
@@ -2401,7 +2422,13 @@
         default_values="1.0 1.0 1.0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
-
+      
+      <IntVectorProperty name="AlwaysOnTop"
+        command="SetAlwaysOnTop"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>      
       <!-- End of OrientedGlyphContourRepresentation -->
     </Proxy>
 
@@ -8736,9 +8763,12 @@
           <Property name="Visibility" />
           <Property name="PointPlacer" />
           <Property name="LineInterpolator" />
-          <Property name="ClosedLoop" />
           <Property name="ClearAllNodes" />
           <Property name="LineColor" />
+          <Property name="AlwaysOnTop" />
+          <Property name="NodePositions" />
+          <Property name="ShowSelectedNodes" />
+          <Property name="SelectNodes" />
         </ExposedProperties>
       </SubProxy>
 
@@ -8748,6 +8778,9 @@
         </Proxy>
         <ExposedProperties>
           <Property name="Enabled" />
+          <Property name="CloseLoop" />
+          <Property name="AllowNodePicking" />
+          <Property name="Initialize" />
         </ExposedProperties>
       </SubProxy>
 
