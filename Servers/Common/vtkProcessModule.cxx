@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.94");
+vtkCxxRevisionMacro(vtkProcessModule, "1.95");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -188,9 +188,11 @@ vtkProcessModule::vtkProcessModule()
   this->LastProgressName = 0;
 
 #ifdef VTK_USE_MPI
+# ifdef PARAVIEW_USE_MPI_SSEND
   // ParaView uses Ssend for all Trigger RMI calls. This helps in overcoming
   // bufferring issues with send on some implementations.
   vtkMPIController::SetUseSsendForRMI(1);
+# endif
 #endif
 
   vtkMapper::SetResolveCoincidentTopologyToShiftZBuffer();
