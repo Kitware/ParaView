@@ -2823,6 +2823,72 @@
      </IntVectorProperty>
    <!-- End ImageReader -->
    </SourceProxy>
+
+   <SourceProxy name="XdmfReader2" 
+                class="vtkXdmfReader2"
+                label="XDMF Reader2">
+     <Documentation
+       short_help="Read XDMF data files."
+       long_help="Read XDMF (eXtensible Data Model and Format) files.">
+       The XDMF reader reads files in XDMF format. The expected file extension
+       is .xmf. Metadata is stored in the XDMF file using an XML format, and
+       large attribute arrays are stored in a corresponding HDF5 file. The
+       output may be unstructured grid, structured grid, or rectiliner grid.
+     </Documentation>
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the XDMF reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+        information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+     <StringVectorProperty name="GridInfo"
+        information_only="1">
+        <SILInformationHelper
+          timestamp_command="GetSILUpdateStamp"
+          subtree="Grids">
+        </SILInformationHelper>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="GridStatus"
+        label="Grids"
+        command="SetGridStatus"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" >
+       <SILDomain name="array_list" subtree="Grids">
+          <RequiredProperties>
+             <Property name="GridInfo" function="ArrayList" />
+          </RequiredProperties>
+       </SILDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="Stride"
+        command="SetStride"
+        number_of_elements="3"
+        default_values="1 1 1" 
+        animateable="0">
+        <IntRangeDomain name="range" min="1 1 1" />
+        <Documentation>
+         If loading structured data, this property indicate the number of
+         indices per dimension (X, Y, or Z) to skip between each point included
+         in this output.
+        </Documentation>
+     </IntVectorProperty>
+     <!-- -->
+   </SourceProxy>
+
    <SourceProxy name="XdmfReader" 
                 class="vtkXdmfReader"
                 label="XDMF Reader">

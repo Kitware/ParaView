@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QMetaObject>
 #include <QMetaProperty>
+#include <QHeaderView>
 
 // VTK includes
 
@@ -64,33 +65,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMSILDomain.h"
 
 // ParaView includes
 #include "pq3DWidget.h"
 #include "pqApplicationCore.h"
 #include "pqCollapsedGroup.h"
 #include "pqComboBoxDomain.h"
-#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqDoubleRangeWidget.h"
-#include "pqIntRangeWidget.h"
-#include "pqWidgetRangeDomain.h"
 #include "pqFieldSelectionAdaptor.h"
 #include "pqFileChooserWidget.h"
+#include "pqIntRangeWidget.h"
 #include "pqListWidgetItemObject.h"
 #include "pqObjectPanel.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqProxySelectionWidget.h"
+#include "pqProxySILModel.h"
 #include "pqSelectionInputWidget.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
+#include "pqSILModel.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
+#include "pqTreeView.h"
 #include "pqTreeWidget.h"
 #include "pqTreeWidgetSelectionHelper.h"
+#include "pqWidgetRangeDomain.h"
 
 //-----------------------------------------------------------------------------
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, 
@@ -392,6 +397,16 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
       treeAdaptor->setObjectName("CompositeTreeAdaptor");
       property_manager->registerLink(
         treeAdaptor, "values", SIGNAL(valuesChanged()),
+        proxy, SMProperty);
+      }
+    }
+  else if (pt == pqSMAdaptor::SIL)
+    {
+    QTreeView* tree = qobject_cast<QTreeView*>(object);
+    if (tree)
+      {
+      property_manager->registerLink(
+        tree->model(), "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
       }
     }
@@ -792,6 +807,8 @@ static QLabel* createPanelLabel(QWidget* parent, QString text, QString pname)
 //-----------------------------------------------------------------------------
 void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 {
+  bool row_streched = false; // when set, the extra setRowStretch() at the end
+                             // is skipped
   int rowCount = 0;
   int skippedFirstFileProperty = 0;
   bool isCompoundProxy = pxy->IsA("vtkSMCompoundSourceProxy");
@@ -1177,6 +1194,7 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
 
           panelLayout->addWidget(textEdit, rowCount, 0, 1, 2);
           panelLayout->setRowStretch(rowCount, 1);
+          row_streched = true;
           rowCount++;
           }
         }
@@ -1366,11 +1384,45 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       header->setData(0, Qt::DisplayRole, propertyLabel);
       tree->setHeaderItem(header);
       panelLayout->addWidget(tree, rowCount, 0, 1, 2); 
+      panelLayout->setRowStretch(rowCount, 1);
+      row_streched = true;
+      rowCount++;
+      }
+    else if (pt == pqSMAdaptor::SIL)
+      {
+      pqTreeView* tree = new pqTreeView(panelLayout->parentWidget());
+      tree->setObjectName(propertyName);
+      tree->header()->setStretchLastSection(true);
+      tree->setRootIsDecorated(false);
+
+      vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(
+        SMProperty->GetDomain("array_list"));
+
+      pqSILModel* silModel = new pqSILModel(tree);
+      pqProxySILModel* proxyModel = new pqProxySILModel(
+        silDomain->GetSubtree(), silModel);
+      proxyModel->setSourceModel(silModel);
+
+      tree->header()->setClickable(true);
+      QObject::connect(tree->header(), SIGNAL(sectionClicked(int)),
+        proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
+
+      // FIXME: This needs to be automated, we want the model to automatically
+      // fetch the SIL when the domain is updated.
+      silModel->update(silDomain->GetSIL());
+      tree->setModel(proxyModel);
+      tree->expandAll();
+      panelLayout->addWidget(tree, rowCount, 0, 1, 2); 
+      panelLayout->setRowStretch(rowCount, 1);
+      row_streched = true;
       rowCount++;
       }
     }
   iter->Delete();
-  panelLayout->setRowStretch(rowCount, 1);
+  if (!row_streched)
+    {
+    panelLayout->setRowStretch(rowCount, 1);
+    }
   panelLayout->invalidate();
 }
 

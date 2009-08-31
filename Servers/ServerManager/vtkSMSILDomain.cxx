@@ -19,7 +19,7 @@
 #include "vtkSMSILInformationHelper.h"
 
 vtkStandardNewMacro(vtkSMSILDomain);
-vtkCxxRevisionMacro(vtkSMSILDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMSILDomain, "1.2");
 //----------------------------------------------------------------------------
 vtkSMSILDomain::vtkSMSILDomain()
 {
@@ -29,6 +29,29 @@ vtkSMSILDomain::vtkSMSILDomain()
 vtkSMSILDomain::~vtkSMSILDomain()
 {
 }
+
+//----------------------------------------------------------------------------
+const char* vtkSMSILDomain::GetSubtree()
+{
+  vtkSMProperty* req_prop = this->GetRequiredProperty("ArrayList");
+  if (!req_prop)
+    {
+    vtkErrorMacro("Required property 'ArrayList' missing."
+      "Cannot fetch the SIL");
+    return 0;
+    }
+
+  vtkSMSILInformationHelper* helper =
+    vtkSMSILInformationHelper::SafeDownCast(req_prop->GetInformationHelper());
+  if (!helper)
+    {
+    vtkErrorMacro("Failed to locate vtkSMSILInformationHelper.");
+    return 0;
+    }
+
+  return helper->GetSubtree();
+}
+
 
 //----------------------------------------------------------------------------
 vtkGraph* vtkSMSILDomain::GetSIL()

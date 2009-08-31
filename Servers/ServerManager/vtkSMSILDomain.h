@@ -45,6 +45,8 @@ public:
   // requesting the vtkSMSILInformationHelper to fetch the SIL.
   vtkGraph* GetSIL();
 
+  const char* GetSubtree();
+
 //BTX
 protected:
   vtkSMSILDomain();

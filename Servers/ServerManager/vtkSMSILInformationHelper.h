@@ -60,6 +60,7 @@ public:
 
   // Description:
   vtkGetObjectMacro(SIL, vtkGraph);
+  vtkGetStringMacro(Subtree);
 
 //BTX
 protected:

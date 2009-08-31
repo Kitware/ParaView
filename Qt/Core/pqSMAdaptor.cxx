@@ -172,6 +172,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       {
       type = pqSMAdaptor::COMPOSITE_TREE;
       }
+    else if (silDomain)
+      {
+      type = pqSMAdaptor::SIL;
+      }
     else if(!silDomain && (
       stringListRangeDomain || 
       (VectorProperty && VectorProperty->GetRepeatCommand() && 

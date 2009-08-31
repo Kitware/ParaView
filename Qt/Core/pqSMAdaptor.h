@@ -71,6 +71,7 @@ public:
     FILE_LIST,
     FIELD_SELECTION,
     COMPOSITE_TREE,
+    SIL,
     };
 
   /// Get the type of the property
