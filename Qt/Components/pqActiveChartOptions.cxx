@@ -206,7 +206,7 @@ void pqActiveChartOptions::changeView(pqView *view)
       }
     else
       {
-      this->Dialog->setWindowTitle("Chart Options");
+      this->Dialog->setWindowTitle("View Settings");
       this->Chart->setView(0);
       }
 
@@ -214,7 +214,7 @@ void pqActiveChartOptions::changeView(pqView *view)
     if(barChart)
       {
       // Set the dialog title.
-      this->Dialog->setWindowTitle("Bar Chart Options");
+      this->Dialog->setWindowTitle("View Settings (Bar Chart)");
 
       // Make sure the bar chart options are added.
       if(!barOptions)
@@ -250,7 +250,7 @@ void pqActiveChartOptions::changeView(pqView *view)
     if(lineChart)
       {
       // Set the dialog title.
-      this->Dialog->setWindowTitle("Line Chart Options");
+      this->Dialog->setWindowTitle("View Settings (Line Chart)");
 
       // Make sure the line chart options are added.
       if(!lineOptions)

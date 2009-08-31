@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Bar Chart Options</string>
+   <string>View Settings (Bar Chart)</string>
   </property>
   <layout class="QGridLayout" >
    <item row="0" column="0" colspan="4" >

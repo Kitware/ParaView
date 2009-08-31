@@ -66,7 +66,7 @@ void pqActiveRenderViewOptions::showOptions(pqView *view, const QString &page,
     this->Internal->Dialog = new pqOptionsDialog(widgetParent);
     this->Internal->Dialog->setApplyNeeded(true);
     this->Internal->Dialog->setObjectName("ActiveRenderViewOptions");
-    this->Internal->Dialog->setWindowTitle("Render View Options");
+    this->Internal->Dialog->setWindowTitle("View Settings (Render View)");
     this->Internal->Options = new pqRenderViewOptions;
     this->Internal->Dialog->addOptions(this->Internal->Options);
     if(page.isEmpty())
