@@ -9159,7 +9159,7 @@
       </DoubleVectorProperty>
 
       <SubProxy>
-        <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
+        <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
           <!-- 
             Outline filter generates a partial outline on all processes.
           -->
@@ -9169,6 +9169,11 @@
                  <DataType value="vtkDataSet"/>
                </DataTypeDomain>
           </InputProperty>
+          <IntVectorProperty name="UseOutline"
+            command="SetUseOutline"
+            number_of_elements="1"
+            default_values="1">
+          </IntVectorProperty>
         </SourceProxy>
       </SubProxy>
 
