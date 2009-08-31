@@ -1547,14 +1547,19 @@ atan: Compute the arctangent of a scalar.
 sinh: Compute the hyperbolic sine of a scalar.
 cosh: Compute the hyperbolic cosine of a scalar.
 tanh: Compute the hyperbolic tangent of a scalar.
+min: Compute minimum of two scalars.
+max: Compute maximum of two scalars.
 x^y: Raise one scalar to the power of another scalar. The operands for this function are not required to be enclosed in parentheses.
 sqrt: Compute the square root of a scalar.
 e^x: Raise e to the power of a scalar.
-log: Compute the logarithm of a scalar.
+log: Compute the logarithm of a scalar (deprecated. same as log10).
+log10: Compute the logarithm of a scalar to the base 10.
+ln: Compute the logarithm of a scalar to the base 'e'.
 ceil: Compute the ceiling of a scalar.
 floor: Compute the floor of a scalar.
 abs: Compute the absolute value of a scalar.
 v1.v2: Compute the dot product of two vectors. The operands for this function are not required to be enclosed in parentheses.
+cross: Compute cross product of two vectors.
 mag: Compute the magnitude of a vector.
 norm: Normalize a vector.
 The operands are described below.
