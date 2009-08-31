@@ -49,4 +49,7 @@
 
 @PARAVIEW_CONFIG_EXTRA_DEFINES@
 
+// defined when SSEND must be used for communication by default.
+#cmakedefine PARAVIEW_USE_MPI_SSEND
+
 #endif
