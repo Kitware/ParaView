@@ -409,7 +409,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
                                         this->proxy()->
                                         GetProperty("HasModeShapes"));
   this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
-  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
+  this->UI->ModeSelectSpinBox->setMaximum(this->UI->TimestepValues.size()-1);
   if (this->UI->TimestepValues.size() > 0)
     {
     this->UI->ModeLabel->setText(
