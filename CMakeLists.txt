@@ -139,6 +139,11 @@ SET(VTK_USE_MPI ${PARAVIEW_USE_MPI} CACHE INTERNAL "Build VTK with MPI support" 
 # variable
 # set it to PARAVIEW_USE_MPI so that VTK_USE_MPI is slaved to it.
 SET(VTK_USE_MPI_ISSET ${PARAVIEW_USE_MPI})
+IF (PARAVIEW_USE_MPI)
+  SET(PARAVIEW_USE_MPI_SSEND OFF CACHE BOOL
+    "Use MPI synchronous-send commands for communication")
+  MARK_AS_ADVANCED(PARAVIEW_USE_MPI_SSEND)
+ENDIF (PARAVIEW_USE_MPI)
 
 #########################################################################
 # Force Infovis support on
