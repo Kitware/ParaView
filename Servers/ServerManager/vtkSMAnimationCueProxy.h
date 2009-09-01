@@ -126,6 +126,10 @@ protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();
 
+  // Overridden to mark the AnimatedProxy dirty as well. That ensures that any
+  // cache is cleared.
+  virtual void MarkConsumersAsDirty(vtkSMProxy* modifiedProxy);
+
   virtual void CreateVTKObjects();
 
   virtual void InitializeObservers(vtkAnimationCue* cue); 
