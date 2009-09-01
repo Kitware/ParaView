@@ -24,7 +24,7 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.27.2.1");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -226,6 +226,7 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
   if (manip && event == vtkCommand::ModifiedEvent)
     {
     this->Modified();
+    this->MarkConsumersAsDirty(this);
     }
 }
 
@@ -329,6 +330,16 @@ void vtkSMAnimationCueProxy::CloneCopy(vtkSMAnimationCueProxy* src)
       vtkSMProxy::COPY_PROXY_PROPERTY_VALUES_BY_CLONING);
     }
   this->MarkAllPropertiesAsModified();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationCueProxy::MarkConsumersAsDirty(vtkSMProxy* modifiedProxy)
+{
+  this->Superclass::MarkConsumersAsDirty(modifiedProxy);
+  if (this->AnimatedProxy)
+    {
+    this->AnimatedProxy->MarkDirty(modifiedProxy);
+    }
 }
 
 //----------------------------------------------------------------------------
