@@ -34,7 +34,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.22");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.23");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -87,7 +87,7 @@ void vtkSMArrayListDomain::AddArrays(vtkSMSourceProxy* sp,
     if ( iad->IsFieldValid(sp, outputport, info->GetArrayInformation(idx), 1) )
       {
       this->ALDInternals->PartialMap[arrayInfo->GetName()] = arrayInfo->GetIsPartial();
-      int nAcceptedTypes=this->ALDInternals->DataTypes.size();
+      int nAcceptedTypes=static_cast<int>(this->ALDInternals->DataTypes.size());
       if ( nAcceptedTypes==0 )
         {
         unsigned int newidx = this->AddString(arrayInfo->GetName());
@@ -451,7 +451,7 @@ void vtkSMArrayListDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "DefaultElement: " << this->DefaultElement << endl;
   os << indent << "AttributeType: " << this->AttributeType << endl;
-  int nDataTypes=this->ALDInternals->DataTypes.size();
+  int nDataTypes=static_cast<int>(this->ALDInternals->DataTypes.size());
   for (int i=0; i<nDataTypes; ++i)
     {
     os << indent << "DataType: " << this->ALDInternals->DataTypes[i] << endl;
