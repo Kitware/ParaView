@@ -2556,7 +2556,7 @@
       <DoubleVectorProperty name="PointSize"
         command="SetPointSize"
         number_of_elements="1"
-        default_values="5.0"
+        default_values="2.0"
         animateable="0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
