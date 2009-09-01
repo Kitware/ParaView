@@ -7,7 +7,7 @@
    All rights reserved.
 
    ParaView is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaView license version 1.2. 
+   under the terms of the ParaView license version 1.2.
 
    See License_v1.2.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QDialog;
 class QMainWindow;
+class QDockWidget;
 
 class PQCORE_EXPORT pqSettings :
   public QSettings
@@ -53,18 +54,20 @@ public:
     const QString& organization,
     const QString& application,
     QObject* p);
-    
+
   void saveState(const QMainWindow& window, const QString& key);
   void saveState(const QDialog& dialog, const QString& key);
-  
+
   void restoreState(const QString& key, QMainWindow& window);
   void restoreState(const QString& key, QDialog& dialog);
 
+  void sanityCheckDock(QDockWidget* dock_widget);
   /// Calling this method will cause the modified signal to be emited.
   void alertSettingsModified();
 
 signals:
   void modified();
+
 };
 
 #endif
