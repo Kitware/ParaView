@@ -50,7 +50,9 @@ public:
   // Description:
   // Get/Set the quality for the generated movie.
   // Applicable only if the choose file format supports it.
-  vtkSetMacro(Quality, int);
+  // 0 means worst quality and smallest file size
+  // 2 means best quality and largest file size
+  vtkSetClampMacro(Quality, int, 0, 2);
   vtkGetMacro(Quality, int);
 
   // Description:
