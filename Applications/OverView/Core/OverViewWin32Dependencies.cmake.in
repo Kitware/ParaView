@@ -6,21 +6,32 @@ ELSE()
   MESSAGE(ERROR "Unknown build type: ${BUILD_TYPE}")
 ENDIF()
 
+# The "blacklist" ...
 # Note that the "IF( ... MATCHES ... ) checks below are case-sensitive
 SET(SKIP_DEPENDENCIES
   "^C:/WINDOWS/system32"
   "^C:/Windows/system32"
   "^C:/Windows/System32" 
-  "^dbghelp.dll$"
-  "^DbgHelp.dll$"
-  "^gdiplus.dll$"
-  "^GdiPlus.dll$"
-  "^GPSVC.dll$"
-  "^mpich"   
-  "^msjava.dll$"
-  "jvm.dll"
-  "^ieshims"
-  "^IESHIMS"
+  ".*dbghelp.dll$"
+  ".*DbgHelp.dll$"
+  ".*GPSVC.dll$"
+  ".*msjava.dll$"
+  ".*jvm.dll$"
+  ".*gdiplus.dll$"
+  ".*GdiPlus.dll$"
+  ".*ieshims"
+  ".*IESHIMS"
+  )
+  
+# The logic above can skip libraries that really need to be added
+# (generally because they are located in C:\Windows\System32).
+# So we have this 'white list' that makes sure if the executable
+# has a dependency on one of these libraries it will get included.
+# Note that license terms need to be satisfied for the DLLs on the
+# white list to be redistributed.
+SET(WHITE_LIST
+  ".*mpich.*.dll"
+  ".*python.*.dll"
   )
 
 INCLUDE(GetPrerequisites)
@@ -34,22 +45,22 @@ FOREACH(LOCATION ${OVERVIEW_BINARY_LOCATIONS})
    
     SET(INSTALL_DEPENDENCY 1)
 
-    # Check unresolved dependencies for exclusion
+    GP_RESOLVE_ITEM("${LOCATION}" "${DEPENDENCY}" "" "" DEPENDENCY)
+    
+    # Check resolved dependencies for exclusion
     FOREACH(SKIP_DEPENDENCY ${SKIP_DEPENDENCIES})
       IF(DEPENDENCY MATCHES "${SKIP_DEPENDENCY}")
         SET(INSTALL_DEPENDENCY 0)
       ENDIF()
     ENDFOREACH()
-
-    IF(INSTALL_DEPENDENCY)
-      GP_RESOLVE_ITEM("${LOCATION}" "${DEPENDENCY}" "" "" DEPENDENCY)
-      # Check resolved dependencies for exclusion
-      FOREACH(SKIP_DEPENDENCY ${SKIP_DEPENDENCIES})
-        IF(DEPENDENCY MATCHES "${SKIP_DEPENDENCY}")
-          SET(INSTALL_DEPENDENCY 0)
-        ENDIF()
+    
+    # Check dependencies for white list inclusion
+    FOREACH(WHITE_LIST_ITEM ${WHITE_LIST})
+      IF(DEPENDENCY MATCHES "${WHITE_LIST_ITEM}")
+        SET(INSTALL_DEPENDENCY 1)
+      ENDIF()
     ENDFOREACH()
-    ENDIF()
+    
 
     IF(INSTALL_DEPENDENCY)
       FILE(INSTALL
