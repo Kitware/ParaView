@@ -47,7 +47,7 @@
 #endif
 
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.13");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.13.6.1");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -57,7 +57,7 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
 {
   this->Magnification = 1;
   this->ErrorCode = 0;
-  this->Quality = 1;
+  this->Quality = 2; // 0 = low, 1 = medium, 2 = high
   this->ActualSize[0] = this->ActualSize[1] = 0;
 
   this->MovieWriter = 0;
