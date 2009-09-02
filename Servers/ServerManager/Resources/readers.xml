@@ -3101,9 +3101,9 @@
      </DoubleVectorProperty>
 
      <IntVectorProperty name="ModeShape"
-                        command="SetTimeStep"
+                        command="SetModeShape"
                         number_of_elements="1"
-                        default_values="0"
+                        default_values="1"
                         information_property="TimestepValues">
        <IntRangeDomain name="range">
          <RequiredProperties>

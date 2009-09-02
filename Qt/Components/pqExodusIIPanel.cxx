@@ -408,8 +408,10 @@ void pqExodusIIPanel::linkServerManagerProperties()
                                         this->proxy(),
                                         this->proxy()->
                                         GetProperty("HasModeShapes"));
-  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size()-1);
-  this->UI->ModeSelectSpinBox->setMaximum(this->UI->TimestepValues.size()-1);
+  this->UI->ModeSelectSlider->setMinimum(1);
+  this->UI->ModeSelectSlider->setMaximum(this->UI->TimestepValues.size());
+  this->UI->ModeSelectSpinBox->setMinimum(1);
+  this->UI->ModeSelectSpinBox->setMaximum(this->UI->TimestepValues.size());
   if (this->UI->TimestepValues.size() > 0)
     {
     this->UI->ModeLabel->setText(
@@ -425,8 +427,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
                                         "value",
                                         SIGNAL(valueChanged(int)),
                                         this->proxy(),
-                                        this->proxy()
-                                        ->GetProperty("ModeShape"));
+                                        this->proxy()->GetProperty("ModeShape"));
   QObject::connect(this->UI->HasModeShapes, SIGNAL(toggled(bool)),
                    this->UI->ModeShapeOptions, SLOT(setEnabled(bool)));
   QObject::connect(this->UI->ModeSelectSlider, SIGNAL(sliderMoved(int)),
@@ -501,10 +502,10 @@ QString pqExodusIIPanel::formatDataFor(vtkPVArrayInformation* ai)
 
 void pqExodusIIPanel::modeChanged(int value)
 {
-  if ((value >= 0) && (value < this->UI->TimestepValues.size()))
+  if ((value > 0) && (value <= this->UI->TimestepValues.size()))
     {
     this->UI->ModeLabel->setText(
-                            QString("%1").arg(this->UI->TimestepValues[value]));
+      QString("%1").arg(this->UI->TimestepValues[value-1]));
     }
 }
 
