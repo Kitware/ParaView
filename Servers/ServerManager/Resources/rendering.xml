@@ -4716,7 +4716,6 @@
         </Proxy>
         <ExposedProperties>
           <Property name="RenderWindowSizeInfo" />
-          <Property name="RenderWindowSize" exposed_name="ViewSize" />
         </ExposedProperties>
       </SubProxy>
 
