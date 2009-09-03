@@ -84,16 +84,10 @@
           extensions="g"
           file_description="BYU Files">
   </Reader>
-  <Reader name="XdmfReader"
+  <Reader name="XdmfReader2"
           extensions="xmf xdmf"
           file_description="Xdmf Reader">
   </Reader>
-  <!--
-  <Reader name="XdmfReader2"
-          extensions="xmf2 xdmf2"
-          file_description="Xdmf2 Reader">
-  </Reader>
-  -->
   <Reader name="pdbreader"
           extensions="pdb"
           file_description="Protein Data Bank Files">
