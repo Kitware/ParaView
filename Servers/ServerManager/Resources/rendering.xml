@@ -4467,6 +4467,18 @@
         IceT Render View with compositing and client delivery mechanisms.
       </Documentation>
 
+      <IntVectorProperty
+        name="ViewSize"
+        command="SetViewSize"
+        number_of_elements="2"
+        update_self="1"
+        default_values="400 400">
+        <IntRangeDomain name="range" min="1 1" />
+        <Documentation>
+          Set the view size for this view module.
+        </Documentation>
+      </IntVectorProperty>
+
       <DoubleVectorProperty
         name="RemoteRenderThreshold"
         command="SetRemoteRenderThreshold"

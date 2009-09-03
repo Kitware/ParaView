@@ -18,11 +18,12 @@
 #include "vtkInformation.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMClientServerRenderSyncManagerHelper.h"
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.18.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
@@ -346,6 +347,12 @@ double vtkSMIceTDesktopRenderViewProxy::GetZBufferValue(int x, int y)
 
   float result = 0.0;
   return res.GetArgument(0, 0, &result)? result : 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMIceTDesktopRenderViewProxy::SetViewSize(int width, int height)
+{
+  this->RenderWindow->SetSize(width, height);
 }
 
 //----------------------------------------------------------------------------

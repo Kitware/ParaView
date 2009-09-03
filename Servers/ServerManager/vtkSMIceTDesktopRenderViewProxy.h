@@ -50,6 +50,14 @@ public:
   virtual void SetViewPosition(int x, int y);
 
   // Description:
+  // Set the view size.
+  // Overridden to affect only the client-size render window size (server-side
+  // sizes are managed by the RenderSyncManager).
+  // Overrides superclasses implementation.
+  virtual void SetViewSize(int width, int height);
+
+
+  // Description:
   // Returns an image data that contains a "screenshot" of the window.
   // It is the responsibility of the caller to delete the image data.
   virtual vtkImageData* CaptureWindow(int magnification);
