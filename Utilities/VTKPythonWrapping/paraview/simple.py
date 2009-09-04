@@ -262,6 +262,7 @@ def Delete(proxy=None):
                     SetActiveSource(proxy.Input)
                 else:
                     SetActiveSource(proxy.Input[0])
+            else: SetActiveSource(None)
         for rep in GetRepresentations().values():
             if rep.Input == proxy:
                 Delete(rep)
