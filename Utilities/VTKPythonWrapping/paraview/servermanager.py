@@ -2853,3 +2853,5 @@ _createModules()
 # Set up our custom importer (if possible)
 loader = _ModuleLoader()
 sys.meta_path.append(loader)
+
+print vtkSMProxyManager.GetParaViewSourceVersion();

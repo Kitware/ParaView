@@ -41,6 +41,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
+#include <vtksys/DateStamp.h> // For date stamp
 #include <vtksys/ios/sstream>
 #include <vtksys/RegularExpression.hxx>
 
@@ -62,6 +63,9 @@ public:
     }
 };
 #endif
+
+
+#define PARAVIEW_SOURCE_VERSION "paraview version " PARAVIEW_VERSION_FULL ", Date: " vtksys_DATE_STAMP_STRING
 
 class vtkSMProxyManagerProxySet : public vtkstd::set<vtkSMProxy*> {};
 
@@ -95,7 +99,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.80.2.1");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.80.2.2");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -118,6 +122,12 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetParaViewSourceVersion()
+{
+  return PARAVIEW_SOURCE_VERSION;
 }
 
 //----------------------------------------------------------------------------

@@ -412,19 +412,23 @@ public:
   // These methods can be used to obtain the ProxyManager version number.
   // Returns the major version number eg. if version is 2.9.1 
   // this method will return 2.
-  int GetVersionMajor();
+  static int GetVersionMajor();
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
   // Returns the minor version number eg. if version is 2.9.1 
   // this method will return 9.
-  int GetVersionMinor();
+  static int GetVersionMinor();
 
   // Description:
   // These methods can be used to obtain the ProxyManager version number.
   // Returns the patch version number eg. if version is 2.9.1 
   // this method will return 1.
-  int GetVersionPatch();
+  static int GetVersionPatch();
+
+  // Description:
+  // Returns a string with the format "paraview version x.x.x, Date: YYYY-MM-DD"
+  static const char* GetParaViewSourceVersion();
 
   // Description:
   // Register a proxy manager extension. Returns true if the registration is
