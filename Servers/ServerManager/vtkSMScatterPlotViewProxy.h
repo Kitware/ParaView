@@ -102,13 +102,9 @@ protected:
   // Description:
   // Called at the start of CreateVTKObjects().
   virtual bool BeginCreateVTKObjects();
-  virtual void EndCreateVTKObjects();
 
   vtkSMRenderViewProxy* RenderView;
   vtkStdString SuggestedViewType;
-
-  vtkSMProxy* CubeAxesActor;
-  vtkSMProxy* LegendScaleActor;
 
 private:
   vtkSMScatterPlotViewProxy(const vtkSMScatterPlotViewProxy&); // Not implemented

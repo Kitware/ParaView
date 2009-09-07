@@ -20,7 +20,6 @@
 #ifndef __vtkSMScatterPlotRepresentationProxy_h
 #define __vtkSMScatterPlotRepresentationProxy_h
 
-//#include "vtkSMPropRepresentationProxy.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkStdString.h" // needed for vtkStdString.
 
@@ -33,10 +32,6 @@ public:
   vtkTypeRevisionMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // virtual void AddInput(unsigned int inputPort,
-//                         vtkSMSourceProxy* input,
-//                         unsigned int outputPort,
-//                         const char* method);
   virtual void SetViewInformation(vtkInformation* info);
   
   // Description:
@@ -52,57 +47,82 @@ public:
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
   // Description:
-  // Set the scalar coloring mode
-  //void SetColorAttributeType(int type);
-
-  // Description:
-  // Set the scalar color array name. If array name is 0 or "" then scalar
-  // coloring is disabled.
-  //void SetColorArrayName(const char* name);
-
-  // Description:
   // Get the bounds for the representation.  Returns true if successful.
   // Default implementation returns non-transformed bounds.
   // Reimplemented to use the Mapper bounds instead of the input bounds
   virtual bool GetBounds(double bounds[6]);
-
+  
+  // Description:
+  // Update the CubeAxesActor with the exact bounds
   virtual void Update() { this->Superclass::Update(); }
   virtual void Update(vtkSMViewProxy* view);
-  virtual bool UpdateRequired();
-
+  
+  // Description:
+  // Visibility controls the visibility of the representation AND the
+  // CubeAxes actor
   virtual void SetVisibility(int visible);
+  
+  // Description:
+  // Turn On/Off the visibility of the CubeAxes actor
   virtual void SetCubeAxesVisibility(int visible);
 
+  // Description:
+  // Set the X-Axis array to the ScatterPlot Mapper
   void SetXAxisArrayName(const char* name);
+
+  // Description:
+  // Set the Y-Axis array to the ScatterPlot Mapper
   void SetYAxisArrayName(const char* name);
+  
+  // Description:
+  // Set the Z-Axis array to the ScatterPlot Mapper
   void SetZAxisArrayName(const char* name);
+
+  // Description:
+  // Set the Color array to the ScatterPlot Mapper
   void SetColorArrayName(const char* name);
+
+  // Description:
+  // Set the Glyph Scaling array to the ScatterPlot Mapper
   void SetGlyphScalingArrayName(const char* name);
+  
+  // Description:
+  // Set the Glyph Source array to the ScatterPlot Mapper
   void SetGlyphMultiSourceArrayName(const char* name);
+
+  // Description:
+  // Set the Glyph Orientation array to the ScatterPlot Mapper
   void SetGlyphOrientationArrayName(const char* name);
-/*
-  void SetThreeDMode(bool enable);
-  void SetColorize(bool enable);
-  void SetGlyphMode(int mode);
-*/
+
   // Description:
   // Get the number of series in this representation
   int GetNumberOfSeries();
 
   // Description:
-  // Get the name of the series with the given index.  Returns 0 is the index
-  // is out of range.  The returned pointer is only valid until the next call
-  // to GetSeriesName.
-  //const char* GetSeriesName(int series);
+  // Get the name of the series with the given index. Returns "" is the index
+  // is out of range.
   vtkStdString GetSeriesName(int series);
-
+  
+  // Description:
+  // Returns the type of the series. Possible output
+  // vtkDataObject::FIELD_ASSOCIATION_POINTS if series is a Point field array
+  // vtkDataObject::FIELD_ASSOCIATION_CELLS if series is a Cell field array
+  // vtkDataObject::NUMBER_OF_ASSOCIATIONS if series is a coordinate array or invalid
   int GetSeriesType(int series);
-
+  
+  // Description:
+  // Returns the number of components of the series.
   int GetSeriesNumberOfComponents(int series);
 
 //BTX
 protected:
+  // Description:
+  // Protected constructor. Call vtkSMScatterPlotRepresentationProxy::New() to 
+  // create an instance of vtkSMScatterPlotRepresentationProxy.
   vtkSMScatterPlotRepresentationProxy();
+  
+  // Description:
+  // Protected destructor.
   virtual ~vtkSMScatterPlotRepresentationProxy();
 
   // Description:
@@ -110,7 +130,7 @@ protected:
   // Overridden to request the correct type of strategy from the view.
   virtual bool InitializeStrategy(vtkSMViewProxy* view);
 
-    // Description:
+  // Description:
   // This method is called at the beginning of CreateVTKObjects().
   // This gives the subclasses an opportunity to set the servers flags
   // on the subproxies.
@@ -123,9 +143,10 @@ protected:
   // initialization.
   virtual bool EndCreateVTKObjects();
 
-  void SetArray(int array, const char* arrayName);
+  // Description:
+  // Utility function that set arrayName to the id array of the mapper
+  void SetArray(int id, const char* arrayName);
 
-  //vtkSMProxy* GeometryFilter;
   vtkSMSourceProxy* FlattenFilter;
   vtkSMProxy* Mapper;
   vtkSMProxy* LODMapper;
@@ -135,7 +156,6 @@ protected:
   
   vtkSMProxy* CubeAxesActor;
   vtkSMProxy* CubeAxesProperty;
-  //vtkSMDataRepresentationProxy* CubeAxesRepresentation;
   int         CubeAxesVisibility;
 private:
   vtkSMScatterPlotRepresentationProxy(const vtkSMScatterPlotRepresentationProxy&); // Not implemented

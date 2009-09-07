@@ -61,7 +61,7 @@ inline void vtkSMScatterPlotRepresentationProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -459,10 +459,8 @@ bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
 void vtkSMScatterPlotRepresentationProxy::Update(vtkSMViewProxy* view)
 {
   bool update = this->UpdateRequired();
-  //cout << __FUNCTION__ << " "<< update <<endl; 
   if (this->CubeAxesActor)
     {    
-    //this->CubeAxesRepresentation->Update(view);
     double bounds[6];
     this->GetBounds(bounds);
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -472,23 +470,11 @@ void vtkSMScatterPlotRepresentationProxy::Update(vtkSMViewProxy* view)
     }
 
   this->Superclass::Update(view);
-//  this->VTKRepresentation->SetInputConnection(
-//    this->GetOutput()->GetProducerPort());
-//  this->VTKRepresentation->Update(); 
   if(update)
     {
     this->GetInputProxy()->UpdatePropertyInformation();
     this->UpdatePropertyInformation();
     }
-}
-//----------------------------------------------------------------------------
-bool vtkSMScatterPlotRepresentationProxy::UpdateRequired()
-{
-//   if (this->CubeAxesRepresentation->UpdateRequired())
-//     {
-//     return true;
-//     }
-  return this->Superclass::UpdateRequired();
 }
 
 void vtkSMScatterPlotRepresentationProxy::SetXAxisArrayName(const char* name)
