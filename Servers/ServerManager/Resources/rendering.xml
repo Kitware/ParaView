@@ -5973,30 +5973,8 @@
       <Documentation>
         Defines base API for ScatterPlotView and subtypes. Don't use directly.
       </Documentation>
-      <SubProxy>
-        <!-- SubProxy used to axes annotation -->
-        <Proxy name="CubeAxesActor"
-          proxygroup="props" proxyname="CubeAxesActor" />
-        <ExposedProperties>
-          <Property name="Visibility" exposed_name="AxesVisibility" />
-        </ExposedProperties>
-      </SubProxy>
-      <SubProxy>
-        <!-- SubProxy used to axes annotation -->
-        <Proxy name="LegendScaleActor"
-          proxygroup="props" proxyname="LegendScaleActor" />
-        <ExposedProperties>
-          <Property name="Visibility" exposed_name="LegendScaleAxesVisibility" />
-          <Property name="LegendVisibility" />
-          <Property name="LabelMode" />
-          <Property name="RightAxisVisibility" />
-          <Property name="TopAxisVisibility" />
-          <Property name="LeftAxisVisibility" />
-          <Property name="BottomAxisVisibility" />
-        </ExposedProperties>
-      </SubProxy>
+      <!-- End of ScatterPlotView -->
     </ScatterPlotViewProxy>
-
 
     <ScatterPlotViewProxy name="ScatterPlotRenderView"
       base_proxygroup="views" base_proxyname="ScatterPlotRenderViewBase">
@@ -9238,6 +9216,7 @@
         </Documentation>
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet" />
+          <DataType value="vtkGraph" />
         </DataTypeDomain>
       </InputProperty>
 
@@ -9473,6 +9452,7 @@
           <Property name="ThreeDMode" />
           <Property name="Colorize" />
           <Property name="GlyphMode" />
+          <Property name="ScaleFactor" />
         </ExposedProperties>
 
       </SubProxy>

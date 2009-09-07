@@ -19,7 +19,7 @@
           This property specifies the file name for the NetDMF reader.
         </Documentation>
      </StringVectorProperty>
-
+<!--
      <IntVectorProperty 
         name="TimeStepRangeInfo"
         command="GetTimeStepRange"
@@ -47,6 +47,14 @@
          Set the current timestep.
        </Documentation>
      </IntVectorProperty>
+-->
+     <DoubleVectorProperty name="TimeRange"
+                           information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
+
+
+
 <!--
      <IntVectorProperty 
         name="ShowEventsInfo"
