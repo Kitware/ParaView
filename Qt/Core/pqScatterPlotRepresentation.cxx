@@ -535,26 +535,26 @@ pqScatterPlotRepresentation::getColorFieldRange(const QString& array)const
   // only provided by some pre-processing filter added by the representation
   // (and is not present in the original input), in that case we use the range
   // provided by the representation.
-  if (inputInfo)
+  int inputInfoNumberOfComponents = 
+    inputInfo ? inputInfo->GetNumberOfComponents() : 0;
+  int representedInfoNumberOfComponents = 
+    representedInfo ? representedInfo->GetNumberOfComponents() : 0;
+  if (inputInfo && 
+      component < inputInfoNumberOfComponents && 
+      inputInfoNumberOfComponents > 0)
     {
-    if (component < inputInfo->GetNumberOfComponents())
-      {
-      double range[2];
-      inputInfo->GetComponentRange(component, range);
-      return QPair<double,double>(range[0], range[1]);
-      }
+    double range[2];
+    inputInfo->GetComponentRange(component, range);
+    ret = QPair<double,double>(range[0], range[1]);
     }
-
-  if (representedInfo)
+  else if (representedInfo &&
+           component < representedInfoNumberOfComponents && 
+           representedInfoNumberOfComponents > 0)
     {
-    if (component <representedInfo->GetNumberOfComponents())
-      {
-      double range[2];
-      representedInfo->GetComponentRange(component, range);
-      return QPair<double,double>(range[0], range[1]);
-      }
+    double range[2];
+    representedInfo->GetComponentRange(component, range);
+    ret = QPair<double,double>(range[0], range[1]);
     }
-  cout << "range not found" <<endl;
   return ret;
 }
 
