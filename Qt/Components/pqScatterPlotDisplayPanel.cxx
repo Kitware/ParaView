@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqColorScaleToolbar.h"
 #include "pqComboBoxDomain.h"
+#include "pqComboBoxDomain.h"
 #include "pqCubeAxesEditorDialog.h"
 #include "pqDataRepresentation.h"
 #include "pqOutputPort.h"
@@ -557,18 +558,31 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
     proxy, proxy->GetProperty("GlyphOrientationArrayName"));
   
   // setup for ThreeDMode
-   this->Internal->Links.addPropertyLink(
-     this->Internal->ZCoordsCheckBox, "checked", SIGNAL(stateChanged(int)),
-     proxy, proxy->GetProperty("ThreeDMode"));
-
+  this->Internal->Links.addPropertyLink(
+    this->Internal->ZCoordsCheckBox, "checked", SIGNAL(stateChanged(int)),
+    proxy, proxy->GetProperty("ThreeDMode"));
+  // setup for Colorize
   this->Internal->Links.addPropertyLink(
     this->Internal->ColorCheckBox, "checked", SIGNAL(stateChanged(int)),
     proxy, proxy->GetProperty("Colorize"));
-
+  
   vtkSMProperty* colorizeProperty = proxy->GetProperty("Colorize");
   this->Internal->ColorCheckBox->setChecked(
     pqSMAdaptor::getElementProperty(colorizeProperty).toInt());
 
+  // setup for scale factor
+  if ((prop = proxy->GetProperty("ScaleFactor")) != 0)
+    {
+    this->Internal->Links.addPropertyLink(this->Internal->GlyphScaleFactorSpinBox,
+      "value", SIGNAL(valueChanged(double)),
+      proxy, proxy->GetProperty("ScaleFactor"));
+    this->Internal->GlyphScaleFactorSpinBox->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->GlyphScaleFactorSpinBox->setEnabled(false);
+    }
+  
   vtkSMProperty* glyphModeProperty = proxy->GetProperty("GlyphMode");
 
   int glyphMode = pqSMAdaptor::getElementProperty(glyphModeProperty).toInt();
