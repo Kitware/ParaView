@@ -23,6 +23,7 @@
 #include "vtkStdString.h" // needed for vtkStdString.
 
 class vtkSMRenderViewProxy;
+class vtkEventForwarderCommand;
 
 class VTK_EXPORT vtkSMScatterPlotViewProxy : public vtkSMViewProxy
 {
@@ -105,7 +106,7 @@ protected:
 
   vtkSMRenderViewProxy* RenderView;
   vtkStdString SuggestedViewType;
-
+  vtkEventForwarderCommand* ForwarderCommand;
 private:
   vtkSMScatterPlotViewProxy(const vtkSMScatterPlotViewProxy&); // Not implemented
   void operator=(const vtkSMScatterPlotViewProxy&); // Not implemented

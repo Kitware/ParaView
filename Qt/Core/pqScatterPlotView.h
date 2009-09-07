@@ -67,6 +67,7 @@ public:
   /// Returns a array of 9 ManipulatorType objects defining
   /// default set of camera manipulators used by this type of view.
   /// The default camera manipulator is in 2D.
+  /// Typically used by pqRenderViewBase::createCameraManipulator
   static const ManipulatorType* getDefaultManipulatorTypes()
     { return pqScatterPlotView::TwoDManipulatorTypes; }
 
@@ -75,17 +76,46 @@ public:
   /// action gets pushed on the interaction undo stack.
   virtual void resetCamera();
   
+  /// Resets the center of rotation to the focal point.
+  void resetCenterOfRotation();
+
   /// Capture the view image into a new vtkImageData with the given magnification
   /// and returns it.
   virtual vtkImageData* captureImage(int magnification);
   virtual vtkImageData* captureImage(const QSize& size)
     { return this->Superclass::captureImage(size); }
   
+  /// Get whether resetCamera() resets the
+  /// center of rotation as well.
+  bool getResetCenterWithCamera() const
+    { return this->ResetCenterWithCamera; }
+
   /// Change the camera mode into 2D or 3D
   void set3DMode(bool);
   
   /// Get the camera mode: 2D or 3D
   bool get3DMode()const;
+
+public slots:
+  // Set the center of rotation. For this to work,
+  // one should have approriate interaction style (vtkPVInteractorStyle subclass)
+  // and camera manipulators that use the center of rotation. 
+  // They are setup correctly by default.
+  void setCenterOfRotation(double x, double y, double z);
+  void setCenterOfRotation(double xyz[3])
+    {
+    this->setCenterOfRotation(xyz[0], xyz[1], xyz[2]);
+    }
+
+  /// Get/Set whether resetCamera() resets the
+  /// center of rotation as well.
+  void setResetCenterWithCamera(bool b)
+    { this->ResetCenterWithCamera = b;}
+
+private slots:
+  // Called when vtkSMRenderViewProxy fires
+  // ResetCameraEvent.
+  void onResetCameraEvent();
 
 protected:
   /// Return the name of the group used for global settings (except interactor
@@ -104,6 +134,7 @@ protected:
     { return "scatterPlotModule/InteractorStyle"; }
 
   /// Must be overridden to return the default manipulator types.
+  /// Typically used by pqRenderViewBase::createCameraManipulator()
   virtual const ManipulatorType* getDefaultManipulatorTypesInternal();
 
   /// Setups up RenderModule and QVTKWidget binding.
@@ -111,6 +142,10 @@ protected:
   /// of whether it is created from state/undo-redo/python or by the GUI. Hence
   /// don't change any render module properties here.
   virtual void initializeWidgets();
+
+  // When true, the camera center of rotation will be reset when the
+  // user reset the camera.
+  bool ResetCenterWithCamera;
 
 private:
   pqScatterPlotView(const pqScatterPlotView&); // Not implemented.

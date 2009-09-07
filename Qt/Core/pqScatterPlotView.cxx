@@ -107,6 +107,12 @@ pqScatterPlotView::pqScatterPlotView(
   Superclass(scatterPlotViewType(), group, name, viewProxy, server, _parent)
 {
   this->Internal = new pqInternal();
+
+
+  this->getConnector()->Connect(
+    viewProxy, vtkCommand::ResetCameraEvent,
+    this, SLOT(onResetCameraEvent()));
+  this->ResetCenterWithCamera = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -202,4 +208,40 @@ const pqScatterPlotView::ManipulatorType* pqScatterPlotView
   return this->Internal->ThreeDMode ? 
     pqScatterPlotView::ThreeDManipulatorTypes:
     pqScatterPlotView::TwoDManipulatorTypes; 
+}
+
+//-----------------------------------------------------------------------------
+void pqScatterPlotView::onResetCameraEvent()
+{
+  if (this->ResetCenterWithCamera)
+    {
+    this->resetCenterOfRotation();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqScatterPlotView::resetCenterOfRotation()
+{
+  // Update center of rotation.
+  vtkSMProxy* viewproxy = this->getProxy();
+  viewproxy->UpdatePropertyInformation();
+  QList<QVariant> values = 
+    pqSMAdaptor::getMultipleElementProperty(
+      viewproxy->GetProperty("CameraFocalPointInfo"));
+  this->setCenterOfRotation(
+    values[0].toDouble(), values[1].toDouble(), values[2].toDouble());
+}
+
+//-----------------------------------------------------------------------------
+void pqScatterPlotView::setCenterOfRotation(double x, double y, double z)
+{
+  QList<QVariant> positionValues;
+  positionValues << x << y << z;
+
+  // this modifies the CenterOfRotation property
+  vtkSMProxy* viewproxy = this->getProxy();
+  pqSMAdaptor::setMultipleElementProperty(
+    viewproxy->GetProperty("CenterOfRotation"),
+    positionValues);
+  viewproxy->UpdateVTKObjects();
 }

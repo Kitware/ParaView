@@ -23,21 +23,25 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkEventForwarderCommand.h"
 
 #include <vtksys/ios/sstream>
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMScatterPlotViewProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMScatterPlotViewProxy, "1.9");
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::vtkSMScatterPlotViewProxy()
 {
   this->RenderView = 0;
+  this->ForwarderCommand = vtkEventForwarderCommand::New();
+  this->ForwarderCommand->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMScatterPlotViewProxy::~vtkSMScatterPlotViewProxy()
 {
+  this->ForwarderCommand->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -194,13 +198,15 @@ bool vtkSMScatterPlotViewProxy::BeginCreateVTKObjects()
     vtkErrorMacro("Missing \"RenderView\" subproxy.");
     return false;
     }
-  
+
+  this->RenderView->AddObserver(vtkCommand::ResetCameraEvent, 
+                                this->ForwarderCommand);
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->RenderView->GetProperty("CameraParallelProjection"));
   ivp->SetElement(0, 1);
   
   bool res =  this->Superclass::BeginCreateVTKObjects();
-
   return res;
 }
 
