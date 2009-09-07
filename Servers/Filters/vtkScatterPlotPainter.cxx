@@ -57,7 +57,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.6");
+vtkCxxRevisionMacro(vtkScatterPlotPainter, "1.7");
 vtkStandardNewMacro(vtkScatterPlotPainter);
 
 vtkInformationKeyMacro(vtkScatterPlotPainter, THREED_MODE, Integer);
@@ -598,10 +598,10 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
   
   if(!this->GlyphMode)
     {
-//     cout << __FUNCTION__ << " bounds: "
-//          << bounds[0] << " " << bounds[1] << " "
-//          << bounds[2] << " " << bounds[3] << " "
-//          << bounds[4] << " " << bounds[5] << endl;
+     // cout << __FUNCTION__ << " bounds: "
+     //      << bounds[0] << " " << bounds[1] << " "
+     //      << bounds[2] << " " << bounds[3] << " "
+     //      << bounds[4] << " " << bounds[5] << endl;
     return;
     }
   
@@ -803,8 +803,8 @@ void vtkScatterPlotPainter::UpdateBounds(double* bounds)
     bbox.Scale(maxScale[0], maxScale[0], maxScale[0]);
     bbox2.Scale(maxScale[1], maxScale[1], maxScale[1]);
     bbox.AddBox(bbox2);
-    bbox.Scale(this->ScaleFactor, this->ScaleFactor, this->ScaleFactor);
     }
+  bbox.Scale(this->ScaleFactor, this->ScaleFactor, this->ScaleFactor);
 
   if(bbox.IsValid())
     {
@@ -1154,6 +1154,7 @@ void vtkScatterPlotPainter::RenderPoints(vtkRenderer *vtkNotUsed(ren),
       }
     glVertex3f(point[0], point[1], point[2]);
     }
+  //glVertex3f(0, 0, 0);
   glEnd();
  }
 
@@ -1200,36 +1201,23 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
      (!glyphYScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph &&
       this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE)!=-1) ||
      (!glyphZScaleArray && this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph && 
-      this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE)!=-1) ||
-     (!glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph) ||
-     (!glyphXOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
+      this->GetArrayComponent(vtkScatterPlotMapper::GLYPH_X_SCALE)!=-1))
+    {
+    vtkWarningMacro("The glyph scale array is not set.");
+    }
+
+  if(!glyphSourceArray && this->GlyphMode & vtkScatterPlotMapper::UseMultiGlyph)
+    {
+    vtkWarningMacro("The glyph source array is not set.");
+    }
+
+  if((!glyphXOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
      (!glyphYOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph) ||
      (!glyphZOrientationArray && this->GlyphMode & vtkScatterPlotMapper::OrientedGlyph))
     {
-    //vtkErrorMacro("One array is not set.");
-    vtkWarningMacro("A glyph array is not set.");
-    //return;
+    vtkWarningMacro("The glyph orientation array is not set.");
     }
   
- 
-  // vtkBitArray *maskArray = 0;
-//     if (this->Masking)
-//       {
-//       maskArray = vtkBitArray::SafeDownCast(this->GetMaskArray(input));
-//       if (maskArray==0)
-//         {
-//         vtkDebugMacro(<<"masking is enabled but there is no mask array. Ignore masking.");
-//         }
-//       else
-//         {
-//         if (maskArray->GetNumberOfComponents()!=1)
-//           {
-//           vtkErrorMacro(" expecting a mask array with one component, getting "
-//             << maskArray->GetNumberOfComponents() << " components.");
-//           return;
-//           }
-//         }
-//       }
   /*
   vtkHardwareSelector* selector = ren->GetSelector();
   bool selecting_points = selector && (selector->GetFieldAssociation() == 
@@ -1403,6 +1391,7 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
 //          scalez = (scalez - this->Range[0]) / den;
 //          }
       }
+    //cout << scale [0] << " " << this->ScaleFactor <<endl;
     scale[0] *= this->ScaleFactor;
     scale[1] *= this->ScaleFactor;
     scale[2] *= this->ScaleFactor;
@@ -1529,9 +1518,10 @@ void vtkScatterPlotPainter::RenderGlyphs(vtkRenderer *ren, vtkActor *actor,
       }
 
     //SCALING
-    if(this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph)
+    if (this->GlyphMode & vtkScatterPlotMapper::ScaledGlyph || 
+        this->ScaleFactor != 1.)
       {
-      trans->Scale(scale[0],scale[1],scale[2]);
+      trans->Scale(scale[0], scale[1], scale[2]);
       }
     
     // Get the 2D glyphs parallel to the camera (billboarding)
