@@ -18,6 +18,7 @@ def reset_trace_globals():
   trace_globals.last_registered_proxies = []
   trace_globals.registered_proxies = []
   trace_globals.trace_output = ["try: paraview.simple\nexcept: from paraview.simple import *\n"]
+  trace_globals.trace_output_endblock = "Render()"
   trace_globals.traced_proxy_groups = ["sources", "representations", "views", \
                                        "lookup_tables", "scalar_bars"]
   trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
@@ -410,6 +411,7 @@ def get_trace_string():
   s = str()
   for line in trace_globals.trace_output:
     s += line + "\n"
+  s += trace_globals.trace_output_endblock + "\n"
   return s
 
 def save_trace(fileName):
@@ -418,12 +420,14 @@ def save_trace(fileName):
   for line in trace_globals.trace_output:
     outFile.write(line)
     outFile.write("\n")
+  outFile.write(trace_globals.trace_output_endblock + "\n")
   outFile.close()
 
 def print_trace():
   append_trace()
   for line in trace_globals.trace_output:
     print line
+  print trace_globals.trace_output_endblock
 
 def on_proxy_registered(o, e):
   '''Called when a proxy is registered with the proxy manager'''
