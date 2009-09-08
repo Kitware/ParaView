@@ -44,6 +44,7 @@ SET (PY_TESTS
   PythonPVSimpleCone
   PythonPVSimpleExII
   PythonPVSimpleSphere
+  PythonSMTraceTest1
 #  SMUndoRedo
 #  SMCompoundProxyUndoRedo
   )
