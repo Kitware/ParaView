@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 
@@ -694,4 +695,23 @@ bool pqRenderViewBase::saveImage(int width, int height, const QString& filename)
     this->render();
     }
   return (error_code == vtkErrorCode::NoError);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderViewBase::setStereo(int mode)
+{
+  QList<pqView*> views =
+    pqApplicationCore::instance()->getServerManagerModel()->findItems<pqView*>();
+  foreach (pqView* view, views)
+    {
+    vtkSMProxy* viewProxy = view->getProxy();
+    pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoRender"),
+      mode != 0);
+    if (mode)
+      {
+      pqSMAdaptor::setElementProperty(viewProxy->GetProperty("StereoType"),
+        mode);
+      }
+    viewProxy->UpdateVTKObjects();
+    }
 }

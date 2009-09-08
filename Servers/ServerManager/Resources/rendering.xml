@@ -418,6 +418,23 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
+      <IntVectorProperty name="StereoType"
+        command="SetStereoType"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Crystal Eyes" />
+          <Entry value="2" text="Red-Blue" />
+          <Entry value="3" text="Interlaced" />
+          <Entry value="4" text="Left" />
+          <Entry value="5" text="Right" />
+          <Entry value="6" text="Dresden" />
+          <Entry value="7" text="Anaglyph" />
+          <Entry value="8" text="Checkerboard" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+
       <IntVectorProperty
         name="NumberOfLayers"
         command="SetNumberOfLayers"
@@ -4350,6 +4367,8 @@
         <ExposedProperties>
           <Property name="RenderWindowSize" exposed_name="ViewSize" />
           <Property name="RenderWindowSizeInfo" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4430,6 +4449,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="RenderWindowSizeInfo" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4550,6 +4571,8 @@
         <ExposedProperties>
           <Property name="RenderWindowSizeInfo" />
           <Property name="RenderWindowSize" exposed_name="ViewSize" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4716,6 +4739,8 @@
         </Proxy>
         <ExposedProperties>
           <Property name="RenderWindowSizeInfo" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
         </ExposedProperties>
       </SubProxy>
 
@@ -4904,6 +4929,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
           <!-- RenderWindow -->
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
@@ -5124,6 +5151,8 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="RemoteRenderThreshold" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -5450,6 +5479,8 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
           <Property name="SquirtLevel" />
@@ -5522,6 +5553,9 @@
           <Property name="CenterOfRotation" />
           <!-- Renderer -->
           <Property name="Background" />
+          <!-- RenderWindow-->
+          <Property name="StereoRender" />
+          <Property name="StereoType" />
           <!-- Tiles -->
           <Property name="CollectGeometryThreshold" />
           <Property name="StillRenderImageReductionFactor" />

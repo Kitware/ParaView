@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyDefinitionIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkRenderWindow.h" // for VTK_STEREO_*
 
 class pqSaveSnapshotDialog::pqInternal : public Ui::SaveSnapshotDialog
 {
@@ -201,4 +202,32 @@ QString pqSaveSnapshotDialog::palette() const
   QString data = this->Internal->palette->itemData(
     this->Internal->palette->currentIndex()).toString();
   return data;
+}
+
+
+//-----------------------------------------------------------------------------
+int pqSaveSnapshotDialog::getStereoMode() const
+{
+  QString stereoMode = this->Internal->stereoMode->currentText();
+  if (stereoMode == "Red-Blue")
+    {
+    return VTK_STEREO_RED_BLUE;
+    }
+  else if (stereoMode == "Interlaced")
+    {
+    return VTK_STEREO_INTERLACED;
+    }
+  else if (stereoMode == "Checkerboard")
+    {
+    return VTK_STEREO_CHECKERBOARD;
+    }
+  else if (stereoMode == "Left Eye Only")
+    {
+    return VTK_STEREO_LEFT;
+    }
+  else if (stereoMode == "Right Eye Only")
+    {
+    return VTK_STEREO_RIGHT;
+    }
+  return 0;
 }
