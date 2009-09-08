@@ -65,6 +65,10 @@ public:
   /// (i.e. "Current Palette" is selected, then an empty string is returned.
   QString palette() const;
 
+  /// Returns one of the stereo mode constants defined in vtkRenderWindow.h if
+  /// user selected a stereo mode. 0 is no-stereo.
+  int getStereoMode() const;
+
 protected slots:
   /// Called when the user has edited width. If aspect ratio is locked,
   /// we will scale the height to maintain the aspect ration.

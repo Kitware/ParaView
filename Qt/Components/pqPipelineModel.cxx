@@ -1828,17 +1828,20 @@ void pqPipelineModel::removeConnection(pqPipelineModelOutput *source,
       pqPipelineModelLink *otherLink = dynamic_cast<pqPipelineModelLink *>(
           otherSource->getChild(row));
 
+      cout << __LINE__ << endl;
       parentIndex = this->makeIndex(otherSource);
       this->beginRemoveRows(parentIndex, row, row);
-      otherSource->getOutputs().removeAll(otherLink);
+      otherSource->removeChild(otherLink);
       this->endRemoveRows();
       delete otherLink;
+      cout << __LINE__ << endl;
 
       QModelIndex serverIndex = this->makeIndex(server);
       int serverRow = server->getChildIndex(sink);
       this->beginRemoveRows(serverIndex, serverRow, serverRow);
       server->getSources().removeAll(sink);
       this->endRemoveRows();
+      cout << __LINE__ << endl;
 
       this->beginInsertRows(parentIndex, row, row);
       otherSource->getOutputs().insert(row, sink);
@@ -1849,6 +1852,7 @@ void pqPipelineModel::removeConnection(pqPipelineModelOutput *source,
         }
 
       emit this->indexRestored(this->makeIndex(sink));
+      cout << __LINE__ << endl;
       }
     }
 }

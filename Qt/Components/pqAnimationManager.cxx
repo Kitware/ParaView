@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMAnimationSceneGeometryWriter.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSmartPointer.h"
@@ -59,11 +60,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectBuilder.h"
 #include "pqProgressManager.h"
 #include "pqProxy.h"
+#include "pqRenderViewBase.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqView.h"
 #include "pqViewManager.h"
 
 #define SEQUENCE 0
@@ -406,6 +407,35 @@ bool pqAnimationManager::saveAnimation()
 
   bool disconnect_and_save = 
     (dialogUI.checkBoxDisconnect->checkState() == Qt::Checked);
+  int stereo = dialogUI.stereoMode->currentIndex();
+  if (stereo)
+    {
+    QString stereoMode = dialogUI.stereoMode->currentText();
+    if (stereoMode == "Red-Blue")
+      {
+      stereo = VTK_STEREO_RED_BLUE;
+      }
+    else if (stereoMode == "Interlaced")
+      {
+      stereo = VTK_STEREO_INTERLACED;
+      }
+    else if (stereoMode == "Checkerboard")
+      {
+      stereo = VTK_STEREO_CHECKERBOARD;
+      }
+    else if (stereoMode == "Left Eye Only")
+      {
+      stereo = VTK_STEREO_LEFT;
+      }
+    else if (stereoMode == "Right Eye Only")
+      {
+      stereo = VTK_STEREO_RIGHT;
+      }
+    else
+      {
+      stereo = 0;
+      }
+    }
 
   // Now obtain filename for the animation.
   vtkSmartPointer<vtkPVServerInformation> serverInfo;
@@ -474,6 +504,11 @@ bool pqAnimationManager::saveAnimation()
 
   // Update Scene properties based on user options. 
   emit this->beginNonUndoableChanges();
+
+  if (stereo)
+    {
+    pqRenderViewBase::setStereo(stereo);
+    }
 
   switch (playMode)
     {
@@ -594,6 +629,11 @@ bool pqAnimationManager::saveAnimation()
     }
   sceneProxy->UpdateVTKObjects();
   this->Internals->ViewWidget->finishedCapture();
+
+  if (stereo)
+    {
+    pqRenderViewBase::setStereo(0);
+    }
   emit this->endNonUndoableChanges();
   return status;
 }
