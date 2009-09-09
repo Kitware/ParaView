@@ -44,7 +44,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.20");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.20.4.1");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -624,6 +624,7 @@ bool vtkSMSelectionHelper::MergeSelection(vtkSMSourceProxy* output,
       ids.push_back(outputIDs.GetAsIdType(cc));
       }
     outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    output->UpdateVTKObjects();
     return true;
     }
 
@@ -645,6 +646,7 @@ bool vtkSMSelectionHelper::MergeSelection(vtkSMSourceProxy* output,
       ids.push_back(outputIDs.GetAsIdType(cc));
       }
     outputIDs.Set(&ids[0], static_cast<unsigned int>(ids.size()));
+    output->UpdateVTKObjects();
     return true;
     }
 
