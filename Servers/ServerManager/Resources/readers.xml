@@ -997,6 +997,82 @@
       </StringVectorProperty>
     </SourceProxy> <!-- SLACParticleReaderCore -->
 
+
+    <SourceProxy name="ParticleReaderCore"
+      class="vtkParticleReader"
+      label="VTK Particle Reader">
+      <Documentation>
+        Core for ParticleReader.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files" />
+        <Documentation>
+          The name of the file to load.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty name="ByteOrder"
+        command="SetDataByteOrder"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+        Set/Get the byte ordering of the file you are trying to read in.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="BigEndian" value="0" />
+          <Entry text="LittleEndian" value="1" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="HasScalar"
+        command="SetHasScalar"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          Default: 1. If 1 then each particle has a value associated with it.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FileType"
+        command="SetFileType"
+        number_of_elements="1"
+        default_values="0">
+        <Documentation>
+          Set the file type.  The options are:
+          - Unknown (0) (default) the reader will attempt to determine the file
+            type. If this fails then you should set the file type yourself.
+          - Text (1) the file type is text.
+          - Binary (2) the file type is binary.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Unknown" value="0" />
+          <Entry text="Text" value="1" />
+          <Entry text="Binary" value="2" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="DataType"
+        command="SetDataType"
+        number_of_elements="1"
+        default_values="10">
+        <Documentation>
+          Get/Set the data type.  The options are:
+          - Float (10) (default) single precision floating point.
+          - Double (11) double precision floating point.
+        </Documentation>
+        <EnumerationDomain name="enum">
+          <Entry text="Float" value="10" />
+          <Entry text="Double" value="11" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <!-- ParticleReaderCore -->
+    </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -4877,6 +4953,68 @@
      </Hints>
       <!-- End of CSVReader -->
    </FileSeriesReaderProxy>
+
+   <FileSeriesReaderProxy name="ParticleReader"
+                          class="vtkFileSeriesReader"
+                          label="Particles Reader"
+                          file_name_method="SetFileName">
+      <Documentation short_help="Read particle data."
+        long_help="Read particle data.">
+        vtkParticleReader reads either a binary or a text file of particles.
+        Each particle can have associated with it an optional scalar value. So
+        the format is: x, y, z, scalar (all floats or doubles). The text file
+        can consist of a comma delimited set of values. In most cases
+        vtkParticleReader can automatically determine whether the file is text
+        or binary.  The data can be either float or double.  Progress updates
+        are provided.  With respect to binary files, random access into the file
+        to read pieces is supported.
+      </Documentation>
+
+      <StringVectorProperty name="FileName"
+                            clean_command="RemoveAllFileNames"
+                            command="AddFileName"
+                            animateable="0"
+                            number_of_elements="0" 
+                            repeat_command="1"
+                            information_property="FileNameInfo">
+        <FileListDomain name="files"/>
+        <Documentation>
+          The list of files to be read by the reader.
+        </Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+
+ 
+      <DoubleVectorProperty name="TimestepValues"
+                            repeatable="1"
+                            information_only="1">
+        <TimeStepsInformationHelper/>
+        <Documentation>
+          Available timestep values.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <SubProxy>
+        <Proxy name="Reader"
+               proxygroup="internal_sources"
+               proxyname="ParticleReaderCore">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="ByteOrder" />
+          <Property name="HasScalar" />
+          <Property name="FileType" />
+          <Property name="DataType" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <!-- End of CSVReader -->
+   </FileSeriesReaderProxy>
+
 
   </ProxyGroup>
 </ServerManagerConfiguration>
