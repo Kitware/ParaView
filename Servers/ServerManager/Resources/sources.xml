@@ -1769,23 +1769,19 @@ OS is the output scalar; M represents the maximum value; G represents the Gaussi
 
 vtkDataObjectGenerator parses a string and produces dataobjects from the
 dataobject template names it sees in the string. For example, if the string
-contains &quot;ID1&quot; the generator will create a vtkImageData. &quot;UF1&quot;, &quot;RD1&quot;, 
-&quot;SD1&quot;, &quot;PD1&quot;, and &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
-vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively. You 
-can compose composite datasets from the atomic ones listed above
-by putting them between &quot;(&quot; and &quot;)&quot; in the string to create groups, and 
-then placing a collection of groups together inside one of the three 
-composite dataset identifiers - &quot;MB{}&quot;, &quot;HD&lt;&gt;&quot; or &quot;HB[]&quot;.
+contains &quot;ID1&quot; the generator will create a vtkImageData. &quot;UF1&quot;, &quot;RG1&quot;, 
+&quot;SG1&quot;, &quot;PD1&quot;, and &quot;UG1&quot; will produce vtkUniformGrid, vtkRectilinearGrid,
+vtkStructuredGrid, vtkPolyData and vtkUnstructuredGrid respectively. 
+&quot;PD2&quot; will produce an alternate vtkPolydata.
+You can compose composite datasets from the atomic ones listed above
+by placing them within one of the two composite dataset identifiers
+- &quot;MB{}&quot; or &quot;HB[]&quot;. &quot;MB{ ID1 PD1 MB{} }&quot; for example will create a 
+vtkMultiBlockDataSet consisting of three blocks: image data, poly data, 
+multi-block (empty). Hierarchical Box data sets additionally require
+the notion of groups, declared within &quot;()&quot; braces, to specify AMR depth.
 &quot;HB[ (UF1)(UF1)(UF1) ]&quot; will create a vtkHierarchicalBoxDataSet representing
-an octree, in which the firstmost cell is refined, and then the firstmost 
-refined cell is refined itself.
-&quot;HD&lt; (UG1UG1UG1) (PD1)&gt;&quot; will create a vtkHierachicalDataSet which contains
-two refinement levels, the first is a group with three unstructured grids,
-the second, more refined level is a vtkPolyData.
-&quot;MB{ (ID1)(PD1 RG1)(MB{}) }&quot; will create a vtkMultiBlockDataSet consisting
-of three groups. The first group has one data set, a vtkImageData. The
-second group has two datasets, a vtkPolyData and a vtkRectilinearGrid. The
-third contains a vtkMultiBlockDataSet, which in this case is empty.
+an octree that is three levels deep, in which the firstmost cell in each level
+is refined.
      </Documentation>
 
      <StringVectorProperty 
