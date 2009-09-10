@@ -166,7 +166,7 @@ int RectilinearToUniformGrid(
 
 
 
-vtkCxxRevisionMacro(vtkVisItDatabase, "1.4");
+vtkCxxRevisionMacro(vtkVisItDatabase, "1.5");
 vtkStandardNewMacro(vtkVisItDatabase);
 
 //-----------------------------------------------------------------------------
@@ -1192,8 +1192,8 @@ int vtkVisItDatabase::ReadData(
     // If this mesh contains multiple domains, the user has a subsetting 
     // opportunity. In that case we turn all domains off, and turn on only 
     // the selected ones. However for meshes with only one domain the user
-    // is never given a subsetting oportunity, and there will be no selcted 
-    // domains, so we can't turn of the domains in that case.
+    // is never given a subsetting oportunity, and there will be no selected 
+    // domains, so we can't turn off the domains in that case.
     const int nAllDomains=meshMetaData->numBlocks;
     if (nAllDomains>1)
       {

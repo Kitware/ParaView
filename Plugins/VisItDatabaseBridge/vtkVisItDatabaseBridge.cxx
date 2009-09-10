@@ -15,7 +15,6 @@
 #include "vtkVisItDatabaseBridge.h"
 #include "vtkVisItDatabase.h"
 #include "vtkVisItDatabaseBridgeTypes.h"
-
 #include "vtkCallbackCommand.h"
 #include "vtkCompositeDataPipeline.h"
 #include "vtkDataArraySelection.h"
@@ -33,16 +32,16 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkProcessModule.h"
 #include "vtkPVOptions.h"
-
 #include <vtksys/SystemTools.hxx>
-#include <vtkstd/string>
 
+#include <vtkstd/string>
 using vtkstd::string;
+
 #include <vtkstd/vector>
 using vtkstd::vector;
 
 
-vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.4");
+vtkCxxRevisionMacro(vtkVisItDatabaseBridge, "1.5");
 vtkStandardNewMacro(vtkVisItDatabaseBridge);
 
 // Never try to print a null pointer to a string.
@@ -66,9 +65,9 @@ int fequal(double a, double b, double tol)
 //-----------------------------------------------------------------------------
 vtkVisItDatabaseBridge::vtkVisItDatabaseBridge()
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================vtkVisItDatabaseBridge" << endl;
-  #endif
+#endif
 
   this->FileName=0;
   this->PluginId=0;
@@ -78,7 +77,6 @@ vtkVisItDatabaseBridge::vtkVisItDatabaseBridge()
     GetOptions()->GetArgv0();
   this->SetPluginPath(
     vtksys::SystemTools::GetFilenamePath(executable_path).c_str());
-cout << "PluginPath: " << this->PluginPath<< endl;
 
   this->Clear();
   this->VisitSource=vtkVisItDatabase::New();
@@ -100,9 +98,9 @@ cout << "PluginPath: " << this->PluginPath<< endl;
 //-----------------------------------------------------------------------------
 vtkVisItDatabaseBridge::~vtkVisItDatabaseBridge()
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================~vtkVisItDatabaseBridge" << endl;
-  #endif
+#endif
 
   this->Clear();
 
@@ -152,9 +150,9 @@ int vtkVisItDatabaseBridge::UpdateVisitSource()
 //----------------------------------------------------------------------------
 vtkExecutive* vtkVisItDatabaseBridge::CreateDefaultExecutive()
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================CreateDefaultExecutive" << endl;
-  #endif
+#endif
 
   return vtkCompositeDataPipeline::New();
 }
@@ -174,10 +172,10 @@ void vtkVisItDatabaseBridge::Clear()
 //-----------------------------------------------------------------------------
 int vtkVisItDatabaseBridge::CanReadFile(const char *file)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================CanReadFile" << endl;
   cerr << "Check " << safeio(file) << "." << endl;
-  #endif
+#endif
   // Configure.
   if (this->UpdatePlugin
     || !this->VisitSource->Configured())
@@ -208,9 +206,9 @@ int vtkVisItDatabaseBridge::CanReadFile(const char *file)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetFileName(const char* _arg)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "Set FileName from " << safeio(this->FileName) << " to " << safeio(_arg) << "." << endl;
-  #endif
+#endif
 
   vtkDebugMacro(<< this->GetClassName() << ": setting FileName to " << (_arg?_arg:"(null)"));
   if (this->FileName == NULL && _arg == NULL) { return;}
@@ -237,9 +235,9 @@ void vtkVisItDatabaseBridge::SetFileName(const char* _arg)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetPluginPath(const char* _arg)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "Set PluginPath from " << safeio(this->PluginPath) << " to " << safeio(_arg) << "." << endl;
-  #endif
+#endif
 
   vtkDebugMacro(<< this->GetClassName() << ": setting PluginPath to " << (_arg?_arg:"(null)"));
   if (this->PluginPath == NULL && _arg == NULL) { return;}
@@ -268,9 +266,9 @@ void vtkVisItDatabaseBridge::SetPluginPath(const char* _arg)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetPluginId(const char* _arg)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "Set PluginId from " << safeio(this->PluginId) << " to " << safeio(_arg) << "." << endl;
-  #endif
+#endif
 
   vtkDebugMacro(<< this->GetClassName() << ": setting PluginId to " << (_arg?_arg:"(null)"));
   if (this->PluginId == NULL && _arg == NULL) { return;}
@@ -302,9 +300,9 @@ int vtkVisItDatabaseBridge::RequestInformation(
   vtkInformationVector** inputVector,
   vtkInformationVector* outputVector)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================RequestInformation" << endl;
-  #endif
+#endif
 
   if (!this->UpdateDatabaseView)
     {
@@ -313,8 +311,6 @@ int vtkVisItDatabaseBridge::RequestInformation(
     return 1;
     }
   this->UpdateDatabaseView=0;
-
-  this->UpdateProgress(0.0);
 
   vtkInformation* info=outputVector->GetInformationObject(0);
 
@@ -350,9 +346,9 @@ int vtkVisItDatabaseBridge::RequestInformation(
           // insert this place holder and adjust in RequestData.
           int ext[6]={0,1,0,1,0,1};
           info->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),ext,6);
-          #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
           cerr << "Set extents to 0, 1, 0, 1, 0, 1." << endl;
-          #endif
+#endif
           }
         }
       else
@@ -362,18 +358,14 @@ int vtkVisItDatabaseBridge::RequestInformation(
       }
     }
 
-  this->UpdateProgress(0.25);
-
   // Create a view of the SIL. The SIL tells us the relationships
   // of the various entities in the database. The view exposes
-  // these to the U.I. for convinient manipulation.
+  // these to the U.I. for convenient manipulation.
   vtkMutableDirectedGraph *view=vtkMutableDirectedGraph::New();
   this->VisitSource->GenerateDatabaseView(view);
   info->Set(vtkDataObject::SIL(), view);
   view->Delete();
   ++this->DatabaseViewMTime;
-
-  this->UpdateProgress(0.75);
 
   // Enumerate Array and Expressions as strings because the client
   // will send a list of id's while VisIt expects the strings.
@@ -392,8 +384,6 @@ int vtkVisItDatabaseBridge::RequestInformation(
     info->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(),timeRange,2);
     }
 
-  this->UpdateProgress(1.0);
-
   return 1;
 }
 
@@ -403,10 +393,10 @@ int vtkVisItDatabaseBridge::RequestDataObject(
   vtkInformationVector** /*inputVector*/,
   vtkInformationVector* outputVector)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================RequestDataObject" << endl;
   cerr << safeio(this->FileName) << endl;
-  #endif
+#endif
 
   int ok;
   ok=this->UpdateVisitSource();
@@ -440,11 +430,10 @@ int vtkVisItDatabaseBridge::RequestDataObject(
   info->Set(vtkDataObject::DATA_EXTENT_TYPE(), dataset->GetExtentType());
   dataset->SetPipelineInformation(info);
   dataset->Delete();
-
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "datasetType=" << info->Get(vtkDataObject::DATA_TYPE_NAME()) << endl;
   cerr << "dataset=" << info->Get(vtkDataObject::DATA_OBJECT()) << endl;
-  #endif
+#endif
 
   // TODO delete data
 
@@ -458,9 +447,9 @@ void vtkVisItDatabaseBridge::DistributeBlocks(
         int nBlocks,
         vtkstd::vector<int> &blockIds)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================DistributeBlocks" << endl;
-  #endif
+#endif
 
   if (nProcs>nBlocks)
     {
@@ -487,10 +476,10 @@ void vtkVisItDatabaseBridge::DistributeBlocks(
     }
 
   size_t n=blockIds.size();
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "Proc Id " << procId << " owns blocks "
        << blockIds[0] << " through " << blockIds[n-1] << "." << endl;
-  #endif
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -499,11 +488,9 @@ int vtkVisItDatabaseBridge::RequestData(
         vtkInformationVector ** /*input*/,
         vtkInformationVector *output)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================RequestData" << endl;
-  #endif
-
-  this->UpdateProgress(0.0);
+#endif
 
   int ok;
   vtkInformation *outputInfo=output->GetInformationObject(0);
@@ -544,9 +531,9 @@ int vtkVisItDatabaseBridge::RequestData(
         }
       }
     outputInfo->Set(vtkDataObject::DATA_TIME_STEPS(),step,1);
-    #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
     cerr << "Requested time " << step[0] << " at " << stepId << "." << endl;
-    #endif
+#endif
     }
 
   // TODO Make use of UPDATE_EXTENT ??
@@ -555,10 +542,9 @@ int vtkVisItDatabaseBridge::RequestData(
     = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   const int nProcs
     = outputInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "I am " << procId << " of " << nProcs << "." << endl;
-  #endif
+#endif
 
   // Configure the data object. The pipeline Initializes dataobjects
   // after RequestDataObject so this has to be done here.
@@ -583,9 +569,9 @@ int vtkVisItDatabaseBridge::RequestData(
       {
       int id=-this->ArrayIds[meshIdx][arrayIdx]-1; // ids are < 0 and off by one in the view.
       activeArrayNames[meshIdx].push_back(this->ArrayNames[meshId][id]);
-      #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
       cerr << "Selected " << this->ArrayNames[meshId][id] << endl;
-      #endif
+#endif
       }
     // Distribute blocks to processes.
     const int nBlocks=this->VisitSource->GetNumberOfBlocks(this->MeshIds[meshIdx]);
@@ -636,8 +622,6 @@ int vtkVisItDatabaseBridge::RequestData(
       outputInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),ext,6);
       }
 
-  this->UpdateProgress(1.0);
-
   //dataOut->Print(cerr);
   return 1;
 }
@@ -675,9 +659,9 @@ void vtkVisItDatabaseBridge::SelectionModifiedCallback(
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::InitializeUI()
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================InitializeUI" << endl;
-  #endif
+#endif
 
   // initialize read lists.
   this->MeshIds.clear();
@@ -699,9 +683,9 @@ void vtkVisItDatabaseBridge::InitializeUI()
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetNumberOfMeshes(int nMeshes)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetNumberOfMeshes " << endl;
-  #endif
+#endif
 
   this->ArrayIds.clear();
   this->ArrayIds.resize(nMeshes);
@@ -724,9 +708,9 @@ void vtkVisItDatabaseBridge::SetNumberOfMeshes(int nMeshes)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetMeshIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetMeshIds " <<  endl;
-  #endif
+#endif
 
   const int n=ids[0];
   if (n>1)
@@ -744,9 +728,9 @@ void vtkVisItDatabaseBridge::SetMeshIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetMeshIds(int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetMeshIds " << endl;
-  #endif
+#endif
 
   if (n)
     {
@@ -763,9 +747,9 @@ void vtkVisItDatabaseBridge::SetMeshIds(int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetArrayIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetArrayIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -783,9 +767,9 @@ void vtkVisItDatabaseBridge::SetArrayIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetArrayIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetArrayIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->ArrayIds.size())
     {
@@ -801,9 +785,9 @@ void vtkVisItDatabaseBridge::SetArrayIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetExpressionIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetExpressionIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -821,9 +805,9 @@ void vtkVisItDatabaseBridge::SetExpressionIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetExpressionIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetExpressionIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->ExpressionIds.size())
     {
@@ -839,9 +823,9 @@ void vtkVisItDatabaseBridge::SetExpressionIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetDomainSSIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetDomainSSIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -859,9 +843,9 @@ void vtkVisItDatabaseBridge::SetDomainSSIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetDomainSSIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetDomainSSIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->DomainSSIds.size())
     {
@@ -877,9 +861,9 @@ void vtkVisItDatabaseBridge::SetDomainSSIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetBlockSSIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetBlockSSIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -897,9 +881,9 @@ void vtkVisItDatabaseBridge::SetBlockSSIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetBlockSSIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetBlockSSIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->BlockSSIds.size())
     {
@@ -916,9 +900,9 @@ void vtkVisItDatabaseBridge::SetBlockSSIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetAssemblySSIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetAssemblySSIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -936,9 +920,9 @@ void vtkVisItDatabaseBridge::SetAssemblySSIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetAssemblySSIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetAssemblySSIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->AssemblySSIds.size())
     {
@@ -954,9 +938,9 @@ void vtkVisItDatabaseBridge::SetAssemblySSIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetMaterialSSIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetMaterialSSIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -974,9 +958,9 @@ void vtkVisItDatabaseBridge::SetMaterialSSIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetMaterialSSIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetMaterialSSIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->MaterialSSIds.size())
     {
@@ -992,9 +976,9 @@ void vtkVisItDatabaseBridge::SetMaterialSSIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetSpeciesSSIds(int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetSpeciesSSIds " << endl;
-  #endif
+#endif
 
   const size_t n=ids[0];
   const size_t meshId=ids[1];
@@ -1012,9 +996,9 @@ void vtkVisItDatabaseBridge::SetSpeciesSSIds(int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetSpeciesSSIds(int meshId, int n, int *ids)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "====================================================================SetSpeciesSSIds " << endl;
-  #endif
+#endif
 
   if (n>0 && meshId>=0 && meshId<this->SpeciesSSIds.size())
     {
@@ -1034,23 +1018,23 @@ void vtkVisItDatabaseBridge::SetSpeciesSSIds(int meshId, int n, int *ids)
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetDomainToBlockSetOperation(int op)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "SetDomainToBlockSetOperation " << op << endl;
-  #endif
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetDomainToAssemblySetOperation(int op)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "SetDomainToAssemblyOperation " << op << endl;
-  #endif
+#endif
 }
 
 //-----------------------------------------------------------------------------
 void vtkVisItDatabaseBridge::SetDomainToMaterialSetOperation(int op)
 {
-  #if defined vtkVisItDatabaseBridgeDEBUG
+#if defined vtkVisItDatabaseBridgeDEBUG
   cerr << "SetDomainToMaterialOperation " << op << endl;
-  #endif
+#endif
 }
