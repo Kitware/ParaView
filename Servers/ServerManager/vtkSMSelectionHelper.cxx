@@ -44,7 +44,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMSelectionHelper);
-vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.21");
+vtkCxxRevisionMacro(vtkSMSelectionHelper, "1.22");
 
 //-----------------------------------------------------------------------------
 void vtkSMSelectionHelper::PrintSelf(ostream& os, vtkIndent indent)
@@ -575,18 +575,18 @@ vtkSMProxy* vtkSMSelectionHelper::ConvertInternal(
 }
 
 //-----------------------------------------------------------------------------
-bool vtkSMSelectionHelper::MergeSelection(vtkSMSourceProxy* output, 
-  vtkSMSourceProxy* input)
+bool vtkSMSelectionHelper::MergeSelection(
+  vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+  vtkSMSourceProxy* dataSource, int dataPort)
 {
-  // Currently only index based selections i.e. ids, global ids based selections
-  // are mergeable and that too only is input and output are identical in all
-  // respects (except the indices ofcourse).
-  if (!output || !input || 
-    strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
+  if (!output || !input)
     {
     return false;
     }
 
+  // Currently only index based selections i.e. ids, global ids based selections
+  // are mergeable and that too only is input and output are identical in all
+  // respects (except the indices ofcourse).
   if (vtkSMPropertyHelper(output, "FieldType").GetAsInt() != 
     vtkSMPropertyHelper(input, "FieldType").GetAsInt())
     {
@@ -604,6 +604,45 @@ bool vtkSMSelectionHelper::MergeSelection(vtkSMSourceProxy* output,
     {
     return false;
     }
+
+  vtkSmartPointer<vtkSMSourceProxy> tempInput;
+  if (strcmp(output->GetXMLName(), input->GetXMLName()) != 0)
+    {
+    // before totally giving up, check to see if the input selection can be
+    // converted to the same type as the output.
+    vtkstd::string inputType = input->GetXMLName();
+    vtkstd::string outputType = output->GetXMLName();
+
+    if (
+      (inputType == "GlobalIDSelectionSource" &&
+       outputType == "IDSelectionSource") || 
+      (inputType == "GlobalIDSelectionSource" &&
+       outputType == "CompositeDataIDSelectionSource") ||
+      (inputType == "IDSelectionSource" &&
+       outputType == "GlobalIDSelectionSource") ||
+      (inputType == "CompositeDataIDSelectionSource" &&
+       outputType == "GlobalIDSelectionSource"))
+      {
+      int type = vtkSelectionNode::INDICES;
+      if (outputType == "GlobalIDSelectionSource")
+        {
+        type = vtkSelectionNode::GLOBALIDS;
+        }
+
+      // Conversion is possible!.
+      tempInput.TakeReference(vtkSMSourceProxy::SafeDownCast(
+          vtkSMSelectionHelper::ConvertSelection(type,
+            input,
+            dataSource,
+            dataPort)));
+      input = tempInput;
+      }
+    else
+      {
+      return false;
+      }
+    }
+
 
   // mergs IDs or Blocks properties.
   if (output->GetProperty("IDs") && input->GetProperty("IDs"))

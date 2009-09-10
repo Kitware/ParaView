@@ -856,12 +856,11 @@ void pqRenderView::collectSelectionPorts(
       continue;
       }
     pqOutputPort* opPort = pqRepr->getOutputPortFromInput();
+    vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
+      opPort->getSource()->getProxy());
 
     if (select_blocks)
       {
-      vtkSMSourceProxy* selectedSource = vtkSMSourceProxy::SafeDownCast(
-        opPort->getSource()->getProxy());
-
       // convert the index based selection to vtkSelectionNode::BLOCKS selection.
       vtkSMSourceProxy* newSelSource = vtkSMSourceProxy::SafeDownCast(
         vtkSMSelectionHelper::ConvertSelection(vtkSelectionNode::BLOCKS,
@@ -873,7 +872,8 @@ void pqRenderView::collectSelectionPorts(
     if (expand)
       {
       vtkSMSelectionHelper::MergeSelection(selectionSource,
-        opPort->getSelectionInput());
+        opPort->getSelectionInput(),
+        selectedSource, opPort->getPortNumber());
       }
     opPort->setSelectionInput(selectionSource, 0);
     output_ports.append(opPort);
