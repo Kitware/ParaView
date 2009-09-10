@@ -81,7 +81,11 @@ public:
   // Description:
   // Updates output to be a combination of (input | output) if the two selection
   // sources are mergeable. Returns true if merge successful.
-  static bool MergeSelection(vtkSMSourceProxy* output, vtkSMSourceProxy* input);
+  // dataSource and outputport are needed if a conversion is needed to make the
+  // input expandable to the type of the output.
+  static bool MergeSelection(
+    vtkSMSourceProxy* output, vtkSMSourceProxy* input,
+    vtkSMSourceProxy* dataSource, int outputport);
 
 protected:
   vtkSMSelectionHelper() {};
