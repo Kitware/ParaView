@@ -53,7 +53,7 @@
 using vtkstd::string;
 
 vtkStandardNewMacro(vtkSMPointSpriteRepresentationProxy)
-vtkCxxRevisionMacro(vtkSMPointSpriteRepresentationProxy, "1.1.2.4")
+vtkCxxRevisionMacro(vtkSMPointSpriteRepresentationProxy, "1.1.2.5")
 //----------------------------------------------------------------------------
 vtkSMPointSpriteRepresentationProxy::vtkSMPointSpriteRepresentationProxy()
 {
@@ -346,7 +346,7 @@ double vtkSMPointSpriteRepresentationProxy::ComputeInitialRadius(vtkPVDataInform
       + (bounds[3] - bounds[2]) * (bounds[3] - bounds[2]) + (bounds[5]
       - bounds[4]) * (bounds[5] - bounds[4])) / 3.0);
 
-  double nn = pow(npts, 1.0 / 3.0) - 1.0;
+  double nn = pow(static_cast<double>(npts), 1.0 / 3.0) - 1.0;
   if (nn < 1.0)
     nn = 1.0;
 
