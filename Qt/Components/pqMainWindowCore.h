@@ -421,6 +421,9 @@ public slots:
   // Set center axes visibility on active render view.
   void setCenterAxesVisibility(bool visible);
 
+  // Set orientation axes visibility on active render view.
+  void setOrientationAxesVisibility(bool visible);
+
   // Set the enable state for main window excepting some widgets marked as
   // non-blockable. Non-blockable widgets are registered with the
   // pqProgressManager.

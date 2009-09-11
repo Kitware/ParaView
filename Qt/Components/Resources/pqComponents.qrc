@@ -159,6 +159,8 @@
         <file>Icons/pqServer32.png</file>
         <file>Icons/pqShowCenterAxes24.png</file>
         <file>Icons/pqShowCenterAxes32.png</file>
+        <file>Icons/pqShowOrientationAxes24.png</file>
+        <file>Icons/pqShowOrientationAxes32.png</file>
         <file>Icons/pqSideSetData16.png</file>
         <file>Icons/pqSinusoidal16.png</file>
         <file>Icons/pqSinusoidal24.png</file>
