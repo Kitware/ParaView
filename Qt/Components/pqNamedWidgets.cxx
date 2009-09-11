@@ -89,6 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSignalAdaptorSelectionTreeWidget.h"
 #include "pqSignalAdaptors.h"
 #include "pqSILModel.h"
+#include "pqSILWidget.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
@@ -402,11 +403,11 @@ void pqNamedWidgets::linkObject(QObject* object, pqSMProxy proxy,
     }
   else if (pt == pqSMAdaptor::SIL)
     {
-    QTreeView* tree = qobject_cast<QTreeView*>(object);
+    pqSILWidget* tree = qobject_cast<pqSILWidget*>(object);
     if (tree)
       {
       property_manager->registerLink(
-        tree->model(), "values", SIGNAL(valuesChanged()),
+        tree->activeModel(), "values", SIGNAL(valuesChanged()),
         proxy, SMProperty);
       }
     }
@@ -1390,28 +1391,19 @@ void pqNamedWidgets::createWidgets(QGridLayout* panelLayout, vtkSMProxy* pxy)
       }
     else if (pt == pqSMAdaptor::SIL)
       {
-      pqTreeView* tree = new pqTreeView(panelLayout->parentWidget());
-      tree->setObjectName(propertyName);
-      tree->header()->setStretchLastSection(true);
-      tree->setRootIsDecorated(false);
-
       vtkSMSILDomain* silDomain = vtkSMSILDomain::SafeDownCast(
         SMProperty->GetDomain("array_list"));
 
+      pqSILWidget* tree = new pqSILWidget( 
+        silDomain->GetSubtree(), panelLayout->parentWidget());
+      tree->setObjectName(propertyName);
+      
       pqSILModel* silModel = new pqSILModel(tree);
-      pqProxySILModel* proxyModel = new pqProxySILModel(
-        silDomain->GetSubtree(), silModel);
-      proxyModel->setSourceModel(silModel);
-
-      tree->header()->setClickable(true);
-      QObject::connect(tree->header(), SIGNAL(sectionClicked(int)),
-        proxyModel, SLOT(toggleRootCheckState()), Qt::QueuedConnection);
-
+      
       // FIXME: This needs to be automated, we want the model to automatically
       // fetch the SIL when the domain is updated.
       silModel->update(silDomain->GetSIL());
-      tree->setModel(proxyModel);
-      tree->expandAll();
+      tree->setModel(silModel);
       panelLayout->addWidget(tree, rowCount, 0, 1, 2); 
       panelLayout->setRowStretch(rowCount, 1);
       row_streched = true;

@@ -2983,7 +2983,7 @@
         information_only="1">
         <SILInformationHelper
           timestamp_command="GetSILUpdateStamp"
-          subtree="Grids">
+          subtree="Blocks">
         </SILInformationHelper>
      </StringVectorProperty>
      
