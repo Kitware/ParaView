@@ -73,7 +73,7 @@
 
     </LookupTableProxy>
 
-    <PVLookupTableProxy name="PVLookupTable" class="vtkPVLookupTable">
+    <PVLookupTableProxy name="PVLookupTable" class="vtkDiscretizableColorTransferFunction">
       <IntVectorProperty
         name="LockScalarRange"
         number_of_elements="1"
@@ -1874,6 +1874,10 @@
           <DataType value="vtkTable"/>
         </DataTypeDomain>
       </InputProperty>
+
+      <ProxyProperty 
+        name="Annotations" command="SetAnnotations">
+      </ProxyProperty>
 
       <OutputPort name="Annotations" index="0"/>
       <OutputPort name="Domain Maps" index="1"/>

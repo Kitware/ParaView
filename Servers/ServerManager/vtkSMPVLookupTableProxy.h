@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPVLookupTableProxy - proxy for vtkPVLookupTable.
+// .NAME vtkSMPVLookupTableProxy - proxy for 
+// vtkDiscretizableColorTransferFunction.
 // .SECTION Description
 // vtkSMPVLookupTableProxy ensure that Build() is called on every 
 // UpdateVTKObjects();
@@ -30,7 +31,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Overriden to call Build() on the vtkPVLookupTable.
+  // Overriden to call Build() on the vtkDiscretizableColorTransferFunction.
   virtual void UpdateVTKObjects()
     { this->Superclass::UpdateVTKObjects(); }
 

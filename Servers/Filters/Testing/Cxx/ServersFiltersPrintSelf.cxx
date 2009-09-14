@@ -64,7 +64,6 @@
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODVolume.h"
-#include "vtkPVLookupTable.h"
 #include "vtkPVMain.h"
 #include "vtkPVRenderViewProxy.h"
 #include "vtkPVServerArrayHelper.h"
@@ -176,7 +175,6 @@ int main(int , char *[])
   c = vtkPVLinearExtrusionFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVLODActor::New(); c->Print(cout); c->Delete();
   c = vtkPVLODVolume::New(); c->Print(cout); c->Delete();
-  c = vtkPVLookupTable::New(); c->Print(cout); c->Delete();
   c = vtkPVMain::New(); c->Print(cout); c->Delete();
   c = vtkPVRenderViewProxy::New(); c->Print(cout); c->Delete();
   c = vtkPVServerArrayHelper::New(); c->Print(cout); c->Delete();
