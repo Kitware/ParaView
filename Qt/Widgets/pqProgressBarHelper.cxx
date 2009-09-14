@@ -34,11 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProgressBar.h"
 
 pqProgressBarHelper::pqProgressBarHelper(pqProgressBar* p)
-#ifdef Q_WS_MAC
-    : QWidget(p), Progress(p)
-#else
-    : QObject(p), Progress(p)
-#endif
+: QObject(p), Progress(p)
 {
 }
   

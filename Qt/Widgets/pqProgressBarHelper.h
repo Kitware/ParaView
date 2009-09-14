@@ -57,10 +57,10 @@ public:
 
   bool progressEnabled() const;
 
-  pqProgressBar* ParentProgress;
 #ifdef Q_WS_MAC
-  QProgressBar* Progress;
+  pqProgressBar* ParentProgress;
 #endif
+  QProgressBar* Progress;
 };
 
 #endif
