@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqProgressBar.cxx
+   Module:    pqProgressBarHelper.cxx
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,58 +29,42 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqProgressBar.h"
+
 #include "pqProgressBarHelper.h"
-#include <QTimer>
-#include <QHBoxLayout>
+#include "pqProgressBar.h"
 
-//-----------------------------------------------------------------------------
-pqProgressBar::pqProgressBar(QWidget* _p) : QProgressBar(_p)
-{
-  this->Helper = new pqProgressBarHelper(this);
-  this->Helper->enableProgress(false);
-  this->CleanUp = false;
-}
-
-
-//-----------------------------------------------------------------------------
-pqProgressBar::~pqProgressBar()
+pqProgressBarHelper::pqProgressBarHelper(pqProgressBar* p)
+#ifdef Q_WS_MAC
+    : QWidget(p), Progress(p)
+#else
+    : QObject(p), Progress(p)
+#endif
 {
 }
-
-//-----------------------------------------------------------------------------
-void pqProgressBar::setProgress(const QString& message, int _value)
+  
+void pqProgressBarHelper::setFormat(const QString& fmt)
 {
-  if(this->Helper->progressEnabled())
+  this->Progress->setFormat(fmt);
+}
+
+void pqProgressBarHelper::setProgress(int num)
+{
+  this->Progress->setValue(num);
+}
+
+void pqProgressBarHelper::enableProgress(bool e)
+{
+  this->Progress->setEnabled(e);
+  this->Progress->setTextVisible(e);
+  if(!e)
     {
-    this->Helper->setFormat(QString("%1: %p").arg(message));
-    this->Helper->setProgress(_value);
+    this->Progress->reset();
     }
 }
 
-//-----------------------------------------------------------------------------
-void pqProgressBar::enableProgress(bool e)
+bool pqProgressBarHelper::progressEnabled() const
 {
-  if(e && !this->Helper->progressEnabled())
-    {
-    this->Helper->enableProgress(true);
-    }
-  else if(!e && this->Helper->progressEnabled())
-    {
-    this->Helper->setProgress(100);
-    if(!this->CleanUp)
-      {
-      this->CleanUp = true;
-      QTimer::singleShot(0, this, SLOT(cleanup()));
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqProgressBar::cleanup()
-{
-  this->CleanUp = false;
-  this->Helper->enableProgress(false);
+  return this->Progress->isEnabled();
 }
 
 

@@ -60,6 +60,7 @@ SET(QtWidgets_SRCS
   pqLookmarkToolbar.h
   pqProgressBar.cxx
   pqProgressBar.h
+  pqProgressBarHelper.h
   pqProgressWidget.cxx
   pqProgressWidget.h
   pqQuickLaunchDialog.cxx
@@ -98,6 +99,12 @@ SET(QtWidgets_SRCS
   QtWidgetsPlugin.cxx
   QtWidgetsPlugin.h
 )
+
+IF(Q_WS_MAC)
+  SET(QtWidgets_SRCS ${QtWidgets_SRCS} pqProgressBarHelper.mm)
+ELSE(Q_WS_MAC)
+  SET(QtWidgets_SRCS ${QtWidgets_SRCS} pqProgressBarHelper.cxx)
+ENDIF(Q_WS_MAC)
 
 ##########################################################################
 ## Add the header files that need to moc processed.
