@@ -40,6 +40,11 @@
 // SetDefaultValues() is called, if the array name specified as 'default_values'
 // is present in the domain, then that will be used, otherwise, it simply uses
 // the first available array (which is default).
+//
+// Additionally, vtkSMArrayListDomain takes an  option required property with
+// function "FieldDataSelection" which can be a vtkSMIntVectorProperty with a
+// single value. If preset, this property's value is used to determine what type
+// of field-data i.e. point-data, cell-data etc. is currently available.
 // .SECTION See Also
 // vtkSMDomain vtkSMProxyProperty vtkSMInputArrayDomain
 
@@ -142,7 +147,6 @@ protected:
 
   char* InputDomainName;
   char* NoneString;
-
 private:
   vtkSMArrayListDomain(const vtkSMArrayListDomain&); // Not implemented
   void operator=(const vtkSMArrayListDomain&); // Not implemented
