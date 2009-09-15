@@ -22,7 +22,6 @@
 
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkStdString.h" // needed for vtkStdString.
-#include <vector>
 
 class vtkSMScatterPlotViewProxy;
 

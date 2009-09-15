@@ -28,7 +28,7 @@
 
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-#include <iostream>
+
 class vtkPainterPolyDataMapper;
 class vtkPolyData;
 class vtkScalarsToColorsPainter;
