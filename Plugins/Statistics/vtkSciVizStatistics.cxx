@@ -19,7 +19,7 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.1");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.2");
 
 vtkSciVizStatistics::vtkSciVizStatistics()
 {
@@ -369,12 +369,12 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
   N = N - 1;
   while ( static_cast<vtkIdType>(trainRows.size()) > M )
     {
-    vtkIdType rec = vtkMath::Random( 0, N );
+    vtkIdType rec = static_cast<vtkIdType>( vtkMath::Random( 0, N ) );
     trainRows.erase( rec );
     }
   while ( static_cast<vtkIdType>(trainRows.size()) < M )
     {
-    vtkIdType rec = vtkMath::Random( 0, N );
+    vtkIdType rec = static_cast<vtkIdType>( vtkMath::Random( 0, N ) );
     trainRows.insert( rec );
     }
   // Finally, copy the subset into the training table
@@ -422,7 +422,7 @@ int vtkSciVizStatistics::FetchModel( vtkDataObject*& model, vtkInformationVector
 vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining( vtkTable* observations )
 {
   vtkIdType N = observations->GetNumberOfRows();
-  vtkIdType M = N * this->TrainingFraction;
+  vtkIdType M = static_cast<vtkIdType>( N * this->TrainingFraction );
   return M < 100 ? ( N < 100 ? N : 100 ) : M;
 }
 
