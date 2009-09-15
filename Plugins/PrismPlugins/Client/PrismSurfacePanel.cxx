@@ -137,6 +137,11 @@ pqNamedObjectPanel(object_proxy, p)
     this,
     SLOT(onScientificNotation(bool)));
 
+    connect(
+    &this->UI->Model,
+    SIGNAL(layoutChanged()),
+    this,
+    SLOT(onSamplesChanged()));
 
   this->onSamplesChanged();
 
@@ -197,7 +202,7 @@ void PrismSurfacePanel::accept()
     }
 
 
-        vtkSMDoubleVectorProperty* contourValueVP = vtkSMDoubleVectorProperty::SafeDownCast(
+    vtkSMDoubleVectorProperty* contourValueVP = vtkSMDoubleVectorProperty::SafeDownCast(
         this->proxy()->GetProperty("ContourValues"));
 
 

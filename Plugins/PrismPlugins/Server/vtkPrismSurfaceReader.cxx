@@ -32,7 +32,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.7");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.8");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -1046,7 +1046,6 @@ int vtkPrismSurfaceReader::RequestData(
 
             this->Internal->ContourFilter->SetInputArrayToProcess(
                 0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
-            this->Internal->ContourFilter->GenerateValues(this->Internal->NumberOfContours,cArray->GetRange());
             this->Internal->ContourFilter->Update();
             contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
 

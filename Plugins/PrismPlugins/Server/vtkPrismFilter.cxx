@@ -28,7 +28,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.10");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.11");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -831,6 +831,7 @@ double vtkPrismFilter::GetSESAMEContourValue(int i)
 {
     return this->Internal->Reader->GetContourValue(i);
 }
+
 
 double* vtkPrismFilter::GetSESAMEContourValues()
 {

@@ -210,6 +210,12 @@ pqNamedObjectPanel(object_proxy, p)
     this,
     SLOT(onNewRange()));
    
+    connect(
+    &this->UI->Model,
+    SIGNAL(layoutChanged()),
+    this,
+    SLOT(onSamplesChanged()));
+
     
   connect(
     this->UI->ScientificNotation,
