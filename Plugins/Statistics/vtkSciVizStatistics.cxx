@@ -19,7 +19,7 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.2");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.3");
 
 vtkSciVizStatistics::vtkSciVizStatistics()
 {
@@ -99,7 +99,10 @@ void vtkSciVizStatistics::SetAttributeArrayStatus( const char* arrName, int stat
 {
   if ( arrName )
     {
-    this->P->SetBufferColumnStatus( arrName, stat );
+    if ( this->P->SetBufferColumnStatus( arrName, stat ) )
+      {
+      this->Modified();
+      }
     }
 }
 
@@ -107,13 +110,19 @@ void vtkSciVizStatistics::EnableAttributeArray( const char* arrName )
 {
   if ( arrName )
     {
-    this->P->SetBufferColumnStatus( arrName, 1 );
+    if ( this->P->SetBufferColumnStatus( arrName, 1 ) )
+      {
+      this->Modified();
+      }
     }
 }
 
 void vtkSciVizStatistics::ClearAttributeArrays()
 {
-  this->P->ResetBuffer();
+  if ( this->P->ResetBuffer() )
+    {
+    this->Modified();
+    }
 }
 
 int vtkSciVizStatistics::FillInputPortInformation( int port, vtkInformation* info )
