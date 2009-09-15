@@ -4515,6 +4515,7 @@ The Contour filter computes isolines or isosurfaces using a selected point-cente
        <ProxyListDomain name="proxy_list">
          <Proxy group="incremental_point_locators" name="MergePoints" />
          <Proxy group="incremental_point_locators" name="IncrementalOctreeMergePoints" />
+         <Proxy group="incremental_point_locators" name="NonMergingPointLocator" />
        </ProxyListDomain>
        <Documentation>
          This property specifies an incremental point locator for merging duplicate / coincident points.
@@ -5173,6 +5174,20 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
        number_of_elements="1"
        default_values="100"
        information_only="1"/>
+     
+     <IntVectorProperty 
+       name="InterpolatorType" 
+       command="SetInterpolatorType" 
+       number_of_elements="1"
+       default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Interpolator with Point Locator"/>
+         <Entry value="1" text="Interpolator with Cell Locator"/>
+       </EnumerationDomain>
+       <Documentation>
+         This property determines which interpolator to use for evaluating the velocity vector field. The first is faster though the second is more robust in locating cells during streamline integration.
+       </Documentation>
+     </IntVectorProperty>
        
      <IntVectorProperty 
        name="IntegrationDirection" 

@@ -281,13 +281,30 @@
       </IntVectorProperty>
     </Proxy>
     
-    <!--
-    <Proxy name="NoMergePoints" class="vtkNoMergePoints">
+    <Proxy name="NonMergingPointLocator" class="vtkNonMergingPointLocator" label="Don't Merge Points" >
       <Documentation>
         Perform direct / check-free point insertion (any point is inserted to a vtkPoints object) and therefore there can be duplicate points.
       </Documentation>  
+      
+      <IntVectorProperty name="Divisions"
+        command="SetDivisions"
+        number_of_elements="3"
+        default_values="50 50 50" >
+        <Documentation>
+          Specify the number of divisions in each axis / direction (x, y, z) for creating a search structure of uniform fixed-resolution bins / buckets.
+        </Documentation>
+      </IntVectorProperty>
+        
+      <IntVectorProperty name="NumberOfPointsPerBucket"
+        command="SetNumberOfPointsPerBucket"
+        label="Number of points per bucket"
+        number_of_elements="1"
+        default_values="8" >
+        <Documentation>
+          Specify the average number of points in each bin / bucket that determines the initial and growing sizes (in terms of number of points) of each bin / bucket.
+        </Documentation>
+      </IntVectorProperty>
     </Proxy>
-    -->
       
     <Proxy name="IncrementalOctreePointLocator" class="vtkIncrementalOctreePointLocator">
       <Documentation>
