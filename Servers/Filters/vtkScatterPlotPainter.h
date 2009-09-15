@@ -59,6 +59,7 @@ public:
   static vtkInformationDoubleKey* SCALE_FACTOR();
   static vtkInformationIntegerKey* ORIENTATION_MODE();
   static vtkInformationIntegerKey* NESTED_DISPLAY_LISTS();
+  static vtkInformationIntegerKey* PARALLEL_TO_CAMERA();
   
   virtual void SetSourceGlyphMappers(vtkCollection*);
   vtkGetObjectMacro(SourceGlyphMappers, vtkCollection);
@@ -121,6 +122,10 @@ protected:
   vtkSetMacro(NestedDisplayLists, int);
   vtkGetMacro(NestedDisplayLists, int);
   vtkBooleanMacro(NestedDisplayLists, int);
+
+  vtkSetMacro(ParallelToCamera, int);
+  vtkGetMacro(ParallelToCamera, int);
+  vtkBooleanMacro(ParallelToCamera, int);
   
   virtual void SetLookupTable(vtkScalarsToColors*);
   vtkGetObjectMacro(LookupTable, vtkScalarsToColors);
@@ -185,7 +190,7 @@ protected:
   int            OrientationMode;
   int            NestedDisplayLists; // boolean
   unsigned int   DisplayListId; // GLuint
-
+  int            ParallelToCamera;
   
   //vtkScatterPlotPainterArray* SourceGlyphMappers; // array of mappers
   vtkCollection* SourceGlyphMappers; // array of mappers

@@ -138,7 +138,7 @@ public:
   // Description:
   // Set cube axes visibility. This flag is considered only if
   // this->GetVisibility() == true, otherwise, cube axes is not shown.
-  void SetCubeAxesVisibility(int);
+  virtual void SetCubeAxesVisibility(int);
   vtkGetMacro(CubeAxesVisibility, int);
 
   // Description:

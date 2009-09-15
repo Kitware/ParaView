@@ -120,7 +120,10 @@ protected:
                           vtkInformationVector *);
   virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
                                  vtkInformationVector *);
-  //virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int FillOutputPortInformation(int port, vtkInformation *info);
+  virtual int ProcessRequest( vtkInformation *request,
+                              vtkInformationVector **inputVector,
+                              vtkInformationVector *outputVector);
 
   vtkNetDmfReaderInternal* Internal;
 

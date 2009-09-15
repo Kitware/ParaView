@@ -21,18 +21,17 @@
 // .SECTION Implementation
 //
 // .SECTION See Also
-// vtkGlyph3D
+// vtkGlyph3D, vtkCompositePolyDataMapper2
 
 #ifndef __vtkScatterPlotMapper_h
 #define __vtkScatterPlotMapper_h
 
 #include "vtkCompositePolyDataMapper2.h"
 #include "vtkWeakPointer.h" // needed for vtkWeakPointer.
-
+#include <iostream>
 class vtkPainterPolyDataMapper;
-class vtkScalarsToColorsPainter;
 class vtkPolyData;
-
+class vtkScalarsToColorsPainter;
 class vtkScatterPlotPainter;
 
 class VTK_EXPORT vtkScatterPlotMapper : public vtkCompositePolyDataMapper2
@@ -59,6 +58,12 @@ public:
     NUMBER_OF_ARRAYS
     };
 
+  // Description
+  // Flags to control how the glyphs are displayed.
+  // To use the default glyphs, set the GlyphMode to UseGlyph. 
+  // The other flags must have their corresponding array in order to be valid.
+  // GLYPH_[XYZ]_SCALE for ScaledGlyph; GLYPH_SOURCE for UseMultiGlyph and 
+  // GLYPH_[XYZ]_ORIENTATION for OrientedGlyph.
   enum GlyphDrawingMode
     {
     NoGlyph       = 0,
@@ -229,6 +234,13 @@ public:
   vtkBooleanMacro(NestedDisplayLists, bool);
 
   // Description:
+  // When the glyphs are in 2D, it might be useful to force them to 
+  // be shown parallel to the camera.
+  vtkSetMacro(ParallelToCamera, bool);
+  vtkGetMacro(ParallelToCamera, bool);
+  vtkBooleanMacro(ParallelToCamera, bool);
+
+  // Description:
   // Specify a source object at a specified table location. New style.
   // Source connection is stored in port 1. This method is equivalent
   // to SetInputConnection(1, id, outputPort).
@@ -298,7 +310,7 @@ public:
   int ScalingArrayMode;
   int OrientationMode;
   bool NestedDisplayLists; // boolean
-
+  bool ParallelToCamera;
  private:
   vtkScatterPlotMapper(const vtkScatterPlotMapper&); // Not implemented.
   void operator=(const vtkScatterPlotMapper&); // Not implemented.

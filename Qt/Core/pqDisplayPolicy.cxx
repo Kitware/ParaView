@@ -69,6 +69,13 @@ pqDisplayPolicy::~pqDisplayPolicy()
 QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
   bool update_pipeline) const
 {
+  QString view_type = QString::null;
+
+  if (!opPort)
+    {
+    return view_type;
+    }
+
   pqPipelineSource* source = opPort->getSource();
   if (update_pipeline)
     {
@@ -100,8 +107,6 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
         }
       }
     }
-
-  QString view_type = QString::null;
 
   // HACK: for now, when update_pipeline is false, we don't do any gather
   // information as that can result in progress events which may case Qt paint

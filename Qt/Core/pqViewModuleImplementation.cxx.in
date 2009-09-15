@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "@ARG_VIEW_TYPE@.h"
 
 #include "vtkSMProxyManager.h"
-#include "pqDataRepresentation.h"
+#include "@ARG_DISPLAY_TYPE@.h"
 #include "pqServer.h"
 
 // configured with CMake

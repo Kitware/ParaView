@@ -55,6 +55,7 @@
 #include "vtkVariantArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
+#include "vtkPLYReader.h"
 
 #include "XdmfArray.h"
 #include "XdmfAttribute.h"
@@ -103,7 +104,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkNetDmfReader);
-vtkCxxRevisionMacro(vtkNetDmfReader, "1.3");
+vtkCxxRevisionMacro(vtkNetDmfReader, "1.4");
 
 //============================================================================
 class vtkNetDmfReaderInternal
@@ -382,6 +383,7 @@ vtkNetDmfReader::vtkNetDmfReader()
   this->TimeStepRange[1] = 0;
   // this->DebugOn();
   this->SetNumberOfInputPorts(0);
+  this->SetNumberOfOutputPorts(1);
   
   this->ShowEvents = false;
   this->ShowConversations = false;
@@ -428,14 +430,25 @@ int vtkNetDmfReader::CanReadFile(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-/*
-int vtkNetDmfReader::FillOutputPortInformation(int,
-                                             vtkInformation *info)
+
+int vtkNetDmfReader::FillOutputPortInformation(int port,
+                                               vtkInformation *info)
 { 
-  info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkGraph");
+  switch (port)
+    {
+    case 0:
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDirectedGraph");
+      break;
+/*    case 1:
+      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
+      break;
+*/    default:
+      return 0;
+      break;
+    }
   return 1;
 }
-*/
+
 //----------------------------------------------------------------------------
 void vtkNetDmfReader::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -544,9 +557,35 @@ int vtkNetDmfReader::RequestDataObject(vtkInformation *request,
     output->Delete();
     }
 */
+  this->Superclass::ProcessRequest(request, inputVector, outputVector);
+/*
+  vtkDataObject *output= vtkDataObject::GetData(outputVector, 1);
+  if (!output)
+    {
+    cout << "create" << endl;
+    vtkInformation *outInfo = outputVector->GetInformationObject(1);
+    output = vtkPolyData::New();
+    output->SetPipelineInformation(outInfo);
+    outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
+    output->Delete();
+    }
+*/
   return 1;
 }
 
+//----------------------------------------------------------------------------
+int vtkNetDmfReader::ProcessRequest(vtkInformation* request,
+                                    vtkInformationVector** inputVector,
+                                    vtkInformationVector* outputVector)
+{
+  // generate the data
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
+    {
+    return this->RequestDataObject(request, inputVector, outputVector);
+    }
+  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+}
 
 //-----------------------------------------------------------------------------
 
@@ -629,6 +668,24 @@ int vtkNetDmfReader::RequestData(
   vtkDebugMacro( << "UpdatePiece " << this->Internal->UpdatePiece 
                  << " : UpdateNumPieces " << this->Internal->UpdateNumPieces
                  );
+/*
+  if (outputVector->GetInformationObject(1))
+    {
+    vtkPLYReader* plyr = vtkPLYReader::New();
+    plyr->SetFileName("/home/julien/work/NetDMF-Tools/V5/HMMWVdeciFixed.ply");
+    plyr->UpdateInformation();
+    plyr->Update();
+
+    vtkPolyData* pd = vtkPolyData::SafeDownCast(
+      outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
+    if (pd)
+      {
+      pd->ShallowCopy(plyr->GetOutput());
+      cout << "POLYDATA" <<endl;
+      }
+    plyr->Delete();
+    }
+*/
   vtkMutableDirectedGraph* output = vtkMutableDirectedGraph::New();
   // Vertex Attribute Data Set
   vtkStringArray* names = vtkStringArray::New();

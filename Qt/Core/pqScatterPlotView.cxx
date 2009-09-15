@@ -162,9 +162,9 @@ void pqScatterPlotView::initializeWidgets()
   vtkSMScatterPlotViewProxy* view = vtkSMScatterPlotViewProxy::SafeDownCast(
     this->getProxy());
 
-  vtkSMRenderViewProxy* renModule = view->GetRenderView();
+  vtkSMRenderViewProxy* renModule = view ? view->GetRenderView() : 0;
   QVTKWidget* vtkwidget = qobject_cast<QVTKWidget*>(this->getWidget());
-  if (vtkwidget)
+  if (vtkwidget && renModule)
     {
     vtkwidget->SetRenderWindow(renModule->GetRenderWindow());
     }

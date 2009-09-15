@@ -1,0 +1,60 @@
+<ServerManagerConfiguration>
+ <ProxyGroup name="representations">
+<!--   
+   <NetDmfRepresentationProxy name="NetDmfDisplay"
+     base_proxygroup="representations" base_proxyname="ScatterPlotRepresentation">
+   </NetDmfRepresentationProxy>
+-->
+<!--
+   <PVRepresentationProxy name="NetDmfDisplay"
+                          base_proxygroup="representations" base_proxyname="GeometryRepresentation">
+   </PVRepresentationProxy>
+-->
+   <GlyphRepresentationProxy name="GlyphRepresentation"
+                              base_proxygroup="representations" 
+                             base_proxyname="GeometryRepresentation">
+   </GlyphRepresentationProxy>
+
+   <Extension name="GeometryRepresentation">
+      <Documentation>
+        Extends standard GeometryRepresentation by adding
+        ScatterPlotRepresentation as a new type of representation.
+      </Documentation>
+ 
+      <!-- this adds to what is already defined in GeometryRepresentation -->
+      <RepresentationType 
+         subproxy="GlyphRepresentation" text="Glyph Representation"/>
+ 
+      <SubProxy>
+        <Proxy name="GlyphRepresentation"
+          proxygroup="representations" proxyname="ScatterPlotRepresentation">
+        </Proxy>
+<!--        
+        <ShareProperties subproxy="ScatterPlotRepresentation2">
+          <Exception name="Input" />
+          <Exception name="GlyphInput" />
+          <Exception name="Visibility" />
+          <Exception name="Representation" />
+        </ShareProperties>
+-->
+
+        <ExposedProperties>
+          <Property name="XArrayName"/>
+          <Property name="YArrayName"/>
+          <Property name="ZArrayName"/>
+          <Property name="ThreeDMode"/>
+          <Property name="GlyphMode"/>
+          <Property name="ScaleFactor"/>
+        </ExposedProperties>
+      </SubProxy>
+    </Extension>
+ </ProxyGroup>
+ 
+
+ <ProxyGroup name="views">
+   <ScatterPlotViewProxy name="NetDmfView"
+     base_proxygroup="views" base_proxyname="ScatterPlotRenderView"
+     representation_name="GlyphRepresentation">
+   </ScatterPlotViewProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

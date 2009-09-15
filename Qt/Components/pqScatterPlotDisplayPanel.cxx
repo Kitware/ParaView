@@ -246,10 +246,7 @@ public:
     this->GlyphMultiSourceArrayAdaptor = 0;
     this->GlyphOrientationArrayDomain = 0;
     this->GlyphOrientationArrayAdaptor = 0;
-    
-    this->AttributeModeAdaptor = 0;
-    this->InChange = false;
-    this->CompositeIndexAdaptor = 0;
+    this->CompositeTreeAdaptor = 0;
     }
 
   ~pqInternal()
@@ -268,9 +265,7 @@ public:
     delete this->GlyphMultiSourceArrayAdaptor;
     delete this->GlyphOrientationArrayDomain;
     delete this->GlyphOrientationArrayAdaptor;
-    
-    delete this->AttributeModeAdaptor;
-    delete this->CompositeIndexAdaptor;
+    delete this->CompositeTreeAdaptor;
     }
 
   pqPropertyLinks Links;
@@ -282,7 +277,6 @@ public:
   pqSignalAdaptorComboBox* GlyphScalingArrayAdaptor;
   pqSignalAdaptorComboBox* GlyphMultiSourceArrayAdaptor;
   pqSignalAdaptorComboBox* GlyphOrientationArrayAdaptor;
-  pqSignalAdaptorComboBox* AttributeModeAdaptor;
 
   pqComboBoxDecoratedDomain* XAxisArrayDomain;
   pqComboBoxDecoratedDomain* YAxisArrayDomain;
@@ -292,12 +286,10 @@ public:
   pqComboBoxDecoratedDomain* GlyphMultiSourceArrayDomain;
   pqComboBoxDecoratedDomain* GlyphOrientationArrayDomain;
 
-  pqSignalAdaptorCompositeTreeWidget* CompositeIndexAdaptor;
   pqSignalAdaptorCompositeTreeWidget* CompositeTreeAdaptor;
   vtkWeakPointer<vtkSMScatterPlotRepresentationProxy> ScatterPlotRepresentation;
   QPointer<pqScatterPlotRepresentation> Representation;
 
-  bool InChange;
 };
 
 //-----------------------------------------------------------------------------
@@ -598,6 +590,14 @@ void pqScatterPlotDisplayPanel::setDisplay(pqRepresentation* disp)
     this, SLOT(updateAllViews()), Qt::QueuedConnection);
 
   this->update3DMode();
+
+  // The defaults glyphs are used here. As they are 2D glyphs, we force them to
+  // be parallel to the camera at all time.
+  vtkSMIntVectorProperty* parallelProperty = 
+    vtkSMIntVectorProperty::SafeDownCast(
+      this->Internal->ScatterPlotRepresentation->GetProperty("ParallelToCamera"));
+  parallelProperty->SetElement(0, 1);
+  this->Internal->ScatterPlotRepresentation->UpdateProperty("ParallelToCamera");
 }
 
 //-----------------------------------------------------------------------------

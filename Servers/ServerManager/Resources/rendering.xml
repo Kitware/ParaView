@@ -1067,15 +1067,19 @@
       <InputProperty
         name="Input"
         command="SetInputConnection"
-        multiple_input="1">
+        multiple_input="1"
+         port_index="0">
         <DataTypeDomain name="input_type">
           <DataType value="vtkDataSet"/>
+          <DataType value="vtkGraph"/>
         </DataTypeDomain>
       </InputProperty>
+
       <InputProperty
-        name="GlyphSource"
-        command="SetGlyphSourceConnection"
-        multiple_input="1">
+        name="GlyphInput"
+        command="SetInputConnection"
+        multiple_input="1"
+         port_index="1">
         <DataTypeDomain name="input_type">
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
@@ -1266,6 +1270,13 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
 
+      <IntVectorProperty name="ParallelToCamera"
+        command="SetParallelToCamera"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       
     </SourceProxy>
 
@@ -9244,7 +9255,8 @@
       </Documentation>
 
       <InputProperty name="Input" 
-        command="not-used">
+        command="not-used"
+        port_index="0">
         <Documentation>
           Set the input to the representation. Can be any vtkDataObject producer.
         </Documentation>
@@ -9253,6 +9265,18 @@
           <DataType value="vtkGraph" />
         </DataTypeDomain>
       </InputProperty>
+
+      <InputProperty name="GlyphInput" 
+        command="not-used"
+        port_index="1">
+        <Documentation>
+          Set the input to the representation. Can be any vtkPointSet producer.
+        </Documentation>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+
 
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
@@ -9419,26 +9443,6 @@
         </Documentation>
       </IntVectorProperty>
 
-
-<!--
-      <IntVectorProperty name="ColorAttributeType"
-        command="SetColorAttributeType"
-        number_of_elements="1"
-        default_values="1"
-        update_self="1">
-        <Documentation>
-          Select the attribute type from where the scalars array is used. The
-          scalar array name is specified using ColorArrayName. Note that if the
-          indicated scalar array is not available, then the image data scalars
-          are used.
-        </Documentation>
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="POINT_DATA" />
-          <Entry value="1" text="CELL_DATA" />
-          <Entry value="2" text="FIELD_DATA" />
-        </EnumerationDomain>
-      </IntVectorProperty>
--->
       <StringVectorProperty name="ColorArrayName"
         command="SetColorArrayName"
         number_of_elements="1"
@@ -9456,20 +9460,6 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
-      
-      <!--
-      <SubProxy>
-        <SourceProxy name="ScatterPlot" class="vtkScatterPlotFilter">
-          <InputProperty
-            name="Input"
-            command="SetInputConnection">
-            <DataTypeDomain name="input_type">
-              <DataType value="vtkDataSet"/>
-            </DataTypeDomain>
-          </InputProperty>
-        </SourceProxy>
-      </SubProxy>
-      -->
 
       <SubProxy>
         <!-- Mapper for high-res image -->
@@ -9487,6 +9477,7 @@
           <Property name="Colorize" />
           <Property name="GlyphMode" />
           <Property name="ScaleFactor" />
+          <Property name="ParallelToCamera" />
         </ExposedProperties>
 
       </SubProxy>

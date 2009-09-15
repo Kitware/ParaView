@@ -22,6 +22,7 @@
 
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkStdString.h" // needed for vtkStdString.
+#include <vector>
 
 class vtkSMScatterPlotViewProxy;
 
@@ -31,6 +32,17 @@ public:
   static vtkSMScatterPlotRepresentationProxy* New();
   vtkTypeRevisionMacro(vtkSMScatterPlotRepresentationProxy, vtkSMDataRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  virtual void AddInput(unsigned int inputPort,
+                        vtkSMSourceProxy* input,
+                        unsigned int outputPort,
+                        const char* method);
+  virtual void AddInput(vtkSMSourceProxy* input,
+                        const char* method)
+  {
+    this->AddInput(0, input, 0, method);
+  }
+
 
   virtual void SetViewInformation(vtkInformation* info);
   
@@ -152,11 +164,16 @@ protected:
   vtkSMProxy* LODMapper;
   vtkSMProxy* Prop3D;
   vtkSMProxy* Property;
-  vtkSMScatterPlotViewProxy* ScatterPlotView;
   
   vtkSMProxy* CubeAxesActor;
   vtkSMProxy* CubeAxesProperty;
   int         CubeAxesVisibility;
+
+  vtkSMSourceProxy* GlyphInput;
+  unsigned int      GlyphOutputPort;
+  
+  struct vtkInternal;
+  vtkInternal* Internal;
 private:
   vtkSMScatterPlotRepresentationProxy(const vtkSMScatterPlotRepresentationProxy&); // Not implemented
   void operator=(const vtkSMScatterPlotRepresentationProxy&); // Not implemented

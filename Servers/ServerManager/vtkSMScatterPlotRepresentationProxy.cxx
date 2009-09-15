@@ -33,8 +33,10 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
-
+#include "vtkSMProxyProperty.h"
+#include "vtkSMInputProperty.h"
 #include <vtksys/ios/sstream>
+#include <vtkstd/vector>
 
 inline void vtkSMScatterPlotRepresentationProxySetString(
   vtkSMProxy* proxy, const char* pname, const char* pval)
@@ -60,26 +62,70 @@ inline void vtkSMScatterPlotRepresentationProxySetInt(
     }
 }
 
+struct vtkSMScatterPlotRepresentationProxy::vtkInternal
+{
+  vtkstd::vector<vtkSMViewProxy*> Views;
+};
+
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
+  this->Internal = new vtkSMScatterPlotRepresentationProxy::vtkInternal;
   this->FlattenFilter = 0;
   this->Mapper = 0;
   this->LODMapper = 0;
   this->Prop3D = 0;
   this->Property = 0;
-  this->ScatterPlotView = 0;
   this->CubeAxesActor = 0;
   this->CubeAxesProperty = 0;
   this->CubeAxesVisibility = 0;
+  this->GlyphInput = 0;
+  this->GlyphOutputPort = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::~vtkSMScatterPlotRepresentationProxy()
 {
+  delete this->Internal;
 }
+
+//-----------------------------------------------------------------------------
+void vtkSMScatterPlotRepresentationProxy::AddInput(unsigned int port,
+                                             vtkSMSourceProxy* input,
+                                             unsigned int outputPort,
+                                             const char* method)
+{
+  switch (port)
+    {
+    case 0:
+      this->Superclass::AddInput(port, input, outputPort, method);
+      break;
+    case 1:
+      if (!input)
+        {
+        vtkErrorMacro("Representation cannot have NULL input.");
+        return;
+        }
+
+      input->CreateOutputPorts();
+      if (input->GetNumberOfOutputPorts() == 0)
+        {
+        vtkErrorMacro("Input has no output. Cannot create the representation.");
+        return;
+        }
+
+      this->GlyphInput = input;
+      this->GlyphOutputPort = outputPort;
+      this->UnRegisterVTKObjects();
+      this->CreateVTKObjects();
+      break;
+    default:
+      break;
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::SetViewInformation(
@@ -143,12 +189,44 @@ bool vtkSMScatterPlotRepresentationProxy::BeginCreateVTKObjects()
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->CubeAxesProperty->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
   return true;
 }
 
 //-----------------------------------------------------------------------------
 bool vtkSMScatterPlotRepresentationProxy::EndCreateVTKObjects()
-{  
+{
+  if (this->GlyphInput)
+    {
+    vtkstd::vector<vtkSMViewProxy*>::iterator iter;
+    for (iter = this->Internal->Views.begin(); 
+         iter != this->Internal->Views.end(); ++iter)
+      {
+      // We know the input data type: it has to be a vtkPolyData. Hence we can
+      // simply ask the view for the correct strategy.
+      vtkSmartPointer<vtkSMRepresentationStrategy> glyphStrategy;
+      glyphStrategy.TakeReference((*iter)->NewStrategy(VTK_POLY_DATA));
+      if (!glyphStrategy.GetPointer())
+        {
+        vtkErrorMacro("View could not provide a strategy to use."
+                      "Cannot be rendered in this view of type: " << (*iter)->GetClassName());
+        return false;
+        }
+
+      glyphStrategy->SetEnableLOD(false);
+      glyphStrategy->SetConnectionID(this->ConnectionID);
+  
+      this->Connect(this->GlyphInput, glyphStrategy, 
+                    "Input", this->GlyphOutputPort);
+      this->Connect(glyphStrategy->GetOutput(), this->Mapper, "GlyphInput");
+
+      // Creates the strategy objects.
+      glyphStrategy->UpdateVTKObjects();
+
+      this->AddStrategy(glyphStrategy);
+      }
+    }
+  
   //this->Connect(this->GetInputProxy(), this->GeometryFilter, 
   //  "Input", this->OutputPort);
   this->Connect(this->GetInputProxy(), this->FlattenFilter, 
@@ -160,6 +238,7 @@ bool vtkSMScatterPlotRepresentationProxy::EndCreateVTKObjects()
   this->Connect(this->CubeAxesProperty, this->CubeAxesActor, "Property");
   
   this->SetCubeAxesVisibility(this->CubeAxesVisibility);
+
 //   if (this->CubeAxesRepresentation)
 //     {
 //     this->Connect(this->Mapper, this->CubeAxesRepresentation);
@@ -224,6 +303,34 @@ bool vtkSMScatterPlotRepresentationProxy::InitializeStrategy(vtkSMViewProxy* vie
   strategy->UpdateVTKObjects();
 
   this->AddStrategy(strategy);
+  /*
+  if (this->GlyphInput)
+    { 
+    cout << "vtkSMScatterPlotRepresentationProxy: ADD GLYPHINPUT " << endl;
+    // We know the input data type: it has to be a vtkPolyData. Hence we can
+    // simply ask the view for the correct strategy.
+    vtkSmartPointer<vtkSMRepresentationStrategy> glyphStrategy;
+    glyphStrategy.TakeReference(view->NewStrategy(VTK_POLY_DATA));
+    if (!glyphStrategy.GetPointer())
+      {
+      vtkErrorMacro("View could not provide a strategy to use."
+                    "Cannot be rendered in this view of type: " << view->GetClassName());
+      return false;
+      }
+
+    glyphStrategy->SetEnableLOD(false);
+    glyphStrategy->SetConnectionID(this->ConnectionID);
+  
+    //this->Connect(this->GlyphInput, glyphStrategy, 
+    //             "Input", this->GlyphOutputPort);
+    //this->Connect(glyphStrategy->GetOutput(), this->Mapper);
+
+    // Creates the strategy objects.
+    glyphStrategy->UpdateVTKObjects();
+
+    this->AddStrategy(glyphStrategy);
+    }
+  */
 
   return this->Superclass::InitializeStrategy(view);  
 }
@@ -247,7 +354,9 @@ bool vtkSMScatterPlotRepresentationProxy::AddToView(vtkSMViewProxy* view)
     {
     return false;
     }
-  this->ScatterPlotView = vtkSMScatterPlotViewProxy::SafeDownCast(view);
+
+  this->Internal->Views.push_back(view);
+
   renderView->AddPropToRenderer(this->Prop3D);
   
   renderView->AddPropToRenderer(this->CubeAxesActor);
@@ -284,7 +393,17 @@ bool vtkSMScatterPlotRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 
   renderView->RemovePropFromRenderer(this->Prop3D);
   renderView->RemovePropFromRenderer(this->CubeAxesActor);
-  this->ScatterPlotView = NULL;
+
+  vtkstd::vector<vtkSMViewProxy*>::iterator iter;
+  for (iter = this->Internal->Views.begin(); 
+       iter != this->Internal->Views.end(); ++iter)
+    {
+    if (*iter == view)
+      {
+      this->Internal->Views.erase(iter);
+      break;
+      }
+    }
 
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
@@ -353,14 +472,6 @@ void vtkSMScatterPlotRepresentationProxy::SetVisibility(int visible)
 //----------------------------------------------------------------------------
 void vtkSMScatterPlotRepresentationProxy::SetCubeAxesVisibility(int visible)
 {
-//   if (this->CubeAxesRepresentation)
-//     {
-//     this->CubeAxesVisibility = visible;
-//     vtkSMScatterPlotRepresentationProxySetInt(
-//       this->CubeAxesRepresentation, "Visibility",
-//       visible && this->GetVisibility());
-//     this->CubeAxesRepresentation->UpdateVTKObjects();
-//     }
   if (this->CubeAxesActor)
     {
     this->CubeAxesVisibility = visible;
@@ -420,16 +531,6 @@ void vtkSMScatterPlotRepresentationProxy::SetColorArrayName(const char* name)
 //-----------------------------------------------------------------------------
 bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
 {
-  /*
-  if (!this->Superclass::GetBounds(bounds))
-    {
-    return false;
-    }
-
-  return true;
-  */
-  //this->Mapper->UpdateVTKObjects();
-
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
           << this->Mapper->GetID()
@@ -442,8 +543,8 @@ bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
     vtkProcessModule::GetProcessModule()->GetLastResult(
       this->ConnectionID,
       vtkProcessModule::RENDER_SERVER);
-  bool ret = true;
-  if(!res.GetArgument(0, 0, bounds, 6))
+  bool ret = res.GetArgument(0, 0, bounds, 6);
+  if(!ret)
     {
     ret = this->Superclass::GetBounds(bounds);
     }
@@ -669,6 +770,10 @@ int vtkSMScatterPlotRepresentationProxy::GetNumberOfSeries()
       }
     }
 */
+  if (dataInformation->GetPointArrayInformation())
+    {
+    //cout << "Number of : " << dataInformation->GetPointArrayInformation()->GetNumberOfComponents() << " and " << dataInformation->GetPointArrayInformation()->GetNumberOfTuples() << endl;
+      }
   count = (dataInformation->GetPointArrayInformation()? 1 :0) + // coordinates
     (dataInformation->GetPointDataInformation() ? 
      dataInformation->GetPointDataInformation()->GetNumberOfArrays() : 0) +

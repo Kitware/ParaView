@@ -60,7 +60,7 @@
 
 #define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.13");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.14");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -72,14 +72,9 @@ int GLYPHS_PORT=1;
 #define min(a,b)(((a)>(b))?(b):(a))
 
 // ---------------------------------------------------------------------------
-// Construct object with scaling on, scaling mode is by scalar value,
-// scale factor = 1.0, the range is (0,1), orient geometry is on, and
-// orientation is by vector. Clamping and indexing are turned off. No
-// initial sources are defined.
 vtkScatterPlotMapper::vtkScatterPlotMapper()
 {
   this->SetNumberOfInputPorts(2);
-//  this->SetNumberOfOutputPorts(1);
   vtkScatterPlotPainter* painter = vtkScatterPlotPainter::New();
   this->Painter->SetDelegatePainter(painter);
   painter->Delete();
@@ -94,6 +89,7 @@ vtkScatterPlotMapper::vtkScatterPlotMapper()
   this->ScaleFactor = 1.0;
   this->OrientationMode = vtkScatterPlotMapper::DIRECTION;
   this->NestedDisplayLists = true;
+  this->ParallelToCamera = false;
 }
 
 // ---------------------------------------------------------------------------
@@ -305,8 +301,6 @@ void vtkScatterPlotMapper::SetArrayByName(ArrayIndex idx, const char* arrayName)
     componentString << arrayComponent ;
     componentString >> component;
     }
-//   cout << " SetArray: " << idx << " " << arrayName << endl;
-//  cout << arrayString << " ***** " << arrayType << " ***** " << component << endl;
   if(arrayType == "point")
     {
     this->SetArrayByFieldName(idx, arrayString.c_str(), 
@@ -468,9 +462,12 @@ void vtkScatterPlotMapper::ComputeBounds()
     this->GetInputDataObject(INPUTS_PORT, 0));
 
 
-  if(this->GetGlyphSource(0) == 0)
+  if (this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
     {
-    this->GenerateDefaultGlyphs();
+    if (this->GetGlyphSource(0) == 0)
+      {
+      this->GenerateDefaultGlyphs();
+      }
     this->InitGlyphMappers(NULL, NULL);
     }
 
@@ -701,7 +698,12 @@ void vtkScatterPlotMapper::UpdatePainterInformation()
   info->Set(vtkScatterPlotPainter::SCALE_FACTOR(), this->ScaleFactor);
   info->Set(vtkScatterPlotPainter::ORIENTATION_MODE(), this->OrientationMode);
   info->Set(vtkScatterPlotPainter::NESTED_DISPLAY_LISTS(), this->NestedDisplayLists);
-  this->InitGlyphMappers(NULL, NULL);
+  info->Set(vtkScatterPlotPainter::PARALLEL_TO_CAMERA(), this->ParallelToCamera);
+
+  if (this->GlyphMode & vtkScatterPlotMapper::UseGlyph)
+    {
+    this->InitGlyphMappers(NULL, NULL);
+    }
 }
 
 
@@ -712,7 +714,8 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
   // Create a default source, if no source is specified.
   if (this->GetGlyphSource(0) == 0)
     {
-    this->GenerateDefaultGlyphs();
+    cout << __FUNCTION__ << ": default glyphs must have been initialized before" 
+         << endl;
     }
   
   //vtkScatterPlotMapperArray* glyphMappers = 
@@ -735,13 +738,11 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
 
   for (size_t cc = 0; cc < numberOfGlyphSources ; cc++)
     {
-    vtkPolyData *s = this->GetGlyphSource(static_cast<int>(cc));
-    // s can be null.
     //if (glyphMappers->Mappers[cc]==0)
     vtkPainterPolyDataMapper* polyDataMapper = 
       vtkPainterPolyDataMapper::SafeDownCast(
         glyphMappers->GetItemAsObject(static_cast<int>(cc)));
-    if ( polyDataMapper == NULL)
+    if (polyDataMapper == NULL)
       {
       //glyphMappers->Mappers[cc] = vtkPainterPolyDataMapper::New();
       //glyphMappers->Mappers[cc]->Delete();
@@ -760,18 +761,19 @@ void vtkScatterPlotMapper::InitGlyphMappers(vtkRenderer* ren, vtkActor* actor,
     // Copy mapper ivar to sub-mapper
     this->CopyInformationToSubMapper(polyDataMapper);
 
+    // source can be null.
+    vtkPolyData *source = this->GetGlyphSource(static_cast<int>(cc));
     vtkPolyData *ss = polyDataMapper->GetInput();
-    if (ss==0)
+    if (ss == 0)
       {
       ss = vtkPolyData::New();
       polyDataMapper->SetInput(ss);
       ss->Delete();
-      ss->ShallowCopy(s);
+      ss->ShallowCopy(source);      
       }
-
-    if (s->GetMTime()>ss->GetMTime())
+    else if (source && source->GetMTime() > ss->GetMTime())
       {
-      ss->ShallowCopy(s);
+      ss->ShallowCopy(source);
       }
 
     if(//!this->ImmediateModeRendering && 

@@ -1,4 +1,8 @@
 <ParaViewReaders>
   <Reader name="NetDmfReader" extensions="xmn" file_description="NetDMF files">
+     <Hints>
+        <!-- View can be used to specify the preferred view for the proxy -->
+        <View type="NetDmfView" />
+     </Hints>
   </Reader>
 </ParaViewReaders>
