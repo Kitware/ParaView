@@ -22,19 +22,19 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMEnumerationDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMOutputPort.h"
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMRepresentationStrategyVector.h"
-#include "vtkSMNetDmfViewProxy.h"
+#include "vtkSMScatterPlotRepresentationProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMViewProxy.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMEnumerationDomain.h"
+
 #include <vtksys/ios/sstream>
-#include "vtkSMScatterPlotRepresentationProxy.h"
 
 inline void vtkSMProxySetInt(
   vtkSMProxy* proxy, const char* pname, int val)
@@ -49,7 +49,7 @@ inline void vtkSMProxySetInt(
 }
 
 vtkStandardNewMacro(vtkSMGlyphRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMGlyphRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMGlyphRepresentationProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMGlyphRepresentationProxy::vtkSMGlyphRepresentationProxy()
 {
