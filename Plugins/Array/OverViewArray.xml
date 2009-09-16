@@ -72,7 +72,7 @@
       <IntVectorProperty name="L" command="SetL" number_of_elements="1" default_values="2"/> 
     </SourceProxy>
  
-    <SourceProxy name="CosineSimilarity" class="vtkCosineSimilarity" label="Cosine Similarity">
+    <SourceProxy name="CosineSimilarity" class="vtkDotProductSimilarity" label="Cosine Similarity">
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>

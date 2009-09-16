@@ -22,7 +22,7 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkArrayToTable.h
     ${VTK_SOURCE_DIR}/Infovis/vtkBoostLogWeighting.h
     ${VTK_SOURCE_DIR}/Infovis/vtkBoostRandomSparseArraySource.h
-    ${VTK_SOURCE_DIR}/Infovis/vtkCosineSimilarity.h
+    ${VTK_SOURCE_DIR}/Infovis/vtkDotProductSimilarity.h
     ${VTK_SOURCE_DIR}/Infovis/vtkDiagonalMatrixSource.h
     ${VTK_SOURCE_DIR}/Infovis/vtkExtractArray.h
     ${VTK_SOURCE_DIR}/Infovis/vtkMatricizeArray.h
