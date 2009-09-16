@@ -82,6 +82,7 @@ public:
   // Description:
   // Set port to use, if the value is 0, then the system will pick the port.
   vtkSetMacro(PortNumber,int);
+  vtkGetMacro(PortNumber,int);
 
   // Description:
   // Add a machine name.
