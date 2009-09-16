@@ -4,8 +4,6 @@
 set( PLUGIN_NAME Statistics )
 set( PLUGIN_VERSION "1.0" )
 
-include( ${QT_USE_FILE} )
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -43,9 +41,14 @@ set_source_files_properties(
     ABSTRACT TRUE
 )
 
+if ( PARAVIEW_BUILD_QT_GUI )
+  include( ${QT_USE_FILE} )
+  set( GUI_XML "GUI_RESOURCE_FILES;${UI_XML}" )
+endif ( PARAVIEW_BUILD_QT_GUI )
+
 add_paraview_plugin( ${PLUGIN_NAME} ${PLUGIN_VERSION}
   SERVER_MANAGER_XML ${SM_XML}
   SERVER_MANAGER_SOURCES ${SM_SRC}
-  GUI_RESOURCE_FILES ${UI_XML}
+  ${GUI_XML}
 )
 
