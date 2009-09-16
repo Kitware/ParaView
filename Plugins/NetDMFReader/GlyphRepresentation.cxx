@@ -1,18 +1,21 @@
-/// \file pqNetDmfRepresentation.cxx
+/// \file GlyphRepresentation.cxx
 /// \date 4/24/2006
 
 #include "GlyphRepresentation.h"
-#include "pqSMAdaptor.h"
-#include "vtkSMGlyphRepresentationProxy.h"
-#include "vtkSMDataRepresentationProxy.h"
+
 #include "pqPipelineSource.h"
+#include "pqSMAdaptor.h"
+
+#include "vtkSMDataRepresentationProxy.h"
+#include "vtkSMGlyphRepresentationProxy.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
 #include "vtkScatterPlotMapper.h"
 
 #include <QMap>
 #include <QStringList>
+
 inline void vtkSMProxySetString(
   vtkSMProxy* proxy, const char* pname, const char* pval)
 {
@@ -76,10 +79,11 @@ void GlyphRepresentation::setDefaultPropertyValues()
     {
     pqSMAdaptor::setEnumerationProperty(repr->GetProperty("Representation"),
                                         "Glyph Representation");
-    vtkSMProxySetString(repr, "XArrayName", "point,Position,0");
-    vtkSMProxySetString(repr, "YArrayName", "point,Position,1");
-    vtkSMProxySetString(repr, "ZArrayName", "point,Position,2");
+    vtkSMProxySetString(repr, "GlyphXOrientationArray", "point,Direction,0");
+    vtkSMProxySetString(repr, "GlyphYOrientationArray", "point,Direction,1");
+    vtkSMProxySetString(repr, "GlyphZOrientationArray", "point,Direction,2");
     vtkSMProxySetInt(repr, "ThreeDMode", 1);
+    vtkSMProxySetInt(repr, "OrientationMode", 1);
     repr->UpdateVTKObjects();
     }
   else

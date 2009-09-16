@@ -2,26 +2,29 @@
 #include "NetDmfDisplay.h"
 
 #include "GlyphRepresentation.h"
+#include "NetDmfView.h"
+
+#include "pqCubeAxesEditorDialog.h"
 #include "pqDisplayProxyEditor.h"
+#include "pqOutputPort.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPropertyLinks.h"
+#include "pqRenderView.h"
+#include "pqSMAdaptor.h"
+#include "pqSignalAdaptorCompositeTreeWidget.h"
+
+#include "ui_NetDmfDisplayPanel.h"
+
 #include "vtkPVDataInformation.h"
+#include "vtkSMCompositeTreeDomain.h"
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMGlyphRepresentationProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "ui_NetDmfDisplayPanel.h"
-#include "pqPropertyLinks.h"
-#include "vtkWeakPointer.h"
-#include "pqSignalAdaptorCompositeTreeWidget.h"
-#include "pqOutputPort.h"
-#include "vtkSMCompositeTreeDomain.h"
-#include "pqSMAdaptor.h"
-#include "pqRenderView.h"
-#include "NetDmfView.h"
 #include "vtkSMRenderViewProxy.h"
-//#include "vtkSMNetDmfViewProxy.h"
 #include "vtkSMScatterPlotViewProxy.h"
-#include "pqCubeAxesEditorDialog.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkScatterPlotMapper.h"
+#include "vtkWeakPointer.h"
 
 #include <QDebug>
 #include <QComboBox>
@@ -188,12 +191,17 @@ NetDmfDisplay::NetDmfDisplay(pqRepresentation* d, QWidget* p)
     }
 
   // setup glyph
-  //QObject::connect(this->Internal->GlyphGroupBox,
-  //                 SIGNAL(toggled(bool)),
-  //                 this, SLOT(updateGlyphMode()), Qt::QueuedConnection);
-  this->Internal->Links.addPropertyLink(this->Internal->GlyphGroupBox,
-                                        "checked", SIGNAL(toggled(bool)),
-    proxy, proxy->GetProperty("GlyphMode"));
+  vtkSMProperty* glyphModeProperty = proxy->GetProperty("GlyphMode");
+  if (glyphModeProperty)
+    {
+    QObject::connect(this->Internal->GlyphGroupBox,
+                     SIGNAL(toggled(bool)),
+                     this, SLOT(updateGlyphMode()), Qt::QueuedConnection);
+
+    int glyphMode = pqSMAdaptor::getElementProperty(glyphModeProperty).toInt();
+    this->Internal->GlyphGroupBox->setChecked(
+      glyphMode & vtkScatterPlotMapper::UseGlyph);
+    }
 
   connect(this->Internal->GlyphInputComboBox, 
           SIGNAL(currentIndexChanged(const QString&)),
@@ -271,9 +279,7 @@ void NetDmfDisplay::zoomToData()
       this->Internal->Representation->getView());
     if (NetDmfModule)
       {
-      //vtkSMNetDmfViewProxy* rm = 
-      //  vtkSMNetDmfViewProxy::SafeDownCast(NetDmfModule->getViewProxy());
-        vtkSMScatterPlotViewProxy* rm = 
+      vtkSMScatterPlotViewProxy* rm = 
         vtkSMScatterPlotViewProxy::SafeDownCast(NetDmfModule->getViewProxy());
       rm->GetRenderView()->ResetCamera(bounds);
       NetDmfModule->render();
@@ -284,16 +290,8 @@ void NetDmfDisplay::zoomToData()
 //-----------------------------------------------------------------------------
 void NetDmfDisplay::cubeAxesVisibilityChanged()
 {
-  vtkSMProxy* reprProxy = (this->Internal->Representation)? 
-    this->Internal->Representation->getProxy() : NULL;
-  vtkSMProperty* prop = 0;
-
-  // setup cube axes visibility.
-  if ((prop = reprProxy->GetProperty("CubeAxesVisibility")) != 0)
-    {
-    pqSMAdaptor::setElementProperty(prop, this->Internal->ShowCubeAxes->isChecked());
-    reprProxy->UpdateVTKObjects();
-    }
+  vtkSMProxySetInt(this->Internal->GlyphRepresentationProxy, "CubeAxesVisibility", 
+                   this->Internal->ShowCubeAxes->isChecked());
   this->updateAllViews();
 }
 
@@ -301,6 +299,19 @@ void NetDmfDisplay::cubeAxesVisibilityChanged()
 void NetDmfDisplay::editCubeAxes()
 {
   pqCubeAxesEditorDialog dialog(this);
-  dialog.setRepresentationProxy(this->Internal->Representation->getProxy());
+  dialog.setRepresentationProxy(this->Internal->GlyphRepresentationProxy);
   dialog.exec();
+}
+//-----------------------------------------------------------------------------
+void NetDmfDisplay::updateGlyphMode()
+{  
+  int glyphMode = 0;
+  if(this->Internal->GlyphGroupBox->isChecked())
+    {
+    glyphMode |= vtkScatterPlotMapper::UseGlyph;
+    }
+  glyphMode |= vtkScatterPlotMapper::OrientedGlyph;
+
+  vtkSMProxySetInt(this->Internal->GlyphRepresentationProxy, "GlyphMode", glyphMode);
+  this->updateAllViews();
 }

@@ -1,10 +1,9 @@
-
 #ifndef __NetDmfDisplay_h
 #define __NetDmfDisplay_h
 
 #include "pqDisplayPanel.h"
 
-/// a simple display panel widget
+/// a simple display panel widget for GlyphRepresentation representations
 class NetDmfDisplay : public pqDisplayPanel
 {
   Q_OBJECT
@@ -17,6 +16,7 @@ public slots:
   void zoomToData();
   void cubeAxesVisibilityChanged();
   void editCubeAxes();
+  void updateGlyphMode();
 
 protected:
   class pqInternal;
@@ -24,4 +24,3 @@ protected:
 };
 
 #endif // __NetDmfDisplay_h
-

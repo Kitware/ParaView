@@ -1,18 +1,18 @@
-
 #include "NetDmfView.h"
+
+#include "GlyphRepresentation.h"
+#include "vtkSMGlyphRepresentationProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
-#include <vtkSMProxy.h>
 
 #include <pqOutputPort.h>
 #include <pqPipelineSource.h>
 #include <pqRepresentation.h>
 #include <pqServer.h>
-#include "vtkSMGlyphRepresentationProxy.h"
-#include "vtkSMIntVectorProperty.h"
-#include "GlyphRepresentation.h"
 
 inline void vtkSMProxySetInt(
   vtkSMProxy* proxy, const char* pname, int val)
@@ -34,12 +34,6 @@ NetDmfView::NetDmfView(const QString& viewmoduletype,
        QObject* p)
  : pqScatterPlotView(group, name, viewmodule, server, p)
 {
-  /*
-  // our view is just a simple QWidget
-  this->MyWidget = new QWidget;
-  this->MyWidget->setAutoFillBackground(true);
-  new QVBoxLayout(this->MyWidget);
-  */
   // connect to display creation so we can show them in our view
   this->connect(this, SIGNAL(representationAdded(pqRepresentation*)),
     SLOT(onRepresentationAdded(pqRepresentation*)));
@@ -51,15 +45,7 @@ NetDmfView::NetDmfView(const QString& viewmoduletype,
 
 NetDmfView::~NetDmfView()
 {
-  //delete this->MyWidget;
 }
-
-/*
-QWidget* NetDmfView::getWidget()
-{
-  return this->MyWidget;
-}
-*/
 
 void NetDmfView::onRepresentationAdded(pqRepresentation* d)
 {
@@ -94,39 +80,3 @@ void NetDmfView::onRepresentationRemoved(pqRepresentation* d)
       }
     }
 }
-
-/*
-void NetDmfView::setBackground(const QColor& c)
-{
-  QPalette p = this->MyWidget->palette();
-  p.setColor(QPalette::Window, c);
-  this->MyWidget->setPalette(p);
-}
-
-QColor NetDmfView::background() const
-{
-  return this->MyWidget->palette().color(QPalette::Window);
-}
-
-bool NetDmfView::canDisplay(pqOutputPort* opPort) const
-{
-  pqPipelineSource* source = opPort? opPort->getSource() : 0;
-  // check valid source and server connections
-  if(!source ||
-     this->getServer()->GetConnectionID() !=
-     source->getServer()->GetConnectionID())
-    {
-    return false;
-    }
-
-  // we can show MyExtractEdges as defined in the server manager xml
-  if(QString("MyExtractEdges") == source->getProxy()->GetXMLName())
-    {
-    return true;
-    }
-
-  return false;
-}
-
-
-*/

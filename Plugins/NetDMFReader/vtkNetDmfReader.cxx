@@ -41,21 +41,22 @@
   =========================================================================*/
 #include "vtkNetDmfReader.h"
 
-#include "vtkSmartPointer.h"
+#include "vtkCharArray.h"
+#include "vtkDataObject.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkFloatArray.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkIntArray.h"
+#include "vtkMath.h"
 #include "vtkMutableDirectedGraph.h"
 #include "vtkObjectFactory.h"
-#include "vtkXMLParser.h"
-#include "vtkDataObject.h"
-#include "vtkInformation.h"
-#include "vtkCharArray.h"
-#include "vtkStringArray.h"
-#include "vtkInformationVector.h"
-#include "vtkStreamingDemandDrivenPipeline.h"
-#include "vtkDataSetAttributes.h"
-#include "vtkVariantArray.h"
-#include "vtkFloatArray.h"
-#include "vtkIntArray.h"
 #include "vtkPLYReader.h"
+#include "vtkSmartPointer.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkStringArray.h"
+#include "vtkVariantArray.h"
+#include "vtkXMLParser.h"
 
 #include "XdmfArray.h"
 #include "XdmfAttribute.h"
@@ -104,7 +105,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkNetDmfReader);
-vtkCxxRevisionMacro(vtkNetDmfReader, "1.4");
+vtkCxxRevisionMacro(vtkNetDmfReader, "1.5");
 
 //============================================================================
 class vtkNetDmfReaderInternal
@@ -113,15 +114,6 @@ public:
   vtkNetDmfReaderInternal()
   {
     this->DOM = 0;
-    this->DataItem = NULL;
-    this->DsmBuffer = NULL;
-    this->InputString = 0;
-    this->InputStringLength = 0;
-    // this->ParallelLevel = 0;
-    this->ParallelLevels.clear();
-    this->UpdatePiece     = 0;
-    this->UpdateNumPieces = 1;
-    this->mostChildren = 0;
     this->TimeRange[0] = 0.;
     this->TimeRange[1] = 0.;
     
@@ -129,22 +121,15 @@ public:
     this->TypeProperties = 0;
     this->ClassProperties = 0;
     this->NodeIdProperties = 0;
-    this->PositionProperties = 0;
+    this->DirectionProperties = 0;
   }
 
   ~vtkNetDmfReaderInternal()
   {
-    if ( this->DataItem )
-      {
-      delete this->DataItem;
-      this->DataItem = 0;
-      }
     if ( this->DOM )
       {
       delete this->DOM;
       }
-    delete [] this->InputString;
-    this->InputString = 0;
   }
 
   vtkNetDmfReaderGrid* GetGrid(const char* gridName);
@@ -182,13 +167,7 @@ public:
   vtkStringArray*  TypeProperties;
   vtkStringArray*  ClassProperties;
   vtkIntArray*     NodeIdProperties;
-  vtkFloatArray*   PositionProperties;
-
-  XdmfDataItem*    DataItem;
-  XdmfDsmBuffer*   DsmBuffer;
-  char*            InputString;
-  unsigned int     InputStringLength;
-  unsigned int     mostChildren;
+  vtkFloatArray*   DirectionProperties;
 
   double       TimeRange[2];
 
@@ -200,9 +179,6 @@ public:
 //============================================================================
 void vtkNetDmfReaderInternal::UpdateTimeRange(NetDMFEvent* event)
 {
-  cout << __FUNCTION__ << " " << static_cast<int>(this->TimeRange[0])
-       << " " << static_cast<int>(this->TimeRange[0]) << endl;
-  cout << "event: " << event << endl;
   double timeRange[2];
   this->GetEventTimeRange(event, timeRange);
 
@@ -225,8 +201,6 @@ void vtkNetDmfReaderInternal::UpdateTimeRange(NetDMFEvent* event)
     this->TimeRange[1] = 
       MAX(this->TimeRange[1], timeRange[1]);
     }
-  cout << __FUNCTION__ << " end " << static_cast<int>(this->TimeRange[0])
-       << " " << static_cast<int>(this->TimeRange[1]) << endl;
 }
 
 //============================================================================
@@ -257,7 +231,6 @@ void vtkNetDmfReaderInternal::GetEventTimeRange(NetDMFEvent* event, double timeR
 double vtkNetDmfReaderInternal::GetMovementEndTime(NetDMFMovement* movement, 
                                                    double startTime)
 {
-  cout << __FUNCTION__ << " " << movement << " " << static_cast<int>(startTime) ;
   // TODO: Support more than Path movement type
   XdmfDataItem* pathData = 
     (movement->GetMovementType() == NETDMF_MOVEMENT_TYPE_PATH)? 
@@ -269,10 +242,8 @@ double vtkNetDmfReaderInternal::GetMovementEndTime(NetDMFMovement* movement,
     return startTime;
     }
   pathData->Update();
-  XdmfArray* dataArray = pathData->GetArray();
   double endTime = 
     startTime + movement->GetMovementInterval() * pathData->GetDataDesc()->GetDimension(0);
-  cout << " end: " << static_cast<int>(endTime) << " interval" << movement->GetMovementInterval() << " elements:" << dataArray->GetNumberOfElements() / pathData->GetDataDesc()->GetDimension(1) << endl;
   return endTime;
 }
 
@@ -299,7 +270,6 @@ void vtkNetDmfReaderInternal::GetMovementTimeRange(NetDMFMovement* movement, dou
     eventNode = this->DOM->GetParentNode(eventNode);
     delete event;
     }
-  cout << __FUNCTION__ << " start" << static_cast<int>(timeRange[0]) << endl;
   timeRange[1] = this->GetMovementEndTime(movement, timeRange[0]);
 }
 
@@ -375,23 +345,10 @@ vtkNetDmfReader::vtkNetDmfReader()
   this->Internal = new vtkNetDmfReaderInternal;
   this->Internal->Reader = this;
 
-  // Setup the selection callback to modify this object when an array
-  // selection is changed.
-  this->TimeStep       = 0;
-  this->ActualTimeStep = 0;
-  this->TimeStepRange[0] = 0;
-  this->TimeStepRange[1] = 0;
-  // this->DebugOn();
   this->SetNumberOfInputPorts(0);
   this->SetNumberOfOutputPorts(1);
   
-  this->ShowEvents = false;
-  this->ShowConversations = false;
-  this->ShowMovements = false;
-  this->ShowScenarios = false;
-  this->ShowResults = false;
-  this->ShowNodes = true;
-  this->ShowAddresses = false;
+  this->CurrentTimeStep = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -402,17 +359,14 @@ vtkNetDmfReader::~vtkNetDmfReader()
   H5garbage_collect();
 }
 
+//----------------------------------------------------------------------------
 void vtkNetDmfReader::SetFileName(const vtkStdString& fileName)
 {
   this->FileName = fileName;
   this->Modified();
 }
-/*
-const vtkStdString& vtkNetDmfReader::GetFileName()const
-{
-  return this->FileName;
-}
-*/
+
+//----------------------------------------------------------------------------
 const char* vtkNetDmfReader::GetFileName()const
 {
   return this->FileName.c_str();
@@ -430,26 +384,6 @@ int vtkNetDmfReader::CanReadFile(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-
-int vtkNetDmfReader::FillOutputPortInformation(int port,
-                                               vtkInformation *info)
-{ 
-  switch (port)
-    {
-    case 0:
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDirectedGraph");
-      break;
-/*    case 1:
-      info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkPolyData");
-      break;
-*/    default:
-      return 0;
-      break;
-    }
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 void vtkNetDmfReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -458,7 +392,6 @@ void vtkNetDmfReader::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 bool vtkNetDmfReader::ParseXML()
 {
-  cout << __FUNCTION__ << endl;
   // * Ensure that the required objects have been instantiated.
   if (!this->Internal->DOM)
     {
@@ -495,100 +428,12 @@ bool vtkNetDmfReader::ParseXML()
     this->Internal->DOM->Parse(this->FileName);
     this->FileParseTime = vtksys::SystemTools::ModifiedTime(this->FileName);
     this->ParseTime.Modified();
-    cout << __FUNCTION__ << " done" << endl;
-    // Since the DOM was re-parsed we need to update the cache for domains
-    // and re-populate the grids.
-    //this->UpdateDomains();
-    //this->UpdateRootGrid();
     }
   return true;
 }
 
-//----------------------------------------------------------------------------
-
-int vtkNetDmfReader::RequestDataObject(vtkInformation *request,
-                                       vtkInformationVector **inputVector,
-                                       vtkInformationVector *outputVector)
-{
-  cout << "RequestDataObject: " << endl;
-  /*
-  if (!this->ParseXML())
-    {
-    return 0;
-    }
-  
-  for (XdmfXmlNode eventNode = this->Internal->DOM->FindNextRecursiveElement("Event");
-       eventNode; 
-       eventNode = this->Internal->DOM->FindNextRecursiveElement("Event", eventNode))
-    {
-    NetDMFEvent* event = new NetDMFEvent();
-    event->SetDOM(this->Internal->DOM);
-    event->SetElement(eventNode);
-    event->UpdateInformation();
-    if (event->GetStartTime())
-      {
-      this->Internal->TimeRange[0] = 
-        MIN(this->Internal->TimeRange[0] ? this->Internal->TimeRange[0]
-            : event->GetStartTime(), event->GetStartTime());
-      }
-    if (event->GetEndTime())
-      {
-      this->Internal->TimeRange[1] = 
-        MAX(this->Internal->TimeRange[1] ? this->Internal->TimeRange[1]
-            : event->GetEndTime(), event->GetEndTime());
-      }
-    }
-  cout << " Time range: " << this->Internal->TimeRange[0] 
-       << " " << this->Internal->TimeRange[1] << endl;
-  */
-/*
-  
-  //Look at the in memory structures and create an empty vtkDataObject of the
-  //proper type for RequestData to fill in later, if needed.
-
-  vtkDataObject *output= vtkDataObject::GetData(outputVector, 0);
-  if (!output)
-    {
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    output = vtkMutableDirectedGraph::New();
-    output->SetPipelineInformation(outInfo);
-    outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-    output->Delete();
-    }
-*/
-  this->Superclass::ProcessRequest(request, inputVector, outputVector);
-/*
-  vtkDataObject *output= vtkDataObject::GetData(outputVector, 1);
-  if (!output)
-    {
-    cout << "create" << endl;
-    vtkInformation *outInfo = outputVector->GetInformationObject(1);
-    output = vtkPolyData::New();
-    output->SetPipelineInformation(outInfo);
-    outInfo->Set(vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
-    outInfo->Set(vtkDataObject::DATA_OBJECT(), output);
-    output->Delete();
-    }
-*/
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkNetDmfReader::ProcessRequest(vtkInformation* request,
-                                    vtkInformationVector** inputVector,
-                                    vtkInformationVector* outputVector)
-{
-  // generate the data
-  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_OBJECT()))
-    {
-    return this->RequestDataObject(request, inputVector, outputVector);
-    }
-  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
-}
 
 //-----------------------------------------------------------------------------
-
 int vtkNetDmfReader::RequestInformation(
   vtkInformation *vtkNotUsed(request),
   vtkInformationVector **vtkNotUsed(inputVector),
@@ -611,8 +456,6 @@ int vtkNetDmfReader::RequestInformation(
     event->UpdateInformation();
     this->Internal->UpdateTimeRange(event);
     }
-  cout << " Time range: " << static_cast<int>(this->Internal->TimeRange[0]) 
-       << " " << static_cast<int>(this->Internal->TimeRange[1]) << endl;
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   //say we can produce as many pieces are are desired
@@ -620,10 +463,7 @@ int vtkNetDmfReader::RequestInformation(
     vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_RANGE(), 
                this->Internal->TimeRange, 2);
-               
-  /// missing things...
-  this->ActualTimeStep = this->TimeStep;
-
+           
   return 1;
 }
 
@@ -637,7 +477,6 @@ int vtkNetDmfReader::RequestData(
   // The file has been read in the RequestDataObject method.
   // Here we create the graph based on the parsed XML.
   this->ParseXML();
-  //long int starttime = this->GetMTime();
 
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkDataObject *outStructure = outInfo->Get(vtkDataObject::DATA_OBJECT());
@@ -668,24 +507,7 @@ int vtkNetDmfReader::RequestData(
   vtkDebugMacro( << "UpdatePiece " << this->Internal->UpdatePiece 
                  << " : UpdateNumPieces " << this->Internal->UpdateNumPieces
                  );
-/*
-  if (outputVector->GetInformationObject(1))
-    {
-    vtkPLYReader* plyr = vtkPLYReader::New();
-    plyr->SetFileName("/home/julien/work/NetDMF-Tools/V5/HMMWVdeciFixed.ply");
-    plyr->UpdateInformation();
-    plyr->Update();
 
-    vtkPolyData* pd = vtkPolyData::SafeDownCast(
-      outputVector->GetInformationObject(1)->Get(vtkDataObject::DATA_OBJECT()));
-    if (pd)
-      {
-      pd->ShallowCopy(plyr->GetOutput());
-      cout << "POLYDATA" <<endl;
-      }
-    plyr->Delete();
-    }
-*/
   vtkMutableDirectedGraph* output = vtkMutableDirectedGraph::New();
   // Vertex Attribute Data Set
   vtkStringArray* names = vtkStringArray::New();
@@ -713,12 +535,16 @@ int vtkNetDmfReader::RequestData(
   nodeIds->Delete();
   this->Internal->NodeIdProperties = nodeIds;
 
-  vtkFloatArray* positions = vtkFloatArray::New();
-  positions->SetName("Position");
-  positions->SetNumberOfComponents(3);
-  output->GetVertexData()->AddArray(positions);
-  positions->Delete();
-  this->Internal->PositionProperties = positions;
+  vtkFloatArray* directions = vtkFloatArray::New();
+  directions->SetName("Direction");
+  directions->SetNumberOfComponents(3);
+  output->GetVertexData()->AddArray(directions);
+  directions->Delete();
+  this->Internal->DirectionProperties = directions;
+
+  vtkPoints* points = vtkPoints::New();
+  output->SetPoints(points);
+  points->Delete();
 
   // Edge Attribute Data Set
   vtkStringArray* conversationType = vtkStringArray::New();
@@ -726,42 +552,17 @@ int vtkNetDmfReader::RequestData(
   output->GetEdgeData()->AddArray(conversationType);
   conversationType->Delete();
 
-  //
-  // Find the correct time step
-  //
-  this->ActualTimeStep = this->TimeStep;
-
-  /*
-  // Use in GetElementName()
-  this->Internal->ElementCount.clear();
-  for (XdmfXmlNode rootNode = this->Internal->DOM->FindRecursiveElement("NetDMF");
-       rootNode; 
-       rootNode = this->Internal->DOM->FindNextRecursiveElement("NetDMF", rootNode))
-    {
-    NetDMFRoot* root = new NetDMFRoot();
-    root->SetDOM(this->Internal->DOM);
-    root->SetElement(rootNode);
-    root->UpdateInformation();
-    
-    this->AddNetDMFElement(output, root);
-    //output->AddVertex();
-    delete root;
-    }
-    
-  */
   // Get the requested time step. We only supprt requests of a single time
   // step in this reader right now
-  double currentTime = 0.;  
+  this->CurrentTimeStep = 0.;  
   if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
     {
     double *requestedTimeSteps = 
       outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
     int numReqTimeSteps = 
       outInfo->Length(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS());
-    currentTime = (requestedTimeSteps && numReqTimeSteps)? requestedTimeSteps[0] : 0;
-    // not sure why but currentTime is included between 0 and 1 ?!?!
-    //currentTime = this->Internal->TimeRange[0] + currentTime * 
-    //  (this->Internal->TimeRange[1] - this->Internal->TimeRange[0]);
+    this->CurrentTimeStep = (requestedTimeSteps && numReqTimeSteps)? 
+      requestedTimeSteps[0] : 0;
     }
 
   this->Internal->ElementCount.clear();
@@ -773,9 +574,25 @@ int vtkNetDmfReader::RequestData(
     node->SetDOM(this->Internal->DOM);
     node->SetElement(nodeNode);
     node->UpdateInformation();
-    
-    this->AddNetDMFElement(output, node);
-    //output->AddVertex();
+
+    // make sure the name is not already added
+    vtkStdString nodeName = this->GetElementName(node);
+    vtkIdType elementVertexId = output->FindVertex(nodeName);
+    if (elementVertexId == -1)
+      {
+      vtksys_ios::stringstream nodeId;
+      nodeId << node->GetNodeId();
+      vtkStdString nodeType(nodeId.str());
+        
+      this->Internal->NameProperties->InsertNextValue(nodeName);          // name
+      this->Internal->TypeProperties->InsertNextValue(nodeType);             // type
+      this->Internal->ClassProperties->InsertNextValue(node->GetClassName()); // class
+      this->Internal->NodeIdProperties->InsertNextValue(node->GetNodeId());  // nodeId
+      this->Internal->DirectionProperties->InsertNextTuple3(0., 0., 0.);     // directions
+      points->InsertNextPoint(0., 0., 0.);
+      elementVertexId = output->AddVertex();
+      }
+
     delete node;
     }
 
@@ -799,7 +616,6 @@ int vtkNetDmfReader::RequestData(
       node->UpdateInformation();
       nodeVertexId = this->Internal->NodeIdProperties->LookupValue(node->GetNodeId());
       }
-    cout << " nodeId: " << movement->GetNodeId() << " " << nodeVertexId << endl;
     // TODO: support more than NETDMF_MOVEMENT_TYPE_PATH
     if (movement->GetMovementType() == NETDMF_MOVEMENT_TYPE_PATH)
       {
@@ -811,9 +627,7 @@ int vtkNetDmfReader::RequestData(
       double timeRange[2];
       this->Internal->GetMovementTimeRange(movement, timeRange);
       double index = static_cast<double>(numberOfTuples) * 
-        ((currentTime - timeRange[0]) / (timeRange[1] - timeRange[0]));
-      //cout << static_cast<int>(currentTime) << " " << static_cast<int>(timeRange[0])
-      //     << " " << index << " " << static_cast<int>(index) <<endl;
+        ((this->CurrentTimeStep - timeRange[0]) / (timeRange[1] - timeRange[0]));
       index = MAX(index, 0.);
       index = MIN(index, numberOfTuples-1);
       // TODO: interpolate the position between floor(index) and ceil(index)
@@ -825,11 +639,45 @@ int vtkNetDmfReader::RequestData(
         static_cast<int>(index) * numberOfComponents + offset[1]);
       position[2] = dataArray->GetValueAsFloat32(
         static_cast<int>(index) * numberOfComponents + offset[2]);
-      cout << currentTime << " node: " << nodeVertexId << " index: " << index 
-           << " p: " << position[0] << " " << position[1] << " " << position[2] << endl;
       if (nodeVertexId != -1)
         {
-        this->Internal->PositionProperties->SetTuple(nodeVertexId, position);
+        points->SetPoint(nodeVertexId, position);
+        }
+      double direction[3];
+      if (index < numberOfTuples-2)
+        {
+        direction[0] = dataArray->GetValueAsFloat32(
+          static_cast<int>(index+1) * numberOfComponents + offset[0]) - position[0];
+        direction[1] = dataArray->GetValueAsFloat32(
+          static_cast<int>(index+1) * numberOfComponents + offset[1]) - position[1];
+        direction[2] = dataArray->GetValueAsFloat32(
+          static_cast<int>(index+1) * numberOfComponents + offset[2]) - position[2];
+        }
+      else
+        {
+        direction[0] = position[0] - dataArray->GetValueAsFloat32(
+          static_cast<int>(index-1) * numberOfComponents + offset[0]);
+        direction[1] = position[1] - dataArray->GetValueAsFloat32(
+          static_cast<int>(index-1) * numberOfComponents + offset[1]);
+        direction[2] = position[2] - dataArray->GetValueAsFloat32(
+          static_cast<int>(index-1) * numberOfComponents + offset[2]);
+        }
+      if (nodeVertexId != -1)
+        {
+        vtkMath::Normalize(direction);
+        /* From v5.py (doesn't work)
+        double degX = -4.5;
+        double degY = -vtkMath::DegreesFromRadians(asin(direction[2]))- 2.2;
+        double degZ = vtkMath::DegreesFromRadians(acos(direction[1]));
+        if (direction[0] < 0)
+          {
+          degZ = -degZ;
+          }
+        directions->SetTuple3(nodeVertexId, degX, degY, degZ);
+        */
+        // Rotations are in the order: RotateZ, RotateX and RotateY.
+        directions->SetTuple3(nodeVertexId, 0., 0.,
+                              vtkMath::DegreesFromRadians(atan2(direction[1],direction[0])));
         }
       }
     
@@ -837,7 +685,7 @@ int vtkNetDmfReader::RequestData(
     }
 
   //long int endtime = this->GetMTime();
-  vtkDirectedGraph::SafeDownCast(outStructure)->DeepCopy(output);
+  vtkDirectedGraph::SafeDownCast(outStructure)->ShallowCopy(output);
   output->Delete();
   
   return 1;
@@ -853,276 +701,4 @@ vtkStdString vtkNetDmfReader::GetElementName(NetDMFElement* element)
   vtksys_ios::stringstream uid;
   uid << element->GetElementName() << index;
   return uid.str();
-}
-
-void vtkNetDmfReader::AddNetDMFElement(vtkMutableDirectedGraph* graph, 
-                                       NetDMFElement* element, 
-                                       vtkIdType parentVertexId/*=-1*/)
-{
-  
-  VTK_CREATE(vtkVariantArray, properties);
-  VTK_CREATE(vtkVariantArray, edgeProperties);
-  vtkIdType elementVertexId = parentVertexId;
-
-  vtkStdString elementName = this->GetElementName(element);
-
-  // ROOT
-  if (dynamic_cast<NetDMFRoot*>(element) != 0)
-    {
-    NetDMFRoot* root = dynamic_cast<NetDMFRoot*>(element);
-
-    vtksys_ios::stringstream rootVersion;
-    rootVersion << root->GetVersion();
-    vtkStdString rootName(root->GetName()?root->GetName():"");
-    vtkStdString rootType(rootVersion.str());
-
-    properties->InsertNextValue(elementName);          // name
-    properties->InsertNextValue(rootType);             // type
-    properties->InsertNextValue(root->GetClassName()); // class
-    elementVertexId = graph->AddVertex(properties);
-    //elementVertexId = graph->AddVertex();
-
-    // Get the scenario nodes
-    for (XdmfXmlNode scenarioNode = this->Internal->DOM->FindNextRecursiveElement("Scenario", root->GetElement());
-         scenarioNode; 
-         scenarioNode = this->Internal->DOM->FindNextRecursiveElement("Scenario", scenarioNode, root->GetElement()))
-      {
-      NetDMFScenario* scenario = new NetDMFScenario();
-      scenario->SetDOM(this->Internal->DOM);
-      scenario->SetElement(scenarioNode);
-      scenario->UpdateInformation();
-
-      this->AddNetDMFElement(graph, scenario, elementVertexId);
-      delete scenario;
-      }
-
-    // Get the result nodes
-    for (XdmfXmlNode resultNode = this->Internal->DOM->FindNextRecursiveElement("Result", root->GetElement());
-         resultNode; 
-         resultNode = this->Internal->DOM->FindNextRecursiveElement("Result", resultNode, root->GetElement()))
-      {
-      NetDMFResult* result = new NetDMFResult();
-      result->SetDOM(this->Internal->DOM);
-      result->SetElement(resultNode);
-      result->UpdateInformation();
-
-      this->AddNetDMFElement(graph, result, elementVertexId);
-      delete result;
-      }
-
-    }
-  // SCENARIO
-  else if (dynamic_cast<NetDMFScenario*>(element) != 0)
-    {
-    NetDMFScenario* scenario = dynamic_cast<NetDMFScenario*>(element);
-    
-    if (this->GetShowScenarios())
-      {
-      properties->InsertNextValue(elementName);              // name
-      properties->InsertNextValue("");                       // type
-      properties->InsertNextValue(scenario->GetClassName()); // class
-      elementVertexId = graph->AddVertex(properties);
-      }
-    
-    int numberOfNodes = scenario->GetNumberOfNodes();
-    for (int i = 0; i < numberOfNodes; ++i)
-      {
-      this->AddNetDMFElement(graph, scenario->GetNode(i), elementVertexId);
-      }
-    }
-  // RESULT
-  else if (dynamic_cast<NetDMFResult*>(element) != 0)
-    {
-    NetDMFResult* result = dynamic_cast<NetDMFResult*>(element);
-    
-    if (this->GetShowResults())
-      {
-      properties->InsertNextValue(elementName);            // name
-      properties->InsertNextValue("");                     // type
-      properties->InsertNextValue(result->GetClassName()); // class
-      elementVertexId = graph->AddVertex(properties);
-      }
-
-    int eventNumber = result->GetNumberOfEvents();
-    for (int i = 0; i < eventNumber; ++i)
-      {
-      this->AddNetDMFElement(graph, result->GetEvent(i), elementVertexId);
-      }
-    }
-  // NODE
-  else if (dynamic_cast<NetDMFNode*>(element) != 0)
-    {
-    NetDMFNode* node = dynamic_cast<NetDMFNode*>(element);
-
-    // make sure the name is not already added
-    vtkStdString nodeName = elementName;
-    if (this->GetShowNodes())
-      {
-      elementVertexId = graph->FindVertex(nodeName);
-      if (elementVertexId == -1)
-        {
-        vtksys_ios::stringstream nodeId;
-        nodeId << node->GetNodeId();
-        vtkStdString nodeType(nodeId.str());
-        
-        this->Internal->NameProperties->InsertNextValue(elementName);          // name
-        this->Internal->TypeProperties->InsertNextValue(nodeType);             // type
-        this->Internal->ClassProperties->InsertNextValue(node->GetClassName()); // class
-        this->Internal->NodeIdProperties->InsertNextValue(node->GetNodeId());
-        this->Internal->PositionProperties->InsertNextTuple3(0., 0., 0.);
-        elementVertexId = graph->AddVertex();
-        }
-      }
-
-    int numberOfAddresses = node->GetNumberOfAddresses();
-    for (int j=0; j < numberOfAddresses; ++j)
-      {
-      this->AddNetDMFElement(graph, node->GetAddress(j), elementVertexId);
-      }
-    }
-  // ADDRESSITEM
-  else if (dynamic_cast<NetDMFAddressItem*>(element))
-    {
-    NetDMFAddressItem* address = dynamic_cast<NetDMFAddressItem*>(element);
-    // AddressItem::Update() is necessary. It retrieve the AddressItem data.
-    address->Update();
-    
-    if (this->GetShowAddresses())
-      {
-      // addressType is typically: ETH, IP...
-      vtkStdString addressType = address->GetAddressTypeAsString();
-      edgeProperties->InsertNextValue(addressType);
-    
-      int numberOfAddresses = address->GetNumberOfAddresses();
-      for (int j=0; j < numberOfAddresses;++j)
-        {
-        // make sure the address is not already added
-        vtkStdString addressName = address->GetAddress(j);
-        elementVertexId = graph->FindVertex(addressName);
-        if (elementVertexId == -1)
-          {
-          properties->Initialize();
-          properties->InsertNextValue(addressName);             // name
-          properties->InsertNextValue(addressType);             // type
-          properties->InsertNextValue(address->GetClassName()); // class
-          elementVertexId = graph->AddVertex(properties);
-          }
-        if (parentVertexId != -1 && elementVertexId != -1)
-          {
-          graph->AddEdge(parentVertexId, elementVertexId, edgeProperties);
-          }
-        // set to invalid to don't add another edge at the end of the function.
-        elementVertexId = -1;
-        }
-      }
-    }
-  // EVENT
-  else if (dynamic_cast<NetDMFEvent*>(element))
-    {
-    NetDMFEvent* event = dynamic_cast<NetDMFEvent*>(element);
-    vtkStdString eventType(event->GetEventTypeAsString());
-    if (this->GetShowEvents())
-      {
-      properties->InsertNextValue(elementName);           // name
-      properties->InsertNextValue(eventType);             // type
-      properties->InsertNextValue(event->GetClassName()); // class
-      elementVertexId = graph->AddVertex(properties);
-      }
-
-    int numberOfAddresses = event->GetNumberOfAddressItems();
-    for (int j=0; j < numberOfAddresses; ++j)
-      {
-      this->AddNetDMFElement(graph, event->GetAddressItem(j), elementVertexId);
-      }
-    
-    int numberOfEvents = event->GetNumberOfChildren();
-    for (int j=0; j < numberOfEvents; ++j)
-      {
-      this->AddNetDMFElement(graph, event->GetChildEvent(j), elementVertexId);
-      }
-    // Conversations must be done after AddressItems and subEvent to make sure 
-    // the addresses already exist.
-    int numberOfConversations = event->GetNumberOfConversations();
-    for (int j=0; j < numberOfConversations; ++j)
-      {
-      this->AddNetDMFElement(graph, event->GetConversation(j), elementVertexId);
-      }
-    int numberOfMovements = event->GetNumberOfMovements();
-    for (int j=0; j < numberOfMovements; ++j)
-      {
-      this->AddNetDMFElement(graph, event->GetMovement(j), elementVertexId);
-      }
-    }
-  // CONVERSATION
-  else if (dynamic_cast<NetDMFConversation*>(element))
-    {
-    NetDMFConversation* conversation = dynamic_cast<NetDMFConversation*>(element);
-    
-    vtkStdString conversationType(conversation->GetConversationTypeAsString());
-    if (this->GetShowConversations())
-      {
-      properties->InsertNextValue(elementName);                  // name
-      properties->InsertNextValue(conversationType);             // type
-      properties->InsertNextValue(conversation->GetClassName()); // class
-      elementVertexId = graph->AddVertex(properties);
-      }
-
-    if (graph->FindVertex(conversation->GetEndPointA()) != -1 && 
-        graph->FindVertex(conversation->GetEndPointB()) != -1)
-      {
-      edgeProperties->InsertNextValue(conversationType);
-      if (this->GetShowConversations())
-        {
-        graph->AddEdge(elementVertexId, 
-                       conversation->GetEndPointA(),
-                       edgeProperties);
-        graph->AddEdge(elementVertexId, 
-                       conversation->GetEndPointB(),
-                       edgeProperties);
-        }
-      else
-        {
-        graph->AddEdge(conversation->GetEndPointA(), 
-                       conversation->GetEndPointB(),
-                       edgeProperties);
-        }
-      edgeProperties->Initialize();
-      }
-    }
-  // MOVEMENT
-  else if (dynamic_cast<NetDMFMovement*>(element))
-    {
-    NetDMFMovement* movement = dynamic_cast<NetDMFMovement*>(element);
-    
-    vtkStdString movementType(movement->GetMovementTypeAsString());
-    vtkIdType nodeVertexId = graph->GetVertexData()->GetAbstractArray("Type")
-      ->LookupValue(movement->GetNodeId());
-
-    if (this->GetShowMovements())
-      {
-      properties->InsertNextValue(elementName);              // name
-      properties->InsertNextValue(movementType);             // type
-      properties->InsertNextValue(movement->GetClassName()); // class
-      elementVertexId = graph->AddVertex(properties);
-
-      if (nodeVertexId != -1)
-        {
-        edgeProperties->InsertNextValue(movementType);    
-
-        graph->AddEdge(elementVertexId, 
-                       nodeVertexId,
-                       edgeProperties);
-        }
-      }
-    }   
-  if (parentVertexId != -1 && 
-      elementVertexId != -1 &&
-      parentVertexId != elementVertexId)
-    {
-    if (edgeProperties->GetNumberOfValues()==0)
-      {
-      edgeProperties->InsertNextValue("");
-      }
-    graph->AddEdge(parentVertexId, elementVertexId, edgeProperties);
-    }
 }

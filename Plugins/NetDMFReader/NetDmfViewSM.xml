@@ -45,6 +45,10 @@
           <Property name="ThreeDMode"/>
           <Property name="GlyphMode"/>
           <Property name="ScaleFactor"/>
+          <Property name="OrientationMode"/>
+          <Property name="GlyphXOrientationArray" />
+          <Property name="GlyphYOrientationArray" />
+          <Property name="GlyphZOrientationArray" />
         </ExposedProperties>
       </SubProxy>
     </Extension>

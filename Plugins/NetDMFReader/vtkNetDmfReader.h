@@ -56,45 +56,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetFileName(const vtkStdString& fileName);
-  //const vtkStdString& GetFileName()const;
   const char* GetFileName()const;
   
   // Description:
   // Determine if the file can be readed with this reader.
   virtual int CanReadFile(const char* fname);
-
-  // Set the Timestep to be read. This is provided for compatibility
-  // reasons only and should not be used. The correct way to
-  // request time is using the UPDATE_TIME_STEPS information key
-  // passed from downstream.
-  vtkSetMacro(TimeStep, int);
-  vtkGetMacro(TimeStep, int);
-
-  // Description:
-  // Save the range of valid timestep index values. This can be used by the PAraView GUI
-
-  vtkGetVector2Macro(TimeStepRange, int);
-
-  vtkSetMacro(ShowEvents, bool);
-  vtkGetMacro(ShowEvents, bool);
-
-  vtkSetMacro(ShowConversations, bool);
-  vtkGetMacro(ShowConversations, bool);
-
-  vtkSetMacro(ShowMovements, bool);
-  vtkGetMacro(ShowMovements, bool);
-
-  vtkSetMacro(ShowScenarios, bool);
-  vtkGetMacro(ShowScenarios, bool);
-
-  vtkSetMacro(ShowResults, bool);
-  vtkGetMacro(ShowResults, bool);
-
-  vtkSetMacro(ShowNodes, bool);
-  vtkGetMacro(ShowNodes, bool);
-
-  vtkSetMacro(ShowAddresses, bool);
-  vtkGetMacro(ShowAddresses, bool);
 
 protected:
   vtkNetDmfReader();
@@ -108,40 +74,17 @@ protected:
 
   vtkStdString GetElementName(NetDMFElement* element);
 
-  void AddNetDMFElement(vtkMutableDirectedGraph* graph,
-                        NetDMFElement* element, 
-                        vtkIdType parent = -1);
-
-  virtual int RequestDataObject(vtkInformation *request,
-                                vtkInformationVector **inputVector,
-                                vtkInformationVector *outputVector);
-
   virtual int RequestData(vtkInformation *, vtkInformationVector **,
                           vtkInformationVector *);
   virtual int RequestInformation(vtkInformation *, vtkInformationVector **,
                                  vtkInformationVector *);
-  virtual int FillOutputPortInformation(int port, vtkInformation *info);
-  virtual int ProcessRequest( vtkInformation *request,
-                              vtkInformationVector **inputVector,
-                              vtkInformationVector *outputVector);
 
   vtkNetDmfReaderInternal* Internal;
 
-  unsigned int   ActualTimeStep;
-  int            TimeStep;
-  int            TimeStepRange[2];
-
+  int            CurrentTimeStep;
   vtkTimeStamp   ParseTime;
   vtkStdString   FileName;
   long int       FileParseTime;
-
-  bool           ShowEvents;
-  bool           ShowConversations;
-  bool           ShowMovements;
-  bool           ShowScenarios;
-  bool           ShowResults;
-  bool           ShowNodes;
-  bool           ShowAddresses;
 
 private:
   vtkNetDmfReader(const vtkNetDmfReader&); // Not implemented

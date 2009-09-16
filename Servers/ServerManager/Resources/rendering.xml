@@ -9477,7 +9477,11 @@
           <Property name="Colorize" />
           <Property name="GlyphMode" />
           <Property name="ScaleFactor" />
+          <Property name="OrientationMode" />
           <Property name="ParallelToCamera" />
+          <Property name="GlyphXOrientationArray" />
+          <Property name="GlyphYOrientationArray" />
+          <Property name="GlyphZOrientationArray" />
         </ExposedProperties>
 
       </SubProxy>

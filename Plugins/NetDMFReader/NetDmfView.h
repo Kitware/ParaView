@@ -4,13 +4,11 @@
 
 #include "pqScatterPlotView.h"
 
-/// a simple view that shows a QLabel with the display's name in the view
+/// a simple view that shows GlyphRepresentation representations
 class NetDmfView : public pqScatterPlotView
 {
   Q_OBJECT
 public:
-  /// constructor takes a bunch of init stuff and must have this signature to 
-    /// satisfy pqView
   NetDmfView(const QString& viewtypemodule, 
              const QString& group, 
              const QString& name, 
@@ -18,6 +16,7 @@ public:
              pqServer* server, 
              QObject* p);
   ~NetDmfView();
+
 protected slots:
   void onRepresentationAdded(pqRepresentation* d);
   void onRepresentationRemoved(pqRepresentation* d);
