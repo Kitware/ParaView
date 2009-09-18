@@ -58,7 +58,7 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.95");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.96");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -477,13 +477,7 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     }
 
   this->ExecuteBlock(input, output, 1);
-
-  vtkDataArray* ghost = output->GetCellData()->GetArray("vtkGhostLevels");
-  if (ghost)
-    {
-    output->RemoveGhostCells(1);
-    }
-  
+  this->RemoveGhostCells(output);
   return 1;
 }
 
@@ -604,6 +598,7 @@ int vtkPVGeometryFilter::ExecuteCompositeDataSet(
     
     vtkPolyData* tmpOut = vtkPolyData::New();
     this->ExecuteBlock(block, tmpOut, 0);
+    this->RemoveGhostCells(tmpOut);
 
     if (hdIter)
       {
@@ -1234,5 +1229,15 @@ void vtkPVGeometryFilter::SetUseStrips(int newvalue)
       this->StripModFirstPass = 0;
       }
     this->StripSettingMTime.Modified();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::RemoveGhostCells(vtkPolyData* output)
+{
+  vtkDataArray* ghost = output->GetCellData()->GetArray("vtkGhostLevels");
+  if (ghost)
+    {
+    output->RemoveGhostCells(1);
     }
 }

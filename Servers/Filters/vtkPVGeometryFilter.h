@@ -172,6 +172,9 @@ protected:
 
   virtual void ReportReferences(vtkGarbageCollector*);
 
+  // Convenience method to purge ghost cells.
+  void RemoveGhostCells(vtkPolyData*);
+
   int PassThroughCellIds;
   int PassThroughPointIds;
   int ForceUseStrips;
