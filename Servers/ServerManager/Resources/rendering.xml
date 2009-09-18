@@ -8815,6 +8815,7 @@
           <Property name="CloseLoop" />
           <Property name="AllowNodePicking" />
           <Property name="Initialize" />
+          <Property name="ProcessEvents"/>
         </ExposedProperties>
       </SubProxy>
 

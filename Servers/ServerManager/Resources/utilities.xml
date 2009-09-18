@@ -729,7 +729,13 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      
+      <IntVectorProperty name="ProcessEvents"
+        command="SetProcessEvents"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain/>
+      </IntVectorProperty>
+
     </Proxy>
 
     <Proxy name="ScalarBarWidget" class="vtkScalarBarWidget"
