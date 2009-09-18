@@ -9,6 +9,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkProcessModuleConnectionManagerInternals.h
       vtkPVServerOptionsInternals.h
       vtkPVTestUtities.h
+      vtkSciVizStatisticsPrivate.h
       vtkSMPropertyInternals.h
       vtkSMPropertyInternals.h
       vtkSMProxyInternals.h

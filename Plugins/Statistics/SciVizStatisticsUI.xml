@@ -1,9 +1,0 @@
-<ParaViewFilters>
-  <Category name="Statistics" menu_label="&amp;Statistics" preserve_order="1">
-    <Filter name="ContingencyStatistics"/>
-    <Filter name="DescriptiveStatistics"/>
-    <Filter name="KMeans"/>
-    <Filter name="MulticorrelativeStatistics"/>
-    <Filter name="PCAStatistics"/>
-  </Category>
-</ParaViewFilters>

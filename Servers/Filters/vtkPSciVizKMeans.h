@@ -1,9 +1,38 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPSciVizKMeans.h
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkPSciVizKMeans - Find k cluster centers and/or assess the closest center and distance to it for each datum.
+// .SECTION Description
+// This filter either computes a statistical model of
+// a dataset or takes such a model as its second input.
+// Then, the model (however it is obtained) may
+// optionally be used to assess the input dataset.
+//
+// This filter iteratively computes the center of k clusters in a space
+// whose coordinates are specified by the arrays you select.
+// The clusters are chosen as local minima of the sum of square Euclidean
+// distances from each point to its nearest cluster center.
+// The model is then a set of cluster centers.
+// Data is assessed by assigning a cluster center and distance to the
+// cluster to each point in the input data set.
+
 #ifndef __vtkPSciVizKMeans_h
 #define __vtkPSciVizKMeans_h
 
 #include "vtkSciVizStatistics.h"
 
-class vtkPSciVizKMeans : public vtkSciVizStatistics
+class VTK_EXPORT vtkPSciVizKMeans : public vtkSciVizStatistics
 {
 public:
   static vtkPSciVizKMeans* New();

@@ -19,7 +19,7 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.3");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.1");
 
 vtkSciVizStatistics::vtkSciVizStatistics()
 {
