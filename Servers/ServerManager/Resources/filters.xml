@@ -8798,6 +8798,8 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
+    <OutputPort name="Statistical Model" index="0"/>
+    <OutputPort name="Assessed Data" index="1"/>
     <Hints>
       <Visibility replace_input="1" />
       <!-- View can be used to specify the preferred view for the proxy -->
@@ -8944,6 +8946,8 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </IntVectorProperty>
 
+    <OutputPort name="Statistical Model" index="0"/>
+    <OutputPort name="Assessed Data" index="1"/>
     <Hints>
       <Visibility replace_input="1" />
       <!-- View can be used to specify the preferred view for the proxy -->
@@ -9109,6 +9113,8 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
+    <OutputPort name="Statistical Model" index="0"/>
+    <OutputPort name="Assessed Data" index="1"/>
     <Hints>
       <Visibility replace_input="1" />
       <!-- View can be used to specify the preferred view for the proxy -->
@@ -9245,6 +9251,8 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
+    <OutputPort name="Statistical Model" index="0"/>
+    <OutputPort name="Assessed Data" index="1"/>
     <Hints>
       <Visibility replace_input="1" />
       <!-- View can be used to specify the preferred view for the proxy -->
@@ -9438,6 +9446,8 @@ This property controls how the filter works to generate tensor cell data. You ca
        </Documentation>
      </DoubleVectorProperty>
 
+    <OutputPort name="Statistical Model" index="0"/>
+    <OutputPort name="Assessed Data" index="1"/>
     <Hints>
       <Visibility replace_input="1" />
       <!-- View can be used to specify the preferred view for the proxy -->
