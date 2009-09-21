@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.17");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.18");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -178,7 +178,7 @@ int vtkFileSeriesReaderTimeRanges::GetAggregateTimeInfo(vtkInformation *outInfo)
     }
 
   outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-               &timeSteps[0], timeSteps.size());
+               &timeSteps[0], static_cast<int>(timeSteps.size()));
   return 1;
 }
 
@@ -389,7 +389,7 @@ void vtkFileSeriesReader::RemoveAllFileNames()
 //----------------------------------------------------------------------------
 unsigned int vtkFileSeriesReader::GetNumberOfFileNames()
 {
-  return this->Internal->FileNames.size();
+  return static_cast<unsigned int>(this->Internal->FileNames.size());
 }
 
 //----------------------------------------------------------------------------
