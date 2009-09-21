@@ -50,7 +50,7 @@
 
 //=============================================================================
 vtkStandardNewMacro(vtkFileSeriesReader);
-vtkCxxRevisionMacro(vtkFileSeriesReader, "1.16");
+vtkCxxRevisionMacro(vtkFileSeriesReader, "1.17");
 
 vtkCxxSetObjectMacro(vtkFileSeriesReader,Reader,vtkAlgorithm);
 
@@ -334,13 +334,14 @@ vtkFileSeriesReader::vtkFileSeriesReader()
   this->Internal->FileNameIsSet = false;
   this->Internal->TimeRanges = new vtkFileSeriesReaderTimeRanges;
 
-  this->FileNameMethod = 0;
+  this->FileNameMethod = NULL;
   //this->SetFileNameMethod("SetFileName");
-  this->SetFileNameMethod(0);
 
   this->MetaFileName = NULL;
   this->UseMetaFile = 0;
   this->CurrentFileName = 0;
+
+  this->IgnoreReaderTime = 0;
 
   this->LastRequestInformationIndex = -1;
 }
@@ -348,7 +349,7 @@ vtkFileSeriesReader::vtkFileSeriesReader()
 //-----------------------------------------------------------------------------
 vtkFileSeriesReader::~vtkFileSeriesReader()
 {
-  this->SetCurrentFileName(0);
+  this->SetCurrentFileName(NULL);
   this->SetMetaFileName(NULL);
   this->SetReader(NULL);
   delete this->Internal->TimeRanges;
@@ -494,7 +495,7 @@ int vtkFileSeriesReader::ProcessRequest(vtkInformation* request,
     int retVal = this->Reader->ProcessRequest(request, 
                                               inputVector,
                                               outputVector);
-    // Aditional processing requried by us.
+    // Additional processing requried by us.
     if (request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
       {
       this->RequestUpdateExtent(request, inputVector, outputVector);
@@ -530,11 +531,14 @@ int vtkFileSeriesReader::RequestInformation(
   this->RequestInformationForInput(0, request, outputVector);
 
   // Does the reader have time?
-  if (   !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS())
-      && !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()) )
+  if (   this->IgnoreReaderTime
+      || (   !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_STEPS())
+          && !outInfo->Has(vtkStreamingDemandDrivenPipeline::TIME_RANGE()) ) )
     {
     // Input files have no time steps.  Fake a time step for each equal to the
     // index.
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    outInfo->Remove(vtkStreamingDemandDrivenPipeline::TIME_RANGE());
     for (int i = 0; i < numFiles; i++)
       {
       double time = (double)i;
@@ -767,4 +771,5 @@ void vtkFileSeriesReader::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "MetaFileName: " << this->MetaFileName << endl;
   os << indent << "UseMetaFile: " << this->UseMetaFile << endl;
+  os << indent << "IgnoreReaderTime: " << this->IgnoreReaderTime << endl;
 }

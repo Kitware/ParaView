@@ -124,6 +124,13 @@ public:
   vtkSetStringMacro(FileNameMethod);
   vtkGetStringMacro(FileNameMethod);
 
+  // Description:
+  // If true, then treat file series like it does not contain any time step 
+  // values. False by default.
+  vtkGetMacro(IgnoreReaderTime, int);
+  vtkSetMacro(IgnoreReaderTime, int);
+  vtkBooleanMacro(IgnoreReaderTime, int);
+
 protected:
   vtkFileSeriesReader();
   ~vtkFileSeriesReader();
@@ -173,6 +180,8 @@ protected:
   // Description:
   // Re-reads information from the metadata file, if necessary.
   virtual void UpdateMetaData();
+
+  int IgnoreReaderTime;
 
 private:
   vtkFileSeriesReader(const vtkFileSeriesReader&); // Not implemented.
