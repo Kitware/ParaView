@@ -900,6 +900,8 @@ class ArrayListProperty(VectorProperty):
         "Returns all elements as a list."
         property = self.SMProperty
         nElems = property.GetNumberOfElements()
+        if nElems%2 != 0:
+            raise ValueError, "The SMProperty with XML label '%s' has a size that is not a multiple of 2." % property.GetXMLLabel()
         self.__arrays = []
         for i in range(0, nElems, 2):
             if self.GetElement(i+1) != '0':
@@ -1981,8 +1983,9 @@ def CreateRenderView(connection=None, **extraArgs):
 
 def GetRepresentation(aProxy, view):
     for rep in view.Representations:
-        if rep.Input == aProxy:
-            return rep
+        try: isRep = rep.Input == aProxy
+        except: isRep = False
+        if isRep: return rep
     return None
 
 def CreateRepresentation(aProxy, view, **extraArgs):
@@ -2427,6 +2430,8 @@ def _make_name_valid(name):
         return None
     name = name.replace(' ','')
     name = name.replace('-','')
+    name = name.replace(':','')
+    name = name.replace('.','')
     if not name[0].isalpha():
         name = 'a' + name
     return name

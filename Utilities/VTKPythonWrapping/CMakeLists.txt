@@ -74,6 +74,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
   # List all python source files.
   # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
+    demos/demo1
     vtk/__init__
     vtk/genericfiltering
     vtk/geovis
@@ -93,6 +94,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     util
     benchmark
     simple
+    smtrace
     )
 
   # Now copy these files if necessary.

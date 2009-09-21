@@ -44,8 +44,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QCoreApplication>
 #include <QResizeEvent>
+#include <QScrollBar>
+#include <QStringListModel>
 #include <QTextCharFormat>
 #include <QVBoxLayout>
+
+
+class pqPythonShellCompleter : public pqConsoleWidgetCompleter
+{
+public:
+  pqPythonShellCompleter(pqPythonShell& p) : Parent(p)
+    {
+    this->setParent(&p);
+    }
+
+  virtual void updateCompletionModel(const QString& completion)
+    {
+    // Start by clearing the model
+    this->setModel(0);
+
+    // Don't try to complete the empty string
+    if (completion.isEmpty())
+      {
+      return;
+      }
+
+    // Search backward through the string for usable characters
+    QString textToComplete;
+    for (int i = completion.length()-1; i >= 0; --i)
+      {
+      QChar c = completion.at(i);
+      if (c.isLetterOrNumber() || c == '.' || c == '_')
+        {
+        textToComplete.prepend(c);
+        }
+      else
+        {
+        break;
+        }
+      }
+
+    // Split the string at the last dot, if one exists
+    QString lookup;
+    QString compareText = textToComplete;
+    int dot = compareText.lastIndexOf('.');
+    if (dot != -1)
+      {
+      lookup = compareText.mid(0, dot);
+      compareText = compareText.mid(dot+1);
+      }
+
+    // Lookup python names
+    QStringList attrs;
+    if (!lookup.isEmpty() || !compareText.isEmpty())
+      {
+      attrs = Parent.getPythonAttributes(lookup);
+      }
+
+    // Initialize the completion model
+    if (!attrs.isEmpty())
+      {
+      this->setCompletionMode(QCompleter::PopupCompletion);
+      this->setModel(new QStringListModel(attrs, this));
+      this->setCaseSensitivity(Qt::CaseInsensitive);
+      this->setCompletionPrefix(compareText.toLower());
+      this->popup()->setCurrentIndex(this->completionModel()->index(0, 0));
+      }
+    }
+  pqPythonShell& Parent;
+};
+
 
 /////////////////////////////////////////////////////////////////////////
 // pqPythonShell::pqImplementation
@@ -165,6 +233,9 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
   boxLayout->addWidget(&this->Implementation->Console);
 
   this->setObjectName("pythonShell");
+
+  pqPythonShellCompleter* completer = new pqPythonShellCompleter(*this);
+  this->Implementation->Console.setCompleter(completer);
   
   QObject::connect(
     &this->Implementation->Console, SIGNAL(executeCommand(const QString&)), 
@@ -209,6 +280,15 @@ void pqPythonShell::clear()
   this->Implementation->promptForInput();
 }
 
+void pqPythonShell::makeCurrent()
+{
+  this->Implementation->Interpreter->MakeCurrent();
+}
+void pqPythonShell::releaseControl()
+{
+  this->Implementation->Interpreter->ReleaseControl();
+}
+
 void pqPythonShell::executeScript(const QString& script)
 {
   this->printStdout("\n");
@@ -217,6 +297,67 @@ void pqPythonShell::executeScript(const QString& script)
     script.toAscii().data());
   emit this->executing(false);
   this->Implementation->promptForInput();
+}
+
+QStringList pqPythonShell::getPythonAttributes(const QString& objectName)
+{
+  this->makeCurrent();
+
+  PyObject* dict = PyImport_GetModuleDict();
+  PyObject* object = PyDict_GetItemString(dict, "__main__");
+  Py_INCREF(object);
+
+
+  if (!objectName.isEmpty())
+    {
+    QStringList tmpNames = objectName.split('.');
+    for (int i = 0; i < tmpNames.size() && object; ++i)
+      {
+      QByteArray tmpName = tmpNames.at(i).toLatin1();
+      PyObject* prevObj = object;
+      if (PyDict_Check(object))
+        {
+        object = PyDict_GetItemString(object, tmpName.data());
+        Py_XINCREF(object);
+        }
+      else
+        {
+        object = PyObject_GetAttrString(object, tmpName.data());
+        }
+      Py_DECREF(prevObj);
+      }
+    PyErr_Clear();
+    }
+
+  QStringList results;
+  if (object)
+    {
+    PyObject* keys = PyObject_Dir(object);
+    if (keys)
+      {
+      PyObject* key;
+      PyObject* value;
+      QString keystr;
+      int nKeys = PyList_Size(keys);
+      for (int i = 0; i < nKeys; ++i)
+        {
+        key = PyList_GetItem(keys, i);
+        value = PyObject_GetAttr(object, key);
+        if (!value)
+          {
+          continue;
+          }
+
+        results << PyString_AsString(key);
+        Py_DECREF(value);
+        }
+      Py_DECREF(keys);
+      }
+    Py_DECREF(object);
+    }
+
+  this->releaseControl();
+  return results;
 }
 
 void pqPythonShell::printStdout(vtkObject*, unsigned long, void*, void* calldata)

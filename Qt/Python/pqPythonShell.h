@@ -62,6 +62,16 @@ public:
   /// Prints some text on the shell.
   void printMessage(const QString&);
 
+  /// Calls MakeCurrent in the internal vtkPVPythonInteractiveInterpretor instance
+  void makeCurrent();
+
+  /// Calls ReleaseControl in the internal vtkPVPythonInteractiveInterpretor instance
+  void releaseControl();
+
+  /// Given a python variable name, lookup its attributes and return them in a
+  /// string list.
+  QStringList getPythonAttributes(const QString& name);
+
 signals:
   void executing(bool);
 

@@ -32,12 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqConsoleWidget.h"
 
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QClipboard>
+#include <QCompleter>
 #include <QKeyEvent>
+#include <QPointer>
 #include <QTextCursor>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QScrollBar>
 
 /////////////////////////////////////////////////////////////////////////
 // pqConsoleWidget::pqImplementation
@@ -72,6 +76,24 @@ public:
 
   void keyPressEvent(QKeyEvent* e)
   {
+
+  if (this->Completer && this->Completer->popup()->isVisible())
+    {
+    // The following keys are forwarded by the completer to the widget
+    switch (e->key())
+      {
+      case Qt::Key_Enter:
+      case Qt::Key_Return:
+      case Qt::Key_Escape:
+      case Qt::Key_Tab:
+      case Qt::Key_Backtab:
+        e->ignore();
+        return; // let the completer do default behavior
+      default:
+        break;
+      }
+    }
+
     QTextCursor text_cursor = this->textCursor();
 
     // Set to true if there's a current selection
@@ -152,6 +174,18 @@ public:
           this->replaceCommandBuffer("");
           }
         break;
+
+      case Qt::Key_Left:
+        if (text_cursor.position() > this->InteractivePosition)
+          {
+          QTextEdit::keyPressEvent(e);
+          }
+        else
+          {
+          e->accept();
+          }
+        break;
+        
   
       case Qt::Key_Delete:
         e->accept();
@@ -165,8 +199,16 @@ public:
           {
           QTextEdit::keyPressEvent(e);
           this->updateCommandBuffer();
+          this->updateCompleterIfVisible();
           }
         break;
+
+      case Qt::Key_Tab:
+        e->accept();
+        this->updateCompleter();
+        this->selectCompletion();
+        break;
+        
 
       case Qt::Key_Home:
         e->accept();
@@ -188,6 +230,7 @@ public:
         e->accept();
         QTextEdit::keyPressEvent(e);
         this->updateCommandBuffer();
+        this->updateCompleterIfVisible();
         break;
       }
   }
@@ -198,6 +241,67 @@ public:
     QTextCursor c(this->document());
     c.movePosition(QTextCursor::End);
     return c.position();
+  }
+
+  void focusOutEvent(QFocusEvent *e)
+  {
+    QTextEdit::focusOutEvent(e);
+
+    // For some reason the QCompleter tries to set the focus policy to
+    // NoFocus, set let's make sure we set it back to the default WheelFocus.
+    this->setFocusPolicy(Qt::WheelFocus);
+  }
+
+  void updateCompleterIfVisible()
+  {
+    if (this->Completer && this->Completer->popup()->isVisible())
+      {
+      this->updateCompleter();
+      }
+  }
+
+  /// If there is exactly 1 completion, insert it and hide the completer,
+  /// else do nothing.
+  void selectCompletion()
+  {
+  if (this->Completer && this->Completer->completionCount() == 1)
+    {
+    this->Parent.insertCompletion(this->Completer->currentCompletion());
+    this->Completer->popup()->hide();
+    }
+  }
+
+  void updateCompleter()
+  {
+    if (this->Completer)
+      {
+      // Get the text between the current cursor position
+      // and the start of the line
+      QTextCursor text_cursor = this->textCursor();
+      text_cursor.setPosition(this->InteractivePosition, QTextCursor::KeepAnchor);
+      QString commandText = text_cursor.selectedText();
+
+      // Call the completer to update the completion model
+      this->Completer->updateCompletionModel(commandText);
+
+      // Place and show the completer if there are available completions
+      if (this->Completer->completionCount())
+        {
+        // Get a QRect for the cursor at the start of the
+        // current word and then translate it down 8 pixels.
+        text_cursor = this->textCursor();
+        text_cursor.movePosition(QTextCursor::StartOfWord);
+        QRect cr = this->cursorRect(text_cursor);
+        cr.translate(0,8);
+        cr.setWidth(this->Completer->popup()->sizeHintForColumn(0)
+          + this->Completer->popup()->verticalScrollBar()->sizeHint().width());
+        this->Completer->complete(cr);
+        }
+      else
+        {
+        this->Completer->popup()->hide();
+        }
+      }
   }
   
   /// Update the contents of the command buffer from the contents of the widget
@@ -241,13 +345,33 @@ public:
     c.insertText("\n");
 
     this->InteractivePosition = this->documentEnd();
-
-
     this->Parent.internalExecuteCommand(command);
+    }
+
+  void setCompleter(pqConsoleWidgetCompleter* completer)
+    {
+    if (this->Completer)
+      {
+      this->Completer->setWidget(0);
+      QObject::disconnect(this->Completer, SIGNAL(activated(const QString&)),
+                        &this->Parent, SLOT(insertCompletion(const QString&)));
+
+      }
+    this->Completer = completer;
+    if (this->Completer)
+      {
+      this->Completer->setWidget(this);
+      QObject::connect(this->Completer, SIGNAL(activated(const QString&)),
+                      &this->Parent, SLOT(insertCompletion(const QString&)));
+      }
     }
   
   /// Stores a back-reference to our owner
   pqConsoleWidget& Parent;
+
+  /// A custom completer
+  QPointer<pqConsoleWidgetCompleter> Completer;
+
   /** Stores the beginning of the area of interactive input, outside which
   changes can't be made to the text edit contents */
   int InteractivePosition;
@@ -285,6 +409,32 @@ QTextCharFormat pqConsoleWidget::getFormat()
 void pqConsoleWidget::setFormat(const QTextCharFormat& Format)
 {
   this->Implementation->setCurrentCharFormat(Format);
+}
+
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::setCompleter(pqConsoleWidgetCompleter* completer)
+{
+  this->Implementation->setCompleter(completer);
+}
+
+//-----------------------------------------------------------------------------
+void pqConsoleWidget::insertCompletion(const QString& completion)
+{
+  QTextCursor tc = this->Implementation->textCursor();
+  tc.movePosition(QTextCursor::Left, QTextCursor::KeepAnchor);
+  if (tc.selectedText()==".")
+    {
+    tc.insertText(QString(".") + completion);
+    }
+  else
+    {
+    tc = this->Implementation->textCursor();
+    tc.movePosition(QTextCursor::StartOfWord, QTextCursor::MoveAnchor);
+    tc.movePosition(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+    tc.insertText(completion);
+    this->Implementation->setTextCursor(tc);
+    }
+  this->Implementation->updateCommandBuffer();
 }
 
 //-----------------------------------------------------------------------------
@@ -328,6 +478,10 @@ void pqConsoleWidget::prompt(const QString& text)
 void pqConsoleWidget::clear()
 {
   this->Implementation->clear();
+
+  // For some reason the QCompleter tries to set the focus policy to
+  // NoFocus, set let's make sure we set it back to the default WheelFocus.
+  this->Implementation->setFocusPolicy(Qt::WheelFocus);
 }
 
 //-----------------------------------------------------------------------------

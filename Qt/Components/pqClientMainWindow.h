@@ -101,6 +101,9 @@ private slots:
 
   void onSelectionModeChanged(int mode);
 
+  /// Connected to pqSettings::modified(). Implemented to show/hide the Macros menu.
+  void onSettingsModified();
+
 private:
   void constructorHelper(); 
 

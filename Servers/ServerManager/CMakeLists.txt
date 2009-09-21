@@ -140,6 +140,7 @@ SET(Kit_SRCS
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxySelectionModel.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
+  vtkSMPythonTraceObserver.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPVLookupTableProxy.cxx
   vtkSMPVRepresentationProxy.cxx

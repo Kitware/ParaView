@@ -71,8 +71,10 @@ def CreateRenderView():
     return view
 
 def GetRenderView():
-    "Returns the first render view."
-    return servermanager.GetRenderView()
+    "Returns the active view if there is one. Else creates and returns a new view."
+    view = active_objects.view
+    if not view: view = CreateRenderView()
+    return view
 
 def GetRenderViews():
     "Returns all render views as a list."
@@ -173,6 +175,18 @@ def SetViewProperties(view=None, **params):
         view = active_objects.view
     SetProperties(view, **params)
 
+def RenameSource(newName, proxy=None):
+    """Renames the given source.  If the given proxy is not registered
+    in the sources group this method will have no effect.  If no source is
+    provided, the active source is used."""
+    if not proxy:
+        proxy = active_objects.source
+    pxm = servermanager.ProxyManager()
+    oldName = pxm.GetProxyName("sources", proxy)
+    if oldName:
+      pxm.RegisterProxy("sources", newName, proxy)
+      pxm.UnRegisterProxy("sources", oldName, proxy)
+
 def FindSource(name):
     return servermanager.ProxyManager().GetProxy("sources", name)
 
@@ -186,7 +200,7 @@ def GetRepresentations():
 
 def UpdatePipeline(time=None, proxy=None):
     """Updates (executes) the given pipeline object for the given time as
-    necessary (i.e. if it did not already execute). If not source is provided,
+    necessary (i.e. if it did not already execute). If no source is provided,
     the active source is used instead."""
     if not proxy:
         proxy = active_objects.source
@@ -248,6 +262,7 @@ def Delete(proxy=None):
                     SetActiveSource(proxy.Input)
                 else:
                     SetActiveSource(proxy.Input[0])
+            else: SetActiveSource(None)
         for rep in GetRepresentations().values():
             if rep.Input == proxy:
                 Delete(rep)
@@ -258,17 +273,45 @@ def Delete(proxy=None):
                 SetActiveView(GetRenderViews()[0])
             else:
                 SetActiveView(None)
+
+def CreateLookupTable(**params):
+    """Create and return a lookup table.  Optionally, parameters can be given
+    to assign to the lookup table.
+    """
+    lt = servermanager.rendering.PVLookupTable()
+    servermanager.Register(lt)
+    SetProperties(lt, **params)
+    return lt
+
+def CreateScalarBar(**params):
+    """Create and return a scalar bar widget.  The returned widget may
+    be added to a render view by appending it to the view's representations
+    The widget must have a valid lookup table before it is added to a view.
+    It is possible to pass the lookup table (and other properties) as arguments
+    to this method:
     
+    lt = MakeBlueToRedLt(3.5, 7.5)
+    bar = CreateScalarBar(LookupTable=lt, Title="Velocity")
+    GetRenderView().Representations.append(bar)
+    
+    By default the returned widget is selectable and resizable.
+    """
+    sb = servermanager.rendering.ScalarBarWidgetRepresentation()
+    servermanager.Register(sb)
+    sb.Selectable = 1
+    sb.Resizable = 1
+    sb.Enabled = 1
+    sb.Title = "Scalars"
+    SetProperties(sb, **params)
+    return sb
+
 # TODO: Change this to take the array name and number of components. Register 
 # the lt under the name ncomp.array_name
 def MakeBlueToRedLT(min, max):
-    lt = servermanager.rendering.PVLookupTable()
-    servermanager.Register(lt)
-    # Add to RGB points. These are tuples of 4 values. First one is
+    # Define RGB points. These are tuples of 4 values. First one is
     # the scalar values, the other 3 the RGB values. 
-    lt.RGBPoints = [min, 0, 0, 1, max, 1, 0, 0]
-    lt.ColorSpace = "HSV"
-    return lt
+    rgbPoints = [min, 0, 0, 1, max, 1, 0, 0]
+    return CreateLookupTable(RGBPoints=rgbPoints, ColorSpace="HSV")
     
 def _find_writer(filename):
     "Internal function."
@@ -291,6 +334,23 @@ def _find_writer(filename):
         return 'vtkJPEGWriter'
     else:
         raise RuntimeError, "Cannot infer filetype from extension:", extension
+
+def AddCameraLink(viewProxy, viewProxyOther, linkName):
+    """Create a camera link between two view proxies.  A name must be given
+    so that the link can be referred to by name.  If a link with the given
+    name already exists it will be removed first."""
+    if not viewProxyOther: viewProxyOther = GetActiveView()
+    link = servermanager.vtkSMCameraLink()
+    link.AddLinkedProxy(viewProxy.SMProxy, 1)
+    link.AddLinkedProxy(viewProxyOther.SMProxy, 2)
+    link.AddLinkedProxy(viewProxyOther.SMProxy, 1)
+    link.AddLinkedProxy(viewProxy.SMProxy, 2)
+    RemoveCameraLink(linkName)
+    servermanager.ProxyManager().RegisterLink(linkName, link)
+
+def RemoveCameraLink(linkName):
+    """Remove a camera link with the given name."""
+    servermanager.ProxyManager().UnRegisterLink(linkName)
 
 def WriteImage(filename, view=None, **params):
     """Saves the given view (or the active one if none is given) as an
@@ -361,6 +421,12 @@ def _create_func(key, module):
         else:
             if len(input) > 0:
                 raise RuntimeError, "This function does not expect an input."
+
+        registrationName = None
+        for nameParam in ['registrationName', 'guiName']:
+          if nameParam in params:
+              registrationName = params[nameParam]
+              del params[nameParam]
 
         # Pass all the named arguments as property,value pairs
         for param in params.keys():
