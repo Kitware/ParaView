@@ -9,5 +9,8 @@
     <file>Icons/ShowWireframeAndBack.png</file>
     <file>Icons/PlotOverZ.png</file>
     <file>Icons/BackgroundBW.png</file>
+    <file>Icons/XPlusSideways.png</file>
+    <file>Icons/ResetRangeTemporal.png</file>
+    <file>Icons/ResetRangeCurrentTime.png</file>
   </qresource>
 </RCC>

@@ -124,6 +124,42 @@
     <string>Toggle the Background Between Black and White</string>
    </property>
   </action>
+  <action name="actionShowStandardViewpoint">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/XPlusSideways.png</normaloff>:/SLACTools/Icons/XPlusSideways.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show Standard Viewpoint</string>
+   </property>
+   <property name="toolTip">
+    <string>Position the camera in a position convienient to see the entire mesh.</string>
+   </property>
+  </action>
+  <action name="actionTemporalResetRange">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ResetRangeTemporal.png</normaloff>:/SLACTools/Icons/ResetRangeTemporal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Temporal Reset Range</string>
+   </property>
+   <property name="toolTip">
+    <string>Reads in all the data over all time and uses the information to fix the scaling of the fields to a range that makes sense for all time steps.</string>
+   </property>
+  </action>
+  <action name="actionCurrentTimeResetRange">
+   <property name="icon">
+    <iconset resource="SLACTools.qrc">
+     <normaloff>:/SLACTools/Icons/ResetRangeCurrentTime.png</normaloff>:/SLACTools/Icons/ResetRangeCurrentTime.png</iconset>
+   </property>
+   <property name="text">
+    <string>Reset Range in Current Time</string>
+   </property>
+   <property name="toolTip">
+    <string>Looks exclusively at the range of the field at the current time step and fixes the range to the minimum and maximum of that range.</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="SLACTools.qrc"/>

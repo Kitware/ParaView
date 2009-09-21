@@ -2,7 +2,7 @@
 # Center to make it easier to visualize finite element simulation results.
 
 SET(PLUGIN_NAME SLACTools)
-SET(PLUGIN_VERSION "0.0")
+SET(PLUGIN_VERSION "1.0")
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -15,8 +15,10 @@ SET(SM_XML
   )
 
 SET(SM_SRC
+  vtkPTemporalRanges.cxx
   vtkSLACPlaneGlyphs.cxx
   vtkSamplePlaneSource.cxx
+  vtkTemporalRanges.cxx
   )
 
 SET(UI_FILES
