@@ -52,17 +52,17 @@ pqSILWidget::~pqSILWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqSILWidget::setModel(pqSILModel* model)
+void pqSILWidget::setModel(pqSILModel* curmodel)
 {
   if (this->Model)
     {
     QObject::disconnect(this->Model, 0, this, 0);
     }
-  this->Model = model;
+  this->Model = curmodel;
   this->ActiveModel->setSourceModel(this->Model);
-  if (model)
+  if (curmodel)
     {
-    QObject::connect(model, SIGNAL(modelReset()), this, SLOT(onModelReset()));
+    QObject::connect(curmodel, SIGNAL(modelReset()), this, SLOT(onModelReset()));
     }
   this->onModelReset();
 }
