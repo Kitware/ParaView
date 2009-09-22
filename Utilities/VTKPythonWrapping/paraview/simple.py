@@ -434,7 +434,10 @@ def _create_func(key, module):
 
         try:
             # Register the proxy with the proxy manager.
-            group, name = servermanager.Register(px)
+            if registrationName:
+                group, name = servermanager.Register(px, registrationName=registrationName)
+            else:
+                group, name = servermanager.Register(px)
 
             # Register pipeline objects with the time keeper. This is used to extract time values
             # from sources. NOTE: This should really be in the servermanager controller layer.
