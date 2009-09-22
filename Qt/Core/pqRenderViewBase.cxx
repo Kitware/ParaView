@@ -188,7 +188,13 @@ void pqRenderViewBase::setDefaultPropertyValues()
   pqSMAdaptor::setElementProperty(proxy->GetProperty("LODThreshold"), 5);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("RemoteRenderThreshold"), 3);
   pqSMAdaptor::setElementProperty(proxy->GetProperty("TileDisplayCompositeThreshold"), 3);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("SquirtLevel"), 3);
+
+  // Compressor setting to pull from application wide settings cache.
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressorConfig"),"NULL");
+  // pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressionEnabled"),-1);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressorConfig"),"vtkSquirtCompressor 0 3");
+  // pqSMAdaptor::setElementProperty(proxy->GetProperty("CompressionEnabled"),1);
+
   // when PV_NO_OFFSCREEN_SCREENSHOTS is set, by default, we disable offscreen
   // screenshots.
   if (getenv("PV_NO_OFFSCREEN_SCREENSHOTS"))
@@ -358,7 +364,8 @@ static const char* pqGlobalRenderViewModuleMiscSettings [] = {
   "RemoteRenderThreshold",
   "TileDisplayCompositeThreshold",
   "ImageReductionFactor",
-  "SquirtLevel",
+  "CompressorConfig",
+  "CompressionEnabled",
   "OrderedCompositing",
   "StillRenderImageReductionFactor",
   "CollectGeometryThreshold",

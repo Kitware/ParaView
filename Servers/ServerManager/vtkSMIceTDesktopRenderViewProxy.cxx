@@ -23,13 +23,12 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderViewProxy, "1.20");
 
 //----------------------------------------------------------------------------
 vtkSMIceTDesktopRenderViewProxy::vtkSMIceTDesktopRenderViewProxy()
 {
   this->RenderSyncManager = 0;
-  this->SquirtLevel = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -204,8 +203,16 @@ void vtkSMIceTDesktopRenderViewProxy::BeginStillRender()
 {
   this->Superclass::BeginStillRender();
 
-  // Make squirt compression loss-less, if enabled.
-  this->SetSquirtLevelInternal(this->SquirtLevel ? 1 : 0);
+  // Signal the desktop delivery client that it must now
+  // employ loss-less compression if compression is enabled.
+  vtkSMProperty *prop
+    = this->RenderSyncManager->GetProperty("LossLessCompression");
+  vtkSMIntVectorProperty* ivp=dynamic_cast<vtkSMIntVectorProperty*>(prop);
+  if (ivp)
+    {
+    ivp->SetElement(0,1);
+    this->RenderSyncManager->UpdateProperty("LossLessCompression");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -213,8 +220,17 @@ void vtkSMIceTDesktopRenderViewProxy::BeginInteractiveRender()
 {
   this->Superclass::BeginInteractiveRender();
 
-  // Use user-specified squirt compression.
-  this->SetSquirtLevelInternal(this->SquirtLevel);
+  // Signal the desktop delivery client that it may
+  // now use lossy-compression if it's enabled and
+  // the compressor can provide it.
+  vtkSMProperty *prop
+    = this->RenderSyncManager->GetProperty("LossLessCompression");
+  vtkSMIntVectorProperty* ivp=dynamic_cast<vtkSMIntVectorProperty*>(prop);
+  if (ivp)
+    {
+    ivp->SetElement(0,0);
+    this->RenderSyncManager->UpdateProperty("LossLessCompression");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -228,18 +244,6 @@ void vtkSMIceTDesktopRenderViewProxy::SetImageReductionFactorInternal(int factor
     {
     ivp->SetElement(0, factor);
     this->RenderSyncManager->UpdateProperty("ImageReductionFactor");
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderViewProxy::SetSquirtLevelInternal(int level)
-{
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderSyncManager->GetProperty("SquirtLevel"));
-  if (ivp)
-    {
-    ivp->SetElement(0, level);
-    this->RenderSyncManager->UpdateProperty("SquirtLevel");
     }
 }
 
@@ -359,7 +363,6 @@ void vtkSMIceTDesktopRenderViewProxy::SetViewSize(int width, int height)
 void vtkSMIceTDesktopRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 }
 
 

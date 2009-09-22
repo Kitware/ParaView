@@ -141,6 +141,7 @@ SET(Filters_SRCS
   vtkSpyPlotReaderMap.cxx
   vtkSpyPlotUniReader.cxx
   vtkSquirtCompressor.cxx
+  vtkZlibImageCompressor.cxx
   vtkSurfaceVectors.cxx
   vtkTableFFT.cxx
   vtkTableStreamer.cxx

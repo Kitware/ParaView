@@ -36,12 +36,16 @@
 // vtkPVDesktopDeliveryServer
 //
 
+// Enable timing of image delivery
+// #define vtkPVDesktopDeliveryTIME
+
 #ifndef __vtkPVDesktopDeliveryClient_h
 #define __vtkPVDesktopDeliveryClient_h
 
 #include "vtkPVClientServerRenderManager.h"
 
 class vtkCommand;
+class vtkImageCompressor;
 
 class VTK_EXPORT vtkPVDesktopDeliveryClient : public vtkPVClientServerRenderManager
 {
@@ -86,35 +90,6 @@ public:
     return (  this->RemoteImageProcessingTime
         + this->TransferTime + this->ImageProcessingTime);
   }
-
-  // For ParaView
-  void SetSquirtLevel (int l)
-  { 
-    if (l == 0)
-      {
-      this->SquirtOff();
-      }
-    else
-      {
-      this->SquirtOn(); 
-      this->SetSquirtCompressionLevel(l-1);
-      }
-  }
-
-  // Description:
-  // Enables or disables SQUIRT compression for image delivery.  By
-  // default, compression is off.  Note that this function may be replaced
-  // with a more universal image compression at a later date.
-  vtkGetMacro(Squirt, int);
-  vtkSetMacro(Squirt, int);
-  vtkBooleanMacro(Squirt, int);
-
-  // Description:
-  // Sets the compression level used by SQUIRT.  Higher values result in
-  // better compression but lower resolution in the color space (the size
-  // of the image is unaffected by this option).
-  vtkGetMacro(SquirtCompressionLevel, int);
-  vtkSetClampMacro(SquirtCompressionLevel, int, 0, 5);
 
   // Description:
   // The client may have many render windows and associated desktop delivery
@@ -177,12 +152,11 @@ protected:
   virtual void CollectWindowInformation(vtkMultiProcessStream& stream);
   virtual void CollectRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
 
-  // Squirt options (probably to be replaced later).
-  int Squirt;
-  int SquirtCompressionLevel;
-  vtkUnsignedCharArray *SquirtBuffer;
-
-  void SquirtDecompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
+  //BTX
+  #if defined vtkPVDesktopDeliveryTIME
+  double CreationTime;
+  #endif
+  //ETX
 
   int UseCompositing;
 

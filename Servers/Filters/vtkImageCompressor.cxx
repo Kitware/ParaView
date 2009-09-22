@@ -17,18 +17,30 @@
 
 #include "vtkUnsignedCharArray.h"
 #include "vtkCommand.h"
+#include "vtkMultiProcessStream.h"
+#include <vtkstd/string>
+#include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkImageCompressor, "1.2");
+vtkCxxRevisionMacro(vtkImageCompressor, "1.3");
+
+//-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkImageCompressor, Output, vtkUnsignedCharArray);
+
+//-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkImageCompressor, Input, vtkUnsignedCharArray);
+
 //-----------------------------------------------------------------------------
 vtkImageCompressor::vtkImageCompressor()
+    :
+  Input(0),
+  Output(0),
+  LossLessMode(0),
+  Configuration(0)
 {
-  this->Output = 0;
+  // Always allocate output array as a convinience.
   vtkUnsignedCharArray* data = vtkUnsignedCharArray::New();
   this->SetOutput(data);
   data->Delete();
-  this->Input = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -36,49 +48,69 @@ vtkImageCompressor::~vtkImageCompressor()
 {
   this->SetOutput(0);
   this->SetInput(0);
+  this->SetConfiguration(NULL);
 }
 
 //-----------------------------------------------------------------------------
-int vtkImageCompressor::Compress()
+void vtkImageCompressor::SaveConfiguration(vtkMultiProcessStream *stream)
 {
-  // Make sure we have input.
-  if (!this->Input)
-    {
-    vtkErrorMacro("No input provided!");
-    return 0;
-    }
-  
-  // always compress even if the data hasn;t changed.
-  this->InvokeEvent(vtkCommand::StartEvent,NULL);
-  int ret = this->CompressData();
-  this->InvokeEvent(vtkCommand::EndEvent,NULL);
-  this->Modified();
-  return ret;
+  *stream
+    << this->GetClassName()
+    << this->GetLossLessMode();
 }
 
 //-----------------------------------------------------------------------------
-int vtkImageCompressor::Decompress()
+const char *vtkImageCompressor::SaveConfiguration()
 {
-  // Make sure we have input.
-  if (!this->Input)
+  vtkstd::ostringstream oss;
+  oss 
+    << this->GetClassName()
+    << " "
+    << this->GetLossLessMode();
+
+  this->SetConfiguration(oss.str().c_str());
+
+  return this->Configuration;
+}
+
+
+//-----------------------------------------------------------------------------
+bool vtkImageCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
+{
+  vtkstd::string typeStr;
+  *stream >> typeStr;
+  if (typeStr==this->GetClassName())
     {
-    vtkErrorMacro("No input provided!");
-    return 0;
+    int mode;
+    *stream >> mode;
+    this->SetLossLessMode(mode);
+    return true;
     }
-  
-  // always decompress even if the data hasn;t changed.
-  this->InvokeEvent(vtkCommand::StartEvent,NULL);
-  int ret = this->DecompressData();
-  this->InvokeEvent(vtkCommand::EndEvent,NULL);
-  this->Modified();
-  return ret;
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+const char *vtkImageCompressor::RestoreConfiguration(const char *stream)
+{
+  vtkstd::istringstream iss(stream);
+  vtkstd::string typeStr;
+  iss >> typeStr;
+  if (typeStr==this->GetClassName())
+    {
+    int mode;
+    iss >> mode;
+    this->SetLossLessMode(mode);
+    return stream+iss.tellg();
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
 void vtkImageCompressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Input: " << this->Input << endl;
-  os << indent << "Output: " << this->Output << endl;
+  os << indent << "Input:          " << this->Input << endl
+     << indent << "Output:         " << this->Output << endl
+     << indent << "LossLessMode: " << this->LossLessMode << endl;
 }
 

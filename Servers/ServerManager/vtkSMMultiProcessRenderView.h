@@ -99,6 +99,7 @@ protected:
   double RemoteRenderThreshold;
   bool LastCompositingDecision;
   bool RemoteRenderAvailable;
+
 private:
   vtkSMMultiProcessRenderView(const vtkSMMultiProcessRenderView&); // Not implemented
   void operator=(const vtkSMMultiProcessRenderView&); // Not implemented

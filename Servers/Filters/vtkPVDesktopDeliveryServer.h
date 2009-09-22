@@ -36,6 +36,8 @@
 class vtkPVDesktopDeliveryServerRendererMap;
 class vtkMultiProcessStream;
 class vtkFloatArray;
+class vtkImageCompressor;
+
 class VTK_EXPORT vtkPVDesktopDeliveryServer : public vtkPVClientServerRenderManager
 {
 public:
@@ -81,11 +83,6 @@ public:
   // Description:
   // DO NOT USE.  FOR INTERNAL USE ONLY.
   virtual void UseRendererSet(int id);
-
-  // Description:
-  // Unused. This is here to provide the same API as the desktop delivery
-  // client. This is required by the render module proxy.
-  void SetSquirtLevel (int) {}
 
   // Description:
   // Capture Z buffer from render window on end render. Works only when
@@ -134,16 +131,8 @@ public:
     bool Restore(vtkMultiProcessStream& stream);
   };
 
-  struct SquirtOptions {
-    int Enabled;
-    int CompressLevel;
-    void Save(vtkMultiProcessStream& stream);
-    bool Restore(vtkMultiProcessStream& stream);
-  };
-
   struct ImageParams {
     int RemoteDisplay;
-    int SquirtCompressed;
     int NumberOfComponents;
     int BufferSize;
     int ImageSize[2];
@@ -180,10 +169,6 @@ protected:
 
   virtual bool ProcessWindowInformation(vtkMultiProcessStream&);
   virtual bool ProcessRendererInformation(vtkRenderer *, vtkMultiProcessStream&);
-
-  int Squirt;
-  int SquirtCompressionLevel;
-  void SquirtCompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
 
   int RemoteDisplay;
 

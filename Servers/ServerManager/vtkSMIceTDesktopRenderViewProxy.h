@@ -32,16 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Squirt is a hybrid run length encoding and bit reduction compression
-  // algorithm that is used to compress images for transmition from the
-  // server to client.  Value of 0 disabled all compression.  Level zero is just
-  // run length compression with no bit compression (lossless).
-  // Squirt compression is only used for client-server image delivery during
-  // InteractiveRender.
-  vtkSetClampMacro(SquirtLevel, int, 0, 7);
-  vtkGetMacro(SquirtLevel, int);
-
-  // Description:
   // Overridden to pass the GUISize to the RenderSyncManager.
   virtual void SetGUISize(int x, int y);
 
@@ -110,15 +100,9 @@ protected:
   // than the ParallelRenderManager.
   virtual void SetUseCompositing(bool usecompositing);
 
-  // Description:
-  // Internal method to set the squirt level on the RenderSyncManager.
-  void SetSquirtLevelInternal(int level);
-
   // RenderManager managing client-server rendering.
   vtkSMProxy* RenderSyncManager;
   vtkClientServerID SharedServerRenderSyncManagerID;
-
-  int SquirtLevel;
 
 private:
   vtkSMIceTDesktopRenderViewProxy(const vtkSMIceTDesktopRenderViewProxy&); // Not implemented

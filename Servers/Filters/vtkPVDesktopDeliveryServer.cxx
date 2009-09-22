@@ -28,7 +28,11 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkSmartPointer.h"
+
+#include "vtkImageCompressor.h"
 #include "vtkSquirtCompressor.h"
+#include "vtkZlibImageCompressor.h"
+
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 
@@ -55,7 +59,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.15");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryServer, "1.16");
 vtkStandardNewMacro(vtkPVDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -63,7 +67,6 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
 {
   this->ParallelRenderManager = NULL;
   this->RemoteDisplay = 1;
-  this->SquirtBuffer = vtkUnsignedCharArray::New();
 
   this->RendererMap = new vtkPVDesktopDeliveryServerRendererMap;
 
@@ -84,7 +87,6 @@ vtkPVDesktopDeliveryServer::vtkPVDesktopDeliveryServer()
 vtkPVDesktopDeliveryServer::~vtkPVDesktopDeliveryServer()
 {
   this->SetParallelRenderManager(NULL);
-  this->SquirtBuffer->Delete();
 
   delete this->RendererMap;
 
@@ -291,14 +293,6 @@ bool vtkPVDesktopDeliveryServer::ProcessWindowInformation(
 
   this->UseRendererSet(winGeoInfo.Id);
 
-  vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
-  if (!squirtOptions.Restore(stream))
-    {
-    vtkErrorMacro("Failed to read SquirtOptions.");
-    return false;
-    }
-  this->Squirt = squirtOptions.Enabled;
-  this->SquirtCompressionLevel = squirtOptions.CompressLevel;
   return true;
 }
 
@@ -429,21 +423,29 @@ void vtkPVDesktopDeliveryServer::PostRenderProcessing()
         }
       }
 
-    ip.SquirtCompressed = this->Squirt && (ip.NumberOfComponents == 4);
-
-    if (ip.SquirtCompressed)
+    // ip.SquirtCompressed = this->Squirt && (ip.NumberOfComponents == 4);
+    // if (ip.SquirtCompressed)
+    if (this->CompressionEnabled)
       {
-      this->SquirtCompress(this->SendImageBuffer, this->SquirtBuffer);
-      ip.NumberOfComponents = 4;
-      ip.BufferSize
-        = ip.NumberOfComponents*this->SquirtBuffer->GetNumberOfTuples();
+      this->Compressor->SetLossLessMode(this->LossLessCompression);
+      this->Compressor->SetInput(this->SendImageBuffer);
+      this->Compressor->SetOutput(this->CompressorBuffer);
+      this->Compressor->Compress();
+      this->Compressor->SetInput(0);
+      this->Compressor->SetOutput(0);
+
+      ip.NumberOfComponents=this->SendImageBuffer->GetNumberOfComponents();
+      ip.BufferSize=this->CompressorBuffer->GetNumberOfTuples();
+
       this->Controller->Send(reinterpret_cast<int *>(&ip),
-                             vtkPVDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                             IMAGE_PARAMS_SIZE,
                              this->RootProcessId,
-                             vtkPVDesktopDeliveryServer::IMAGE_PARAMS_TAG);
-      this->Controller->Send(this->SquirtBuffer->GetPointer(0), ip.BufferSize,
+                             IMAGE_PARAMS_TAG);
+
+      this->Controller->Send(this->CompressorBuffer->GetPointer(0),
+                             ip.BufferSize,
                              this->RootProcessId,
-                             vtkPVDesktopDeliveryServer::IMAGE_TAG);
+                             IMAGE_TAG);
       }
     else
       {
@@ -477,7 +479,6 @@ void vtkPVDesktopDeliveryServer::PostRenderProcessing()
     {
     tm.ImageProcessingTime = 0.0;
     }
-
   this->Controller->Send(reinterpret_cast<double *>(&tm),
                          vtkPVDesktopDeliveryServer::TIMING_METRICS_SIZE,
                          this->RootProcessId,
@@ -633,18 +634,6 @@ void vtkPVDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
-                                              vtkUnsignedCharArray *out)
-{
-  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
-  compressor->SetInput(in);
-  compressor->SetSquirtLevel(this->SquirtCompressionLevel);
-  compressor->SetOutput(out);
-  compressor->Compress();
-  compressor->Delete();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -723,22 +712,3 @@ bool vtkPVDesktopDeliveryServer::WindowGeometry::Restore(vtkMultiProcessStream& 
   return true;
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryServer::SquirtOptions::Save(vtkMultiProcessStream& stream)
-{
-  stream << vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG;
-  stream << this->Enabled << this->CompressLevel;
-}
-
-//-----------------------------------------------------------------------------
-bool vtkPVDesktopDeliveryServer::SquirtOptions::Restore(vtkMultiProcessStream& stream)
-{
-  int tag;
-  stream >> tag;
-  if (tag != vtkPVDesktopDeliveryServer::SQUIRT_OPTIONS_TAG)
-    {
-    return false;
-    }
-  stream >> this->Enabled >> this->CompressLevel;
-  return true;
-}

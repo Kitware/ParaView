@@ -26,6 +26,8 @@
 #include "vtkParallelRenderManager.h"
 
 class vtkRemoteConnection;
+class vtkImageCompressor;
+
 class VTK_EXPORT vtkPVClientServerRenderManager : public vtkParallelRenderManager
 {
 public:
@@ -65,13 +67,43 @@ public:
     this->DeActivate();
     }
 
+  // Descritpion:
+  // This flag is set by the renderer during still renderers. When set
+  // compressor must use loss-less compression. When unset compressor
+  // can (if it's enabled) use lossy compression.
+  vtkSetMacro(LossLessCompression,int);
+  vtkGetMacro(LossLessCompression,int);
+
+  // Description:
+  // Enable/disable compressor.
+  vtkSetMacro(CompressionEnabled,int);
+  vtkGetMacro(CompressionEnabled,int);
+
+  // Description:
+  // Set/Get the compressor object, it's setting can be manipulated directly.
+  void SetCompressor(vtkImageCompressor *comp);
+  vtkGetObjectMacro(Compressor,vtkImageCompressor);
+
+  // Description:
+  // Set and configure a compressor from it's own configuration stream. This
+  // is used by ParaView to configure the compressor from application wide
+  // user settings.
+  virtual void ConfigureCompressor(const char *stream);
+  virtual char *GetCompressorConfiguration();
+
 //BTX
 protected:
   vtkPVClientServerRenderManager();
-  ~vtkPVClientServerRenderManager();
+  virtual ~vtkPVClientServerRenderManager();
 
   void Activate();
   void DeActivate();
+
+  // Compressor related
+  int LossLessCompression;                // Set when processing still render.
+  int CompressionEnabled;                 // Set when user enables compression.
+  vtkImageCompressor *Compressor;         // A compressor instance.
+  vtkUnsignedCharArray *CompressorBuffer; // Scratch array for the compressor
 
 private:
   vtkPVClientServerRenderManager(const vtkPVClientServerRenderManager&); // Not implemented

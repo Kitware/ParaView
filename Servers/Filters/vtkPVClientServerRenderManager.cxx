@@ -19,8 +19,14 @@
 #include "vtkWeakPointer.h"
 #include "vtkSocketController.h"
 #include "vtkProcessModule.h"
+#include "vtkImageCompressor.h"
+#include "vtkSquirtCompressor.h"
+#include "vtkZlibImageCompressor.h"
+#include "vtkUnsignedCharArray.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
+
 
 class vtkPVClientServerRenderManager::vtkInternal
 {
@@ -52,11 +58,18 @@ static void RenderRMI(void *arg, void *, int, int)
 }
 
 
-vtkCxxRevisionMacro(vtkPVClientServerRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkPVClientServerRenderManager, "1.2");
 //----------------------------------------------------------------------------
 vtkPVClientServerRenderManager::vtkPVClientServerRenderManager()
 {
   this->Internal = new vtkPVClientServerRenderManager::vtkInternal();
+
+  // Compressor related.
+  this->Compressor=0;
+  this->ConfigureCompressor("vtkSquirtCompressor 0 3");
+  this->LossLessCompression=1;
+  this->CompressionEnabled=1;
+  this->CompressorBuffer = vtkUnsignedCharArray::New();
 }
 
 //----------------------------------------------------------------------------
@@ -64,6 +77,10 @@ vtkPVClientServerRenderManager::~vtkPVClientServerRenderManager()
 {
   delete this->Internal;
   this->Internal = 0;
+
+  // compressor related
+  this->CompressorBuffer->Delete();
+  this->SetCompressor(0);
 }
 
 //----------------------------------------------------------------------------
@@ -112,6 +129,73 @@ void vtkPVClientServerRenderManager::SetController(
   this->Superclass::SetController(controller);
 }
 
+//-----------------------------------------------------------------------------
+vtkCxxSetObjectMacro(vtkPVClientServerRenderManager,Compressor,vtkImageCompressor);
+
+
+//-----------------------------------------------------------------------------
+void vtkPVClientServerRenderManager::ConfigureCompressor(const char *stream)
+{
+  // cerr << this->GetClassName() << "::ConfigureCompressor " << stream << endl;
+
+  // Conmfigure the compressor from a string. The string will
+  // contain the class name of the compressor type to use,
+  // follwed by a stream that the named class will restore itself
+  // from.
+  vtkstd::istringstream iss(stream);
+  vtkstd::string className;
+  iss >> className;
+
+  // Allocate the desired compressor unless we have one in hand.
+  if (!(this->Compressor && this->Compressor->IsA(className.c_str())))
+    {
+    vtkImageCompressor *comp=0;
+    if (className=="vtkSquirtCompressor")
+      {
+      comp=vtkSquirtCompressor::New();
+      }
+    else
+    if (className=="vtkZlibImageCompressor")
+      {
+      comp=vtkZlibImageCompressor::New();
+      }
+    else
+    if (className=="NULL")
+      {
+      this->SetCompressor(0);
+      return;
+      }
+    if (comp==0)
+      {
+      vtkWarningMacro("Could not create the compressor by name " << className << ".");
+      return;
+      }
+    this->SetCompressor(comp);
+    comp->Delete();
+    }
+  // move passed the class name and let the compressor configure itself
+  // from the stream.
+  const char *ok=this->Compressor->RestoreConfiguration(stream);
+  if (!ok)
+    {
+    vtkWarningMacro("Could not configure the compressor, invalid stream. " << stream << ".");
+    return;
+    }
+}
+
+//-----------------------------------------------------------------------------
+char *vtkPVClientServerRenderManager::GetCompressorConfiguration()
+{
+  // cerr
+  //   << this->GetClassName()
+  //   << "::GetCompressorConfiguration "
+  //   << this->Compressor->SaveConfiguration()
+  //   << endl;
+
+  return
+    const_cast<char *>(this->Compressor->SaveConfiguration());
+}
+
 //----------------------------------------------------------------------------
 void vtkPVClientServerRenderManager::Activate()
 {
@@ -134,6 +218,18 @@ void vtkPVClientServerRenderManager::DeActivate()
 void vtkPVClientServerRenderManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Compressor: " << this->Compressor << endl;
+  if (this->Compressor)
+    {
+    this->Compressor->PrintSelf(os,indent.GetNextIndent());
+    }
+  os << indent << "LossLessCompression: " << this->LossLessCompression << endl;
+  os << indent << "CompressionEnabled: " << this->CompressionEnabled << endl;
 }
 
-
+// virtual void SetCompressionEnabled(int i) {
+//     cerr << ":::::::::::::::::::SetCompressionEnabled " << i << endl;
+//     this->CompressionEnabled=i;
+//     this->Modified();
+//     }

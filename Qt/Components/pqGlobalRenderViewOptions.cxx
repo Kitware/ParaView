@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 
 #include "vtkType.h"
+#include <vtksys/ios/sstream>
 
 #include "pqApplicationCore.h"
 #include "pqPipelineRepresentation.h"  
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqViewModuleInterface.h"
+#include "pqImageCompressorType.h"
 
 typedef pqRenderView::ManipulatorType Manip;
 
@@ -60,6 +62,7 @@ public:
   QList<QComboBox*> CameraControl2DComboBoxList;
   QList<QString> CameraControl2DComboItemList;
 
+public:
   void updateLODThresholdLabel(int value)
     {
     this->lodThresholdLabel->setText(
@@ -95,12 +98,22 @@ public:
     this->subsamplingRateLabel->setText(QVariant(value).toString() 
       + " Pixels");
     }
-  void updateSquirtLevelLabel(int val)
+
+  void updateSquirtColorspaceLabel(int val)
     {
-    static int bitValues[] = {24, 24, 22, 19, 16, 13, 10};
+    static int bitValues[] = {24, 22, 19, 16, 13, 10};
     val = (val < 0 )? 0 : val;
-    val = ( val >6)? 6 : val;
-    this->squirtLevelLabel->setText(
+    val = (val > 5) ? 5 : val;
+    this->squirtColorspaceLabel->setText(
+      QVariant(bitValues[val]).toString() + " Bits");
+    }
+
+  void updateZlibColorspaceLabel(int val)
+    {
+    static int bitValues[] = {24, 21, 18, 15, 12, 9};
+    val = (val < 0) ? 0 : val;
+    val = (val > 5) ? 5 : val;
+    this->zlibColorspaceLabel->setText(
       QVariant(bitValues[val]).toString() + " Bits");
     }
 
@@ -197,18 +210,23 @@ void pqGlobalRenderViewOptions::init()
   QObject::connect(this->Internal->subsamplingRate,
     SIGNAL(valueChanged(int)), this, SLOT(subsamplingRateSliderChanged(int)));
 
-  QObject::connect(this->Internal->squirtLevel,
-    SIGNAL(valueChanged(int)), this, SLOT(squirtLevelRateSliderChanged(int)));
-  
+  QObject::connect(this->Internal->squirtColorspaceSlider,
+    SIGNAL(valueChanged(int)), this, SLOT(squirtColorspaceSliderChanged(int)));
+
+  QObject::connect(this->Internal->zlibColorspaceSlider,
+    SIGNAL(valueChanged(int)), this, SLOT(zlibColorspaceSliderChanged(int)));
+
+  QObject::connect(this->Internal->CompressorBWOpt,
+    SIGNAL(currentIndexChanged(int)),this,SLOT(applyCompressorDefaults()));
+
   QObject::connect(this->Internal->stillRenderSubsampleRate, 
     SIGNAL(valueChanged(int)), 
     this, SLOT(stillRenderSubsampleRateSliderChanged(int)));
-  
+
   QObject::connect(this->Internal->clientCollect,
     SIGNAL(valueChanged(int)),
     this, SLOT(clientCollectSliderChanged(int)));
-  
-  
+
   // enable the apply button when things are changed
   QObject::connect(this->Internal->enableLOD,
                   SIGNAL(toggled(bool)),
@@ -250,7 +268,24 @@ void pqGlobalRenderViewOptions::init()
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
-  QObject::connect(this->Internal->enableSquirt,
+  // Compressor
+  QObject::connect(this->Internal->squirtEnable,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->zlibEnable,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->zlibCompressionLevel,
+                  SIGNAL(valueChanged(int)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->zlibStripAlpha,
+                  SIGNAL(toggled(bool)),
+                  this, SIGNAL(changesAvailable()));
+
+  QObject::connect(this->Internal->CompressorGroup,
                   SIGNAL(toggled(bool)),
                   this, SIGNAL(changesAvailable()));
 
@@ -396,16 +431,40 @@ void pqGlobalRenderViewOptions::applyChanges()
     settings->setValue("ImageReductionFactor", 1);
     }
 
-  if (this->Internal->enableSquirt->isChecked())
+  // Compressor Settings
+  settings->setValue("CompressionEnabled",(int)this->Internal->CompressorGroup->isChecked());
+  if (this->Internal->squirtEnable->isChecked())
     {
-    settings->setValue("SquirtLevel", this->Internal->squirtLevel->value());
+    settings->setValue("CompressorType",COMPRESSOR_SQUIRT);
+    // build a configuration string that can be passed directly to
+    // the compressor.
+    vtkstd::ostringstream os;
+    os << "vtkSquirtCompressor 0 "
+       << this->Internal->squirtColorspaceSlider->value();
+    settings->setValue("CompressorConfig",os.str().c_str());
     }
   else
+  if (this->Internal->zlibEnable->isChecked())
     {
-    settings->setValue("SquirtLevel", 0);
+    settings->setValue("CompressorType",COMPRESSOR_ZLIB);
+    // build a configuration string that can be passed directly to
+    // the compressor.
+    vtkstd::ostringstream os;
+    os << "vtkZlibImageCompressor 0 "
+       << this->Internal->zlibCompressionLevel->value()
+       << " "
+       << this->Internal->zlibColorspaceSlider->value()
+       << " "
+       << (int)this->Internal->zlibStripAlpha->isChecked();
+    settings->setValue("CompressorConfig",os.str().c_str());
     }
+  // save the UI settings, some of these are not be passed to
+  // the underlying objects each time but we want to preserve.
+  settings->setValue("SquirtColorSpace",this->Internal->squirtColorspaceSlider->value());
+  settings->setValue("ZlibCompressionLevel",this->Internal->zlibCompressionLevel->value());
+  settings->setValue("ZlibColorSpace",this->Internal->zlibColorspaceSlider->value());
+  settings->setValue("ZlibStripAlpha",this->Internal->zlibStripAlpha->isChecked());
 
-  
   if (this->Internal->enableStillRenderSubsampleRate->checkState() == Qt::Checked)
     {
     settings->setValue("StillRenderImageReductionFactor",
@@ -540,7 +599,6 @@ void pqGlobalRenderViewOptions::resetChanges()
   this->Internal->renderingInterrupts->setChecked(val.toBool());
 
 
-  //SquirtLevel"), 3);
   val = settings->value("RemoteRenderThreshold", 3);
   if(val.toDouble() >= VTK_LARGE_FLOAT)
     {
@@ -586,21 +644,34 @@ void pqGlobalRenderViewOptions::resetChanges()
     this->Internal->updateSubsamplingRateLabel(this->Internal->subsamplingRate->value());
     }
 
-  val = settings->value("SquirtLevel", 3);
-  if (val.toInt() == 0)
+  // Compressor
+  val = settings->value("CompressorType",COMPRESSOR_SQUIRT);
+  switch (val.toInt())
     {
-    this->Internal->enableSquirt->setCheckState(Qt::Unchecked);
-    this->Internal->updateSquirtLevelLabel(this->Internal->squirtLevel->value());
+    case COMPRESSOR_ZLIB:
+      this->Internal->squirtEnable->setChecked(false);
+      this->Internal->zlibEnable->setChecked(true);
+      break;
+    case COMPRESSOR_SQUIRT:
+    default:
+      this->Internal->squirtEnable->setChecked(true);
+      this->Internal->zlibEnable->setChecked(false);
+      break;
     }
-  else
-    {
-    this->Internal->enableSquirt->setCheckState(Qt::Checked);
-    this->Internal->squirtLevel->setValue(val.toInt());
-    this->Internal->updateSquirtLevelLabel(this->Internal->squirtLevel->value());
-    }
+  val = settings->value("SquirtColorSpace",3);
+  this->Internal->squirtColorspaceSlider->setValue(val.toInt());
+  this->Internal->updateSquirtColorspaceLabel(val.toInt());
+  val = settings->value("ZlibCompressionLevel",1);
+  this->Internal->zlibCompressionLevel->setValue(val.toInt());
+  val = settings->value("ZlibColorSpace",0);
+  this->Internal->zlibColorspaceSlider->setValue(val.toInt());
+  this->Internal->updateZlibColorspaceLabel(val.toInt());
+  val = settings->value("ZlibStripAlpha",0);
+  this->Internal->zlibStripAlpha->setChecked(val.toInt());
+  val = settings->value("CompressionEnabled",1);
+  this->Internal->CompressorGroup->setChecked(val.toInt());
 
   val = settings->value("StillRenderImageReductionFactor", 1);
-  
   if (val.toInt() == 1)
     {
     this->Internal->enableStillRenderSubsampleRate->setCheckState(Qt::Unchecked);
@@ -760,9 +831,104 @@ void pqGlobalRenderViewOptions::subsamplingRateSliderChanged(int value)
 }
 
 //-----------------------------------------------------------------------------
-void pqGlobalRenderViewOptions::squirtLevelRateSliderChanged(int value)
+void pqGlobalRenderViewOptions::squirtColorspaceSliderChanged(int value)
 {
-  this->Internal->updateSquirtLevelLabel(value);
+  this->Internal->updateSquirtColorspaceLabel(value);
+  emit this->changesAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqGlobalRenderViewOptions::zlibColorspaceSliderChanged(int value)
+{
+  this->Internal->updateZlibColorspaceLabel(value);
+  emit this->changesAvailable();
+}
+
+//-----------------------------------------------------------------------------
+void pqGlobalRenderViewOptions::applyCompressorDefaults()
+{
+  enum {
+    CONSUMER_DSL=1,
+    ETHERNET_1_MEG,
+    ETHERNET_1_GIG,
+    ETHERNET_10_GIG,
+    SHARED_MEMORY
+    };
+
+  int bwOpt=this->Internal->CompressorBWOpt->currentIndex();
+  if (bwOpt==0) return;
+  switch (bwOpt)
+    {
+    case CONSUMER_DSL:
+      this->Internal->zlibEnable->setChecked(true);
+      this->Internal->squirtEnable->setChecked(false);
+      this->Internal->squirtColorspaceSlider->setValue(5);
+      this->Internal->updateSquirtColorspaceLabel(5);
+      this->Internal->zlibCompressionLevel->setValue(9);
+      this->Internal->zlibColorspaceSlider->setValue(3);
+      this->Internal->updateZlibColorspaceLabel(3);
+      this->Internal->zlibStripAlpha->setChecked(true);
+      this->Internal->subsamplingRate->setValue(3);
+      this->Internal->enableSubsampling->setChecked(true);
+      this->Internal->CompressorGroup->setChecked(true);
+      break;
+
+    case ETHERNET_1_MEG:
+      this->Internal->zlibEnable->setChecked(true);
+      this->Internal->squirtEnable->setChecked(false);
+      this->Internal->squirtColorspaceSlider->setValue(3);
+      this->Internal->updateSquirtColorspaceLabel(3);
+      this->Internal->zlibCompressionLevel->setValue(6);
+      this->Internal->zlibColorspaceSlider->setValue(2);
+      this->Internal->updateZlibColorspaceLabel(2);
+      this->Internal->zlibStripAlpha->setChecked(false);
+      this->Internal->subsamplingRate->setValue(2);
+      this->Internal->enableSubsampling->setChecked(true);
+      this->Internal->CompressorGroup->setChecked(true);
+      break;
+
+    case ETHERNET_1_GIG:
+      this->Internal->zlibEnable->setChecked(true);
+      this->Internal->squirtEnable->setChecked(false);
+      this->Internal->squirtColorspaceSlider->setValue(3);
+      this->Internal->updateSquirtColorspaceLabel(3);
+      this->Internal->zlibCompressionLevel->setValue(1);
+      this->Internal->zlibColorspaceSlider->setValue(0);
+      this->Internal->updateZlibColorspaceLabel(0);
+      this->Internal->zlibStripAlpha->setChecked(false);
+      this->Internal->subsamplingRate->setValue(2);
+      this->Internal->enableSubsampling->setChecked(true);
+      this->Internal->CompressorGroup->setChecked(true);
+      break;
+
+    case ETHERNET_10_GIG:
+      this->Internal->zlibEnable->setChecked(false);
+      this->Internal->squirtEnable->setChecked(true);
+      this->Internal->squirtColorspaceSlider->setValue(3);
+      this->Internal->updateSquirtColorspaceLabel(3);
+      this->Internal->zlibCompressionLevel->setValue(1);
+      this->Internal->zlibColorspaceSlider->setValue(0);
+      this->Internal->updateZlibColorspaceLabel(0);
+      this->Internal->zlibStripAlpha->setChecked(false);
+      this->Internal->subsamplingRate->setValue(2);
+      this->Internal->enableSubsampling->setChecked(false);
+      this->Internal->CompressorGroup->setChecked(true);
+      break;
+
+    case SHARED_MEMORY:
+      this->Internal->zlibEnable->setChecked(false);
+      this->Internal->squirtEnable->setChecked(true);
+      this->Internal->squirtColorspaceSlider->setValue(3);
+      this->Internal->updateSquirtColorspaceLabel(3);
+      this->Internal->zlibCompressionLevel->setValue(1);
+      this->Internal->zlibColorspaceSlider->setValue(0);
+      this->Internal->updateZlibColorspaceLabel(0);
+      this->Internal->zlibStripAlpha->setChecked(false);
+      this->Internal->subsamplingRate->setValue(2);
+      this->Internal->enableSubsampling->setChecked(false);
+      this->Internal->CompressorGroup->setChecked(false);
+      break;
+    }
   emit this->changesAvailable();
 }
 

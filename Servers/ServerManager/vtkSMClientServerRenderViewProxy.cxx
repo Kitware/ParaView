@@ -22,13 +22,12 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMClientServerRenderViewProxy);
-vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMClientServerRenderViewProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderViewProxy::vtkSMClientServerRenderViewProxy()
 {
   this->RenderSyncManager = 0;
-  this->SquirtLevel = 0;
   this->RenderersID = 0;
 }
 
@@ -164,8 +163,16 @@ void vtkSMClientServerRenderViewProxy::BeginStillRender()
 {
   this->Superclass::BeginStillRender();
 
-  // Make squirt compression loss-less, if enabled.
-  this->SetSquirtLevelInternal(this->SquirtLevel ? 1 : 0);
+  // Signal the desktop delivery client that it must now
+  // employ loss-less compression if compression is enabled.
+  vtkSMProperty *prop
+    = this->RenderSyncManager->GetProperty("LossLessCompression");
+  vtkSMIntVectorProperty* ivp=dynamic_cast<vtkSMIntVectorProperty*>(prop);
+  if (ivp)
+    {
+    ivp->SetElement(0,1);
+    this->RenderSyncManager->UpdateProperty("LossLessCompression");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -173,19 +180,16 @@ void vtkSMClientServerRenderViewProxy::BeginInteractiveRender()
 {
   this->Superclass::BeginInteractiveRender();
 
-  // Use user-specified squirt compression.
-  this->SetSquirtLevelInternal(this->SquirtLevel);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMClientServerRenderViewProxy::SetSquirtLevelInternal(int level)
-{
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->RenderSyncManager->GetProperty("SquirtLevel"));
+  // Signal the desktop delivery client that it may
+  // now use lossy-compression if it's enabled and
+  // the compressor can provide it.
+  vtkSMProperty *prop
+    = this->RenderSyncManager->GetProperty("LossLessCompression");
+  vtkSMIntVectorProperty* ivp=dynamic_cast<vtkSMIntVectorProperty*>(prop);
   if (ivp)
     {
-    ivp->SetElement(0, level);
-    this->RenderSyncManager->UpdateProperty("SquirtLevel");
+    ivp->SetElement(0,0);
+    this->RenderSyncManager->UpdateProperty("LossLessCompression");
     }
 }
 
@@ -290,7 +294,6 @@ double vtkSMClientServerRenderViewProxy::GetZBufferValue(int x, int y)
 void vtkSMClientServerRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 }
 
 

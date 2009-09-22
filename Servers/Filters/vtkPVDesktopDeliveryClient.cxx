@@ -26,9 +26,20 @@
 #include "vtkObjectFactory.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
+
+#include "vtkImageCompressor.h"
 #include "vtkSquirtCompressor.h"
+#include "vtkZlibImageCompressor.h"
+
 #include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
+
+#if defined vtkPVDesktopDeliveryTIME
+  #include <vtksys/ios/iostream>
+  #include <vtksys/ios/sstream>
+  #include <sys/time.h>
+  using namespace std;
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -44,15 +55,19 @@ static void vtkPVDesktopDeliveryClientReceiveImageCallback(vtkObject *,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.11");
+vtkCxxRevisionMacro(vtkPVDesktopDeliveryClient, "1.12");
 vtkStandardNewMacro(vtkPVDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
 vtkPVDesktopDeliveryClient::vtkPVDesktopDeliveryClient()
 {
-  this->Squirt = 0;
-  this->SquirtCompressionLevel = 5;
-  this->SquirtBuffer = vtkUnsignedCharArray::New();
+  #if defined vtkPVDesktopDeliveryTIME
+  // Mark creation time to reduce digits when reporting time stamps.
+  timeval wtime;
+  gettimeofday(&wtime,0);
+  this->CreationTime=wtime.tv_sec+wtime.tv_usec/1.0E6;
+  #endif
+
   this->UseCompositing = 0;
   this->RemoteDisplay = 1;
   this->ReceivedImageFromServer = 1;
@@ -81,7 +96,6 @@ vtkPVDesktopDeliveryClient::vtkPVDesktopDeliveryClient()
 //----------------------------------------------------------------------------
 vtkPVDesktopDeliveryClient::~vtkPVDesktopDeliveryClient()
 {
-  this->SquirtBuffer->Delete();
   this->ReceiveImageCallback->Delete();
 }
 
@@ -125,6 +139,8 @@ float vtkPVDesktopDeliveryClient::GetZBufferValue(int x, int y)
   z = 1.0;
   return z;
 }
+
+
 
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
@@ -187,12 +203,8 @@ void vtkPVDesktopDeliveryClient::CollectWindowInformation(vtkMultiProcessStream&
   winGeoInfo.Id = this->Id;
   winGeoInfo.AnnotationLayer = this->AnnotationLayer;
   winGeoInfo.Save(stream);
-
-  vtkPVDesktopDeliveryServer::SquirtOptions squirtOptions;
-  squirtOptions.Enabled = this->Squirt;
-  squirtOptions.CompressLevel = this->SquirtCompressionLevel;
-  squirtOptions.Save(stream);
 }
+
 
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryClient::CollectRendererInformation(vtkRenderer *renderer,
@@ -284,6 +296,13 @@ void vtkPVDesktopDeliveryClient::PostRenderProcessing()
 //-----------------------------------------------------------------------------
 void vtkPVDesktopDeliveryClient::ReceiveImageFromServer()
 {
+  #if defined vtkPVDesktopDeliveryTIME
+  // Generate a report that can be used for benchmarking
+  // compressor.
+  vtkstd::ostringstream os;
+  const int colw=25;
+  #endif
+
   if (this->ReceivedImageFromServer) return;
 
   this->ReceivedImageFromServer = 1;
@@ -319,15 +338,45 @@ void vtkPVDesktopDeliveryClient::ReceiveImageFromServer()
     this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
                                           * this->ReducedImageSize[1]);
 
-    if (ip.SquirtCompressed)
+    if (this->CompressionEnabled)
       {
-      this->SquirtBuffer->SetNumberOfComponents(ip.NumberOfComponents);
-      this->SquirtBuffer->SetNumberOfTuples(  ip.BufferSize
-                                            / ip.NumberOfComponents);
-      this->Controller->Receive(this->SquirtBuffer->GetPointer(0),
-                                ip.BufferSize, this->ServerProcessId,
-                                vtkPVDesktopDeliveryServer::IMAGE_TAG);
-      this->SquirtDecompress(this->SquirtBuffer, this->ReducedImage);
+      // Allocate buffer.
+      this->CompressorBuffer->SetNumberOfComponents(1);
+      this->CompressorBuffer->SetNumberOfTuples(ip.BufferSize);
+
+      // Pull compressed image.
+      this->Controller->Receive(
+          this->CompressorBuffer->GetPointer(0),
+          ip.BufferSize,
+          this->ServerProcessId,
+          vtkPVDesktopDeliveryServer::IMAGE_TAG);
+
+      // Decompress the image.
+      this->Compressor->SetLossLessMode(this->LossLessCompression);
+      this->Compressor->SetInput(this->CompressorBuffer);
+      this->Compressor->SetOutput(this->ReducedImage);
+      this->Compressor->Decompress();
+      this->Compressor->SetInput(0);
+      this->Compressor->SetOutput(0);
+
+      #if defined vtkPVDesktopDeliveryTIME
+      // Add compression ratio to the report.
+      size_t compImSize=this->CompressorBuffer->GetNumberOfTuples();
+      size_t redImSize
+      =this->ReducedImage->GetNumberOfTuples()*this->ReducedImage->GetNumberOfComponents();
+      size_t fullImSize
+      =this->FullImage->GetNumberOfTuples()*this->FullImage->GetNumberOfComponents();
+      double cRat=(double)redImSize/(double)compImSize;
+      double effCRat=(double)fullImSize/(double)compImSize;
+      char comprId=this->Compressor->GetClassName()[3];
+      os << setw(3) << comprId
+         << setw(3) << this->LossLessCompression
+         << setw(colw) << fullImSize
+         << setw(colw) << redImSize
+         << setw(colw) << compImSize
+         << setw(colw) << cRat
+         << setw(colw) << effCRat;
+      #endif
       }
     else
       {
@@ -350,6 +399,15 @@ void vtkPVDesktopDeliveryClient::ReceiveImageFromServer()
     this->RenderWindowImageUpToDate = 1;
     }
 
+  #if defined vtkPVDesktopDeliveryTIME
+  // Add a time stamp to the report and send the report to terminal.
+  timeval wtime;
+  gettimeofday(&wtime,0);
+  double timestamp=wtime.tv_sec+wtime.tv_usec/1.0E6-this->CreationTime;
+  os << setw(colw) << scientific << setprecision(15) << timestamp;
+  cerr << os.str() << endl;
+  #endif
+
   vtkPVDesktopDeliveryServer::TimingMetrics tm;
   this->Controller->Receive(reinterpret_cast<double *>(&tm),
                             vtkPVDesktopDeliveryServer::TIMING_METRICS_SIZE,
@@ -366,28 +424,7 @@ void vtkPVDesktopDeliveryClient::ReceiveImageFromServer()
 void vtkPVDesktopDeliveryClient::SetImageReductionFactorForUpdateRate(double desiredUpdateRate)
 {
   this->Superclass::SetImageReductionFactorForUpdateRate(desiredUpdateRate);
-  if (this->Squirt)
-    {
-    if (this->ImageReductionFactor == 1)
-      {
-      this->SetSquirtCompressionLevel(0);
-      }
-    else
-      {
-      this->SetSquirtCompressionLevel(5);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDesktopDeliveryClient::SquirtDecompress(vtkUnsignedCharArray *in,
-                                                vtkUnsignedCharArray *out)
-{
-  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
-  compressor->SetInput(in);
-  compressor->SetOutput(out);
-  compressor->Decompress();
-  compressor->Delete();
+  vtkErrorMacro("This method is defunct and should not be called.");
 }
 
 //----------------------------------------------------------------------------
@@ -399,13 +436,9 @@ void vtkPVDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "RemoteDisplay: "
      << (this->RemoteDisplay ? "On" : "Off") << endl;
-  os << indent << "Squirt: "
-     << (this->Squirt? "On" : "Off") << endl;
-
   os << indent << "RemoteImageProcessingTime: "
      << this->RemoteImageProcessingTime << endl;
   os << indent << "TransferTime: " << this->TransferTime << endl;
-  os << indent << "SquirtCompressionLevel: " << this->SquirtCompressionLevel << endl;
   os << indent << "Id: " << this->Id << endl;
   os << indent << "AnnotationLayer: " << this->AnnotationLayer << endl;
   os << indent << "WindowPosition: "

@@ -19,26 +19,34 @@
 #include "vtkSquirtCompressor.h"
 #include "vtkObjectFactory.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkImageData.h"
+#include "vtkMultiProcessStream.h"
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSquirtCompressor);
-vtkCxxRevisionMacro(vtkSquirtCompressor, "1.6");
+vtkCxxRevisionMacro(vtkSquirtCompressor, "1.7");
+
+
 //-----------------------------------------------------------------------------
 vtkSquirtCompressor::vtkSquirtCompressor()
-{
-  this->SquirtLevel = 0; // no compression by default.
-}
+    :
+  SquirtLevel(3)
+{}
 
 //-----------------------------------------------------------------------------
 vtkSquirtCompressor::~vtkSquirtCompressor()
-{
-}
+{}
 
 //-----------------------------------------------------------------------------
-int vtkSquirtCompressor::CompressData()
+int vtkSquirtCompressor::Compress()
 {
+  if (!(this->Input && this->Output))
+    {
+    vtkWarningMacro("Cannot compress empty input or output detected.");
+    return VTK_ERROR;
+    }
+
   vtkUnsignedCharArray* input =  this->GetInput();
-  
+
   if (input->GetNumberOfComponents() != 4 && input->GetNumberOfComponents() != 3)
     {
     vtkErrorMacro("Squirt only works with RGBA or RGB");
@@ -49,7 +57,7 @@ int vtkSquirtCompressor::CompressData()
   int index=0;
   int comp_index=0;
   int end_index;
-  int compress_level = this->SquirtLevel;
+  int compress_level = this->LossLessMode?0:this->SquirtLevel;
   unsigned int current_color;
   unsigned char compress_masks[6][4] = {  {0xFF, 0xFF, 0xFF, 0xFF},
       {0xFE, 0xFF, 0xFE, 0xFF},
@@ -57,7 +65,7 @@ int vtkSquirtCompressor::CompressData()
       {0xF8, 0xFC, 0xF8, 0xFF},
       {0xF0, 0xF8, 0xF0, 0xFF},
       {0xE0, 0xF0, 0xE0, 0xFF}};
-  
+
   if (compress_level < 0 || compress_level > 5)
     {
     vtkErrorMacro("Squirt compression level (" << compress_level 
@@ -157,14 +165,21 @@ int vtkSquirtCompressor::CompressData()
     }
 
   // Back to vtk arrays :)
-  this->Output->SetNumberOfComponents(4);
-  this->Output->SetNumberOfTuples(comp_index);
+  this->Output->SetNumberOfComponents(1);
+  this->Output->SetNumberOfTuples(4*comp_index);
+
   return VTK_OK;
 }
 
 //-----------------------------------------------------------------------------
-int vtkSquirtCompressor::DecompressData()
+int vtkSquirtCompressor::Decompress()
 {
+  if (!(this->Input && this->Output))
+    {
+    vtkWarningMacro("Cannot decompress empty input or output detected.");
+    return VTK_ERROR;
+    }
+
   vtkUnsignedCharArray* in = this->GetInput();
   vtkUnsignedCharArray* out = this->GetOutput();
   int count=0;
@@ -174,7 +189,7 @@ int vtkSquirtCompressor::DecompressData()
   unsigned int* _rawCompressedBuffer;
 
   // Get compressed buffer size
-  int CompSize = in->GetNumberOfTuples();
+  int CompSize = in->GetNumberOfTuples()/4; /// NOTE 1->4
 
   // Access raw arrays directly
   _rawColorBuffer = (unsigned int*)out->GetPointer(0);
@@ -200,6 +215,53 @@ int vtkSquirtCompressor::DecompressData()
       _rawColorBuffer[index++] = current_color;
     }
   return VTK_OK;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSquirtCompressor::SaveConfiguration(vtkMultiProcessStream *stream)
+{
+  vtkImageCompressor::SaveConfiguration(stream);
+  *stream
+    << this->SquirtLevel;
+}
+
+//-----------------------------------------------------------------------------
+bool vtkSquirtCompressor::RestoreConfiguration(vtkMultiProcessStream *stream)
+{
+  if (vtkImageCompressor::RestoreConfiguration(stream))
+    {
+    *stream
+      >> this->SquirtLevel;
+    return true;
+    }
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+const char *vtkSquirtCompressor::SaveConfiguration()
+{
+  vtkstd::ostringstream oss;
+  oss
+    << vtkImageCompressor::SaveConfiguration()
+    << " "
+    << this->SquirtLevel;
+
+  this->SetConfiguration(oss.str().c_str());
+
+  return this->Configuration;
+}
+
+//-----------------------------------------------------------------------------
+const char *vtkSquirtCompressor::RestoreConfiguration(const char *stream)
+{
+  stream=vtkImageCompressor::RestoreConfiguration(stream);
+  if (stream)
+    {
+    vtkstd::istringstream iss(stream);
+    iss >> this->SquirtLevel;
+    return stream+iss.tellg();
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

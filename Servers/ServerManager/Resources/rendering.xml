@@ -3294,7 +3294,10 @@
     </Proxy>
   </ProxyGroup>
 
+  
+  
   <ProxyGroup name="composite_managers">
+    <!-- =================================================================== -->
     <Proxy name="DesktopDeliveryClient" class="vtkPVDesktopDeliveryClient">
       <ProxyProperty name="RenderWindow"
                      command="SetRenderWindow">
@@ -3320,12 +3323,7 @@
                          default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-      <IntVectorProperty name="SquirtLevel"
-                         command="SetSquirtLevel"
-                         number_of_elements="1"
-                         default_values="0">
-        <IntRangeDomain name="range" min="0" max="7" />
-      </IntVectorProperty>
+
       <IntVectorProperty name="SyncRenderWindowRenderers"
                          command="SetSyncRenderWindowRenderers"
                          number_of_elements="1"
@@ -3361,15 +3359,37 @@
         </Documentation>
       </IntVectorProperty>
 
+      <IntVectorProperty
+        name="CompressionEnabled"
+        command="SetCompressionEnabled"
+        number_of_elements="1"
+        default_values="1">
+      <IntRangeDomain name="range" min="0" max="1"/>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="CompressorConfig"
+        command="ConfigureCompressor"
+        number_of_elements="1"
+        default_values="vtkSquirtCompressor 0 3"/>
+
+      <IntVectorProperty
+        name="LossLessCompression"
+        command="SetLossLessCompression"
+        number_of_elements="1"
+        default_values="0">
+      <IntRangeDomain name="range" min="0" max="1"/>
+      </IntVectorProperty>
       <!-- End of DesktopDeliveryClient -->
     </Proxy>
 
+    <!-- =================================================================== -->
     <Proxy name="DesktopDeliveryServer" class="vtkPVDesktopDeliveryServer"
            base_proxygroup="composite_managers" 
            base_proxyname="DesktopDeliveryClient">
-      <!-- End of DesktopDeliveryServer -->
     </Proxy>
     
+    <!-- =================================================================== -->
     <Proxy name="IceTRenderManager" class="vtkIceTRenderManager">
       <ProxyProperty name="RenderWindow"
                      command="SetRenderWindow">
@@ -4903,19 +4923,6 @@
       </IntVectorProperty>
 
       <IntVectorProperty
-        name="SquirtLevel"
-        command="SetSquirtLevel"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <IntRangeDomain name="range" min="0" max="7" />
-        <Documentation>
-          Set the level for squirt compression to use when delivering rendered
-          image to the client during interactive rendering.
-        </Documentation>
-      </IntVectorProperty>
-
-      <IntVectorProperty
         name="DisableOrderedCompositing"
         command="SetDisableOrderedCompositing"
         number_of_elements="1"
@@ -4948,11 +4955,16 @@
           <Property name="StereoType" />
         </ExposedProperties>
       </SubProxy>
-
       <SubProxy>
-        <Proxy name="RenderSyncManager" proxygroup="composite_managers"
+        <Proxy 
+          name="RenderSyncManager" 
+          proxygroup="composite_managers"
           proxyname="DesktopDeliveryClient">
         </Proxy>
+        <ExposedProperties>
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
+        </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
@@ -5083,19 +5095,6 @@
            server.
         </Documentation>
       </DoubleVectorProperty>
-     
-      <IntVectorProperty
-        name="SquirtLevel"
-        command="SetSquirtLevel"
-        number_of_elements="1"
-        default_values="0"
-        update_self="1">
-        <IntRangeDomain name="range" min="0" max="7" />
-        <Documentation>
-          Set the level for squirt compression to use when delivering rendered
-          image to the client during interactive rendering.
-        </Documentation>
-      </IntVectorProperty>
 
       <SubProxy>
         <Proxy name="Renderer" proxyname="Renderer" proxygroup="renderers">
@@ -5118,10 +5117,16 @@
         </ExposedProperties>
       </SubProxy>
 
-      <SubProxy>
-        <Proxy name="RenderSyncManager" proxygroup="composite_managers"
+     <SubProxy>
+        <Proxy 
+          name="RenderSyncManager" 
+          proxygroup="composite_managers"
           proxyname="DesktopDeliveryClient">
         </Proxy>
+        <ExposedProperties>
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
+        </ExposedProperties>
       </SubProxy>
 
       <!-- End of ClientServerRenderView-->
@@ -5378,9 +5383,11 @@
           <Property name="StereoType" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -5457,9 +5464,11 @@
           <Property name="StillRenderImageReductionFactor" />
           <Property name="TileDisplayCompositeThreshold" />
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RootView" subproxy -->
       </SubProxy>
@@ -5860,9 +5869,11 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RenderView" subproxy -->
       </SubProxy>
@@ -5935,9 +5946,11 @@
           <Property name="StillRenderImageReductionFactor" />
           <Property name="TileDisplayCompositeThreshold" />
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RenderView" subproxy -->
       </SubProxy>
@@ -6220,9 +6233,11 @@
           <Property name="Background" />
           <!-- RenderWindow -->
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RenderView" subproxy -->
       </SubProxy>
@@ -6295,9 +6310,11 @@
           <Property name="StillRenderImageReductionFactor" />
           <Property name="TileDisplayCompositeThreshold" />
           <Property name="ImageReductionFactor" />
-          <Property name="SquirtLevel" />
           <Property name="DisableOrderedCompositing" />
           <Property name="RemoteRenderThreshold" />
+          <!-- Image Delivery Compressor -->
+          <Property name="CompressionEnabled" />
+          <Property name="CompressorConfig" />
         </ExposedProperties>
         <!-- End of "RenderView" subproxy -->
       </SubProxy>

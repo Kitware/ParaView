@@ -19,10 +19,11 @@
 #include "vtkProcessModule.h"
 #include "vtkPVServerInformation.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
-vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.4");
+vtkCxxRevisionMacro(vtkSMClientServerRenderSyncManagerHelper, "1.5");
 //----------------------------------------------------------------------------
 vtkSMClientServerRenderSyncManagerHelper::vtkSMClientServerRenderSyncManagerHelper()
 {
@@ -176,6 +177,19 @@ void vtkSMClientServerRenderSyncManagerHelper::InitializeRenderSyncManager(
     rsmProxy->GetProperty("RenderWindow"));
   pp->RemoveAllProxies();
   pp->AddProxy(renderWindowProxy);
+
+  // Force compressor setting from client to server. This is needed when loading
+  // from state.
+  vtkSMStringVectorProperty* svp =
+      dynamic_cast<vtkSMStringVectorProperty*>(rsmProxy->GetProperty("CompressorConfig"));
+  vtkstd::string sv(svp->GetElement(0));
+  svp->SetElement(0,"NULL");
+  svp->SetElement(0,sv.c_str());
+
+  ivp=dynamic_cast<vtkSMIntVectorProperty*>(rsmProxy->GetProperty("CompressionEnabled"));
+  int iv=ivp->GetElement(0);
+  ivp->SetElement(0,-1);
+  ivp->SetElement(0,iv);
 
   // Update the server process so that the render window is set before
   // we initialize offscreen rendering.

@@ -3351,13 +3351,6 @@
       <Element index="0" value="1"/>
       <Domain name="bool" id="4.RenderInterruptsEnabled.bool"/>
     </Property>
-    <Property name="SquirtLevel" id="4.SquirtLevel" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="4.SquirtLevel.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="7"/>
-      </Domain>
-    </Property>
     <Property name="UseCompositeCompression" id="4.UseCompositeCompression" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="4.UseCompositeCompression.bool"/>
