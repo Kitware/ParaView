@@ -8522,6 +8522,777 @@ This property controls how the filter works to generate tensor cell data. You ca
       </Hints>
       <!-- End of PlotAttributes -->
     </SourceProxy>
+
+   <!-- ==================================================================== -->
+   <SourceProxy
+       name="ContingencyStatistics"
+       class="vtkPSciVizContingencyStats"
+       label="Contingency Statistics">
+     <Documentation
+       short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model."
+       long_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model." >
+       This filter either computes a statistical model of a dataset or takes such a model as its second input.  Then, the model (however it is obtained) may optionally be used to assess the input dataset.
+       This filter computes contingency tables between pairs of attributes.  This result is a tabular bivariate probability distribution which serves as a Bayesian-style prior model.  Data is assessed by computing &lt;ul&gt;
+       &lt;li&gt; the probability of observing both variables simultaneously;
+       &lt;li&gt; the probability of each variable conditioned on the other (the two values need not be identical); and
+       &lt;li&gt; the pointwise mutual information (PMI). &lt;/ul&gt;
+       Finally, the summary statistics include the information entropy of the observations.
+     </Documentation>
+
+     <InputProperty name="Input" command="SetInputConnection" port_index="0">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+         <DataType value="vtkStructuredGrid"/>
+         <DataType value="vtkPolyData"/>
+         <DataType value="vtkUnstructuredGrid"/>
+         <DataType value="vtkTable"/>
+         <DataType value="vtkGraph"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array"/>
+       <Documentation>
+         The input to the filter.  Arrays from this dataset will be used for computing statistics and/or assessed by a statistical model.
+       </Documentation>
+     </InputProperty>
+
+     <InputProperty
+         name="ModelInput"
+         command="SetInputConnection"
+         port_index="1"
+         null_on_empty="1">
+       <Hints>
+         <Optional/> <!-- No input selection dialog at instantiation -->
+       </Hints>
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkTable"/>
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         A previously-calculated model with which to assess a separate dataset. This input is optional.
+       </Documentation>
+     </InputProperty>
+
+     <IntVectorProperty name="AttributeMode"
+         command="SetAttributeMode"
+         number_of_elements="1"
+         default_values="0">
+       <FieldDataDomain name="enum"
+           enable_field_data="1">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+       <Documentation>
+         Specify which type of field data the arrays will be drawn from.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       label="Variables of Interest"
+       command="EnableAttributeArray"
+       clean_command="ClearAttributeArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+           <Property name="AttributeMode" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays whose entries will be used to form observations for statistical analysis.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="Task"
+         command="SetTask"
+         animateable="0"
+         number_of_elements="1"
+         default_values="3">
+       <EnumerationDomain name="task_list">
+         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="1" text="Model a subset of the data"/>
+         <Entry value="2" text="Assess the data with a model"/>
+         <Entry value="3" text="Model and assess the same data"/>
+       </EnumerationDomain>
+       <Documentation>
+         Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
+         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
+         &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
+         &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
+         &lt;/ol&gt;
+         When the task includes creating a model (i.e., tasks 2, and 4), you may adjust the fraction of the input dataset used for training.  You should avoid using a large fraction of the input data for training as you will then not be able to detect overfitting.  The &lt;i&gt;Training fraction&lt;/i&gt; setting will be ignored for tasks 1 and 3.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TrainingFraction"
+         command="SetTrainingFraction"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="training_range" min="0" max="1"/>
+       <Documentation>
+         Specify the fraction of values from the input dataset to be used for model fitting. The exact set of values is chosen at random from the dataset.
+       </Documentation>
+     </DoubleVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="1" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="SpreadSheetView" />
+    </Hints>
+
+   </SourceProxy> <!-- ContingencyStatistics -->
+
+   <!-- ==================================================================== -->
+   <SourceProxy
+       name="DescriptiveStatistics"
+       class="vtkPSciVizDescriptiveStats"
+       label="Descriptive Statistics">
+     <Documentation
+       short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model."
+       long_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model." >
+       This filter either computes a statistical model of a dataset or takes such a model as its second input.  Then, the model (however it is obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+       This filter computes the min, max, mean, raw moments M2 through M4, standard deviation, skewness, and kurtosis for each array you select.&lt;p&gt;
+       The model is simply a univariate Gaussian distribution with the mean and standard deviation provided. Data is assessed using this model by detrending the data (i.e., subtracting the mean) and then dividing by the standard deviation. Thus the assessment is an array whose entries are the number of standard deviations from the mean that each input point lies.
+     </Documentation>
+
+     <InputProperty name="Input" command="SetInputConnection" port_index="0">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+         <DataType value="vtkStructuredGrid"/>
+         <DataType value="vtkPolyData"/>
+         <DataType value="vtkUnstructuredGrid"/>
+         <DataType value="vtkTable"/>
+         <DataType value="vtkGraph"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array"/>
+       <Documentation>
+         The input to the filter.  Arrays from this dataset will be used for computing statistics and/or assessed by a statistical model.
+       </Documentation>
+     </InputProperty>
+
+     <InputProperty
+         name="ModelInput"
+         command="SetInputConnection"
+         port_index="1"
+         null_on_empty="1">
+       <Hints>
+         <Optional/> <!-- No input selection dialog at instantiation -->
+       </Hints>
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkTable"/>
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         A previously-calculated model with which to assess a separate dataset.  This input is optional.
+       </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
+
+     <IntVectorProperty name="AttributeMode"
+         command="SetAttributeMode"
+         number_of_elements="1"
+         default_values="0">
+       <FieldDataDomain name="enum"
+           enable_field_data="1">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+       <Documentation>
+         Specify which type of field data the arrays will be drawn from.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       label="Variables of Interest"
+       command="EnableAttributeArray"
+       clean_command="ClearAttributeArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+           <Property name="AttributeMode" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays whose entries will be used to form observations for statistical analysis.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="Task"
+         command="SetTask"
+         animateable="0"
+         number_of_elements="1"
+         default_values="3">
+       <EnumerationDomain name="task_list">
+         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="1" text="Model a subset of the data"/>
+         <Entry value="2" text="Assess the data with a model"/>
+         <Entry value="3" text="Model and assess the same data"/>
+       </EnumerationDomain>
+       <Documentation>
+         Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
+         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
+         &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
+         &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
+         &lt;/ol&gt;
+         When the task includes creating a model (i.e., tasks 2, and 4), you may adjust the fraction of the input dataset used for training.  You should avoid using a large fraction of the input data for training as you will then not be able to detect overfitting.  The &lt;i&gt;Training fraction&lt;/i&gt; setting will be ignored for tasks 1 and 3.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TrainingFraction"
+         command="SetTrainingFraction"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="training_range" min="0" max="1"/>
+       <Documentation>
+         Specify the fraction of values from the input dataset to be used for model fitting. The exact set of values is chosen at random from the dataset.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="SignedDeviations"
+         command="SetSignedDeviations"
+         label="Deviations should be"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="signed_distance">
+         <Entry value="0" text="Unsigned"/>
+         <Entry value="1" text="Signed"/>
+       </EnumerationDomain>
+       <Documentation>
+         Should the assessed values be signed deviations or unsigned?
+       </Documentation>
+     </IntVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="1" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="SpreadSheetView" />
+    </Hints>
+
+   </SourceProxy> <!-- DescriptiveStatistics -->
+
+   <!-- ==================================================================== -->
+   <SourceProxy
+       name="KMeans"
+       class="vtkPSciVizKMeans"
+       label="K Means">
+     <Documentation
+       short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model."
+       long_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model." >
+       This filter either computes a statistical model of a dataset or takes such a model as its second input.  Then, the model (however it is obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+       This filter iteratively computes the center of k clusters in a space whose coordinates are specified by the arrays you select. The clusters are chosen as local minima of the sum of square Euclidean distances from each point to its nearest cluster center. The model is then a set of cluster centers. Data is assessed by assigning a cluster center and distance to the cluster to each point in the input data set.
+     </Documentation>
+
+     <InputProperty name="Input" command="SetInputConnection" port_index="0">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+         <DataType value="vtkStructuredGrid"/>
+         <DataType value="vtkPolyData"/>
+         <DataType value="vtkUnstructuredGrid"/>
+         <DataType value="vtkTable"/>
+         <DataType value="vtkGraph"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array"/>
+       <Documentation>
+         The input to the filter.  Arrays from this dataset will be used for computing statistics and/or assessed by a statistical model.
+       </Documentation>
+     </InputProperty>
+
+     <InputProperty
+         name="ModelInput"
+         command="SetInputConnection"
+         port_index="1"
+         null_on_empty="1">
+       <Hints>
+         <Optional/> <!-- No input selection dialog at instantiation -->
+       </Hints>
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkTable"/>
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         A previously-calculated model with which to assess a separate dataset. This input is optional.
+       </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
+
+     <IntVectorProperty name="AttributeMode"
+         command="SetAttributeMode"
+         number_of_elements="1"
+         default_values="0">
+       <FieldDataDomain name="enum"
+           enable_field_data="1">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+       <Documentation>
+         Specify which type of field data the arrays will be drawn from.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       label="Variables of Interest"
+       command="EnableAttributeArray"
+       clean_command="ClearAttributeArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+           <Property name="AttributeMode" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays whose entries will be used to form observations for statistical analysis.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="Task"
+         command="SetTask"
+         animateable="0"
+         number_of_elements="1"
+         default_values="3">
+       <EnumerationDomain name="task_list">
+         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="1" text="Model a subset of the data"/>
+         <Entry value="2" text="Assess the data with a model"/>
+         <Entry value="3" text="Model and assess the same data"/>
+       </EnumerationDomain>
+       <Documentation>
+         Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
+         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
+         &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
+         &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
+         &lt;/ol&gt;
+         When the task includes creating a model (i.e., tasks 2, and 4), you may adjust the fraction of the input dataset used for training.  You should avoid using a large fraction of the input data for training as you will then not be able to detect overfitting.  The &lt;i&gt;Training fraction&lt;/i&gt; setting will be ignored for tasks 1 and 3.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TrainingFraction"
+         command="SetTrainingFraction"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="training_range" min="0" max="1"/>
+       <Documentation>
+         Specify the fraction of values from the input dataset to be used for model fitting. The exact set of values is chosen at random from the dataset.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="K"
+         label="k"
+         command="SetK"
+         animateable="1"
+         number_of_elements="1"
+         default_values="5">
+       <IntRangeDomain name="num_cluster_centers" min="1"/>
+       <Documentation>
+         Specify the number of clusters.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="MaxNumIterations"
+         label="Max Iterations"
+         command="SetMaxNumIterations"
+         animateable="1"
+         number_of_elements="1"
+         default_values="50">
+       <IntRangeDomain name="max_num_iter" min="1"/>
+       <Documentation>
+         Specify the maximum number of iterations in which cluster centers are moved before the algorithm terminates.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="Tolerance"
+         command="SetTolerance"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.01">
+       <DoubleRangeDomain name="cluster_center_tolerance" min="0" max="1"/>
+       <Documentation>
+         Specify the relative tolerance that will cause early termination.
+       </Documentation>
+     </DoubleVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="1" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="SpreadSheetView" />
+    </Hints>
+
+   </SourceProxy> <!-- K Means -->
+
+   <!-- ==================================================================== -->
+   <SourceProxy
+       name="MulticorrelativeStatistics"
+       class="vtkPSciVizMultiCorrelativeStats"
+       label="Multicorrelative Statistics">
+     <Documentation
+       short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model."
+       long_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model." >
+       This filter either computes a statistical model of a dataset or takes such a model as its second input. Then, the model (however it is obtained) may optionally be used to assess the input dataset.&lt;p&gt;
+       This filter computes the covariance matrix for all the arrays you select plus the mean of each array. The model is thus a multivariate Gaussian distribution with the mean vector and variances provided. Data is assessed using this model by computing the Mahalanobis distance for each input point. This distance will always be positive.&lt;p&gt;
+       The learned model output format is rather dense and can be confusing, so it is discussed here. The first filter output is a multiblock dataset consisting of 2 tables: &lt;ol&gt;
+       &lt;li&gt; Raw covariance data.
+       &lt;li&gt; Covariance matrix and its Cholesky decomposition. &lt;/ol&gt;
+       The raw covariance table has 3 meaningful columns: 2 titled "Column1" and "Column2" whose entries generally refer to the N arrays you selected when preparing the filter and 1 column titled "Entries" that contains numeric values. The first row will always contain the number of observations in the statistical analysis. The next N rows contain the mean for each of the N arrays you selected. The remaining rows contain covariances of pairs of arrays.&lt;p&gt;
+       The second table (covariance matrix and Cholesky decomposition) contains information derived from the raw covariance data of the first table. The first N rows of the first column contain the name of one array you selected for analysis. These rows are followed by a single entry labeled "Cholesky" for a total of N+1 rows. The second column, Mean contains the mean of each variable in the first N entries and the number of observations processed in the final (N+1) row.&lt;p&gt;
+       The remaining columns (there are N, one for each array) contain 2 matrices in triangular format. The upper right triangle contains the covariance matrix (which is symmetric, so its lower triangle may be inferred). The lower left triangle contains the Cholesky decomposition of the covariance matrix (which is triangular, so its upper triangle is zero). Because the diagonal must be stored for both matrices, an additional row is required — hence the N+1 rows and the final entry of the column named "Column". 
+     </Documentation>
+
+     <InputProperty name="Input" command="SetInputConnection" port_index="0">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+         <DataType value="vtkStructuredGrid"/>
+         <DataType value="vtkPolyData"/>
+         <DataType value="vtkUnstructuredGrid"/>
+         <DataType value="vtkTable"/>
+         <DataType value="vtkGraph"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array"/>
+       <Documentation>
+         The input to the filter. Arrays from this dataset will be used for computing statistics and/or assessed by a statistical model.
+       </Documentation>
+     </InputProperty>
+
+     <InputProperty
+         name="ModelInput"
+         command="SetInputConnection"
+         port_index="1"
+         null_on_empty="1">
+       <Hints>
+         <Optional/> <!-- No input selection dialog at instantiation -->
+       </Hints>
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkTable"/>
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         A previously-calculated model with which to assess a separate dataset. This input is optional.
+       </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
+
+     <IntVectorProperty name="AttributeMode"
+         command="SetAttributeMode"
+         number_of_elements="1"
+         default_values="0">
+       <FieldDataDomain name="enum"
+           enable_field_data="1">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+       <Documentation>
+         Specify which type of field data the arrays will be drawn from.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       label="Variables of Interest"
+       command="EnableAttributeArray"
+       clean_command="ClearAttributeArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+           <Property name="AttributeMode" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays whose entries will be used to form observations for statistical analysis.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="Task"
+         command="SetTask"
+         animateable="0"
+         number_of_elements="1"
+         default_values="3">
+       <EnumerationDomain name="task_list">
+         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="1" text="Model a subset of the data"/>
+         <Entry value="2" text="Assess the data with a model"/>
+         <Entry value="3" text="Model and assess the same data"/>
+       </EnumerationDomain>
+       <Documentation>
+         Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
+         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
+         &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
+         &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
+         &lt;/ol&gt;
+         When the task includes creating a model (i.e., tasks 2, and 4), you may adjust the fraction of the input dataset used for training.  You should avoid using a large fraction of the input data for training as you will then not be able to detect overfitting.  The &lt;i&gt;Training fraction&lt;/i&gt; setting will be ignored for tasks 1 and 3.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TrainingFraction"
+         command="SetTrainingFraction"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="training_range" min="0" max="1"/>
+       <Documentation>
+         Specify the fraction of values from the input dataset to be used for model fitting. The exact set of values is chosen at random from the dataset.
+       </Documentation>
+     </DoubleVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="1" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="SpreadSheetView" />
+    </Hints>
+
+   </SourceProxy> <!-- MulticorrelativeStatistics -->
+
+   <!-- ==================================================================== -->
+   <SourceProxy
+       name="PCAStatistics"
+       class="vtkPSciVizPCAStats"
+       label="Principal Component Analysis">
+     <Documentation
+       short_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model."
+       long_help="Compute a statistical model of a dataset and/or assess the dataset with a statistical model." >
+       This filter either computes a statistical model of a dataset or takes such a model as its second input. Then, the model (however it is obtained) may optionally be used to assess the input dataset. &lt;p&gt;
+       This filter performs additional analysis above and beyond the multicorrelative filter. It computes the eigenvalues and eigenvectors of the covariance matrix from the multicorrelative filter. Data is then assessed by projecting the original tuples into a possibly lower-dimensional space. &lt;p&gt;
+       Since the PCA filter uses the multicorrelative filter's analysis, it shares the same raw covariance table specified in the multicorrelative documentation. The second table in the multiblock dataset comprising the model output is an expanded version of the multicorrelative version. &lt;p&gt;
+       As with the multicorrlative filter, the second model table contains the mean values, the upper-triangular portion of the symmetric covariance matrix, and the non-zero lower-triangular portion of the Cholesky decomposition of the covariance matrix. Below these entries are the eigenvalues of the covariance matrix (in the column labeled "Mean") and the eigenvectors (as row vectors) in an additional NxN matrix.
+     </Documentation>
+
+     <InputProperty name="Input" command="SetInputConnection" port_index="0">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkImageData"/>
+         <DataType value="vtkStructuredGrid"/>
+         <DataType value="vtkPolyData"/>
+         <DataType value="vtkUnstructuredGrid"/>
+         <DataType value="vtkTable"/>
+         <DataType value="vtkGraph"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array"/>
+       <Documentation>
+         The input to the filter. Arrays from this dataset will be used for computing statistics and/or assessed by a statistical model.
+       </Documentation>
+     </InputProperty>
+
+     <InputProperty
+         name="ModelInput"
+         command="SetInputConnection"
+         port_index="1"
+         null_on_empty="1">
+       <Hints>
+         <Optional/> <!-- No input selection dialog at instantiation -->
+       </Hints>
+       <ProxyGroupDomain name="groups">
+         <Group name="sources" />
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkTable"/>
+         <DataType value="vtkMultiBlockDataSet"/>
+       </DataTypeDomain>
+       <Documentation>
+         A previously-calculated model with which to assess a separate dataset. This input is optional.
+       </Documentation>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectArrayInfo" information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Attribute"/> <!-- attribute_name => GetNumberOf___Arrays -->
+     </StringVectorProperty>
+
+     <IntVectorProperty name="AttributeMode"
+         command="SetAttributeMode"
+         number_of_elements="1"
+         default_values="0">
+       <FieldDataDomain name="enum"
+           enable_field_data="1">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+       <Documentation>
+         Specify which type of field data the arrays will be drawn from.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty
+       name="SelectArrays"
+       label="Variables of Interest"
+       command="EnableAttributeArray"
+       clean_command="ClearAttributeArrays"
+       repeat_command="1"
+       number_of_elements_per_command="1">
+       <ArrayListDomain name="array_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+           <Property name="AttributeMode" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <Documentation>
+         Choose arrays whose entries will be used to form observations for statistical analysis.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="Task"
+         command="SetTask"
+         animateable="0"
+         number_of_elements="1"
+         default_values="3">
+       <EnumerationDomain name="task_list">
+         <Entry value="0" text="Statistics of all the data"/>
+         <Entry value="1" text="Model a subset of the data"/>
+         <Entry value="2" text="Assess the data with a model"/>
+         <Entry value="3" text="Model and assess the same data"/>
+       </EnumerationDomain>
+       <Documentation>
+         Specify the task to be performed: modeling and/or assessment. &lt;ol&gt;
+         &lt;li&gt; "Statistics of all the data," creates an output table (or tables) summarizing the &lt;b&gt;entire&lt;/b&gt; input dataset;&lt;/li&gt;
+         &lt;li&gt; "Model a subset of the data," creates an output table (or tables) summarizing a &lt;b&gt;randomly-chosen subset&lt;/b&gt; of the input dataset;&lt;/li&gt;
+         &lt;li&gt; "Assess the data with a model," adds attributes to the first input dataset using a model provided on the second input port; and&lt;/li&gt;
+         &lt;li&gt; "Model and assess the same data," is really just operations 2 and 3 above applied to the same input dataset.  The model is first trained using a fraction of the input data and then the entire dataset is assessed using that model.&lt;/li&gt;
+         &lt;/ol&gt;
+         When the task includes creating a model (i.e., tasks 2, and 4), you may adjust the fraction of the input dataset used for training.  You should avoid using a large fraction of the input data for training as you will then not be able to detect overfitting.  The &lt;i&gt;Training fraction&lt;/i&gt; setting will be ignored for tasks 1 and 3.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TrainingFraction"
+         command="SetTrainingFraction"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="training_range" min="0" max="1"/>
+       <Documentation>
+         Specify the fraction of values from the input dataset to be used for model fitting. The exact set of values is chosen at random from the dataset.
+       </Documentation>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="NormalizationScheme"
+         label="Normalization Scheme"
+         command="SetNormalizationScheme"
+         animateable="1"
+         number_of_elements="1"
+         default_values="2">
+       <EnumerationDomain name="norm_scheme">
+         <Entry value="0" text="No normalization"/>
+         <Entry value="3" text="Normalize using covariances"/>
+       </EnumerationDomain>
+       <Documentation>
+         Before the eigenvector decomposition of the covariance matrix takes place, you may normalize each (i,j) entry by sqrt( cov(i,i) * cov(j,j) ). This implies that the variance of each variable of interest should be of equal importance. 
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="BasisScheme"
+         label="Basis Scheme"
+         command="SetBasisScheme"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0">
+       <EnumerationDomain name="basis_scheme">
+         <Entry value="0" text="Full basis"/>
+         <Entry value="1" text="Fixed-size basis"/>
+         <Entry value="2" text="Fixed-energy basis"/>
+       </EnumerationDomain>
+       <Documentation>
+         When reporting assessments, should the full eigenvector decomposition be used to project the original vector into the new space (Full basis), or should a fixed subset of the decomposition be used (Fixed-size basis), or should the projection be clipped to preserve at least some fixed "energy" (Fixed-energy basis)?&lt;p&gt;
+
+         As an example, suppose the variables of interest were {A,B,C,D,E} and that the eigenvalues of the covariance matrix for these were {5,2,1.5,1,.5}. If the "Full basis" scheme is used, then all 5 components of the eigenvectors will be used to project each {A,B,C,D,E}-tuple in the original data into a new 5-components space.&lt;p&gt;
+
+         If the "Fixed-size" scheme is used and the "Basis Size" property is set to 4, then only the first 4 eigenvector components will be used to project each {A,B,C,D,E}-tuple into the new space and that space will be of dimension 4, not 5.&lt;p&gt;
+
+         If the "Fixed-energy basis" scheme is used and the "Basis Energy" property is set to 0.8, then only the first 3 eigenvector components will be used to project each {A,B,C,D,E}-tuple into the new space, which will be of dimension 3. The number 3 is chosen because 3 is the lowest N for which the sum of the first N eigenvalues divided by the sum of all eigenvalues is larger than the specified "Basis Energy" (i.e., (5+2+1.5)/10 = 0.85 > 0.8).
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="BasisSize"
+         label="Basis Size"
+         command="SetFixedBasisSize"
+         animateable="1"
+         number_of_elements="1"
+         default_values="2">
+       <IntRangeDomain name="basis_size_range" min="1"/>
+       <Documentation>
+         The maximum number of eigenvector components to use when projecting into the new space.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="BasisEnergy"
+         label="Basis Energy"
+         command="SetFixedBasisEnergy"
+         animateable="1"
+         number_of_elements="1"
+         default_values="0.1">
+       <DoubleRangeDomain name="basis_energy_range" min="0" max="1"/>
+       <Documentation>
+         The minimum energy to use when determining the dimensionality of the new space into which the assessment will project tuples.
+       </Documentation>
+     </DoubleVectorProperty>
+
+    <Hints>
+      <Visibility replace_input="1" />
+      <!-- View can be used to specify the preferred view for the proxy -->
+      <View type="SpreadSheetView" />
+    </Hints>
+
+   </SourceProxy> <!-- PCAStatistics -->
+
   </ProxyGroup>
 
 </ServerManagerConfiguration>

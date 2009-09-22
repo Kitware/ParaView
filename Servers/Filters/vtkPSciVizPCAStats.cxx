@@ -1,0 +1,135 @@
+#include "vtkPSciVizPCAStats.h"
+#include "vtkSciVizStatisticsPrivate.h"
+
+#include "vtkDataSetAttributes.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkObjectFactory.h"
+#include "vtkPPCAStatistics.h"
+#include "vtkStringArray.h"
+#include "vtkTable.h"
+#include "vtkVariantArray.h"
+
+vtkStandardNewMacro(vtkPSciVizPCAStats);
+vtkCxxRevisionMacro(vtkPSciVizPCAStats,"1.1.2.2");
+
+vtkPSciVizPCAStats::vtkPSciVizPCAStats()
+{
+  this->NormalizationScheme = vtkPCAStatistics::NONE;
+  this->BasisScheme = vtkPCAStatistics::FULL_BASIS;
+  this->FixedBasisSize = 10;
+  this->FixedBasisEnergy = 1.;
+}
+
+vtkPSciVizPCAStats::~vtkPSciVizPCAStats()
+{
+}
+
+void vtkPSciVizPCAStats::PrintSelf( ostream& os, vtkIndent indent )
+{
+  this->Superclass::PrintSelf( os, indent );
+  os << indent << "NormalizationScheme: " << this->NormalizationScheme << "\n";
+  os << indent << "BasisScheme: " << this->BasisScheme << "\n";
+  os << indent << "FixedBasisSize: " << this->FixedBasisSize << "\n";
+  os << indent << "FixedBasisEnergy: " << this->FixedBasisEnergy << "\n";
+}
+
+int vtkPSciVizPCAStats::RequestModelDataObject( vtkInformation* oinfo )
+{
+  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
+  if ( ! ouData || ! ouData->IsA( "vtkMultiBlockDataSet" ) )
+    {
+    vtkMultiBlockDataSet* mbds = vtkMultiBlockDataSet::New();
+    mbds->SetPipelineInformation( oinfo );
+    oinfo->Set( vtkDataObject::DATA_OBJECT(), mbds );
+    oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbds->GetExtentType() );
+    mbds->FastDelete();
+    }
+  return 1;
+}
+
+int vtkPSciVizPCAStats::FitModel( vtkDataObject*& modelDO, vtkInformationVector* output, vtkTable* trainingData )
+{
+  // Get where we'll store the output statistical model.
+  modelDO = vtkDataObject::GetData( output, 0 );
+  if ( ! modelDO )
+    {
+    vtkErrorMacro( "No model output dataset" );
+    return 0;
+    }
+  modelDO->Initialize();
+
+  // Create the statistics filter and run it
+  vtkPPCAStatistics* stats = vtkPPCAStatistics::New();
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );
+  vtkIdType ncols = trainingData->GetNumberOfColumns();
+  for ( vtkIdType i = 0; i < ncols; ++ i )
+    {
+    stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
+    }
+  stats->SetNormalizationScheme( this->NormalizationScheme );
+
+  stats->SetLearnOption( true );
+  stats->SetDeriveOption( true );
+  stats->SetAssessOption( false );
+  stats->Update();
+
+  // Copy the output of the statistics filter to our output
+  modelDO->ShallowCopy( stats->GetOutputDataObject( vtkStatisticsAlgorithm::OUTPUT_MODEL ) );
+  stats->Delete();
+
+  return 1;
+}
+
+int vtkPSciVizPCAStats::AssessData( vtkTable* observations, vtkDataObject* assessedOut, vtkDataObject* modelOut )
+{
+  if ( ! assessedOut )
+    {
+    vtkErrorMacro( "No output data object." );
+    return 0;
+    }
+
+  vtkFieldData* dataAttrOut = assessedOut->GetAttributesAsFieldData( this->AttributeMode );
+  if ( ! dataAttrOut )
+    {
+    vtkErrorMacro( "No attributes of type " << this->AttributeMode << " on data object " << assessedOut );
+    return 0;
+    }
+
+  // Shallow-copy the model so we don't create an infinite loop.
+  vtkDataObject* modelCopy = modelOut->NewInstance();
+  modelCopy->ShallowCopy( modelOut );
+
+  // Create the statistics filter and run it
+  vtkPPCAStatistics* stats = vtkPPCAStatistics::New();
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, observations );
+  stats->SetInput( vtkStatisticsAlgorithm::INPUT_MODEL, modelCopy );
+  //stats->GetAssessNames()->SetValue( 0, "d2" );
+  modelCopy->FastDelete();
+  vtkIdType ncols = observations->GetNumberOfColumns();
+  for ( vtkIdType i = 0; i < ncols; ++ i )
+    {
+    stats->SetColumnStatus( observations->GetColumnName( i ), 1 );
+    }
+  stats->SetNormalizationScheme( this->NormalizationScheme );
+  stats->SetBasisScheme( this->BasisScheme );
+  stats->SetFixedBasisSize( this->FixedBasisSize );
+  stats->SetFixedBasisEnergy( this->FixedBasisEnergy );
+
+  stats->SetLearnOption( false );
+  stats->SetDeriveOption( true );
+  stats->SetAssessOption( true );
+  stats->Update();
+
+  vtkTable* assessTable = vtkTable::SafeDownCast( stats->GetOutput( vtkStatisticsAlgorithm::OUTPUT_DATA ) );
+  vtkIdType ncolsout = assessTable ? assessTable->GetNumberOfColumns() : 0;
+  for ( int i = ncols; i < ncolsout; ++ i )
+    {
+    dataAttrOut->AddArray( assessTable->GetColumn( i ) );
+    }
+  stats->Delete();
+
+  return 1;
+}
+

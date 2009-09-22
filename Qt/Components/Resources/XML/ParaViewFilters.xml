@@ -32,6 +32,14 @@
             icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
   </Category>
 
+  <Category name="Statistics" menu_label="&amp;Statistics">
+    <Filter name="ContingencyStatistics"/>
+    <Filter name="DescriptiveStatistics"/>
+    <Filter name="KMeans"/>
+    <Filter name="MulticorrelativeStatistics"/>
+    <Filter name="PCAStatistics"/>
+  </Category>
+
   <Category name="Temporal" menu_label="&amp;Temporal">    
     <Filter name="ParticleTracer" />    
     <Filter name="ParticlePathLines" />
