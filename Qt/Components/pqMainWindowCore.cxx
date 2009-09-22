@@ -3502,6 +3502,20 @@ void pqMainWindowCore::resetCenterOfRotationToCenterOfCurrentData()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindowCore::setOrientationAxesVisibility(bool visible)
+{
+  pqRenderView* rm = qobject_cast<pqRenderView*>(
+    pqActiveView::instance().current());
+  if (!rm)
+    {
+    qDebug() << "No active render module. setOrientationAxesVisibility failed.";
+    return;
+    }
+  rm->setOrientationAxesVisibility(visible);
+  rm->render();
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindowCore::setCenterAxesVisibility(bool visible)
 {
   pqRenderView* rm = qobject_cast<pqRenderView*>(

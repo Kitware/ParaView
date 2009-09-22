@@ -113,6 +113,7 @@
     </widget>
     <addaction name="menuCamera" />
     <addaction name="separator" />
+    <addaction name="actionShowOrientationAxes" />
     <addaction name="actionShowCenterAxes" />
     <addaction name="actionResetCenter" />
     <addaction name="actionPickCenter" />
@@ -409,6 +410,7 @@
    <attribute name="toolBarBreak" >
     <bool>false</bool>
    </attribute>
+   <addaction name="actionShowOrientationAxes" />
    <addaction name="actionShowCenterAxes" />
    <addaction name="actionResetCenter" />
    <addaction name="actionPickCenter" />
@@ -1094,6 +1096,23 @@
   <action name="actionTable_View" >
    <property name="text" >
     <string>Table View</string>
+   </property>
+  </action>
+  <action name="actionShowOrientationAxes" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc">:/pqWidgets/Icons/pqShowOrientationAxes24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Show Orientation Axes</string>
+   </property>
+   <property name="statusTip" >
+    <string>Show/Hide orientation axes</string>
    </property>
   </action>
   <action name="actionShowCenterAxes" >
