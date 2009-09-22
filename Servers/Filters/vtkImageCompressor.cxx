@@ -21,7 +21,7 @@
 #include <vtkstd/string>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkImageCompressor, "1.3");
+vtkCxxRevisionMacro(vtkImageCompressor, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkCxxSetObjectMacro(vtkImageCompressor, Output, vtkUnsignedCharArray);
@@ -32,8 +32,8 @@ vtkCxxSetObjectMacro(vtkImageCompressor, Input, vtkUnsignedCharArray);
 //-----------------------------------------------------------------------------
 vtkImageCompressor::vtkImageCompressor()
     :
-  Input(0),
   Output(0),
+  Input(0),
   LossLessMode(0),
   Configuration(0)
 {

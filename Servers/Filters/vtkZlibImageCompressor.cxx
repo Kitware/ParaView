@@ -20,7 +20,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkZlibImageCompressor);
-vtkCxxRevisionMacro(vtkZlibImageCompressor, "1.1");
+vtkCxxRevisionMacro(vtkZlibImageCompressor, "1.2");
 
 
 //=============================================================================
@@ -129,7 +129,7 @@ void vtkZlibCompressorImageConditioner::SetMaskId(const int maskId)
     return;
     }
   this->MaskId=maskId;
-  const unsigned char m=this->Mask[this->MaskId];
+  // const unsigned char m=this->Mask[this->MaskId];
   // cerr << "Mask=" << hex << (int)m << endl;
 }
 
@@ -351,8 +351,8 @@ void vtkZlibCompressorImageConditioner::PrintSelf(ostream &os, vtkIndent indent)
 //-----------------------------------------------------------------------------
 vtkZlibImageCompressor::vtkZlibImageCompressor()
     :
-  CompressionLevel(1),
-  Conditioner(0)
+  Conditioner(0),
+  CompressionLevel(1)
 {
   this->Conditioner=new vtkZlibCompressorImageConditioner;
   this->Conditioner->SetMaskId(0);
