@@ -77,7 +77,7 @@ ADD_PARAVIEW_ACTION_GROUP(TOOLBARIFACE TOOLBAR_IFACE_SRCS CLASS_NAME PrismToolBa
 ADD_PARAVIEW_ACTION_GROUP(MENUBARIFACE MENU_IFACE_SRCS CLASS_NAME PrismMenuActions 
                           GROUP_NAME "MenuBar/Prism")
 # create a plugin for this panel
-ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.0" 
+ADD_PARAVIEW_PLUGIN(PrismClientPlugin "1.1" 
                     GUI_INTERFACES ${TOOLBARIFACE} ${MENUBARIFACE} PrismDisplayPanels PrismObjectPanels 
                     SERVER_MANAGER_SOURCES vtkSMPrismCubeAxesRepresentationProxy.cxx
                     GUI_SOURCES 
