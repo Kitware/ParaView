@@ -138,6 +138,9 @@ pqNamedObjectPanel(object_proxy, p)
         this, SLOT(useXLogScaling(bool)));
     QObject::connect(this->UI->YLogScaling, SIGNAL(toggled (bool)),
         this, SLOT(useYLogScaling(bool)));
+    QObject::connect(this->UI->ZLogScaling, SIGNAL(toggled (bool)),
+        this, SLOT(useZLogScaling(bool)));
+
 
 
     QObject::connect(this->UI->ThresholdXBetweenLower, SIGNAL(valueEdited(double)),
@@ -830,6 +833,18 @@ void PrismPanel::accept()
         contourValueVP->SetElement(i, sample_list[i]);
     }
  
+
+
+
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("SESAMEXLogScaling"), this->UI->XLogScaling->isChecked());
+
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("SESAMEYLogScaling"), this->UI->YLogScaling->isChecked());
+    pqSMAdaptor::setElementProperty(
+        this->proxy()->GetProperty("SESAMEZLogScaling"), this->UI->ZLogScaling->isChecked());
+
+
 
 
     pqSettings* settings = pqApplicationCore::instance()->settings();
@@ -2200,6 +2215,18 @@ void PrismPanel::useYLogScaling(bool b)
     this->setModified();
 
 }
+void PrismPanel::useZLogScaling(bool b)
+{
+    //get access to the property that lets us pick the domain
+    pqSMAdaptor::setElementProperty(
+        this->UI->PanelHelper->GetProperty("SESAMEZLogScaling"), b);
+    this->UI->PanelHelper->UpdateVTKObjects();
+    this->UI->PanelHelper->UpdatePropertyInformation();
+
+    this->setModified();
+
+}
+
 void PrismPanel::onSamplesChanged()
 {
    this->UI->DeleteAll->setEnabled(

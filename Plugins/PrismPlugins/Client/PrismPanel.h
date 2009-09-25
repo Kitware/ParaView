@@ -70,6 +70,7 @@ protected slots:
 
   void useXLogScaling(bool);
   void useYLogScaling(bool);
+  void useZLogScaling(bool);
 
   void onSamplesChanged();
 
