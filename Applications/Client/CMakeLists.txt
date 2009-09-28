@@ -288,6 +288,7 @@ IF(BUILD_TESTING)
     XdmfReadRectilinearGridCollection
     XdmfReadStructuredGrid
     XdmfReadStructuredGridCollection
+    XdmfGridAttributes
   )
 
   # Add image threshold overrides for tests.
