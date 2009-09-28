@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.23");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.24");
 
 struct vtkSMStringListDomainInternals
 {
@@ -149,9 +149,22 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
     {
     this->RemoveAllStrings();
     unsigned int numStrings = svp->GetNumberOfElements();
-    for (unsigned int i=0; i<numStrings; i++)
+    if (svp->GetNumberOfElementsPerCommand()==2)
       {
-      this->AddString(svp->GetElement(i));
+      // if the information property is something like a array-status-info
+      // property on readers where the first value is the array name while the
+      // second is it's status.
+      for (unsigned int i=0; i<numStrings; i+=2)
+        {
+        this->AddString(svp->GetElement(i));
+        }
+      }
+    else
+      {
+      for (unsigned int i=0; i<numStrings; i++)
+        {
+        this->AddString(svp->GetElement(i));
+        }
       }
     this->InvokeModified();
     }
