@@ -3944,6 +3944,22 @@
      </IntVectorProperty>
 
      <IntVectorProperty 
+        name="GenerateImplicitNodeIdArray" 
+        command="SetGenerateImplicitNodeIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateImplicitElementIdArray" 
+        command="SetGenerateImplicitElementIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
         name="GenerateFileIdArray" 
         command="SetGenerateFileIdArray" 
         number_of_elements="1"
