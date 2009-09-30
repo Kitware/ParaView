@@ -25,11 +25,17 @@
 
 #include "vtkExodusFileSeriesReader.h"
 
+#include "vtkDirectory.h"
 #include "vtkExodusIIReader.h"
 #include "vtkObjectFactory.h"
 #include "vtkStdString.h"
 
+#include "vtkSmartPointer.h"
+#define VTK_CREATE(type, name) \
+  vtkSmartPointer<type> name = vtkSmartPointer<type>::New()
+
 #include <vtkstd/vector>
+#include <vtksys/RegularExpression.hxx>
 
 static const int ExodusArrayTypeIndices[] = {
   vtkExodusIIReader::GLOBAL,
@@ -138,7 +144,7 @@ void vtkExodusFileSeriesReaderStatus::RestoreStatus(vtkExodusIIReader *reader)
 }
 
 //=============================================================================
-vtkCxxRevisionMacro(vtkExodusFileSeriesReader, "1.1");
+vtkCxxRevisionMacro(vtkExodusFileSeriesReader, "1.2");
 vtkStandardNewMacro(vtkExodusFileSeriesReader);
 
 //-----------------------------------------------------------------------------
@@ -153,6 +159,21 @@ vtkExodusFileSeriesReader::~vtkExodusFileSeriesReader()
 void vtkExodusFileSeriesReader::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+}
+
+//-----------------------------------------------------------------------------
+int vtkExodusFileSeriesReader::RequestInformation(
+                                             vtkInformation *request,
+                                             vtkInformationVector **inputVector,
+                                             vtkInformationVector *outputVector)
+{
+  if (!this->UseMetaFile)
+    {
+    this->FindRestartedResults();
+    }
+
+  return this->Superclass::RequestInformation(request,
+                                              inputVector, outputVector);
 }
 
 //-----------------------------------------------------------------------------
@@ -187,4 +208,81 @@ int vtkExodusFileSeriesReader::RequestInformationForInput(
 
   return this->Superclass::RequestInformationForInput(index,
                                                       request, outputVector);
+}
+
+//-----------------------------------------------------------------------------
+void vtkExodusFileSeriesReader::FindRestartedResults()
+{
+  if (this->GetNumberOfFileNames() < 1)
+    {
+    vtkWarningMacro(<< "No files given.");
+    return;
+    }
+
+  vtkStdString originalFile = this->GetFileName(0);
+  this->RemoveAllFileNames();
+
+  vtkStdString path;
+  vtkStdString baseName;
+  vtkStdString::size_type dirseppos = originalFile.find_last_of("/\\");
+  if (dirseppos == vtkStdString::npos)
+    {
+    path = "./";
+    baseName = originalFile;
+    }
+  else
+    {
+    path = originalFile.substr(0, dirseppos+1);
+    baseName = originalFile.substr(dirseppos+1);
+    }
+
+  // We are looking for files following the convention of
+  //
+  //   <file>.e-s.<rs#>.<numproc>.<rank>
+  //
+  // When the simulation was run on a single process, the .<numproc>.<rank> is
+  // optional.  If it exists, we will look exclusively for files with that
+  // extension as all restarts should have been run on that process.
+  //
+  // Additionally, the -s.<rs#> (which captures the restart number) is often not
+  // there on the first file set (before the first restart occured).  Thus it is
+  // optional (although there can only be one as this is the only place we check
+  // numbering).
+  vtksys::RegularExpression
+    regEx("^(.*\\.e)(-s.[0-9]+)?(\\.[0-9]+\\.[0-9]+)?$");
+  if (!regEx.find(baseName))
+    {
+    // Filename does not follow convention.  Just use it.
+    this->AddFileName(originalFile);
+    return;
+    }
+
+  vtkStdString prefix = regEx.match(1);
+  vtkStdString suffix = regEx.match(3);
+
+  VTK_CREATE(vtkDirectory, dir);
+  if (!dir->Open(path))
+    {
+    vtkWarningMacro(<< "Could not open directory " << originalFile.c_str()
+                    << " is supposed to be from (" << path.c_str() << ")");
+    this->AddFileName(originalFile);
+    return;
+    }
+
+  for (vtkIdType i = 0; i < dir->GetNumberOfFiles(); i++)
+    {
+    const char *file = dir->GetFile(i);
+    if (!regEx.find(file)) continue;
+    if (regEx.match(1) != prefix) continue;
+    if (regEx.match(3) != suffix) continue;
+    this->AddFileName((path + file).c_str());
+    }
+
+  // Check to make sure we found something.
+  if (this->GetNumberOfFileNames() < 1)
+    {
+    vtkWarningMacro(<< "Could not find any actual files matching "
+                    << originalFile.c_str());
+    this->AddFileName(originalFile);
+    }
 }

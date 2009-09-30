@@ -1073,6 +1073,745 @@
       <!-- ParticleReaderCore -->
     </SourceProxy>
 
+   <SourceProxy name="ExodusIIReaderCore" 
+                class="vtkPExodusIIReader">
+     <Documentation
+       short_help="Read Exodus II files."
+       long_help="Read an Exodus II file to produce an unstructured grid.">
+        The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000 .
+     </Documentation>
+     
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1"
+        animateable="0">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Exodus reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePrefixInfo" >
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePrefixInfo" function="Prefix"/>
+          </RequiredProperties>
+       </FileListDomain>
+        <Documentation>
+          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1"
+        animateable="0"
+        information_property="FilePatternInfo" >
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePatternInfo" function="Pattern"/>
+          </RequiredProperties>
+       </FileListDomain>
+       <Documentation>
+         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2" 
+        default_values="-1 -1"
+        animateable="0"
+        information_property="FileRangeInfo" >
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="FileRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         This property controls the indices of the first and last files to be read.
+       </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="XMLFileName"
+        command="SetXMLFileName"
+        number_of_elements="1"
+        animateable="0"
+        label="XML File Name">
+       <FileListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="XMLFileNameInfo" function="XMLFileName"/>
+          </RequiredProperties>
+       </FileListDomain>
+       <Documentation>
+         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="HasModeShapes"
+                        command="SetHasModeShapes"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Some simulations overload the Exodus time steps to represent mode
+         shapes.  In this case, it does not make sense to iterate over the
+         "time steps", because they are not meant to be played in order.
+         Rather, each represents the vibration at a different "mode."
+         Setting the value of this property to 1 changes the semantics of the reader to not
+         report the time steps to downstream filters.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="AnimateVibrations"
+                        command="SetAnimateModeShapes"
+                        number_of_elements="1"
+                        default_values="1"
+                        animateable="0"
+                        label="Animate Vibrations">
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this flag is on and HasModeShapes is also on, then this reader
+         will report a continuous time range [0,1] and animate the
+         displacements in a periodic sinusoid.  If this flag is off and
+         HasModeShapes is on, this reader ignores time.  This flag has no
+         effect if HasModeShapes is off.
+       </Documentation>
+     </IntVectorProperty>
+
+     <!-- The following two properties magically send time information -->
+     <!-- to the animation panel.  Usually you only need one (the former -->
+     <!-- for discrete time, the latter for continuous time), but changing -->
+     <!-- the HasModeShapes ivar switches between discrete and continuous -->
+     <!-- time. -->
+     <DoubleVectorProperty 
+         name="TimestepValues" 
+         repeatable="1"
+         information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     <DoubleVectorProperty name="TimeRange" information_only="1">
+       <TimeRangeInformationHelper/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty name="ModeShape"
+                        command="SetModeShape"
+                        number_of_elements="1"
+                        default_values="1"
+                        information_property="TimestepValues">
+       <IntRangeDomain name="range">
+         <RequiredProperties>
+           <Property name="TimeStepRangeInfo" function="Range"/>
+         </RequiredProperties>
+       </IntRangeDomain>
+       <Documentation>
+         Specify the current mode shape when HasModeShapes in on.
+       </Documentation>
+     </IntVectorProperty>
+
+     <Property name="Refresh"
+               command="UpdateTimeInformation"
+               is_internal="1">
+       <Documentation>
+          Read in more time information if its available. Useful while running a simulation.
+       </Documentation>
+     </Property>
+     
+     <StringVectorProperty 
+        name="EdgeBlocksInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeBlock"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="EdgeBlocks"
+        command="SetEdgeBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="EdgeBlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeBlocksInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceBlocksInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceBlock"/>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="FaceBlocks"
+        command="SetFaceBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="FaceBlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceBlocksInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="SILUpdateStamp"
+        command="GetSILUpdateStamp"
+        information_only="1">
+        <SimpleIntInformationHelper />
+        <Documentation>
+          Information property indicating the update stamp of the SIL. Every
+          time the SIL is rebuild, this time stamp is changed.
+        </Documentation>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="ElementBlocksInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
+        <SILInformationHelper
+          timestamp_command="GetSILUpdateStamp"
+          subtree="Blocks">
+        </SILInformationHelper>
+     </StringVectorProperty>
+     
+     <StringVectorProperty
+        name="ElementBlocks"
+        command="SetElementBlockArrayStatus"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" >
+       <SILDomain name="array_list" subtree="Blocks">
+          <RequiredProperties>
+             <Property name="ElementBlocksInfo" function="ArrayList" />
+          </RequiredProperties>
+       </SILDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="GlobalVariablesInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="GlobalVariables"
+        command="SetGlobalResultArrayStatus"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="GlobalVariablesInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="GlobalVariablesInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="PointVariablesInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="PointResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointVariables"
+        command="SetPointResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointVariablesInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointVariablesInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeVariablesInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeVariables"
+        command="SetEdgeResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeVariablesInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeVariablesInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceVariablesInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceVariables"
+        command="SetFaceResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceVariablesInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceVariablesInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="ElementVariablesInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementVariables"
+        command="SetElementResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="ElementVariablesInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementVariablesInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+      
+     <StringVectorProperty 
+        name="NodeMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeMapArrayStatus"
+        command="SetNodeMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="EdgeMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeMapArrayStatus"
+        command="SetEdgeMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="FaceMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceMapArrayStatus"
+        command="SetFaceMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+      <StringVectorProperty 
+        name="ElementMapInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementMap"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementMapArrayStatus"
+        command="SetElementMapArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementMapInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementMapInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+      
+     <StringVectorProperty 
+        name="NodeSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeSetArrayStatus"
+        command="SetNodeSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="SideSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="SideSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="SideSetArrayStatus"
+        command="SetSideSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="SideSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SideSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceSetArrayStatus"
+        command="SetFaceSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeSetArrayStatus"
+        command="SetEdgeSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="ElementSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementSetArrayStatus"
+        command="SetElementSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="ElementSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="ElementSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="ElementSetResultArrayStatus"
+        command="SetElementSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="ElementSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="ElementSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="SideSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="SideSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="SideSetResultArrayStatus"
+        command="SetSideSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="SideSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SideSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="FaceSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="FaceSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="FaceSetResultArrayStatus"
+        command="SetFaceSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="FaceSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="FaceSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="EdgeSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="EdgeSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="EdgeSetResultArrayStatus"
+        command="SetEdgeSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="EdgeSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="EdgeSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="NodeSetResultArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeSetResult"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeSetResultArrayStatus"
+        command="SetNodeSetResultArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeSetResultArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeSetResultArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="ApplyDisplacements" 
+        command="SetApplyDisplacements" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Geometric locations can include displacements. When this option is on, the nodal positions are 'displaced' by the standard exodus displacement vector. If displacements are turned 'off', the user can explicitly add them by applying a warp filter.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="DisplacementMagnitude" 
+        command="SetDisplacementMagnitude" 
+        number_of_elements="1"
+        default_values="1" > 
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         When displacements are being applied, they are scaled by this amount.  Set to 1 for no scaling.
+       </Documentation>
+     </DoubleVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateObjectIdCellArray" 
+        command="SetGenerateObjectIdCellArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateGlobalNodeIdArray" 
+        command="SetGenerateGlobalNodeIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateGlobalElementIdArray" 
+        command="SetGenerateGlobalElementIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateImplicitNodeIdArray" 
+        command="SetGenerateImplicitNodeIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+     
+     <IntVectorProperty 
+        name="GenerateImplicitElementIdArray" 
+        command="SetGenerateImplicitElementIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateFileIdArray" 
+        command="SetGenerateFileIdArray" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ExodusModelMetadata" 
+        command="SetExodusModelMetadata" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <Hints>
+       <Property name="Refresh" show="0"/>
+     </Hints>
+
+   <!-- End ExodusIIReaderCore -->
+   </SourceProxy>
+
     <!-- End of "internal_sources" -->
   </ProxyGroup>
 
@@ -3235,786 +3974,46 @@
    </SourceProxy>
    
 
-   <SourceProxy name="ExodusIIReader" 
-                class="vtkPExodusIIReader">
+   <FileSeriesReaderProxy name="ExodusIIReader"
+                          class="vtkExodusFileSeriesReader"
+                          file_name_method="SetFileName">
      <Documentation
        short_help="Read Exodus II files."
        long_help="Read an Exodus II file to produce an unstructured grid.">
         The Exodus reader loads Exodus II files and produces an unstructured grid output. The default file extensions are .g, .e, .ex2, .ex2v2, .exo, .gen, .exoII, .exii, .0, .00, .000, and .0000 .
      </Documentation>
-     
-     <StringVectorProperty
-        name="FileName"
-        command="SetFileName"
-        number_of_elements="1"
-        animateable="0">
-        <FileListDomain name="files"/>
-        <Documentation>
-          This property specifies the file name for the Exodus reader.
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="FilePrefixInfo"
-        command="GetFilePrefix"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePrefix"
-        command="SetFilePrefix"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePrefixInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePrefixInfo" function="Prefix"/>
-          </RequiredProperties>
-       </FileListDomain>
-        <Documentation>
-          This property specifies the file root used with the file pattern to format a file name. (See the File Pattern property.)
-        </Documentation>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="FilePatternInfo"
-        command="GetFilePattern"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FilePattern"
-        command="SetFilePattern"
-        number_of_elements="1"
-        animateable="0"
-        information_property="FilePatternInfo" >
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="FilePatternInfo" function="Pattern"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property contains a text string specifying the pattern used to load files. There are two parts to it: the prefix (%s) and the file number (%i). The format used is the same as that used for printf.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="FileRangeInfo"
-        command="GetFileRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="FileRange"
-        command="SetFileRange"
-        number_of_elements="2" 
-        default_values="-1 -1"
-        animateable="0"
-        information_property="FileRangeInfo" >
-       <IntRangeDomain name="range">
-          <RequiredProperties>
-             <Property name="FileRangeInfo" function="Range"/>
-          </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         This property controls the indices of the first and last files to be read.
-       </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty 
-        name="XMLFileNameInfo"
-        command="GetXMLFileName"
-        information_only="1">
-        <SimpleStringInformationHelper/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="XMLFileName"
-        command="SetXMLFileName"
-        number_of_elements="1"
-        animateable="0"
-        label="XML File Name">
-       <FileListDomain name="default_value" optional="1">
-          <RequiredProperties>
-             <Property name="XMLFileNameInfo" function="XMLFileName"/>
-          </RequiredProperties>
-       </FileListDomain>
-       <Documentation>
-         This property specifies the name of an XML file containing part and material descriptions and a mapping to element blocks.
-       </Documentation>
-     </StringVectorProperty>
-
-     <IntVectorProperty name="HasModeShapes"
-                        command="SetHasModeShapes"
-                        number_of_elements="1"
-                        default_values="0">
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         Some simulations overload the Exodus time steps to represent mode
-         shapes.  In this case, it does not make sense to iterate over the
-         "time steps", because they are not meant to be played in order.
-         Rather, each represents the vibration at a different "mode."
-         Setting the value of this property to 1 changes the semantics of the reader to not
-         report the time steps to downstream filters.
-       </Documentation>
-     </IntVectorProperty>
-
-     <IntVectorProperty name="AnimateModeShapes"
-                        command="SetAnimateModeShapes"
-                        number_of_elements="1"
-                        default_values="1"
-                        animateable="0"
-                        label="Animate Vibrations">
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         If this flag is on and HasModeShapes is also on, then this reader
-         will report a continuous time range [0,1] and animate the
-         displacements in a periodic sinusoid.  If this flag is off and
-         HasModeShapes is on, this reader ignores time.  This flag has no
-         effect if HasModeShapes is off.
-       </Documentation>
-     </IntVectorProperty>
-
-     <!-- The following two properties magically send time information -->
-     <!-- to the animation panel.  Usually you only need one (the former -->
-     <!-- for discrete time, the latter for continuous time), but changing -->
-     <!-- the HasModeShapes ivar switches between discrete and continuous -->
-     <!-- time. -->
-     <DoubleVectorProperty 
-         name="TimestepValues" 
-         repeatable="1"
-         information_only="1">
-       <TimeStepsInformationHelper/>
-     </DoubleVectorProperty>
-     <DoubleVectorProperty name="TimeRange" information_only="1">
-       <TimeRangeInformationHelper/>
-     </DoubleVectorProperty>
-
-     <IntVectorProperty name="ModeShape"
-                        command="SetModeShape"
-                        number_of_elements="1"
-                        default_values="1"
-                        information_property="TimestepValues">
-       <IntRangeDomain name="range">
-         <RequiredProperties>
-           <Property name="TimeStepRangeInfo" function="Range"/>
-         </RequiredProperties>
-       </IntRangeDomain>
-       <Documentation>
-         Specify the current mode shape when HasModeShapes in on.
-       </Documentation>
-     </IntVectorProperty>
-
-     <Property name="Refresh"
-               command="UpdateTimeInformation"
-               is_internal="1">
-       <Documentation>
-          Read in more time information if its available. Useful while running a simulation.
-       </Documentation>
-     </Property>
-     
-     <StringVectorProperty 
-        name="EdgeBlockArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeBlock"/>
-     </StringVectorProperty>
-     
-     <StringVectorProperty
-        name="EdgeBlockArrayStatus"
-        label="Edge Blocks"
-        command="SetEdgeBlockArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="EdgeBlockArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="EdgeBlockArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="FaceBlockArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceBlock"/>
-     </StringVectorProperty>
-     
-     <StringVectorProperty
-        name="FaceBlockArrayStatus"
-        label="Face Blocks"
-        command="SetFaceBlockArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="FaceBlockArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="FaceBlockArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-     <IntVectorProperty name="SILUpdateStamp"
-        command="GetSILUpdateStamp"
-        information_only="1">
-        <SimpleIntInformationHelper />
-        <Documentation>
-          Information property indicating the update stamp of the SIL. Every
-          time the SIL is rebuild, this time stamp is changed.
-        </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty 
-        name="ElementBlockArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
-        <SILInformationHelper
-          timestamp_command="GetSILUpdateStamp"
-          subtree="Blocks">
-        </SILInformationHelper>
-     </StringVectorProperty>
-     
-     <StringVectorProperty
-        name="ElementBlockArrayStatus"
-        label="Element Blocks"
-        command="SetElementBlockArrayStatus"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" >
-       <SILDomain name="array_list" subtree="Blocks">
-          <RequiredProperties>
-             <Property name="ElementBlockArrayInfo" function="ArrayList" />
-          </RequiredProperties>
-       </SILDomain>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="GlobalResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="GlobalResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="GlobalResultArrayStatus"
-        label="Global Variables"
-        command="SetGlobalResultArrayStatus"
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="GlobalResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="GlobalResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="PointResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="PointResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="PointResultArrayStatus"
-        label="Point Variables"
-        command="SetPointResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="PointResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="PointResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="EdgeResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="EdgeResultArrayStatus"
-        label="Edge Variables"
-        command="SetEdgeResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="EdgeResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="EdgeResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="FaceResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FaceResultArrayStatus"
-        label="Face Variables"
-        command="SetFaceResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="FaceResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="FaceResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="ElementResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="ElementResultArrayStatus"
-        label="Element Variables"
-        command="SetElementResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" 
-        information_property="ElementResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="ElementResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-      
-     <StringVectorProperty 
-        name="NodeMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeMap"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="NodeMapArrayStatus"
-        command="SetNodeMapArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="NodeMapInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="NodeMapInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-      <StringVectorProperty 
-        name="EdgeMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeMap"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="EdgeMapArrayStatus"
-        command="SetEdgeMapArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="EdgeMapInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="EdgeMapInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-      <StringVectorProperty 
-        name="FaceMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceMap"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FaceMapArrayStatus"
-        command="SetFaceMapArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="FaceMapInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="FaceMapInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-      <StringVectorProperty 
-        name="ElementMapInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementMap"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="ElementMapArrayStatus"
-        command="SetElementMapArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="ElementMapInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="ElementMapInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-      
-     <StringVectorProperty 
-        name="NodeSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeSet"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="NodeSetArrayStatus"
-        command="SetNodeSetArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="NodeSetInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="NodeSetInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="SideSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="SideSet"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="SideSetArrayStatus"
-        command="SetSideSetArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="SideSetInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="SideSetInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="FaceSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceSet"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FaceSetArrayStatus"
-        command="SetFaceSetArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="FaceSetInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="FaceSetInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="EdgeSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeSet"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="EdgeSetArrayStatus"
-        command="SetEdgeSetArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="EdgeSetInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="EdgeSetInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="ElementSetInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementSet"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="ElementSetArrayStatus"
-        command="SetElementSetArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="ElementSetInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="ElementSetInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="ElementSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="ElementSetResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="ElementSetResultArrayStatus"
-        command="SetElementSetResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="ElementSetResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="ElementSetResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="SideSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="SideSetResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="SideSetResultArrayStatus"
-        command="SetSideSetResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="SideSetResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="SideSetResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="FaceSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="FaceSetResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="FaceSetResultArrayStatus"
-        command="SetFaceSetResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="FaceSetResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="FaceSetResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="EdgeSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="EdgeSetResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="EdgeSetResultArrayStatus"
-        command="SetEdgeSetResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="EdgeSetResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="EdgeSetResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-     
-     <StringVectorProperty 
-        name="NodeSetResultArrayInfo"
-        information_only="1">
-        <ArraySelectionInformationHelper attribute_name="NodeSetResult"/>
-     </StringVectorProperty>
-
-     <StringVectorProperty
-        name="NodeSetResultArrayStatus"
-        command="SetNodeSetResultArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0"
-        information_property="NodeSetResultArrayInfo"> 
-       <ArraySelectionDomain name="array_list">
-          <RequiredProperties>
-             <Property name="NodeSetResultArrayInfo" function="ArrayList"/>
-          </RequiredProperties>
-       </ArraySelectionDomain>
-     </StringVectorProperty>
-
-     <IntVectorProperty 
-        name="ApplyDisplacements" 
-        command="SetApplyDisplacements" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         Geometric locations can include displacements. When this option is on, the nodal positions are 'displaced' by the standard exodus displacement vector. If displacements are turned 'off', the user can explicitly add them by applying a warp filter.
-       </Documentation>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty 
-        name="DisplacementMagnitude" 
-        command="SetDisplacementMagnitude" 
-        number_of_elements="1"
-        default_values="1" > 
-       <DoubleRangeDomain name="range"/>
-       <Documentation>
-         When displacements are being applied, they are scaled by this amount.  Set to 1 for no scaling.
-       </Documentation>
-     </DoubleVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateObjectIdCellArray" 
-        command="SetGenerateObjectIdCellArray" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="GenerateGlobalNodeIdArray" 
-        command="SetGenerateGlobalNodeIdArray" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateGlobalElementIdArray" 
-        command="SetGenerateGlobalElementIdArray" 
-        number_of_elements="1"
-        default_values="1" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="GenerateImplicitNodeIdArray" 
-        command="SetGenerateImplicitNodeIdArray" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-     
-     <IntVectorProperty 
-        name="GenerateImplicitElementIdArray" 
-        command="SetGenerateImplicitElementIdArray" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="GenerateFileIdArray" 
-        command="SetGenerateFileIdArray" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="ExodusModelMetadata" 
-        command="SetExodusModelMetadata" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-     </IntVectorProperty>
-
-     <Hints>
-       <Property name="Refresh" show="0"/>
-     </Hints>
-
-   <!-- End ExodusIIReader -->
-   </SourceProxy>
-
-   <FileSeriesReaderProxy name="ExodusRestartReader"
-                          class="vtkExodusFileSeriesReader"
-                          label="Restarted Sim Exodus Reader"
-                          file_name_method="SetFileName">
-     <Documentation short_help="Read Exodus files from simulation restarts."
-                    long_help="Read collections of Exodus output files from simulations that were restarted.">
-       When a simulation that outputs exodus files is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
-     </Documentation>
      <SubProxy>
-       <Proxy name="Reader" proxygroup="sources" proxyname="ExodusIIReader" />
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
        <ExposedProperties>
-         <Property name="XMLFileNameInfo" />
+         <Property name="FilePrefix" />
+         <Property name="FilePrefixInfo" />
+         <Property name="FilePattern" />
+         <Property name="FilePatternInfo" />
+         <Property name="FileRange" />
+         <Property name="FileRangeInfo" />
          <Property name="XMLFileName" />
+         <Property name="XMLFileNameInfo" />
          <Property name="HasModeShapes" />
          <Property name="ModeShape" />
-         <Property name="AnimateModeShapes" />
+         <Property name="AnimateVibrations" />
          <Property name="Refresh" />
          <Property name="SILUpdateStamp" />
-         <Property name="EdgeBlockArrayInfo" />
-         <Property name="EdgeBlockArrayStatus" />
-         <Property name="FaceBlockArrayInfo" />
-         <Property name="FaceBlockArrayStatus" />
-         <Property name="ElementBlockArrayStatus" />
-         <Property name="GlobalResultArrayInfo" />
-         <Property name="GlobalResultArrayStatus" />
-         <Property name="PointResultArrayInfo" />
-         <Property name="PointResultArrayStatus" />
-         <Property name="EdgeResultArrayInfo" />
-         <Property name="EdgeResultArrayStatus" />
-         <Property name="FaceResultArrayInfo" />
-         <Property name="FaceResultArrayStatus" />
-         <Property name="ElementResultArrayInfo" />
-         <Property name="ElementResultArrayStatus" />
+         <Property name="EdgeBlocks" />
+         <Property name="EdgeBlocksInfo" />
+         <Property name="FaceBlocks" />
+         <Property name="FaceBlocksInfo" />
+         <Property name="ElementBlocks" />
+         <Property name="GlobalVariables" />
+         <Property name="GlobalVariablesInfo" />
+         <Property name="PointVariables" />
+         <Property name="PointVariablesInfo" />
+         <Property name="EdgeVariables" />
+         <Property name="EdgeVariablesInfo" />
+         <Property name="FaceVariables" />
+         <Property name="FaceVariablesInfo" />
+         <Property name="ElementVariables" />
+         <Property name="ElementVariablesInfo" />
          <Property name="NodeMapInfo" />
          <Property name="NodeMapArrayStatus" />
          <Property name="EdgeMapInfo" />
@@ -4052,9 +4051,131 @@
        </ExposedProperties>
      </SubProxy>
 
+     <StringVectorProperty name="FileNameInfo"
+                           command="GetCurrentFileName"
+                           information_only="1">
+       <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0"
+                           information_property="FileNameInfo"
+                           repeat_command="1">
+       <FileListDomain name="files" />
+       <Documentation>
+         This property specifies the file name for the Exodus reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty name="UseMetaFile"
+                        command="SetUseMetaFile"
+                        number_of_elements="1"
+                        default_values="0">
+       <BooleanDomain name="bool" />
+       <Documentation>
+         This hidden property must always be set to 1 for this proxy to work.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues" 
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+
+     <Hints>
+       <!-- This property is here simply to set it. -->
+       <Property name="UseMetaFile" show="0" />
+       <!-- This is for special GUI control. -->
+       <Property name="Refresh" show="0"/>
+     </Hints>
+     <!-- ExodusIIReader -->
+   </FileSeriesReaderProxy>
+
+   <FileSeriesReaderProxy name="ExodusRestartReader"
+                          class="vtkExodusFileSeriesReader"
+                          label="Restarted Sim Exodus Reader"
+                          file_name_method="SetFileName">
+     <Documentation short_help="Read Exodus files from simulation restarts."
+                    long_help="Read collections of Exodus output files from simulations that were restarted.">
+       When a simulation that outputs exodus files is restarted, typically you get a new set of output files.  When you read them in your visualization, you often want to string these file sets together as if it was one continuous dump of files.  This reader allows you to specify a metadata file that will implicitly string the files together.
+     </Documentation>
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources" proxyname="ExodusIIReaderCore" />
+       <ExposedProperties>
+         <Property name="XMLFileNameInfo" />
+         <Property name="XMLFileName" />
+         <Property name="HasModeShapes" />
+         <Property name="ModeShape" />
+         <Property name="AnimateVibrations" />
+         <Property name="Refresh" />
+         <Property name="SILUpdateStamp" />
+         <Property name="EdgeBlocks" />
+         <Property name="EdgeBlocksInfo" />
+         <Property name="FaceBlocks" />
+         <Property name="FaceBlocksInfo" />
+         <Property name="ElementBlocks" />
+         <Property name="GlobalVariables" />
+         <Property name="GlobalVariablesInfo" />
+         <Property name="PointVariables" />
+         <Property name="PointVariablesInfo" />
+         <Property name="EdgeVariables" />
+         <Property name="EdgeVariablesInfo" />
+         <Property name="FaceVariables" />
+         <Property name="FaceVariablesInfo" />
+         <Property name="ElementVariables" />
+         <Property name="ElementVariablesInfo" />
+         <Property name="NodeMapInfo" />
+         <Property name="NodeMapArrayStatus" />
+         <Property name="EdgeMapInfo" />
+         <Property name="EdgeMapArrayStatus" />
+         <Property name="FaceMapInfo" />
+         <Property name="FaceMapArrayStatus" />
+         <Property name="ElementMapInfo" />
+         <Property name="ElementMapArrayStatus" />
+         <Property name="NodeSetInfo" />
+         <Property name="NodeSetArrayStatus" />
+         <Property name="SideSetInfo" />
+         <Property name="SideSetArrayStatus" />
+         <Property name="FaceSetInfo" />
+         <Property name="FaceSetArrayStatus" />
+         <Property name="EdgeSetInfo" />
+         <Property name="EdgeSetArrayStatus" />
+         <Property name="ElementSetInfo" />
+         <Property name="ElementSetArrayStatus" />
+         <Property name="ElementSetResultArrayInfo" />
+         <Property name="ElementSetResultArrayStatus" />
+         <Property name="SideSetResultArrayInfo" />
+         <Property name="SideSetResultArrayStatus" />
+         <Property name="FaceSetResultArrayInfo" />
+         <Property name="FaceSetResultArrayStatus" />
+         <Property name="EdgeSetResultArrayInfo" />
+         <Property name="EdgeSetResultArrayStatus" />
+         <Property name="NodeSetResultArrayInfo" />
+         <Property name="NodeSetResultArrayStatus" />
+         <Property name="ApplyDisplacements" />
+         <Property name="DisplacementMagnitude" />
+         <Property name="GenerateObjectIdCellArray" />
+         <Property name="GenerateGlobalNodeIdArray" />
+         <Property name="GenerateGlobalElementIdArray" />
+         <Property name="ExodusModelMetadata" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+                           command="GetCurrentFileName"
+                           information_only="1">
+       <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
      <StringVectorProperty name="FileName"
                            animateable="0"
                            command="SetMetaFileName"
+                           information_property="FileNameInfo"
                            number_of_elements="1">
        <FileListDomain name="files" />
        <Documentation>

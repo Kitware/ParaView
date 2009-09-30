@@ -49,9 +49,18 @@ protected:
   vtkExodusFileSeriesReader();
   ~vtkExodusFileSeriesReader();
 
+  virtual int RequestInformation(vtkInformation *request,
+                                 vtkInformationVector **inputVector,
+                                 vtkInformationVector *outputVector);
+
   virtual int RequestInformationForInput(int index,
                                          vtkInformation *request,
                                          vtkInformationVector *outputVector);
+
+  // Replaces the filenames, which probably represents partitions of the data,
+  // with a set of files where each represents a set of solution files for one
+  // of the simulation restarts.
+  virtual void FindRestartedResults();
 
 private:
   vtkExodusFileSeriesReader(const vtkExodusFileSeriesReader &); // Not implemented

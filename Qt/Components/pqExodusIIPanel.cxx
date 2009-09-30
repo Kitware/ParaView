@@ -269,7 +269,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->propertyManager()->registerLink(
     this->UI->Blocks->model(), "values", SIGNAL(valuesChanged()),
     this->proxy(),
-    this->proxy()->GetProperty("ElementBlockArrayStatus"));
+    this->proxy()->GetProperty("ElementBlocks"));
 
   // parent class hooks up some of our widgets in the ui
   this->Superclass::linkServerManagerProperties();
@@ -293,15 +293,15 @@ void pqExodusIIPanel::linkServerManagerProperties()
                    PM_ELEMBLK, "GenerateFileIdArray");
   
   // do the cell variables
-  this->addSelectionsToTreeWidget("ElementResultArrayStatus",
+  this->addSelectionsToTreeWidget("ElementVariables",
                                   this->UI->Variables, PM_ELEMBLK);
   
   // do the face variables
-  this->addSelectionsToTreeWidget("FaceResultArrayStatus",
+  this->addSelectionsToTreeWidget("FaceVariables",
                                   this->UI->Variables, PM_FACEBLK);
   
   // do the edge variables
-  this->addSelectionsToTreeWidget("EdgeResultArrayStatus",
+  this->addSelectionsToTreeWidget("EdgeVariables",
                                   this->UI->Variables, PM_EDGEBLK);
 
   // do the set results variables
@@ -326,7 +326,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
   int numBef = this->UI->Variables->topLevelItemCount();
   
   // do the node variables
-  this->addSelectionsToTreeWidget("PointResultArrayStatus",
+  this->addSelectionsToTreeWidget("PointVariables",
                                   this->UI->Variables, PM_NODE);
   
   int numAft = this->UI->Variables->topLevelItemCount();
@@ -362,7 +362,7 @@ void pqExodusIIPanel::linkServerManagerProperties()
     }
 
   // do the global variables
-  this->addSelectionsToTreeWidget("GlobalResultArrayStatus",
+  this->addSelectionsToTreeWidget("GlobalVariables",
                                   this->UI->Variables, PM_GLOBAL);
 
   // we hook up the sideset/nodeset 
@@ -370,9 +370,9 @@ void pqExodusIIPanel::linkServerManagerProperties()
 
 
   // blocks
-  this->addSelectionsToTreeWidget("EdgeBlockArrayStatus",
+  this->addSelectionsToTreeWidget("EdgeBlocks",
                                   this->UI->EdgeBlockArrays, PM_EDGEBLK);
-  this->addSelectionsToTreeWidget("FaceBlockArrayStatus",
+  this->addSelectionsToTreeWidget("FaceBlocks",
                                   this->UI->FaceBlockArrays, PM_FACEBLK);
 
   // sets

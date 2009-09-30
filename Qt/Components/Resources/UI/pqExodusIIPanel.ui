@@ -405,7 +405,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QCheckBox" name="AnimateModeShapes" >
+          <widget class="QCheckBox" name="AnimateVibrations" >
            <property name="text" >
             <string>Animate Vibrations</string>
            </property>

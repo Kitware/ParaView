@@ -235,6 +235,7 @@ IF(BUILD_TESTING)
 #    ExodusWriter -- ENABLE WHEN WRITER IS ADDED
     ExodusXML
     ExTimeseries
+    ExTimeseries2
     ExtractBlock
     ExtractLevel
     FFTOverTime
