@@ -73,7 +73,7 @@ C_EXPORT void C_DECL ParaViewPluginXMLList(int& num, char** & xml)
 #include "vtkProcessModule.h"
 #include "vtkClientServerInterpreter.h"
 
-extern "C" void @MODULE_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
 
 namespace {
   class StaticInitSMWrappings
@@ -85,13 +85,13 @@ namespace {
       // process module has been initialized. Otherwise, it will register the
       // callback with the process module so that when it gets intialized, the
       // callback will be called. 
-      // This removes the need for calling the @MODULE_NAME@_Initialize function
+      // This removes the need for calling the @PLUGIN_NAME@_Initialize function
       // explicitly if an application is linking against the plugin directly.
       vtkProcessModule::InitializeInterpreter(initfunc);
       }
     };
 }
-static StaticInitSMWrappings InitSMWrappings(@MODULE_NAME@_Initialize);
+static StaticInitSMWrappings InitSMWrappings(@PLUGIN_NAME@_Initialize);
 
 #endif // HAVE_SRCS
 
