@@ -69,7 +69,7 @@
           file_description="Legacy VTK Files (partitioned)">
   </Reader>
   <Reader name="ensight"
-          extensions="case CASE Case"
+          extensions="case CASE Case encas ENCAS Encas EnCas"
           file_description="EnSight Files">
   </Reader>
   <Reader name="ensightMS"
