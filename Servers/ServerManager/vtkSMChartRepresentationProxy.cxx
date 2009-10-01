@@ -23,12 +23,12 @@
 #include "vtkSMChartViewProxy.h"
 
 vtkStandardNewMacro(vtkSMChartRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMChartRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMChartRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMChartRepresentationProxy::vtkSMChartRepresentationProxy()
 {
   this->VTKRepresentation = vtkQtChartRepresentation::New();
-  this->Visibility = 0;
+  this->Visibility = 1;
 
   this->UseIndexForXAxis = true;
   this->XSeriesName = 0;
@@ -74,8 +74,8 @@ bool vtkSMChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
     {
     return false;
     }
-  vtkSMChartViewProxy* chartView = vtkSMChartViewProxy::SafeDownCast(
-    view);
+
+  vtkSMChartViewProxy* chartView = vtkSMChartViewProxy::SafeDownCast(view);
   if (!chartView)
     {
     return false;
@@ -93,9 +93,8 @@ bool vtkSMChartRepresentationProxy::AddToView(vtkSMViewProxy* view)
 //----------------------------------------------------------------------------
 bool vtkSMChartRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 {
-  vtkSMChartViewProxy* barChartView = vtkSMChartViewProxy::SafeDownCast(
-    view);
-  if (!barChartView || barChartView != this->ChartViewProxy)
+  vtkSMChartViewProxy* chartView = vtkSMChartViewProxy::SafeDownCast(view);
+  if (!chartView || chartView != this->ChartViewProxy)
     {
     return false;
     }
