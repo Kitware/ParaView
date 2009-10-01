@@ -116,15 +116,7 @@ void pqBlotDialog::runScript(const QStringList &files)
 {
   foreach (QString filename, files)
     {
-    QFile file(filename);
-    if (file.open(QIODevice::ReadOnly))
-      {
-      this->ui->shellWidget->executeBlotScript(file.readAll().data());
-      }
-    else
-      {
-      qWarning() << "Error opening " << filename;
-      }
+    this->ui->shellWidget->executeBlotScript(filename);
     }
 }
 

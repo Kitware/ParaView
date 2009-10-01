@@ -158,12 +158,12 @@ void pqBlotShell::echoExecuteBlotCommand(const QString &command)
 }
 
 //-----------------------------------------------------------------------------
-void pqBlotShell::executeBlotScript(const QString &script)
+void pqBlotShell::executeBlotScript(const QString &filename)
 {
-  foreach (QString command, script.split("\n"))
-    {
-    this->echoExecuteBlotCommand(command);
-    }
+  QString pythonCommand = QString("pvblot.execute_file('%1')\n").arg(filename);
+  this->executePythonCommand(pythonCommand);
+
+  this->promptForInput();
 }
 
 //-----------------------------------------------------------------------------

@@ -1,41 +1,11 @@
-r"""
+"""
 
 The blotish module provides a set of commands that control batch ParaView
-visualization using semantics similar to the blot program.  Those already
-familiar with blot should have no trouble understanding scripts written
-using this module.  However, when writing scripts with the blotish module
-should understand some very important differences.
+visualization using semantics similar to the blot program.
 
-The major difference between using blotish and blot is that blotish is
-using the Python interpreter, which has a significantly different syntax
-than the blot interpreter.  For starters, Python commands wrap their
-arguments in parenthesis and separate the arguments with commas.  Thus, the
-detour command must be called as "detour()" and a 20 degree rotation around
-the x axis must be called as "rotate(x, 20)".  Another difference is that
-Python is case sensitive.  The commands are implemented in lower case
-because that seems to be the most common.  Thus, "detour()" works but
-"DETOUR()" does not.  Python also does not support partial commands; you
-have to type in the entire command.  Thus, "det()" will not work in place
-of "detour()" Some command have aliases for common abbreviations.  For
-example, a "pl()" command exists to use in replacement for "plot()", but
-"plo()" will still not work.  A final difference is that Python is more
-picky about defining identifiers before using them.  The upshot is that
-identifiers that refer to dynamic things like variable names must be passed
-as strings.  For example, to paint the variable "Temp", the command is
-executed like "paint('Temp')".
-
-On the flip side, the Python interpreter provides many helpful features
-such as flow control structures and mathematical operations.  You also have
-the "help" command that can provide documentation on any module or command.
-
-To start using the blotish commands, first load the blotish module and then
-start running commands.  Note that at some point you will have to specify a
-filename.  This can be done as an argument to detour.
-
-  from blotish import *
-
-  detour('/path/to/exodus/file')
-  plot()
+Instead of calling the public methods of blotish directly this module is
+driven by pvblot.  The pvblot module creates an interpreter that translates
+blot syntax to botish method calls.  See pvblot.
 
 """
 
@@ -60,51 +30,107 @@ filename.  This can be done as an argument to detour.
 # the U.S. Government retains certain rights in this software.
 #-------------------------------------------------------------------------
 
-
-# Import myself so that if the user called "from blotish import *",
-# help(blotish) still works.
-import blotish
-
 import paraview.simple
+import async_io_helper
+import timestep_selection
+import number_list_parser
+import blot_common
+import tplot as tplot_mod
 import math
 
-# An class that can be caught the signifies a blotish parameter error.
-class BlotishError(ValueError): pass
+# Global variable state is used by methods in this module
+# After _init_blotish is called state is an instance of
+# the class _State.
+state = None
 
-_standard_colors = [
-    [ 0.933, 0.000, 0.000],     # Red
-    [ 0.000, 0.804, 0.804 ],    # Cyan
-    [ 0.000, 1.000, 0.000 ],    # Green
-    [ 0.804, 0.804, 0.000 ],    # Yellow
-    [ 0.647, 0.165, 0.165 ],    # Brown
-    [ 0.804, 0.569, 0.620 ],    # Pink
-    [ 0.576, 0.439, 0.859 ],    # Purple
-    [ 0.804, 0.522, 0.000 ],    # Orange
-    ]
+# The exception class that is raised by this module
+BlotishError = blot_common.Error
 
-def _find_case_insensitive(str, lst):
-    """
-    Finds string str in list of strings lst ignoring case.  If the string is
-    found, returns the actual value of the string.  Otherwise, returns None.
-    """
-    strUpper = str.upper()
-    for entry in lst:
-        if entry.upper() == strUpper:
-            return entry
-    return None
+# Some constants
+NODE_VARIABLE = blot_common.NODE_VARIABLE
+ELEMENT_VARIABLE = blot_common.ELEMENT_VARIABLE
+GLOBAL_VARIABLE = blot_common.GLOBAL_VARIABLE
+EXODUS = blot_common.EXODUS
+SPYPLOT = blot_common.SPYPLOT
+
+STANDARD_COLORS = blot_common.STANDARD_COLORS
+
+
+def _subprogram(names=[]):
+    """A decorator factor that can be applied to methods to signal that the
+    method requires a specifc subprogram or subprograms.  The argument to this
+    factor method can be a single string to require a specific subpgram,
+    a list of strings to require one of a set of subprograms, or if no argument
+    is provided than the method is valid if any subprogram is active."""
+    def decorator_func(func):
+        if isinstance(names, str): programs = [names]
+        else: programs = list(names)
+        def wrapper(*args, **kwargs):
+            if not state.subProgram \
+                or (state.subProgram and programs
+                    and state.subProgram not in programs):
+                if programs:
+                    if len(programs) > 1: plural = "s"
+                    else: plural = ""
+                    msg = "This command is only available in the subprogram%s: %s" % (plural,
+                                                                         ", ".join(programs))
+                else:
+                    msg = "Expected a subprogram name"
+                raise BlotishError(msg)
+            func(*args, **kwargs)
+        wrapper.__name__ = func.__name__
+        wrapper.__doc__ = func.__doc__
+        return wrapper
+    return decorator_func
+
 
 class _State(object):
     "This class holds state variables for blotish including PV objects."
 
-    filename = None
-    numBlocks = 1
-    numBlockColors = len(_standard_colors)
-    numSpectrumColors = 5
-    availableTimes = []
-    plotTimes = []
-    mlines = 1
-    msurface = 1
-    autoplot = True
+    def __init__(self):
+        self.filename = None
+        self.numBlocks = 1
+        self.numBlockColors = len(STANDARD_COLORS)
+        self.numSpectrumColors = 5
+        self.filename_counter = 0
+        self.mlines = 1
+        self.msurface = 1
+        self.tplot = None
+        self.autoplot = True
+        self.subProgram = None
+        self.ioHelper = async_io_helper.new_helper()
+        self.interactive = True
+        self.diskwrite = False
+        self.time_selection = None # will be set to an instance of timestep_selection
+
+        # set some default values acceptable for the ExodusIIReader
+        # these may be adjusted for the SpyPlotReader
+        self._block_id_variable = "ObjectId"
+        self._block_id_field = "CELL_DATA"
+        self._block_id_offset = 1
+
+    def __del__(self):
+
+        # Remove tplot first
+        del self.tplot
+
+        # Sometimes paraview is already unloaded at this point.
+        if not paraview: return
+
+        # Remove pipeline objects
+        for name in self._pipelineObjects.keys():
+            source = self._pipelineObjects.pop(name)
+            paraview.simple.Delete(source)
+
+        # Finally remove the reader
+        paraview.simple.Delete(self.reader)
+
+    def _getPrompt(self):
+        if self.subProgram == "detour": return "DETOUR> "
+        if self.subProgram == "tplot": return "TPLOT> "
+        if self.subProgram == "splot": return "SPLOT> "
+        else: return "BLOT> "
+    prompt = property(_getPrompt, doc="Return the prompt for the active subprogram.")
 
     _pipelineObjects = {}
     def _getPipelineObject(self, name, createFunc, **newObjectOptions):
@@ -119,9 +145,39 @@ class _State(object):
     _reader = None
     def _getReader(self):
         if not self.filename:
-            raise BlotishError, "No filename specified."
-        return self._getPipelineObject('reader', paraview.simple.ExodusIIReader,
-                                       FileName=self.filename)
+            raise BlotishError("No filename specified.")
+        if not self._reader:
+
+            if self.filename.lower().endswith("spcth"):
+
+                # For the spy plot reader we will turn on all variables
+                # and then apply the Extract CTH Parts filter to give us
+                # something to work with
+                r = paraview.simple.SpyPlotReader(FileName=self.filename)
+                r.CellArrays = r.CellArrays.Available
+                extract = paraview.simple.ExtractCTHParts()
+                material_vars = []
+                for var_name in r.CellArrays:
+                    if var_name.startswith("Material volume fraction"):
+                        material_vars.append(var_name)
+
+                extract.UnsignedCharacterVolumeArrays = material_vars
+
+                extract.add_attribute("DatabaseType", SPYPLOT)
+                extract.add_attribute("FileName", r.FileName)
+                extract.add_attribute("TimestepValues", r.TimestepValues)
+
+                self._reader = extract
+                self._block_id_variable = "Part Index"
+                self._block_id_field = "POINT_DATA"
+                self._block_id_offset = 0
+                
+            else:
+                self._reader = paraview.simple.ExodusIIReader(FileName=self.filename)
+                self._reader.add_attribute("DatabaseType", EXODUS)
+
+        return self._reader
+
     reader = property(_getReader, doc="ParaView Exodus reader pipeline object.")
 
     _surface = None
@@ -152,7 +208,7 @@ class _State(object):
 
     # The last variable selected.
     currentVariable = None
-    # The type of the last variable selected ('POINT_DATA' or 'CELL_DATA')
+    # The type of the last variable selected (NODE_VARIABLE, ELEMENT_VARIABLE, GLOBAL_VARIABLE)
     currentVariableType = None
 
     def loadVariable(self, name):
@@ -163,36 +219,25 @@ class _State(object):
         of this object are set.  If the variable is not found, an exception is
         raised.
         """
-        reader = self.reader
-        realname = _find_case_insensitive(name, reader.PointVariables.Available)
-        if realname:
-            vars = reader.PointVariables[:]
-            if vars.count(realname) == 0:
-                vars.append(realname)
-                reader.PointVariables = vars
-            self.currentVariable = realname
-            self.currentVariableType = 'POINT_DATA'
-            return
-        realname = _find_case_insensitive(name, reader.ElementVariables.Available)
+        var = _find_variable_or_raise_exception(self.reader, name)
+        self.currentVariable = var.name
+        self.currentVariableType = var.type
+        self.currentVariableComponent = var.component
 
-        if realname:
-            vars = reader.ElementVariables[:]
-            if vars.count(realname) == 0:
-                vars.append(realname)
-                reader.ElementVariables = vars
-            self.currentVariable = realname
-            self.currentVariableType = 'CELL_DATA'
-            return
-
-        raise BlotishError, "No such variable " + name
+    def get_next_screenshot_filename(self, label=""):
+        self.filename_counter += 1
+        return "pvblot_%05d_%s.png" % (self.filename_counter, label)
 
     def _getCurrentVariableInfo(self):
         if not self.currentVariable:
-            raise BlotishError, "No variable selected."
-        if self.currentVariableType == 'POINT_DATA':
-            return self.reader[0].PointData[self.currentVariable]
-        else:   # Must be CELL_DATA
-            return self.reader[0].CellData[self.currentVariable]
+            raise BlotishError("No variable selected.")
+        r = self.reader
+        itr = zip([NODE_VARIABLE, ELEMENT_VARIABLE, GLOBAL_VARIABLE],
+                  [r.PointData, r.CellData, r.FieldData])
+        for var_type, var_data in itr:
+            if self.currentVariableType == var_type:
+                return var_data[self.currentVariable]
+        return None
     currentVariableInfo = property(_getCurrentVariableInfo)
 
     # The handling of the lookup table may change dramatically as
@@ -217,8 +262,8 @@ class _State(object):
         # one is the scalar values, the other 3 the RGB values.
         rgbpoints = []
         for i in xrange(self.numBlocks):
-            rgbpoints.append(i + 1)
-            rgbpoints.extend(_standard_colors[(i)%self.numBlockColors])
+            rgbpoints.append(i + self._block_id_offset)
+            rgbpoints.extend(STANDARD_COLORS[i % self.numBlockColors])
         lt.RGBPoints = rgbpoints
 
     _spectrumLookupTable = None
@@ -241,14 +286,14 @@ class _State(object):
     def _rebuildSpectrumLookupTable(self, lt):
         import paraview.vtk
         # Find a good range for the data.
-        range = self.currentVariableInfo.GetRange()
-        if self.currentVariableInfo.GetNumberOfComponents() > 1:
-            diag = 0
-            for i in xrange(self.currentVariableInfo.GetNumberOfComponents()):
-                range = self.currentVariableInfo.GetRange(i)
-                largest = max(abs(range[0]), range[1])
-                diag = diag + largest*largest
-            range = [0, math.sqrt(diag)]
+        range = self.currentVariableInfo.GetRange(self.currentVariableComponent)
+        
+        if self.currentVariableComponent == -1:
+            lt.VectorMode = "Magnitude"
+        else:
+            lt.VectorMode = "Component"
+            lt.VectorComponent = self.currentVariableComponent
+
         hueStep = (2.0/3.0)/(self.numSpectrumColors)
         rangeStep = (range[1]-range[0])/(self.numSpectrumColors+1)
         # Add RGB points to lookup table.  These are tuples of 4 values.  First
@@ -268,11 +313,37 @@ class _State(object):
     spectrumScalarValues = property(_getSpectrumScalarValues,
                                     doc="The scalar values associated with each spectrum contour.")
 
-global state
-state = _State()
+    def getPlotTimes(self):
+        return self.time_selection.get_selected_times()
 
-on = "on"
-off = "off"
+
+def _cleanup():
+    global state
+    del state
+    state = None
+
+def _get_prompt():
+    if state.ioHelper.get_output():
+        return str(state.ioHelper.get_output())
+    return state.prompt
+
+def _handle_input(line):
+    return state.ioHelper.handle_input(line)
+
+def _get_io_helper():
+    return state.ioHelper
+
+def _set_interactive(value):
+    """Sets interactive mode on/off.  Sets diskwrite mode to the opposite value."""
+    state.interactive = value
+    state.diskwrite = not value
+
+def _find_variable_or_raise_exception(reader, name):
+    """Returns a valid blot_common.Variable instance or raises a BlotishError."""
+    var = blot_common.find_variable(reader, name)
+    if not var:
+        raise BlotishError("'%s' is an invalid variable name" % name)
+    return var
 
 def _init_blotish(filename):
     """
@@ -282,23 +353,26 @@ def _init_blotish(filename):
     This function takes a single string argument that is the path to the
     exodus file to load.
     """
+    global state
+    if state: return
+    elif not filename: raise BlotishError("You need to specify a filename.")
 
-    if state.filename:
-        return
-    elif not filename:
-        raise BlotishError, "You need to specify a filename."
-
+    state = _State()
     state.filename = filename
 
-    # This will automatically load the reader
+    # Make sure a render window has been created
+    state.renderview = paraview.simple.GetRenderView()
+    state.renderview.UseOffscreenRenderingForScreenshots = 0
+
+    # This will automatically load the reader, filename must be set first.
     reader = state.reader
 
     if not reader:
         state.filename = None
-        print "Failed to load file", filename
+        raise BlotishError("Failed to load file %s" % filename)
 
-    #paraview.simple.UpdatePipeline()
-    datainfo = reader[0].GetDataInformation()
+    reader.UpdatePipeline()
+    datainfo = reader.GetDataInformation()
     state.numBlocks = datainfo.GetNumberOfDataSets()
 
     print "Database:", reader.FileName
@@ -307,43 +381,201 @@ def _init_blotish(filename):
     print "Number of elements       =", datainfo.GetNumberOfCells()
     print "Number of element blocks =", state.numBlocks
     print
-    print "Number of node sets      =", len(reader.NodeSetArrayStatus.Available)
-    print "Number of side sets      =", len(reader.SideSetArrayStatus.Available)
-    print
-    print "Variable Names"
-    print "Global: ",
-    for name in reader.GlobalVariables.Available:
-        print " ", name,
-    print
-    print "Nodal:  ",
-    for name in reader.PointVariables.Available:
-        print " ", name,
-    print
-    print "Element:",
-    for name in reader.ElementVariables.Available:
-        print " ", name,
+
+    if reader.DatabaseType == EXODUS:
+        print "Number of node sets      =", len(reader.NodeSetArrayStatus.Available)
+        print "Number of side sets      =", len(reader.SideSetArrayStatus.Available)
+        print
+        print "Variable Names"
+        print "Global: ",
+        for name in reader.GlobalVariables.Available:
+            print " ", name,
+        print
+        print "Nodal:  ",
+        for name in reader.PointVariables.Available:
+            print " ", name,
+        print
+        print "Element:",
+        for name in reader.ElementVariables.Available:
+            print " ", name,
+
+    elif reader.DatabaseType == SPYPLOT:
+
+        print "Variable Names"
+        print "Element:",
+        for name in reader.Input.CellArrays.Available:
+            print " ", name,
+
     print
     print "Number of time steps     =", len(reader.TimestepValues)
     if len(reader.TimestepValues) > 0:
         print "   Minimum time          =", min(reader.TimestepValues)
         print "   Maximum time          =", max(reader.TimestepValues)
-        state.availableTimes = reader.TimestepValues
+        all_times = reader.TimestepValues
     else:
-        state.availableTimes = [0]
-    state.plotTimes = state.availableTimes
+        all_times = [0]
+    print
+    state.time_selection = timestep_selection.TimestepSelection(all_times)
 
 def _finish_plot_change():
+    """Maybe re-render depending on the value of state.autoplot"""
     if state.autoplot:
         paraview.simple.Render()
 
-def detour(filename=None):
-    """
-    Start a subprogram to plot deformed meshes.  If a filename has not been
-    specified earlier, you can specify one here.
-    """
-    _init_blotish(filename)
-    wirefram()
+def _find_variable_command(variable_name):
+    """When a command is entered that doesn't match any existing command it
+    might be a variable name in which case we should call typlot with that
+    variable as the first argument."""
+    def call_typlot(*args, **kwargs):
+        args = list(args)
+        args.insert(0, variable_name)
+        typlot(*args, **kwargs)
+    call_typlot.__name__ = typlot.__name__
+    call_typlot.__doc__ = typlot.__doc__
 
+    var = blot_common.find_variable(state.reader, variable_name)
+    if var: return call_typlot
+    return None
+
+@_subprogram("tplot")
+@async_io_helper.wrap(_get_io_helper)
+def typlot(*args, **kwargs):
+    """Create a time plot of the given variable"""
+
+    _require_plot_mode(tplot_mod.TYCURVE)
+
+    # If args not specified then get args using asynchronous input
+    if not args:
+        yield "Y VARIABLE "
+        args = kwargs["io_helper"].get_input().split()
+        if not args: args = [" "]
+
+    args = list(args)
+    var = _find_variable_or_raise_exception(state.reader, args.pop(0))
+
+    if var.type == GLOBAL_VARIABLE:
+        if args:
+            print_blot_warning("Extra tokens after global variable name ignored.")
+        c = tplot_mod.Curve(var)
+        state.tplot.add_curve(c)
+        state.tplot.print_show()
+        return
+
+    if not args:
+        raise BlotishError("Expected node/element number")
+
+    s = " ".join(args)
+    try: selected_ids = number_list_parser.parse_number_list(s, int)
+    except number_list_parser.Error as err: raise BlotishError(err)
+
+    uniq = dict()
+    selected_ids = [uniq.setdefault(i,i) for i in selected_ids if i not in uniq]
+
+    for id in selected_ids:
+        c = tplot_mod.Curve(var, id)
+        state.tplot.add_curve(c)
+    state.tplot.print_show()
+
+
+def _require_plot_mode(mode):
+    """Check if the current tplot mode is the given mode.  If there is a mismatch
+    raise a BlotishError."""
+    current_mode = state.tplot.get_current_curve_mode()
+    if current_mode is not None:
+        if mode != current_mode:
+            raise BlotishError("Time curves and X-Y curves must be defined separately")
+
+
+@_subprogram("tplot")
+@async_io_helper.wrap(_get_io_helper)
+def xyplot(io_helper=None):
+    """Create a variable versus variable plot with data points at each timestep"""
+
+    _require_plot_mode(tplot_mod.XYCURVE)
+
+    def extract_variable_and_ids(args):
+        # convert to list of at least one token
+        if not args: args = [" "]
+        args = list(args)
+
+        # treat the first token as a variable name to lookup a variable
+        var = _find_variable_or_raise_exception(state.reader, args.pop(0))
+
+        # variable must not be a global
+        if var.type == GLOBAL_VARIABLE:
+            raise BlotishError("XYPlot does not support global variables")
+            return
+
+        # Now parse the remaining tokens as a list of numbers and number ranges
+        if not args: raise BlotishError("Expected node/element number")
+        s = " ".join(args)
+        try: selected_ids = number_list_parser.parse_number_list(s, int)
+        except number_list_parser.Error as err: raise BlotishError(err)
+
+        # Convert to list of unique values and return
+        uniq = dict()
+        selected_ids = [uniq.setdefault(i,i) for i in selected_ids if i not in uniq]
+        return var, selected_ids
+
+    yield "X VARIABLE "
+    args = io_helper.get_input().split()
+    x_var, x_ids = extract_variable_and_ids(args)
+
+    yield "Y VARIABLE "
+    args = io_helper.get_input().split()
+    y_var, y_ids = extract_variable_and_ids(args)
+
+    if len(x_ids) != len(y_ids):
+        raise BlotishError("The number of selected node or element ids must be "
+                           "the same for the X variable and Y variable.")
+
+    if x_var.type != y_var.type:
+        raise BlotishError("X and Y variable must be the same type (node or element)")
+
+    for xid, yid in zip(x_ids, y_ids):
+        if xid != yid:
+            raise BlotishError("XYPlot does not support plotting variables at "
+                               "different node or element ids against each other.")
+
+
+    for id in x_ids:
+        c = tplot_mod.Curve(y_var, id)
+        c.set_x_variable(x_var)
+        state.tplot.add_curve(c)
+    state.tplot.print_show()
+
+
+
+def detour():
+    """
+    Start a subprogram to plot deformed meshes.
+    """
+    print " DETOUR - a deformed mesh and contour plot program"
+    print
+    state.subProgram = "detour"
+    paraview.simple.SetActiveView(state.renderview)
+    wireframe()
+
+def tplot():
+    """Start TPLOT subprogram to plot curves of variables over times.  Variables
+    can be nodal, elemental, or global."""
+    print " TPLOT - a time history or X-Y plot program"
+    print
+    state.subProgram = "tplot"
+    state.tplot = tplot_mod.TPlot()
+
+@_subprogram("tplot")
+def overlay(*args):
+    """Turn overlay on or off."""
+    value = True
+    if args: value = _token_to_bool(args[0])
+    state.tplot.overlay = value
+    print " Overlay curves for all variables",
+    if value: print "on"
+    else: print "off"
+    print
+
+@_subprogram("detour")
 def color(ncol=None):
     """
     Set the maximum number of standard color scale colors to use on a color
@@ -363,6 +595,7 @@ def color(ncol=None):
     state.rebuildBlockLookupTable()
     _finish_plot_change()
 
+@_subprogram("detour")
 def spectrum(ncol=5):
     """Set the number of contours to include in a paint or contour plot."""
     state.numSpectrumColors = int(ncol)
@@ -399,60 +632,68 @@ def _updateMeshRender():
             paraview.simple.Hide(todraw)
     return todraw
 
-def mlines(mlines_flag):
+@_subprogram("detour")
+def mlines(*args):
     """
-    Turns on/off the grid lines for block elements.  This method takes
-    exactly one argument.  If it is on, then the wireframe grid is drawn.
-    If it is off, the wireframe grid is not drawn.
+    Turns on/off the grid lines for block elements.  The default value
+    is on.  If it is on, then the wireframe grid is drawn.  If it is off,
+    the wireframe grid is not drawn.
     """
-    if isinstance(mlines_flag, str):
-        mlines_flag = mlines_flag.lower()
-        if mlines_flag == on:
-            mlines_flag = 1
-        elif mlines_flag == off:
-            mlines_flag = 0
-        else:
-            raise BlotishError, ("Unknown mlines flag: " + mlines_flag)
-    state.mlines = mlines_flag
+    value = True
+    if args: value = _token_to_bool(args[0])
+    state.mlines = value
+    print " Display element mesh lines",
+    if value: print "on"
+    else: print "off"
+    print
     _updateMeshRender()
     _finish_plot_change()
 
-def wire():
-    "Alias for wireframe command."
-    wireframe()
-def wirefram():
-    "Alias for wireframe command."
-    wireframe()
-def wireframe():
+
+def diskwrite(*args):
+    """
+    Turns on/off writing to disk.  During non-interactive mode
+    disk write default to on, else it is off.
+    """
+    value = True
+    if args: value = _token_to_bool(args[0])
+    state.diskwrite = value
+    print " Write to disk",
+    if value: print "on"
+    else: print "off"
+    print
+
+@_subprogram("detour")
+def wireframe(*args):
     "Sets the view to wireframe mesh mode, which displays the mesh lines."
     state.resetPipeline()
     state.mlines = 1
     state.msurface = 0
     todraw = _updateMeshRender()
     paraview.simple.SetDisplayProperties(todraw,
-                                         ColorAttributeType="CELL_DATA",
-                                         ColorArrayName="ObjectId",
+                                         ColorAttributeType=state._block_id_field,
+                                         ColorArrayName=state._block_id_variable,
                                          LookupTable=state.blockLookupTable)
     _finish_plot_change()
 
-def solid(mlines_flag=on):
+@_subprogram("detour")
+def solid():
     """
     Sets the view to solid mesh mode, which paints each element using a
     different color for each element block.
-
-    The optional argument specifies weather you want to show mesh lines
-    (by default they are shown).
     """
+    print " Solid mesh plot"
+    print
     state.resetPipeline()
     state.msurface = 1
-    mlines(mlines_flag)
     todraw = _updateMeshRender()
     paraview.simple.SetDisplayProperties(todraw,
-                                         ColorAttributeType="CELL_DATA",
-                                         ColorArrayName="ObjectId",
+                                         ColorAttributeType=state._block_id_field,
+                                         ColorArrayName=state._block_id_variable,
                                          LookupTable=state.blockLookupTable)
     _finish_plot_change()
 
+@_subprogram("detour")
 def paint(variable=None):
     """Sets the view to paint contour mode, which paints contours of the
     given variable on the mesh.  The variable may be either nodal or element.
@@ -460,7 +701,9 @@ def paint(variable=None):
     if variable:
         state.loadVariable(variable)
     if not state.currentVariable:
-        raise BlotishError, "No variable selected."
+        raise BlotishError("No variable selected.")
+    if state.currentVariableType not in [NODE_VARIABLE, ELEMENT_VARIABLE]:
+        raise BlotishError("Contour variable must be nodal or element variable")
 
     state.resetPipeline()
     state.mlines = 0
@@ -472,17 +715,18 @@ def paint(variable=None):
                                          LookupTable=state.spectrumLookupTable)
     _finish_plot_change()
 
+@_subprogram("detour")
 def contour(variable=None):
     """Sets the view to contour mode, which plots the line or surface contours
     where the given variable is equal to one of the contour values (set with
     the spectrum command)."""
     if variable:
         state.loadVariable(variable)
-    if state.currentVariableType != 'POINT_DATA':
-        raise BlotishError, "Only nodal variables supported by contour right now."
+    if state.currentVariableType != NODE_VARIABLE:
+        raise BlotishError("Only nodal variables supported by contour right now.")
     info = state.currentVariableInfo
     if (info.GetNumberOfComponents() > 1):
-        raise BlotishError, state.currentVariable + " is not a scalar."
+        raise BlotishError(state.currentVariable + " is not a scalar.")
 
     state.resetPipeline()
     state.mlines = 0
@@ -499,6 +743,7 @@ def contour(variable=None):
                                          LookupTable=state.spectrumLookupTable)
     _finish_plot_change()
 
+@_subprogram("detour")
 def vector(variable=None):
     """
     Sets the view to vector mode.  Pass the name of the variable as the
@@ -507,10 +752,10 @@ def vector(variable=None):
     if variable:
         state.loadVariable(variable)
     if state.currentVariableType != 'POINT_DATA':
-        raise BlotishError, "Only nodal variables supported by vector right now."
+        raise BlotishError("Only nodal variables supported by vector right now.")
     info = state.currentVariableInfo
     if (info.GetNumberOfComponents() < 2):
-        raise BlotishError, state.currentVariable + " is not a vector."
+        raise BlotishError(state.currentVariable + " is not a vector.")
     glyph = state.glyph
     glyph.Vectors = state.currentVariable
     glyph.Orient = 1
@@ -537,33 +782,173 @@ def vector(variable=None):
     state.msurface = 1
     surface = _updateMeshRender()
     paraview.simple.SetDisplayProperties(surface,
-                                         ColorAttributeType="CELL_DATA",
-                                         ColorArrayName="ObjectId",
+                                         ColorAttributeType=state._block_id_field,
+                                         ColorArrayName=state._block_id_variable,
                                          LookupTable=state.blockLookupTable,
                                          Opacity=0.5)
     _finish_plot_change()
 
-def pl():
-    "Alias for plot command."
-    plot()
-def plot():
+
+
+
+@async_io_helper.wrap(_get_io_helper)
+def _tplot_plot(io_helper=None):
+    if state.tplot.overlay:
+        state.tplot.plot()
+
+        if state.diskwrite:
+            state.tplot.write_image(state.get_next_screenshot_filename("tplot_overlay"))
+        return
+
+    interactive = state.interactive
+    nCurves = state.tplot.get_number_of_curves()
+    for i in xrange(nCurves):
+        state.tplot.plot(i)
+
+        if state.diskwrite:
+            state.tplot.write_image(state.get_next_screenshot_filename("tplot_curve%02d"%i))
+
+        if interactive and i < nCurves-1:
+            yield "Enter 'Q' to quit, '' to continue. "
+            result = io_helper.get_input().lower()
+            if result.startswith('q'):
+                break
+
+
+def _tplot_reset():
+    state.tplot.reset()
+    
+def _detour_reset():
+    wireframe()
+
+@_subprogram(["detour", "tplot"])
+def plot(*args):
     "Generates the current plot."
-    import sys
-    prompt = sys.stdin.isatty()
-    for t in state.plotTimes:
-        paraview.simple.GetActiveView().ViewTime = t
-        paraview.simple.Render()
-        if prompt and (not t == state.plotTimes[len(state.plotTimes)-1]):
-            print "Time", t,
-            print "  Enter 'C' to complete, 'Q' to quit. ",
-            result = sys.stdin.readline()
-            result = result.lower()
+    if state.subProgram == "tplot": return _tplot_plot()
+    if state.subProgram == "detour": return _detour_plot()
+
+@_subprogram(["detour", "tplot"])
+def reset(*args):
+    "Reset the plot settings"
+    if state.subProgram == "tplot": return _tplot_reset()
+    if state.subProgram == "detour": return _detour_reset()
+
+@_subprogram(["detour", "tplot"])
+def times(*args):
+    """Select time steps"""
+    try: state.time_selection.parse_times(" ".join(args))
+    except timestep_selection.Error as err: raise BlotishError(err)
+    print " Select specified whole times"
+    print "    Number of selected times = %d" % len(state.time_selection.selected_indices)
+    print
+
+@_subprogram(["detour", "tplot"])
+def steps(*args):
+    """Select time steps"""
+    try: state.time_selection.parse_steps(" ".join(args))
+    except timestep_selection.Error as err: raise BlotishError(err)
+    print " Select specified whole times"
+    print "    Number of selected times = %d" % len(state.time_selection.selected_indices)
+    print
+
+
+@_subprogram("tplot")
+def xscale(min_value=None, max_value=None):
+    """Set the minimum and maximum values of the X axis"""
+    state.tplot.set_xscale(_maybe_convert(min_value, float),
+                           _maybe_convert(max_value, float))
+
+@_subprogram("tplot")
+def yscale(min_value=None, max_value=None):
+    """Set the minimum and maximum values of the X axis"""
+    state.tplot.set_yscale(_maybe_convert(min_value, float),
+                           _maybe_convert(max_value, float))
+
+@_subprogram("tplot")
+def xlabel(*args):
+    """Set the X axis label"""
+    label = " ".join(args)
+    state.tplot.set_xlabel(label)
+
+@_subprogram("tplot")
+def ylabel(*args):
+    """Set the Y axis label"""
+    label = " ".join(args)
+    state.tplot.set_ylabel(label)
+
+@_subprogram()
+def nintv(value=None):
+    """Set nintv"""
+    state.time_selection.set_nintv(_maybe_convert(value, int))
+    state.time_selection.print_show()
+
+@_subprogram()
+def zintv(value=None):
+    """Set zintv"""
+    state.time_selection.set_zintv(_maybe_convert(value, int))
+    state.time_selection.print_show()
+
+@_subprogram()
+def deltime(value=None):
+    """Set deltime"""
+    state.time_selection.set_deltime(_maybe_convert(value, float))
+    state.time_selection.print_show()
+
+@_subprogram()
+def tmin(value=None):
+    """Set deltime"""
+    state.time_selection.set_tmin(_maybe_convert(value, float))
+    state.time_selection.print_show()
+
+@_subprogram()
+def tmax(value=None):
+    """Set deltime"""
+    state.time_selection.set_tmax(_maybe_convert(value, float))
+    state.time_selection.print_show()
+
+@_subprogram()
+def alltimes():
+    """Set time selection mode to ALLTIMES"""
+    state.time_selection.set_alltimes()
+    state.time_selection.print_show()
+
+def show(name=""):
+    """Show the given parameter name"""
+    
+    name = name.lower()
+    if name in ["tmin", "tmax", "nintv", "zintv", "times", "steps"]:
+        sel = state.time_selection
+        count = 0
+        state.time_selection.print_show()
+        print " %d selected time steps" % len(sel.selected_times)
+        for idx, time in zip(sel.selected_indices, sel.selected_times):
+            print "     %d)  (step %3d)  %f" % (count+1, idx+1, time)
+            count += 1
+        print
+
+
+@async_io_helper.wrap(_get_io_helper)
+def _detour_plot(io_helper=None):
+
+    interactive = state.interactive
+    plotTimes = state.time_selection.selected_times
+    nSteps = len(plotTimes)
+    view = state.renderview
+    for stepIdx in xrange(nSteps):
+        t = plotTimes[stepIdx]
+        view.ViewTime = t
+        paraview.simple.Render(view)
+
+        if state.diskwrite:
+            paraview.simple.WriteImage(state.get_next_screenshot_filename("detour"), view)
+
+        if interactive and stepIdx != nSteps-1:
+            yield ("Time %f: Enter 'C' to complete, 'Q' to quit, '' to continue. " % t)
+            result = io_helper.get_input().lower()
             if result.startswith('q'):
                 break
             elif result.startswith('c'):
-                prompt = False
-        else:
-            print "Time", t
+                interactive = False
 
 def autoplot(flag):
     """    
@@ -585,9 +970,7 @@ elevation = 'elevation'
 azimuth = 'azimuth'
 roll = 'roll'
 
-def rot(*rotations):
-    "Alias for rotate command."
-    rotate(*rotations)
+@_subprogram("detour")
 def rotate(*rotations):
     """
     Rotates the 3D mesh.  Each (axis, ndeg) parameter pair specifies an
@@ -627,9 +1010,8 @@ def rotate(*rotations):
             print "Unknown axis: ", axis
     _finish_plot_change()
 
-each = 'each'
-mesh = 'mesh'
-reset = 'reset'
+
+@_subprogram("detour")
 def zoom(factor):
     """
     Zooms the view by the given factor.  Factors bigger than 1 make the
@@ -647,7 +1029,7 @@ def zoom(factor):
     camera = paraview.simple.GetActiveCamera()
     if isinstance(factor, str):
         factor = factor.lower()
-        if (factor == each) or (factor == mesh) or (factor == reset):
+        if factor in ["each", "mesh", "reset"]:
             paraview.simple.ResetCamera()
             _finish_plot_change()
             return
@@ -655,12 +1037,7 @@ def zoom(factor):
     camera.Dolly(factor)
     _finish_plot_change()
 
-def trans(x, y):
-    "Alias for translate."
-    translate(x, y)
-def translat(x, y):
-    "Alias for translate."
-    translate(x, y)
+@_subprogram("detour")
 def translate(x, y):
     """
     Translate the view in the x and y directions.  The x argument pans
@@ -697,3 +1074,23 @@ def translate(x, y):
     camera.SetFocalPoint(pos)
 
     _finish_plot_change()
+
+def _token_to_bool(token):
+    token = str(token).lower()
+    if token in ["1", "on", "true", "yes"]:
+        return True
+    if token in ["0", "off", "false", "no"]:
+        return False
+    raise BlotishError("Expected \"ON\" or \"OFF\"")
+
+
+def _maybe_convert(token, number_class):
+    """Attempts to convert the argument to the given number class if the
+    argument is not None.  Raises an exception on a conversion error.  If the
+    argument is None, returns None without raising any error."""
+    if token is None: return None
+    try: num = number_list_parser.convert_to_number_class(token, number_class)
+    except number_list_parser.Error as err: raise BlotishError(err)
+    return num
+
+
