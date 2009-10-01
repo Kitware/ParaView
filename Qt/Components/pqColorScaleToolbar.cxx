@@ -33,10 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqColorScaleToolbar.h"
 
 #include "pqColorScaleEditor.h"
-#include "pqDataRepresentation.h"
 #include "pqDisplayColorWidget.h"
 #include "pqPipelineRepresentation.h"
+#include "pqPipelineRepresentation.h"
 #include "pqSMAdaptor.h"
+#include "pqStandardColorLinkAdaptor.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 #include <QAction>
 #include <QApplication>
@@ -172,18 +174,40 @@ void pqColorScaleToolbar::changeColor()
       {
       this->editColorMap(this->Internal->Representation);
       }
-    else */if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
+    else */
+    if(this->Internal->ColorBy->getCurrentText() == "Solid Color")
       {
       if(!this->Internal->Representation.isNull())
         {
         // Get the color property.
         vtkSMProxy *proxy = this->Internal->Representation->getProxy();
-        vtkSMProperty *diffuse = proxy->GetProperty("DiffuseColor");
-        if(diffuse)
+
+        pqPipelineRepresentation* pr = qobject_cast<pqPipelineRepresentation*>(
+          this->Internal->Representation);
+        const char* pname = "Color";
+        if (pr)
+          {
+          // based on representation type, we are either changing the diffuse
+          // color or the solid color.
+          int reprType = pr->getRepresentationType();
+          if (reprType == vtkSMPVRepresentationProxy::WIREFRAME ||
+            reprType == vtkSMPVRepresentationProxy::POINTS ||
+            reprType == vtkSMPVRepresentationProxy::OUTLINE)
+            {
+            pname = "AmbientColor";
+            }
+          else
+            {
+            pname = "DiffuseColor";
+            }
+          }
+        vtkSMProperty* colorProperty = proxy->GetProperty(pname);
+        
+        if (colorProperty)
           {
           // Get the current color from the property.
           QList<QVariant> rgb =
-              pqSMAdaptor::getMultipleElementProperty(diffuse);
+              pqSMAdaptor::getMultipleElementProperty(colorProperty);
           QColor color(Qt::white);
           if(rgb.size() >= 3)
             {
@@ -200,10 +224,11 @@ void pqColorScaleToolbar::changeColor()
             rgb.append(color.redF());
             rgb.append(color.greenF());
             rgb.append(color.blueF());
-            pqSMAdaptor::setMultipleElementProperty(diffuse, rgb);
-            pqSMAdaptor::setMultipleElementProperty(
-                proxy->GetProperty("AmbientColor"), rgb);
+            pqSMAdaptor::setMultipleElementProperty(colorProperty, rgb);
             proxy->UpdateVTKObjects();
+            // need to break any global-property link that might have existed
+            // with this property.
+            pqStandardColorLinkAdaptor::breakLink(proxy, pname);
             }
           }
         }

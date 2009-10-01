@@ -81,6 +81,18 @@ void pqStandardColorLinkAdaptor::onGlobalPropertiesChanged()
 }
 
 //-----------------------------------------------------------------------------
+void pqStandardColorLinkAdaptor::breakLink(vtkSMProxy* proxy, const char* pname)
+{
+  vtkSMGlobalPropertiesManager* mgr =
+    pqApplicationCore::instance()->getGlobalPropertiesManager();
+  const char* oldname = mgr->GetGlobalPropertyName(proxy, pname);
+  if (oldname)
+    {
+    mgr->RemoveGlobalPropertyLink(oldname, proxy, pname);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqStandardColorLinkAdaptor::onStandardColorChanged(const QString& name)
 {
   this->IgnoreModifiedEvents = true;
@@ -88,13 +100,8 @@ void pqStandardColorLinkAdaptor::onStandardColorChanged(const QString& name)
     pqApplicationCore::instance()->getGlobalPropertiesManager();
   if (name.isEmpty())
     {
-    const char* oldname = mgr->GetGlobalPropertyName(this->Proxy,
+    pqStandardColorLinkAdaptor::breakLink(this->Proxy,
       this->PropertyName.toAscii().data());
-    if (oldname)
-      {
-      mgr->RemoveGlobalPropertyLink(oldname,
-        this->Proxy, this->PropertyName.toAscii().data());
-      }
     }
   else
     {

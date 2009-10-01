@@ -48,6 +48,9 @@ public:
     pqStandardColorButton*, vtkSMProxy* proxy, const char* propname);
   ~pqStandardColorLinkAdaptor();
 
+  /// Break a global-property link.
+  static void breakLink(vtkSMProxy* proxy, const char* pname);
+
 protected slots:
   /// called when pqStandardColorButton fires standardColorChanged() signal.
   /// We update the property link between the standard color and the
