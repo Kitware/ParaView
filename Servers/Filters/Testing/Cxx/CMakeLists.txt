@@ -16,6 +16,7 @@ IF (VTK_DATA_ROOT)
     ${ServersFilters_SRCS}
     TestContinuousClose3D
     TestPVFilters
+    TestSpyPlotTracers
     )
 ENDIF (VTK_DATA_ROOT)
 

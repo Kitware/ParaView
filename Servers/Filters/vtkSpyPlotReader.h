@@ -286,6 +286,9 @@ protected:
   int UpdateSpyDataFile(vtkInformation* request, 
                         vtkInformationVector* outputVector);
 
+  int UpdateFile(vtkInformation *request, 
+                 vtkInformationVector *outputVector);
+
   void AddGhostLevelArray(int numLevels);
   int AddBlockIdArray(vtkCompositeDataSet *cds);
   int AddAttributes(vtkHierarchicalBoxDataSet *hbds);

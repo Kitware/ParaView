@@ -62,7 +62,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.74");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.75");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,GlobalController,vtkMultiProcessController);
 
@@ -128,15 +128,17 @@ vtkSpyPlotReader::~vtkSpyPlotReader()
 //-----------------------------------------------------------------------------
 // Create either vtkHierarchicalBoxDataSet or vtkMultiBlockDataSet based on
 // whether the dataset is AMR.
-int vtkSpyPlotReader::RequestDataObject(vtkInformation *vtkNotUsed(req),
+int vtkSpyPlotReader::RequestDataObject(vtkInformation *req,
   vtkInformationVector **vtkNotUsed(inV),
   vtkInformationVector *outV)
 {
   vtkInformation *outInfo = outV->GetInformationObject(0);
   vtkCompositeDataSet* outData = NULL;
 
-  // IsAMR is first set during the RequestInformation pass. This will
-  // make the wrong decision if RequestDataObject runs first.
+  // Call UpdateFile (which sets IsAMR) because RequestInformation isn't called
+  // before RequestDataObject
+  this->UpdateFile (req, outV);
+
   if (this->IsAMR)
     {
     outData = vtkHierarchicalBoxDataSet::New();
@@ -180,6 +182,13 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     return 0;
     }
 
+  return this->UpdateFile (request, outputVector);
+}
+
+//-----------------------------------------------------------------------------
+int vtkSpyPlotReader::UpdateFile (vtkInformation* request,
+                                  vtkInformationVector* outputVector)
+{
   ifstream ifs(this->FileName);
   if(!ifs)
     {
@@ -854,7 +863,7 @@ int vtkSpyPlotReader::RequestData(
 
       if (this->GenerateTracerArray == 1 && needTracers)
         {
-        vtkFieldData *fd = hbds->GetFieldData ();
+        vtkFieldData *fd = cds->GetFieldData ();
         vtkDataArray *array= fd->GetArray("Tracer Coordinates");
         if (array != 0)
           {
