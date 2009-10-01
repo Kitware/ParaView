@@ -155,9 +155,9 @@ void pqCommandServerStartup::execute(const OptionsT& user_options)
   // const double timeout = this->getTimeout();
   QStringList arguments = this->getArguments();
 
-  QRegExp regex("[$]([^$].*)[$]");
+  QRegExp regex("\\$([^$]*)\\$");
   // Do string-substitution on the executable
-  if (regex.indexIn(executable) > -1)
+  while (regex.indexIn(executable) > -1)
     {
     QString before = regex.cap(0);
     QString variable = regex.cap(1);
@@ -169,7 +169,7 @@ void pqCommandServerStartup::execute(const OptionsT& user_options)
   for (QStringList::iterator i = arguments.begin(); i != arguments.end(); )
     {
     QString& argument = *i;
-    if(regex.indexIn(argument) > -1)
+    while (regex.indexIn(argument) > -1)
       {
       const QString before = regex.cap(0);
       const QString variable = regex.cap(1);
