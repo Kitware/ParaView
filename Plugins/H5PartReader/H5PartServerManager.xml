@@ -1,0 +1,103 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="H5PartReader" class="vtkH5PartReader">
+      <Documentation>
+        Reader for H5Part (HDF5) particle files.
+      </Documentation>
+
+     <StringVectorProperty name="FileName"
+       command="SetFileName"
+       number_of_elements="1">
+       <FileListDomain name="files"/>
+     </StringVectorProperty>
+      
+     <IntVectorProperty name="MaskOutOfTimeRangeOutput"
+        command="SetMaskOutOfTimeRangeOutput"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+       information_only="1">
+      <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+     
+     <StringVectorProperty
+        name="Xarray"
+        command="SetXarray"
+        number_of_elements="1">
+       <Documentation>
+         This property lists which point array to use for coordinates.
+       </Documentation>
+       <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="Yarray"
+        command="SetYarray"
+        number_of_elements="1">
+       <Documentation>
+         This property lists which point array to use for coordinates.
+       </Documentation>
+       <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="Zarray"
+        command="SetZarray"
+        number_of_elements="1">
+       <Documentation>
+         This property lists which point array to use for coordinates.
+       </Documentation>
+       <StringListDomain name="array_list">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayInfo"
+        information_only="1">
+       <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="PointArrayInfo"
+        label="Point Arrays">
+       <ArraySelectionDomain name="array_list">
+         <RequiredProperties>
+           <Property name="PointArrayInfo" function="ArrayList"/>
+         </RequiredProperties>
+       </ArraySelectionDomain>
+       <Documentation>
+         This property lists which point-centered arrays to read.
+       </Documentation>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="GenerateVertexCells"
+        command="SetGenerateVertexCells"
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

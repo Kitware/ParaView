@@ -95,6 +95,11 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ".include.openmpi"
   "warning LNK4098"
   "include/mpicxx.h"
+  "ClientServer.cxx"
+  "vtkexodus2.*conversion from 'size_t' to 'int', possible loss of data"
+
+  # suppress warning from H5Part library.
+  ".H5Part.src"
   )
 
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
