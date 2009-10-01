@@ -285,6 +285,9 @@ void pqExodusIIPanel::linkServerManagerProperties()
   this->addSelectionToTreeWidget("Global Element Ids", "GlobalElementId", this->UI->Variables,
                    PM_ELEMBLK, "GenerateGlobalElementIdArray");
 
+  this->addSelectionToTreeWidget("Implicit Element Ids", "ImplicitElementId", this->UI->Variables,
+                   PM_ELEMBLK, "GenerateImplicitElementIdArray");
+
   // integer array indicating file id (number in file name or position in sequence)
   this->addSelectionToTreeWidget("File Ids", "FileId", this->UI->Variables,
                    PM_ELEMBLK, "GenerateFileIdArray");
@@ -316,6 +319,9 @@ void pqExodusIIPanel::linkServerManagerProperties()
     
   this->addSelectionToTreeWidget("Global Node Ids", "GlobalNodeId", this->UI->Variables,
                    PM_NODE, "GenerateGlobalNodeIdArray");
+
+  this->addSelectionToTreeWidget("Implicit Node Ids", "ImplicitNodeId", this->UI->Variables,
+                   PM_NODE, "GenerateImplicitNodeIdArray");
 
   int numBef = this->UI->Variables->topLevelItemCount();
   
