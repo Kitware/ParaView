@@ -18,7 +18,7 @@
   Module                  : vtkH5PartReader.h
   Revision of last commit : $Rev: 793 $
   Author of last commit   : $Author: utkarsh $
-  Date of last commit     : $Date: 2009-10-01 18:40:56 $
+  Date of last commit     : $Date: 2009-10-01 19:21:15 $
 
   Copyright (C) CSCS - Swiss National Supercomputing Centre.
   You may use modify and and distribute this code freely providing
@@ -142,7 +142,7 @@ static hid_t H5PartGetDiskShape(H5PartFile *f, hid_t dataset)
 }
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkH5PartReader, "1.2");
+vtkCxxRevisionMacro(vtkH5PartReader, "1.3");
 vtkStandardNewMacro(vtkH5PartReader);
 //----------------------------------------------------------------------------
 vtkH5PartReader::vtkH5PartReader()
@@ -389,7 +389,8 @@ int vtkH5PartReader::RequestInformation(
         }
       }
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(),
-      &this->TimeStepValues[0], this->TimeStepValues.size());
+      &this->TimeStepValues[0],
+      static_cast<int>(this->TimeStepValues.size()));
     double timeRange[2];
     timeRange[0] = this->TimeStepValues.front();
     timeRange[1] = this->TimeStepValues.back();
@@ -675,7 +676,7 @@ int vtkH5PartReader::RequestData(
     vtkstd::vector<vtkstd::string> &arraylist = (*it).second;
     const char *array_name = arraylist[0].c_str();
     vtkstd::string rootname = this->NameOfVectorComponent(array_name);
-    int Nc = arraylist.size();
+    int Nc = static_cast<int>(arraylist.size());
     //
     vtkSmartPointer<vtkDataArray> dataarray = NULL;
     hid_t datatype = H5PartGetNativeDatasetType(H5FileId,array_name);
