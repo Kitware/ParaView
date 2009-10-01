@@ -185,6 +185,9 @@ public:
   // observers etc. //DDM TODO Do I have to make this public?
   virtual void AddRepresentationInternal(vtkSMRepresentationProxy* rep);
 
+  //Description: For streaming provide a hook to stop multipass rendering.
+  virtual void Interrupt() {};
+
 //BTX
 protected:
   vtkSMViewProxy();

@@ -6958,6 +6958,18 @@ Tessellate a higher-order dataset.
           If on, the output polygonal dataset will have a pointdata array that holds the point index of the original 3D vertex that produced each output vertex. This is useful for picking.
         </Documentation>
       </IntVectorProperty>
+      <IntVectorProperty
+        name="MakeOutlineOfInput"
+        command="SetMakeOutlineOfInput"
+        number_of_elements="1"
+        default_values="0"
+        animateable="0">
+        <BooleanDomain name="bool"/> 
+        <Documentation>
+          Causes filter to try to make geometry of input to the algorithm on its input.
+        </Documentation>
+      </IntVectorProperty>
+
     <!-- End GeometryFilter -->
     </SourceProxy>
 

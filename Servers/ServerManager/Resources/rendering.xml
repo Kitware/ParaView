@@ -7015,6 +7015,9 @@
         -->
         <Proxy name="OutlineFilter"
           proxygroup="filters" proxyname="GeometryFilter" />
+        <ExposedProperties>
+          <Property name="MakeOutlineOfInput" />
+        </ExposedProperties>
       </SubProxy>
   
       <SubProxy>

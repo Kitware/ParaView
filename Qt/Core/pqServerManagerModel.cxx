@@ -229,7 +229,7 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     // Ignore prototype proxies.
     return;
     }
-  if (name=="StreamingOptionsInstance")
+  if (name=="StreamingOptionsInstance" || name=="AdaptiveOptionsInstance")
     {
     // Ignore this particular proxy
     return;

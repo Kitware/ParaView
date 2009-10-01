@@ -50,7 +50,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.61");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.62");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -426,10 +426,13 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
 
-  bds = data->GetBounds();
-  for (idx = 0; idx < 6; ++idx)
+  if (!vtkMath::AreBoundsInitialized(this->Bounds))
     {
-    this->Bounds[idx] = bds[idx];
+    bds = data->GetBounds();
+    for (idx = 0; idx < 6; ++idx)
+      {
+      this->Bounds[idx] = bds[idx];
+      }
     }
   this->MemorySize = data->GetActualMemorySize();
 
@@ -591,6 +594,29 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     {
     // Don't gather any data information from the hypothetical null source.
     return;
+    }
+
+  // Get the bounds from the reader meta-data if available
+  vtkAlgorithmOutput* pp = dobj->GetProducerPort();
+  if (pp)
+    {
+    vtkExecutive* exec = pp->GetProducer()->GetExecutive();
+    vtkInformation* outInfo = exec->GetOutputInformation(
+      pp->GetIndex());
+    if (outInfo->Has(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX()))
+      {
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::WHOLE_BOUNDING_BOX(),
+        this->Bounds);
+      }
+    else
+      {
+      vtkStreamingDemandDrivenPipeline *sddp =
+        vtkStreamingDemandDrivenPipeline::SafeDownCast(exec);
+      if (sddp)
+        {
+        sddp->GetWholeBoundingBox(0, this->Bounds);
+        }
+      }
     }
 
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);

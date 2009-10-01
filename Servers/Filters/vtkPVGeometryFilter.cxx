@@ -52,13 +52,14 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
+#include "vtkAlgorithmOutput.h"
 #include "vtkUnstructuredGrid.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include <assert.h>
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.96");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.97");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -378,7 +379,7 @@ vtkCompositeDataSet* vtkPVGeometryFilter::FillPartialArrays(
 
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::RequestInformation(
-  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
+  vtkInformation*, vtkInformationVector** inVectors, vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
@@ -393,6 +394,26 @@ int vtkPVGeometryFilter::RequestInformation(
 void vtkPVGeometryFilter::ExecuteBlock(
   vtkDataObject* input, vtkPolyData* output, int doCommunicate)
 {
+  if (this->UseOutline && this->MakeOutlineOfInput)
+    {    
+    vtkAlgorithmOutput *pport = input->GetProducerPort();
+    vtkDataObject *insin = NULL;
+    if (pport)
+      {
+      vtkAlgorithm *alg = pport->GetProducer();
+      if (alg && 
+          alg->GetNumberOfInputPorts() && 
+          alg->GetNumberOfInputConnections(0))
+        {
+        insin = alg->GetInputDataObject(0,0);
+        }
+      }
+    if (insin)
+      {
+      input = insin;
+      }
+    }
+
   if (input->IsA("vtkImageData"))
     {
     this->ImageDataExecute(static_cast<vtkImageData*>(input), output, doCommunicate);
@@ -478,6 +499,7 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
 
   this->ExecuteBlock(input, output, 1);
   this->RemoveGhostCells(output);
+
   return 1;
 }
 
@@ -917,6 +939,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
 
     output->SetPoints(outline->GetOutput()->GetPoints());
     output->SetLines(outline->GetOutput()->GetLines());
+    output->SetPolys(outline->GetOutput()->GetPolys());
     outline->Delete();
     }
   else
