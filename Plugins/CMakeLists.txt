@@ -42,4 +42,6 @@ paraview_build_optional_plugin(ThresholdTablePanel "ThresholdTablePanel" Thresho
 paraview_build_optional_plugin(ClientGraphViewFrame "ClientGraphViewFrame" ClientGraphViewFrame OFF) 
 paraview_build_optional_plugin(ClientTreeAreaView "ClientTreeAreaView" ClientTreeAreaView OFF) 
 paraview_build_optional_plugin(VisItReaderPlugin "VisItReaderPlugin" VisItDatabaseBridge OFF) 
-paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails OFF) 
+paraview_build_optional_plugin(VisTrailsPlugin "VisTrailsPlugin" VisTrails OFF)
+paraview_build_optional_plugin(H5PartReader "Reader for *.h5part files" H5PartReader ON)
+
