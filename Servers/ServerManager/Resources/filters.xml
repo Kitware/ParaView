@@ -73,6 +73,27 @@
              This property specifies the dataset whose geometry will be used in determining positions to probe.
            </Documentation>
       </InputProperty>
+
+      <IntVectorProperty name="PassPartialArrays"
+        command="SetPassPartialArrays"
+        number_of_elements="1"
+        default_values="1">
+        <Documentation>
+          When dealing with composite datasets, partial arrays are common i.e.
+          data-arrays that are not available in all of the blocks. By default,
+          this filter only passes those point and cell data-arrays that are
+          available in all the blocks i.e. partial array are removed.  When
+          PassPartialArrays is turned on, this behavior is changed to take a
+          union of all arrays present thus partial arrays are passed as well.
+          However, for composite dataset input, this filter still produces a
+          non-composite output. For all those locations in a block of where a
+          particular data array is missing, this filter uses vtkMath::Nan() for
+          double and float arrays, while 0 for all other types of arrays i.e
+          int, char etc.
+        </Documentation>
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
    <!-- End ProbeLine -->
    </SourceProxy>
 
@@ -5053,6 +5074,8 @@ The Probe filter samples the data set attributes of the current data set at the 
      <ExposedProperties>
        <Property name="Input" proxy_name="PlotOverLine1" exposed_name="Input"/>
        <Property name="Source" proxy_name="PlotOverLine1" exposed_name="Source"/>
+       <Property name="PassPartialArrays"
+          proxy_name="PlotOverLine1" exposed_name="PassPartialArrays"/>
      </ExposedProperties>
      <OutputPort name="Output" proxy="AppendArcLength1" port_index="0"/>
      <Hints>
