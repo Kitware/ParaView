@@ -34,7 +34,7 @@ void vtkSpyPlotBlockIterator::Init(int numberOfProcessors,
   this->FileMap=fileMap;
   this->Parent = parent;
   this->CurrentTimeStep=currentTimeStep;
-  this->NumberOfFiles=this->FileMap->Files.size();
+  this->NumberOfFiles=static_cast<int>(this->FileMap->Files.size());
 }
   
 void vtkSpyPlotBlockDistributionBlockIterator::Start()
@@ -52,7 +52,7 @@ int vtkSpyPlotBlockDistributionBlockIterator::GetNumberOfBlocksToProcess()
   int total_num_blocks = 0;
   vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
   fileIterator = this->FileMap->Files.begin();
-  int numFiles = this->FileMap->Files.size();
+  size_t numFiles = this->FileMap->Files.size();
   int cur_file = 1;
   int progressInterval = numFiles/20 + 1;
   for ( ;
