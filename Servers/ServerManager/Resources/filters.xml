@@ -146,7 +146,7 @@
    <!-- ==================================================================== -->
    <SourceProxy name="ExtractFieldDataOverTime"
                           class="vtkExtractTemporalFieldData"
-                          label="Plot Global Variables over Time">
+                          label="Plot Global Variables Over Time">
      <Documentation
       short_help="Extracts and plots data in field data over time."
       long_help="Extracts and plots data in field data over time." >
