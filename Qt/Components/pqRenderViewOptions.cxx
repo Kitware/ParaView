@@ -40,10 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkSMProxy.h"
 
+#include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
 #include "pqRenderView.h"
 #include "pqSignalAdaptors.h"
-#include "pqNamedWidgets.h"
+#include "pqStandardColorLinkAdaptor.h"
 
 class pqRenderViewOptions::pqInternal : public Ui::pqRenderViewOptions
 {
@@ -64,6 +65,7 @@ pqRenderViewOptions::pqRenderViewOptions(QWidget *widgetParent)
 
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(this->Internal->backgroundColor, 
     "chosenColor", SIGNAL(chosenColorChanged(const QColor&)), false);
+
 
   // enable the apply button when things are changed
   QObject::connect(&this->Internal->Links, SIGNAL(modified()),
@@ -180,6 +182,9 @@ void pqRenderViewOptions::connectGUI()
   this->Internal->Links.registerLink(this->Internal->ColorAdaptor, "color",
     SIGNAL(colorChanged(const QVariant&)),
     proxy, proxy->GetProperty("Background"));
+
+  new pqStandardColorLinkAdaptor(this->Internal->backgroundColor,
+    proxy, "Background");
   
   this->Internal->Links.registerLink(this->Internal->parallelProjection, "checked",
     SIGNAL(stateChanged(int)),
