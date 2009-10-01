@@ -221,4 +221,9 @@
           file_description="SLAC Particle Files">
   </Reader>
 
+  <Reader name="ParticleReader"
+          extensions="particles"
+          file_description="VTK Particle Files">
+  </Reader>
+
 </ParaViewReaders>
