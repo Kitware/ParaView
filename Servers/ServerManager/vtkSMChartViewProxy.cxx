@@ -21,11 +21,16 @@
 #include "vtkQtChartView.h"
 #include "vtkSMChartOptionsProxy.h"
 
-vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.4");
+#include "vtkQtInitialization.h"
+#include <QWidget>
+
+vtkCxxRevisionMacro(vtkSMChartViewProxy, "1.5");
 //----------------------------------------------------------------------------
 vtkSMChartViewProxy::vtkSMChartViewProxy()
 {
   this->ChartView = 0;
+
+  vtkQtInitialization::New()->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -76,12 +81,42 @@ vtkQtChartView* vtkSMChartViewProxy::GetChartView()
 }
 
 //----------------------------------------------------------------------------
+bool vtkSMChartViewProxy::WriteImage(const char* filename)
+{
+  this->PerformRender();
+  return this->ChartView->SaveImage(filename);
+}
+
+//----------------------------------------------------------------------------
 void vtkSMChartViewProxy::PerformRender()
 {
   vtkSMChartOptionsProxy::SafeDownCast(
     this->GetSubProxy("ChartOptions"))->PrepareForRender(this);
+
+  // For now use this to know if we are running in the gui or not
+  bool isGui = this->ChartView->GetWidget()->parent() != NULL;
+
+  // If not using the gui then we'll call Show() the first time we get here
+  // to make the chart appear in a new window.  Then we have to manually
+  // process events so that the window system can create the window.
+  if (!isGui && !this->ChartView->GetWidget()->isVisible())
+    {
+    this->ChartView->GetWidget()->resize(800, 600);
+    this->ChartView->Show();
+    this->ChartView->ProcessQtEventsNoUserInput();
+    }
+
+  // This will update the representations and series options for the view
   this->ChartView->Update();
   this->ChartView->Render();
+
+  // When we aren't using the gui we don't have an active Qt event loop
+  // so we have to manually process events here.
+  if (!isGui)
+    {
+    this->ChartView->ProcessQtEventsNoUserInput(); // once
+    this->ChartView->ProcessQtEventsNoUserInput(); // twice for good luck ;-)
+    }
 }
 
 //----------------------------------------------------------------------------

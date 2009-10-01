@@ -31,17 +31,20 @@ public:
   vtkTypeRevisionMacro(vtkSMChartViewProxy, vtkSMViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Saves the chart view as an image file.  See vtkQtChartView::SaveImage().
+  // Returns true on success.
+  bool WriteImage(const char* filename);
+
   //BTX
   // Description:
-  // Provides access to the bar chart widget.
+  // Provides access to the chart view's widget.
   vtkQtChartWidget* GetChartWidget();
-  //ETX
 
   // Description:
-  // Provides access to the line chart view.
-//BTX
+  // Provides access to the vtk chart view.
   vtkQtChartView* GetChartView();
-//ETX
+  //ETX
 
 //BTX
 protected:
