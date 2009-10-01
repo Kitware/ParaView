@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqViewManager.h>
 #include <pqViewMenu.h>
 #include <pqHelpWindow.h>
+#include <pqCoreTestUtility.h>
 
 
 // Include pqPythonManager when compiled with python support
@@ -900,6 +901,12 @@ void pqClientMainWindow::onSettingsModified()
   bool showMacroMenu = pqApplicationCore::instance()->settings()->value(
     "PythonMacros/ShowMenu", false).toBool();
   this->Implementation->UI.menuMacros->menuAction()->setVisible(showMacroMenu);
+}
+
+//-----------------------------------------------------------------------------
+QString pqClientMainWindow::getTestDirectory()
+{
+  return pqCoreTestUtility::TestDirectory();
 }
 
 //-----------------------------------------------------------------------------
