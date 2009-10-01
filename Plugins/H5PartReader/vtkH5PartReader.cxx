@@ -18,7 +18,7 @@
   Module                  : vtkH5PartReader.h
   Revision of last commit : $Rev: 793 $
   Author of last commit   : $Author: utkarsh $
-  Date of last commit     : $Date: 2009-10-01 17:55:29 $
+  Date of last commit     : $Date: 2009-10-01 18:40:56 $
 
   Copyright (C) CSCS - Swiss National Supercomputing Centre.
   You may use modify and and distribute this code freely providing
@@ -142,29 +142,7 @@ static hid_t H5PartGetDiskShape(H5PartFile *f, hid_t dataset)
 }
 
 //----------------------------------------------------------------------------
-#ifdef JB_DEBUG__
-  #ifdef WIN32
-      #define OUTPUTTEXT(a) vtkOutputWindowDisplayText(a);
-  #else
-      #define OUTPUTTEXT(a) cout << (a) << "\n"; cout.flush();
-  #endif
-
-    #undef vtkDebugMacro
-    #define vtkDebugMacro(a)  \
-    { \
-      vtkOStreamWrapper::EndlType endl; \
-      vtkOStreamWrapper::UseEndl(endl); \
-      vtkOStrStreamWrapper vtkmsg; \
-      vtkmsg a << "\n"; \
-      OUTPUTTEXT(vtkmsg.str()); \
-      vtkmsg.rdbuf()->freeze(0); \
-    }
-
-  #undef vtkErrorMacro
-  #define vtkErrorMacro(a) vtkDebugMacro(a)
-#endif
-//----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkH5PartReader, "1.1");
+vtkCxxRevisionMacro(vtkH5PartReader, "1.2");
 vtkStandardNewMacro(vtkH5PartReader);
 //----------------------------------------------------------------------------
 vtkH5PartReader::vtkH5PartReader()
@@ -645,9 +623,6 @@ int vtkH5PartReader::RequestData(
   //
   // Get the TimeStep Requested from the information if present
   //
-  vtkOStreamWrapper::EndlType endl;
-  vtkOStreamWrapper::UseEndl(endl);
-
   this->TimeOutOfRange = 0;
   this->ActualTimeStep = this->TimeStep;
   if (outInfo->Has(vtkStreamingDemandDrivenPipeline::UPDATE_TIME_STEPS()))
@@ -698,12 +673,12 @@ int vtkH5PartReader::RequestData(
     {
     // use the type of the first array for all if it is a vector field
     vtkstd::vector<vtkstd::string> &arraylist = (*it).second;
-    const char *name = arraylist[0].c_str();
-    vtkstd::string rootname = this->NameOfVectorComponent(name);
+    const char *array_name = arraylist[0].c_str();
+    vtkstd::string rootname = this->NameOfVectorComponent(array_name);
     int Nc = arraylist.size();
     //
     vtkSmartPointer<vtkDataArray> dataarray = NULL;
-    hid_t datatype = H5PartGetNativeDatasetType(H5FileId,name);
+    hid_t datatype = H5PartGetNativeDatasetType(H5FileId,array_name);
     // Put the float and double first as they are the most common
     if (H5Tequal(datatype,H5T_NATIVE_FLOAT))
       {
