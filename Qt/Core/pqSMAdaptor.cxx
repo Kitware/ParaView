@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // vtk includes
 #include "vtkConfigure.h"   // for 64-bitness
+#include "vtkStringList.h"
+#include "vtkSmartPointer.h"
 
 // server manager includes
 #include "vtkSMArrayListDomain.h"
@@ -676,20 +678,31 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProperty* Property,
         return;
         }
       }
-    // not found, just put it in the first empty slot
+
+    // Not found, add it...
+    // We will create a vtkStringList for the name,value pair and then
+    // set the string values in one atomic call.
+    vtkSmartPointer<vtkStringList> stringValues = vtkSmartPointer<vtkStringList>::New();
+    StringProperty->GetElements(stringValues);
+    numElems = stringValues->GetLength();
+
+    // First look for an empty slot to add the values
     for(i=0; i<numElems; i+=2)
       {
       const char* elem = StringProperty->GetElement(i);
       if(!elem || elem[0] == '\0')
         {
-        StringProperty->SetElement(i, name.toAscii().data());
-        StringProperty->SetElement(i+1, valueStr.toAscii().data());
+        stringValues->SetString(i, name.toAscii().data());
+        stringValues->SetString(i+1, valueStr.toAscii().data());
+        StringProperty->SetElements(stringValues);
         return;
         }
       }
-    // If we didn't find any empty spots, append to the vector
-    StringProperty->SetElement(numElems, name.toAscii().data());
-    StringProperty->SetElement(numElems+1, valueStr.toAscii().data());
+
+    // Add the values at the end
+    stringValues->SetString(numElems, name.toAscii().data());
+    stringValues->SetString(numElems+1, valueStr.toAscii().data());
+    StringProperty->SetElements(stringValues);
     }
   else if(EnumerationDomain)
     {
