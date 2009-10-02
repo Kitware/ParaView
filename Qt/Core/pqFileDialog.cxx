@@ -314,7 +314,7 @@ pqFileDialog::pqFileDialog(
                    SLOT(onNavigate(const QString&)));
 
   QObject::connect(this->Implementation->Ui.FileType, 
-                   SIGNAL(activated(const QString&)), 
+                   SIGNAL(currentIndexChanged(const QString&)), 
                    this, 
                    SLOT(onFilterChange(const QString&)));
   
@@ -505,12 +505,11 @@ void pqFileDialog::setRecentlyUsedExtension(const QString& fileExtension)
   else
     {
     int index = this->Implementation->Ui.FileType->findText(fileExtension,
-                                                            Qt::MatchContains);
+      Qt::MatchContains);
     // just in case the provided extension is not in the combobox list
     index = (index == -1) ? 0 : index;
-    
     this->Implementation->Ui.FileType->setCurrentIndex(index);
-  }
+    }
 }
 
 //-----------------------------------------------------------------------------
