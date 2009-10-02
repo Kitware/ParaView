@@ -1,10 +1,12 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   Prism 
   Module:    vtkPrismCubeAxesActor.h
   Language:  C++
+  Date:      $Date$
   Version:   $Revision$
   Thanks:    Kathleen Bonnell, B Division, Lawrence Livermore Nat'l Laboratory 
+  This class is largely based on vtkCubeAxisActor
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
 All rights reserve  
@@ -61,7 +63,7 @@ All rights reserve
 class vtkAxisActor;
 class vtkCamera;
 
-class VTK_EXPORT vtkPrismCubeAxesActor : public vtkActor
+class vtkPrismCubeAxesActor : public vtkActor
 {
 public:
   vtkTypeRevisionMacro(vtkPrismCubeAxesActor,vtkActor);
@@ -88,23 +90,21 @@ public:
                  double& zmin, double& zmax);
   void GetBounds(double bounds[6]);
 
+
+
   // Description:
   // Explicitly specify the range of values used on the bounds.
   // The ranges are specified according to (xmin,xmax, ymin,ymax, zmin,zmax), 
   // making sure that the min's are less than the max's.
-  vtkSetVector6Macro(Ranges,double);
-  double *GetRanges();
-  void GetRanges(double& xmin, double& xmax, double& ymin, double& ymax, 
+  vtkSetVector6Macro(LabelRanges,double);
+  double *GetLabelRanges();
+  void GetLabelRanges(double& xmin, double& xmax, double& ymin, double& ymax, 
                  double& zmin, double& zmax);
-  void GetRanges(double ranges[6]);  
+  void GetLabelRanges(double ranges[6]);  
 
-  // Description:
-  // Set/Get a flag that controls whether the axes use the data ranges
-  // or the ranges set by SetRanges. By default the axes use the data
-  // ranges.
-  vtkSetMacro(UseRanges,int);
-  vtkGetMacro(UseRanges,int);
-  vtkBooleanMacro(UseRanges,int);
+
+
+
   // Description:
   // Set/Get the camera to perform scaling and translation of the 
   // vtkPrismCubeAxesActor.
@@ -269,9 +269,7 @@ protected:
   double FSign(double, double);
 
   double       Bounds[6]; //Define bounds explicitly
-
-  double       Ranges[6]; //Define ranges explicitly
-  int        UseRanges; //Flag to use ranges or not
+  double       LabelRanges[6]; //Define ranges explicitly
 
   vtkCamera *Camera;
   int FlyMode;
@@ -347,6 +345,9 @@ private:
   double LastXRange[2];
   double LastYRange[2];
   double LastZRange[2];
+  double LastXBound[2];
+  double LastYBound[2];
+  double LastZBound[2];
   int   LastFlyMode;
 
   int   RenderAxesX[4];
@@ -362,7 +363,6 @@ private:
   bool ForceXLabelReset;
   bool ForceYLabelReset;
   bool ForceZLabelReset;
-
   // various helper methods
   void  TransformBounds(vtkViewport *viewport, const double bounds[6], 
                         double pts[8][3]);
@@ -371,17 +371,15 @@ private:
                    double zCoords[4][6],
                    double xRange[2], double yRange[2], double zRange[2]);
 
-  bool  ComputeTickSize(double bounds[6]);
+  bool  ComputeTickSize(double bounds[6],double ranges[6]);
   void  AdjustValues(const double bounds[6]);
   void  AdjustRange(const double bounds[6]);
   void  BuildAxes(vtkViewport *);
   void  DetermineRenderAxes(vtkViewport *);
   void  SetNonDependentAttributes(void);
   void  BuildLabels(vtkAxisActor *axes[4]);
-  void  AdjustTicksComputeRange(vtkAxisActor *axes[4]);
-
-  void  BuildLabelsFromRanges(vtkAxisActor *axes[4]);
   void  AdjustTicksComputeRange(vtkAxisActor *axes[4], double minBounds,double maxBounds);
+
   // hide the superclass' ShallowCopy() from the user and the compiler.
   void ShallowCopy(vtkProp *prop) { this->vtkProp::ShallowCopy( prop ); };
 };

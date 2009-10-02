@@ -37,8 +37,39 @@
           pipeline or use "UpdateTime" set on the representation instead.
         </Documentation>
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1"
+        animateable="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        default_values="1 1 1"
+        update_self="1"
+        animateable="0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Orientation"
+        command="SetOrientation"
+        number_of_elements="3"
+        default_values="0 0 0"
+        update_self="1"
+        animateable="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+
       <SubProxy>
-        <SourceProxy name="OutlineFilter" class="vtkOutlineFilter">
+        <SourceProxy name="OutlineFilter" class="vtkPVGeometryFilter">
           <!-- 
             Outline filter generates a partial outline on all processes.
           -->
@@ -48,6 +79,11 @@
                  <DataType value="vtkDataSet"/>
                </DataTypeDomain>
           </InputProperty>
+          <IntVectorProperty name="UseOutline"
+            command="SetUseOutline"
+            number_of_elements="1"
+            default_values="1">
+          </IntVectorProperty>
         </SourceProxy>
       </SubProxy>
 
@@ -55,39 +91,39 @@
         <Proxy name="Prop2D" 
           proxygroup="props" proxyname="PrismCubeAxesActor" />
         <ExposedProperties>
-          <Property exposed_name="CubeAxesCornerOffset" name="CornerOffset" />
-          <Property exposed_name="CubeAxesFlyMode" name="FlyMode" />
-          <Property exposed_name="CubeAxesInertia" name="Inertia" />
-          <Property exposed_name="CubeAxesTickLocation" name="TickLocation" />
+          <Property name="CornerOffset" />
+          <Property name="FlyMode" />
+          <Property name="Inertia" />
+          <Property name="TickLocation" />
           <Property name="Visibility" />
-          <Property exposed_name="CubeAxesXAxisMinorTickVisibility" name="XAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesXAxisTickVisibility" name="XAxisTickVisibility" />
-          <Property exposed_name="CubeAxesXAxisVisibility" name="XAxisVisibility" />
-          <Property exposed_name="CubeAxesXGridLines" name="XGridLines" />
-          <Property exposed_name="CubeAxesXTitle" name="XTitle" />
-          <Property exposed_name="CubeAxesYAxisMinorTickVisibility" name="YAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesYAxisTickVisibility" name="YAxisTickVisibility" />
-          <Property exposed_name="CubeAxesYAxisVisibility" name="YAxisVisibility" />
-          <Property exposed_name="CubeAxesYGridLines" name="YGridLines" />
-          <Property exposed_name="CubeAxesYTitle" name="YTitle" />
-          <Property exposed_name="CubeAxesZAxisMinorTickVisibility" name="ZAxisMinorTickVisibility" />
-          <Property exposed_name="CubeAxesZAxisTickVisibility" name="ZAxisTickVisibility" />
-          <Property exposed_name="CubeAxesZAxisVisibility" name="ZAxisVisibility" />
-          <Property exposed_name="CubeAxesZGridLines" name="ZGridLines" />
-          <Property exposed_name="CubeAxesZTitle" name="ZTitle" />
+          <Property name="XAxisMinorTickVisibility" />
+          <Property name="XAxisTickVisibility" />
+          <Property name="XAxisVisibility" />
+          <Property name="XGridLines" />
+          <Property name="XTitle" />
+          <Property name="YAxisMinorTickVisibility" />
+          <Property name="YAxisTickVisibility" />
+          <Property name="YAxisVisibility" />
+          <Property name="YGridLines" />
+          <Property name="YTitle" />
+          <Property name="ZAxisMinorTickVisibility" />
+          <Property name="ZAxisTickVisibility" />
+          <Property name="ZAxisVisibility" />
+          <Property name="ZGridLines" />
+          <Property name="ZTitle" />
         </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
         <Proxy name="Property"
-          proxygroup="properties" proxyname="Property" />
+          proxygroup="properties" proxyname="Property2" />
         <ExposedProperties>
-          <Property exposed_name="CubeAxesColor" name="Color" />
+          <Property name="Color" />
         </ExposedProperties>
       </SubProxy>
-      <!-- End of PrismCubeAxesRepresentation -->
+      
+      <!-- End of CubeAxesRepresentation -->
     </PrismCubeAxesRepresentationProxy>
-
     <Proxy name="PrismCubeAxesActor" class="vtkPrismCubeAxesActor">
       <Documentation>
         Proxy for vtPrismkCubeAxesActor.
@@ -104,7 +140,7 @@
       <IntVectorProperty name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool" />
         <Documentation>
           Set the visibility for this actor.
@@ -130,26 +166,16 @@
         <DoubleRangeDomain />
       </DoubleVectorProperty>
 
-      <DoubleVectorProperty name="Ranges"
-        command="SetRanges"
+      <DoubleVectorProperty name="LabelRanges"
+        command="SetLabelRanges"
         number_of_elements="6"
         default_values="0 1 0 1 0 1">
         <Documentation>
-          Set the ranges for this cube axes.
+          Set the Ranges for this cube axes.
         </Documentation>
 
         <DoubleRangeDomain />
       </DoubleVectorProperty>
-
-      <IntVectorProperty name="UseRanges"
-        command="SetUseRanges"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-        <Documentation>
-          Set the visibility for this actor.
-        </Documentation>
-      </IntVectorProperty>
 
       <IntVectorProperty name="FlyMode"
         command="SetFlyMode"
@@ -649,8 +675,8 @@
      <DoubleVectorProperty 
         name="SESAMEConversions" 
         command="SetSESAMEConversions"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        number_of_elements="4"
+        default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 
@@ -863,8 +889,8 @@
      <DoubleVectorProperty 
         name="Conversions" 
         command="SetConversions"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        number_of_elements="4"
+        default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 
@@ -1085,8 +1111,8 @@
      <DoubleVectorProperty 
         name="SESAMEConversions" 
         command="SetSESAMEConversions"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        number_of_elements="4"
+        default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 
@@ -1216,8 +1242,8 @@
      <DoubleVectorProperty 
         name="Conversions" 
         command="SetConversions"
-        number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        number_of_elements="4"
+        default_values="1.0 1.0 1.0 1.0">
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 

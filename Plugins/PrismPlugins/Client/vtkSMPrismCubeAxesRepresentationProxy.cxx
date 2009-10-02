@@ -24,33 +24,39 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkBoundingBox.h"
+#include "vtkTransform.h"
 #include "vtkSMIntVectorProperty.h"
 
-inline void vtkSMPrismRepresentationProxySetInt(
-  vtkSMProxy* proxy, const char* pname, int val)
-{
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    proxy->GetProperty(pname));
-  if (ivp)
-    {
-    ivp->SetElement(0, val);
-    }
-  proxy->UpdateProperty(pname);
-}
-
-
 vtkStandardNewMacro(vtkSMPrismCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::vtkSMPrismCubeAxesRepresentationProxy()
 {
   this->OutlineFilter = 0;
-  this->CubeAxesProxy = 0;
+  this->CubeAxesActor = 0;
+  this->Position[0] = this->Position[1] = this->Position[2] = 0.0;
+  this->Orientation[0] = this->Orientation[1] = this->Orientation[2] = 0.0;
+  this->Scale[0] = this->Scale[1] = this->Scale[2] = 1.0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::~vtkSMPrismCubeAxesRepresentationProxy()
 {
+}
+
+void vtkSMPrismCubeAxesRepresentationProxy::SetCubeAxesVisibility(int visible)
+{
+    this->CubeAxesVisibility = visible;
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+        this->CubeAxesActor->GetProperty("Visibility"));
+    if (ivp)
+    {
+        ivp->SetElement(0, visible);
+        this->CubeAxesActor->UpdateProperty("Visibility");
+    }
+
+  this->CubeAxesActor->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -63,17 +69,17 @@ bool vtkSMPrismCubeAxesRepresentationProxy::BeginCreateVTKObjects()
 
   this->OutlineFilter = vtkSMSourceProxy::SafeDownCast(
     this->GetSubProxy("OutlineFilter"));
-  this->CubeAxesProxy = this->GetSubProxy("Prop2D");
+  this->CubeAxesActor = this->GetSubProxy("Prop2D");
   this->Property = this->GetSubProxy("Property");
 
-  if (!this->OutlineFilter || !this->CubeAxesProxy || !this->Property)
+  if (!this->OutlineFilter || !this->CubeAxesActor || !this->Property)
     {
     vtkErrorMacro("Missing required subproxies");
     return false;
     }
 
   this->OutlineFilter->SetServers(vtkProcessModule::DATA_SERVER);
-  this->CubeAxesProxy->SetServers(
+  this->CubeAxesActor->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Property->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -85,10 +91,7 @@ bool vtkSMPrismCubeAxesRepresentationProxy::EndCreateVTKObjects()
 {
   vtkSMSourceProxy* input = this->GetInputProxy();
   this->Connect(input, this->OutlineFilter);
-  this->Connect(this->Property, this->CubeAxesProxy, "Property");
-  
-  vtkSMPrismRepresentationProxySetInt(this->CubeAxesProxy, "Visibility", 0);
-
+  this->Connect(this->Property, this->CubeAxesActor, "Property");
   return this->Superclass::EndCreateVTKObjects();
 }
 
@@ -145,7 +148,7 @@ bool vtkSMPrismCubeAxesRepresentationProxy::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  renderView->AddPropToRenderer(this->CubeAxesProxy);
+  renderView->AddPropToRenderer(this->CubeAxesActor);
 
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
@@ -153,7 +156,7 @@ bool vtkSMPrismCubeAxesRepresentationProxy::AddToView(vtkSMViewProxy* view)
           << "GetActiveCamera"
           << vtkClientServerStream::End;
   stream  << vtkClientServerStream::Invoke
-          << this->CubeAxesProxy->GetID()
+          << this->CubeAxesActor->GetID()
           << "SetCamera"
           << vtkClientServerStream::LastResult
           << vtkClientServerStream::End;
@@ -174,11 +177,11 @@ bool vtkSMPrismCubeAxesRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
     return false;
     }
 
-  renderView->RemovePropFromRenderer(this->CubeAxesProxy);
+  renderView->RemovePropFromRenderer(this->CubeAxesActor);
 
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
-          << this->CubeAxesProxy->GetID()
+          << this->CubeAxesActor->GetID()
           << "SetCamera" << 0
           << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
@@ -200,53 +203,68 @@ void vtkSMPrismCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
     vtkPVDataInformation* info = output->GetDataInformation();
     if (info)
       {
+      double *scale = this->Scale;
+      double *position = this->Position;
+      double *rotation = this->Orientation;
+      double bds[6];
+      if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
+          position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
+          rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
+        {
+        const double *bounds = info->GetBounds();
+        vtkSmartPointer<vtkTransform> transform = 
+          vtkSmartPointer<vtkTransform>::New();
+        transform->Translate(position);
+        transform->RotateZ(rotation[2]);
+        transform->RotateX(rotation[0]);
+        transform->RotateY(rotation[1]);
+        transform->Scale(scale);
+        vtkBoundingBox bbox;
+        int i, j, k;
+        double origX[3], x[3];
+
+        for (i = 0; i < 2; i++)
+          {
+          origX[0] = bounds[i];
+          for (j = 0; j < 2; j++)
+            {
+            origX[1] = bounds[2 + j];
+            for (k = 0; k < 2; k++)
+              {
+              origX[2] = bounds[4 + k];
+              transform->TransformPoint(origX, x);
+              bbox.AddPoint(x);
+              }
+            }
+          }
+        bbox.GetBounds(bds);
+        }
+      else 
+        {
+        info->GetBounds(bds);
+        }
       vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->CubeAxesProxy->GetProperty("Bounds"));
-      dvp->SetElements(info->GetBounds());
-
-      vtkSMSourceProxy* input = this->GetInputProxy();
-      vtkSMProperty *rangeProperty = input->GetProperty("RangesInfo");
-      input->UpdatePropertyInformation(rangeProperty);
-       vtkSMDoubleVectorProperty* rangeVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        rangeProperty);
-
-  
-       vtkSMDoubleVectorProperty* newRangeVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->CubeAxesProxy->GetProperty("Ranges"));
-
-      newRangeVP->SetElement(0,rangeVP->GetElement(0));
-      newRangeVP->SetElement(1,rangeVP->GetElement(1));
-      newRangeVP->SetElement(2,rangeVP->GetElement(2));
-      newRangeVP->SetElement(3,rangeVP->GetElement(3));
-      newRangeVP->SetElement(4,rangeVP->GetElement(4));
-      newRangeVP->SetElement(5,rangeVP->GetElement(5));
-
-
-  
-      vtkSMPrismRepresentationProxySetInt(this->CubeAxesProxy, "UseRanges",
-   1);
-
-
-
-      this->CubeAxesProxy->UpdateVTKObjects();
+        this->CubeAxesActor->GetProperty("Bounds"));
+      dvp->SetElements(bds);
+      this->CubeAxesActor->UpdateVTKObjects();
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPrismCubeAxesRepresentationProxy::SetCubeAxesVisibility(int visible)
-{
-  this->CubeAxesVisibility = visible;
-  vtkSMPrismRepresentationProxySetInt(this->CubeAxesProxy, "Visibility",
-    visible);
-  this->CubeAxesProxy->UpdateVTKObjects();
-}
-
-
-//----------------------------------------------------------------------------
 void vtkSMPrismCubeAxesRepresentationProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Scale: " << 
+    this->Scale[0] << ", " << this->Scale[1] << ", " << this->Scale[2] << endl;
+  os << indent << "Position: " 
+    << this->Position[0] << ", " 
+    << this->Position[1] << ", " 
+    << this->Position[2] << endl;
+  os << indent << "Orientation: " 
+    << this->Orientation[0] << ", " 
+    << this->Orientation[1] << ", " 
+    << this->Orientation[2] << endl;
 }
 
 

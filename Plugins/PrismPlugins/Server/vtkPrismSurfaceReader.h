@@ -92,8 +92,8 @@ public:
   const char *GetZAxisVarName(); 
 
 
-  void SetConversions(double xc,double yc,double zc);
-  vtkGetVector3Macro(Conversions,double);
+  void SetConversions(double xc,double yc,double zc,double cc);
+  vtkGetVector4Macro(Conversions,double);
 
 
   void SetXLogScaling(bool);
@@ -150,7 +150,7 @@ protected:
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];
-  double Conversions[3];
+  double Conversions[4];
 
 
   bool GetVariableRange (const char *name,vtkDoubleArray*);

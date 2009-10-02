@@ -32,7 +32,7 @@ Module:    vtkPrismSurfaceReader.cxx
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.8");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.9");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 class vtkPrismSurfaceReader::MyInternal
@@ -149,6 +149,7 @@ vtkPrismSurfaceReader::vtkPrismSurfaceReader()
     this->Conversions[0]=1.0;
     this->Conversions[1]=1.0;
     this->Conversions[2]=1.0;
+    this->Conversions[3]=1.0;
 
     this->SetNumberOfInputPorts(0);
     this->SetNumberOfOutputPorts(2);
@@ -223,7 +224,8 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetContourVarRange()
     {
         this->Internal->CRangeTime.Modified();
         this->GetVariableRange(this->GetContourVarName(),this->Internal->CRangeArray);
-        this->Internal->CRangeArray->SetValue(0,(this->Internal->CRangeArray->GetValue(0)*this->Conversions[2]));
+        this->Internal->CRangeArray->SetValue(0,(this->Internal->CRangeArray->GetValue(0)*this->Conversions[3]));
+        this->Internal->CRangeArray->SetValue(1,(this->Internal->CRangeArray->GetValue(1)*this->Conversions[3]));
 
     }
 
@@ -287,11 +289,12 @@ bool vtkPrismSurfaceReader::GetZLogScaling()
     {
     return   this->Internal->ArrayLogScaling[2];
     }
-void vtkPrismSurfaceReader::SetConversions(double xc,double yc,double zc)
+void vtkPrismSurfaceReader::SetConversions(double xc,double yc,double zc, double cc)
 {
     this->Conversions[0]=xc;
     this->Conversions[1]=yc;
     this->Conversions[2]=zc;
+    this->Conversions[3]=cc;
     this->Modified();
 }
 
@@ -379,6 +382,7 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetXRange ()
 
         this->GetVariableRange(this->GetXAxisVarName(),this->Internal->XRangeArray);
         this->Internal->XRangeArray->SetValue(0,(this->Internal->XRangeArray->GetValue(0)*this->Conversions[0]));
+        this->Internal->XRangeArray->SetValue(1,(this->Internal->XRangeArray->GetValue(1)*this->Conversions[0]));
 
         if(this->Internal->ArrayLogScaling[0])
             {
@@ -420,6 +424,7 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetYRange ()
         this->GetVariableRange(this->GetYAxisVarName(),this->Internal->YRangeArray);
        
         this->Internal->YRangeArray->SetValue(0,(this->Internal->YRangeArray->GetValue(0)*this->Conversions[1]));
+        this->Internal->YRangeArray->SetValue(1,(this->Internal->YRangeArray->GetValue(1)*this->Conversions[1]));
 
         
         if(this->Internal->ArrayLogScaling[1])
@@ -465,6 +470,7 @@ vtkDoubleArray* vtkPrismSurfaceReader::GetZRange ()
 
         this->GetVariableRange(this->GetZAxisVarName(),this->Internal->ZRangeArray);
         this->Internal->ZRangeArray->SetValue(0,(this->Internal->ZRangeArray->GetValue(0)*this->Conversions[2]));
+        this->Internal->ZRangeArray->SetValue(1,(this->Internal->ZRangeArray->GetValue(1)*this->Conversions[2]));
 
         if(this->Internal->ArrayLogScaling[2])
             {
@@ -1041,13 +1047,35 @@ int vtkPrismSurfaceReader::RequestData(
 
         if(cArray)
             {
-            this->Internal->ContourFilter->SetInput(this->Internal->CleanPolyData->GetOutput());
+
+             
+                vtkSmartPointer<vtkFloatArray> newContourArray;
+
+                newContourArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray("PrismContours"));
+
+                if(!newContourArray)
+                {
+                    newContourArray= vtkSmartPointer<vtkFloatArray>::New();
+                    this->Internal->CleanPolyData->GetOutput()->GetPointData()->AddArray(newContourArray);
+                 } 
+                newContourArray->SetNumberOfComponents(1);
+                newContourArray->Allocate(numPts);
+                newContourArray->SetName("PrismContours");
+                newContourArray->SetNumberOfTuples(numPts);
+               
+                for(int p=0;p<numPts;p++)
+                {
+                    newContourArray->InsertNextValue(cArray->GetValue(p)*this->Conversions[3]);
+                }
 
 
-            this->Internal->ContourFilter->SetInputArrayToProcess(
-                0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
-            this->Internal->ContourFilter->Update();
-            contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
+                this->Internal->ContourFilter->SetInput(this->Internal->CleanPolyData->GetOutput());
+
+
+                this->Internal->ContourFilter->SetInputArrayToProcess(
+                    0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,newContourArray->GetName());
+                this->Internal->ContourFilter->Update();
+                contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
 
             }
 

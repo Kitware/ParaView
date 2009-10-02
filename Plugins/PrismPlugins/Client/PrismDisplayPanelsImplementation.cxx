@@ -32,7 +32,7 @@ bool PrismDisplayPanelsImplementation::canCreatePanel(pqRepresentation* repr) co
     {
         pqPipelineSource* input = dataRepr->getInput(); 
         QString name=input->getProxy()->GetXMLName();
-        if(name=="PrismFilter")
+        if(name=="PrismFilter"|| name=="PrismSurfaceReader")
         {
             return false;//This needs to be changed back to true when the cube axis filter is fixed.
         }
@@ -55,7 +55,7 @@ pqDisplayPanel* PrismDisplayPanelsImplementation::createPanel(pqRepresentation* 
         {
         pqPipelineSource* input = dataRepr->getInput(); 
         QString name=input->getProxy()->GetXMLName();
-        if(name=="PrismFilter")
+        if(name=="PrismFilter" || name=="PrismSurfaceReader")
             {
 
             pqPipelineRepresentation* pd = qobject_cast<pqPipelineRepresentation*>(repr);

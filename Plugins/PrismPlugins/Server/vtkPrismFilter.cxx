@@ -28,7 +28,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.11");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.12");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -720,9 +720,9 @@ bool vtkPrismFilter::GetSESAMEZLogScaling()
 }
 
 
-void vtkPrismFilter::SetSESAMEConversions(double x,double y,double z)
+void vtkPrismFilter::SetSESAMEConversions(double x,double y,double z,double c)
 {
-    this->Internal->Reader->SetConversions(x,y,z);
+    this->Internal->Reader->SetConversions(x,y,z,c);
 }
 
 double* vtkPrismFilter::GetSESAMEConversions()
@@ -730,12 +730,12 @@ double* vtkPrismFilter::GetSESAMEConversions()
     return this->Internal->Reader->GetConversions();
 }
 
-void vtkPrismFilter::GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3)
+void vtkPrismFilter::GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4)
 {
-    return this->Internal->Reader->GetConversions(_arg1,_arg2,_arg3);
+    return this->Internal->Reader->GetConversions(_arg1,_arg2,_arg3,_arg4);
 }
 
-void vtkPrismFilter::GetSESAMEConversions (double _arg[3])
+void vtkPrismFilter::GetSESAMEConversions (double _arg[4])
 {
     this->Internal->Reader->GetConversions(_arg);
 }

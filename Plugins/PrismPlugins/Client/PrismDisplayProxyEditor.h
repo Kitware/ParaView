@@ -28,11 +28,10 @@ public:
   PrismDisplayProxyEditor(pqPipelineRepresentation* display, QWidget* p = NULL);
   /// destructor
   ~PrismDisplayProxyEditor();
+  protected slots:
+      virtual void editCubeAxes();
+      virtual void cubeAxesVisibilityChanged();
 
-
-protected slots:
-  void editCubeAxes();
-  void cubeAxesVisibilityChanged();
 protected:
   vtkSMPrismCubeAxesRepresentationProxy* CubeAxesActor;
   QPointer<pqPipelineRepresentation> Representation;

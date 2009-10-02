@@ -22,7 +22,7 @@
 
 #include "vtkSMDataRepresentationProxy.h"
 
-class vtkSMPrismCubeAxesRepresentationProxy : public vtkSMDataRepresentationProxy
+class VTK_EXPORT vtkSMPrismCubeAxesRepresentationProxy : public vtkSMDataRepresentationProxy
 {
 public:
   static vtkSMPrismCubeAxesRepresentationProxy* New();
@@ -36,15 +36,21 @@ public:
   virtual void Update(vtkSMViewProxy* view);
   virtual void Update() { this->Superclass::Update(); }
 
+  vtkSetVector3Macro(Position, double);
+  vtkGetVector3Macro(Position, double);
 
+  vtkSetVector3Macro(Orientation, double);
+  vtkGetVector3Macro(Orientation, double);
+
+  vtkSetVector3Macro(Scale, double);
+  vtkGetVector3Macro(Scale, double);
+ 
 
  // Description:
   // Set cube axes visibility. This flag is considered only if
   // this->GetVisibility() == true, otherwise, cube axes is not shown.
   void SetCubeAxesVisibility(int);
   vtkGetMacro(CubeAxesVisibility, int);
-
-
 //BTX
 protected:
   vtkSMPrismCubeAxesRepresentationProxy();
@@ -53,7 +59,7 @@ protected:
   // Description:
   // This representation needs a surface compositing strategy.
   // Overridden to request the correct type of strategy from the view.
-  virtual bool InitializeStrategy(vtkSMViewProxy* vtkNotUsed(view));
+  virtual bool InitializeStrategy(vtkSMViewProxy* view);
 
   // Description:
   // This method is called at the beginning of CreateVTKObjects().
@@ -80,16 +86,13 @@ protected:
   // Currently a representation can be added to only one view.
   virtual bool RemoveFromView(vtkSMViewProxy* view);
 
+  int CubeAxesVisibility;
   vtkSMSourceProxy* OutlineFilter;
-  vtkSMProxy* CubeAxesProxy;
+  vtkSMProxy* CubeAxesActor;
   vtkSMProxy* Property;
   vtkSMRepresentationStrategy* Strategy;
-  int CubeAxesVisibility;
-
+  double Position[3], Scale[3], Orientation[3];
 private:
-
-
-
   vtkSMPrismCubeAxesRepresentationProxy(const vtkSMPrismCubeAxesRepresentationProxy&); // Not implemented
   void operator=(const vtkSMPrismCubeAxesRepresentationProxy&); // Not implemented
 //ETX

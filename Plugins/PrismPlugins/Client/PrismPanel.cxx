@@ -44,6 +44,8 @@ Module:    PrismPanel.cxx
 #include "pqApplicationCore.h"
 #include "pqFileDialog.h"
 
+namespace
+{
 class SESAMEConversionVariable
 {
 public:
@@ -59,6 +61,17 @@ public:
 
 };
 
+class SESAMEConversionsForTable
+{
+public:
+    SESAMEConversionsForTable();
+    ~SESAMEConversionsForTable(){};
+
+    int TableId;
+    QMap<QString,SESAMEConversionVariable> VariableConversions;
+};
+
+}
 SESAMEConversionVariable::SESAMEConversionVariable()
 {
     this->Name="None";
@@ -69,15 +82,7 @@ SESAMEConversionVariable::SESAMEConversionVariable()
     this->cgsUnits="n/a";
 }
 
-class SESAMEConversionsForTable
-{
-public:
-    SESAMEConversionsForTable();
-    ~SESAMEConversionsForTable(){};
 
-    int TableId;
-    QMap<QString,SESAMEConversionVariable> VariableConversions;
-};
 SESAMEConversionsForTable::SESAMEConversionsForTable()
 {
     TableId=-1;
@@ -289,100 +294,60 @@ PrismPanel::~PrismPanel()
 
 void PrismPanel::onDensityConversionChanged(const QString & text)
 {
-    double value=text.toDouble();
-    QString densityConversion;
-      pqSettings* settings = pqApplicationCore::instance()->settings();
+   
+        this->updateConversions();
+             this->updateXThresholds();
+    this->updateYThresholds();
+     this->onRangeChanged();
 
-    if ( settings->contains("PrismPlugin/Conversions/Density") )
-    {
-        densityConversion = settings->value("PrismPlugin/Conversions/Density").toString();
-
-    }
-    else
-    {
-        densityConversion = "1.0";
-    }
-
-
-    if(densityConversion.toDouble()!=value)
-    {
            this->setModified();
-    }
+  
 
 
 }
 void PrismPanel::onTemperatureConversionChanged(const QString & text)
 {
-    double value=text.toDouble();
-    QString conversion;
-      pqSettings* settings = pqApplicationCore::instance()->settings();
+  
+          this->updateConversions();
+             this->updateXThresholds();
+    this->updateYThresholds();
+     this->onRangeChanged();
 
-    if ( settings->contains("PrismPlugin/Conversions/Temperature") )
-    {
-        conversion = settings->value("PrismPlugin/Conversions/Temperature").toString();
-
-    }
-    else
-    {
-        conversion = "1.0";
-    }
-
-
-    if(conversion.toDouble()!=value)
-    {
-        this->setModified();
-    }
+      this->setModified();
+   
 }
 void PrismPanel::onPressureConversionChanged(const QString & text)
 {
-      double value=text.toDouble();
-    QString conversion;
-      pqSettings* settings = pqApplicationCore::instance()->settings();
-
-    if ( settings->contains("PrismPlugin/Conversions/Pressure") )
-    {
-        conversion = settings->value("PrismPlugin/Conversions/Pressure").toString();
-
-    }
-    else
-    {
-        conversion = "1.0";
-    }
-
-
-    if(conversion.toDouble()!=value)
-    {
-        this->setModified();
-    }
+  
+           this->updateConversions();
+             this->updateXThresholds();
+    this->updateYThresholds();
+     this->onRangeChanged();
+     this->setModified();
+   
 }
 void PrismPanel::onEnergyConversionChanged(const QString & text)
 {
-     double value=text.toDouble();
-    QString conversion;
-      pqSettings* settings = pqApplicationCore::instance()->settings();
+ 
+         this->updateConversions();
+             this->updateXThresholds();
+    this->updateYThresholds();
+     this->onRangeChanged();
 
-    if ( settings->contains("PrismPlugin/Conversions/Energy") )
-    {
-        conversion = settings->value("PrismPlugin/Conversions/Energy").toString();
-
-    }
-    else
-    {
-        conversion = "1.0";
-    }
-
-
-    if(conversion.toDouble()!=value)
-    {
         this->setModified();
-    }
+  
 }
 
 
 
 void PrismPanel::onConversionTypeChanged(int)
 {
-    this->updateConversions();
+    this->updateConversionsLabels();
+     this->updateConversions();
+             this->updateXThresholds();
+    this->updateYThresholds();
+     this->onRangeChanged();
+
     this->setModified();
 }
 
@@ -414,7 +379,10 @@ void PrismPanel::onConversionFileButton()
 
        }
 
-        this->updateConversions();
+        this->updateConversionsLabels();
+        this->updateXThresholds();
+        this->updateYThresholds();
+
         this->setModified();
 
 
@@ -529,7 +497,7 @@ bool PrismPanel::pqUI::LoadConversions(QString &fileName)
 
     return true;
 }
-void PrismPanel::updateConversions()
+void PrismPanel::updateConversionsLabels()
 {
     this->UI->ConversionVar1->blockSignals(true);
     this->UI->ConversionVar2->blockSignals(true);
@@ -936,6 +904,26 @@ void PrismPanel::accept()
         {
              conversionsVP->SetElement(2,this->UI->ConversionVar4->text().toDouble());
        }
+
+        QString cVar=cVariables->currentText();
+        cVar=cVar.toLower();
+        if(cVar.contains("density"))
+        {
+            conversionsVP->SetElement(3,this->UI->ConversionVar1->text().toDouble());
+        }
+        else if(cVar.contains("temperature"))
+        {
+            conversionsVP->SetElement(3,this->UI->ConversionVar2->text().toDouble());
+        }
+        else if(cVar.contains("pressure"))
+        {
+            conversionsVP->SetElement(3,this->UI->ConversionVar3->text().toDouble());
+        }
+        else
+        {
+            conversionsVP->SetElement(3,this->UI->ConversionVar4->text().toDouble());
+        }
+
     }
 
  
@@ -958,6 +946,8 @@ void PrismPanel::reset()
     this->setupTableWidget();
     this->setupVariables();
     this->setupConversions();
+        this->updateConversions();
+
     this->setupXThresholds();
     this->setupYThresholds();
 
@@ -972,6 +962,8 @@ void PrismPanel::linkServerManagerProperties()
     this->setupTableWidget();
     this->setupVariables();
     this->setupConversions();
+        this->updateConversions();
+
     this->setupXThresholds();
     this->setupYThresholds();
 
@@ -1023,7 +1015,103 @@ void PrismPanel::setupTableWidget()
     tableWidget->blockSignals(false);
 
 }
+void PrismPanel::updateConversions()
+{
+        vtkSMDoubleVectorProperty* conversionsVP = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->UI->PanelHelper->GetProperty("SESAMEConversions"));
 
+        if(conversionsVP)
+        {
+
+            QComboBox* xVariables = this->UI->XAxisVarName;
+            QComboBox* yVariables = this->UI->YAxisVarName;
+            QComboBox* zVariables = this->UI->ZAxisVarName;
+            QComboBox* cVariables = this->UI->ContourVarName;
+
+
+            QString xVar=xVariables->currentText();
+            xVar=xVar.toLower();
+            if(xVar.contains("density"))
+            {
+                conversionsVP->SetElement(0,this->UI->ConversionVar1->text().toDouble());
+            }
+            else if(xVar.contains("temperature"))
+            {
+                conversionsVP->SetElement(0,this->UI->ConversionVar2->text().toDouble());
+            }
+            else if(xVar.contains("pressure"))
+            {
+                conversionsVP->SetElement(0,this->UI->ConversionVar3->text().toDouble());
+            }
+            else
+            {
+                conversionsVP->SetElement(0,this->UI->ConversionVar4->text().toDouble());
+            }
+
+
+            QString yVar=yVariables->currentText();
+            yVar=yVar.toLower();
+            if(yVar.contains("density"))
+            {
+                conversionsVP->SetElement(1,this->UI->ConversionVar1->text().toDouble());
+            }
+            else if(yVar.contains("temperature"))
+            {
+                conversionsVP->SetElement(1,this->UI->ConversionVar2->text().toDouble());
+            }
+            else if(yVar.contains("pressure"))
+            {
+                conversionsVP->SetElement(1,this->UI->ConversionVar3->text().toDouble());
+            }
+            else
+            {
+                conversionsVP->SetElement(1,this->UI->ConversionVar4->text().toDouble());
+            }
+
+            QString zVar=zVariables->currentText();
+            zVar=zVar.toLower();
+            if(zVar.contains("density"))
+            {
+                conversionsVP->SetElement(2,this->UI->ConversionVar1->text().toDouble());
+            }
+            else if(zVar.contains("temperature"))
+            {
+                conversionsVP->SetElement(2,this->UI->ConversionVar2->text().toDouble());
+            }
+            else if(zVar.contains("pressure"))
+            {
+                conversionsVP->SetElement(2,this->UI->ConversionVar3->text().toDouble());
+            }
+            else
+            {
+                conversionsVP->SetElement(2,this->UI->ConversionVar4->text().toDouble());
+            }
+
+            QString cVar=cVariables->currentText();
+            cVar=cVar.toLower();
+            if(cVar.contains("density"))
+            {
+                conversionsVP->SetElement(3,this->UI->ConversionVar1->text().toDouble());
+            }
+            else if(cVar.contains("temperature"))
+            {
+                conversionsVP->SetElement(3,this->UI->ConversionVar2->text().toDouble());
+            }
+            else if(cVar.contains("pressure"))
+            {
+                conversionsVP->SetElement(3,this->UI->ConversionVar3->text().toDouble());
+            }
+            else
+            {
+                conversionsVP->SetElement(3,this->UI->ConversionVar4->text().toDouble());
+            }
+
+            this->UI->PanelHelper->UpdateVTKObjects();
+            this->UI->PanelHelper->UpdatePropertyInformation();
+
+        }
+
+}
 void PrismPanel::setupConversions()
 {
     this->UI->ConversionVar1->blockSignals(true);
@@ -2023,10 +2111,11 @@ void PrismPanel::setTableId(QString newId)
     this->UI->PanelHelper->UpdatePropertyInformation();
 
     this->updateVariables();
+    this->updateConversionsLabels();
+    this->updateConversions();
     this->updateXThresholds();
     this->updateYThresholds();
 
-    this->updateConversions();
     this->setModified();
 
 
@@ -2037,9 +2126,7 @@ void PrismPanel::setXVariable(QString name)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("SESAMEXAxisVariableName"), name);
-    this->UI->PanelHelper->UpdateVTKObjects();
-    this->UI->PanelHelper->UpdatePropertyInformation();
-
+    this->updateConversions(); 
     this->updateXThresholds();
 
     this->setModified();
@@ -2049,9 +2136,7 @@ void PrismPanel::setYVariable(QString name)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("SESAMEYAxisVariableName"), name);
-    this->UI->PanelHelper->UpdateVTKObjects();
-    this->UI->PanelHelper->UpdatePropertyInformation();
-
+    this->updateConversions(); 
     this->updateYThresholds();
 
     this->setModified();
@@ -2062,8 +2147,7 @@ void PrismPanel::setZVariable(QString name)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("SESAMEZAxisVariableName"), name);
-    this->UI->PanelHelper->UpdateVTKObjects();
-    this->UI->PanelHelper->UpdatePropertyInformation();
+     this->updateConversions(); 
     this->setModified();
 }
 
@@ -2073,8 +2157,7 @@ void PrismPanel::setContourVariable(QString name)
     //get access to the property that lets us pick the domain
     pqSMAdaptor::setElementProperty(
         this->UI->PanelHelper->GetProperty("SESAMEContourVariableName"), name);
-    this->UI->PanelHelper->UpdateVTKObjects();
-    this->UI->PanelHelper->UpdatePropertyInformation();
+    this->updateConversions(); 
     this->onRangeChanged();
     this->setModified();
 }

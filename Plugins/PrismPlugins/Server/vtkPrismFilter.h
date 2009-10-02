@@ -113,10 +113,10 @@ public:
   bool GetSESAMEYLogScaling();
   bool GetSESAMEZLogScaling();
 
-  void SetSESAMEConversions(double,double,double);
+  void SetSESAMEConversions(double,double,double, double);
   virtual double *GetSESAMEConversions();
-  virtual void GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3);
-  virtual void GetSESAMEConversions (double _arg[3]);
+  virtual void GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4);
+  virtual void GetSESAMEConversions (double _arg[4]);
 
 
 

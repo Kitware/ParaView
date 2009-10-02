@@ -44,6 +44,7 @@ protected:
   void setupTableWidget();
   void updateVariables();
   void setupConversions();
+  void updateConversionsLabels();
   void updateConversions();
  // void setupLogScaling();
   void setupXThresholds();

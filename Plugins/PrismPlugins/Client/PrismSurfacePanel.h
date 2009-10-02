@@ -46,7 +46,9 @@ protected:
  // void setupLogScaling();
   void updateXThresholds();
   void setupXThresholds();
-
+  void setupConversions();
+  void updateConversionsLabels();
+ void updateConversions();
   void updateYThresholds();
   void setupYThresholds();
 
@@ -79,6 +81,12 @@ protected slots:
   void onNewRange();
   void onSelectAll();
   void onScientificNotation(bool);
+  void onConversionFileButton();
+  void onConversionTypeChanged(int);
+  void onDensityConversionChanged(const QString & text);
+  void onTemperatureConversionChanged(const QString & text);
+  void onPressureConversionChanged(const QString & text);
+  void onEnergyConversionChanged(const QString & text);
 
 private:
       bool eventFilter(QObject *object, QEvent *e);

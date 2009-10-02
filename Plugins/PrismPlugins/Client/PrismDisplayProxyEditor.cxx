@@ -142,22 +142,19 @@ PrismDisplayProxyEditor::~PrismDisplayProxyEditor()
 
     }
 
-
-
-//-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::cubeAxesVisibilityChanged()
-    {
-    this->CubeAxesActor->SetCubeAxesVisibility(this->isCubeAxesVisible());
+{
+   this->CubeAxesActor->SetCubeAxesVisibility(this->isCubeAxesVisible());
     this->Representation->renderViewEventually();
-    }
 
+}
 //-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::editCubeAxes()
-    {
-    pqCubeAxesEditorDialog dialog(this);
-    dialog.setRepresentationProxy(this->CubeAxesActor);
-    dialog.exec();
-    }
+{
+  pqCubeAxesEditorDialog dialog(this);
+  dialog.setRepresentationProxy(this->CubeAxesActor);
+  dialog.exec();
+}
 
 pqServer* PrismDisplayProxyEditor::getActiveServer() const
     {
