@@ -292,49 +292,49 @@ PrismPanel::~PrismPanel()
 {
 }
 
-void PrismPanel::onDensityConversionChanged(const QString & text)
+void PrismPanel::onDensityConversionChanged(const QString & )
 {
-   
-        this->updateConversions();
-             this->updateXThresholds();
-    this->updateYThresholds();
-     this->onRangeChanged();
 
-           this->setModified();
-  
+    this->updateConversions();
+    this->updateXThresholds();
+    this->updateYThresholds();
+    this->onRangeChanged();
+
+    this->setModified();
+
 
 
 }
-void PrismPanel::onTemperatureConversionChanged(const QString & text)
+void PrismPanel::onTemperatureConversionChanged(const QString & )
 {
-  
-          this->updateConversions();
-             this->updateXThresholds();
-    this->updateYThresholds();
-     this->onRangeChanged();
 
-      this->setModified();
-   
-}
-void PrismPanel::onPressureConversionChanged(const QString & text)
-{
-  
-           this->updateConversions();
-             this->updateXThresholds();
+    this->updateConversions();
+    this->updateXThresholds();
     this->updateYThresholds();
-     this->onRangeChanged();
-     this->setModified();
+    this->onRangeChanged();
+
+    this->setModified();
+
+}
+void PrismPanel::onPressureConversionChanged(const QString & )
+{
+
+    this->updateConversions();
+    this->updateXThresholds();
+    this->updateYThresholds();
+    this->onRangeChanged();
+    this->setModified();
    
 }
-void PrismPanel::onEnergyConversionChanged(const QString & text)
+void PrismPanel::onEnergyConversionChanged(const QString & )
 {
  
-         this->updateConversions();
-             this->updateXThresholds();
+    this->updateConversions();
+    this->updateXThresholds();
     this->updateYThresholds();
-     this->onRangeChanged();
+    this->onRangeChanged();
 
-        this->setModified();
+    this->setModified();
   
 }
 
@@ -343,10 +343,10 @@ void PrismPanel::onEnergyConversionChanged(const QString & text)
 void PrismPanel::onConversionTypeChanged(int)
 {
     this->updateConversionsLabels();
-     this->updateConversions();
-             this->updateXThresholds();
+    this->updateConversions();
+    this->updateXThresholds();
     this->updateYThresholds();
-     this->onRangeChanged();
+    this->onRangeChanged();
 
     this->setModified();
 }

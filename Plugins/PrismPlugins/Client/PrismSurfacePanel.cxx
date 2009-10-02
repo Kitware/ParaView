@@ -367,51 +367,51 @@ void PrismSurfacePanel::updateConversions()
         }
 
 }
-void PrismSurfacePanel::onDensityConversionChanged(const QString & text)
+void PrismSurfacePanel::onDensityConversionChanged(const QString & )
 {
-  
+
     this->updateConversions();
     this->updateXThresholds();
     this->updateYThresholds();
-     this->onRangeChanged();
+    this->onRangeChanged();
 
     this->setModified();
-    
+
 
 
 }
-void PrismSurfacePanel::onTemperatureConversionChanged(const QString & text)
+void PrismSurfacePanel::onTemperatureConversionChanged(const QString & )
 {
-  
+
     this->updateConversions();
     this->updateXThresholds();
     this->updateYThresholds();
-     this->onRangeChanged();
+    this->onRangeChanged();
 
     this->setModified();
    
 }
-void PrismSurfacePanel::onPressureConversionChanged(const QString & text)
+void PrismSurfacePanel::onPressureConversionChanged(const QString & )
 {
- 
-         this->updateConversions();
-             this->updateXThresholds();
-    this->updateYThresholds();
-     this->onRangeChanged();
 
-        this->setModified();
+    this->updateConversions();
+    this->updateXThresholds();
+    this->updateYThresholds();
+    this->onRangeChanged();
+
+    this->setModified();
    
 }
-void PrismSurfacePanel::onEnergyConversionChanged(const QString & text)
+void PrismSurfacePanel::onEnergyConversionChanged(const QString & )
 {
-  
-         this->updateConversions();
-             this->updateXThresholds();
-    this->updateYThresholds();
-     this->onRangeChanged();
 
-        this->setModified();
-   
+    this->updateConversions();
+    this->updateXThresholds();
+    this->updateYThresholds();
+    this->onRangeChanged();
+
+    this->setModified();
+
 }
 
 
