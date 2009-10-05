@@ -886,7 +886,7 @@ void PrismSurfacePanel::linkServerManagerProperties()
     this->updateYThresholds();
 
    vtkSMDoubleVectorProperty* xThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UI->PanelHelper->GetProperty("ThresholdSESAMEXBetween"));
+        this->UI->PanelHelper->GetProperty("ThresholdXBetween"));
 
     if(xThresholdVP)
     {
@@ -895,7 +895,7 @@ void PrismSurfacePanel::linkServerManagerProperties()
     }
 
     vtkSMDoubleVectorProperty* yThresholdVP = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->UI->PanelHelper->GetProperty("ThresholdSESAMEYBetween"));
+        this->UI->PanelHelper->GetProperty("ThresholdYBetween"));
 
     if(yThresholdVP)
     {
