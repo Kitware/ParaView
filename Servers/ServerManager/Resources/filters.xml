@@ -8567,7 +8567,7 @@ This property controls how the filter works to generate tensor cell data. You ca
          <Group name="sources" />
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type" composite_data_supported="0">
          <DataType value="vtkImageData"/>
          <DataType value="vtkStructuredGrid"/>
          <DataType value="vtkPolyData"/>
@@ -8694,7 +8694,8 @@ This property controls how the filter works to generate tensor cell data. You ca
          <Group name="sources" />
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type"
+          composite_data_supported="0">
          <DataType value="vtkImageData"/>
          <DataType value="vtkStructuredGrid"/>
          <DataType value="vtkPolyData"/>
@@ -8839,7 +8840,7 @@ This property controls how the filter works to generate tensor cell data. You ca
          <Group name="sources" />
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type" composite_data_supported="0">
          <DataType value="vtkImageData"/>
          <DataType value="vtkStructuredGrid"/>
          <DataType value="vtkPolyData"/>
@@ -9010,7 +9011,7 @@ This property controls how the filter works to generate tensor cell data. You ca
          <Group name="sources" />
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type" composite_data_supported="0">
          <DataType value="vtkImageData"/>
          <DataType value="vtkStructuredGrid"/>
          <DataType value="vtkPolyData"/>
@@ -9142,7 +9143,7 @@ This property controls how the filter works to generate tensor cell data. You ca
          <Group name="sources" />
          <Group name="filters"/>
        </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
+       <DataTypeDomain name="input_type" composite_data_supported="0">
          <DataType value="vtkImageData"/>
          <DataType value="vtkStructuredGrid"/>
          <DataType value="vtkPolyData"/>
