@@ -48,4 +48,8 @@ IF(BUILD_SHARED_LIBS)
   paraview_build_optional_application(StreamingParaView "Streaming ParaView Application" StreamingParaView OFF)
 ENDIF(BUILD_SHARED_LIBS)
 
+IF(BUILD_SHARED_LIBS)
+  paraview_build_optional_application(AdaptiveParaView "Adaptive ParaView Application" AdaptiveParaView OFF)
+ENDIF(BUILD_SHARED_LIBS)
+
 ENDIF(QT4_FOUND)

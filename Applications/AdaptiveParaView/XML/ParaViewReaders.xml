@@ -1,0 +1,202 @@
+<ParaViewReaders>
+  <Reader name="ExodusReader"
+          extensions="ex_old"
+          file_description="Exodus">
+  </Reader>
+  <Reader name="ExodusIIReader"
+          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          file_description="ExodusII">
+  </Reader>
+  <Reader name="ExodusRestartReader"
+          extensions="ex-timeseries"
+          file_description="Metafile for restarted exodus outputs">
+  </Reader>
+  <Reader name="LSDynaReader"
+          extensions="d3plot k lsdyna"
+          file_description="LSDyna">
+  </Reader>
+  <Reader name="PVDReader" 
+          extensions="pvd" 
+          file_description="ParaView Data Files">
+  </Reader>
+  <Reader name="XMLPolyDataReader"
+          extensions="vtp"
+          file_description="VTK PolyData Files">
+  </Reader>
+  <Reader name="XMLUnstructuredGridReader"
+          extensions="vtu"
+          file_description="VTK UnstructuredGrid Files">
+  </Reader>
+  <Reader name="XMLImageDataReader"
+          extensions="vti"
+          file_description="VTK ImageData Files">
+  </Reader>
+  <Reader name="XMLStructuredGridReader"
+          extensions="vts"
+          file_description="VTK StructuredGrid Files">
+  </Reader>
+  <Reader name="XMLRectilinearGridReader"
+          extensions="vtr"
+          file_description="VTK RectilinearGrid Files">
+  </Reader>
+  <Reader name="XMLPPolyDataReader"
+          extensions="pvtp"
+          file_description="VTK PolyData Files (partitioned)">
+  </Reader>
+  <Reader name="XMLPUnstructuredGridReader"
+          extensions="pvtu"
+          file_description="VTK UnstructuredGrid Files (partitioned)">
+  </Reader>
+  <Reader name="XMLPImageDataReader"
+          extensions="pvti"
+          file_description="VTK ImageData Files (partitioned)">
+  </Reader>
+  <Reader name="XMLPStructuredGridReader"
+          extensions="pvts"
+          file_description="VTK StructuredGrid Files (partitioned)">
+  </Reader>
+  <Reader name="XMLPRectilinearGridReader"
+          extensions="pvtr"
+          file_description="VTK RectilinearGrid Files (partitioned)">
+  </Reader>
+  <Reader name="XMLMultiBlockDataReader"
+          extensions="vtm vtmb"
+          file_description="VTK MultiBlock Data Files">
+  </Reader>
+  <Reader name="XMLHierarchicalBoxDataReader"
+          extensions="vtm vthb"
+          file_description="VTK Hierarchical Box Data Files">
+  </Reader>
+  <Reader name="LegacyVTKFileReader"
+          extensions="vtk"
+          file_description="Legacy VTK files">
+  </Reader>
+  <Reader name="pvtkfile"
+          extensions="pvtk"
+          file_description="Legacy VTK Files (partitioned)">
+  </Reader>
+  <Reader name="ensight"
+          extensions="case CASE Case"
+          file_description="EnSight Files">
+  </Reader>
+  <Reader name="ensightMS"
+          extensions="sos SOS"
+          file_description="EnSight Master Server Files">
+  </Reader>
+  <Reader name="byureader"
+          extensions="g"
+          file_description="BYU Files">
+  </Reader>
+  <Reader name="XdmfReader"
+          extensions="xmf xdmf"
+          file_description="Xdmf Reader">
+  </Reader>
+  <Reader name="pdbreader"
+          extensions="pdb"
+          file_description="Protein Data Bank Files">
+  </Reader>
+  <Reader name="xyzreader"
+          extensions="xyz"
+          file_description="XMol Molecule Files">
+  </Reader>
+  <Reader name="P3DReader"
+          extensions="xyz"
+          file_description="PLOT3D Files">
+  </Reader>
+
+  <Reader name="spcthreader"
+          extensions="spcth 0"
+          file_description="SpyPlot CTH dataset">
+  </Reader>
+
+  <Reader name="SPCTHRestartReader"
+          extensions="spcth-timeseries"
+          file_description="Case file for restarted CTH outputs">
+  </Reader>
+
+  <Reader name="DEMReader"
+          extensions="dem"
+          file_description="Digital Elevation Map Files">
+  </Reader>
+  <Reader name="vrmlreader"
+          extensions="wrl"
+          file_description="VRML 2 Files">
+  </Reader>
+  <Reader name="plyreader"
+          extensions="ply"
+          file_description="PLY Polygonal File Format">
+  </Reader>
+  <Reader name="stlreader"
+          extensions="stl"
+          file_description="Stereo Lithography">
+  </Reader>
+  <Reader name="gaussiancubereader"
+          extensions="cube"
+          file_description="Gaussian Cube Files">
+  </Reader>
+  <Reader name="ImageReader"
+          extensions="raw"
+          file_description="Raw (binary) Files" >
+  </Reader>
+  <Reader name="popreader"
+          extensions="pop"
+          file_description="POP Ocean Files">
+  </Reader>
+
+  <Reader name="AVSucdReader"
+          extensions="inp"
+          file_description="AVS UCD Binary/ASCII Files">
+  </Reader>
+  <Reader name="Meta Image Reader"
+          extensions="mhd mha"
+          file_description="Meta Image Data Files">
+  </Reader>
+  <Reader name="Facet Reader"
+          extensions="facet"
+          file_description="Facet Polygonal Data Files">
+  </Reader>
+  <Reader name="PNGReader"
+          extensions="png"
+          file_description="PNG Image Files">
+  </Reader>
+
+  <Reader name="PhastaReader"
+          extensions="pht"
+          file_description="Phasta Files">
+  </Reader>
+  <Reader name="SESAMEReader"
+          extensions="sesame"
+          file_description="SESAME">
+  </Reader>
+
+  <Reader name="CSVReader"
+          extensions="csv"
+          file_description="Comma-separated-values">
+  </Reader>
+
+  <Reader name="MFIXReader"
+          extensions="RES"
+          file_description="MFIX Unstructured Grid Files">
+  </Reader>
+
+  <Reader name="FLUENTReader"
+          extensions="cas"
+          file_description="Fluent Case Files">
+  </Reader>
+
+  <Reader name="OpenFOAMReader"
+          extensions="foam"
+          file_description="OpenFOAM Files">
+  </Reader>
+
+  <Reader name="CosmoReader"
+          extensions="cosmo"
+          file_description="Cosmology files">
+  </Reader>
+
+  <Reader name="SiloReader"
+          extensions="silo"
+          file_description="Silo files">
+  </Reader>
+
+</ParaViewReaders>

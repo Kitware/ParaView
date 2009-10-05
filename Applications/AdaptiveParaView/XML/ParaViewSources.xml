@@ -1,0 +1,25 @@
+<ParaViewSources>
+  <Source name="GlyphSource2D" />
+  <Source name="VectorText" />
+  <Source name="TimeToTextConvertorSource" />
+  <Source name="ArrowSource" />
+  <Source name="Axes" />
+  <Source name="CubeSource" />
+  <Source name="ConeSource" />
+  <Source name="CylinderSource" />
+  <Source name="DataObjectGenerator" />
+  <Source name="HierarchicalFractal" />
+  <Source name="LineSource" />
+  <Source name="ImageMandelbrotSource" />
+  <Source name="OctreeFractal" />
+  <Source name="OutlineSource" />
+  <Source name="PlaneSource" />
+  <Source name="PointSource" />
+  <Source name="ProgrammableSource" />
+  <Source name="SphereSource" />
+  <Source name="SuperquadricSource" />
+  <Source name="TextSource" />
+  <Source name="TimeSource" />
+  <Source name="Ruler" />
+  <Source name="RTAnalyticSource" />
+</ParaViewSources>

@@ -1,0 +1,233 @@
+<ui version="4.0" >
+ <class>pqGlobalAdaptiveViewOptions</class>
+ <widget class="QWidget" name="pqGlobalAdaptiveViewOptions" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>328</width>
+    <height>260</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <property name="leftMargin" >
+    <number>9</number>
+   </property>
+   <property name="topMargin" >
+    <number>9</number>
+   </property>
+   <property name="rightMargin" >
+    <number>9</number>
+   </property>
+   <property name="bottomMargin" >
+    <number>9</number>
+   </property>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget" >
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="General" >
+      <widget class="QWidget" name="layoutWidget" >
+       <property name="geometry" >
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>309</width>
+         <height>236</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" >
+        <item row="0" column="0" >
+         <widget class="QLabel" name="label" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Display Every</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" >
+         <widget class="QComboBox" name="ShowOn" >
+          <property name="toolTip" >
+           <string>Determines how often the screen is refreshed to show the rendering progress.</string>
+          </property>
+          <item>
+           <property name="text" >
+            <string>Piece</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Refine</string>
+           </property>
+          </item>
+          <item>
+           <property name="text" >
+            <string>Complete</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0" >
+         <widget class="QLabel" name="label_9" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Enable Prioritization</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" >
+         <widget class="QCheckBox" name="UsePrioritization" >
+          <property name="toolTip" >
+           <string>When checked pieces are rendered in priority order and unimportant pieces are skipped.</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" >
+         <widget class="QLabel" name="label_8" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>View Order</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" >
+         <widget class="QCheckBox" name="UseViewOrdering" >
+          <property name="toolTip" >
+           <string>When checked pieces nearest the camera are drawn first and those off screen are ignored.</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" >
+         <widget class="QLabel" name="label_6" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Cache Size [#Pieces]</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" >
+         <widget class="QLineEdit" name="PieceCacheLimit" >
+          <property name="toolTip" >
+           <string>Determines the maximum number of pieces that each filter will cache.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" >
+         <widget class="QLabel" name="label_11" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Height</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1" >
+         <widget class="QLineEdit" name="Height" >
+          <property name="toolTip" >
+           <string>Determines the number of refinement levels to reach full resolution.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0" >
+         <widget class="QLabel" name="label_12" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Degree</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1" >
+         <widget class="QLineEdit" name="Degree" >
+          <property name="toolTip" >
+           <string>Determines the number of branches at each refinement.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" >
+         <widget class="QLabel" name="label_2" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Rate</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="1" >
+         <widget class="QLineEdit" name="Rate" >
+          <property name="toolTip" >
+           <string>Controls the sampling rate within a piece.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0" >
+         <widget class="QLabel" name="label_3" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Max Splits</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1" >
+         <widget class="QLineEdit" name="MaxSplits" >
+          <property name="toolTip" >
+           <string>Detemines the number of pieces that are refined in each refinement pass.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" >
+         <widget class="QLabel" name="label_7" >
+          <property name="toolTip" >
+           <string/>
+          </property>
+          <property name="text" >
+           <string>Enable Diagnostic Logs</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1" >
+         <widget class="QCheckBox" name="EnableStreamMessages" >
+          <property name="toolTip" >
+           <string>Turns on developer's console messages.</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

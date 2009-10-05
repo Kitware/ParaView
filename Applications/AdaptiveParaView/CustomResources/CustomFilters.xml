@@ -1,0 +1,120 @@
+<ParaViewFilters>
+  <Category name="Common" menu_label="&amp;Common">
+    <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Filter name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
+    <Filter name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
+    <Filter name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
+    <Filter name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
+    <Filter name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
+    <Filter name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Filter name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
+    <Filter name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
+    <Filter name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Filter name="ExtractLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+  </Category>
+
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
+    <Filter name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Filter name="ExtractSelection"
+            icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+    <Filter name="ExtractSelectionOverTime"
+            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
+    <Filter name="ExtractHistogram" 
+            icon=":/pqWidgets/Icons/pqHistogram24.png"/>
+    <Filter name="IntegrateAttributes" />
+    <Filter name="ExtractFieldDataOverTime" />
+    <Filter name="ProbeLine" 
+            icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
+    <Filter name="ProbePoint" 
+            icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
+    <Filter name="Programmable Filter" 
+            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
+  </Category>
+
+  <Filter name="Append" />
+  <Filter name="AppendAttributes" />
+  <Filter name="AppendPolyData" />
+  <Filter name="ArbitrarySourceGlyph" />
+  <Filter name="ArbitrarySourceStreamTracer" />
+  <Filter name="BlockIdScalars" />
+  <Filter name="BrownianPoints" />
+  <Filter name="Calculator" />
+  <Filter name="CellCenters" />
+  <Filter name="CellDataToPointData" />
+  <Filter name="CellDerivatives"/>
+  <Filter name="CleanPolyData" />
+  <Filter name="CleanUnstructuredGrid" />
+  <Filter name="Clip" />
+  <Filter name="Contour" />
+  <Filter name="Curvatures" />
+  <Filter name="Cut" />
+  <Filter name="D3" />
+  <Filter name="DataSetSurfaceFilter" />
+  <Filter name="DataSetTriangleFilter" />
+  <Filter name="DecimatePro" />
+  <Filter name="Delaunay2D" />
+  <Filter name="Delaunay3D" />
+  <Filter name="ElevationFilter" />
+  <Filter name="ExtractBlock" />
+  <Filter name="ExtractEdges" />
+  <Filter name="ExtractGeometry" />
+  <Filter name="ExtractGrid" />
+  <Filter name="ExtractHistogram" />
+  <Filter name="ExtractLevel" />
+  <Filter name="ExtractSelection" />
+  <Filter name="ExtractSelectionOverTime" />
+  <Filter name="ExtractDataSets" />
+  <Filter name="FeatureEdges" />
+  <Filter name="GenerateIdScalars"/>
+  <Filter name="Glyph" />
+  <Filter name="Gradient" />
+  <Filter name="GradientMagnitude" />
+  <Filter name="GroupDataSets" />
+  <Filter name="IntegrateAttributes" />
+  <Filter name="IntegrateFlowThroughSurface" />
+  <Filter name="LevelIdScalars" />
+  <Filter name="LinearExtrusionFilter" />
+  <Filter name="LoopSubdivisionFilter" />
+  <Filter name="MaskPoints" />
+  <Filter name="Median" />
+  <Filter name="MeshQuality" />
+  <Filter name="OutlineCornerFilter" />
+  <Filter name="OutlineFilter" />
+  <Filter name="ParticleTracer" />
+  <Filter name="PieceCache" />
+  <Filter name="PointDataToCellData" />
+  <Filter name="PolyDataNormals" />
+  <Filter name="Probe" />
+  <Filter name="ProbeLine" />
+  <Filter name="ProbePoint" />
+  <Filter name="ProcessIdScalars" />
+  <Filter name="Programmable Filter" />
+  <Filter name="QuadricClustering" />
+  <Filter name="ReflectionFilter" />
+  <Filter name="RibbonFilter" />
+  <Filter name="RotationalExtrusionFilter" />
+  <Filter name="ShrinkFilter" />
+  <Filter name="SmoothPolyDataFilter" />
+  <Filter name="StreamTracer" />
+  <Filter name="Stripper" />
+  <Filter name="StructuredGridOutlineFilter" />
+  <Filter name="Subdivide" />
+  <Filter name="SurfaceVectors" />
+  <Filter name="TemporalCache" />
+  <Filter name="TemporalInterpolator" />
+  <Filter name="TemporalShiftScale" />
+  <Filter name="TemporalStatistics" />
+  <Filter name="TessellatorFilter" />
+  <Filter name="TextureMapToCylinder" />
+  <Filter name="TextureMapToPlane" />
+  <Filter name="TextureMapToSphere" />
+  <Filter name="Threshold" />
+  <Filter name="TimeToTextConvertor" />
+  <Filter name="TransformFilter" />
+  <Filter name="TriangleFilter" />
+  <Filter name="TubeFilter" />
+  <Filter name="UnstructuredGradient" />
+  <Filter name="WarpScalar" />
+  <Filter name="WarpVector" />
+
+</ParaViewFilters>
