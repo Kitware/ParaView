@@ -1,18 +1,18 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
+  Program:   Prism 
   Module:    vtkPrismCubeAxesActor.cxx
-  Thanks:    Kathleen Bonnell, B Division, Lawrence Livermore National Lab
+  Thanks:    Kathleen Bonnell, B Division, Lawrence Livermore Nat'l Laboratory 
+  This class is largely based on vtkPrismCubeAxisActor
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
+Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
+All rights reserve  
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even 
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
      PURPOSE.  See the above copyright notice for more information.
-
- =========================================================================*/
+=========================================================================*/
 #include "vtkPrismCubeAxesActor.h"
 
 #include "vtkCamera.h"
@@ -32,7 +32,7 @@
 // *************************************************************************
 
 vtkStandardNewMacro(vtkPrismCubeAxesActor);
-vtkCxxRevisionMacro(vtkPrismCubeAxesActor, "1.1");
+vtkCxxRevisionMacro(vtkPrismCubeAxesActor, "1.1.6.1");
 vtkCxxSetObjectMacro(vtkPrismCubeAxesActor, Camera,vtkCamera);
 
 // *************************************************************************
@@ -73,11 +73,10 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
   this->Bounds[2] = -1.0; this->Bounds[3] = 1.0;
   this->Bounds[4] = -1.0; this->Bounds[5] = 1.0;
 
-  this->UseRanges = 0;
-  this->Ranges[0] = 0.0; this->Ranges[1] = 1.0;
-  this->Ranges[2] = 0.0; this->Ranges[3] = 1.0;
-  this->Ranges[4] = 0.0; this->Ranges[5] = 1.0;
-
+  this->LabelRanges[0] = -1.0; this->LabelRanges[1] = 1.0;
+  this->LabelRanges[2] = -1.0; this->LabelRanges[3] = 1.0;
+  this->LabelRanges[4] = -1.0; this->LabelRanges[5] = 1.0;
+  
   this->TickLocation = VTK_TICKS_INSIDE;
   this->Camera = NULL;
   this->FlyMode = VTK_FLY_CLOSEST_TRIAD;
@@ -160,12 +159,12 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
   this->LastYAxisDigits = 3;
   this->LastZAxisDigits = 3;
 
-  this->LastXRange[0] = VTK_FLOAT_MAX;
-  this->LastXRange[1] = VTK_FLOAT_MAX;
-  this->LastYRange[0] = VTK_FLOAT_MAX;
-  this->LastYRange[1] = VTK_FLOAT_MAX;
-  this->LastZRange[0] = VTK_FLOAT_MAX;
-  this->LastZRange[1] = VTK_FLOAT_MAX;
+  this->LastXBound[0] = VTK_FLOAT_MAX;
+  this->LastXBound[1] = VTK_FLOAT_MAX;
+  this->LastYBound[0] = VTK_FLOAT_MAX;
+  this->LastYBound[1] = VTK_FLOAT_MAX;
+  this->LastZBound[0] = VTK_FLOAT_MAX;
+  this->LastZBound[1] = VTK_FLOAT_MAX;
 
   this->LastFlyMode = -1;
   for (i = 0; i < 4; i++)
@@ -227,8 +226,6 @@ void vtkPrismCubeAxesActor::ShallowCopy(vtkPrismCubeAxesActor *actor)
   this->ForceXLabelReset = actor->ForceXLabelReset;
   this->ForceYLabelReset = actor->ForceYLabelReset;
   this->ForceZLabelReset = actor->ForceZLabelReset;
-  this->SetRanges(actor->GetRanges());
-  this->SetUseRanges(actor->GetUseRanges());
 }
 
 // ****************************************************************************
@@ -413,24 +410,14 @@ void vtkPrismCubeAxesActor::AdjustAxes(double bounds[6], double xCoords[4][6],
                                   double xRange[2], double yRange[2], 
                                   double zRange[2])
 {
-  double *internal_bounds;
-  if ( this->UseRanges )
-  {
-    internal_bounds = this->Ranges;
-  }
-  else 
-  {
-    internal_bounds = bounds;
-  }
+  xRange[0] = bounds[0];
+  xRange[1] = bounds[1];
 
-  xRange[0] = internal_bounds[0];
-  xRange[1] = internal_bounds[1];
+  yRange[0] = bounds[2];
+  yRange[1] = bounds[3];
 
-  yRange[0] = internal_bounds[2];
-  yRange[1] = internal_bounds[3];
-
-  zRange[0] = internal_bounds[4];
-  zRange[1] = internal_bounds[5];
+  zRange[0] = bounds[4];
+  zRange[1] = bounds[5];
 
   // Pull back the corners if specified
   if (this->CornerOffset > 0.0)
@@ -493,41 +480,6 @@ void vtkPrismCubeAxesActor::AdjustAxes(double bounds[6], double xCoords[4][6],
     }
 }
 
-//----------------------------------------------------------------------------
-// Return the ranges
-void vtkPrismCubeAxesActor::GetRanges(double ranges[6])
-{
-  int i;
-  for ( i=0; i<6; i++ )
-    {
-    ranges[i] = this->Ranges[i];
-    }
-}
-
-//----------------------------------------------------------------------------
-// Compute the ranges
-void vtkPrismCubeAxesActor::GetRanges(double& xmin, double& xmax, 
-                                   double& ymin, double& ymax,
-                                   double& zmin, double& zmax)
-{
-  double ranges[6];
-  this->GetRanges(ranges);
-  xmin = ranges[0];
-  xmax = ranges[1];
-  ymin = ranges[2];
-  ymax = ranges[3];
-  zmin = ranges[4];
-  zmax = ranges[5];
-}
-
-//----------------------------------------------------------------------------
-// Compute the bounds
-double *vtkPrismCubeAxesActor::GetRanges()
-{
-  double ranges[6];
-  this->GetRanges(ranges);
-  return this->Ranges;
-}
 // Release any graphics resources that are being consumed by this actor.
 // The parameter window could be used to determine which graphic
 // resources to release.
@@ -575,6 +527,32 @@ double *vtkPrismCubeAxesActor::GetBounds()
   return this->Bounds;
 }
 
+void vtkPrismCubeAxesActor::GetLabelRanges(double ranges[6])
+{
+  for (int i=0; i< 6; i++)
+    {
+    ranges[i] = this->LabelRanges[i];
+    }
+}
+
+// Compute the bounds
+void vtkPrismCubeAxesActor::GetLabelRanges(double& xmin, double& xmax, 
+                                 double& ymin, double& ymax,
+                                 double& zmin, double& zmax)
+{
+  xmin = this->LabelRanges[0];
+  xmax = this->LabelRanges[1];
+  ymin = this->LabelRanges[2];
+  ymax = this->LabelRanges[3];
+  zmin = this->LabelRanges[4];
+  zmax = this->LabelRanges[5];
+}
+
+// Compute the bounds
+double *vtkPrismCubeAxesActor::GetLabelRanges()
+{
+  return this->LabelRanges;
+}
 // ******************************************************************
 // Modifications:
 //   Kathleen Bonnell, Wed Mar  6 13:48:48 PST 2002
@@ -728,28 +706,24 @@ void vtkPrismCubeAxesActor::TransformBounds(vtkViewport *viewport,
 //
 // ***********************************************************************
 
-bool vtkPrismCubeAxesActor::ComputeTickSize(double bounds[6])
+bool vtkPrismCubeAxesActor::ComputeTickSize(double bounds[6],double ranges[6])
 {
+  bool xBoundChanged = this->LastXBound[0] != bounds[0] ||
+                       this->LastXBound[1] != bounds[1] ||
+                       this->LastXRange[0] != ranges[0] ||
+                       this->LastXRange[1] != ranges[1];
 
-  double *internal_bounds;
-  if ( this->UseRanges )
-  {
-    internal_bounds = this->Ranges;
-  }
-  else 
-  {
-    internal_bounds = bounds;
-  }
-  bool xRangeChanged = this->LastXRange[0] != internal_bounds[0] ||
-                       this->LastXRange[1] != internal_bounds[1];
+  bool yBoundChanged = this->LastYBound[0] != bounds[2] ||
+                       this->LastYBound[1] != bounds[3] ||
+                       this->LastYRange[0] != ranges[2] ||
+                       this->LastYRange[1] != ranges[3];
 
-  bool yRangeChanged = this->LastYRange[0] != internal_bounds[2] ||
-                       this->LastYRange[1] != internal_bounds[3];
+  bool zBoundChanged = this->LastZBound[0] != bounds[4] ||
+                       this->LastZBound[1] != bounds[5] ||
+                       this->LastZRange[0] != ranges[4] ||
+                       this->LastZRange[1] != ranges[5];
 
-  bool zRangeChanged = this->LastZRange[0] != internal_bounds[4] ||
-                       this->LastZRange[1] != internal_bounds[5];
-
-  if (!(xRangeChanged || yRangeChanged || zRangeChanged))
+  if (!(xBoundChanged || yBoundChanged || zBoundChanged))
     {
     // no need to re-compute ticksize.
     return false;
@@ -760,49 +734,35 @@ bool vtkPrismCubeAxesActor::ComputeTickSize(double bounds[6])
   double yExt = bounds[3] - bounds[2];
   double zExt = bounds[5] - bounds[4];
 
-  if ( this->UseRanges )
-  {
-    if (xRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->XAxes,bounds[0],bounds[1]);
-      this->BuildLabelsFromRanges(this->XAxes);
-      }
-    if (yRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->YAxes,bounds[2],bounds[3]);
-      this->BuildLabelsFromRanges(this->YAxes);
-      }
-    if (zRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->ZAxes,bounds[4],bounds[5]);
-      this->BuildLabelsFromRanges(this->ZAxes);
-      }
-  }
-  else 
-  {
-    if (xRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->XAxes);
-      this->BuildLabels(this->XAxes);
-      }
-    if (yRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->YAxes);
-      this->BuildLabels(this->YAxes);
-      }
-    if (zRangeChanged)
-      {
-      this->AdjustTicksComputeRange(this->ZAxes);
-      this->BuildLabels(this->ZAxes);
-      }
-  }
+  if (xBoundChanged)
+    {
+    this->AdjustTicksComputeRange(this->XAxes,bounds[0],bounds[1]);
+    this->BuildLabels(this->XAxes);
+    }
+  if (yBoundChanged)
+    {
+    this->AdjustTicksComputeRange(this->YAxes,bounds[2],bounds[3]);
+    this->BuildLabels(this->YAxes);
+    }
+  if (zBoundChanged)
+    {
+    this->AdjustTicksComputeRange(this->ZAxes,bounds[4],bounds[5]);
+    this->BuildLabels(this->ZAxes);
+    }
 
-  this->LastXRange[0] = internal_bounds[0];
-  this->LastXRange[1] = internal_bounds[1];
-  this->LastYRange[0] = internal_bounds[2];
-  this->LastYRange[1] = internal_bounds[3];
-  this->LastZRange[0] = internal_bounds[4];
-  this->LastZRange[1] = internal_bounds[5];
+  this->LastXBound[0] = bounds[0];
+  this->LastXBound[1] = bounds[1];
+  this->LastYBound[0] = bounds[2];
+  this->LastYBound[1] = bounds[3];
+  this->LastZBound[0] = bounds[4];
+  this->LastZBound[1] = bounds[5];
+
+  this->LastXRange[0] = ranges[0];
+  this->LastXRange[1] = ranges[1];
+  this->LastYRange[0] = ranges[2];
+  this->LastYRange[1] = ranges[3];
+  this->LastZRange[0] = ranges[4];
+  this->LastZRange[1] = ranges[5];
 
   double major = 0.02 * (xExt + yExt + zExt) / 3.;
   double minor = 0.5 * major;
@@ -877,7 +837,7 @@ bool vtkPrismCubeAxesActor::ComputeTickSize(double bounds[6])
 //
 // ****************************************************************************
 
-void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
+void vtkPrismCubeAxesActor::AdjustValues(const double rngs[6])
 {
   char xTitle[64];
 
@@ -885,9 +845,9 @@ void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
 
   if (AutoLabelScaling)
     {
-    xPow = this->LabelExponent(bnds[0], bnds[1]);
-    yPow = this->LabelExponent(bnds[2], bnds[3]);
-    zPow = this->LabelExponent(bnds[4], bnds[5]);
+    xPow = this->LabelExponent(rngs[0], rngs[1]);
+    yPow = this->LabelExponent(rngs[2], rngs[3]);
+    zPow = this->LabelExponent(rngs[4], rngs[5]);
     }
   else 
     {
@@ -932,7 +892,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
 
     if (XUnits == NULL || XUnits[0] == '\0')
       {
-      sprintf(xTitle, this->XTitle);
+      sprintf(xTitle,"%s",this->XTitle);
       }
     else
       {
@@ -975,7 +935,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
     this->MustAdjustYValue = false;
     if (YUnits == NULL || YUnits[0] == '\0')
       {
-      sprintf(yTitle, this->YTitle);
+      sprintf(yTitle,"%s",this->YTitle);
       }
     else
       {
@@ -1020,7 +980,7 @@ void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
 
     if (ZUnits == NULL || ZUnits[0] == '\0')
       {
-      sprintf(zTitle, this->ZTitle);
+      sprintf(zTitle,"%s",this->ZTitle);
       }
     else
       {
@@ -1062,15 +1022,15 @@ void vtkPrismCubeAxesActor::AdjustValues(const double bnds[6])
 //
 // ****************************************************************************
 
-void vtkPrismCubeAxesActor::AdjustRange(const double bnds[6])
+void vtkPrismCubeAxesActor::AdjustRange(const double rngs[6])
 {
   double xrange[2], yrange[2], zrange[2];
-  xrange[0] = bnds[0];
-  xrange[1] = bnds[1];
-  yrange[0] = bnds[2];
-  yrange[1] = bnds[3];
-  zrange[0] = bnds[4];
-  zrange[1] = bnds[5];
+  xrange[0] = rngs[0];
+  xrange[1] = rngs[1];
+  yrange[0] = rngs[2];
+  yrange[1] = rngs[3];
+  zrange[0] = rngs[4];
+  zrange[1] = rngs[5];
 
   if (this->LastXPow != 0)
     {
@@ -1153,7 +1113,7 @@ int vtkPrismCubeAxesActor::Digits(double min, double max )
 {
   double  range = max - min;
   double  pow10   = log10(range);
-  int    ipow10  = (int)floor(pow10);
+  int    ipow10  = static_cast<int>(floor(pow10));
   int    digitsPastDecimal = -ipow10;
 
   if (digitsPastDecimal < 0) 
@@ -1253,7 +1213,7 @@ int vtkPrismCubeAxesActor::LabelExponent(double min, double max)
     ipow10 = 0;
     }
 
-  return (int)ipow10;
+  return static_cast<int>(ipow10);
 }
 
 // *************************************************************************
@@ -1280,7 +1240,6 @@ int vtkPrismCubeAxesActor::LabelExponent(double min, double max)
 
 void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
 {
-  double bounds[6]; 
   double pts[8][3];
   int i; 
 
@@ -1291,13 +1250,12 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
 
   this->SetNonDependentAttributes();
   // determine the bounds to use (input, prop, or user-defined)
-  this->GetBounds(bounds);
 
   // Build the axes (almost always needed so we don't check mtime)
   // Transform all points into display coordinates (to determine which closest
   // to camera).
 
-  this->TransformBounds(viewport, bounds, pts);
+  this->TransformBounds(viewport, this->Bounds, pts);
 
   // Setup the axes for plotting
   double xCoords[4][6], yCoords[4][6], zCoords[4][6];
@@ -1309,43 +1267,30 @@ void vtkPrismCubeAxesActor::BuildAxes(vtkViewport *viewport)
   for (i = 0; i < 4; i++)
     {
     this->XAxes[i]->SetAxisPosition(i);
-    xCoords[i][0] = bounds[0];
-    xCoords[i][3] = bounds[1];
-    xCoords[i][1] = xCoords[i][4] = bounds[2+mm1[i]];
-    xCoords[i][2] = xCoords[i][5] = bounds[4+mm2[i]];
+    xCoords[i][0] = this->Bounds[0];
+    xCoords[i][3] = this->Bounds[1];
+    xCoords[i][1] = xCoords[i][4] = this->Bounds[2+mm1[i]];
+    xCoords[i][2] = xCoords[i][5] = this->Bounds[4+mm2[i]];
 
     this->YAxes[i]->SetAxisPosition(i);
-    yCoords[i][0] = yCoords[i][3] = bounds[0+mm1[i]];
-    yCoords[i][1] = bounds[2];
-    yCoords[i][4] = bounds[3];
-    yCoords[i][2] = yCoords[i][5] = bounds[4+mm2[i]];
+    yCoords[i][0] = yCoords[i][3] = this->Bounds[0+mm1[i]];
+    yCoords[i][1] = this->Bounds[2];
+    yCoords[i][4] = this->Bounds[3];
+    yCoords[i][2] = yCoords[i][5] = this->Bounds[4+mm2[i]];
 
     this->ZAxes[i]->SetAxisPosition(i);
-    zCoords[i][0] = zCoords[i][3] = bounds[0+mm1[i]];
-    zCoords[i][1] = zCoords[i][4] = bounds[2+mm2[i]];
-    zCoords[i][2] = bounds[4];
-    zCoords[i][5] = bounds[5];
+    zCoords[i][0] = zCoords[i][3] = this->Bounds[0+mm1[i]];
+    zCoords[i][1] = zCoords[i][4] = this->Bounds[2+mm2[i]];
+    zCoords[i][2] = this->Bounds[4];
+    zCoords[i][5] = this->Bounds[5];
     }
 
-  double xRange[2], yRange[2], zRange[2];
-
-  // this method sets the Coords, and offsets if necessary.
-  this->AdjustAxes(bounds, xCoords, yCoords, zCoords, xRange, yRange, zRange);
 
   // adjust for sci. notation if necessary 
   // May set a flag for each axis specifying that label values should
   // be scaled, may change title of each axis, may change label format.
-if ( this->UseRanges )
-  {
-   this->AdjustValues(this->Ranges);
-  this->AdjustRange(this->Ranges);
- }
-  else 
-  {
-  this->AdjustValues(this->Bounds);
-  this->AdjustRange(this->Bounds);
-  }
-
+  this->AdjustValues(this->LabelRanges);
+  this->AdjustRange(this->LabelRanges);
 
   // Prepare axes for rendering with user-definable options 
   for (i = 0; i < 4; i++)
@@ -1369,58 +1314,37 @@ if ( this->UseRanges )
                                                     zCoords[i][4],
                                                     zCoords[i][5]);
 
-    this->XAxes[i]->SetRange(xRange[0], xRange[1]);
-    this->YAxes[i]->SetRange(yRange[0], yRange[1]);
-    this->ZAxes[i]->SetRange(zRange[0], zRange[1]);
+    this->XAxes[i]->SetRange(this->LabelRanges[0], this->LabelRanges[1]);
+    this->YAxes[i]->SetRange(this->LabelRanges[2], this->LabelRanges[3]);
+    this->ZAxes[i]->SetRange(this->LabelRanges[4], this->LabelRanges[5]);
 
     this->XAxes[i]->SetTitle(this->ActualXLabel);
     this->YAxes[i]->SetTitle(this->ActualYLabel);
     this->ZAxes[i]->SetTitle(this->ActualZLabel);
     }
 
-  bool ticksRecomputed = this->ComputeTickSize(bounds);
+  bool ticksRecomputed = this->ComputeTickSize(this->Bounds,this->LabelRanges);
 
   //
   // Labels are built during ComputeTickSize. if
   // ticks were not recomputed, but we need a label
   // reset, then build the labels here. 
   //
-if ( this->UseRanges )
-  {
-    if (!ticksRecomputed)
+  if (!ticksRecomputed)
+    {
+    if (this->ForceXLabelReset)
       {
-      if (this->ForceXLabelReset)
-        {
-        this->BuildLabelsFromRanges(this->XAxes);
-        }
-      if (this->ForceYLabelReset)
-        {
-        this->BuildLabelsFromRanges(this->YAxes);
-        }
-      if (this->ForceZLabelReset)
-        {
-        this->BuildLabelsFromRanges(this->ZAxes);
-        }
+      this->BuildLabels(this->XAxes);
       }
-  }
-  else 
-  {
-    if (!ticksRecomputed)
+    if (this->ForceYLabelReset)
       {
-      if (this->ForceXLabelReset)
-        {
-        this->BuildLabels(this->XAxes);
-        }
-      if (this->ForceYLabelReset)
-        {
-        this->BuildLabels(this->YAxes);
-        }
-      if (this->ForceZLabelReset)
-        {
-        this->BuildLabels(this->ZAxes);
-        }
+      this->BuildLabels(this->YAxes);
       }
-   }
+    if (this->ForceZLabelReset)
+      {
+      this->BuildLabels(this->ZAxes);
+      }
+    }
 
   if (ticksRecomputed || this->ForceXLabelReset || this->ForceYLabelReset ||
       this->ForceZLabelReset)
@@ -1879,8 +1803,8 @@ double vtkPrismCubeAxesActor::MaxOf(double a, double b, double c, double d)
 
 inline double vtkPrismCubeAxesActor::FFix(double value)
 {
-  int ivalue = (int)value;
-  return (double) ivalue;
+  int ivalue = static_cast<int>(value);
+  return ivalue;
 }
 
 inline double vtkPrismCubeAxesActor::FSign(double value, double sign)
@@ -1916,186 +1840,117 @@ inline double vtkPrismCubeAxesActor::FSign(double value, double sign)
 //
 // *******************************************************************
 
-void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4]) 
-{
-  double sortedRange[2], range;
-  double fxt, fnt, frac;
-  double div, major, minor;
-  double majorStart, minorStart; 
-  int numTicks;
-  double *inRange = axes[0]->GetRange();
-
-  sortedRange[0] = (double)(inRange[0] < inRange[1] ? inRange[0] : inRange[1]);
-  sortedRange[1] = (double)(inRange[0] > inRange[1] ? inRange[0] : inRange[1]);
-
-  range = sortedRange[1] - sortedRange[0];
-
-  // Find the integral points.
-  double pow10 = log10(range);
-
-  // Build in numerical tolerance
-  if (pow10 != 0.)
-    {
-    double eps = 10.0e-10;
-    pow10 = this->FSign((fabs(pow10) + eps), pow10);
-    }
-
-  // FFix move you in the wrong direction if pow10 is negative.
-  if (pow10 < 0.)
-    {
-    pow10 = pow10 - 1.;
-    }
-
-  fxt = pow(10., this->FFix(pow10));
-    
-  // Find the number of integral points in the interval.
-  fnt  = range/fxt;
-  fnt  = this->FFix(fnt);
-  frac = fnt;
-  numTicks = (frac <= 0.5 ? (int)this->FFix(fnt) : ((int)this->FFix(fnt) + 1));
-
-  div = 1.;
-  if (numTicks < 5)
-    {
-    div = 2.;
-    }
-  if (numTicks <= 2)
-    {
-    div = 5.;
-    }
-
-  // If there aren't enough major tick points in this decade, use the next
-  // decade.
-  major = fxt;
-  if (div != 1.)
-    {
-    major /= div;
-    }
-  minor = (fxt/div) / 10.;
-
-  // Figure out the first major and minor tick locations, relative to the
-  // start of the axis.
-  if (sortedRange[0] <= 0.)
-    {
-    majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 0.);
-    minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 0.);
-    }
-  else
-    {
-    majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 1.);
-    minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 1.);
-    }
-
-  for (int i = 0; i < 4; i++)
-    {
-    axes[i]->SetMinorStart(minorStart); 
-    axes[i]->SetMajorStart(majorStart); 
-
-    axes[i]->SetDeltaMinor(minor); 
-    axes[i]->SetDeltaMajor(major); 
-    }
-}
-
 void vtkPrismCubeAxesActor::AdjustTicksComputeRange(vtkAxisActor *axes[4], double minBounds, double maxBounds) 
 {
-  double sortedRange[2], range, span;
-  double fxt, fnt, frac;
-  double div, major, minor;
-  double majorStart, minorStart; 
-  int numTicks;
-  double *inRange = axes[0]->GetRange();
+    double sortedRange[2], range, span;
+    double fxt, fnt, frac;
+    double div, major, minor;
+    double majorStart, minorStart; 
+    int numTicks;
+    double *inRange = axes[0]->GetRange();
 
 
-  sortedRange[0] = (double)(inRange[0] < inRange[1] ? inRange[0] : inRange[1]);
-  sortedRange[1] = (double)(inRange[0] > inRange[1] ? inRange[0] : inRange[1]);
+    sortedRange[0] = (double)(inRange[0] < inRange[1] ? inRange[0] : inRange[1]);
+    sortedRange[1] = (double)(inRange[0] > inRange[1] ? inRange[0] : inRange[1]);
 
-  range = sortedRange[1] - sortedRange[0];
-  span = maxBounds-minBounds;
+    range = sortedRange[1] - sortedRange[0];
+    span = maxBounds-minBounds;
 
-  // Find the integral points.
-  double pow10 = log10(range);
+    // Find the integral points.
+    double pow10 = log10(range);
 
-  // Build in numerical tolerance
-  if (pow10 != 0.)
-    {
-    double eps = 10.0e-10;
-    pow10 = this->FSign((fabs(pow10) + eps), pow10);
-    }
+    // Build in numerical tolerance
+    if (pow10 != 0.)
+        {
+        double eps = 10.0e-10;
+        pow10 = this->FSign((fabs(pow10) + eps), pow10);
+        }
 
-  // FFix move you in the wrong direction if pow10 is negative.
-  if (pow10 < 0.)
-    {
-    pow10 = pow10 - 1.;
-    }
+    // FFix move you in the wrong direction if pow10 is negative.
+    if (pow10 < 0.)
+        {
+        pow10 = pow10 - 1.;
+        }
 
-  fxt = pow(10., this->FFix(pow10));
-    
-  // Find the number of integral points in the interval.
-  fnt  = range/fxt;
-  fnt  = this->FFix(fnt);
-  frac = fnt;
-  numTicks = (frac <= 0.5 ? (int)this->FFix(fnt) : ((int)this->FFix(fnt) + 1));
+    fxt = pow(10., this->FFix(pow10));
 
-  div = 1.;
-  if (numTicks < 5)
-    {
-    div = 2.;
-    }
-  if (numTicks <= 2)
-    {
-    div = 5.;
-    }
+    // Find the number of integral points in the interval.
+    fnt  = range/fxt;
+    fnt  = this->FFix(fnt);
+    frac = fnt;
+    numTicks = (frac <= 0.5 ? (int)this->FFix(fnt) : ((int)this->FFix(fnt) + 1));
 
-  // If there aren't enough major tick points in this decade, use the next
-  // decade.
-  major = fxt;
- 
-  if (div != 1.)
-    {
-    major /= div;
-    }
-  minor = (fxt/div) / 10.;
+    div = 1.;
+    if (numTicks < 5)
+        {
+        div = 2.;
+        }
+    if (numTicks <= 2)
+        {
+        div = 5.;
+        }
 
- 
-  // Figure out the first major and minor tick locations, relative to the
-  // start of the axis.
+    // If there aren't enough major tick points in this decade, use the next
+    // decade.
+    major = fxt;
 
-  if (sortedRange[0] <= 0.)
-    {
-    majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 0.);
-    minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 0.);
-    }
-  else
-    {
-    majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 1.);
-    minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 1.);
-    }
-    
-  double ratio= span/range;
+    if (div != 1.)
+        {
+        major /= div;
+        }
+    minor = (fxt/div) / 10.;
 
-  major*=ratio;
-  minor*=ratio;
 
-  majorStart=(majorStart-sortedRange[0])*ratio +minBounds;
-  minorStart=(minorStart-sortedRange[0])*ratio + minBounds;
+    // Figure out the first major and minor tick locations, relative to the
+    // start of the axis.
 
-  for (int i = 0; i < 4; i++)
-    {
-    axes[i]->SetMinorStart(minorStart); 
-    axes[i]->SetMajorStart(majorStart); 
+    if (sortedRange[0] <= 0.)
+        {
+        majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 0.);
+        minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 0.);
+        }
+    else
+        {
+        majorStart = major*(this->FFix(sortedRange[0]*(1./major)) + 1.);
+        minorStart = minor*(this->FFix(sortedRange[0]*(1./minor)) + 1.);
+        }
 
-    axes[i]->SetDeltaMinor(minor); 
-    axes[i]->SetDeltaMajor(major); 
-    }
+    double ratio= span/range;
+
+    major*=ratio;
+    minor*=ratio;
+
+    majorStart=(majorStart-sortedRange[0])*ratio +minBounds;
+    minorStart=(minorStart-sortedRange[0])*ratio + minBounds;
+
+    for (int i = 0; i < 4; i++)
+        {
+        axes[i]->SetMinorStart(minorStart); 
+        axes[i]->SetMajorStart(majorStart); 
+
+        axes[i]->SetDeltaMinor(minor); 
+        axes[i]->SetDeltaMajor(major); 
+        }
 }
+
 // ****************************************************************
 //  Determine what the labels should be and set them in each axis.
 //
+//  Modification:
+//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
+//    Each axis type now has it's own 'mustAdjustValue' and 'pow'.
+//
+//    Kathleen Bonnell, Tue Jul 20 14:29:10 PDT 2004 
+//    Ensure that '-0.0' is never used as a label. 
+//
+//    Eric Brugger, Mon Jul 26 16:09:26 PDT 2004
+//    Correct a bug with a misplaced closing parenthesis.
+//
 // ****************************************************************
 
-void vtkPrismCubeAxesActor::BuildLabelsFromRanges(vtkAxisActor *axes[4])
+void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
 {
-  char label[64];
+   char label[64];
   int i, labelCount = 0;
   const double *inRange     = axes[0]->GetRange();
   double lastVal = 0, val = 0;
@@ -2268,132 +2123,7 @@ void vtkPrismCubeAxesActor::BuildLabelsFromRanges(vtkAxisActor *axes[4])
     axes[i]->SetLabels(labels);
     }
   labels->Delete();
-}
 
-
-// ****************************************************************
-//  Determine what the labels should be and set them in each axis.
-//
-//  Modification:
-//    Kathleen Bonnell, Wed Aug  6 13:59:15 PDT 2003
-//    Each axis type now has it's own 'mustAdjustValue' and 'pow'.
-//
-//    Kathleen Bonnell, Tue Jul 20 14:29:10 PDT 2004 
-//    Ensure that '-0.0' is never used as a label. 
-//
-//    Eric Brugger, Mon Jul 26 16:09:26 PDT 2004
-//    Correct a bug with a misplaced closing parenthesis.
-//
-// ****************************************************************
-
-void vtkPrismCubeAxesActor::BuildLabels(vtkAxisActor *axes[4])
-{
-  char label[64];
-  int i, labelCount = 0;
-  double majorStart = axes[0]->GetMajorStart();
-  const double deltaMajor = axes[0]->GetDeltaMajor();
-  const double *p2        = axes[0]->GetPoint2Coordinate()->GetValue();
-  const double *range     = axes[0]->GetRange();
-  double lastVal = 0, val = majorStart;
-  double extents = range[1] - range[0];
-  bool mustAdjustValue = 0;
-  int lastPow = 0;
-
-  vtkStringArray *labels = vtkStringArray::New();
-  const char *format = "%s";
-  switch (axes[0]->GetAxisType())
-    {
-    case VTK_AXIS_TYPE_X:
-      lastVal = p2[0];
-      format = this->XLabelFormat;
-      mustAdjustValue = this->MustAdjustXValue;
-      lastPow = this->LastXPow;
-      break;
-    case VTK_AXIS_TYPE_Y:
-      lastVal = p2[1];
-      format = this->YLabelFormat;
-      mustAdjustValue = this->MustAdjustYValue;
-      lastPow = this->LastYPow;
-      break;
-    case VTK_AXIS_TYPE_Z:
-      lastVal = p2[2];
-      format = this->ZLabelFormat;
-      mustAdjustValue = this->MustAdjustZValue;
-      lastPow = this->LastZPow;
-      break;
-    }
-
-  // figure out how many labels we need:
-  while (val <= lastVal && labelCount < VTK_MAX_LABELS)
-    {
-    labelCount++;
-    val += deltaMajor;
-    }
-
-  labels->SetNumberOfValues(labelCount);
-  val = majorStart;
-
-  double scaleFactor = 1.;
-  if (lastPow != 0)
-    {
-    scaleFactor = 1.0/pow(10., lastPow);
-    }
-
-  for (i = 0; i < labelCount; i++)
-    {
-    if (fabs(val) < 0.01 && extents > 1)
-      {
-      // We just happened to fall at something near zero and the range is
-      // large, so set it to zero to avoid ugliness.
-      val = 0.;  
-      }
-    if (mustAdjustValue) 
-      {
-      sprintf(label, format, val*scaleFactor);
-      }
-    else
-      {
-      sprintf(label, format, val);
-      }
-    if (fabs(val) < 0.01)
-      {
-      // 
-      // Ensure that -0.0 is never a label
-      // The maximum number of digits that we allow past the decimal is 5.
-      // 
-      if (strcmp(label, "-0") == 0)
-        {
-        sprintf(label, "0");
-        }
-      else if (strcmp(label, "-0.0") == 0)
-        {
-        sprintf(label, "0.0");
-        }
-      else if (strcmp(label, "-0.00") == 0)
-        {
-        sprintf(label, "0.00");
-        }
-      else if (strcmp(label, "-0.000") == 0)
-        {
-        sprintf(label, "0.000");
-        }
-      else if (strcmp(label, "-0.0000") == 0)
-        {
-        sprintf(label, "0.0000");
-        }
-      else if (strcmp(label, "-0.00000") == 0)
-        {
-        sprintf(label, "0.00000");
-        }
-      }
-    labels->SetValue(i, label);
-    val += deltaMajor;
-    }
-  for (i = 0; i < 4; i++)
-    {
-    axes[i]->SetLabels(labels);
-    }
-  labels->Delete();
 }
 
 // ****************************************************************************

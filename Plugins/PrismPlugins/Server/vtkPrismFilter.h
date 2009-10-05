@@ -13,6 +13,7 @@ Module:    vtkPrismFilter.h
 #include "vtkAlgorithm.h"
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
+#include "vtkStringArray.h"
 
 class vtkIntArray;
 class vtkDoubleArray;
@@ -25,12 +26,14 @@ public:
 
   static vtkPrismFilter *New();
 
+  unsigned long GetMTime();
 
   // Description:
   // see vtkAlgorithm for details
   virtual int ProcessRequest(vtkInformation*,
     vtkInformationVector**,
     vtkInformationVector*);
+  
   // Description:
   // Set the filename to read
   void SetFileName(const char* file);
@@ -95,6 +98,70 @@ public:
  vtkDoubleArray* GetRanges();
  
 
+
+  void SetSESAMEXAxisVarName( const char *name );
+  void SetSESAMEYAxisVarName( const char *name );
+  void SetSESAMEZAxisVarName( const char *name );
+  const char *GetSESAMEXAxisVarName();
+  const char *GetSESAMEYAxisVarName(); 
+  const char *GetSESAMEZAxisVarName(); 
+
+  void SetSESAMEXLogScaling(bool);
+  void SetSESAMEYLogScaling(bool);
+  void SetSESAMEZLogScaling(bool);
+  bool GetSESAMEXLogScaling();
+  bool GetSESAMEYLogScaling();
+  bool GetSESAMEZLogScaling();
+
+  void SetSESAMEConversions(double,double,double, double);
+  virtual double *GetSESAMEConversions();
+  virtual void GetSESAMEConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4);
+  virtual void GetSESAMEConversions (double _arg[4]);
+
+
+
+  vtkDoubleArray* GetSESAMEXRange();
+  vtkDoubleArray* GetSESAMEYRange();
+
+  void SetThresholdSESAMEXBetween(double lower, double upper);
+  void SetThresholdSESAMEYBetween(double lower, double upper);
+
+ virtual double *GetSESAMEXThresholdBetween();
+ virtual void GetSESAMEXThresholdBetween (double &_arg1, double &_arg2);
+ virtual void GetSESAMEXThresholdBetween (double _arg[2]);
+
+
+ virtual double *GetSESAMEYThresholdBetween();
+ virtual void GetSESAMEYThresholdBetween (double &_arg1, double &_arg2);
+ virtual void GetSESAMEYThresholdBetween (double _arg[2]);
+
+
+
+ 
+
+
+
+  void SetWarpSESAMESurface(bool);
+  void SetDisplaySESAMEContours(bool);
+  void SetSESAMEContourVarName( const char *name );
+  const char *GetSESAMEContourVarName(); 
+  vtkDoubleArray* GetSESAMEContourVarRange();
+
+
+  void SetSESAMEContourValue(int i, double value);
+  double GetSESAMEContourValue(int i);
+  double *GetSESAMEContourValues();
+  void GetSESAMEContourValues(double *contourValues);
+
+  void SetNumberOfSESAMEContours(int);
+
+
+  vtkStringArray* GetSESAMEAxisVarNames();
+
+
+
+
+
 protected:
   vtkPrismFilter();
   ~vtkPrismFilter() {}
@@ -127,7 +194,7 @@ protected:
 
   // virtual void ExecuteData(vtkDataObject *output);
 private:
-  int CalculateValues( double *x, double *f );
+ // int CalculateValues( double *x, double *f );
   vtkPrismFilter(const vtkPrismFilter&);  // Not implemented.
   void operator=(const vtkPrismFilter&);  // Not implemented.
   int RequestSESAMEData(

@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    PrismDisplayProxyEditor.cxx
+Program: ParaView
+Module:    PrismDisplayProxyEditor.cxx
 
 =========================================================================*/
 
@@ -65,133 +65,130 @@
 //-----------------------------------------------------------------------------
 /// constructor
 PrismDisplayProxyEditor::PrismDisplayProxyEditor(pqPipelineRepresentation* repr, QWidget* p)
-  : pqDisplayProxyEditor(repr, p)
-{
-  this->CubeAxesActor = NULL;
-  this->Representation= repr;
- 
-   pqApplicationCore* core = pqApplicationCore::instance();
+: pqDisplayProxyEditor(repr, p)
+    {
+    this->CubeAxesActor = NULL;
+    this->Representation= repr;
+
+    pqApplicationCore* core = pqApplicationCore::instance();
     pqObjectBuilder* builder = core->getObjectBuilder();
     pqServer* server = this->getActiveServer();
     if(!server)
-      {
-      qCritical() << "Cannot create reader without an active server.";
-      return ;
-      }
+        {
+        qCritical() << "Cannot create reader without an active server.";
+        return ;
+        }
 
     this->CubeAxesActor=vtkSMPrismCubeAxesRepresentationProxy::SafeDownCast(builder->createProxy("props", 
-      "PrismCubeAxesRepresentation", server, 
-      "props"));
+        "PrismCubeAxesRepresentation", server, 
+        "props"));
 
 
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->CubeAxesActor->GetProperty("Input"));
+        this->CubeAxesActor->GetProperty("Input"));
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
     if (!pp)
-      {
-      vtkErrorWithObjectMacro(this->CubeAxesActor,"Failed to locate property " << "Input"
-        << " on the consumer " <<  (this->CubeAxesActor->GetXMLName()));
-      return;
-      }
+        {
+        vtkErrorWithObjectMacro(this->CubeAxesActor,"Failed to locate property " << "Input"
+            << " on the consumer " <<  (this->CubeAxesActor->GetXMLName()));
+        return;
+        }
 
     if (ip)
-      {
-       ip->RemoveAllProxies();
-     ip->AddInputConnection(repr->getInput()->getProxy(),repr->getOutputPortFromInput()->getPortNumber() );
-      }
+        {
+        ip->RemoveAllProxies();
+        ip->AddInputConnection(repr->getInput()->getProxy(),repr->getOutputPortFromInput()->getPortNumber() );
+        }
     else
-      {
-      pp->RemoveAllProxies();
-      pp->AddProxy(repr->getInput()->getProxy());
-      }
+        {
+        pp->RemoveAllProxies();
+        pp->AddProxy(repr->getInput()->getProxy());
+        }
     this->CubeAxesActor->UpdateProperty("Input");
 
 
     pqRenderView * view= qobject_cast<pqRenderView*>(this->Representation->getView());
     if(view)
-      {
-      vtkSMViewProxy* renv= view->getViewProxy();
-      renv->AddRepresentation(this->CubeAxesActor);
-      }
-}
+        {
+        vtkSMViewProxy* renv= view->getViewProxy();
+        renv->AddRepresentation(this->CubeAxesActor);
+        }
+    }
 
 //-----------------------------------------------------------------------------
 /// destructor
 PrismDisplayProxyEditor::~PrismDisplayProxyEditor()
-{
-
- if (this->CubeAxesActor)
     {
 
-  pqRenderView * view= qobject_cast<pqRenderView*>(this->Representation->getView());
-    if(view)
-      {
-      vtkSMViewProxy* renv= view->getViewProxy();
-      renv->RemoveRepresentation(this->CubeAxesActor);
-      view->getProxy()->UpdateVTKObjects();
-      }
+    if (this->CubeAxesActor)
+        {
+
+        pqRenderView * view= qobject_cast<pqRenderView*>(this->Representation->getView());
+        if(view)
+            {
+            vtkSMViewProxy* renv= view->getViewProxy();
+            renv->RemoveRepresentation(this->CubeAxesActor);
+            view->getProxy()->UpdateVTKObjects();
+            }
 
 
 
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->UnRegisterProxy(this->CubeAxesActor->GetXMLGroup(),this->CubeAxesActor->GetClassName(),this->CubeAxesActor);
+        vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+        pxm->UnRegisterProxy(this->CubeAxesActor->GetXMLGroup(),this->CubeAxesActor->GetClassName(),this->CubeAxesActor);
+        }
+
+
+
+
     }
 
-   
-
-
-}
-
-
-
-//-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::cubeAxesVisibilityChanged()
 {
- 
-  this->CubeAxesActor->SetCubeAxesVisibility(this->isCubeAxesVisible());
-  this->Representation->renderViewEventually();
- 
-}
+   this->CubeAxesActor->SetCubeAxesVisibility(this->isCubeAxesVisible());
+    this->Representation->renderViewEventually();
 
+}
 //-----------------------------------------------------------------------------
 void PrismDisplayProxyEditor::editCubeAxes()
 {
   pqCubeAxesEditorDialog dialog(this);
   dialog.setRepresentationProxy(this->CubeAxesActor);
   dialog.exec();
-  
 }
 
 pqServer* PrismDisplayProxyEditor::getActiveServer() const
-{
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
-  pqPipelineSource* source = 0;
-  pqServer* server=0;
-  pqOutputPort* outputPort=0;
-  pqServerManagerModelItem* item = 0;
-  pqServerManagerSelection::ConstIterator iter = sels.begin();
+    {
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqServer* server=core->getActiveServer();
 
-  item = *iter;
-  source = dynamic_cast<pqPipelineSource*>(item);   
- 
-  if(source)
+    /* pqServerManagerSelection sels = *core->getSelectionModel()->selectedItems();
+    pqPipelineSource* source = 0;
+    pqServer* server=0;
+    pqOutputPort* outputPort=0;
+    pqServerManagerModelItem* item = 0;
+    pqServerManagerSelection::ConstIterator iter = sels.begin();
+
+    item = *iter;
+    source = dynamic_cast<pqPipelineSource*>(item);   
+
+    if(source)
     {
     server = source->getServer();
     }
-  else
+    else
     {
     outputPort=dynamic_cast<pqOutputPort*>(item); 
     if(outputPort)
-      {
-      server= outputPort->getServer();
-      }
-    else
-      {
-      server = dynamic_cast<pqServer*>(item);  
-      }
+    {
+    server= outputPort->getServer();
     }
-  return server;
-}
+    else
+    {
+    server = dynamic_cast<pqServer*>(item);  
+    }
+    }
+    */
+    return server;
+    }
 
 

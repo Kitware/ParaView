@@ -1,0 +1,6 @@
+
+Variable               Sesame units                          label                sesame to SI    label            sesame to cgs        label
+density                 megagram/(meter)^3               Mg/m^3            *1000                kg/m^3        *1.0                         g/(cm)^3
+temperature        Kelvin                                      K                       *1.0                 K                *1.0                         K
+pressure               gigaPascal                            GPa                  *1.0e9              Pa               *1.0e10                  dyne/(cm)^2
+energy                  megaJoule/kilogram               MJ/kg               *1.0e6              J/kg              *1.0e10                  erg/g

@@ -22,7 +22,7 @@ public:
 
    static PrismCore* instance();
 
-  QList<QAction*> actions();
+  void  actions(QList<QAction*>&);
 
 public slots:
   void onSESAMEFileOpen();
