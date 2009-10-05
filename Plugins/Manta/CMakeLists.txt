@@ -325,80 +325,83 @@ IF ( VTK_FOUND )
   # ------------------------------------
 
 
-  # Create Tcl wrappers if VTK is wrapped in Tcl.
-  IF ( VTK_WRAP_TCL )
+  IF ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
+    # Create Tcl wrappers if VTK is wrapped in Tcl.
+    IF ( VTK_WRAP_TCL )
 
-    INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapTcl.cmake )
-    VTK_WRAP_TCL3 ( ${PROJECT_NAME}TCL vtkMantaTCL_SRCS "${MANTA_SRCS}" "" )
-    ADD_LIBRARY ( ${PROJECT_NAME}TCL ${vtkMantaTCL_SRCS} )
+      INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapTcl.cmake )
+      VTK_WRAP_TCL3 ( ${PROJECT_NAME}TCL vtkMantaTCL_SRCS "${MANTA_SRCS}" "" )
+      ADD_LIBRARY ( ${PROJECT_NAME}TCL ${vtkMantaTCL_SRCS} )
+      
+      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}TCL ${PROJECT_NAME} ${MANTA_TARGET_LINK_LIBRARIES} )
+      FOREACH ( c ${vtkManta_LIBS} )
+        TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}TCL ${c}TCL )
+      ENDFOREACH ( c )
 
-    TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}TCL ${PROJECT_NAME} ${MANTA_TARGET_LINK_LIBRARIES} )
-    FOREACH ( c ${vtkManta_LIBS} )
-      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}TCL ${c}TCL )
-    ENDFOREACH ( c )
+      # Create the list of kits that are required.
+      SET ( VTKManta_KITS "" )
+      FOREACH ( c ${vtkManta_LIBS} )
+        SET ( VTKManta_KITS "${VTKManta_KITS} ${c}" )
+      ENDFOREACH ( c )
 
-    # Create the list of kits that are required.
-    SET ( VTKManta_KITS "" )
-    FOREACH ( c ${vtkManta_LIBS} )
-      SET ( VTKManta_KITS "${VTKManta_KITS} ${c}" )
-    ENDFOREACH ( c )
+      FOREACH ( c ${MANTA_SRCS} )
+        GET_FILENAME_COMPONENT ( VTKManta_LAST_CLASS ${c} NAME_WE )
+      ENDFOREACH ( c )
 
-    FOREACH ( c ${MANTA_SRCS} )
-      GET_FILENAME_COMPONENT ( VTKManta_LAST_CLASS ${c} NAME_WE )
-    ENDFOREACH ( c )
+      IF ( CMAKE_CONFIGURATION_TYPES )
+        FOREACH ( config ${CMAKE_CONFIGURATION_TYPES} )
+          SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}/${config}" )
+          CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in
+            ${PROJECT_BINARY_DIR}/${config}/pkgIndex.tcl
+            @ONLY
+            IMMEDIATE
+            )
+        ENDFOREACH ( config )
+      ELSE ( CMAKE_CONFIGURATION_TYPES )
+        SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}" )
+        CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in  
+          ${PROJECT_BINARY_DIR}/pkgIndex.tcl     
+          @ONLY
+          IMMEDIATE
+          )
+      ENDIF ( CMAKE_CONFIGURATION_TYPES ) 
 
-    IF ( CMAKE_CONFIGURATION_TYPES )
-      FOREACH ( config ${CMAKE_CONFIGURATION_TYPES} )
-        SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}/${config}" )
-        CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in
-                         ${PROJECT_BINARY_DIR}/${config}/pkgIndex.tcl
-                         @ONLY
-                         IMMEDIATE
-                       )
-      ENDFOREACH ( config )
-    ELSE ( CMAKE_CONFIGURATION_TYPES )
-      SET ( VTKManta_TCL_LIBRARY_DIR "${LIBRARY_OUTPUT_PATH}" )
-      CONFIGURE_FILE ( ${PROJECT_SOURCE_DIR}/pkgIndex.tcl.in  
-                       ${PROJECT_BINARY_DIR}/pkgIndex.tcl     
-                       @ONLY
-                       IMMEDIATE
-                     )
-    ENDIF ( CMAKE_CONFIGURATION_TYPES ) 
-
-  ENDIF ( VTK_WRAP_TCL )
-
-
-  # Create Python wrappers if VTK is wrapped in Python.
-  IF ( VTK_WRAP_PYTHON )
-
-    INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapPython.cmake )
-    VTK_WRAP_PYTHON3 ( ${PROJECT_NAME}Python vtkMantaPYTHON_SRCS "${MANTA_SRCS}" )
-    ADD_LIBRARY ( ${PROJECT_NAME}PythonD ${vtkMantaPYTHON_SRCS} )
-    ADD_LIBRARY ( ${PROJECT_NAME}Python MODULE ${PROJECT_NAME}PythonInit.cxx )
-
-    TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}PythonD ${PROJECT_NAME} ${MANTA_TARGET_LINK_LIBRARIES} )
-    FOREACH ( c ${vtkManta_LIBS} )
-      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}PythonD ${c}PythonD )
-    ENDFOREACH ( c )
-    TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Python ${PROJECT_NAME}PythonD )
-
-  ENDIF ( VTK_WRAP_PYTHON )
+    ENDIF ( VTK_WRAP_TCL )
 
 
-  # Create Java wrappers if VTK is wrapped in Java.
-  IF ( VTK_WRAP_JAVA )
-    INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapJava.cmake )
-    SET ( VTK_WRAP_JAVA3_INIT_DIR "${PROJECT_SOURCE_DIR}" )
-    SET ( VTK_JAVA_HOME ${PROJECT_BINARY_DIR}/java/${PROJECT_NAME} )
-    MAKE_DIRECTORY ( ${VTK_JAVA_HOME} )
-    VTK_WRAP_JAVA3 ( ${PROJECT_NAME}Java vtkMantaJAVA_SRCS "${MANTA_SRCS}" )
-    ADD_LIBRARY ( ${PROJECT_NAME}Java ${vtkMantaJAVA_SRCS} )
+    # Create Python wrappers if VTK is wrapped in Python.
+    IF ( VTK_WRAP_PYTHON )
 
-    TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Java ${PROJECT_NAME} )
-    FOREACH ( c ${vtkManta_LIBS} )
-      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Java ${c}Java )
-    ENDFOREACH ( c )
-  ENDIF ( VTK_WRAP_JAVA )
+      INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapPython.cmake )
+      VTK_WRAP_PYTHON3 ( ${PROJECT_NAME}Python vtkMantaPYTHON_SRCS "${MANTA_SRCS}" )
+      ADD_LIBRARY ( ${PROJECT_NAME}PythonD ${vtkMantaPYTHON_SRCS} )
+      ADD_LIBRARY ( ${PROJECT_NAME}Python MODULE ${PROJECT_NAME}PythonInit.cxx )
+
+      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}PythonD ${PROJECT_NAME} ${MANTA_TARGET_LINK_LIBRARIES} )
+      FOREACH ( c ${vtkManta_LIBS} )
+        TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}PythonD ${c}PythonD )
+      ENDFOREACH ( c )
+      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Python ${PROJECT_NAME}PythonD )
+
+    ENDIF ( VTK_WRAP_PYTHON )
+
+
+    # Create Java wrappers if VTK is wrapped in Java.
+    IF ( VTK_WRAP_JAVA )
+      INCLUDE ( ${VTK_CMAKE_DIR}/vtkWrapJava.cmake )
+      SET ( VTK_WRAP_JAVA3_INIT_DIR "${PROJECT_SOURCE_DIR}" )
+      SET ( VTK_JAVA_HOME ${PROJECT_BINARY_DIR}/java/${PROJECT_NAME} )
+      MAKE_DIRECTORY ( ${VTK_JAVA_HOME} )
+      VTK_WRAP_JAVA3 ( ${PROJECT_NAME}Java vtkMantaJAVA_SRCS "${MANTA_SRCS}" )
+      ADD_LIBRARY ( ${PROJECT_NAME}Java ${vtkMantaJAVA_SRCS} )
+
+      TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Java ${PROJECT_NAME} )
+      FOREACH ( c ${vtkManta_LIBS} )
+        TARGET_LINK_LIBRARIES ( ${PROJECT_NAME}Java ${c}Java )
+      ENDFOREACH ( c )
+    ENDIF ( VTK_WRAP_JAVA )
+
+  ENDIF ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
   
 
 ENDIF ( VTK_FOUND )
