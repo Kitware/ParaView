@@ -140,7 +140,7 @@
              <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
              <!-- <Entry value="17" text="vtkHyperOctree"/> -->
              <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
-             <!-- <Entry value="19" text="vtkTable"/> -->
+             <Entry value="19" text="vtkTable"/>
              <!-- <Entry value="20" text="vtkGraph"/> -->
              <!-- <Entry value="21" text="vtkTree"/> -->
            </EnumerationDomain>
@@ -251,7 +251,7 @@ Interpretor, a python interpretor to run the script upon the first
          <!-- <Entry value="16" text="vtkGenericDataSet"/> -->
          <!-- <Entry value="17" text="vtkHyperOctree"/> -->
          <!-- <Entry value="18" text="vtkTemporalDataSet"/> -->
-         <!-- <Entry value="19" text="vtkTable"/> -->
+         <Entry value="19" text="vtkTable"/>
          <!-- <Entry value="20" text="vtkGraph"/> -->
          <!-- <Entry value="21" text="vtkTree"/> -->
        </EnumerationDomain>
