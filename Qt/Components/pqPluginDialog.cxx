@@ -145,7 +145,8 @@ void pqPluginDialog::loadLocalPlugin()
 //----------------------------------------------------------------------------
 QString pqPluginDialog::loadPlugin(pqServer* server, bool remote)
 {
-  pqFileDialog fd(server, this, "Load Plugin", QString(), 
+  pqFileDialog fd(remote? server: NULL,
+                  this, "Load Plugin", QString(), 
                   "Plugins (*.so;*.dylib;*.dll;*.sl)\n"
                   "Client Resource Files (*.bqrc)\n"
                   "Server Manager XML (*.xml)\n"
