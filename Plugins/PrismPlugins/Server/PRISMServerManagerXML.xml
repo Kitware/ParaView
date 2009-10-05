@@ -862,7 +862,6 @@
            <Property name="ContourVarRange" function="GetContourVarRange"/>
           </RequiredProperties>
        </DoubleRangeDomain>
-    filter->setDefaultPropertyValues();
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 

@@ -28,7 +28,7 @@ Module:    vtkPrismFilter.cxx
 #include "vtkCompositeDataIterator.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.12");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.13");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
@@ -42,7 +42,6 @@ public:
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
     vtkstd::string AxisVarName[3];
-    double Conversion[3];
     MyInternal()
     {
         this->RangeArray = vtkSmartPointer<vtkDoubleArray>::New();
@@ -720,9 +719,9 @@ bool vtkPrismFilter::GetSESAMEZLogScaling()
 }
 
 
-void vtkPrismFilter::SetSESAMEConversions(double x,double y,double z,double c)
+void vtkPrismFilter::SetSESAMEConversions(double d,double t,double p,double e)
 {
-    this->Internal->Reader->SetConversions(x,y,z,c);
+    this->Internal->Reader->SetConversions(d,t,p,e);
 }
 
 double* vtkPrismFilter::GetSESAMEConversions()

@@ -92,8 +92,10 @@ public:
   const char *GetZAxisVarName(); 
 
 
-  void SetConversions(double xc,double yc,double zc,double cc);
-  vtkGetVector4Macro(Conversions,double);
+  void SetConversions(double dc,double tc,double pc,double ec);
+  virtual double *GetConversions();
+  virtual void GetConversions (double &_arg1, double &_arg2,double &_arg3,double &_arg4);
+  virtual void GetConversions (double _arg[4]);
 
 
   void SetXLogScaling(bool);
@@ -150,9 +152,9 @@ protected:
   double VariableRange[2];
   double XThresholdBetween[2];
   double YThresholdBetween[2];
-  double Conversions[4];
+ 
 
-
+ 
   bool GetVariableRange (const char *name,vtkDoubleArray*);
   //BTX 
   class MyInternal;
