@@ -805,8 +805,8 @@
     <!-- ================================================================= -->
     <WriterProxy name="XdmfWriter" class="vtkXdmfWriter">
       <Documentation
-        short_help="Writer data in Xdmf files.">
-        Writer to writer data in eXtensible Data Model and Format *(XDMF) files.
+        short_help="Write data in Xdmf files.">
+        Writer to write data in eXtensible Data Model and Format *(XDMF) files.
       </Documentation>
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
@@ -814,6 +814,39 @@
           <Group name="filters"/>
         </ProxyGroupDomain>
         <DataTypeDomain name="input_type" composite_data_supported="0">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+        <Documentation>
+          The input filter/source whose output dataset is to written to the
+          file.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+      <Hints>
+        <Property name="Input" show="0"/>
+        <Property name="FileName" show="0"/>
+      </Hints>
+      <!-- End of XdmfWriter -->
+    </WriterProxy>
+
+    <!-- ================================================================= -->
+
+    <WriterProxy name="XdmfWriter2" class="vtkXdmfWriter2">
+      <Documentation
+        short_help="Write data in Xdmf files.">
+        Writer to write data in eXtensible Data Model and Format *(XDMF) files.
+      </Documentation>
+      <InputProperty name="Input" command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type" composite_data_supported="1">
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
         <Documentation>
