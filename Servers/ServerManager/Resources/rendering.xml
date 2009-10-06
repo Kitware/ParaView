@@ -2393,6 +2393,15 @@
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       
+      <IntVectorProperty
+         name="ClosedLoopInfo"
+         command="GetClosedLoop"
+         number_of_elements="1"
+         information_only="1"
+         default_values="0">
+        <SimpleIntInformationHelper/>
+      </IntVectorProperty>
+
       <ProxyProperty
         name="PointPlacer"
         command="SetPointPlacer">
@@ -8823,6 +8832,7 @@
           <Property name="NodePositions" />
           <Property name="ShowSelectedNodes" />
           <Property name="SelectNodes" />
+          <Property name="ClosedLoop" />
         </ExposedProperties>
       </SubProxy>
 
