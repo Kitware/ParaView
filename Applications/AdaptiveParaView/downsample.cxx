@@ -1,7 +1,11 @@
 #include <stdio.h>
-#include <mach/mach_time.h>
 #include <string.h>
 #include <stdlib.h>
+
+#ifdef __APPLE__
+#include <mach/mach_time.h>
+#endif
+
 
 // calculate sampling levels and blocks
 inline void sampleRates(size_t* r, size_t* s, size_t* t,
@@ -55,7 +59,7 @@ inline void sampleRates(size_t* r, size_t* s, size_t* t,
 int main(int argc, char* argv[]) {
   if(argc != 8) 
     {
-    fprintf(stderr, "%s <file> <height> <degree> <rate> <i_#pts> <j_#pts> <z_#pts>\n", argv[0]);
+    fprintf(stderr, "%s <file> <height> <degree> <rate> <i_#pts> <j_#pts> <k_#pts>\n", argv[0]);
     exit(0);
     }
   
@@ -106,10 +110,12 @@ int main(int argc, char* argv[]) {
            u[h] * v[h] * w[h] * sizeof(float));
     }
   
+#ifdef __APPLE__
   mach_timebase_info_data_t timebase;
   mach_timebase_info(&timebase);
   uint64_t start = mach_absolute_time();
-  
+#endif
+
   for(size_t k = 0; k < z; k = k + 1) 
     {
     for(size_t j = 0; j < y; j = j + 1) 
@@ -129,15 +135,18 @@ int main(int argc, char* argv[]) {
         }
       }
     }
-  
+
   fclose(fp);
   for(unsigned int h = 1; h < height; h = h + 1) 
     {
     fclose(output[h]);
     }
   delete [] output;
-  
+
+#ifdef __APPLE__
   uint64_t end = mach_absolute_time();
   uint64_t elapsed = (end - start) * timebase.numer / timebase.denom;
   printf("overall: %f s\n", elapsed / 1000000000.0);
+#endif
+
 }
