@@ -60,6 +60,10 @@ public:
 
   float* SetupMap(size_t);
 
+  // Description:
+  // Checks for presence of preprocessed files.
+  int CanReadFile(const char *filename);
+
 protected:
   vtkRawStridedReader2();
   ~vtkRawStridedReader2();

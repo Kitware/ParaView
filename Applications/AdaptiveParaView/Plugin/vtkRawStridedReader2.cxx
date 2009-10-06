@@ -41,7 +41,7 @@
 #include <errno.h>
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkRawStridedReader2, "1.1");
+vtkCxxRevisionMacro(vtkRawStridedReader2, "1.2");
 vtkStandardNewMacro(vtkRawStridedReader2);
 
 #if 0
@@ -562,6 +562,22 @@ void vtkRawStridedReader2::SwapDataByteOrder(int i)
     {
     this->Skimmer->swap_endian();
     }
+}
+
+//------------------------------------------------------------------------------
+int vtkRawStridedReader2::CanReadFile(const char* rawfile)
+{
+  int ret = 0;
+  char *filename = new char[strlen(rawfile) + 10];
+  sprintf(filename, "%s-1", rawfile);
+  FILE *fp = fopen(filename, "r");
+  if (fp)
+    {
+    ret = 1;
+    fclose(fp);
+    }
+  delete filename;
+  return ret;
 }
 
 //----------------------------------------------------------------------------

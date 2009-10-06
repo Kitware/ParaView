@@ -6,7 +6,7 @@
   </Reader>
 
   <Reader name="StridedReader1"
-          extensions="raw1"
+          extensions="raw"
           file_description="Raw Files (Strided rev 1)" >
   </Reader>
 
