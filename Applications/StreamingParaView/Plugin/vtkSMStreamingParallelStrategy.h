@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMSUnstructuredDataParallelStrategy.h
+  Module:    vtkSMStreamingParallelStrategy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSUnstructuredDataParallelStrategy
+// .NAME vtkSMStreamingParallelStrategy
 // .SECTION Description
 
-#ifndef __vtkSMSUnstructuredDataParallelStrategy_h
-#define __vtkSMSUnstructuredDataParallelStrategy_h
+#ifndef __vtkSMStreamingParallelStrategy_h
+#define __vtkSMStreamingParallelStrategy_h
 
 #include "vtkSMUnstructuredDataParallelStrategy.h"
 
-class VTK_EXPORT vtkSMSUnstructuredDataParallelStrategy 
+class VTK_EXPORT vtkSMStreamingParallelStrategy 
 : public vtkSMUnstructuredDataParallelStrategy
 {
 public:
-  static vtkSMSUnstructuredDataParallelStrategy* New();
-  vtkTypeRevisionMacro(vtkSMSUnstructuredDataParallelStrategy,
+  static vtkSMStreamingParallelStrategy* New();
+  vtkTypeRevisionMacro(vtkSMStreamingParallelStrategy,
                        vtkSMUnstructuredDataParallelStrategy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // LOD and streaming are not working yet.
+  virtual void SetEnableLOD(bool vtkNotUsed(enable))
+  {}
 
   // Description:
   // Tells server side to work with a particular piece until further notice.
@@ -47,8 +52,8 @@ public:
 
 //BTX
 protected:
-  vtkSMSUnstructuredDataParallelStrategy();
-  ~vtkSMSUnstructuredDataParallelStrategy();
+  vtkSMStreamingParallelStrategy();
+  ~vtkSMStreamingParallelStrategy();
 
   // Description:
   // Overridden to swap in StreamingUpdateSupressors and add the PieceCache.
@@ -59,11 +64,6 @@ protected:
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
 
   // Description:
-  // Overridden to insert piececache in front of LOD render pipeline.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
-
-
-  // Description:
   // Copies ordered piece list from one UpdateSupressor to the other.
   virtual void CopyPieceList(vtkClientServerStream *stream,
                              vtkSMSourceProxy *src, 
@@ -72,10 +72,6 @@ protected:
   // Description:
   // Overridden to gather information incrementally.
   virtual void GatherInformation(vtkPVInformation*);
-
-  // Description:
-  // Overridden to gather information incrementally.
-  virtual void GatherLODInformation(vtkPVInformation*);
 
   // Description:
   // Overridden to clean piececache too.
@@ -90,8 +86,8 @@ protected:
   vtkSMSourceProxy* ViewSorter;
 
 private:
-  vtkSMSUnstructuredDataParallelStrategy(const vtkSMSUnstructuredDataParallelStrategy&); // Not implemented
-  void operator=(const vtkSMSUnstructuredDataParallelStrategy&); // Not implemented
+  vtkSMStreamingParallelStrategy(const vtkSMStreamingParallelStrategy&); // Not implemented
+  void operator=(const vtkSMStreamingParallelStrategy&); // Not implemented
 
 //ETX
 };
