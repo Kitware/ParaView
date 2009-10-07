@@ -32,7 +32,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkMPIMoveData.h"
 
-vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.1");
+vtkCxxRevisionMacro(vtkStreamingUpdateSuppressor, "1.2");
 vtkStandardNewMacro(vtkStreamingUpdateSuppressor);
 
 #define DEBUGPRINT_EXECUTION(arg)\
@@ -137,7 +137,7 @@ void vtkStreamingUpdateSuppressor::ForceUpdate()
   
   input->Update();
   output->ShallowCopy(input);
-    
+
   this->PipelineUpdateTime.Modified();
 }
 
@@ -299,16 +299,17 @@ void vtkStreamingUpdateSuppressor::ClearPriorities()
 //-----------------------------------------------------------------------------
 void vtkStreamingUpdateSuppressor::ComputePriorities()
 {
-  vtkDataObject *input = this->GetInput();
-  if (input == 0)
-    {
-    return;
-    }
   DEBUGPRINT_EXECUTION(
   cerr << "US(" << this << ") COMPUTE PRIORITIES ";
   this->PrintPipe(this);
   cerr << endl;
   );
+  vtkDataObject *input = this->GetInput();
+  if (input == 0)
+    {
+    cerr << "NO INPUT" << endl;
+    return;
+    }
   if (this->PieceList)
     {
     this->PieceList->Delete();
@@ -334,6 +335,9 @@ void vtkStreamingUpdateSuppressor::ComputePriorities()
         );
         sddp->SetUpdateExtent(info, gPiece, gPieces, 0); 
         priority = sddp->ComputePriority();
+        DEBUGPRINT_EXECUTION(
+        cerr << "US(" << this << ") result was " << priority << endl;
+        );
         }
       piece->SetPiece(i);
       piece->SetNumPieces(this->NumberOfPasses);

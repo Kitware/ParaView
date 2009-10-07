@@ -29,6 +29,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // LOD and streaming are not working yet.
+  virtual void SetEnableLOD(bool vtkNotUsed(enable))
+  {}
+
+  // Description:
   // Tells server side to work with a particular piece until further notice.
   virtual void SetPassNumber(int Pass, int force);
   // Description:
@@ -65,22 +70,10 @@ protected:
   virtual void CreatePipeline(vtkSMSourceProxy* input, int outputport);
   
   // Description:
-  // Create and initialize the LOD data pipeline.
-  // Note that this method is called irrespective of EnableLOD
-  // flag.
-  virtual void CreateLODPipeline(vtkSMSourceProxy* input, int outputport);
-
-  // Description:
   // Gather the information of the displayed data (non-LOD).
   // Update the part of the pipeline needed to gather full information
   // and then gather that information. 
   virtual void GatherInformation(vtkPVInformation*);
-
-  // Description:
-  // Gather the information of the displayed data (lod);
-  // Update the part of the pipeline needed to gather full information
-  // and then gather that information. 
-  virtual void GatherLODInformation(vtkPVInformation*);
 
   // Description:
   // Invalidates the full resolution pipeline, overridden to clean up cache.

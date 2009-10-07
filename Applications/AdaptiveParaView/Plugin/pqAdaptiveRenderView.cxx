@@ -4,7 +4,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
-#include "QVTKWidget.h"
+#include <QVTKWidget.h>
 #include <vtkSMProxy.h>
 #include <vtkSMRenderViewProxy.h>
 #include <vtkSMAdaptiveViewProxy.h>
@@ -51,7 +51,8 @@ vtkSMRenderViewProxy* pqAdaptiveRenderView::getRenderViewProxy() const
 //-----------------------------------------------------------------------------
 QWidget* pqAdaptiveRenderView::createWidget() 
 {
-  QVTKWidget* vtkwidget = dynamic_cast<QVTKWidget*>(this->Superclass::createWidget());
+  QVTKWidget* vtkwidget =
+    dynamic_cast<QVTKWidget*>(this->Superclass::createWidget());
   if (vtkwidget)
     {
     vtkwidget->setAutomaticImageCacheEnabled(false);

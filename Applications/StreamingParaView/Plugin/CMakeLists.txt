@@ -10,16 +10,13 @@ SET(STREAMING_SS_SOURCES
   vtkPieceList.cxx
   vtkPVSGeometryInformation.cxx
   vtkRawStridedReader.cxx
-  vtkSMSImageDataParallelStrategy.cxx
   vtkSMStreamingOptionsProxy.cxx
   vtkSMStreamingOutputPort.cxx
   vtkSMStreamingRepresentation.cxx 
+  vtkSMStreamingParallelStrategy.cxx
   vtkSMStreamingSerialStrategy.cxx 
   vtkSMStreamingViewHelper.cxx
   vtkSMStreamingViewProxy.cxx
-  vtkSMSUniformGridParallelStrategy.cxx
-  vtkSMSUnstructuredDataParallelStrategy.cxx
-  vtkSMSUnstructuredGridParallelStrategy.cxx
   vtkStreamingFactory.cxx
   vtkStreamingOptions.cxx
   vtkStreamingUpdateSuppressor.cxx

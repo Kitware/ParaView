@@ -31,10 +31,12 @@
     }
 
 vtkStandardNewMacro(vtkSMStreamingSerialStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingSerialStrategy, "1.2");
 //----------------------------------------------------------------------------
 vtkSMStreamingSerialStrategy::vtkSMStreamingSerialStrategy()
 {
+  this->EnableCaching = false; //don't try to use animation caching
+  this->SetEnableLOD(false); //don't try to have LOD while interacting either
 }
 
 //----------------------------------------------------------------------------
@@ -43,21 +45,9 @@ vtkSMStreamingSerialStrategy::~vtkSMStreamingSerialStrategy()
 }
 
 //----------------------------------------------------------------------------
-#define ReplaceSubProxy(orig, name) \
-{\
-  vtkTypeUInt32 servers = orig->GetServers(); \
-  orig = vtkSMSourceProxy::SafeDownCast(this->GetSubProxy(name));\
-  orig->SetServers(servers);\
-}
-
-//----------------------------------------------------------------------------
 void vtkSMStreamingSerialStrategy::BeginCreateVTKObjects()
 {
   this->Superclass::BeginCreateVTKObjects();
-
-  //replace all of UpdateSuppressorProxies with StreamingUpdateSuppressorProxies
-  ReplaceSubProxy(this->UpdateSuppressor, "StreamingUpdateSuppressor");
-  ReplaceSubProxy(this->UpdateSuppressorLOD, "StreamingUpdateSuppressorLOD");
 
   //Get hold of the caching filter proxy
   this->PieceCache = 
@@ -72,26 +62,10 @@ void vtkSMStreamingSerialStrategy::BeginCreateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMStreamingSerialStrategy::CreatePipeline(vtkSMSourceProxy* input, int outputport)
 {
-  //turn off caching for animation it will interfere with streaming
-  vtkSMSourceProxy *cacher =
-    vtkSMSourceProxy::SafeDownCast(this->GetSubProxy("CacheKeeper"));
-  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-    cacher->GetProperty("CachingEnabled"));
-  ivp->SetElement(0, 0);
-
   this->Connect(input, this->ViewSorter, "Input", outputport);
   this->Connect(this->ViewSorter, this->PieceCache);
   this->Superclass::CreatePipeline(this->PieceCache, 0);
   //input->ViewSorter->PieceCache->US
-}
-
-//----------------------------------------------------------------------------
-void vtkSMStreamingSerialStrategy::CreateLODPipeline(vtkSMSourceProxy* input, int outputport)
-{
-  this->Connect(input, this->ViewSorter, "Input", outputport);
-  this->Connect(this->ViewSorter, this->PieceCache);
-  this->Superclass::CreateLODPipeline(this->PieceCache, 0);
-  //input->ViewSorter->PieceCache->LODDec->USLOD
 }
 
 //----------------------------------------------------------------------------
@@ -137,40 +111,6 @@ void vtkSMStreamingSerialStrategy::GatherInformation(vtkPVInformation* info)
                           vtkProcessModule::DATA_SERVER_ROOT,
                           sinfo,
                           this->UpdateSuppressor->GetID());
-    info->AddInformation(sinfo);
-    sinfo->Delete();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMStreamingSerialStrategy::GatherLODInformation(vtkPVInformation* info)
-{
-  //gather information in multiple passes so as never to request the whole data  
-  DEBUGPRINT_STRATEGY(
-    cerr << "SSS(" << this << ") Gather LOD Info" << endl;
-    );
-
-  vtkSMIntVectorProperty* ivp;
-  int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  for (int i = 0; i < 1; i++)
-    {
-    vtkPVInformation *sinfo = 
-      vtkPVInformation::SafeDownCast(info->NewInstance());
-    ivp = vtkSMIntVectorProperty::SafeDownCast(
-      this->UpdateSuppressorLOD->GetProperty("PassNumber"));
-    ivp->SetElement(0, i);
-    ivp->SetElement(1, nPasses);
-
-    this->UpdateSuppressorLOD->UpdateVTKObjects();
-    this->UpdateLODPipeline();
-    
-    // For simple strategy information sub-pipline is same as the full pipeline
-    // so no data movements are involved.
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    pm->GatherInformation(this->ConnectionID,
-                          vtkProcessModule::DATA_SERVER_ROOT,
-                          sinfo,
-                          this->UpdateSuppressorLOD->GetID());
     info->AddInformation(sinfo);
     sinfo->Delete();
     }
@@ -244,14 +184,6 @@ int vtkSMStreamingSerialStrategy::ComputePriorities()
   this->UpdateSuppressor->UpdatePropertyInformation(rp);
   ret = rp->GetElement(0);
 
-  vtkClientServerStream stream;
-  this->CopyPieceList(&stream, this->UpdateSuppressor, this->UpdateSuppressorLOD);
-
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(this->GetConnectionID(),
-                 vtkProcessModule::SERVERS,
-                 stream);
-
   return ret;
 }
 
@@ -302,7 +234,7 @@ void vtkSMStreamingSerialStrategy::SharePieceList(
 
   vtkSMSourceProxy *US2 =
     vtkSMSourceProxy::SafeDownCast(
-      dest->GetSubProxy("StreamingUpdateSuppressor"));
+      dest->GetSubProxy("UpdateSuppressor"));
 
   vtkClientServerStream s2c;
   s2c << vtkClientServerStream::Invoke

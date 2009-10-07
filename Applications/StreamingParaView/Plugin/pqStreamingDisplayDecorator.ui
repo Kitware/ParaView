@@ -24,6 +24,9 @@
      <property name="text" >
       <string>Show Piece Bounds</string>
      </property>
+     <property name="toolTip" >
+      <string>Turns on diagnostic display of piece bounding boxes - NOTE: Not functional yet</string>
+     </property>
     </widget>
    </item>
   </layout>

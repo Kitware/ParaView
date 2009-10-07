@@ -45,7 +45,7 @@
 #include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingViewProxy, "1.2");
 vtkStandardNewMacro(vtkSMStreamingViewProxy);
 
 #define DEBUGPRINT_VIEW(arg)\
@@ -140,6 +140,7 @@ bool vtkSMStreamingViewProxy::BeginCreateVTKObjects()
 void vtkSMStreamingViewProxy::EndCreateVTKObjects()
 {
   this->Superclass::EndCreateVTKObjects();
+  this->Internals->RootView->SetLODThreshold(1000000);
 
   //replace the real view's interactor, which points to the real view
   //with one that points to this so that mouse events will result in streaming
@@ -222,6 +223,9 @@ void vtkSMStreamingViewProxy::StillRender()
 //----------------------------------------------------------------------------
 void vtkSMStreamingViewProxy::InteractiveRender()
 {
+  //a hack to disable LOD
+  this->Internals->RootView->SetLODThreshold(1000000);
+
   static bool in_interactive_render = false;
   if (in_interactive_render)
     {
@@ -303,44 +307,9 @@ vtkSMRepresentationProxy* vtkSMStreamingViewProxy::CreateDefaultRepresentation(
     }
 
   // Choose which type of representation proxy to create.
-  vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations", 
-    "StreamingUnstructuredGridRepresentation");
-
-  vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
-    prototype->GetProperty("Input"));
-  pp->RemoveAllUncheckedProxies();
-  pp->AddUncheckedInputConnection(source, opport);
-  bool usg = (pp->IsInDomains()>0);
-  pp->RemoveAllUncheckedProxies();
-  if (usg)
-    {
-    DEBUGPRINT_VIEW(
-      cerr << "SV(" << this << ") Created StreamingUnstructuredGridRepresentation" << endl;
-      );
-    return vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy("representations", "StreamingUnstructuredGridRepresentation"));
-    }
-
-  prototype = pxm->GetPrototypeProxy("representations",
-    "StreamingUniformGridRepresentation");
-  pp = vtkSMInputProperty::SafeDownCast(
-    prototype->GetProperty("Input"));
-  pp->RemoveAllUncheckedProxies();
-  pp->AddUncheckedInputConnection(source, opport);
-  bool sg = (pp->IsInDomains()>0);
-  pp->RemoveAllUncheckedProxies();
-  if (sg)
-    {
-    DEBUGPRINT_VIEW(
-      cerr << "SV(" << this << ") Created StreamingUniformGridRepresentation" << endl;
-      );
-    return vtkSMRepresentationProxy::SafeDownCast(
-      pxm->NewProxy("representations", "StreamingUniformGridRepresentation"));
-    }
-
-  prototype = pxm->GetPrototypeProxy("representations",
+  vtkSMProxy* prototype = pxm->GetPrototypeProxy("representations",
     "StreamingGeometryRepresentation");
-  pp = vtkSMInputProperty::SafeDownCast(
+  vtkSMInputProperty *pp = vtkSMInputProperty::SafeDownCast(
     prototype->GetProperty("Input"));
   pp->RemoveAllUncheckedProxies();
   pp->AddUncheckedInputConnection(source, opport);
@@ -368,21 +337,13 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
   if (this->IsSerial)
     {
     if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
-        dataType == VTK_IMAGE_DATA)
+        dataType == VTK_IMAGE_DATA || dataType == VTK_UNSTRUCTURED_GRID )
       {
       DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingPolyDataStrategy" << endl;
+        cerr << "SV(" << this << ") Creating StreamingStrategy" << endl;
         );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
         pxm->NewProxy("strategies", "StreamingPolyDataStrategy"));
-      }
-    else if (dataType == VTK_UNSTRUCTURED_GRID)
-      {
-      DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingUnstructuredGridStrategy" << endl;
-        );
-      strategy = vtkSMRepresentationStrategy::SafeDownCast(
-        pxm->NewProxy("strategies", "StreamingUnstructuredGridStrategy"));
       }
     else
       {
@@ -392,37 +353,14 @@ vtkSMRepresentationStrategy* vtkSMStreamingViewProxy::NewStrategyInternal(
     }
   else
     {
-    if (dataType == VTK_POLY_DATA)
+    if (dataType == VTK_POLY_DATA || dataType == VTK_UNIFORM_GRID || 
+        dataType == VTK_IMAGE_DATA || dataType == VTK_UNSTRUCTURED_GRID )
       {
       DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingPolyDataParallelStrategy" << endl;
+        cerr << "SV(" << this << ") Creating StreamingParallelStrategy" << endl;
         );
       strategy = vtkSMRepresentationStrategy::SafeDownCast(
-         pxm->NewProxy("strategies", "StreamingPolyDataParallelStrategy"));
-      }
-    else if (dataType == VTK_UNIFORM_GRID)
-      {
-      DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingUniformGridParallelStrategy" << endl;
-        );
-      strategy = vtkSMRepresentationStrategy::SafeDownCast(
-        pxm->NewProxy("strategies", "StreamingUniformGridParallelStrategy"));
-      }
-    else if (dataType == VTK_UNSTRUCTURED_GRID)
-      {
-      DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingUnstructuredGridParallelStrategy" << endl;
-        );
-      strategy = vtkSMRepresentationStrategy::SafeDownCast(
-        pxm->NewProxy("strategies", "StreamingUnstructuredGridParallelStrategy"));
-      }
-    else if (dataType == VTK_IMAGE_DATA)
-      {
-      DEBUGPRINT_VIEW(
-        cerr << "SV(" << this << ") Creating StreamingImageDataParallelStrategy" << endl;
-        );
-      strategy = vtkSMRepresentationStrategy::SafeDownCast(
-        pxm->NewProxy("strategies", "StreamingImageDataParallelStrategy"));
+         pxm->NewProxy("strategies", "StreamingParallelStrategy"));
       }
     else
       {

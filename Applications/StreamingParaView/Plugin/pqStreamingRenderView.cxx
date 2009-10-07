@@ -4,6 +4,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QVTKWidget.h>
 #include <vtkSMProxy.h>
 #include <vtkSMRenderViewProxy.h>
 #include <vtkSMStreamingViewProxy.h>
@@ -26,7 +27,6 @@ pqStreamingRenderView::pqStreamingRenderView(
   QObject* p)
   : pqRenderView(viewType, group, name, viewProxy, server, p)
 {
-
 }
 
 //-----------------------------------------------------------------------------
@@ -47,3 +47,14 @@ vtkSMRenderViewProxy* pqStreamingRenderView::getRenderViewProxy() const
     this->getStreamingViewProxy()->GetRootView());
 }
 
+//-----------------------------------------------------------------------------
+QWidget* pqStreamingRenderView::createWidget() 
+{
+  QVTKWidget* vtkwidget = 
+    dynamic_cast<QVTKWidget*>(this->Superclass::createWidget());
+  if (vtkwidget)
+    {
+    vtkwidget->setAutomaticImageCacheEnabled(false);
+    }
+  return vtkwidget;
+}

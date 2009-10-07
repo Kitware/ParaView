@@ -27,16 +27,13 @@
 #include "vtkSMRenderViewProxy.h"
 #include "vtkSMRepresentationStrategy.h"
 #include "vtkSMRepresentationStrategyVector.h"
-#include "vtkSMSImageDataParallelStrategy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStreamingSerialStrategy.h"
 #include "vtkSMStreamingViewProxy.h"
-#include "vtkSMSUniformGridParallelStrategy.h"
-#include "vtkSMSUnstructuredDataParallelStrategy.h"
-#include "vtkSMSUnstructuredGridParallelStrategy.h"
+#include "vtkSMStreamingParallelStrategy.h"
 #include "vtkStreamingOptions.h"
 
-vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingRepresentation, "1.2");
 vtkStandardNewMacro(vtkSMStreamingRepresentation);
 
 #define DEBUGPRINT_REPRESENTATION(arg)\
@@ -179,17 +176,6 @@ void vtkSMStreamingRepresentation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
-/*
-//----------------------------------------------------------------------------
-void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
-{
-  if (this->PieceBoundsRepresentation && this->PieceBoundsVisibility)
-    {
-    //this->PieceBoundsRepresentation->SetPassNumber(val, force);
-    }
-}
-*/
-
 #define TrySetPassNumber(type) \
 { \
   type *ptr = type::SafeDownCast(iter->GetPointer());\
@@ -215,38 +201,12 @@ void vtkSMStreamingRepresentation::SetPassNumber(int val, int force)
       {
       //multiple inheritance would be nice about now
       TrySetPassNumber(vtkSMStreamingSerialStrategy);
-      TrySetPassNumber(vtkSMSUnstructuredDataParallelStrategy);
-      TrySetPassNumber(vtkSMSUnstructuredGridParallelStrategy);
-      TrySetPassNumber(vtkSMSImageDataParallelStrategy);
-      TrySetPassNumber(vtkSMSUniformGridParallelStrategy);
+      TrySetPassNumber(vtkSMStreamingParallelStrategy);
       }
     this->Modified();
+    //this->PieceBoundsRepresentation->SetPassNumber(val, 1);
     }
 }
-
-/*
-//----------------------------------------------------------------------------
-int vtkSMStreamingRepresentation::ComputePriorities()
-{
-  if (this->PieceBoundsRepresentation && this->PieceBoundsVisibility)
-    {
-    //Don't compute anything with the piecebounds rep. It's a waste of effort
-    //and the piece ordering will end up different because geometry is not the
-    //same. Instead, just copy the piece list from the surface representation that 
-    //it is attached to.
-    vtkSMRepresentationStrategyVector strats1;
-    this->ActiveRepresentation->GetActiveStrategies(strats1);
-    vtkSMRepresentationStrategy *strat1 = strats1[0];
-
-    vtkSMRepresentationStrategyVector strats2;
-    this->PieceBoundsRepresentation->GetActiveStrategies(strats2);
-    vtkSMRepresentationStrategy *strat2 = strats2[0];
-    
-    strat1->SharePieceList(strat2);
-    }
-  return 0;
-}
-*/
 
 #define TryComputePriorities(type) \
 { \
@@ -274,10 +234,7 @@ int vtkSMStreamingRepresentation::ComputePriorities()
   for (iter = strats.begin(); iter != strats.end(); ++iter)
     {
     TryComputePriorities(vtkSMStreamingSerialStrategy);
-    TryComputePriorities(vtkSMSUnstructuredDataParallelStrategy);
-    TryComputePriorities(vtkSMSUnstructuredGridParallelStrategy);
-    TryComputePriorities(vtkSMSImageDataParallelStrategy);
-    TryComputePriorities(vtkSMSUniformGridParallelStrategy);
+    TryComputePriorities(vtkSMStreamingParallelStrategy);
     }
   return maxPass;
 }
@@ -291,17 +248,6 @@ int vtkSMStreamingRepresentation::ComputePriorities()
     }\
 }
 
-/*
-//----------------------------------------------------------------------------
-void vtkSMStreamingRepresentation::ClearStreamCache()
-{
-  if (this->PieceBoundsRepresentation && this->PieceBoundsVisibility)
-    {
-    //this->PieceBoundsRepresentation->ClearStreamCache();
-    }
-}
-*/
-
 //----------------------------------------------------------------------------
 void vtkSMStreamingRepresentation::ClearStreamCache()
 {
@@ -311,10 +257,7 @@ void vtkSMStreamingRepresentation::ClearStreamCache()
   for (iter = strats.begin(); iter != strats.end(); ++iter)
     {
     TryMethod(vtkSMStreamingSerialStrategy, ClearStreamCache());
-    TryMethod(vtkSMSUnstructuredDataParallelStrategy, ClearStreamCache());
-    TryMethod(vtkSMSUnstructuredGridParallelStrategy, ClearStreamCache());
-    TryMethod(vtkSMSImageDataParallelStrategy, ClearStreamCache());
-    TryMethod(vtkSMSUniformGridParallelStrategy, ClearStreamCache());
+    TryMethod(vtkSMStreamingParallelStrategy, ClearStreamCache());
     }
 }
 
@@ -328,11 +271,13 @@ bool vtkSMStreamingRepresentation::AddToView(vtkSMViewProxy* view)
     return false;
     }
 
-  //this->PieceBoundsRepresentation->AddToView(streamView->GetRootView());
 
   //this tells renderview to let view create strategy
   vtkSMRenderViewProxy* renderView = streamView->GetRootView();
   renderView->SetNewStrategyHelper(view);
+
+  //Disabled for now, I need to be able to tell it what piece is current.
+  //this->PieceBoundsRepresentation->AddToView(renderView);
 
   //but still add this to renderView
   return this->Superclass::AddToView(renderView);
@@ -347,9 +292,6 @@ void vtkSMStreamingRepresentation::SetViewState(double *camera, double *frustum)
   for (iter = strats.begin(); iter != strats.end(); ++iter)
     {
     TryMethod(vtkSMStreamingSerialStrategy, SetViewState(camera, frustum));
-    TryMethod(vtkSMSUnstructuredDataParallelStrategy, SetViewState(camera, frustum));
-    TryMethod(vtkSMSUnstructuredGridParallelStrategy, SetViewState(camera, frustum));
-    TryMethod(vtkSMSImageDataParallelStrategy, SetViewState(camera, frustum));
-    TryMethod(vtkSMSUniformGridParallelStrategy, SetViewState(camera, frustum));
+    TryMethod(vtkSMStreamingParallelStrategy, SetViewState(camera, frustum));
     }
 }

@@ -34,7 +34,8 @@ public:
 
 protected:
 
-  /// Overridden to disable Qt caching of front buffer. The multipass rendering doesn't play well with that.
+  /// Overridden to disable Qt caching of front buffer. 
+  // The multipass rendering doesn't play well with that.
   virtual QWidget* createWidget();
 
 private:
