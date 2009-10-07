@@ -11,7 +11,7 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizContingencyStats);
-vtkCxxRevisionMacro(vtkPSciVizContingencyStats,"1.1");
+vtkCxxRevisionMacro(vtkPSciVizContingencyStats,"1.2");
 
 vtkPSciVizContingencyStats::vtkPSciVizContingencyStats()
 {
@@ -26,30 +26,8 @@ void vtkPSciVizContingencyStats::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
 }
 
-int vtkPSciVizContingencyStats::RequestModelDataObject( vtkInformation* oinfo )
+int vtkPSciVizContingencyStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
 {
-  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
-  if ( ! ouData || ! ouData->IsA( "vtkMultiBlockDataSet" ) )
-    {
-    vtkMultiBlockDataSet* mbds = vtkMultiBlockDataSet::New();
-    mbds->SetPipelineInformation( oinfo );
-    oinfo->Set( vtkDataObject::DATA_OBJECT(), mbds );
-    oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbds->GetExtentType() );
-    mbds->FastDelete();
-    }
-  return 1;
-}
-int vtkPSciVizContingencyStats::FitModel( vtkDataObject*& modelDO, vtkInformationVector* output, vtkTable* trainingData )
-{
-  // Get where we'll store the output statistical model.
-  modelDO = vtkDataObject::GetData( output, 0 );
-  if ( ! modelDO )
-    {
-    vtkErrorMacro( "No model output dataset" );
-    return 0;
-    }
-  modelDO->Initialize();
-
   // Create the statistics filter and run it
   vtkPContingencyStatistics* stats = vtkPContingencyStatistics::New();
   stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );

@@ -12,7 +12,7 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizPCAStats);
-vtkCxxRevisionMacro(vtkPSciVizPCAStats,"1.1");
+vtkCxxRevisionMacro(vtkPSciVizPCAStats,"1.2");
 
 vtkPSciVizPCAStats::vtkPSciVizPCAStats()
 {
@@ -35,31 +35,8 @@ void vtkPSciVizPCAStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "FixedBasisEnergy: " << this->FixedBasisEnergy << "\n";
 }
 
-int vtkPSciVizPCAStats::RequestModelDataObject( vtkInformation* oinfo )
+int vtkPSciVizPCAStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
 {
-  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
-  if ( ! ouData || ! ouData->IsA( "vtkMultiBlockDataSet" ) )
-    {
-    vtkMultiBlockDataSet* mbds = vtkMultiBlockDataSet::New();
-    mbds->SetPipelineInformation( oinfo );
-    oinfo->Set( vtkDataObject::DATA_OBJECT(), mbds );
-    oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbds->GetExtentType() );
-    mbds->FastDelete();
-    }
-  return 1;
-}
-
-int vtkPSciVizPCAStats::FitModel( vtkDataObject*& modelDO, vtkInformationVector* output, vtkTable* trainingData )
-{
-  // Get where we'll store the output statistical model.
-  modelDO = vtkDataObject::GetData( output, 0 );
-  if ( ! modelDO )
-    {
-    vtkErrorMacro( "No model output dataset" );
-    return 0;
-    }
-  modelDO->Initialize();
-
   // Create the statistics filter and run it
   vtkPPCAStatistics* stats = vtkPPCAStatistics::New();
   stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );

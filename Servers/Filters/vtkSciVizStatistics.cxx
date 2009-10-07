@@ -3,12 +3,17 @@
 
 #include "vtkAlgorithm.h"
 #include "vtkCellData.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkCompositeDataIterator.h"
 #include "vtkDataObject.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkInformation.h"
+#include "vtkInformationIntegerKey.h"
 #include "vtkInformationVector.h"
+#include "vtkInstantiator.h"
 #include "vtkMath.h"
+#include "vtkMultiBlockDataSet.h"
 #include "vtkPointData.h"
 #include "vtkStatisticsAlgorithm.h"
 #include "vtkStdString.h"
@@ -19,7 +24,8 @@
 #include <vtkstd/set>
 #include <vtksys/ios/sstream>
 
-vtkCxxRevisionMacro(vtkSciVizStatistics,"1.1");
+vtkCxxRevisionMacro(vtkSciVizStatistics,"1.2");
+vtkInformationKeyMacro(vtkSciVizStatistics, MULTIPLE_MODELS, Integer);
 
 vtkSciVizStatistics::vtkSciVizStatistics()
 {
@@ -144,7 +150,7 @@ int vtkSciVizStatistics::FillOutputPortInformation( int port, vtkInformation* in
 {
   if ( port == 0 )
     {
-    info->Set( vtkDataObject::DATA_TYPE_NAME(), this->GetModelDataTypeName() );
+    info->Set( vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject" );
     return 1;
     }
   else if ( port == 1 )
@@ -167,20 +173,54 @@ int vtkSciVizStatistics::ProcessRequest( vtkInformation* request, vtkInformation
 int vtkSciVizStatistics::RequestDataObject(
   vtkInformation* vtkNotUsed(request), vtkInformationVector** input, vtkInformationVector* output )
 {
+  // Input 0: Data for learning/assessment.
+  // If this is composite data, both outputs must be composite datasets with the same structure.
   vtkInformation* iinfo = input[0]->GetInformationObject( 0 );
   vtkDataObject* inData = iinfo->Get( vtkDataObject::DATA_OBJECT() );
+  vtkCompositeDataSet* inDataComp = vtkCompositeDataSet::SafeDownCast( inData );
 
-  vtkInformation* oinfo = output->GetInformationObject( 0 );
-  this->RequestModelDataObject( oinfo );
+  // Output 0: Model
+  // The output model type depends on whether the input data is a composite dataset or not.
+  // If the input data is composite, both the output data and model will be composite.
+  // Otherwise, the output model will be of the type specified by the subclass through GetModelDataTypeName().
+  vtkInformation* oinfom = output->GetInformationObject( 0 );
+  vtkDataObject* ouModel = oinfom->Get( vtkDataObject::DATA_OBJECT() );
 
-  oinfo = output->GetInformationObject( 1 );
-  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
+  if ( inDataComp )
+    {
+    vtkMultiBlockDataSet* mbModel = vtkMultiBlockDataSet::SafeDownCast( ouModel );
+    if ( ! mbModel )
+      {
+      mbModel = vtkMultiBlockDataSet::New();
+      mbModel->SetPipelineInformation( oinfom );
+      oinfom->Set( vtkDataObject::DATA_OBJECT(), mbModel );
+      oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbModel->GetExtentType() );
+      mbModel->FastDelete();
+      }
+    }
+  else
+    {
+    if ( ! ouModel || ! ouModel->IsA( this->GetModelDataTypeName() ) )
+      {
+      vtkDataObject* modelObj = this->CreateModelDataType();
+      modelObj->SetPipelineInformation( oinfom );
+      oinfom->Set( vtkDataObject::DATA_OBJECT(), modelObj );
+      oinfom->Set( vtkDataObject::DATA_EXTENT_TYPE(), modelObj->GetExtentType() );
+      modelObj->FastDelete();
+      }
+    }
+
+  // Output 1: Assessed data
+  // The assessed data output will always be a shallow copy of the input data.
+  vtkInformation* oinfod = output->GetInformationObject( 1 );
+  vtkDataObject* ouData = oinfod->Get( vtkDataObject::DATA_OBJECT() );
+
   if ( ! ouData || ! ouData->IsA( inData->GetClassName() ) )
     {
     ouData = inData->NewInstance();
-    ouData->SetPipelineInformation( oinfo );
-    oinfo->Set( vtkDataObject::DATA_OBJECT(), ouData );
-    //oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType() );
+    ouData->SetPipelineInformation( oinfod );
+    oinfod->Set( vtkDataObject::DATA_OBJECT(), ouData );
+    //oinfod->Set( vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType() );
     ouData->FastDelete();
     this->GetOutputPortInformation( 1 )->Set( vtkDataObject::DATA_EXTENT_TYPE(), ouData->GetExtentType() );
     }
@@ -190,6 +230,7 @@ int vtkSciVizStatistics::RequestDataObject(
 int vtkSciVizStatistics::RequestData(
   vtkInformation* vtkNotUsed(request), vtkInformationVector** input, vtkInformationVector* output )
 {
+  vtkDataObject* modelObjIn = vtkDataObject::GetData( input[1], 0 );
   vtkDataObject* dataObjIn = vtkDataObject::GetData( input[0], 0 );
   if ( ! dataObjIn )
     {
@@ -197,16 +238,179 @@ int vtkSciVizStatistics::RequestData(
     return 1;
     }
 
-  vtkFieldData* dataAttrIn = dataObjIn->GetAttributesAsFieldData( this->AttributeMode );
-  if ( ! dataAttrIn )
-    {
-    // Silently ignore missing attributes.
-    return 1;
-    }
-
   if ( ! this->P->Buffer.size() )
     {
     // Silently ignore empty requests.
+    return 1;
+    }
+
+  // Get output model data and sci-viz data.
+  vtkDataObject* modelObjOu = vtkDataObject::GetData( output, 0 );
+  vtkDataObject* dataObjOu = vtkDataObject::GetData( output, 1 );
+  if ( ! dataObjOu || ! modelObjOu )
+    {
+    // Silently ignore missing data.
+    return 1;
+    }
+
+  // Either we have a multiblock input dataset or a single data object of interest.
+  int stat = 1;
+  vtkCompositeDataSet* compDataObjIn = vtkCompositeDataSet::SafeDownCast( dataObjIn );
+  if ( compDataObjIn )
+    {
+    // I. Prepare output model containers
+    vtkMultiBlockDataSet* ouModelRoot = vtkMultiBlockDataSet::SafeDownCast( modelObjOu );
+    if ( ! ouModelRoot )
+      {
+      vtkErrorMacro( "Output model data object of incorrect type \"" << modelObjOu->GetClassName() << "\"" );
+      return 0;
+      }
+    // Copy the stucture of the input dataset to the model output.
+    // If we have input models in the proper structure, then we'll copy them into this structure later.
+    ouModelRoot->CopyStructure( compDataObjIn );
+    ouModelRoot->GetInformation()->Set( MULTIPLE_MODELS(), 1 );
+    }
+  else
+    {
+    modelObjOu->GetInformation()->Remove( MULTIPLE_MODELS() );
+    }
+
+  // II. Create/update the output sci-viz data
+  dataObjOu->ShallowCopy( dataObjIn );
+
+  if ( compDataObjIn )
+    {
+    // Loop over each data object of interest, fitting and/or assessing it.
+    vtkCompositeDataSet* compModelObjIn = vtkCompositeDataSet::SafeDownCast( modelObjIn );
+    vtkCompositeDataSet* compModelObjOu = vtkCompositeDataSet::SafeDownCast( modelObjOu );
+    vtkCompositeDataSet* compDataObjOu = vtkCompositeDataSet::SafeDownCast( dataObjOu );
+    // We may have a single model for all blocks or one per block
+    // This is too tricky to detect automagically (because a single model may be a composite dataset),
+    // so we'll only treat an input composite dataset as a collection of models if it is marked
+    // as such. Otherwise, it is treated as a single model that is applied to each block.
+    vtkDataObject* preModel =
+      ( compModelObjIn && compModelObjIn->GetInformation()->Has( MULTIPLE_MODELS() ) ) ?
+      0 :
+      modelObjIn; // Pre-existing model. Initialize as if we have a single model.
+    // Iterate over all blocks at the given hierarchy level looking for leaf nodes
+    this->RequestData( compDataObjOu, compModelObjOu, compDataObjIn, compModelObjIn, preModel );
+    }
+  else
+    {
+    stat = this->RequestData( dataObjOu, modelObjOu, dataObjIn, modelObjIn );
+    }
+
+  return stat;
+}
+
+int vtkSciVizStatistics::RequestData(
+  vtkCompositeDataSet* compDataOu, vtkCompositeDataSet* compModelOu,
+  vtkCompositeDataSet* compDataIn, vtkCompositeDataSet* compModelIn,
+  vtkDataObject* singleModel )
+{
+  if ( ! compDataOu || ! compModelOu || ! compDataIn )
+    {
+    vtkErrorMacro(
+      << "Mismatch between inputs and/or outputs."
+      << " Data in: " << compDataIn
+      << " Model in: " << compModelIn
+      << " Data out: " << compDataOu
+      << " Model out: " << compModelOu
+      << " Pre-existing model: " << singleModel
+      );
+    return 0;
+    }
+
+  int stat = 1;
+  vtkCompositeDataIterator* inDataIter = compDataIn->NewIterator();
+  vtkCompositeDataIterator* ouDataIter = compDataOu->NewIterator();
+  vtkCompositeDataIterator* ouModelIter = compModelOu->NewIterator();
+
+  // We may have a single model for all blocks or one per block
+  vtkCompositeDataIterator* inModelIter = compModelIn ?  compModelIn->NewIterator() : 0;
+  vtkDataObject* currentModel = singleModel;
+
+  inDataIter->VisitOnlyLeavesOff();
+  inDataIter->TraverseSubTreeOff();
+  //inDataIter->SkipEmptyNodesOff();
+
+  ouDataIter->VisitOnlyLeavesOff();
+  ouDataIter->TraverseSubTreeOff();
+  //ouDataIter->SkipEmptyNodesOff();
+
+  ouModelIter->VisitOnlyLeavesOff();
+  ouModelIter->TraverseSubTreeOff();
+  ouModelIter->SkipEmptyNodesOff(); // Cannot skip since we may need to copy or create models as we go.
+
+  if ( inModelIter )
+    {
+    inModelIter->VisitOnlyLeavesOff();
+    inModelIter->TraverseSubTreeOff();
+    //inModelIter->SkipEmptyNodesOff();
+
+    inModelIter->InitTraversal();
+    currentModel = inModelIter->GetCurrentDataObject();
+    }
+
+  for (
+    inDataIter->InitTraversal(), ouDataIter->InitTraversal(), ouModelIter->InitTraversal();
+    ! inDataIter->IsDoneWithTraversal();
+    inDataIter->GoToNextItem(), ouDataIter->GoToNextItem(), ouModelIter->GoToNextItem() )
+    {
+    vtkDataObject* inDataCur = inDataIter->GetCurrentDataObject();
+    if ( inDataCur && ! inDataCur->IsA( "vtkCompositeDataSet" ) )
+      { // We have a leaf node
+      vtkDataObject* ouModelCur = ouModelIter->GetCurrentDataObject();
+      if ( ! ouModelCur )
+        {
+        ouModelCur = this->CreateModelDataType();
+        ouModelIter->GetDataSet()->SetDataSet( ouModelIter, ouModelCur );
+        }
+      stat = this->RequestData(
+        ouDataIter->GetCurrentDataObject(),
+        ouModelCur,
+        inDataIter->GetCurrentDataObject(),
+        currentModel );
+      if ( ! stat )
+        {
+        break;
+        }
+      }
+    else if ( inDataCur )
+      { // Iterate over children
+      stat = this->RequestData(
+        vtkCompositeDataSet::SafeDownCast( ouDataIter->GetCurrentDataObject() ),
+        vtkCompositeDataSet::SafeDownCast( ouModelIter->GetCurrentDataObject() ),
+        vtkCompositeDataSet::SafeDownCast( inDataIter->GetCurrentDataObject() ),
+        inModelIter ? vtkCompositeDataSet::SafeDownCast( inModelIter->GetCurrentDataObject() ) : 0,
+        currentModel );
+      if ( ! stat )
+        {
+        break;
+        }
+      }
+    if ( inModelIter )
+      { // Update currentModel to point to the next input model in the tree
+      inModelIter->GoToNextItem();
+      currentModel = inModelIter->GetCurrentDataObject();
+      }
+    }
+  inDataIter->Delete();
+  ouDataIter->Delete();
+  ouModelIter->Delete();
+  if ( inModelIter ) inModelIter->Delete();
+
+  return stat;
+}
+
+int vtkSciVizStatistics::RequestData(
+    vtkDataObject* observationsOut, vtkDataObject* modelOut,
+    vtkDataObject* observationsIn, vtkDataObject* modelIn )
+{
+  vtkFieldData* dataAttrIn = observationsIn->GetAttributesAsFieldData( this->AttributeMode );
+  if ( ! dataAttrIn )
+    {
+    // Silently ignore missing attributes.
     return 1;
     }
 
@@ -220,7 +424,6 @@ int vtkSciVizStatistics::RequestData(
     }
 
   // Either create or retrieve the model, depending on the task at hand
-  vtkDataObject* modelOut = 0;
   if ( this->Task != ASSESS_INPUT )
     {
     // We are creating a model by fitting the input data
@@ -245,7 +448,18 @@ int vtkSciVizStatistics::RequestData(
       train = vtkTable::New();
       this->PrepareTrainingTable( train, tableIn, M );
       }
-    stat = this->FitModel( modelOut, output, train ); // creates modelOut
+
+    // Fit the output model to the data
+    if ( ! modelOut )
+      {
+      vtkErrorMacro( "No model output dataset" );
+      stat = 0;
+      }
+    else
+      {
+      modelOut->Initialize();
+      stat = this->FitModel( modelOut, train );
+      }
 
     if ( train )
       {
@@ -255,8 +469,13 @@ int vtkSciVizStatistics::RequestData(
   else
     {
     // We are using an input model specified by the user
-    stat = this->FetchModel( modelOut, input[1] ); // retrieves modelOut from input[1]
-    // FIXME: Initialize modelOut with the input model or freak out if it's not there.
+    //stat = this->FetchModel( modelOut, input[1] ); // retrieves modelOut from input[1]
+    if ( ! modelIn )
+      {
+      vtkErrorMacro( "No input model dataset" );
+      stat = 0;
+      }
+    modelOut->ShallowCopy( modelIn );
     }
 
   if ( stat < 1 )
@@ -265,12 +484,13 @@ int vtkSciVizStatistics::RequestData(
     return -stat;
     }
 
+  if ( observationsOut )
+    {
+    observationsOut->ShallowCopy( observationsIn );
+    }
   if ( this->Task != CREATE_MODEL && this->Task != FULL_STATISTICS )
     { // we need to assess the data using the input or the just-created model
-    vtkInformation* oinfo = output->GetInformationObject( 1 );
-    vtkDataObject* dataObjOut = oinfo->Get( vtkDataObject::DATA_OBJECT() );
-    dataObjOut->ShallowCopy( dataObjIn );
-    stat = this->AssessData( tableIn, dataObjOut, modelOut );
+    stat = this->AssessData( tableIn, observationsOut, modelOut );
     }
   tableIn->Delete();
 
@@ -408,24 +628,24 @@ int vtkSciVizStatistics::PrepareTrainingTable( vtkTable* trainingTable, vtkTable
   return 1;
 }
 
-int vtkSciVizStatistics::RequestModelDataObject( vtkInformation* oinfo )
+vtkDataObject* vtkSciVizStatistics::CreateModelDataType()
 {
-  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
-  if ( ! ouData || ! ouData->IsA( "vtkTable" ) )
+  vtkDataObject* modelDO = 0;
+  vtkObject* model = vtkInstantiator::CreateInstance( this->GetModelDataTypeName() );
+  if ( model )
     {
-    vtkTable* tab = vtkTable::New();
-    tab->SetPipelineInformation( oinfo );
-    oinfo->Set( vtkDataObject::DATA_OBJECT(), tab );
-    oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), tab->GetExtentType() );
-    tab->FastDelete();
+    modelDO = vtkDataObject::SafeDownCast( model );
+    if ( ! modelDO )
+      {
+      vtkErrorMacro( "Object " << model << " of type \"" << model->GetClassName() << "\" not a subclass of vtkDataObject." );
+      model->Delete();
+      }
     }
-  return 1;
-}
-
-int vtkSciVizStatistics::FetchModel( vtkDataObject*& model, vtkInformationVector* input )
-{
-  model = vtkDataObject::GetData( input, 0 );
-  return 1;
+  else
+    {
+    vtkErrorMacro( "Could not create object of type \"" << model->GetClassName() << ".\"" );
+    }
+  return modelDO;
 }
 
 vtkIdType vtkSciVizStatistics::GetNumberOfObservationsForTraining( vtkTable* observations )

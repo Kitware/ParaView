@@ -10,7 +10,7 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizDescriptiveStats);
-vtkCxxRevisionMacro(vtkPSciVizDescriptiveStats,"1.1");
+vtkCxxRevisionMacro(vtkPSciVizDescriptiveStats,"1.2");
 
 vtkPSciVizDescriptiveStats::vtkPSciVizDescriptiveStats()
 {
@@ -27,17 +27,15 @@ void vtkPSciVizDescriptiveStats::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "SignedDeviations: " << this->SignedDeviations << "\n";
 }
 
-int vtkPSciVizDescriptiveStats::FitModel( vtkDataObject*& modelDO, vtkInformationVector* output, vtkTable* trainingData )
+int vtkPSciVizDescriptiveStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
 {
   // Get where we'll store the output statistical model.
-  vtkTable* modelOut = vtkTable::GetData( output, 0 );
-  modelDO = modelOut;
+  vtkTable* modelOut = vtkTable::SafeDownCast( modelDO );
   if ( ! modelOut )
     {
-    vtkErrorMacro( "No output table" );
+    vtkErrorMacro( "Output is not a table" );
     return 0;
     }
-  modelOut->Initialize();
 
   // Create the statistics filter and run it
   vtkPDescriptiveStatistics* stats = vtkPDescriptiveStatistics::New();
@@ -45,8 +43,8 @@ int vtkPSciVizDescriptiveStats::FitModel( vtkDataObject*& modelDO, vtkInformatio
   vtkIdType ncols = trainingData->GetNumberOfColumns();
   for ( vtkIdType i = 0; i < ncols; ++ i )
     {
-    //stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
-    stats->AddColumn( trainingData->GetColumnName( i ) );
+    //stats->AddColumn( trainingData->GetColumnName( i ) );
+    stats->SetColumnStatus( trainingData->GetColumnName( i ), 1 );
     }
   //stats->SetSignedDeviations( this->SignedDeviations ); // Shouldn't matter for model fitting, only affects assessed values.
 

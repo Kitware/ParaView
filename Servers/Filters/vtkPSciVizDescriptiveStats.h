@@ -48,7 +48,7 @@ protected:
   vtkPSciVizDescriptiveStats();
   virtual ~vtkPSciVizDescriptiveStats();
 
-  virtual int FitModel( vtkDataObject*& model, vtkInformationVector* output, vtkTable* trainingData );
+  virtual int FitModel( vtkDataObject* model, vtkTable* trainingData );
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkDataObject* model );
 
   int SignedDeviations;

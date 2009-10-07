@@ -12,7 +12,7 @@
 #include "vtkVariantArray.h"
 
 vtkStandardNewMacro(vtkPSciVizMultiCorrelativeStats);
-vtkCxxRevisionMacro(vtkPSciVizMultiCorrelativeStats,"1.1");
+vtkCxxRevisionMacro(vtkPSciVizMultiCorrelativeStats,"1.2");
 
 vtkPSciVizMultiCorrelativeStats::vtkPSciVizMultiCorrelativeStats()
 {
@@ -27,31 +27,8 @@ void vtkPSciVizMultiCorrelativeStats::PrintSelf( ostream& os, vtkIndent indent )
   this->Superclass::PrintSelf( os, indent );
 }
 
-int vtkPSciVizMultiCorrelativeStats::RequestModelDataObject( vtkInformation* oinfo )
+int vtkPSciVizMultiCorrelativeStats::FitModel( vtkDataObject* modelDO, vtkTable* trainingData )
 {
-  vtkDataObject* ouData = oinfo->Get( vtkDataObject::DATA_OBJECT() );
-  if ( ! ouData || ! ouData->IsA( "vtkMultiBlockDataSet" ) )
-    {
-    vtkMultiBlockDataSet* mbds = vtkMultiBlockDataSet::New();
-    mbds->SetPipelineInformation( oinfo );
-    oinfo->Set( vtkDataObject::DATA_OBJECT(), mbds );
-    oinfo->Set( vtkDataObject::DATA_EXTENT_TYPE(), mbds->GetExtentType() );
-    mbds->FastDelete();
-    }
-  return 1;
-}
-
-int vtkPSciVizMultiCorrelativeStats::FitModel( vtkDataObject*& modelDO, vtkInformationVector* output, vtkTable* trainingData )
-{
-  // Get where we'll store the output statistical model.
-  modelDO = vtkDataObject::GetData( output, 0 );
-  if ( ! modelDO )
-    {
-    vtkErrorMacro( "No model output dataset" );
-    return 0;
-    }
-  modelDO->Initialize();
-
   // Create the statistics filter and run it
   vtkPMultiCorrelativeStatistics* stats = vtkPMultiCorrelativeStatistics::New();
   stats->SetInput( vtkStatisticsAlgorithm::INPUT_DATA, trainingData );

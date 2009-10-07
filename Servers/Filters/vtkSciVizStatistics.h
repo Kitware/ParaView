@@ -28,10 +28,12 @@
 
 #include "vtkTableAlgorithm.h"
 
-class vtkStatisticsAlgorithm;
+class vtkCompositeDataSet;
 class vtkDataObjectToTable;
 class vtkFieldData;
 class vtkSciVizStatisticsP;
+class vtkStatisticsAlgorithm;
+class vtkInformationIntegerKey;
 
 class VTK_EXPORT vtkSciVizStatistics : public vtkTableAlgorithm
 {
@@ -98,6 +100,12 @@ public:
   vtkSetMacro(Task,int);
   vtkGetMacro(Task,int);
 
+  // Description:
+  // A key used to mark the output model data object (output port 0) when it is a multiblock
+  // of models (any of which may be multiblock dataset themselves) as opposed to a multiblock
+  // dataset containing a single model.
+  vtkInformationIntegerKey* MULTIPLE_MODELS();
+
 protected:
   vtkSciVizStatistics();
   virtual ~vtkSciVizStatistics();
@@ -108,6 +116,13 @@ protected:
   virtual int ProcessRequest( vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output );
   virtual int RequestDataObject( vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output );
   virtual int RequestData( vtkInformation* request, vtkInformationVector** input, vtkInformationVector* output );
+  virtual int RequestData(
+    vtkCompositeDataSet* compDataOu, vtkCompositeDataSet* compModelOu,
+    vtkCompositeDataSet* compDataIn, vtkCompositeDataSet* compModelIn,
+    vtkDataObject* singleModel );
+  virtual int RequestData(
+    vtkDataObject* observationsOut, vtkDataObject* modelOut,
+    vtkDataObject* observationsIn, vtkDataObject* modelIn );
 
   virtual int PrepareFullDataTable( vtkTable* table, vtkFieldData* dataAttrIn );
   virtual int PrepareTrainingTable( vtkTable* trainingTable, vtkTable* fullDataTable, vtkIdType numObservations );
@@ -116,27 +131,23 @@ protected:
   // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
   //
   // The name of a vtkDataObject subclass should be returned.
-  // If you override this method, you must also override RequestModelDataObject().
+  // If you override this method, you <b>may</b> also override CreateModelDataType();
+  // if you don't, then the instantiator will be used to create an object of the type
+  // specified by GetModelDataTypeName().
   virtual const char* GetModelDataTypeName() { return "vtkTable"; }
 
   // Description:
   // Method subclasses <b>may</b> override to change the output model type from a vtkTable to some other Type.
   //
-  // The name of a vtkDataObject subclass should be returned.
+  // A new instance of a vtkDataObject subclass should be returned.
   // If you override this method, you must also override GetModelDataTypeName().
-  virtual int RequestModelDataObject( vtkInformation* outInfo );
+  virtual vtkDataObject* CreateModelDataType();
 
   // Description:
   // Method subclasses <b>must</b> override to fit a model to the given training data.
   // The model should be placed on the first output port of the passed vtkInformationVector
   // as well as returned in the \a model parameter.
-  virtual int FitModel( vtkDataObject*& model, vtkInformationVector* output, vtkTable* trainingData ) = 0;
-
-  // Description:
-  // Method subclasses <b>may</b> override to fetch a model from the given vtkInformationVector
-  // which corresponds to the second input port of this filter.
-  // The result should be returned in the \a model parameter.
-  virtual int FetchModel( vtkDataObject*& model, vtkInformationVector* input );
+  virtual int FitModel( vtkDataObject* model, vtkTable* trainingData ) = 0;
 
   // Description:
   // Method subclasses <b>must</b> override to assess an input table given a model of the proper type.

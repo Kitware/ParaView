@@ -47,10 +47,10 @@ public:
 protected:
   vtkPSciVizContingencyStats();
   virtual ~vtkPSciVizContingencyStats();
-  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
-  virtual int RequestModelDataObject( vtkInformation* outInfo );
 
-  virtual int FitModel( vtkDataObject*& model, vtkInformationVector* output, vtkTable* trainingData );
+  virtual const char* GetModelDataTypeName() { return "vtkMultiBlockDataSet"; }
+
+  virtual int FitModel( vtkDataObject* model, vtkTable* trainingData );
   virtual int AssessData( vtkTable* observations, vtkDataObject* dataset, vtkDataObject* model );
 
 private:
