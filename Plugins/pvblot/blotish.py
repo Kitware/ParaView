@@ -455,7 +455,8 @@ def typlot(*args, **kwargs):
 
     if var.type == GLOBAL_VARIABLE:
         if args:
-            print_blot_warning("Extra tokens after global variable name ignored.")
+            blot_common.print_blot_warning("Extra tokens after global "
+                                           "variable name ignored.")
         c = tplot_mod.Curve(var)
         state.tplot.add_curve(c)
         state.tplot.print_show()
@@ -466,7 +467,7 @@ def typlot(*args, **kwargs):
 
     s = " ".join(args)
     try: selected_ids = number_list_parser.parse_number_list(s, int)
-    except number_list_parser.Error as err: raise BlotishError(err)
+    except number_list_parser.Error, err: raise BlotishError(err)
 
     uniq = dict()
     selected_ids = [uniq.setdefault(i,i) for i in selected_ids if i not in uniq]
@@ -510,7 +511,7 @@ def xyplot(io_helper=None):
         if not args: raise BlotishError("Expected node/element number")
         s = " ".join(args)
         try: selected_ids = number_list_parser.parse_number_list(s, int)
-        except number_list_parser.Error as err: raise BlotishError(err)
+        except number_list_parser.Error, err: raise BlotishError(err)
 
         # Convert to list of unique values and return
         uniq = dict()
@@ -837,7 +838,7 @@ def reset(*args):
 def times(*args):
     """Select time steps"""
     try: state.time_selection.parse_times(" ".join(args))
-    except timestep_selection.Error as err: raise BlotishError(err)
+    except timestep_selection.Error, err: raise BlotishError(err)
     print " Select specified whole times"
     print "    Number of selected times = %d" % len(state.time_selection.selected_indices)
     print
@@ -846,7 +847,7 @@ def times(*args):
 def steps(*args):
     """Select time steps"""
     try: state.time_selection.parse_steps(" ".join(args))
-    except timestep_selection.Error as err: raise BlotishError(err)
+    except timestep_selection.Error, err: raise BlotishError(err)
     print " Select specified whole times"
     print "    Number of selected times = %d" % len(state.time_selection.selected_indices)
     print
@@ -1090,7 +1091,7 @@ def _maybe_convert(token, number_class):
     argument is None, returns None without raising any error."""
     if token is None: return None
     try: num = number_list_parser.convert_to_number_class(token, number_class)
-    except number_list_parser.Error as err: raise BlotishError(err)
+    except number_list_parser.Error, err: raise BlotishError(err)
     return num
 
 
