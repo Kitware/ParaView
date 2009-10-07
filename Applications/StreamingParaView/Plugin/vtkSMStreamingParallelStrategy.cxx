@@ -29,7 +29,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMStreamingParallelStrategy);
-vtkCxxRevisionMacro(vtkSMStreamingParallelStrategy, "1.1");
+vtkCxxRevisionMacro(vtkSMStreamingParallelStrategy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMStreamingParallelStrategy::vtkSMStreamingParallelStrategy()
@@ -116,7 +116,7 @@ void vtkSMStreamingParallelStrategy::CreatePipeline(vtkSMSourceProxy* input, int
 void vtkSMStreamingParallelStrategy::SetPassNumber(int val, int force)
 {
   int nPasses = vtkStreamingOptions::GetStreamedPasses();
-  cerr << "SPS(" << this << ") SetPassNumber " << val << "/" << nPasses << " " << (force?"FORCE":"LAZY") << endl;
+//  cerr << "SPS(" << this << ") SetPassNumber " << val << "/" << nPasses << " " << (force?"FORCE":"LAZY") << endl;
 
   vtkSMIntVectorProperty* ivp;
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -155,7 +155,6 @@ int vtkSMStreamingParallelStrategy::ComputePriorities()
   this->UpdateSuppressor->UpdateVTKObjects();
 
   //ask it to compute the priorities
-  cerr << "CALLING CP" << endl;
   vtkSMProperty* cp = 
     this->UpdateSuppressor->GetProperty("ComputePriorities");
   vtkSMIntVectorProperty* rp = vtkSMIntVectorProperty::SafeDownCast(
@@ -195,13 +194,14 @@ int vtkSMStreamingParallelStrategy::ComputePriorities()
   this->UpdateSuppressor->UpdatePropertyInformation(dvp);
   int np = dvp->GetNumberOfElements();
   double *elems = dvp->GetElements();
+/*
   cerr << "SPS(" << this << ") Obtained list " << np << ":";
   for (int i = 0; i < np; i++)
     {
     cerr << elems[i] << " ";
     }
   cerr << endl;
-
+*/
   vtkClientServerStream s3c;
   s3c << vtkClientServerStream::Invoke
       << this->PostDistributorSuppressor->GetID()
