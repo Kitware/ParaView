@@ -189,6 +189,7 @@ ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
     SET(MANTA_PLUGIN_SS_SOURCES
       ${MANTA_CLASSES}
       vtkSMMantaViewProxy.cxx
+      vtkSMMantaClientServerViewProxy.cxx
       vtkSMMantaParallelViewProxy.cxx
       vtkServerSideFactory.cxx
       )      

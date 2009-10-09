@@ -67,13 +67,22 @@
      
       <!-- End of MantaRenderView -->
     </MantaViewProxy>
+
+    <MantaClientServerViewProxy 
+       name="MantaClientServerRenderView"
+       base_proxygroup="views" base_proxyname="ClientServerRenderView">
+      
+      <Documentation>
+        A render view that uses Manta rendering in client server configurations.
+      </Documentation>
+    </MantaClientServerViewProxy>
         
     <MantaParallelViewProxy 
        name="MantaIceTDesktopRenderView"
        base_proxygroup="views" base_proxyname="IceTDesktopRenderView">
       
       <Documentation>
-        A render view that uses Manta rendering in client server configurations.
+        A render view that uses Manta rendering in client parallel-server configurations.
       </Documentation>
 
       <SubProxy>
