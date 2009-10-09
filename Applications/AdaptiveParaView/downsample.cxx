@@ -29,7 +29,7 @@ inline void sampleRates(size_t* r, size_t* s, size_t* t,
     s[level] = s[level - 1];
     t[level] = t[level - 1];
 
-    for(int d = 0; d < degree; d = d + 1) 
+    for(size_t d = 0; d < degree; d = d + 1) 
       {
       if(z >= y && z >= x) 
         {
@@ -78,13 +78,13 @@ int main(int argc, char* argv[]) {
   size_t y = atol(argv[6]);
   size_t z = atol(argv[7]);
   
-  size_t r[height];  // sample rate at a level
-  size_t s[height];
-  size_t t[height];
+  size_t *r = new size_t[height];  // sample rate at a level
+  size_t *s = new size_t[height];
+  size_t *t = new size_t[height];
   
-  size_t u[height];  // dimensions at level
-  size_t v[height];
-  size_t w[height];
+  size_t *u = new size_t[height];  // dimensions at level
+  size_t *v = new size_t[height];
+  size_t *w = new size_t[height];
   
   sampleRates(r, s, t, u, v, w, x, y, z, height, degree, rate);
   
@@ -98,9 +98,9 @@ int main(int argc, char* argv[]) {
     }
   
   FILE** output = new FILE*[height];
+  char *fn = new char[strlen(argv[1]) + 256];
   for(unsigned int h = 1; h < height; h = h + 1) 
     {
-    char fn[strlen(argv[1]) + 256];
     sprintf(fn, "%s-%d", argv[1], h);
     output[h] = fopen(fn, "w");
     
@@ -108,7 +108,9 @@ int main(int argc, char* argv[]) {
            u[h], v[h], w[h],
            r[h] * s[h] * t[h], 
            u[h] * v[h] * w[h] * sizeof(float));
+
     }
+  delete[] fn;
   
 #ifdef __APPLE__
   mach_timebase_info_data_t timebase;
@@ -142,6 +144,14 @@ int main(int argc, char* argv[]) {
     fclose(output[h]);
     }
   delete [] output;
+
+  delete[] r;
+  delete[] s;
+  delete[] t;
+  
+  delete[] u;
+  delete[] v;
+  delete[] w;
 
 #ifdef __APPLE__
   uint64_t end = mach_absolute_time();
