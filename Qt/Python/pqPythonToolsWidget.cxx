@@ -116,6 +116,8 @@ pqPythonToolsWidget::pqPythonToolsWidget(QWidget* p) : Superclass(p)
     this, SLOT(onStartTraceClicked()));
   QObject::connect(this->Internal->StopTraceButton, SIGNAL(clicked()),
     this, SLOT(onStopTraceClicked()));
+  QObject::connect(this->Internal->TraceStateButton, SIGNAL(clicked()),
+    this, SLOT(onTraceStateClicked()));
   QObject::connect(this->Internal->ShowTraceButton, SIGNAL(clicked()),
     this, SLOT(onShowTraceClicked()));
   QObject::connect(this->Internal->EditTraceButton, SIGNAL(clicked()),
@@ -198,6 +200,7 @@ QString macroNameFromFileName(const QString& filename)
 void pqPythonToolsWidget::onInterpreterReset()
 {
   this->Internal->StartTraceButton->setEnabled(1);
+  this->Internal->TraceStateButton->setEnabled(1);
   this->Internal->StopTraceButton->setEnabled(0);
 }
 
@@ -293,7 +296,22 @@ void pqPythonToolsWidget::onStartTraceClicked()
                       "  print 'Trace started.'\n"
                       "except: raise RuntimeError('could not import paraview.smtrace')\n");
     this->Internal->StartTraceButton->setEnabled(0);
+    this->Internal->TraceStateButton->setEnabled(0);
     this->Internal->StopTraceButton->setEnabled(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void pqPythonToolsWidget::onTraceStateClicked()
+{
+  pqPythonDialog* pyDiag = this->pythonShellDialog();
+  if (pyDiag)
+    {
+    pyDiag->runString("try:\n"
+                      "    from paraview import smstate\n"
+                      "except:\n"
+                      "    raise RuntimeError('could not import paraview.smstate')\n"
+                      "smstate.run()\n");
     }
 }
 
@@ -309,6 +327,7 @@ void pqPythonToolsWidget::onStopTraceClicked()
                       "  print 'Trace stopped.'\n"
                       "except: raise RuntimeError('could not import paraview.smtrace')\n");
     this->Internal->StartTraceButton->setEnabled(1);
+    this->Internal->TraceStateButton->setEnabled(1);
     this->Internal->StopTraceButton->setEnabled(0);
     }
 }

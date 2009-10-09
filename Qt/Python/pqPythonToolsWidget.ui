@@ -339,6 +339,19 @@
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="TraceStateButton">
+               <property name="toolTip">
+                <string>Captures the current paraview state as a trace.  If there is a current trace it will be cleared first.</string>
+               </property>
+               <property name="text">
+                <string>Trace State</string>
+               </property>
+               <property name="autoDefault" >
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="ShowTraceButton" >
                <property name="toolTip" >
                 <string>Prints the current trace output in the python shell for display</string>

@@ -95,6 +95,7 @@ IF (PARAVIEW_ENABLE_PYTHON)
     benchmark
     simple
     smtrace
+    smstate
     )
 
   # Now copy these files if necessary.

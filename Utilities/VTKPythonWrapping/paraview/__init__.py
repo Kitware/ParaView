@@ -34,16 +34,15 @@ class compatibility:
     GetVersion = classmethod(GetVersion)
 
 def make_name_valid(name):
-    "Make a string into a valid Python variable name"
-    if not name:
+    """"Make a string into a valid Python variable name.  Return None if
+    the name contains parentheses."""
+    if not name or '(' in name or ')' in name:
         return None
-    if name.find('(') >= 0 or name.find(')') >=0:
-        return None
-    name = name.replace(' ','')
-    name = name.replace('-','')
-    name = name.replace(':','')
-    name = name.replace('.','')
+    import string
+    valid_chars = "_%s%s" % (string.ascii_letters, string.digits)
+    name = str().join(c for c in name if c in valid_chars)
     if not name[0].isalpha():
         name = 'a' + name
     return name
+
         

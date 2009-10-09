@@ -295,6 +295,15 @@ def CreateLookupTable(**params):
     SetProperties(lt, **params)
     return lt
 
+def CreatePiecewiseFunction(**params):
+    """Create and return a piecewise function.  Optionally, parameters can be
+    given to assign to the piecewise function.
+    """
+    pfunc = servermanager.piecewise_functions.PiecewiseFunction()
+    servermanager.Register(pfunc)
+    SetProperties(pfunc, **params)
+    return pfunc
+
 def CreateScalarBar(**params):
     """Create and return a scalar bar widget.  The returned widget may
     be added to a render view by appending it to the view's representations

@@ -2363,7 +2363,8 @@ def _createSetProperty(pName):
 def _findClassForProxy(xmlName, xmlGroup):
     """Given the xmlName for a proxy, returns a Proxy class. Note
     that if there are duplicates, the first one is returned."""
-    global sources, filters, rendering, animation, implicit_functions, writers, extended_sources, misc
+    global sources, filters, writers, rendering, animation, implicit_functions,\
+           piecewise_functions, extended_sources, misc
     if not xmlName:
         return None
     if xmlGroup == "sources":
@@ -2372,6 +2373,8 @@ def _findClassForProxy(xmlName, xmlGroup):
         return filters.__dict__[xmlName]
     elif xmlGroup == "implicit_functions":
         return implicit_functions.__dict__[xmlName]
+    elif xmlGroup == "piecewise_functions":
+        return piecewise_functions.__dict__[xmlName]
     elif xmlGroup == "writers":
         return writers.__dict__[xmlName]
     elif xmlGroup == "extended_sources":
@@ -2422,7 +2425,8 @@ def _printProgress(caller, event):
 def updateModules():
     """Called when a plugin is loaded, this method updates
     the proxy class object in all known modules."""
-    global sources, filters, writers, rendering, animation, implicit_functions, extended_sources, misc
+    global sources, filters, writers, rendering, animation, implicit_functions,\
+           piecewise_functions, extended_sources, misc
 
     createModule("sources", sources)
     createModule("filters", filters)
@@ -2435,12 +2439,15 @@ def updateModules():
     createModule("misc", misc)
     createModule('animation_keyframes', animation)
     createModule('implicit_functions', implicit_functions)
+    createModule('piecewise_functions', piecewise_functions)
     createModule("extended_sources", extended_sources)
+    createModule("incremental_point_locators", misc)
 
 def _createModules():
     """Called when the module is loaded, this creates sub-
     modules for all know proxy groups."""
-    global sources, filters, writers, rendering, animation, implicit_functions, extended_sources, misc
+    global sources, filters, writers, rendering, animation, implicit_functions,\
+           piecewise_functions, extended_sources, misc
 
     sources = createModule('sources')
     filters = createModule('filters')
@@ -2452,8 +2459,10 @@ def _createModules():
     animation = createModule('animation')
     createModule('animation_keyframes', animation)
     implicit_functions = createModule('implicit_functions')
+    piecewise_functions = createModule('piecewise_functions')
     extended_sources = createModule("extended_sources")
     misc = createModule("misc")
+    createModule("incremental_point_locators", misc)
 
 class PVModule(object):
     pass
@@ -2554,6 +2563,8 @@ def __determineGroup(proxy):
         return "lookup_tables"
     elif xmlgroup == "implicit_functions":
         return "implicit_functions"
+    elif xmlgroup == "piecewise_functions":
+        return "piecewise_functions"
     return None
 
 __nameCounter = {}
