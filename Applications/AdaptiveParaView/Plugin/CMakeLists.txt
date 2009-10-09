@@ -10,7 +10,6 @@ SET(ADAPTIVE_SS_SOURCES
   vtkPieceList.cxx
   vtkPVSGeometryInformation.cxx
   vtkRawStridedReader1.cxx
-  vtkRawStridedReader2.cxx
   vtkGridSampler1.cxx
   vtkGridSampler2.cxx
   vtkMetaInfoDatabase.cxx
@@ -30,6 +29,10 @@ SET(ADAPTIVE_SS_SOURCES
   vtkAdaptiveUpdateSuppressor.cxx
   vtkVisibilityPrioritizer.cxx
 )
+
+IF(NOT WIN32)
+  SET(ADAPTIVE_SS_SOURCES ${ADAPTIVE_SS_SOURCES} vtkRawStridedReader2.cxx)
+ENDIF(NOT WIN32)
 
 # arguments for the server side pieces of the plugin
 SET(SERVER_ARGS
@@ -148,4 +151,3 @@ ENDIF (PARAVIEW_ENABLE_PYTHON)
 
 #configure regression tests
 ADD_SUBDIRECTORY(Testing)
-

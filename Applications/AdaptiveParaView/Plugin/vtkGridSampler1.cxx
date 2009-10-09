@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkGridSampler1, "1.1");
+vtkCxxRevisionMacro(vtkGridSampler1, "1.2");
 vtkStandardNewMacro(vtkGridSampler1);
 
 //define to 1 to adapt for thin k dimension
@@ -210,6 +210,7 @@ double vtkGridSampler1::SuggestSampling(int axis)
   //cerr << " STRIDE =" << *stride << endl;
 
   //NOTE: a table would be much faster
+  return ret;
 }
 
 //------------------------------------------------------------------------------
