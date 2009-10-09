@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 #ifdef __APPLE__
 #include <mach/mach_time.h>
@@ -13,6 +14,7 @@ inline void sampleRates(size_t* r, size_t* s, size_t* t,
       size_t x, size_t y, size_t z,
       size_t height, size_t degree, size_t rate)
 {
+  degree = (size_t)log2((double)degree);
   r[0] = 1;
   s[0] = 1;
   t[0] = 1;
