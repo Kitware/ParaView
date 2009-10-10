@@ -117,8 +117,9 @@ def _trace_state():
 
 
 def run():
-    """Calls _run and makes sure that smtrace.stop_trace() is called event
-    if there are exceptions thrown while saving state"""
+    """This is the main method to call to save the state.  It calls _trace_state()
+    and makes sure that smtrace.stop_trace() is called even if exceptions are
+    thrown during execution."""
     try:
         _trace_state()
     finally:
