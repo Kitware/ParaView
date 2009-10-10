@@ -7,6 +7,13 @@
 #include <mach/mach_time.h>
 #endif
 
+#ifdef WIN32
+  double log2(double value)
+  {
+    return log(value)/log(2.0);
+  }
+#endif
+
 
 // calculate sampling levels and blocks
 inline void sampleRates(size_t* r, size_t* s, size_t* t,
