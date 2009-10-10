@@ -40,7 +40,7 @@ def make_name_valid(name):
         return None
     import string
     valid_chars = "_%s%s" % (string.ascii_letters, string.digits)
-    name = str().join(c for c in name if c in valid_chars)
+    name = str().join([c for c in name if c in valid_chars])
     if not name[0].isalpha():
         name = 'a' + name
     return name
