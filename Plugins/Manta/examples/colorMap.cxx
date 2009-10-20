@@ -18,6 +18,11 @@
 
 #include "vtkRegressionTestImage.h"
 
+#ifndef usleep
+#define usleep(time)
+#endif
+
+
 // this program tests
 // various color map modes involving parameters governed by
 // vtkPolyDataMapper, vtkProperty, and vtkLookupTable

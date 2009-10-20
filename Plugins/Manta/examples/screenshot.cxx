@@ -34,6 +34,11 @@
 #include <stdlib.h>
 #include <ostream>
 
+#ifndef usleep
+#define sleep(time)
+#endif
+
+
 // macros
 #ifndef MAX
 #define MAX(a,b)        ((a) > (b) ? (a) : (b))

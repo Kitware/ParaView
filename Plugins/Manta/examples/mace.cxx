@@ -12,6 +12,14 @@
 
 #include <signal.h>
 
+#ifndef alarm
+#define alarm(num)
+#endif
+
+#ifndef signal
+#define signal(alarm, dfl)
+#endif
+
 vtkAssembly *assembly;
 vtkRenderWindow *win;
 static void
@@ -36,7 +44,6 @@ sig_alrm(int signo)
        cerr << endl << "... rendering session in process ..." << endl << endl;
        return;
     }
-
     alarm(0);
     cerr << endl << "... rendering session completed (interaction done)" << endl;
     cerr << endl << "... new rendering session (signal handler) ..."     << endl;

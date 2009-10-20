@@ -8,6 +8,11 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRegressionTestImage.h"
 
+#ifndef usleep
+#define usleep(time)
+#endif
+
+
 // this program tests creating odd-width images
 
 //----------------------------------------------------------------------------

@@ -10,6 +10,10 @@
 
 // this program tests creating and deleting objects
 
+#ifndef usleep
+#define usleep(time)
+#endif
+
 //----------------------------------------------------------------------------
 int main( int argc, char* argv[] )
 {
