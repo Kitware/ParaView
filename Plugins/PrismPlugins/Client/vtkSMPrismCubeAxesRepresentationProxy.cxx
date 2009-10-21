@@ -27,9 +27,15 @@
 #include "vtkBoundingBox.h"
 #include "vtkTransform.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVCompositeDataInformation.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkStringList.h"
+#include "pqSMAdaptor.h"
 
 vtkStandardNewMacro(vtkSMPrismCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.3");
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::vtkSMPrismCubeAxesRepresentationProxy()
 {
@@ -181,12 +187,12 @@ bool vtkSMPrismCubeAxesRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 
   vtkClientServerStream stream;
   stream  << vtkClientServerStream::Invoke
-          << this->CubeAxesActor->GetID()
-          << "SetCamera" << 0
-          << vtkClientServerStream::End;
+      << this->CubeAxesActor->GetID()
+      << "SetCamera" << 0
+      << vtkClientServerStream::End;
   vtkProcessModule::GetProcessModule()->SendStream(
-    this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
-    stream);
+      this->ConnectionID, vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER,
+      stream);
   this->Strategy = 0;
   return this->Superclass::RemoveFromView(view);
 }
@@ -195,59 +201,150 @@ bool vtkSMPrismCubeAxesRepresentationProxy::RemoveFromView(vtkSMViewProxy* view)
 //----------------------------------------------------------------------------
 void vtkSMPrismCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
 {
-  this->Superclass::Update(view);
-  if (this->GetVisibility() && this->Strategy)
+    this->Superclass::Update(view);
+    if (this->GetVisibility() && this->Strategy)
     {
-    // Get bounds and set on the actor.
-    vtkSMSourceProxy* output = this->Strategy->GetOutput();
-    vtkPVDataInformation* info = output->GetDataInformation();
-    if (info)
-      {
-      double *scale = this->Scale;
-      double *position = this->Position;
-      double *rotation = this->Orientation;
-      double bds[6];
-      if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
-          position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
-          rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
-        {
-        const double *bounds = info->GetBounds();
-        vtkSmartPointer<vtkTransform> transform = 
-          vtkSmartPointer<vtkTransform>::New();
-        transform->Translate(position);
-        transform->RotateZ(rotation[2]);
-        transform->RotateX(rotation[0]);
-        transform->RotateY(rotation[1]);
-        transform->Scale(scale);
-        vtkBoundingBox bbox;
-        int i, j, k;
-        double origX[3], x[3];
+        // Get bounds and set on the actor.
+        //  vtkSMSourceProxy* output = this->Strategy->GetOutput();
+        // this->Strategy->UpdateVTKObjects();
+        vtkSMSourceProxy* output = this->GetInputProxy();
 
-        for (i = 0; i < 2; i++)
-          {
-          origX[0] = bounds[i];
-          for (j = 0; j < 2; j++)
-            {
-            origX[1] = bounds[2 + j];
-            for (k = 0; k < 2; k++)
-              {
-              origX[2] = bounds[4 + k];
-              transform->TransformPoint(origX, x);
-              bbox.AddPoint(x);
-              }
-            }
-          }
-        bbox.GetBounds(bds);
-        }
-      else 
+        vtkPVDataInformation* info = output->GetDataInformation(0);
+        if (info)
         {
-        info->GetBounds(bds);
+            vtkPVDataSetAttributesInformation* fieldInfo=info->GetFieldDataInformation();
+            if(fieldInfo)
+            {
+                int n=fieldInfo->GetNumberOfArrays();
+                double labelRanges[6];
+                vtkPVArrayInformation* xRangeArrayInfo=fieldInfo->GetArrayInformation("XRange");
+                if(xRangeArrayInfo)
+                {
+                    double* range=xRangeArrayInfo->GetComponentRange(0);
+                    labelRanges[0]=range[0];
+                    labelRanges[1]=range[1];
+                }
+                vtkPVArrayInformation* yRangeArrayInfo=fieldInfo->GetArrayInformation("YRange");
+                if(yRangeArrayInfo)
+                {
+                    double* range=yRangeArrayInfo->GetComponentRange(0);
+                    labelRanges[2]=range[0];
+                    labelRanges[3]=range[1];
+                }
+                vtkPVArrayInformation* zRangeArrayInfo=fieldInfo->GetArrayInformation("ZRange");
+                if(zRangeArrayInfo)
+                {
+                    double* range=zRangeArrayInfo->GetComponentRange(0);
+                    labelRanges[4]=range[0];
+                    labelRanges[5]=range[1];
+                }
+
+
+                vtkstd::string name=output->GetXMLName();
+                if(name=="PrismSurfaceReader")
+                {
+                    vtkSMProperty* xVariableProperty = output->GetProperty("XAxisVariableName");
+                    QVariant str = pqSMAdaptor::getEnumerationProperty(xVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("XTitle"),
+                        str);
+
+                    vtkSMProperty* yVariableProperty = output->GetProperty("YAxisVariableName");
+                    str = pqSMAdaptor::getEnumerationProperty(yVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("YTitle"),
+                        str);
+
+                    vtkSMProperty* zVariableProperty = output->GetProperty("ZAxisVariableName");
+                    str = pqSMAdaptor::getEnumerationProperty(zVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("ZTitle"),
+                        str);
+                }
+                else if(name=="PrismFilter")
+                {
+                    vtkSMProperty* xVariableProperty = output->GetProperty("SESAMEXAxisVariableName");
+                    QVariant str = pqSMAdaptor::getEnumerationProperty(xVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("XTitle"),
+                        str);
+
+                    vtkSMProperty* yVariableProperty = output->GetProperty("SESAMEYAxisVariableName");
+                    str = pqSMAdaptor::getEnumerationProperty(yVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("YTitle"),
+                        str);
+
+                    vtkSMProperty* zVariableProperty = output->GetProperty("SESAMEZAxisVariableName");
+                    str = pqSMAdaptor::getEnumerationProperty(zVariableProperty);
+
+                    pqSMAdaptor::setElementProperty(
+                        this->CubeAxesActor->GetProperty("ZTitle"),
+                        str);
+                }
+
+
+                vtkSMDoubleVectorProperty* rvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                    this->CubeAxesActor->GetProperty("LabelRanges"));
+                rvp->SetElements(labelRanges);
+
+
+            }
+
+
+
+            double *scale = this->Scale;
+            double *position = this->Position;
+            double *rotation = this->Orientation;
+            double bds[6];
+            if (scale[0] != 1.0 || scale[1] != 1.0 || scale[2] != 1.0 ||
+                position[0] != 0.0 || position[1] != 0.0 || position[2] != 0.0 ||
+                rotation[0] != 0.0 || rotation[1] != 0.0 || rotation[2] != 0.0)
+            {
+                const double *bounds = info->GetBounds();
+                vtkSmartPointer<vtkTransform> transform = 
+                    vtkSmartPointer<vtkTransform>::New();
+                transform->Translate(position);
+                transform->RotateZ(rotation[2]);
+                transform->RotateX(rotation[0]);
+                transform->RotateY(rotation[1]);
+                transform->Scale(scale);
+                vtkBoundingBox bbox;
+                int i, j, k;
+                double origX[3], x[3];
+
+                for (i = 0; i < 2; i++)
+                {
+                    origX[0] = bounds[i];
+                    for (j = 0; j < 2; j++)
+                    {
+                        origX[1] = bounds[2 + j];
+                        for (k = 0; k < 2; k++)
+                        {
+                            origX[2] = bounds[4 + k];
+                            transform->TransformPoint(origX, x);
+                            bbox.AddPoint(x);
+                        }
+                    }
+                }
+                bbox.GetBounds(bds);
+            }
+            else 
+            {
+                info->GetBounds(bds);
+            }
+            vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+                this->CubeAxesActor->GetProperty("Bounds"));
+            dvp->SetElements(bds);
+
+
+            this->CubeAxesActor->UpdateVTKObjects();
         }
-      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-        this->CubeAxesActor->GetProperty("Bounds"));
-      dvp->SetElements(bds);
-      this->CubeAxesActor->UpdateVTKObjects();
-      }
     }
 }
 

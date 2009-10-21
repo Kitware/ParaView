@@ -142,12 +142,15 @@ public:
 
  void GetRanges(vtkDoubleArray* RangeArray);
 
+  vtkGetVectorMacro(AspectScale,double,3);
+
+
 protected:
   vtkPrismSurfaceReader();
   ~vtkPrismSurfaceReader() {}
 
 
-  //double Scale[3];
+  double AspectScale[3];
   //double Range[6];
   double VariableRange[2];
   double XThresholdBetween[2];
@@ -163,6 +166,7 @@ protected:
 
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  //int FillOutputPortInformation(int port, vtkInformation* info);
 
 private:
   vtkPrismSurfaceReader(const vtkPrismSurfaceReader&);  // Not implemented.

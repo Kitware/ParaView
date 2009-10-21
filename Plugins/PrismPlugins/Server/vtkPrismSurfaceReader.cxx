@@ -14,7 +14,6 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkPolyData.h"
-#include "vtkTransform.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 #include "vtkRectilinearGrid.h"
@@ -29,11 +28,14 @@ Module:    vtkPrismSurfaceReader.cxx
 #include "vtkExtractPolyDataGeometry.h"
 #include "vtkBox.h"
 #include "vtkCleanPolyData.h"
+#include "vtkTransformFilter.h"
+#include "vtkTransform.h"
 #include <vtkstd/algorithm>
+#include "vtkMultiBlockDataSet.h"
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.10");
+vtkCxxRevisionMacro(vtkPrismSurfaceReader, "1.11");
 vtkStandardNewMacro(vtkPrismSurfaceReader);
 
 namespace
@@ -64,7 +66,7 @@ private:
   void operator=(const vtkSESAMEConversionFilter&);  // Not implemented.
 };
 }
-vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.10");
+vtkCxxRevisionMacro(vtkSESAMEConversionFilter, "1.11");
 vtkStandardNewMacro(vtkSESAMEConversionFilter);
 
 //----------------------------------------------------------------------------
@@ -217,7 +219,8 @@ class vtkPrismSurfaceReader::MyInternal
         vtkSmartPointer<vtkBox> Box;
 
         vtkSmartPointer<vtkCleanPolyData> CleanPolyData;
-
+        vtkSmartPointer<vtkTransformFilter> ScaleTransform;
+        vtkSmartPointer<vtkTransformFilter> ContourScaleTransform;
         vtkstd::string AxisVarName[3];
         vtkSmartPointer<vtkStringArray> ArrayNames;
 
@@ -257,6 +260,10 @@ class vtkPrismSurfaceReader::MyInternal
             this->YRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
              this->ZRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
            this->CRangeArray=vtkSmartPointer<vtkDoubleArray>::New();
+
+           this->ScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
+           this->ContourScaleTransform= vtkSmartPointer<vtkTransformFilter>::New(); 
+
 
             this->XRangeArray->Initialize();
             this->XRangeArray->SetNumberOfComponents(1);
@@ -983,6 +990,9 @@ int vtkPrismSurfaceReader::RequestData(
     vtkPointSet *contourOutput = vtkPointSet::SafeDownCast(
         contourOutInfo->Get(vtkDataObject::DATA_OBJECT()));
 
+
+
+
     vtkSmartPointer<vtkPolyData> localOutput= vtkSmartPointer<vtkPolyData>::New();
 
     vtkPointSet *input = this->Internal->ConversionFilter->GetOutput();
@@ -1049,7 +1059,6 @@ int vtkPrismSurfaceReader::RequestData(
             break;
             }
         }
-
 
 
     for(ptId=0;ptId<numPts;ptId++)
@@ -1151,14 +1160,71 @@ int vtkPrismSurfaceReader::RequestData(
         this->YThresholdBetween[0],
         this->YThresholdBetween[1],
         bounds[4],
-        bounds[5]
-    );
+        bounds[5]);
 
     this->Internal->CleanPolyData->SetInput( this->Internal->ExtractGeometry->GetOutput());
 
     this->Internal->CleanPolyData->Update();
-    surfaceOutput->ShallowCopy(this->Internal->CleanPolyData->GetOutput());
 
+    vtkSmartPointer<vtkFloatArray> newXArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(xArray->GetName()));
+    vtkSmartPointer<vtkFloatArray> newYArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(yArray->GetName()));
+    vtkSmartPointer<vtkFloatArray> newZArray= vtkFloatArray::SafeDownCast(this->Internal->CleanPolyData->GetOutput()->GetPointData()->GetArray(zArray->GetName()));
+
+    double scaleBounds[6];
+    this->Internal->CleanPolyData->GetOutput()->GetPoints()->GetBounds(scaleBounds);
+
+    double delta[3] = {
+        scaleBounds[1] - scaleBounds[0],
+        scaleBounds[3] - scaleBounds[2],
+        scaleBounds[5] - scaleBounds[4]
+    };
+    this->AspectScale[0]=100/delta[0];
+    this->AspectScale[1]=100/delta[1];
+    this->AspectScale[2]=100/delta[2];
+
+    vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
+    transform->Scale(this->AspectScale[0],this->AspectScale[1],this->AspectScale[2]);
+
+    this->Internal->ScaleTransform->SetInput(this->Internal->CleanPolyData->GetOutput());
+    this->Internal->ScaleTransform->SetTransform(transform);
+    this->Internal->ScaleTransform->Update();
+    surfaceOutput->ShallowCopy(this->Internal->ScaleTransform->GetOutput());
+
+
+    if(newXArray)
+    {
+        vtkSmartPointer<vtkFloatArray> xRangeArray= vtkSmartPointer<vtkFloatArray>::New();
+        xRangeArray->SetNumberOfComponents(1);
+        xRangeArray->Allocate(2);
+        xRangeArray->SetName("XRange");
+        double* rdb=newXArray->GetRange();
+        xRangeArray->InsertNextValue(rdb[0]);
+        xRangeArray->InsertNextValue(rdb[1]);
+        surfaceOutput->GetFieldData()->AddArray(xRangeArray);
+    }
+    if(newYArray)
+    {
+        vtkSmartPointer<vtkFloatArray> yRangeArray= vtkSmartPointer<vtkFloatArray>::New();
+        yRangeArray->SetNumberOfComponents(1);
+        yRangeArray->Allocate(2);
+        yRangeArray->SetName("YRange");
+        double* rdb=newYArray->GetRange();
+        yRangeArray->InsertNextValue(rdb[0]);
+        yRangeArray->InsertNextValue(rdb[1]);
+        surfaceOutput->GetFieldData()->AddArray(yRangeArray);
+    }
+
+    if(newZArray)
+    {
+        vtkSmartPointer<vtkFloatArray> zRangeArray= vtkSmartPointer<vtkFloatArray>::New();
+        zRangeArray->SetNumberOfComponents(1);
+        zRangeArray->Allocate(2);
+        zRangeArray->SetName("ZRange");
+        double* rdb=newZArray->GetRange();
+        zRangeArray->InsertNextValue(rdb[0]);
+        zRangeArray->InsertNextValue(rdb[1]);
+        surfaceOutput->GetFieldData()->AddArray(zRangeArray);
+    }
 
     if(this->Internal->DisplayContours)
         {
@@ -1191,8 +1257,11 @@ int vtkPrismSurfaceReader::RequestData(
                 this->Internal->ContourFilter->SetInputArrayToProcess(
                     0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,cArray->GetName());
                 this->Internal->ContourFilter->Update();
-                contourOutput->ShallowCopy(this->Internal->ContourFilter->GetOutput());
 
+                this->Internal->ContourScaleTransform->SetInput(this->Internal->ContourFilter->GetOutput());
+                this->Internal->ContourScaleTransform->SetTransform(transform);
+                this->Internal->ContourScaleTransform->Update();
+                contourOutput->ShallowCopy(this->Internal->ContourScaleTransform->GetOutput());
             }
 
         }
@@ -1225,7 +1294,4 @@ void vtkPrismSurfaceReader::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Not Implemented: " << "\n";
 
     }
-
-
-
 

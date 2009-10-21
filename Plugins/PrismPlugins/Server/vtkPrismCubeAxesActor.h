@@ -62,6 +62,7 @@ All rights reserve
 
 class vtkAxisActor;
 class vtkCamera;
+class vtkDataSet;
 
 class vtkPrismCubeAxesActor : public vtkActor
 {
@@ -78,6 +79,9 @@ public:
   // Draw the axes as per the vtkProp superclass' API.
   virtual int RenderOpaqueGeometry(vtkViewport*);
   virtual int RenderTranslucentGeometry(vtkViewport *) {return 0;}
+
+
+
 
   // Description:
   // Explicitly specify the region in space around which to draw the bounds.
@@ -260,6 +264,8 @@ public:
 protected:
   vtkPrismCubeAxesActor();
   ~vtkPrismCubeAxesActor();
+
+  vtkDataSet *Input;    //Define bounds from input data, or
 
   int LabelExponent(double min, double max);
   int Digits(double min, double max);

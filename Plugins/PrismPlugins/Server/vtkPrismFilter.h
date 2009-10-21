@@ -10,29 +10,25 @@ Module:    vtkPrismFilter.h
 #ifndef __vtkPrismFilter
 #define __vtkPrismFilter
 
-#include "vtkAlgorithm.h"
+
 
 #include "vtkCell.h" // Needed for VTK_CELL_SIZE
 #include "vtkStringArray.h"
-
+#include "vtkMultiBlockDataSetAlgorithm.h"
 class vtkIntArray;
 class vtkDoubleArray;
 
-class VTK_EXPORT vtkPrismFilter : public vtkAlgorithm 
+class VTK_EXPORT vtkPrismFilter : public vtkMultiBlockDataSetAlgorithm 
 {
 public:
-  vtkTypeRevisionMacro(vtkPrismFilter,vtkAlgorithm);
+  vtkTypeRevisionMacro(vtkPrismFilter,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   static vtkPrismFilter *New();
 
   unsigned long GetMTime();
 
-  // Description:
-  // see vtkAlgorithm for details
-  virtual int ProcessRequest(vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*);
+ 
   
   // Description:
   // Set the filename to read
@@ -179,20 +175,10 @@ protected:
     vtkInformationVector** inputVector,
     vtkInformationVector* outputVector);
 
-  // Description:
-  // This is called by the superclass.
-  // This is the method you should override.
-  virtual int RequestUpdateExtent(vtkInformation*,
-    vtkInformationVector**,
-    vtkInformationVector*);
 
-  int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
 
   // see algorithm for more info
   virtual int FillOutputPortInformation(int port, vtkInformation* info);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-
-  // virtual void ExecuteData(vtkDataObject *output);
 private:
  // int CalculateValues( double *x, double *f );
   vtkPrismFilter(const vtkPrismFilter&);  // Not implemented.
@@ -203,7 +189,7 @@ private:
     vtkInformationVector *outputVector);
   int RequestGeometryData(
     vtkInformation *vtkNotUsed(request),
-    vtkInformationVector **vtkNotUsed(inputVector),
+    vtkInformationVector **inputVector,
     vtkInformationVector *outputVector);
 };
 

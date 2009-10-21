@@ -12,7 +12,6 @@
           Input around which the bound box is to be shown.
         </Documentation>
       </InputProperty>
-
       <DoubleVectorProperty name="UpdateTime"
         command="SetUpdateTime"
         update_self="1"
@@ -89,7 +88,8 @@
 
       <SubProxy>
         <Proxy name="Prop2D" 
-          proxygroup="props" proxyname="PrismCubeAxesActor" />
+          proxygroup="props" proxyname="PrismCubeAxesActor"> 
+        </Proxy>
         <ExposedProperties>
           <Property name="CornerOffset" />
           <Property name="FlyMode" />

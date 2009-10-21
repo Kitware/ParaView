@@ -23,6 +23,7 @@ All rights reserve
 #include "vtkProperty.h"
 #include "vtkStringArray.h"
 #include "vtkViewport.h"
+#include "vtkDataSet.h"
 
 // *************************************************************************
 // Modifications:
@@ -32,7 +33,7 @@ All rights reserve
 // *************************************************************************
 
 vtkStandardNewMacro(vtkPrismCubeAxesActor);
-vtkCxxRevisionMacro(vtkPrismCubeAxesActor, "1.3");
+vtkCxxRevisionMacro(vtkPrismCubeAxesActor, "1.4");
 vtkCxxSetObjectMacro(vtkPrismCubeAxesActor, Camera,vtkCamera);
 
 // *************************************************************************
@@ -69,6 +70,7 @@ vtkCxxSetObjectMacro(vtkPrismCubeAxesActor, Camera,vtkCamera);
 
 vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
 {
+
   this->Bounds[0] = -1.0; this->Bounds[1] = 1.0;
   this->Bounds[2] = -1.0; this->Bounds[3] = 1.0;
   this->Bounds[4] = -1.0; this->Bounds[5] = 1.0;
@@ -187,6 +189,8 @@ vtkPrismCubeAxesActor::vtkPrismCubeAxesActor()
   this->UserXPow = 0;
   this->UserYPow = 0;
   this->UserZPow = 0;
+
+  this->SetVisibility(false);
 }
 
 // ****************************************************************************
@@ -220,6 +224,7 @@ void vtkPrismCubeAxesActor::ShallowCopy(vtkPrismCubeAxesActor *actor)
   this->SetFlyMode(actor->GetFlyMode());
   this->SetCamera(actor->GetCamera());
   this->SetBounds(actor->GetBounds());
+  this->SetLabelRanges(actor->GetLabelRanges());
   this->MustAdjustXValue = actor->MustAdjustXValue;
   this->MustAdjustYValue = actor->MustAdjustYValue;
   this->MustAdjustZValue = actor->MustAdjustZValue;
@@ -242,7 +247,6 @@ void vtkPrismCubeAxesActor::ShallowCopy(vtkPrismCubeAxesActor *actor)
 vtkPrismCubeAxesActor::~vtkPrismCubeAxesActor()
 {
   this->SetCamera(NULL);
-
   for (int i = 0; i < 4; i++)
     {
     if (this->XAxes[i]) 
@@ -502,10 +506,12 @@ void vtkPrismCubeAxesActor::ReleaseGraphicsResources(vtkWindow *win)
 // *************************************************************************
 void vtkPrismCubeAxesActor::GetBounds(double bounds[6])
 {
-  for (int i=0; i< 6; i++)
+   
+    for (int i=0; i< 6; i++)
     {
-    bounds[i] = this->Bounds[i];
+        bounds[i] = this->Bounds[i];
     }
+   
 }
 
 // Compute the bounds
@@ -513,12 +519,15 @@ void vtkPrismCubeAxesActor::GetBounds(double& xmin, double& xmax,
                                  double& ymin, double& ymax,
                                  double& zmin, double& zmax)
 {
-  xmin = this->Bounds[0];
-  xmax = this->Bounds[1];
-  ymin = this->Bounds[2];
-  ymax = this->Bounds[3];
-  zmin = this->Bounds[4];
-  zmax = this->Bounds[5];
+ double bounds[6];
+  this->GetBounds(bounds);
+  xmin = bounds[0];
+  xmax = bounds[1];
+  ymin = bounds[2];
+  ymax = bounds[3];
+  zmin = bounds[4];
+  zmax = bounds[5];
+
 }
 
 // Compute the bounds
@@ -529,6 +538,7 @@ double *vtkPrismCubeAxesActor::GetBounds()
 
 void vtkPrismCubeAxesActor::GetLabelRanges(double ranges[6])
 {
+
   for (int i=0; i< 6; i++)
     {
     ranges[i] = this->LabelRanges[i];
@@ -540,6 +550,8 @@ void vtkPrismCubeAxesActor::GetLabelRanges(double& xmin, double& xmax,
                                  double& ymin, double& ymax,
                                  double& zmin, double& zmax)
 {
+  
+
   xmin = this->LabelRanges[0];
   xmax = this->LabelRanges[1];
   ymin = this->LabelRanges[2];

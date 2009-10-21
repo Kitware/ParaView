@@ -31,6 +31,7 @@ INCLUDE_DIRECTORIES(
   ${QtPython_BINARY_DIR}
 )
 
+
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
 SET(MOC_INCLUDE_DIRS ${MOC_INCLUDE_DIRS} ${QT_QTDESIGNER_INCLUDE_DIR} ${pqComponents_SOURCE_DIR} )
@@ -47,7 +48,7 @@ VTK_MAKE_INSTANTIATOR3(vtk${KIT}Instantiator PrismInstantiator_SRCS
 
 
 
-QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h)
+QT4_WRAP_CPP(MOC_SRCS PrismToolBarActions.h PrismCore.h PrismMenuActions.h PrismDisplayProxyEditor.h PrismDisplayPanelsImplementation.h PrismObjectPanelsImplementation.h PrismSurfacePanel.h PrismPanel.h )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
     Resources/UI/PrismSurfacePanelWidget.ui

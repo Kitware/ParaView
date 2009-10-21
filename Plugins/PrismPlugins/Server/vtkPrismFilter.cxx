@@ -26,19 +26,18 @@ Module:    vtkPrismFilter.cxx
 #include "vtkPoints.h"
 #include "vtkMultiBlockDataSet.h"
 #include "vtkCompositeDataIterator.h"
+#include "vtkTransformFilter.h"
+#include "vtkTransform.h"
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPrismFilter, "1.13");
+vtkCxxRevisionMacro(vtkPrismFilter, "1.14");
 vtkStandardNewMacro(vtkPrismFilter);
 
 class vtkPrismFilter::MyInternal
 {
 public:
 
-
-
-
-
+    vtkSmartPointer<vtkTransformFilter> TransformFilter;
     vtkPrismSurfaceReader *Reader;
     vtkSmartPointer<vtkDoubleArray> RangeArray;
     vtkstd::string AxisVarName[3];
@@ -54,7 +53,7 @@ public:
         this->AxisVarName[1]      = "none";
         this->AxisVarName[2]      = "none";
 
-
+        this->TransformFilter=vtkSmartPointer<vtkTransformFilter>::New(); 
 
     }
     ~MyInternal()
@@ -251,6 +250,7 @@ int vtkPrismFilter::RequestData(
 {
     this->RequestSESAMEData(request, inputVector,outputVector);
     this->RequestGeometryData(request, inputVector,outputVector);
+
     return 1;
 }
 
@@ -277,6 +277,7 @@ int vtkPrismFilter::RequestSESAMEData(
     output->ShallowCopy(input);
 
 
+
     vtkInformation *contourOutInfo = outputVector->GetInformationObject(1);
     vtkPointSet *contourOutput = vtkPointSet::SafeDownCast(
         contourOutInfo->Get(vtkDataObject::DATA_OBJECT()));
@@ -288,7 +289,6 @@ int vtkPrismFilter::RequestSESAMEData(
 
     return 1;
 }
-
 int vtkPrismFilter::RequestGeometryData(
                                         vtkInformation *vtkNotUsed(request),
                                         vtkInformationVector **inputVector,
@@ -342,9 +342,6 @@ int vtkPrismFilter::RequestGeometryData(
         if(inputData)
         {
             vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New(); 
-            output->SetBlock(j,polydata);
-            j++;
-
 
             vtkPointData  *outPD = polydata->GetPointData();
             vtkCellData  *outCD = polydata->GetCellData();
@@ -404,12 +401,6 @@ int vtkPrismFilter::RequestGeometryData(
                     outPD->InterpolatePoint(inPD, cellId, cellPts, weights);
                 }
 
-                //// calculate the position for the new point at the cell center
-                //funcArgs[0] = inputScalars[0]->GetTuple1( cellId );
-                //funcArgs[1] = inputScalars[1]->GetTuple1( cellId );
-                //funcArgs[2] = inputScalars[2]->GetTuple1( cellId );
-                //this->CalculateValues( funcArgs, newPt );
-                //newIDs[0] = newPoints->InsertNextPoint( newPt );
 
                 newPt[0] = inputScalars[0]->GetTuple1( cellId );
                 newPt[1] = inputScalars[1]->GetTuple1( cellId );
@@ -420,29 +411,28 @@ int vtkPrismFilter::RequestGeometryData(
                 polydata->InsertNextCell( VTK_VERTEX, 1, newIDs );
             }
 
-            // pass the new points to the output data, etc.
-
-          /*  for (ptId=0; ptId < numCells; ptId++)
-            {
-
-                newPoints->GetPoint(ptId, x);
-
-                newX[0] = x[0]*this->Internal->Scale[0];
-                newX[1] = x[1]*this->Internal->Scale[1];
-                newX[2] = x[2]*this->Internal->Scale[2];
-
-                newPoints->SetPoint(ptId, newX);
-
-            }
-
-            */
-
             polydata->SetPoints( newPoints );
             newPoints->Delete();
             polydata->Squeeze();
-
             cellPts->Delete();
             delete [] weights;
+
+
+            double scale[3];
+            this->Internal->Reader->GetAspectScale(scale);
+            vtkSmartPointer<vtkTransform> transform= vtkSmartPointer<vtkTransform>::New();
+            transform->Scale(scale);
+            this->Internal->TransformFilter->SetTransform(transform);
+            this->Internal->TransformFilter->SetInput(polydata);
+            this->Internal->TransformFilter->Update();
+
+            polydata->ShallowCopy(this->Internal->TransformFilter->GetOutput());
+
+            output->SetBlock(j,polydata);
+            j++;
+
+
+
         }
     }
 
@@ -450,6 +440,7 @@ int vtkPrismFilter::RequestGeometryData(
 
     return 1;
 }
+
 
 
 vtkDoubleArray* vtkPrismFilter::GetRanges()
@@ -488,111 +479,7 @@ const char * vtkPrismFilter::GetZAxisVarName()
 {
     return this->Internal->AxisVarName[2].c_str();
 }
-/*
-int vtkPrismFilter::CalculateValues( double *x, double *f )
-{
-    // convert units
-    int retVal = 1; 
 
-    // only performing this for table 602
-    if ( this->GetTable() == 602 )
-    {
-        for ( int i=0;i<3; i++ )
-        {
-            if ( x[i] <= 0.0 )
-            {
-                x[i] = 0.0;
-            }
-            else 
-            {
-                switch ( i )
-                {
-                case 0:
-                    f[i] = log10( x[i]/1.0e3 );
-                    break;
-                case 1:
-                    f[i] = log10( x[i]/11604.5 );
-                    break;
-                case 2:
-                    f[i] = log10( x[i] );
-                    break;
-                }
-            }
-        }
-    }
-    else if ( this->GetTable() == 301 || this->GetTable() == 304 )
-    {
-        for ( int i=0;i<3; i++ )
-        {
-            switch ( i )
-            {
-            case 0:
-                f[i] = x[i]/1.0e3;
-                break;
-            case 1:
-                f[i]=x[i];
-                break;
-            case 2:
-                f[i]=x[i]/1.0e9 ;
-                break;
-            }
-        }
-    }
-    else
-    {
-        for ( int i=0;i<3; i++ )
-        {
-            f[i]=x[i];
-        }
-    }
-    return retVal;
-}
-*/
-//----------------------------------------------------------------------------
-int vtkPrismFilter::RequestInformation(
-                                       vtkInformation *vtkNotUsed(request),
-                                       vtkInformationVector **vtkNotUsed(inputVector),
-                                       vtkInformationVector *outputVector)
-{
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-        -1);
-
-    outInfo = outputVector->GetInformationObject(1);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-        -1);
-
-    outInfo = outputVector->GetInformationObject(2);
-    outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),
-        -1);
-
-    return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPrismFilter::ProcessRequest(vtkInformation* request,
-                                   vtkInformationVector** inputVector,
-                                   vtkInformationVector* outputVector)
-{
-    // generate the data
-    if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA()))
-    {
-        return this->RequestData(request, inputVector, outputVector);
-    }
-
-    if(request->Has(vtkStreamingDemandDrivenPipeline::REQUEST_UPDATE_EXTENT()))
-    {
-        return this->RequestUpdateExtent(request, inputVector, outputVector);
-    }
-
-    // execute information
-    if(request->Has(vtkDemandDrivenPipeline::REQUEST_INFORMATION()))
-    {
-        return this->RequestInformation(request, inputVector, outputVector);
-    }
-
-    return this->Superclass::ProcessRequest(request, inputVector, outputVector);
-}
 
 //----------------------------------------------------------------------------
 int vtkPrismFilter::FillOutputPortInformation(
@@ -616,36 +503,6 @@ int vtkPrismFilter::FillOutputPortInformation(
     return 1;
 }
 
-//----------------------------------------------------------------------------
-int vtkPrismFilter::FillInputPortInformation(
-    int port, vtkInformation* info)
-{
-    if(port==0)
-    {
-        info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkMultiBlockDataSet");
-    }
-
-    return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPrismFilter::RequestUpdateExtent(
-                                        vtkInformation* vtkNotUsed(request),
-                                        vtkInformationVector** inputVector,
-                                        vtkInformationVector* vtkNotUsed(outputVector))
-{
-    int numInputPorts = this->GetNumberOfInputPorts();
-    for (int i=0; i<numInputPorts; i++)
-    {
-        int numInputConnections = this->GetNumberOfInputConnections(i);
-        for (int j=0; j<numInputConnections; j++)
-        {
-            vtkInformation* inputInfo = inputVector[i]->GetInformationObject(j);
-            inputInfo->Set(vtkStreamingDemandDrivenPipeline::EXACT_EXTENT(), 1);
-        }
-    }
-    return 1;
-}
 
 //----------------------------------------------------------------------------
 void vtkPrismFilter::PrintSelf(ostream& os, vtkIndent indent)
