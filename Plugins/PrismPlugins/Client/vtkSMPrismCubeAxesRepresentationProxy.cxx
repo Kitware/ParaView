@@ -35,7 +35,7 @@
 #include "pqSMAdaptor.h"
 
 vtkStandardNewMacro(vtkSMPrismCubeAxesRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPrismCubeAxesRepresentationProxy, "1.4");
 //----------------------------------------------------------------------------
 vtkSMPrismCubeAxesRepresentationProxy::vtkSMPrismCubeAxesRepresentationProxy()
 {
@@ -215,7 +215,6 @@ void vtkSMPrismCubeAxesRepresentationProxy::Update(vtkSMViewProxy* view)
             vtkPVDataSetAttributesInformation* fieldInfo=info->GetFieldDataInformation();
             if(fieldInfo)
             {
-                int n=fieldInfo->GetNumberOfArrays();
                 double labelRanges[6];
                 vtkPVArrayInformation* xRangeArrayInfo=fieldInfo->GetArrayInformation("XRange");
                 if(xRangeArrayInfo)
