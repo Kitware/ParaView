@@ -38,21 +38,30 @@ paraview.compatibility.major = 3
 paraview.compatibility.minor = 5
 import servermanager
 
-def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
-    """Creates a connection to a server. Example usage:
-    > Connect("amber") # Connect to a single server at default port
-    > Connect("amber", 12345) # Connect to a single server at port 12345
-    > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair
-    This also create a default render view."""
+def _disconnect():
     servermanager.ProxyManager().UnRegisterProxies()
     active_objects.view = None
     active_objects.source = None
     import gc
     gc.collect()
     servermanager.Disconnect()
+
+def Connect(ds_host=None, ds_port=11111, rs_host=None, rs_port=11111):
+    """Creates a connection to a server. Example usage:
+    > Connect("amber") # Connect to a single server at default port
+    > Connect("amber", 12345) # Connect to a single server at port 12345
+    > Connect("amber", 11111, "vis_cluster", 11111) # connect to data server, render server pair"""
+    _disconnect()
     cid = servermanager.Connect(ds_host, ds_port, rs_host, rs_port)
     servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
+    return cid
 
+def ReverseConnect(port=11111):
+    """Create a reverse connection to a server.  Listens on port and waits for
+    an incoming connection from the server."""
+    _disconnect()
+    cid = servermanager.ReverseConnect(port)
+    servermanager.ProxyManager().RegisterProxy("timekeeper", "tk", servermanager.misc.TimeKeeper())
     return cid
 
 def _create_view(view_xml_name):
