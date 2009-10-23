@@ -37,11 +37,14 @@
 #include <string>
 #include <vtkstd/vector>
 
+#ifndef _WIN32
 #include <sys/mman.h>
 #include <errno.h>
+#endif
+
 #include "vtkAdaptiveOptions.h"
 
-vtkCxxRevisionMacro(vtkRawStridedReader2, "1.3");
+vtkCxxRevisionMacro(vtkRawStridedReader2, "1.4");
 vtkStandardNewMacro(vtkRawStridedReader2);
 
 #if 0
@@ -315,6 +318,7 @@ int vtkRSRFileSkimmer2::read(FILE* fp,
   size_t js = (sWholeExtent_[1] - sWholeExtent_[0] + 1);
   size_t ks = (sWholeExtent_[1] - sWholeExtent_[0] + 1) * (sWholeExtent_[3] - sWholeExtent_[2] + 1);
 
+#ifndef _WIN32
   float* map = reader->SetupMap(0);
   if(map != MAP_FAILED) {
     for(size_t k = 0; k < kr; k++) 
@@ -346,6 +350,7 @@ int vtkRSRFileSkimmer2::read(FILE* fp,
   }
   else 
   {
+#endif
     for(size_t k = 0; k < kr; k++) 
       {
       for(size_t j = 0; j < jr; j++) 
@@ -358,7 +363,10 @@ int vtkRSRFileSkimmer2::read(FILE* fp,
         fread(&(this->data_[di]), sizeof(float), ir, fp);
         }
       }
+#ifndef _WIN32
   }
+#endif
+
   if(use_timer_)
     {
     stop = clock();
@@ -392,7 +400,9 @@ void vtkRawStridedReader2::SetupFile() {
   if(this->lastname) {
     if(this->lastresolution != stop ||
        strcmp(this->lastname, this->Filename)) {
+#ifndef _WIN32
       this->TearDownMap();
+#endif
       this->TearDownFile();
     }
     else {
@@ -444,7 +454,7 @@ void vtkRawStridedReader2::TearDownFile() {
   this->fd = -1;
 }
 
-
+#ifndef _WIN32
 float* vtkRawStridedReader2::SetupMap(size_t which) {
   // make sure it's the right map
   if(which != this->chunk) {
@@ -494,7 +504,7 @@ void vtkRawStridedReader2::TearDownMap() {
   this->chunk = -1;
   this->map = (float*)MAP_FAILED;
 }
-
+#endif
 
 //============================================================================
 
@@ -529,8 +539,10 @@ vtkRawStridedReader2::vtkRawStridedReader2()
   this->fd = -1;
   this->lastname = 0;
 
+#ifndef _WIN32
   this->chunk = -1;
   this->map = (float*)MAP_FAILED;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -544,7 +556,9 @@ vtkRawStridedReader2::~vtkRawStridedReader2()
   this->RangeKeeper->Delete();
   this->GridSampler->Delete();
 
+#ifndef _WIN32
   this->TearDownMap();
+#endif
   this->TearDownFile();
 }
 

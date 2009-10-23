@@ -10,4 +10,9 @@
           file_description="Raw Files (Strided rev 1)" >
   </Reader>
 
+  <Reader name="StridedReader2"
+          extensions="raw"
+          file_description="Raw Files (Strided rev 2)" >
+  </Reader>
+
 </ParaViewReaders>

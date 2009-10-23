@@ -58,11 +58,13 @@ public:
   vtkSetMacro(BlockReadSize, int);
   vtkGetMacro(BlockReadSize, int);
 
-  float* SetupMap(size_t);
-
   // Description:
   // Checks for presence of preprocessed files.
   int CanReadFile(const char *filename);
+
+#ifndef _WIN32
+  float* SetupMap(size_t);  
+#endif
 
 protected:
   vtkRawStridedReader2();
@@ -132,13 +134,15 @@ protected:
   char* lastname;
   vtkIdType lastresolution;
 
+#ifndef _WIN32
   size_t chunk;
   float* map;
   size_t mapsize;
+  void TearDownMap();
+#endif
 
   void SetupFile();
   void TearDownFile();
-  void TearDownMap();
 
 private:
   vtkRawStridedReader2(const vtkRawStridedReader2&);  // Not implemented.
