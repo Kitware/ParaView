@@ -23,7 +23,7 @@ paraview_build_optional_plugin(ClientRichTextView "ClientRichTextView" ClientRic
 paraview_build_optional_plugin(ClientTableView "ClientTableView" ClientTableView OFF)
 paraview_build_optional_plugin(ClientTreeView "ClientTreeView" ClientTreeView OFF)
 paraview_build_optional_plugin(CommonToolbar "CommonToolbar" CommonToolbar OFF)
-paraview_build_optional_plugin(CosmoFilters "Cosmology Filters" CosmoFilters OFF)
+paraview_build_optional_plugin(CosmoFilters "Cosmology Filters" CosmoFilters ON)
 paraview_build_optional_plugin(GraphLayoutFilterPanel "GraphLayoutFilterPanel" GraphLayoutFilterPanel OFF)
 paraview_build_optional_plugin(Infovis "Infovis" Infovis OFF)
 IF(NOT WIN32)
