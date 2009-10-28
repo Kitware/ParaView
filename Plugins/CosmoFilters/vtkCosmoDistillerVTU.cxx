@@ -71,7 +71,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "vtkTimerLog.h"
 //#include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkCosmoDistillerVTU, "1.1");
+vtkCxxRevisionMacro(vtkCosmoDistillerVTU, "1.2");
 vtkStandardNewMacro(vtkCosmoDistillerVTU);
 
 /****************************************************************************/
@@ -161,7 +161,8 @@ int vtkCosmoDistillerVTU::RequestData(vtkInformation* vtkNotUsed(request),
     // need this
     vtkIdType nodeIds[1];
     nodeIds[0] = vtkPointID;
-    long vtkCellID = output->InsertNextCell (VTK_VERTEX, 1, nodeIds);
+    //long vtkCellID =
+    output->InsertNextCell (VTK_VERTEX, 1, nodeIds);
     }
 
   output->ShallowCopy(input);
@@ -179,4 +180,9 @@ int vtkCosmoDistillerVTU::RequestData(vtkInformation* vtkNotUsed(request),
 /****************************************************************************/
 void vtkCosmoDistillerVTU::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "rL: " << this->rL << endl;
+  os << indent << "XORG: " << this->XORG << endl;
+  os << indent << "YORG: " << this->YORG << endl;
+  os << indent << "ZORG: " << this->ZORG << endl;
 }

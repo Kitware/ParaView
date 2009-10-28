@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnstructuredGrid.h"
 #include "vtkInformationIntegerKey.h"
 
-vtkCxxRevisionMacro(vtkCosmoHaloClassFilter, "1.1");
+vtkCxxRevisionMacro(vtkCosmoHaloClassFilter, "1.2");
 vtkStandardNewMacro(vtkCosmoHaloClassFilter);
 
 vtkInformationKeyMacro(vtkCosmoHaloClassFilter, OUTPUT_NUMBER_OF_CLASSES, Integer);
@@ -91,8 +91,8 @@ vtkCosmoHaloClassFilter::~vtkCosmoHaloClassFilter()
   this->bounds->Delete();
 }
 
-int vtkCosmoHaloClassFilter::RequestInformation(vtkInformation* request,
-                                                vtkInformationVector** inputVector,
+int vtkCosmoHaloClassFilter::RequestInformation(vtkInformation*,
+                                                vtkInformationVector**,
                                                 vtkInformationVector* outputVector)
 {
   // set the number of classes information
@@ -102,7 +102,7 @@ int vtkCosmoHaloClassFilter::RequestInformation(vtkInformation* request,
   return 1;
 }
 
-int vtkCosmoHaloClassFilter::RequestData(vtkInformation* request,
+int vtkCosmoHaloClassFilter::RequestData(vtkInformation* ,
                                          vtkInformationVector** inputVector,
                                          vtkInformationVector* outputVector)
 {
