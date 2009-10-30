@@ -76,6 +76,10 @@
           extensions="sos SOS"
           file_description="EnSight Master Server Files">
   </Reader>
+  <Reader name="tecplotreader"
+          extensions="tec"
+          file_description="Tecplot Files">
+  </Reader>
   <Reader name="netCDFReader"
           extensions="ncdf nc"
           file_description="netCDF Files">

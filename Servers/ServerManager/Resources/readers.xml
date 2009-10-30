@@ -2912,6 +2912,54 @@
      </StringVectorProperty>
    <!-- End spcthreader-->
    </SourceProxy>
+      
+   <SourceProxy name="tecplotreader" class="vtkTecplotReader"
+                label="Tecplot Reader">
+     <Documentation
+       short_help="Read files in the Tecplot ASCII file format."
+       long_help="Read files in the Tecplot ASCII file format.">
+       The Tecplot reader extracts multiple zones (blocks) of data from a Tecplot ASCII file, in which a zone is stored in either point packing mode (i.e., tuple-based, with only point data supported) or block packing mode (i.e., component-based, with point data and cell data supported). The output of the reader is a vtkMultiBlockDataset, of which each block is either a vtkStructuredGrid or a vtkUnstructuredGrid. 
+     </Documentation>
+      
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        animateable="0"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+        <Documentation>
+          This property specifies the file name for the Tecplot reader.
+        </Documentation>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="DataArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Data"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="DataArrayStatus"
+        command="SetDataArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="DataArrayInfo"
+        label="Data Arrays">
+      
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="DataArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+       
+       <Documentation>
+         This property lists what dataset attribute arrays (point data and cell data) to read.
+       </Documentation>
+     </StringVectorProperty>
+   <!-- End tecplotreader-->
+   </SourceProxy>
 
   <FileSeriesReaderProxy name="SPCTHRestartReader"
                          class="vtkFileSeriesReader"
