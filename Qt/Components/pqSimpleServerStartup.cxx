@@ -404,11 +404,20 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
   vtkstd::map<QString, QString> true_values;
   vtkstd::map<QString, QString> false_values;
 
-  int num = xml_options->GetNumberOfNestedElements();
-  for (int i=0; i<num; i++)
+  int number_of_elements = xml_options->GetNumberOfNestedElements();
+  for (int i=0; i<number_of_elements; i++)
     {
     vtkPVXMLElement* xml_option = xml_options->GetNestedElement(i);
-    if (QString(xml_option->GetName()) == "Option")
+    if (QString(xml_option->GetName()) == "Set")
+      {
+      const char* option_name = xml_option->GetAttribute("name");
+      const char* option_value = xml_option->GetAttribute("value");
+      if (option_name && option_value)
+        {
+        this->Implementation->Options[option_name] = option_value;
+        }
+      }
+    else if (QString(xml_option->GetName()) == "Option")
       {
       const QString option_name = xml_option->GetAttribute("name");
       const QString option_label = xml_option->GetAttribute("label");
@@ -656,6 +665,71 @@ bool pqSimpleServerStartup::promptRuntimeArguments()
       {
       this->Implementation->Server.setRenderServerPort(
         this->Implementation->Options["PV_RENDER_SERVER_PORT"].toInt());
+      }
+    }
+
+  // Handle any Switch-es in the configuration. This has to happen after the
+  // Options have been updated with user-selected values so that we can pick the
+  // right case.
+  for (int cc=0; cc < number_of_elements; cc++)
+    {
+    vtkPVXMLElement* switchXML = xml_options->GetNestedElement(cc);
+    if (!switchXML->GetName() || strcmp(switchXML->GetName(), "Switch") != 0)
+      {
+      continue;
+      }
+    const char* variable = switchXML->GetAttribute("name");
+    if (!variable)
+      {
+      qWarning("Missing attribute 'name' in 'Switch' statement");
+      continue;
+      }
+    if (!this->Implementation->Options.contains(variable))
+      {
+      qWarning() << "'Switch' statement has no effect since no variable named " 
+        << variable << " is defined. ";
+      continue;
+      }
+    QString value = this->Implementation->Options[variable];
+    bool handled = false;
+    for (unsigned int kk=0;
+      !handled && kk < switchXML->GetNumberOfNestedElements(); kk++)
+      {
+      vtkPVXMLElement* caseXML = switchXML->GetNestedElement(kk);
+      if (!caseXML->GetName() || strcmp(caseXML->GetName(), "Case") != 0)
+        {
+        continue;
+        }
+      const char* case_value = caseXML->GetAttribute("value");
+      if (!case_value || value != case_value)
+        {
+        continue;
+        }
+      handled = true;
+      for (unsigned int i=0; i < caseXML->GetNumberOfNestedElements(); i++)
+        {
+        vtkPVXMLElement* setXML= caseXML->GetNestedElement(i);
+        if (QString(setXML->GetName()) == "Set")
+          {
+          const char* option_name = setXML->GetAttribute("name");
+          const char* option_value = setXML->GetAttribute("value");
+          if (option_name && option_value)
+            {
+            this->Implementation->Options[option_name] = option_value;
+            }
+          }
+        else
+          {
+          qWarning()
+            << "'Case' element can only contain 'Set' elements as children and not '"
+            << setXML->GetName() << "'";
+          }
+        }
+      }
+    if (!handled)
+      {
+      qWarning() << "Case '"<< value << "' not handled in 'Switch' for variable "
+        "'" << variable << "'";
       }
     }
 
