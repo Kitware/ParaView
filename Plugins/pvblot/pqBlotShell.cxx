@@ -26,6 +26,7 @@
 #include "pqConsoleWidget.h"
 #include "pqServer.h"
 
+#include <QDir>
 #include <QCoreApplication>
 #include <QVBoxLayout>
 
@@ -63,7 +64,7 @@ pqBlotShell::~pqBlotShell()
 //-----------------------------------------------------------------------------
 void pqBlotShell::initialize(const QString &filename)
 {
-  this->FileName = filename;
+  this->FileName = QDir::fromNativeSeparators(filename);
   this->initialize();
 }
 
