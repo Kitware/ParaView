@@ -305,6 +305,12 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/Qt/Components
                               ${ParaView_SOURCE_DIR}/Qt/Testing
                               ${ParaView_BINARY_DIR}/Qt/Testing )
+IF (PARAVIEW_ENABLE_PYTHON)
+  SET (PARAVIEW_GUI_INCLUDE_DIRS ${PARAVIEW_GUI_INCLUDE_DIRS}
+                                 ${ParaView_SOURCE_DIR}/Qt/Python
+                                 ${ParaView_BINARY_DIR}/Qt/Python)
+ENDIF(PARAVIEW_ENABLE_PYTHON)
+
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
 GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview${PV_EXE_SUFFIX} LOCATION)
 GET_TARGET_PROPERTY(PARAVIEW_BATCH_EXECUTABLE pvbatch${PV_EXE_SUFFIX} LOCATION)
