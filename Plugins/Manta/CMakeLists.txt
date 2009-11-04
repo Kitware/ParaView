@@ -82,7 +82,7 @@ FOREACH ( manta_build_name ${MANTA_BUILD_NAMES} )
     )
 ENDFOREACH ( manta_build_name )
 
-FIND_PACKAGE(Manta REQUIRED)
+#FIND_PACKAGE(Manta REQUIRED)
 
 FIND_PATH ( MANTA_BUILD MantaConfigure.cmake ${MANTA_BUILD_SEARCH_PATH} DOC "Manta build directory" )
 IF ( MANTA_BUILD )
