@@ -117,7 +117,7 @@ public:
   void SetMantaWorldGroup( Manta::Group * mantaWorldGroup )
   { this->MantaWorldGroup = mantaWorldGroup; }
   Manta::Mesh * GetMesh() { return this->Mesh; }
-  Manta::AccelerationStructure * GetMantaAS() { this->MantaAS; }
+  Manta::AccelerationStructure * GetMantaAS() { return this->MantaAS; }
   Manta::Group * GetMantaWorldGroup() { return this->MantaWorldGroup; }
   //ETX
   

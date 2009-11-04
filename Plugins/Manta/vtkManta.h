@@ -70,7 +70,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #if defined(__APPLE__) && (defined(VTK_USE_CARBON) || defined(VTK_USE_COCOA))
 # include <OpenGL/gl.h> // Include OpenGL API.
 #else
-# include <GL/gl.h> // Include OpenGL API.
+#include "vtkgl.h"
 #endif
 
 #endif

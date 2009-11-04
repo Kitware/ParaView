@@ -94,6 +94,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Backgrounds/ConstantBackground.h>
 #include <Core/Color/Color.h>
 #include <Core/Color/ColorDB.h>
+#include <Core/Color/RGBColor.h>
 
 #include <Image/SimpleImage.h>
 #include <Engine/Control/RTRT.h>
@@ -107,7 +108,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkMantaRenderer, "1.1");
+vtkCxxRevisionMacro(vtkMantaRenderer, "1.2");
 vtkStandardNewMacro(vtkMantaRenderer);
 
 //----------------------------------------------------------------------------
@@ -204,7 +205,7 @@ void vtkMantaRenderer::InitEngine()
   this->MantaScene->getRenderParameters().setMaxDepth( this->MaxDepth );
   double *color = this->GetBackground();
   Manta::ConstantBackground * background = new Manta::ConstantBackground(
-    Manta::Color(  Manta::RGB( color[0], color[1], color[2] )  )  );
+    Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] )  )  );
   color = NULL;
   this->MantaScene->setBackground( background );
 
@@ -217,7 +218,7 @@ void vtkMantaRenderer::InitEngine()
   double *ambient = this->Ambient;
   this->MantaLightSet = new Manta::LightSet();
   this->MantaLightSet->setAmbientLight( new Manta::ConstantAmbient(
-    Manta::Color(  Manta::RGB( ambient[0], ambient[1], ambient[2] )
+    Manta::Color(  Manta::RGBColor( ambient[0], ambient[1], ambient[2] )
                 ) ) );
   ambient = NULL;
   this->MantaScene->setLights( this->MantaLightSet );
@@ -283,7 +284,7 @@ int vtkMantaRenderer::UpdateLights()
     vtkWarningMacro(
       << "No light defined, creating a headlight at camera position" );
     Manta::Light *headlight =
-      new Manta::HeadLight(    0, Manta::Color(  Manta::RGB( 1, 1, 1 )  )   );
+      new Manta::HeadLight(    0, Manta::Color(  Manta::RGBColor( 1, 1, 1 )  )   );
 
     this->MantaEngine->addTransaction( "add headlight",
       Manta::Callback::create( this->MantaLightSet, &Manta::LightSet::add,
@@ -304,6 +305,7 @@ int vtkMantaRenderer::UpdateLights()
         }
       }
     }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -414,7 +416,7 @@ void vtkMantaRenderer::DeviceRender()
   // reset background in the scene
   double *color = this->GetBackground();
   dynamic_cast<Manta::ConstantBackground *> (this->MantaScene->getBackground())->
-    setValue(Manta::Color(  Manta::RGB( color[0], color[1], color[2] ) ) );
+    setValue(Manta::Color(  Manta::RGBColor( color[0], color[1], color[2] ) ) );
   color = NULL;
 
   // call Light::Render()

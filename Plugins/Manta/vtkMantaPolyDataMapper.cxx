@@ -102,7 +102,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Model/Textures/Constant.h>
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.1");
+vtkCxxRevisionMacro(vtkMantaPolyDataMapper, "1.2");
 vtkStandardNewMacro(vtkMantaPolyDataMapper);
 
 //----------------------------------------------------------------------------
@@ -815,9 +815,9 @@ void vtkMantaPolyDataMapper::Draw(vtkRenderer *renderer, vtkActor *actor)
           //TODO: Phong shading on colormap??
           double *specular = actor->GetProperty()->GetSpecularColor();
           Manta::Texture<Manta::Color> *specularTexture =
-            new Manta::Constant<Manta::Color>(Manta::Color(Manta::RGB(specular[0],
-                                                                      specular[1],
-                                                                      specular[2])));
+            new Manta::Constant<Manta::Color>(Manta::Color(Manta::RGBColor(specular[0],
+                                                                           specular[1],
+                                                                           specular[2])));
           material =
             new Manta::Phong(texture,
                              specularTexture,

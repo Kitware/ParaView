@@ -76,7 +76,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMantaLight, "1.1");
+vtkCxxRevisionMacro(vtkMantaLight, "1.2");
 vtkStandardNewMacro(vtkMantaLight);
 
 void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
@@ -94,7 +94,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
     if ( pointLight )
         {
         pointLight->setPosition(Manta::Vector(position[0], position[1], position[2]));
-        pointLight->setColor(Manta::Color(Manta::RGB(color[0],color[1],color[2])));
+        pointLight->setColor(Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
         }
     else
       {
@@ -113,7 +113,7 @@ void vtkMantaLight::UpdateMantaLight(vtkRenderer *ren)
         direction[1] = position[1] - focal[1];
         direction[2] = position[2] - focal[2];
         dirLight->setDirection(Manta::Vector(direction[0], direction[1], direction[2]));
-        dirLight->setColor(Manta::Color(Manta::RGB(color[0],color[1],color[2])));
+        dirLight->setColor(Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
         }
     else
       {
@@ -140,7 +140,7 @@ void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
     {
     this->mantaLight = new Manta::PointLight(
       Manta::Vector(position[0], position[1], position[2]),
-      Manta::Color(Manta::RGB(color[0],color[1],color[2])));
+      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
     }
   else
     {
@@ -151,7 +151,7 @@ void vtkMantaLight::CreateMantaLight(vtkRenderer *ren)
     direction[2] = position[2] - focal[2];
     this->mantaLight = new Manta::DirectionalLight(
       Manta::Vector(direction[0], direction[1], direction[2]),
-      Manta::Color(Manta::RGB(color[0],color[1],color[2])));
+      Manta::Color(Manta::RGBColor(color[0],color[1],color[2])));
     }
   mantaRenderer->GetMantaLightSet()->add(mantaLight);
 }
