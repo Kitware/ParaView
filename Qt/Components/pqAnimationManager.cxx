@@ -335,7 +335,16 @@ bool pqAnimationManager::saveAnimation()
   QSize viewSize = this->Internals->ViewWidget->clientSize();
   // to avoid some unpredicable padding issues, I am reducing the size by a few
   // pixels.
-  viewSize -= PADDING_COMPENSATION;
+  QSize padding = PADDING_COMPENSATION;
+  if (viewSize.width() > viewSize.height())
+    {
+    padding.setWidth((padding.width()*viewSize.width())/viewSize.height());
+    }
+  else
+    {
+    padding.setHeight((padding.height()*viewSize.height())/viewSize.width());
+    }
+  viewSize -= padding;
   dialogUI.spinBoxHeight->setValue(viewSize.height());
   dialogUI.spinBoxWidth->setValue(viewSize.width());
 
