@@ -90,7 +90,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define dataY 1
 #define dataZ 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2.2.1");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 struct ValueIdPair
@@ -709,9 +709,16 @@ void vtkCosmoHaloFinder::basicMerge(int ii, int jj)
 
 void vtkCosmoHaloFinder::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "np: " << this->np << endl;
+  os << indent << "bb: " << this->bb << endl;
+  os << indent << "pmin: " << this->pmin << endl;
+  os << indent << "rL: " << this->rL << endl;
+  os << indent << "Periodic: " << (this->Periodic?"ON":"OFF") << endl;
+  os << indent << "BatchMode: " << (this->BatchMode?"ON":"OFF") << endl;
 }
 
-int vtkCosmoHaloFinder::FillInputPortInformation(int port, vtkInformation* info)
+int vtkCosmoHaloFinder::FillInputPortInformation(int, vtkInformation* info)
 {
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   return 1;

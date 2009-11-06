@@ -72,7 +72,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkCosmoCorrelater, "1.3");
+vtkCxxRevisionMacro(vtkCosmoCorrelater, "1.3.4.1");
 vtkStandardNewMacro(vtkCosmoCorrelater);
 
 /****************************************************************************/
@@ -387,7 +387,10 @@ void vtkCosmoCorrelater::RangeSearch(int first, int last, int dataFlag, float *b
 /****************************************************************************/
 void vtkCosmoCorrelater::PrintSelf(ostream& os, vtkIndent indent)
 {
-  //this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "np: " << this->np << endl;
+  os << indent << "bb: " << this->bb << endl;
+  os << indent << "rL: " << this->rL << endl;
 }
 
 void vtkCosmoCorrelater::SetFieldName(const char* field_name)

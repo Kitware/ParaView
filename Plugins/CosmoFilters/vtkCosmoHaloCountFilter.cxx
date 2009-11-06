@@ -76,7 +76,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDoubleArray.h"
 #include "vtkCosmoHaloClassFilter.h"
 
-vtkCxxRevisionMacro(vtkCosmoHaloCountFilter, "1.1");
+vtkCxxRevisionMacro(vtkCosmoHaloCountFilter, "1.1.4.1");
 vtkStandardNewMacro(vtkCosmoHaloCountFilter);
 
 //----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ int vtkCosmoHaloCountFilter::ProcessRequest(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkCosmoHaloCountFilter::RequestInformation(vtkInformation* request,
+int vtkCosmoHaloCountFilter::RequestInformation(vtkInformation* ,
                                                 vtkInformationVector** inputVector,
                                                 vtkInformationVector* outputVector)
 {
@@ -166,9 +166,9 @@ int vtkCosmoHaloCountFilter::RequestInformation(vtkInformation* request,
 }
 
 //----------------------------------------------------------------------------
-int vtkCosmoHaloCountFilter::RequestUpdateExtent(vtkInformation* request,
+int vtkCosmoHaloCountFilter::RequestUpdateExtent(vtkInformation*,
                                                  vtkInformationVector** inputVector,
-                                                 vtkInformationVector* outputVector)
+                                                 vtkInformationVector*)
 {
   // get the requested update extent
   double *inTimes = inputVector[0]->GetInformationObject(0)
