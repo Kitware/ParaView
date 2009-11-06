@@ -174,27 +174,31 @@ ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
   # INCLUDE ( FindParaView.cmake )
 
   # Locate ParaView build directory just in case FindParaView.cmake fails to do so
-  IF ( NOT ParaView_DIR )
-
-    SET ( PARAVIEW_BUILD_SEARCH_PATH
-          ../buildParaView  ../build_ParaView  ../build-ParaView
-          ../buildparaView  ../build_paraView  ../build-paraView
-        )
-    FIND_PATH ( ParaView_DIR ParaViewConfig.cmake ${PARAVIEW_BUILD_SEARCH_PATH} DOC "ParaView build directory" )
-
-    IF ( ParaView_DIR )
-      INCLUDE ( ${ParaView_DIR}/ParaViewConfig.cmake )
-    ENDIF ( ParaView_DIR )
-
-  ENDIF ( NOT ParaView_DIR )
+  #IF ( NOT ParaView_DIR )
+  #
+  #  SET ( PARAVIEW_BUILD_SEARCH_PATH
+  #        ../buildParaView  ../build_ParaView  ../build-ParaView
+  #        ../buildparaView  ../build_paraView  ../build-paraView
+  #      )
+  #  FIND_PATH ( ParaView_DIR ParaViewConfig.cmake ${PARAVIEW_BUILD_SEARCH_PATH} DOC "ParaView build directory" )
+  #
+  #  IF ( ParaView_DIR )
+  #    INCLUDE ( ${ParaView_DIR}/ParaViewConfig.cmake )
+  #  ENDIF ( ParaView_DIR )
+  #ENDIF ( NOT ParaView_DIR )
 
   # Make sure ParaView is found. Otherwise key 'g' would not appear for generating CMakefile(s).
   IF (ParaView_SOURCE_DIR)
+    
+    # Find VTK so VKT_INCLUDE_DIRS is defined.
+    SET(VTK_DIR ${PARAVIEW_VTK_DIR})
+    FIND_PACKAGE(VTK)
+    
     INCLUDE_DIRECTORIES(
       ${PARAVIEW_INCLUDE_DIRS}
       ${PARAVIEW_GUI_INCLUDE_DIRS}
       ${PARAVIEW_KWSYS_INCLUDE_DIRS}
-      ${VTK_INCLUDE_DIR}
+      ${VTK_INCLUDE_DIRS}
       ${MPI_INCLUDE_PATH}
     )
   ELSE (ParaView_SOURCE_DIR)
@@ -202,13 +206,13 @@ ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
     INCLUDE(${PARAVIEW_USE_FILE})
   ENDIF (ParaView_SOURCE_DIR)
 
-  IF ( ParaView_DIR )
+  IF ( ParaView_SOURCE_DIR )
 
     INCLUDE ( ${PARAVIEW_USE_FILE} )
   
     # Set the directory for exporting vtkManta executables and libraries
     # to ParaView's build directory (just if necessary)
-    SET ( EXES_LIBS_EXPORT_DIR ${ParaView_DIR} )
+    SET ( EXES_LIBS_EXPORT_DIR ${ParaView_BINARY_DIR} )
     MARK_AS_ADVANCED ( EXES_LIBS_EXPORT_DIR )
 
     # define a flag exported to vtkMantaConfigure.h to determine if some ParaView-dependent
@@ -263,7 +267,7 @@ ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
     
     TARGET_LINK_LIBRARIES ( MantaView vtkManta )
     
-  ENDIF ( ParaView_DIR )
+  ENDIF ( ParaView_SOURCE_DIR )
   
 ENDIF ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
 
