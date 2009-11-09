@@ -1853,6 +1853,7 @@
         <SimpleIntInformationHelper/>
      </IntVectorProperty>
 
+     <!--
      <IntVectorProperty
         name="PositionRange"
         command="SetPositionRange"
@@ -1864,6 +1865,7 @@
              </RequiredProperties>
         </IntRangeDomain>
      </IntVectorProperty>
+     -->
 
      <StringVectorProperty
         name="PointArrayInfo"
@@ -1894,6 +1896,18 @@
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a VTK_VERTEX cell is created for each point.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TagSize"
+        command="SetTagSize"
+        label="64-bit Tags"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is false, then 32-bit tags are used for the tag field.  Otherwise, 64-bit tags are used.
        </Documentation>
      </IntVectorProperty>
 
