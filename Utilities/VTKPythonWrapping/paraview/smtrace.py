@@ -4,9 +4,11 @@ import servermanager
 
 
 class trace_globals: pass
+
 def reset_trace_observer():
   trace_globals.observer = servermanager.vtkSMPythonTraceObserver()
   trace_globals.observer_active = False
+
 def reset_trace_globals():
   trace_globals.capture_all_properties = False
   trace_globals.use_gui_name = False
@@ -25,6 +27,7 @@ def reset_trace_globals():
   trace_globals.ignored_view_properties = ["ViewSize", "GUISize", "ViewPosition", \
                                            "ViewTime", "Representations"]
   trace_globals.ignored_representation_properties = ["Input"]
+  trace_globals.proxy_ctor_hook = None
   reset_trace_observer()
 reset_trace_globals()
 
@@ -410,6 +413,10 @@ def append_trace():
         for propName, propValue in propNameValues:
           ctorArgs.append("%s=%s"%(propName, propValue))
         propNameValues = []
+
+      if trace_globals.proxy_ctor_hook:
+        ctorMethod, ctorArgs, extraCtorCommands = trace_globals.proxy_ctor_hook(info,
+          ctorMethod, ctorArgs, extraCtorCommands)
 
       ctorArgString = make_comma_separated_string(ctorArgs)
       traceOutput = "%s = %s(%s)\n%s" % (info.PyVariable, ctorMethod, ctorArgString, extraCtorCommands)
