@@ -564,6 +564,15 @@ void pqPipelineBrowser::handleSingleClickItem(const QModelIndex &index)
         {
         repr->renderView(false);
         }
+
+      // Change the selection to the item if we just made it visible.
+      if (visible)
+        {
+        QModelIndex nameIndex
+          = this->Model->index(index.row(), 0, index.parent());
+        this->getSelectionModel()->select(nameIndex,
+                                          QItemSelectionModel::ClearAndSelect);
+        }
       }
     // TODO
     //else if(index.column() == 2)
