@@ -31,7 +31,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.7");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.8");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   
-  // get the input and ouptut
+  // get the input and output
   vtkSmartPointer<vtkDataObject> input = inInfo->Get(vtkDataObject::DATA_OBJECT());
 
   vtkDataSet *dsInput = vtkDataSet::SafeDownCast(

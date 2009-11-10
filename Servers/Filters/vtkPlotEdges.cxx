@@ -126,7 +126,7 @@ private:
 };
 
 
-vtkCxxRevisionMacro(Segment, "1.7");
+vtkCxxRevisionMacro(Segment, "1.8");
 vtkStandardNewMacro(Segment);
 
 Segment::Segment()
@@ -473,7 +473,7 @@ void Segment::InsertSegment(vtkIdType pos, Segment* segment)
   //cerr << __FUNCTION__ << "end." << endl;
 }
 
-vtkCxxRevisionMacro(Node, "1.7");
+vtkCxxRevisionMacro(Node, "1.8");
 vtkStandardNewMacro(Node);
 
 Node::Node()
@@ -555,7 +555,7 @@ double Node::ComputeConnectionScore(Segment* segment1, Segment* segment2)
   return angleScore * pointFrequencyScore * penaltyScore;
 }
 
-vtkCxxRevisionMacro(vtkPlotEdges, "1.7");
+vtkCxxRevisionMacro(vtkPlotEdges, "1.8");
 vtkStandardNewMacro(vtkPlotEdges);
 
 // Construct object with MaximumLength set to 1000.
@@ -591,7 +591,7 @@ int vtkPlotEdges::RequestData(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // get the input and ouptut
+  // get the input and output
   vtkMultiBlockDataSet *output = vtkMultiBlockDataSet::GetData(outInfo);
 
   // The filter accepts vtkPolyData or vtkMultiBlockDataSet as input.

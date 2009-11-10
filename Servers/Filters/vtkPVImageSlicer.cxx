@@ -23,7 +23,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 vtkStandardNewMacro(vtkPVImageSlicer);
-vtkCxxRevisionMacro(vtkPVImageSlicer, "1.6");
+vtkCxxRevisionMacro(vtkPVImageSlicer, "1.7");
 //----------------------------------------------------------------------------
 vtkPVImageSlicer::vtkPVImageSlicer()
 {
@@ -150,7 +150,7 @@ int vtkPVImageSlicer::RequestData(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // get the input and ouptut
+  // get the input and output
   vtkImageData *input = vtkImageData::GetData(inInfo);
   vtkImageData *output = vtkImageData::GetData(outInfo);
 

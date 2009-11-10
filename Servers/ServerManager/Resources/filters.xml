@@ -637,7 +637,7 @@ This filter generates scalars  using cell and point ids. That is, the point attr
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData"
      label="Clean">
      <Documentation
-        long_help="Merge coincident points if they do not meet a feature edge critera."
+        long_help="Merge coincident points if they do not meet a feature edge criteria."
         short_help="Merge coincident points.">
 The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged).
      </Documentation>
@@ -1115,7 +1115,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
    <!-- ==================================================================== -->
    <SourceProxy name="Curvatures" class="vtkCurvatures" label="Curvature">
     <Documentation
-       long_help="This filter will compute the gaussian or mean curvature of the mesh at each point."
+       long_help="This filter will compute the Gaussian or mean curvature of the mesh at each point."
        short_help="Compute the curvature at each point.">
 The Curvature filter computes the curvature at each point in a polygonal data set. This filter supports both Gaussian and mean curvatures.
 
@@ -1747,7 +1747,7 @@ The filter operates on any type of data set, but the input data set must have at
     label="Feature Edges">
     <Documentation
        long_help="This filter will extract edges along sharp edges of surfaces or boundaries of surfaces."
-       short_help="Extract edges that meet the feature critera.">
+       short_help="Extract edges that meet the feature criteria.">
 The Feature Edges filter extracts various subsets of edges from the input data set. This filter operates on polygonal data and produces polygonal output.
     </Documentation>
     <InputProperty
@@ -2437,7 +2437,7 @@ This filter creates a new cell array containing a geometric measure of each cell
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals"
     label="Generate Surface Normals">
     <Documentation
-       long_help="This filter will produce surface normals used for smooth shading. Spltting is used to avoid smoothing across feature edges."
+       long_help="This filter will produce surface normals used for smooth shading. Splitting is used to avoid smoothing across feature edges."
        short_help="Produce surface point normals.">
 This filter generates surface normals at the points of the input polygonal dataset to provide smooth shading of the dataset. The resulting dataset is also polygonal. The filter works by calculating a normal vector for each polygon in the dataset and then averaging the normals at the shared points.
     </Documentation>
@@ -5093,7 +5093,7 @@ The Probe filter samples the data set attributes of the current data set at the 
     <Documentation
        long_help="Sample data attributes at the points of a dataset."
        short_help="Sample data values at the points of a dataset.">
-Probe is a filter that computes point attributes at specified point positions. The filter has two inputs: the Input and Source. The Input geometric structure is passed through the filter. The point attributes are computed at the Input point positions by interpolating into the source data. For example, we can compute data values on a plane (plane specified as Input) from a volume (Source). The cell data of the source data is copied to the output based on in which source cell each input point is. If an array of the same name existsboth in source's point and cell data, only the one from the point data is probed.
+Probe is a filter that computes point attributes at specified point positions. The filter has two inputs: the Input and Source. The Input geometric structure is passed through the filter. The point attributes are computed at the Input point positions by interpolating into the source data. For example, we can compute data values on a plane (plane specified as Input) from a volume (Source). The cell data of the source data is copied to the output based on in which source cell each input point is. If an array of the same name exists both in source's point and cell data, only the one from the point data is probed.
     </Documentation>
     <InputProperty
        name="Input"
