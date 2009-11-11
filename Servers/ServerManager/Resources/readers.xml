@@ -1812,22 +1812,20 @@
    <!-- End ExodusIIReaderCore -->
    </SourceProxy>
       
-   <SourceProxy name="tecplotreader" class="vtkTecplotReader"
-                label="Tecplot Reader">
-     <Documentation
-       short_help="Read files in the Tecplot ASCII file format."
-       long_help="Read files in the Tecplot ASCII file format.">
-       The Tecplot reader extracts multiple zones (blocks) of data from a Tecplot ASCII file, in which a zone is stored in either point packing mode (i.e., tuple-based, with only point data supported) or block packing mode (i.e., component-based, with point data and cell data supported). The output of the reader is a vtkMultiBlockDataset, of which each block is either a vtkStructuredGrid or a vtkUnstructuredGrid. 
-     </Documentation>
+   <SourceProxy name="TecplotReaderCore" 
+                class="vtkTecplotReader"
+                label="VTK Tecplot Reader">
+       <Documentation>
+          Core for TecplotReader
+       </Documentation>
       
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        animateable="0"
         number_of_elements="1">
         <FileListDomain name="files"/>
         <Documentation>
-          This property specifies the file name for the Tecplot reader.
+          The name of the file to load
         </Documentation>
      </StringVectorProperty>
 
@@ -1857,7 +1855,7 @@
          This property lists what dataset attribute arrays (point data and cell data) to read.
        </Documentation>
      </StringVectorProperty>
-     <!-- End tecplotreader-->
+     <!-- End TecplotReaderCore-->
    </SourceProxy>
 
     <!-- End of "internal_sources" -->
@@ -5239,7 +5237,7 @@
       <!-- End of CSVReader -->
    </FileSeriesReaderProxy>
       
-   <FileSeriesReaderProxy name="tecplotseriesreader"
+   <FileSeriesReaderProxy name="TecplotReader"
                           class="vtkFileSeriesReader"
                           label="Tecplot Reader"
                           file_name_method="SetFileName">
@@ -5248,23 +5246,7 @@
        long_help="Read files in the Tecplot ASCII file format.">
        The Tecplot reader extracts multiple zones (blocks) of data from a Tecplot ASCII file, in which a zone is stored in either point packing mode (i.e., tuple-based, with only point data supported) or block packing mode (i.e., component-based, with point data and cell data supported). The output of the reader is a vtkMultiBlockDataset, of which each block is either a vtkStructuredGrid or a vtkUnstructuredGrid. This supports reading a file series.
      </Documentation>
-
-     <SubProxy>
-       <Proxy name="Reader"
-         proxygroup="internal_sources" proxyname="tecplotreader">
-       </Proxy>
-       <ExposedProperties>
-          <Property name="DataArrayInfo" />
-          <Property name="DataArrayStatus" />
-       </ExposedProperties>
-     </SubProxy>
-
-     <StringVectorProperty name="FileNameInfo"
-        command="GetCurrentFileName"
-        information_only="1" >
-        <SimpleStringInformationHelper />
-     </StringVectorProperty>
-
+       
      <StringVectorProperty
         name="FileNames"
         clean_command="RemoveAllFileNames"
@@ -5275,12 +5257,16 @@
         information_property="FileNameInfo" >
         <FileListDomain name="files"/>
        <Documentation>
-         The list of files to be read by the reader. If more than 1 file is
-         specified, the reader will switch to file series mode in which it will
-         pretend that it can support time and provide 1 file per time step.
+           The list of files to be read by the reader.
        </Documentation>
      </StringVectorProperty>
-
+       
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+       
      <DoubleVectorProperty 
         name="TimestepValues"
         repeatable="1"
@@ -5290,7 +5276,18 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
-   <!-- End of tecplotseriesreader -->
+
+     <SubProxy>
+       <Proxy name="Reader"
+         proxygroup="internal_sources" proxyname="TecplotReaderCore">
+       </Proxy>
+       <ExposedProperties>
+          <Property name="DataArrayInfo" />
+          <Property name="DataArrayStatus" />
+       </ExposedProperties>
+     </SubProxy>
+       
+   <!-- End TecplotReader -->
    </FileSeriesReaderProxy>
 
   </ProxyGroup>

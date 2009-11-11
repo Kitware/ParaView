@@ -76,7 +76,7 @@
           extensions="sos SOS"
           file_description="EnSight Master Server Files">
   </Reader>
-  <Reader name="tecplotseriesreader"
+  <Reader name="TecplotReader"
           extensions="tec TEC Tec tp TP"
           file_description="Tecplot Files">
   </Reader>
