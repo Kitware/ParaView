@@ -17,11 +17,11 @@
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
   Module:    vtkCosmoHaloFinder.h
 
-Copyright (c) 2007, Los Alamos National Security, LLC
+Copyright (c) 2007, 2009, Los Alamos National Security, LLC
 
 All rights reserved.
 
-Copyright 2007. Los Alamos National Security, LLC. 
+Copyright 2007, 2009. Los Alamos National Security, LLC. 
 This software was produced under U.S. Government contract DE-AC52-06NA25396 
 for Los Alamos National Laboratory (LANL), which is operated by 
 Los Alamos National Security, LLC for the U.S. Department of Energy. 
@@ -69,18 +69,25 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // that code for VTK.
 //
 // .SECTION Note
-// this finder implements a recursive algorithm.
-// linked lists are used for halos.
-// merge is done recursively.
-// each interval has its bounding box calculated in Reorder().
-// JimRecOptList
-// non-power-of-two case can be handled.
+// This finder implements a recursive algorithm.
+// Linked lists are used for halos.
+// Merge is done recursively.
+// Each interval has its bounding box calculated in Reorder().
+// Non-power-of-two case can be handled.
 
 
 #ifndef __vtkCosmoHaloFinder_h
 #define __vtkCosmoHaloFinder_h
 
 #include "vtkUnstructuredGridAlgorithm.h"
+
+struct ValueIdPair
+{
+  float value;
+  int id;
+};
+
+typedef struct ValueIdPair ValueIdPair;
 
 class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 {
@@ -91,15 +98,17 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   vtkTypeRevisionMacro(vtkCosmoHaloFinder,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  /*
   // Number of particles seeded in each dim of the original simulation app. From the source.
   vtkSetMacro(np,int);
   vtkGetMacro(np,int);
+  */
 
   // Minimal number of particles needed before a group is called a halo.
   vtkSetMacro(pmin,int);
   vtkGetMacro(pmin,int);
 
-  // Linking length measured in units of interparticle spacing, and so dimensionless.
+  // Linking length measured in units of interparticle spacing is dimensionless.
   vtkSetMacro(bb,double);
   vtkGetMacro(bb,double);
 
@@ -107,7 +116,7 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   vtkSetMacro(rL,double);
   vtkGetMacro(rL,double);
 
-  // Physical length of the box.
+  // If the box is periodic on the boundaries.
   vtkSetMacro(Periodic,bool);
   vtkGetMacro(Periodic,bool);
 
@@ -148,7 +157,7 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 
   int *seq;
 
-  long long *v;
+  ValueIdPair *v;
   float **data;
 
   float **lb;
@@ -168,6 +177,9 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
 
   int CurrentTimeIndex;
   int NumberOfTimeSteps;
+
+  char* outputDir;
+  
  private:
 
   vtkCosmoHaloFinder(const vtkCosmoHaloFinder&);  // Not implemented.
@@ -177,7 +189,7 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   //void Finding();
   //void Writing(vtkUnstructuredGrid *);
 
-  void Reorder(long long *, long long *, int);
+  void Reorder(int, int, int);
 
   void myFOF(int, int, int);
 
@@ -185,12 +197,6 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   void basicMerge(int, int);
 
   void WritePVDFile(vtkInformationVector** inputVector);
-
-  //BTX
-  class vtkInternal;
-  vtkInternal* Internal;
-  //ETX
-
 };
 
 #endif //  __vtkCosmoHaloFinder_h

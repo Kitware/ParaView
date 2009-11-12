@@ -20,29 +20,33 @@
         default_values="0" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         Set this property to process the whole time series and write the output as a new time series.
+         When this is on, process the whole time series and write the output as a new time series.
        </Documentation>
      </IntVectorProperty>
 
      <StringVectorProperty 
         name="OutputDirectory" 
         command="SetOutputDirectory" 
+        label="Batch Mode Output Directory"
         number_of_elements="1"
         default_values="./halo/"> 
         <Documentation>
-          Set the output directory for the new time series data.
+          The output directory for the data when running in batch mode.
         </Documentation>
      </StringVectorProperty>
      
+     <!--
      <IntVectorProperty 
         name="np" 
         command="Setnp" 
         number_of_elements="1"
         default_values="256" > 
        <Documentation>
-         Number of particles seeded in each dim of the original simulation app.
+         Number of particles seeded in each dimension of the original simulation app.
        </Documentation>
      </IntVectorProperty>
+     -->
+
      <IntVectorProperty 
         name="pmin" 
         command="Setpmin" 
@@ -58,7 +62,7 @@
         number_of_elements="1"
         default_values="0.20" > 
        <Documentation>
-         Linking length measured in units of interparticle spacing, and so dimensionless.
+         Linking length measured in units of interparticle spacing and is dimensionless.
        </Documentation>
      </DoubleVectorProperty>
      <DoubleVectorProperty 
