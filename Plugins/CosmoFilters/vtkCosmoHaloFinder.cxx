@@ -90,7 +90,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.4");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.5");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -247,7 +247,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     }
 
   // calculate np from data
-  this->np = (int)round(pow(this->npart, 1.0 / 3.0));
+  this->np = (int)(pow(this->npart, 1.0 / 3.0) + .5);
   vtkDebugMacro(<< "np = " << this->np);
 
   // normalize
@@ -407,7 +407,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     {
     double *inTimes = inputVector[0]->GetInformationObject(0)
       ->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    char buffer[strlen(this->outputDir) + 64];
+    char* buffer = new char[strlen(this->outputDir) + 64];
     sprintf(buffer, "%s/part_%08.4f.vtu", this->outputDir,
             fabs(inTimes[this->CurrentTimeIndex]));
 
@@ -424,6 +424,8 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
       this->CurrentTimeIndex = 0;
       }
+
+    delete [] buffer;
     }
 
   // copy the data from temorary variable to the real output
@@ -725,7 +727,7 @@ void vtkCosmoHaloFinder::WritePVDFile(vtkInformationVector** inputVector)
   double *inTimes = inputVector[0]->GetInformationObject(0)
     ->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-  char buffer[strlen(this->outputDir) + 64];
+  char* buffer = new char[strlen(this->outputDir) + 64];
   sprintf(buffer, "%s/halo.pvd", this->outputDir);
   ofstream ofile(buffer);
   if (!ofile)
@@ -747,4 +749,6 @@ void vtkCosmoHaloFinder::WritePVDFile(vtkInformationVector** inputVector)
   ofile << "</Collection>\n</VTKFile>";
 
   ofile.close();
+
+  delete [] buffer;
 }
