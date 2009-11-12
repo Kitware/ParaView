@@ -90,7 +90,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.5");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.6");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -439,7 +439,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
 void vtkCosmoHaloFinder::Reorder(int first, int last, 
                                  int dataFlag)
 {
-  size_t len = (last - first);
+  int len = (last - first);
 
   // base case
   if (len <= 1)
@@ -461,7 +461,7 @@ void vtkCosmoHaloFinder::Reorder(int first, int last,
     }
 
   // divide
-  size_t half = len / 2;
+  int half = len / 2;
   vtkstd::nth_element(&this->v[first], 
                       &this->v[first+half], 
                       &this->v[last], ValueIdPairLT());
@@ -470,9 +470,9 @@ void vtkCosmoHaloFinder::Reorder(int first, int last,
   Reorder(first+half, last, (dataFlag+1)%3);
 
   // book-keeping
-  size_t middle  = first + len / 2;
-  size_t middle1 = first + len / 4;
-  size_t middle2 = first + 3 * len / 4;
+  int middle  = first + len / 2;
+  int middle1 = first + len / 4;
+  int middle2 = first + 3 * len / 4;
 
   // base case
   if (len == 2)
