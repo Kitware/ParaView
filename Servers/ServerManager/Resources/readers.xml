@@ -1938,7 +1938,7 @@
         name="MakeCells" 
         command="SetMakeCells" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
          If this property is set to 1, a VTK_VERTEX cell is created for each point.
