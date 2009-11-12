@@ -68,7 +68,7 @@ struct vtkSMScatterPlotRepresentationProxy::vtkInternal
 };
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -543,7 +543,7 @@ bool vtkSMScatterPlotRepresentationProxy::GetBounds(double bounds[6])
     vtkProcessModule::GetProcessModule()->GetLastResult(
       this->ConnectionID,
       vtkProcessModule::RENDER_SERVER);
-  bool ret = static_cast<bool>(res.GetArgument(0, 0, bounds, 6));
+  bool ret=res.GetArgument(0,0,bounds,6)==1;
   if(!ret)
     {
     ret = this->Superclass::GetBounds(bounds);
