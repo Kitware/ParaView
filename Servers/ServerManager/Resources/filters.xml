@@ -2039,6 +2039,118 @@ attributes of the fragments.
    <!-- End Grid Fragment -->
    </SourceProxy>
 
+  <!-- ==================================================================== -->
+   <SourceProxy name="AMRDualContour" class="vtkAMRDualContour"
+      label="AMR Contour">
+     <Documentation
+       short_help="Iso surface cell array."
+       long_help="Crack free iso surface using dual grid.">
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkCompositeDataSet"/>
+           </DataTypeDomain>
+           <InputArrayDomain name="input_array" attribute_type="cell"
+                             number_of_components="1"/>
+      </InputProperty>
+
+      <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"
+        label="Contour By">
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+          <Documentation>
+            This property specifies the name of the cell scalar array from which the contour filter will compute isolines and/or isosurfaces.
+          </Documentation>
+      </StringVectorProperty>
+
+      <DoubleVectorProperty
+        name="ContourValue"
+        command="SetIsoValue"
+        label="Isosurface"
+        number_of_elements="1"
+        default_values="1" > 
+        animateable="1">
+          <ArrayRangeDomain name="scalar_range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain>
+          <Documentation>
+            This property specifies the values at which to compute the isosurface.
+          </Documentation>
+      </DoubleVectorProperty>
+      <IntVectorProperty 
+        name="Capping" 
+        command="SetEnableCapping" 
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is on, the the boundary of the data set is capped.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty 
+        name="DegenerateCells" 
+        command="SetEnableDegenerateCells" 
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is on, a transition mesh between levels is created.
+       </Documentation>
+      </IntVectorProperty>
+      <IntVectorProperty 
+        name="MultiprocessCommunication" 
+        command="SetEnableMultiProcessCommunication" 
+        number_of_elements="1"
+        animateable="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is off, each process executes independantly..
+       </Documentation>
+      </IntVectorProperty>
+   <!-- End AMR Dual Contour -->
+   </SourceProxy>
+
+  <!-- ==================================================================== -->
+   <SourceProxy name="CTHSurface" class="vtkCTHSimpleSurface"
+      label="CTH Surface">
+     <Documentation
+       short_help="Creates surface for every block."
+       long_help="Not finished yet.">
+     </Documentation>
+     <InputProperty
+        name="Input"
+        command="SetInputConnection">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkCompositeDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End CTH Simple Surface -->
+   </SourceProxy> 
+
    <!-- ==================================================================== -->
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter"
     label="Linear Extrusion">
