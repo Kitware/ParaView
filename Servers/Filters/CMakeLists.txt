@@ -38,7 +38,6 @@ SET(Filters_SRCS
   vtkCompositeDataToUnstructuredGridFilter.cxx
   vtkCSVExporter.cxx
   vtkCSVWriter.cxx
-  vtkCTHSimpleSurface.cxx
   vtkDataSetToRectilinearGrid.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
