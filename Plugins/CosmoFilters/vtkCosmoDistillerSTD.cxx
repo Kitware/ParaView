@@ -72,7 +72,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkCosmoDistillerSTD, "1.1");
+vtkCxxRevisionMacro(vtkCosmoDistillerSTD, "1.2");
 vtkStandardNewMacro(vtkCosmoDistillerSTD);
 
 /****************************************************************************/
@@ -189,9 +189,10 @@ void vtkCosmoDistillerSTD::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 }
 
+/****************************************************************************/
 void vtkCosmoDistillerSTD::SetSourceArrayToProcess(
-                      int idx, int port, int connection,
-                      int fieldAssociation, const char *name)
+  int vtkNotUsed(idx), int vtkNotUsed(port), int connection,
+  int fieldAssociation, const char *name)
 {
   this->Superclass::SetInputArrayToProcess(1, 1, connection, 
                                            fieldAssociation, name);
