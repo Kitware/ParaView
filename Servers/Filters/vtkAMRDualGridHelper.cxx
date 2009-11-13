@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.1");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.2");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -179,6 +179,8 @@ void vtkAMRDualGridHelperLevel::CreateBlockFaces(
   int y,
   int z)
 {
+  // avoid a warning.
+  int temp = x+y+z+block->Level;
   /*
   vtkAMRDualGridHelperBlock* neighborBlock;
   if (block == 0)
@@ -518,6 +520,8 @@ vtkAMRDualGridHelperFace::~vtkAMRDualGridHelperFace()
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelperFace::InheritBlockValues(vtkAMRDualGridHelperBlock* block, int faceIndex)
 {
+  // avoid warning.
+  faceIndex = block->Level;
   /* we are not worring about connectivity yet.
   int* ext = block->Image->GetExtent();
   this->Level = block->Level;
@@ -638,6 +642,7 @@ vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os, indent);
 }
 
 //----------------------------------------------------------------------------
@@ -1596,7 +1601,7 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
     }
   this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
   // Now copy the layers into the message buffer.
-  void* messagePtr = this->MessageBuffer;
+  void* messagePtr = (void*)(this->MessageBuffer);
   for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
     {
     region = &(this->DegenerateRegionQueue[queueIdx]);
@@ -1614,7 +1619,7 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
     }
 
   // Send the message
-  this->Controller->Send((unsigned char*)(this->MessageBuffer), 
+  this->Controller->Send(this->MessageBuffer, 
                          messageLength, remoteProc, 879015);
 }
 
@@ -1664,11 +1669,11 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
 
   // Receive the message.
   this->AllocateMessageBuffer(messageLength * sizeof(unsigned char));
-  unsigned char* message = (unsigned char*)(this->MessageBuffer);
+  unsigned char* message = this->MessageBuffer;
   this->Controller->Receive(message, messageLength, remoteProc, 879015);
   
   // Now copy the regions in the message into thelocal blocks.
-  void* messagePtr = this->MessageBuffer;
+  void* messagePtr = (void*)(this->MessageBuffer);
   for (queueIdx = 0; queueIdx < queueLength; ++queueIdx)
     {
     region = &(this->DegenerateRegionQueue[queueIdx]);
@@ -1772,7 +1777,7 @@ void vtkAMRDualGridHelper::ShareBlocks()
     int numProcs = this->Controller->GetNumberOfProcesses();
     for (procIdx = 1; procIdx < numProcs; ++procIdx)
       {
-      this->ReceiveBlocks(procIdx, myProc);
+      this->ReceiveBlocks(procIdx);
       }
     // Broadcast / send back.
     for (procIdx = 1; procIdx < numProcs; ++procIdx)
@@ -1783,7 +1788,7 @@ void vtkAMRDualGridHelper::ShareBlocks()
   else
     {
     this->SendBlocks(0, myProc);
-    this->ReceiveBlocks(0, myProc);
+    this->ReceiveBlocks(0);
     }
 }
 void vtkAMRDualGridHelper::AllocateMessageBuffer(int maxSize)
@@ -1796,9 +1801,9 @@ void vtkAMRDualGridHelper::AllocateMessageBuffer(int maxSize)
       }
     }
   this->MessageBufferLength = maxSize + 100; // Extra to avoid reallocating.
-  this->MessageBuffer = (void*)(new unsigned char[this->MessageBufferLength]);
+  this->MessageBuffer = new unsigned char[this->MessageBufferLength];
 }
-void vtkAMRDualGridHelper::ReceiveBlocks(int remoteProc, int localProc)
+void vtkAMRDualGridHelper::ReceiveBlocks(int remoteProc)
 {
   int messageLength;
   this->Controller->Receive(&messageLength, 1, remoteProc, 87344879);

@@ -69,9 +69,9 @@ private:
   void ShareMetaData();
   void ShareBlocks();
   void SendBlocks(int remoteProc, int localProc);
-  void ReceiveBlocks(int remoteProc, int localProc);
+  void ReceiveBlocks(int remoteProc);
   void AllocateMessageBuffer(int maxLength);
-  void* MessageBuffer;
+  unsigned char* MessageBuffer;
   int MessageBufferLength;
 
   vtkMultiProcessController *Controller;
