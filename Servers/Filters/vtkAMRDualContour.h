@@ -46,6 +46,7 @@ class vtkCallbackCommand;
 class vtkAMRDualGridHelper;
 class vtkAMRDualGridHelperBlock;
 class vtkAMRDualGridHelperFace;
+class vtkAMRDualContourEdgeLocator;
 
 
 class VTK_EXPORT vtkAMRDualContour : public vtkMultiBlockDataSetAlgorithm
@@ -97,6 +98,7 @@ protected:
     double values[8]);
 
   void CapCell(
+    int cellX, int cellY, int cellZ,  // block coordinates
     // Which cell faces need to be capped.
     unsigned char cubeBoundaryBits,
     // Marching cubes case for this cell
@@ -122,6 +124,8 @@ protected:
   // The buffer is not used too many times, but .....
   int* MessageBuffer;
   int* MessageBufferLength;
+
+  vtkAMRDualContourEdgeLocator* BlockLocator;
 
 private:
   vtkAMRDualContour(const vtkAMRDualContour&);  // Not implemented.
