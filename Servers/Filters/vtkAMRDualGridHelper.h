@@ -23,7 +23,7 @@
 #define __vtkAMRDualGridHelper_h
 
 #include "vtkObject.h"
-#include "vtkstd/vector"
+#include <vtkstd/vector>
 
 class vtkHierarchicalBoxDataSet;
 class vtkAMRDualGridHelperBlock;

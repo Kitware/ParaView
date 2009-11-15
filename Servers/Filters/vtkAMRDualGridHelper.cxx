@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.2");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.3");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -181,6 +181,11 @@ void vtkAMRDualGridHelperLevel::CreateBlockFaces(
 {
   // avoid a warning.
   int temp = x+y+z+block->Level;
+  if (temp < 1)
+    {
+    return;
+    }
+  
   /*
   vtkAMRDualGridHelperBlock* neighborBlock;
   if (block == 0)
