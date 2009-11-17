@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.3");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.4");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -123,7 +123,7 @@ vtkAMRDualGridHelperLevel::vtkAMRDualGridHelperLevel()
 vtkAMRDualGridHelperLevel::~vtkAMRDualGridHelperLevel()
 {
   int ii;
-  int num = this->Blocks.size();
+  int num = (int)(this->Blocks.size());
 
   this->Level = -1;
   for (ii = 0; ii < num; ++ii)
@@ -622,7 +622,7 @@ vtkAMRDualGridHelper::vtkAMRDualGridHelper()
 vtkAMRDualGridHelper::~vtkAMRDualGridHelper()
 {
   int ii;
-  int numberOfLevels = this->Levels.size();
+  int numberOfLevels = (int)(this->Levels.size());
 
   this->SetArrayName(0);
 
@@ -670,7 +670,7 @@ int vtkAMRDualGridHelper::GetNumberOfBlocksInLevel(int level)
     {
     return 0;
     }
-  return this->Levels[level]->Blocks.size();
+  return (int)(this->Levels[level]->Blocks.size());
 }
 
 //----------------------------------------------------------------------------
@@ -1566,7 +1566,7 @@ void vtkAMRDualGridHelper::SendDegenerateRegionsFromQueue(int remoteProc, int lo
   // Find the length of the message.
   vtkAMRDualGridHelperDegenerateRegion* region;
   int messageLength = 0;
-  int queueLength = this->DegenerateRegionQueue.size();
+  int queueLength = (int)(this->DegenerateRegionQueue.size());
   int queueIdx;
   
   // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
@@ -1634,7 +1634,7 @@ void vtkAMRDualGridHelper::ReceiveDegenerateRegionsFromQueue(int remoteProc, int
   // Find the length of the message.
   vtkAMRDualGridHelperDegenerateRegion* region;
   int messageLength = 0;
-  int queueLength = this->DegenerateRegionQueue.size();
+  int queueLength = (int)(this->DegenerateRegionQueue.size());
   int queueIdx;
   
   // Each region is actually either 1/4 of a face, 1/2 of and edge or a corner.
@@ -1863,11 +1863,11 @@ void vtkAMRDualGridHelper::SendBlocks(int remoteProc, int localProc)
     ++messageLength;
     if (localProc == 0)
       { // x,y,z,proc for each block.
-      messageLength += 4* this->Levels[levelIdx]->Blocks.size();
+      messageLength += 4* (int)(this->Levels[levelIdx]->Blocks.size());
       }
     else
       { // xyz for each block.
-      messageLength += 3* this->Levels[levelIdx]->Blocks.size();
+      messageLength += 3* (int)(this->Levels[levelIdx]->Blocks.size());
       }
     }
 
@@ -1881,7 +1881,7 @@ void vtkAMRDualGridHelper::SendBlocks(int remoteProc, int localProc)
   for (int levelIdx = 0; levelIdx < numLevels; ++levelIdx)
     {
     int numBlocksSending = 0;
-    numBlocks = this->Levels[levelIdx]->Blocks.size();
+    numBlocks = (int)(this->Levels[levelIdx]->Blocks.size());
     // Fill in num blocks later.  Process 0 skips blocks sender already has.
     numBlocksPtr = messagePtr++;
     for (int blockIdx = 0; blockIdx < numBlocks; ++blockIdx)
