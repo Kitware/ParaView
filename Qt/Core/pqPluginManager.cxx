@@ -665,7 +665,7 @@ vtkPVPluginInformation* pqPluginManager::getExistingExtensionByFileName(
 vtkPVPluginInformation* pqPluginManager::getExistingExtensionByPluginName(
   pqServer* server, const QString& name)
 {
-  return this->getExistingExtensionByFileName(this->getServerURIKey(server), name);
+  return this->getExistingExtensionByPluginName(this->getServerURIKey(server), name);
 }
 
 //-----------------------------------------------------------------------------
@@ -891,5 +891,6 @@ bool pqPluginManager::isPluginFuntional(
     plInfo->SetError("Missing required plugins!");
     return false;
     }
+  plInfo->SetError(NULL);
   return true;    
 }
