@@ -53,6 +53,7 @@
     <Filter name="TimeToTextConvertor" />    
   </Category>
 
+  <Filter name="AMRDualContour" />
   <Filter name="Append" />
   <Filter name="AppendAttributes" />
   <Filter name="AppendPolyData" />
