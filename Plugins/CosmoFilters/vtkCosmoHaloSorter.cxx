@@ -68,7 +68,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSortDataArray.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkCosmoHaloSorter, "1.1");
+vtkCxxRevisionMacro(vtkCosmoHaloSorter, "1.1.4.1");
 vtkStandardNewMacro(vtkCosmoHaloSorter);
 
 /****************************************************************************/
@@ -261,4 +261,6 @@ int vtkCosmoHaloSorter::RequestData(
 /****************************************************************************/
 void vtkCosmoHaloSorter::PrintSelf(ostream& os, vtkIndent indent)
 {
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Descending: " << (this->Descending?"ON":"OFF") << "\n";
 }

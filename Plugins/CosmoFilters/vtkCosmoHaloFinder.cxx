@@ -17,11 +17,11 @@
   Program:   VTK/ParaView Los Alamos National Laboratory Modules (PVLANL)
   Module:    vtkCosmoHaloFinder.cxx
 
-Copyright (c) 2007, Los Alamos National Security, LLC
+Copyright (c) 2007, 2009, Los Alamos National Security, LLC
 
 All rights reserved.
 
-Copyright 2007. Los Alamos National Security, LLC. 
+Copyright 2007, 2009. Los Alamos National Security, LLC. 
 This software was produced under U.S. Government contract DE-AC52-06NA25396 
 for Los Alamos National Laboratory (LANL), which is operated by 
 Los Alamos National Security, LLC for the U.S. Department of Energy. 
@@ -81,84 +81,49 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDirectory.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
-#include <vtksys/ios/fstream>
-#include <vtkstd/string>
-#include <vtkstd/algorithm>
+#include "vtksys/ios/fstream"
+#include "vtkstd/algorithm"
+#include "string.h"
 
-#define numDataDims 3
-#define dataX 0
-#define dataY 1
-#define dataZ 2
+#define NUM_DATA_DIMS 3
+#define DATA_X 0
+#define DATA_Y 1
+#define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2.2.1");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2.2.2");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
-
-struct ValueIdPair
-{
-  float value;
-  int id;
-};
-
-static float GetValue(const long long &pairParam)
-{
-  ValueIdPair &pair = (ValueIdPair &)pairParam;
-  return pair.value;
-}
-
-static int GetId(const long long &pairParam)
-{
-  ValueIdPair &pair = (ValueIdPair &)pairParam;
-  return pair.id;
-}
-
-static void SetValue(long long &pairParam, float value)
-{
-  ValueIdPair &pair = (ValueIdPair &)pairParam;
-  pair.value = value;
-}
-
-static void SetId(long long &pairParam, int id)
-{
-  ValueIdPair &pair = (ValueIdPair &)pairParam;
-  pair.id = id;
-}
 
 //----------------------------------------------------------------------------
 class ValueIdPairLT
 {
 public:
-  bool operator() (const long long& p, const long long& q) const
+  bool operator() (const ValueIdPair& p, const ValueIdPair& q) const
   {
-    return GetValue(p) < GetValue(q);
+    return p.value < q.value;
   }
 };
 
-//----------------------------------------------------------------------------
-class vtkCosmoHaloFinder::vtkInternal
-{
-public:
-  vtkstd::string outputDir;
-};
-
 /****************************************************************************/
-vtkCosmoHaloFinder::vtkCosmoHaloFinder() : Superclass()
+vtkCosmoHaloFinder::vtkCosmoHaloFinder()
 {
-  this->Internal = new vtkInternal;
   this->CurrentTimeIndex = 0;
   this->NumberOfTimeSteps = 0;
   this->BatchMode = false;
-  this->Internal->outputDir = "./halo/";
+  this->outputDir = new char[strlen("./halo/") + 1];
+  strcpy(this->outputDir, "./halo/");
 }
 
 /****************************************************************************/
 vtkCosmoHaloFinder::~vtkCosmoHaloFinder()
 {
-  delete this->Internal;
+  delete [] this->outputDir;
 }
 
 void vtkCosmoHaloFinder::SetOutputDirectory(const char *dir)
 {
-  this->Internal->outputDir = vtkstd::string(dir);
+  delete [] this->outputDir;
+  this->outputDir = new char[strlen(dir) + 1];
+  strcpy(this->outputDir, dir);
 }
 
 //----------------------------------------------------------------------------
@@ -228,11 +193,11 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
                                     vtkInformationVector** inputVector,
                                     vtkInformationVector* outputVector)
 {
-  vtkDebugMacro(<< "np:       " << np << "\n");
-  vtkDebugMacro(<< "rL:       " << rL << "\n");
-  vtkDebugMacro(<< "bb:       " << bb << "\n");
-  vtkDebugMacro(<< "pmin:     " << pmin << "\n");
-  vtkDebugMacro(<< "periodic: " << Periodic << "\n");
+  //vtkDebugMacro(<< "np:       " << this->np << "\n");
+  vtkDebugMacro(<< "rL:       " << this->rL << "\n");
+  vtkDebugMacro(<< "bb:       " << this->bb << "\n");
+  vtkDebugMacro(<< "pmin:     " << this->pmin << "\n");
+  vtkDebugMacro(<< "periodic: " << this->Periodic << "\n");
 
   if (this->BatchMode && this->NumberOfTimeSteps == 0)
     {
@@ -252,11 +217,12 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     {
     // check the existence of the output directory
     vtkDirectory *directory = vtkDirectory::New();
-    if (!directory->Open(this->Internal->outputDir.c_str()))
+    if (!directory->Open(this->outputDir))
       {
-      if (!vtkDirectory::MakeDirectory(this->Internal->outputDir.c_str()))
+      if (!vtkDirectory::MakeDirectory(this->outputDir))
         {
-        vtkErrorMacro(<< "Invalid output directory: " << this->Internal->outputDir << "\n");
+        vtkErrorMacro(<< "Invalid output directory: " << 
+                      this->outputDir << "\n");
         return 0;
         }
       }
@@ -270,8 +236,8 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   // copy over the existing fields from input data
   tmp_output->ShallowCopy(input);
 
-  npart = input->GetNumberOfPoints();
-  vtkDebugMacro(<< "npart = " << npart);
+  this->npart = input->GetNumberOfPoints();
+  vtkDebugMacro(<< "npart = " << this->npart);
 
   vtkDataArray* tag = input->GetPointData()->GetArray("tag");
   if (tag == NULL)
@@ -280,33 +246,40 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     return 0;
     }
 
+  // calculate np from data
+  this->np = (int)(pow(this->npart, 1.0 / 3.0) + .5);
+  vtkDebugMacro(<< "np = " << this->np);
+
   // normalize
-  float xscal = rL / (1.0*np);
+  float xscal = this->rL / (1.0 * this->np);
 
   // create workspace for halo finding.  
-  ht = new int[npart];
-  halo = new int[npart];
-  nextp = new int[npart];
-  pt = new int[npart];
+  this->ht = new int[this->npart];
+  this->halo = new int[this->npart];
+  this->nextp = new int[this->npart];
+  this->pt = new int[this->npart];
 
-  for (int i = 0; i < npart; i++)
+  for (int i = 0; i < this->npart; i++)
     {
-    ht[i] = i;
-    halo[i] = i;
-    nextp[i] = -1;
-    pt[i] = (int)tag->GetComponent(i, 0);
+    this->ht[i] = i;
+    this->halo[i] = i;
+    this->nextp[i] = -1;
+    this->pt[i] = (int)tag->GetComponent(i, 0);
     }
 
   // preprocess
   typedef float* floatptr;
-  data = new floatptr[numDataDims];
-  for (int i=0; i<numDataDims; i++)
+  this->data = new floatptr[NUM_DATA_DIMS];
+  this->lb = new floatptr[NUM_DATA_DIMS];
+  this->ub = new floatptr[NUM_DATA_DIMS];
+  for (int i=0; i<NUM_DATA_DIMS; i++)
     {
-    data[i] = new float[npart];
+    this->data[i] = new float[this->npart];
+    this->lb[i] = new float[this->npart];
+    this->ub[i] = new float[this->npart];
     }
 
-
-  for (int i=0; i<npart; i++)
+  for (int i=0; i<this->npart; i++)
     {
     double* point = input->GetPoint(i);
     float xx = (float) point[0];
@@ -327,76 +300,64 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
       zz = 0.0;
       }
 
-    data[dataX][i] = xx / xscal;
-    data[dataY][i] = yy / xscal;
-    data[dataZ][i] = zz / xscal;
+    this->data[DATA_X][i] = xx / xscal;
+    this->data[DATA_Y][i] = yy / xscal;
+    this->data[DATA_Z][i] = zz / xscal;
     }
 
-  v = new long long[npart];
-  for (int i=0; i<npart; i++)
+  this->v = new ValueIdPair[this->npart];
+  for (int i=0; i<this->npart; i++)
     {
-    SetValue(v[i], data[dataX][i]);
-    SetId(v[i], i);
-    }
-
-  lb = new floatptr[numDataDims];
-  for (int i=0; i<numDataDims; i++)
-    {
-    lb[i] = new float[npart];
-    }
-
-  ub = new floatptr[numDataDims];
-  for (int i=0; i<numDataDims; i++)
-    {
-    ub[i] = new float[npart];
+    this->v[i].value = this->data[DATA_X][i];
+    this->v[i].id = i;
     }
 
   // reorder
-  Reorder(v, v+npart, dataX);
+  Reorder(0, this->npart, DATA_X);
 
   // recording
-  seq = new int[npart];
-  for (int i=0; i<npart; i++)
+  this->seq = new int[this->npart];
+  for (int i=0; i<this->npart; i++)
     {
-    seq[i] = GetId(v[i]);
+    this->seq[i] = this->v[i].id;
     }
 
   // finding halos
-  myFOF(0, npart, dataX);
+  myFOF(0, this->npart, DATA_X);
 
   // compute halos statistics
-  int *hsize = new int[npart];
-  for (int h=0; h<npart; h++)
+  int *hsize = new int[this->npart];
+  for (int h=0; h<this->npart; h++)
     {
     hsize[h] = 0;
     }
 
-  for (int i=0; i<npart; i++)
+  for (int i=0; i<this->npart; i++)
     {
-    hsize[ht[i]] += 1;
+    hsize[this->ht[i]] += 1;
     }
 
-  nhalo = 0;
-  for (int h=0; h<npart; h++)
+  this->nhalo = 0;
+  for (int h=0; h<this->npart; h++)
     {
-    if (hsize[h] >= pmin)
+    if (hsize[h] >= this->pmin)
       {
-      nhalo++;
+      this->nhalo++;
       }
     }
 
   vtkDebugMacro(<< nhalo << " halos\n");
 
-  nhalopart = 0;
-  for (int i=0; i<npart; i++)
+  this->nhalopart = 0;
+  for (int i=0; i<this->npart; i++)
     {
-    if (hsize[ht[i]] >= pmin)
+    if (hsize[this->ht[i]] >= this->pmin)
       {
-      nhalopart++;
+      this->nhalopart++;
       }
     }
 
-  vtkDebugMacro(<< nhalopart << " halo particles\n");
+  vtkDebugMacro(<< this->nhalopart << " halo particles\n");
 
   vtkIntArray* hID = vtkIntArray::New();
   hID->SetName("hID");
@@ -405,14 +366,17 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
 
   vtkIntArray* haloSize = vtkIntArray::New();
   haloSize->SetName("haloSize");
-  haloSize->SetNumberOfValues(npart);
+  haloSize->SetNumberOfValues(this->npart);
 
-  for (int i = 0; i < npart; i++)
+  for (int i = 0; i < this->npart; i++)
     {
-    hID->SetValue(i, ((hsize[ht[i]] < pmin) ? -1 : pt[ht[i]]));
-    haloSize->SetValue(i, (hsize[ht[i]] < pmin) ? 0 : hsize[ht[i]]);
+    hID->SetValue(i, 
+                  ((hsize[this->ht[i]] < this->pmin) 
+                   ? -1 : pt[ht[i]]));
+    haloSize->SetValue(i, 
+                       (hsize[this->ht[i]] < this->pmin) 
+                       ? 0 : hsize[this->ht[i]]);
     }
-
 
   tmp_output->GetPointData()->AddArray(hID);
   tmp_output->GetPointData()->AddArray(haloSize);
@@ -420,22 +384,22 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   haloSize->Delete();
 
   // clean up
-  delete[] pt;
-  delete[] ht;
-  delete[] halo;
-  delete[] nextp;
+  delete[] this->pt;
+  delete[] this->ht;
+  delete[] this->halo;
+  delete[] this->nextp;
 
-  for (int i = 0; i < numDataDims; i++)
+  for (int i = 0; i < NUM_DATA_DIMS; i++)
     {
-    delete[] data[i];
-    delete[] lb[i];
-    delete[] ub[i];
+    delete[] this->data[i];
+    delete[] this->lb[i];
+    delete[] this->ub[i];
     }
-  delete[] data;
-  delete[] lb;
-  delete[] ub;
-  delete[] v;
-  delete[] seq;
+  delete[] this->data;
+  delete[] this->lb;
+  delete[] this->ub;
+  delete[] this->v;
+  delete[] this->seq;
   delete[] hsize;
 
   // if in batch mode, write out the new dataset to file
@@ -443,16 +407,14 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     {
     double *inTimes = inputVector[0]->GetInformationObject(0)
       ->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    char buffer[64];
-    sprintf(buffer, "/part_%08.4f.vtu", fabs(inTimes[this->CurrentTimeIndex]));
-    //cout << "Current time step "<< inTimes[this->CurrentTimeIndex] << endl;
-    vtkstd::string file_name = this->Internal->outputDir + buffer;
-    //cout << "Writing file " << file_name << endl;
+    char* buffer = new char[strlen(this->outputDir) + 64];
+    sprintf(buffer, "%s/part_%08.4f.vtu", this->outputDir,
+            fabs(inTimes[this->CurrentTimeIndex]));
 
     vtkXMLUnstructuredGridWriter* writer = vtkXMLUnstructuredGridWriter::New();
     writer->SetInput(tmp_output);
     writer->SetDataModeToBinary();
-    writer->SetFileName(file_name.c_str());
+    writer->SetFileName(buffer);
     writer->Write();
     writer->Delete();
 
@@ -462,6 +424,8 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
       request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
       this->CurrentTimeIndex = 0;
       }
+
+    delete [] buffer;
     }
 
   // copy the data from temorary variable to the real output
@@ -471,51 +435,64 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   return 1;
 }
 
-/****************************************************************************************/
-void vtkCosmoHaloFinder::Reorder(long long *first, long long *last, int dataFlag)
+/****************************************************************************/
+void vtkCosmoHaloFinder::Reorder(int first, int last, 
+                                 int dataFlag)
 {
-  long long *i;
-
-  int len = last - first;
+  int len = (last - first);
 
   // base case
-  if (len == 1)
+  if (len <= 1)
     {
+    double progress = .5 * (double)last / (double)this->npart;
+    if (int(100 * progress) % 1 == 0)
+      {
+      this->UpdateProgress(progress);
+      }
+
     return;
     }
 
   // non-base cases
   // preprocessing
-  for (i = first; i < last; i++)
+  for (int i = first; i < last; i = i + 1)
     {
-    SetValue(*i, data[dataFlag][GetId(*i)]);
+    this->v[i].value = this->data[dataFlag][this->v[i].id];
     }
 
   // divide
-  int half = len >> 1;
-  vtkstd::nth_element(first, first+half, last, ValueIdPairLT());
+  int half = len / 2;
+  vtkstd::nth_element(&this->v[first], 
+                      &this->v[first+half], 
+                      &this->v[last], ValueIdPairLT());
 
   Reorder(first, first+half, (dataFlag+1)%3);
-  Reorder(first+half,  last, (dataFlag+1)%3);
+  Reorder(first+half, last, (dataFlag+1)%3);
 
   // book-keeping
-  int middle  = (int) (first + len/2 - v);
-  int middle1 = (int) (first + len/4 - v);
-  int middle2 = (int) (first + 3*len/4 - v);
+  int middle  = first + len / 2;
+  int middle1 = first + len / 4;
+  int middle2 = first + 3 * len / 4;
 
   // base case
   if (len == 2)
     {
-    int ii = GetId(*first);
-    int jj = GetId(*(first+1));
+    int ii = this->v[first+0].id;
+    int jj = this->v[first+1].id;
 
-    lb[dataX][middle] = vtkstd::min(data[dataX][ii], data[dataX][jj]);
-    lb[dataY][middle] = vtkstd::min(data[dataY][ii], data[dataY][jj]);
-    lb[dataZ][middle] = vtkstd::min(data[dataZ][ii], data[dataZ][jj]);
+    this->lb[DATA_X][middle] = 
+      vtkstd::min(this->data[DATA_X][ii], this->data[DATA_X][jj]);
+    this->lb[DATA_Y][middle] = 
+      vtkstd::min(this->data[DATA_Y][ii], this->data[DATA_Y][jj]);
+    this->lb[DATA_Z][middle] = 
+      vtkstd::min(this->data[DATA_Z][ii], this->data[DATA_Z][jj]);
 
-    ub[dataX][middle] = vtkstd::max(data[dataX][ii], data[dataX][jj]);
-    ub[dataY][middle] = vtkstd::max(data[dataY][ii], data[dataY][jj]);
-    ub[dataZ][middle] = vtkstd::max(data[dataZ][ii], data[dataZ][jj]);
+    this->ub[DATA_X][middle] = 
+      vtkstd::max(this->data[DATA_X][ii], this->data[DATA_X][jj]);
+    this->ub[DATA_Y][middle] = 
+      vtkstd::max(this->data[DATA_Y][ii], this->data[DATA_Y][jj]);
+    this->ub[DATA_Z][middle] = 
+      vtkstd::max(this->data[DATA_Z][ii], this->data[DATA_Z][jj]);
 
     return;
     }
@@ -524,27 +501,39 @@ void vtkCosmoHaloFinder::Reorder(long long *first, long long *last, int dataFlag
   // this case is needed when len is a non-power-of-two
   if (len == 3)
     {
-    int ii = GetId(*first);
+    int ii = this->v[first+0].id;
 
-    lb[dataX][middle] = vtkstd::min(data[dataX][ii], lb[dataX][middle2]);
-    lb[dataY][middle] = vtkstd::min(data[dataY][ii], lb[dataY][middle2]);
-    lb[dataZ][middle] = vtkstd::min(data[dataZ][ii], lb[dataZ][middle2]);
+    this->lb[DATA_X][middle] = 
+      vtkstd::min(data[DATA_X][ii], this->lb[DATA_X][middle2]);
+    this->lb[DATA_Y][middle] = 
+      vtkstd::min(data[DATA_Y][ii], this->lb[DATA_Y][middle2]);
+    this->lb[DATA_Z][middle] = 
+      vtkstd::min(data[DATA_Z][ii], this->lb[DATA_Z][middle2]);
 
-    ub[dataX][middle] = vtkstd::max(data[dataX][ii], ub[dataX][middle2]);
-    ub[dataY][middle] = vtkstd::max(data[dataY][ii], ub[dataY][middle2]);
-    ub[dataZ][middle] = vtkstd::max(data[dataZ][ii], ub[dataZ][middle2]);
+    this->ub[DATA_X][middle] = 
+      vtkstd::max(data[DATA_X][ii], this->ub[DATA_X][middle2]);
+    this->ub[DATA_Y][middle] = 
+      vtkstd::max(data[DATA_Y][ii], this->ub[DATA_Y][middle2]);
+    this->ub[DATA_Z][middle] = 
+      vtkstd::max(data[DATA_Z][ii], this->ub[DATA_Z][middle2]);
 
     return;
     }
 
   // non-base case
-  lb[dataX][middle] = vtkstd::min(lb[dataX][middle1], lb[dataX][middle2]);
-  lb[dataY][middle] = vtkstd::min(lb[dataY][middle1], lb[dataY][middle2]);
-  lb[dataZ][middle] = vtkstd::min(lb[dataZ][middle1], lb[dataZ][middle2]);
+  this->lb[DATA_X][middle] = 
+    vtkstd::min(this->lb[DATA_X][middle1], this->lb[DATA_X][middle2]);
+  this->lb[DATA_Y][middle] = 
+    vtkstd::min(this->lb[DATA_Y][middle1], this->lb[DATA_Y][middle2]);
+  this->lb[DATA_Z][middle] = 
+    vtkstd::min(this->lb[DATA_Z][middle1], this->lb[DATA_Z][middle2]);
 
-  ub[dataX][middle] = vtkstd::max(ub[dataX][middle1], ub[dataX][middle2]);
-  ub[dataY][middle] = vtkstd::max(ub[dataY][middle1], ub[dataY][middle2]);
-  ub[dataZ][middle] = vtkstd::max(ub[dataZ][middle1], ub[dataZ][middle2]);
+  this->ub[DATA_X][middle] = 
+    vtkstd::max(this->ub[DATA_X][middle1], this->ub[DATA_X][middle2]);
+  this->ub[DATA_Y][middle] = 
+    vtkstd::max(this->ub[DATA_Y][middle1], this->ub[DATA_Y][middle2]);
+  this->ub[DATA_Z][middle] = 
+    vtkstd::max(this->ub[DATA_Z][middle1], this->ub[DATA_Z][middle2]);
 
   return;
 }
@@ -561,13 +550,19 @@ void vtkCosmoHaloFinder::myFOF(int first, int last, int dataFlag)
   // base case
   if (len == 1)
     {
+    double progress = .5 * (double)last / (double)this->npart + .5;
+    if (int(100 * progress) % 1 == 0)
+      {
+      this->UpdateProgress(progress);
+      }
+
     return;
     }
 
   // non-base cases
 
   // divide
-  int half = len >> 1;
+  int half = len / 2;
 
   // continue FOF at the next level
   myFOF(first, first+half, (dataFlag+1)%3);
@@ -597,23 +592,23 @@ void vtkCosmoHaloFinder::Merge(int first1, int last1, int first2, int last2, int
   // base cases
   if (len1 == 1 && len2 == 1)
     {
-    basicMerge(seq[first1], seq[first2]);
+    basicMerge(this->seq[first1], this->seq[first2]);
     return;
     }
 
   if (len1 == 1 && len2 == 2) 
     {
-    basicMerge(seq[first1], seq[first2]);
-    basicMerge(seq[first1], seq[first2+1]);
-    basicMerge(seq[first2], seq[first2+1]);
+    basicMerge(this->seq[first1], this->seq[first2]);
+    basicMerge(this->seq[first1], this->seq[first2+1]);
+    basicMerge(this->seq[first2], this->seq[first2+1]);
     return;
     }
 
   if (len1 == 2 && len2 == 1)
     {
-    basicMerge(seq[first1], seq[first2]);
-    basicMerge(seq[first1+1], seq[first2]);
-    basicMerge(seq[first1], seq[first1+1]);
+    basicMerge(this->seq[first1], this->seq[first2]);
+    basicMerge(this->seq[first1+1], this->seq[first2]);
+    basicMerge(this->seq[first1], this->seq[first1+1]);
     return;
     }
 
@@ -623,22 +618,22 @@ void vtkCosmoHaloFinder::Merge(int first1, int last1, int first2, int last2, int
   int middle1 = first1 + len1 / 2;
   int middle2 = first2 + len2 / 2;
 
-  float lL = lb[dataFlag][middle1];
-  float uL = ub[dataFlag][middle1];
-  float lR = lb[dataFlag][middle2];
-  float uR = ub[dataFlag][middle2];
+  float lL = this->lb[dataFlag][middle1];
+  float uL = this->ub[dataFlag][middle1];
+  float lR = this->lb[dataFlag][middle2];
+  float uR = this->ub[dataFlag][middle2];
 
   float dL = uL - lL;
   float dR = uR - lR;
   float dc = vtkstd::max(uL,uR) - vtkstd::min(lL,lR);
 
   float dist = dc - dL - dR;
-  if (Periodic) 
+  if (this->Periodic) 
     {
     dist = vtkstd::min(dist, np-dc);
     }
 
-  if (dist >= bb)
+  if (dist >= this->bb)
     {
     return;
     }
@@ -663,18 +658,18 @@ void vtkCosmoHaloFinder::basicMerge(int ii, int jj)
     }
 
   // ht[ii] != ht[jj]
-  float xdist = fabs(data[dataX][jj] - data[dataX][ii]);
-  float ydist = fabs(data[dataY][jj] - data[dataY][ii]);
-  float zdist = fabs(data[dataZ][jj] - data[dataZ][ii]);
+  float xdist = fabs(this->data[DATA_X][jj] - this->data[DATA_X][ii]);
+  float ydist = fabs(this->data[DATA_Y][jj] - this->data[DATA_Y][ii]);
+  float zdist = fabs(this->data[DATA_Z][jj] - this->data[DATA_Z][ii]);
 
-  if (Periodic)
+  if (this->Periodic)
     {
     xdist = vtkstd::min(xdist, np-xdist);
     ydist = vtkstd::min(ydist, np-ydist);
     zdist = vtkstd::min(zdist, np-zdist);
     }
 
-  if ((xdist<bb) && (ydist<bb) && (zdist<bb))
+  if ((xdist<this->bb) && (ydist<this->bb) && (zdist<this->bb))
     {
 
     float dist = xdist*xdist + ydist*ydist + zdist*zdist;
@@ -682,23 +677,25 @@ void vtkCosmoHaloFinder::basicMerge(int ii, int jj)
       {
 
       // union two halos to one
-      int newHaloId = (ht[ii] < ht[jj]) ? ht[ii] : ht[jj];
-      int oldHaloId = (ht[ii] < ht[jj]) ? ht[jj] : ht[ii];
+      int newHaloId = (this->ht[ii] < this->ht[jj]) 
+        ? this->ht[ii] : this->ht[jj];
+      int oldHaloId = (this->ht[ii] < this->ht[jj]) 
+        ? this->ht[jj] : this->ht[ii];
 
       // update particles with oldHaloId
       int last = -1;
-      int ith = halo[oldHaloId];
+      int ith = this->halo[oldHaloId];
       while (ith != -1)
         {
-        ht[ith] = newHaloId;
+        this->ht[ith] = newHaloId;
         last = ith;
-        ith = nextp[ith];
+        ith = this->nextp[ith];
         }
 
       // update halo's linked list
-      nextp[last] = halo[newHaloId];
-      halo[newHaloId] = halo[oldHaloId];
-      halo[oldHaloId] = -1;
+      this->nextp[last] = this->halo[newHaloId];
+      this->halo[newHaloId] = this->halo[oldHaloId];
+      this->halo[oldHaloId] = -1;
       }
     }
 
@@ -710,7 +707,7 @@ void vtkCosmoHaloFinder::basicMerge(int ii, int jj)
 void vtkCosmoHaloFinder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "np: " << this->np << endl;
+  //os << indent << "np: " << this->np << endl;
   os << indent << "bb: " << this->bb << endl;
   os << indent << "pmin: " << this->pmin << endl;
   os << indent << "rL: " << this->rL << endl;
@@ -730,8 +727,9 @@ void vtkCosmoHaloFinder::WritePVDFile(vtkInformationVector** inputVector)
   double *inTimes = inputVector[0]->GetInformationObject(0)
     ->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
 
-  vtkstd::string file_name = this->Internal->outputDir + "/halo.pvd";
-  ofstream ofile(file_name.c_str());
+  char* buffer = new char[strlen(this->outputDir) + 64];
+  sprintf(buffer, "%s/halo.pvd", this->outputDir);
+  ofstream ofile(buffer);
   if (!ofile)
     {
     vtkErrorMacro("Failed to open pvd file for writing!");
@@ -741,7 +739,6 @@ void vtkCosmoHaloFinder::WritePVDFile(vtkInformationVector** inputVector)
   ofile <<"<?xml version=\"1.0\"?>\n"
         <<"<VTKFile type=\"Collection\" version=\"0.1\" byte_order=\"LittleEndian\">\n"
         <<"<Collection>\n";
-  char buffer[64];
 
   for (int i = 0; i < this->NumberOfTimeSteps; i++)
     {
@@ -752,4 +749,6 @@ void vtkCosmoHaloFinder::WritePVDFile(vtkInformationVector** inputVector)
   ofile << "</Collection>\n</VTKFile>";
 
   ofile.close();
+
+  delete [] buffer;
 }
