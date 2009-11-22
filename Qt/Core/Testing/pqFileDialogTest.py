@@ -19,7 +19,7 @@ fdUp = 'main/pqFileDialog/NavigateUp'
 fdMsgOk = 'main/pqFileDialog/1QMessageBox0/qt_msgbox_buttonbox/1QPushButton0'
 
 def checkFile(f):
-  time.sleep(0.1)
+  time.sleep(1)
   text = QtTesting.getProperty(returnLabel, 'text')
   if not text.endswith(f):
     raise ValueError('failed and got ' + text + ' instead of ' + f)
