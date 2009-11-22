@@ -49,7 +49,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqOptionsDialog.h"
 #include "pqStackedChartOptionsEditor.h"
 #include "pqStackedChartOptionsHandler.h"
-#include "pqUndoStack.h"
 
 #include <QString>
 #include <QVariant>
@@ -390,21 +389,10 @@ void pqActiveChartOptions::cleanupDialog()
 
 void pqActiveChartOptions::openUndoSet()
 {
-  pqUndoStack *stack = pqApplicationCore::instance()->getUndoStack();
-  if(stack)
-    {
-    stack->beginUndoSet("Chart Options");
-    }
 }
 
 void pqActiveChartOptions::closeUndoSet()
 {
-  pqUndoStack *stack = pqApplicationCore::instance()->getUndoStack();
-  if(stack)
-    {
-    stack->endUndoSet();
-    }
-
   pqView *view = this->Chart->getView();
   if(view)
     {

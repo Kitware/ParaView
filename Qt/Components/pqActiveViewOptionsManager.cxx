@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqActiveViewOptionsManager.h"
 
 #include "pqActiveViewOptions.h"
+#include "pqCoreUtilities.h"
 #include "pqRenderView.h"
 #include "pqView.h"
 
@@ -44,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 #include <QWidget>
 
-
+//-----------------------------------------------------------------------------
 class pqActiveViewOptionsManagerInternal
 {
 public:
@@ -55,7 +56,6 @@ public:
   pqActiveViewOptions *RenderOptions;
   pqActiveViewOptions *Current;
   pqView *ActiveView;
-  QWidget *Parent;
   bool IgnoreClose;
 };
 
@@ -67,24 +67,24 @@ pqActiveViewOptionsManagerInternal::pqActiveViewOptionsManagerInternal()
   this->RenderOptions = 0;
   this->Current = 0;
   this->ActiveView = 0;
-  this->Parent = 0;
   this->IgnoreClose = false;
 }
 
 
 //----------------------------------------------------------------------------
-pqActiveViewOptionsManager::pqActiveViewOptionsManager(QWidget *parentObject)
+pqActiveViewOptionsManager::pqActiveViewOptionsManager(QObject *parentObject)
   : QObject(parentObject)
 {
   this->Internal = new pqActiveViewOptionsManagerInternal();
-  this->Internal->Parent = parentObject;
 }
 
+//-----------------------------------------------------------------------------
 pqActiveViewOptionsManager::~pqActiveViewOptionsManager()
 {
   delete this->Internal;
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::setRenderViewOptions(
     pqActiveViewOptions *renderOptions)
 {
@@ -104,6 +104,7 @@ void pqActiveViewOptionsManager::setRenderViewOptions(
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqActiveViewOptionsManager::registerOptions(const QString &viewType,
     pqActiveViewOptions *options)
 {
@@ -130,6 +131,7 @@ bool pqActiveViewOptionsManager::registerOptions(const QString &viewType,
   return true;
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::unregisterOptions(
     pqActiveViewOptions *options)
 {
@@ -166,6 +168,7 @@ void pqActiveViewOptionsManager::unregisterOptions(
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqActiveViewOptionsManager::isRegistered(
     pqActiveViewOptions *options) const
 {
@@ -182,6 +185,7 @@ bool pqActiveViewOptionsManager::isRegistered(
   return false;
 }
 
+//-----------------------------------------------------------------------------
 pqActiveViewOptions *pqActiveViewOptionsManager::getOptions(
     const QString &viewType) const
 {
@@ -195,6 +199,7 @@ pqActiveViewOptions *pqActiveViewOptionsManager::getOptions(
   return 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::setActiveView(pqView *view)
 {
   this->Internal->ActiveView = view;
@@ -218,17 +223,20 @@ void pqActiveViewOptionsManager::setActiveView(pqView *view)
         {
         // Open the options dialog for the new active view.
         this->Internal->Current->showOptions(this->Internal->ActiveView,
-            QString(), this->Internal->Parent);
+            QString(),
+            pqCoreUtilities::mainWidget());
         }
       }
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::showOptions()
 {
   this->showOptions(QString());
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::showOptions(const QString &page)
 {
   if(this->Internal->Current || !this->Internal->ActiveView)
@@ -240,7 +248,7 @@ void pqActiveViewOptionsManager::showOptions(const QString &page)
   if(this->Internal->Current)
     {
     this->Internal->Current->showOptions(this->Internal->ActiveView, page,
-        this->Internal->Parent);
+      pqCoreUtilities::mainWidget());
     }
   else
     {
@@ -248,6 +256,7 @@ void pqActiveViewOptionsManager::showOptions(const QString &page)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqActiveViewOptionsManager::removeCurrent(pqActiveViewOptions *options)
 {
   if(!this->Internal->IgnoreClose && options == this->Internal->Current)
@@ -256,6 +265,7 @@ void pqActiveViewOptionsManager::removeCurrent(pqActiveViewOptions *options)
     }
 }
 
+//-----------------------------------------------------------------------------
 pqActiveViewOptions *pqActiveViewOptionsManager::getCurrent() const
 {
   pqActiveViewOptions *options = 0;
@@ -285,6 +295,7 @@ pqActiveViewOptions *pqActiveViewOptionsManager::getCurrent() const
   return options;
 }
 
+//-----------------------------------------------------------------------------
 bool pqActiveViewOptionsManager::canShowOptions(pqView* view) const
 {
   pqView* oldCur = this->Internal->ActiveView;

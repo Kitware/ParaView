@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqViewExporterManager_h
 
 #include <QObject>
+#include <QPointer>
 #include "pqCoreExport.h"
 
 class pqView;
@@ -74,8 +75,7 @@ private:
   pqViewExporterManager(const pqViewExporterManager&); // Not implemented.
   void operator=(const pqViewExporterManager&); // Not implemented.
 
-  class pqInternal;
-  pqInternal* Internal;
+  QPointer<pqView> View;
 };
 
 #endif

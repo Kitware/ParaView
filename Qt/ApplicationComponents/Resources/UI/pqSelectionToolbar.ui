@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqSelectionToolbar</class>
+ <widget class="QToolBar" name="pqSelectionToolbar" >
+  <property name="windowTitle" >
+   <string>Selection Controls</string>
+  </property>
+  <property name="toolTip" >
+   <string>Select Block</string>
+  </property>
+  <property name="orientation" >
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <attribute name="toolBarArea" >
+   <enum>TopToolBarArea</enum>
+  </attribute>
+  <attribute name="toolBarBreak" >
+   <bool>false</bool>
+  </attribute>
+  <action name="actionMoveMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRotate24.png</normaloff>:/pqWidgets/Icons/pqRotate24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Interact</string>
+   </property>
+   <property name="iconText">
+    <string>Interact</string>
+   </property>
+   <property name="toolTip">
+    <string>Interact</string>
+   </property>
+   <property name="statusTip">
+    <string>Interact</string>
+   </property>
+   <property name="shortcut">
+    <string/>
+   </property>
+  </action>
+  <action name="actionSelectionMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqSurfaceSelectionCell24.png</normaloff>:/pqWidgets/Icons/pqSurfaceSelectionCell24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Cells On</string>
+   </property>
+   <property name="iconText">
+    <string>Select Cells On</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Cells On</string>
+   </property>
+   <property name="statusTip">
+    <string>Select Cells On</string>
+   </property>
+   <property name="shortcut">
+    <string>S</string>
+   </property>
+  </action>
+  <action name="actionSelect_Frustum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell24.png</normaloff>:/pqWidgets/Icons/pqFrustumSelectionCell24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Cells Through</string>
+   </property>
+   <property name="iconText">
+    <string>Select Cells Through</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Cells Through</string>
+   </property>
+   <property name="statusTip">
+    <string>Select Cells Through</string>
+   </property>
+  </action>
+  <action name="actionSelectSurfacePoints">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqSurfaceSelectionPoint24.png</normaloff>:/pqWidgets/Icons/pqSurfaceSelectionPoint24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Points On</string>
+   </property>
+   <property name="iconText">
+    <string>Select Points On</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Points On</string>
+   </property>
+   <property name="statusTip">
+    <string>Select Points On</string>
+   </property>
+  </action>
+  <action name="actionSelectFrustumPoints">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqFrustumSelectionPoint24.png</normaloff>:/pqWidgets/Icons/pqFrustumSelectionPoint24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Points Through</string>
+   </property>
+   <property name="iconText">
+    <string>Select Points Through</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Points Through</string>
+   </property>
+   <property name="statusTip">
+    <string>Select Points Through</string>
+   </property>
+  </action>
+  <action name="actionSelect_Block">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqGroupExtract24.png</normaloff>:/pqWidgets/Icons/pqGroupExtract24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Select Block</string>
+   </property>
+   <property name="shortcut">
+    <string>B</string>
+   </property>
+  </action>
+
+  <addaction name="actionMoveMode" />
+  <addaction name="actionSelectionMode" />
+  <addaction name="actionSelectSurfacePoints" />
+  <addaction name="actionSelect_Frustum" />
+  <addaction name="actionSelectFrustumPoints" />
+  <addaction name="actionSelect_Block" />
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

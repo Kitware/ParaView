@@ -1943,7 +1943,7 @@
        <Documentation>
          If this property is set to 1, a VTK_VERTEX cell is created for each point.
        </Documentation>
-     </IntVectorProperty>
+     </IntVectorProperty> 
 
      <IntVectorProperty
         name="TagSize"
@@ -1957,6 +1957,9 @@
        </Documentation>
      </IntVectorProperty>
 
+     <Hints>
+       <ReaderFactory extensions="cosmo" file_description="Cosmology files" />
+     </Hints>
    <!-- End CosmoReader -->
    </SourceProxy>
 
@@ -1978,6 +1981,11 @@
           This property specifies the file name for the DEM (Digital Elevation Map) reader.
         </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="dem"
+          file_description="Digital Elevation Map Files" />
+     </Hints>
 
    <!-- End DEMReader -->
    </SourceProxy>
@@ -2009,6 +2017,11 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+        <ReaderFactory extensions="pvd" 
+          file_description="ParaView Data Files"/>
+     </Hints>
    <!-- End PVDReader -->
    </SourceProxy>
 
@@ -2065,6 +2078,11 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="vtm vtmb"
+          file_description="VTK MultiBlock Data Files" />
+     </Hints>
+
    <!-- end of XMLMultiBlockDataReader -->
    </FileSeriesReaderProxy>
 
@@ -2119,6 +2137,11 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="vtm vthb"
+          file_description="VTK Hierarchical Box Data Files" />
+     </Hints>
+
    <!-- end of XMLHierarchicalBoxDataReader -->
    </FileSeriesReaderProxy>
 
@@ -2171,6 +2194,10 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="vtp"
+          file_description="VTK PolyData Files" />
+     </Hints>
    </FileSeriesReaderProxy> <!-- XMLPolyDataReader -->
 
    <FileSeriesReaderProxy name="XMLUnstructuredGridReader"
@@ -2222,6 +2249,11 @@
          Available timestep values.
        </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="vtu"
+          file_description="VTK UnstructuredGrid Files" />
+     </Hints>
 
    </FileSeriesReaderProxy> <!-- XMLUnstructuredGridReader -->
 
@@ -2275,6 +2307,11 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="vti"
+          file_description="VTK ImageData Files" />
+     </Hints>
+
    </FileSeriesReaderProxy> <!-- XMLImageDataReader -->
 
    <FileSeriesReaderProxy name="XMLStructuredGridReader"
@@ -2327,6 +2364,10 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="vts"
+          file_description="VTK StructuredGrid Files" />
+     </Hints>
    </FileSeriesReaderProxy> <!-- XMLStructuredGridReader -->
 
    <FileSeriesReaderProxy name="XMLRectilinearGridReader"
@@ -2378,6 +2419,10 @@
          Available timestep values.
        </Documentation>
      </DoubleVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="vtr"
+          file_description="VTK RectilinearGrid Files" />
+     </Hints>
 
    </FileSeriesReaderProxy> <!-- XMLRectilinearGridReader -->
 
@@ -2429,6 +2474,11 @@
          Available timestep values.
        </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pvtp"
+          file_description="VTK PolyData Files (partitioned)" />
+     </Hints>
 
    </FileSeriesReaderProxy> <!-- XMLPPolyDataReader -->
 
@@ -2482,6 +2532,10 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="pvtu"
+          file_description="VTK UnstructuredGrid Files (partitioned)" />
+     </Hints>
    </FileSeriesReaderProxy> <!-- XMLPUnstructuredGridReader -->
 
    <FileSeriesReaderProxy name="XMLPImageDataReader"
@@ -2533,6 +2587,11 @@
          Available timestep values.
        </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pvti"
+          file_description="VTK ImageData Files (partitioned)" />
+     </Hints>
 
    </FileSeriesReaderProxy> <!-- XMLPImageDataReader -->
 
@@ -2586,6 +2645,11 @@
        </Documentation>
      </DoubleVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="pvts"
+          file_description="VTK StructuredGrid Files (partitioned)" />
+     </Hints>
+
    </FileSeriesReaderProxy> <!-- XMLPStructuredGridReader -->
 
    <FileSeriesReaderProxy name="XMLPRectilinearGridReader"
@@ -2637,6 +2701,11 @@
          Available timestep values.
        </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pvtr"
+          file_description="VTK RectilinearGrid Files (partitioned)" />
+     </Hints>
 
    </FileSeriesReaderProxy> <!-- XMLPRectilinearGridReader -->
 
@@ -2736,7 +2805,12 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
-     <!-- End legacyreader_t -->
+
+     <Hints>
+      <ReaderFactory extensions="vtk"
+          file_description="Legacy VTK files" />
+     </Hints>
+     <!-- End LegacyVTKFileReader -->
    </FileSeriesReaderProxy>
 
    <SourceProxy name="pvtkfile" 
@@ -2757,6 +2831,11 @@
          This property specifies the file name for the Partitioned Legacy VTK reader.
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pvtk"
+          file_description="Legacy VTK Files (partitioned)" />
+     </Hints>
    <!-- End pvtkfile -->
    </SourceProxy>
 
@@ -2838,6 +2917,11 @@
          This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="case CASE Case"
+          file_description="EnSight Files" />
+     </Hints>
    <!-- End ensight -->
    </SourceProxy>
 
@@ -2970,6 +3054,11 @@
          This property lists which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="spcth 0"
+          file_description="SpyPlot CTH dataset" />
+     </Hints>
    <!-- End spcthreader-->
    </SourceProxy>
 
@@ -3023,6 +3112,8 @@
     <Hints>
       <!-- This property is here simply to set it. -->
       <Property name="UseMetaFile" show="0" />
+      <ReaderFactory extensions="spcth-timeseries"
+          file_description="Case file for restarted CTH outputs" />
     </Hints>
     <!-- SPCTHRestartReader -->
   </FileSeriesReaderProxy>
@@ -3044,6 +3135,10 @@
           This property specifies the file name for the VRML reader.
         </Documentation>
      </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="wrl vrml"
+          file_description="VRML 2 Files" />
+     </Hints>
    <!-- End vrmlreader -->
    </SourceProxy>
 
@@ -3063,6 +3158,10 @@
           This property specifies the file name for the PLY reader.
         </Documentation>
      </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="ply"
+          file_description="PLY Polygonal File Format" />
+     </Hints>
    <!-- End plyreader -->
    </SourceProxy>
 
@@ -3082,6 +3181,9 @@
           This property specifies the file name for the PDB reader.
         </Documentation>
      </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="pdb" file_description="Protein Data Bank Files" />
+     </Hints>
    <!-- End pdbreader -->
    </SourceProxy>
 
@@ -3113,6 +3215,11 @@
          This property specifies the timestep the XYZ reader should load.
        </Documentation>
      </IntVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="xyz"
+          file_description="XMol Molecule Files" />
+     </Hints>
    <!-- End xyzreader -->
    </SourceProxy>
 
@@ -3251,6 +3358,11 @@
          This property lists which functions (point-centered arrays) to compute.
        </Documentation>
      </IntVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="xyz"
+          file_description="PLOT3D Files" />
+     </Hints>
    <!-- End P3DReader -->
    </SourceProxy>
 
@@ -3282,6 +3394,11 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pht"
+          file_description="Phasta Files" />
+     </Hints>
    </SourceProxy>
 
    <FileSeriesReaderProxy name="stlreader"
@@ -3330,7 +3447,11 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
-     <!-- End legacyreader_t -->
+     <Hints>
+      <ReaderFactory extensions="stl"
+          file_description="Stereo Lithography" />
+     </Hints>
+     <!-- End stlreader-->
    </FileSeriesReaderProxy>
 
    <SourceProxy name="byureader" class="vtkBYUReader" label="BYU Reader">
@@ -3349,7 +3470,11 @@
           This property specifies the file name for the BYU reader.
         </Documentation>
      </StringVectorProperty>
-   <!-- End stlreader -->
+     <Hints>
+      <ReaderFactory extensions="g"
+          file_description="BYU Files"/>
+     </Hints>
+   <!-- End byureader -->
    </SourceProxy>
 
    <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader"
@@ -3395,6 +3520,11 @@
           A scaling factor to compute bonds between non-hydrogen atoms
         </Documentation>
       </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="cube"
+          file_description="Gaussian Cube Files" />
+     </Hints>
    <!-- End gaussiancubereader -->
    </SourceProxy>
 
@@ -3447,6 +3577,11 @@
          This property indicates the number of ghost levels to generate.
        </Documentation>
      </IntVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="pop"
+          file_description="POP Ocean Files"/>
+     </Hints>
    <!-- End popreader -->
    </SourceProxy>
 
@@ -3544,6 +3679,11 @@
          This property lists which point-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="sos SOS"
+          file_description="EnSight Master Server Files" />
+     </Hints>
    <!-- End ensightMS -->
    </SourceProxy>
 
@@ -3561,6 +3701,8 @@
           whether the given property is shown in the GUI or not. -->
      <Hints>
        <Property name="FilePrefix" show="1"/>
+       <ReaderFactory extensions="raw"
+          file_description="Raw (binary) Files" />
      </Hints>
 
      <StringVectorProperty
@@ -3839,6 +3981,11 @@
         </Documentation>
      </IntVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="xmf xdmf"
+          file_description="Xdmf Reader" />
+     </Hints>
+
      <!-- -->
    </SourceProxy>
 
@@ -4029,11 +4176,14 @@
          Set the current timestep.
        </Documentation>
      </IntVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="xmf xdmf"
+          file_description="Xdmf Reader" />
+     </Hints>
      
    <!-- End XdmfReader -->
    </SourceProxy>
    
-
    <FileSeriesReaderProxy name="ExodusIIReader"
                           class="vtkExodusFileSeriesReader"
                           file_name_method="SetFileName">
@@ -4151,6 +4301,9 @@
        <Property name="UseMetaFile" show="0" />
        <!-- This is for special GUI control. -->
        <Property name="Refresh" show="0"/>
+       <ReaderFactory 
+          extensions="g e ex2 ex2v2 exo gen exoII 0 00 000 0000 exii"
+          file_description="ExodusII"/>
      </Hints>
      <!-- ExodusIIReader -->
    </FileSeriesReaderProxy>
@@ -4264,11 +4417,12 @@
        <Property name="UseMetaFile" show="0" />
        <!-- This is for special GUI control. -->
        <Property name="Refresh" show="0"/>
+
+      <ReaderFactory extensions="ex-timeseries"
+          file_description="Metafile for restarted exodus outputs" />
      </Hints>
      <!-- ExodusRestartReader -->
    </FileSeriesReaderProxy>
-
-
 
    <FileSeriesReaderProxy name="AVSucdSeriesReader"
                           class="vtkFileSeriesReader"
@@ -4326,6 +4480,11 @@
           Available timestep values.
         </Documentation>
      </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="inp"
+          file_description="AVS UCD Binary/ASCII Files"/>
+     </Hints>
    <!-- End of AVSucdSeriesReader -->
    </FileSeriesReaderProxy>
 
@@ -4346,6 +4505,11 @@
           This property specifies the file name for the Facet reader.
         </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="facet"
+          file_description="Facet Polygonal Data Files" />
+     </Hints>
    <!-- End Facet Reader -->
    </SourceProxy>
 
@@ -4366,6 +4530,10 @@
           This property specifies the file name for the Meta Image reader.
         </Documentation>
      </StringVectorProperty>
+     <Hints>
+      <ReaderFactory extensions="mhd mha"
+          file_description="Meta Image Data Files" />
+     </Hints>
    <!-- End Meta Image Reader -->
    </SourceProxy>
 
@@ -4387,6 +4555,11 @@
           This property specifies the file name for the PNG reader.
         </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="png"
+          file_description="PNG Image Files" />
+     </Hints>
    <!-- End PNGReader -->
    </SourceProxy>
 
@@ -4408,6 +4581,11 @@
           This property specifies the file name for the TIFF reader.
         </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="tif tiff"
+          file_description="TIFF Image Files"/>
+     </Hints>
    <!-- End TIFFReader -->
    </SourceProxy>
 
@@ -4454,6 +4632,11 @@
          information_only="1">
          <ArraySelectionInformationHelper attribute_name="Table"/>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="sesame"
+          file_description="SESAME" />
+     </Hints>
      <!-- End SESAMEReader -->
    </SourceProxy>
 
@@ -4524,6 +4707,11 @@
           information_only="1">
         <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="foam"
+          file_description="OpenFOAM Files" />
+     </Hints>
     </SourceProxy>
     <!-- End of foam Reader -->
 
@@ -4578,6 +4766,11 @@
           information_only="1">
        <TimeStepsInformationHelper/>
       </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="RES"
+          file_description="MFIX Unstructured Grid Files" />
+     </Hints>
     </SourceProxy>
     <!-- End of MFIX Reader -->
 
@@ -4621,6 +4814,11 @@
          Select which cell-centered arrays to read.
        </Documentation>
      </StringVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="cas"
+          file_description="Fluent Case Files" />
+     </Hints>
    </SourceProxy>
    <!-- End of FLUENT Reader -->
 
@@ -4877,6 +5075,10 @@
        </Documentation>
      </IntVectorProperty>
 
+     <Hints>
+      <ReaderFactory extensions="d3plot k lsdyna" file_description="LSDyna" />
+     </Hints>
+
    </SourceProxy>
    <!-- End of LSDyna Reader -->
 
@@ -4952,6 +5154,11 @@
           visit the time steps defined in the file.
         </Documentation>
       </DoubleVectorProperty>
+
+     <Hints>
+      <ReaderFactory extensions="ncdf nc"
+          file_description="netCDF Files" />
+     </Hints>
 
     </SourceProxy> <!-- netCDFReader -->
 
@@ -5064,12 +5271,13 @@
         </Documentation>
       </DoubleVectorProperty>
 
-      <Hints>
+     <Hints>
+      <ReaderFactory extensions="ncdf nc"
+          file_description="SLAC Mesh Files" />
         <!-- Usually you want to look at the external surface, but the
              volume is there for visualizing the internal fields. -->
         <OutputPort index="1" visible="0" />
-      </Hints>
-
+     </Hints>
     </SourceProxy> <!-- SLACReader -->
 
     <FileSeriesReaderProxy name="SLACParticleReader"
@@ -5107,6 +5315,11 @@
           Available timestep values.
         </Documentation>
       </DoubleVectorProperty>
+
+     <Hints>
+       <ReaderFactory extensions="ncdf netcdf"
+          file_description="SLAC Particle Files" />
+     </Hints>
     </FileSeriesReaderProxy> <!-- SLACParticleReader -->
 
    <FileSeriesReaderProxy name="CSVReader"
@@ -5172,6 +5385,8 @@
      <Hints>
         <!-- View can be used to specify the preferred view for the proxy -->
         <View type="SpreadSheetView" />
+        <ReaderFactory extensions="csv"
+          file_description="Comma-separated-values" />
      </Hints>
       <!-- End of CSVReader -->
    </FileSeriesReaderProxy>
@@ -5234,6 +5449,11 @@
         </ExposedProperties>
       </SubProxy>
 
+     <Hints>
+        <ReaderFactory extensions="particles"
+          file_description="VTK Particle Files" />
+     </Hints>
+
       <!-- End of CSVReader -->
    </FileSeriesReaderProxy>
       
@@ -5286,6 +5506,11 @@
           <Property name="DataArrayStatus" />
        </ExposedProperties>
      </SubProxy>
+
+     <Hints>
+        <ReaderFactory extensions="tec TEC Tec tp TP"
+          file_description="Tecplot Files" />
+     </Hints>
        
    <!-- End TecplotReader -->
    </FileSeriesReaderProxy>

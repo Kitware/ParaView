@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqCameraToolbar</class>
+  <widget class="QToolBar" name="cameraToolbar" >
+   <property name="windowTitle" >
+    <string>Camera Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <action name="actionResetCamera" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetCamera24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>&amp;Reset</string>
+    </property>
+    <property name="iconText" >
+     <string>Reset Camera</string>
+    </property>
+    <property name="statusTip" >
+     <string>Reset Camera</string>
+    </property>
+   </action>
+   <action name="actionPositiveX" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqXPlus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>+X</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to +X</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to +X</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to +X</string>
+    </property>
+   </action>
+   <action name="actionNegativeX" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqXMinus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>-X</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to -X</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to -X</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to -X</string>
+    </property>
+   </action>
+   <action name="actionPositiveY" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqYPlus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>+Y</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to +Y</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to +Y</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to +Y</string>
+    </property>
+   </action>
+   <action name="actionNegativeY" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqYMinus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>-Y</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to -Y</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to -Y</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to -Y</string>
+    </property>
+   </action>
+   <action name="actionPositiveZ" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqZPlus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>+Z</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to +Z</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to +Z</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to +Z</string>
+    </property>
+   </action>
+   <action name="actionNegativeZ" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqZMinus24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>-Z</string>
+    </property>
+    <property name="toolTip" >
+     <string>Set view direction to -Z</string>
+    </property>
+    <property name="statusTip" >
+     <string>Set view direction to -Z</string>
+    </property>
+    <property name="whatsThis" >
+     <string>Set view direction to -Z</string>
+    </property>
+   </action>
+  <action name="actionZoomToBox" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqZoomToSelection24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Zoom to Box</string>
+   </property>
+   <property name="statusTip" >
+    <string>Zoom to Box</string>
+   </property>
+  </action>
+   <addaction name="actionResetCamera" />
+   <addaction name="actionZoomToBox" />
+   <addaction name="actionPositiveX" />
+   <addaction name="actionNegativeX" />
+   <addaction name="actionPositiveY" />
+   <addaction name="actionNegativeY" />
+   <addaction name="actionPositiveZ" />
+   <addaction name="actionNegativeZ" />
+  </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

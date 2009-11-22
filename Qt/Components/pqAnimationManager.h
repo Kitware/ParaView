@@ -39,16 +39,15 @@ class QSize;
 
 class pqAnimationCue;
 class pqAnimationScene;
-class pqViewManager;
 class pqProxy;
 class pqServer;
 class pqView;
 class vtkSMProxy;
 
-// pqAnimationManager manages the Animation sub-system.
-// It encapsulates the initialization of animation scene per server
-// connection i.e. this class basically keeps track of the active 
-// animation scene.
+//// pqAnimationManager manages the Animation sub-system.
+//// It encapsulates the initialization of animation scene per server
+//// connection i.e. this class basically keeps track of the active 
+//// animation scene.
 class PQCOMPONENTS_EXPORT pqAnimationManager : public QObject
 {
   Q_OBJECT
@@ -56,34 +55,29 @@ public:
   pqAnimationManager(QObject* parent=0);
   virtual ~pqAnimationManager();
 
-  // Returns the scene for the active server connection, if any.
+  /// Returns the scene for the active server connection, if any.
   pqAnimationScene* getActiveScene() const;
 
-  // Returns the scene on the server connection, if any.
+  /// Returns the scene on the server connection, if any.
   pqAnimationScene* getScene(pqServer* server) const;
 
-  // Creates a new scene for the active server connection,
-  // if possible, and returns it.
+  /// Creates a new scene for the active server connection,
+  /// if possible, and returns it.
   pqAnimationScene* createActiveScene();
 
-  // In the given \c scene, returns the cue that animates the given 
-  // \c index of the given \c property on the \c proxy.
-  // This method simply calls getCue() on the pqAnimationScene instance.
+  /// In the given \c scene, returns the cue that animates the given 
+  /// \c index of the given \c property on the \c proxy.
+  /// This method simply calls getCue() on the pqAnimationScene instance.
   pqAnimationCue* getCue(pqAnimationScene* scene, 
     vtkSMProxy* proxy, const char* propertyname, int index) const;
 
-  // Saves the animation from the active scene. The active scene
-  // is determined using the active server.
-  // Returns true if the save was successful.
+  /// Saves the animation from the active scene. The active scene
+  /// is determined using the active server.
+  /// Returns true if the save was successful.
   bool saveAnimation();
 
-  // The the Widget that contains all the views.
-  // This is required since the manager may need to change the view size
-  // depending upon the users requested animation size.
-  void setViewWidget(pqViewManager*);
-
-  // Saves the animation geometry from the active scene
-  // as visible in the given view.
+  /// Saves the animation geometry from the active scene
+  /// as visible in the given view.
   bool saveGeometry(const QString& filename, pqView* view);
   
   /// Save the settings of "save animation" with QSettings.
@@ -125,7 +119,7 @@ protected slots:
 
   void updateGUI();
 
-  // Update the ViewModules property in the active scene.
+  /// Update the ViewModules property in the active scene.
   void updateViewModules();
 
   /// Called on every tick while saving animation.

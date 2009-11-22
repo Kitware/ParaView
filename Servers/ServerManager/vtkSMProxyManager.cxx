@@ -33,8 +33,10 @@
 #include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMReaderFactory.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
+#include "vtkSMWriterFactory.h"
 #include "vtkSMXMLParser.h"
 #include "vtkStdString.h"
 #include "vtkStringList.h"
@@ -100,7 +102,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.84");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.85");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -113,6 +115,9 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->AddObserver(vtkCommand::RegisterEvent, obs);
   this->AddObserver(vtkCommand::UnRegisterEvent, obs);
 #endif
+
+  this->ReaderFactory = vtkSMReaderFactory::New();
+  this->WriterFactory = vtkSMWriterFactory::New();
 }
 
 //---------------------------------------------------------------------------
@@ -123,6 +128,12 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+
+  this->ReaderFactory->Delete();
+  this->ReaderFactory = 0;
+
+  this->WriterFactory->Delete();
+  this->WriterFactory = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1148,7 +1159,13 @@ void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
     spLoader = loader;
     }
   spLoader->GetProxyLocator()->SetConnectionID(id);
-  spLoader->LoadState(rootElement);
+  if (spLoader->LoadState(rootElement))
+    {
+    LoadStateInformation info;
+    info.RootElement = rootElement;
+    info.ProxyLocator = spLoader->GetProxyLocator();
+    this->InvokeEvent(vtkCommand::LoadStateEvent, &info);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -1178,18 +1195,39 @@ void vtkSMProxyManager::SaveState(const char* filename)
   rootElement->Delete();
 }
 
-
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::SaveState()
 {
-  return this->SaveStateInternal(
+  vtkPVXMLElement* smstate = this->SaveStateInternal(
     vtkProcessModuleConnectionManager::GetNullConnectionID(), 0, 0);
+
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("GenericParaViewApplication");
+  root->AddNestedElement(smstate);
+  smstate->FastDelete();
+
+  LoadStateInformation info;
+  info.RootElement = root;
+  info.ProxyLocator = NULL;
+  this->InvokeEvent(vtkCommand::SaveStateEvent, &info);
+  return root;
 }
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::SaveState(vtkIdType connectionID)
 {
-  return this->SaveStateInternal(connectionID, 0, 0);
+  vtkPVXMLElement* smstate = this->SaveStateInternal(connectionID, 0, 0);
+
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("GenericParaViewApplication");
+  root->AddNestedElement(smstate);
+  smstate->FastDelete();
+
+  LoadStateInformation info;
+  info.RootElement = root;
+  info.ProxyLocator = NULL;
+  this->InvokeEvent(vtkCommand::SaveStateEvent, &info);
+  return root;
 }
 
 //---------------------------------------------------------------------------

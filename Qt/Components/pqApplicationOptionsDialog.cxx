@@ -29,11 +29,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "pqApplicationOptionsDialog.h"
+
+#include "pqApplicationCore.h"
 #include "pqApplicationOptions.h"
 #include "pqGlobalRenderViewOptions.h"
+#include "pqPluginManager.h"
+#include "pqViewOptionsInterface.h"
   
+//-----------------------------------------------------------------------------
 pqApplicationOptionsDialog::pqApplicationOptionsDialog(QWidget* p)
   : pqOptionsDialog(p)
 {
@@ -50,10 +54,37 @@ pqApplicationOptionsDialog::pqApplicationOptionsDialog(QWidget* p)
     {
     this->setCurrentPage(pages[0]);
     }
+
+  /// Add panes as plugins are loaded.
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+    SIGNAL(guiInterfaceLoaded(QObject*)),
+    this, SLOT(pluginLoaded(QObject*)));
+
+  // Load panes from already loaded plugins.
+  foreach (QObject* plugin_interface,
+    pqApplicationCore::instance()->getPluginManager()->interfaces())
+    {
+    this->pluginLoaded(plugin_interface);
+    }
 }
 
-pqApplicationOptionsDialog::~pqApplicationOptionsDialog()
+//-----------------------------------------------------------------------------
+void pqApplicationOptionsDialog::pluginLoaded(QObject* iface)
 {
+  pqViewOptionsInterface* viewOptions =
+    qobject_cast<pqViewOptionsInterface*>(iface);
+  if (viewOptions)
+    {
+    foreach(QString viewtype, viewOptions->viewTypes())
+      {
+      // Try to create global view options
+      pqOptionsContainer* globalOptions =
+        viewOptions->createGlobalViewOptions(viewtype, this);
+      if (globalOptions)
+        {
+        this->addOptions(globalOptions);
+        }
+      }
+    }
 }
-
 

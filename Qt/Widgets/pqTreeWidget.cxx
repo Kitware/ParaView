@@ -365,7 +365,7 @@ QModelIndex pqTreeWidget::moveCursor(CursorAction cursorAction, Qt::KeyboardModi
       // if the table grows, the index may change.
       suggestedIndex = this->Superclass::moveCursor(cursorAction, modifiers);
       }
-    // otherwise default behaviour takes it to the first column in the next
+    // otherwise default behavior takes it to the first column in the next
     // row, which is what is expected.
     }
   else if (cursorAction == QAbstractItemView::MovePrevious && modifiers == Qt::NoModifier)

@@ -43,7 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 #include "vtkSMServerProxyManagerReviver.h"
 
-#include <QApplication>
 #include <QFileInfo>
 #include <QMap>
 #include <QMessageBox>
@@ -51,10 +50,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSize>
 #include <QtDebug>
 
+
 #include "pqAnimationCue.h"
 #include "pqAnimationScene.h"
 #include "pqAnimationSceneImageWriter.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqEventDispatcher.h"
 #include "pqFileDialog.h"
 #include "pqObjectBuilder.h"
@@ -76,7 +77,6 @@ class pqAnimationManager::pqInternals
 {
 public:
   QPointer<pqServer> ActiveServer;
-  QPointer<pqViewManager> ViewWidget;
   typedef QMap<pqServer*, QPointer<pqAnimationScene> > SceneMap;
   SceneMap Scenes;
   Ui::Dialog* AnimationSettingsDialog;
@@ -110,12 +110,6 @@ pqAnimationManager::~pqAnimationManager()
 {
   this->saveSettings();
   delete this->Internals;
-}
-
-//-----------------------------------------------------------------------------
-void pqAnimationManager::setViewWidget(pqViewManager* w)
-{
-  this->Internals->ViewWidget = w;
 }
 
 //-----------------------------------------------------------------------------
@@ -331,8 +325,12 @@ bool pqAnimationManager::saveAnimation()
   dialogUI.checkBoxDisconnect->setEnabled(
     this->Internals->ActiveServer->isRemote());
 
+  // Use viewManager is available.
+  pqViewManager* viewManager = qobject_cast<pqViewManager*>(
+    pqApplicationCore::instance()->manager("MULTIVIEW_MANAGER"));
+  
   // Set current size of the window.
-  QSize viewSize = this->Internals->ViewWidget->clientSize();
+  QSize viewSize = viewManager? viewManager->clientSize() : QSize(800, 600);
   // to avoid some unpredicable padding issues, I am reducing the size by a few
   // pixels.
   QSize padding = PADDING_COMPENSATION;
@@ -473,13 +471,7 @@ bool pqAnimationManager::saveAnimation()
   filters +="JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png);;";
   filters +="All files(*)";
 
-  QWidget* parent_window = qobject_cast<QWidget*>(this->parent());
-  if (!parent_window)
-    {
-    // QApplication::activateWindow() is set up differntly on Macs resulting in
-    // ambiguities in test playback. Hence we use it as the last resort.
-    parent_window = QApplication::activeWindow();
-    }
+  QWidget* parent_window = pqCoreUtilities::mainWidget();
 
   // Create a server dialog is disconnect-and-save is true, else create a client
   // dialog.
@@ -550,7 +542,7 @@ bool pqAnimationManager::saveAnimation()
 
   // Enforce any view size conditions (such a multiple of 4). 
   ::enforceMultiple4(newSize); 
-  int magnification = this->Internals->ViewWidget->prepareForCapture(newSize);
+  int magnification = viewManager? viewManager->prepareForCapture(newSize): 1;
  
   if (disconnect_and_save)
     {
@@ -586,7 +578,10 @@ bool pqAnimationManager::saveAnimation()
     reviver->Delete();
     emit this->endNonUndoableChanges();
     pqApplicationCore::instance()->getObjectBuilder()->removeServer(server);
-    this->Internals->ViewWidget->finishedCapture();
+    if (viewManager)
+      {
+      viewManager->finishedCapture();
+      }
     emit this->disconnectServer();
     return status;
     }
@@ -637,7 +632,10 @@ bool pqAnimationManager::saveAnimation()
     break;
     }
   sceneProxy->UpdateVTKObjects();
-  this->Internals->ViewWidget->finishedCapture();
+  if (viewManager)
+    {
+    viewManager->finishedCapture();
+    }
 
   if (stereo)
     {

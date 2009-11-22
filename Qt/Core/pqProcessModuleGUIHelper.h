@@ -48,6 +48,8 @@ class vtkSMApplication;
  * when the ProcessModule requests the event loop to begin.
  * \todo When the GUI Helper receives Progress, it must be conveyed over to the
  * MainWindow so that the progress can be shown.
+ * @deprecated vtkProcessModuleGUIHelper and subclasses will soon be removed.
+ * Switch to using new style application initialization.
  */
 class PQCORE_EXPORT pqProcessModuleGUIHelper : public vtkProcessModuleGUIHelper
 {
@@ -135,7 +137,7 @@ protected:
   /// Returns the number of errors registered in the OutputWindow
   virtual int ErrorCount();
 
-  pqProcessModuleGUIHelper();
+  VTK_LEGACY(pqProcessModuleGUIHelper());
   ~pqProcessModuleGUIHelper();
 
 private:

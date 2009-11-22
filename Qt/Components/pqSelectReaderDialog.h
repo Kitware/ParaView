@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 
 class pqServer;
-class pqReaderFactory;
+class vtkSMReaderFactory;
 
 /// a dialog that prompts for a reader type to open a file
 class PQCOMPONENTS_EXPORT pqSelectReaderDialog : public QDialog
@@ -47,13 +47,16 @@ public:
   /// constructor
   pqSelectReaderDialog(const QString& file,
                        pqServer* s, 
-                       pqReaderFactory* factory,
+                       vtkSMReaderFactory* factory,
                        QWidget* p = 0);
   /// destructor
   ~pqSelectReaderDialog();
 
   /// get the reader that was chosen to read a file
   QString getReader() const;
+
+  /// get the group for the chosen reader.
+  QString getGroup() const;
 
 protected:
   class pqInternal;

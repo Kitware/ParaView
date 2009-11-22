@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineBrowser.h"
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqDisplayPolicy.h"
@@ -42,14 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeView.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
-#include "pqPipelineBrowserStateManager.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
+
 //#include "pqSourceInfoIcons.h"
 //#include "pqSourceHistoryModel.h"
 //#include "pqSourceInfoFilterModel.h"
@@ -105,7 +107,6 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   //this->Icons = new pqSourceInfoIcons(this);
   //this->FilterGroups = new pqSourceInfoGroupMap(this);
   //this->FilterHistory = new pqSourceHistoryModel(this);
-  this->Manager = new pqPipelineBrowserStateManager(this);
 
   // Set the icons for the history models.
   //this->FilterHistory->setIcons(this->Icons, pqSourceInfoIcons::Filter);
@@ -167,10 +168,6 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->connect(this->Model, SIGNAL(firstChildAdded(const QModelIndex &)),
       this->TreeView, SLOT(expand(const QModelIndex &)));
 
-  // Use the model's move and restore signals to keep track of
-  // selected and expanded indexes.
-  this->Manager->setModelAndView(this->Model, this->TreeView);
-
   // The tree view should have a context menu based on the selected
   // items. The context menu policy should be set to custom for this
   // behavior.
@@ -184,6 +181,22 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   // Create the selection adaptor.
   new pqPipelineModelSelectionAdaptor(this->TreeView->getSelectionModel(),
       pqApplicationCore::instance()->getSelectionModel(), this);
+
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setView(pqView*)));
+
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    // Connect undo/redo.
+    QObject::connect(
+      this, SIGNAL(beginUndo(const QString&)),
+      usStack, SLOT(beginUndoSet(const QString&)));
+    QObject::connect(
+      this, SIGNAL(endUndo()),
+      usStack, SLOT(endUndoSet()));
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -221,18 +234,6 @@ void pqPipelineBrowser::loadFilterInfo(vtkPVXMLElement *root)
   this->FilterGroups->addSource("Threshold", "Released");
 }
 #endif
-
-//----------------------------------------------------------------------------
-void pqPipelineBrowser::saveState(vtkPVXMLElement *root) const
-{
-  this->Manager->saveState(root);
-}
-
-//----------------------------------------------------------------------------
-void pqPipelineBrowser::restoreState(vtkPVXMLElement *root)
-{
-  this->Manager->restoreState(root);
-}
 
 //----------------------------------------------------------------------------
 QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const

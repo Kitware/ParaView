@@ -144,5 +144,60 @@ private:
 };
 
 
+#include "pqApplicationCore.h"
+
+inline void BEGIN_UNDO_SET(const QString& name)
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->beginUndoSet(name);
+    }
+}
+
+inline void END_UNDO_SET()
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->endUndoSet();
+    }
+}
+
+inline void CLEAR_UNDO_STACK()
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->clear();
+    }
+}
+
+inline void ADD_UNDO_ELEM(vtkUndoElement* elem)
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->addToActiveUndoSet(elem);
+    }
+}
+
+inline void BEGIN_UNDO_EXCLUDE()
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->beginNonUndoableChanges();
+    }
+}
+
+inline void END_UNDO_EXCLUDE()
+{
+  pqUndoStack* usStack = pqApplicationCore::instance()->getUndoStack();
+  if (usStack)
+    {
+    usStack->endNonUndoableChanges();
+    }
+}
 #endif
 

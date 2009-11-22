@@ -48,15 +48,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Includes.
 #include "pqApplicationCore.h"
+#include "pqHelperProxyStateLoader.h"
+#include "pqOutputPort.h"
+#include "pqPipelineSource.h"
 #include "pqPluginManager.h"
 #include "pqProxy.h"
+#include "pqRepresentation.h"
 #include "pqServer.h"
 #include "pqServerManagerModelInterface.h"
 #include "pqServerManagerObserver.h"
-#include "pqPipelineSource.h"
 #include "pqView.h"
-#include "pqRepresentation.h"
-#include "pqOutputPort.h"
 
 //-----------------------------------------------------------------------------
 class pqServerManagerModel::pqInternal
@@ -92,6 +93,9 @@ pqServerManagerModel::pqServerManagerModel(
     this, SLOT(onConnectionCreated(vtkIdType)));
   QObject::connect(observer, SIGNAL(connectionClosed(vtkIdType)),
     this, SLOT(onConnectionClosed(vtkIdType)));
+  QObject::connect(observer,
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -314,6 +318,9 @@ void pqServerManagerModel::onProxyRegistered(const QString& group,
     QObject::connect(
       source, SIGNAL(modifiedStateChanged(pqServerManagerModelItem*)),
       this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
+    QObject::connect(
+      source, SIGNAL(dataUpdated(pqPipelineSource*)),
+      this, SIGNAL(dataUpdated(pqPipelineSource*)));
 
     emit this->preSourceAdded(source);
     }
@@ -467,6 +474,14 @@ void pqServerManagerModel::onConnectionClosed(vtkIdType id)
   emit this->serverRemoved(server);
   emit this->itemRemoved(server);
   delete server;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::onStateLoaded(vtkPVXMLElement* root,
+  vtkSMProxyLocator* locator)
+{
+  pqHelperProxyStateLoader loader;
+  loader.loadState(root, locator);
 }
 
 //-----------------------------------------------------------------------------

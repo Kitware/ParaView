@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.48");
+vtkCxxRevisionMacro(vtkPVOptions, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -207,10 +207,11 @@ void vtkPVOptions::Initialize()
                     "after which the server may timeout. The client typically shows warning "
                     "messages before the server times out.",
                     vtkPVOptions::PVDATA_SERVER|vtkPVOptions::PVSERVER);
-  
-  // This should be deprecated when I get the time 
-  this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
-    "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
+ 
+  // Disabling for now since we don't support Cave anymore.
+  // this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
+  // "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
+
   this->AddArgument("--machines", "-m", &this->MachinesFileName, 
                     "Specify the network configurations file for the render server.");
 

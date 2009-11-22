@@ -180,6 +180,11 @@ void pqThreadedEventSource::guiAcknowledge()
   this->Internal->Waiting = 0;
 }
 
+void pqThreadedEventSource::msleep(int msec)
+{
+  pqInternal::ThreadHelper::msleep(msec);
+}
+
 void pqThreadedEventSource::done(int success)
 {
   if(success == 0)

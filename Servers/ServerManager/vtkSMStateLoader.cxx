@@ -21,6 +21,7 @@
 #include "vtkSMCameraLink.h"
 #include "vtkSMGlobalPropertiesManager.h"
 #include "vtkSMPropertyLink.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyLink.h"
 #include "vtkSMProxyLocator.h"
 #include "vtkSMProxyManager.h"
@@ -33,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.35");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.36");
 vtkCxxSetObjectMacro(vtkSMStateLoader, ProxyLocator, vtkSMProxyLocator);
 //---------------------------------------------------------------------------
 struct vtkSMStateLoaderRegistrationInfo
@@ -98,6 +99,49 @@ vtkSMProxy* vtkSMStateLoader::CreateProxy(
       this->GetViewXMLName(cid, xml_name), cid);
     }
 
+  //**************************************************************************
+  // This is temporary code until we clean up time-keeper and animation scene
+  // interactions. There needs to be some rework with the management of
+  // time-keeper, making it a SM-behavior perhaps. Until that happens, I am
+  // letting this piece of code be which ensures that there's only open
+  // time-keeper and animation scene in the application.
+  if (xml_group && xml_name && strcmp(xml_group, "animation")==0
+    && strcmp(xml_name, "AnimationScene")==0)
+    {
+    // If an animation scene already exists, we use that.
+    vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+    vtkSMProxy* scene = 0;
+    for (iter->Begin("animation"); !iter->IsAtEnd(); iter->Next())
+      {
+      if (strcmp(iter->GetProxy()->GetXMLGroup(), xml_group) == 0 &&
+        strcmp(iter->GetProxy()->GetXMLName(), xml_name) == 0)
+        {
+        scene = iter->GetProxy();
+        break;
+        }
+      }
+    iter->Delete();
+    if (scene)
+      {
+      scene->Register(this);
+      return scene;
+      }
+    }
+  else if (xml_group && xml_name && strcmp(xml_group, "misc") == 0 
+    && strcmp(xml_name, "TimeKeeper") == 0)
+    {
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    // There is only one time keeper per connection, simply
+    // load the state on the timekeeper.
+    vtkSMProxy* timekeeper = pxm->GetProxy("timekeeper", "TimeKeeper");
+    if (timekeeper)
+      {
+      timekeeper->Register(this);
+      return timekeeper;
+      }
+    }
+  //**************************************************************************
+
   // If all else fails, let the superclass handle it:
   return this->Superclass::CreateProxy(xml_group, xml_name, cid);
 }
@@ -118,6 +162,7 @@ void vtkSMStateLoader::CreatedNewProxy(int id, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
 {
+
   vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
     = this->Internal->RegistrationInformation.find(id);
   if (iter == this->Internal->RegistrationInformation.end())
@@ -137,7 +182,11 @@ void vtkSMStateLoader::RegisterProxyInternal(const char* group,
   const char* name, vtkSMProxy* proxy)
 {
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-
+  if (pxm->GetProxyName(group, proxy))
+    {
+    // Don't re-register a proxy in the same group.
+    return;
+    }
   pxm->RegisterProxy(group, name, proxy);
 }
 

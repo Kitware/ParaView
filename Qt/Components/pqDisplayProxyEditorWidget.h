@@ -58,14 +58,16 @@ public:
   void setView(pqView* view);
   void setOutputPort(pqOutputPort* port);
 
-  /// Set the representation to edit. If NULL, source and view must be set so
-  /// that the widget can show a default GUI which allows the user to
-  /// turn visibility on which entails creating a new representation.
-  void setRepresentation(pqRepresentation*);
+
   pqRepresentation* getRepresentation() const;
 
 public slots:
   void reloadGUI();
+
+  /// Set the representation to edit. If NULL, source and view must be set so
+  /// that the widget can show a default GUI which allows the user to
+  /// turn visibility on which entails creating a new representation.
+  void setRepresentation(pqRepresentation*);
 
 signals:
   /// Fired when the browser begins performing an undoable change.

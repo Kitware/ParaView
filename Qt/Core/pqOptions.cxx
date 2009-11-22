@@ -37,7 +37,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.8");
+vtkCxxRevisionMacro(pqOptions, "1.9");
+
+static int AddTestScript(const char*, const char* value, void* call_data)
+{
+  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
+  if (self)
+    {
+    return self->AddTestScript(value);
+    }
+  return 0;
+}
+
+static int AddTestBaseline(const char*, const char* value, void* call_data)
+{
+  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
+  if (self)
+    {
+    return self->SetLastTestBaseline(value);
+    }
+  return 0;
+}
+
+static int AddTestImageThreshold(const char*, const char* value, void* call_data)
+{
+  pqOptions* self = reinterpret_cast<pqOptions*>(call_data);
+  if (self)
+    {
+    return self->SetLastTestImageThreshold(QString(value).toInt());
+    }
+  return 0;
+}
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -51,6 +81,7 @@ pqOptions::pqOptions()
   this->TestFileName = 0;
   this->TestInitFileName = 0;
   this->ServerResourceName = 0;
+  this->DisableLightKit = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -99,6 +130,23 @@ void pqOptions::Initialize()
   this->AddArgument("--server", "-s",
     &this->ServerResourceName,
     "Set the name of the server resource to connect with when the client starts.");
+
+  this->AddBooleanArgument("--disable-light-kit", 0,
+    &this->DisableLightKit,
+    "When present, disables light kit by default. Useful for dashboard tests.");
+
+  this->AddCallback("--test-script", NULL,
+    &::AddTestScript, this, "Add test script. Can be used multiple times to "
+    "specify multiple tests.");
+  this->AddCallback("--test-baseline", NULL,
+    &::AddTestBaseline, this,
+    "Add test baseline. Can be used multiple times to specify "
+    "multiple baselines for multiple tests, in order.");
+  this->AddCallback("--test-threshold", NULL,
+    &::AddTestImageThreshold, this,
+    "Add test image threshold. "
+    "Can be used multiple times to specify multiple image thresholds for "
+    "multiple tests in order.");
 }
 
 //-----------------------------------------------------------------------------
@@ -132,6 +180,36 @@ int pqOptions::WrongArgument(const char* arg)
       }
     }
   return this->Superclass::WrongArgument(arg);
+}
+
+//-----------------------------------------------------------------------------
+int pqOptions::AddTestScript(const char* script)
+{
+  TestInfo info;
+  info.TestFile = script;
+  this->TestScripts.push_back(info);
+  return 1;
+}
+//-----------------------------------------------------------------------------
+int pqOptions::SetLastTestBaseline(const char* image)
+{
+  if (this->TestScripts.size() > 0)
+    {
+    this->TestScripts.last().TestBaseline = image;
+    return 1;
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int pqOptions::SetLastTestImageThreshold(int threshold)
+{
+  if (this->TestScripts.size() > 0)
+    {
+    this->TestScripts.last().ImageThreshold = threshold;
+    return 1;
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

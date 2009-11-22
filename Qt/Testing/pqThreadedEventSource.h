@@ -80,6 +80,9 @@ public:
   /** Give the testing thread an acknowledgement.
       For use by the GUI thread */
   void guiAcknowledge();
+
+  // helper method to sleep.
+  static void msleep(int msecs);
   
 private slots:
 

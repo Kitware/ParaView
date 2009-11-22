@@ -60,7 +60,7 @@ public:
     {
     }
 
-  // overrides default behaviour when this->HideDecorations is true.
+  // overrides default behavior when this->HideDecorations is true.
   virtual QSize sizeHint () const
     {
     return this->HideDecorations? QSize(): QSplitterHandle::sizeHint();

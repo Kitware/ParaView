@@ -16,19 +16,8 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
-  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${pqComponents_SOURCE_DIR}
-  ${pqComponents_BINARY_DIR}
-  ${pqCore_SOURCE_DIR}
-  ${pqCore_BINARY_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
-  ${QtTesting_SOURCE_DIR}
-  ${QtTesting_BINARY_DIR}
-  ${QtPython_SOURCE_DIR}
-  ${QtPython_BINARY_DIR}
+  ${PARAVIEW_GUI_INCLUDE_DIRS}
   )
-
 
 MACRO(paraview_build_optional_application name comment subdirectory default)
   OPTION(PARAVIEW_BUILD_${name} "Build ${comment}" ${default})
@@ -41,7 +30,7 @@ MACRO(paraview_build_optional_application name comment subdirectory default)
   ENDIF(PARAVIEW_BUILD_${name})
 ENDMACRO(paraview_build_optional_application)
 
-paraview_build_optional_application(Client "Standard ParaView Client" Client ON)
+paraview_build_optional_application(ParaView "Standard ParaView Client" ParaView ON)
 paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
 
 IF(BUILD_SHARED_LIBS)

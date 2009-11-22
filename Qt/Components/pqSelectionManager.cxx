@@ -34,15 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtDebug>
 
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqRenderView.h"
+#include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
-
-#include "pqServer.h"
 #include "pqTimeKeeper.h"
 #include "vtkAlgorithm.h"
 #include "vtkCollection.h"
@@ -127,6 +127,11 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
     this, SLOT(clearSelection()));
 
   pqApplicationCore::instance()->registerManager("SelectionManager", this);
+
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setActiveView(pqView*)));
+  this->setActiveView(pqActiveObjects::instance().activeView());
 }
 
 //-----------------------------------------------------------------------------

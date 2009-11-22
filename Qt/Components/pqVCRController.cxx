@@ -38,14 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QtDebug>
-#include <QCoreApplication>
+#include <QApplication>
 
 // ParaView includes.
-#include "pqApplicationCore.h"
-#include "pqPipelineSource.h"
 #include "pqAnimationScene.h"
-#include "pqSMAdaptor.h"
+#include "pqApplicationCore.h"
 #include "pqEventDispatcher.h"
+#include "pqPipelineSource.h"
+#include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 //-----------------------------------------------------------------------------
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 {
@@ -107,9 +108,13 @@ void pqVCRController::onPlay()
     return;
     }
 
- this->Scene->getProxy()->InvokeCommand("Play");
-                       // NOTE: This is a blocking call, returns only after the
-                       // the animation has stopped.
+  BEGIN_UNDO_EXCLUDE();
+
+  this->Scene->getProxy()->InvokeCommand("Play");
+
+  // NOTE: This is a blocking call, returns only after the
+  // the animation has stopped.
+  END_UNDO_EXCLUDE();
 
   pqApplicationCore::instance()->render();
 }
@@ -121,11 +126,7 @@ void pqVCRController::onTick()
   // the animation scene proxy does it.
 
   // process the events so that the GUI remains responsive.
-  pqEventDispatcher::processEventsAndWait(1);  // would be nice to enhance
-                                               // testing framework so we can
-                                               // simply call
-                                               // QApplication::processEvents
-
+  QApplication::processEvents();
   emit this->timestepChanged();
 }
 

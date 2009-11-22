@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QList>
 
+class vtkEventQtSlotConnect;
+
 /// pqProgressManager is progress manager. It centralizes progress raising/
 /// handling. Provides ability for any object to lock progress so that
 /// only progress fired by itself will be notified to the rest of the world.
@@ -68,7 +70,6 @@ public:
     { this->NonBlockableObjects.push_back(o); }
   void removeNonBlockableObject(QObject* o)
     { this->NonBlockableObjects.removeAll(o); }
-
 
   /// Returns the list of non-blockable objects.
   const QList<QPointer<QObject> >& nonBlockableObjects() const
@@ -106,11 +107,22 @@ signals:
 
   void enableAbort(bool);
 
+protected slots:
+  /// callbacks for signals fired from vtkProcessModule.
+  void onStartProgress();
+  void onEndProgress();
+  void onProgress();
+
 protected:
   QPointer<QObject> Lock;
   QList<QPointer<QObject> > NonBlockableObjects;
   int ProgressCount;
   bool InUpdate; // used to avoid recursive updates.
+
+  double LastProgressTime;
+  bool EnableProgress;
+  bool ReadyEnableProgress;
+  vtkEventQtSlotConnect* VTKConnect;
 private:
   pqProgressManager(const pqProgressManager&); // Not implemented.
   void operator=(const pqProgressManager&); // Not implemented.

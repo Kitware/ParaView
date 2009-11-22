@@ -53,16 +53,21 @@ pqProxy* pqObjectPanel::referenceProxy() const
   return this->ReferenceProxy;
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectPanel::accept()
 {
   pqProxyPanel::accept();
   this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
 }
 
+//-----------------------------------------------------------------------------
 void pqObjectPanel::reset()
 {
   pqProxyPanel::reset();
-  this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+  if (this->ReferenceProxy->modifiedState() != pqProxy::UNINITIALIZED)
+    {
+    this->ReferenceProxy->setModifiedState(pqProxy::UNMODIFIED);
+    }
 }
 
 //-----------------------------------------------------------------------------

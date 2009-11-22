@@ -57,11 +57,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView
 #include "pqDataRepresentation.h"
+#include "pqHelperProxyRegisterUndoElement.h"
 #include "pqOutputPort.h"
 #include "pqPipelineFilter.h"
 #include "pqServer.h"
 #include "pqSMAdaptor.h"
 #include "pqTimeKeeper.h"
+#include "pqUndoStack.h"
 #include "pqXMLUtil.h"
 
 //-----------------------------------------------------------------------------
@@ -381,6 +383,15 @@ void pqPipelineSource::setDefaultPropertyValues()
     }
 
   this->createAnimationHelpersIfNeeded();
+
+  // This is sort-of-a-hack to ensure that when this operation is undo, all the
+  // helper proxies are discovered correctly. This needs to happen only after
+  // all helper proxies have been created.
+  pqHelperProxyRegisterUndoElement* elem = 
+    pqHelperProxyRegisterUndoElement::New();
+  elem->RegisterHelperProxies(this);
+  ADD_UNDO_ELEM(elem);
+  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------

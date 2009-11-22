@@ -2,7 +2,13 @@
 
 IF(PARAVIEW_DATA_ROOT)
   SET(BASELINE_DIR ${PARAVIEW_DATA_ROOT}/Baseline)
-  ADD_EXECUTABLE(pqCoreBasicApp BasicApp.cxx)
+  # Reduce the number of dirs that get included on moc command line
+  # since it causes issues on Windows 2000.
+  GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
+  QT4_WRAP_CPP(MOC_SRCS BasicApp.h)
+  SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
+  ADD_EXECUTABLE(pqCoreBasicApp BasicApp.cxx BasicApp.h ${MOC_SRCS})
   TARGET_LINK_LIBRARIES(pqCoreBasicApp pqCore QtTesting ${QT_LIBRARIES} )
   ADD_TEST(pqCoreBasicApp "${EXECUTABLE_OUTPUT_PATH}/pqCoreBasicApp" -dr "--test-directory=${PARAVIEW_TEST_DIR}"
            "--compare-view=${BASELINE_DIR}/pqCoreBasicApp.png" --exit)
@@ -15,6 +21,7 @@ IF(QT_TESTING_WITH_PYTHON)
   # since it causes issues on Windows 2000.
   GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
+  SET (MOC_SRCS)
   QT4_WRAP_CPP(MOC_SRCS pqFileDialogTest.h)
   SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
   ADD_EXECUTABLE(pqFileDialogTest

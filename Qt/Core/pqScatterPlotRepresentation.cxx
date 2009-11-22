@@ -264,7 +264,7 @@ void pqScatterPlotRepresentation::setDefaultPropertyValues()
   // Get the time that this representation is going to use.
   vtkPVDataInformation* dataInfo = 0;
 
-  dataInfo = this->getOutputPortFromInput()->getDataInformation(true);
+  dataInfo = this->getOutputPortFromInput()->getDataInformation();
 
 /*
   if (repr->GetProperty("ScalarOpacityUnitDistance"))

@@ -72,6 +72,10 @@ public:
   /// about the polydata forming the outline not the input dataset.
   vtkPVDataInformation* getRepresentedDataInformation(bool update=true) const;
 
+  /// Get the data bounds for the input of this display.
+  /// Returns if the operation was successful.
+  bool getDataBounds(double bounds[6]);
+
   /// Returns the lookuptable proxy, if any.
   /// Most consumer displays take a lookup table. This method
   /// provides access to the Lookup table, if one exists.

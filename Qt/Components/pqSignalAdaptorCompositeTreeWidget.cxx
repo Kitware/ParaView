@@ -148,11 +148,11 @@ public:
 };
 
 // This TreeItem specialization needs some explanation.
-// Default Qt behaviour for tristate items:
+// Default Qt behavior for tristate items:
 //   - If all immediate children are checked or partially checked
 //     then the item becomes fully checked.
 // This is not appropriate for this widget. A parent item should never be fully
-// checked unless the user explicitly checked it, since otherwise, the behaviour
+// checked unless the user explicitly checked it, since otherwise, the behavior
 // of the filter is to pass the entire subtree through. 
 // This class fixes that issue.
 class pqCompositeTreeWidgetItem : public pqTreeWidgetItem
@@ -807,7 +807,8 @@ void pqSignalAdaptorCompositeTreeWidget::updateSelectionCounts()
   
   // Iterate over the selection data information and then update the labels.
   vtkSMSourceProxy* sourceProxy = this->Internal->Domain->GetSource();
-  if (!sourceProxy->GetSelectionOutput(this->Internal->Domain->GetSourcePort()))
+  if (!sourceProxy ||
+    !sourceProxy->GetSelectionOutput(this->Internal->Domain->GetSourcePort()))
     {
     return;
     }

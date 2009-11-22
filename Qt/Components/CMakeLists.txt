@@ -51,6 +51,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DWidget.h
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.h
+  pqActiveObjects.h
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.h
   pqActiveView.h
@@ -76,7 +77,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqChartViewContextMenuHandler.h
   pqChartSeriesEditorModel.h
   pqClientAboutDialog.h
-  pqClientMainWindow.h
   pqClipPanel.h
   pqColorMapModel.h
   pqColorPresetManager.h
@@ -127,18 +127,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqLinksEditor.h
   pqLinksManager.h
   pqLoadedFormObjectPanel.h
-  pqLookmarkDefinitionWizard.h
-  pqLookmarkBrowser.h
-  pqLookmarkBrowserModel.h
-  pqLookmarkInspector.h
-  pqLookmarkManagerModel.h
-  pqLookmarkModel.h
-  pqLookmarkSourceDialog.h
-  pqMainWindowCore.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
-  pqObjectInspectorDriver.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqOptionsContainer.h
@@ -150,8 +141,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 #  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
   pqPipelineBrowser.h
+  pqPipelineBrowserWidget.h
   pqPipelineBrowserContextMenu.h
-  pqPipelineBrowserStateManager.h
   pqPipelineMenu.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
@@ -192,11 +183,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionInputWidget.h
   pqSimpleServerStartup.h
   pqSourceComboBox.h
-  #pqSourceHistoryModel.h
-  #pqSourceInfoFilterModel.h
-  #pqSourceInfoGroupMap.h
-  #pqSourceInfoIcons.h
-  #pqSourceInfoModel.h
   pqSourcesMenuManager.h
   pqSphereWidget.h
   pqSplineWidget.h
@@ -220,6 +206,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqWidgetRangeDomain.h
   pqWriterDialog.h
   pqXDMFPanel.h
+  pqComponentsTestUtility.h
   ${EXTRA_PQ_COMPONENT_MOC_SOURCES}
 )
 
@@ -239,7 +226,6 @@ SET(UI_FORMS
   Resources/UI/pqCameraKeyFrameWidget.ui
   Resources/UI/pqChartOptionsWidget.ui
   Resources/UI/pqClientAboutDialog.ui
-  Resources/UI/pqClientMainWindow.ui
   Resources/UI/pqColorPresetDialog.ui
   Resources/UI/pqColorScaleDialog.ui
   Resources/UI/pqComparativeVisPanel.ui
@@ -267,9 +253,6 @@ SET(UI_FORMS
   Resources/UI/pqLineSourceControls.ui
   Resources/UI/pqLinksEditor.ui
   Resources/UI/pqLinksManager.ui
-  Resources/UI/pqLookmarkDefinitionWizard.ui
-  Resources/UI/pqLookmarkBrowser.ui
-  Resources/UI/pqLookmarkInspector.ui
   Resources/UI/pqMultiViewFrameMenu.ui
   Resources/UI/pqOptionsDialog.ui
   Resources/UI/pqOrbitCreatorDialog.ui
@@ -309,29 +292,19 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 SET(STANDARD_GUI_RESOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ParaViewWriters.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ParaViewReaders.xml 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ParaViewFilters.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/ParaViewSources.xml
-  ${ParaView_SOURCE_DIR}/Documentation/pqClient.qch
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/XML/Placeholder.xml
  )
+
 SET(ALL_GUI_RESOURCES
   ${STANDARD_GUI_RESOURCES}
   ${PARAVIEW_EXTRA_GUI_RESOURCES}
   )
 
-SET(QT_COMPONENTS_GUI_RESOURCES_CONTENTS)
-FOREACH(RESOURCE ${ALL_GUI_RESOURCES})
-  GET_FILENAME_COMPONENT(ALIAS ${RESOURCE} NAME)
-  FILE(RELATIVE_PATH RESOURCE ${CMAKE_CURRENT_BINARY_DIR} "${RESOURCE}")
-  FILE(TO_NATIVE_PATH "${RESOURCE}" RESOURCE)
-  SET(QT_COMPONENTS_GUI_RESOURCES_CONTENTS 
-      "${QT_COMPONENTS_GUI_RESOURCES_CONTENTS}  <file alias=\"${ALIAS}\">${RESOURCE}</file>\n")
-ENDFOREACH(RESOURCE)
-
-CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqExtraResources.qrc.in"
-               "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc" @ONLY)
-
+GENERATE_QT_RESOURCE_FROM_FILES(
+  "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
+  "/ParaViewResources"
+  ${ALL_GUI_RESOURCES})
+  
 SET(UI_RESOURCES
   Resources/pqComponents.qrc
   "${CMAKE_CURRENT_BINARY_DIR}/pqExtraResources.qrc"
@@ -360,6 +333,8 @@ ADD_LIBRARY(pqComponents
   pqActiveChartOptions.h
   pqActiveRenderViewOptions.cxx
   pqActiveRenderViewOptions.h
+  pqActiveObjects.cxx
+  pqActiveObjects.h
   pqActiveServer.cxx
   pqActiveServer.h
   pqActiveTwoDRenderViewOptions.cxx
@@ -424,10 +399,6 @@ ADD_LIBRARY(pqComponents
   pqChartSeriesEditorModel.h
   pqClientAboutDialog.cxx
   pqClientAboutDialog.h
-  pqClientMainWindow.cxx
-  pqClientMainWindow.h
-  pqClientProcessModuleGUIHelper.cxx
-  pqClientProcessModuleGUIHelper.h
   pqClipPanel.cxx
   pqClipPanel.h
   pqCloseViewUndoElement.cxx
@@ -449,6 +420,8 @@ ADD_LIBRARY(pqComponents
   pqComparativeVisPanel.cxx
   pqComparativeVisPanel.h
   pqComponentsExport.h
+  pqComponentsTestUtility.cxx
+  pqComponentsTestUtility.h
   pqComponentsInit.cxx
   pqComponentsInit.h
   pqContourPanel.cxx
@@ -539,24 +512,6 @@ ADD_LIBRARY(pqComponents
   pqLinksManager.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
-  pqLookmarkBrowser.cxx
-  pqLookmarkBrowser.h
-  pqLookmarkBrowserModel.cxx
-  pqLookmarkBrowserModel.h
-  pqLookmarkDefinitionWizard.cxx
-  pqLookmarkDefinitionWizard.h
-  pqLookmarkInspector.cxx
-  pqLookmarkInspector.h
-  pqLookmarkManagerModel.cxx
-  pqLookmarkManagerModel.h
-  pqLookmarkModel.cxx
-  pqLookmarkModel.h
-  pqLookmarkSourceDialog.cxx
-  pqLookmarkSourceDialog.h
-  pqLookmarkStateLoader.cxx
-  pqLookmarkStateLoader.h
-  pqMainWindowCore.cxx
-  pqMainWindowCore.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -565,8 +520,6 @@ ADD_LIBRARY(pqComponents
   pqNamedObjectPanel.h
   pqNamedWidgets.cxx
   pqNamedWidgets.h
-  pqObjectInspectorDriver.cxx
-  pqObjectInspectorDriver.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx
@@ -589,10 +542,10 @@ ADD_LIBRARY(pqComponents
 #  pqParticleTracerPanel.h
   pqPipelineBrowser.cxx
   pqPipelineBrowser.h
+  pqPipelineBrowserWidget.cxx
+  pqPipelineBrowserWidget.h
   pqPipelineBrowserContextMenu.cxx
   pqPipelineBrowserContextMenu.h
-  pqPipelineBrowserStateManager.cxx
-  pqPipelineBrowserStateManager.h
   pqPipelineMenu.cxx
   pqPipelineMenu.h
   pqPipelineModel.cxx
@@ -673,18 +626,6 @@ ADD_LIBRARY(pqComponents
   pqSimpleServerStartup.h
   pqSourceComboBox.cxx
   pqSourceComboBox.h
-  #pqSourceHistoryModel.cxx
-  #pqSourceHistoryModel.h
-  #pqSourceInfoFilterModel.cxx
-  #pqSourceInfoFilterModel.h
-  #pqSourceInfoGroupMap.cxx
-  #pqSourceInfoGroupMap.h
-  #pqSourceInfoIcons.cxx
-  #pqSourceInfoIcons.h
-  #pqSourceInfoModel.cxx
-  #pqSourceInfoModel.h
-  #pqSourceProxyInfo.cxx
-  #pqSourceProxyInfo.h
   pqSourcesMenuManager.cxx
   pqSourcesMenuManager.h
   pqSphereWidget.cxx
@@ -693,8 +634,6 @@ ADD_LIBRARY(pqComponents
   pqSplineWidget.h
   pqSplitViewUndoElement.cxx
   pqSplitViewUndoElement.h
-  pqStateLoader.cxx
-  pqStateLoader.h
   pqSpreadSheetDisplayEditor.cxx
   pqSpreadSheetDisplayEditor.h
   pqSpreadSheetViewDecorator.cxx

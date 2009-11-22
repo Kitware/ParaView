@@ -24,7 +24,7 @@
 
 #include "vtkObject.h"
 
-class vtkDummyProcessModuleHelper;
+class vtkProcessModuleGUIHelper;
 class vtkPVMain;
 class vtkPVOptions;
 class vtkSMApplication;
@@ -39,6 +39,12 @@ public:
   // Initializes the server manager. Do not use the server manager
   // before calling this.
   static void Initialize(const char* executable);
+
+  // Description:
+  // Alternative API to initialize the server manager. This takes in  the
+  // command line arguments and the vtkPVOptions instance to use to process the
+  // command line options.
+  static void Initialize(int argc, char**argv, vtkPVOptions* options);
 
   // Description:
   // Finalizes the server manager. Do not use the server manager
@@ -56,7 +62,7 @@ protected:
   static vtkPVMain* PVMain;
   static vtkSMApplication* Application;
   static vtkPVOptions* Options;
-  static vtkDummyProcessModuleHelper* Helper;
+  static vtkProcessModuleGUIHelper* Helper;
 
 private:
 

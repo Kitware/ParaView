@@ -51,9 +51,9 @@ class PQCOMPONENTS_EXPORT pqClientAboutDialog :
 
 public:
   pqClientAboutDialog(QWidget* Parent);
+  ~pqClientAboutDialog();
 
 private:
-  ~pqClientAboutDialog();
   pqClientAboutDialog(const pqClientAboutDialog&);
   pqClientAboutDialog& operator=(const pqClientAboutDialog&);
 

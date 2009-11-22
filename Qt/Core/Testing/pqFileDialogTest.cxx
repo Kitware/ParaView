@@ -18,7 +18,6 @@
 #include "vtkSmartPointer.h"
 
 #include "pqMain.h"
-#include "pqProcessModuleGUIHelper.h"
 #include "pqServer.h"
 #include "pqFileDialog.h"
 #include "pqApplicationCore.h"
@@ -35,39 +34,24 @@ pqFileDialogTestUtility::~pqFileDialogTestUtility()
   this->cleanupFiles();
 }
 
-void pqFileDialogTestUtility::playTests(const QStringList& filenames)
+void pqFileDialogTestUtility::playTheTests(const QStringList& files)
 {
-  if (filenames.size() > 0)
-    {
-    this->playTests(filenames[0]);
-    }
+  this->playTests(files);
 }
-
-void pqFileDialogTestUtility::playTests(const QString& filename)
+bool pqFileDialogTestUtility::playTests(const QStringList& filenames)
 {
   this->setupFiles();
-  pqTestUtility::playTests(filename);
-}
+  bool val = this->pqTestUtility::playTests(filenames);
 
-void pqFileDialogTestUtility::testSucceeded()
-{
   pqOptions* const options = pqOptions::SafeDownCast(
     vtkProcessModule::GetProcessModule()->GetOptions());
   if(options && options->GetExitAppWhenTestsDone())
     {
-    QApplication::exit(0);
+    QApplication::exit(val? 0 : 1);
     }
+  return val;
 }
 
-void pqFileDialogTestUtility::testFailed()
-{
-  pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions());
-  if(options && options->GetExitAppWhenTestsDone())
-    {
-    QApplication::exit(1);
-    }
-}
 
 static void CreateEmptyFile(const QString& f)
 {
@@ -233,32 +217,20 @@ void pqFileDialogTestWidget::record()
     }
 }
 
-// our gui helper makes our MainWindow
-class GUIHelper : public pqProcessModuleGUIHelper
-{
-public:
-  vtkTypeMacro(GUIHelper, pqProcessModuleGUIHelper)
-  static GUIHelper* New();
-
-  pqTestUtility* TestUtility()
-  {
-    return this->TestWidget->Tester();
-  }
-
-  QWidget* CreateMainWindow()
-  {
-    this->TestWidget = new pqFileDialogTestWidget();
-    return this->TestWidget;
-  }
-  pqFileDialogTestWidget* TestWidget;
-};
-
-vtkStandardNewMacro(GUIHelper);
-
 
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-  return pqMain::Run(app, vtkSmartPointer<GUIHelper>::New());
+  pqOptions* options = pqOptions::New();
+  pqApplicationCore appCore(argc, argv, options);
+  options->Delete();
+
+  pqFileDialogTestWidget mainWidget;
+  mainWidget.show();
+
+  QMetaObject::invokeMethod(mainWidget.Tester(), "playTheTests",
+    Qt::QueuedConnection,
+    Q_ARG(QStringList, options->GetTestFiles()));
+  return app.exec();
 }
 

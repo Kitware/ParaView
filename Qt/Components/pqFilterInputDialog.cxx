@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFilterInputDialog.h"
 
 #include "pqFlatTreeView.h"
-#include "pqPipelineBrowserStateManager.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
@@ -208,7 +207,6 @@ pqFilterInputDialog::pqFilterInputDialog(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Internal = new pqFilterInputDialogInternal();
-  this->Manager = new pqPipelineBrowserStateManager(this);
   this->Filter = 0;
   this->Model = 0;
   this->Pipeline = 0;
@@ -336,7 +334,6 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
 
   // Add the model to the tree view.
   this->Preview->setModel(this->Model);
-  this->Manager->setModelAndView(this->Model, this->Preview);
   if(this->Model)
     {
     // Hide all but the first column.

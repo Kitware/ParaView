@@ -102,13 +102,10 @@ public:
   /// immediate render otherwise render on idle.
   void renderAllViews(bool force=false);
 
-  /// Returns the current data information at this output port. 
-  /// Note \c update is no longer used and will be deprecated soon.
-  vtkPVDataInformation* getDataInformation(bool update=false) const;
-
-  /// Simply returns the data information as available on the client, without any
-  /// gathers from the server side or any pipeline updates.
-  vtkPVDataInformation* getCachedDataInformation() const;
+  /// Returns the current data information at this output port.
+  /// This does not update the pipeline, it simply returns the data information
+  /// for data currently present on the output port on the server.
+  vtkPVDataInformation* getDataInformation() const;
 
   /// Returns the class name of the output data.
   const char* getDataClassName() const;

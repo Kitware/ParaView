@@ -84,7 +84,7 @@ public:
   /// </ul>
   /// or not of the type preferred by the source, it may create a new view and 
   /// add the displayto new view. \c dont_create_view can be used to 
-  /// override this behaviour.
+  /// override this behavior.
   virtual pqDataRepresentation* createPreferredRepresentation(
     pqOutputPort* port, pqView* view, bool dont_create_view) const;
 

@@ -122,10 +122,6 @@ public:
   /// field is a string of format "<arrayname> (cell|point)".
   int getColorFieldNumberOfComponents(const QString& field);
 
-  /// Get the data bounds for the input of this display.
-  /// Returns if the operation was successful.
-  bool getDataBounds(double bounds[6]);
-
   /// Returns the proxy for the piecewise function used to
   /// map scalars to opacity.
   virtual vtkSMProxy* getScalarOpacityFunctionProxy();
@@ -186,6 +182,10 @@ protected slots:
   /// used to color this repr is being used by any other repr. If not, we turn off
   /// the scalar bar.
   void updateScalarBarVisibility(bool visible);
+
+  /// Called when the data is updated. We call updateLookupTableScalarRange() to
+  /// ensure that the lookuptable has correct ranges.
+  void onDataUpdated();
 protected:
   /// Creates helper proxies such as as the proxy
   /// for volume opacity function.

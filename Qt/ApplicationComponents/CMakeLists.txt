@@ -1,0 +1,302 @@
+PROJECT(pqApplicationComponents)
+
+INCLUDE_DIRECTORIES(
+  ${pqApplicationComponents_SOURCE_DIR}
+  ${pqApplicationComponents_BINARY_DIR}
+  ${pqComponents_BINARY_DIR}
+  ${pqComponents_SOURCE_DIR}
+  ${pqCore_BINARY_DIR}
+  ${pqCore_SOURCE_DIR}
+  ${VTK_INCLUDE_DIR}
+  ${PARAVIEW_INCLUDE_DIRS}
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt
+  ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt/Chart
+  ${ParaView_BINARY_DIR}/VTK/GUISupport/Qt/Chart
+  ${QtTesting_SOURCE_DIR}
+  ${QtTesting_BINARY_DIR}
+  ${QtWidgets_SOURCE_DIR}
+  ${QtWidgets_BINARY_DIR}
+  ${QtPython_BINARY_DIR}
+  ${QtPython_SOURCE_DIR}
+  ${QT_QTASSISTANTCLIENT_INCLUDE_DIR})
+
+# List headers to be processed by moc
+SET (MOC_HEADERS
+  pqAboutDialogReaction.h
+  pqAlwaysConnectedBehavior.h
+  pqAnimationTimeToolbar.h
+  pqApplicationSettingsReaction.h
+  pqAutoLoadPluginXMLBehavior.h
+  pqAxesToolbar.h
+  pqCameraLinkReaction.h
+  pqCameraReaction.h
+  pqCameraToolbar.h
+  pqCameraUndoRedoReaction.h
+  pqCategoryToolbarsBehavior.h
+  pqChangePipelineInputReaction.h
+  pqColorToolbar.h
+  pqCommandLineOptionsBehavior.h
+  pqCrashRecoveryBehavior.h
+  pqCreateCustomFilterReaction.h
+  pqDataTimeStepBehavior.h
+  pqDefaultMainWindow.h
+  pqDefaultViewBehavior.h
+  pqDeleteBehavior.h
+  pqDeleteReaction.h
+  pqEditCameraReaction.h
+  pqEditColorMapReaction.h
+  pqExportReaction.h
+  pqFiltersMenuReaction.h
+  pqHelpReaction.h
+  pqIgnoreSourceTimeReaction.h
+  pqListNewProxyDefinitionsBehavior.h
+  pqLoadDataReaction.h
+  pqLoadStateReaction.h
+  pqMainControlsToolbar.h
+  pqManageCustomFiltersReaction.h
+  pqManageLinksReaction.h
+  pqManagePluginsReaction.h
+  pqParaViewBehaviors.h
+  pqPersistentMainWindowStateBehavior.h
+  pqPluginActionGroupBehavior.h
+  pqPluginDockWidgetsBehavior.h
+  pqProxyGroupMenuManager.h
+  pqPVAnimationWidget.h
+  pqPVApplicationCore.h
+  pqPVNewSourceBehavior.h
+  pqPythonShellReaction.h
+  pqReaction.h
+  pqRepresentationToolbar.h
+  pqResetScalarRangeReaction.h
+  pqSaveAnimationGeometryReaction.h
+  pqSaveAnimationReaction.h
+  pqSaveDataReaction.h
+  pqSaveScreenshotReaction.h
+  pqSaveStateReaction.h
+  pqScalarBarVisibilityReaction.h
+  pqSelectionInspectorWidget.h
+  pqSelectionToolbar.h
+  pqServerConnectReaction.h
+  pqServerDisconnectReaction.h
+  pqSourcesMenuReaction.h
+  pqStandardViewFrameActionGroup.h
+  pqStatusBar.h
+  pqTestingReaction.h
+  pqTimerLogReaction.h
+  pqUndoRedoBehavior.h
+  pqUndoRedoReaction.h
+  pqVCRToolbar.h
+  pqViewFrameActionsBehavior.h
+  pqViewMenuManager.h
+  pqViewSettingsManager.h
+  pqViewSettingsReaction.h
+)
+
+# List UI files.
+SET (UI_FILES
+  Resources/UI/pqAxesToolbar.ui
+  Resources/UI/pqCameraToolbar.ui
+  Resources/UI/pqColorToolbar.ui
+  Resources/UI/pqDefaultMainWindow.ui
+  Resources/UI/pqEditMenuBuilder.ui
+  Resources/UI/pqFileMenuBuilder.ui
+  Resources/UI/pqMainControlsToolbar.ui
+  Resources/UI/pqPipelineBrowserContextMenu.ui
+  Resources/UI/pqSelectionToolbar.ui
+  Resources/UI/pqVCRToolbar.ui
+)
+
+# List qrc files
+SET (UI_RESOURCES
+  Resources/pqApplicationComponents.qrc
+)
+
+# List all source files.
+SET (SOURCE_FILES
+  pqAboutDialogReaction.cxx
+  pqAboutDialogReaction.h
+  pqAlwaysConnectedBehavior.cxx
+  pqAlwaysConnectedBehavior.h
+  pqAnimationTimeToolbar.cxx
+  pqAnimationTimeToolbar.h
+  pqApplicationSettingsReaction.cxx
+  pqApplicationSettingsReaction.h
+  pqAutoLoadPluginXMLBehavior.cxx
+  pqAutoLoadPluginXMLBehavior.h
+  pqAxesToolbar.cxx
+  pqAxesToolbar.h
+  pqCameraLinkReaction.cxx
+  pqCameraLinkReaction.h
+  pqCameraReaction.cxx
+  pqCameraReaction.h
+  pqCameraToolbar.cxx
+  pqCameraToolbar.h
+  pqCameraUndoRedoReaction.cxx
+  pqCameraUndoRedoReaction.h
+  pqChangePipelineInputReaction.cxx
+  pqChangePipelineInputReaction.h
+  pqPVApplicationCore.cxx
+  pqPVApplicationCore.h
+  pqColorToolbar.cxx
+  pqColorToolbar.h
+  pqCommandLineOptionsBehavior.cxx
+  pqCommandLineOptionsBehavior.h
+  pqCrashRecoveryBehavior.cxx
+  pqCrashRecoveryBehavior.h
+  pqCreateCustomFilterReaction.cxx
+  pqCreateCustomFilterReaction.h
+  pqDataTimeStepBehavior.cxx
+  pqDataTimeStepBehavior.h
+  pqDefaultMainWindow.cxx
+  pqDefaultMainWindow.h
+  pqDefaultViewBehavior.cxx
+  pqDefaultViewBehavior.h
+  pqDeleteBehavior.cxx
+  pqDeleteBehavior.h
+  pqDeleteReaction.cxx
+  pqDeleteReaction.h
+  pqEditColorMapReaction.cxx
+  pqEditColorMapReaction.h
+  pqExportReaction.cxx
+  pqExportReaction.h
+  pqFiltersMenuReaction.cxx
+  pqFiltersMenuReaction.h
+  pqIgnoreSourceTimeReaction.cxx
+  pqIgnoreSourceTimeReaction.h
+  pqListNewProxyDefinitionsBehavior.cxx
+  pqListNewProxyDefinitionsBehavior.h
+  pqLoadDataReaction.cxx
+  pqLoadDataReaction.h
+  pqLoadStateReaction.cxx
+  pqLoadStateReaction.h
+  pqMainControlsToolbar.cxx
+  pqMainControlsToolbar.h
+  pqManageCustomFiltersReaction.cxx
+  pqManageCustomFiltersReaction.h
+  pqManageLinksReaction.cxx
+  pqManageLinksReaction.h
+  pqManagePluginsReaction.cxx
+  pqManagePluginsReaction.h
+  pqParaViewBehaviors.cxx
+  pqParaViewBehaviors.h
+  pqParaViewMenuBuilders.cxx
+  pqParaViewMenuBuilders.h
+  pqPersistentMainWindowStateBehavior.cxx
+  pqPersistentMainWindowStateBehavior.h
+  pqPluginActionGroupBehavior.cxx
+  pqPluginActionGroupBehavior.h
+  pqPluginDockWidgetsBehavior.cxx
+  pqPluginDockWidgetsBehavior.h
+  pqProxyGroupMenuManager.cxx
+  pqProxyGroupMenuManager.h
+  pqPVAnimationWidget.cxx
+  pqPVAnimationWidget.h
+  pqPVNewSourceBehavior.cxx
+  pqPVNewSourceBehavior.h
+  pqReaction.cxx
+  pqReaction.h
+  pqRepresentationToolbar.cxx
+  pqRepresentationToolbar.h
+  pqResetScalarRangeReaction.cxx
+  pqResetScalarRangeReaction.h
+  pqSaveAnimationGeometryReaction.cxx
+  pqSaveAnimationGeometryReaction.h
+  pqSaveAnimationReaction.cxx
+  pqSaveAnimationReaction.h
+  pqSaveScreenshotReaction.cxx
+  pqSaveScreenshotReaction.h
+  pqSaveStateReaction.cxx
+  pqSaveStateReaction.h
+  pqScalarBarVisibilityReaction.cxx
+  pqScalarBarVisibilityReaction.h
+  pqSelectionInspectorWidget.cxx
+  pqSelectionInspectorWidget.h
+  pqSelectionToolbar.cxx
+  pqSelectionToolbar.h
+  pqServerConnectReaction.cxx
+  pqServerConnectReaction.h
+  pqServerDisconnectReaction.cxx
+  pqServerDisconnectReaction.h
+  pqSourcesMenuReaction.cxx
+  pqSourcesMenuReaction.h
+  pqTestingReaction.cxx
+  pqTestingReaction.h
+  pqTimerLogReaction.cxx
+  pqTimerLogReaction.h
+  pqUndoRedoReaction.cxx
+  pqUndoRedoReaction.h
+  pqUndoRedoBehavior.cxx
+  pqUndoRedoBehavior.h
+  pqVCRToolbar.cxx
+  pqVCRToolbar.h
+  pqViewMenuManager.cxx
+  pqViewMenuManager.h
+  pqViewSettingsManager.cxx
+  pqViewSettingsManager.h
+  pqViewSettingsReaction.cxx
+  pqViewSettingsReaction.h
+  pqSaveDataReaction.cxx
+  pqSaveDataReaction.h
+  pqHelpReaction.cxx
+  pqHelpReaction.h
+  pqEditCameraReaction.cxx
+  pqEditCameraReaction.h
+  pqStandardViewFrameActionGroup.cxx
+  pqStandardViewFrameActionGroup.h
+  pqViewFrameActionsBehavior.cxx
+  pqViewFrameActionsBehavior.h
+  pqCategoryToolbarsBehavior.cxx
+  pqCategoryToolbarsBehavior.h
+  pqStatusBar.cxx
+  pqStatusBar.h
+  pqPythonShellReaction.cxx
+  pqPythonShellReaction.h
+)
+
+#---------------------------------------------
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/pqApplicationComponentsExport.h.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h")
+
+
+QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  ${MOC_HEADERS}
+)
+
+QT4_WRAP_UI(UI_BUILT_SOURCES
+  ${UI_FILES}
+)
+
+QT4_ADD_RESOURCES(RCS_SOURCES
+  ${UI_RESOURCES}
+)
+
+SOURCE_GROUP("Resources" FILES
+  ${UI_RESOURCES}
+  ${UI_FILES}
+)
+
+SOURCE_GROUP("Generated" FILES
+  ${MOC_BUILT_SOURCES}
+  ${RCS_SOURCES}
+  ${UI_BUILT_SOURCES}
+  ${CMAKE_CURRENT_BINARY_DIR}/pqApplicationComponentsExport.h
+)
+
+ADD_LIBRARY(pqApplicationComponents
+  ${SOURCE_FILES}
+  ${UI_BUILT_SOURCES}
+  ${MOC_BUILT_SOURCES}
+  ${RCS_SOURCES}
+  )
+
+TARGET_LINK_LIBRARIES(pqApplicationComponents
+  pqComponents
+  )
+
+INSTALL(TARGETS pqApplicationComponents
+  RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime
+  LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Runtime
+  ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR} COMPONENT Development)
+
+

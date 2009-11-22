@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqDisplayPolicy.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOutputPort.h"
@@ -76,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
-#include "pqDisplayPolicy.h"
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineRepresentation::pqInternal
@@ -167,6 +168,14 @@ pqPipelineRepresentation::pqPipelineRepresentation(
 
   QObject::connect(this, SIGNAL(visibilityChanged(bool)),
     this, SLOT(updateScalarBarVisibility(bool)));
+
+  // Whenever the pipeline gets be updated, it's possible that the scalar ranges
+  // change. If that happens, we try to ensure that the lookuptable range is big
+  // enough to show the entire data (unless of course, the user locked the
+  // lookuptable ranges).
+  this->Internal->VTKConnect->Connect(
+    display, vtkCommand::UpdateDataEvent,
+    this, SLOT(onDataUpdated()));
 }
 
 //-----------------------------------------------------------------------------
@@ -287,7 +296,7 @@ void pqPipelineRepresentation::setDefaultPropertyValues()
   // Get the time that this representation is going to use.
   vtkPVDataInformation* dataInfo = 0;
 
-  dataInfo = this->getOutputPortFromInput()->getDataInformation(true);
+  dataInfo = this->getOutputPortFromInput()->getDataInformation();
 
   // get data set type
   // and set the default representation
@@ -713,6 +722,19 @@ void pqPipelineRepresentation::resetLookupTableScalarRange()
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineRepresentation::onDataUpdated()
+{
+  // Since this part of the code happens every time the pipeline is updated, we
+  // don't need to record it on the undo stack. It will happen automatically
+  // each time.
+  BEGIN_UNDO_EXCLUDE();
+
+  this->updateLookupTableScalarRange();
+
+  END_UNDO_EXCLUDE();
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineRepresentation::updateLookupTableScalarRange()
 {
   pqScalarsToColors* lut = this->getLookupTable();
@@ -808,7 +830,7 @@ QList<QString> pqPipelineRepresentation::getColorFields()
     vtkPVDataInformation* dataInfo = NULL;
     if(this->getInput())
       {
-      dataInfo = this->getOutputPortFromInput()->getDataInformation(false);
+      dataInfo = this->getOutputPortFromInput()->getDataInformation();
       }
     if(dataInfo)
       {
@@ -1039,22 +1061,6 @@ QString pqPipelineRepresentation::getColorField(bool raw)
     }
 
   return pqPipelineRepresentation::solidColor();
-}
-
-//-----------------------------------------------------------------------------
-bool pqPipelineRepresentation::getDataBounds(double bounds[6])
-{
-  vtkSMPropRepresentationProxy* repr = 
-    this->getRepresentationProxy();
-
-  vtkPVDataInformation* info = repr? 
-    repr->GetRepresentedDataInformation() : 0;
-  if(!info)
-    {
-    return false;
-    }
-  info->GetBounds(bounds);
-  return true;
 }
 
 //-----------------------------------------------------------------------------

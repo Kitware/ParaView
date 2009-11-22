@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkInitializationHelper, "1.7");
+vtkCxxRevisionMacro(vtkInitializationHelper, "1.8");
 
 static void vtkInitializationHelperInit(vtkProcessModule* pm);
 
@@ -70,7 +70,7 @@ extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
-vtkDummyProcessModuleHelper* vtkInitializationHelper::Helper = 0;
+vtkProcessModuleGUIHelper* vtkInitializationHelper::Helper = 0;
 vtkPVMain* vtkInitializationHelper::PVMain = 0;
 vtkPVOptions* vtkInitializationHelper::Options = 0;
 vtkSMApplication* vtkInitializationHelper::Application = 0;
@@ -83,29 +83,55 @@ void vtkInitializationHelper::Initialize(const char* executable)
     vtkGenericWarningMacro("Executable name has to be defined.");
     return;
     }
-  if (PVMain)
+
+  // Pass the program name to make option parser happier
+  char* argv = new char[strlen(executable)+1];
+  strcpy(argv, executable);
+  vtkPVOptions* options = vtkPVOptions::New();
+  vtkInitializationHelper::Initialize(1, &argv, options);
+  options->Delete();
+  delete[] argv;
+}
+
+//----------------------------------------------------------------------------
+void vtkInitializationHelper::Initialize(int argc, char**argv, vtkPVOptions* options)
+{
+  if (vtkInitializationHelper::PVMain)
     {
     vtkGenericWarningMacro("Python module already initialize. Skipping.");
     return;
     }
+
+  if (!options)
+    {
+    vtkGenericWarningMacro("vtkPVOptions must be specified.");
+    return;
+    }
+
   vtkPVMain::SetUseMPI(0); // don't use MPI even when available.
-  PVMain = vtkPVMain::New();
-  Options = vtkPVOptions::New();
-  Options->SetProcessType(vtkPVOptions::PVCLIENT);
-  // This process module does nothing
-  Helper = vtkDummyProcessModuleHelper::New();
-  // Pass the program name to make option parser happier
-  char* argv = new char[strlen(executable)+1];
-  strcpy(argv, executable);
+  vtkInitializationHelper::PVMain = vtkPVMain::New();
+  vtkInitializationHelper::Options = options;
+  vtkInitializationHelper::Options->Register(0); // keep reference.
+
+  vtkInitializationHelper::Options->SetProcessType(vtkPVOptions::PVCLIENT);
+
+  // This process module helper does nothing. ProcessModuleHelpers are to be
+  // deprecated, then don't serve much anymore.
+  vtkInitializationHelper::Helper = vtkDummyProcessModuleHelper::New();
+
   // First initialization
-  PVMain->Initialize(Options, Helper, vtkInitializationHelperInit, 1, &argv);
-  Application = vtkSMApplication::New();
-  Application->Initialize();
+  PVMain->Initialize(
+    vtkInitializationHelper::Options, 
+    vtkInitializationHelper::Helper,
+    vtkInitializationHelperInit, 
+    argc, argv);
+
+  vtkInitializationHelper::Application = vtkSMApplication::New();
+  vtkInitializationHelper::Application->Initialize();
   vtkSMProperty::SetCheckDomains(0);
   vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
   // Initialize everything else
-  PVMain->Run(Options);
-  delete[] argv;
+  vtkInitializationHelper::PVMain->Run(Options);
 }
 
 //----------------------------------------------------------------------------

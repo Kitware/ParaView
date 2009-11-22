@@ -33,8 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqPluginManager.h"
-#include "pqOutputWindowAdapter.h"
-#include "pqOutputWindow.h"
 #include "pqCoreTestUtility.h"
 #include "pqOptions.h"
 
@@ -59,8 +57,6 @@ class pqProcessModuleGUIHelper::pqImplementation
 {
 public:
   pqImplementation() :
-    OutputWindowAdapter(vtkSmartPointer<pqOutputWindowAdapter>::New()),
-    OutputWindow(0),
     SMApplication(vtkSMApplication::New()),
     ApplicationCore(0),
     Window(0),
@@ -68,8 +64,6 @@ public:
     ReadyEnableProgress(false),
     LastProgress(0)
     {
-    // Redirect Qt debug output to VTK ...
-    qInstallMsgHandler(QtMessageOutput);
     }
 
   ~pqImplementation()
@@ -77,34 +71,8 @@ public:
     this->SMApplication->Finalize();
     this->SMApplication->Delete();
     delete this->Window;
-    delete this->OutputWindow;
     delete this->ApplicationCore;
     }
-
-  /// Routes Qt debug output through the VTK output window mechanism
-  static void QtMessageOutput(QtMsgType type, const char *msg)
-    {
-    switch(type)
-      {
-      case QtDebugMsg:
-        vtkOutputWindow::GetInstance()->DisplayText(msg);
-        break;
-      case QtWarningMsg:
-        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-        break;
-      case QtCriticalMsg:
-        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-        break;
-      case QtFatalMsg:
-        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-        break;
-      }
-    }
-
-  /// Converts VTK debug output into Qt signals
-  vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
-  /// Displays VTK debug output in a console window
-  pqOutputWindow* OutputWindow;
 
   vtkSMApplication* SMApplication;
   pqApplicationCore* ApplicationCore;
@@ -118,7 +86,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.29");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.30");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -134,15 +102,13 @@ pqProcessModuleGUIHelper::~pqProcessModuleGUIHelper()
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::disableOutputWindow()
 {
-  this->Implementation->OutputWindowAdapter->setActive(false);
+  this->Implementation->ApplicationCore->disableOutputWindow();
 }
 
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::showOutputWindow()
 {
-  this->Implementation->OutputWindow->show();
-  this->Implementation->OutputWindow->raise();
-  this->Implementation->OutputWindow->activateWindow();
+  this->Implementation->ApplicationCore->showOutputWindow();
 }
 
 //-----------------------------------------------------------------------------
@@ -246,11 +212,11 @@ int pqProcessModuleGUIHelper::postAppExec()
   int status = 0;
   this->FinalizeApplication();
 
-  // If there were any errors from Qt / VTK, ensure that we return an error code
-  if(!status && this->Implementation->OutputWindowAdapter->getErrorCount())
-    {
-    status = 1;
-    }
+  //// If there were any errors from Qt / VTK, ensure that we return an error code
+  //if(!status && this->Implementation->OutputWindowAdapter->getErrorCount())
+  //  {
+  //  status = 1;
+  //  }
 
   return status;
 }
@@ -260,20 +226,6 @@ int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc),
            char** vtkNotUsed(argv))
 {
   this->Implementation->ApplicationCore = this->CreateApplicationCore();
-
-  // Redirect VTK debug output to a Qt window ...
-  this->Implementation->OutputWindow = new pqOutputWindow(0);
-  this->Implementation->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
-    SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
-    SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
-    SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter,
-    SIGNAL(displayGenericWarningText(const QString&)), SLOT(onDisplayGenericWarningText(const QString&)));
-  vtkOutputWindow::SetInstance(Implementation->OutputWindowAdapter);
-
   this->Implementation->Window = this->CreateMainWindow();
 
   return 1;
@@ -313,7 +265,7 @@ void pqProcessModuleGUIHelper::SendCleanupPendingProgress()
   this->Implementation->ReadyEnableProgress = false;
   if(this->Implementation->EnableProgress)
     {
-    this->Implementation->ApplicationCore->cleanupPendingProgress();
+    //this->Implementation->ApplicationCore->cleanupPendingProgress();
     }
   this->Implementation->EnableProgress = false;
 }
@@ -354,7 +306,7 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
   if(this->Implementation->EnableProgress == false)
     {
     this->Implementation->EnableProgress = true;
-    this->Implementation->ApplicationCore->prepareProgress();
+    //this->Implementation->ApplicationCore->prepareProgress();
     }
 
   this->Implementation->LastProgress = lastprog;
@@ -369,7 +321,7 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* text,
   this->SetStatusText(text);
   this->GetProgressGauge()->SetValue(val);
   */
-  this->Implementation->ApplicationCore->sendProgress(text, progress);
+  //this->Implementation->ApplicationCore->sendProgress(text, progress);
   //cout << (name? name : "(null)") << " : " << progress << endl;
   // Here we would call something like
   // this->Window->SetProgress(name, progress).
@@ -417,5 +369,6 @@ pqTestUtility* pqProcessModuleGUIHelper::TestUtility()
 //-----------------------------------------------------------------------------
 int pqProcessModuleGUIHelper::ErrorCount()
 {
-  return this->Implementation->OutputWindowAdapter->getErrorCount();
+  return 0;
+  //return this->Implementation->OutputWindowAdapter->getErrorCount();
 }

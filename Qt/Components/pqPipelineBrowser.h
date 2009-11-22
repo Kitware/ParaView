@@ -38,12 +38,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqComponentsExport.h"
+#include "vtkSetGet.h"
 #include <QWidget>
 #include <QModelIndex> // Needed for typedef
 
 class pqFlatTreeView;
 class pqPipelineBrowserInternal;
-class pqPipelineBrowserStateManager;
 class pqPipelineModel;
 class pqPipelineSource;
 class pqServer;
@@ -63,6 +63,7 @@ class vtkPVXMLElement;
 // the server manager. It provides slot (select()) to change the currently
 // selected item, it also fires a signal selectionChanged() when the selection
 // changes.
+// @deprecated Replaced by pqPipelineBrowserWidget
 class PQCOMPONENTS_EXPORT pqPipelineBrowser : public QWidget
 {
   Q_OBJECT
@@ -71,7 +72,7 @@ public:
   /// \brief
   ///   Creates a pipeline browser instance.
   /// \param parent The parent widget.
-  pqPipelineBrowser(QWidget *parent=0);
+  VTK_LEGACY(pqPipelineBrowser(QWidget *parent=0));
   virtual ~pqPipelineBrowser();
 
   /// \brief
@@ -94,11 +95,6 @@ public:
 #if 0
   void loadFilterInfo(vtkPVXMLElement *root);
 #endif
-
-  void saveState(vtkPVXMLElement *root) const;
-
-  void restoreState(vtkPVXMLElement *root);
-  //@}
 
   /// \name Selection Helper Methods
   //@{
@@ -157,9 +153,6 @@ private:
   //pqSourceInfoIcons *Icons;            ///< Stores the icons.
   //pqSourceInfoGroupMap *FilterGroups;  ///< Stores the filter grouping.
   //pqSourceHistoryModel *FilterHistory; ///< Stores the recent filters.
-
-  /// Keeps track of tree state for moving indexes.
-  pqPipelineBrowserStateManager *Manager;
 };
 
 #endif

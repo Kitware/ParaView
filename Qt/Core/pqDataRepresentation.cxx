@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqDataRepresentation.h"
 
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVDataInformation.h"
 #include "vtkSMDataRepresentationProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -206,6 +207,18 @@ unsigned long pqDataRepresentation::getFullResMemorySize()
     }
 
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+bool pqDataRepresentation::getDataBounds(double bounds[6])
+{
+  vtkPVDataInformation* info = this->getRepresentedDataInformation(true);
+  if (!info)
+    {
+    return false;
+    }
+  info->GetBounds(bounds);
+  return true;
 }
 
 //-----------------------------------------------------------------------------

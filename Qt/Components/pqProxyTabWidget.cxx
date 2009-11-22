@@ -36,23 +36,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes
 #include <QScrollArea>
 
-// VTK includes
 
-// ParaView Server Manager includes
-
-// ParaView widget includes
-
-// ParaView core includes
+#include "pqActiveObjects.h"
+#include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
+#include "pqDisplayProxyEditorWidget.h"
+#include "pqObjectBuilder.h"
+#include "pqObjectInspectorWidget.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
-#include "pqView.h"
-
-// ParaView components includes
-#include "pqObjectInspectorWidget.h"
 #include "pqProxyInformationWidget.h"
-#include "pqDisplayProxyEditorWidget.h"
-
+#include "pqView.h"
 
 //-----------------------------------------------------------------------------
 pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
@@ -83,11 +77,44 @@ pqProxyTabWidget::pqProxyTabWidget(QWidget* p)
   this->DelayedSetViewTimer.setInterval(1);
   QObject::connect(&this->DelayedSetViewTimer, SIGNAL(timeout()),
     this, SLOT(setViewInternal()));
+
+  this->setupDefaultConnections();
 }
 
 //-----------------------------------------------------------------------------
 pqProxyTabWidget::~pqProxyTabWidget()
 {
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::setupDefaultConnections()
+{
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setView(pqView*)));
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(portChanged(pqOutputPort*)),
+    this, SLOT(setOutputPort(pqOutputPort*)));
+  QObject::connect(
+    &pqActiveObjects::instance(),
+    SIGNAL(representationChanged(pqRepresentation*)),
+    this->Display,
+    SLOT(setRepresentation(pqRepresentation*)));
+
+  // Make sure the property tab is showing since the accept/reset
+  // buttons are on that panel.
+  QObject::connect(
+    pqApplicationCore::instance()->getObjectBuilder(),
+    SIGNAL(sourceCreated(pqPipelineSource*)),
+    this, SLOT(showPropertiesTab()));
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::removeDefaultConnections()
+{
+  QObject::disconnect(&pqActiveObjects::instance(), 0, this, 0);
+  QObject::connect(
+    &pqActiveObjects::instance(), 0, this->Display, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -112,17 +139,15 @@ void pqProxyTabWidget::setViewInternal()
 }
 
 //-----------------------------------------------------------------------------
-void pqProxyTabWidget::setRepresentation(pqDataRepresentation* repr)
-{
-  this->Display->setRepresentation(repr);
-}
-
-//-----------------------------------------------------------------------------
 void pqProxyTabWidget::setOutputPort(pqOutputPort* port)
 {
   if (this->OutputPort == port)
     {
     return;
+    }
+  if (this->OutputPort)
+    {
+    QObject::disconnect(this->OutputPort, 0, this, 0);
     }
 
   this->OutputPort = port;
@@ -130,14 +155,18 @@ void pqProxyTabWidget::setOutputPort(pqOutputPort* port)
   this->Display->setOutputPort(port);
   if (!port)
     {
-    this->setRepresentation(0);
     this->setProxy(0);
     }
   else
     {
     this->setProxy(port->getSource());
-    this->setRepresentation(port->getRepresentation(this->View));
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::setRepresentation(pqDataRepresentation* repr)
+{
+  this->Display->setRepresentation(repr);
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +180,18 @@ pqPipelineSource* pqProxyTabWidget::getProxy()
 pqObjectInspectorWidget* pqProxyTabWidget::getObjectInspector()
 {
   return this->Inspector;
+}
+
+//-----------------------------------------------------------------------------
+void pqProxyTabWidget::setShowOnAccept(bool val)
+{
+  this->Inspector->setShowOnAccept(val);
+}
+
+//-----------------------------------------------------------------------------
+bool pqProxyTabWidget::showOnAccept() const
+{
+  return this->Inspector->showOnAccept();
 }
 
 

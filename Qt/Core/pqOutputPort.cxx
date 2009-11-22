@@ -99,7 +99,7 @@ vtkSMOutputPort* pqOutputPort::getOutputPortProxy() const
 }
 
 //-----------------------------------------------------------------------------
-vtkPVDataInformation* pqOutputPort::getDataInformation(bool vtkNotUsed(update)) const
+vtkPVDataInformation* pqOutputPort::getDataInformation() const
 {
   vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
     this->getSource()->getProxy());
@@ -111,22 +111,6 @@ vtkPVDataInformation* pqOutputPort::getDataInformation(bool vtkNotUsed(update)) 
 
   return source->GetDataInformation(this->PortNumber);
 }
-
-//-----------------------------------------------------------------------------
-vtkPVDataInformation* pqOutputPort::getCachedDataInformation() const
-{
-  vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(
-    this->getSource()->getProxy());
-
-  if (!source || !source->GetOutputPortsCreated())
-    {
-    return NULL;
-    }
-
-  vtkSMOutputPort* port = source->GetOutputPort(this->PortNumber);
-  return port? port->GetCachedDataInformation(): NULL;
-}
-
 
 //-----------------------------------------------------------------------------
 const char* pqOutputPort::getDataClassName() const

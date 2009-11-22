@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqOptionsContainer.h"
 #include "pqOptionsPage.h"
+#include "pqUndoStack.h"
 
 #include <QAbstractItemModel>
 #include <QHeaderView>
@@ -531,6 +532,7 @@ void pqOptionsDialog::applyChanges()
 {
   if(this->Form->ApplyNeeded)
     {
+    BEGIN_UNDO_SET("Changed View Settings");
     emit this->aboutToApplyChanges();
     QMap<QString, pqOptionsPage *>::Iterator iter = this->Form->Pages.begin();
     for( ; iter != this->Form->Pages.end(); ++iter)
@@ -540,6 +542,7 @@ void pqOptionsDialog::applyChanges()
 
     this->setApplyNeeded(false);
     emit this->appliedChanges();
+    END_UNDO_SET();
     }
 }
 

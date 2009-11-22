@@ -49,7 +49,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.25");
+vtkCxxRevisionMacro(vtkPVMain, "1.26");
 
 int vtkPVMain::UseMPI = 1;
 int vtkPVMain::FinalizeMPI = 0;
@@ -202,6 +202,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
 #endif
 
   int display_help = 0;
+  bool ret_failure = false;
   vtksys_ios::ostringstream sscerr;
   if (argv && !options->Parse(argc, argv) )
     {
@@ -219,8 +220,9 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
     {
     sscerr << options->GetHelp() << endl;
     vtkOutputWindow::GetInstance()->DisplayText( sscerr.str().c_str() );
-    return 1;
+    ret_failure = true;
     }
+
   if (options->GetTellVersion() ) 
     {
     int MajorVersion = PARAVIEW_VERSION_MAJOR;
@@ -228,7 +230,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
     char name[128];
     sprintf(name, "ParaView%d.%d\n", MajorVersion, MinorVersion);
     vtkOutputWindow::GetInstance()->DisplayText(name);
-    return 1;
+    ret_failure = true;
     }
 
   // Create the process module for initializing the processes.
@@ -249,7 +251,7 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
 
   (*initInterp)(this->ProcessModule);
 
-  return 0;
+  return ret_failure? 1 : 0;
 }
 
 //-----------------------------------------------------------------------------

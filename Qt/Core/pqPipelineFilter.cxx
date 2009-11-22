@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
+#include "vtkSMPVRepresentationProxy.h"
 
 //Qt includes.
 #include <QList>
@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"
 #include "pqOutputPort.h"
+#include "pqPipelineRepresentation.h"
 
 uint qHash(QPair<QPointer<pqPipelineSource>, int> arg)
 {
@@ -452,3 +453,36 @@ int pqPipelineFilter::replaceInput() const
   return 1; // default value.
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::hideInputIfRequired(pqView* view)
+{
+  int replace_input = this->replaceInput();
+  if (replace_input > 0)
+    {
+    // hide input source.
+    QList<pqOutputPort*> inputs = this->getAllInputs();
+    for(int kk=0; kk < inputs.size(); ++kk)
+      {
+      pqOutputPort* input = inputs[kk];
+      pqDataRepresentation* inputRepr = input->getRepresentation(view);
+      if (inputRepr)
+        {
+        pqPipelineRepresentation* sourceDisp =
+          qobject_cast<pqPipelineRepresentation*>(inputRepr);
+        if (sourceDisp && replace_input == 2)
+          {
+          // Conditionally turn off the input. The input should be turned
+          // off if the representation is surface and the opacity is 1.
+          int reprType = sourceDisp->getRepresentationType();
+          if ((reprType != vtkSMPVRepresentationProxy::SURFACE &&
+              reprType != vtkSMPVRepresentationProxy::SURFACE_WITH_EDGES) ||
+            sourceDisp->getOpacity() < 1.0)
+            {
+            continue;
+            }
+          }
+        inputRepr->setVisible(false);
+        }
+      }
+    }
+}

@@ -40,6 +40,7 @@ class QAction;
 
 // Keeps a menu updated using the proxy definitions under a particular group.
 // Useful for sources/filters menus.
+// OBSOLETE - TO DEPRECATE (this and subclasses).
 class PQCOMPONENTS_EXPORT pqProxyMenuManager : public QObject
 {
   Q_OBJECT

@@ -137,7 +137,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.95");
+vtkCxxRevisionMacro(vtkProcessModule, "1.96");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1175,6 +1175,7 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
     {
     this->Internals->ProgressServersFlag = servers;
     this->GUIHelper->SendPrepareProgress();
+    this->InvokeEvent(vtkCommand::StartEvent);
     }
   else
     {
@@ -1233,6 +1234,7 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
     this->InvokeEvent(vtkCommand::ProgressEvent, &fprog);
     this->SetLastProgressName(0);
     }
+  this->InvokeEvent(vtkCommand::EndEvent);
 }
 
 //-----------------------------------------------------------------------------

@@ -83,7 +83,7 @@ public:
   /// </ul>
   /// or not of the type preferred by the source, it may create a new view and 
   /// add the displayto new view. \c dont_create_view can be used to 
-  /// override this behaviour.
+  /// override this behavior.
   virtual pqDataRepresentation* createPreferredRepresentation(
     pqOutputPort* port, pqView* view, bool dont_create_view) const;
 
@@ -127,6 +127,10 @@ protected:
   /// type may be created and returned. A new 3D view will be created if the
   /// view has no preferred view type and the active view cannot show the data.
   virtual pqView* getPreferredView(pqOutputPort* opPort, pqView* view) const;
+
+  /// Create a new representation. port and view cannot be null at this point.
+  virtual pqDataRepresentation* newRepresentation(pqOutputPort* port, 
+    pqView* view) const;
 };
 
 #endif

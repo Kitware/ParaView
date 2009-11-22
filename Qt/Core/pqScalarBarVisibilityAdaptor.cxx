@@ -63,15 +63,6 @@ pqScalarBarVisibilityAdaptor::pqScalarBarVisibilityAdaptor(QAction* p)
     p, SLOT(setEnabled(bool)), Qt::QueuedConnection);
   QObject::connect(this, SIGNAL(scalarBarVisible(bool)),
     p, SLOT(setChecked(bool)));
-
-  pqUndoStack* us = pqApplicationCore::instance()->getUndoStack();
-  if (us)
-    {
-    QObject::connect(this, SIGNAL(begin(const QString&)),
-      us, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(end()),
-      us, SLOT(endUndoSet()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -132,10 +123,10 @@ void pqScalarBarVisibilityAdaptor::setScalarBarVisibility(bool visible)
     return;
     }
 
-  emit this->begin("Toggle Color Legend Visibility");
+  BEGIN_UNDO_SET( "Toggle Color Legend Visibility");
   pqScalarBarRepresentation* scalar_bar =
     lut_mgr->setScalarBarVisibility(this->Internal->ActiveRenderView, lut, visible);
-  emit this->end();
+  END_UNDO_SET();
   if (scalar_bar)
     {
     scalar_bar->renderViewEventually();

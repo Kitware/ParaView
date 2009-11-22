@@ -98,15 +98,6 @@ signals:
   /// changes.
   void modified();
 
-  /// Fired just before the color is changed on the underlying proxy.
-  /// This must be hooked to an undo stack to record the
-  /// changes in a undo set.
-  void begin(const QString&);
-
-  /// Fired just after the color is changed on the underlying proxy.
-  /// This must be hooked to an undo stack to record the
-  /// changes in a undo set.
-  void end();
 private slots:
   /// Called to emit the variableChanged() signal in response to user input 
   /// or the chooseVariable() method.

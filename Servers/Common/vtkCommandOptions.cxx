@@ -34,7 +34,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.10");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.11");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -270,6 +270,30 @@ void vtkCommandOptions::AddArgument(const char* longarg, const char* shortarg, c
     if ( shortarg )
       {
       this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkCommandOptions::AddCallback(const char* longarg, const char* shortarg,
+  vtkCommandOptions::CallbackType callback, void* call_data, const char* help,
+  int type)
+{
+  if(type & XMLONLY)
+    {
+    vtkErrorMacro("Callback arguments cannot be processed through XML.");
+    return;
+    }
+
+  if (type & this->ProcessType || type == vtkCommandOptions::EVERYBODY)
+    {
+    typedef vtksys::CommandLineArguments argT;
+    this->Internals->CMD.AddCallback(longarg, argT::EQUAL_ARGUMENT,
+      callback, call_data, help);
+    if ( shortarg )
+      {
+      this->Internals->CMD.AddCallback(shortarg, argT::EQUAL_ARGUMENT,
+        callback, call_data, longarg);
       }
     }
 }

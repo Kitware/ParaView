@@ -58,8 +58,7 @@ class PQCOMPONENTS_EXPORT pqActiveViewOptionsManager : public QObject
 public:
   /// \brief
   ///   Creates a view options manager.
-  /// \param parent The main window used when opening dialogs.
-  pqActiveViewOptionsManager(QWidget *parent=0);
+  pqActiveViewOptionsManager(QObject *parent=0);
   virtual ~pqActiveViewOptionsManager();
 
   /// \brief

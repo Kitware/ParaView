@@ -39,7 +39,6 @@ ENDIF (PVServerManagerTestData)
 
 # Add python script names here.
 SET (PY_TESTS
-  SMAnimation
   ProxyPropertyLinks
   PythonPVSimpleCone
   PythonPVSimpleExII

@@ -78,6 +78,13 @@ public:
   /// sets whether auto accept is on/off
   static void setAutoAccept(bool);
 
+  /// When set to true, on accept(), newly created sources will be shown.
+  /// Default is false.
+  void setShowOnAccept(bool val)
+    { this->ShowOnAccept = val; }
+  bool showOnAccept() const
+    { return this->ShowOnAccept; }
+
 public slots:
   void setProxy(pqProxy *proxy);
 
@@ -132,6 +139,10 @@ protected slots:
   void handleConnectionChanged(pqPipelineSource* in, pqPipelineSource* out);
 
   void updateAcceptState();
+
+protected:
+  /// shows the source.
+  void show(pqPipelineSource*, pqView*);
   
 private:
 
@@ -145,6 +156,7 @@ private:
   QPointer<pqView> View;
   QTimer AutoAcceptTimer;
   static bool AutoAccept;
+  bool ShowOnAccept;
   
   pqObjectPanel* CurrentPanel;
 

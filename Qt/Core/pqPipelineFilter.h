@@ -101,6 +101,9 @@ public:
   /// returns false, otherwise true.
   int replaceInput() const;
 
+  /// Hides the representations for the input if required, in the given view.
+  void hideInputIfRequired(pqView* view);
+
 protected slots:
   /// process some change in the input property for the proxy.
   void inputChanged(vtkObject*, unsigned long, void* client_data);

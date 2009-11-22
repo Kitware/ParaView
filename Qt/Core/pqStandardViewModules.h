@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// interface class for plugins that create view modules
 class PQCORE_EXPORT pqStandardViewModules : public QObject, 
-                                                 public pqViewModuleInterface
+                                            public pqViewModuleInterface
 {
   Q_OBJECT
   Q_INTERFACES(pqViewModuleInterface)

@@ -50,13 +50,6 @@ public:
 signals:
   void currentTextChanged(const QString&);
 
-  /// Fired when the widget begins an undo-able change.
-  void beginUndo(const QString&);
-
-  /// Fired when the widget is finished with an 
-  /// undo-able change.
-  void endUndo();
-
 public slots:
   void setRepresentation(pqDataRepresentation* display);
   

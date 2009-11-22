@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menuSources" command="activate" arguments="RTAnalyticSource" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Edit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/PageNames" command="mousePress" arguments="1,1,0,37,11,/1:0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/PageNames" command="mouseRelease" arguments="1,0,0,37,11,/1:0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/Stack/pqGlobalRenderViewOptions/stackedWidget/General/lodParameters/outlineThreshold" command="set_int" arguments="0" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/ApplyButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/ApplicationSettings/CloseButton" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/menubar/menuFilters/Alphabetical" command="activate" arguments="DataSetTriangleFilter" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_stackedwidget/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="pqClientMainWindow/proxyTabDock/proxyTabWidget/qt_tabwidget_tabbar" command="set_tab" arguments="2" />
+</pqevents>

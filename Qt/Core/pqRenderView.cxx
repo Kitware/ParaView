@@ -74,6 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqDataRepresentation.h"
 #include "pqLinkViewWidget.h"
+#include "pqOptions.h"
 #include "pqOutputPort.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -250,8 +251,11 @@ void pqRenderView::initializeWidgets()
 void pqRenderView::setDefaultPropertyValues()
 {
   vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+  if (!pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
+    {
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+    }
   this->Superclass::setDefaultPropertyValues();
   this->clearUndoStack();
 }
@@ -260,10 +264,13 @@ void pqRenderView::setDefaultPropertyValues()
 void pqRenderView::restoreDefaultLightSettings()
 {
   this->Superclass::restoreDefaultLightSettings();
-  vtkSMProxy* proxy = this->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
-  proxy->UpdateVTKObjects();
+  if (!pqApplicationCore::instance()->getOptions()->GetDisableLightKit())
+    {
+    vtkSMProxy* proxy = this->getProxy();
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("UseLight"), 1);
+    pqSMAdaptor::setElementProperty(proxy->GetProperty("LightSwitch"), 0);
+    proxy->UpdateVTKObjects();
+    }
 }
 
 //-----------------------------------------------------------------------------

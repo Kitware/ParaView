@@ -256,7 +256,7 @@ bool pqChartView::canDisplay(pqOutputPort* opPort) const
     return true;
     }
 
-  vtkPVDataInformation* dataInfo = opPort->getDataInformation(true);
+  vtkPVDataInformation* dataInfo = opPort->getDataInformation();
   return (dataInfo && dataInfo->DataSetTypeIsA("vtkTable"));
 }
 

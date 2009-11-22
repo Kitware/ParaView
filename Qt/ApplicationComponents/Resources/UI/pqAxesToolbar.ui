@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqAxesToolbar</class>
+ <widget class="QToolBar" name="axesToolbar" >
+  <property name="enabled" >
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle" >
+   <string>Center Axes Controls</string>
+  </property>
+  <property name="orientation" >
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <attribute name="toolBarArea" >
+   <enum>TopToolBarArea</enum>
+  </attribute>
+  <attribute name="toolBarBreak" >
+   <bool>false</bool>
+  </attribute>
+
+  <action name="actionShowOrientationAxes" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc">:/pqWidgets/Icons/pqShowOrientationAxes24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Show Orientation Axes</string>
+   </property>
+   <property name="statusTip" >
+    <string>Show/Hide orientation axes</string>
+   </property>
+  </action>
+
+  <action name="actionShowCenterAxes" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqShowCenterAxes24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Show Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Show/Hide center of rotation</string>
+   </property>
+  </action>
+  <action name="actionPickCenter" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqPickCenter24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Pick Center</string>
+   </property>
+   <property name="iconText" >
+    <string>Pick Center</string>
+   </property>
+   <property name="toolTip" >
+    <string>Pick Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Mouse press to pick center of rotation</string>
+   </property>
+  </action>
+  <action name="actionResetCenter" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../pqComponents.qrc" >:/pqWidgets/Icons/pqResetCenter24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Reset Center</string>
+   </property>
+   <property name="statusTip" >
+    <string>Reset center of rotation</string>
+   </property>
+  </action>
+ 
+  <addaction name="actionShowOrientationAxes" />
+  <addaction name="actionShowCenterAxes" />
+  <addaction name="actionResetCenter" />
+  <addaction name="actionPickCenter" />
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -75,15 +75,6 @@ public:
   // of widget.
   void addWidgetForMacros(QWidget* widget);
 
-  // Description:
-  // Set the widget (usually a QMainWindow) that will be used as parent to the
-  // pqPythonDialog.  This is optional.  From Qt documentation:
-  //
-  // "A dialog is always a top-level widget, but if it has a parent, its default
-  // location is centered on top of the parent. It will also share the parent's
-  // taskbar entry."
-  void setParentForPythonDialog(QWidget* parent = 0);
-
 signals:
 
   void paraviewPythonModulesImported();

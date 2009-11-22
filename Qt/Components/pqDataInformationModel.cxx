@@ -489,7 +489,7 @@ void pqDataInformationModel::dataUpdated(pqPipelineSource* changedSource)
       continue;
       }
     
-    vtkPVDataInformation* dataInfo = port->getDataInformation(false);
+    vtkPVDataInformation* dataInfo = port->getDataInformation();
     if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
       {
       iter->MTime = dataInfo->GetMTime();

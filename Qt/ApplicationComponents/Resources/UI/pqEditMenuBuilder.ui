@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqEditMenuBuilder</class>
+ <widget class="QMenu" name="pqEditMenuBuilder">
+  <property name="title">
+   <string>&amp;Edit</string>
+  </property>
+  <action name="actionEditUndo">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqUndo24.png</normaloff>:/pqWidgets/Icons/pqUndo24.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionEditRedo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRedo24.png</normaloff>:/pqWidgets/Icons/pqRedo24.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionEditCameraUndo">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</normaloff>:/pqWidgets/Icons/pqUndoCamera24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionEditCameraRedo">
+   <property name="icon">
+    <iconset resource="../../../Components/Resources/pqComponents.qrc">
+     <normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</normaloff>:/pqWidgets/Icons/pqRedoCamera24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Camera Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionChangeInput">
+   <property name="text">
+    <string>Change &amp;Input...</string>
+   </property>
+   <property name="iconText">
+    <string>Change Input...</string>
+   </property>
+   <property name="toolTip">
+    <string>Change a Filter's Input</string>
+   </property>
+   <property name="statusTip">
+    <string>Change a Filter's Input</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+   <property name="statusTip">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionDelete_All">
+   <property name="text">
+    <string>Delete All</string>
+   </property>
+  </action>
+  <action name="actionIgnoreTime">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ignore Time</string>
+   </property>
+   <property name="toolTip">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="statusTip">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="whatsThis">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+  </action>
+  <action name="actionEditViewSettings">
+   <property name="text">
+    <string>View Settings...</string>
+   </property>
+  </action>
+  <action name="actionEditSettings">
+   <property name="text">
+    <string>Settings...</string>
+   </property>
+   <property name="iconText">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Settings</string>
+   </property>
+  </action>
+  <addaction name="actionEditUndo"/>
+  <addaction name="actionEditRedo"/>
+  <addaction name="separator"/>
+  <addaction name="actionEditCameraUndo"/>
+  <addaction name="actionEditCameraRedo"/>
+  <addaction name="separator"/>
+  <addaction name="actionChangeInput"/>
+  <addaction name="actionIgnoreTime"/>
+  <addaction name="actionDelete"/>
+  <addaction name="actionDelete_All"/>
+  <addaction name="separator"/>
+  <addaction name="actionEditSettings"/>
+  <addaction name="actionEditViewSettings"/>
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

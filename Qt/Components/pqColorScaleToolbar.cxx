@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqColorScaleToolbar.h"
 
+#include "pqCoreUtilities.h"
 #include "pqColorScaleEditor.h"
 #include "pqDisplayColorWidget.h"
 #include "pqPipelineRepresentation.h"
@@ -41,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPVRepresentationProxy.h"
 
 #include <QAction>
-#include <QApplication>
 #include <QColor>
 #include <QColorDialog>
 #include <QList>
@@ -147,12 +147,7 @@ void pqColorScaleToolbar::editColorMap(pqDataRepresentation *display)
     // Create the color map editor if needed.
     if (this->Internal->ColorScaleEditor.isNull())
       {
-      QWidget* parentWidget = qobject_cast<QWidget*>(this->parent());
-      if (!parentWidget)
-        {
-        parentWidget = QApplication::activeWindow();
-        }
-
+      QWidget* parentWidget = pqCoreUtilities::mainWidget();
       this->Internal->ColorScaleEditor = new pqColorScaleEditor(parentWidget);
       this->Internal->ColorScaleEditor->setAttribute(Qt::WA_DeleteOnClose);
       }
@@ -216,7 +211,7 @@ void pqColorScaleToolbar::changeColor()
             }
 
           // Let the user pick a new color.
-          color = QColorDialog::getColor(color, QApplication::activeWindow());
+          color = QColorDialog::getColor(color, pqCoreUtilities::mainWidget());
           if(color.isValid())
             {
             // Set the properties to the new color.

@@ -167,7 +167,7 @@ public:
   /// This is a convenience method to return the name of the
   /// property on the proxy, if any, which can be used to set the filename.
   /// If no such property exists, this retruns a null string.
-  QString getFileNamePropertyName(vtkSMProxy*)  const;
+  static QString getFileNamePropertyName(vtkSMProxy*);
   
   // HACK: pqSimpleServerStartup needs to fire the
   // finishedAddingServer() signal on successful

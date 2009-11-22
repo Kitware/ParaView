@@ -12,13 +12,14 @@ class pqServer;
 
 class pqFileDialogTestUtility : public pqTestUtility
 {
+  Q_OBJECT
 public:
   pqFileDialogTestUtility();
   ~pqFileDialogTestUtility();
-  void playTests(const QString& filename);
-  void playTests(const QStringList& filenames);
-  void testSucceeded();
-  void testFailed();
+  virtual bool playTests(const QStringList& filenames);
+public slots:
+  void playTheTests(const QStringList&);
+
 protected:
   void setupFiles();
   void cleanupFiles();

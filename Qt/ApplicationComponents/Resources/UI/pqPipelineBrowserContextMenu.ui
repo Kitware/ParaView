@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqPipelineBrowserContextMenu</class>
+ <widget class="QWidget" name="pqPipelineBrowserContextMenu">
+  <action name="actionPBChangeInput">
+   <property name="text">
+    <string>Change &amp;Input...</string>
+   </property>
+   <property name="iconText">
+    <string>Change Input...</string>
+   </property>
+   <property name="toolTip">
+    <string>Change a Filter's Input</string>
+   </property>
+   <property name="statusTip">
+    <string>Change a Filter's Input</string>
+   </property>
+  </action>
+  <action name="actionPBDelete">
+   <property name="icon">
+    <iconset>
+     <normaloff/>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Delete</string>
+   </property>
+   <property name="statusTip">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionPBIgnoreTime">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Ignore Time</string>
+   </property>
+   <property name="toolTip">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="statusTip">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+   <property name="whatsThis">
+    <string>Disregard this source/filter's time from animations</string>
+   </property>
+  </action>
+  <action name="actionPBOpen" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Open</string>
+   </property>
+   <property name="statusTip" >
+    <string>Open</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionPBCreateCustomFilter" >
+   <property name="text" >
+    <string>&amp;Create Custom Filter...</string>
+   </property>
+  </action>
+  <addaction name="actionPBOpen" />
+  <addaction name="actionPBCreateCustomFilter" />
+  <addaction name="actionPBChangeInput"/>
+  <addaction name="actionPBIgnoreTime"/>
+  <addaction name="actionPBDelete"/>
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>
+

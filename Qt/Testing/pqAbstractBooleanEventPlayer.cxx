@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAbstractButton>
 #include <QtDebug>
+#include <QAction>
 
 pqAbstractBooleanEventPlayer::pqAbstractBooleanEventPlayer(QObject* p)
   : pqWidgetEventPlayer(p)
@@ -51,6 +52,15 @@ bool pqAbstractBooleanEventPlayer::playEvent(QObject* Object, const QString& Com
     {
     if(value != object->isChecked())
       object->click();
+    return true;
+    }
+
+  if (QAction* const action = qobject_cast<QAction*>(Object))
+    {
+    if (action->isChecked() != value)
+      {
+      action->trigger();
+      }
     return true;
     }
 

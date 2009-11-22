@@ -41,8 +41,7 @@ QString pqCustomDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     return view_type;
     }
 
-  vtkPVDataInformation* datainfo = update_pipeline?
-    opPort->getDataInformation(true) : opPort->getCachedDataInformation();
+  vtkPVDataInformation* datainfo = opPort->getDataInformation();
   QString className = datainfo?  datainfo->GetDataClassName() : QString();
 
   // * Check if we should create the 2D view.

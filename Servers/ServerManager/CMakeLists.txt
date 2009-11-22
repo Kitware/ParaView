@@ -145,6 +145,7 @@ SET(Kit_SRCS
   vtkSMPVRepresentationProxy.cxx
   vtkSMPWriterProxy.cxx
   vtkSMRampKeyFrameProxy.cxx
+  vtkSMReaderFactory.cxx
   vtkSMRenderViewHelper.cxx
   vtkSMRenderViewProxy.cxx
   vtkSMRenderViewExporterProxy.cxx
@@ -208,6 +209,7 @@ SET(Kit_SRCS
   vtkSMVectorProperty.cxx
   vtkSMViewProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
+  vtkSMWriterFactory.cxx
   vtkSMWriterProxy.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
@@ -461,13 +463,13 @@ ELSE(CMAKE_CROSSCOMPILING)
   GET_TARGET_PROPERTY(DOCUMENTATION_EXE vtkSMExtractDocumentation LOCATION)
 ENDIF(CMAKE_CROSSCOMPILING)
 
-SET(adpFile ${ParaView_SOURCE_DIR}/Documentation/pqClient.adp)
+# FIXME: DUDE! Dependency on Qt code in ServerManager!!!!
 FOREACH(gcf ${GUI_CONFIG_FILES})
-  SET(fullXMLFile ${ParaView_SOURCE_DIR}/Qt/Components/Resources/XML/${gcf}.xml)
+  SET(fullXMLFile ${ParaView_SOURCE_DIR}/Applications/ParaView/${gcf}.xml)
   SET(fullHTMLFile ${ParaView_BINARY_DIR}/Documentation/${gcf}.html)
   ADD_CUSTOM_COMMAND(
     OUTPUT ${fullHTMLFile}
-    DEPENDS ${fullXMLFile} ${resourceFiles} ${adpFile} vtkSMExtractDocumentation
+    DEPENDS ${fullXMLFile} ${resourceFiles} vtkSMExtractDocumentation
     COMMAND ${DOCUMENTATION_EXE}
     ARGS ${ParaView_BINARY_DIR}/Documentation ${fullXMLFile}
     COMMENT "Creating Documentation for ${gcf}"

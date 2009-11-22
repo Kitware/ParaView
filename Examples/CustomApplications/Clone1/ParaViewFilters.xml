@@ -1,0 +1,162 @@
+<ParaViewFilters>
+  <Category name="Common" menu_label="&amp;Common" preserve_order="1"
+    show_in_toolbar="1">
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
+    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
+    <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
+    <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
+    <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
+    <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
+    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
+    <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+  </Category>
+
+  <Category name="DataAnalysis" menu_label="&amp;Data Analysis">
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
+    <Proxy group="filters" name="ExtractSelection"
+            icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+    <Proxy group="filters" name="ExtractSelectionOverTime"
+            icon=":/pqWidgets/Icons/pqPlotCellOverTime24.png" />
+    <Proxy group="filters" name="ExtractHistogram" 
+            icon=":/pqWidgets/Icons/pqHistogram24.png"/>
+    <Proxy group="filters" name="IntegrateAttributes" />
+    <Proxy group="filters" name="ExtractFieldDataOverTime" />
+    <Proxy group="filters" name="ProbeLine" 
+            icon=":/pqWidgets/Icons/pqPlotLineOverTime24.png" />
+    <Proxy group="filters" name="ProbePoint" 
+            icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
+    <Proxy group="filters" name="PlotAttributes" />
+    <Proxy group="filters" name="PlotOnSortedLines" />
+    <Proxy group="filters" name="PlotOnIntersectionCurves" />
+    <Proxy group="filters" name="ProgrammableFilter" 
+            icon=":/pqWidgets/Icons/pqProgrammableFilter24.png"/>
+  </Category>
+
+  <Category name="Statistics" menu_label="&amp;Statistics">
+    <Proxy group="filters" name="ContingencyStatistics"/>
+    <Proxy group="filters" name="DescriptiveStatistics"/>
+    <Proxy group="filters" name="KMeans"/>
+    <Proxy group="filters" name="MulticorrelativeStatistics"/>
+    <Proxy group="filters" name="PCAStatistics"/>
+  </Category>
+
+  <Category name="Temporal" menu_label="&amp;Temporal">    
+    <Proxy group="filters" name="ParticleTracer" />    
+    <Proxy group="filters" name="ParticlePathLines" />
+    <Proxy group="filters" name="TemporalCache" />    
+    <Proxy group="filters" name="TemporalInterpolator" />    
+    <Proxy group="filters" name="TemporalSnapToTimeStep" />    
+    <Proxy group="filters" name="TemporalShiftScale" />    
+    <Proxy group="filters" name="TemporalStatistics" />
+    <Proxy group="filters" name="TimeToTextConvertor" />    
+  </Category>
+
+  <Proxy group="filters" name="Append" />
+  <Proxy group="filters" name="AppendAttributes" />
+  <Proxy group="filters" name="AppendPolyData" />
+  <Proxy group="filters" name="ArbitrarySourceGlyph" />
+  <Proxy group="filters" name="ArbitrarySourceStreamTracer" />
+  <Proxy group="filters" name="BlockIdScalars" />
+  <Proxy group="filters" name="BrownianPoints" />
+  <Proxy group="filters" name="Calculator" />
+  <Proxy group="filters" name="CellCenters" />
+  <Proxy group="filters" name="CellDataToPointData" />
+  <Proxy group="filters" name="CellDerivatives"/>
+  <Proxy group="filters" name="CleanPolyData" />
+  <Proxy group="filters" name="CleanUnstructuredGrid" />
+  <Proxy group="filters" name="Clip" />
+  <Proxy group="filters" name="Contour" />
+  <Proxy group="filters" name="CTHFragmentConnect"/>
+  <Proxy group="filters" name="CTHFragmentIntersect"/>
+  <Proxy group="filters" name="CTHPart" />
+  <Proxy group="filters" name="Curvatures" />
+  <Proxy group="filters" name="Cut" />
+  <Proxy group="filters" name="D3" />
+  <Proxy group="filters" name="DataSetSurfaceFilter" />
+  <Proxy group="filters" name="DataSetTriangleFilter" />
+  <Proxy group="filters" name="DecimatePro" />
+  <Proxy group="filters" name="Delaunay2D" />
+  <Proxy group="filters" name="Delaunay3D" />
+  <Proxy group="filters" name="ElevationFilter" />
+  <Proxy group="filters" name="ExtractBlock" />
+  <Proxy group="filters" name="ExtractEdges" />
+  <Proxy group="filters" name="ExtractGeometry" />
+  <Proxy group="filters" name="ExtractGrid" />
+  <Proxy group="filters" name="ExtractHistogram" />
+  <Proxy group="filters" name="ExtractHierarchicalLevel" />
+  <Proxy group="filters" name="ExtractSelection" />
+  <Proxy group="filters" name="ExtractSelectionOverTime" />
+  <Proxy group="filters" name="ExtractHierarchicalDataSets" />
+  <Proxy group="filters" name="FeatureEdges" />
+  <Proxy group="filters" name="FFTSelectionOverTime" />
+  <Proxy group="filters" name="GenerateIdScalars"/>
+  <Proxy group="filters" name="Glyph" />
+  <Proxy group="filters" name="Gradient" />
+  <Proxy group="filters" name="GroupDataSets" />
+  <Proxy group="filters" name="IntegrateAttributes" />
+  <Proxy group="filters" name="IntegrateFlowThroughSurface" />
+  <Proxy group="filters" name="LevelIdScalars" />
+  <Proxy group="filters" name="LinearExtrusionFilter" />
+  <Proxy group="filters" name="LoopSubdivisionFilter" />
+  <Proxy group="filters" name="MaskPoints" />
+  <Proxy group="filters" name="Median" />
+  <Proxy group="filters" name="MergeBlocks" />
+  <Proxy group="filters" name="MeshQuality" />
+  <Proxy group="filters" name="OctreeDepthLimit" />
+  <Proxy group="filters" name="OctreeDepthScalars" />
+  <Proxy group="filters" name="OutlineCornerFilter" />
+  <Proxy group="filters" name="OutlineFilter" />
+  <Proxy group="filters" name="ParticlePathLines" />
+  <Proxy group="filters" name="ParticleTracer" />
+  <Proxy group="filters" name="PlotAttributes" />
+  <Proxy group="filters" name="PlotOnIntersectionCurves" />
+  <Proxy group="filters" name="PlotOnSortedLines" />
+  <Proxy group="filters" name="PointDataToCellData" />
+  <Proxy group="filters" name="PolyDataNormals" />
+  <Proxy group="filters" name="Probe" />
+  <Proxy group="filters" name="ProbeLine" />
+  <Proxy group="filters" name="ProbePoint" />
+  <Proxy group="filters" name="ProcessIdScalars" />
+  <Proxy group="filters" name="ProgrammableFilter" />
+  <Proxy group="filters" name="PVConnectivityFilter" />
+  <Proxy group="filters" name="PythonCalculator" />
+  <Proxy group="filters" name="QuadraturePointInterpolator" />
+  <Proxy group="filters" name="QuadraturePointsGenerator" />
+  <Proxy group="filters" name="QuadraturePointStatistics" />
+  <Proxy group="filters" name="QuadratureSchemeDictionaryGenerator" />
+  <Proxy group="filters" name="QuadricClustering" />
+  <Proxy group="filters" name="ReflectionFilter" />
+  <Proxy group="filters" name="RibbonFilter" />
+  <Proxy group="filters" name="RotationalExtrusionFilter" />
+  <Proxy group="filters" name="ScatterPlot"/>
+  <Proxy group="filters" name="ShrinkFilter" />
+  <Proxy group="filters" name="SmoothPolyDataFilter" />
+  <Proxy group="filters" name="StreamTracer" />
+  <Proxy group="filters" name="Stripper" />
+  <Proxy group="filters" name="StructuredGridOutlineFilter" />
+  <Proxy group="filters" name="Subdivide" />
+  <Proxy group="filters" name="SurfaceVectors" />
+  <Proxy group="filters" name="TemporalCache" />
+  <Proxy group="filters" name="TemporalInterpolator" />
+  <Proxy group="filters" name="TemporalSnapToTimeStep" />  
+  <Proxy group="filters" name="TemporalShiftScale" />
+  <Proxy group="filters" name="TemporalStatistics" />
+  <Proxy group="filters" name="TessellatorFilter" />
+  <Proxy group="filters" name="TextureMapToCylinder" />
+  <Proxy group="filters" name="TextureMapToPlane" />
+  <Proxy group="filters" name="TextureMapToSphere" />
+  <Proxy group="filters" name="Threshold" />
+  <Proxy group="filters" name="TimeToTextConvertor" />
+  <Proxy group="filters" name="TransformFilter" />
+  <Proxy group="filters" name="TriangleFilter" />
+  <Proxy group="filters" name="TubeFilter" />
+  <Proxy group="filters" name="UnstructuredGradient" />
+  <Proxy group="filters" name="WarpScalar" />
+  <Proxy group="filters" name="WarpVector" />
+  <Proxy group="filters" name="NormalGlyphs" />
+  <Proxy group="filters" name="TableToPolyData" />
+  <Proxy group="filters" name="TableToStructuredGrid" />
+</ParaViewFilters>

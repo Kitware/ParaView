@@ -34,15 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 
-class pqActiveViewOptionsManager;
 class pqMultiViewFrame;
 class pqServer;
-class pqUndoStack;
 class pqView;
 class vtkImageData;
 class vtkPVXMLElement;
 class vtkSMProxyLocator;
-class vtkUndoElement;
 
 /// This class manages all view windows. View windows occupy the central
 /// area in the application are all layed out using split windows. This 
@@ -61,12 +58,6 @@ public:
   /// returns the active view module.
   pqView* getActiveView() const;
 
-  /// Save the state of the view window manager.
-  void saveState(vtkPVXMLElement* root);
-
-  /// Loads the state for the view window manager.
-  bool loadState(vtkPVXMLElement* rwRoot, vtkSMProxyLocator* loader);
-
   /// This option is used for testing. When size.isEmpty() is true,
   /// it resets the maximum bounds on the view windows.
   /// This is useful when running tests, so that we are guranteed that 
@@ -79,9 +70,6 @@ public:
 
   /// Given a frame, returns the view, if any contained in it.
   pqView* getView(pqMultiViewFrame* frame) const;
-
-  /// Set the undo stack used for the application.
-  void setUndoStack(pqUndoStack* stack);
 
   /// Prepare the multiview for a screen capture for the given size. Returns the
   /// magnification to be used while performing the capture, if the
@@ -108,38 +96,21 @@ public:
   ///   Resets the multi-view to its original state.
   /// \param removed Used to return all the removed widgets.
   virtual void reset(QList<QWidget*> &removed);
+  virtual void reset();
 
-  /// View options manager is used to show the view options dialog for the
-  /// current view. If the manager is not set, then the view options tool button
-  /// will be disabled.
-  void setViewOptionsManager(pqActiveViewOptionsManager* manager);
+protected slots:
+  /// Save the state of the view window manager.
+  void saveState(vtkPVXMLElement* root);
+
+  /// Loads the state for the view window manager.
+  bool loadState(vtkPVXMLElement* rwRoot, vtkSMProxyLocator* loader);
+
+  /// Called when server disconnects, we reset the view layout.
+  void onServerDisconnect();
 
 signals:
   /// Fired when the active view module changes.
   void activeViewChanged(pqView*);
-
-  /// Fired when the user pressed the lookmark button for one of the views
-  void createLookmark(QWidget*);
-
-  /// Fired when the manager begins an undoable change.
-  void beginUndo(const QString& label);
-
-  /// Fired when the manager is done with an undoable change.
-  void endUndo();
-
-  /// Fired to add the elem to the undo stack.
-  void addToUndoStack(vtkUndoElement* elem);
-
-  /// emitted when the manager begins changes that should not get
-  /// recorded on the undo stack.
-  void beginNonUndoableChanges();
-
-  /// emitted when the manager is done with changes that
-  /// should not get recorded on the undo stack.
-  void endNonUndoableChanges();
-
-  /// Fired when the camera button is clicked.
-  void triggerCameraAdjustment(pqView*);
 
 private slots:
   /// This will create a view module to fill the frame.
@@ -186,19 +157,7 @@ private slots:
   /// We add an undo element to the stack to undo/redo the split.
   void onSplittingView(const Index&, Qt::Orientation, float, const Index&);
 
-  /// Called when the camera button is clicked
-  virtual void onCameraTriggered();
-
-  /// Called when the view options button is clicked.
-  void onViewOptionsRequested();
-
 public slots:
-  /// Set the active server. This must be called whenever
-  /// active server changes. The active server is used to 
-  /// determine the server on whcih to create new view modules
-  /// when a frame a split.
-  void setActiveServer(pqServer* server);
-
   /// Called to change the active view. If view==null and then if the view
   /// manager is currently focused on an empty frame, then it does not change
   /// that. Otherwise the frame containing the view is activated.
@@ -249,6 +208,9 @@ protected:
 
   QAction* getAction(pqMultiViewFrame* frame,QString name);
 
+  /// need access to the loadState()/saveState() methods.
+  friend class pqCloseViewUndoElement;
+  friend class pqSplitViewUndoElement;
 
 private:
   pqViewManager(pqViewManager&); // Not implemented.

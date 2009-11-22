@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqVCRToolbar</class>
+ <widget class="QToolBar" name="VCRToolbar" >
+  <property name="windowTitle" >
+   <string>VCR Controls</string>
+  </property>
+  <property name="orientation" >
+   <enum>Qt::Horizontal</enum>
+  </property>
+  <attribute name="toolBarArea" >
+   <enum>TopToolBarArea</enum>
+  </attribute>
+  <attribute name="toolBarBreak" >
+   <bool>false</bool>
+  </attribute>
+  <action name="actionVCRPlay" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrPlay24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Play</string>
+   </property>
+  </action>
+
+  <action name="actionVCRPreviousFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrBack24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Pre&amp;vious Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRFirstFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrFirst24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;First Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRNextFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrForward24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Next Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRLastFrame" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLast24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Last Frame</string>
+   </property>
+  </action>
+  <action name="actionVCRLoop" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqVcrLoop24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>L&amp;oop</string>
+   </property>
+   <property name="iconText" >
+    <string>Loop</string>
+   </property>
+   <property name="toolTip" >
+    <string>Loop</string>
+   </property>
+   <property name="statusTip" >
+    <string>Loop</string>
+   </property>
+  </action>
+
+
+  <addaction name="actionVCRFirstFrame" />
+  <addaction name="actionVCRPreviousFrame" />
+  <addaction name="actionVCRPlay" />
+  <addaction name="actionVCRNextFrame" />
+  <addaction name="actionVCRLastFrame" />
+  <addaction name="actionVCRLoop" />
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

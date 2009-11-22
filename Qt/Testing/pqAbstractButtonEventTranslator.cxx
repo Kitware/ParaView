@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QToolButton>
 
 #include <iostream>
 
@@ -91,11 +92,17 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
   return true;
 }
 
-void pqAbstractButtonEventTranslator::onActivate(QAbstractButton* object)
+void pqAbstractButtonEventTranslator::onActivate(QAbstractButton* actualObject)
 {
-  if(object->isCheckable())
+  QObject* object = actualObject;
+  QToolButton* tb = qobject_cast<QToolButton*>(object);
+  if (tb && tb->defaultAction())
     {
-    const bool new_value = !object->isChecked();
+    object = tb->defaultAction();
+    }
+  if(actualObject->isCheckable())
+    {
+    const bool new_value = !actualObject->isChecked();
     emit recordEvent(object, "set_boolean", new_value ? "true" : "false");
     }
   else

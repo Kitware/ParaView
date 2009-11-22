@@ -42,7 +42,7 @@ class pqView;
 class pqServerManagerModelItem;
 class vtkSMProxy;
 
-/// This is the Animation panel widget. It controls the behaviour
+/// This is the Animation panel widget. It controls the behavior
 /// of the Animation panel which includes adding of key frames,
 /// changing of keyframes etc etc.
 class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
@@ -50,7 +50,7 @@ class PQCOMPONENTS_EXPORT pqAnimationViewWidget : public QWidget
   Q_OBJECT
   typedef QWidget Superclass;
 public:
-  pqAnimationViewWidget(QWidget* parent);
+  pqAnimationViewWidget(QWidget* parent=0);
   virtual ~pqAnimationViewWidget();
 
 public slots:

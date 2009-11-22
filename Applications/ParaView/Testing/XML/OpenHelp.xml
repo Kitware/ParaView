@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionHelp" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/menubar/menu_Help" command="activate" arguments="actionHelp" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="expand" arguments="0.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="setCurrent" arguments="0.0.1.0" />
+  <pqevent object="pqClientMainWindow/pqHelpWindow/contentsDock/1QHelpContentWidget0" command="expand" arguments="0.0.1.0" />
+</pqevents>

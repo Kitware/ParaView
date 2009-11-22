@@ -33,21 +33,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqApplicationCore_h
 
 #include "pqCoreExport.h"
+#include "vtkSetGet.h" // for VTK_LEGACY macro
 #include <QObject>
+#include <QPointer>
 
 class pq3DWidgetFactory;
-class pqApplicationCoreInternal;
 class pqDisplayPolicy;
-class vtkSMGlobalPropertiesManager;
 class pqLinksModel;
-class pqLookmarkManagerModel;
 class pqLookupTableManager;
 class pqObjectBuilder;
-class pqPendingDisplayManager;
+class pqOptions;
+class pqOutputWindow;
+class pqOutputWindowAdapter;
 class pqPipelineSource;
 class pqPluginManager;
 class pqProgressManager;
-class pqRenderViewModule;
 class pqServer;
 class pqServerManagerModel;
 class pqServerManagerObserver;
@@ -56,20 +56,22 @@ class pqServerResource;
 class pqServerResources;
 class pqServerStartups;
 class pqSettings;
+class pqTestUtility;
 class pqUndoStack;
+class QApplication;
+class QStringList;
 class vtkPVXMLElement;
-class vtkSMStateLoader;
+class vtkSMGlobalPropertiesManager;
+class vtkSMProxyLocator;
 
 /// This class is the crux of the ParaView application. It creates
-/// and manages various managers which are necessary for the PQClient
-/// to work with the ServerManager. The functionality implemented by
-/// this class itself should be kept minimal. It should typically use
-/// delegates to do all the work. This class is merely the toolbox
-/// to look for anything of interest. 
-/// This class also must be free of actual GUI element i.e. QWidget
-/// (and subclasses) probably don't belong here. This will make it
-/// it possible for the GUI to change isolated from the core (hopefully). 
-
+/// and manages various managers which are necessary for the ParaView-based
+/// client to work with the ServerManager.
+/// For clients based of the pqCore library,
+/// simply instantiate this pqApplicationCore after QApplication initialization 
+/// and then create your main window etc. like a standard Qt application. You can then
+/// use the facilities provided by pqCore such as the pqObjectBuilder,
+/// pqUndoStack etc. in your application. After that point.
 class PQCORE_EXPORT pqApplicationCore : public QObject
 {
   Q_OBJECT
@@ -77,27 +79,39 @@ public:
   // Get the global instace for the pqApplicationCore.
   static pqApplicationCore* instance();
 
-  pqApplicationCore(QObject* parent=NULL);
-  virtual ~pqApplicationCore();
+  /// DEPRECATED CONSTRUCTOR. This expects the old-style
+  /// pqProcessModuleGUIHelper shebang. Only here till all application switch to
+  /// new style.
+  /// @deprecated Use pqApplicationCore(int, char**, pqOptions*, QObject*)
+  /// instead which uses the new style application initialization process.
+  VTK_LEGACY(pqApplicationCore(QObject* parentObject=NULL));
+
+  /// Preferred constructor. Initializes the server-manager engine and sets up
+  /// the core functionality. If application supports special command line
+  /// options, pass an instance of pqOptions subclass to the constructor,
+  /// otherwise a new instance of pqOptions with standard ParaView command line
+  /// options will be created.
+  pqApplicationCore(int& argc, char** argv, pqOptions* options=0, QObject* parent=0);
+
+  /// Dangerous option that disables the debug output window, intended for
+  /// demo purposes only
+  void disableOutputWindow();
+
+  /// Provides access to the command line options object.
+  pqOptions* getOptions() const
+    { return this->Options; }
 
   /// Get the Object Builder. Object Buider must be used
   /// to create complex objects such as sources, filters,
   /// readers, views, displays etc.
-  pqObjectBuilder* getObjectBuilder() const;
+  pqObjectBuilder* getObjectBuilder() const
+    { return this->ObjectBuilder; }
 
-  /// Set/Get the application undo stack.
-  /// No undo stack is set up by default. The application
-  /// must create and set one if it should support undo/redo
-  /// operations.
-  /// I'd really like the application core not reference the
-  /// the undo stack at all. However, time and again we have 
-  /// some widget somewhere in the GUI that needs access to the undo
-  /// stack. It's a pain to provide the undo stack to evety such deep
-  /// widget, hence we provide this access location. 
-  /// Everyone using getUndoStack() must handle the case
-  /// when this method returns NULL.
+  /// Set/Get the application's central undo stack. By default no undo stack is
+  /// provided. Applications must set on up as required.
   void setUndoStack(pqUndoStack* stack);
-  pqUndoStack* getUndoStack() const;
+  pqUndoStack* getUndoStack() const
+    { return this->UndoStack; }
 
   /// Custom Applications may need use various "managers"
   /// All such manager can be registered with the pqApplicationCore
@@ -121,80 +135,91 @@ public:
   /// for changes to the server manager and fires signals on
   /// certain actions such as registeration/unregistration of proxies
   /// etc. Returns the ServerManagerObserver used by the application.
-  pqServerManagerObserver* getServerManagerObserver();
+  pqServerManagerObserver* getServerManagerObserver()
+    { return this->ServerManagerObserver; }
 
   /// ServerManagerModel is the representation of the ServerManager
   /// using pqServerManagerModelItem subclasses. It makes it possible to
   /// explore the ServerManager with ease by separating proxies based 
   /// on their functionality/type.
-  pqServerManagerModel* getServerManagerModel() const;
+  pqServerManagerModel* getServerManagerModel() const
+    { return this->ServerManagerModel; }
 
-  pq3DWidgetFactory* get3DWidgetFactory();
-  pqLinksModel* getLinksModel();
-  pqPluginManager* getPluginManager();
+  pq3DWidgetFactory* get3DWidgetFactory() const
+    { return this->WidgetFactory; }
+
+  /// pqLinksModel is the model used to keep track of proxy/property links
+  /// maintained by vtkSMProxyManager.
+  /// TODO: It may be worthwhile to investigate if we even need a global
+  /// pqLinksModel. All the information is already available in
+  /// vtkSMProxyManager.
+  pqLinksModel* getLinksModel() const
+    { return this->LinksModel; }
+
+  /// pqPluginManager manages all functionality associated with loading plugins.
+  pqPluginManager* getPluginManager() const
+    { return this->PluginManager; }
 
   /// ProgressManager is the manager that streamlines progress.
-  pqProgressManager* getProgressManager() const;
+  pqProgressManager* getProgressManager() const
+    { return this->ProgressManager; }
 
-  // Returns the display policy instance used by the application.
-  // pqDisplayPolicy defines the policy for creating displays
-  // given a (source,view) pair.
-  pqDisplayPolicy* getDisplayPolicy() const;
+  //// Returns the display policy instance used by the application.
+  //// pqDisplayPolicy defines the policy for creating representations
+  //// for sources.
+  pqDisplayPolicy* getDisplayPolicy() const
+    { return this->DisplayPolicy; }
 
-  // It is possible to change the display policy used by
-  // the application. Used to change the active display
-  // policy.
-  void setDisplayPolicy(pqDisplayPolicy*);
+  /// It is possible to change the display policy used by
+  /// the application. Used to change the active display
+  /// policy. The pqApplicationCore takes over the ownership of the display policy.
+  void setDisplayPolicy(pqDisplayPolicy* dp);
 
-  // Returns the server manager selection model.
-  pqServerManagerSelectionModel* getSelectionModel();
+  /// Returns the server manager selection model which keeps track of the active
+  /// sources/filters.
+  pqServerManagerSelectionModel* getSelectionModel()
+    { return this->SelectionModel; }
 
-  // Set/Get the lookup table manager. 
+  /// Provides access to the test utility.
+  virtual pqTestUtility* testUtility();
+
+  /// Set/Get the lookup table manager. Lookup table manager is used to manage
+  /// lookup tables used for coloring using data arrays.
+  /// policy. The pqApplicationCore takes over the ownership of the manager.
   void setLookupTableManager(pqLookupTableManager*);
-  pqLookupTableManager* getLookupTableManager() const;
+  pqLookupTableManager* getLookupTableManager() const
+    { return this->LookupTableManager; }
 
-  /// Save the ServerManager state.
-  void saveState(vtkPVXMLElement* root);
-
-  /// Loads the ServerManager state. Emits the signal
-  /// stateLoaded() on loading state successfully.
-  void loadState(vtkPVXMLElement* root, pqServer* server, 
-    vtkSMStateLoader* loader=NULL);
+  /// Returns the manager for the global properties such as ForegroundColor etc.
+  vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
 
   /// Returns the set of available server resources
   pqServerResources& serverResources();
   /// Set server resources
   void setServerResources(pqServerResources* serverResources);
-  
   /// Returns an object that can start remote servers
   pqServerStartups& serverStartups();
 
   /// Get the application settings.
   pqSettings* settings();
 
-  /// Set/get the application name for the application settings.
-  void setApplicationName(const QString&);
-  QString applicationName();
+  /// Save the ServerManager state.
+  vtkPVXMLElement* saveState();
+  void saveState(const QString& filename);
 
-  /// Set/get the organization name for the application settngs.
-  void setOrganizationName(const QString&);
-  QString organizationName();
+  /// Loads the ServerManager state. Emits the signal
+  /// stateLoaded() on loading state successfully.
+  void loadState(vtkPVXMLElement* root, pqServer* server);
+  void loadState(const char* filename, pqServer* server);
 
-  /// Renders all windows
-  void render();
-
-  /// Set the application specific state loader to use 
-  /// while loading states, if any. This is used
-  /// only when loadState is called with loader=NULL.
-  void setStateLoader(vtkSMStateLoader* loader);
-
-  // Check to see if its in the process of loading a state
+  /// Check to see if its in the process of loading a state
+  /// Reliance on this flag is chimerical since we cannot set this ivar when
+  /// state file is  being loaded from python shell.
   bool isLoadingState(){return this->LoadingState;};
 
-  /// Returns the manager for the global properties such as ForegroundColor etc.
-  vtkSMGlobalPropertiesManager* getGlobalPropertiesManager();
-
   /// Loads global properties values from settings.
+  /// HACK: Need more graceful way of dealing with changes to settings and
+  /// updating items that depend on it.
   void loadGlobalPropertiesFromSettings();
 
   /// loads palette i.e. global property values given the name of the palette.
@@ -211,7 +236,9 @@ public:
 
   /// returns the active server is any.
   pqServer* getActiveServer() const;
- 
+
+  /// Destructor.
+  virtual ~pqApplicationCore();
 public slots:
   /// Called QCoreApplication::quit().
   /// Applications should use this method instead of directly
@@ -219,28 +246,70 @@ public slots:
   /// that any cleanup is performed correctly.
   void quit();
 
+  /// Causes the output window to be shown.
+  void showOutputWindow();
+
+  /// Load configuration xml. This results in firing of the loadXML() signal
+  /// which different components that support configuration catch and process to
+  /// update their behavior.
+  void loadConfiguration(const QString& filename);
+
+  /// Renders all windows
+  void render();
+
 signals:
   // Fired when a state file is loaded successfully.
-  void stateLoaded();
+  // GUI components that may have state saved in the XML state file must listen
+  // to this signal and handle process the XML to update their state.
+  void stateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
+
+  // Fired to save state xml. Components that need to save XML state should
+  // listen to this signal and add their XML elements to the root. DO NOT MODIFY
+  // THE ROOT besides adding new children.
+  void stateSaved(vtkPVXMLElement* root);
+
+  /// Fired when the undo stack is set.
+  void undoStackChanged(pqUndoStack*);
+
+  /// Fired on loadConfiguration().
+  void loadXML(vtkPVXMLElement*);
+
+protected slots:
+  void onStateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
+  void onStateSaved(vtkPVXMLElement* root);
 
 protected:
-
-  friend class pqProcessModuleGUIHelper;
-
-  /// called to start accepting progress.
-  void prepareProgress();
-
-  /// called to stop accepting progress.
-  void cleanupPendingProgress();
-
-  /// called to udpate progress.
-  void sendProgress(const char* name, int value);
-
   bool LoadingState;
 
+  pqOutputWindow* OutputWindow;
+  pqOutputWindowAdapter* OutputWindowAdapter;
+  pqOptions* Options;
+
+  pq3DWidgetFactory* WidgetFactory;
+  pqDisplayPolicy* DisplayPolicy;
+  pqLinksModel* LinksModel;
+  pqLookupTableManager* LookupTableManager;
+  pqObjectBuilder* ObjectBuilder;
+  pqPluginManager* PluginManager;
+  pqProgressManager* ProgressManager;
+  pqServerManagerModel* ServerManagerModel;
+  pqServerManagerObserver* ServerManagerObserver;
+  pqServerManagerSelectionModel* SelectionModel;
+  pqUndoStack* UndoStack;
+  pqServerResources* ServerResources;
+  pqServerStartups* ServerStartups;
+  pqSettings* Settings;
+  QPointer<pqTestUtility> TestUtility;
+
 private:
-  pqApplicationCoreInternal* Internal;
+  Q_DISABLE_COPY(pqApplicationCore)
+
+  class pqInternals;
+  pqInternals* Internal;
   static pqApplicationCore* Instance;
+  void constructor();
+  void createOutputWindow();
+  bool FinalizeOnExit;
 };
 
 #endif

@@ -43,41 +43,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 
 // ParaView Includes.
-#include "pqView.h"
+#include "pqApplicationCore.h"
+#include "pqPluginManager.h"
 #include "pqSMAdaptor.h"
-
-class pqViewExporterManager::pqInternal
-{
-public:
-  QPointer<pqView> View;
-  
-};
+#include "pqView.h"
 
 //-----------------------------------------------------------------------------
 pqViewExporterManager::pqViewExporterManager(QObject* _parent):
   Superclass(_parent)
 {
-  this->Internal = new pqInternal();
   this->refresh();
+  QObject::connect(pqApplicationCore::instance()->getPluginManager(),
+    SIGNAL(serverManagerExtensionLoaded()),
+    this, SLOT(refresh()));
 }
 
 //-----------------------------------------------------------------------------
 pqViewExporterManager::~pqViewExporterManager()
 {
-  delete this->Internal;
 }
 
 //-----------------------------------------------------------------------------
 void pqViewExporterManager::refresh()
 {
   vtkSMProxyManager::GetProxyManager()->InstantiateGroupPrototypes("exporters");
-  this->setView(this->Internal->View);
+  this->setView(this->View);
 }
 
 //-----------------------------------------------------------------------------
 void pqViewExporterManager::setView(pqView* view)
 {
-  this->Internal->View = view;
+  this->View = view;
   if (!view)
     {
     emit this->exportable(false);
@@ -105,14 +101,14 @@ void pqViewExporterManager::setView(pqView* view)
 QString pqViewExporterManager::getSupportedFileTypes() const
 {
   QString types = "";
-  if (!this->Internal->View)
+  if (!this->View)
     {
     return types;
     }
 
   QList<QString> supportedWriters;
 
-  vtkSMProxy* proxy = this->Internal->View->getProxy();
+  vtkSMProxy* proxy = this->View->getProxy();
 
   bool first = true;
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
@@ -149,7 +145,7 @@ QString pqViewExporterManager::getSupportedFileTypes() const
 //-----------------------------------------------------------------------------
 bool pqViewExporterManager::write(const QString& filename)
 {
-  if (!this->Internal->View)
+  if (!this->View)
     {
     return false;
     }
@@ -158,7 +154,7 @@ bool pqViewExporterManager::write(const QString& filename)
   QString extension = info.suffix();
 
   vtkSMProxy* exporter = 0;
-  vtkSMProxy* proxy = this->Internal->View->getProxy();
+  vtkSMProxy* proxy = this->View->getProxy();
 
   vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
   iter->SetModeToOneGroup();

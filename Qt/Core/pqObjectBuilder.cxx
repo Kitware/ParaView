@@ -57,12 +57,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqPluginManager.h"
+#include "pqProxyModifiedStateUndoElement.h"
 #include "pqRenderView.h"
 #include "pqScalarBarRepresentation.h"
 #include "pqScalarsToColors.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
+#include "pqUndoStack.h"
 #include "pqView.h"
 #include "pqViewModuleInterface.h"
 
@@ -102,6 +104,12 @@ pqPipelineSource* pqObjectBuilder::createSource(const QString& sm_group,
     // initialize the source.
     source->setDefaultPropertyValues();
     source->setModifiedState(pqProxy::UNINITIALIZED);
+
+    pqProxyModifiedStateUndoElement* elem =
+      pqProxyModifiedStateUndoElement::New();
+    elem->MadeUninitialized(source);
+    ADD_UNDO_ELEM(elem);
+    elem->Delete();
 
     emit this->sourceCreated(source);
     emit this->proxyCreated(source);
@@ -273,8 +281,15 @@ pqPipelineSource* pqObjectBuilder::createReader(const QString& sm_group,
   reader->setDefaultPropertyValues();
   reader->setModifiedState(pqProxy::UNINITIALIZED);
 
+  pqProxyModifiedStateUndoElement* elem =
+    pqProxyModifiedStateUndoElement::New();
+  elem->MadeUninitialized(reader);
+  ADD_UNDO_ELEM(elem);
+  elem->Delete();
+
   emit this->readerCreated(reader, files[0]);
   emit this->readerCreated(reader, files);
+  emit this->sourceCreated(reader);
   emit this->proxyCreated(reader);
   return reader;
 }
@@ -735,7 +750,7 @@ void pqObjectBuilder::destroyProxyInternal(pqProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy) const
+QString pqObjectBuilder::getFileNamePropertyName(vtkSMProxy* proxy)
 {
   // Find the first property that has a vtkSMFileListDomain. Assume that
   // it is the property used to set the filename.

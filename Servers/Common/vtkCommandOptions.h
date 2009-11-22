@@ -93,6 +93,11 @@ protected:
   virtual ~vtkCommandOptions();
 
   // Description:
+  // Prototype for callbacks.
+  typedef int(*CallbackType)(const char* argument, const char* value, 
+    void* call_data);
+
+  // Description:
   // Add a command line option.  For each argument added there is a long
   // version --long and a short version -l, a help string, and a variable
   // that is set to the value of the option.  The types can be int, char*, or
@@ -109,6 +114,10 @@ protected:
                    int* var, const char* help, int type=EVERYBODY);
   void AddArgument(const char* longarg, const char* shortarg,
                    char** var, const char* help, int type=EVERYBODY);
+
+  void AddCallback(const char* longarg, const char* shortarg,
+    CallbackType callback, void* call_data, const char* help,
+    int type=EVERYBODY);
   
   // Description:
   // Initialize arguments.

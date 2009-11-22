@@ -1,0 +1,133 @@
+<ui version="4.0" >
+ <class>pqFileMenuBuilder</class>
+ <widget class="QMenu" name="pqFileMenuBuilder" >
+  <property name="title" >
+   <string>&amp;File</string>
+  </property>
+  <widget class="QMenu" name="menuRecentFiles" >
+   <property name="title" >
+    <string>Recent Files</string>
+   </property>
+  </widget>
+
+  <action name="actionServerConnect" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqConnect24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Connect</string>
+   </property>
+   <property name="statusTip" >
+    <string>Connect</string>
+   </property>
+  </action>
+  <action name="actionServerDisconnect" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqDisconnect24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Disconnect</string>
+   </property>
+   <property name="statusTip" >
+    <string>Disconnect</string>
+   </property>
+  </action>
+  <action name="actionFileSaveScreenshot" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqCaptureScreenshot24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Save Screenshot</string>
+   </property>
+  </action>
+  <action name="actionFileSaveAnimation" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSaveAnimation24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Save &amp;Animation</string>
+   </property>
+  </action>
+  <action name="actionFileSaveData" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqSave24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Save Data</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionFileLoadServerState" >
+   <property name="text" >
+    <string>&amp;Load State</string>
+   </property>
+  </action>
+  <action name="actionFileSaveServerState" >
+   <property name="text" >
+    <string>&amp;Save State</string>
+   </property>
+  </action>
+  <action name="actionFileSaveGeometry" >
+   <property name="text" >
+    <string>Save &amp;Geometry</string>
+   </property>
+  </action>
+  <action name="actionFileOpen" >
+   <property name="icon" >
+    <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqOpen24.png</iconset>
+   </property>
+   <property name="text" >
+    <string>&amp;Open</string>
+   </property>
+   <property name="statusTip" >
+    <string>Open</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionFileExit" >
+   <property name="icon" >
+    <iconset/>
+   </property>
+   <property name="text" >
+    <string>E&amp;xit</string>
+   </property>
+   <property name="statusTip" >
+    <string>Exit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionExport" >
+   <property name="text" >
+    <string>Export</string>
+   </property>
+  </action>
+
+  <addaction name="actionFileOpen" />
+  <addaction name="menuRecentFiles" />
+  <addaction name="separator" />
+  <addaction name="actionFileLoadServerState" />
+  <addaction name="actionFileSaveServerState" />
+  <addaction name="separator" />
+  <addaction name="actionFileSaveData" />
+  <addaction name="actionFileSaveScreenshot" />
+  <addaction name="actionExport" />
+  <addaction name="separator" />
+  <addaction name="actionFileSaveAnimation" />
+  <addaction name="actionFileSaveGeometry" />
+  <addaction name="separator" />
+  <addaction name="actionServerConnect" />
+  <addaction name="actionServerDisconnect" />
+  <addaction name="separator" />
+  <addaction name="actionFileExit" />
+ </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc" />
+ </resources>
+ <connections/>
+</ui>

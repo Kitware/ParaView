@@ -17,7 +17,7 @@
 // .SECTION Description
 // vtkSMPQStateLoader is a state loader with added functionality to reuse
 // views. The views to be reused can be set by using AddPreferredView().
-
+// OBSOLETE. To be removed when the pqLookmarkStateLoader is removed.
 #ifndef __vtkSMPQStateLoader_h
 #define __vtkSMPQStateLoader_h
 

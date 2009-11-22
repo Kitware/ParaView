@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqObjectBuilder.h"
-#include "pqReaderFactory.h"
 #include "pqServer.h"
 #include "pqServerResources.h"
 #include "pqServerStartups.h"
@@ -166,7 +165,7 @@ void pqServerResources::open(pqServer* server, const pqServerResource& resource)
       // Get the root element from the parser.
       if(vtkPVXMLElement* const root = xmlParser->GetRootElement())
         {
-        pqApplicationCore::instance()->loadState(root, server, 0/*this->getActiveRenderModule()*/);
+        pqApplicationCore::instance()->loadState(root, server);
         }
       else
         {

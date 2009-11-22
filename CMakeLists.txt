@@ -251,12 +251,14 @@ SET(dynamicHeaders
 #########################################################################
 # Include the file that most of the environment setup (except GUI)
 # It also adds the VTK directories
+SET(PARAVIEW_MACROS_CMAKE_FILE  "${ParaView_SOURCE_DIR}/CMake/ParaViewMacros.cmake")
 SET(PARAVIEW_PLUGINS_CMAKE_FILE "${ParaView_SOURCE_DIR}/CMake/ParaViewPlugins.cmake")
+SET(PARAVIEW_BRANDING_CMAKE_FILE "${ParaView_SOURCE_DIR}/CMake/ParaViewBranding.cmake")
 SET(VTK_MAKE_INSTANTIATOR       "${ParaView_SOURCE_DIR}/VTK/CMake")
 SET(VTKCS_SOURCE_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer")
 SET(VTKCS_CONFIG_DIR            "${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/CMake")
+INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewMacros.cmake)
 INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
-
 
 #########################################################################
 IF(BUILD_DOCUMENTATION)
@@ -303,6 +305,8 @@ SET(PARAVIEW_GUI_INCLUDE_DIRS ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
                               ${ParaView_BINARY_DIR}/Qt/Core
                               ${ParaView_SOURCE_DIR}/Qt/Components
                               ${ParaView_BINARY_DIR}/Qt/Components
+                              ${ParaView_SOURCE_DIR}/Qt/ApplicationComponents
+                              ${ParaView_BINARY_DIR}/Qt/ApplicationComponents
                               ${ParaView_SOURCE_DIR}/Qt/Testing
                               ${ParaView_BINARY_DIR}/Qt/Testing )
 IF (PARAVIEW_ENABLE_PYTHON)
@@ -312,13 +316,23 @@ IF (PARAVIEW_ENABLE_PYTHON)
 ENDIF(PARAVIEW_ENABLE_PYTHON)
 
 SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${PARAVIEW_INCLUDE_DIRS})
-GET_TARGET_PROPERTY(PARAVIEW_GUI_CLIENT_EXECUTABLE paraview${PV_EXE_SUFFIX} LOCATION)
-GET_TARGET_PROPERTY(PARAVIEW_BATCH_EXECUTABLE pvbatch${PV_EXE_SUFFIX} LOCATION)
-GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 SET(PARAVIEW_SERVER_MANAGER_RESOURCES_DIRECTORY 
   "${ParaView_SOURCE_DIR}/Servers/ServerManager/Resources")
 
+# Few more variable needed in ParaViewConfig.cmake
+# We don't worry about the debug/release configuration directories on windows
+# here since when using these variables in tests, ctest handles it as well as
+# smTestDriver handles it.
+SET(PARAVIEW_BATCH_EXECUTABLE         ${EXECUTABLE_OUTPUT_PATH}/pvbatch${PV_EXE_SUFFIX} )
+SET(PARAVIEW_PYTHON_EXECUTABLE        ${EXECUTABLE_OUTPUT_PATH}/pvpython${PV_EXE_SUFFIX} )
+SET(PARAVIEW_SERVER_EXECUTABLE        ${EXECUTABLE_OUTPUT_PATH}/pvserver${PV_EXE_SUFFIX} )
+SET(PARAVIEW_DATA_SERVER_EXECUTABLE   ${EXECUTABLE_OUTPUT_PATH}/pvdataserver${PV_EXE_SUFFIX} )
+SET(PARAVIEW_RENDER_SERVER_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/pvrenderserver${PV_EXE_SUFFIX} )
+SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE  ${EXECUTABLE_OUTPUT_PATH}/smTestDriver${PV_EXE_SUFFIX} )
 
+# Since this is used in custom commands etc. we use LOCATION so that the
+# release/debug configuration gets considered.
+GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 
 #########################################################################
 IF(BUILD_SHARED_LIBS)
@@ -350,6 +364,7 @@ ENDFOREACH(PLUGIN)
 SET(PARAVIEW_LIBRARY_DEPENDS_FILE
   "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")
 EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_LIBRARY_DEPENDS_FILE})
+
 # Perform build tree configuration. Install configuration is
 # handled below.
 CONFIGURE_FILE(
@@ -380,8 +395,7 @@ IF (NOT PV_INSTALL_NO_DEVELOPMENT)
       ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.h.in
       ${ParaView_SOURCE_DIR}/Qt/Components/pqDockWindowImplementation.cxx.in
       ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.h.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.cxx.in
-      ${ParaView_SOURCE_DIR}/Qt/Components/pqExtraResources.qrc.in)
+      ${ParaView_SOURCE_DIR}/Qt/Components/pqDisplayPanelDecoratorImplementation.cxx.in)
   INSTALL(
       FILES ${pluginQtComponentConfig}
       DESTINATION ${PV_INSTALL_INCLUDE_DIR}/Qt/Components

@@ -121,10 +121,8 @@ QString pqDisplayPolicy::getPreferredViewType(pqOutputPort* opPort,
     return view_type;
     }
 
-  vtkPVDataInformation* datainfo = update_pipeline?
-    opPort->getDataInformation(true) : opPort->getCachedDataInformation();
+  vtkPVDataInformation* datainfo = opPort->getDataInformation();
   QString className = datainfo?  datainfo->GetDataClassName() : QString();
-
 
   // * Check if we should create the 2D view.
   if ((className == "vtkImageData" || className == "vtkUniformGrid") && 
@@ -208,7 +206,7 @@ pqView* pqDisplayPolicy::getPreferredView(
 
   if (!currentView || (currentView && !currentView->canDisplay(opPort)))
     {
-    vtkPVDataInformation* info = opPort->getDataInformation(false);
+    vtkPVDataInformation* info = opPort->getDataInformation();
     // GetDataSetType() == -1 signifies that there's no data to show.
     if (info->GetDataSetType() != -1)
       {
@@ -253,8 +251,7 @@ pqDataRepresentation* pqDisplayPolicy::createPreferredRepresentation(
 
   // Simply create a display for the view set up the connections and
   // return.
-  pqDataRepresentation* display = pqApplicationCore::instance()->
-    getObjectBuilder()->createDataRepresentation(opPort, view);
+  pqDataRepresentation* display = this->newRepresentation(opPort, view);
 
   // If this is the only source displayed in the view, reset the camera to make sure its visible
   if(view->getNumberOfVisibleRepresentations()==1)
@@ -297,8 +294,7 @@ pqDataRepresentation* pqDisplayPolicy::setRepresentationVisibility(
       }
     if (view)
       {
-      repr = pqApplicationCore::instance()->getObjectBuilder()->
-        createDataRepresentation(opPort, view);
+      repr = this->newRepresentation(opPort, view);
       }
     }
   if (!repr)
@@ -352,7 +348,15 @@ pqDisplayPolicy::VisibilityState pqDisplayPolicy::getVisibility(
       }
     }
 
-  // Default behaviour if no view is present
+  // Default behavior if no view is present
   return Hidden;
 }
 
+
+//-----------------------------------------------------------------------------
+pqDataRepresentation* pqDisplayPolicy::newRepresentation(pqOutputPort* port, 
+  pqView* view) const
+{
+  return pqApplicationCore::instance()->getObjectBuilder()->
+    createDataRepresentation(port, view);
+}

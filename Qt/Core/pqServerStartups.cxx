@@ -220,6 +220,11 @@ pqServerStartups::pqServerStartups(QObject* p) :
     // load user settings
     this->load(userSettings(), true);
     }
+  else if (options && options->GetDisableRegistry())
+    {
+    // load the testing servers resource.
+    this->load(":/pqCoreTesting/pqTestingServers.pvsc", false);
+    }
 }
 
 pqServerStartups::~pqServerStartups()
@@ -424,12 +429,12 @@ void pqServerStartups::load(vtkPVXMLElement* xml_servers, bool userPrefs)
 void pqServerStartups::load(const QString& path, bool userPrefs)
 {
   QFile file(path);
-  if(file.exists())
+  if (file.open(QIODevice::ReadOnly))
     {
+    QByteArray dat = file.readAll();
     vtkSmartPointer<vtkPVXMLParser> parser =
       vtkSmartPointer<vtkPVXMLParser>::New();
-    parser->SetFileName(path.toAscii().data());
-    if(parser->Parse())
+    if (parser->Parse(dat.data()))
       {
       this->load(parser->GetRootElement(), userPrefs);
       }

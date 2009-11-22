@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqFilterInputDialogInternal;
 class pqFlatTreeView;
 class pqOutputPort;
-class pqPipelineBrowserStateManager;
 class pqPipelineFilter;
 class pqPipelineModel;
 class QButtonGroup;
@@ -117,7 +116,6 @@ private slots:
 
 private:
   pqFilterInputDialogInternal *Internal;
-  pqPipelineBrowserStateManager *Manager;
   pqPipelineFilter *Filter;
   pqPipelineModel *Model;
   pqPipelineModel *Pipeline;

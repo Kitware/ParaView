@@ -9,14 +9,15 @@ SUBDIRS (
 
 IF(PARAVIEW_BUILD_QT_GUI)
   SUBDIRS(
-    GUIToolBar
-    Reader
-    GUIObjectPanel
-    GUIView
-    Writer
     Autostart
     DisplayPanelDecorator
+    DockWidget
+    GUIObjectPanel
+    GUIToolBar
+    GUIView
+    Reader
     SourceToolbar
+    Writer
     )
 ENDIF(PARAVIEW_BUILD_QT_GUI)
 

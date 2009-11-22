@@ -147,7 +147,7 @@ void pqProxyInformationWidget::updateInformation()
     source = this->OutputPort->getSource();
     if (this->OutputPort->getOutputPortProxy())
       {
-      dataInformation = this->OutputPort->getDataInformation(/*update=*/false);
+      dataInformation = this->OutputPort->getDataInformation();
       }
     }
 

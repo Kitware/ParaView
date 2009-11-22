@@ -100,7 +100,6 @@ pqSpreadSheetViewDecorator::pqSpreadSheetViewDecorator(pqSpreadSheetView* view):
 //-----------------------------------------------------------------------------
 pqSpreadSheetViewDecorator::~pqSpreadSheetViewDecorator()
 {
-  delete this->Internal->AttributeDomain;
   delete this->Internal;
   this->Internal = 0;
 }

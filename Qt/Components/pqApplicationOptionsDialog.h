@@ -29,7 +29,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqApplicationOptionsDialog_h
 #define _pqApplicationOptionsDialog_h
 
@@ -37,16 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqComponentsExport.h"
 #include "pqOptionsDialog.h"
 
-
-/// dialog class that allows editing of application wide settings
+/// pqApplicationOptionsDialog dialog class that allows editing of application
+/// wide settings. The constructor also iterates over all loaded plugins to
+/// add panels from the plugins. It also listens to plugin loaded signals to
+/// keep the dialog updated as new plugins are loaded.
 class PQCOMPONENTS_EXPORT pqApplicationOptionsDialog : public pqOptionsDialog
 {
   Q_OBJECT
-
 public:
   pqApplicationOptionsDialog(QWidget *parent=0);
-  ~pqApplicationOptionsDialog();
 
+protected slots:
+  void pluginLoaded(QObject* plugin_interface);
+
+private:
+  Q_DISABLE_COPY(pqApplicationOptionsDialog)
 };
 
 #endif

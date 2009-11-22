@@ -949,17 +949,13 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
 
     IF(PARAVIEW_BUILD_QT_GUI)
       IF(ARG_GUI_RESOURCE_FILES)
-        SET(QT_COMPONENTS_GUI_RESOURCES_CONTENTS)
-        FOREACH(RESOURCE ${ARG_GUI_RESOURCE_FILES})
-          GET_FILENAME_COMPONENT(ALIAS ${RESOURCE} NAME)
-          GET_FILENAME_COMPONENT(RESOURCE ${RESOURCE} ABSOLUTE)
-          FILE(RELATIVE_PATH RESOURCE ${CMAKE_CURRENT_BINARY_DIR} "${RESOURCE}")
-          FILE(TO_NATIVE_PATH "${RESOURCE}" RESOURCE)
-          SET(QT_COMPONENTS_GUI_RESOURCES_CONTENTS
-              "${QT_COMPONENTS_GUI_RESOURCES_CONTENTS} <file alias=\"${ALIAS}\">${RESOURCE}</file>\n")
-        ENDFOREACH(RESOURCE)
-        CONFIGURE_FILE("${ParaView_SOURCE_DIR}/Qt/Components/pqExtraResources.qrc.in"
-                       "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.qrc" @ONLY)
+        # The generated qrc file has resource prefix "/name/ParaViewResources"
+        # which helps is avoiding conflicts with resources from different
+        # plugins
+        GENERATE_QT_RESOURCE_FROM_FILES(
+          "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.qrc"
+           "/${NAME}/ParaViewResources" 
+           "${ARG_GUI_RESOURCE_FILES}")
         SET(ARG_GUI_RESOURCES ${ARG_GUI_RESOURCES}
           "${CMAKE_CURRENT_BINARY_DIR}/${NAME}.qrc")
       ENDIF(ARG_GUI_RESOURCE_FILES)

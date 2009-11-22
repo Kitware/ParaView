@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqPythonManager.h"
 #include "pqApplicationCore.h"
+#include "pqCoreUtilities.h"
 #include "pqPythonDialog.h"
 #include "pqPythonMacroSupervisor.h"
 #include "pqPythonToolsWidget.h"
@@ -55,7 +56,6 @@ public:
   QPointer<pqPythonToolsWidget>       ToolsWidget;
   QPointer<pqPythonMacroSupervisor>   MacroSupervisor;
   QPointer<pqServer>                  ActiveServer;
-  QPointer<QWidget>                   DialogParent;
 };
 
 //-----------------------------------------------------------------------------
@@ -110,7 +110,8 @@ pqPythonDialog* pqPythonManager::pythonShellDialog()
   if (!this->Internal->PythonDialog)
     {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    this->Internal->PythonDialog = new pqPythonDialog(this->Internal->DialogParent);
+    this->Internal->PythonDialog =
+      new pqPythonDialog(pqCoreUtilities::mainWidget());
 
     // Initialize the interpreter and then import paraview modules
     this->Internal->PythonDialog->initializeInterpretor();
@@ -201,12 +202,6 @@ void pqPythonManager::initializeParaviewPythonModules()
     this->Internal->PythonDialog->runString(initStr);
     emit this->paraviewPythonModulesImported();
     }
-}
-
-//-----------------------------------------------------------------------------
-void pqPythonManager::setParentForPythonDialog(QWidget* widget)
-{
-  this->Internal->DialogParent = widget;
 }
 
 //-----------------------------------------------------------------------------

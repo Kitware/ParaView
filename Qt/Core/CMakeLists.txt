@@ -40,6 +40,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAnimationScene.h
   pqApplicationCore.h
   pqBarChartView.h
+  pqBrandPluginsLoader.h
   pqChartRepresentation.h
   pqChartView.h
   pqColorButtonEventPlayer.h
@@ -60,6 +61,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileDialogRecentDirsModel.h
   pqFlatTreeViewEventTranslator.h
   pqFormBuilder.h
+  pqHelperProxyStateLoader.h
   pqHistogramTableModel.h
   pqLineChartView.h
   pqLinksModel.h
@@ -81,7 +83,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyManager.h
   pqProxy.h
   pqQVTKWidgetEventTranslator.h
-  pqReaderFactory.h
   pqRenderView.h
   pqRenderViewBase.h
   pqRepresentation.h
@@ -129,8 +130,22 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
   ${UI_FORMS}
 )
 
+SET(PV_TEST_SERVER_ROOT "localhost" CACHE STRING
+  "Node which serves as the root node for the cluster when testing in parallel")
+MARK_AS_ADVANCED(PV_TEST_SERVER_ROOT)
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqTestingServers.pvsc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqTestingServers.pvsc")
+
+GENERATE_QT_RESOURCE_FROM_FILES(
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqCoreTesting.qrc"
+  "/pqCoreTesting"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqTestingServers.pvsc")
+
 SET(UI_RESOURCES
-  Resources/pqCore.qrc
+  "${CMAKE_CURRENT_SOURCE_DIR}/Resources/pqCore.qrc"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/pqCoreTesting.qrc"
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
@@ -162,6 +177,8 @@ ADD_LIBRARY(pqCore
   pqApplicationCore.h
   pqBarChartView.cxx
   pqBarChartView.h
+  pqBrandPluginsLoader.cxx
+  pqBrandPluginsLoader.h
   pqChartRepresentation.cxx
   pqChartRepresentation.h
   pqChartView.cxx
@@ -185,6 +202,8 @@ ADD_LIBRARY(pqCore
   pqCoreInit.h
   pqCoreTestUtility.cxx
   pqCoreTestUtility.h
+  pqCoreUtilities.cxx
+  pqCoreUtilities.h
   pqDataRepresentation.cxx
   pqDataRepresentation.h
   pqDisplayPolicy.cxx
@@ -211,6 +230,8 @@ ADD_LIBRARY(pqCore
   pqFormBuilder.h
   pqHelperProxyRegisterUndoElement.cxx
   pqHelperProxyRegisterUndoElement.h
+  pqHelperProxyStateLoader.cxx
+  pqHelperProxyStateLoader.h
   pqHistogramTableModel.cxx
   pqHistogramTableModel.h
   pqImageUtil.cxx
@@ -263,14 +284,14 @@ ADD_LIBRARY(pqCore
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
+  pqProxyModifiedStateUndoElement.cxx
+  pqProxyModifiedStateUndoElement.h
   pqProxyUnRegisterUndoElement.cxx
   pqProxyUnRegisterUndoElement.h
   pqQVTKWidgetEventPlayer.cxx
   pqQVTKWidgetEventPlayer.h
   pqQVTKWidgetEventTranslator.cxx
   pqQVTKWidgetEventTranslator.h
-  pqReaderFactory.cxx
-  pqReaderFactory.h
   pqRenderView.cxx
   pqRenderView.h
   pqRenderViewBase.cxx

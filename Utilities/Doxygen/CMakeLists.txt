@@ -33,10 +33,11 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/ApplicationComponents\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/ParaView\" \\
         \"${ParaView_SOURCE_DIR}/Applications/OverView\" \\
         \"${ParaView_SOURCE_DIR}/Applications/OverView/Core\" \\
         \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
@@ -52,10 +53,11 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaView_SOURCE_DIR}/Utilities/VTKClientServer\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/ApplicationComponents\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
         \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
-        \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/ParaView\" \\
         \"${ParaView_SOURCE_DIR}/Applications/OverView\" \\
         \"${ParaView_SOURCE_DIR}/Applications/OverView/Core\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Qt/Core\" \\
@@ -76,7 +78,7 @@ IF (BUILD_DOCUMENTATION)
 
   SET(TAGFILES "\"${CMAKE_CURRENT_BINARY_DIR}/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html\"")
   IF(INCLUDE_QT_DOCUMENTATION)
-    SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://doc.trolltech.com/4.2\"")
+    SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://doc.trolltech.com/4.5\"")
   ENDIF(INCLUDE_QT_DOCUMENTATION)
 
   CONFIGURE_FILE(

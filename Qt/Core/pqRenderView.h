@@ -132,9 +132,6 @@ public:
   /// if that's not the case.
   virtual bool supportsUndo() const { return true; }
  
-  /// This view supports lookmarks.
-  virtual bool supportsLookmarks() const { return true; }
- 
   /// Returns if the view module can undo/redo interaction
   /// given the current state of the interaction undo stack.
   virtual bool canUndo() const;
@@ -261,7 +258,7 @@ protected:
   /// through undo-redo/state/python, we try to use the first Axes display in 
   /// the view as the center axes if any. Otherwise a new center axes will be 
   /// created for the view then setCenterAxesVisibility(true) is called. Thus, 
-  /// for such views the behaviour is analogous to center axis visibility being 
+  /// for such views the behavior is analogous to center axis visibility being 
   /// off. Once, the user enables the center axes, we will show one.
   void initializeCenterAxes();
 

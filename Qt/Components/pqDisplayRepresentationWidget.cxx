@@ -77,15 +77,6 @@ pqDisplayRepresentationWidget::pqDisplayRepresentationWidget(
   QObject::connect(&this->Internal->Links,
     SIGNAL(qtWidgetChanged()),
     this, SLOT(onQtWidgetChanged()));
-
-  pqUndoStack* ustack = pqApplicationCore::instance()->getUndoStack();
-  if (ustack)
-    {
-    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
-      ustack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(endUndo()),
-      ustack, SLOT(endUndoSet()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -157,8 +148,7 @@ void pqDisplayRepresentationWidget::reloadGUI()
 //-----------------------------------------------------------------------------
 void pqDisplayRepresentationWidget::onQtWidgetChanged()
 {
-  emit this->beginUndo("Changed 'Representation'");
-
+  BEGIN_UNDO_SET("Changed 'Representation'");
   QString text = this->Internal->Adaptor->currentText();
 
   vtkSMProperty* repProperty =
@@ -177,7 +167,7 @@ void pqDisplayRepresentationWidget::onQtWidgetChanged()
     //this->Internal->Links.accept();
     this->Internal->Links.blockSignals(false);
     }
-  emit this->endUndo();
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------

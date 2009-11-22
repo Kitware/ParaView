@@ -51,7 +51,7 @@ class PQCOMPONENTS_EXPORT pqProxyTabWidget : public QTabWidget
   Q_OBJECT
 public:
   /// constructor
-  pqProxyTabWidget(QWidget* p);
+  pqProxyTabWidget(QWidget* p=0);
   /// destructor
   ~pqProxyTabWidget();
 
@@ -67,17 +67,43 @@ public:
     INFORMATION=2
   };
 
+  /// By default pqProxyTabWidget connects to pqActiveObjects to know when the
+  /// active port/view change. If your application does not what this behavior
+  /// then in  that case you should call removeDefaultConnections() and set up
+  /// your connections to the public slots. If default behavior is acceptable,
+  /// then no need to call setupDefaultConnections() since that's done in the
+  /// constructor itself.
+  void setupDefaultConnections();
+  void removeDefaultConnections();
+
+  /// When set to true, on accept(), newly created sources will be shown.
+  /// Default is false.
+  void setShowOnAccept(bool val);
+  bool showOnAccept() const;
+
 public slots:
-  /// set the current render module that these panels work on
+  /// set the current render module that these panels work on.
+  /// By default these slots are connected to corresponding signals on
+  /// pqActiveObjects. So unless your application does not what that behavior,
+  /// there's no need to connect to these slots.
   void setView(pqView* rm);
 
   /// Set the output port whose information is to be shown in the 
   /// information tab.
+  /// set the current render module that these panels work on.
+  /// By default these slots are connected to corresponding signals on
+  /// pqActiveObjects. So unless your application does not what that behavior,
+  /// there's no need to connect to these slots.
   void setOutputPort(pqOutputPort* port);
 
-  /// Set the representation whose properties are to be shown in the
-  /// display tab.
+  /// Set the active representation.
   void setRepresentation(pqDataRepresentation* repr);
+
+
+  void showPropertiesTab()
+    {
+    this->setCurrentIndex(pqProxyTabWidget::PROPERTIES);
+    }
 
 protected:
   /// Set the display whose properties we want to edit. 

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pqColorToolbar</class>
+  <widget class="QToolBar" name="variableToolbar" >
+   <property name="windowTitle" >
+    <string>Active Variable Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <action name="actionScalarBarVisibility" >
+    <property name="checkable" >
+     <bool>true</bool>
+    </property>
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqScalarBar24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Show Color Legend</string>
+    </property>
+    <property name="toolTip" >
+     <string>Toggle Color Legend Visibility</string>
+    </property>
+    <property name="statusTip" >
+     <string>Toggle Color Legend Visibility</string>
+    </property>
+   </action>
+   <action name="actionEditColorMap" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqEditColor24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Edit Color Map</string>
+    </property>
+    <property name="statusTip" >
+     <string>Edit Color Map</string>
+    </property>
+   </action>
+   <action name="actionResetRange" >
+    <property name="enabled" >
+     <bool>false</bool>
+    </property>
+    <property name="icon" >
+     <iconset resource="../../../Components/Resources/pqComponents.qrc" >:/pqWidgets/Icons/pqResetRange24.png</iconset>
+    </property>
+    <property name="text" >
+     <string>Reset Range</string>
+    </property>
+    <property name="toolTip" >
+     <string>Rescale to Data Range</string>
+    </property>
+    <property name="statusTip" >
+     <string>Rescale to Data Range</string>
+    </property>
+   </action>
+   <addaction name="actionScalarBarVisibility" />
+   <addaction name="actionEditColorMap" />
+   <addaction name="actionResetRange" />
+  </widget>
+ <resources>
+  <include location="../../../Components/Resources/pqComponents.qrc"/>
+ </resources>
+ <connections/>
+</ui>

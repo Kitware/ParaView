@@ -58,11 +58,16 @@ public:
   /// which have the assistant configuration details.
   /// Unlike registering the documentation with the Qt assistant, this is not
   /// remembered across sessions and must be done each time.
-  virtual void registerDocumentation(const QString& qchfilename);
+  /// On successful loading, returns the namespace name provided by the help
+  /// file.
+  virtual QString registerDocumentation(const QString& qchfilename);
 
   /// Requests showing of a particular page. The url must begin with "qthelp:"
   /// scheme when referring to pages from the help files.
   virtual void showPage(const QString& url);
+
+  /// Experimental. I am not sure how to reliably determine the home page.
+  virtual void showHomePage(const QString& namespace_name);
 
 signals:
   /// fired to relay warning messages from the help system.

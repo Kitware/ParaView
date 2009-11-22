@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QHelpEngine>
 #include <QHelpContentWidget>
+#include <QHelpContentModel>
+#include <QHelpContentItem>
 #include <QHelpIndexWidget>
 #include <QDir>
 #include <QTextBrowser>
@@ -115,7 +117,24 @@ void pqHelpWindow::showPage(const QString& url)
 }
 
 //-----------------------------------------------------------------------------
-void pqHelpWindow::registerDocumentation(const QString& qchfilename)
+void pqHelpWindow::showHomePage(const QString& namespace_name)
+{
+  QList<QUrl> html_pages = this->HelpEngine->files(namespace_name,
+    QStringList(), "html");
+  // now try to locate a file named index.html in this collection.
+  foreach (QUrl url, html_pages)
+    {
+    if (url.path().endsWith("index.html"))
+      {
+      this->showPage(url.toString());
+      return;
+      }
+    }
+  qWarning() << "Could not locate index.html";
+}
+
+//-----------------------------------------------------------------------------
+QString pqHelpWindow::registerDocumentation(const QString& qchfilename)
 {
   QString filename = qchfilename;
   // this piece of code handles the case where a resource file name is passed.
@@ -128,5 +147,6 @@ void pqHelpWindow::registerDocumentation(const QString& qchfilename)
     tFile->setAutoRemove(true);
     }
   this->HelpEngine->registerDocumentation(filename);
+  return this->HelpEngine->namespaceName(filename);
 }
 

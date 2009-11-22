@@ -43,6 +43,8 @@ class QAction;
 /// any action to make it control the scalar bar 
 /// visibility of the scalar bar for the selected source 
 /// in the selected render window.
+/// TO_DEPRECATE: This class will be deprecated soon and replaced by
+/// pqScalarBarVisibilityReaction.
 class PQCORE_EXPORT pqScalarBarVisibilityAdaptor : public QObject
 {
   Q_OBJECT
@@ -57,13 +59,6 @@ signals:
 
   /// Fired to update the scalarbar visibility state.
   void scalarBarVisible(bool);
-
-  /// Fired before scalar bar visibility is changed. 
-  /// This signal can be connected with pqUndoStack.
-  void begin(const QString& label);
-
-  /// Fired after changing scalar bar visibility.
-  void end();
 
 public slots:
   /// Set the active display which this adaptor is going to

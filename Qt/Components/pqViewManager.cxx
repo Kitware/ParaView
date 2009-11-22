@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaView includes.
-#include "pqActiveViewOptionsManager.h"
+#include "pqActiveObjects.h"
 #include "pqApplicationCore.h"
 #include "pqCloseViewUndoElement.h"
 #include "pqComparativeRenderView.h"
@@ -99,12 +99,8 @@ uint qHash(const QPointer<T> key)
 class pqViewManager::pqInternals 
 {
 public:
-  QPointer<pqServer> ActiveServer;
   QPointer<pqView> ActiveView;
-  QPointer<pqUndoStack> UndoStack;
-  QPointer<pqActiveViewOptionsManager> ViewOptionsManager;
   QMenu ConvertMenu;
-  QSignalMapper* LookmarkSignalMapper;
 
 
   typedef QMap<pqMultiViewFrame*, QPointer<pqView> > FrameMapType;
@@ -137,10 +133,6 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   this->Internal = new pqInternals();
   this->Internal->DontCreateDeleteViewsModules = false;
   this->Internal->MaxWindowSize = QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-  this->Internal->LookmarkSignalMapper = new QSignalMapper(this);
-  QObject::connect(this->Internal->LookmarkSignalMapper, SIGNAL(mapped(QWidget*)), 
-    this, SIGNAL(createLookmark(QWidget*)));
-
 
   pqServerManagerModel* smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
@@ -176,11 +168,38 @@ pqViewManager::pqViewManager(QWidget* _parent/*=null*/)
   this->init();
 
   qApp->installEventFilter(this);
+
+  // Connect the view manager to the pqActiveView.
+  QObject::connect(this, SIGNAL(activeViewChanged(pqView*)),
+    &pqActiveObjects::instance(), SLOT(setActiveView(pqView*)));
+  QObject::connect(
+    &pqActiveObjects::instance(), SIGNAL(viewChanged(pqView*)),
+    this, SLOT(setActiveView(pqView*)));
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+
+  // When server disconnects, we reset the layout.
+  QObject::connect(core->getServerManagerModel(),
+    SIGNAL(finishedRemovingServer()),
+    this, SLOT(onServerDisconnect()));
+
+  // This is essential since there are various GUI components such as the
+  // pqAnimationManager that require a pqViewManager to perform certain tasks.
+  // They get access to the pqViewManager using the pqAnimationCore.
+  core->registerManager("MULTIVIEW_MANAGER", this);
+  QObject::connect(core,
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(loadState(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(core,
+    SIGNAL(stateSaved(vtkPVXMLElement*)),
+    this, SLOT(saveState(vtkPVXMLElement*)));
 }
 
 //-----------------------------------------------------------------------------
 pqViewManager::~pqViewManager()
 {
+  // they will get cleared as the application quits.
+  this->Internal->DontCreateDeleteViewsModules = true;
   // Cleanup all render modules.
   foreach (pqMultiViewFrame* frame , this->Internal->Frames.keys())
     {
@@ -190,12 +209,6 @@ pqViewManager::~pqViewManager()
       }
     }
   delete this->Internal;
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::setViewOptionsManager(pqActiveViewOptionsManager* mgr)
-{
-  this->Internal->ViewOptionsManager = mgr;
 }
 
 //-----------------------------------------------------------------------------
@@ -233,39 +246,9 @@ void pqViewManager::buildConvertMenu()
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::setActiveServer(pqServer* server)
-{
-  this->Internal->ActiveServer = server;
-}
-
-//-----------------------------------------------------------------------------
 pqView* pqViewManager::getActiveView() const
 {
   return this->Internal->ActiveView;
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::setUndoStack(pqUndoStack* stack)
-{
-  if (this->Internal->UndoStack)
-    {
-    QObject::disconnect(this->Internal->UndoStack, 0, this, 0);
-    }
-
-  this->Internal->UndoStack = stack;
-
-  if (stack)
-    {
-    QObject::connect(this, SIGNAL(beginUndo(const QString&)),
-      stack, SLOT(beginUndoSet(QString)));
-    QObject::connect(this, SIGNAL(endUndo()), stack, SLOT(endUndoSet()));
-    QObject::connect(this, SIGNAL(addToUndoStack(vtkUndoElement*)),
-      stack, SLOT(addToActiveUndoSet(vtkUndoElement*)));
-    QObject::connect(this, SIGNAL(beginNonUndoableChanges()),
-      stack, SLOT(beginNonUndoableChanges()));
-    QObject::connect(this, SIGNAL(endNonUndoableChanges()),
-      stack, SLOT(endNonUndoableChanges()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -418,10 +401,10 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 
   if (this->Internal->CloseFrameUndoElement)
     {
-    emit this->addToUndoStack(this->Internal->CloseFrameUndoElement);
+    ADD_UNDO_ELEM(this->Internal->CloseFrameUndoElement);
     this->Internal->CloseFrameUndoElement = 0;
+    END_UNDO_SET();
     }
-  emit this->endUndo();
 
   // Now activate some frame, so that we have an active view.
   if (this->Internal->Frames.size() > 0)
@@ -442,7 +425,7 @@ void pqViewManager::onFrameRemoved(pqMultiViewFrame* frame)
 //-----------------------------------------------------------------------------
 void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
 {
-  emit this->beginUndo("Close View");
+  BEGIN_UNDO_SET("Close View");
 
   vtkPVXMLElement* state = vtkPVXMLElement::New();
   this->saveState(state);
@@ -454,6 +437,17 @@ void pqViewManager::onPreFrameRemoved(pqMultiViewFrame* frame)
   this->Internal->CloseFrameUndoElement = elem;
   elem->Delete();
   state->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::reset()
+{
+  QList<QWidget*> removed;
+  this->reset(removed);
+  foreach (QWidget* widget, removed)
+    {
+    delete widget;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -501,77 +495,6 @@ void pqViewManager::connect(pqMultiViewFrame* frame, pqView* view)
       }
     }
 
-  pqRenderView* const render_module = 
-    qobject_cast<pqRenderView*>(view);
-  if(render_module)
-    {
-    QAction* cameraAction = new QAction(QIcon(":/pqWidgets/Icons/pqEditCamera16.png"), 
-      "Adjust Camera", 
-      this);
-    cameraAction->setObjectName("CameraButton");
-    frame->addTitlebarAction(cameraAction);
-    cameraAction->setEnabled(true);
-    QObject::connect(cameraAction, SIGNAL(triggered()), 
-      this, SLOT(onCameraTriggered()));
-    }
-
-  if(view->supportsLookmarks())
-    {
-    QAction* lookmarkAction = new QAction(QIcon(":/pqWidgets/Icons/pqLookmark16.png"), 
-      "Lookmark", 
-      this);
-    lookmarkAction->setObjectName("LookmarkButton");
-    frame->addTitlebarAction(lookmarkAction);
-
-    lookmarkAction->setEnabled(true);
-    this->Internal->LookmarkSignalMapper->setMapping(lookmarkAction, frame);
-    QObject::connect(lookmarkAction, SIGNAL(triggered(bool)), 
-      this->Internal->LookmarkSignalMapper, SLOT(map()));
-    }
-
-  QAction* optionsAction = new QAction(
-    QIcon(":/pqWidgets/Icons/pqOptions16.png"), "Edit View Options", this);
-  optionsAction->setObjectName("OptionsButton");
-  optionsAction->setEnabled(false);
-  if (this->Internal->ViewOptionsManager && 
-    this->Internal->ViewOptionsManager->canShowOptions(view))
-    {
-    optionsAction->setEnabled(true);
-    }
-  frame->addTitlebarAction(optionsAction);
-  QObject::connect(optionsAction, SIGNAL(triggered()), 
-    this, SLOT(onViewOptionsRequested()));
-
-  if (view->supportsUndo())
-    {
-    // Setup undo/redo connections if the view module
-    // supports interaction undo.
-    QAction* forwardAction = new QAction(QIcon(":/pqWidgets/Icons/pqRedoCamera24.png"), 
-      "", 
-      this);
-    forwardAction->setObjectName("ForwardButton");
-    frame->addTitlebarAction(forwardAction);
-    forwardAction->setEnabled(false);
-
-    QObject::connect(forwardAction, SIGNAL( triggered ()), 
-      view, SLOT(redo()));
-    QObject::connect(view, SIGNAL(canRedoChanged(bool)),
-      forwardAction, SLOT(setEnabled(bool)));
-
-
-    QAction* backAction = new QAction(QIcon(":/pqWidgets/Icons/pqUndoCamera24.png"), 
-      "", 
-      this);
-    backAction->setObjectName("BackButton");
-    frame->addTitlebarAction(backAction);
-    backAction->setEnabled(false);
-    
-    QObject::connect(backAction, SIGNAL( triggered ()), 
-      view, SLOT(undo()));
-    QObject::connect(view, SIGNAL(canUndoChanged(bool)),
-      backAction, SLOT(setEnabled(bool)));
-    }
-
   this->Internal->Frames.insert(frame, view);
 }
 
@@ -592,54 +515,6 @@ void pqViewManager::disconnect(pqMultiViewFrame* frame, pqView* view)
     viewWidget->removeEventFilter(this);
     }
   frame->setMainWidget(NULL);
-
-
-  pqRenderView* const render_module = 
-    qobject_cast<pqRenderView*>(view);
-  if(render_module)
-    {
-    QAction *cameraAction= frame->getAction("CameraButton");
-    if(cameraAction)
-      {
-      frame->removeTitlebarAction(cameraAction);
-      delete cameraAction;
-      }
-    }
-
-  if(view->supportsLookmarks())
-    {
-    QAction *lookmarkAction= frame->getAction("LookmarkButton");
-    if(lookmarkAction)
-      {
-      frame->removeTitlebarAction(lookmarkAction);
-      delete lookmarkAction;
-      }
-    }
-
-  QAction *optionsAction= frame->getAction("OptionsButton");
-  if(optionsAction)
-    {
-    frame->removeTitlebarAction(optionsAction);
-    delete optionsAction;
-    }
-
-  if (view->supportsUndo())
-    {
-    QAction *forwardAction= frame->getAction("ForwardButton");
-    if(forwardAction)
-      {
-      frame->removeTitlebarAction(forwardAction);
-      delete forwardAction;
-      }
-
-
-    QAction *backAction= frame->getAction("BackButton");
-    if(backAction)
-      {
-      frame->removeTitlebarAction(backAction);
-      delete backAction;
-      }
-    }
 
   // Search for view frame action group plugins and have them remove their 
   // actions for this view's frame if need be.
@@ -672,10 +547,10 @@ void pqViewManager::assignFrame(pqView* view)
   if (this->Internal->PendingFrames.size() == 0)
     {
     // Create a new frame.
-  
-    if (this->Internal->UndoStack && (
-      this->Internal->UndoStack->getInUndo() ||
-      this->Internal->UndoStack->getInRedo()))
+ 
+    pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
+    if (undoStack && (undoStack->getInUndo() ||
+      undoStack->getInRedo()))
       {
       // HACK: If undo-redoing, don't split 
       // to create a new pane, it will be created 
@@ -841,7 +716,7 @@ void pqViewManager::onConvertToTriggered(QAction* action)
     return;
     }
 
-  emit this->beginUndo(QString("Convert View to %1").arg(type));
+  BEGIN_UNDO_SET(QString("Convert View to %1").arg(type));
 
   pqObjectBuilder* builder = 
     pqApplicationCore::instance()-> getObjectBuilder();
@@ -855,7 +730,7 @@ void pqViewManager::onConvertToTriggered(QAction* action)
     builder->createView(type, server);
     }
 
-  emit this->endUndo();
+  END_UNDO_SET();
 }
 
 //-----------------------------------------------------------------------------
@@ -976,7 +851,7 @@ void pqViewManager::updateViewPositions()
   /// GUISize, ViewSize and ViewPosition properties are managed
   /// by the GUI, the undo/redo stack should not worry about 
   /// the changes made to them.
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
 
   // Now we loop thorough all view modules and set the GUISize/ViewPosition.
   foreach(pqView* view, this->Internal->Frames)
@@ -1005,7 +880,7 @@ void pqViewManager::updateViewPositions()
     // view->getProxy()->UpdateProperty("ViewSize");
     }
 
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
   this->updateCompactViewPositions();
 }
 
@@ -1026,7 +901,7 @@ void pqViewManager::updateCompactViewPositions()
   /// GUISize, ViewSize and ViewPosition properties are managed
   /// by the GUI, the undo/redo stack should not worry about 
   /// the changes made to them.
-  emit this->beginNonUndoableChanges();
+  BEGIN_UNDO_EXCLUDE();
 
   // Loop for each view
   QList<pqMultiViewFrame*> frames = ViewInfo.keys();
@@ -1065,7 +940,7 @@ void pqViewManager::updateCompactViewPositions()
       prop->SetElements2(viewSize.width(), viewSize.height());
       }
     }
-  emit this->endNonUndoableChanges();
+  END_UNDO_EXCLUDE();
 }
 
 //-----------------------------------------------------------------------------
@@ -1101,10 +976,15 @@ void pqViewManager::saveState(vtkPVXMLElement* root)
 bool pqViewManager::loadState(vtkPVXMLElement* rwRoot, 
   vtkSMProxyLocator* locator)
 {
-  if (!rwRoot || !rwRoot->GetName() || strcmp(rwRoot->GetName(), "ViewManager"))
+  if (!rwRoot || !rwRoot->GetName())
     {
-    qDebug() << "Argument must be <ViewManager /> element.";
+    // qDebug() << "Argument must be <ViewManager /> element.";
     return false;
+    }
+  if (strcmp(rwRoot->GetName(), "ViewManager") != 0)
+    {
+    return this->loadState(rwRoot->FindNestedElementByName("ViewManager"),
+      locator);
     }
 
   // When state is loaded by the server manager,
@@ -1114,7 +994,7 @@ bool pqViewManager::loadState(vtkPVXMLElement* rwRoot,
   // state file.
   this->Internal->DontCreateDeleteViewsModules = true; 
 
-  // We remove all "randomly" layed out frames. Note that we are not
+  // We remove all "randomly" laid out frames. Note that we are not
   // destroying the view modules, only the frames that got created
   // when the server manager state was getting loaded.
   foreach (pqMultiViewFrame* frame, this->Internal->Frames.keys())
@@ -1307,20 +1187,14 @@ void pqViewManager::frameDrop(pqMultiViewFrame* acceptingFrame,
 void pqViewManager::onSplittingView(const Index& index, 
   Qt::Orientation orientation, float fraction, const Index& childIndex)
 {
-  emit this->beginUndo("Split View");
+  BEGIN_UNDO_SET("Split View");
 
   pqSplitViewUndoElement* elem = pqSplitViewUndoElement::New();
   elem->SplitView(index, orientation, fraction, childIndex);
-  emit this->addToUndoStack(elem);
+  ADD_UNDO_ELEM(elem);
   elem->Delete();
 
-  emit this->endUndo();
-}
-
-//-----------------------------------------------------------------------------
-void pqViewManager::onCameraTriggered()
-{
-  emit this->triggerCameraAdjustment(this->Internal->ActiveView);
+  END_UNDO_SET();
 }
 
 #define PADDING_COMPENSATION QSize(16, 16);
@@ -1429,15 +1303,6 @@ void pqViewManager::restoreWidget(QWidget* wdg)
 }
 
 //-----------------------------------------------------------------------------
-void pqViewManager::onViewOptionsRequested()
-{
-  if (this->Internal->ViewOptionsManager)
-    {
-    this->Internal->ViewOptionsManager->showOptions();
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqViewManager::setActiveView(pqView* view)
 {
   if (this->Internal->ActiveView == view)
@@ -1454,6 +1319,20 @@ void pqViewManager::setActiveView(pqView* view)
   else if (this->Internal->ActiveView)
     {
     frame = this->getFrame(this->Internal->ActiveView);
-    frame->setActive(false);
+    if (frame)
+      {
+      frame->setActive(false);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqViewManager::onServerDisconnect()
+{
+  QList<QWidget*> removed;
+  this->reset(removed);
+  foreach (QWidget* widget, removed)
+    {
+    delete widget;
     }
 }

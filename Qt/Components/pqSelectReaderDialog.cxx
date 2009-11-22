@@ -36,17 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QListWidgetItem>
 
-#include "pqReaderFactory.h"
+#include "vtkSMReaderFactory.h"
+#include "vtkStringList.h"
+#include "pqServer.h"
 
+//-----------------------------------------------------------------------------
 class pqSelectReaderDialog::pqInternal : public QObject, public Ui::pqSelectReaderDialog
 { 
 public:
   pqInternal(QObject* p) : QObject(p) {}
 };
 
+//-----------------------------------------------------------------------------
 pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
                        pqServer* s,
-                       pqReaderFactory* readerInfo, QWidget* p)
+                       vtkSMReaderFactory* readerFactory, QWidget* p)
   : QDialog(p)
 {
   this->Internal = new pqInternal(this);
@@ -60,19 +64,39 @@ pqSelectReaderDialog::pqSelectReaderDialog(const QString& file,
   // populate the list view with readers
   QListWidget* lw = this->Internal->listWidget;
 
-  QStringList readers = readerInfo->getSupportedReadersForFile(s, file);
-  foreach(QString reader, readers)
+  vtkStringList* readers = readerFactory->GetPossibleReaders(
+    file.toAscii().data(), s->GetConnectionID());
+  
+  for (int cc=0; (cc+2) < readers->GetNumberOfStrings(); cc+=3)
     {
-    QString desc = readerInfo->getReaderDescription(reader);
+    QString desc = readers->GetString(cc+2);
     QListWidgetItem* item = new QListWidgetItem(desc, lw);
-    item->setData(Qt::UserRole, reader);
+    item->setData(Qt::UserRole, readers->GetString(cc+0));
+    item->setData(Qt::UserRole+1, readers->GetString(cc+1));
     }
 };
 
+//-----------------------------------------------------------------------------
 pqSelectReaderDialog::~pqSelectReaderDialog()
 {
 }
 
+//-----------------------------------------------------------------------------
+QString pqSelectReaderDialog::getGroup() const
+{
+  QListWidget* lw = this->Internal->listWidget;
+  QList<QListWidgetItem*> selection = lw->selectedItems();
+  if(selection.empty())
+    {
+    return QString();
+    }
+
+  // should have only one with single selection mode
+  QListWidgetItem* item = selection[0];
+  return item->data(Qt::UserRole+0).toString();
+}
+
+//-----------------------------------------------------------------------------
 QString pqSelectReaderDialog::getReader() const
 {
   QListWidget* lw = this->Internal->listWidget;
@@ -87,8 +111,7 @@ QString pqSelectReaderDialog::getReader() const
   // should have only one with single selection mode
   QListWidgetItem* item = selection[0];
 
-  return item->data(Qt::UserRole).toString();
+  return item->data(Qt::UserRole+1).toString();
 
 }
-
 

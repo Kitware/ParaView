@@ -863,7 +863,7 @@ void pqSelectionInspectorPanel::updateThreholdDataArrays()
     }
 
   vtkPVDataInformation* geomInfo = 
-    this->Implementation->InputPort->getDataInformation(true);
+    this->Implementation->InputPort->getDataInformation();
 
   vtkPVDataSetAttributesInformation* attrInfo;
 
@@ -1801,7 +1801,7 @@ bool pqSelectionInspectorPanel::hasGlobalIDs(pqOutputPort* port)
     return false;
     }
 
-  vtkPVDataInformation* info = port->getDataInformation(false);
+  vtkPVDataInformation* info = port->getDataInformation();
   vtkPVDataSetAttributesInformation* attrInfo = 0;
 
   if (this->Implementation->comboFieldType->currentText() == QString("POINT"))

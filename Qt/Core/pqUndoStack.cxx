@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqHelperProxyRegisterUndoElement.h"
 #include "pqPendingDisplayUndoElement.h"
+#include "pqProxyModifiedStateUndoElement.h"
 #include "pqProxyUnRegisterUndoElement.h"
 #include "pqServer.h"
 
@@ -103,6 +104,10 @@ pqUndoStack::pqUndoStack(bool clientOnly,
   elem->Delete();
 
   elem = pqProxyUnRegisterUndoElement::New();
+  loader->RegisterElement(elem);
+  elem->Delete();
+
+  elem = pqProxyModifiedStateUndoElement::New();
   loader->RegisterElement(elem);
   elem->Delete();
 

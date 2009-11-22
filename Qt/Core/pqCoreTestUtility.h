@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QString;
 class pqEventPlayer;
 class pqEventTranslator;
-class pqProcessModuleGUIHelper;
 class vtkRenderWindow;
 class vtkImageData;
 
@@ -49,10 +48,18 @@ class vtkImageData;
 class PQCORE_EXPORT pqCoreTestUtility : public pqTestUtility
 {
   Q_OBJECT
+  typedef pqTestUtility Superclass;
 
 public:
   pqCoreTestUtility(QObject* parent = 0);
   ~pqCoreTestUtility();
+
+  virtual bool playTests(const QStringList& filenames)
+    {
+    bool ret = this->Superclass::playTests(filenames);
+    this->testFinished(ret);
+    return ret;
+    }
 
 public:
   /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
@@ -83,13 +90,8 @@ public:
                            ostream& Output, 
                            const QString& TempDirectory);
 
-public slots:
-  void playTests(const QString& filename);
-  void playTests(const QStringList& filenames); 
-
-protected slots:
-  void testSucceeded();
-  void testFailed();
+private:
+  void testFinished(bool success);
 
 private:
   QStringList TestFilenames;

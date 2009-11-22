@@ -654,6 +654,10 @@ void ExtractProxyNames(vtkPVXMLElement *elem, vtkStringPairList *proxyNameList)
       {
       groupName << "sources" << ends;
       }
+    else if (strcmp(elemName, "proxy") == 0)
+      {
+      groupName << elem->GetAttribute("group");
+      }
     else
       {
       groupName << elemName << "s" << ends;

@@ -45,7 +45,9 @@ public:
 
   // Description:
   // Open a connection dialog GUI.
-  virtual int OpenConnectionDialog(int* start) = 0;
+  // OBSOLETE. This is no longer applicable was used in 2.*, but not since 3.0.
+  // We may just want to get rid of it.
+  virtual int OpenConnectionDialog(int* vtkNotUsed(start)){ return 0; }
   
   // Description:
   // Handle progress links.

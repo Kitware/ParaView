@@ -57,8 +57,18 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
     return false;
     }
 
-  if(menubar)
+  if (menubar)
     {
+    QMouseEvent* e = static_cast<QMouseEvent*>(Event);
+    if (e->button() == Qt::LeftButton)
+      {
+      QAction* action = menubar->actionAt(e->pos());
+      if (action && action->menu())
+        {
+        QString which = action->menu()->objectName();
+        emit recordEvent(menubar, "activate", which);
+        }
+      }
     return true;
     }
 
@@ -86,7 +96,7 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
     if(e->button() == Qt::LeftButton)
       {
       QAction* action = menu->actionAt(e->pos());
-      if(action && !action->menu())
+      if (action && !action->menu())
         {
         QString which = action->objectName();
         if(which == QString::null)

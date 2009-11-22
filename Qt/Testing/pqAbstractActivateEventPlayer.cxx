@@ -55,6 +55,30 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
   if(Command != "activate")
     return false;
 
+  if (QMenuBar* const menu_bar  = qobject_cast<QMenuBar*>(Object))
+    {
+    QMenu* sub_menu = menu_bar->findChild<QMenu*>(Arguments);
+    if (sub_menu)
+      {
+      QAction* action = 0;
+      foreach (QAction* cur_action, menu_bar->actions())
+        {
+        if (cur_action->menu() == sub_menu)
+          {
+          action = cur_action;
+          break;
+          }
+        }
+      if (action)
+        {
+        menu_bar->setActiveAction(action);
+        return true;
+        }
+      }
+    Error = true;
+    return true;
+    }
+
   if(QMenu* const object = qobject_cast<QMenu*>(Object))
     {
     
@@ -107,7 +131,8 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
       if(QMenuBar* menu_bar = qobject_cast<QMenuBar*>(p))
         {
         menu_bar->setActiveAction(next->menuAction());
-        while(!next->isVisible())
+        int max_wait = 0;
+        while(!next->isVisible() && (++max_wait) <= 10)
           {
           pqEventDispatcher::processEventsAndWait(100);
           }
@@ -131,7 +156,8 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         menu->setActiveAction(next->menuAction());
 #endif
         
-        while(!next->isVisible())
+        int max_wait = 0;
+        while(!next->isVisible() && (++max_wait) <= 10)
           {
           pqEventDispatcher::processEventsAndWait(100);
           }
@@ -149,12 +175,21 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
     QApplication::sendEvent(object, &keyDown);
     QApplication::sendEvent(object, &keyUp);
 
+    QApplication::processEvents();
     return true;
     }
 
   if(QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object))
     {
     object->click();
+    QApplication::processEvents();
+    return true;
+    }
+
+  if (QAction* const action = qobject_cast<QAction*>(Object))
+    {
+    action->activate(QAction::Trigger);
+    QApplication::processEvents();
     return true;
     }
   

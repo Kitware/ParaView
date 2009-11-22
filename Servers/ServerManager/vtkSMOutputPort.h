@@ -44,12 +44,6 @@ public:
   virtual vtkPVDataInformation* GetDataInformation();
 
   // Description:
-  // Simply returns the data information as available on the client, without any
-  // gathers from the server side or any pipeline updates.
-  virtual vtkPVDataInformation* GetCachedDataInformation()
-    { return this->DataInformation; }
-
-  // Description:
   // Returns the classname of the data object on this output port.
   virtual const char* GetDataClassName();
 

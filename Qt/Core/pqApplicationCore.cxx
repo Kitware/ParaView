@@ -31,34 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ========================================================================*/
 #include "pqApplicationCore.h"
 
-// ParaView Server Manager includes.
-#include "vtkProcessModuleConnectionManager.h"
-#include "vtkProcessModule.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVXMLElement.h"
-#include "vtkSMArrayListDomain.h"
-#include "vtkSmartPointer.h"
-#include "vtkSMDoubleRangeDomain.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMGlobalPropertiesManager.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMPQStateLoader.h"
-#include "vtkSMPropertyHelper.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMProxy.h"
-#include "vtkSMProxyLocator.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMRenderViewProxy.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMStringVectorProperty.h"
-
 #include <vtksys/SystemTools.hxx>
 
 // Qt includes.
 #include <QApplication>
+#include <QDebug>
+#include <QFile>
+#include <QMainWindow>
 #include <QMap>
 #include <QPointer>
 #include <QSize>
@@ -68,12 +47,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqAnimationScene.h"
 #include "pqCoreInit.h"
+#include "pqCoreTestUtility.h"
 #include "pqDisplayPolicy.h"
 #include "pqEventDispatcher.h"
 #include "pqLinksModel.h"
 #include "pqLookupTableManager.h"
 #include "pqObjectBuilder.h"
 #include "pqOptions.h"
+#include "pqOutputWindowAdapter.h"
+#include "pqOutputWindow.h"
 #include "pqPipelineFilter.h"
 #include "pqPluginManager.h"
 #include "pqProgressManager.h"
@@ -90,31 +72,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqStandardViewModules.h"
 #include "pqUndoStack.h"
 #include "pqXMLUtil.h"
+#include "vtkInitializationHelper.h"
+#include "vtkProcessModule.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMProperty.h"
+#include "vtkSMPropertyHelper.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMReaderFactory.h"
+#include "vtkSMWriterFactory.h"
+
+static void QtMessageOutput(QtMsgType type, const char *msg)
+{
+  switch(type)
+    {
+  case QtDebugMsg:
+    vtkOutputWindow::GetInstance()->DisplayText(msg);
+    break;
+  case QtWarningMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+    break;
+  case QtCriticalMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+    break;
+  case QtFatalMsg:
+    vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+    break;
+    }
+}
 
 //-----------------------------------------------------------------------------
-class pqApplicationCoreInternal
+class pqApplicationCore::pqInternals
 {
 public:
-  pqServerManagerObserver* ServerManagerObserver;
-  pqServerManagerModel* ServerManagerModel;
-  pqObjectBuilder* ObjectBuilder;
-  pq3DWidgetFactory* WidgetFactory;
-  pqServerManagerSelectionModel* SelectionModel;
-  QPointer<pqDisplayPolicy> DisplayPolicy;
-  vtkSmartPointer<vtkSMStateLoader> StateLoader;
-  QPointer<pqLookupTableManager> LookupTableManager;
-  pqLinksModel LinksModel;
-  pqPluginManager* PluginManager;
-  pqProgressManager* ProgressManager;
   vtkSmartPointer<vtkSMGlobalPropertiesManager> GlobalPropertiesManager;
-
-  QPointer<pqUndoStack> UndoStack;
-
   QMap<QString, QPointer<QObject> > RegisteredManagers;
-
-  QPointer<pqServerResources> ServerResources;
-  QPointer<pqServerStartups> ServerStartups;
-  QPointer<pqSettings> Settings;
 };
 
 //-----------------------------------------------------------------------------
@@ -127,159 +123,225 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
-  : QObject(p)
+// deprecated constructor.
+pqApplicationCore::pqApplicationCore(QObject* parentObject)
+  : QObject(parentObject)
 {
+  this->createOutputWindow();
+  this->constructor();
+  this->FinalizeOnExit = false;
+
+  // Register ParaView interfaces.
+  pqPluginManager* pgm = this->getPluginManager();
+
+  // * adds support for standard paraview views.
+  pgm->addInterface(new pqStandardViewModules(pgm));
+  
+  this->Options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+}
+
+//-----------------------------------------------------------------------------
+pqApplicationCore::pqApplicationCore(int& argc, char** argv, pqOptions* options,
+  QObject* parentObject)
+  : QObject(parentObject)
+{
+  vtkSmartPointer<pqOptions> defaultOptions;
+  if (!options)
+    {
+    defaultOptions = vtkSmartPointer<pqOptions>::New();
+    options = defaultOptions;
+    }
+  this->Options = options;
+
+  // Create output window before initializing server manager.
+  this->createOutputWindow();
+  vtkInitializationHelper::Initialize(argc, argv, options);
+  this->constructor();
+  this->FinalizeOnExit = true;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::constructor()
+{
+  // Only 1 pqApplicationCore instance can be created.
+  Q_ASSERT(pqApplicationCore::Instance == NULL);
+  pqApplicationCore::Instance = this;
+
+  this->LookupTableManager = NULL;
+  this->UndoStack = NULL;
+  this->ServerResources = NULL;
+  this->ServerStartups = NULL;
+  this->Settings = NULL;
+
   // initialize statics in case we're a static library
   pqCoreInit();
 
-  this->Internal = new pqApplicationCoreInternal();
-
-  this->setApplicationName("ParaViewBasedApplication");
-  this->setOrganizationName("Humanity");
+  this->Internal = new pqInternals();
 
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
-  this->Internal->ServerManagerObserver = new pqServerManagerObserver(this);
+  this->ServerManagerObserver = new pqServerManagerObserver(this);
 
   // *  Make signal-slot connections between ServerManagerObserver and ServerManagerModel.
-  //this->connect(this->Internal->ServerManagerObserver, this->Internal->ServerManagerModel);
-
-  this->Internal->ServerManagerModel = new pqServerManagerModel(
-    this->Internal->ServerManagerObserver, this);
+  this->ServerManagerModel = new pqServerManagerModel(
+    this->ServerManagerObserver, this);
 
   // *  Create the pqObjectBuilder. This is used to create pipeline objects.
-  this->Internal->ObjectBuilder = new pqObjectBuilder(this);
+  this->ObjectBuilder = new pqObjectBuilder(this);
 
-  if (!pqApplicationCore::Instance)
-    {
-    pqApplicationCore::Instance = this;
-    }
-  
-  this->Internal->PluginManager = new pqPluginManager(this);
+  this->PluginManager = new pqPluginManager(this);
 
   // * Create various factories.
-  this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
+  this->WidgetFactory = new pq3DWidgetFactory(this);
 
   // * Setup the selection model.
-  this->Internal->SelectionModel = new pqServerManagerSelectionModel(
-    this->Internal->ServerManagerModel, this);
+  this->SelectionModel = new pqServerManagerSelectionModel(
+    this->ServerManagerModel, this);
   
-  this->Internal->DisplayPolicy = new pqDisplayPolicy(this);
+  this->DisplayPolicy = new pqDisplayPolicy(this);
 
-  this->Internal->ProgressManager = new pqProgressManager(this);
-
-  // add standard views
-  this->Internal->PluginManager->addInterface(
-    new pqStandardViewModules(this->Internal->PluginManager));
+  this->ProgressManager = new pqProgressManager(this);
 
   // add standard server manager model interface
-  this->Internal->PluginManager->addInterface(
-    new pqStandardServerManagerModelInterface(this->Internal->PluginManager));
+  this->PluginManager->addInterface(
+    new pqStandardServerManagerModelInterface(this->PluginManager));
+
+  this->LinksModel = new pqLinksModel(this);
+
   this->LoadingState = false;
+  QObject::connect(this->ServerManagerObserver,
+    SIGNAL(stateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)),
+    this, SLOT(onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*)));
+  QObject::connect(this->ServerManagerObserver,
+    SIGNAL(stateSaved(vtkPVXMLElement*)),
+    this, SLOT(onStateSaved(vtkPVXMLElement*)));
 }
 
 //-----------------------------------------------------------------------------
 pqApplicationCore::~pqApplicationCore()
 {
   // Ensure that startup plugins get a chance to cleanup before pqApplicationCore is gone.
-  delete this->Internal->PluginManager;
+  delete this->PluginManager;
+  this->PluginManager = 0;
 
   // give chance to save before pqApplicationCore is gone
-  delete this->Internal->ServerStartups;
+  delete this->ServerStartups;
+  this->ServerStartups = 0;
+
+  // Ensure that all managers are deleted.
+  delete this->WidgetFactory;
+  this->WidgetFactory = 0;
+
+  delete this->LinksModel;
+  this->LinksModel = 0;
+
+  delete this->ObjectBuilder;
+  this->ObjectBuilder = 0;
+
+  delete this->ProgressManager;
+  this->ProgressManager = 0;
+
+  delete this->ServerManagerModel;
+  this->ServerManagerModel = 0;
+
+  delete this->ServerManagerObserver;
+  this->ServerManagerObserver = 0;
+
+  delete this->SelectionModel;
+  this->SelectionModel = 0;
+
+
+  delete this->ServerResources;
+  this->ServerResources = 0;
+
+  delete this->Settings;
+  this->Settings = 0;
+
+  
+  // We don't call delete on these since we have already setup parent on these
+  // correctly so they will be deleted. It's possible that the user calls delete
+  // on these explicitly in which case we end up with segfaults.
+  this->LookupTableManager = 0;
+  this->DisplayPolicy = 0;
+  this->UndoStack = 0;
+
+  // Delete all children, which clears up all managers etc. before the server
+  // manager application is finalized.
+  delete this->Internal;
+
+  delete this->TestUtility;
 
   if (pqApplicationCore::Instance == this)
     {
     pqApplicationCore::Instance = 0;
     }
-  delete this->Internal;
 
-  // Unregister all proxies registered with the proxy manager.
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  pxm->UnRegisterProxies();
+  if (this->FinalizeOnExit)
+    {
+    vtkInitializationHelper::Finalize();
+    }
+  vtkOutputWindow::SetInstance(NULL);
+  delete this->OutputWindow;
+  this->OutputWindow = NULL;
+  this->OutputWindowAdapter->Delete();
+  this->OutputWindowAdapter= 0;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::createOutputWindow()
+{
+  // Set up error window.
+  pqOutputWindowAdapter* owAdapter = pqOutputWindowAdapter::New();
+  qInstallMsgHandler(::QtMessageOutput);
+  this->OutputWindow = new pqOutputWindow(0);
+  this->OutputWindow->setAttribute(Qt::WA_QuitOnClose, false);
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
+  this->OutputWindow->connect(owAdapter,
+    SIGNAL(displayGenericWarningText(const QString&)),
+    SLOT(onDisplayGenericWarningText(const QString&)));
+  vtkOutputWindow::SetInstance(owAdapter);
+  this->OutputWindowAdapter = owAdapter;
+
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setLookupTableManager(pqLookupTableManager* mgr)
 {
-  this->Internal->LookupTableManager = mgr;
-}
-
-//-----------------------------------------------------------------------------
-pqLookupTableManager* pqApplicationCore::getLookupTableManager() const
-{
-  return this->Internal->LookupTableManager;
+  this->LookupTableManager = mgr;
+  if (mgr)
+    {
+    mgr->setParent(this);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setUndoStack(pqUndoStack* stack)
 {
-  this->Internal->UndoStack = stack;
-}
-
-//-----------------------------------------------------------------------------
-pqUndoStack* pqApplicationCore::getUndoStack() const
-{
-  return this->Internal->UndoStack;
-}
-
-//-----------------------------------------------------------------------------
-pqObjectBuilder* pqApplicationCore::getObjectBuilder() const
-{
-  return this->Internal->ObjectBuilder;
-}
-
-//-----------------------------------------------------------------------------
-pqServerManagerObserver* pqApplicationCore::getServerManagerObserver()
-{
-  return this->Internal->ServerManagerObserver;
-}
-
-//-----------------------------------------------------------------------------
-pqServerManagerModel* pqApplicationCore::getServerManagerModel() const
-{
-  return this->Internal->ServerManagerModel;
-}
-
-//-----------------------------------------------------------------------------
-pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
-{
-  return this->Internal->WidgetFactory;
-}
-
-//-----------------------------------------------------------------------------
-pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
-{
-  return this->Internal->SelectionModel;
-}
-
-//-----------------------------------------------------------------------------
-pqLinksModel* pqApplicationCore::getLinksModel()
-{
-  return &this->Internal->LinksModel;
-}
-
-//-----------------------------------------------------------------------------
-pqPluginManager* pqApplicationCore::getPluginManager()
-{
-  return this->Internal->PluginManager;
-}
-
-//-----------------------------------------------------------------------------
-pqProgressManager* pqApplicationCore::getProgressManager() const
-{
-  return this->Internal->ProgressManager;
+  if (stack != this->UndoStack)
+    {
+    this->UndoStack = stack;
+    if (stack)
+      {
+      stack->setParent(this);
+      }
+    emit this->undoStackChanged(stack);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setDisplayPolicy(pqDisplayPolicy* policy) 
 {
-  this->Internal->DisplayPolicy = policy;
-}
-
-//-----------------------------------------------------------------------------
-pqDisplayPolicy* pqApplicationCore::getDisplayPolicy() const
-{
-  return this->Internal->DisplayPolicy;
+  delete this->DisplayPolicy;
+  this->DisplayPolicy = policy;
+  if (policy)
+    {
+    policy->setParent(this);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -420,67 +482,74 @@ QObject* pqApplicationCore::manager(const QString& function)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::setStateLoader(vtkSMStateLoader* loader)
+void pqApplicationCore::saveState(const QString& filename)
 {
-  this->Internal->StateLoader = loader;
+  // * Save the Proxy Manager state.
+  vtkSMProxyManager::GetProxyManager()->SaveState(filename.toAscii().data());
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
+vtkPVXMLElement* pqApplicationCore::saveState()
 {
   // * Save the Proxy Manager state.
-
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
   // Eventually proxy manager will save state for each connection separately.
   // For now, we only have one connection, so simply save it.
-  vtkPVXMLElement* smState = pxm->SaveState();
-  rootElement->AddNestedElement(smState);
-  smState->Delete();
-
+  return pxm->SaveState();
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadState(vtkPVXMLElement* rootElement, 
-  pqServer* server, vtkSMStateLoader* arg_loader/*=NULL*/)
+void pqApplicationCore::loadState(const char* filename, pqServer* server)
+{
+  if (!server || !filename)
+    {
+    return ;
+    }
+
+  QList<pqView*> current_views = 
+    this->ServerManagerModel->findItems<pqView*>(server);
+  foreach (pqView* view, current_views)
+    {
+    this->ObjectBuilder->destroy(view);
+    }
+
+  // FIXME: this->LoadingState cannot be relied upon.
+  this->LoadingState = true;
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->LoadState(filename, server->GetConnectionID());
+  this->LoadingState = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadState(
+  vtkPVXMLElement* rootElement, pqServer* server)
 {
   if (!server || !rootElement)
     {
     return ;
     }
 
-  vtkSmartPointer<vtkSMStateLoader> loader = arg_loader;
-  if (!loader)
-    {
-    loader = this->Internal->StateLoader;
-    }
-
-  if (!loader)
-    {
-    // Create a default server manager state loader.
-    // Since server manager state loader does not handle
-    // any elements except "ServerManagerState",
-    // we make that the root element.
-    loader.TakeReference(vtkSMPQStateLoader::New());
-    rootElement = pqXMLUtil::FindNestedElementByName(rootElement,
-      "ServerManagerState");
-    }
-
   QList<pqView*> current_views = 
-    this->Internal->ServerManagerModel->findItems<pqView*>(server);
+    this->ServerManagerModel->findItems<pqView*>(server);
   foreach (pqView* view, current_views)
     {
-    this->Internal->ObjectBuilder->destroy(view);
+    this->ObjectBuilder->destroy(view);
     }
 
+  // FIXME: this->LoadingState cannot be relied upon.
   this->LoadingState = true;
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->LoadState(rootElement, server->GetConnectionID());
+  this->LoadingState = false;
+}
 
-  if (rootElement)
-    {
-    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->LoadState(rootElement, server->GetConnectionID(), loader);
-    loader->GetProxyLocator()->Clear();
-    }
+//-----------------------------------------------------------------------------
+void pqApplicationCore::onStateLoaded(
+  vtkPVXMLElement* root, vtkSMProxyLocator* locator)
+{
+  emit this->stateLoaded(root, locator);
+
   pqEventDispatcher::processEventsAndWait(1);
 
   // This is essential since it's possible that the AnimationTime property on
@@ -492,127 +561,85 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     {
     scene->getProxy()->UpdateProperty("AnimationTime", 1);
     }
-
   this->render();
-  this->LoadingState = false;
-  emit this->stateLoaded();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::onStateSaved(vtkPVXMLElement* root)
+{
+  if (!QApplication::applicationName().isEmpty())
+    {
+    // Change root element to match the application name.
+    QString valid_name =
+      QApplication::applicationName().replace(QRegExp("\\W"), "_");
+    root->SetName(valid_name.toAscii().data());
+    }
+  emit this->stateSaved(root);
 }
 
 //-----------------------------------------------------------------------------
 pqServerResources& pqApplicationCore::serverResources()
 {
-  if(!this->Internal->ServerResources)
+  if(!this->ServerResources)
     {
-    this->Internal->ServerResources = new pqServerResources(this);
-    this->Internal->ServerResources->load(*this->settings());
+    this->ServerResources = new pqServerResources(this);
+    this->ServerResources->load(*this->settings());
     }
     
-  return *this->Internal->ServerResources;
+  return *this->ServerResources;
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::setServerResources(
   pqServerResources* aserverResources)
 {
-  this->Internal->ServerResources = aserverResources;
-  if(this->Internal->ServerResources)
+  this->ServerResources = aserverResources;
+  if(this->ServerResources)
     {
-    this->Internal->ServerResources->load(*this->settings());
+    this->ServerResources->load(*this->settings());
     }
 }
 
 //-----------------------------------------------------------------------------
 pqServerStartups& pqApplicationCore::serverStartups()
 {
-  if(!this->Internal->ServerStartups)
+  if(!this->ServerStartups)
     {
-    this->Internal->ServerStartups = new pqServerStartups(this);
+    this->ServerStartups = new pqServerStartups(this);
     }
-  return *this->Internal->ServerStartups;
+  return *this->ServerStartups;
 }
 
 //-----------------------------------------------------------------------------
 pqSettings* pqApplicationCore::settings()
 {
-  if ( !this->Internal->Settings )
+  if ( !this->Settings )
     {
     pqOptions* options = pqOptions::SafeDownCast(
       vtkProcessModule::GetProcessModule()->GetOptions());
     if (options && options->GetDisableRegistry())
       {
-      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+      this->Settings = new pqSettings(QApplication::organizationName(),
         QApplication::applicationName() + ".DisabledRegistry", this);
-      this->Internal->Settings->clear();
+      this->Settings->clear();
       }
     else
       {
-      this->Internal->Settings = new pqSettings(QApplication::organizationName(),
+      this->Settings = new pqSettings(QApplication::organizationName(),
         QApplication::applicationName(), this);
       }
     }
-  return this->Internal->Settings;
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setApplicationName(const QString& an)
-{
-  QApplication::setApplicationName(an);
-}
-
-//-----------------------------------------------------------------------------
-QString pqApplicationCore::applicationName()
-{
-  return QApplication::applicationName();
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setOrganizationName(const QString& on)
-{
-  QApplication::setOrganizationName(on);
-}
-
-//-----------------------------------------------------------------------------
-QString pqApplicationCore::organizationName()
-{
-  return QApplication::organizationName();
+  return this->Settings;
 }
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::render()
 {
   QList<pqView*> list = 
-    this->Internal->ServerManagerModel->findItems<pqView*>();
+    this->ServerManagerModel->findItems<pqView*>();
   foreach(pqView* view, list)
     {
     view->render();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::prepareProgress()
-{
-  if (this->Internal->ProgressManager)
-    {
-    this->Internal->ProgressManager->setEnableProgress(true);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::cleanupPendingProgress()
-{
-  if (this->Internal->ProgressManager)
-    {
-    this->Internal->ProgressManager->setEnableProgress(false);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::sendProgress(const char* name, int value)
-{
-  QString message = name;
-  if (this->Internal->ProgressManager)
-    {
-    this->Internal->ProgressManager->setProgress(message, value);
     }
 }
 
@@ -639,3 +666,57 @@ void pqApplicationCore::quit()
   QCoreApplication::instance()->quit();
 }
 
+//-----------------------------------------------------------------------------
+void pqApplicationCore::showOutputWindow()
+{
+  this->OutputWindow->show();
+  this->OutputWindow->raise();
+  this->OutputWindow->activateWindow();
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::disableOutputWindow()
+{
+  this->OutputWindowAdapter->setActive(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadConfiguration(const QString& filename)
+{
+  QFile xml(filename);
+  if (!xml.open(QIODevice::ReadOnly))
+    {
+    qCritical() << "Failed to load " << filename;
+    return;
+    }
+
+  QByteArray dat = xml.readAll();
+  vtkSmartPointer<vtkPVXMLParser> parser = 
+    vtkSmartPointer<vtkPVXMLParser>::New();
+  if (!parser->Parse(dat.data()))
+    {
+    xml.close();
+    return;
+    }
+
+  vtkPVXMLElement* root = parser->GetRootElement();
+  
+  // Load configuration files for server manager components since they don't
+  // listen to Qt signals.
+  vtkSMProxyManager::GetProxyManager()->GetReaderFactory()->
+    LoadConfiguration(root);
+  vtkSMProxyManager::GetProxyManager()->GetWriterFactory()->
+    LoadConfiguration(root);
+
+  emit this->loadXML(root);
+}
+
+//-----------------------------------------------------------------------------
+pqTestUtility* pqApplicationCore::testUtility()
+{
+  if (!this->TestUtility)
+    {
+    this->TestUtility = new pqCoreTestUtility(this);
+    }
+  return this->TestUtility;
+}

@@ -1,9 +1,9 @@
 
 // A Test of a very simple app based on pqCore
+#include "BasicApp.h"
 
-#include <QMainWindow>
+#include <QTimer>
 #include <QApplication>
-#include <QPointer>
 
 #include "QVTKWidget.h"
 #include "vtkObjectFactory.h"
@@ -14,108 +14,110 @@
 #include "pqCoreTestUtility.h"
 #include "pqMain.h"
 #include "pqObjectBuilder.h"
+#include "pqOptions.h"
 #include "pqPipelineSource.h"
-#include "pqProcessModuleGUIHelper.h"
-#include "pqRenderView.h"
+#include "pqPluginManager.h"
 #include "pqServer.h"
+#include "pqStandardViewModules.h"
+#include "vtkProcessModule.h"
 
-// our main window
-class MainWindow : public QMainWindow
+MainWindow::MainWindow()
 {
-public:
-  MainWindow()
-  {
-    // automatically make a server connection
-    pqApplicationCore* core = pqApplicationCore::instance();
-    pqObjectBuilder* ob = core->getObjectBuilder();
-    pqServer* server = ob->createServer(pqServerResource("builtin:"));
-    
-    // create a graphics window and put it in our main window
-    this->RenderView = qobject_cast<pqRenderView*>(
-      ob->createView(pqRenderView::renderViewType(), server));
-    this->setCentralWidget(this->RenderView->getWidget());
-    
-    // create source and elevation filter
-    pqPipelineSource* source;
-    pqPipelineSource* elevation;
+  // automatically make a server connection
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqObjectBuilder* ob = core->getObjectBuilder();
+  pqServer* server = ob->createServer(pqServerResource("builtin:"));
 
-    source = ob->createSource("sources", "SphereSource", server);
-    // updating source so that when elevation filter is created, the defaults
-    // are setup correctly using the correct data bounds etc.
-    vtkSMSourceProxy::SafeDownCast(source->getProxy())->UpdatePipeline();
+  // Register ParaView interfaces.
+  pqPluginManager* pgm = pqApplicationCore::instance()->getPluginManager();
 
-    elevation = ob->createFilter("filters", "ElevationFilter", source);
-    
-    // put the elevation in the window
-    ob->createDataRepresentation(elevation->getOutputPort(0), this->RenderView);
+  // * adds support for standard paraview views.
+  pgm->addInterface(new pqStandardViewModules(pgm));
 
-    // zoom to sphere
-    this->RenderView->resetCamera();
-    // make sure we update
-    this->RenderView->render();
-  }
+  // create a graphics window and put it in our main window
+  this->RenderView = qobject_cast<pqRenderView*>(
+    ob->createView(pqRenderView::renderViewType(), server));
+  this->setCentralWidget(this->RenderView->getWidget());
+
+  // create source and elevation filter
+  pqPipelineSource* source;
+  pqPipelineSource* elevation;
+
+  source = ob->createSource("sources", "SphereSource", server);
+  // updating source so that when elevation filter is created, the defaults
+  // are setup correctly using the correct data bounds etc.
+  vtkSMSourceProxy::SafeDownCast(source->getProxy())->UpdatePipeline();
+
+  elevation = ob->createFilter("filters", "ElevationFilter", source);
+
+  // put the elevation in the window
+  ob->createDataRepresentation(elevation->getOutputPort(0), this->RenderView);
+
+  // zoom to sphere
+  this->RenderView->resetCamera();
+  // make sure we update
+  this->RenderView->render();
+  QTimer::singleShot(100, this, SLOT(processTest()));
+}
+
+void MainWindow::processTest()
+{
+  if (pqOptions* const options = pqApplicationCore::instance()->getOptions())
+    {
+    bool comparison_succeeded = true;
+    if (options->GetBaselineImage())
+      {
+      comparison_succeeded = this->compareView(options->GetBaselineImage(),
+        options->GetImageThreshold(), cout, options->GetTestDirectory());
+      }
+    if (options->GetExitAppWhenTestsDone())
+      {
+      QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
+      }
+    }
+}
+
+bool MainWindow::compareView(const QString& referenceImage, double threshold,
+  ostream& output, const QString& tempDirectory)
+{
+  pqRenderView* renModule = this->RenderView;
+
+  if (!renModule)
+    {
+    output << "ERROR: Could not locate the render module." << endl;
+    return false;
+    }
+
+  QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->getWidget());
+  if(!widget)
+    {
+    output << "ERROR: Not a QVTKWidget." << endl;
+    return false;
+    }
+
+  vtkRenderWindow* const render_window =
+    widget->GetRenderWindow();
+
+  if(!render_window)
+    {
+    output << "ERROR: Could not locate the Render Window." << endl;
+    return false;
+    }
+
+  bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
+    threshold, output, tempDirectory);
+  renModule->render();
+  return ret;
+}
   
-  QPointer<pqRenderView> RenderView;
-
-};
-
-
-// our gui helper makes our MainWindow
-class GUIHelper : public pqProcessModuleGUIHelper
-{
-public:
-  static GUIHelper* New();
-  vtkTypeMacro(GUIHelper, pqProcessModuleGUIHelper);
-
-  QWidget* CreateMainWindow()
-  {
-    Win = new MainWindow;
-    Win->resize(200,150);
-    return Win;
-  }
-  bool compareView(const QString& referenceImage, double threshold,
-                   ostream& output, const QString& tempDirectory)
-  {
-    pqRenderView* renModule = Win->RenderView;
-
-    if (!renModule)
-      {
-      output << "ERROR: Could not locate the render module." << endl;
-      return false;
-      }
-
-    QVTKWidget* const widget = qobject_cast<QVTKWidget*>(renModule->getWidget());
-    if(!widget)
-      {
-      output << "ERROR: Not a QVTKWidget." << endl;
-      return false;
-      }
-
-    vtkRenderWindow* const render_window =
-      widget->GetRenderWindow();
-
-    if(!render_window)
-      {
-      output << "ERROR: Could not locate the Render Window." << endl;
-      return false;
-      }
-
-    bool ret = pqCoreTestUtility::CompareImage(render_window, referenceImage, 
-      threshold, output, tempDirectory);
-    renModule->render();
-    return ret;
-  }
-
-  QPointer<MainWindow> Win;
-};
-
-vtkStandardNewMacro(GUIHelper);
-
 int main(int argc, char** argv)
 {
   QApplication app(argc, argv);
-  vtkSmartPointer<GUIHelper> helper = vtkSmartPointer<GUIHelper>::New();
-  return pqMain::Run(app, helper);
+  pqApplicationCore appCore(argc, argv);
+  MainWindow window;
+  window.resize(200, 150);
+  window.show();
+  return app.exec();
 }
 
 

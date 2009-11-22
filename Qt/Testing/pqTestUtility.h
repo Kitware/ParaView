@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSet>
 #include <QTextStream>
 #include <QFile>
+#include <QStringList>
 
 #include "QtTestingExport.h"
 #include "pqEventDispatcher.h"
@@ -58,11 +59,15 @@ public:
 
 public:
 
-  /// get the event dispatcher
+  /// Get the event dispatcher. Dispatcher is used to play tests back.
   pqEventDispatcher* dispatcher();
-  /// get the event player
+
+  /// Get the event player. This the test-file-interpreter (if you will), that
+  /// parses the test file and creates events from it that can be dispatched by
+  /// the pqEventDispatcher.
   pqEventPlayer* eventPlayer();
-  /// get the event translator
+
+  /// Get the event translator. This is used for recording tests.
   pqEventTranslator* eventTranslator();
 
   /// add an event source for playback of files
@@ -75,25 +80,25 @@ public:
   /// A pqPythonEventObserver is automatically added if Python support is enabled.
   void addEventObserver(const QString& fileExtension, 
                           pqEventObserver* translator);
-  
-public slots:
-  /// start the playing of tests in a file
-  virtual void playTests(const QString& filename);
 
-  /// start playing the tests in the collection of files.
-  virtual void playTests(const QStringList& filenames);
+  /// Returns if the utility is currently playing a test.
+  bool playingTest() const
+    { return this->PlayingTest; }
+
+  /// Plays back the test given by the filename(s). This is a blocking call i.e.
+  /// it does not return until the test has been played or aborted due to
+  /// failure. Returns true if the test played successfully.
+  bool playTests(const QString& filename);
+  virtual bool playTests(const QStringList& filenames);
 
   /// start the recording of tests to a file
-  virtual void recordTests(const QString& filename);
-
-protected slots:
-  virtual void testSucceeded();
-  virtual void testFailed();
+  void recordTests(const QString& filename);
 
 protected:
   pqEventDispatcher Dispatcher;
   pqEventPlayer Player;
   pqEventTranslator Translator;
+  bool PlayingTest;
 
   QMap<QString, pqEventSource*> EventSources;
   QMap<QString, pqEventObserver*> EventObservers;

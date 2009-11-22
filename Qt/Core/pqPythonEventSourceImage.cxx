@@ -83,7 +83,9 @@ QtTestingImage_compareImage(PyObject* /*self*/, PyObject* args)
   // void QtTestingImage.compareImage('png file', 'baselineFile')   or
   // void QtTestingImage.compareImage('object', 'baselineFile', width, height)
   //   an exception is thrown in this fails
-  
+ 
+  pqThreadedEventSource::msleep(1000);
+
   const char* object = 0;
   const char* baseline = 0;
   const char* pngfile = 0;

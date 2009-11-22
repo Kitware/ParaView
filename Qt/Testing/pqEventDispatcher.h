@@ -36,46 +36,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtTestingExport.h"
 
 #include <QObject>
+#include <QTimer>
+#include <QEvent>
 
 class pqEventPlayer;
 class pqEventSource;
 
-class QTTESTING_EXPORT pqEventDispatcher :
-  public QObject
+/// pqEventDispatcher is responsible for taking each "event" from the test and
+/// then "playing" it using the player. The dispatcher is the critical component
+/// of this playback since it decides when it's time to dispatch the next
+/// "event" from the test.
+class QTTESTING_EXPORT pqEventDispatcher : public QObject
 {
   Q_OBJECT
-  
+  typedef QObject Superclass; 
 public:
-  pqEventDispatcher();
+  pqEventDispatcher(QObject* parent=0);
   ~pqEventDispatcher();
 
-  /** Retrieves events from the given event source, dispatching them to
-  the given event player for test case playback.  Note that playback is
-  asynchronous - the call to playEvents() returns immediately.  Callers
-  must ensure that the source, dispatcher, and player objects remain
-  in-scope until either the succeeded() or failed() signal is emitted
-  to indicate that playback has finished. */
-  void playEvents(pqEventSource& source, pqEventPlayer& player);
+  /// Retrieves events from the given event source, dispatching them to
+  /// the given event player for test case playback. This call blocks until all
+  /// the events from the source have been played back (or failure). Returns
+  /// true if playback was successful.
+  bool playEvents(pqEventSource& source, pqEventPlayer& player);
 
   /** Wait function provided for players that need to wait for the GUI
       to perform a certain action */
   static void processEventsAndWait(int ms);
 
+protected:
+  /// filter application level events. This is not really a "filter", but more
+  /// like an observer of the application level events.
+  bool eventFilter(QObject *obj, QEvent *ev); 
+
 signals:
-  void succeeded();
-  void failed();
-  void readyPlayNextEvent();
+  void triggerPlayEventStack(void*);
 
-private slots:
-  void playNextEvent();
-  void checkPlayNextEvent();
-  void queueNextEvent();
+protected slots:
+  /// Plays event set, until 
+  /// 2> All events have been processed
+  /// 3> There's an error.
+  void playEventStack(void* activeWidget);
 
-private:
-  void stopPlayback();
+  void onMenuTimerTimeout();
+protected:
+  bool PlayBackFinished;
+  bool PlayBackStatus;
 
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqEventSource* ActiveSource;
+  pqEventPlayer* ActivePlayer;
+  QTimer AdhocMenuTimer;
+  QList<QWidget*> ActiveModalWidgetStack;
 };
 
 #endif // !_pqEventDispatcher_h

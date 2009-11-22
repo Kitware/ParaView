@@ -8,6 +8,7 @@ IF(NOT ParaView_BINARY_DIR)
   INCLUDE(${PARAVIEW_USE_FILE})
 
   SUBDIRS(Plugins)
+  SUBDIRS(CustomApplications)
 
 ELSE(NOT ParaView_BINARY_DIR)
 

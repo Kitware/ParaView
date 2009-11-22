@@ -216,34 +216,6 @@ bool pqCoreTestUtility::CompareImage(vtkImageData* testImage,
   return false;
 }
 
-void pqCoreTestUtility::playTests(const QStringList& filenames)
-{
-  this->TestFilenames = filenames;
-  if (this->TestFilenames.size() > 0)
-    {
-    QString filename = this->TestFilenames[0];
-    this->TestFilenames.pop_front();
-    this->pqTestUtility::playTests(filename);
-    }
-  else
-    {
-    this->testSucceeded();
-    }
-}
-
-void pqCoreTestUtility::playTests(const QString& filename)
-{
-  this->TestFilenames.clear();
-  if(!filename.isEmpty())
-    {
-    pqTestUtility::playTests(filename);
-    }
-  else
-    {
-    this->testSucceeded();
-    }
-}
-
 QString pqCoreTestUtility::TestDirectory()
 {
   if (pqOptions* const options = pqOptions::SafeDownCast(
@@ -254,50 +226,36 @@ QString pqCoreTestUtility::TestDirectory()
   return QString();
 }
 
-void pqCoreTestUtility::testSucceeded()
+
+void pqCoreTestUtility::testFinished(bool success)
 {
-  if (this->TestFilenames.size() > 0)
-    {
-    QString filename = this->TestFilenames[0];
-    this->TestFilenames.pop_front();
-    this->pqTestUtility::playTests(filename);
-    return;
-    }
+
+  // OBSOLETE: This is obsolete code only here till old paraview and application
+  // are fixed.
   if(pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions())
-    )
+    vtkProcessModule::GetProcessModule()->GetOptions()))
     {
     // TODO: image comparisons probably ought to be done the same
     //       way widget validation is done (when that gets implemented)
     //       That is, check that the text of a QLineEdit is a certain value
     //       Referencing a QVTKWidget can then be done the same way as referencing
     //       any other widget, instead of relying on the "active" view.
-    bool comparison_succeeded = true;
-    if(options->GetBaselineImage())
+    pqProcessModuleGUIHelper * helper = pqProcessModuleGUIHelper::SafeDownCast(
+      vtkProcessModule::GetProcessModule()->GetGUIHelper());
+    if (helper)
       {
-      pqProcessModuleGUIHelper * helper;
-      helper = pqProcessModuleGUIHelper::SafeDownCast(
-           vtkProcessModule::GetProcessModule()->GetGUIHelper());
-
-      comparison_succeeded = helper->compareView(options->GetBaselineImage(),
-        options->GetImageThreshold(), cout, options->GetTestDirectory());
-      }
-      
-    if(options->GetExitAppWhenTestsDone())
-      {
-      QApplication::instance()->exit(comparison_succeeded ? 0 : 1);
-      }
-    }
-}
-
-void pqCoreTestUtility::testFailed()
-{
-  if(pqOptions* const options = pqOptions::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetOptions()))
-    {
-    if(options->GetExitAppWhenTestsDone())
-      {
-      QApplication::instance()->exit(1);
+      if (success)
+        {
+        if(options->GetBaselineImage())
+          {
+          success = helper->compareView(options->GetBaselineImage(),
+            options->GetImageThreshold(), cout, options->GetTestDirectory());
+          }
+        }
+      if(options->GetExitAppWhenTestsDone())
+        {
+        QApplication::instance()->exit(success? 0 : 1);
+        }
       }
     }
 }

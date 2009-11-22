@@ -51,11 +51,22 @@ public:
 
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(DataDirectory);
-  vtkGetStringMacro(BaselineImage);
-  vtkGetMacro(ImageThreshold, int);
+
+  /// DEPRECATED.
+  /// @deprecated Use GetTestScript(int)/GetTestBaseline(int)/
+  /// GetTestImageThreshold(int) instead which allows for providing
+  /// multiples tests/baselines/thresholds on  the command line.
+  VTK_LEGACY(vtkGetStringMacro(BaselineImage));
+  VTK_LEGACY(vtkGetMacro(ImageThreshold, int));
+  VTK_LEGACY(vtkSetMacro(ImageThreshold, int));
+
   vtkGetMacro(ExitAppWhenTestsDone, int);
   vtkGetMacro(DisableRegistry, int);
-  
+ 
+  /// DEPRECATED.
+  /// @deprecated Use GetTestScript(int)/GetTestBaseline(int)/
+  /// GetTestImageThreshold(int) instead which allows for providing
+  /// multiples tests/baselines/thresholds on  the command line.
   const QStringList& GetTestFiles() 
     { return this->TestFiles; }
 
@@ -69,6 +80,26 @@ public:
   vtkSetStringMacro(TestFileName);
   vtkSetStringMacro(TestInitFileName);
   vtkSetStringMacro(ServerResourceName);
+
+  int GetNumberOfTestScripts()
+    { return this->TestScripts.size(); }
+  QString GetTestScript(int cc)
+    { return this->TestScripts[cc].TestFile; }
+  QString GetTestBaseline(int cc)
+    { return this->TestScripts[cc].TestBaseline; }
+  int GetTestImageThreshold(int cc)
+    { return this->TestScripts[cc].ImageThreshold; }
+
+  // Description
+  // Get/Set whether lightkit is disabled by default. This is useful for
+  // testing.
+  vtkGetMacro(DisableLightKit, int);
+  vtkSetMacro(DisableLightKit, int);
+
+  // DO NOT CALL. Public for internal callbacks.
+  int AddTestScript(const char*);
+  int SetLastTestBaseline(const char*);
+  int SetLastTestImageThreshold(int);
 
 protected:
   pqOptions();
@@ -86,6 +117,17 @@ protected:
   int ImageThreshold;
   int ExitAppWhenTestsDone;
   int DisableRegistry;
+  int DisableLightKit;
+
+  struct TestInfo
+    {
+    QString TestFile;
+    QString TestBaseline;
+    int ImageThreshold;
+    TestInfo():ImageThreshold(12) { }
+    };
+
+  QList<TestInfo> TestScripts;
 
   QStringList TestFiles;
     

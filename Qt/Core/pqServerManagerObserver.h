@@ -36,15 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCoreExport.h"
 #include <QObject>
 #include "vtkType.h" // needed for vtkIdType
+
 class pqMultiView;
 class pqServerManagerObserverInternal;
-
 class QVTKWidget;
-
 class vtkCommand;
 class vtkObject;
 class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyLocator;
 
 // This is a vtkSMProxyManager observer. This class should simply listen to events
 // fired by proxy manager and responds. It does not support any creation method. 
@@ -79,6 +79,12 @@ signals:
   /// Fired when a server connection is closed by  the vtkProcessModule.
   void connectionClosed(vtkIdType connectionId);
 
+  /// Fired when a state file is loaded successfully.
+  void stateLoaded(vtkPVXMLElement* root, vtkSMProxyLocator* locator);
+  
+  /// Fired when state is being saved.
+  void stateSaved(vtkPVXMLElement* root);
+
 private slots:
   void proxyRegistered(vtkObject* object, unsigned long e, void* clientData,
       void* callData, vtkCommand* command);
@@ -86,6 +92,8 @@ private slots:
     void* callData, vtkCommand*);
   void connectionCreated(vtkObject*, unsigned long, void*, void* callData);
   void connectionClosed(vtkObject*, unsigned long, void*, void* callData);
+  void stateLoaded(vtkObject*, unsigned long, void*, void* callData);
+  void stateSaved(vtkObject*, unsigned long, void*, void* callData);
 
 protected:
   pqServerManagerObserverInternal *Internal;  ///< Stores the pipeline objects.

@@ -46,7 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMViewProxy.h"
 
 #include <QHeaderView>
-#include "vtksys/ios/sstream"
+#include <QApplication>
+#include <QFile>
+
+#include <vtksys/ios/sstream>
 
 //-----------------------------------------------------------------------------
 pqClientAboutDialog::pqClientAboutDialog(QWidget* Parent) :
@@ -55,6 +58,13 @@ pqClientAboutDialog::pqClientAboutDialog(QWidget* Parent) :
 {
   this->Ui->setupUi(this);
   this->setObjectName("pqClientAboutDialog");
+
+  QString spashImage =
+    QString(":/%1/SplashImage.img").arg(QApplication::applicationName());
+  if (QFile::exists(spashImage))
+    {
+    this->Ui->Image->setPixmap(QPixmap(spashImage));
+    }
 
   // get extra information and put it in
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();

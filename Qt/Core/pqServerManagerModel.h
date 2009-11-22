@@ -46,7 +46,9 @@ class pqServerManagerModelItem;
 class pqServerManagerObserver;
 class pqServerResource;
 class pqView;
+class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMProxyLocator;
 
 //BTX
 class pqServerManagerModel;
@@ -238,6 +240,9 @@ signals:
   void preConnectionRemoved(pqPipelineSource* source, 
     pqPipelineSource* consumer, int srcOutputPort);
 
+  /// Fired when a source indicates that data was updated i.e. the pipeline was
+  /// updated.
+  void dataUpdated(pqPipelineSource*);
 
 protected slots:
   /// Called when a proxy is registered.
@@ -253,6 +258,10 @@ protected slots:
 
   /// Called when a server connection is closed.
   virtual void onConnectionClosed(vtkIdType id);
+
+  /// Called when state file is loaded. We need to discover "helper proxies" and
+  /// set up the associations accordingly.
+  virtual void onStateLoaded(vtkPVXMLElement*, vtkSMProxyLocator*);
 
 private:
   pqServerManagerModel(const pqServerManagerModel&); // Not implemented.

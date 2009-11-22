@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.12");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.13");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -92,8 +92,8 @@ QWidget* ProcessModuleGUIHelper::GetUserInterface()
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
-  pqApplicationCore::instance()->setApplicationName(OverView::GetBrandedApplicationTitle() + " " + OverView::GetBrandedVersion());
-  pqApplicationCore::instance()->setOrganizationName("Sandia National Laboratories");
+  QApplication::setApplicationName(OverView::GetBrandedApplicationTitle() + " " + OverView::GetBrandedVersion());
+  QApplication::setOrganizationName("Sandia National Laboratories");
 
   if(this->WindowType == "QMainWindow")
     {

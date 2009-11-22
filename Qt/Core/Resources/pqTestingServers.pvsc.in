@@ -1,0 +1,19 @@
+<Servers>
+  <!-- Default server resources used by testing framework. These servers are
+  loaded by default when "disable-registry" option is used -->
+  <Server name="builtin" resource="builtin:">
+    <ManualStartup/>
+  </Server>
+  <Server name="testserver" resource="cs://@PV_TEST_SERVER_ROOT@:11111">
+    <ManualStartup/>
+  </Server>
+  <Server name="testserver-rc" resource="csrc://@PV_TEST_SERVER_ROOT@:11111">
+    <ManualStartup/>
+  </Server>
+  <Server name="testserver-dsrs" resource="cdsrs://@PV_TEST_SERVER_ROOT@:11111//@PV_TEST_SERVER_ROOT@:22221">
+    <ManualStartup/>
+  </Server>
+  <Server name="testserver-dsrs-rc" resource="cdsrsrc://@PV_TEST_SERVER_ROOT@:11111//@PV_TEST_SERVER_ROOT@:22221">
+    <ManualStartup/>
+  </Server>
+</Servers>

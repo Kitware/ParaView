@@ -237,7 +237,7 @@ vtkSMSourceProxy* pqSpreadSheetViewSelectionModel::getSelectionSource()
   // Determine what selection proxy name we want. If the name differs then not
   // updatable.
   const char* proxyname = "IDSelectionSource";
-  vtkPVDataInformation* dinfo = opport->getDataInformation(false);
+  vtkPVDataInformation* dinfo = opport->getDataInformation();
   const char* cdclassname = dinfo->GetCompositeDataClassName();
   if (cdclassname && strcmp(cdclassname, "vtkHierarchicalBoxDataSet") == 0)
     {

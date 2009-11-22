@@ -85,15 +85,6 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
     SLOT(onVariableChanged(pqVariableType, const QString&)));
 
   this->VTKConnect = vtkEventQtSlotConnect::New();
-
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  if (stack)
-    {
-    QObject::connect(this, SIGNAL(begin(const QString&)),
-      stack, SLOT(beginUndoSet(const QString&)));
-    QObject::connect(this, SIGNAL(end()),
-      stack, SLOT(endUndoSet()));
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -178,7 +169,7 @@ void pqDisplayColorWidget::onComponentActivated(int row)
   pqPipelineRepresentation* display = this->getRepresentation();
   if(display)
     {
-    emit this->begin("Color Component Change");
+    BEGIN_UNDO_SET("Color Component Change");
     pqScalarsToColors* lut = display->getLookupTable();
     if(row == 0)
       {
@@ -190,7 +181,7 @@ void pqDisplayColorWidget::onComponentActivated(int row)
       }
     lut->updateScalarBarTitles(this->Components->itemText(row));
     display->resetLookupTableScalarRange();
-    emit this->end();
+    END_UNDO_SET();
 
     display->renderViewEventually();
     }
@@ -257,7 +248,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
   pqPipelineRepresentation* display = this->getRepresentation();
   if (display)
     {
-    emit this->begin("Color Change");
+    BEGIN_UNDO_SET("Color Change");
     switch(type)
       {
     case VARIABLE_TYPE_NONE:
@@ -272,7 +263,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType type,
         vtkSMDataRepresentationProxy::CELL_DATA);
       break;
       }
-    emit this->end();
+    END_UNDO_SET();
     display->renderViewEventually();
     }
 }

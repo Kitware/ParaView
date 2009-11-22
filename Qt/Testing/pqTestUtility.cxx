@@ -45,22 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPythonEventObserver.h"
 #endif
 
-
+//-----------------------------------------------------------------------------
 pqTestUtility::pqTestUtility(QObject* p) :
   QObject(p)
 {
-  QObject::connect(
-    &this->Dispatcher,
-    SIGNAL(succeeded()),
-    this,
-    SLOT(testSucceeded()));
-    
-  QObject::connect(
-    &this->Dispatcher,
-    SIGNAL(failed()),
-    this,
-    SLOT(testFailed()));
-  
+  this->PlayingTest = false;
   this->Translator.addDefaultWidgetEventTranslators();
   this->Player.addDefaultWidgetEventPlayers();
 
@@ -71,25 +60,30 @@ pqTestUtility::pqTestUtility(QObject* p) :
 #endif
 }
 
+//-----------------------------------------------------------------------------
 pqTestUtility::~pqTestUtility()
 {
 }
   
+//-----------------------------------------------------------------------------
 pqEventDispatcher* pqTestUtility::dispatcher()
 {
   return &this->Dispatcher;
 }
 
+//-----------------------------------------------------------------------------
 pqEventPlayer* pqTestUtility::eventPlayer()
 {
   return &this->Player;
 }
 
+//-----------------------------------------------------------------------------
 pqEventTranslator* pqTestUtility::eventTranslator()
 {
   return &this->Translator;
 }
 
+//-----------------------------------------------------------------------------
 void pqTestUtility::addEventSource(const QString& fileExtension, pqEventSource* source)
 {
   QMap<QString, pqEventSource*>::iterator iter;
@@ -104,6 +98,7 @@ void pqTestUtility::addEventSource(const QString& fileExtension, pqEventSource* 
   source->setParent(this);
 }
 
+//-----------------------------------------------------------------------------
 void pqTestUtility::addEventObserver(const QString& fileExtension,
                                      pqEventObserver* observer)
 {
@@ -125,27 +120,49 @@ void pqTestUtility::addEventObserver(const QString& fileExtension,
 
 }
 
-void pqTestUtility::playTests(const QString& filename)
+//-----------------------------------------------------------------------------
+bool pqTestUtility::playTests(const QString& filename)
 {
-  QFileInfo info(filename);
-  QString suffix = info.completeSuffix();
-  QMap<QString, pqEventSource*>::iterator iter;
-  iter = this->EventSources.find(suffix);
-  if(info.isReadable() && iter != this->EventSources.end())
-    {
-    iter.value()->setContent(filename);
-    this->Dispatcher.playEvents(*iter.value(), this->Player);
-    }
+  QStringList files;
+  files << filename;
+  return this->playTests(files);
 }
 
-void pqTestUtility::playTests(const QStringList& filenames)
+//-----------------------------------------------------------------------------
+bool pqTestUtility::playTests(const QStringList& filenames)
 {
-  foreach(QString filename, filenames)
+  if (this->PlayingTest)
     {
-    this->playTests(filename);
+    qCritical("playTests() cannot be called recursively.");
+    return false;
     }
+
+  this->PlayingTest = true;
+
+  bool success = true;
+  foreach (QString filename, filenames)
+    {
+    QFileInfo info(filename);
+    QString suffix = info.completeSuffix();
+    QMap<QString, pqEventSource*>::iterator iter;
+    iter = this->EventSources.find(suffix);
+    if(info.isReadable() && iter != this->EventSources.end())
+      {
+      iter.value()->setContent(filename);
+      if (!this->Dispatcher.playEvents(*iter.value(), this->Player))
+        {
+        // dispatcher returned failure, don't continue with rest of the tests
+        // and flag error.
+        success = false;
+        break;
+        }
+      }
+    }
+  this->PlayingTest = false;
+  return success;
 }
 
+//-----------------------------------------------------------------------------
 void pqTestUtility::recordTests(const QString& filename)
 {
 #if defined(Q_WS_MAC)
@@ -183,13 +200,5 @@ void pqTestUtility::recordTests(const QString& filename)
                                           QApplication::activeWindow());
   dialog->setAttribute(Qt::WA_QuitOnClose, false);
   dialog->show();
-}
-
-void pqTestUtility::testSucceeded()
-{
-}
-
-void pqTestUtility::testFailed()
-{
 }
 

@@ -41,7 +41,9 @@ class pqDataRepresentation;
 class pqDisplayColorWidget;
 class QAction;
 
-
+/// TO_DEPRECATE: Remove this class since it's not longer of any use. The
+/// functionality has been split into reactions for handling the actions from the
+/// color toolbar.
 class PQCOMPONENTS_EXPORT pqColorScaleToolbar : public QObject
 {
   Q_OBJECT

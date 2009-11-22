@@ -1,5 +1,0 @@
-<RCC>
-<qresource prefix="/ParaViewResources">
-@QT_COMPONENTS_GUI_RESOURCES_CONTENTS@
-</qresource>
-</RCC>
