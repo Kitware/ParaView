@@ -72,6 +72,10 @@ static QStringList ObjectList;
 static PyObject*
 QtTesting_playCommand(PyObject* /*self*/, PyObject* args)
 {
+  // this gives the main thread some time to refresh before we start sending
+  // commands. Avoids crazy hangs in QDialog::exec() calls.
+  pqThreadedEventSource::msleep(500);
+
   // void QtTesting.playCommand('object', 'command', 'arguments')
   //   an exception is thrown in this fails
   
