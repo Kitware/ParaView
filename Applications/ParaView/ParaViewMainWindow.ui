@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../../Qt/Components/Resources/pqComponents.qrc">
+    <normaloff>:/pqWidgets/Icons/pqAppIcon64.png</normaloff>:/pqWidgets/Icons/pqAppIcon64.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <property name="margin">
@@ -199,6 +203,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../Qt/Components/Resources/pqComponents.qrc"/>
+ </resources>
  <connections/>
 </ui>
