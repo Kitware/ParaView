@@ -4513,8 +4513,9 @@
    <!-- End Facet Reader -->
    </SourceProxy>
 
-   <SourceProxy name="Meta Image Reader" 
-                class="vtkMetaImageReader">
+   <SourceProxy name="MetaImageReader" 
+                class="vtkMetaImageReader"
+                label="Meta Image reader">
      <Documentation
        short_help="Read UNC meta image data."
        long_help="Read binary UNC meta image data.">
