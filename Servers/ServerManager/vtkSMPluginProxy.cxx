@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPluginProxy);
-vtkCxxRevisionMacro(vtkSMPluginProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMPluginProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMPluginProxy::vtkSMPluginProxy()
@@ -83,7 +83,6 @@ void vtkSMPluginProxy::UpdatePropertyInformation()
   this->GetPropertyArray(this->GetConnectionID(),
     this->GetServers(), this->GetID(), prop, this->ServerManagerXML);
 
-#ifdef VTK_WRAP_PYTHON
   prop = this->GetProperty("PythonModuleNames");
   this->GetPropertyArray(this->GetConnectionID(),
     this->GetServers(), this->GetID(), prop, this->PythonModuleNames);
@@ -93,7 +92,6 @@ void vtkSMPluginProxy::UpdatePropertyInformation()
   prop = this->GetProperty("PythonPackageFlags");
   this->GetPropertyArray(this->GetConnectionID(),
     this->GetServers(), this->GetID(), prop, this->PythonPackageFlags);
-#endif //VTK_WRAP_PYTHON
 }
   
 //---------------------------------------------------------------------------

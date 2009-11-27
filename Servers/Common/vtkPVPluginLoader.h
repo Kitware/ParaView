@@ -22,9 +22,10 @@
 
 #include "vtkObject.h"
 
+class vtkIntArray;
+class vtkPVPlugin;
 class vtkPVPluginInformation;
 class vtkStringArray;
-class vtkIntArray;
 
 class VTK_EXPORT vtkPVPluginLoader : public vtkObject
 {
@@ -37,6 +38,12 @@ public:
   // set/get the filename and load the plugin
   void SetFileName(const char* file);
   const char* GetFileName();
+
+//BTX
+  // Description:
+  // Loads the paraview plugin.
+  void Load(vtkPVPlugin*);
+//ETX
   
   // Description:
   // Get the Server Manager PluginInformation object
@@ -98,6 +105,7 @@ protected:
   vtkStringArray* PythonModuleNames;
   vtkStringArray* PythonModuleSources;
   vtkIntArray*    PythonPackageFlags;
+  bool DebugPlugin;
 
 private:
   vtkPVPluginLoader(const vtkPVPluginLoader&); // Not implemented.

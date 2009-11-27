@@ -1,0 +1,124 @@
+/*=========================================================================
+
+   Program: ParaView
+   Module:    pqParaViewPlugin.cxx.in
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2. 
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+========================================================================*/
+#include "@PLUGIN_NAME@_Plugin.h"
+
+#include "vtkObjectFactory.h"
+
+#ifdef INITIALIZE_WRAPPING
+# include "vtkProcessModule.h"
+# include "vtkClientServerInterpreter.h"
+
+extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+#endif
+
+@SM_PLUGIN_INCLUDES@
+@INTERFACE_INCLUDES@
+
+@PUSH_BACK_XML_INTERFACES@
+@PUSH_BACK_PV_INTERFACES@
+
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_servermanager
+vtkProcessModule::InterpreterInitializationCallback 
+@PLUGIN_NAME@_Plugin::GetInitializeInterpreterCallback()
+{
+# ifdef INITIALIZE_WRAPPING
+  return @PLUGIN_NAME@_Initialize;
+# endif
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+void @PLUGIN_NAME@_Plugin::GetXMLs(vtkstd::vector<vtkstd::string> &xmls)
+{
+# ifdef PUSH_BACK_XML_INTERFACES
+  PUSH_BACK_XML_INTERFACES(xmls);
+# endif
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_gui
+QObjectList @PLUGIN_NAME@_Plugin::interfaces()
+{
+  QObjectList interfaces;
+#ifdef PUSH_BACK_PV_INTERFACES
+  PUSH_BACK_PV_INTERFACES(interfaces);
+#endif
+  return interfaces;
+}
+#endif
+
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_python
+@WRAP_PYTHON_INCLUDES@
+
+void @PLUGIN_NAME@_Plugin::GetPythonSourceList(vtkstd::vector<vtkstd::string>& modules,
+  vtkstd::vector<vtkstd::string>& sources,
+  vtkstd::vector<int> &package_flags)
+{
+  const char *moduleNames[] = {
+    @PY_MODULE_LIST@
+  };
+  char *moduleSources[] = {
+    @PY_LOADER_LIST@
+  };
+  const int packageFlags[] = {
+    @PY_PACKAGE_FLAGS@
+  };
+
+  int num_modules = sizeof(moduleNames)/sizeof(const char *);
+  for (int cc=0; cc < num_modules; cc++)
+    {
+    modules.push_back(moduleNames[cc]);
+    sources.push_back(moduleSources[cc]);
+    package_flags.push_back(packageFlags[cc]);
+
+    // free allocated memory.
+    delete moduleSources[cc];
+    moduleSources[cc] = NULL;
+    }
+}
+#endif
+
+//-----------------------------------------------------------------------------
+// Mark this as a ParaView-ServerManager plugin.
+PV_PLUGIN_EXPORT(@PLUGIN_NAME@, @PLUGIN_NAME@_Plugin)
+
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_gui
+
+// Required to mark this as a Qt plugin.
+Q_EXPORT_PLUGIN2(@PLUGIN_NAME@,  @PLUGIN_NAME@_Plugin)
+#endif
+
+

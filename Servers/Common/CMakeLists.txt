@@ -111,10 +111,10 @@ ENDIF (VTK_USE_MPI)
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
   vtkCellIntegrator.cxx
-  vtkPVCreateProcessModule
-  vtkPVInformation
   vtkProcessModuleConnection
   vtkProcessModuleGUIHelper
+  vtkPVCreateProcessModule
+  vtkPVInformation
   vtkRemoteConnection
   vtkUndoElement
   ABSTRACT
@@ -122,12 +122,12 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkCommandOptionsXMLParser.cxx
   vtkConnectionIterator.cxx
-  # vtkStringList.cxx
+  vtkPVCreateProcessModule
   vtkPVOptionsXMLParser.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
-  vtkPVCreateProcessModule
   vtkPVTestUtilities.cxx
+  # vtkStringList.cxx
   WRAP_EXCLUDE
   )
 

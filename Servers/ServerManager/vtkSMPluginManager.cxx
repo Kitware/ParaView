@@ -18,6 +18,7 @@
 #include "vtkIntArray.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVEnvironmentInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkSmartPointer.h"
@@ -61,7 +62,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.5");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.6");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -272,11 +273,11 @@ void vtkSMPluginManager::ProcessPluginInfo(vtkSMPluginProxy* pluginProxy)
   
   this->Internal->LoadedServerManagerXMLs.insert(loadedxml);  
   
-#ifdef VTK_WRAP_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   this->ProcessPluginPythonInfo(pluginProxy->GetPythonModuleNames(),
                                 pluginProxy->GetPythonModuleSources(),
                                 pluginProxy->GetPythonPackageFlags());
-#endif //VTK_WRAP_PYTHON
+#endif //PARAVIEW_ENABLE_PYTHON
 }
 
 //---------------------------------------------------------------------------
@@ -298,11 +299,11 @@ void vtkSMPluginManager::ProcessPluginInfo(vtkPVPluginLoader* pluginLoader)
 
   this->Internal->LoadedServerManagerXMLs.insert(loadedxml);  
 
-#ifdef VTK_WRAP_PYTHON
+#ifdef PARAVIEW_ENABLE_PYTHON
   this->ProcessPluginPythonInfo(pluginLoader->GetPythonModuleNames(),
     pluginLoader->GetPythonModuleSources(),
     pluginLoader->GetPythonPackageFlags());
-#endif //VTK_WRAP_PYTHON
+#endif //PARAVIEW_ENABLE_PYTHON
   }
 
 //---------------------------------------------------------------------------

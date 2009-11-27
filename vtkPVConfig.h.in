@@ -47,6 +47,7 @@
 #define OPENGL_INCLUDE_DIR  "@OPENGL_INCLUDE_DIR@"
 #define CMAKE_BUILD_TYPE    "@CMAKE_BUILD_TYPE@"
 
+#define CMAKE_CXX_COMPILER_ID "@CMAKE_CXX_COMPILER_ID@"
 @PARAVIEW_CONFIG_EXTRA_DEFINES@
 
 // defined when SSEND must be used for communication by default.
