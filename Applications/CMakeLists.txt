@@ -31,7 +31,8 @@ MACRO(paraview_build_optional_application name comment subdirectory default)
 ENDMACRO(paraview_build_optional_application)
 
 paraview_build_optional_application(ParaView "Standard ParaView Client" ParaView ON)
-paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
+# OverView is disabled until we upgrade it to ParaView Branding
+#paraview_build_optional_application(OverView "OverView Informatics Client" OverView OFF)
 
 IF(BUILD_SHARED_LIBS)
   paraview_build_optional_application(StreamingParaView "Streaming ParaView Application" StreamingParaView OFF)
