@@ -26,6 +26,8 @@
 class VTK_EXPORT vtkPVServerManagerPluginInterface
 {
 public:
+  virtual ~vtkPVServerManagerPluginInterface() { }
+
   // Description:
   // Obtain the server-manager configuration xmls, if any.
   virtual void GetXMLs(vtkstd::vector<vtkstd::string>& vtkNotUsed(xmls)) = 0;

@@ -38,6 +38,8 @@
 class VTK_EXPORT vtkPVPlugin
 {
 public:
+  virtual ~vtkPVPlugin() {}
+
   // Description:
   // Returns the name for this plugin.
   virtual const char* GetPluginName() = 0;
@@ -90,13 +92,13 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 // FIXME: This still needs some work to make sure all kinds of plugins work when
 // compiled in statically.
 //// Call this macro when linking against this plugin directly.
-//#define PV_PLUGIN_IMPORT(PLUGIN) \
-//{\
-//  vtkPVPlugin* plugin = pv_plugin_instance_##PLUGIN();\
-//  vtkPVPluginLoader* loader= vtkPVPluginLoader::New();\
-//  loader->Load(plugin);\
-//  loader->Delete();\
-//}
+#define fixme_PV_PLUGIN_IMPORT(PLUGIN) \
+{\
+  vtkPVPlugin* plugin = pv_plugin_instance_##PLUGIN();\
+  vtkPVPluginLoader* loader= vtkPVPluginLoader::New();\
+  loader->Load(plugin);\
+  loader->Delete();\
+}
 
 #endif
 

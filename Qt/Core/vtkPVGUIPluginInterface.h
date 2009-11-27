@@ -24,6 +24,7 @@
 class vtkPVGUIPluginInterface 
 {
 public:
+  virtual ~vtkPVGUIPluginInterface() { }
   virtual QObjectList interfaces() = 0;
 };
 

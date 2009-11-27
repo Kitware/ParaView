@@ -25,6 +25,8 @@
 class VTK_EXPORT vtkPVPythonPluginInterace
 {
 public:
+  virtual ~vtkPVPythonPluginInterace() { }
+
   virtual void GetPythonSourceList(vtkstd::vector<vtkstd::string>& modules,
     vtkstd::vector<vtkstd::string>& sources,
     vtkstd::vector<int> &package_flags) = 0;
