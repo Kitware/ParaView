@@ -53,4 +53,7 @@
 // defined when SSEND must be used for communication by default.
 #cmakedefine PARAVIEW_USE_MPI_SSEND
 
+// ParaView data root (useful for testing).
+#define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
+
 #endif

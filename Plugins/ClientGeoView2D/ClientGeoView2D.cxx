@@ -87,7 +87,7 @@
 #include <vtksys/stl/map>
 
 #include "ClientGeoView2DConfig.h" // Overview config file
-#include "vtkPQConfig.h" // For PARAVIEW_DATA_ROOT
+#include "vtkPVConfig.h" // For PARAVIEW_DATA_ROOT
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientGeoView2D::command

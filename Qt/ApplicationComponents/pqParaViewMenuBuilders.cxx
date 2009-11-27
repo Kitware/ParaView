@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqParaViewMenuBuilders.h"
-#include "vtkPQConfig.h"
+#include "vtkPVConfig.h"
 
 #include "ui_pqFileMenuBuilder.h"
 #include "ui_pqEditMenuBuilder.h"

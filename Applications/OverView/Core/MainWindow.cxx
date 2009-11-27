@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include <vtkPQConfig.h>
+#include <vtkPVConfig.h>
 
 #include "AboutDialog.h"
 #include "AnnotationLink.h"

@@ -235,13 +235,6 @@ MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 # variable so that they also get installed.
 SET (dynamicHeaders)
 
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
-  ${ParaView_BINARY_DIR}/vtkPQConfig.h
-  ESCAPE_QUOTES)
-
-SET(dynamicHeaders 
-    "${dynamicHeaders};${ParaView_BINARY_DIR}/vtkPQConfig.h")
-
 #########################################################################
 #
 # add directories

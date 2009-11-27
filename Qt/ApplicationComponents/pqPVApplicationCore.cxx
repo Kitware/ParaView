@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 #include "pqPVApplicationCore.h"
-#include "vtkPQConfig.h"
+#include "vtkPVConfig.h"
 
 #include "pqActiveObjects.h"
 #include "pqAnimationManager.h"

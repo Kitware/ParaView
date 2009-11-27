@@ -85,7 +85,7 @@
 #include <vtksys/stl/map>
 
 #include "ClientGeoViewConfig.h"
-#include "vtkPQConfig.h" // For PARAVIEW_DATA_ROOT
+#include "vtkPVConfig.h" // For PARAVIEW_DATA_ROOT
 
 ////////////////////////////////////////////////////////////////////////////////////
 // ClientGeoView::command
