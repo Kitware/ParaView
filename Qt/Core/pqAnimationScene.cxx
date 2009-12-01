@@ -178,6 +178,10 @@ void pqAnimationScene::updateTimeSteps()
     {
     // If we are currently loading state then we don't want to change
     // the currently set start/end times.
+
+    // however we still do need to relay the timeStepsChanged signal to ensure
+    // that GUI components are updated correctly.
+    emit this->timeStepsChanged();
     return;
     }
 
