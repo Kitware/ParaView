@@ -140,6 +140,69 @@ IF(BUILD_TESTING)
   ELSE(Q_WS_MAC)
     SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview --test-directory=${PARAVIEW_TEST_DIR})
   ENDIF(Q_WS_MAC)
+  
+  if("${CMAKE_SIZEOF_VOID_P}" EQUAL 8)
+    INSTALL(FILES C:/Python/Python25-x64/python25.dll
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+  
+    # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x64/DLLs/_socket.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+      
+     # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x64/DLLs/pyexpat.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+      
+     # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x64/DLLs/_elementtree.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+
+    # Vistrails needs Lib\site-packages to have PyQT and sip
+    INSTALL(DIRECTORY C:/Python/Python25-x64/Lib
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      USE_SOURCE_PERMISSIONS
+      COMPONENT Runtime)
+      
+  else()
+  
+      INSTALL(FILES C:/Python/Python25-x86/python25.dll
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+    
+    # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x86/DLLs/_socket.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+      
+     # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x86/DLLs/pyexpat.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+      
+     # needed by vistrails
+    INSTALL(FILES C:/Python/Python25-x86/DLLs/_elementtree.pyd
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      COMPONENT Runtime)
+
+    # Vistrails needs Lib\site-packages to have PyQT and sip
+    INSTALL(DIRECTORY C:/Python/Python25-x86/Lib
+      DESTINATION ${PV_INSTALL_BIN_DIR}
+      USE_SOURCE_PERMISSIONS
+      COMPONENT Runtime)
+      
+  endif()
 
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_PYTHON ${pqClient_SOURCE_DIR}/Testing/Python)

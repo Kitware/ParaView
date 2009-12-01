@@ -17,7 +17,7 @@ ParaView_App="@EXECUTABLE_OUTPUT_PATH@/$ParaViewExeName.app"
 # Remove the previous app package so we start with a clean bundle
 #
 echo "Remove previous bundle"
-rm -rf "$InstallPrefix/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app"
+rm -rf "$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
 
 
 # Copy paraview.app from the build tree to the install tree:
@@ -25,12 +25,12 @@ rm -rf "$InstallPrefix/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR
 echo "Copy paraview.app from the build tree to $InstallPrefix/"
 mkdir -p "$InstallPrefix"
 cp -Rp "$ParaView_App" "$InstallPrefix/"
-mv "$InstallPrefix/paraview.app" "$InstallPrefix/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app"
+mv "$InstallPrefix/paraview.app" "$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
 
 
 # Now operate on the bundle in the install tree:
 #
-ParaView_App="$InstallPrefix/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app"
+ParaView_App="$InstallPrefix/ParaView @PARAVIEW_VERSION_FULL@.app"
 
 FrameworksDir="$ParaView_App/Contents/Frameworks"
 LibrariesDir="$ParaView_App/Contents/Libraries"

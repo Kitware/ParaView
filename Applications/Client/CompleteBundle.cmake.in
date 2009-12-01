@@ -74,7 +74,7 @@ endif()
 set(ENV{InstallPrefix} "${InstallPrefix}")
 
 execute_process(COMMAND "@OSX_MAKE_STANDALONE_BUNDLE_BASH_SCRIPT@")
-set(bundle "${InstallPrefix}/ParaView @PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@.app")
+set(bundle "${InstallPrefix}/ParaView @PARAVIEW_VERSION_FULL@.app")
 
 if(NOT EXISTS "${bundle}")
   message(FATAL_ERROR "error: shell script did not put ParaView .app bundle in expected location: ${bundle}")
