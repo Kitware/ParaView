@@ -20,18 +20,19 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVEnvironmentInformation.h"
-#include "vtkPVPluginLoader.h"
-#include "vtkSmartPointer.h"
-#include "vtkStringArray.h"
-#include <vtkstd/map>
-
 #include "vtkPVPluginInformation.h"
+#include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMPluginProxy.h"
+#include "vtkSMPropertyHelper.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLParser.h"
+#include "vtkStringArray.h"
+
+#include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
 
@@ -62,7 +63,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.6");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.7");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -269,14 +270,48 @@ void vtkSMPluginManager::ProcessPluginInfo(vtkSMPluginProxy* pluginProxy)
     // already processed;
     return;
     }
-  this->ProcessPluginSMXML(pluginProxy->GetServerManagerXML());  
+
+  vtkStringArray *array = vtkStringArray::New();
+  vtkSMPropertyHelper helper(pluginProxy, "ServerManagerXML");
+  array->SetNumberOfTuples(helper.GetNumberOfElements());
+  for (unsigned int cc=0; cc < helper.GetNumberOfElements(); cc++)
+    {
+    array->SetValue(cc, helper.GetAsString(cc));
+    }
+  this->ProcessPluginSMXML(array);
+  array->Delete();
   
   this->Internal->LoadedServerManagerXMLs.insert(loadedxml);  
   
 #ifdef PARAVIEW_ENABLE_PYTHON
-  this->ProcessPluginPythonInfo(pluginProxy->GetPythonModuleNames(),
-                                pluginProxy->GetPythonModuleSources(),
-                                pluginProxy->GetPythonPackageFlags());
+  vtkStringArray* modules = vtkStringArray::New();
+  vtkSMPropertyHelper helperModules(pluginProxy, "PythonModuleNames");
+  modules->SetNumberOfTuples(helperModules.GetNumberOfElements());
+  for (unsigned int cc=0; cc < helperModules.GetNumberOfElements(); cc++)
+    {
+    modules->SetValue(cc, helperModules.GetAsString(cc));
+    }
+
+  vtkStringArray* sources = vtkStringArray::New();
+  vtkSMPropertyHelper helperSources(pluginProxy, "PythonModuleSources");
+  sources->SetNumberOfTuples(helperSources.GetNumberOfElements());
+  for (unsigned int cc=0; cc < helperSources.GetNumberOfElements(); cc++)
+    {
+    sources->SetValue(cc, helperSources.GetAsString(cc));
+    }
+
+  vtkIntArray* flags = vtkIntArray::New();
+  vtkSMPropertyHelper helperFlags(pluginProxy, "PythonPackageFlags");
+  flags->SetNumberOfTuples(helperFlags.GetNumberOfElements());
+  for (unsigned int cc=0; cc < helperFlags.GetNumberOfElements(); cc++)
+    {
+    flags->SetValue(cc, helperFlags.GetAsInt(cc));
+    }
+
+  this->ProcessPluginPythonInfo(modules, sources, flags);
+  modules->Delete();
+  sources->Delete();
+  flags->Delete();
 #endif //PARAVIEW_ENABLE_PYTHON
 }
 
