@@ -90,7 +90,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2.2.2");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.2.2.3");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -247,7 +247,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     }
 
   // calculate np from data
-  this->np = (int)(pow(this->npart, 1.0 / 3.0) + .5);
+  this->np = (int)(pow((double)this->npart, 1.0 / 3.0) + .5);
   vtkDebugMacro(<< "np = " << this->np);
 
   // normalize
