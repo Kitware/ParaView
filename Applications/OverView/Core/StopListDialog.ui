@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>LDRDView: Edit stop words</string>
+   <string>Edit stop words</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="spacing" >
