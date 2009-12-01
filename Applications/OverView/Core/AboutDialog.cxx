@@ -218,6 +218,8 @@ void AboutDialog::AddServerInformation(pqServer* server, QTreeWidget* tree)
     ::addItem(tree, "Tile Display", "Off");
     }
 
+  ::addItem(tree, "Write Ogg/Theora Animations",
+    serverInfo->GetOGVSupport()? "On": "Off");
   ::addItem(tree, "Write AVI Animations",
     serverInfo->GetAVISupport()? "On": "Off");
 }

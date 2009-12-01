@@ -46,8 +46,13 @@
 # endif
 #endif
 
+#ifdef VTK_USE_OGGTHEORA_ENCODER
+#  include "vtkOggTheoraWriter.h"
+#  include "vtkPVConfig.h"
+#endif
+
 vtkStandardNewMacro(vtkSMAnimationSceneImageWriter);
-vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.14");
+vtkCxxRevisionMacro(vtkSMAnimationSceneImageWriter, "1.15");
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
   ImageWriter, vtkImageWriter);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneImageWriter,
@@ -58,6 +63,11 @@ vtkSMAnimationSceneImageWriter::vtkSMAnimationSceneImageWriter()
   this->Magnification = 1;
   this->ErrorCode = 0;
   this->Quality = 2; // 0 = low, 1 = medium, 2 = high
+#ifdef PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
+  this->Subsampling = 1;
+#else
+  this->Subsampling = 0;
+#endif
   this->ActualSize[0] = this->ActualSize[1] = 0;
 
   this->MovieWriter = 0;
@@ -377,6 +387,17 @@ bool vtkSMAnimationSceneImageWriter::CreateWriter()
     }
 # endif
 #endif
+#ifdef VTK_USE_OGGTHEORA_ENCODER
+  else if (extension == ".ogv" || extension == ".ogg")
+    {
+    vtkOggTheoraWriter *ogvwriter = vtkOggTheoraWriter::New();
+    ogvwriter->SetQuality(this->Quality);
+    ogvwriter->SetRate(
+      static_cast<int>(this->GetFrameRate()));
+    ogvwriter->SetSubsampling(this->GetSubsampling());
+    mwriter = ogvwriter;
+    }
+#endif
   else
     {
     vtkErrorMacro("Unknown extension " << extension.c_str());
@@ -434,6 +455,7 @@ void vtkSMAnimationSceneImageWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Quality: " << this->Quality << endl;
   os << indent << "Magnification: " << this->Magnification << endl;
+  os << indent << "Subsampling: " << this->Subsampling << endl;
   os << indent << "ErrorCode: " << this->ErrorCode << endl;
   os << indent << "FrameRate: " << this->FrameRate << endl;
   os << indent << "BackgroundColor: " << this->BackgroundColor[0]

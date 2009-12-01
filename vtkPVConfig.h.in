@@ -56,4 +56,7 @@
 // ParaView data root (useful for testing).
 #define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
 
+// Should chroma-subsampling be used by default?
+#cmakedefine PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
+
 #endif

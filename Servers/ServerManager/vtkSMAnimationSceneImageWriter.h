@@ -56,6 +56,15 @@ public:
   vtkGetMacro(Quality, int);
 
   // Description:
+  // Get/Set the setting whether the movie encoder should use subsampling of
+  // the chrome planes or not, if applicable. Since the human eye is more
+  // sensitive to brightness than color variations, subsampling can be
+  // useful to reduce the bitrate. Default value is 0.
+  vtkSetMacro(Subsampling, double);
+  vtkGetMacro(Subsampling, double);
+  vtkBooleanMacro(Subsampling, double);
+
+  // Description:
   // Get the error code which is set if there's an error while writing
   // the images.
   vtkGetMacro(ErrorCode, int);
@@ -121,6 +130,7 @@ protected:
   int Magnification;
   int FileCount;
   int ErrorCode;
+  int Subsampling;
 
   char* Prefix;
   char* Suffix;

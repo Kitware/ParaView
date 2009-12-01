@@ -80,6 +80,11 @@ public:
   vtkGetStringMacro(RenderModuleName);
 
   // Description:
+  // Get/Set if the server supports saving OGVs.
+  vtkSetMacro(OGVSupport, int);
+  vtkGetMacro(OGVSupport, int);
+
+  // Description:
   // Get/Set if the server supports saving AVIs.
   vtkSetMacro(AVISupport, int);
   vtkGetMacro(AVISupport, int);
@@ -120,6 +125,7 @@ protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
 
+  int OGVSupport;
   int AVISupport;
   int RemoteRendering;
   int TileDimensions[2];

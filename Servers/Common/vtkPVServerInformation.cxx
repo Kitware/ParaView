@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.16");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -47,6 +47,11 @@ vtkPVServerInformation::vtkPVServerInformation()
 # if defined(VTK_USE_FFMPEG_ENCODER)
   this->AVISupport = 1;
 # endif
+#endif
+#if defined(VTK_USE_OGGTHEORA_ENCODER)
+  this->OGVSupport = 1;
+#else
+  this->OGVSupport = 0;
 #endif
 
   this->RenderModuleName = NULL;
@@ -73,6 +78,7 @@ void vtkPVServerInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseIceT: " << this->UseIceT << endl;
   os << indent << "RenderModuleName: "
      << (this->RenderModuleName ? this->RenderModuleName : "(none)") << endl;
+  os << indent << "OGVSupport: " << this->OGVSupport << endl;
   os << indent << "AVISupport: " << this->AVISupport << endl;
   os << indent << "Timeout: " << this->Timeout << endl;
 }
@@ -167,6 +173,11 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
       this->Timeout = serverInfo->GetTimeout();
       }
 
+    if (!serverInfo->GetOGVSupport())
+      {
+      this->OGVSupport = 0;
+      }
+
     if (!serverInfo->GetAVISupport())
       {
       this->AVISupport = 0;
@@ -199,6 +210,7 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
   *css << this->Timeout;
   *css << this->UseIceT;
   *css << this->RenderModuleName;
+  *css << this->OGVSupport;
   *css << this->AVISupport;
   *css << this->GetNumberOfMachines();
   unsigned int idx;
@@ -257,6 +269,11 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
   this->SetRenderModuleName(rmName);
+  if (!css->GetArgument(0, 9, &this->OGVSupport))
+    {
+    vtkErrorMacro("Error parsing OGVSupport flag from message.");
+    return;
+    }
   if (!css->GetArgument(0, 9, &this->AVISupport))
     {
     vtkErrorMacro("Error parsing AVISupport flag from message.");

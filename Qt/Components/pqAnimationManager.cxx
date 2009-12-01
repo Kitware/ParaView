@@ -464,6 +464,10 @@ bool pqAnimationManager::saveAnimation()
     }
 
   QString filters = "";
+  if (serverInfo && serverInfo->GetOGVSupport())
+    {
+    filters += "Ogg/Theora files (*.ogv);;";
+    }
   if (serverInfo && serverInfo->GetAVISupport())
     {
     filters += "AVI files (*.avi);;";

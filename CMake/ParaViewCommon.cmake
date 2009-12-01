@@ -509,6 +509,18 @@ MARK_AS_ADVANCED(CLEAR
   )
 
 #########################################################################
+# Configure chroma-subsampling of the Ogg/Theora writer
+IF(VTK_USE_OGGTHEORA_ENCODER)
+  SET(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING FALSE CACHE STRING
+    "Use 4:2:0 chroma-subsampling when writing Ogg/Theora movies")
+  MARK_AS_ADVANCED(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING)
+  IF(VTK_USE_SYSTEM_OGGTHEORA AND OGGTHEORA_NO_444_SUBSAMPLING)
+    SET(PARAVIEW_OGGTHEORA_USE_SUBSAMPLING TRUE CACHE STRING
+      "Must use 4:2:0 subsampling with this version of system-Ogg/Theora." FORCE)
+  ENDIF(VTK_USE_SYSTEM_OGGTHEORA AND OGGTHEORA_NO_444_SUBSAMPLING)
+ENDIF(VTK_USE_OGGTHEORA_ENCODER)
+
+#########################################################################
 # Configure IceT
 SET(ICET_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(ICET_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
