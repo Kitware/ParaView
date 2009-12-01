@@ -1870,7 +1870,7 @@
         command="PlaceWidget"
         number_of_elements="6"
         argument_is_array="1"
-        default_values="0 1 0 1 0 1">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
@@ -1922,7 +1922,7 @@
         command="PlaceWidget"
         number_of_elements="6"
         argument_is_array="1"
-        default_values="0 1 0 1 0 1">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -1978,7 +1978,7 @@
         command="PlaceWidget"
         number_of_elements="6"
         argument_is_array="1"
-        default_values="0 1 0 1 0 1">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -2313,7 +2313,7 @@
         command="PlaceWidget"
         number_of_elements="6"
         argument_is_array="1"
-        default_values="0 1 0 1 0 1">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -2375,7 +2375,7 @@
         command="PlaceWidget"
         number_of_elements="6"
         argument_is_array="1"
-        default_values="0 1 0 1 0 1">
+        default_values="none">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
