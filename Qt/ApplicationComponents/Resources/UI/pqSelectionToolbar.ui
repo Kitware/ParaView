@@ -155,7 +155,7 @@
    </property>
    <property name="icon">
     <iconset resource="../../../Components/Resources/pqComponents.qrc">
-     <normaloff>:/pqWidgets/Icons/pqGroupExtract24.png</normaloff>:/pqWidgets/Icons/pqGroupExtract24.png</iconset>
+     <normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</normaloff>:/pqWidgets/Icons/pqSelectBlock24.png</iconset>
    </property>
    <property name="text">
     <string>Select Block</string>
