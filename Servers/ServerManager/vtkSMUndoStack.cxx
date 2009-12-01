@@ -109,6 +109,45 @@ public:
     return status;
     }
 
+  //begin vistrails
+  vtkUndoSet* getLastUndoSet()
+  {
+    vtkPVXMLElement* state;
+    if (this->State)
+      {
+      state = this->State;
+      state->Register(this);
+      }
+    else
+      {
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      state = pm->NewNextUndo(this->ConnectionID);
+      }
+    if (state) {
+      if (!this->UndoRedoManager->GetStateLoader())
+      {
+        vtkSMUndoRedoStateLoader* sl = vtkSMUndoRedoStateLoader::New();
+        this->UndoRedoManager->SetStateLoader(sl);
+        sl->Delete();
+      }
+
+
+    vtkSMIdBasedProxyLocator* locator = vtkSMIdBasedProxyLocator::New();
+    locator->SetConnectionID(this->ConnectionID);
+    locator->SetDeserializer(this->UndoRedoManager->StateLoader);
+    vtkUndoSet* undo = this->UndoRedoManager->StateLoader->LoadUndoRedoSet(state, locator);
+    locator->Delete();
+
+      //this->UndoRedoManager->GetStateLoader()->ClearCreatedProxies();
+    state->Delete();
+
+      return undo;
+    }
+    return NULL;
+
+  }
+//end vistrails
+
   void SetConnectionID(vtkIdType id)
     {
     this->ConnectionID = id;
@@ -149,11 +188,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.15");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.15.4.1");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.15");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.15.4.1");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -379,4 +418,18 @@ void vtkSMUndoStack::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StateLoader: " << this->StateLoader << endl;
   os << indent << "ClientOnly: " << this->ClientOnly << endl;
 }
+
+//-----------------------------------------------------------------------------
+//begin vistrails
+vtkUndoSet* vtkSMUndoStack::getLastUndoSet() {
+  if (this->Internal->UndoStack.empty())
+    {
+    return NULL;
+    }
+  vtkSMUndoStackUndoSet *us = 
+    vtkSMUndoStackUndoSet::SafeDownCast(
+      this->Internal->UndoStack.back().UndoSet.GetPointer());
+  return us->getLastUndoSet();
+}
+//end vistrails
 

@@ -86,6 +86,9 @@ public:
   vtkBooleanMacro(ClientOnly, int);
 
 //BTX
+
+  vtkUndoSet *getLastUndoSet(); //vistrails
+
 protected:
   vtkSMUndoStack();
   ~vtkSMUndoStack();
