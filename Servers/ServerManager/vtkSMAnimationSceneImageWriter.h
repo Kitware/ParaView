@@ -60,9 +60,9 @@ public:
   // the chrome planes or not, if applicable. Since the human eye is more
   // sensitive to brightness than color variations, subsampling can be
   // useful to reduce the bitrate. Default value is 0.
-  vtkSetMacro(Subsampling, double);
-  vtkGetMacro(Subsampling, double);
-  vtkBooleanMacro(Subsampling, double);
+  vtkSetMacro(Subsampling, int);
+  vtkGetMacro(Subsampling, int);
+  vtkBooleanMacro(Subsampling, int);
 
   // Description:
   // Get the error code which is set if there's an error while writing
