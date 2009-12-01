@@ -510,14 +510,6 @@ void pqPluginManager::handleAutoStartPlugins(QObject* iface, bool startup)
 //-----------------------------------------------------------------------------
 QStringList pqPluginManager::pluginPaths(pqServer* server)
 {
-  if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST"))
-    {
-    cout << 
-      "Ignoring plugin paths since the application is being run on the dashboard"
-      << endl;
-    return QStringList();
-    }
-
   QString pv_plugin_path;
 
   if(!server || !this->Internal->IsCurrentServerRemote)
@@ -603,6 +595,14 @@ QStringList pqPluginManager::pluginPaths(pqServer* server)
         pv_plugin_path.replace(index, 1, ';');
         }
       }
+    }
+
+  if (vtksys::SystemTools::GetEnv("DASHBOARD_TEST_FROM_CTEST"))
+    {
+    cout << 
+      "Ignoring plugin paths since the application is being run on the dashboard"
+      << endl;
+    return QStringList();
     }
 
   QStringList plugin_paths = pv_plugin_path.split(';', QString::SkipEmptyParts);
