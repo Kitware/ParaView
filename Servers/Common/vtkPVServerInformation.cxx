@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.17");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -274,13 +274,13 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing OGVSupport flag from message.");
     return;
     }
-  if (!css->GetArgument(0, 9, &this->AVISupport))
+  if (!css->GetArgument(0, 10, &this->AVISupport))
     {
     vtkErrorMacro("Error parsing AVISupport flag from message.");
     return;
     }
   unsigned int numMachines;
-  if (!css->GetArgument(0, 10, &numMachines))
+  if (!css->GetArgument(0, 11, &numMachines))
     {
     vtkErrorMacro("Error parsing number of machines from message.");
     return;
@@ -290,37 +290,37 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
   const char* env;
   for (idx = 0; idx < numMachines; idx++)
     {
-    if (!css->GetArgument(0, 11 + idx*10, &env))
+    if (!css->GetArgument(0, 12 + idx*10, &env))
       {
       vtkErrorMacro("Error parsing display environment from message.");
       return;
       }
     this->MachinesInternals->MachineInformationVector[idx].Environment = env;
-    if (!css->GetArgument(0, 12 + idx*10,
+    if (!css->GetArgument(0, 13 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0]) ||
-        !css->GetArgument(0, 13 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
         !css->GetArgument(0, 14 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
+        !css->GetArgument(0, 15 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2]))
       {
       vtkErrorMacro("Error parsing lower left coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 15 + idx*10,
+    if (!css->GetArgument(0, 16 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[0]) ||
-        !css->GetArgument(0, 16 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
         !css->GetArgument(0, 17 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
+        !css->GetArgument(0, 18 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].LowerRight[2]))
       {
       vtkErrorMacro("Error parsing lower right coordinate from message.");
       return;
       }
-    if (!css->GetArgument(0, 18 + idx*10,
+    if (!css->GetArgument(0, 19 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0]) ||
-        !css->GetArgument(0, 19 + idx*10,
-                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
         !css->GetArgument(0, 20 + idx*10,
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
+        !css->GetArgument(0, 21 + idx*10,
                           &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");
