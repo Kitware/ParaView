@@ -37,3 +37,6 @@
 // This line won't be split into smaller arguments
 #cmakedefine PV_SETUP_SCRIPT "@PV_SETUP_SCRIPT@"
 
+#ifndef DART_TESTING_TIMEOUT
+# define DART_TESTING_TIMEOUT 1500
+#endif
