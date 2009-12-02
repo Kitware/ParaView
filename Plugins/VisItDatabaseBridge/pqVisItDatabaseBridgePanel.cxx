@@ -246,10 +246,10 @@ pqVisItDatabaseBridgePanel::pqVisItDatabaseBridgePanel(
 
   // Pull some property values from the XML...
   // ...to display the plugin path...
-  vtkSMStringVectorProperty *ppProp
-    =dynamic_cast<vtkSMStringVectorProperty *>(dbbProxy->GetProperty("PluginPath"));
-  const char *pp=ppProp->GetElement(0);
-  this->Form->PluginPath->setText(pp);
+  //vtkSMStringVectorProperty *ppProp
+  //  =dynamic_cast<vtkSMStringVectorProperty *>(dbbProxy->GetProperty("PluginPath"));
+  //const char *pp=ppProp->GetElement(0);
+  //this->Form->PluginPath->setText(pp);
   // ...and to display the plugin id.
   vtkSMStringVectorProperty *piProp
     =dynamic_cast<vtkSMStringVectorProperty *>(dbbProxy->GetProperty("PluginId"));

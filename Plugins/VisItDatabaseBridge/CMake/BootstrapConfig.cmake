@@ -36,12 +36,13 @@ set(VISIT_RUN_TIME
 
 add_custom_command(
   OUTPUT ${_configOut}
-  DEPENDS BootstrapConfigure ${VISIT_LIBS} vtkCommon vtkFiltering vtkIO vtkGraphics vtkRendering
+  DEPENDS ${_configIn}
   COMMAND BootstrapConfigure
   ARGS
     ${VISIT_LOCAL}
     ${VISIT_RUN_TIME}
     ${_configIn}
+    ${_configOut}
     ${BOOTSTRAP_CONFIGURE_EXLUDES}
   COMMENT "Configuring vtkVisItDatabaseBridge build.")
 

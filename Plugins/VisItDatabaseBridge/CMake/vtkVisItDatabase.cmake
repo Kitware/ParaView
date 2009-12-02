@@ -7,8 +7,8 @@
 link_directories(vtkVisItDatabase ${VISIT_LIB_PATH})
 include_directories(vtkVisItDatabase ${VISIT_INCLUDE_PATH})
 add_library(vtkVisItDatabase SHARED vtkVisItDatabase.cxx PrintUtils.cxx)
-target_link_libraries(vtkVisItDatabase ${VISIT_LIBS})
-target_link_libraries(vtkVisItDatabase vtkCommon vtkFiltering vtkGraphics vtkParallel)
+
+target_link_libraries(vtkVisItDatabase ${VISIT_LIBS} vtkCommon vtkFiltering vtkGraphics vtkParallel)
 # Platform
 if (UNIX OR CYGWIN)
   message(STATUS "Configuring vtkVisItDatabase for use on Linux.")

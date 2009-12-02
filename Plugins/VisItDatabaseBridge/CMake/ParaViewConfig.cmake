@@ -5,11 +5,6 @@
 # +---------------------------------------------------------------------------+
 #ParaView3
 
-set(ParaView_DIR 
-  ${ParaView_BINARY_DIR}
-  CACHE FILEPATH
-  "Path to ParaView build.")
-
 INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(
     ${VTK_INCLUDE_DIR}

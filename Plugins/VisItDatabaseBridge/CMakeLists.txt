@@ -42,10 +42,8 @@ file(MAKE_DIRECTORY "${ParaView_BINARY_DIR}/bin/${PLUGIN_BUILD_TYPE}")
 include("CMake/ParaViewConfig.cmake")             # Locate ParaView.
 include("CMake/VisItConfig.cmake")                # Locate VisIt.
 include("CMake/VisItRelocate.cmake")              # Construct a local copy of VisIt.
-include("CMake/BootstrapConfig.cmake")            # Build configuration tools.
 
 include_directories(${PARAVIEW_INCLUDE_DIRS};${PARAVIEW_GUI_INCLUDE_DIRS};${PARAVIEW_KWSYS_INCLUDE_DIRS};)
 include("CMake/vtkVisItDatabase.cmake")           # Build the avt interface.
-include("CMake/vtkVisItDatabaseBridge.cmake")     # Build the VTK source.
 include("CMake/pqVisItDatabaseBridgePanel.cmake") # Build the custom qt panel.
 include("CMake/install.cmake")                    # Install plugins and VisIt databases.

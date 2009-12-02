@@ -4,18 +4,22 @@
 # |                                                                           |
 # +---------------------------------------------------------------------------+
 
+SET (visit_install_dir ${PV_INSTALL_LIB_DIR})
+IF (WIN32)
+  SET (visit_install_dir ${PV_INSTALL_BIN_DIR})
+ENDIF(WIN32)
 
 install(FILES ${VISIT_FILES_TO_INSTALL_AVT} 
-  DESTINATION "${PV_INSTALL_BIN_DIR}"
+  DESTINATION "${visit_install_dir}"
   COMPONENT Runtime)
  
 install(FILES ${VISIT_FILES_TO_INSTALL_THIRD_PARTY}
-  DESTINATION "${PV_INSTALL_BIN_DIR}"
+  DESTINATION "${visit_install_dir}"
   COMPONENT Runtime)
 
 #install databases
 install(FILES ${VISIT_FILES_TO_INSTALL_DATABASES}
-  DESTINATION "${PV_INSTALL_BIN_DIR}/plugins/VisItReaderPlugin/databases"
+  DESTINATION "${visit_install_dir}/databases"
   COMPONENT Runtime)
 
 #set(_libExts ".a" ".so" ".lib" ".dll")
