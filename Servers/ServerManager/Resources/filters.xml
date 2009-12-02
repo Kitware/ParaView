@@ -5468,7 +5468,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
     <Documentation
        long_help="Integrate streamlines in a vector field."
        short_help="Integrate streamlines in a vector field.">
-The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. Production of streamlines terminates if a streamline crosses the exterior boundary of the input dataset. Other reasons for termination are listed for the MaximumNumberOfSteps, TerminalSpeed, and MaximumPropagation properties. This filter operates on any type of dataset, provided it has point-centered vectors. The output is polygonal data containing polylines. 
+The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. Production of streamlines terminates if a streamline crosses the exterior boundary of the input dataset. Other reasons for termination are listed for the MaximumNumberOfSteps, TerminalSpeed, and MaximumPropagation properties. This filter operates on any type of dataset, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter takes a Source input that provides the seed points.
     </Documentation>
     <InputProperty
        name="Input"
@@ -5491,14 +5491,12 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
 
      <InputProperty
         name="Source"
-        command="SetSourceConnection"
-        label="Seed Type">
+        command="SetSourceConnection" >
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
            <Documentation>
-             The value of this property determines how the seeds for the 
-             streamlines will be generated.
+              This property specifies the input used to obtain the seed points. 
            </Documentation>
       </InputProperty>
 
