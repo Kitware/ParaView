@@ -66,7 +66,8 @@ void PVBlotPluginActions::startPVBlot()
   // Allow the user to pick a file, and then send that to create a new
   // blot window.
   QString filter =
-    "Exodus Files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII *.0 *.00 *.000 *.0000 *.exii);"
+    "Exodus Files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII *.0 *.00 *.000 *.0000 *.exii);;"
+    "SpyPlot CTH Files (*.spcth *.0);;"
     "All Files (*)";
     
   pqFileDialog *fdialog = new pqFileDialog(server, this->mainWindow(),

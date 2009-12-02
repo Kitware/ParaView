@@ -37,6 +37,7 @@ import number_list_parser
 import blot_common
 import tplot as tplot_mod
 import math
+import re
 
 # Global variable state is used by methods in this module
 # After _init_blotish is called state is an instance of
@@ -147,8 +148,8 @@ class _State(object):
         if not self.filename:
             raise BlotishError("No filename specified.")
         if not self._reader:
-
-            if self.filename.lower().endswith("spcth"):
+            # matches patterns that end with "spcth" or spcth.<num>
+            if re.match(".*spcth($|(?:\.\d+))", self.filename.lower()):
 
                 # For the spy plot reader we will turn on all variables
                 # and then apply the Extract CTH Parts filter to give us
