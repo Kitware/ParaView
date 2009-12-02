@@ -68,7 +68,7 @@ struct vtkSMScatterPlotRepresentationProxy::vtkInternal
 };
 
 vtkStandardNewMacro(vtkSMScatterPlotRepresentationProxy);
-vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMScatterPlotRepresentationProxy, "1.13");
 //-----------------------------------------------------------------------------
 vtkSMScatterPlotRepresentationProxy::vtkSMScatterPlotRepresentationProxy()
 {
@@ -110,11 +110,19 @@ void vtkSMScatterPlotRepresentationProxy::AddInput(unsigned int port,
         }
 
       input->CreateOutputPorts();
-      if (input->GetNumberOfOutputPorts() == 0)
+      if (input->GetNumberOfOutputPorts() == 0 || 
+          input->GetNumberOfOutputPorts() <= outputPort)
         {
-        vtkErrorMacro("Input has no output. Cannot create the representation.");
+        vtkErrorMacro("Input has the wrong number of output. Cannot create the glyph representation.");
         return;
         }
+
+      if (!input->GetDataInformation(outputPort)->DataSetTypeIsA("vtkPolyData"))
+        {
+        vtkErrorMacro("The glyph input must be a vtkPolyData.");
+        return ;
+        }
+
 
       this->GlyphInput = input;
       this->GlyphOutputPort = outputPort;
@@ -202,7 +210,7 @@ bool vtkSMScatterPlotRepresentationProxy::EndCreateVTKObjects()
     for (iter = this->Internal->Views.begin(); 
          iter != this->Internal->Views.end(); ++iter)
       {
-      // We know the input data type: it has to be a vtkPolyData. Hence we can
+      // We know the input data type: it HAS to be a vtkPolyData. Hence we can
       // simply ask the view for the correct strategy.
       vtkSmartPointer<vtkSMRepresentationStrategy> glyphStrategy;
       glyphStrategy.TakeReference((*iter)->NewStrategy(VTK_POLY_DATA));
