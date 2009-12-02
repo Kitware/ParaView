@@ -41,7 +41,7 @@
 
 
 vtkStandardNewMacro(vtkPVPluginLoader);
-vtkCxxRevisionMacro(vtkPVPluginLoader, "1.17");
+vtkCxxRevisionMacro(vtkPVPluginLoader, "1.18");
 //-----------------------------------------------------------------------------
 vtkPVPluginLoader::vtkPVPluginLoader()
 {
@@ -141,7 +141,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
   // * pv_plugin_instance -- to obtain the plugin instance.
 
   pv_plugin_query_verification_data_fptr pv_plugin_query_verification_data = 
-    reinterpret_cast<pv_plugin_query_verification_data_fptr>(
+    (pv_plugin_query_verification_data_fptr)(
       vtkDynamicLoader::GetSymbolAddress(lib,
         "pv_plugin_query_verification_data"));
   if (!pv_plugin_query_verification_data)
@@ -186,7 +186,7 @@ void vtkPVPluginLoader::SetFileName(const char* file)
   // plugin and load it.
   
   pv_plugin_query_instance_fptr pv_plugin_query_instance = 
-    reinterpret_cast<pv_plugin_query_instance_fptr>(
+    (pv_plugin_query_instance_fptr)(
       vtkDynamicLoader::GetSymbolAddress(lib,
         "pv_plugin_instance"));
   if (!pv_plugin_query_instance)
