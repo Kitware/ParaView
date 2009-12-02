@@ -58,9 +58,9 @@
 #include <vtkstd/string>
 #include <assert.h>
 
-#define PI 3.141592653589793
+//#define PI 3.141592653589793
 
-vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.14");
+vtkCxxRevisionMacro(vtkScatterPlotMapper, "1.15");
 vtkStandardNewMacro(vtkScatterPlotMapper);
 
 vtkInformationKeyMacro(vtkScatterPlotMapper, FIELD_ACTIVE_COMPONENT, Integer);
@@ -802,10 +802,10 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   // triangle
   defaultSource->Allocate();
   defaultPoints->Allocate(4);
-  defaultPoints->InsertNextPoint(-0.2*tan(PI/6.), -0.1, 0);
+  defaultPoints->InsertNextPoint(-0.2*tan(vtkMath::Pi()/6.), -0.1, 0);
   defaultPoints->InsertNextPoint(0, 0.1, 0);
-  defaultPoints->InsertNextPoint(0.2*tan(PI/6.), -0.1, 0);
-  defaultPoints->InsertNextPoint(-0.2*tan(PI/6.), -0.1, 0);
+  defaultPoints->InsertNextPoint(0.2*tan(vtkMath::Pi()/6.), -0.1, 0);
+  defaultPoints->InsertNextPoint(-0.2*tan(vtkMath::Pi()/6.), -0.1, 0);
   defaultSource->SetPoints(defaultPoints);
 
   defaultSource->InsertNextCell(VTK_POLY_LINE, 4, defaultPointIds);
@@ -836,17 +836,17 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultPoints = vtkPoints::New();
   defaultSource->Allocate();
   defaultPoints->Allocate(11);
-  double angle5 = 2. * PI / 5.;
+  double angle5 = 2. * vtkMath::Pi() / 5.;
   defaultPoints->InsertNextPoint(0.0, 0.1, 0);
-  defaultPoints->InsertNextPoint(0.05*cos(0.5*angle5 + PI/2.), 0.05*sin(0.5*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.1*cos(angle5 + PI/2.), 0.1*sin(angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.05*cos(1.5*angle5 + PI/2.), 0.05*sin(1.5*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.1*cos(2.*angle5 + PI/2.), 0.1*sin(2.*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.05*cos(2.5*angle5 + PI/2.), 0.05*sin(2.5*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.1*cos(3.*angle5 + PI/2.), 0.1*sin(3.*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.05*cos(3.5*angle5 + PI/2.), 0.05*sin(3.5*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.1*cos(4.*angle5 + PI/2.), 0.1*sin(4.*angle5 + PI/2.), 0);
-  defaultPoints->InsertNextPoint(0.05*cos(4.5*angle5 + PI/2.), 0.05*sin(4.5*angle5 + PI/2.), 0);
+  defaultPoints->InsertNextPoint(0.05*cos(0.5*angle5 + vtkMath::Pi()/2.), 0.05*sin(0.5*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.1*cos(angle5 + vtkMath::Pi()/2.), 0.1*sin(angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.05*cos(1.5*angle5 + vtkMath::Pi()/2.), 0.05*sin(1.5*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.1*cos(2.*angle5 + vtkMath::Pi()/2.), 0.1*sin(2.*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.05*cos(2.5*angle5 + vtkMath::Pi()/2.), 0.05*sin(2.5*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.1*cos(3.*angle5 + vtkMath::Pi()/2.), 0.1*sin(3.*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.05*cos(3.5*angle5 + vtkMath::Pi()/2.), 0.05*sin(3.5*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.1*cos(4.*angle5 + vtkMath::Pi()/2.), 0.1*sin(4.*angle5 + vtkMath::Pi()/2.), 0);
+  defaultPoints->InsertNextPoint(0.05*cos(4.5*angle5 + vtkMath::Pi()/2.), 0.05*sin(4.5*angle5 + vtkMath::Pi()/2.), 0);
   defaultPoints->InsertNextPoint(0.0, 0.1, 0);
   defaultSource->SetPoints(defaultPoints);
   defaultSource->InsertNextCell(VTK_POLY_LINE, 11, defaultPointIds);
@@ -861,7 +861,7 @@ void vtkScatterPlotMapper::GenerateDefaultGlyphs()
   defaultSource->Allocate();
   defaultPoints->Allocate(points+1);
   double angle = 0.;
-  double step = 2. * PI / points;
+  double step = 2. * vtkMath::Pi() / points;
   for(int i = 0; i <= points; ++i)
     {
     angle = step*i;
