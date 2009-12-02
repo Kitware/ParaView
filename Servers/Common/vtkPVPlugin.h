@@ -12,10 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVPlugin
+// .NAME vtkPVPlugin - defines the core interface for any ParaView plugin. 
 // .SECTION Description
+// vtkPVPlugin defines the core interface for any ParaView plugin. A plugin
+// implementing merely this interface is pretty much useless.
+// The header file also defines few import macros that are required for
+// exporting/importing plugins.
 //
-
+// When debugging issues with plugins try setting the PV_PLUGIN_DEBUG
+// environment variable on all the processes where you are trying to load the
+// plugin. That will print extra information as the plugin is being loaded.
 #ifndef __vtkPVPlugin_h
 #define __vtkPVPlugin_h
 
@@ -33,8 +39,6 @@
 # define C_EXPORT extern "C"
 #endif
 
-/// vtkPVPlugin defines the core interface for any ParaView plugin. A plugin
-/// implementing merely this interface is pretty much useless.
 class VTK_EXPORT vtkPVPlugin
 {
 public:
@@ -59,6 +63,16 @@ public:
   // Description:
   // Returns a ';' separated list of plugin names required by this plugin.
   virtual const char* GetRequiredPlugins() = 0;
+
+  // Description:
+  // Used when import plugins programmatically.
+  // This must only be called after the application has initialized, more
+  // specifically, all plugin managers have been created and they have
+  // registered their callbacks.
+  static void ImportPlugin(vtkPVPlugin* plugin);
+
+  typedef void (*Callback)(vtkPVPlugin*, void* calldata);
+  static void RegisterPluginManagerCallback(Callback callback, void* calldata);
 };
 
 typedef const char* (C_DECL *pv_plugin_query_verification_data_fptr)();
@@ -70,35 +84,45 @@ typedef vtkPVPlugin* (C_DECL *pv_plugin_query_instance_fptr)();
 // vtkPVPluginLoader checks for existence of this function
 // to determine if the shared-library is a paraview-server-manager plugin or
 // not. The returned value is used to match paraview version/compiler version
-// etc.
-// TODO: handle static-builds -- i.e. these methods must not exist in static
-// builds of ParaView.
-#define __PV_PLUGIN_VERIFICATION_DATA(PLUGIN) \
+// etc. These global functions are added only for shared builds. In static
+// builds, plugins cannot be loaded at runtime (only at compile time) so
+// verification is not necessary.
+#ifdef BUILD_SHARED_LIBS
+# define __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN) \
   C_EXPORT const char* C_DECL pv_plugin_query_verification_data()\
   { return __PV_PLUGIN_VERIFICATION_STRING__; } \
   C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance() \
   { return pv_plugin_instance_##PLUGIN(); }
- 
-// vtkPVPluginLoader uses this function to obtain the vtkPVPlugin subclass for
-// this plugin.
-#define PV_PLUGIN_EXPORT(PLUGIN, PLUGINCLASS) \
-  C_EXPORT PLUGINCLASS* C_DECL pv_plugin_instance_##PLUGIN()  \
+#else // BUILD_SHARED_LIBS
+// define empty export. When building static, we don't want to define the global
+// functions.
+# define __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN)
+#endif // BUILD_SHARED_LIBS
+
+// vtkPVPluginLoader uses this function to obtain the vtkPVPlugin instance  for
+// this plugin. In a plugin, there can only be one call to this macro. When
+// using the CMake macro ADD_PARAVIEW_PLUGIN, you don't have to worry about
+// this, the CMake macro takes care of it.
+# define PV_PLUGIN_EXPORT(PLUGIN, PLUGINCLASS) \
+  C_EXPORT vtkPVPlugin* C_DECL pv_plugin_instance_##PLUGIN()  \
   { \
     static PLUGINCLASS instance;\
     return &instance;\
   }\
-  __PV_PLUGIN_VERIFICATION_DATA(PLUGIN);
+  __PV_PLUGIN_GLOBAL_FUNCTIONS(PLUGIN);
 
-// FIXME: This still needs some work to make sure all kinds of plugins work when
-// compiled in statically.
-//// Call this macro when linking against this plugin directly.
-#define fixme_PV_PLUGIN_IMPORT(PLUGIN) \
-{\
-  vtkPVPlugin* plugin = pv_plugin_instance_##PLUGIN();\
-  vtkPVPluginLoader* loader= vtkPVPluginLoader::New();\
-  loader->Load(plugin);\
-  loader->Delete();\
-}
+// PV_PLUGIN_IMPORT_INIT and PV_PLUGIN_IMPORT are provided to make it possible
+// to import a plugin at compile time. In static builds, the only way to use a
+// plugin is by explicitly importing it using these macros.
+// PV_PLUGIN_IMPORT_INIT must be typically placed at after the #include's in a
+// cxx file, while PV_PLUGIN_IMPORT must be called at a point after all the
+// plugin managers for the application, including the vtkSMPluginManager,
+// have been initialized.
+# define PV_PLUGIN_IMPORT_INIT(PLUGIN) \
+  extern "C" vtkPVPlugin* pv_plugin_instance_##PLUGIN();
 
-#endif
+# define PV_PLUGIN_IMPORT(PLUGIN)\
+  vtkPVPlugin::ImportPlugin(pv_plugin_instance_##PLUGIN());
+
+#endif // __vtkPVPlugin_h
 

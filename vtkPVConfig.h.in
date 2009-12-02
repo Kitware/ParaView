@@ -59,4 +59,6 @@
 // Should chroma-subsampling be used by default?
 #cmakedefine PARAVIEW_OGGTHEORA_USE_SUBSAMPLING
 
+#cmakedefine BUILD_SHARED_LIBS
+
 #endif

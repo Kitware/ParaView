@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVEnvironmentInformation.h"
 #include "vtkPVEnvironmentInformationHelper.h"
 #include "vtkPVGUIPluginInterface.h"
+#include "vtkPVPlugin.h"
 #include "vtkPVPluginInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
@@ -124,6 +125,17 @@ public:
   bool NeedUpdatePluginInfo;
 };
 
+static void pqPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
+{
+  vtkPVGUIPluginInterface* interface =
+    dynamic_cast<vtkPVGUIPluginInterface*>(plugin);
+  pqPluginManager* mgr = reinterpret_cast<pqPluginManager*>(calldata);
+  if (interface && mgr)
+    {
+    mgr->loadGUIPlugin(interface);
+    }
+}
+
 //-----------------------------------------------------------------------------
 pqPluginManager::pqPluginManager(QObject* p)
   : QObject(p)
@@ -144,7 +156,9 @@ pqPluginManager::pqPluginManager(QObject* p)
   QObject::connect(pqApplicationCore::instance()->getServerManagerModel(), 
     SIGNAL(serverRemoved(pqServer*)),
     this, SLOT(onServerDisconnected(pqServer*)));
-  
+ 
+  vtkPVPlugin::RegisterPluginManagerCallback(::pqPluginManagerImportPlugin,
+    this);
 //  this->addPluginFromSettings();
 }
 
@@ -253,13 +267,7 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
         pluginInfo->SetLoaded(1);
         this->addExtension(NULL, pluginInfo);
         emit this->guiExtensionLoaded();
-        QObjectList ifaces = plugin->interfaces();
-        foreach(QObject* iface, ifaces)
-          {
-          this->Internal->Interfaces.append(iface);
-          this->handleAutoStartPlugins(iface, true);
-          emit this->guiInterfaceLoaded(iface);
-          }
+        this->loadGUIPlugin(plugin);
         }
       else
         {
@@ -287,6 +295,21 @@ pqPluginManager::LoadStatus pqPluginManager::loadClientExtension(
     }
 
   return success;
+}
+
+//-----------------------------------------------------------------------------
+void pqPluginManager::loadGUIPlugin(vtkPVGUIPluginInterface* plugin)
+{
+  if (plugin)
+    {
+    QObjectList ifaces = plugin->interfaces();
+    foreach(QObject* iface, ifaces)
+      {
+      this->Internal->Interfaces.append(iface);
+      this->handleAutoStartPlugins(iface, true);
+      emit this->guiInterfaceLoaded(iface);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

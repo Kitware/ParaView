@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectInspectorWidget.h"
 #include "pqParaViewBehaviors.h"
 #include "pqParaViewMenuBuilders.h"
+#include "vtkPVPlugin.h"
 
 class ParaViewMainWindow::pqInternals : public Ui::pqClientMainWindow
 {

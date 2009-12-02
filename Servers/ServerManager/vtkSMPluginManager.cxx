@@ -20,6 +20,7 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVEnvironmentInformation.h"
+#include "vtkPVPlugin.h"
 #include "vtkPVPluginInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
@@ -62,12 +63,27 @@ public:
 };
 
 //*****************************************************************************
+static void vtkSMPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
+{
+  vtkPVPluginLoader* loader = vtkPVPluginLoader::New();
+  loader->Load(plugin);
+
+  vtkSMPluginManager* mgr = reinterpret_cast<vtkSMPluginManager*>(calldata);
+  mgr->ProcessPluginInfo(loader);
+  mgr->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked,
+    loader->GetPluginInfo());
+  loader->Delete();
+}
+
+//*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.7");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.8");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
   this->Internal = new vtkSMPluginManagerInternals();
+  vtkPVPlugin::RegisterPluginManagerCallback(vtkSMPluginManagerImportPlugin,
+    this);
 }
 
 //---------------------------------------------------------------------------

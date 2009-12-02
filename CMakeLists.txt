@@ -328,9 +328,7 @@ SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE  ${EXECUTABLE_OUTPUT_PATH}/smTestDriver${PV
 GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 
 #########################################################################
-IF(BUILD_SHARED_LIBS)
-  ADD_SUBDIRECTORY(Plugins)
-ENDIF(BUILD_SHARED_LIBS)
+ADD_SUBDIRECTORY(Plugins)
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)

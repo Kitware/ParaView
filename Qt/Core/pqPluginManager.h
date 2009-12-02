@@ -38,10 +38,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "pqCoreExport.h"
 
+class pqPluginManagerInternal;
 class pqServer;
 class vtkObject;
+class vtkPVGUIPluginInterface;
 class vtkPVPluginInformation;
-class pqPluginManagerInternal;
 
 /// extension manager takes care of loading plugins, xml files, and binary qrc files
 /// the plugins may also contain xml files and qrc files
@@ -121,7 +122,8 @@ public:
   // exclude an extension from being saved with settings.
   void removePlugin(pqServer* server, const QString& lib, 
     bool remote=true);
-  
+ 
+  void loadGUIPlugin(vtkPVGUIPluginInterface*);
 signals:
   /// signal for when an interface is loaded
   void guiInterfaceLoaded(QObject* iface);

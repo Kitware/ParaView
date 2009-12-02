@@ -61,6 +61,7 @@ SET(Kit_SRCS
   vtkPVInformation.cxx
   vtkPVOpenGLExtensionsInformation.cxx
   vtkPVPluginInformation.cxx
+  vtkPVPlugin.cxx
   vtkPVPluginLoader.cxx
   vtkPVProgressHandler.cxx
   vtkPVPythonModule.cxx
@@ -115,6 +116,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkProcessModuleGUIHelper
   vtkPVCreateProcessModule
   vtkPVInformation
+  vtkPVPlugin.cxx
   vtkRemoteConnection
   vtkUndoElement
   ABSTRACT
@@ -124,6 +126,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkConnectionIterator.cxx
   vtkPVCreateProcessModule
   vtkPVOptionsXMLParser.cxx
+  vtkPVPlugin.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVTestUtilities.cxx
