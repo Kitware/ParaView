@@ -33,18 +33,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
-#ifdef INITIALIZE_WRAPPING
-# include "vtkProcessModule.h"
-# include "vtkClientServerInterpreter.h"
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_servermanager
+# ifdef INITIALIZE_WRAPPING
+#  include "vtkProcessModule.h"
+#  include "vtkClientServerInterpreter.h"
 
 extern "C" void @PLUGIN_NAME@_Initialize(vtkClientServerInterpreter *arlu);
+# endif
 #endif
 
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_servermanager
 @SM_PLUGIN_INCLUDES@
-@INTERFACE_INCLUDES@
-
 @PUSH_BACK_XML_INTERFACES@
+#endif
+
+//-----------------------------------------------------------------------------
+#ifdef plugin_type_gui
 @PUSH_BACK_PV_INTERFACES@
+@INTERFACE_INCLUDES@
+#endif
 
 //-----------------------------------------------------------------------------
 #ifdef plugin_type_servermanager
