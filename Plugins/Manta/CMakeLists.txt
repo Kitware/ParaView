@@ -13,9 +13,12 @@ MARK_AS_ADVANCED ( FORCE CMAKE_INSTALL_PREFIX )
 # "class vtkManta_EXPORT vtkFoo", where vtkManta is the name of the project set here.
 PROJECT ( vtkManta )
 
+# If ParaView_SOURCE_DIR is defined we are building within paraview and will provide no choice otherwise,
 # Choose either VTK (VTK_DIR required and ParaView_DIR ignored)
 # or ParaView (ParaView_DIR required and VTK_DIR ignored) to build against
-SET ( BUILD_AGAINST_PACKAGE "ParaView" CACHE STRING "Build against either VTK or ParaView." )
+IF(NOT ParaView_SOURCE_DIR)
+  SET ( BUILD_AGAINST_PACKAGE "ParaView" CACHE STRING "Build against either VTK or ParaView." )
+ENDIF(NOT ParaView_SOURCE_DIR)
 
 IF(VTK_USE_CARBON)
   SET(RenderWindowType "vtkCarbonRenderWindow")
@@ -62,9 +65,6 @@ SET ( MANTA_SRCS
   ${MANTA_CLASSES}
   vtkMantaObjectFactory.cxx
   )
-
-# testing is OFF by default to avoid time-consuming build of many tests
-OPTION ( BUILD_TESTING "Build vtkManta Testing" OFF )
 
 # Locate Manta build-include and build-library directories
 SET ( MANTA_BUILD_NAMES
@@ -115,6 +115,11 @@ SET ( MANTA_TARGET_LINK_LIBRARIES
 
 IF ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
 
+  # testing is OFF by default to avoid time-consuming build of many tests
+  IF(NOT ParaView_SOURCE_DIR)
+    OPTION ( BUILD_TESTING "Build vtkManta Testing" OFF )
+  ENDIF()
+
   # Show VTK-build dependent flags while hiding ParaView-build dependent flags 
   MARK_AS_ADVANCED ( CLEAR VTK_DIR )
   MARK_AS_ADVANCED ( FORCE ParaView_DIR )
@@ -164,6 +169,7 @@ IF ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
 
 ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
 
+  message("ELSE ELSE ELSE")
   # Show ParaView-build dependent flags while hiding VTK-build dependent flags
   MARK_AS_ADVANCED ( CLEAR BUILD_AS_PLUGIN )
   MARK_AS_ADVANCED ( CLEAR ParaView_DIR )
@@ -208,6 +214,7 @@ ELSE ( BUILD_AGAINST_PACKAGE MATCHES "VTK" )
 
   IF ( ParaView_SOURCE_DIR )
 
+    message(" Paraview SOURCE DIR")
     INCLUDE ( ${PARAVIEW_USE_FILE} )
   
     # Set the directory for exporting vtkManta executables and libraries
@@ -308,12 +315,13 @@ ENDIF ( BUILD_SHARED_LIBS )
 IF ( VTK_FOUND )
   # Access the 'examples' directory for the secondary CMakeLists.txt 
   SUBDIRS(examples)
-
+  
+  
   # Build vtkManta tests
-  IF ( BUILD_TESTING )
+  IF ( BUILD_TESTING AND NOT ParaView_SOURCE_DIR)
     ENABLE_TESTING()
     INCLUDE( CTest )
-  ENDIF ( BUILD_TESTING )
+  ENDIF ( BUILD_TESTING AND NOT ParaView_SOURCE_DIR)
 
   # If this is a build tree, provide an option for exporting this
   # project's executables and libraries to VTK's or ParaView's build directory.
