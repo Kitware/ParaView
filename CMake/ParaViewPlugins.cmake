@@ -979,9 +979,11 @@ MACRO(ADD_PARAVIEW_PLUGIN NAME VERSION)
       SET (plugin_sources ${plugin_sources} ${tmp})
     ENDIF (plugin_type_gui)
 
-    ADD_LIBRARY(${NAME}
-      ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES}
-      ${plugin_sources})
+    IF (PARAVIEW_BUILD_SHARED_LIBS)
+      ADD_LIBRARY(${NAME} SHARED ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
+    ELSE (PARAVIEW_BUILD_SHARED_LIBS)
+      ADD_LIBRARY(${NAME} ${GUI_SRCS} ${SM_SRCS} ${ARG_SOURCES} ${plugin_sources})
+    ENDIF (PARAVIEW_BUILD_SHARED_LIBS)
 
     IF(GUI_SRCS)
       TARGET_LINK_LIBRARIES(${NAME} pqComponents)
