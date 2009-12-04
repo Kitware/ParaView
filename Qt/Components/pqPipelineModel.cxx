@@ -1166,15 +1166,15 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::setView(pqView *view)
+void pqPipelineModel::setView(pqView *newview)
 {
-  if (this->View == view)
+  if (this->View == newview)
     {
     return;
     }
-  this->View = view;
+  this->View = newview;
   // update all VisibilityIcons.
-  this->Internal->Root.updateVisibilityIcon(view, true);
+  this->Internal->Root.updateVisibilityIcon(newview, true);
 }
 
 //-----------------------------------------------------------------------------
