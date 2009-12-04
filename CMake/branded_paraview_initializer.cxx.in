@@ -1,0 +1,144 @@
+// ***************** DO NOT EDIT ***********************************
+// This is a generated file. 
+// It will be replaced next time you rebuild.
+/*=========================================================================
+
+   Program: ParaView
+  Module:    branded_paraview_initializer.cxx.in
+
+   Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.2. 
+
+   See License_v1.2.txt for the full ParaView license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+#include "pq@BPC_NAME@Initializer.h"
+
+#include <QApplication>
+#include <QBitmap>
+#include <QDir>
+#include <QSplashScreen>
+#include <QtDebug>
+
+#include "@BPC_PVMAIN_WINDOW_INCLUDE@"
+#include "pqPVApplicationCore.h"
+#include "pqViewManager.h"
+#include "pqBrandPluginsLoader.h"
+#include "pqOptions.h"
+
+#ifdef Q_WS_X11
+#include <QPlastiqueStyle>
+#endif
+
+//-----------------------------------------------------------------------------
+pq@BPC_NAME@Initializer::pq@BPC_NAME@Initializer()
+{
+  this->PVApp = NULL;
+  this->MainWindow = NULL;
+  this->Splash = NULL;
+}
+
+//-----------------------------------------------------------------------------
+pq@BPC_NAME@Initializer::~pq@BPC_NAME@Initializer()
+{
+  delete this->Splash;
+  this->Splash = NULL;
+
+  delete this->MainWindow;
+  this->MainWindow = NULL;
+
+  delete this->PVApp;
+  this->PVApp = 0;
+}
+//-----------------------------------------------------------------------------
+bool pq@BPC_NAME@Initializer::Initialize(int argc, char* argv[])
+{
+  this->PVApp = new pqPVApplicationCore (argc, argv);
+  if (this->PVApp->getOptions()->GetHelpSelected() ||
+      this->PVApp->getOptions()->GetUnknownArgument() ||
+      this->PVApp->getOptions()->GetErrorMessage() ||
+      this->PVApp->getOptions()->GetTellVersion())
+    {
+    return false;
+    }
+
+#ifndef PARAVIEW_BUILD_SHARED_LIBS
+  Q_INIT_RESOURCE(@BPC_NAME@_generated);
+  Q_INIT_RESOURCE(@BPC_NAME@_configuration);
+  Q_INIT_RESOURCE(@BPC_NAME@_help);
+#endif  
+
+  // Create and show the splash screen as the main window is being created.
+  QPixmap pixmap("@BPC_SPLASH_RESOURCE@");
+  this->Splash = new QSplashScreen(pixmap);
+  this->Splash->setMask(pixmap.createMaskFromColor(QColor(Qt::transparent)));
+  this->Splash->show();
+
+  // Not sure why this is needed. Andy added this ages ago with comment saying
+  // needed for Mac apps. Need to check that it's indeed still required.
+  QDir dir(QApplication::applicationDirPath());
+  dir.cdUp();
+  dir.cd("Plugins");
+  QApplication::addLibraryPath(dir.absolutePath());
+
+  // Create main window.
+  this->MainWindow = new @BPC_PVMAIN_WINDOW@();
+
+  // Load required application plugins.
+  QString plugin_string = "@BPC_REQUIRED_PLUGINS@";
+  QStringList plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
+  pqBrandPluginsLoader loader;
+  if (loader.loadPlugins(plugin_list) == false)
+    {
+    qCritical() << "Failed to load required plugins for this application";
+    return false;
+    }
+
+  // Load optional plugins.
+  plugin_string = "@BPC_OPTIONAL_PLUGINS@";
+  plugin_list = plugin_string.split(';',QString::SkipEmptyParts);
+  loader.loadPlugins(plugin_list, true); //quietly skip not-found plugins.
+
+
+#if @BPC_HAS_GUI_CONFIGURATION_XMLS@
+  // Load configuration xmls after all components have been instantiated.
+  // This configuration part is something that needs to be cleaned up, I haven't
+  // given this too much thought.
+  QDir dir2(":/@BPC_NAME@/Configuration");
+  QStringList files = dir2.entryList(QDir::Files);
+  foreach (QString file, files)
+    {
+    this->PVApp->loadConfiguration(QString(":/@BPC_NAME@/Configuration/") + file);
+    }
+#endif
+  this->MainWindow->setWindowTitle("@BPC_TITLE@");
+  
+  // give GUI components time to update before the mainwindow is shown
+  QApplication::instance()->processEvents();
+  this->MainWindow->show();
+
+  QApplication::instance()->processEvents();
+  this->Splash->finish(this->MainWindow);
+  return true;
+}
+// ***************** DO NOT EDIT ***********************************

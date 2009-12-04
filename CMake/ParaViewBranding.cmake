@@ -65,6 +65,12 @@
 #
 #   # Additional source files.
 #   SOURCES <list of source files>
+#
+#   # If this option is present, the this macro won't create an executable,
+#   # instead a shared library named {Name} with a class
+#   # pq{Name}Initializer that can be used to initialize paraview in your own
+#   # custom main, where {Name} is the first argument passed to this function.
+#   DONT_MAKE_EXECUTABLE
 #   )
 # 
 ###############################################################################
@@ -99,10 +105,10 @@ MACRO(PV_PARSE_ARGUMENTS prefix arg_names option_names)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PV_PARSE_ARGUMENTS)
 
-MACRO(build_paraview_client BPC_NAME)
+FUNCTION(build_paraview_client BPC_NAME)
   PV_PARSE_ARGUMENTS(BPC 
     "TITLE;ORGANIZATION;SPLASH_IMAGE;VERSION_MAJOR;VERSION_MINOR;VERSION_PATCH;BUNDLE_ICON;APPLICATION_ICON;REQUIRED_PLUGINS;OPTIONAL_PLUGINS;PVMAIN_WINDOW;PVMAIN_WINDOW_INCLUDE;EXTRA_DEPENDENCIES;GUI_CONFIGURATION_XMLS;COMPRESSED_HELP_FILE;SOURCES"
-    ""
+    "DONT_MAKE_EXECUTABLE"
     ${ARGN}
     )
 
@@ -214,8 +220,15 @@ MACRO(build_paraview_client BPC_NAME)
     ${rcs_sources}
     )
 
-  CONFIGURE_FILE(${branding_source_dir}/branded_paraview_main.cxx.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_main.cxx @ONLY)
+  IF (NOT BPC_DONT_MAKE_EXECUTABLE)
+    CONFIGURE_FILE(${branding_source_dir}/branded_paraview_main.cxx.in
+                   ${CMAKE_CURRENT_BINARY_DIR}/${BPC_NAME}_main.cxx @ONLY)
+  ENDIF (NOT BPC_DONT_MAKE_EXECUTABLE)
+
+  CONFIGURE_FILE(${branding_source_dir}/branded_paraview_initializer.cxx.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/pq${BPC_NAME}Initializer.cxx @ONLY)
+  CONFIGURE_FILE(${branding_source_dir}/branded_paraview_initializer.h.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/pq${BPC_NAME}Initializer.h @ONLY)
 
   IF (NOT Q_WS_MAC)
     SET(pv_exe_name ${BPC_NAME}${PV_EXE_SUFFIX})
@@ -227,35 +240,51 @@ MACRO(build_paraview_client BPC_NAME)
     ${PARAVIEW_GUI_INCLUDE_DIRS}
     )
 
-  # needed to set up shared forwarding correctly.
-  SET (PV_EXE_LIST ${BPC_NAME})
-  ADD_EXECUTABLE(${pv_exe_name} WIN32 ${MAKE_BUNDLE}
-                 ${BPC_NAME}_main.cxx
-                 ${rcs_sources}
-                 ${exe_icon}
-                 ${apple_bundle_sources}
-                 ${BPC_SOURCES}
-                 )
-  TARGET_LINK_LIBRARIES(${pv_exe_name}
-    pqApplicationComponents
-    ${QT_QTMAIN_LIBRARY}
-    ${BPC_EXTRA_DEPENDENCIES}
-    )
+  IF (NOT BPC_DONT_MAKE_EXECUTABLE)
+    # needed to set up shared forwarding correctly.
+    SET (PV_EXE_LIST ${BPC_NAME})
+    ADD_EXECUTABLE(${pv_exe_name} WIN32 ${MAKE_BUNDLE}
+                   ${BPC_NAME}_main.cxx
+                   pq${BPC_NAME}Initializer.cxx
+                   ${rcs_sources}
+                   ${exe_icon}
+                   ${apple_bundle_sources}
+                   ${BPC_SOURCES}
+                   )
+    TARGET_LINK_LIBRARIES(${pv_exe_name}
+      pqApplicationComponents
+      ${QT_QTMAIN_LIBRARY}
+      ${BPC_EXTRA_DEPENDENCIES}
+      )
 
-  # Add shared link forwarding executables if necessary.
-  IF(PV_NEED_SHARED_FORWARD)
-    FOREACH(pvexe ${PV_EXE_LIST})
-      SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
-      CONFIGURE_FILE(
-        ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
-        ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
-        @ONLY IMMEDIATE)
-      ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
-      ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
-      # INSTALL(TARGETS ${pvexe} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime)
-    ENDFOREACH(pvexe)
-  ENDIF(PV_NEED_SHARED_FORWARD)
+    # Add shared link forwarding executables if necessary.
+    IF(PV_NEED_SHARED_FORWARD)
+      FOREACH(pvexe ${PV_EXE_LIST})
+        SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
+        CONFIGURE_FILE(
+          ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+          ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
+          @ONLY IMMEDIATE)
+        ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
+        ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
+        # INSTALL(TARGETS ${pvexe} DESTINATION ${PV_INSTALL_BIN_DIR} COMPONENT Runtime)
+      ENDFOREACH(pvexe)
+    ENDIF(PV_NEED_SHARED_FORWARD)
+
+  ELSE (NOT BPC_DONT_MAKE_EXECUTABLE)
+
+    ADD_LIBRARY(${BPC_NAME} SHARED 
+                pq${BPC_NAME}Initializer.cxx
+                ${rcs_sources}
+                ${BPC_SOURCES}
+                )
+    TARGET_LINK_LIBRARIES(${BPC_NAME}
+      pqApplicationComponents
+      ${QT_QTMAIN_LIBRARY}
+      ${BPC_EXTRA_DEPENDENCIES}
+      )
+  ENDIF (NOT BPC_DONT_MAKE_EXECUTABLE)
 
   # TODO: Fix install rules.
   # TODO: Fix assistant location logic.
-ENDMACRO(build_paraview_client)
+ENDFUNCTION(build_paraview_client)

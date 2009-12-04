@@ -4,7 +4,7 @@
 /*=========================================================================
 
    Program: ParaView
-  Module:    branded_paraview_main.cxx.in
+  Module:    branded_paraview_initializer.h.in
 
    Copyright (c) 2005-2008 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -33,34 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include <QApplication>
-#include "pq@BPC_NAME@Initializer.h"
+#ifndef __pq@BPC_NAME@Initializer
+#define __pq@BPC_NAME@Initializer
 
-#ifdef Q_WS_X11
-#include <QPlastiqueStyle>
-#endif
+class QMainWindow;
+class pqPVApplicationCore;
+class QSplashScreen;
 
-int main(int argc, char* argv[])
+class pq@BPC_NAME@Initializer
 {
-#ifdef Q_WS_X11
-  // Using motif style gives us test failures (and its ugly).
-  // Using cleanlooks style gives us errors when using valgrind (Trolltech's bug #179200)
-  // let's just use plastique for now
-  QApplication::setStyle(new QPlastiqueStyle);
+public:
+  pq@BPC_NAME@Initializer();
+  ~pq@BPC_NAME@Initializer();
+
+  /// Initialize ParaView. It returns false if the initialization failed.
+  bool Initialize(int argc, char* argv[]);
+private:
+  pqPVApplicationCore* PVApp;
+  QMainWindow* MainWindow;
+  QSplashScreen* Splash;
+};
+
 #endif
-
-  QApplication::setApplicationName("@BPC_NAME@");
-  // Only in Qt > 4.4
-  QApplication::setApplicationVersion("@BPC_VERSION_MAJOR@.@BPC_VERSION_MINOR@.@BPC_VERSION_PATCH@");
-  QApplication::setOrganizationName("@BPC_ORGANIZATION@");
-
-  QApplication qtapp(argc, argv);
-  pq@BPC_NAME@Initializer pvInitializer;
-  if (!pvInitializer.Initialize(argc, argv))
-    {
-    return 1;
-    }
-
-  return qtapp.exec();
-}
-// ***************** DO NOT EDIT ***********************************
