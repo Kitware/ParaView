@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 class pqPipelineModelDataItem : public QObject
 {
+  bool InConstructor;
 public:
    enum IconType
     {
@@ -90,6 +91,7 @@ public:
     pqPipelineModel::ItemType itemType,
     pqPipelineModel* model) :QObject(p)
     {
+    this->InConstructor = true;
     this->Selectable = true;
     this->Model = model;
     this->Parent = NULL;
@@ -107,6 +109,7 @@ public:
       {
       this->updateVisibilityIcon(this->Model->view(), false);
       }
+    this->InConstructor = false;
     }
   ~pqPipelineModelDataItem()
     {
@@ -254,7 +257,10 @@ public:
     if (this->VisibilityIcon != newIcon)
       {
       this->VisibilityIcon = newIcon;
-      this->Model->itemDataChanged(this);
+      if (!this->InConstructor && this->Model)
+        {
+        this->Model->itemDataChanged(this);
+        }
       return true;
       }
     if (traverse_subtree)
