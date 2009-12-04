@@ -71,27 +71,36 @@ class QPixmap;
 /// than one input, a link object is placed in the child list of the
 /// input objects. The link item represents a connection instead of a
 /// pipeline object.
+
+class pqPipelineModelInternal;
+class pqServerManagerModelItem;
+class pqPipelineSource;
+class pqServer;
+class QPixmap;
+class QString;
+class pqPipelineModelDataItem;
+
+/// This class is the model for the PipelineLine browser tree view.
+/// pqServerManagerModel models the vtkSMProxyManager for the GUI. The 
+/// vtkSMProxyManager maintains all proxies and hence it is difficult 
+/// to detect/trasvers pipelines etc etc. The pqServerManagerModel
+/// provides a simplified view of the Server Manager. This class
+/// takes that simplified "model" and transforms it into hierachical
+/// tables which can be represented by the Tree View.
 class PQCOMPONENTS_EXPORT pqPipelineModel : public QAbstractItemModel
 {
-  Q_OBJECT
+  Q_OBJECT;
 
 public:
-  enum ItemType
-    {
+  enum ItemType {
     Invalid = -1,
     Server = 0,
-    Source,
-    Filter,
-    CustomFilter,
-    Link,
-    OutputPort,
-    LastType = OutputPort
-    };
+    Proxy,
+    Port,
+    Link
+  };
 
 public:
-  /// \brief
-  ///   Creates an empty pipeline model.
-  /// \param parent The parent object.
   pqPipelineModel(QObject *parent=0);
 
   /// \brief
@@ -105,6 +114,7 @@ public:
   /// \param other Used to build a pipeline model.
   /// \param parent The parent object.
   pqPipelineModel(const pqServerManagerModel &other, QObject *parent=0);
+
   virtual ~pqPipelineModel();
 
   /// \name QAbstractItemModel Methods
@@ -157,6 +167,12 @@ public:
       int role=Qt::DisplayRole) const;
 
   /// \brief
+  ///  Sets the role data for the item at index to value. Returns 
+  ///  true if successful; otherwise returns false.
+  bool setData(const QModelIndex &index, const QVariant& value, 
+    int role = Qt::EditRole);
+
+  /// \brief
   ///   Gets the flags for a given model index.
   ///
   /// The flags for an item indicate if it is enabled, editable, etc.
@@ -165,34 +181,16 @@ public:
   /// \return
   ///   The flags for the given model index.
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
-
-  /// \brief
-  ///  Sets the role data for the item at index to value. Returns 
-  ///  true if successful; otherwise returns false.
-  bool setData(const QModelIndex &index, const QVariant& value, 
-    int role = Qt::EditRole);
   //@}
 
   /// \name Object Mapping
   //@{
-  /// \brief
-  ///   Gets the server manager model item represented by the index.
-  ///
-  /// If the index represents a link item, the server manager model
-  /// item returned will be the object the link points to.
-  ///
-  /// \param index The model index to look up.
-  /// \return
-  ///   A pointer to the server manager model item. Null is returned
-  ///   if the index does not point to a server manager item.
-  pqServerManagerModelItem *getItemFor(const QModelIndex &index) const;
 
-  /// \brief
-  ///   Gets the model index for the given server manager model item.
-  /// \param item The server manager model item to look up.
-  /// \return
-  ///   The model index for the given item. The index will be invalid
-  ///   if the item is not in the model.
+  /// Given the index, get the pqServerManagerModelItem it represents.
+  /// NULL is returned for root or invalid index.
+  pqServerManagerModelItem* getItemFor(const QModelIndex& ) const;
+
+
   QModelIndex getIndexFor(pqServerManagerModelItem *item) const;
 
   /// \brief
@@ -203,19 +201,7 @@ public:
   ItemType getTypeFor(const QModelIndex &index) const;
   //@}
 
-  /// \name Model Interaction
-  //@{
-  /// \brief
-  ///   Gets the next model index in the tree.
-  /// \param index The current index.
-  /// \param root An alternate root for walking a subtree.
-  /// \return
-  ///   An index to the next item in the tree or an invalid index
-  ///   when the end of the tree is reached.
-  QModelIndex getNextIndex(const QModelIndex index,
-      const QModelIndex &root=QModelIndex()) const;
-
-  /// \brief
+   /// \brief
   ///   Gets whether or not the model indexes are editable.
   /// \return
   ///   True if the model indexes can be edited.
@@ -227,17 +213,17 @@ public:
   void setEditable(bool editable) {this->Editable = editable;}
 
   /// \brief
+  ///   Sets whether or not the given index is selectable.
+  /// \param index The model index.
+  /// \param selectable True if the index can be selected.
+  void setSelectable(const QModelIndex &index, bool selectable);
+
+  /// \brief
   ///   Gets whether or not the given index is selectable.
   /// \param index The model index.
   /// \return
   ///   True if the given index is selectable.
   bool isSelectable(const QModelIndex &index) const;
-
-  /// \brief
-  ///   Sets whether or not the given index is selectable.
-  /// \param index The model index.
-  /// \param selectable True if the index can be selected.
-  void setSelectable(const QModelIndex &index, bool selectable);
 
   /// \brief
   ///   Sets whether of not an item subtree is selectable.
@@ -246,241 +232,101 @@ public:
   void setSubtreeSelectable(pqServerManagerModelItem *item, bool selectable);
 
   /// \brief
+  ///   Gets the next model index in the tree.
+  /// \param index The current index.
+  /// \param root An alternate root for walking a subtree.
+  /// \return
+  ///   An index to the next item in the tree or an invalid index
+  ///   when the end of the tree is reached.
+  QModelIndex getNextIndex(const QModelIndex index,
+      const QModelIndex &root=QModelIndex()) const;
+
+  /// Provides access to the view.
+  pqView* view() const
+    { return this->View; }
+
+  /// \brief
   ///   Sets the font hint for modified items.
   /// \param font The font to use for modified items.
   void setModifiedFont(const QFont &font);
-  //@}
 
 public slots:
-  /// \name Model Modification Methods
-  //@{
-  /// \brief
-  ///   Adds a server item to the pipeline model.
-  ///
-  /// The server is added as a child of the root node.
-  ///
-  /// \param server The server object to add.
+  /// Called when a new server connection is detected. Adds the connection to the
+  /// list.
   void addServer(pqServer *server);
 
-  /// \brief
-  ///   Sets up the model for a server removal.
-  ///
-  /// The closing book end event is not used. The information used
-  /// in the process is cleaned up when the removing server signal is
-  /// sent. This leaves nothing for the closing book end event to do.
-  /// The removing server signal must be sent last in the cleanup
-  /// process to avoid warnings.
-  ///
-  /// \param server The server that will be removed.
-  void startRemovingServer(pqServer *server);
-
-  /// \brief
-  ///   Removes a server item from the pipeline model.
-  /// \param server The server object to remove.
+  /// Called when a server connection is closed. Removes the server from the list.
   void removeServer(pqServer *server);
 
-  /// \brief
-  ///   Adds a source to the pipeline model.
-  ///
-  /// The source is added to its server's list of sources. The source
-  /// should have no inputs when added. The icon displayed for the
-  /// source is determined by the type of source (source, filter or
-  /// custom filter).
-  ///
-  /// \param source The source object to add.
-  /// \sa pqPipelineModel::addConnection(pqPipelineSource *,
-  ///   pqPipelineSource *, int)
-  void addSource(pqPipelineSource *source);
+  /// Called when a new source/filter/bundle is registered.
+  void addSource(pqPipelineSource* source);
 
-  /// \brief
-  ///   Removes a source from the pipeline model.
-  ///
-  /// The source should not have connected outputs when it is removed.
-  ///
-  /// \param source The source object to remove.
-  /// \sa pqPipelineModel::removeConnection(pqPipelineSource *,
-  ///   pqPipelineSource *, int)
-  void removeSource(pqPipelineSource *source);
+  /// Called when a new source/filter/bundle is unregistred.
+  void removeSource(pqPipelineSource* source);
 
-  /// \brief
-  ///   Creates a connection between the source and sink.
-  /// \param source The source object being connected.
-  /// \param sink The sink object being connected.
-  /// \param sourceOutputPort The ouput port on the source.
-  /// \sa pqPipelineModel::addConnection(pqPipelineModelOutput *,
-  ///   pqPipelineModelFilter *)
-  void addConnection(pqPipelineSource *source, pqPipelineSource *sink,
-      int sourceOutputPort);
+  /// Called when new pipeline connection (between two pipeline objects)
+  /// is made.
+  void addConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
 
-  /// \brief
-  ///   Disconnects the source and sink.
-  /// \param source The source object being connected.
-  /// \param sink The sink object being connected.
-  /// \param sourceOutputPort The ouput port on the source.
-  /// \sa pqPipelineModel::removeConnection(pqPipelineModelOutput *,
-  ///   pqPipelineModelFilter *)
-  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink,
-      int sourceOutputPort);
-  //@}
+  /// Called when new pipeline connection (between two pipeline objects)
+  /// is broken.
+  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
 
-  /// \name Model Update Methods
-  //@{
-  /// \brief
-  ///   Updates the name column for the specified item.
-  ///
-  /// The model always returns the current name for an item. The view
-  /// is notified so it can update the layout for the given index.
-  ///
-  /// \param item The server manager model item that changed.
-  void updateItemName(pqServerManagerModelItem *item);
-
-  /// \brief
-  ///   Updates the display columns for the given source.
-  /// \param source The source to update.
-  void updateRepresentations(pqPipelineSource *source);
-
-  /// \brief
-  ///   Updates the icons in the current window column.
-  ///
+  /// Updates the icons in the current window column.
   /// The current window column shows whether or not the source is
   /// displayed in the current window. When the current window changes
   /// the entire column needs to be updated.
-  ///
-  /// \param module The current render module.
   void setView(pqView *module);
-  //@}
 
 signals:
-  /// \brief
-  ///   Emitted when the first child is added to a parent index.
-  ///
-  /// This signal can be used to expand the parent index when a child
-  /// is added. This would always keep the tree expanded.
-  ///
-  /// \param index The parent index that now has children.
   void firstChildAdded(const QModelIndex &index);
 
-  /// \brief
-  ///   Emitted when an index is about to be moved in the hierarchy.
-  ///
-  /// This signal can be used to save the expanded state of the index
-  /// and its subtree. When the index is restored, the expanded state
-  /// can then be applied. The index row and parent will change in the
-  /// move, so something else should be used to identify the index.
-  /// The data in column zero can be used to identify the index when it
-  /// is restored.
-  ///
-  /// \param index The index that will be moved.
-  /// \sa pqPipelineModel::indexRestored(const QModelIndex &)
-  void movingIndex(const QModelIndex &index);
+private slots:
+  void serverDataChanged();
 
-  /// \brief
-  ///   Emitted when an index is added back in the hierarchy.
-  ///
-  /// The signal is paired with a \c movingIndex signal. It is emitted
-  /// after the index has been moved in the tree.
-  ///
-  /// \param index The index that was moved.
-  /// \sa pqPipelineModel::movingIndex(const QModelIndex &)
-  void indexRestored(const QModelIndex &index);
+  /// called when visibility of the source may have changed.
+  void updateVisibility(pqPipelineSource*);
 
-  /// \brief
-  //    Emitted when the label for any index is changed via the GUI.
-  //  
-  //  \param index The index that was changed.
-  //  \param name New name set by the user.
-  void rename(const QModelIndex& index, const QString& name);
+  /// called when the item's name changes.
+  void updateData(pqServerManagerModelItem*);
 
 private:
-  /// \brief
-  ///   Handles the connection of the internal pipeline objects.
-  ///
-  /// A connection is created from source to sink. If the sink had no
-  /// inputs, it will be moved from the server's list of sources to
-  /// the source's list of outputs. If the sink was already on another
-  /// source's output list, it will be moved back to the server's list
-  /// of sources. A link item will be added to the two source's output
-  /// lists in its place. If the sink was already on the server's list
-  /// of sources because it had multiple inputs, a link item will be
-  /// added to the source's list of outputs and the sink will remain
-  /// where it is.
-  ///
-  /// \param source The source object being connected.
-  /// \param sink The sink object being connected.
-  /// \sa pqPipelineModel::removeConnection(pqPipelineModelOutput *,
-  ///   pqPipelineModelFilter *)
-  void addConnection(pqPipelineModelOutput *source,
-      pqPipelineModelFilter *sink);
+  friend class pqPipelineModelDataItem;
 
-  /// \brief
-  ///   Removes the connection of the internal pipeline objects.
-  ///
-  /// If the source is the only input of the sink, the sink will be
-  /// moved to the server's source list. If the sink had two inputs,
-  /// it will be moved to the other source's output list. If the sink
-  /// had more inputs, the link item on the source's list will be
-  /// removed and the link will stay where it is.
-  ///
-  /// \param source The source object being disconnected.
-  /// \param sink The sink object being disconnected.
-  /// \sa pqPipelineModel::addConnection(pqPipelineModelOutput *,
-  ///   pqPipelineModelFilter *)
-  void removeConnection(pqPipelineModelOutput *source,
-      pqPipelineModelFilter *sink);
+  // Add an item as a child under the parent at the given index.
+  // Note that this method does not actually change the underlying
+  // pqServerManagerModel, it merely signals that such an addition
+  // has taken place.
+  void addChild(pqPipelineModelDataItem* parent, 
+    pqPipelineModelDataItem* child);
 
-  /// \brief
-  ///   Updates the display columns for sources displayed in the
-  ///   render module.
-  /// \param module The modified render module.
-  void updateDisplays(pqView *module);
+  // Remove a child item from under the parent.
+  // Note that this method does not actually change the underlying
+  // pqServerManagerModel, it merely signals that such an addition
+  // has taken place.
+  void removeChildFromParent(pqPipelineModelDataItem* child);
 
-  /// \brief
-  ///   Notifies the view that the input link items have changed.
-  /// \param sink The modified item.
-  /// \param column The column to use in the index.
-  void updateInputLinks(pqPipelineModelFilter *sink, int column=0);
+  // Returns the pqPipelineModelDataItem for the given pqServerManagerModelItem.
+  pqPipelineModelDataItem* getDataItem(pqServerManagerModelItem* item,
+    pqPipelineModelDataItem* subtreeRoot,
+    ItemType type=Invalid) const;
 
-  /// \brief
-  ///   Notifies the view that the output port items have changed.
-  /// \param source The modified item.
-  /// \param column The column to use in the index.
-  void updateOutputPorts(pqPipelineModelSource* source, int column=0);
+  // called by pqPipelineModelDataItem to indicate that the data for the item
+  // may have changed.
+  void itemDataChanged(pqPipelineModelDataItem*);
+  
+  
+  /// used by the variant of setSubtreeSelectable() for recursion.
+  void setSubtreeSelectable(pqPipelineModelDataItem *item, bool selectable);
 
-  /// \brief
-  ///   Gets the pipeline model item for the server manager model item.
-  /// \param item The server manager model item to look up.
-  /// \return
-  ///   A pointer to the associated pipeline model item.
-  pqPipelineModelItem *getModelItemFor(pqServerManagerModelItem *item) const;
-
-  /// \brief
-  ///   Creates a model index for the pipeline model item.
-  /// \param item The item to make an index for.
-  /// \param column The column to set in the new index.
-  /// \return
-  ///   A model index for the specified item.
-  QModelIndex makeIndex(pqPipelineModelItem *item, int column=0) const;
-
-  /// Used to remove all the null entries in the item map.
-  void cleanPipelineMap();
-
-  /// \brief
-  ///   Gets the next model item in the tree.
-  /// \param item The current item.
-  /// \param root An alternate root for walking a subtree.
-  /// \return
-  ///   A pointer to the next item in the tree or null when the end
-  ///   of the tree is reached.
-  pqPipelineModelItem *getNextModelItem(pqPipelineModelItem *item,
-      pqPipelineModelItem *root=0) const;
-
-  /// Initializes the list of pixmaps.
-  void initializePixmaps();
-
+  QModelIndex getIndex(pqPipelineModelDataItem* item) const;
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
   QPixmap *PixmapList;               ///< Stores the item icons.
-  bool Editable;                     ///< True if the model is editable.
+  pqView* View;
+  bool Editable;
+
+  void constructor();
 };
 
 #endif

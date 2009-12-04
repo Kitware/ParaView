@@ -171,7 +171,7 @@ QString pqFilterInputDialogInternal::getSourceName(const QModelIndex &index,
     const pqPipelineModel *model) const
 {
   QString name = model->data(index, Qt::DisplayRole).toString();
-  if(model->getTypeFor(index) == pqPipelineModel::OutputPort)
+  if (model->getTypeFor(index) == pqPipelineModel::Port)
     {
     QModelIndex source = index.parent();
     name.prepend(" - ");
@@ -302,6 +302,7 @@ void pqFilterInputDialog::setModelAndFilter(pqPipelineModel *model,
     pqPipelineFilter *filter,
     const QMap<QString, QList<pqOutputPort*> > &namedInputs)
 {
+ 
   if(this->Model == model && this->Filter == filter)
     {
     return;
@@ -556,7 +557,7 @@ void pqFilterInputDialog::changeCurrentInput(int id)
                 source);
             if(!source || (source->getNumberOfOutputPorts() > 1 &&
                 this->Pipeline->getTypeFor(index) !=
-                pqPipelineModel::OutputPort))
+                pqPipelineModel::Port))
               {
               this->Pipeline->setSelectable(index, false);
               }

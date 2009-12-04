@@ -140,10 +140,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputPortComboBox.h
 #  pqParticleTracerPanel.h
   pqPQLookupTableManager.h
-  pqPipelineBrowser.h
   pqPipelineBrowserWidget.h
-  pqPipelineBrowserContextMenu.h
-  pqPipelineMenu.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h
   pqPipelineTimeKeyFrameEditor.h
@@ -540,14 +537,8 @@ ADD_LIBRARY(pqComponents
   pqPQLookupTableManager.h
 #  pqParticleTracerPanel.cxx
 #  pqParticleTracerPanel.h
-  pqPipelineBrowser.cxx
-  pqPipelineBrowser.h
   pqPipelineBrowserWidget.cxx
   pqPipelineBrowserWidget.h
-  pqPipelineBrowserContextMenu.cxx
-  pqPipelineBrowserContextMenu.h
-  pqPipelineMenu.cxx
-  pqPipelineMenu.h
   pqPipelineModel.cxx
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.cxx

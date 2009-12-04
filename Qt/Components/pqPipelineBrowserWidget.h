@@ -67,7 +67,6 @@ public slots:
   void setActiveView(pqView*);
 
 protected slots:
-  void renameRequest(const QModelIndex& index, const QString& new_name);
   void handleIndexClicked(const QModelIndex& index);
 
 protected:
