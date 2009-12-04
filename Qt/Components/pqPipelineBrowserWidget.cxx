@@ -167,6 +167,14 @@ void pqPipelineBrowserWidget::handleIndexClicked(const QModelIndex &index)
         QModelIndexList indexes2;
         indexes2 << index;
         this->setVisibility(new_visibility_state, indexes2);
+        // change the selection to the item, if we just made it visible.
+        if (new_visibility_state)
+          {
+          QModelIndex itemIndex = this->PipelineModel->index(index.row(), 0,
+            index.parent());
+          this->getSelectionModel()->select(itemIndex,
+            QItemSelectionModel::ClearAndSelect);
+          }
         }
       }
     }
