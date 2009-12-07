@@ -2,7 +2,7 @@
 
 #include <pqComboBoxDomain.h>
 #include <pqProxy.h>
-#include <pqPropertyHelper.h>
+#include <pqSMAdaptor.h>
 
 #include <vtkSMProxy.h>
 
@@ -13,34 +13,39 @@
 #include <iostream>
 #include <set>
 
-TableToGraphPanel::TableToGraphPanel(pqProxy* proxy, QWidget* p) :
-  pqObjectPanel(proxy, p)
+TableToGraphPanel::TableToGraphPanel(pqProxy* object_proxy, QWidget* p) :
+  pqObjectPanel(object_proxy, p)
 {
   this->Widgets.setupUi(this);
 
-  vtkSMProxy* const table_to_graph = proxy->getProxy();
+  vtkSMProxy* const table_to_graph = object_proxy->getProxy();
 
-  pqComboBoxDomain* const vertex_field_domain_1 = new pqComboBoxDomain(
+  //pqComboBoxDomain* const vertex_field_domain_1 =
+  new pqComboBoxDomain(
     this->Widgets.vertexField1,
     table_to_graph->GetProperty("VertexField1"),
     "array_list");
 
-  pqComboBoxDomain* const vertex_field_domain_2 = new pqComboBoxDomain(
+  //pqComboBoxDomain* const vertex_field_domain_2 =
+  new pqComboBoxDomain(
     this->Widgets.vertexField2,
     table_to_graph->GetProperty("VertexField2"),
     "array_list");
 
-  pqComboBoxDomain* const vertex_field_domain_3 = new pqComboBoxDomain(
+  //pqComboBoxDomain* const vertex_field_domain_3 =
+  new pqComboBoxDomain(
     this->Widgets.vertexField3,
     table_to_graph->GetProperty("VertexField3"),
     "array_list");
 
-  pqComboBoxDomain* const vertex_field_domain_4 = new pqComboBoxDomain(
+  //pqComboBoxDomain* const vertex_field_domain_4 =
+  new pqComboBoxDomain(
     this->Widgets.vertexField4,
     table_to_graph->GetProperty("VertexField4"),
     "array_list");
 
-  pqComboBoxDomain* const vertex_field_domain_5 = new pqComboBoxDomain(
+  //pqComboBoxDomain* const vertex_field_domain_5 =
+  new pqComboBoxDomain(
     this->Widgets.vertexField5,
     table_to_graph->GetProperty("VertexField5"),
     "array_list");
@@ -51,7 +56,11 @@ TableToGraphPanel::TableToGraphPanel(pqProxy* proxy, QWidget* p) :
   this->Widgets.vertexDomain4->setText(this->Widgets.vertexField4->currentText());
   this->Widgets.vertexDomain5->setText(this->Widgets.vertexField5->currentText());
 
-  const QStringList link_vertices = pqPropertyHelper(table_to_graph, "LinkVertices").GetAsStringList();
+  QStringList link_vertices;
+  foreach (QVariant link_vertices_entry, pqSMAdaptor::getMultipleElementProperty(table_to_graph->GetProperty("LinkVertices")))
+    {
+    link_vertices << link_vertices_entry.toString();
+    }
   if(link_vertices.size() > 2)
     {
     this->Widgets.vertexField1->setCurrentIndex(this->Widgets.vertexField1->findText(link_vertices[0]));
@@ -83,7 +92,11 @@ TableToGraphPanel::TableToGraphPanel(pqProxy* proxy, QWidget* p) :
     this->Widgets.vertexHidden5->setChecked(link_vertices[14] == "1");
     }
 
-  const QStringList link_edges = pqPropertyHelper(table_to_graph, "LinkEdges").GetAsStringList();
+  QStringList link_edges;
+  foreach (QVariant link_edges_entry, pqSMAdaptor::getMultipleElementProperty(table_to_graph->GetProperty("LinkEdges")))
+    {
+    link_edges << link_edges_entry.toString();
+    }
   if(link_edges.size() > 1)
     {
     this->Widgets.edgeSource1->setCurrentIndex(this->Widgets.edgeSource1->findText(link_edges[0]));
@@ -248,7 +261,7 @@ void TableToGraphPanel::onVertexTypeChanged()
 void TableToGraphPanel::accept()
 {
 
-  QStringList link_vertices;
+  QList<QVariant> link_vertices;
   if(this->Widgets.enableVertex1->isChecked())
     link_vertices << this->Widgets.vertexField1->currentText() << this->Widgets.vertexDomain1->text() << (this->Widgets.vertexHidden1->isChecked() ? "1" : "0");
   if(this->Widgets.enableVertex2->isChecked())
@@ -260,7 +273,7 @@ void TableToGraphPanel::accept()
   if(this->Widgets.enableVertex5->isChecked())
     link_vertices << this->Widgets.vertexField5->currentText() << this->Widgets.vertexDomain5->text() << (this->Widgets.vertexHidden5->isChecked() ? "1" : "0");
 
-  QStringList link_edges;
+  QList<QVariant> link_edges;
   if(this->Widgets.enableEdge1->isChecked())
     link_edges << this->Widgets.edgeSource1->currentText() << this->Widgets.edgeTarget1->currentText();
   if(this->Widgets.enableEdge2->isChecked())
@@ -274,8 +287,10 @@ void TableToGraphPanel::accept()
 
   vtkSMProxy* const table_to_graph = this->referenceProxy()->getProxy();
 
-  pqPropertyHelper(table_to_graph, "LinkVertices").Set(link_vertices);
-  pqPropertyHelper(table_to_graph, "LinkEdges").Set(link_edges);
+  pqSMAdaptor::setMultipleElementProperty(
+                    table_to_graph->GetProperty("LinkVertices"), link_vertices);
+  pqSMAdaptor::setMultipleElementProperty(
+                          table_to_graph->GetProperty("LinkEdges"), link_edges);
   table_to_graph->UpdateVTKObjects();
 
   Superclass::accept();    
