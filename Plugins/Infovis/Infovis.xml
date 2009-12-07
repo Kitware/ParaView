@@ -530,6 +530,7 @@
     </SourceProxy>
 
     <SourceProxy name="TableToGraph" class="vtkTableToGraph">
+
       <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -540,6 +541,7 @@
         </DataTypeDomain>
         <InputArrayDomain name="row_arrays" attribute_type="row"/>
       </InputProperty>
+
       <InputProperty name="VertexTable" command="SetVertexTableConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -548,7 +550,11 @@
         <DataTypeDomain name="input_type">
           <DataType value="vtkTable"/>
         </DataTypeDomain>
+        <Hints>
+          <Optional />
+        </Hints>
       </InputProperty>
+
       <StringVectorProperty name="VertexField1" number_of_elements="1">
         <ArrayListDomain name="array_list" input_domain_name="row_arrays">
           <RequiredProperties>
@@ -584,8 +590,21 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
-      <StringVectorProperty name="LinkVertices" command="AddLinkVertex" clean_command="ClearLinkVertices" repeat_command="1" number_of_elements_per_command="3" element_types="2 2 0"/>
-      <StringVectorProperty name="LinkEdges" command="AddLinkEdge" clean_command="ClearLinkEdges" repeat_command="1" number_of_elements_per_command="2" element_types="2 2"/>
+
+      <StringVectorProperty name="LinkVertices" command="AddLinkVertex"
+                            clean_command="ClearLinkVertices" repeat_command="1"
+                            number_of_elements_per_command="3"
+                            element_types="2 2 0"/>
+      <StringVectorProperty name="LinkEdges" command="AddLinkEdge"
+                            clean_command="ClearLinkEdges" repeat_command="1"
+                            number_of_elements_per_command="2"
+                            element_types="2 2"/>
+
+      <IntVectorProperty name="Directed" command="SetDirected"
+                         number_of_elements="1" default_values="0">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <Hints>
         <View type="ClientGraphView"/>
       </Hints>

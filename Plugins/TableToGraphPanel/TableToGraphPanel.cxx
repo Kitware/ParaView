@@ -218,6 +218,9 @@ TableToGraphPanel::TableToGraphPanel(pqProxy* object_proxy, QWidget* p) :
   QObject::connect(this->Widgets.edgeTarget4, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setModified()));
   QObject::connect(this->Widgets.edgeTarget5, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(setModified()));
 
+  QObject::connect(this->Widgets.Directed, SIGNAL(toggled(bool)),
+                   this, SLOT(setModified()));
+
   this->onVertexTypeChanged();
 }
 
@@ -291,6 +294,10 @@ void TableToGraphPanel::accept()
                     table_to_graph->GetProperty("LinkVertices"), link_vertices);
   pqSMAdaptor::setMultipleElementProperty(
                           table_to_graph->GetProperty("LinkEdges"), link_edges);
+
+  pqSMAdaptor::setElementProperty(table_to_graph->GetProperty("Directed"),
+                                  this->Widgets.Directed->isChecked());
+
   table_to_graph->UpdateVTKObjects();
 
   Superclass::accept();    

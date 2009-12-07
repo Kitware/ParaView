@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>TableToGraphPanel</class>
- <widget class="QWidget" name="TableToGraphPanel" >
-  <property name="geometry" >
+ <widget class="QWidget" name="TableToGraphPanel">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,209 +10,209 @@
     <height>524</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Link Vertices</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="1" column="2" >
-       <widget class="QLineEdit" name="vertexDomain1" />
+     <layout class="QGridLayout">
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="vertexDomain1"/>
       </item>
-      <item row="1" column="3" >
-       <widget class="QCheckBox" name="vertexHidden1" >
-        <property name="text" >
+      <item row="1" column="3">
+       <widget class="QCheckBox" name="vertexHidden1">
+        <property name="text">
          <string>Hidden</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" >
-       <widget class="QLineEdit" name="vertexDomain2" />
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="vertexDomain2"/>
       </item>
-      <item row="2" column="3" >
-       <widget class="QCheckBox" name="vertexHidden2" >
-        <property name="text" >
+      <item row="2" column="3">
+       <widget class="QCheckBox" name="vertexHidden2">
+        <property name="text">
          <string>Hidden</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" >
-       <widget class="QLineEdit" name="vertexDomain3" >
-        <property name="enabled" >
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="vertexDomain3">
+        <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="3" column="3" >
-       <widget class="QCheckBox" name="vertexHidden3" >
-        <property name="enabled" >
+      <item row="3" column="3">
+       <widget class="QCheckBox" name="vertexHidden3">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Hidden</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="2" >
-       <widget class="QLineEdit" name="vertexDomain4" >
-        <property name="enabled" >
+      <item row="4" column="2">
+       <widget class="QLineEdit" name="vertexDomain4">
+        <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="4" column="3" >
-       <widget class="QCheckBox" name="vertexHidden4" >
-        <property name="enabled" >
+      <item row="4" column="3">
+       <widget class="QCheckBox" name="vertexHidden4">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Hidden</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="3" >
-       <widget class="QCheckBox" name="vertexHidden5" >
-        <property name="enabled" >
+      <item row="5" column="3">
+       <widget class="QCheckBox" name="vertexHidden5">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="text" >
+        <property name="text">
          <string>Hidden</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" >
-       <widget class="QLineEdit" name="vertexDomain5" >
-        <property name="enabled" >
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="vertexDomain5">
+        <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="vertexField1" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+      <item row="1" column="1">
+       <widget class="QComboBox" name="vertexField1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="vertexField2" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+      <item row="2" column="1">
+       <widget class="QComboBox" name="vertexField2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="QComboBox" name="vertexField3" >
-        <property name="enabled" >
+      <item row="3" column="1">
+       <widget class="QComboBox" name="vertexField3">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
-       <widget class="QComboBox" name="vertexField4" >
-        <property name="enabled" >
+      <item row="4" column="1">
+       <widget class="QComboBox" name="vertexField4">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" >
-       <widget class="QComboBox" name="vertexField5" >
-        <property name="enabled" >
+      <item row="5" column="1">
+       <widget class="QComboBox" name="vertexField5">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="enableVertex1" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="enableVertex1">
+        <property name="text">
          <string>Vertex Type 1</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QCheckBox" name="enableVertex2" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="enableVertex2">
+        <property name="text">
          <string>Vertex Type 2</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QCheckBox" name="enableVertex3" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="enableVertex3">
+        <property name="text">
          <string>Vertex Type 3</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" >
-       <widget class="QCheckBox" name="enableVertex4" >
-        <property name="text" >
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="enableVertex4">
+        <property name="text">
          <string>Vertex Type 4</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
-       <widget class="QCheckBox" name="enableVertex5" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="enableVertex5">
+        <property name="text">
          <string>Vertex Type 5</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+      <item row="0" column="2">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Domain&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Domain&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Column&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Column&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
@@ -220,196 +221,203 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Link Edges</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="edgeSource1" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+     <layout class="QGridLayout">
+      <item row="1" column="1">
+       <widget class="QComboBox" name="edgeSource1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QComboBox" name="edgeTarget1" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+      <item row="1" column="2">
+       <widget class="QComboBox" name="edgeTarget1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" >
-       <widget class="QComboBox" name="edgeSource2" >
-        <property name="enabled" >
+      <item row="2" column="1">
+       <widget class="QComboBox" name="edgeSource2">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="3" column="1" >
-       <widget class="QComboBox" name="edgeSource3" >
-        <property name="enabled" >
+      <item row="3" column="1">
+       <widget class="QComboBox" name="edgeSource3">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" >
-       <widget class="QComboBox" name="edgeSource4" >
-        <property name="enabled" >
+      <item row="4" column="1">
+       <widget class="QComboBox" name="edgeSource4">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="5" column="1" >
-       <widget class="QComboBox" name="edgeSource5" >
-        <property name="enabled" >
+      <item row="5" column="1">
+       <widget class="QComboBox" name="edgeSource5">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" >
-       <widget class="QComboBox" name="edgeTarget2" >
-        <property name="enabled" >
+      <item row="2" column="2">
+       <widget class="QComboBox" name="edgeTarget2">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" >
-       <widget class="QComboBox" name="edgeTarget3" >
-        <property name="enabled" >
+      <item row="3" column="2">
+       <widget class="QComboBox" name="edgeTarget3">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="4" column="2" >
-       <widget class="QComboBox" name="edgeTarget4" >
-        <property name="enabled" >
+      <item row="4" column="2">
+       <widget class="QComboBox" name="edgeTarget4">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="5" column="2" >
-       <widget class="QComboBox" name="edgeTarget5" >
-        <property name="enabled" >
+      <item row="5" column="2">
+       <widget class="QComboBox" name="edgeTarget5">
+        <property name="enabled">
          <bool>false</bool>
         </property>
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Expanding" >
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="enableEdge1" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="enableEdge1">
+        <property name="text">
          <string>Edge Type 1</string>
         </property>
-        <property name="checked" >
+        <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QCheckBox" name="enableEdge2" >
-        <property name="text" >
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="enableEdge2">
+        <property name="text">
          <string>Edge Type 2</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0" >
-       <widget class="QCheckBox" name="enableEdge3" >
-        <property name="text" >
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="enableEdge3">
+        <property name="text">
          <string>Edge Type 3</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0" >
-       <widget class="QCheckBox" name="enableEdge4" >
-        <property name="text" >
+      <item row="4" column="0">
+       <widget class="QCheckBox" name="enableEdge4">
+        <property name="text">
          <string>Edge Type 4</string>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" >
-       <widget class="QCheckBox" name="enableEdge5" >
-        <property name="text" >
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="enableEdge5">
+        <property name="text">
          <string>Edge Type 5</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="label_3" >
-        <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Source Column&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Source Column&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" >
-       <widget class="QLabel" name="label_4" >
-        <property name="text" >
-         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Target Column&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Target Column&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <property name="alignment" >
+        <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="3">
+       <widget class="QCheckBox" name="Directed">
+        <property name="text">
+         <string>Edges are Directed</string>
         </property>
        </widget>
       </item>
@@ -418,10 +426,10 @@ p, li { white-space: pre-wrap; }
    </item>
    <item>
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeHint" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>40</height>
