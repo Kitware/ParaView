@@ -92,6 +92,13 @@ void pqVCRToolbar::constructor()
 }
 
 //-----------------------------------------------------------------------------
+pqVCRToolbar::~pqVCRToolbar()
+{
+  delete this->UI;
+  this->UI = 0;
+}
+
+//-----------------------------------------------------------------------------
 void pqVCRToolbar::setTimeRanges(double start, double end)
 {
   this->UI->actionVCRFirstFrame->setToolTip(

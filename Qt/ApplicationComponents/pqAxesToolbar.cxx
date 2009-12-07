@@ -82,6 +82,13 @@ void pqAxesToolbar::constructor()
 }
 
 //-----------------------------------------------------------------------------
+pqAxesToolbar::~pqAxesToolbar()
+{
+  delete this->Internals;
+  this->Internals = 0;
+}
+
+//-----------------------------------------------------------------------------
 void pqAxesToolbar::updateEnabledState()
 {
   pqRenderView* renderView = 

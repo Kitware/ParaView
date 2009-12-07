@@ -55,6 +55,8 @@ public:
     {
     this->constructor();
     }
+  ~pqVCRToolbar();
+
 protected slots:
   void setTimeRanges(double, double);
   void onPlaying(bool);

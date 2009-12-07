@@ -54,6 +54,7 @@ public:
     {
     this->constructor();
     }
+  ~pqAxesToolbar();
 
 protected slots:
   void updateEnabledState();

@@ -57,6 +57,18 @@ public:
   pqSignalAdaptorComboBox* AttributeAdaptor;
   pqComboBoxDomain* AttributeDomain;
   pqSignalAdaptorSpinBox* DecimalPrecisionAdaptor;
+  pqInternal()
+    {
+    this->AttributeAdaptor = 0;
+    this->AttributeDomain = 0;
+    this->DecimalPrecisionAdaptor = 0;
+    }
+  ~pqInternal()
+    {
+    delete this->AttributeAdaptor;
+    delete this->AttributeDomain;
+    delete this->DecimalPrecisionAdaptor;
+    }
 };
 
 //-----------------------------------------------------------------------------
