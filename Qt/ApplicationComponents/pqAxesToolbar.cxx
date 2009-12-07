@@ -111,7 +111,7 @@ void pqAxesToolbar::updateEnabledState()
 }
 
 //-----------------------------------------------------------------------------
-void pqAxesToolbar::showOrientationAxes(bool show)
+void pqAxesToolbar::showOrientationAxes(bool show_axes)
 {
   pqRenderView* renderView =
     qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
@@ -120,12 +120,12 @@ void pqAxesToolbar::showOrientationAxes(bool show)
     return;
     }
 
-  renderView->setOrientationAxesVisibility(show);
+  renderView->setOrientationAxesVisibility(show_axes);
   renderView->render();
 }
 
 //-----------------------------------------------------------------------------
-void pqAxesToolbar::showCenterAxes(bool show)
+void pqAxesToolbar::showCenterAxes(bool show_axes)
 {
   pqRenderView* renderView =
     qobject_cast<pqRenderView*>(pqActiveObjects::instance().activeView());
@@ -134,7 +134,7 @@ void pqAxesToolbar::showCenterAxes(bool show)
     return;
     }
 
-  renderView->setCenterAxesVisibility(show);
+  renderView->setCenterAxesVisibility(show_axes);
   renderView->render();
 }
 
