@@ -2094,6 +2094,7 @@ attributes of the fragments.
             This property specifies the values at which to compute the isosurface.
           </Documentation>
       </DoubleVectorProperty>
+      
       <IntVectorProperty 
         name="Capping" 
         command="SetEnableCapping" 
@@ -2105,6 +2106,7 @@ attributes of the fragments.
          If this property is on, the the boundary of the data set is capped.
        </Documentation>
       </IntVectorProperty>
+      
       <IntVectorProperty 
         name="DegenerateCells" 
         command="SetEnableDegenerateCells" 
@@ -2116,18 +2118,45 @@ attributes of the fragments.
          If this property is on, a transition mesh between levels is created.
        </Documentation>
       </IntVectorProperty>
-      <IntVectorProperty 
-        name="MultiprocessCommunication" 
-        command="SetEnableMultiProcessCommunication" 
-        number_of_elements="1"
-        animateable="1"
-        default_values="1" > 
+
+     <IntVectorProperty
+       name="MultiprocessCommunication"
+       command="SetEnableMultiProcessCommunication"
+       number_of_elements="1"
+       animateable="1"
+       default_values="1" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is off, each process executes independantly..
+         If this property is off, each process executes independantly.
        </Documentation>
-      </IntVectorProperty>
-   <!-- End AMR Dual Contour -->
+     </IntVectorProperty>
+     
+     <IntVectorProperty
+       name="Triangulate"
+       command="SetTriangulateCap"
+       number_of_elements="1"
+       animateable="1"
+       default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Use triangles instead of quads on capping surfaces.
+       </Documentation>
+     </IntVectorProperty>
+
+     <IntVectorProperty
+       name="MergePoints"
+       command="SetEnableMergePoints"
+       number_of_elements="1"
+       animateable="1"
+       default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         Use more memory to merge points on the boundaries of blocks.
+       </Documentation>
+     </IntVectorProperty>
+
+
+     <!-- End AMR Dual Contour -->
    </SourceProxy>
 
   <!-- ==================================================================== -->

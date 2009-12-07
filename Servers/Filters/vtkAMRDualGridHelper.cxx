@@ -24,7 +24,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkstd/vector"
 
-vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.4");
+vtkCxxRevisionMacro(vtkAMRDualGridHelper, "1.5");
 vtkStandardNewMacro(vtkAMRDualGridHelper);
 
 class vtkAMRDualGridHelperSeed;
@@ -168,6 +168,7 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelperLevel::GetGridBlock(
 
   return this->Grid[x+ y*this->GridIncY + z*this->GridIncZ];
 }
+
 //----------------------------------------------------------------------------
 // This method is meant to be called after all the blocks are created and 
 // in their level grids.  It shoud also be called after FindExistingFaces
@@ -277,6 +278,8 @@ void vtkAMRDualGridHelperLevel::CreateBlockFaces(
 //****************************************************************************
 vtkAMRDualGridHelperBlock::vtkAMRDualGridHelperBlock()
 {
+  this->UserData = 0;
+
   //int ii;
   this->Level = 0;
   this->OriginIndex[0] = 0;
@@ -317,6 +320,13 @@ vtkAMRDualGridHelperBlock::vtkAMRDualGridHelperBlock()
 //----------------------------------------------------------------------------
 vtkAMRDualGridHelperBlock::~vtkAMRDualGridHelperBlock()
 {
+  if (this->UserData)
+    {
+    // It is not a vtkObject yet.
+    //this->UserData->Delete();
+    this->UserData = 0;
+    }
+
   int ii;
   this->Level = 0;
   this->OriginIndex[0] = 0;
@@ -687,6 +697,16 @@ vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(int level, int blockId
   return this->Levels[level]->Blocks[blockIdx];
 }
 
+//----------------------------------------------------------------------------
+vtkAMRDualGridHelperBlock* vtkAMRDualGridHelper::GetBlock(
+  int level, int xGrid, int yGrid, int zGrid)
+{
+  if (level < 0 || level >= (int)(this->Levels.size()))
+    {
+    return 0;
+    }
+  return this->Levels[level]->GetGridBlock(xGrid, yGrid, zGrid);
+}
 
 //----------------------------------------------------------------------------
 void vtkAMRDualGridHelper::AddBlock(int level, vtkImageData* volume)

@@ -54,6 +54,8 @@ public:
   int                       GetNumberOfLevels() { return (int)(this->Levels.size());}
   int                       GetNumberOfBlocksInLevel(int level);
   vtkAMRDualGridHelperBlock* GetBlock(int level, int blockIdx);
+  vtkAMRDualGridHelperBlock* GetBlock(int level, int xGrid, int yGrid, int zGrid);
+
 
 private:
   vtkAMRDualGridHelper();
@@ -206,6 +208,11 @@ public:
   // Bits 1-6 are set if faces 1-6 are on boundary of dataset
   // and have no neighbors.
   unsigned char BoundaryBits;
+
+  // Different algorithms need to store differnt information
+  // with the blocks.  I could make this a vtkObject so the desctructor 
+  // would delete it.
+  void* UserData;
 
 private:
 };

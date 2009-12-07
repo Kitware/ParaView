@@ -73,6 +73,21 @@ public:
   vtkGetMacro(EnableMultiProcessCommunication,int);
   vtkBooleanMacro(EnableMultiProcessCommunication,int);
 
+  // Description:
+  // This flag causes blocks to share locators so there are no
+  // boundary edges between blocks. It does not eliminate
+  // boundary edges between processes.
+  vtkSetMacro(EnableMergePoints,int);
+  vtkGetMacro(EnableMergePoints,int);
+  vtkBooleanMacro(EnableMergePoints,int);
+
+  // Description:
+  // A flag that causes the polygons on the capping surfaces to be triagulated.
+  vtkSetMacro(TriangulateCap,int);
+  vtkGetMacro(TriangulateCap,int);
+  vtkBooleanMacro(TriangulateCap,int);
+
+
 protected:
   vtkAMRDualContour();
   ~vtkAMRDualContour();
@@ -83,11 +98,16 @@ protected:
   int EnableDegenerateCells;
   int EnableCapping;
   int EnableMultiProcessCommunication;
+  int EnableMergePoints;
+  int TriangulateCap;
 
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   virtual int FillInputPortInformation(int port, vtkInformation *info);
   virtual int FillOutputPortInformation(int port, vtkInformation *info);
+
+  void ShareBlockLocatorWithNeighbors(
+    vtkAMRDualGridHelperBlock* block);
 
   void ProcessBlock(vtkAMRDualGridHelperBlock* block, int blockId);
   
@@ -96,6 +116,8 @@ protected:
     int marchingCase,
     int x, int y, int z,
     double values[8]);
+
+  void AddCapPolygon(int ptCount, vtkIdType* pointIds, int blockId);
 
   void CapCell(
     int cellX, int cellY, int cellZ,  // block coordinates
