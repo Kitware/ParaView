@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkFileSeriesWriter);
-vtkCxxRevisionMacro(vtkFileSeriesWriter, "1.2");
+vtkCxxRevisionMacro(vtkFileSeriesWriter, "1.3");
 vtkCxxSetObjectMacro(vtkFileSeriesWriter, Writer, vtkAlgorithm);
 //-----------------------------------------------------------------------------
 vtkFileSeriesWriter::vtkFileSeriesWriter()
@@ -149,7 +149,7 @@ int vtkFileSeriesWriter::RequestData(
   // this->Writer has already written out the file, just manage the looping for
   // timesteps.
 
-  if (this->CurrentTimeIndex == 0)
+  if (this->CurrentTimeIndex == 0 && this->WriteAllTimeSteps)
     {
     // Tell the pipeline to start looping.
     request->Set(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING(), 1);
@@ -159,14 +159,17 @@ int vtkFileSeriesWriter::RequestData(
   vtkDataObject* input = inInfo->Get(vtkDataObject::DATA_OBJECT());
   this->WriteATimestep(input);
 
-  this->CurrentTimeIndex++;
-  if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
+  if (this->WriteAllTimeSteps)
     {
-    // Tell the pipeline to stop looping.
-    request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
-    this->CurrentTimeIndex = 0;
+    this->CurrentTimeIndex++;
+    if (this->CurrentTimeIndex >= this->NumberOfTimeSteps)
+      {
+      // Tell the pipeline to stop looping.
+      request->Remove(vtkStreamingDemandDrivenPipeline::CONTINUE_EXECUTING());
+      this->CurrentTimeIndex = 0;
+      }
     }
-
+  
   return 1;
 }
  //----------------------------------------------------------------------------
