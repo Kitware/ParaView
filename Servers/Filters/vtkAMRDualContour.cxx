@@ -47,7 +47,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualContour, "1.5");
+vtkCxxRevisionMacro(vtkAMRDualContour, "1.6");
 vtkStandardNewMacro(vtkAMRDualContour);
 
 static int vtkAMRDualIsoEdgeToPointsTable[12][2] =
@@ -673,8 +673,6 @@ int vtkAMRDualContour::RequestData(
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkHierarchicalBoxDataSet *hbdsInput=vtkHierarchicalBoxDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  vtkObject *tmp= inInfo->Get(vtkDataObject::DATA_OBJECT());
-
 
   // Get the outputs
   // 0
