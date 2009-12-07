@@ -80,6 +80,7 @@ SET (MOC_HEADERS
   pqServerConnectReaction.h
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.h
+  pqSpreadSheetVisibilityBehavior.h
   pqStandardViewFrameActionGroup.h
   pqStatusBar.h
   pqTestingReaction.h
@@ -220,6 +221,8 @@ SET (SOURCE_FILES
   pqServerDisconnectReaction.h
   pqSourcesMenuReaction.cxx
   pqSourcesMenuReaction.h
+  pqSpreadSheetVisibilityBehavior.cxx
+  pqSpreadSheetVisibilityBehavior.h
   pqTestingReaction.cxx
   pqTestingReaction.h
   pqTimerLogReaction.cxx

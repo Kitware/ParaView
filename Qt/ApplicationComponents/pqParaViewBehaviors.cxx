@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPluginDockWidgetsBehavior.h"
 #include "pqPluginManager.h"
 #include "pqPVNewSourceBehavior.h"
+#include "pqSpreadSheetVisibilityBehavior.h"
 #include "pqStandardViewModules.h"
 #include "pqUndoRedoBehavior.h"
 #include "pqViewFrameActionsBehavior.h"
@@ -65,6 +66,7 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   // Define application behaviors.
   new pqDataTimeStepBehavior(this);
   new pqViewFrameActionsBehavior(this);
+  new pqSpreadSheetVisibilityBehavior(this);
   new pqDefaultViewBehavior(this);
   new pqAlwaysConnectedBehavior(this);
   new pqPVNewSourceBehavior(this);
