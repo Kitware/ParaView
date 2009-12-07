@@ -96,6 +96,11 @@ ENDFUNCTION (add_client_render_server_tests)
 
 SUBDIRS(XML)
 
+OPTION(PARAVIEW_CLIENT_RENDER_SERVER_TESTS
+  "Turn on/off client tests that involve separate data and render servers."
+  ON)
+MARK_AS_ADVANCED(PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+
 IF (QT_TESTING_WITH_PYTHON)
   SUBDIRS(Python)
 ENDIF (QT_TESTING_WITH_PYTHON)

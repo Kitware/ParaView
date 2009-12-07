@@ -28,9 +28,11 @@ IF (PARAVIEW_DATA_ROOT)
     TEST_SCRIPTS ${TESTS_WITH_BASELINES}
   )
 
-  add_client_render_server_tests("pypvcrs"
-    TEST_SCRIPTS ${TESTS_WITH_BASELINES}
-  )
+  IF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
+    add_client_render_server_tests("pypvcrs"
+      TEST_SCRIPTS ${TESTS_WITH_BASELINES}
+    )
+  ENDIF (PARAVIEW_CLIENT_RENDER_SERVER_TESTS)
 
 # TODO: remote rendering tests and reverse connect tests.
 
