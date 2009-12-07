@@ -4065,6 +4065,29 @@ The Tube filter creates tubes around the lines in the input polygonal dataset. T
           not varying the radius, this value has no effect.
         </Documentation>
       </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="UseDefaultNormal" 
+        command="SetUseDefaultNormal" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If this property is set to 0, and the input contains no vector array, then default ribbon normals will be generated (DefaultNormal property); if a vector array has been set (SelectInputVectors property), the ribbon normals will be set from the specified array. If this property is set to 1, the default normal (DefaultNormal property) will be used, regardless of whether the SelectInputVectors property has been set.
+       </Documentation>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="DefaultNormal"
+        command="SetDefaultNormal"
+        number_of_elements="3"
+        default_values="0 0 1" >
+       <DoubleRangeDomain name="range"/>
+       <Documentation>
+         The value of this property specifies the normal to use when the UseDefaultNormal property is set to 1 or the input contains no vector array (SelectInputVectors property).
+       </Documentation>
+     </DoubleVectorProperty>
+
    <!-- End TubeFilter -->
    </SourceProxy>
 
