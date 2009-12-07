@@ -18,28 +18,6 @@
 
   <ProxyGroup name="sources">
 
-    <SourceProxy name="DelimitedTextReader" class="vtkDelimitedTextReader">
-      <StringVectorProperty name="FileName" command="SetFileName" number_of_elements="1">
-        <FileListDomain name="files"/>
-      </StringVectorProperty>
-      <StringVectorProperty name="FieldDelimiterCharacters" command="SetFieldDelimiterCharacters" number_of_elements="1" default_values=","/>
-      <IntVectorProperty name="UseStringDelimiter" command="SetUseStringDelimiter" number_of_elements="1" default_values="1"/>
-      <IntVectorProperty name="HaveHeaders" command="SetHaveHeaders" number_of_elements="1" default_values="1"/>
-      <IntVectorProperty name="MergeConsecutiveDelimiters" command="SetMergeConsecutiveDelimiters" number_of_elements="1" default_values="0"/>
-      <IntVectorProperty name="MaxRecords" command="SetMaxRecords" number_of_elements="1" default_values="0"/>
-      <IntVectorProperty name="DetectNumericColumns" command="SetDetectNumericColumns" number_of_elements="1" default_values="1"/>
-      <IntVectorProperty name="OutputPedigreeIds" command="SetOutputPedigreeIds" number_of_elements="1" label="Output Pedigree IDs" default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <IntVectorProperty name="GeneratePedigreeIds" command="SetGeneratePedigreeIds" number_of_elements="1" label="Generate Pedigree IDs" default_values="1">
-        <BooleanDomain name="bool"/>
-      </IntVectorProperty>
-      <StringVectorProperty name="PedigreeIdArrayName" command="SetPedigreeIdArrayName" number_of_elements="1" label="Pedigree ID Array Name"/> 
-      <Hints>
-        <View type="ClientTableView"/>
-      </Hints>
-    </SourceProxy>
-
     <SourceProxy name="RandomGraphSource" class="vtkRandomGraphSource">
       <IntVectorProperty name="NumberOfVertices" command="SetNumberOfVertices" number_of_elements="1" default_values="10"/>  
       <IntVectorProperty name="NumberOfEdges" command="SetNumberOfEdges" number_of_elements="1" default_values="10"/>  

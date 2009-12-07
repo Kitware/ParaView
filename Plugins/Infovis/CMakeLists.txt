@@ -46,7 +46,6 @@ ADD_PARAVIEW_PLUGIN(
     ${VTK_SOURCE_DIR}/Infovis/vtkTulipReader.h
     ${VTK_SOURCE_DIR}/Infovis/vtkXMLTreeReader.h
   GUI_RESOURCE_FILES
-    vtkDelimitedTextReader.xml
     vtkTulipReader.xml
     vtkXMLTreeReader.xml
   )
