@@ -37,6 +37,6 @@ ADD_CUSTOM_TARGET(ParaViewOnlineHelp
   COMMENT "Compiling Qt help project paraview.qhp"
 )
 
-ADD_DEPENDENCIES(ParaViewOnlineHelp
-  HTMLDocumentation
-  )
+#ADD_DEPENDENCIES(ParaViewOnlineHelp
+#  HTMLDocumentation
+#  )
