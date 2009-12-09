@@ -5307,8 +5307,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
     <InputProperty
        name="Input"
        command="AddInputConnection"
-       clean_command="RemoveAllInputs"
-       multiple_input="1">
+       clean_command="RemoveAllInputs">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
@@ -5525,8 +5524,7 @@ The Stream Tracer filter generates streamlines in a vector field from a collecti
     <InputProperty
        name="Input"
        command="AddInputConnection"
-       clean_command="RemoveAllInputs"
-       multiple_input="1">
+       clean_command="RemoveAllInputs">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
             <Group name="filters"/>
