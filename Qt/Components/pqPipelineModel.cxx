@@ -481,8 +481,17 @@ void pqPipelineModel::setSubtreeSelectable(pqServerManagerModelItem *smitem,
     smitem = port->getSource();
     }
 
-  pqPipelineModelDataItem* item = this->getDataItem(smitem,
-    &this->Internal->Root, pqPipelineModel::Proxy);
+  pqPipelineModelDataItem* item;
+  pqServer* server = qobject_cast<pqServer*>(smitem);
+  if (server)
+    {
+    item = this->getDataItem(smitem, &this->Internal->Root, pqPipelineModel::Server);
+    }
+  else
+    {
+    item = this->getDataItem(smitem,
+      &this->Internal->Root, pqPipelineModel::Proxy);
+    }
   this->setSubtreeSelectable(item, selectable);
 }
   
