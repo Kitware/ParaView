@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqUndoStack.h"
 #include "pqView.h"
+#include "pqObjectBuilder.h"
 
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -61,7 +62,9 @@ pqPipelineBrowserWidget::pqPipelineBrowserWidget(QWidget* parentObject)
   // Connect the model to the ServerManager model.
   pqServerManagerModel *smModel = 
     pqApplicationCore::instance()->getServerManagerModel();
-  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
+  pqObjectBuilder* builder = 
+    pqApplicationCore::instance()->getObjectBuilder();
+  QObject::connect(builder, SIGNAL(finishedAddingServer(pqServer*)),
     this->PipelineModel, SLOT(addServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->PipelineModel, SLOT(removeServer(pqServer*)));
