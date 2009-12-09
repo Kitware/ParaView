@@ -143,13 +143,14 @@ FUNCTION(build_paraview_client BPC_NAME)
   # If BPC_BUNDLE_ICON is set, setup the macosx bundle.
   IF (APPLE)
     IF (BPC_BUNDLE_ICON)
-      SET(apple_bundle_sources ${BPC_BUNDLE_ICON})
+      GET_FILENAME_COMPONENT(bundle_icon_file "${BPC_BUNDLE_ICON}" NAME)
+      SET(apple_bundle_sources ${bundle_icon_file})
       SET_SOURCE_FILES_PROPERTIES(
         ${BPC_BUNDLE_ICON}
         PROPERTIES
         MACOSX_PACKAGE_LOCATION Resources
         )
-      SET(MACOSX_BUNDLE_ICON_FILE ${BPC_BUNDLE_ICON})
+      SET(MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
     ENDIF (BPC_BUNDLE_ICON)
     SET(MAKE_BUNDLE MACOSX_BUNDLE)
   ENDIF (APPLE)
@@ -256,6 +257,10 @@ FUNCTION(build_paraview_client BPC_NAME)
       ${QT_QTMAIN_LIBRARY}
       ${BPC_EXTRA_DEPENDENCIES}
       )
+    if (bundle_icon_file)
+    set_target_properties(${pv_exe_name} PROPERTIES
+      MACOSX_BUNDLE_ICON_FILE ${bundle_icon_file})
+    endif (bundle_icon_file)
 
     # Add shared link forwarding executables if necessary.
     IF(PV_NEED_SHARED_FORWARD)
