@@ -330,8 +330,7 @@ GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 #########################################################################
 # PARAVIEW_PLUGINLIST is used to generate the config file distributed with
 # ParaView that lists the plugins distributed with ParaView.
-SET(PARAVIEW_PLUGINLIST ${PARAVIEW_PLUGINLIST} CACHE INTERNAL
-  "List of configured plugins")
+SET(PARAVIEW_PLUGINLIST "" CACHE INTERNAL "List of configured plugins" FORCE)
 ADD_SUBDIRECTORY(Plugins)
 
 #########################################################################
