@@ -237,6 +237,11 @@ public:
   /// returns the active server is any.
   pqServer* getActiveServer() const;
 
+  /// Called to load the configuration xml bundled with the application the
+  /// lists the plugins that the application is aware by default. If no filename
+  /// is specified, {executable-path}/.plugins is loaded.
+  void loadDistributedPlugins(const char* filename=0);
+
   /// Destructor.
   virtual ~pqApplicationCore();
 public slots:

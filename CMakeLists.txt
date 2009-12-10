@@ -328,6 +328,10 @@ SET(PARAVIEW_SMTESTDRIVER_EXECUTABLE  ${EXECUTABLE_OUTPUT_PATH}/smTestDriver${PV
 GET_TARGET_PROPERTY(PARAVIEW_PROCESS_XML_EXECUTABLE kwProcessXML LOCATION)
 
 #########################################################################
+# PARAVIEW_PLUGINLIST is used to generate the config file distributed with
+# ParaView that lists the plugins distributed with ParaView.
+SET(PARAVIEW_PLUGINLIST ${PARAVIEW_PLUGINLIST} CACHE INTERNAL
+  "List of configured plugins")
 ADD_SUBDIRECTORY(Plugins)
 
 #########################################################################
@@ -338,19 +342,6 @@ IF (PARAVIEW_BUILD_QT_GUI)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 ####################################################################################
-# Generate a list of configured plugins for use by external projects
-# This must happen AFTER Application, but before creating ParaViewConfig.cmake
-
-SET(PARAVIEW_PLUGIN_CONFIG_FILE "${ParaView_BINARY_DIR}/ParaViewPluginConfig.cmake")
-FILE(WRITE ${PARAVIEW_PLUGIN_CONFIG_FILE} "")
-FOREACH(PLUGIN ${PARAVIEW_PLUGIN_CONFIG_LIST})
-  IF(PARAVIEW_BUILD_PLUGIN_${PLUGIN})
-    FILE(APPEND ${PARAVIEW_PLUGIN_CONFIG_FILE} "SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} \"ON\")\n")
-  ELSE()
-    FILE(APPEND ${PARAVIEW_PLUGIN_CONFIG_FILE} "SET(PARAVIEW_BUILD_PLUGIN_${PLUGIN} \"OFF\")\n")
-  ENDIF()
-ENDFOREACH(PLUGIN)
-
 # The ParaView library dependencies.
 SET(PARAVIEW_LIBRARY_DEPENDS_FILE
   "${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake")

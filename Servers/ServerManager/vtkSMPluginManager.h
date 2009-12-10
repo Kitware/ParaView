@@ -21,12 +21,14 @@
 #define __vtkSMPluginManager_h
 
 #include "vtkSMObject.h"
+#include "vtkStdString.h" // needed for vtkStdString;
 
 class vtkSMPluginProxy;
 class vtkPVPluginInformation;
 class vtkPVPluginLoader;
 class vtkStringArray;
 class vtkIntArray;
+class vtkStdString;
 
 class VTK_EXPORT vtkSMPluginManager : public vtkSMObject
 {
@@ -34,6 +36,16 @@ public:
   static vtkSMPluginManager* New();
   vtkTypeRevisionMacro(vtkSMPluginManager, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Called to load application-specific configuration xml.
+  void LoadPluginConfigurationXML(const char* filename);
+
+  // Description:
+  // Given the name for a plugin, tries to locate the shared library for it in
+  // the standard locations. Returns NULL on failure, otherwise the full path to
+  // the shared library is returned.
+  vtkStdString LocatePlugin(const char* pluginname);
   
   // Description:
   // Method to load a plugin in server manager.

@@ -20,10 +20,13 @@
 #include "vtkProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVEnvironmentInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkPVPlugin.h"
 #include "vtkPVPluginInformation.h"
 #include "vtkPVPluginLoader.h"
 #include "vtkPVPythonModule.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMPluginProxy.h"
 #include "vtkSMPropertyHelper.h"
@@ -33,29 +36,24 @@
 #include "vtkSMXMLParser.h"
 #include "vtkStringArray.h"
 
+#include <vtksys/SystemTools.hxx>
+#include <vtksys/ios/sstream>
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
 
+#define vtkPVPluginLoaderDebugMacro(x)\
+{ if (debug_plugin) {\
+  vtksys_ios::ostringstream vtkerror;\
+  vtkerror << x;\
+  vtkOutputWindowDisplayText(vtkerror.str().c_str());} }
+
 class vtkSMPluginManager::vtkSMPluginManagerInternals
 {
 public:
-  vtkSMPluginManagerInternals(){}
-  ~vtkSMPluginManagerInternals()
-  {
-    for(ServerPluginsMap::iterator it = this->Server2PluginsMap.begin();
-      it != this->Server2PluginsMap.end(); it++)
-      {
-      for(int i=0; i<(int)(it->second.size()) ; i++)
-        {
-        if(it->second[i])
-          {
-          it->second[i]->Delete();
-          }
-        }
-      }
-  }
-  typedef vtkstd::map<vtkstd::string, vtkstd::vector<vtkPVPluginInformation* > >ServerPluginsMap;
+  typedef vtkstd::vector<vtkSmartPointer<vtkPVPluginInformation> >
+    VectorOfPluginInformation;
+  typedef vtkstd::map<vtkstd::string, VectorOfPluginInformation> ServerPluginsMap;
   typedef vtkstd::map<vtkstd::string, vtkstd::string>ServerSearchPathsMap;
   ServerPluginsMap Server2PluginsMap;
   ServerSearchPathsMap Server2SearchPathsMap;
@@ -77,7 +75,7 @@ static void vtkSMPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.8");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.9");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -90,6 +88,116 @@ vtkSMPluginManager::vtkSMPluginManager()
 vtkSMPluginManager::~vtkSMPluginManager()
 { 
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPluginManager::LoadPluginConfigurationXML(const char* filename)
+{
+  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
+  vtkPVPluginLoaderDebugMacro("Loading plugin configuration xml: " << filename);
+  if (!vtksys::SystemTools::FileExists(filename, true))
+    {
+    vtkPVPluginLoaderDebugMacro("Failed to located configuration xml. "
+      "Could not populate the list of plugins distributed with application.");
+    return;
+    }
+
+  vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
+  parser->SetFileName(filename);
+  parser->SuppressErrorMessagesOn();
+  if (!parser->Parse())
+    {
+    vtkPVPluginLoaderDebugMacro("Configuration file not a valid xml.");
+    return;
+    }
+
+  vtkPVXMLElement* root = parser->GetRootElement();
+  if (strcmp(root->GetName(), "Plugins") != 0)
+    {
+    vtkPVPluginLoaderDebugMacro("Root element in the xml must be <Plugins/>. "
+      "Got " << root->GetName());
+    return;
+    }
+
+  for (unsigned int cc=0; cc < root->GetNumberOfNestedElements(); cc++)
+    {
+    vtkPVXMLElement* child = root->GetNestedElement(cc);
+    if (child && child->GetName() && strcmp(child->GetName(), "Plugin") == 0)
+      {
+      const char* name=child->GetAttribute("name");
+      int auto_load;
+      if (!name || !child->GetScalarAttribute("auto_load", &auto_load))
+        {
+        vtkPVPluginLoaderDebugMacro(
+          "Missing required attribute name or auto_load. Skipping element.");
+        continue;
+        }
+      vtkPVPluginLoaderDebugMacro("Trying to locate plugin with name: "
+        << name);
+      vtkstd::string plugin_filename = this->LocatePlugin(name);
+      if (plugin_filename == "")
+        {
+        int required = 0;
+        child->GetScalarAttribute("required", &required);
+        if (required)
+          {
+          vtkErrorMacro(
+            "Failed to locate required plugin: " << name << "\n"
+            "Application may not work exactly as expected.");
+          }
+        vtkPVPluginLoaderDebugMacro("Failed to locate file plugin: "
+          << name);
+        continue;
+        }
+      vtkPVPluginLoaderDebugMacro("--- Found " << plugin_filename);
+      vtkPVPluginInformation* info = vtkPVPluginInformation::New();
+      info->SetPluginName(name);
+      info->SetFileName(plugin_filename.c_str());
+      info->SetLoaded(0);
+      info->SetAutoLoad(auto_load);
+      info->SetServerURI("builtin:");
+      this->UpdatePluginMap("builtin:", info);
+      this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, info);
+      info->Delete();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkStdString vtkSMPluginManager::LocatePlugin(const char* plugin)
+{
+  vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
+  vtkstd::string app_dir = options->GetApplicationPath();
+  app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
+
+
+  vtkstd::vector<vtkstd::string> paths_to_search;
+  paths_to_search.push_back(app_dir);
+  paths_to_search.push_back(app_dir + "/plugins/" + plugin);
+#if defined(Q_WS_MAC)
+  paths_to_search.push_back(app_dir + "/../Plugins");
+  paths_to_search.push_back(app_dir + "/../../..");
+#endif
+
+  vtkstd::string name = plugin;
+  vtkstd::string filename;
+#if defined(Q_WS_WIN)
+  filename = name + ".dll";
+#elif defined(Q_WS_MAC)
+  filename = "lib" + name + ".dylib";
+#else
+  filename = "lib" + name + ".so";
+#endif
+  for (size_t cc=0; cc < paths_to_search.size(); cc++)
+    {
+    vtkstd::string path = paths_to_search[cc];
+    if (vtksys::SystemTools::FileExists(
+        (path + "/" + filename).c_str(), true))
+      {
+      return (path + "/" + filename);
+      }
+    }
+  return vtkStdString();
 }
 
 //-----------------------------------------------------------------------------
@@ -128,6 +236,7 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadLocalPlugin(const char* filename
     
   this->UpdatePluginMap(serverURI, localInfo);   
   this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, localInfo);
+  localInfo->Delete();
 
   return localInfo;
 }
@@ -180,6 +289,7 @@ vtkPVPluginInformation* vtkSMPluginManager::LoadPlugin(
       localInfo->SetError(loadError.c_str());
       }
     this->UpdatePluginMap(serverURI, localInfo);
+    localInfo->Delete();
     pxy->UnRegister(NULL);
     this->InvokeEvent(vtkSMPluginManager::LoadPluginInvoked, localInfo);
     pluginInfo = localInfo;
@@ -204,7 +314,7 @@ void vtkSMPluginManager::RemovePlugin(
     if(filename && *filename)
       {
       bool found = false;
-      vtkstd::vector<vtkPVPluginInformation* >::iterator infoIt = 
+      vtkSMPluginManagerInternals::VectorOfPluginInformation::iterator infoIt = 
         it->second.begin();
       for(; infoIt != it->second.end(); infoIt++)
         {

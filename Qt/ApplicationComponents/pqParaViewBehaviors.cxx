@@ -63,6 +63,9 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   // * adds support for standard paraview views.
   pgm->addInterface(new pqStandardViewModules(pgm));
 
+  // Load plugins distributed with application.
+  pqApplicationCore::instance()->loadDistributedPlugins();
+
   // Define application behaviors.
   new pqDataTimeStepBehavior(this);
   new pqViewFrameActionsBehavior(this);

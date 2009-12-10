@@ -76,8 +76,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSMApplication.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMGlobalPropertiesManager.h"
+#include "vtkSMPluginManager.h"
 #include "vtkSMProperty.h"
 #include "vtkSMPropertyHelper.h"
 #include "vtkSMPropertyIterator.h"
@@ -719,4 +721,17 @@ pqTestUtility* pqApplicationCore::testUtility()
     this->TestUtility = new pqCoreTestUtility(this);
     }
   return this->TestUtility;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadDistributedPlugins(const char* filename)
+{
+  QString config_file = filename;
+  if (!filename)
+    {
+    config_file = QApplication::applicationDirPath() +  "/.plugins";
+    }
+
+  vtkSMApplication::GetApplication()->GetPluginManager()->LoadPluginConfigurationXML(
+    config_file.toStdString().c_str());
 }
