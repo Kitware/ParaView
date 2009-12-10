@@ -481,10 +481,8 @@ void pqPluginManager::onServerConnected(pqServer* server)
   this->Internal->NeedUpdatePluginInfo = false;
   this->Internal->IsCurrentServerRemote = 
     server && server->isRemote() ? true : false;
-  if(this->Internal->Extensions.size()==0)
-    {
-    this->addPluginFromSettings();
-    }  
+
+  this->addPluginFromSettings();
   this->loadAutoLoadPlugins(server);
   this->loadExtensions(server);
   if(this->Internal->NeedUpdatePluginInfo)
@@ -811,15 +809,22 @@ void pqPluginManager::processPluginSettings(QString& plSettingKey)
     int autoLoad = rx.cap(3).toInt();
     QString pluginName = rx.cap(4);
     QString pluginVersion = rx.cap(5);
-    if(!this->getExistingExtensionByFileName(serverURI, fileName))
+    vtkSmartPointer<vtkPVPluginInformation> pluginInfo = 
+      this->getExistingExtensionByFileName(serverURI, fileName);
+    if (!pluginInfo.GetPointer())
       {
-      VTK_CREATE(vtkPVPluginInformation, pluginInfo);
+      pluginInfo = vtkSmartPointer<vtkPVPluginInformation>::New();
       pluginInfo->SetServerURI(serverURI.toAscii().constData());
       pluginInfo->SetFileName(fileName.toAscii().constData());
-      pluginInfo->SetAutoLoad(autoLoad>0 ? 1 : 0);
       pluginInfo->SetPluginName(pluginName.toAscii().constData());
       pluginInfo->SetPluginVersion(pluginVersion.toAscii().constData());
       this->addExtension(pluginInfo->GetServerURI(), pluginInfo);
+      }
+    else
+      {
+      pluginInfo->SetPluginName(pluginName.toAscii().constData());
+      pluginInfo->SetPluginVersion(pluginVersion.toAscii().constData());
+      pluginInfo->SetAutoLoad(autoLoad>0 ? 1 : 0);
       }
     } 
 }
