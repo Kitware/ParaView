@@ -2,13 +2,14 @@ INCLUDE_DIRECTORIES(${PARAVIEW_INCLUDE_DIRS}
                     ${VTK_INCLUDE_DIR})
 
 SET(COSMO_FILTERS_SOURCES
-    vtkCosmoHaloCountFilter.cxx
-    vtkCosmoHaloClassFilter.cxx
+#    vtkCosmoHaloCountFilter.cxx
+#    vtkCosmoHaloClassFilter.cxx
     vtkCosmoHaloFinder.cxx 
-    vtkCosmoDistillerSTD.cxx
-    vtkCosmoHaloSorter.cxx
-    vtkCosmoCorrelater.cxx
-    vtkCosmoDistillerVTU.cxx)
+#    vtkCosmoDistillerSTD.cxx
+#    vtkCosmoHaloSorter.cxx
+#    vtkCosmoCorrelater.cxx
+#    vtkCosmoDistillerVTU.cxx
+)
 
 SET(SERVER_ARGS
     SERVER_MANAGER_XML CosmoFilters.xml
@@ -26,20 +27,21 @@ IF(PARAVIEW_BUILD_QT_GUI)
                           ${pqComponents_BINARY_DIR}
                           ${pqComponents_SOURCE_DIR})
 
-      QT4_WRAP_CPP(MOC_SRCS HaloClassPanel.h)
+#      QT4_WRAP_CPP(MOC_SRCS HaloClassPanel.h)
 
-      ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS
-                                CLASS_NAME HaloClassPanel
-                                XML_NAME HaloClass
-                                XML_GROUP filters)
+#      ADD_PARAVIEW_OBJECT_PANEL(IFACES IFACE_SRCS
+#                                CLASS_NAME HaloClassPanel
+#                                XML_NAME HaloClass
+#                                XML_GROUP filters)
 
       SET(CLIENT_ARGS
           GUI_INTERFACES ${IFACES}
           GUI_RESOURCE_FILES CosmoFiltersResources.xml
-          SOURCES ${MOC_SRCS}
-                  ${IFACE_SRCS}
-                  HaloClassPanel.h
-                  HaloClassPanel.cxx)
+          SOURCES ${IFACE_SRCS}
+                  ${MOC_SRCS}
+#                  HaloClassPanel.h
+#                  HaloClassPanel.cxx
+      )
 
     ENDIF(QT4_FOUND)
 ENDIF(PARAVIEW_BUILD_QT_GUI)

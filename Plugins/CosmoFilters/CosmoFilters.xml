@@ -35,18 +35,6 @@
         </Documentation>
      </StringVectorProperty>
      
-     <!--
-     <IntVectorProperty 
-        name="np" 
-        command="Setnp" 
-        number_of_elements="1"
-        default_values="256" > 
-       <Documentation>
-         Number of particles seeded in each dimension of the original simulation app.
-       </Documentation>
-     </IntVectorProperty>
-     -->
-
      <IntVectorProperty 
         name="pmin" 
         command="Setpmin" 
@@ -83,9 +71,9 @@
        <Documentation>
        </Documentation>
      </IntVectorProperty>
-   <!-- End HaloFinder -->
    </SourceProxy>
-   
+
+<!--   
    <SourceProxy name="HaloClass" class="vtkCosmoHaloClassFilter" label="Cosmology Halo Classification">
      <InputProperty
         name="Input"
@@ -127,12 +115,6 @@
         number_of_elements_per_command="1"
         use_index="1"
         animateable="1">
-          <!--ArrayRangeDomain name="scalar_range">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-               <Property name="SelectInputScalars" function="ArraySelection"/>
-            </RequiredProperties>
-          </ArrayRangeDomain-->
           <Documentation>
             This property specifies the bound values between halo classes.
           </Documentation>
@@ -140,7 +122,6 @@
      <Hints>
        <Visibility replace_input="2" />
      </Hints>
-   <!-- End HaloClass -->
    </SourceProxy>
    
    <SourceProxy name="HaloCount" class="vtkCosmoHaloCountFilter" label="Number of Halos Over Time">
@@ -155,7 +136,6 @@
             <DataType value="vtkUnstructuredGrid"/>
           </DataTypeDomain>
      </InputProperty>
-   <!-- End HaloCount -->
    </SourceProxy>
    
    <SourceProxy name="CosmoDistiller" class="vtkCosmoDistillerSTD"
@@ -229,7 +209,6 @@
             This property specifies the name of the scalar array which will be distilled.
           </Documentation>
      </StringVectorProperty>
-   <!-- End CosmoDistiller -->
    </SourceProxy>
 
    <SourceProxy name="CosmoHaloSorter" class="vtkCosmoHaloSorter"
@@ -280,7 +259,6 @@
          When set, the halos are sorted descendingly, otherwise ascendingly.
        </Documentation>
      </IntVectorProperty>
-  <!-- End CosmoHaloSorter -->
   </SourceProxy>
   
    <SourceProxy name="CosmoNDF" class="vtkCosmoCorrelater" label="Cosmology Number of Direct Friends">
@@ -351,8 +329,8 @@
           Set the field name of NDF data.
         </Documentation>
      </StringVectorProperty>
-   <!-- End NDF -->
    </SourceProxy>
+   
    <SourceProxy name="CosmoWrapAround" class="vtkCosmoDistillerVTU" label="Cosmology Wrap-Around Translate">
      <InputProperty
         name="Input"
@@ -401,7 +379,8 @@
          The Z-coordinate of the new origin.
        </Documentation>
      </DoubleVectorProperty>
-   <!-- End NDF -->
    </SourceProxy>
+-->
+
  </ProxyGroup>
 </ServerManagerConfiguration>
