@@ -818,6 +818,7 @@ void pqPluginManager::processPluginSettings(QString& plSettingKey)
       pluginInfo->SetFileName(fileName.toAscii().constData());
       pluginInfo->SetPluginName(pluginName.toAscii().constData());
       pluginInfo->SetPluginVersion(pluginVersion.toAscii().constData());
+      pluginInfo->SetAutoLoad(autoLoad>0 ? 1 : 0);
       this->addExtension(pluginInfo->GetServerURI(), pluginInfo);
       }
     else
