@@ -1194,6 +1194,14 @@ void pqPipelineModel::updateVisibility(pqPipelineSource* source)
   if (item)
     {
     item->updateVisibilityIcon(this->View, false);
+    foreach (pqPipelineModelDataItem* child, item->Children)
+      {
+      if (child->Type == Port)
+        {
+        child->updateVisibilityIcon(this->View, false);
+        }
+      }
+
     foreach (pqPipelineModelDataItem* link, item->Links)
       {
       link->updateVisibilityIcon(this->View, false);
