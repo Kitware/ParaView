@@ -730,6 +730,10 @@ void pqApplicationCore::loadDistributedPlugins(const char* filename)
   if (!filename)
     {
     config_file = QApplication::applicationDirPath() +  "/.plugins";
+#if defined(__APPLE__)
+    config_file =  QApplication::applicationDirPath() + "/../../../.plugins";
+    // FIXME: locating the .plugins in the installed .app bundle.
+#endif
     }
 
   vtkSMApplication::GetApplication()->GetPluginManager()->LoadPluginConfigurationXML(

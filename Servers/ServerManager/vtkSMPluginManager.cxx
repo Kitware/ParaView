@@ -75,7 +75,7 @@ static void vtkSMPluginManagerImportPlugin(vtkPVPlugin* plugin, void* calldata)
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMPluginManager);
-vtkCxxRevisionMacro(vtkSMPluginManager, "1.9");
+vtkCxxRevisionMacro(vtkSMPluginManager, "1.10");
 //---------------------------------------------------------------------------
 vtkSMPluginManager::vtkSMPluginManager()
 {
@@ -166,6 +166,7 @@ void vtkSMPluginManager::LoadPluginConfigurationXML(const char* filename)
 //-----------------------------------------------------------------------------
 vtkStdString vtkSMPluginManager::LocatePlugin(const char* plugin)
 {
+  bool debug_plugin = vtksys::SystemTools::GetEnv("PV_PLUGIN_DEBUG") != NULL;
   vtkPVOptions* options = vtkProcessModule::GetProcessModule()->GetOptions();
   vtkstd::string app_dir = options->GetApplicationPath();
   app_dir = vtksys::SystemTools::GetProgramPath(app_dir.c_str());
@@ -174,16 +175,16 @@ vtkStdString vtkSMPluginManager::LocatePlugin(const char* plugin)
   vtkstd::vector<vtkstd::string> paths_to_search;
   paths_to_search.push_back(app_dir);
   paths_to_search.push_back(app_dir + "/plugins/" + plugin);
-#if defined(Q_WS_MAC)
+#if defined(__APPLE__)
   paths_to_search.push_back(app_dir + "/../Plugins");
   paths_to_search.push_back(app_dir + "/../../..");
 #endif
 
   vtkstd::string name = plugin;
   vtkstd::string filename;
-#if defined(Q_WS_WIN)
+#if defined(_WIN32) && !defined(__CYGWIN__)
   filename = name + ".dll";
-#elif defined(Q_WS_MAC)
+#elif defined(__APPLE__)
   filename = "lib" + name + ".dylib";
 #else
   filename = "lib" + name + ".so";
@@ -196,6 +197,8 @@ vtkStdString vtkSMPluginManager::LocatePlugin(const char* plugin)
       {
       return (path + "/" + filename);
       }
+    vtkPVPluginLoaderDebugMacro(
+      (path + "/" + filename).c_str() << "-- not found");
     }
   return vtkStdString();
 }
