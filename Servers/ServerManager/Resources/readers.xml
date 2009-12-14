@@ -1858,20 +1858,9 @@
      <!-- End TecplotReaderCore-->
    </SourceProxy>
 
-    <!-- End of "internal_sources" -->
-  </ProxyGroup>
-
-  <ProxyGroup name="sources">
-   <SourceProxy name="CosmoReader" 
-                class="vtkCosmoReader"
+   <SourceProxy name="CosmoReaderCore" 
+                class="vtkPCosmoReader"
                 label="COSMO Reader">
-     <Documentation
-       short_help="Read a cosmology file."
-       long_help="Read a cosmology file into a vtkUnstructuredGrid.">
-       The Cosmology reader reads a binary file of particle location, 
-       velocity and mass creating a vtkUnstructuredGrid. The default 
-       file extension is .cosmo.
-     </Documentation>
 
      <StringVectorProperty
         name="FileName"
@@ -1891,27 +1880,6 @@
         default_values="1" >
         <IntRangeDomain name="range" min="1" />
      </IntVectorProperty>
-
-     <IntVectorProperty
-        name="DefaultRangeInfo"
-        command="GetPositionRange"
-        information_only="1">
-        <SimpleIntInformationHelper/>
-     </IntVectorProperty>
-
-     <!--
-     <IntVectorProperty
-        name="PositionRange"
-        command="SetPositionRange"
-        number_of_elements="2"
-        default_values="0 0">
-        <IntRangeDomain name="range">
-             <RequiredProperties>
-                 <Property name="DefaultRangeInfo" function="Range"/>
-             </RequiredProperties>
-        </IntRangeDomain>
-     </IntVectorProperty>
-     -->
 
      <StringVectorProperty
         name="PointArrayInfo"
@@ -1956,12 +1924,72 @@
          If this property is false, then 32-bit tags are used for the tag field.  Otherwise, 64-bit tags are used.
        </Documentation>
      </IntVectorProperty>
+   <!-- End CosmoReaderCore -->
+   </SourceProxy>
+
+    <!-- End of "internal_sources" -->
+  </ProxyGroup>
+
+  <ProxyGroup name="sources">
+   <FileSeriesReaderProxy name="CosmoReader"
+                          class="vtkFileSeriesReader"
+                          label="COSMO Reader"
+                          file_name_method="SetFileName">
+     <Documentation
+       short_help="Read a cosmology file."
+       long_help="Read a cosmology file into a vtkUnstructuredGrid.">
+       The Cosmology reader reads a binary file of particle location, 
+       velocity and mass creating a vtkUnstructuredGrid. The default 
+       file extension is .cosmo.
+     </Documentation>
+
+     <SubProxy>
+       <Proxy name="Reader"
+              proxygroup="internal_sources"
+              proxyname="CosmoReaderCore">
+       </Proxy>
+       <ExposedProperties>
+         <Property name="Stride" />
+         <Property name="PointArrayInfo" />
+         <Property name="PointArrayStatus" />
+         <Property name="MakeCells" />
+         <Property name="TagSize" />
+       </ExposedProperties>
+     </SubProxy>
+
+     <StringVectorProperty name="FileNameInfo"
+        command="GetCurrentFileName"
+        information_only="1" >
+        <SimpleStringInformationHelper />
+     </StringVectorProperty>
+
+     <StringVectorProperty name="FileName"
+                           clean_command="RemoveAllFileNames"
+                           command="AddFileName"
+                           animateable="0"
+                           number_of_elements="0" 
+                           repeat_command="1"
+                           information_property="FileNameInfo" >
+       <FileListDomain name="files"/>
+       <Documentation>
+         The list of files to be read by the reader.
+       </Documentation>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty name="TimestepValues"
+                           repeatable="1"
+                           information_only="1">
+       <TimeStepsInformationHelper/>
+       <Documentation>
+         Available timestep values.
+       </Documentation>
+     </DoubleVectorProperty>
 
      <Hints>
        <ReaderFactory extensions="cosmo" file_description="Cosmology files" />
      </Hints>
    <!-- End CosmoReader -->
-   </SourceProxy>
+   </FileSeriesReaderProxy> 
 
    <SourceProxy name="DEMReader" 
                 class="vtkDEMReader"
