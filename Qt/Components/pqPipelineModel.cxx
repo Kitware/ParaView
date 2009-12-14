@@ -1216,9 +1216,11 @@ void pqPipelineModel::updateData(pqServerManagerModelItem* source)
     &this->Internal->Root, pqPipelineModel::Proxy);
   if (item)
     {
+    item->updateVisibilityIcon(this->View, false);
     this->itemDataChanged(item);
     foreach (pqPipelineModelDataItem* link, item->Links)
       {
+      item->updateVisibilityIcon(this->View, false);
       this->itemDataChanged(link);
       }
     }
