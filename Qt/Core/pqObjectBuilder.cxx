@@ -369,7 +369,8 @@ pqView* pqObjectBuilder::createView(const QString& type,
 
   if (!proxy)
     {
-    qDebug() << "Failed to create a proxy for the requested view type.";
+    qDebug() << "Failed to create a proxy for the requested view type:"
+             << type;
     return NULL;
     }
 
@@ -391,8 +392,8 @@ pqView* pqObjectBuilder::createView(const QString& type,
     }
   else
     {
-    qDebug() << "Cannot locate the pqView for the " 
-      << "view module proxy.";
+    qDebug() << "Cannot locate the pqView for the view module proxy:"
+             << name << "of type" << type;
     }
 
   return view;
