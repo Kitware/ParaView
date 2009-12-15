@@ -288,6 +288,7 @@ void AnnotationManagerPanel::onSelectButtonPressed()
     return;
     }
 
+  this->annotationsChanged();
   vtkAnnotationLink* link = static_cast<vtkAnnotationLink*>(this->Implementation->AnnotationLink->GetClientSideObject());
   vtkAnnotationLayers* annotations = link->GetAnnotationLayers();
   vtkSmartPointer<vtkSelection> s = vtkSmartPointer<vtkSelection>::New(); 
