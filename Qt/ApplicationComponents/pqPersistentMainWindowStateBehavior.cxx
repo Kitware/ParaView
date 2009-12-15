@@ -52,6 +52,8 @@ pqPersistentMainWindowStateBehavior::pqPersistentMainWindowStateBehavior(
   // as a consequence of loading of the configuration files will have their
   // state restored as well.
   QTimer::singleShot(10, this, SLOT(restoreState()));
+
+  this->restoreState();
 }
 
 //-----------------------------------------------------------------------------

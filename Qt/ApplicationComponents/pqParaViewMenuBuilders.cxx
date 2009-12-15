@@ -278,9 +278,6 @@ void pqParaViewMenuBuilders::buildHelpMenu(QMenu& menu)
 //-----------------------------------------------------------------------------
 void pqParaViewMenuBuilders::buildToolbars(QMainWindow& mainWindow)
 {
-  // So that on Mac the icons don't appear too big.
-  mainWindow.setIconSize(QSize(24, 24));
-
   QToolBar* mainToolBar = new pqMainControlsToolbar(&mainWindow)
     << pqSetName("MainControlsToolbar");
   mainToolBar->layout()->setSpacing(0);

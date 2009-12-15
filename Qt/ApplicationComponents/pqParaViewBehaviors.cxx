@@ -75,12 +75,12 @@ pqParaViewBehaviors::pqParaViewBehaviors(
   new pqPVNewSourceBehavior(this);
   new pqDeleteBehavior(this);
   new pqUndoRedoBehavior(this);
-  new pqPersistentMainWindowStateBehavior(mainWindow);
   new pqCrashRecoveryBehavior(this);
   new pqAutoLoadPluginXMLBehavior(this);
   new pqPluginDockWidgetsBehavior(mainWindow);
   new pqPluginActionGroupBehavior(mainWindow);
   new pqCommandLineOptionsBehavior(this);
+  new pqPersistentMainWindowStateBehavior(mainWindow);
 
   // Setup quick-launch shortcuts.
   QShortcut *ctrlSpace = new QShortcut(Qt::CTRL + Qt::Key_Space,
