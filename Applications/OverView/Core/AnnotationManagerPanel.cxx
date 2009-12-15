@@ -225,9 +225,12 @@ void AnnotationManagerPanel::onUpButtonPressed()
   QModelIndexList indexes = model->selectedIndexes();
   if(indexes.size()==0)
     return;
+  int removedRow = indexes[0].row();
+  if(removedRow == 0)
+    return;
   vtkSmartPointer<vtkAnnotationLayers> newAnnotations = vtkSmartPointer<vtkAnnotationLayers>::New();
   vtkSmartPointer<vtkAnnotation> a = vtkSmartPointer<vtkAnnotation>::New();
-  int removedRow = indexes[0].row();
+
   a->DeepCopy(annotations->GetAnnotation(removedRow));
   annotations->RemoveAnnotation(annotations->GetAnnotation(removedRow));
   for(int i=0; i<removedRow-1; ++i)
@@ -235,10 +238,11 @@ void AnnotationManagerPanel::onUpButtonPressed()
     newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
     }
   newAnnotations->AddAnnotation(a);
-  for(int i=removedRow; i<annotations->GetNumberOfAnnotations(); ++i)
+  for(int i=removedRow-1; i<annotations->GetNumberOfAnnotations(); ++i)
     {
     newAnnotations->AddAnnotation(annotations->GetAnnotation(i)); 
     }
+  link->SetAnnotationLayers(newAnnotations);
   this->getAnnotationLink()->MarkModified(0);
 }
 
@@ -256,12 +260,24 @@ void AnnotationManagerPanel::onDownButtonPressed()
   QModelIndexList indexes = model->selectedIndexes();
   if(indexes.size()==0)
     return;
-  vtkAnnotation* a = annotations->GetAnnotation(indexes[0].row());
-  vtkSmartPointer<vtkAnnotation> na = vtkSmartPointer<vtkAnnotation>::New();
-  na->DeepCopy(a);
-  annotations->RemoveAnnotation(a);
-  annotations->AddAnnotation(na);
+  int removedRow = indexes[0].row();
+  if(removedRow == annotations->GetNumberOfAnnotations()-1)
+    return;
+  vtkSmartPointer<vtkAnnotationLayers> newAnnotations = vtkSmartPointer<vtkAnnotationLayers>::New();
+  vtkSmartPointer<vtkAnnotation> a = vtkSmartPointer<vtkAnnotation>::New();
 
+  a->DeepCopy(annotations->GetAnnotation(removedRow));
+  annotations->RemoveAnnotation(annotations->GetAnnotation(removedRow));
+  for(int i=0; i<removedRow+1; ++i)
+    {
+    newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
+    }
+  newAnnotations->AddAnnotation(a);
+  for(int i=removedRow+1; i<annotations->GetNumberOfAnnotations(); ++i)
+    {
+    newAnnotations->AddAnnotation(annotations->GetAnnotation(i));
+    }
+  link->SetAnnotationLayers(newAnnotations);
   this->getAnnotationLink()->MarkModified(0);
 }
 
