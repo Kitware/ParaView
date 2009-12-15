@@ -257,7 +257,7 @@ FUNCTION(build_paraview_client BPC_NAME)
       )
   ENDIF (BPC_MAKE_INITIALIZER_LIBRARY)
 
-  SET (PV_EXE_LIST ${pv_exe_name})
+  SET (PV_EXE_LIST ${BPC_NAME})
 
   # needed to set up shared forwarding correctly.
   ADD_EXECUTABLE(${pv_exe_name} WIN32 ${MAKE_BUNDLE}
