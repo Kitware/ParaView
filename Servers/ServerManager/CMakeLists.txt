@@ -214,7 +214,6 @@ SET(Kit_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
-  vtkSMXYPlotRepresentationProxy.cxx
   vtkSMDataSourceProxy.cxx
   )
 
