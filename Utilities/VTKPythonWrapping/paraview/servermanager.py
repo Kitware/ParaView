@@ -2486,11 +2486,10 @@ def createModule(groupName, mdl=None):
     for i in range(numProxies):
         proxyName = pxm.GetXMLProxyName(groupName, i)
         proto = pxm.GetPrototypeProxy(groupName, proxyName)
-        if paraview.compatibility.GetVersion() >= 3.5:
-            if proto.GetXMLLabel():
-                pname = proto.GetXMLLabel()
-        else:
-            pname = proxyName
+        pname = proxyName
+        if paraview.compatibility.GetVersion() >= 3.5 and\
+           proto.GetXMLLabel():
+            pname = proto.GetXMLLabel()
         pname = _make_name_valid(pname)
         if not pname:
             continue
