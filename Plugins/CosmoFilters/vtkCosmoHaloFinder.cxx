@@ -89,7 +89,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.9");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.10");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ vtkCosmoHaloFinder::~vtkCosmoHaloFinder()
 }
 
 /****************************************************************************/
-int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
+int vtkCosmoHaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
                                     vtkInformationVector** inputVector,
                                     vtkInformationVector* outputVector)
 {
