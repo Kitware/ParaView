@@ -107,21 +107,25 @@ public:
   // Subclasses override this method to do the appropriate action.
   // On SelfConnection, the undo set is stored locally, while on
   // remote server connection, the undo set is sent to the server.
-  virtual void PushUndo(const char* label, vtkPVXMLElement* root) =0;
+  // OBSOLETE: Will be deprecated soon.
+  virtual void PushUndo(const char* vtkNotUsed(label),
+    vtkPVXMLElement* vtkNotUsed(root)){}
 
   // Description:
   // Get the next undo  xml from this connection.
   // This method allocates  a new vtkPVXMLElement. It is the responsibility 
   // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
-  virtual vtkPVXMLElement* NewNextUndo()=0;
+  // OBSOLETE: Will be deprecated soon.
+  virtual vtkPVXMLElement* NewNextUndo(){return 0;}
  
   // Description:
   // Get the next redo  xml from this connection.
   // This method allocates  a new vtkPVXMLElement. It is the responsibility 
   // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
-  virtual vtkPVXMLElement* NewNextRedo()=0;
+  // OBSOLETE: Will be deprecated soon.
+  virtual vtkPVXMLElement* NewNextRedo(){return 0;}
 
   // Description:
   // Get the progress handler for this connection.

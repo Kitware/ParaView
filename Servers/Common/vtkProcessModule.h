@@ -49,6 +49,7 @@ class vtkRemoteConnection;
 class vtkSocketController;
 class vtkStringList;
 class vtkTimerLog;
+class vtkSocket;
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
@@ -602,6 +603,20 @@ public:
   // invoked once the process module is created. This is generally necessary for
   // plugins.
   static void InitializeInterpreter(InterpreterInitializationCallback callback);
+
+  // Description:
+  // Add a socket to be managed. conn is the connection is any, 
+  // associated with the socket.
+  // INTENDED FOR SPECIALIST USE ONLY. IF YOU ARE WONDERING WHAT DOES METHOD
+  // DOES THEN YOU SHOULDN'T BE USING THIS METHOD.
+  void AddManagedSocket(vtkSocket* soc, vtkProcessModuleConnection* conn);
+
+  // Description:
+  // Remove a socket from being managed.
+  // INTENDED FOR SPECIALIST USE ONLY. IF YOU ARE WONDERING WHAT DOES METHOD
+  // DOES THEN YOU SHOULDN'T BE USING THIS METHOD.
+  void RemoveManagedSocket(vtkSocket* soc);
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();

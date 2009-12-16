@@ -325,10 +325,6 @@ public:
   // a remote server connection with separate socket connections
   // for data server and render server.
   int GetRenderClientMode(vtkIdType cid);
-//ETX
-protected:
-  vtkProcessModuleConnectionManager();
-  ~vtkProcessModuleConnectionManager();
 
   // Description:
   // Add a socket to be managed. conn is the connection is any,
@@ -344,11 +340,15 @@ protected:
   // active on that socket.
   vtkProcessModuleConnection* GetManagedConnection(vtkSocket* soc);
 
+//ETX
+protected:
+  vtkProcessModuleConnectionManager();
+  ~vtkProcessModuleConnectionManager();
+
   // Description:
   // Instantiates a vtkRemoteConnection() subclass.
   // The actual class instantiated depends on this->ClientMode.
   vtkRemoteConnection* NewRemoteConnection();
-
 
   // Description:
   // Internal method to create a connection from a client socket
