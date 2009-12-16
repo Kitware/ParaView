@@ -182,39 +182,17 @@ bool vtkSMReaderFactory::vtkInternals::vtkValue::CanReadFile(
     return true;
     }
 
-  // Assume that it can read the file (based on extension match)
-  // if CanReadFile does not exist.
-  int canRead = 1;
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
   vtkSMProxy* proxy = pxm->NewProxy(this->Group.c_str(), this->Name.c_str());
   proxy->SetConnectionID(cid);
   proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
   proxy->UpdateVTKObjects();
-
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() 
-         << "SetReportInterpreterErrors" << 0
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-         << proxy->GetID() << "CanReadFile" << filename
-         << vtkClientServerStream::End;
-  pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
-  pm->GetLastResult(cid,
-    vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
-  stream << vtkClientServerStream::Invoke
-         << pm->GetProcessModuleID() 
-         << "SetReportInterpreterErrors" << 1
-         << vtkClientServerStream::End;
-  pm->SendStream(cid, vtkProcessModule::DATA_SERVER_ROOT, stream);
+  bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
   proxy->Delete();
-  return (canRead != 0);
+  return canRead;
 }
 
 vtkStandardNewMacro(vtkSMReaderFactory);
-vtkCxxRevisionMacro(vtkSMReaderFactory, "1.1");
+vtkCxxRevisionMacro(vtkSMReaderFactory, "1.2");
 //----------------------------------------------------------------------------
 vtkSMReaderFactory::vtkSMReaderFactory()
 {
@@ -507,6 +485,53 @@ bool vtkSMReaderFactory::TestFileReadability(const char* filename, vtkIdType cid
     }
 
   return false;
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMReaderFactory::CanReadFile(const char* filename, vtkSMProxy* proxy)
+{
+  // Assume that it can read the file if CanReadFile does not exist.
+  int canRead = 1;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() 
+         << "SetReportInterpreterErrors" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << proxy->GetID() << "CanReadFile" << filename
+         << vtkClientServerStream::End;
+  pm->SendStream(proxy->GetConnectionID(), 
+    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
+  pm->GetLastResult(proxy->GetConnectionID(),
+    vtkProcessModule::GetRootId(proxy->GetServers())).GetArgument(0, 0, &canRead);
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() 
+         << "SetReportInterpreterErrors" << 1
+         << vtkClientServerStream::End;
+  pm->SendStream(proxy->GetConnectionID(), 
+    vtkProcessModule::GetRootId(proxy->GetServers()), stream);
+  return (canRead != 0);
+}
+
+//----------------------------------------------------------------------------
+bool vtkSMReaderFactory::CanReadFile(const char* filename, 
+  const char* readerxmlgroup, const char* readerxmlname, vtkIdType cid)
+{
+  vtkSMProxy* proxy = vtkSMProxyManager::GetProxyManager()->NewProxy(
+    readerxmlgroup, readerxmlname);
+  if (!proxy)
+    {
+    return false;
+    }
+  proxy->SetConnectionID(cid);
+  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->UpdateVTKObjects();
+  bool canRead = vtkSMReaderFactory::CanReadFile(filename, proxy);
+  proxy->Delete();
+  return canRead;
 }
 
 //----------------------------------------------------------------------------

@@ -149,8 +149,9 @@ class _State(object):
             raise BlotishError("No filename specified.")
         if not self._reader:
             # matches patterns that end with "spcth" or spcth.<num>
-            if re.match(".*spcth($|(?:\.\d+))", self.filename.lower()):
-
+            if paraview.servermanager.vtkSMReaderFactory.CanReadFile(\
+              self.filename, "sources", "spcthreader",\
+              paraview.servermanager.ActiveConnection.ID):
                 # For the spy plot reader we will turn on all variables
                 # and then apply the Extract CTH Parts filter to give us
                 # something to work with

@@ -39,6 +39,7 @@
 
 class vtkStringList;
 class vtkPVXMLElement;
+class vtkSMProxy;
 
 class VTK_EXPORT vtkSMReaderFactory : public vtkSMObject
 {
@@ -114,7 +115,16 @@ public:
   // "Supported Files (*.vtk *.pvd);;PVD Files (*.pvd);;VTK Files (*.vtk)"
   // \endverbatim
   const char* GetSupportedFileTypes(vtkIdType cid);
- 
+
+  // Description:
+  // Helper method to check if the reader can read the given file. This is a
+  // generic method that simply tries to call CanReadFile() on the reader. If
+  // the reader des not support CanReadFile() then we assume the reader can read
+  // the file, and return true.
+  static bool CanReadFile(const char* filename, vtkSMProxy* reader);
+  static bool CanReadFile(const char* filename, const char* readerxmlgroup,
+    const char* readerxmlname, vtkIdType cid);
+
 //BTX
 protected:
   vtkSMReaderFactory();
