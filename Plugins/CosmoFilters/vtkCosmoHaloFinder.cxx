@@ -89,7 +89,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.7");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.8");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -178,11 +178,11 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   this->v = new ValueIdPair[this->npart];
   for (int i=0; i<this->npart; i++)
     {
-    this->v[i].value = this->data[DATA_X][i];
     this->v[i].id = i;
     }
 
   this->Reorder(0, this->npart, DATA_X);
+  delete [] this->v;
 
   this->seq = new int[this->npart];
   for (int i=0; i<this->npart; i++)
@@ -204,6 +204,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   this->ht = new int[this->npart];
   this->halo = new int[this->npart];
   this->nextp = new int[this->npart];
+  // to make sure tag matches
   int* pt = new int[this->npart];
 
   for (int i = 0; i < this->npart; i++)
@@ -264,7 +265,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
     {
     hID->SetValue(i, 
                   ((hsize[this->ht[i]] < this->pmin) 
-                   ? -1 : pt[ht[i]]));
+                   ? -1 : pt[this->ht[i]]));
     haloSize->SetValue(i, 
                        (hsize[this->ht[i]] < this->pmin) 
                        ? 0 : hsize[this->ht[i]]);
@@ -294,7 +295,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* request,
   delete[] this->ub;
 
   delete[] this->seq;
-  delete[] this->v;
+  // delete[] this->v done earlier
 
   return 1;
 }
@@ -318,7 +319,6 @@ void vtkCosmoHaloFinder::Reorder(int first, int last,
     }
 
   // non-base cases
-  // preprocessing
   for (int i = first; i < last; i = i + 1)
     {
     this->v[i].value = this->data[dataFlag][this->v[i].id];
