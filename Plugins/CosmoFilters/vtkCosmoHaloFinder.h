@@ -98,12 +98,6 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   vtkTypeRevisionMacro(vtkCosmoHaloFinder,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  /*
-  // Number of particles seeded in each dim of the original simulation app. From the source.
-  vtkSetMacro(np,int);
-  vtkGetMacro(np,int);
-  */
-
   // Minimal number of particles needed before a group is called a halo.
   vtkSetMacro(pmin,int);
   vtkGetMacro(pmin,int);
@@ -120,13 +114,12 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   vtkSetMacro(Periodic,bool);
   vtkGetMacro(Periodic,bool);
 
-  // Process the complete time series
-  vtkSetMacro(BatchMode, bool);
-  vtkGetMacro(BatchMode, bool);
-
-  void SetOutputDirectory(const char* dir);
-
  protected:
+  vtkCosmoHaloFinder();
+  ~vtkCosmoHaloFinder();
+
+  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+
   // np.in
   int np;
   double rL;
@@ -134,69 +127,31 @@ class VTK_EXPORT vtkCosmoHaloFinder : public vtkUnstructuredGridAlgorithm
   int pmin;
   bool Periodic;
 
-  // if true, the filter will process all the time steps, otherwise only the current time step
-  bool BatchMode;
-  // output path for the new dataset
-
   // internal state
   int npart;
-  int nhalo;
-  int nhalopart;
-  int realnpart;
-
-  //  float *xx, *yy, *zz, *vx, *vy, *vz, *pm;
-  int *pt;
-  int *ht;
-
-  //  vtkDataArray *velocity, *mass, *tag, *hID;
-
-  //  float xscal;
 
   int *halo;
   int *nextp;
 
+  ValueIdPair *v;
   int *seq;
 
-  ValueIdPair *v;
+  int *ht;
+
   float **data;
 
   float **lb;
   float **ub;
 
-  vtkCosmoHaloFinder();
-  ~vtkCosmoHaloFinder();
+  void Reorder(int, int, int);
+  void ComputeLU(int, int);
+  void MyFOF(int, int, int);
+  void Merge(int, int, int, int, int);
 
-  virtual int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  virtual int FillInputPortInformation(int port, vtkInformation* info);
-  virtual int RequestInformation(vtkInformation* request,
-                                 vtkInformationVector** inputVector,
-                                 vtkInformationVector* outputVector);
-  virtual int RequestUpdateExtent(vtkInformation*,
-                                  vtkInformationVector**,
-                                  vtkInformationVector*);
-
-  int CurrentTimeIndex;
-  int NumberOfTimeSteps;
-
-  char* outputDir;
-  
  private:
-
   vtkCosmoHaloFinder(const vtkCosmoHaloFinder&);  // Not implemented.
   void operator=(const vtkCosmoHaloFinder&);  // Not implemented.
 
-  //void Reading(vtkDataSet *);
-  //void Finding();
-  //void Writing(vtkUnstructuredGrid *);
-
-  void Reorder(int, int, int);
-
-  void myFOF(int, int, int);
-
-  void Merge(int, int, int, int, int);
-  void basicMerge(int, int);
-
-  void WritePVDFile(vtkInformationVector** inputVector);
 };
 
 #endif //  __vtkCosmoHaloFinder_h

@@ -14,28 +14,6 @@
      </InputProperty>
      
      <IntVectorProperty 
-        name="BatchMode" 
-        command="SetBatchMode" 
-        number_of_elements="1"
-        default_values="0" > 
-       <BooleanDomain name="bool"/>
-       <Documentation>
-         When this is on, process the whole time series and write the output as a new time series.
-       </Documentation>
-     </IntVectorProperty>
-
-     <StringVectorProperty 
-        name="OutputDirectory" 
-        command="SetOutputDirectory" 
-        label="Batch Mode Output Directory"
-        number_of_elements="1"
-        default_values="./halo/"> 
-        <Documentation>
-          The output directory for the data when running in batch mode.
-        </Documentation>
-     </StringVectorProperty>
-     
-     <IntVectorProperty 
         name="pmin" 
         command="Setpmin" 
         number_of_elements="1"
@@ -56,6 +34,7 @@
      <DoubleVectorProperty 
         name="rL" 
         command="SetrL" 
+        label="rL"
         number_of_elements="1"
         default_values="90.140845070423" > 
        <Documentation>
