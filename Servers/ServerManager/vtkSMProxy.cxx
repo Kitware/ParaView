@@ -38,7 +38,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.115");
+vtkCxxRevisionMacro(vtkSMProxy, "1.116");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 vtkCxxSetObjectMacro(vtkSMProxy, Hints, vtkPVXMLElement);
@@ -1578,6 +1578,7 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
       {
       // UpdatePropertyEvent is fired only for exposed properties.
       this->InvokeEvent(vtkCommand::UpdatePropertyEvent, (void*)exposed_name);
+      this->MarkModified(this);
       }
     }
 
@@ -1717,8 +1718,11 @@ void vtkSMProxy::PostUpdateData()
       this->GetProducerProxy(i)->PostUpdateData();
       }
     }
-  this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
-  this->NeedsUpdate = false;
+  if (this->NeedsUpdate)
+    {
+    this->InvokeEvent(vtkCommand::UpdateDataEvent, 0);
+    this->NeedsUpdate = false;
+    }
 }
 
 //----------------------------------------------------------------------------
