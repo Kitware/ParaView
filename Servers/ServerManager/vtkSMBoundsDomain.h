@@ -107,6 +107,8 @@ protected:
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented
+
+  void SetDomainValues(double bounds[6]);
 };
 
 #endif

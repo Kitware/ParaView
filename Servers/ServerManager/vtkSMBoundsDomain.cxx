@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.15");
 
 vtkCxxSetObjectMacro(vtkSMBoundsDomain,InputInformation,vtkPVDataInformation)
 
@@ -192,10 +192,51 @@ void vtkSMBoundsDomain::UpdateOriented()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMBoundsDomain::SetDomainValues(double bounds[6])
+{
+  if (this->Mode == vtkSMBoundsDomain::NORMAL)
+    {
+    for (int j = 0; j < 3; j++)
+      {
+      this->AddMinimum(j, bounds[2*j]);
+      this->AddMaximum(j, bounds[2*j+1]);
+      }
+    }
+  else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
+    {
+    double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
+                       (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
+                       (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
+    // Never use 0 min/max.
+    if (magn == 0)
+      {
+      magn = 1;
+      }
+    this->AddMinimum(0, -magn/2.0);
+    this->AddMaximum(0,  magn/2.0);
+    }
+  else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
+    {
+    double maxbounds = bounds[1] - bounds[0];
+    maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
+    maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
+    maxbounds *= this->ScaleFactor;
+    // Never use 0 maxbounds.
+    if (maxbounds == 0)
+      {
+      maxbounds = this->ScaleFactor;
+      }
+    this->AddMinimum(0, 0);
+    this->AddMaximum(0, maxbounds);
+    }
+
+}
+
+//---------------------------------------------------------------------------
 void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
 {
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(pp);
-  unsigned int i, j;
+  unsigned int i;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
     {
@@ -211,31 +252,7 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
         }
       double bounds[6];
       info->GetBounds(bounds);
-      if (this->Mode == vtkSMBoundsDomain::NORMAL)
-        {
-        for (j = 0; j < 3; j++)
-          {
-          this->AddMinimum(j, bounds[2*j]);
-          this->AddMaximum(j, bounds[2*j+1]);
-          }
-        }
-      else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
-        {
-        double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
-                           (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
-                           (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
-        this->AddMinimum(0, -magn);
-        this->AddMaximum(0,  magn);
-        }
-      else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
-        {
-        double maxbounds = bounds[1] - bounds[0];
-        maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
-        maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
-        maxbounds *= this->ScaleFactor;
-        this->AddMinimum(0, 0);
-        this->AddMaximum(0, maxbounds);
-        }
+      this->SetDomainValues(bounds);
       return;
       }
     }
@@ -257,31 +274,7 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
         }
       double bounds[6];
       info->GetBounds(bounds);
-      if (this->Mode == vtkSMBoundsDomain::NORMAL)
-        {
-        for (j = 0; j < 3; j++)
-          {
-          this->AddMinimum(j, bounds[2*j]);
-          this->AddMaximum(j, bounds[2*j+1]);
-          }
-        }
-      else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
-        {
-        double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
-                           (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
-                           (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
-        this->AddMinimum(0, -magn/2.0);
-        this->AddMaximum(0,  magn/2.0);
-        }
-      else if (this->Mode == vtkSMBoundsDomain::SCALED_EXTENT)
-        {
-        double maxbounds = bounds[1] - bounds[0];
-        maxbounds = (bounds[3] - bounds[2] > maxbounds) ? (bounds[3] - bounds[2]) : maxbounds;
-        maxbounds = (bounds[5] - bounds[4] > maxbounds) ? (bounds[5] - bounds[4]) : maxbounds;
-        maxbounds *= this->ScaleFactor;
-        this->AddMinimum(0, 0);
-        this->AddMaximum(0, maxbounds);
-        }
+      this->SetDomainValues(bounds);
       return;
       }
     }
