@@ -1924,6 +1924,19 @@
          If this property is false, then 32-bit tags are used for the tag field.  Otherwise, 64-bit tags are used.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="ReadStriped"
+        command="SetReadStriped"
+        label="Read in Parallel Stripes"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If running in parallel, when property is false, then it will read the points blockwise.  Otherwise, processors will stripe (stride) through the file.  Has no effect if running in serial mode.
+       </Documentation>
+     </IntVectorProperty>
+
    <!-- End CosmoReaderCore -->
    </SourceProxy>
 
@@ -1954,6 +1967,7 @@
          <Property name="PointArrayStatus" />
          <Property name="MakeCells" />
          <Property name="TagSize" />
+         <Property name="ReadStriped" />
        </ExposedProperties>
      </SubProxy>
 

@@ -63,11 +63,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // vtkCosmoHaloFinder is a filter object that operates on the unstructured 
 // grid of all particles and assigns each particle a halo id.
 //
-// .SECTION Thanks
-// Katrin Heitmann (heitmann@lanl.gov) provided the original code.
-// Lee Ankeny (laa@lanl.gov) and James Ahrens (ahrens@lanl.gov) adapted
-// that code for VTK.
-//
 // .SECTION Note
 // This finder implements a recursive algorithm.
 // Linked lists are used for halos.

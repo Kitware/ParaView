@@ -89,7 +89,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.11");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.12");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
@@ -143,7 +143,7 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
   vtkDebugMacro(<< "np = " << this->np);
 
   // normalize
-  float xscal = this->rL / (1.0 * this->np);
+  float xscal = (float)this->np / this->rL;
 
   this->data = new float*[NUM_DATA_DIMS];
   for (int i=0; i<NUM_DATA_DIMS; i++)
@@ -169,9 +169,9 @@ int vtkCosmoHaloFinder::RequestData(vtkInformation* vtkNotUsed(request),
       return 0;
       }
 
-    this->data[DATA_X][i] = xx / xscal;
-    this->data[DATA_Y][i] = yy / xscal;
-    this->data[DATA_Z][i] = zz / xscal;
+    this->data[DATA_X][i] = xx * xscal;
+    this->data[DATA_Y][i] = yy * xscal;
+    this->data[DATA_Z][i] = zz * xscal;
     }
 
   // reorder
