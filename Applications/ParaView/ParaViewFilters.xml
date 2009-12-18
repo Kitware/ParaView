@@ -96,6 +96,7 @@
   <Proxy group="filters" name="GenerateIdScalars"/>
   <Proxy group="filters" name="Glyph" />
   <Proxy group="filters" name="Gradient" />
+  <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
