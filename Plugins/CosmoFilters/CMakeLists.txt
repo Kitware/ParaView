@@ -5,7 +5,7 @@ SET(COSMO_FILTERS_SOURCES
 #    vtkCosmoHaloCountFilter.cxx
 #    vtkCosmoHaloClassFilter.cxx
     vtkCosmoHaloFinder.cxx 
-    vtkPCosmoHaloFinder.cxx
+#    vtkPCosmoHaloFinder.cxx
 #    vtkCosmoDistillerSTD.cxx
 #    vtkCosmoHaloSorter.cxx
 #    vtkCosmoCorrelater.cxx
