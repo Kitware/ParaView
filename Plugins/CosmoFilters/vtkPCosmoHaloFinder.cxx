@@ -81,7 +81,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkstd/algorithm"
 
-vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.1");
+vtkCxxRevisionMacro(vtkPCosmoHaloFinder, "1.2");
 vtkStandardNewMacro(vtkPCosmoHaloFinder);
 
 /****************************************************************************/
@@ -156,7 +156,8 @@ int vtkPCosmoHaloFinder::RequestInformation(
     return 0;
     }
   
-  this->Superclass::RequestInformation(request, inputVector, outputVector);
+  return this->Superclass::RequestInformation
+    (request, inputVector, outputVector);
 }
 
 //----------------------------------------------------------------------------
@@ -168,6 +169,7 @@ int vtkPCosmoHaloFinder::RequestData(
   //int rank = this->Controller->GetLocalProcessId();
   //int size = this->Controller->GetNumberOfProcesses();
 
-  this->Superclass::RequestData(request, inputVector, outputVector);
+  return this->Superclass::RequestData
+    (request, inputVector, outputVector);
 }
 
