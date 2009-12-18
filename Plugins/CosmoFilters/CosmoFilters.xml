@@ -1,6 +1,6 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="filters">
-   <SourceProxy name="HaloFinder" class="vtkCosmoHaloFinder" label="Cosmology Halo Finder">
+   <SourceProxy name="HaloFinder" class="vtkPCosmoHaloFinder" label="Cosmology Halo Finder">
      <InputProperty
         name="Input"
         command="SetInputConnection">
@@ -9,7 +9,7 @@
             <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
+            <DataType value="vtkUnstructuredGrid"/>
           </DataTypeDomain>
      </InputProperty>
      

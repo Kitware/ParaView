@@ -76,12 +76,6 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-#include "vtkTimerLog.h"
-#include "vtkMath.h"
-#include "vtkDirectory.h"
-#include "vtkXMLUnstructuredGridWriter.h"
-
-#include "vtksys/ios/fstream"
 #include "vtkstd/algorithm"
 
 #define NUM_DATA_DIMS 3
@@ -89,7 +83,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DATA_Y 1
 #define DATA_Z 2
 
-vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.12");
+vtkCxxRevisionMacro(vtkCosmoHaloFinder, "1.13");
 vtkStandardNewMacro(vtkCosmoHaloFinder);
 
 //----------------------------------------------------------------------------
