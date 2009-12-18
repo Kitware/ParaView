@@ -47,7 +47,7 @@
 #include <ctime>
 
 
-vtkCxxRevisionMacro(vtkAMRDualContour, "1.6");
+vtkCxxRevisionMacro(vtkAMRDualContour, "1.7");
 vtkStandardNewMacro(vtkAMRDualContour);
 
 static int vtkAMRDualIsoEdgeToPointsTable[12][2] =
@@ -236,7 +236,8 @@ vtkIdType* vtkAMRDualContourEdgeLocator::GetEdgePointer(
   int axis = (ptIdx0 ^ ptIdx1);
   // Some fancy bit logic to increment cell index based on edge here.
   // Bitwise exclusive-or to mask the edge axis.
-  ptIdx0 = (ptIdx0 ^ axis);
+  //ptIdx0 = (ptIdx0 ^ axis); // This had a flaw.
+  ptIdx0 = (ptIdx0 & ptIdx1);
   // Adjusted index to 3 axis template.
   int xp0 = xCell;
   int yp0 = yCell;
