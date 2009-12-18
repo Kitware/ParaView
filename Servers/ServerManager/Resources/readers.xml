@@ -1879,6 +1879,9 @@
         number_of_elements="1"
         default_values="1" >
         <IntRangeDomain name="range" min="1" />
+       <Documentation>
+         The read will skip through the file only reading every stride-th point, therefore the data will be 1/stride in size.
+       </Documentation>
      </IntVectorProperty>
 
      <StringVectorProperty
@@ -1909,7 +1912,7 @@
         default_values="1" > 
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is set to 1, a VTK_VERTEX cell is created for each point.
+         If this property is set, a VTK_VERTEX cell is created for each point.
        </Documentation>
      </IntVectorProperty> 
 
@@ -1921,21 +1924,33 @@
         default_values="0" >
        <BooleanDomain name="bool"/>
        <Documentation>
-         If this property is false, then 32-bit tags are used for the tag field.  Otherwise, 64-bit tags are used.
+         If this property is set, then 32-bit tags are used for the tag field.  Otherwise, if it is unset, 64-bit tags are used.
        </Documentation>
      </IntVectorProperty>
 
      <IntVectorProperty
-        name="ReadStriped"
-        command="SetReadStriped"
-        label="Read in Parallel Stripes"
+        name="ReadProcessors"
+        command="SetReadProcessors"
         number_of_elements="1"
         default_values="0" >
-       <BooleanDomain name="bool"/>
+        <IntRangeDomain name="range" min="0" />
        <Documentation>
-         If running in parallel, when property is false, then it will read the points blockwise.  Otherwise, processors will stripe (stride) through the file.  Has no effect if running in serial mode.
+         This is the number of processors that will actually read the file.  To redistribute the points, use the D3 filter.  0 means use all processors, and a number greater than the number of processors will be clamped to the number of processors.  Can run out of memory if Read Processors is too small and file is large (because redistribution is not done yet).  Has no effect if running in serial mode.
        </Documentation>
      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TakeTurns"
+        command="SetTakeTurns"
+        label="Take Turns Reading"
+        number_of_elements="1"
+        default_values="1" >
+       <BooleanDomain name="bool"/>
+       <Documentation>
+         If running in parallel, when property is set, then processors will take turns reading their file portion in one go.  Otherwise, if this property is unset, processors will read simultaneously.  Has no effect if running in serial mode.
+       </Documentation>
+     </IntVectorProperty>
+
 
    <!-- End CosmoReaderCore -->
    </SourceProxy>
@@ -1967,7 +1982,8 @@
          <Property name="PointArrayStatus" />
          <Property name="MakeCells" />
          <Property name="TagSize" />
-         <Property name="ReadStriped" />
+         <Property name="ReadProcessors" />
+         <Property name="TakeTurns" />
        </ExposedProperties>
      </SubProxy>
 
