@@ -35,6 +35,7 @@ paraview_build_optional_plugin(NetDMFReader "NetDMF file format reader" NetDMFRe
 paraview_build_optional_plugin(Prism "Prism" PrismPlugins ON)
 paraview_build_optional_plugin(PointSprite "Point Sprites" PointSprite ON) 
 paraview_build_optional_plugin(pvblot "pvblot" pvblot OFF)
+paraview_build_optional_plugin(SierraPlotTools "SierraPlotTools" SierraPlotTools OFF)
 paraview_build_optional_plugin(SLACTools "SLACTools" SLACTools ON)
 #paraview_build_optional_plugin(SQLDatabaseGraphSourcePanel "SQLDatabaseGraphSourcePanel" SQLDatabaseGraphSourcePanel OFF) 
 #paraview_build_optional_plugin(SQLDatabaseTableSourcePanel "SQLDatabaseTableSourcePanel" SQLDatabaseTableSourcePanel OFF) 
