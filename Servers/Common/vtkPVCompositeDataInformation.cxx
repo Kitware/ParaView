@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.16");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.17");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -299,8 +299,6 @@ void vtkPVCompositeDataInformation::CopyToStream(
     this->Internal->ChildrenInformation.size());
   *css << numChildren;
   
-  // If data is a vtkHierarchicalBoxDataSet or sub-class, do not get the
-  // information for sub-datasets. There may be a lot of them.
   for(unsigned i=0; i<numChildren; i++)
     {
     vtkPVDataInformation* dataInf = this->Internal->ChildrenInformation[i].Info;
