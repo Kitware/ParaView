@@ -206,6 +206,13 @@
         </ProxyGroupDomain>
       </ProxyProperty>
 
+      <ProxyProperty name="RenderPass" 
+                     command="SetPass">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderpasses"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
     <!-- End Renderer -->
     </Proxy>
 
