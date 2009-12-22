@@ -87,6 +87,14 @@ public:
   vtkGetMacro(TriangulateCap,int);
   vtkBooleanMacro(TriangulateCap,int);
 
+  // Description:
+  // An option to turn off copying ghost values across process boundaries.
+  // If the ghost values are already correct, then the extra communication is 
+  // not necessary.  If this assumption is wrong, this option will produce
+  // cracks / seams.
+  vtkSetMacro(SkipGhostCopy,int);
+  vtkGetMacro(SkipGhostCopy,int);
+  vtkBooleanMacro(SkipGhostCopy,int);
 
 protected:
   vtkAMRDualContour();
@@ -100,6 +108,7 @@ protected:
   int EnableMultiProcessCommunication;
   int EnableMergePoints;
   int TriangulateCap;
+  int SkipGhostCopy;
 
   //BTX
   virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
