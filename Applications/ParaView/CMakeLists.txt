@@ -1,5 +1,6 @@
 INCLUDE(${PARAVIEW_BRANDING_CMAKE_FILE})
 INCLUDE(${PARAVIEW_PLUGINS_CMAKE_FILE})
+INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewBrandingCPack.cmake)
 
 #------------------------------------------------------------------------------
 # Add extra library containing custom code for the client.
@@ -66,3 +67,20 @@ IF (BUILD_TESTING)
 ENDIF (BUILD_TESTING)
 
 
+#########################################################################
+build_paraview_client_cpack_config_init(
+    PACKAGE_NAME "ParaView"
+    ORGANIZATION "Kitware Inc."
+    VERSION_MAJOR "${PARAVIEW_VERSION_MAJOR}"
+    VERSION_MINOR "${PARAVIEW_VERSION_MINOR}"
+    VERSION_PATCH "${PARAVIEW_VERSION_PATCH}"
+    DESCRIPTION "ParaView is a scientific visualization tool"
+    LICENSE_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
+    DESCRIPTION_FILE "${ParaView_SOURCE_DIR}/License_v1.2.txt"
+    PACKAGE_EXECUTABLES "paraview;ParaView"
+)
+
+build_paraview_client_cpack_config()
+# Setup CPack
+#INCLUDE(ParaView3CPack.cmake)
+#########################################################################

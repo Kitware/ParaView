@@ -249,11 +249,6 @@ IF (BUILD_EXAMPLES)
 ENDIF (BUILD_EXAMPLES)
 
 #########################################################################
-# Setup CPack
-
-INCLUDE(ParaView3CPack.cmake)
-
-#########################################################################
 # Additional definitions for ParaViewConfig.cmake
 SET(PARAVIEW_USE_FILE "${ParaView_SOURCE_DIR}/ParaViewUse.cmake")
 SET(PARAVIEW_VTK_DIR "${ParaView_BINARY_DIR}/VTK")
